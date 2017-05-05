@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { UserConfig } from '../users/Users';
-import Util from '../Util';
 
 // CREATE TABLE versions (id integer PRIMARY KEY, \
 // objectType text NOT NULL, objectId integer NOT NULL, \

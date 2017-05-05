@@ -48,7 +48,10 @@ THE SOFTWARE.
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
-import { Query, QueryHandler } from '../../../app/query/QueryHandler';
+
+import Query from '../../../app/query/Query';
+import QueryHandler from '../../../app/query/QueryHandler';
+import {QueryResponse} from '../../../app/query/QueryRouter';
 import QueryError from '../../../app/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
@@ -66,40 +69,46 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: Query): Promise<string>
+  public async handleQuery(request: Query): Promise<QueryResponse>
   {
     const type = request.type;
     const body = request.body;
 
     if (type === 'search')
     {
-      return new Promise<string>((resolve, reject) =>
-      {
-        this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
-      });
-
       // NB: streaming not yet implemented
+      return new Promise<QueryResponse>((resolve, reject) =>
+      {
+        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
+      });
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  private makeQueryCallback<T>(resolve: (T) => void, reject: (Error) => void)
+  private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
   {
-    return (error: Error, response: T) =>
+    return (error: Error, response: any) =>
     {
       if (error)
       {
         if (QueryError.isElasticQueryError(error))
         {
-          resolve(QueryError.composeFromElasticError(error));
+          const res: QueryResponse = QueryError.composeFromElasticError(error).getMidwayErrorObject();
+          resolve(res);
         } else
         {
-          reject(error);
+          reject(error); // this will be handled by RouteError.RouteErrorHandler
         }
       } else
       {
-        resolve(response);
+        if (typeof response !== 'object')
+        {
+          winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
+          response = {response};
+        }
+        const res: QueryResponse = {results: [response]};
+        resolve(res);
       }
     };
   }

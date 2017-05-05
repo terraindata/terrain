@@ -55,7 +55,7 @@ import QueryRouter from './query/QueryRouter';
 import SchemaRouter from './schema/SchemaRouter';
 import StatusRouter from './status/StatusRouter';
 import UserRouter from './users/UserRouter';
-import Util from './Util';
+import * as Util from './Util';
 import VersionRouter from './versions/VersionRouter';
 
 const AppRouter = new KoaRouter();

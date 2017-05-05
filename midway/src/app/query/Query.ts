@@ -44,57 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-
-import * as Util from '../Util';
-import { UserConfig, Users } from './Users';
-
-const Router = new KoaRouter();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export interface Query
 {
-  winston.info('getting all users');
-  ctx.body = await Users.get();
-});
+  database: number;
+  type: string;
+  body: object | string;
+}
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting user ID ' + ctx.params.id);
-  ctx.body = await Users.get(ctx.params.id);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // update user, must be super user or authenticated user updating own info
-  winston.info('user update');
-  const user = ctx.request.body;
-  Util.verifyParameters(user.body, ['email', 'password']);
-  user.body.id = ctx.params.id;
-  user.callingUser = ctx.state.user;
-  // if superuser or id to be updated is current user
-  if (ctx.state.user.isSuperUser || ctx.request.body.id === ctx.params.id)
-  {
-    ctx.body = await Users.createOrUpdate(user);
-  }
-});
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // create a user, must be admin
-  winston.info('create user');
-  const user = ctx.request.body;
-  Util.verifyParameters(user.body, ['email', 'password']);
-  if (user.body.id)
-  {
-    throw Error('Invalid parameter user ID');
-  }
-
-  if (ctx.state.user.isSuperUser)
-  {
-    ctx.body = await Users.createOrUpdate(user);
-  }
-});
-
-export default Router;
+export default Query;

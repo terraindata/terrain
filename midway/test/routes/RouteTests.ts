@@ -236,6 +236,7 @@ describe('Item route tests', () =>
         accessToken: 'AccessToken',
         body: {
           name: 'Test Item',
+          status: 'LIVE',
         },
       })
       .expect(200)
@@ -314,6 +315,30 @@ describe('Item route tests', () =>
         fail('POST /midway/v1/items/ request returned an error: ' + error);
       });
   });
+
+  test('Update with invalid status: POST /midway/v1/items/', () =>
+  {
+    return request(server)
+      .post('/midway/v1/items/2')
+      .send({
+        id: 2,
+        accessToken: testUserAccessToken,
+        body: {
+          id: 2,
+          name: 'Test Item',
+          status: 'BUILD',
+        },
+      })
+      .expect(500)
+      .then((response) =>
+      {
+        winston.info('response: "' + response + '"');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
 });
 
 describe('Schema route tests', () =>
@@ -340,7 +365,7 @@ describe('Schema route tests', () =>
 
 describe('Query route tests', () =>
 {
-  test('POST /midway/v1/query', () =>
+  test('Elastic Search Query: POST /midway/v1/query', () =>
   {
     return request(server)
       .post('/midway/v1/query/')
@@ -363,7 +388,8 @@ describe('Query route tests', () =>
       .then((response) =>
       {
         // winston.info(JSON.stringify(response));
-        expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        expect(JSON.parse(response.text).result.hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        expect(JSON.parse(response.text).status).toEqual('ok');
       })
       .catch((error) =>
       {

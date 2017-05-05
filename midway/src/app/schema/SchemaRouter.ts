@@ -52,7 +52,7 @@ import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 
-import Util from '../Util';
+import * as Util from '../Util';
 
 const Router = new KoaRouter();
 
