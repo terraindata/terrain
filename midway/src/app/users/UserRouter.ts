@@ -80,7 +80,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   {
     if (user.id !== Number(ctx.params.id))
     {
-      throw Error('User ID does not match the supplied id in the URL');
+      throw new Error('User ID does not match the supplied id in the URL');
     }
   }
 
@@ -100,7 +100,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   Util.verifyParameters(user, ['email', 'password']);
   if (user.id)
   {
-    throw Error('Invalid parameter user ID');
+    throw new Error('Invalid parameter user ID');
   }
 
   if (ctx.state.user.isSuperUser)
@@ -109,7 +109,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   }
   else
   {
-    throw Error('Only superuser can create new users.');
+    throw new Error('Only superuser can create new users.');
   }
 });
 

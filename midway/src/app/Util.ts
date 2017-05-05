@@ -68,7 +68,7 @@ export function verifyParameters(parameters: any, required: string[]): void
 {
   if (!parameters)
   {
-    throw Error('No parameters found.');
+    throw new Error('No parameters found.');
   }
 
   for (const key of required)

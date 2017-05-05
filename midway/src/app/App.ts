@@ -121,7 +121,7 @@ class App
     }
     else
     {
-      throw Error('Error parsing database connection parameters.');
+      throw new Error('Error parsing database connection parameters.');
     }
   }
 
@@ -148,7 +148,7 @@ class App
     }
     else
     {
-      throw Error('Error initializing Nodeway system database.');
+      throw new Error('Error initializing Nodeway system database.');
     }
   }
 }
