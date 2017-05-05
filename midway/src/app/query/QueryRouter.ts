@@ -51,7 +51,7 @@ import * as winston from 'winston';
 import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import Util from '../Util';
+import * as Util from '../Util';
 import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
