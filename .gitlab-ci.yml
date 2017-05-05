@@ -22,11 +22,13 @@ cache:
 
 before_script:
   - apt-get update && apt --assume-yes install parallel mysql-client sed
-  - sed -i 's/mysqladmin\(.*\)-h127.0.0.1/mysqladmin \1-hmoviesdb\-mysql/g' midway/test/scripts/setup_env.sh
-  - sed -i 's#http://127.0.0.1:$elastic#http://moviesdb\-elk:$elastic#g' midway/test/scripts/setup_env.sh
-  - sed -i 's#http://localhost:9200#http://moviesdb\-elk:9200#g' midway/test/database/elastic/client/ElasticClientTests.ts midway/test/database/elastic/tasty/ElasticExecutorTests.ts midway/test/database/elastic/tasty/ElasticGeneratorTests.ts midway/test/routes/RouteTests.ts
-  - sed -i 's/host\: \'localhost\'/host\: \'moviesdb\-mysql\'/g' midway/test/database/tasty/MySQLExecutorTests.ts
-  - sed -i 's/host\: \'localhost\'/host\: \'moviesdb\-mysql\'/g' midway/test/utils/CopyDataFromSqlToElastic.ts
+  - sed -i 's/mysqladmin\(.*\)-h127.0.0.1/mysqladmin \1-hmoviesdb-mysql/g' midway/test/scripts/setup_env.sh
+  - sed -i 's#http://127.0.0.1:$elastic#http://moviesdb-elk:$elastic#g' midway/test/scripts/setup_env.sh
+  - sed -i 's#http://localhost:9200#http://moviesdb-elk:9200#g' midway/test/database/elastic/client/ElasticClientTests.ts midway/test/database/elastic/tasty/ElasticExecutorTests.ts midway/test/database/elastic/tasty/ElasticGeneratorTests.ts midway/test/routes/RouteTests.ts
+  - >
+    sed -i "s/host: 'localhost'/host: 'moviesdb-mysql'/g" midway/test/database/mysql/tasty/MySQLExecutorTests.ts
+  - >
+    sed -i "s/host: 'localhost'/host: 'moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
   - yarn global add webpack
   - yarn global add webpack-dev-server
   - yarn install
@@ -39,4 +41,4 @@ test_backends:
   script:
    - yarn install
    - yarn run fix
-   - yarn run test-back
+   - yarn run test-back-all

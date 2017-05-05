@@ -44,72 +44,77 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// import ElasticConfig from '../ElasticConfig';
-// import ElasticCluster from '../client/ElasticCluster';
-// import ElasticIndices from '../client/ElasticIndices';
-import * as winston from 'winston';
-
-import Query from '../../../app/query/Query';
-import QueryHandler from '../../../app/query/QueryHandler';
-import { QueryResponse } from '../../../app/query/QueryRouter';
-import QueryError from '../../../app/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
-import ElasticController from '../ElasticController';
-
-/**
- * Implements the QueryHandler interface for ElasticSearch
- */
-export default class ElasticQueryHandler extends QueryHandler
+export interface MidwayErrorItem
 {
-  private controller: ElasticController;
+  status: number;
+  title: string;
+  detail: string;
+  source: object;
+}
 
-  constructor(controller: ElasticController)
+export interface MidwayErrorObject
+{
+  errors: MidwayErrorItem[];
+}
+
+export class MidwayError
+{
+  public static fromJSON(json: string | MidwayErrorObject)
   {
-    super();
-    this.controller = controller;
-  }
-
-  public async handleQuery(request: Query): Promise<QueryResponse>
-  {
-    const type = request.type;
-    const body = request.body;
-
-    if (type === 'search')
+    const midwayError = Object.create(MidwayError.prototype);
+    if (typeof json === 'string')
     {
-      // NB: streaming not yet implemented
-      return new Promise<QueryResponse>((resolve, reject) =>
-      {
-        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
-      });
+      const jobject = JSON.parse(json);
+      midwayError.errorObject = jobject;
+    } else
+    {
+      midwayError.errorObject = json;
     }
-
-    throw new Error('Query type "' + type + '" is not currently supported.');
+    return midwayError;
   }
 
-  private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
+  public errorObject: MidwayErrorObject;
+
+  public constructor(status: number, title: string, detail: string, source: object)
   {
-    return (error: Error, response: any) =>
-    {
-      if (error)
-      {
-        if (QueryError.isElasticQueryError(error))
-        {
-          const res: QueryResponse = QueryError.composeFromElasticError(error).getMidwayErrorObject();
-          resolve(res);
-        } else
-        {
-          reject(error); // this will be handled by RouteError.RouteErrorHandler
-        }
-      } else
-      {
-        if (typeof response !== 'object')
-        {
-          winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
-          response = { response };
-        }
-        const res: QueryResponse = { results: [response] };
-        resolve(res);
-      }
-    };
+    const o: MidwayErrorItem = { status, title, detail, source };
+    this.errorObject = { errors: [o] };
+  }
+
+  public getMidwayErrorObject(): MidwayErrorObject
+  {
+    return this.errorObject;
+  }
+
+  // we may provide a iterator interface later
+  public getNthMidwayErrorItem(index): MidwayErrorItem
+  {
+    return this.errorObject.errors[index];
+  }
+
+  // get the first error object's status
+  public getStatus(): number
+  {
+    return this.getNthMidwayErrorItem(0).status;
+  }
+
+  // get the first error object's title
+  public getTitle(): string
+  {
+    return this.getNthMidwayErrorItem(0).title;
+  }
+
+  // get the first error object's detail
+  public getDetail(): string
+  {
+    return this.getNthMidwayErrorItem(0).detail;
+  }
+
+  // get the first error object's source
+  public getSource(): object
+  {
+    return this.getNthMidwayErrorItem(0).source;
   }
 }
+
+export default MidwayError;

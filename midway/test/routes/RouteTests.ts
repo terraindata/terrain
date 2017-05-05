@@ -47,6 +47,8 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import { MidwayError } from '../../src/app/MidwayError';
+import QueryError from '../../src/app/QueryError';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
@@ -365,7 +367,7 @@ describe('Schema route tests', () =>
 
 describe('Query route tests', () =>
 {
-  test('Elastic Search Query: POST /midway/v1/query', () =>
+  test('Elastic Search Query Result: POST /midway/v1/query', () =>
   {
     return request(server)
       .post('/midway/v1/query/')
@@ -387,13 +389,76 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        // winston.info(JSON.stringify(response));
-        expect(JSON.parse(response.text).result.hits).toEqual({ total: 27278, max_score: 0, hits: [] });
-        expect(JSON.parse(response.text).status).toEqual('ok');
+        winston.info(JSON.stringify(response));
+        expect(JSON.parse(response.text).results[0].hits).toEqual({ total: 27278, max_score: 0, hits: [] });
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + error);
+      });
+  });
+
+  test('Elastic Search Query Error: POST /midway/v1/query', () =>
+  {
+    return request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        database: 0,
+        type: 'search',
+        body: {
+          index: 'wrongindex',
+          type: 'data',
+          from: 0,
+          size: 0,
+          body: {
+            query: {},
+          },
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(JSON.stringify(response));
+        const midwayError: MidwayError = MidwayError.fromJSON(response.text);
+        expect(midwayError.getTitle()).toEqual('[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + error);
+      });
+  });
+
+  test('Elastic Search Route Error: POST /midway/v1/query', () =>
+  {
+    return request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        database: 0,
+        type: 'wrongtype',
+        body: {
+          index: 'wrongindex',
+          type: 'data',
+          from: 0,
+          size: 0,
+          body: {
+            query: {},
+          },
+        },
+      })
+      .expect(400)
+      .then((response) =>
+      {
+        winston.info(JSON.stringify(response));
+        const midwayError: MidwayError = MidwayError.fromJSON(response.text);
+        expect(midwayError.getTitle()).toEqual('Route /midway/v1/query/ has an error.');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + error);
       });
   });
 });
