@@ -68,7 +68,7 @@ export function verifyParameters(parameters: any, required: string[]): void
 {
   if (!parameters)
   {
-    throw Error('No parameters found.');
+    throw new Error('No parameters found.');
   }
 
   for (const key of required)
@@ -90,4 +90,18 @@ export function updateObject<T>(obj: T, newObj: T): T
     }
   }
   return obj;
+}
+
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+{
+  return (error: Error, response: T) =>
+  {
+    if (error)
+    {
+      reject(error);
+    } else
+    {
+      resolve(response);
+    }
+  };
 }

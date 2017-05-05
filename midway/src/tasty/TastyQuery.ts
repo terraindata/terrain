@@ -158,7 +158,7 @@ export class TastyQuery
   {
     if (!this.isTastyNode(node))
     {
-      throw Error('node argument is not a TastyNode.');
+      throw new Error('node argument is not a TastyNode.');
     }
   }
 }
