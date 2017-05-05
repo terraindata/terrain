@@ -29,9 +29,9 @@ before_script:
     sed -i "s/host: 'localhost'/host: 'moviesdb-mysql'/g" midway/test/database/mysql/tasty/MySQLExecutorTests.ts
   - >
     sed -i "s/host: 'localhost'/host: 'moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
-  - sudo yarn global add webpack
-  - sudo yarn global add webpack-dev-server
-  - sudo yarn install
+  - yarn add webpack
+  - yarn add webpack-dev-server
+  - yarn install
 
 lint:
   script:
