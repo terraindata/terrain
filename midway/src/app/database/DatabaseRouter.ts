@@ -49,7 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import { Databases } from './Databases';
+import { DatabaseConfig, Databases } from './Databases';
 
 const Router = new KoaRouter();
 const databases = new Databases();
@@ -69,7 +69,7 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('add new database');
-  const db = ctx.request.body.body;
+  const db: DatabaseConfig = ctx.request.body.body;
   Util.verifyParameters(db, ['name', 'dsn']);
   if (db.id)
   {
@@ -82,7 +82,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('update existing database');
-  const db = ctx.request.body.body;
+  const db: DatabaseConfig = ctx.request.body.body;
   if (!db.id)
   {
     db.id = ctx.params.id;
@@ -101,16 +101,19 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('connect to database');
+  ctx.body = await databases.connect(ctx.state.user, ctx.params.id);
 });
 
 Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('disconnect from database');
+  ctx.body = await databases.disconnect(ctx.state.user, ctx.params.id);
 });
 
 Router.post('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('get database schema');
+  ctx.body = await databases.schema(ctx.params.id);
 });
 
 export default Router;

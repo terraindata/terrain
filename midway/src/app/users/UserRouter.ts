@@ -50,6 +50,7 @@ import * as winston from 'winston';
 
 import * as Util from '../Util';
 import { UserConfig, Users } from './Users';
+export * from './Users';
 
 const Router = new KoaRouter();
 export const users = new Users();

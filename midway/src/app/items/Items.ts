@@ -77,13 +77,18 @@ export class Items
     return App.DB.delete(this.itemTable, { id } as ItemConfig);
   }
 
+  public async select(columns: string[], filter: object): Promise<ItemConfig[]>
+  {
+    return App.DB.select(this.itemTable, columns, filter) as Promise<ItemConfig[]>;
+  }
+
   public async get(id?: number): Promise<ItemConfig[]>
   {
     if (id !== undefined)
     {
-      return App.DB.select(this.itemTable, [], { id }) as any;
+      return this.select([], { id });
     }
-    return App.DB.select(this.itemTable, [], {}) as any;
+    return this.select([], {});
   }
 
   // both regular and superusers can create items

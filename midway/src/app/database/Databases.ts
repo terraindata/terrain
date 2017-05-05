@@ -44,16 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
 import { ItemConfig, items } from '../items/ItemRouter';
+import { UserConfig } from '../users/UserRouter';
+
+export interface DatabaseConfig
+{
+  id?: number;
+  name: string;
+  dsn: string;
+  status?: string;
+}
 
 export class Databases
 {
   constructor()
   {
-
+    winston.info('db root');
   }
 
   public async delete(id: number): Promise<object[]>
@@ -61,21 +71,43 @@ export class Databases
     return items.delete(id);
   }
 
-  public async get(filter: object): Promise<ItemConfig[]>
+  public async get(id?: number): Promise<ItemConfig[]>
   {
     if (id !== undefined)
     {
       return items.get(id);
     }
-    return items.query([], { type: 'database' } as ItemConfig);
+    return items.select([], { type: 'database' });
   }
 
-  public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
+  public async upsert(user: UserConfig, db: DatabaseConfig): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
+      const item: ItemConfig = {
+        name: db.name,
+        type: 'database',
+        meta: db.dsn,
+        status: db.status || '',
+      };
+      await items.upsert(user, item);
       resolve('Success');
     });
+  }
+
+  public async connect(user: UserConfig, id: number): Promise<string>
+  {
+    return Promise.resolve('Success');
+  }
+
+  public async disconnect(user: UserConfig, id: number): Promise<string>
+  {
+    return Promise.resolve('Success');
+  }
+
+  public async schema(id: number): Promise<string>
+  {
+    return Promise.resolve('Success');
   }
 }
 
