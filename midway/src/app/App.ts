@@ -164,7 +164,7 @@ class App
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter.routes());
-    this.app.use(serve({rootDir: './midway/src/assets', rootPath: '/assets'}));
+    this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
   }
 
   public listen(port: number = CmdLineArgs.port): http.Server
