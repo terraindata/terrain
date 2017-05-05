@@ -57,6 +57,7 @@ let testUserAccessToken: string;
 
 beforeAll((done) =>
 {
+  winston.level = 'debug';
   const options =
     {
       db: 'sqlite',
@@ -307,7 +308,7 @@ describe('Item route tests', () =>
           name: 'Test Item',
         },
       })
-      .expect(500)
+      .expect(400)
       .then((response) =>
       {
         winston.info('response: "' + response + '"');
@@ -331,7 +332,7 @@ describe('Item route tests', () =>
           status: 'BUILD',
         },
       })
-      .expect(500)
+      .expect(400)
       .then((response) =>
       {
         winston.info('response: "' + response + '"');

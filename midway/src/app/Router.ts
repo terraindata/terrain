@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as send from 'koa-send';
 import * as winston from 'winston';
 
-import reqText = require('require-text');
 import AuthRouter from './auth/AuthRouter';
 import DatabaseRouter from './database/DatabaseRouter';
 import ItemRouter from './items/ItemRouter';
@@ -97,11 +97,10 @@ MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
 MidwayRouter.get('/', async (ctx, next) =>
 {
-  const index = reqText('../../src/app/index.html', require);
-  ctx.body = index.toString();
+  await send(ctx, '/src/app/index.html');
 });
 
-MidwayRouter.get('/bundle.js', async (ctx, next) =>
+MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
 {
   // TODO render this if DEV, otherwise render compiled bundle.js
   ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
