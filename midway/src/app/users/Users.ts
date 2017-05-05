@@ -53,16 +53,17 @@ import * as App from '../App';
 import * as Util from '../Util';
 
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
-// , isSuperUser bool NOT NULL, name text NOT NULL, password text NOT NULL, timezone string NOT NULL)
+// , isSuperUser bool NOT NULL, name text NOT NULL, oldPassword text, password text NOT NULL, timezone string)
 
 export interface UserConfig
 {
   accessToken?: string;
   email: string;
   id?: number;
-  isDisabled?: boolean | number;
-  isSuperUser?: boolean | number;
+  isDisabled?: boolean;
+  isSuperUser?: boolean;
   name?: string;
+  oldPassword?: string;
   password: string;
   timezone?: string;
 }
@@ -74,14 +75,20 @@ export class Users
 
   constructor()
   {
-    this.userTable = new Tasty.Table('users', ['id'],
-      ['accessToken',
-       'email',
-       'isDisabled',
-       'isSuperUser',
-       'name',
-       'password',
-       'timezone']);
+    this.userTable = new Tasty.Table(
+      'users',
+      ['id'],
+      [
+        'accessToken',
+        'email',
+        'isDisabled',
+        'isSuperUser',
+        'name',
+        'oldPassword',
+        'password',
+        'timezone',
+      ],
+    );
   }
 
   public async create(user: UserConfig): Promise<string>
@@ -94,15 +101,17 @@ export class Users
       }
 
       const newUser: UserConfig =
-      {
-        accessToken: '',
-        email: user.email,
-        isDisabled: user.isDisabled ? 1 : 0,
-        isSuperUser: user.isSuperUser ? 1 : 0,
-        password: await bcrypt.hash(user.password, this.saltRounds, Util.makePromiseCallback(resolve, reject)),
-      };
+        {
+          accessToken: '',
+          email: user.email,
+          isDisabled: user.isDisabled || false,
+          isSuperUser: user.isSuperUser || false,
+          name: user.name || '',
+          password: await this.hashPassword(user.password),
+          timezone: user.timezone || '',
+        };
 
-      this.upsert(newUser);
+      await this.upsert(newUser);
       resolve('Success');
     });
   }
@@ -111,79 +120,42 @@ export class Users
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      let requirePassword: boolean = false;
-
       const results = await this.get(user.id);
       if (results.length === 0)
       {
-        return reject('User with that id not found');
+        return reject('User id not found');
       }
-      const oldUser = results[0];
 
-      if (user.email !== oldUser.email || user.password)
+      const oldUser = results[0];
+      if (!isSuperUser && (user.isDisabled !== undefined || user.isSuperUser !== undefined))
       {
-        requirePassword = true;
+        return reject('Only superuser can change user privileges or status');
+      }
+
+      // authenticate if email change or password change
+      if (user.email !== oldUser.email || user.oldPassword)
+      {
         if (!user.password)
         {
-          reject('Must provide password if updating email');
-          return;
+          return reject('Must provide password if updating email or password');
+        }
+
+        user.password = await this.hashPassword(user.password);
+        if (user.oldPassword)
+        {
+          user.oldPassword = await this.hashPassword(user.oldPassword);
+        }
+        const hashedPassword = user.oldPassword || user.password;
+        const passwordsMatch: boolean = await this.comparePassword(hashedPassword, oldUser.password);
+        if (!passwordsMatch)
+        {
+          return reject('Password does not match');
         }
       }
 
-      const newUser: UserConfig = {
-        accessToken: oldUser.accessToken,
-        email: user.email ? user.email : oldUser.email,
-        id: user.id,
-        isDisabled: isSuperUser && user.isDisabled !== undefined ? (user.isDisabled ? 1 : 0) : (oldUser.isDisabled ? 1 : 0),
-        isSuperUser: isSuperUser && user.isSuperUser !== undefined ? (user.isSuperUser ? 1 : 0) : (oldUser.isSuperUser ? 1 : 0),
-        name: user.name || oldUser.name,
-        password: oldUser.password,
-        timezone: user.timezone ? user.timezone : 'PST', // or whatever default timezone we want
-      };
-
-      // update passwords, if necessary
-      if (requirePassword && user.password && user.oldPassword)
-      {
-        bcrypt.compare(user.oldPassword, oldUser.password, async (err, res) =>
-        {
-          if (res)
-          {
-            bcrypt.hash(user.password, this.saltRounds, async (errHash, hash) =>
-            {
-              newUser.password = hash;
-              this.upsert(newUser);
-              return resolve('Success');
-            });
-          }
-          else
-          {
-            return reject('Invalid password');
-          }
-        });
-      }
-      else if (requirePassword && user.password && !user.oldPassword) // email change
-      {
-        bcrypt.compare(user.password, oldUser.password, async (err, res) =>
-        {
-          if (res)
-          {
-            this.upsert(newUser);
-            return resolve('Success');
-          }
-          else
-          {
-            return reject('Invalid password');
-          }
-        });
-      }
-      else if (requirePassword && !user.password) // if password isn't provided
-      {
-        return reject('Password required');
-      }
-      else
-      {
-        return resolve(this.upsert(newUser)); // anything else
-      }
+      user = Util.updateObject(oldUser, user);
+      await this.upsert(user);
+      resolve('Success');
     });
   }
 
@@ -267,6 +239,22 @@ export class Users
   public async upsert(newUser: UserConfig)
   {
     return App.DB.upsert(this.userTable, newUser);
+  }
+
+  private async hashPassword(password: string): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      bcrypt.hash(password, this.saltRounds, Util.makePromiseCallback(resolve, reject));
+    });
+  }
+
+  private async comparePassword(oldPassword: string, newPassword: string): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      bcrypt.compare(oldPassword, newPassword, Util.makePromiseCallback(resolve, reject));
+    });
   }
 }
 

@@ -52,7 +52,7 @@ import * as Util from '../Util';
 import { Items } from './Items';
 
 const Router = new KoaRouter();
-const items = new Items();
+export const items = new Items();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

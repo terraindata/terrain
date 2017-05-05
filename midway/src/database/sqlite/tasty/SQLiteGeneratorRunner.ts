@@ -369,7 +369,7 @@ export default class SQLiteGeneratorRunner
     }
     if (node.type === 'boolean')
     {
-      return node.value ? 'TRUE' : 'FALSE';
+      return node.value ? '1' : '0';
     }
 
     throw new Error('Unsupported node type "' + node.type + '".');
