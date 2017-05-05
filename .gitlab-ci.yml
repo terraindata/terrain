@@ -26,8 +26,8 @@ before_script:
   - sed -i 's#http://127.0.0.1:$elastic#http://moviesdb-elk:$elastic#g' midway/test/scripts/setup_env.sh
   - sed -i 's#http://localhost:9200#http://moviesdb-elk:9200#g' midway/test/database/elastic/*/Elastic\*Tests.ts
   - sed -i 's#http://localhost:9200#http://moviesdb-elk:9200#g' midway/test/routes/RouteTests.ts
-  - sed -i 's/host: \'localhost\'/host: 'moviesdb-mysql'/g" midway/test/database/tasty/MySQLExecutorTests.ts
-  - sed -i "s/host: \'localhost\'/host: 'moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
+  - sed -i 's/host: \'localhost\'/host: 'moviesdb-mysql'/g' midway/test/database/tasty/MySQLExecutorTests.ts
+  - sed -i "s/host: \'localhost\'/host: 'moviesdb-mysql'/g' midway/test/utils/CopyDataFromSqlToElastic.ts
   - yarn global add webpack
   - yarn global add webpack-dev-server
   - yarn install
