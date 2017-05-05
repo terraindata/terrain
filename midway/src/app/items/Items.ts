@@ -120,7 +120,7 @@ export class Items
           return reject('Invalid item id passed');
         }
         if (!user.isSuperUser && items[0].status
-              && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
+          && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
         {
           return reject('Cannot update LIVE or DEFAULT item as non-superuser');
         }

@@ -54,47 +54,66 @@ export interface MidwayErrorItem
 
 export interface MidwayErrorObject
 {
-  error: MidwayErrorItem[];
+  errors: MidwayErrorItem[];
 }
 
 export class MidwayError
 {
+  public static fromJSON(json: string | MidwayErrorObject)
+  {
+    const midwayError = Object.create(MidwayError.prototype);
+    if (typeof json === 'string')
+    {
+      const jobject = JSON.parse(json);
+      midwayError.errorObject = jobject;
+    } else
+    {
+      midwayError.errorObject = json;
+    }
+    return midwayError;
+  }
+
   public errorObject: MidwayErrorObject;
 
   public constructor(status: number, title: string, detail: string, source: object)
   {
     const o: MidwayErrorItem = { status, title, detail, source };
-    this.errorObject = { error: [o] };
+    this.errorObject = { errors: [o] };
   }
 
-  public getValue(index)
+  public getMidwayErrorObject(): MidwayErrorObject
   {
-    return this.errorObject.error[0][index];
+    return this.errorObject;
   }
 
-  public getStatus()
+  // we may provide a iterator interface later
+  public getNthMidwayErrorItem(index): MidwayErrorItem
   {
-    return this.errorObject.error[0].status;
+    return this.errorObject.errors[index];
   }
 
-  public getTitle()
+  // get the first error object's status
+  public getStatus(): number
   {
-    return this.errorObject.error[0].title;
+    return this.getNthMidwayErrorItem(0).status;
   }
 
-  public getDetail()
+  // get the first error object's title
+  public getTitle(): string
   {
-    return this.errorObject.error[0].detail;
+    return this.getNthMidwayErrorItem(0).title;
   }
 
-  public getSource()
+  // get the first error object's detail
+  public getDetail(): string
   {
-    return this.errorObject.error[0].source;
+    return this.getNthMidwayErrorItem(0).detail;
   }
 
-  public getBody()
+  // get the first error object's source
+  public getSource(): object
   {
-    return JSON.stringify(this.errorObject);
+    return this.getNthMidwayErrorItem(0).source;
   }
 }
 

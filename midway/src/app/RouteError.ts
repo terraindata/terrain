@@ -59,9 +59,9 @@ class RouteError extends MidwayError
     {
       const routeError = RouteError.composeFromRouteContext(ctx, err);
       const status = routeError.getStatus();
-      const body = routeError.getBody();
-      winston.error(JSON.stringify(routeError));
-      ctx.throw(body, status);
+      winston.info(JSON.stringify(routeError));
+      ctx.status = status;
+      ctx.body = routeError.getMidwayErrorObject();
     }
   }
   public static composeFromRouteContext(ctx, err): RouteError

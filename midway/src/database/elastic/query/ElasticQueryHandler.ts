@@ -51,7 +51,7 @@ import * as winston from 'winston';
 
 import Query from '../../../app/query/Query';
 import QueryHandler from '../../../app/query/QueryHandler';
-import {QueryResponse} from '../../../app/query/QueryRouter';
+import { QueryResponse } from '../../../app/query/QueryRouter';
 import QueryError from '../../../app/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
@@ -105,9 +105,9 @@ export default class ElasticQueryHandler extends QueryHandler
         if (typeof response !== 'object')
         {
           winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
-          response = {response};
+          response = { response };
         }
-        const res: QueryResponse = {results: [response]};
+        const res: QueryResponse = { results: [response] };
         resolve(res);
       }
     };
