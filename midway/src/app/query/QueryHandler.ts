@@ -45,10 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import Query from './Query';
+import { QueryResponse } from './QueryRouter';
 
 export abstract class QueryHandler
 {
-  public async abstract handleQuery(request: Query): Promise<string | object>;
+  public async abstract handleQuery(request: Query): Promise<QueryResponse>;
 }
 
 export default QueryHandler;

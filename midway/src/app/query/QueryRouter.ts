@@ -51,10 +51,19 @@ import * as winston from 'winston';
 import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { MidwayErrorObject } from '../MidwayError';
+import QueryError from '../QueryError';
 import * as Util from '../Util';
 import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
+
+export interface QueryResultObject
+{
+  results: object[];
+}
+
+export type QueryResponse = MidwayErrorObject | QueryResultObject;
 
 QueryRouter.post(
   '/',
@@ -76,11 +85,9 @@ QueryRouter.post(
     }
 
     const qh: QueryHandler = database.getQueryHandler();
-    const result: string | object = await qh.handleQuery(query);
-    ctx.body = {
-      result,
-      status: 'ok',
-    };
+    const result: QueryResponse = await qh.handleQuery(query);
+    ctx.body = result;
+    ctx.status = 200;
   });
 
 export default QueryRouter;

@@ -43,73 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// import ElasticConfig from '../ElasticConfig';
-// import ElasticCluster from '../client/ElasticCluster';
-// import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
 
-import Query from '../../../app/query/Query';
-import QueryHandler from '../../../app/query/QueryHandler';
-import { QueryResponse } from '../../../app/query/QueryRouter';
-import QueryError from '../../../app/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
-import ElasticController from '../ElasticController';
+import MidwayError from './MidwayError';
 
-/**
- * Implements the QueryHandler interface for ElasticSearch
- */
-export default class ElasticQueryHandler extends QueryHandler
+class RouteError extends MidwayError
 {
-  private controller: ElasticController;
-
-  constructor(controller: ElasticController)
+  public static async RouteErrorHandler(ctx, next)
   {
-    super();
-    this.controller = controller;
-  }
-
-  public async handleQuery(request: Query): Promise<QueryResponse>
-  {
-    const type = request.type;
-    const body = request.body;
-
-    if (type === 'search')
+    try
     {
-      // NB: streaming not yet implemented
-      return new Promise<QueryResponse>((resolve, reject) =>
-      {
-        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
-      });
+      await next();
     }
-
-    throw new Error('Query type "' + type + '" is not currently supported.');
+    catch (err)
+    {
+      const routeError = RouteError.composeFromRouteContext(ctx, err);
+      const status = routeError.getStatus();
+      winston.info(JSON.stringify(routeError));
+      ctx.status = status;
+      ctx.body = routeError.getMidwayErrorObject();
+    }
+  }
+  public static composeFromRouteContext(ctx, err): RouteError
+  {
+    if (typeof err !== 'object')
+    {
+      err = new Error(err);
+    }
+    const status = 'status' in err ? err['status'] : 400;
+    const title = 'title' in err ? err['title'] : 'Route ' + ctx.url + ' has an error.';
+    const detail = err['detail'] || err['message'] || JSON.stringify(err);
+    const source = { ctx, err };
+    return new RouteError(status, title, detail, source);
   }
 
-  private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
+  public constructor(status, title, detail, source)
   {
-    return (error: Error, response: any) =>
-    {
-      if (error)
-      {
-        if (QueryError.isElasticQueryError(error))
-        {
-          const res: QueryResponse = QueryError.composeFromElasticError(error).getMidwayErrorObject();
-          resolve(res);
-        } else
-        {
-          reject(error); // this will be handled by RouteError.RouteErrorHandler
-        }
-      } else
-      {
-        if (typeof response !== 'object')
-        {
-          winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
-          response = { response };
-        }
-        const res: QueryResponse = { results: [response] };
-        resolve(res);
-      }
-    };
+    super(status, title, detail, source);
   }
 }
+
+export default RouteError;

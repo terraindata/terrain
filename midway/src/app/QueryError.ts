@@ -43,73 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import MidwayError from './MidwayError';
 
-// import ElasticConfig from '../ElasticConfig';
-// import ElasticCluster from '../client/ElasticCluster';
-// import ElasticIndices from '../client/ElasticIndices';
-import * as winston from 'winston';
-
-import Query from '../../../app/query/Query';
-import QueryHandler from '../../../app/query/QueryHandler';
-import { QueryResponse } from '../../../app/query/QueryRouter';
-import QueryError from '../../../app/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
-import ElasticController from '../ElasticController';
-
-/**
- * Implements the QueryHandler interface for ElasticSearch
- */
-export default class ElasticQueryHandler extends QueryHandler
+class QueryError extends MidwayError
 {
-  private controller: ElasticController;
-
-  constructor(controller: ElasticController)
+  public static isElasticQueryError(err: object): boolean
   {
-    super();
-    this.controller = controller;
+    return err['response'] ? true : false;
   }
 
-  public async handleQuery(request: Query): Promise<QueryResponse>
+  public static composeFromElasticError(err: object): QueryError
   {
-    const type = request.type;
-    const body = request.body;
-
-    if (type === 'search')
-    {
-      // NB: streaming not yet implemented
-      return new Promise<QueryResponse>((resolve, reject) =>
-      {
-        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
-      });
-    }
-
-    throw new Error('Query type "' + type + '" is not currently supported.');
+    const status = err['statusCode'] || 400;
+    const title = err['message'] || 'The Elastic query has an error.';
+    const detail = err['response'] || JSON.stringify(err);
+    const source = err;
+    return new QueryError(status, title, detail, source);
   }
 
-  private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
+  public constructor(status, title, detail, source)
   {
-    return (error: Error, response: any) =>
-    {
-      if (error)
-      {
-        if (QueryError.isElasticQueryError(error))
-        {
-          const res: QueryResponse = QueryError.composeFromElasticError(error).getMidwayErrorObject();
-          resolve(res);
-        } else
-        {
-          reject(error); // this will be handled by RouteError.RouteErrorHandler
-        }
-      } else
-      {
-        if (typeof response !== 'object')
-        {
-          winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
-          response = { response };
-        }
-        const res: QueryResponse = { results: [response] };
-        resolve(res);
-      }
-    };
+    super(status, title, detail, source);
   }
 }
+
+export default QueryError;

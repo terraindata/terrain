@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+
 import reqText = require('require-text');
 import AuthRouter from './auth/AuthRouter';
 import ItemRouter from './items/ItemRouter';
