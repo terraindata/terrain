@@ -114,12 +114,12 @@ export class Tasty
   {
     if (typeof query === 'string')
     {
-      return await this.executor.query(query);
+      return this.executor.query(query);
     }
     else
     {
       const queryString = this.generator.generate(query);
-      return await this.executor.query(queryString);
+      return this.executor.query(queryString);
     }
   }
 
@@ -132,7 +132,7 @@ export class Tasty
    */
   public async destroy(): Promise<void>
   {
-    return await this.executor.destroy();
+    return this.executor.destroy();
   }
 
   /**
@@ -167,7 +167,7 @@ export class Tasty
       }
 
       const queryString = this.generator.generate(query);
-      return await this.executor.query(queryString);
+      return this.executor.query(queryString);
     }
     catch (e)
     {
@@ -195,14 +195,14 @@ export class Tasty
         {
           promises.push(this.upsert(table, o));
         });
-      return await Promise.all(promises);
+      return Promise.all(promises);
     }
     else
     {
       query.upsert(obj);
     }
     const queryString = this.generator.generate(query);
-    return await this.executor.query(queryString);
+    return this.executor.query(queryString);
   }
 
   /**
@@ -231,7 +231,7 @@ export class Tasty
         {
           promises.push(this.upsert(table, o));
         });
-      return await Promise.all(promises);
+      return Promise.all(promises);
     }
     else if (typeof obj === 'object')
     {
@@ -240,7 +240,7 @@ export class Tasty
       query.delete();
     }
     const queryString = this.generator.generate(query);
-    return await this.executor.query(queryString);
+    return this.executor.query(queryString);
   }
 
   public async schema(): Promise<TastySchema>

@@ -57,6 +57,7 @@ let testUserAccessToken: string;
 
 beforeAll((done) =>
 {
+  winston.level = 'debug';
   const options =
     {
       db: 'sqlite',
@@ -70,7 +71,7 @@ beforeAll((done) =>
   DatabaseRegistry.set(
     0,
     new ElasticController({
-      hosts: ['http://td1:9200'],
+      hosts: ['http://localhost:9200'],
     }, 0, 'RouteTests'));
 
   request(server)
@@ -307,7 +308,7 @@ describe('Item route tests', () =>
           name: 'Test Item',
         },
       })
-      .expect(500)
+      .expect(400)
       .then((response) =>
       {
         winston.info('response: "' + response + '"');
@@ -331,7 +332,7 @@ describe('Item route tests', () =>
           status: 'BUILD',
         },
       })
-      .expect(500)
+      .expect(400)
       .then((response) =>
       {
         winston.info('response: "' + response + '"');
