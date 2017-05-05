@@ -48,63 +48,69 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import reqText = require('require-text');
-import AuthRouter from './auth/AuthRouter';
-import DatabaseRouter from './database/DatabaseRouter';
-import ItemRouter from './items/ItemRouter';
-import QueryRouter from './query/QueryRouter';
-import SchemaRouter from './schema/SchemaRouter';
-import StatusRouter from './status/StatusRouter';
-import UserRouter from './users/UserRouter';
-import * as Util from './Util';
-import VersionRouter from './versions/VersionRouter';
+import * as Util from '../Util';
+import { Databases } from './Databases';
 
-const AppRouter = new KoaRouter();
+const Router = new KoaRouter();
+const databases = new Databases();
 
-AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
-AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
-AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
-AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
-AppRouter.use('/database', DatabaseRouter.routes(), DatabaseRouter.allowedMethods());
-AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
-AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
-AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
-// Add future routes here.
-
-// Prefix all routes with /midway
-//  This is so that we can allow the front-end to use all other routes.
-//  Any route not prefixed with /midway will just serve the front-end.
-
-AppRouter.get('/', async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  if (ctx.state.user)
+  winston.info('getting all databases');
+  ctx.body = await databases.get();
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting database ID ' + ctx.params.id);
+  ctx.body = await databases.get(ctx.params.id);
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add new database');
+  const db = ctx.request.body.body;
+  Util.verifyParameters(db, ['name', 'dsn']);
+  if (db.id)
   {
-    ctx.body = 'authenticated as ' + ctx.state.user.username;
+    throw Error('Invalid parameter database ID');
+  }
+
+  ctx.body = await databases.upsert(ctx.state.user, db);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('update existing database');
+  const db = ctx.request.body.body;
+  if (!db.id)
+  {
+    db.id = ctx.params.id;
   }
   else
   {
-    ctx.body = 'not authenticated';
+    if (db.id !== Number(ctx.params.id))
+    {
+      throw Error('Database ID does not match the supplied id in the URL');
+    }
   }
+
+  ctx.body = await databases.upsert(ctx.state.user, db);
 });
 
-AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = 'authenticated as ' + ctx.state.user.username;
+  winston.info('connect to database');
 });
 
-const MidwayRouter = new KoaRouter();
-MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-MidwayRouter.get('/', async (ctx, next) =>
+Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const index = reqText('../../src/app/index.html', require);
-  ctx.body = index.toString();
+  winston.info('disconnect from database');
 });
 
-MidwayRouter.get('/bundle.js', async (ctx, next) =>
+Router.post('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
+  winston.info('get database schema');
 });
 
-export default MidwayRouter;
+export default Router;
