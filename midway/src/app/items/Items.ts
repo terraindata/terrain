@@ -48,9 +48,7 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
-import { Versions } from '../versions/Versions';
-
-const versions = new Versions();
+import { versions } from '../versions/VersionRouter';
 
 // CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
 // parent integer, status text, type text);
