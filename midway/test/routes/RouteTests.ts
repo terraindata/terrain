@@ -70,7 +70,7 @@ beforeAll((done) =>
   DatabaseRegistry.set(
     0,
     new ElasticController({
-      hosts: ['http://td1:9200'],
+      hosts: ['http://localhost:9200'],
     }, 0, 'RouteTests'));
 
   request(server)
