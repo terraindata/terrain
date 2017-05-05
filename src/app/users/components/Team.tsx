@@ -282,7 +282,7 @@ class Team extends Classs<Props>
     const username = AuthStore.getState().get('username');
     const user = Store.getState().getIn(['users', username]) as User;
 
-    if (user && user.isAdmin)
+    if (user && user.isSuperUser)
     {
       if (this.state.addingUser)
       {

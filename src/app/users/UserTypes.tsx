@@ -51,8 +51,9 @@ export module UserTypes
   class UserC extends BaseClass
   {
     // db-level fields
+    id = '';
     username = '';
-    isAdmin = false;
+    isSuperUser = false;
     isDisabled = false;
 
     // metadata fields
@@ -74,7 +75,7 @@ export module UserTypes
     emailNews = 'on';
 
     // DB level fields
-    dbFields = ['isAdmin', 'username', 'disabled'];
+    dbFields = ['isSuperUser', 'username', 'disabled'];
     // "static" fields to exclude
     excludeFields = ['name, dbFields', 'excludeFields'];
 

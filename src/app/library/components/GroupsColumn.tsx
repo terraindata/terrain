@@ -149,7 +149,7 @@ class GroupsColumn extends Classs<Props>
     const {me, roles} = this.state;
     const groupRoles = roles && roles.get(id);
     const canCreate = (me && groupRoles && groupRoles.getIn([me.username, 'admin']));
-    const canEdit = canCreate || (me && me.isAdmin);
+    const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
 
         // onDuplicate={this.handleDuplicate}
@@ -223,7 +223,7 @@ class GroupsColumn extends Classs<Props>
   renderCategory(status: LibraryTypes.EGroupStatus)
   {
     const ids = this.props.groupsOrder.filter((id) => this.props.groups.get(id).status === status);
-    const canCreate = this.state.me && this.state.me.isAdmin;
+    const canCreate = this.state.me && this.state.me.isSuperUser;
 
     return (
       <LibraryItemCategory

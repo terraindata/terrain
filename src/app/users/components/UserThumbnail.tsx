@@ -132,7 +132,7 @@ class UserThumbnail extends Classs<Props>
           'user-thumbnail-small': this.props.small,
           'user-thumbnail-smallest': this.props.smallest,
           'user-thumbnail-square': this.props.square,
-          'user-thumbnail-admin': user && user.isAdmin && !this.props.hideAdmin,
+          'user-thumbnail-admin': user && user.isSuperUser && !this.props.hideAdmin,
         })}
         data-tip={tip}
         data-html={true}

@@ -93,7 +93,7 @@ MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
 MidwayRouter.get('/', async (ctx, next) =>
 {
-  const index = reqText('../../src/app/index.html', require);
+  const index = reqText('../../../index.html', require);
   ctx.body = index.toString();
 });
 

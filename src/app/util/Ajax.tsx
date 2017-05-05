@@ -77,7 +77,7 @@ export const Ajax =
   {
     return Ajax._req(
       method,
-      "/midway/v1/" + url,
+      "/midway/v1" + url,
       data,
       onLoad,
       _.extend({
@@ -93,7 +93,7 @@ export const Ajax =
   {
     return Ajax._reqMidway2(
       "get",
-      "status",
+      "/status",
       '',
       (respStr: string) =>
       {
@@ -206,12 +206,12 @@ export const Ajax =
 
   _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._req('POST', url, data, onLoad, {onError});
+    return Ajax._reqMidway2('post', url, data, onLoad, {onError});
   },
 
   _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._req('GET', url, data, onLoad, {onError});
+    return Ajax._reqMidway2('get', url, data, onLoad, {onError});
   },
 
   _postMidway1(
@@ -268,7 +268,7 @@ export const Ajax =
       {
         const usersArr = JSON.parse(response);
         const usersObj = {};
-        usersArr.map((user) => usersObj[user.username] = user);
+        usersArr.map((user) => usersObj[user.id] = user);
         onLoad(usersObj);
       });
   },
@@ -278,14 +278,14 @@ export const Ajax =
     const data = user.toJS();
     user.excludeFields.map((field) => delete data[field]);
     user.dbFields.map((field) => delete data[field]);
-    return Ajax._post(`/users/${user.username}`, JSON.stringify({
+    return Ajax._post(`/users/${user.id}`, JSON.stringify({
       data: JSON.stringify(data),
     }), onSave, onError);
   },
 
-  changePassword(username: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
+  changePassword(id: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
-    return Ajax._post(`/users/${username}`, JSON.stringify({
+    return Ajax._post(`/users/${id}`, JSON.stringify({
       oldpassword: oldPassword,
       password: newPassword,
     }), onSave, onError);
@@ -293,15 +293,16 @@ export const Ajax =
 
   adminSaveUser(user: UserTypes.User)
   {
-    return Ajax._post(`/users/${user.username}`, JSON.stringify({
-      admin: user.isAdmin ? 1 : 0,
-      disabled: user.isDisabled ? 1 : 0,
+    return Ajax._post(`/users/${user.id}`, JSON.stringify({
+      admin: user.isSuperUser,
+      disabled: user.isDisabled,
     }), _.noop);
   },
 
-  createUser(username: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
+  createUser(email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
-    return Ajax._post(`/users/${username}`, JSON.stringify({
+    return Ajax._post(`/users/`, JSON.stringify({
+      email,
       password,
     }), onSave, onError);
   },

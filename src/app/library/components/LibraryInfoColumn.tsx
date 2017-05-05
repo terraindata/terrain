@@ -135,12 +135,12 @@ class LibraryInfoColumn extends Classs<Props>
     });
   }
 
-  renderVariant(isAdmin, isBuilder)
+  renderVariant(isSuperUser, isBuilder)
   {
     return (
       <LibraryVariantInfo
         variant={this.props.variant}
-        isAdmin={isAdmin}
+        isSuperUser={isSuperUser}
         isBuilder={isBuilder}
         dbs={this.state.dbs}
       />
@@ -152,7 +152,7 @@ class LibraryInfoColumn extends Classs<Props>
     Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
   }
 
-  renderAlgorithm(isAdmin, isBuilder)
+  renderAlgorithm(isSuperUser, isBuilder)
   {
     if (! this.props.algorithm || this.props.variant)
     {
@@ -169,7 +169,7 @@ class LibraryInfoColumn extends Classs<Props>
             selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.algorithm.db)}
             options={this.state.dbs}
             onChange={this.handleAlgorithmDbChange}
-            canEdit={isBuilder || isAdmin}
+            canEdit={isBuilder || isSuperUser}
             className="bic-db-dropdown"
           />
         </div>
@@ -237,7 +237,7 @@ class LibraryInfoColumn extends Classs<Props>
     Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
   }
 
-  renderGroup(isAdmin, isBuilder)
+  renderGroup(isSuperUser, isBuilder)
   {
     const { group } = this.props;
     if (!group || this.props.algorithm || this.props.variant)
@@ -249,7 +249,7 @@ class LibraryInfoColumn extends Classs<Props>
     // let me: UserTypes.User = UserStore.getState().get('currentUser');
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
 
-    const isSysAdmin = this.state.me && this.state.me.isAdmin;
+    const isSysAdmin = this.state.me && this.state.me.isSuperUser;
 
     return (
       <div>
@@ -261,7 +261,7 @@ class LibraryInfoColumn extends Classs<Props>
             selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.group.db)}
             options={this.state.dbs}
             onChange={this.handleGroupDbChange}
-            canEdit={isBuilder || isAdmin}
+            canEdit={isBuilder || isSuperUser}
             className="bic-db-dropdown"
           />
         </div>
@@ -300,7 +300,7 @@ class LibraryInfoColumn extends Classs<Props>
         break;
     }
 
-    const isAdmin = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
+    const isSuperUser = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
     const isBuilder = Util.haveRole(groupId, 'builder', UserStore, RolesStore);
 
     return (
@@ -334,13 +334,13 @@ class LibraryInfoColumn extends Classs<Props>
                 }
               </div>
               {
-                this.renderVariant(isAdmin, isBuilder)
+                this.renderVariant(isSuperUser, isBuilder)
               }
               {
-                this.renderAlgorithm(isAdmin, isBuilder)
+                this.renderAlgorithm(isSuperUser, isBuilder)
               }
               {
-                this.renderGroup(isAdmin, isBuilder)
+                this.renderGroup(isSuperUser, isBuilder)
               }
             </div>
           :
@@ -404,12 +404,12 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
     }
 
     const gr = groupRoles && groupRoles.get(user.username);
-    const isAdmin = gr && gr.admin;
-    const isBuilder = gr && gr.builder && !isAdmin;
-    const isViewer = !isAdmin && !isBuilder;
-    const roleText = isAdmin ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
+    const isSuperUser = gr && gr.admin;
+    const isBuilder = gr && gr.builder && !isSuperUser;
+    const isViewer = !isSuperUser && !isBuilder;
+    const roleText = isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
-    const imSysAdmin = me.isAdmin;
+    const imSysAdmin = me.isSuperUser;
     const imGroupAdmin = groupRoles && groupRoles.get(me.username) && groupRoles.get(me.username).admin;
     // TODO
     const menuOptions =
@@ -427,7 +427,7 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
       {
         text: 'Admin',
         onClick: this.changeToAdmin,
-        disabled: isAdmin,
+        disabled: isSuperUser,
       },
     ]);
 
