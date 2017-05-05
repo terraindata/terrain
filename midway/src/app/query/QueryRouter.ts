@@ -81,7 +81,7 @@ QueryRouter.post(
     const database: DatabaseController = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
-      throw Error('Database "' + query.database + '" not found.');
+      throw new Error('Database "' + query.database + '" not found.');
     }
 
     const qh: QueryHandler = database.getQueryHandler();

@@ -48,7 +48,7 @@ import * as passport from 'koa-passport';
 import passportLocal = require('passport-local');
 
 import Middleware from '../Middleware';
-import { Users } from '../users/Users';
+import { users } from '../users/UserRouter';
 
 // authenticate with id and accessToken
 Middleware.passport.use('access-token-local', new passportLocal.Strategy(
@@ -59,7 +59,7 @@ Middleware.passport.use('access-token-local', new passportLocal.Strategy(
   },
   async (req: any, id: string, accessToken: string, done) =>
   {
-    const user = await Users.loginWithAccessToken(Number(id), accessToken);
+    const user = await users.loginWithAccessToken(Number(id), accessToken);
     done(null, user);
   }));
 
@@ -71,7 +71,7 @@ Middleware.passport.use('local', new passportLocal.Strategy(
   },
   async (req: any, email: string, password: string, done) =>
   {
-    const user = await Users.loginWithEmail(email, password);
+    const user = await users.loginWithEmail(email, password);
     done(null, user);
   }));
 
@@ -87,7 +87,7 @@ Middleware.passport.deserializeUser(async (id, done) =>
 {
   try
   {
-    const user = await Users.get(id);
+    const user = await users.get(id);
     done(null, user);
   }
   catch (e)
