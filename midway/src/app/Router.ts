@@ -95,7 +95,7 @@ MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
 MidwayRouter.get('/', async (ctx, next) =>
 {
-  await send(ctx, '/src/app/index.html', require);
+  await send(ctx, '/src/app/index.html');
 });
 
 MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
