@@ -86,7 +86,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   Util.verifyParameters(item, ['name']);
   if (!item.id)
   {
-    item.id = ctx.params.id;
+    item.id = Number(ctx.params.id);
   }
   else
   {

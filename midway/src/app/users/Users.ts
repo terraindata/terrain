@@ -50,12 +50,10 @@ import * as winston from 'winston';
 import srs = require('secure-random-string');
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import * as Util from '../Util';
 
-const saltRounds = 10;
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
 // , isSuperUser bool NOT NULL, name text NOT NULL, password text NOT NULL, timezone string NOT NULL)
-const User = new Tasty.Table('users', ['id'], ['accessToken', 'email', 'isDisabled', 'isSuperUser', 'name',
-  'password', 'timezone']);
 
 export interface UserConfig
 {
@@ -69,205 +67,207 @@ export interface UserConfig
   timezone?: string;
 }
 
-export const Users =
+export class Users
+{
+  private readonly saltRounds = 10;
+  private userTable: Tasty.Table;
+
+  constructor()
   {
-    createOrUpdate: async (req) =>
-    {
-      return new Promise(async (resolve, reject) =>
-      {
-        let requirePassword: boolean = false;
-        const reqBody = req['body'];
-        let user;
-        const newUser: UserConfig =
-          {
-            email: '',
-            password: '',
-          };
-        // update
-        if (reqBody.id)
-        {
-          user = await Users.get(reqBody.id);
-          const userExists: boolean = !!user && user.length !== 0;
-          if (!userExists)
-          {
-            reject('User with that id not found');
-            return;
-          }
-          if (reqBody.email !== user[0].email || reqBody.password)
-          {
-            requirePassword = true;
-            if (!reqBody.password)
-            {
-              reject('Must provide password if updating email');
-              return;
-            }
-          }
-          newUser['accessToken'] = user[0].accessToken;
-          newUser['email'] = reqBody.email ? reqBody.email : user[0].email;
-          newUser['id'] = reqBody.id;
-          newUser['isDisabled'] = req['callingUser'] && req['callingUser'].isSuperUser
-            && reqBody.isDisabled !== undefined ? (reqBody.isDisabled ? 1 : 0) : (user[0].isDisabled ? 1 : 0);
-          newUser['isSuperUser'] = req['callingUser'] && req['callingUser'].isSuperUser
-            && reqBody.isSuperUser !== undefined ? (reqBody.isSuperUser ? 1 : 0) : (user[0].isSuperUser ? 1 : 0);
-          newUser['name'] = reqBody.name || user[0].name;
-          newUser['password'] = user[0].password;
-          newUser['timezone'] = reqBody.timezone ? reqBody.timezone : 'PST'; // or whatever default timezone we want
-        }
-        else // create
-        {
-          // requirePassword = true;
-          if (!reqBody.email || !reqBody.password)
-          {
-            reject('Require both email and password for user creation');
-            return;
-          }
-          if (reqBody.oldPassword)
-          {
-            reject('No existing password for non-existent user');
-            return;
-          }
-          newUser['accessToken'] = '';
-          newUser['email'] = reqBody.email;
-          newUser['isDisabled'] = reqBody.isDisabled ? 1 : 0;
-          newUser['isSuperUser'] = reqBody.isSuperUser ? 1 : 0;
-          newUser['name'] = reqBody.name ? reqBody.name : '';
-          newUser['timezone'] = reqBody.timezone ? reqBody.timezone : 'PST'; // or whatever default timezone we want
-          bcrypt.hash(reqBody.password, saltRounds, async (errHash, hash) =>
-          {
-            newUser['password'] = hash;
-            resolve(Users.upsert(newUser));
-            return;
-          });
-          return;
-        }
+    this.userTable = new Tasty.Table('users', ['id'],
+      ['accessToken',
+       'email',
+       'isDisabled',
+       'isSuperUser',
+       'name',
+       'password',
+       'timezone']);
+  }
 
-        // update passwords, if necessary
-        if (requirePassword && reqBody.password && reqBody.oldPassword)
-        {
-          bcrypt.compare(reqBody.oldPassword, user[0].password, async (err, res) =>
-          {
-            if (res)
-            {
-              bcrypt.hash(reqBody.password, saltRounds, async (errHash, hash) =>
-              {
-                newUser.password = hash;
-                resolve(Users.upsert(newUser));
-                return;
-              });
-            }
-            else
-            {
-              reject('Invalid password');
-              return;
-            }
-          });
-        }
-        else if (requirePassword && reqBody.password && !reqBody.oldPassword) // email change
-        {
-          bcrypt.compare(reqBody.password, user[0].password, async (err, res) =>
-          {
-            if (res)
-            {
-              resolve(Users.upsert(newUser));
-              return;
-            }
-            else
-            {
-              reject('Invalid password');
-              return;
-            }
-          });
-        }
-        else if (requirePassword && !reqBody.password) // if password isn't provided
-        {
-          reject('Password required');
-          return;
-        }
-        else
-        {
-          resolve(Users.upsert(newUser)); // anything else
-          return;
-        }
-      });
-    },
-
-    get: async (id?: number): Promise<UserConfig[]> =>
+  public async create(user: UserConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
     {
-      if (id !== undefined)
+      if (!user.email || !user.password)
       {
-        return App.DB.select(User, [], { id }) as any;
+        return reject('Require both email and password for user creation');
       }
-      return App.DB.select(User, [], {}) as any;
-    },
 
-    loginWithAccessToken: async (id: number, accessToken: string): Promise<UserConfig> =>
-    {
-      return new Promise<UserConfig>(async (resolve, reject) =>
+      const newUser: UserConfig =
       {
-        const results: UserConfig[] = await App.DB.select(User, [], { id, accessToken }) as UserConfig[];
-        if (results.length > 0)
-        {
-          resolve(results[0]);
-        }
-        else
-        {
-          resolve(null);
-        }
-      });
-    },
+        accessToken: '',
+        email: user.email,
+        isDisabled: user.isDisabled ? 1 : 0,
+        isSuperUser: user.isSuperUser ? 1 : 0,
+        password: await bcrypt.hash(user.password, this.saltRounds, Util.makePromiseCallback(resolve, reject)),
+      };
 
-    loginWithEmail: async (email: string, password: string) =>
+      this.upsert(newUser);
+      resolve('Success');
+    });
+  }
+
+  public async update(isSuperUser: boolean, user: UserConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
     {
-      const results = await App.DB.select(User, [], { email });
-      if (results && results.length === 0)
+      let requirePassword: boolean = false;
+
+      const results = await this.get(user.id);
+      if (results.length === 0)
       {
-        return Promise.resolve(null);
+        return reject('User with that id not found');
+      }
+      const oldUser = results[0];
+
+      if (user.email !== oldUser.email || user.password)
+      {
+        requirePassword = true;
+        if (!user.password)
+        {
+          reject('Must provide password if updating email');
+          return;
+        }
+      }
+
+      const newUser: UserConfig = {
+        accessToken: oldUser.accessToken,
+        email: user.email ? user.email : oldUser.email,
+        id: user.id,
+        isDisabled: isSuperUser && user.isDisabled !== undefined ? (user.isDisabled ? 1 : 0) : (oldUser.isDisabled ? 1 : 0),
+        isSuperUser: isSuperUser && user.isSuperUser !== undefined ? (user.isSuperUser ? 1 : 0) : (oldUser.isSuperUser ? 1 : 0),
+        name: user.name || oldUser.name,
+        password: oldUser.password,
+        timezone: user.timezone ? user.timezone : 'PST', // or whatever default timezone we want
+      };
+
+      // update passwords, if necessary
+      if (requirePassword && user.password && user.oldPassword)
+      {
+        bcrypt.compare(user.oldPassword, oldUser.password, async (err, res) =>
+        {
+          if (res)
+          {
+            bcrypt.hash(user.password, this.saltRounds, async (errHash, hash) =>
+            {
+              newUser.password = hash;
+              this.upsert(newUser);
+              return resolve('Success');
+            });
+          }
+          else
+          {
+            return reject('Invalid password');
+          }
+        });
+      }
+      else if (requirePassword && user.password && !user.oldPassword) // email change
+      {
+        bcrypt.compare(user.password, oldUser.password, async (err, res) =>
+        {
+          if (res)
+          {
+            this.upsert(newUser);
+            return resolve('Success');
+          }
+          else
+          {
+            return reject('Invalid password');
+          }
+        });
+      }
+      else if (requirePassword && !user.password) // if password isn't provided
+      {
+        return reject('Password required');
       }
       else
       {
-        const user = results[0];
-        return new Promise(async (resolve, reject) =>
+        return resolve(this.upsert(newUser)); // anything else
+      }
+    });
+  }
+
+  public async get(id?: number): Promise<UserConfig[]>
+  {
+    if (id !== undefined)
+    {
+      return App.DB.select(this.userTable, [], { id }) as any;
+    }
+    return App.DB.select(this.userTable, [], {}) as any;
+  }
+
+  public async loginWithAccessToken(id: number, accessToken: string): Promise<UserConfig>
+  {
+    return new Promise<UserConfig>(async (resolve, reject) =>
+    {
+      const results: UserConfig[] = await App.DB.select(this.userTable, [], { id, accessToken }) as UserConfig[];
+      if (results.length > 0)
+      {
+        resolve(results[0]);
+      }
+      else
+      {
+        resolve(null);
+      }
+    });
+  }
+
+  public async loginWithEmail(email: string, password: string)
+  {
+    return new Promise(async (resolve, reject) =>
+    {
+      const results: UserConfig[] = await App.DB.select(this.userTable, [], { email }) as UserConfig[];
+      if (results.length === 0)
+      {
+        resolve(null);
+      }
+      else
+      {
+        const user: UserConfig = results[0] as UserConfig;
+        bcrypt.compare(password, user.password, async (err, res) =>
         {
-          bcrypt.compare(password, user['password'], async (err, res) =>
+          if (res)
           {
-            if (res)
+            if (user.accessToken.length === 0)
             {
-              if (user['accessToken'].length === 0)
-              {
-                user['accessToken'] = srs(
-                  {
-                    length: 256,
-                  });
-                await Users.upsert(user);
-              }
-              resolve(user);
+              user.accessToken = srs(
+                {
+                  length: 256,
+                });
+              await this.upsert(user);
             }
-            else
-            {
-              resolve(null);
-            }
-          });
+            resolve(user);
+          }
+          else
+          {
+            resolve(null);
+          }
         });
       }
-    },
+    });
+  }
 
-    logout: async (id: number, accessToken: string) =>
+  public async logout(id: number, accessToken: string): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
     {
-      const results = await App.DB.select(User, [], { id, accessToken });
-      if ((results && results.length === 0) || !results)
+      const results = await App.DB.select(this.userTable, [], { id, accessToken });
+      if (results.length === 0)
       {
-        return null;
+        reject('Cannot find user');
       }
-      const user = results[0];
-      user['accessToken'] = '';
-      await Users.upsert(user);
-      return [];
-    },
 
-    upsert: async (newUser) =>
-    {
-      return App.DB.upsert(User, newUser);
-    },
-  };
+      const user: UserConfig = results[0] as UserConfig;
+      user.accessToken = '';
+      await this.upsert(user);
+      resolve('Success');
+    });
+  }
+
+  public async upsert(newUser: UserConfig)
+  {
+    return App.DB.upsert(this.userTable, newUser);
+  }
+}
 
 export default Users;

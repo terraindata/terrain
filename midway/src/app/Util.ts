@@ -91,3 +91,17 @@ export function updateObject<T>(obj: T, newObj: T): T
   }
   return obj;
 }
+
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+{
+  return (error: Error, response: T) =>
+  {
+    if (error)
+    {
+      reject(error);
+    } else
+    {
+      resolve(response);
+    }
+  };
+}
