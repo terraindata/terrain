@@ -48,18 +48,29 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import Util from '../Util';
+import { MidwayErrorObject } from '../MidwayError';
+import QueryError from '../QueryError';
+import * as Util from '../Util';
+import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
+
+export interface QueryResultObject
+{
+  results: object[];
+}
+
+export type QueryResponse = MidwayErrorObject | QueryResultObject;
 
 QueryRouter.post(
   '/',
   passport.authenticate('access-token-local'),
   async (ctx, next) =>
   {
-    const query = ctx.request.body;
+    const query: Query = ctx.request.body as Query;
 
     Util.verifyParameters(query, ['database', 'type', 'body']);
 
@@ -70,11 +81,13 @@ QueryRouter.post(
     const database: DatabaseController = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
-      throw Error('Database "' + query.database + '" not found.');
+      throw new Error('Database "' + query.database + '" not found.');
     }
 
-    const qh = database.getQueryHandler();
-    ctx.body = await qh.handleQuery(query);
+    const qh: QueryHandler = database.getQueryHandler();
+    const result: QueryResponse = await qh.handleQuery(query);
+    ctx.body = result;
+    ctx.status = 200;
   });
 
 export default QueryRouter;

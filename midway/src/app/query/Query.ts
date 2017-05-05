@@ -44,24 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-import { Versions } from './Versions';
-
-const Router = new KoaRouter();
-export const versions = new Versions();
-
-Router.get('/', async (ctx, next) =>
+export interface Query
 {
-  // return all versions
-  winston.info('get all versions');
-  ctx.body = await versions.get();
-});
+  database: number;
+  type: string;
+  body: object | string;
+}
 
-Router.get('/:objtype/:id', async (ctx, next) =>
-{
-  winston.info('get versions by object type and id');
-  ctx.body = await versions.get(ctx.params.objtype, ctx.params.id);
-});
-
-export default Router;
+export default Query;

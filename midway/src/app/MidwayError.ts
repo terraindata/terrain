@@ -44,24 +44,77 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-import { Versions } from './Versions';
-
-const Router = new KoaRouter();
-export const versions = new Versions();
-
-Router.get('/', async (ctx, next) =>
+export interface MidwayErrorItem
 {
-  // return all versions
-  winston.info('get all versions');
-  ctx.body = await versions.get();
-});
+  status: number;
+  title: string;
+  detail: string;
+  source: object;
+}
 
-Router.get('/:objtype/:id', async (ctx, next) =>
+export interface MidwayErrorObject
 {
-  winston.info('get versions by object type and id');
-  ctx.body = await versions.get(ctx.params.objtype, ctx.params.id);
-});
+  errors: MidwayErrorItem[];
+}
 
-export default Router;
+export class MidwayError
+{
+  public static fromJSON(json: string | MidwayErrorObject)
+  {
+    const midwayError = Object.create(MidwayError.prototype);
+    if (typeof json === 'string')
+    {
+      const jobject = JSON.parse(json);
+      midwayError.errorObject = jobject;
+    } else
+    {
+      midwayError.errorObject = json;
+    }
+    return midwayError;
+  }
+
+  public errorObject: MidwayErrorObject;
+
+  public constructor(status: number, title: string, detail: string, source: object)
+  {
+    const o: MidwayErrorItem = { status, title, detail, source };
+    this.errorObject = { errors: [o] };
+  }
+
+  public getMidwayErrorObject(): MidwayErrorObject
+  {
+    return this.errorObject;
+  }
+
+  // we may provide a iterator interface later
+  public getNthMidwayErrorItem(index): MidwayErrorItem
+  {
+    return this.errorObject.errors[index];
+  }
+
+  // get the first error object's status
+  public getStatus(): number
+  {
+    return this.getNthMidwayErrorItem(0).status;
+  }
+
+  // get the first error object's title
+  public getTitle(): string
+  {
+    return this.getNthMidwayErrorItem(0).title;
+  }
+
+  // get the first error object's detail
+  public getDetail(): string
+  {
+    return this.getNthMidwayErrorItem(0).detail;
+  }
+
+  // get the first error object's source
+  public getSource(): object
+  {
+    return this.getNthMidwayErrorItem(0).source;
+  }
+}
+
+export default MidwayError;

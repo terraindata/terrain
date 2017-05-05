@@ -43,25 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import MidwayError from './MidwayError';
 
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-import { Versions } from './Versions';
-
-const Router = new KoaRouter();
-export const versions = new Versions();
-
-Router.get('/', async (ctx, next) =>
+class QueryError extends MidwayError
 {
-  // return all versions
-  winston.info('get all versions');
-  ctx.body = await versions.get();
-});
+  public static isElasticQueryError(err: object): boolean
+  {
+    return err['response'] ? true : false;
+  }
 
-Router.get('/:objtype/:id', async (ctx, next) =>
-{
-  winston.info('get versions by object type and id');
-  ctx.body = await versions.get(ctx.params.objtype, ctx.params.id);
-});
+  public static composeFromElasticError(err: object): QueryError
+  {
+    const status = err['statusCode'] || 400;
+    const title = err['message'] || 'The Elastic query has an error.';
+    const detail = err['response'] || JSON.stringify(err);
+    const source = err;
+    return new QueryError(status, title, detail, source);
+  }
 
-export default Router;
+  public constructor(status, title, detail, source)
+  {
+    super(status, title, detail, source);
+  }
+}
+
+export default QueryError;

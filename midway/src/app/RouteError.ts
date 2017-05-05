@@ -43,25 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
-import { Versions } from './Versions';
 
-const Router = new KoaRouter();
-export const versions = new Versions();
+import MidwayError from './MidwayError';
 
-Router.get('/', async (ctx, next) =>
+class RouteError extends MidwayError
 {
-  // return all versions
-  winston.info('get all versions');
-  ctx.body = await versions.get();
-});
+  public static async RouteErrorHandler(ctx, next)
+  {
+    try
+    {
+      await next();
+    }
+    catch (err)
+    {
+      const routeError = RouteError.composeFromRouteContext(ctx, err);
+      const status = routeError.getStatus();
+      winston.info(JSON.stringify(routeError));
+      ctx.status = status;
+      ctx.body = routeError.getMidwayErrorObject();
+    }
+  }
+  public static composeFromRouteContext(ctx, err): RouteError
+  {
+    if (typeof err !== 'object')
+    {
+      err = new Error(err);
+    }
+    const status = 'status' in err ? err['status'] : 400;
+    const title = 'title' in err ? err['title'] : 'Route ' + ctx.url + ' has an error.';
+    const detail = err['detail'] || err['message'] || JSON.stringify(err);
+    const source = { ctx, err };
+    return new RouteError(status, title, detail, source);
+  }
 
-Router.get('/:objtype/:id', async (ctx, next) =>
-{
-  winston.info('get versions by object type and id');
-  ctx.body = await versions.get(ctx.params.objtype, ctx.params.id);
-});
+  public constructor(status, title, detail, source)
+  {
+    super(status, title, detail, source);
+  }
+}
 
-export default Router;
+export default RouteError;
