@@ -44,12 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as http from 'http';
 import * as Koa from 'koa';
 import * as winston from 'winston';
 
 import babelRegister = require('babel-register');
 import convert = require('koa-convert');
 import session = require('koa-generic-session');
+import serve = require('koa-static-server');
 import cors = require('kcors');
 import srs = require('secure-random-string');
 
@@ -74,15 +76,76 @@ export let DB: Tasty.Tasty;
 
 class App
 {
+  private static dsnToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
+  {
+    if (type === 'sqlite')
+    {
+      return {
+        filename: dsn,
+      } as SQLiteConfig;
+    }
+    else if (type === 'mysql')
+    {
+      // TODO: Convert DSN to a MySQLConfig object.
+    }
+    else if (type === 'elasticsearch' || type === 'elastic')
+    {
+      // TODO: Convert DSN to a ElasticConfig object.
+    }
+    else
+    {
+      throw Error('Error parsing database connection parameters.');
+    }
+  }
+
+  private static initializeDB(type: string, dsn: string): Tasty.Tasty
+  {
+    winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
+    if (type === 'sqlite')
+    {
+      const config = App.dsnToConfig(type, dsn) as SQLiteConfig;
+      const controller = new SQLiteController(config, 0, 'NodewaySQLite');
+      return controller.getTasty();
+    }
+    else if (type === 'mysql')
+    {
+      const config = App.dsnToConfig(type, dsn) as MySQLConfig;
+      const controller = new MySQLController(config, 0, 'NodewayMySQL');
+      return controller.getTasty();
+    }
+    else if (type === 'elasticsearch' || type === 'elastic')
+    {
+      const config = App.dsnToConfig(type, dsn) as ElasticConfig;
+      const controller = new ElasticController(config, 0, 'NodewayElastic');
+      return controller.getTasty();
+    }
+    else
+    {
+      throw Error('Error initializing Nodeway system database.');
+    }
+  }
+
+  private static uncaughtExceptionHandler(err: any): void
+  {
+    winston.error('Uncaught Exception: ' + err);
+    // this is a good place to clean tangled resources
+    process.abort();
+  }
+
+  private static unhandledRejectionHandler(res: any): void
+  {
+    winston.error('Unhandled Promise Rejection: ' + res);
+  }
+
   private DB: Tasty.Tasty;
   private app: Koa;
 
   constructor(config: any = CmdLineArgs)
   {
-    process.on('uncaughtException', this.uncaughtExceptionHandler);
-    process.on('unhandledRejection', this.unhandledRejectionHandler);
+    process.on('uncaughtException', App.uncaughtExceptionHandler);
+    process.on('unhandledRejection', App.unhandledRejectionHandler);
 
-    this.DB = this.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
+    this.DB = App.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
     DB = this.DB;
 
     this.app = new Koa();
@@ -101,73 +164,12 @@ class App
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter.routes());
+    this.app.use(serve({rootDir: './midway/src/assets', rootPath: '/assets'}));
   }
 
-  public listen(port: number = CmdLineArgs.port)
+  public listen(port: number = CmdLineArgs.port): http.Server
   {
     return this.app.listen(port);
-  }
-
-  private dsnToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
-  {
-    if (type === 'sqlite')
-    {
-      const config: SQLiteConfig = {
-        filename: dsn,
-      };
-      return config;
-    }
-    else if (type === 'mysql')
-    {
-      // TODO: Convert DSN to a MySQLConfig object.
-    }
-    else if (type === 'elasticsearch' || type === 'elastic')
-    {
-      // TODO: Convert DSN to a ElasticConfig object.
-    }
-    else
-    {
-      throw Error('Error parsing database connection parameters.');
-    }
-  }
-
-  private initializeDB(type: string, dsn: string): Tasty.Tasty
-  {
-    winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    if (type === 'sqlite')
-    {
-      const config = this.dsnToConfig(type, dsn) as SQLiteConfig;
-      const controller = new SQLiteController(config, 0, 'NodewaySQLite');
-      return controller.getTasty();
-    }
-    else if (type === 'mysql')
-    {
-      const config = this.dsnToConfig(type, dsn) as MySQLConfig;
-      const controller = new MySQLController(config, 0, 'NodewayMySQL');
-      return controller.getTasty();
-    }
-    else if (type === 'elasticsearch' || type === 'elastic')
-    {
-      const config = this.dsnToConfig(type, dsn) as ElasticConfig;
-      const controller = new ElasticController(config, 0, 'NodewayElastic');
-      return controller.getTasty();
-    }
-    else
-    {
-      throw Error('Error initializing Nodeway system database.');
-    }
-  }
-
-  private uncaughtExceptionHandler(err: any): void
-  {
-    winston.error('Uncaught Exception: ' + err);
-    // this is a good palce to clean tangle resources
-    process.abort();
-  }
-
-  private unhandledRejectionHandler(res: any): void
-  {
-    winston.error('Unhandled Promise Rejection: ' + res);
   }
 }
 
