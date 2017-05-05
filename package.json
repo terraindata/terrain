@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://luke@kingcrow.no-ip.biz:3984/var/git/TerrainSearch.git"
+    "url": "http://git.terrain.int/terrain/Search"
   },
   "authors": [
     "Luke Knepper",
@@ -73,9 +73,7 @@
     "elasticsearch": "^13.0.0-rc2",
     "global": "^4.3.2",
     "immutable": "^3.7.3",
-    "jest": "^19.0.2",
     "jquery": "^2.1.3",
-    "karma-typescript": "3.0.1",
     "kcors": "^1.3.2",
     "koa": "^2.2.0",
     "koa-bodyparser": "^4.2.0",
@@ -177,12 +175,14 @@
     "css-loader": "^0.28.1",
     "expose-loader": "0.7.3",
     "file-loader": "0.11.1",
+    "jest": "^19.0.2",
     "json-loader": "^0.5.4",
     "karma": "^1.5.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-tap": "^3.1.1",
+    "karma-typescript": "3.0.1",
     "karma-webpack": "^2.0.3",
     "less-loader": "^0.6.2",
     "nodemon": "^1.11.0",

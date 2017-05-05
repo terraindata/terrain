@@ -48,7 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import { Users } from '../users/Users';
+import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
 
@@ -71,27 +71,18 @@ Router.get('/login', passport.authenticate('local'), async (ctx, next) =>
 
 Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
 {
-  winston.info('User has successfully authenticated as ' + ctx.state.user.email);
   ctx.body =
     {
       accessToken: ctx.state.user.accessToken,
       username: ctx.state.user.username,
     };
+  winston.info('User has successfully authenticated as ' + ctx.state.user.email);
 });
 
 Router.post('/api_logout', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const returnStatus: any = await Users.logout(ctx.request.body.id, ctx.request.body.accessToken);
-  // TODO revise this once error handling is implemented in Tasty
-  if (returnStatus instanceof Array)
-  {
-    ctx.body = 'Success';
-    winston.info('User ' + ctx.state.user.email + ' has successfully logged out');
-  }
-  else
-  {
-    ctx.body = 'Unauthorized';
-  }
+  winston.info('Logging out user ' + ctx.state.user.email);
+  ctx.body = await users.logout(ctx.request.body.id, ctx.request.body.accessToken);
 });
 
 export default Router;
