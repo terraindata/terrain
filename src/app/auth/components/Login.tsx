@@ -203,9 +203,9 @@ class Login extends PureClasss<Props>
         this.toggleErrorModal();
         return;
       }
-      const token = this.xhr.responseText;
       this.xhr = null;
-      login(token);
+      const loginData = JSON.parse(this.xhr.responseText);
+      login(loginData);
     };
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     this.xhr.open('POST', MIDWAY_HOST + '/auth', true);
