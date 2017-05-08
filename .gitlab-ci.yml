@@ -34,9 +34,10 @@ before_script:
   - yarn install
   - npm install sqlite3 bcrypt
 
-lint:
-  script:
-    - yarn run lint
+# Comment for testing speed
+# lint:
+#  script:
+#    - yarn run lint
 
 
 test_backends:
