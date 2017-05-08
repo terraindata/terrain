@@ -31,6 +31,7 @@ before_script:
     sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
   - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
+  - npm install sqlite3
 
 lint:
   script:
@@ -42,5 +43,4 @@ test_backends:
    - yarn install
    - yarn run lint
    - yarn run style
-   - find
    - yarn run test-back
