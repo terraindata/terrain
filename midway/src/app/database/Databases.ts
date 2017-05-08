@@ -88,7 +88,7 @@ export class Databases
 
   public async get(id?: number): Promise<DatabaseConfig[]>
   {
-    if (id !== undefined)
+    if (id)
     {
       return this.select([], { id });
     }
@@ -99,7 +99,7 @@ export class Databases
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (db.id !== undefined)
+      if (db.id)
       {
         const results: DatabaseConfig[] = await this.get(db.id);
         // database id specified but database not found

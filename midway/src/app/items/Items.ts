@@ -84,7 +84,7 @@ export class Items
 
   public async get(id?: number): Promise<ItemConfig[]>
   {
-    if (id !== undefined)
+    if (id)
     {
       return this.select([], { id });
     }
@@ -101,7 +101,7 @@ export class Items
       // check privileges
       if (!user.isSuperUser && item.status)
       {
-        if (item.id !== undefined)
+        if (item.id)
         {
           return reject('Only superuser can change item status');
         }
@@ -114,7 +114,7 @@ export class Items
         }
       }
 
-      if (item.id !== undefined)
+      if (item.id)
       {
         // item id specified but item not found
         const items: ItemConfig[] = await this.get(item.id);
