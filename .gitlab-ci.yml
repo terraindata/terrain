@@ -29,8 +29,7 @@ before_script:
     sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/database/mysql/tasty/MySQLExecutorTests.ts
   - >
     sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
-  - yarn global add webpack
-  - yarn global add webpack-dev-server
+  - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
 
 lint:
@@ -41,7 +40,6 @@ lint:
 test_backends:
   script:
    - yarn install
-   - yarn install sqlite3
    - yarn run lint
    - parallel --version
    - yarn run style
