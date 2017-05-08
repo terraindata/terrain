@@ -40,5 +40,6 @@ lint:
 test_backends:
   script:
    - yarn install
-   - yarn run fix
+   - yarn run lint
+   - yarn run style
    - yarn run test-back
