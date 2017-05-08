@@ -57,7 +57,7 @@ let testUserAccessToken: string;
 
 beforeAll((done) =>
 {
-  winston.level = 'debug';
+  winston.transports.Console.level = 'debug';
   const options =
     {
       db: 'sqlite',
