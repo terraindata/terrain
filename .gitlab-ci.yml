@@ -45,4 +45,5 @@ test_backends:
    - yarn install
    - yarn run lint
    - yarn run style
+   - stat moviesdb.db
    - yarn run test-back
