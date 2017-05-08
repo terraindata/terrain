@@ -44,57 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import { UserConfig } from '../users/Users';
+import ElasticConfig from '../database/elastic/ElasticConfig';
+import ElasticController from '../database/elastic/ElasticController';
 
-// CREATE TABLE versions (id integer PRIMARY KEY, \
-// objectType text NOT NULL, objectId integer NOT NULL, \
-// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
+import MySQLConfig from '../database/mysql/MySQLConfig';
+import MySQLController from '../database/mysql/MySQLController';
 
-export interface VersionConfig
+import SQLiteConfig from '../database/sqlite/SQLiteConfig';
+import SQLiteController from '../database/sqlite/SQLiteController';
+
+import DatabaseController from './DatabaseController';
+
+export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
 {
-  createdByUserId: number;
-  id?: number;
-  object: string;
-  objectId: number;
-  objectType: string;
-}
-
-export class Versions
-{
-  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
-
-  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
+  if (type === 'sqlite')
   {
-    // can only insert
-    const newVersion: VersionConfig =
-      {
-        createdByUserId: user.id,
-        object: obj.toString(),
-        objectId: id,
-        objectType: type,
-      };
-    return App.DB.upsert(this.Version, newVersion) as any;
+    return {
+      filename: dsn,
+    } as SQLiteConfig;
   }
-
-  public async find(id: number): Promise<VersionConfig[]>
+  else if (type === 'mysql')
   {
-    return App.DB.select(this.Version, [], { id }) as any;
+    // TODO: Convert DSN to a MySQLConfig object.
   }
-
-  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
+  else if (type === 'elasticsearch' || type === 'elastic')
   {
-    if (objectId && objectType)
-    {
-      return App.DB.select(this.Version, [], { objectType, objectId }) as any;
-    }
-    else if (objectId)
-    {
-      return App.DB.select(this.Version, [], { objectType }) as any;
-    }
-    return App.DB.select(this.Version, [], {}) as any;
+    // TODO: Convert DSN to a ElasticConfig object.
+  }
+  else
+  {
+    throw new Error('Error parsing database connection parameters.');
   }
 }
 
-export default Versions;
+export function makeDatabaseController(type: string, dsn: string): SQLiteController | MySQLController | ElasticController
+{
+  if (type === 'sqlite')
+  {
+    const config = DSNToConfig(type, dsn) as SQLiteConfig;
+    return new SQLiteController(config, 0, 'SQLite');
+  }
+  else if (type === 'mysql')
+  {
+    const config = DSNToConfig(type, dsn) as MySQLConfig;
+    return new MySQLController(config, 0, 'MySQL');
+  }
+  else if (type === 'elasticsearch' || type === 'elastic')
+  {
+    const config = DSNToConfig(type, dsn) as ElasticConfig;
+    return new ElasticController(config, 0, 'Elastic');
+  }
+  else
+  {
+    throw new Error('Error making new database controller.');
+  }
+}

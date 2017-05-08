@@ -255,7 +255,7 @@ export class Tasty
 
     columns.map((col) =>
     {
-      if (obj[col] !== undefined)
+      if (obj[col])
       {
         if (node === null)
         {

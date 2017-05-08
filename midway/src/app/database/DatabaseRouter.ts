@@ -44,57 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import { UserConfig } from '../users/Users';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-// CREATE TABLE versions (id integer PRIMARY KEY, \
-// objectType text NOT NULL, objectId integer NOT NULL, \
-// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
+import * as Util from '../Util';
+import { DatabaseConfig, Databases } from './Databases';
 
-export interface VersionConfig
+const Router = new KoaRouter();
+const databases = new Databases();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  createdByUserId: number;
-  id?: number;
-  object: string;
-  objectId: number;
-  objectType: string;
-}
+  winston.info('getting all databases');
+  ctx.body = await databases.get();
+});
 
-export class Versions
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
+  winston.info('getting database ID ' + ctx.params.id);
+  ctx.body = await databases.get(ctx.params.id);
+});
 
-  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add new database');
+  const db: DatabaseConfig = ctx.request.body.body;
+  Util.verifyParameters(db, ['name', 'dsn']);
+  if (db.id)
   {
-    // can only insert
-    const newVersion: VersionConfig =
-      {
-        createdByUserId: user.id,
-        object: obj.toString(),
-        objectId: id,
-        objectType: type,
-      };
-    return App.DB.upsert(this.Version, newVersion) as any;
+    throw Error('Invalid parameter database ID');
   }
 
-  public async find(id: number): Promise<VersionConfig[]>
-  {
-    return App.DB.select(this.Version, [], { id }) as any;
-  }
+  ctx.body = await databases.upsert(ctx.state.user, db);
+});
 
-  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('update existing database');
+  const db: DatabaseConfig = ctx.request.body.body;
+  if (!db.id)
   {
-    if (objectId && objectType)
+    db.id = ctx.params.id;
+  }
+  else
+  {
+    if (db.id !== Number(ctx.params.id))
     {
-      return App.DB.select(this.Version, [], { objectType, objectId }) as any;
+      throw Error('Database ID does not match the supplied id in the URL');
     }
-    else if (objectId)
-    {
-      return App.DB.select(this.Version, [], { objectType }) as any;
-    }
-    return App.DB.select(this.Version, [], {}) as any;
   }
-}
 
-export default Versions;
+  ctx.body = await databases.upsert(ctx.state.user, db);
+});
+
+Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('connect to database');
+  ctx.body = await databases.connect(ctx.state.user, ctx.params.id);
+});
+
+Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('disconnect from database');
+  ctx.body = await databases.disconnect(ctx.state.user, ctx.params.id);
+});
+
+Router.post('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('get database schema');
+  ctx.body = await databases.schema(ctx.params.id);
+});
+
+export default Router;

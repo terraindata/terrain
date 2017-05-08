@@ -44,45 +44,49 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import { UserConfig } from '../users/Users';
+
+import DatabaseController from '../../database/DatabaseController';
+import * as DBUtil from '../../database/Util';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { ItemConfig, items } from '../items/ItemRouter';
+import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
-import { versions } from '../versions/VersionRouter';
 
-// CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
-// parent integer, status text, type text);
+// CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
+// dsn text NOT NULL, status text);
 
-export interface ItemConfig
+export interface DatabaseConfig
 {
   id?: number;
-  meta?: string;
   name: string;
-  parent?: number;
+  type: string;
+  dsn: string;
   status?: string;
-  type?: string;
 }
 
-export class Items
+export class Databases
 {
-  private itemTable: Tasty.Table;
+  private databaseTable: Tasty.Table;
 
   constructor()
   {
-    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parent', 'status', 'type']);
+    this.databaseTable = new Tasty.Table('databases', ['id'], ['name', 'type', 'dsn', 'status']);
   }
 
   public async delete(id: number): Promise<object[]>
   {
-    return App.DB.delete(this.itemTable, { id } as ItemConfig);
+    return App.DB.delete(this.databaseTable, { id } as DatabaseConfig);
   }
 
-  public async select(columns: string[], filter: object): Promise<ItemConfig[]>
+  public async select(columns: string[], filter: object): Promise<DatabaseConfig[]>
   {
-    return App.DB.select(this.itemTable, columns, filter) as Promise<ItemConfig[]>;
+    return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
   }
 
-  public async get(id?: number): Promise<ItemConfig[]>
+  public async get(id?: number): Promise<DatabaseConfig[]>
   {
     if (id)
     {
@@ -91,58 +95,62 @@ export class Items
     return this.select([], {});
   }
 
-  // both regular and superusers can create items
-  // only superusers can change existing items that are not BUILD status
-  // both regular and superusers can change items that are not LIVE or DEFAULT status
-  public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
+  public async upsert(user: UserConfig, db: DatabaseConfig): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      // check privileges
-      if (!user.isSuperUser && item.status)
+      if (db.id)
       {
-        if (item.id)
+        const results: DatabaseConfig[] = await this.get(db.id);
+        // database id specified but database not found
+        if (results.length === 0)
         {
-          return reject('Only superuser can change item status');
-        }
-        else
-        {
-          if (item.status === 'LIVE' || item.status === 'DEFAULT')
-          {
-            return reject('Cannot set item status as LIVE or DEFAULT as non-superuser');
-          }
-        }
-      }
-
-      if (item.id)
-      {
-        // item id specified but item not found
-        const items: ItemConfig[] = await this.get(item.id);
-        if (items.length === 0)
-        {
-          return reject('Invalid item id passed');
-        }
-        if (!user.isSuperUser && items[0].status
-          && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
-        {
-          return reject('Cannot update LIVE or DEFAULT item as non-superuser');
+          return reject('Invalid db id passed');
         }
 
-        await versions.create(user, 'items', items[0].id, items[0]);
-        item = Util.updateObject(items[0], item);
+        db = Util.updateObject(results[0], db);
       }
 
-      try
-      {
-        await App.DB.upsert(this.itemTable, item);
-        resolve('Success');
-      }
-      catch (e)
-      {
-        reject(e);
-      }
+      await App.DB.upsert(this.databaseTable, db);
+      resolve('Success');
     });
+  }
+
+  public async connect(user: UserConfig, id: number): Promise<string>
+  {
+    const results: DatabaseConfig[] = await this.get(id);
+    if (results.length === 0)
+    {
+      return Promise.reject('Invalid db id passed');
+    }
+
+    const db: DatabaseConfig = results[0];
+    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
+    DatabaseRegistry.set(db.id, controller);
+    db.status = 'CONNECTED';
+    await this.upsert(user, db);
+    return Promise.resolve('Success');
+  }
+
+  public async disconnect(user: UserConfig, id: number): Promise<string>
+  {
+    await DatabaseRegistry.remove(id);
+    // TODO: clean up controller?
+    await this.upsert(user, { id, status: 'DISCONNECTED' } as DatabaseConfig);
+    return Promise.resolve('Success');
+  }
+
+  public async schema(id: number): Promise<string>
+  {
+    const controller: DatabaseController = await DatabaseRegistry.get(id);
+    if (controller === undefined)
+    {
+      return Promise.reject('Invalid db id passed');
+    }
+
+    const schema: Tasty.Schema = await controller.getTasty().schema();
+    return schema.toString();
   }
 }
 
-export default Items;
+export default Databases;

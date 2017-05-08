@@ -50,6 +50,7 @@ import * as send from 'koa-send';
 import * as winston from 'winston';
 
 import AuthRouter from './auth/AuthRouter';
+import DatabaseRouter from './database/DatabaseRouter';
 import ItemRouter from './items/ItemRouter';
 import QueryRouter from './query/QueryRouter';
 import SchemaRouter from './schema/SchemaRouter';
@@ -64,6 +65,7 @@ AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
 AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
 AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
 AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
+AppRouter.use('/database', DatabaseRouter.routes(), DatabaseRouter.allowedMethods());
 AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
 AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
