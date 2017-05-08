@@ -42,5 +42,5 @@ test_backends:
    - yarn install
    - yarn run lint
    - yarn run style
-   - yarn add sqlite3
+   - find
    - yarn run test-back
