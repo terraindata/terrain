@@ -48,66 +48,108 @@ import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
+import DatabaseController from '../../database/DatabaseController';
+import * as DBUtil from '../../database/Util';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { ItemConfig, items } from '../items/ItemRouter';
 import { UserConfig } from '../users/UserRouter';
+import * as Util from '../Util';
+
+// CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
+// dsn text NOT NULL, status text);
 
 export interface DatabaseConfig
 {
   id?: number;
   name: string;
+  type: string;
   dsn: string;
   status?: string;
 }
 
 export class Databases
 {
+  private databaseTable: Tasty.Table;
+
   constructor()
   {
-    winston.info('db root');
+    this.databaseTable = new Tasty.Table('databases', ['id'], ['name', 'type', 'dsn', 'status']);
   }
 
   public async delete(id: number): Promise<object[]>
   {
-    return items.delete(id);
+    return App.DB.delete(this.databaseTable, { id } as DatabaseConfig);
   }
 
-  public async get(id?: number): Promise<ItemConfig[]>
+  public async select(columns: string[], filter: object): Promise<DatabaseConfig[]>
+  {
+    return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
+  }
+
+  public async get(id?: number): Promise<DatabaseConfig[]>
   {
     if (id !== undefined)
     {
-      return items.get(id);
+      return this.select([], { id });
     }
-    return items.select([], { type: 'database' });
+    return this.select([], {});
   }
 
   public async upsert(user: UserConfig, db: DatabaseConfig): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      const item: ItemConfig = {
-        name: db.name,
-        type: 'database',
-        meta: db.dsn,
-        status: db.status || '',
-      };
-      await items.upsert(user, item);
+      if (db.id !== undefined)
+      {
+        const results: DatabaseConfig[] = await this.get(db.id);
+        // database id specified but database not found
+        if (results.length === 0)
+        {
+          return reject('Invalid db id passed');
+        }
+
+        db = Util.updateObject(results[0], db);
+      }
+
+      await App.DB.upsert(this.databaseTable, db);
       resolve('Success');
     });
   }
 
   public async connect(user: UserConfig, id: number): Promise<string>
   {
+    const results: DatabaseConfig[] = await this.get(id);
+    if (results.length === 0)
+    {
+      return Promise.reject('Invalid db id passed');
+    }
+
+    const db: DatabaseConfig = results[0];
+    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
+    DatabaseRegistry.set(db.id, controller);
+    db.status = 'CONNECTED';
+    await this.upsert(user, db);
     return Promise.resolve('Success');
   }
 
   public async disconnect(user: UserConfig, id: number): Promise<string>
   {
+    await DatabaseRegistry.remove(id);
+    // TODO: clean up controller?
+    await this.upsert(user, { id, status: 'DISCONNECTED' } as DatabaseConfig);
     return Promise.resolve('Success');
   }
 
   public async schema(id: number): Promise<string>
   {
-    return Promise.resolve('Success');
+    const controller: DatabaseController = await DatabaseRegistry.get(id);
+    if (controller === undefined)
+    {
+      return Promise.reject('Invalid db id passed');
+    }
+
+    const schema: Tasty.Schema = await controller.getTasty().schema();
+    return schema.toString();
   }
 }
 
