@@ -33,6 +33,7 @@ before_script:
   - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
   - npm install sqlite3 bcrypt
+  - docker run -v$PWD:/data/ terrain/moviesdb-sqlite:1.0a
 
 # Comment for testing speed
 # lint:
