@@ -105,15 +105,15 @@ export class Items
       if (item.id !== undefined)
       {
         const items: ItemConfig[] = await this.get(item.id);
-        
+
         if (items.length === 0)
         {
           // item id specified but item not found
           return reject('Invalid item id passed');
         }
-        
+
         const status = items[0].status;
-        
+
         if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
         {
           // only superusers can update live / default items
@@ -122,7 +122,7 @@ export class Items
 
         // insert a version to save the past state of this item
         await versions.create(user, 'items', items[0].id, items[0]);
-        
+
         item = Util.updateObject(items[0], item);
       }
 
