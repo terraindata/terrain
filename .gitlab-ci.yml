@@ -41,6 +41,6 @@ test_backends:
   script:
    - yarn install
    - yarn run lint
-   - parallel --version
    - yarn run style
+   - yarn add sqlite3
    - yarn run test-back
