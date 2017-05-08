@@ -41,6 +41,7 @@ lint:
 test_backends:
   script:
    - yarn install
+   - yarn install sqlite3
    - yarn run lint
    - parallel --version
    - yarn run style
