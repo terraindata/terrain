@@ -41,5 +41,6 @@ test_backends:
   script:
    - yarn install
    - yarn run lint
+   - parallel --version
    - yarn run style
    - yarn run test-back
