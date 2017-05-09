@@ -33,7 +33,7 @@ before_script:
   - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
   - npm install sqlite3 bcrypt
-  - sudo get install --assume-yes python-software-properties
+  - sudo apt-get install --assume-yes python-software-properties
   - sudo add-apt-repository ppa:git-core/ppa
   - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
   - sudo apt-get install --assume-yes git-lfs
