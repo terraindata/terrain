@@ -17,7 +17,5 @@ lint:
 test_backends:
   script:
    - yarn install
-   - yarn run lint
-   - yarn run style
-   - stat moviesdb.db && ls -l moviesdb.db
+   - yarn run fix
    - yarn run test-back-all
