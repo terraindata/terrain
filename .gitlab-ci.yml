@@ -13,7 +13,7 @@ services:
   - terrain/moviesdb-elk:1.0a
   - terrain/moviesdb-mysql:1.0a
 #  This docker image doesn't actually run as a service, just delivers a file
-  - terrain/moviesdb-sqlite:1.0a
+#  - terrain/moviesdb-sqlite:1.0a
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -33,7 +33,7 @@ before_script:
   - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
   - npm install sqlite3 bcrypt
-  #- docker run -v$PWD:/data/ terrain/moviesdb-sqlite:1.0a
+  - chown `id -u`.`id -g` moviesdb.db
 
 # Comment for testing speed
 # lint:
