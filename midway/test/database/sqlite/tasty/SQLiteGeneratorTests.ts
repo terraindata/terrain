@@ -70,7 +70,7 @@ let sqliteGenerator: SQLiteGenerator;
 
 beforeAll(async () =>
 {
-  winston.level = 'debug';
+  winston.transports.Console.level = 'debug';
   const config: SQLiteConfig =
     {
       filename: 'moviesdb.db',

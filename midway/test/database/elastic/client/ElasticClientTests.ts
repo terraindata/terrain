@@ -63,7 +63,7 @@ function getExpectedFile(): string
 
 beforeAll(() =>
 {
-  winston.level = 'debug';
+  winston.transports.Console.level = 'debug';
   const config: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };

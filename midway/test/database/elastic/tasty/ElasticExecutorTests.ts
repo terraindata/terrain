@@ -65,7 +65,7 @@ const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']
 
 beforeAll(async () =>
 {
-  winston.level = 'debug';
+  winston.transports.Console.level = 'debug';
   try
   {
     const config: ElasticConfig = {

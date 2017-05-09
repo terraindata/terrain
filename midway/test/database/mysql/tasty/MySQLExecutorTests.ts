@@ -64,7 +64,7 @@ let mysqlController: MySQLController;
 
 beforeAll(async () =>
 {
-  winston.level = 'debug';
+  winston.transports.Console.level = 'debug';
   const config: MySQLConfig =
     {
       connectionLimit: 20,

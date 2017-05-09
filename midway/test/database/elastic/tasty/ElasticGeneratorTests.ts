@@ -58,7 +58,7 @@ let elasticGenerator: ElasticGenerator;
 
 beforeAll(() =>
 {
-  winston.level = 'debug';
+  winston.transports.Console.level = 'debug';
   const elasticConfig: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };
