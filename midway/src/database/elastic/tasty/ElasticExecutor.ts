@@ -247,7 +247,7 @@ export default class ElasticExecutor implements TastyExecutor
 
   private makeID(table: TastyTable, element: object): string
   {
-    return table.getPrimaryKeys(element).map(
+    return table.getPrimaryKeys().map(
       (key: string) =>
       {
         return element[key];
