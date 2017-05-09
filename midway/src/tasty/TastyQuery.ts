@@ -92,11 +92,11 @@ export class TastyQuery
 
     if (value instanceof Array)
     {
-      this.upserts = value;
+      this.upserts.concat(value);
     }
     else
     {
-      this.upserts = [value];
+      this.upserts.push(value);
     }
 
     return this;
