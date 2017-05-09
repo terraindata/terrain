@@ -33,7 +33,6 @@ before_script:
   - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
   - npm install sqlite3 bcrypt
-  - chmod ogu+rw moviesdb.db
 
 # Comment for testing speed
 # lint:
