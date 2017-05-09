@@ -22,7 +22,7 @@ cache:
   - node_modules/
 
 before_script:
-  - apt-get update && apt --assume-yes install parallel mysql-client sed sqlite3 node-sqlite3
+  - sudo apt-get update && sudo apt --assume-yes install parallel mysql-client sed sqlite3 node-sqlite3
   - sed -i 's/mysqladmin\(.*\)-h127.0.0.1/mysqladmin \1-hterrain-moviesdb-mysql/g' midway/test/scripts/setup_env.sh
   - sed -i 's#http://127.0.0.1:$elastic#http://terrain-moviesdb-elk:$elastic#g' midway/test/scripts/setup_env.sh
   - sed -i 's#http://localhost:9200#http://terrain-moviesdb-elk:9200#g' midway/test/database/elastic/client/ElasticClientTests.ts midway/test/database/elastic/tasty/ElasticExecutorTests.ts midway/test/database/elastic/tasty/ElasticGeneratorTests.ts midway/test/routes/RouteTests.ts
@@ -33,8 +33,8 @@ before_script:
   - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
   - npm install sqlite3 bcrypt
-  - apt-get install --assume-yes python-software-properties
-  - add-apt-repository ppa:git-core/ppa
+  - sudo -get install --assume-yes python-software-properties
+  - sudo add-apt-repository ppa:git-core/ppa
   - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
   - sudo apt-get install --assume-yes git-lfs
   - git lfs pull
