@@ -98,37 +98,34 @@ export class Items
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      // check privileges
-      if (!user.isSuperUser && item.status)
+      // check privileges if setting to live/default
+      if (!user.isSuperUser && (item.status === 'LIVE' || item.status === 'DEFAULT'))
       {
-        if (item.id !== undefined)
-        {
-          return reject('Only superuser can change item status');
-        }
-        else
-        {
-          if (item.status === 'LIVE' || item.status === 'DEFAULT')
-          {
-            return reject('Cannot set item status as LIVE or DEFAULT as non-superuser');
-          }
-        }
+        return reject('Cannot set item status as LIVE or DEFAULT as non-superuser');
       }
 
+      // if modifying existing item, check for existence and check privileges
       if (item.id !== undefined)
       {
-        // item id specified but item not found
         const items: ItemConfig[] = await this.get(item.id);
+
         if (items.length === 0)
         {
+          // item id specified but item not found
           return reject('Invalid item id passed');
         }
-        if (!user.isSuperUser && items[0].status
-          && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
+
+        const status = items[0].status;
+
+        if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
         {
+          // only superusers can update live / default items
           return reject('Cannot update LIVE or DEFAULT item as non-superuser');
         }
 
+        // insert a version to save the past state of this item
         await versions.create(user, 'items', items[0].id, items[0]);
+
         item = Util.updateObject(items[0], item);
       }
 
