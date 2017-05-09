@@ -45,57 +45,39 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import TastyColumn from './TastyColumn';
-import TastyTableState from './TastyTableState';
+import TastyTable from './TastyTable';
 
-export default class TastyTable
+export default class TastyTableState
 {
-  // tslint:disable:variable-name
-  private ___tastyTableState___: TastyTableState;
+  public table: TastyTable;
+  public databaseName: string;
+  public tableName: string;
+  public columns: Map<string, TastyColumn>;
+  public primaryKeys: string[];
+  public columnNames: string[]; // sorted list of columns
 
-  constructor(name: string, primaryKeys: string[], columns: string[], database?: string)
+  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[], database?: string)
   {
-    this.___tastyTableState___ = new TastyTableState(
-      this, name, primaryKeys, columns, database);
-    this.___tastyTableState___.init();
+    // primary key is a list, so that composite keys can be supported
+    this.table = table;
+    this.databaseName = database;
+    this.tableName = name;
+    this.columns = new Map();
+    this.primaryKeys = primaryKeys;
+    this.columnNames = columns.concat(primaryKeys).sort();
+  }
 
-    this.___tastyTableState___.columns.forEach(
-      (value: TastyColumn, key: string) =>
+  public init(): void
+  {
+    this.addColumns(this.columnNames);
+  }
+
+  private addColumns(columns: string[]): void
+  {
+    columns.forEach(
+      (columnName) =>
       {
-        this[key] = value;
+        this.columns.set(columnName, new TastyColumn(this.table, columnName));
       });
-  }
-
-  public getTableName(): string
-  {
-    return this.___tastyTableState___.tableName;
-  }
-
-  public getDatabaseName(): string
-  {
-    return this.___tastyTableState___.databaseName;
-  }
-
-  public getPrimaryKeys(): string[]
-  {
-    return this.___tastyTableState___.primaryKeys;
-  }
-
-  public getColumns(): Map<string, TastyColumn>
-  {
-    return this.___tastyTableState___.columns;
-  }
-
-  /**
-   * Returns a sorted list of all column names
-   * @returns {string[]}
-   */
-  public getColumnNames(): string[]
-  {
-    return this.___tastyTableState___.columnNames;
-  }
-
-  public toString(): string
-  {
-    return JSON.stringify(this, null, 2);
   }
 }

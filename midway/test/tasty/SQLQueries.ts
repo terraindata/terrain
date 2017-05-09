@@ -45,42 +45,66 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 const SQLQueries: Array<[string, string]> = [
-  ['simple query (select all)',
-    `SELECT * \n  FROM movies\n  LIMIT 10;`],
+  [
+    'simple query (select all)',
+    [`SELECT * \n  FROM movies\n  LIMIT 10;`],
+  ],
 
-  ['simple query (select columns)',
-    `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  LIMIT 10;`],
+  [
+    'simple query (select columns)',
+    [`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  LIMIT 10;`],
+  ],
 
-  ['simple query (filter equals)',
-    `SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`],
+  [
+    'simple query (filter equals)',
+    [`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`],
+  ],
 
-  ['simple query (filter doesNotEqual)',
-    `SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)'\n  LIMIT 10;`],
+  [
+    'simple query (filter doesNotEqual)',
+    [`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)'\n  LIMIT 10;`],
+  ],
 
-  ['simple query (sort asc)',
-    `SELECT * \n  FROM movies\n  ORDER BY movies.title ASC\n  LIMIT 10;`],
+  [
+    'simple query (sort asc)',
+    [`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC\n  LIMIT 10;`],
+  ],
 
-  ['simple query (sort desc)',
-    `SELECT * \n  FROM movies\n  ORDER BY movies.title DESC\n  LIMIT 10;`],
+  [
+    'simple query (sort desc)',
+    [`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC\n  LIMIT 10;`],
+  ],
 
-  ['simple query (take)',
-    `SELECT * \n  FROM movies\n  LIMIT 10;`],
+  [
+    'simple query (take)',
+    [`SELECT * \n  FROM movies\n  LIMIT 10;`],
+  ],
 
-  ['simple query (skip)',
-    `SELECT * \n  FROM movies\n  LIMIT 10 OFFSET 20;`],
+  [
+    'simple query (skip)',
+    [`SELECT * \n  FROM movies\n  LIMIT 10 OFFSET 20;`],
+  ],
 
-  ['simple query (upsert)',
-    `REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
+  [
+    'simple query (upsert)',
+    [`REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
+  ],
 
-  ['simple query (delete)',
-    `DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
+  [
+    'simple query (delete)',
+    [`DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
+  ],
 
-  ['complex query',
-    `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies
+  [
+    'complex query',
+    [
+      `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies
   WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'
      AND movies.releasedate < '2017-03-24'
   ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC
-  LIMIT 10 OFFSET 20;`],
+  LIMIT 10 OFFSET 20;`,
+    ],
+  ],
 ];
 
 export default SQLQueries;

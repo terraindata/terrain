@@ -105,22 +105,15 @@ export class Tasty
   /**
    * Execute a query.
    *
-   * @param {TastyQuery | string} query The Tasty Query to execute.
+   * @param {TastyQuery} query The Tasty Query to execute.
    * @returns {Promise<object[]>} Returns a promise that would return a list of objects.
    *
    * @memberOf TastyInterface
    */
-  public async execute(query: TastyQuery | string): Promise<object[]>
+  public async execute(query: TastyQuery): Promise<object[]>
   {
-    if (typeof query === 'string')
-    {
-      return this.executor.query(query);
-    }
-    else
-    {
-      const queryString = this.generator.generate(query);
-      return this.executor.query(queryString);
-    }
+    const queryString = this.generator.generate(query);
+    return this.executor.query(queryString);
   }
 
   /**
@@ -140,7 +133,7 @@ export class Tasty
    *
    * @param {TastyTable} table A Tasty Table
    * @param {string[]} columns List of columns to select
-   * @param {object) filter A filter object populated with keys corresponding to table
+   * @param {object} filter A filter object populated with keys corresponding to table
    *                        columns and values to filter on.
    *
    * @returns {Promise<object[]>}
@@ -149,60 +142,42 @@ export class Tasty
    */
   public async select(table: TastyTable, columns?: string[], filter?: object): Promise<object[]>
   {
-    const query = new TastyQuery(table);
+    const query: TastyQuery = new TastyQuery(table);
     if (columns === undefined || columns.length === 0)
     {
       columns = table.getColumnNames();
     }
 
-    const selectedColumns = columns.map((col) => table[col]);
+    const selectedColumns: TastyColumn[] = columns.map((col) => table[col]);
     query.select(selectedColumns);
 
-    try
+    const node: TastyNode = this.filterColumns(table, filter);
+    if (node)
     {
-      const node: TastyNode = this.filterColumns(table, filter);
-      if (node)
-      {
-        query.filter(node);
-      }
+      query.filter(node);
+    }
 
-      const queryString = this.generator.generate(query);
-      return this.executor.query(queryString);
-    }
-    catch (e)
-    {
-      throw (e);
-    }
+    const generatedQuery: string[] = this.generator.generate(query);
+    return this.executor.query(generatedQuery);
   }
 
   /**
    * Update or insert an object or a list of objects.
    *
    * @param {TastyTable} table The table to upsert the object in.
-   * @param {(object | object[])} obj An object or a list of objects to upsert.
+   * @param {(object | object[])} value An object or a list of objects to upsert.
    * @returns {Promise<object[]>}
    *
    * @memberOf TastyInterface
    */
-  public async upsert(table: TastyTable, obj: object | object[]): Promise<object[]>
+  public async upsert(table: TastyTable, value: object | object[]): Promise<object[]>
   {
     const query = new TastyQuery(table);
-    if (obj instanceof Array)
-    {
-      const promises = [];
-      obj.map(
-        (o) =>
-        {
-          promises.push(this.upsert(table, o));
-        });
-      return Promise.all(promises);
-    }
-    else
-    {
-      query.upsert(obj);
-    }
-    const queryString = this.generator.generate(query);
-    return this.executor.query(queryString);
+    query.upsert(value);
+
+    const generatedQuery = this.generator.generate(query);
+    // return this.executor.upsert(generatedQuery);
+    return this.executor.query(generatedQuery);
   }
 
   /**
@@ -251,9 +226,9 @@ export class Tasty
   private filterColumns(table: TastyTable, obj: object): TastyNode
   {
     let node: TastyNode = null;
-    const columns = table.getColumnNames();
+    const columns: string[] = table.getColumnNames();
 
-    columns.map((col) =>
+    for (const col of columns)
     {
       if (obj[col] !== undefined)
       {
@@ -266,7 +241,7 @@ export class Tasty
           node = node.and(table[col].equals(obj[col]));
         }
       }
-    });
+    }
     return node;
   }
 }
