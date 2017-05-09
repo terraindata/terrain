@@ -53,13 +53,13 @@ import SQLiteGeneratorRunner from './SQLiteGeneratorRunner';
  */
 export default class SQLiteGenerator extends TastyGenerator
 {
-  public generate(query: TastyQuery): string
+  public generate(query: TastyQuery): string[]
   {
-    return new SQLiteGeneratorRunner(query).queryString;
+    return new SQLiteGeneratorRunner(query).statements;
   }
 
   public generateString(query: TastyQuery): string
   {
-    return this.generate(query);
+    return this.generate(query).join('\n');
   }
 }
