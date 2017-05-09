@@ -49,10 +49,11 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import { Items } from './Items';
+import { ItemConfig, Items } from './Items';
+export * from './Items';
 
 const Router = new KoaRouter();
-export const items = new Items();
+export const items: Items = new Items();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -69,7 +70,7 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('create items');
-  const item = ctx.request.body.body;
+  const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
   if (item.id)
   {
@@ -82,7 +83,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('modify items');
-  const item = ctx.request.body.body;
+  const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
   if (!item.id)
   {

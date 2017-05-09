@@ -49,69 +49,71 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import { UserConfig, Users } from './Users';
-export * from './Users';
+import { DatabaseConfig, Databases } from './Databases';
 
 const Router = new KoaRouter();
-export const users = new Users();
+const databases = new Databases();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all users');
-  ctx.body = await users.get();
+  winston.info('getting all databases');
+  ctx.body = await databases.get();
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting user ID ' + ctx.params.id);
-  ctx.body = await users.get(ctx.params.id);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // update user, must be super user or authenticated user updating own info
-  winston.info('user update');
-  const user: UserConfig = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
-  if (!user.id)
-  {
-    user.id = Number(ctx.params.id);
-  }
-  else
-  {
-    if (user.id !== Number(ctx.params.id))
-    {
-      throw new Error('User ID does not match the supplied id in the URL');
-    }
-  }
-
-  // if superuser or id to be updated is current user
-  const isSuperUser: boolean = ctx.state.user.isSuperUser;
-  if (isSuperUser || ctx.request.body.id === ctx.params.id)
-  {
-    ctx.body = await users.update(isSuperUser, user);
-  }
+  winston.info('getting database ID ' + ctx.params.id);
+  ctx.body = await databases.get(ctx.params.id);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  // create a user, must be admin
-  winston.info('create user');
-  const user: UserConfig = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
-  if (user.id)
+  winston.info('add new database');
+  const db: DatabaseConfig = ctx.request.body.body;
+  Util.verifyParameters(db, ['name', 'dsn']);
+  if (db.id)
   {
-    throw new Error('Invalid parameter user ID');
+    throw Error('Invalid parameter database ID');
   }
 
-  if (ctx.state.user.isSuperUser)
+  ctx.body = await databases.upsert(ctx.state.user, db);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('update existing database');
+  const db: DatabaseConfig = ctx.request.body.body;
+  if (!db.id)
   {
-    ctx.body = await users.create(user);
+    db.id = ctx.params.id;
   }
   else
   {
-    throw new Error('Only superuser can create new users.');
+    if (db.id !== Number(ctx.params.id))
+    {
+      throw Error('Database ID does not match the supplied id in the URL');
+    }
   }
+
+  ctx.body = await databases.upsert(ctx.state.user, db);
+});
+
+Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('connect to database');
+  ctx.body = await databases.connect(ctx.state.user, ctx.params.id);
+});
+
+Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('disconnect from database');
+  ctx.body = await databases.disconnect(ctx.state.user, ctx.params.id);
+});
+
+Router.post('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('get database schema');
+  ctx.body = await databases.schema(ctx.params.id);
 });
 
 export default Router;

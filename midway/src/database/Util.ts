@@ -44,74 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import ElasticConfig from '../database/elastic/ElasticConfig';
+import ElasticController from '../database/elastic/ElasticController';
 
-import * as Util from '../Util';
-import { UserConfig, Users } from './Users';
-export * from './Users';
+import MySQLConfig from '../database/mysql/MySQLConfig';
+import MySQLController from '../database/mysql/MySQLController';
 
-const Router = new KoaRouter();
-export const users = new Users();
+import SQLiteConfig from '../database/sqlite/SQLiteConfig';
+import SQLiteController from '../database/sqlite/SQLiteController';
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+import DatabaseController from './DatabaseController';
+
+export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
 {
-  winston.info('getting all users');
-  ctx.body = await users.get();
-});
-
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting user ID ' + ctx.params.id);
-  ctx.body = await users.get(ctx.params.id);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // update user, must be super user or authenticated user updating own info
-  winston.info('user update');
-  const user: UserConfig = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
-  if (!user.id)
+  if (type === 'sqlite')
   {
-    user.id = Number(ctx.params.id);
+    return {
+      filename: dsn,
+    } as SQLiteConfig;
+  }
+  else if (type === 'mysql')
+  {
+    // TODO: Convert DSN to a MySQLConfig object.
+  }
+  else if (type === 'elasticsearch' || type === 'elastic')
+  {
+    // TODO: Convert DSN to a ElasticConfig object.
   }
   else
   {
-    if (user.id !== Number(ctx.params.id))
-    {
-      throw new Error('User ID does not match the supplied id in the URL');
-    }
+    throw new Error('Error parsing database connection parameters.');
   }
+}
 
-  // if superuser or id to be updated is current user
-  const isSuperUser: boolean = ctx.state.user.isSuperUser;
-  if (isSuperUser || ctx.request.body.id === ctx.params.id)
-  {
-    ctx.body = await users.update(isSuperUser, user);
-  }
-});
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export function makeDatabaseController(type: string, dsn: string): SQLiteController | MySQLController | ElasticController
 {
-  // create a user, must be admin
-  winston.info('create user');
-  const user: UserConfig = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
-  if (user.id)
+  if (type === 'sqlite')
   {
-    throw new Error('Invalid parameter user ID');
+    const config = DSNToConfig(type, dsn) as SQLiteConfig;
+    return new SQLiteController(config, 0, 'SQLite');
   }
-
-  if (ctx.state.user.isSuperUser)
+  else if (type === 'mysql')
   {
-    ctx.body = await users.create(user);
+    const config = DSNToConfig(type, dsn) as MySQLConfig;
+    return new MySQLController(config, 0, 'MySQL');
+  }
+  else if (type === 'elasticsearch' || type === 'elastic')
+  {
+    const config = DSNToConfig(type, dsn) as ElasticConfig;
+    return new ElasticController(config, 0, 'Elastic');
   }
   else
   {
-    throw new Error('Only superuser can create new users.');
+    throw new Error('Error making new database controller.');
   }
-});
-
-export default Router;
+}

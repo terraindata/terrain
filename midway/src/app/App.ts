@@ -55,15 +55,7 @@ import serve = require('koa-static-server');
 import cors = require('kcors');
 import srs = require('secure-random-string');
 
-import ElasticConfig from '../database/elastic/ElasticConfig';
-import ElasticController from '../database/elastic/ElasticController';
-
-import MySQLConfig from '../database/mysql/MySQLConfig';
-import MySQLController from '../database/mysql/MySQLController';
-
-import SQLiteConfig from '../database/sqlite/SQLiteConfig';
-import SQLiteController from '../database/sqlite/SQLiteController';
-
+import * as Util from '../database/Util';
 import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
 import CmdLineArgs from './CmdLineArgs';
@@ -76,53 +68,11 @@ export let DB: Tasty.Tasty;
 
 class App
 {
-  private static dsnToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
-  {
-    if (type === 'sqlite')
-    {
-      return {
-        filename: dsn,
-      } as SQLiteConfig;
-    }
-    else if (type === 'mysql')
-    {
-      // TODO: Convert DSN to a MySQLConfig object.
-    }
-    else if (type === 'elasticsearch' || type === 'elastic')
-    {
-      // TODO: Convert DSN to a ElasticConfig object.
-    }
-    else
-    {
-      throw new Error('Error parsing database connection parameters.');
-    }
-  }
-
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    if (type === 'sqlite')
-    {
-      const config = App.dsnToConfig(type, dsn) as SQLiteConfig;
-      const controller = new SQLiteController(config, 0, 'NodewaySQLite');
-      return controller.getTasty();
-    }
-    else if (type === 'mysql')
-    {
-      const config = App.dsnToConfig(type, dsn) as MySQLConfig;
-      const controller = new MySQLController(config, 0, 'NodewayMySQL');
-      return controller.getTasty();
-    }
-    else if (type === 'elasticsearch' || type === 'elastic')
-    {
-      const config = App.dsnToConfig(type, dsn) as ElasticConfig;
-      const controller = new ElasticController(config, 0, 'NodewayElastic');
-      return controller.getTasty();
-    }
-    else
-    {
-      throw new Error('Error initializing Nodeway system database.');
-    }
+    const controller = Util.makeDatabaseController(type, dsn);
+    return controller.getTasty();
   }
 
   private static uncaughtExceptionHandler(err: any): void
