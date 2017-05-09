@@ -39,10 +39,9 @@ before_script:
 #  - sudo apt-get install --assume-yes git-lfs
   - git lfs pull
 
-# Comment for testing speed
-# lint:
-#  script:
-#    - yarn run lint
+lint:
+  script:
+   - yarn run lint
 
 
 test_backends:
