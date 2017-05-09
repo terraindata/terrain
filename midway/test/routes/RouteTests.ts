@@ -200,7 +200,7 @@ describe('Version route tests', () =>
         expect(response.text)
           .toBe(
           // tslint:disable-next-line
-          '[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+          '[{\"createdAt\":\"2017-04-28 03:32:25\",\"createdByUserId\":1,\"id\":1,\"object\":\"[object Object]\",\"objectId\":2,\"objectType\":\"items\"}]');
       })
       .catch((error) =>
       {
@@ -424,8 +424,9 @@ describe('Query route tests', () =>
       {
         winston.info(JSON.stringify(response));
         const midwayError: MidwayError = MidwayError.fromJSON(response.text);
-        // tslint:disable-next-line
-        expect(midwayError.getTitle()).toEqual('[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
+        expect(midwayError.getTitle())
+          .toEqual(
+          '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
       })
       .catch((error) =>
       {

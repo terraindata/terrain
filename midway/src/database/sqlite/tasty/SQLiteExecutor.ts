@@ -66,11 +66,11 @@ export class SQLiteExecutor implements TastyExecutor
     const results = {};
     results[this.client.getFilename()] = {};
 
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
+    const tableListResult: any[] = await this.query(['SELECT name FROM sqlite_master WHERE Type=\'table\';']);
     for (const table of tableListResult)
     {
       results[this.client.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
+      const colResult: any = await this.query([`pragma table_info(${table.name});`]);
       for (const col of colResult)
       {
         results[this.client.getFilename()][table.name][col.name] =
@@ -82,13 +82,54 @@ export class SQLiteExecutor implements TastyExecutor
     return new TastySchema(results);
   }
 
-  public async query(queryStr: string): Promise<object[]>
+  /**
+   * executes statements sequentially
+   * @param statements
+   * @returns {Promise<Array>} the result of the last one
+   */
+  public async query(statements: string[]): Promise<object[]>
   {
-    return new Promise<object[]>((resolve, reject) =>
+    if (statements.length === 0)
     {
-      this.client.all(queryStr, makePromiseCallback(resolve, reject));
-    });
+      return [];
+    }
+
+    for (let i = 0; ; ++i)
+    {
+      const statement: string = statements[i];
+      const result: Promise<object[]> = new Promise<object[]>((resolve, reject) =>
+      {
+        this.client.all(statement, makePromiseCallback(resolve, reject));
+      });
+
+      if (i === statements.length - 1)
+      {
+        return result;
+      }
+
+      await result;
+    }
   }
+
+  // /**
+  //  * executes statements sequentially
+  //  * @param statements
+  //  * @returns {Promise<Array>} appended result objects
+  //  */
+  // public async upsert(statements: string[]): Promise<object[]>
+  // {
+  //   const result : object[] = [];
+  //
+  //   for (const statement of statements)
+  //   {
+  //     const result = await new Promise<object[]>((resolve, reject) =>
+  //     {
+  //       this.client.all(statement, makePromiseCallback(resolve, reject));
+  //     });
+  //
+  //     result.concat();
+  //   }
+  // }
 
   public async destroy(): Promise<void>
   {

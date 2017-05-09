@@ -1,19 +1,5 @@
-# This file is a template, and might need editing before it works on your project.
-# Official framework image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/node/tags/
-image: node:latest
-
 variables:
   GIT_SSL_NO_VERIFY: "true"
-  
-# Pick zero or more services to be used on all builds.
-# Only needed when using a docker container to run your tests in.
-# Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-service
-services:
-  - terrain/moviesdb-elk:1.0a
-  - terrain/moviesdb-mysql:1.0a
-#  This docker image doesn't actually run as a service, just delivers a file
-  - terrain/moviesdb-sqlite:1.0a
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -22,29 +8,27 @@ cache:
   - node_modules/
 
 before_script:
-  - apt-get update && apt --assume-yes install parallel mysql-client sed sqlite3 node-sqlite3
-  - sed -i 's/mysqladmin\(.*\)-h127.0.0.1/mysqladmin \1-hterrain-moviesdb-mysql/g' midway/test/scripts/setup_env.sh
-  - sed -i 's#http://127.0.0.1:$elastic#http://terrain-moviesdb-elk:$elastic#g' midway/test/scripts/setup_env.sh
-  - sed -i 's#http://localhost:9200#http://terrain-moviesdb-elk:9200#g' midway/test/database/elastic/client/ElasticClientTests.ts midway/test/database/elastic/tasty/ElasticExecutorTests.ts midway/test/database/elastic/tasty/ElasticGeneratorTests.ts midway/test/routes/RouteTests.ts
-  - >
-    sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/database/mysql/tasty/MySQLExecutorTests.ts
-  - >
-    sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
-  - yarn global add webpack webpack-dev-server sqlite3
-  - yarn install
-  - npm install sqlite3 bcrypt
-  #- docker run -v$PWD:/data/ terrain/moviesdb-sqlite:1.0a
+  - yarn
 
-# Comment for testing speed
-# lint:
-#  script:
-#    - yarn run lint
+stages:
+  - lint
+  - fix
+  - test-backend
 
-
-test_backends:
+lint:
   script:
-   - yarn install
    - yarn run lint
-   - yarn run style
-   - stat moviesdb.db
-   - yarn run test-back
+  stage: lint
+
+fix:
+  script:
+   - yarn run fix
+  stage: lint
+
+test-backend:
+  script:
+   - yarn run test-back-all
+  stage: test-backend
+  artifacts:
+    paths:
+      - coverage

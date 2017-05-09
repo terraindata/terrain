@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as winston from 'winston';
+
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import ElasticGenerator from '../../../../src/database/elastic/tasty/ElasticGenerator';
@@ -56,6 +58,7 @@ let elasticGenerator: ElasticGenerator;
 
 beforeAll(() =>
 {
+  winston.transports.Console.level = 'debug';
   const elasticConfig: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };

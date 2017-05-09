@@ -61,18 +61,40 @@ export class MySQLExecutor implements TastyExecutor
 
   public async schema(): Promise<TastySchema>
   {
-    const result = await this.query('SELECT table_schema, table_name, column_name, data_type ' +
-      'FROM information_schema.columns ' +
-      'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');');
+    const result = await this.query(
+      ['SELECT table_schema, table_name, column_name, data_type ' +
+        'FROM information_schema.columns ' +
+        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');']);
     return TastySchema.fromMySQLResultSet(result);
   }
 
-  public async query(queryStr: string): Promise<object[]>
+  /**
+   * executes statements sequentially
+   * @param statements
+   * @returns {Promise<Array>} the result of the last one
+   */
+  public async query(statements: string[]): Promise<object[]>
   {
-    return new Promise<object[]>((resolve, reject) =>
+    if (statements.length === 0)
     {
-      this.client.query(queryStr, makePromiseCallback(resolve, reject));
-    });
+      return [];
+    }
+
+    for (let i = 0; ; ++i)
+    {
+      const statement: string = statements[i];
+      const result: Promise<object[]> = new Promise<object[]>((resolve, reject) =>
+      {
+        this.client.query(statement, makePromiseCallback(resolve, reject));
+      });
+
+      if (i === statements.length - 1)
+      {
+        return result;
+      }
+
+      await result;
+    }
   }
 
   public async destroy(): Promise<void>

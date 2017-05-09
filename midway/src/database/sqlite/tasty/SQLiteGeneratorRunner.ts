@@ -55,11 +55,13 @@ import TastyQuery from '../../../tasty/TastyQuery';
  */
 export default class SQLiteGeneratorRunner
 {
+  public statements: string[];
   public queryString: string;
   private indentation: number;
 
   constructor(query: TastyQuery)
   {
+    this.statements = [];
     this.queryString = '';
     this.indentation = 0;
 
@@ -188,23 +190,97 @@ export default class SQLiteGeneratorRunner
         this.queryString += 'INTO ';
         this.queryString += this.escapeString(query.table.getTableName());
 
-        let keys = '';
-        let values = '';
-        for (let i = 0; i < query.upserts.length; i++)
+        const baseQuery = this.queryString;
+
+        const columns: string[] = query.table.getColumnNames();
+        let definedColumnsList: string[] = [];
+        let definedColumnsSet: Set<string> = new Set();
+        let accumulatedUpdates: object[] = [];
+
+        for (const obj of query.upserts)
         {
-          const obj = query.upserts[i];
-          keys += Object.keys(obj).join(', ');
-          values += Object.keys(obj).map((prop) =>
+          // check if this object has the same set of defined cols as the previous one
+          for (const col of columns)
           {
-            return this.sqlName(TastyNode.make(obj[prop]));
-          }).join(', ');
+            const isInObj: boolean = obj.hasOwnProperty(col);
+            const isInDefined: boolean = definedColumnsSet.has(col);
+            if (isInObj !== isInDefined)
+            {
+              this.accumulateUpsert(definedColumnsList, accumulatedUpdates);
+
+              this.queryString = baseQuery;
+              definedColumnsList = this.getDefinedColumns(columns, obj);
+              definedColumnsSet = new Set();
+              for (const definedCol of definedColumnsList)
+              {
+                definedColumnsSet.add(definedCol);
+              }
+              accumulatedUpdates = [];
+            }
+          }
+
+          accumulatedUpdates.push(obj);
         }
 
-        this.queryString += ' (' + keys + ') VALUES (' + values + ')';
+        this.accumulateUpsert(definedColumnsList, accumulatedUpdates);
       }
+      this.queryString = '';
     }
 
-    this.queryString += ';';
+    this.accumulateStatement(this.queryString);
+  }
+
+  private accumulateStatement(queryString: string): void
+  {
+    if (queryString !== '')
+    {
+      queryString += ';';
+      this.statements.push(queryString);
+    }
+  }
+
+  private getDefinedColumns(columns: string[], obj: object): string[]
+  {
+    const definedColumns: string[] = [];
+    for (const col of columns)
+    {
+      if (obj.hasOwnProperty(col))
+      {
+        definedColumns.push(col);
+      }
+    }
+    return definedColumns;
+  }
+
+  private accumulateUpsert(columns: string[],
+    accumulatedUpdates: object[]): void
+  {
+    if (accumulatedUpdates.length <= 0)
+    {
+      return;
+    }
+
+    let query = this.queryString;
+    query += ' (' + columns.join(', ') + ') VALUES ';
+
+    let first: boolean = true;
+    for (const obj of accumulatedUpdates)
+    {
+      if (!first)
+      {
+        query += ',';
+      }
+      first = false;
+
+      query += '(';
+      query += columns.map(
+        (col: string) =>
+        {
+          return this.sqlName(TastyNode.make(obj[col]));
+        }).join(', ');
+      query += ')';
+    }
+    this.accumulateStatement(query);
   }
 
   private newLine()
@@ -284,7 +360,7 @@ export default class SQLiteGeneratorRunner
       // base case
       if (fix !== SQLGenerator.FixEnum.nullary)
       {
-        throw new Error("Non-operator node that isn't nullary.");
+        throw new Error('Non-operator node that isn\'t nullary.');
       }
 
       this.queryString += this.sqlName(node);
@@ -361,7 +437,7 @@ export default class SQLiteGeneratorRunner
     }
     if (node.type === 'string')
     {
-      return "'" + this.escapeString(node.value) + "'";
+      return '\'' + this.escapeString(node.value) + '\'';
     }
     if (node.type === 'number')
     {
@@ -395,7 +471,7 @@ export default class SQLiteGeneratorRunner
           case '\r':
             return '\\r';
           case '\"':
-          case "'":
+          case '\'':
           case '\\':
           case '%':
             return '\\' + char;
