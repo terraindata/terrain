@@ -85,11 +85,11 @@ export class Versions
 
   public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
   {
-    if (objectId && objectType)
+    if (objectId !== undefined && objectType !== undefined)
     {
       return App.DB.select(this.Version, [], { objectType, objectId }) as any;
     }
-    else if (objectId)
+    else if (objectId !== undefined)
     {
       return App.DB.select(this.Version, [], { objectType }) as any;
     }

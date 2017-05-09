@@ -127,7 +127,7 @@ export class Users
       }
 
       const oldUser = results[0];
-      if (!isSuperUser && (user.isDisabled || user.isSuperUser))
+      if (!isSuperUser && (user.isDisabled !== undefined || user.isSuperUser !== undefined))
       {
         return reject('Only superuser can change user privileges or status');
       }
@@ -161,7 +161,7 @@ export class Users
 
   public async get(id?: number): Promise<UserConfig[]>
   {
-    if (id)
+    if (id !== undefined)
     {
       return App.DB.select(this.userTable, [], { id }) as any;
     }
