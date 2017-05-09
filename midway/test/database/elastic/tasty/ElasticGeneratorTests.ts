@@ -50,7 +50,7 @@ import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import ElasticGenerator from '../../../../src/database/elastic/tasty/ElasticGenerator';
 import * as Tasty from '../../../../src/tasty/Tasty';
-import { TastyTable } from '../../../../src/tasty/TastyTable';
+import TastyTable from '../../../../src/tasty/TastyTable';
 
 let DBMovies: TastyTable;
 let elasticController: ElasticController;

@@ -165,7 +165,7 @@ export default class SQLiteGeneratorRunner
 
         if (query.numTaken !== 0)
         {
-          this.queryString += 'LIMIT ' + query.numTaken;
+          this.queryString += 'LIMIT ' + query.numTaken.toString();
           if (query.numSkipped !== 0)
           {
             this.queryString += ' ';
@@ -174,7 +174,7 @@ export default class SQLiteGeneratorRunner
 
         if (query.numSkipped !== 0)
         {
-          this.queryString += 'OFFSET ' + query.numSkipped;
+          this.queryString += 'OFFSET ' + query.numSkipped.toString();
         }
       }
     } else if (query.command.tastyType === TastyNodeTypes.upsert)
@@ -302,7 +302,7 @@ export default class SQLiteGeneratorRunner
     this.indentation = Math.max(this.indentation - 1, 0);
   }
 
-  private appendStandardClause(clauseName, onNewLine, elements, onEach, onSeparator)
+  private appendStandardClause(clauseName: string | null, onNewLine, elements, onEach, onSeparator)
   {
     // skip empty clauses
     if (elements.length === 0)

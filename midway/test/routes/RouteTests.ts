@@ -121,7 +121,7 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/auth/login request returned an error: ' + error);
+        fail('GET /midway/v1/auth/login request returned an error: ' + String(error));
       });
   });
 
@@ -140,7 +140,7 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
       });
   });
 
@@ -159,7 +159,7 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
       });
   });
 
@@ -179,7 +179,7 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
       });
   });
 });
@@ -204,7 +204,7 @@ describe('Version route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/versions/items/1 request returned an error: ' + error);
+        fail('GET /midway/v1/versions/items/1 request returned an error: ' + String(error));
       });
   });
 });
@@ -227,7 +227,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/items/ request returned an error: ' + error);
+        fail('GET /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -250,7 +250,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -270,7 +270,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/items/ request returned an error: ' + error);
+        fail('GET /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -293,7 +293,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -312,11 +312,11 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + response + '"');
+        winston.info('response: "' + JSON.stringify(response) + '"');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -336,11 +336,11 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + response + '"');
+        winston.info('response: "' + JSON.stringify(response) + '"');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 });
@@ -396,7 +396,7 @@ describe('Query route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 
@@ -430,7 +430,7 @@ describe('Query route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 
@@ -462,7 +462,7 @@ describe('Query route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 });

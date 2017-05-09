@@ -62,7 +62,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting database ID ' + ctx.params.id);
+  winston.info('getting database ID ' + String(ctx.params.id));
   ctx.body = await databases.get(ctx.params.id);
 });
 

@@ -71,7 +71,7 @@ class RouteError extends MidwayError
       err = new Error(err);
     }
     const status = 'status' in err ? err['status'] : 400;
-    const title = 'title' in err ? err['title'] : 'Route ' + ctx.url + ' has an error.';
+    const title = 'title' in err ? err['title'] : 'Route ' + String(ctx.url) + ' has an error.';
     const detail = err['detail'] || err['message'] || JSON.stringify(err);
     const source = { ctx, err };
     return new RouteError(status, title, detail, source);

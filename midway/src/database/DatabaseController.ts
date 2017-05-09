@@ -66,7 +66,7 @@ abstract class DatabaseController
     this.lsn = -1;
     this.type = type;
     this.name = name;
-    this.header = 'DB:' + this.id + ':' + this.name + ':' + this.type + ':';
+    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
   }
 
   public log(methodName: string, info?: any)

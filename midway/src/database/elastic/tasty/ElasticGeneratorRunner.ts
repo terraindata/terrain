@@ -82,7 +82,7 @@ export default class ElasticGeneratorRunner
         esQuery.param = this.constructDeleteQuery(query);
         break;
       default:
-        throw new Error('Unknown command in the query:' + query);
+        throw new Error('Unknown command in the query:' + query.toString());
     }
   }
 

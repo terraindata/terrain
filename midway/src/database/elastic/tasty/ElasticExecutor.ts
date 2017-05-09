@@ -207,7 +207,7 @@ export default class ElasticExecutor implements TastyExecutor
       case 'select':
         return await this.executeElasticTastySelectQuery(query);
       default:
-        throw new Error('Unknown query command ' + query);
+        throw new Error('Unknown query command ' + JSON.stringify(query));
     }
   }
 
