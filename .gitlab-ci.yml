@@ -22,21 +22,21 @@ cache:
   - node_modules/
 
 before_script:
-  - sudo apt-get update && sudo apt --assume-yes install parallel mysql-client sed sqlite3
-  - sed -i 's/mysqladmin\(.*\)-h127.0.0.1/mysqladmin \1-hterrain-moviesdb-mysql/g' midway/test/scripts/setup_env.sh
-  - sed -i 's#http://127.0.0.1:$elastic#http://terrain-moviesdb-elk:$elastic#g' midway/test/scripts/setup_env.sh
-  - sed -i 's#http://localhost:9200#http://terrain-moviesdb-elk:9200#g' midway/test/database/elastic/client/ElasticClientTests.ts midway/test/database/elastic/tasty/ElasticExecutorTests.ts midway/test/database/elastic/tasty/ElasticGeneratorTests.ts midway/test/routes/RouteTests.ts
-  - >
-    sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/database/mysql/tasty/MySQLExecutorTests.ts
-  - >
-    sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
-  - yarn global add webpack webpack-dev-server sqlite3
-  - yarn install
-  - npm install sqlite3 bcrypt
-  - sudo apt-get install --assume-yes python-software-properties
-  - sudo add-apt-repository ppa:git-core/ppa
-  - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-  - sudo apt-get install --assume-yes git-lfs
+#  - sudo apt-get update && sudo apt --assume-yes install parallel mysql-client sed sqlite3
+#  - sed -i 's/mysqladmin\(.*\)-h127.0.0.1/mysqladmin \1-hterrain-moviesdb-mysql/g' midway/test/scripts/setup_env.sh
+#  - sed -i 's#http://127.0.0.1:$elastic#http://terrain-moviesdb-elk:$elastic#g' midway/test/scripts/setup_env.sh
+#  - sed -i 's#http://localhost:9200#http://terrain-moviesdb-elk:9200#g' midway/test/database/elastic/client/ElasticClientTests.ts midway/test/database/elastic/tasty/ElasticExecutorTests.ts midway/test/database/elastic/tasty/ElasticGeneratorTests.ts midway/test/routes/RouteTests.ts
+#  - >
+#    sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/database/mysql/tasty/MySQLExecutorTests.ts
+#  - >
+#    sed -i "s/host: 'localhost'/host: 'terrain-moviesdb-mysql'/g" midway/test/utils/CopyDataFromSqlToElastic.ts
+#  - yarn global add webpack webpack-dev-server sqlite3
+#  - yarn install
+#  - npm install sqlite3 bcrypt
+#  - sudo apt-get install --assume-yes python-software-properties
+#  - sudo add-apt-repository ppa:git-core/ppa
+#  - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+#  - sudo apt-get install --assume-yes git-lfs
   - git lfs pull
 
 # Comment for testing speed
@@ -51,4 +51,4 @@ test_backends:
    - yarn run lint
    - yarn run style
    - stat moviesdb.db && ls -l moviesdb.db
-   - yarn run test-back
+   - yarn run test-back-all
