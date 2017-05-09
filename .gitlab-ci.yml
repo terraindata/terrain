@@ -11,9 +11,9 @@ before_script:
   - yarn
 
 stages:
-  lint
-  fix
-  test-backend
+  - lint
+  - fix
+  - test-backend
 
 lint:
   script:
@@ -30,4 +30,5 @@ test-backend:
    - yarn run test-back-all
   stage: test-backend
   artifacts:
-    - coverage
+    paths:
+      - coverage
