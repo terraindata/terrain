@@ -33,6 +33,7 @@ before_script:
   - yarn global add webpack webpack-dev-server sqlite3
   - yarn install
   - npm install sqlite3 bcrypt
+  - git lfs pull
 
 # Comment for testing speed
 # lint:
