@@ -54,23 +54,23 @@ const RolesReducer = {};
 RolesReducer[ActionTypes.fetch] =
   (state, action) =>
   {
-    Ajax.getRoles((rolesData: any[]) =>
-    {
-      let roles = Immutable.Map({});
-      rolesData.map((role) =>
-      {
-        const { groupId, username } = role;
-        if (!roles.get(groupId))
-        {
-          roles = roles.set(groupId, Immutable.Map({}));
-        }
-        role.admin = !! role.admin;
-        role.builder = !! role.builder;
-        roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-      });
+    // Ajax.getRoles((rolesData: any[]) =>
+    // {
+    //   let roles = Immutable.Map({});
+    //   rolesData.map((role) =>
+    //   {
+    //     const { groupId, username } = role;
+    //     if (!roles.get(groupId))
+    //     {
+    //       roles = roles.set(groupId, Immutable.Map({}));
+    //     }
+    //     role.admin = !! role.admin;
+    //     role.builder = !! role.builder;
+    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
+    //   });
 
-      Actions.setRoles(roles);
-    });
+    //   Actions.setRoles(roles);
+    // });
     return state.set('loading', true);
   };
 
@@ -85,7 +85,7 @@ RolesReducer[ActionTypes.change] =
   {
     const role: RoleTypes.Role = action.payload.role;
 
-    Ajax.saveRole(role);
+    // Ajax.saveRole(role);
     if (!state.get(role.groupId))
     {
       state = state.set(role.groupId, Immutable.Map({}));

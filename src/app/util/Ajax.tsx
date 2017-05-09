@@ -49,7 +49,6 @@ import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
-import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 
@@ -250,18 +249,6 @@ export const Ajax =
     };
   },
 
-  saveRole: (role: RoleTypes.Role) =>
-    Ajax._post(
-      `/roles/${role.groupId}/${role.username}/${role.admin ? '1' : '0'}/${role.builder ? '1' : '0'}`,
-      '',
-      _.noop),
-
-  getRoles: (onLoad: (roles: any[]) => void) =>
-    Ajax._get('/roles/', '', (response: any) => {
-      onLoad(JSON.parse(response));
-    })
-  ,
-
   getUsers(onLoad: (users: {[id: string]: any}) => void)
   {
     return Ajax._get('/users/', '', (response: any) =>
@@ -323,7 +310,7 @@ export const Ajax =
         groups: {},
         groupsOrder: [],
       };
-      const keys = ['groups', 'algorithms', 'variants'];
+      const keys = ['id', 'meta', 'name', 'parent', 'status', 'type'];
       keys.map((key) =>
         items[key].map((item) =>
         {
@@ -347,15 +334,16 @@ export const Ajax =
     return Ajax._get(`/items/${id}`, '', (response: any) =>
     {
       // TODO change if the middle tier format changes
-      const r = JSON.parse(response);
-      const all = r && r[type + 's'];
-      const item = all && all.find((i) => i.id === id);
-      if (item)
-      {
-        _.extend(item, JSON.parse(item.data));
-        delete item.data;
-      }
-      onLoad(item);
+      // const r = JSON.parse(response);
+      // const all = r && r[type + 's'];
+      // const item = all && all.find((i) => i.id === id);
+      // if (item)
+      // {
+      //   _.extend(item, JSON.parse(item.data));
+      //   delete item.data;
+      // }
+      // onLoad(item);
+      onLoad(JSON.parse(response));
     }, onError);
   },
 

@@ -53,7 +53,8 @@ import { UserConfig, Users } from './Users';
 
 const Router = new KoaRouter();
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+// Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/', async (ctx, next) =>
 {
   winston.info('getting all users');
   ctx.body = await Users.get();

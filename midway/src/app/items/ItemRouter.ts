@@ -54,7 +54,8 @@ import { Items } from './Items';
 const Router = new KoaRouter();
 const items = new Items();
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+// Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/', async (ctx, next) =>
 {
   winston.info('getting all items');
   ctx.body = await items.get();
