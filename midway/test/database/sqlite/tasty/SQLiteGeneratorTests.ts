@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as winston from 'winston';
+
 import SQLiteConfig from '../../../../src/database/sqlite/SQLiteConfig';
 import SQLiteController from '../../../../src/database/sqlite/SQLiteController';
 import SQLiteGenerator from '../../../../src/database/sqlite/tasty/SQLiteGenerator';
@@ -68,6 +70,7 @@ let sqliteGenerator: SQLiteGenerator;
 
 beforeAll(async () =>
 {
+  winston.level = 'debug';
   const config: SQLiteConfig =
     {
       filename: 'moviesdb.db',
@@ -179,7 +182,7 @@ test(testName(9), (done) =>
 {
   const query = new Tasty.Query(DBMovies).delete();
   const qstr1 = sqliteGenerator.generate(query);
-  expect(qstr1).toEqual(`DELETE \n  FROM movies;`);
+  expect(qstr1).toEqual([`DELETE \n  FROM movies;`]);
   query.filter(DBMovies['movieid'].equals(13371337));
   const qstr2 = sqliteGenerator.generate(query);
   expect(qstr2).toEqual(testQuery(9));

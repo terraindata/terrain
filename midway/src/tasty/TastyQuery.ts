@@ -86,10 +86,19 @@ export class TastyQuery
     return this;
   }
 
-  public upsert(obj: object): TastyQuery
+  public upsert(value: object | object[]): TastyQuery
   {
     this.command = new TastyNode('upsert', null);
-    this.upserts.push(obj);
+
+    if (value instanceof Array)
+    {
+      this.upserts = value;
+    }
+    else
+    {
+      this.upserts = [value];
+    }
+
     return this;
   }
 

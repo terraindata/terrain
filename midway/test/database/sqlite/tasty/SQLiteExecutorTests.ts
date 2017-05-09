@@ -64,6 +64,7 @@ let sqliteController: SQLiteController;
 
 beforeAll(async () =>
 {
+  winston.level = 'debug';
   const config: SQLiteConfig =
     {
       filename: 'moviesdb.db',
@@ -86,7 +87,7 @@ function runTest(index: number)
   {
     try
     {
-      const results = await tasty.execute(SQLQueries[index][1]);
+      const results = await tasty.getExecutor().query(SQLQueries[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
 
     } catch (e)

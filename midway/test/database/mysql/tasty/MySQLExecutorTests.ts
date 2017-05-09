@@ -64,6 +64,7 @@ let mysqlController: MySQLController;
 
 beforeAll(async () =>
 {
+  winston.level = 'debug';
   const config: MySQLConfig =
     {
       connectionLimit: 20,
@@ -91,7 +92,7 @@ function runTest(index: number)
   {
     try
     {
-      const results = await tasty.execute(SQLQueries[index][1]);
+      const results = await tasty.getExecutor().query(SQLQueries[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     } catch (e)
     {

@@ -48,7 +48,7 @@ import TastySchema from './TastySchema';
 
 abstract class TastyExecutor
 {
-  public async abstract query(query: string | object): Promise<object[]>;
+  public async abstract query(query: any): Promise<object[]>;
   public async abstract schema(): Promise<TastySchema>;
   public async abstract destroy(): Promise<void>;
 }
