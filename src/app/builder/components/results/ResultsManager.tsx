@@ -169,10 +169,12 @@ export class ResultsManager extends PureClasss<Props>
       return;
     }
 
-    const tql = TQLConverter.toTQL(query, {
-      limit: MAX_RESULTS,
-      replaceInputs: true,
-    });
+    // skip tql conversion step for now
+    // const tql = TQLConverter.toTQL(query, {
+    //   limit: MAX_RESULTS,
+    //   replaceInputs: true,
+    // });
+    const tql = query.tql;
 
     if (tql !== this.state.queriedTql)
     {
@@ -188,34 +190,35 @@ export class ResultsManager extends PureClasss<Props>
           ),
       });
 
-      const selectCard = query.cards.get(0);
-      if (
-        !this.props.noExtraFields
-        && selectCard
-        && !selectCard['cards'].some(
-            (card) => card.type === 'groupBy',
-          )
-        && !selectCard['fields'].some(
-            (field) => field.field.static && field.field.static.isAggregate,
-          )
-      )
-      {
-        // temporary, don't dispatch select * if query has group by
-
-        this.setState({
-          allQuery: Ajax.query(
-            TQLConverter.toTQL(query, {
-              allFields: true,
-              transformAliases: true,
-              limit: MAX_RESULTS,
-              replaceInputs: true,
-            }),
-            db,
-            this.handleAllFieldsResponse,
-            this.handleAllFieldsError,
-          ),
-        });
-      }
+      // disabled for elastic support
+      // const selectCard = query.cards.get(0);
+      // if (
+      //   !this.props.noExtraFields
+      //   && selectCard
+      //   && !selectCard['cards'].some(
+      //       (card) => card.type === 'groupBy',
+      //     )
+      //   && !selectCard['fields'].some(
+      //       (field) => field.field.static && field.field.static.isAggregate,
+      //     )
+      // )
+      // {
+      //   // temporary, don't dispatch select * if query has group by
+      //
+      //   this.setState({
+      //     allQuery: Ajax.query(
+      //       TQLConverter.toTQL(query, {
+      //         allFields: true,
+      //         transformAliases: true,
+      //         limit: MAX_RESULTS,
+      //         replaceInputs: true,
+      //       }),
+      //       db,
+      //       this.handleAllFieldsResponse,
+      //       this.handleAllFieldsError,
+      //     ),
+      //   });
+      // }
 
       // temporarily disable count
       // this.setState({

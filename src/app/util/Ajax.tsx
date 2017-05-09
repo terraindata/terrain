@@ -500,20 +500,28 @@ export const Ajax =
     // kill queries running under the same id
     // Ajax.killQueries(); // TODO add id
 
-    let dest = '/query';
-    if (options.csv)
-    {
-      dest = '/query_csv';
-    }
-    else if (sqlQuery)
-    {
-      dest = '/sql_query';
-    }
+    const dest = '/query';
+    // temporarily disabled for M2 conversion
+    // if (options.csv)
+    // {
+    //   dest = '/query_csv';
+    // }
+    // else if (sqlQuery)
+    // {
+    //   dest = '/sql_query';
+    // }
+
+    const body = JSON.parse(tql);
 
     return Ajax._postMidway1(dest, {
-        query_string: encode_utf8(tql),
-        db,
-        format: options.csv ? 'csv' : undefined,
+        id: 1, // not sure if this is right...
+        accessToken: 'AccessToken', // not sure if this is right...
+        type: 'search', // can be other things in the future
+        database: 0, // should be passed by caller
+        body,
+        // temporarily disabled for M2 conversion
+        // db,
+        // format: options.csv ? 'csv' : undefined,
       },
 
       (resp) =>
