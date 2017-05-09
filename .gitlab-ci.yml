@@ -8,12 +8,26 @@ cache:
   - node_modules/
 
 before_script:
+  - yarn
 
-test_backends:
+stages:
+  lint
+  fix
+  test-backend
+
+lint:
   script:
-   - yarn
-   - yarn run test-back-all
+   - yarn run lint
+  stage: lint
 
 fix:
   script:
    - yarn run fix
+  stage: lint
+
+test-backend:
+  script:
+   - yarn run test-back-all
+  stage: test-backend
+  artifacts:
+    - coverage
