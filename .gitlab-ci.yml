@@ -9,13 +9,11 @@ cache:
 
 before_script:
 
-lint:
-  script:
-   - yarn run lint
-
-
 test_backends:
   script:
-   - yarn install
-   - yarn run fix
+   - yarn
    - yarn run test-back-all
+
+fix:
+  script:
+   - yarn run fix
