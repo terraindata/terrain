@@ -104,11 +104,11 @@ export class Users
         {
           accessToken: '',
           email: user.email,
-          isDisabled: user.isDisabled || false,
-          isSuperUser: user.isSuperUser || false,
-          name: user.name || '',
+          isDisabled: user.isDisabled,
+          isSuperUser: user.isSuperUser,
+          name: user.name,
           password: await this.hashPassword(user.password),
-          timezone: user.timezone || '',
+          timezone: user.timezone,
         };
 
       await this.upsert(newUser);
@@ -196,25 +196,23 @@ export class Users
       else
       {
         const user: UserConfig = results[0] as UserConfig;
-        bcrypt.compare(password, user.password, async (err, res) =>
+        const passwordsMatch: boolean = await this.comparePassword(password, user.password);
+        if (passwordsMatch)
         {
-          if (res)
+          if (user.accessToken.length === 0)
           {
-            if (user.accessToken.length === 0)
-            {
-              user.accessToken = srs(
-                {
-                  length: 256,
-                });
-              await this.upsert(user);
-            }
-            resolve(user);
+            user.accessToken = srs(
+              {
+                length: 256,
+              });
+            await this.upsert(user);
           }
-          else
-          {
-            resolve(null);
-          }
-        });
+          resolve(user);
+        }
+        else
+        {
+          resolve(null);
+        }
       }
     });
   }
@@ -243,18 +241,12 @@ export class Users
 
   private async hashPassword(password: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      bcrypt.hash(password, this.saltRounds, Util.makePromiseCallback(resolve, reject));
-    });
+    return bcrypt.hash(password, this.saltRounds);
   }
 
   private async comparePassword(oldPassword: string, newPassword: string): Promise<boolean>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      bcrypt.compare(oldPassword, newPassword, Util.makePromiseCallback(resolve, reject));
-    });
+    return bcrypt.compare(oldPassword, newPassword);
   }
 }
 

@@ -70,7 +70,19 @@ test('t1', (done) =>
 {
   const query = new Tasty.Query(DBMovies).take(10);
   const qstr = elasticGenerator.generateString(query);
-  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{}}}');
+  expect(JSON.parse(qstr)).toEqual(
+    {
+      index: 'movies',
+      table: 'data',
+      op: 'select',
+      param:
+      {
+        index: 'movies',
+        type: 'data',
+        size: 10,
+        body: {},
+      },
+    });
   done();
 });
 

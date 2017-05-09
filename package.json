@@ -21,7 +21,7 @@
     "build-demo": "yarn run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "yarn run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony -- ./midway/src/Nodeway.ts",
-    "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'",
+    "lint": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
     "style": "find midway -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
     "fix": "yarn run lint; yarn run style;"
   },
@@ -197,7 +197,7 @@
     "ts-jest": "^19.0.10",
     "ts-loader": "2.0.3",
     "ts-node": "^3.0.2",
-    "tslint": "^5.1.0",
+    "tslint": "^5.2.0",
     "typescript": "^2.3.1",
     "typescript-formatter": "^5.1.3",
     "url-loader": "^0.5.6",

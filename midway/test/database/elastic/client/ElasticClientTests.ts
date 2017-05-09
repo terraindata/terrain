@@ -50,8 +50,8 @@ import { makePromiseCallback } from '../../../../src/tasty/Utils';
 import * as Utils from '../../../Utils';
 
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
+import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
-import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 
 let elasticController: ElasticController;
 let elasticClient: ElasticClient;
@@ -79,7 +79,7 @@ test('elastic health', async (done) =>
       {},
       makePromiseCallback(resolve, reject));
   });
-  winston.info(result);
+  winston.info(JSON.stringify(result));
   done();
 });
 
@@ -87,7 +87,7 @@ test('search', async (done) =>
 {
   try
   {
-    const result = await new Promise((resolve, reject) =>
+    const result: any = await new Promise((resolve, reject) =>
     {
       elasticClient.search(
         {
@@ -150,7 +150,7 @@ test('putScript', async (done) =>
         makePromiseCallback(resolve, reject));
     });
 
-    const result = await new Promise((resolve, reject) =>
+    const result: any = await new Promise((resolve, reject) =>
     {
       elasticClient.search(
         {

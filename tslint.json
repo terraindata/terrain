@@ -4,7 +4,7 @@
   },
   "extends" : "tslint:recommended",
   "rules" : {
-    "max-line-length": false,
+    "max-line-length": [true, 140],
     "quotemark" : [
       true,
       "single",
@@ -41,10 +41,15 @@
     "no-misused-new" : true,
     "no-switch-case-fall-through" : true,
     "switch-default" : true,
-    "restrict-plus-operands" : true,
     "no-string-literal" : false,
     "prefer-for-of" : false,
-    "strict-boolean-expressions" : true,
+    "strict-boolean-expressions" : [
+      true,
+      "allow-null-union",
+      "allow-undefined-union",
+      "allow-string",
+      "allow-number"
+    ],
     "object-literal-sort-keys" : false,
     "interface-name" : [
       true,
