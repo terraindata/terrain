@@ -57,7 +57,7 @@ winston.configure(
           {
             const message: string = options.message;
             const level = winston.config.colorize(options.level);
-            const meta = options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta)
+            const meta = (options.meta !== undefined) && (Object.keys(options.meta).length > 0) ? '\n\t' + JSON.stringify(options.meta)
               : '';
             return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
           },

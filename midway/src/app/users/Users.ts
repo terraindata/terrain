@@ -95,7 +95,7 @@ export class Users
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (!user.email || !user.password)
+      if (user.email === undefined || user.password === undefined)
       {
         return reject('Require both email and password for user creation');
       }
@@ -133,19 +133,25 @@ export class Users
       }
 
       // authenticate if email change or password change
-      if (user.email !== oldUser.email || user.oldPassword)
+      if (user.email !== oldUser.email || user.oldPassword !== undefined)
       {
-        if (!user.password)
+        if (user.password === undefined)
         {
           return reject('Must provide password if updating email or password');
         }
 
         user.password = await this.hashPassword(user.password);
-        if (user.oldPassword)
+        let hashedPassword: string;
+        if (user.oldPassword !== undefined)
         {
           user.oldPassword = await this.hashPassword(user.oldPassword);
+          hashedPassword = user.oldPassword;
         }
-        const hashedPassword = user.oldPassword || user.password;
+        else
+        {
+          hashedPassword = user.password;
+        }
+
         const passwordsMatch: boolean = await this.comparePassword(hashedPassword, oldUser.password);
         if (!passwordsMatch)
         {

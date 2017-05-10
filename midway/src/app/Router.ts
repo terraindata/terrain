@@ -77,7 +77,7 @@ AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 
 AppRouter.get('/', async (ctx, next) =>
 {
-  if (ctx.state.user)
+  if (ctx.state.user !== undefined)
   {
     ctx.body = 'authenticated as ' + String(ctx.state.user.username);
   }

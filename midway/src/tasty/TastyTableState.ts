@@ -56,11 +56,11 @@ export default class TastyTableState
   public primaryKeys: string[];
   public columnNames: string[]; // sorted list of columns
 
-  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[], database?: string)
+  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[], database: string = '')
   {
     // primary key is a list, so that composite keys can be supported
     this.table = table;
-    this.databaseName = database || '';
+    this.databaseName = database;
     this.tableName = name;
     this.columns = new Map();
     this.primaryKeys = primaryKeys;

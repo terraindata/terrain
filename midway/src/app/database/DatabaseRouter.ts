@@ -71,7 +71,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   winston.info('add new database');
   const db: DatabaseConfig = ctx.request.body.body;
   Util.verifyParameters(db, ['name', 'dsn']);
-  if (db.id)
+  if (db.id !== undefined)
   {
     throw Error('Invalid parameter database ID');
   }
@@ -83,7 +83,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 {
   winston.info('update existing database');
   const db: DatabaseConfig = ctx.request.body.body;
-  if (!db.id)
+  if (db.id === undefined)
   {
     db.id = ctx.params.id;
   }

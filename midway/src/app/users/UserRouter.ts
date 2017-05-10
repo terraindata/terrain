@@ -73,7 +73,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   winston.info('user update');
   const user: UserConfig = ctx.request.body.body;
   Util.verifyParameters(user, ['email', 'password']);
-  if (!user.id)
+  if (user.id === undefined)
   {
     user.id = Number(ctx.params.id);
   }
@@ -87,7 +87,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 
   // if superuser or id to be updated is current user
   const isSuperUser: boolean = ctx.state.user.isSuperUser;
-  if (isSuperUser || ctx.request.body.id === ctx.params.id)
+  if (isSuperUser === true || ctx.request.body.id === ctx.params.id)
   {
     ctx.body = await users.update(isSuperUser, user);
   }
@@ -99,12 +99,13 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   winston.info('create user');
   const user: UserConfig = ctx.request.body.body;
   Util.verifyParameters(user, ['email', 'password']);
-  if (user.id)
+  if (user.id !== undefined)
   {
     throw new Error('Invalid parameter user ID');
   }
 
-  if (ctx.state.user.isSuperUser)
+  const isSuperUser: boolean = ctx.state.user.isSuperUser;
+  if (isSuperUser === true)
   {
     ctx.body = await users.create(user);
   }

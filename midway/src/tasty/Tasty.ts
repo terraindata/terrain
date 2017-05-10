@@ -151,7 +151,7 @@ export class Tasty
     const selectedColumns: TastyColumn[] = columns.map((col) => table[col]);
     query.select(selectedColumns);
 
-    const node: TastyNode | null = this.filterColumns(table, filter || {});
+    const node: TastyNode | null = this.filterColumns(table, filter);
     if (node !== null)
     {
       query.filter(node);
@@ -226,8 +226,13 @@ export class Tasty
     return this.executor.schema();
   }
 
-  private filterColumns(table: TastyTable, obj: object): TastyNode | null
+  private filterColumns(table: TastyTable, obj?: object): TastyNode | null
   {
+    if (obj === undefined)
+    {
+      return null;
+    }
+
     let node: TastyNode | null = null;
     const columns: string[] = table.getColumnNames();
 

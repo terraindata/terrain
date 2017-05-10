@@ -70,7 +70,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 {
   winston.info('getting all schema');
   const request = ctx.request.body.body;
-  if (request && request.database)
+  if (request !== undefined && request.database !== undefined)
   {
     ctx.body = await getSchema(request.database);
   }

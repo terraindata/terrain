@@ -72,7 +72,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   winston.info('create items');
   const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
-  if (item.id)
+  if (item.id !== undefined)
   {
     throw new Error('Invalid parameter item ID');
   }
@@ -85,7 +85,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   winston.info('modify items');
   const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
-  if (!item.id)
+  if (item.id === undefined)
   {
     item.id = Number(ctx.params.id);
   }

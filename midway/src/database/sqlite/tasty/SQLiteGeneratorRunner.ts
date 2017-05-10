@@ -302,7 +302,7 @@ export default class SQLiteGeneratorRunner
     this.indentation = Math.max(this.indentation - 1, 0);
   }
 
-  private appendStandardClause(clauseName: string | null, onNewLine, elements, onEach, onSeparator)
+  private appendStandardClause(clauseName: string | null, onNewLine: boolean, elements, onEach, onSeparator)
   {
     // skip empty clauses
     if (elements.length === 0)
@@ -445,7 +445,7 @@ export default class SQLiteGeneratorRunner
     }
     if (node.type === 'boolean')
     {
-      return node.value ? '1' : '0';
+      return node.value === true ? '1' : '0';
     }
 
     throw new Error('Unsupported node type "' + node.type + '".');

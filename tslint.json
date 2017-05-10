@@ -41,15 +41,10 @@
     "no-misused-new" : true,
     "no-switch-case-fall-through" : true,
     "switch-default" : true,
+    "restrict-plus-operands" : true,
     "no-string-literal" : false,
     "prefer-for-of" : false,
-    "strict-boolean-expressions" : [
-      true,
-      "allow-null-union",
-      "allow-undefined-union",
-      "allow-string",
-      "allow-number"
-    ],
+    "strict-boolean-expressions" : true,
     "object-literal-sort-keys" : false,
     "interface-name" : [
       true,
