@@ -49,14 +49,14 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testResultsProcessor": "<rootDir>/node_modules/ts-jest/coverageprocessor.js",
     "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
       "js",
       "json"
-    ]
+    ],
+    "mapCoverage": true
   },
   "private": true,
   "dependencies": {
