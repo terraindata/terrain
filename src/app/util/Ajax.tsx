@@ -484,9 +484,9 @@ export const Ajax =
     return Ajax._req('POST', `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
 
+
   // run query, consider renaming
-  query(
-    tql: string,
+  query(tql: string,
     db: string,
     onLoad: (response: QueryResponse) => void,
     onError?: (ev: Event) => void,
@@ -494,13 +494,12 @@ export const Ajax =
     options: {
       csv?: boolean,
       csvName?: string,
-    } = {},
-  )
+    } = {},): { xhr: XMLHttpRequest, queryId: string }
   {
     // kill queries running under the same id
     // Ajax.killQueries(); // TODO add id
 
-    const dest = '/query';
+    // const dest = '/query';
     // temporarily disabled for M2 conversion
     // if (options.csv)
     // {
@@ -511,40 +510,45 @@ export const Ajax =
     //   dest = '/sql_query';
     // }
 
+    //alert(tql);
     const body = JSON.parse(tql);
+    // alert(JSON.stringify(body));
 
-    return Ajax._postMidway1(dest, {
-        id: 1, // not sure if this is right...
-        accessToken: 'AccessToken', // not sure if this is right...
-        type: 'search', // can be other things in the future
-        database: 0, // should be passed by caller
-        body,
-        // temporarily disabled for M2 conversion
-        // db,
-        // format: options.csv ? 'csv' : undefined,
-      },
+    const unique_id = '' + Math.random();
+    return {
+      xhr:     Ajax._reqMidway2(
+        'post',
+        'query/',
+        JSON.stringify({
+          id:          1, // not sure if this is right...
+          accessToken: 'AccessToken', // not sure if this is right...
+          type:        'search', // can be other things in the future
+          database:    0, // should be passed by caller
+          body:        body,
+          // temporarily disabled for M2 conversion
+          // db,
+          // format: options.csv ? 'csv' : undefined,
+        }),
+        (resp: string) =>
+        {
+          let respData = null;
+          try
+          {
+            resp = resp.replace(/\t/g, ' ').replace(/\n/g, ' ');
 
-      (resp) =>
-      {
-        let respData = null;
-        try {
-          resp = resp.replace(/\t/g, ' ').replace(/\n/g, ' ');
-          respData = JSON.parse(resp);
-        } catch (e) {
-          onError && onError(resp as any);
-          return;
-        }
-        onLoad(respData);
-      },
-
-      onError,
-
-      {
-        download: options.csv,
-        downloadFilename: options.csvName || 'Results.csv',
-        useMidway: options.csv,
-      },
-    );
+            respData = JSON.parse(resp);
+            alert(JSON.stringify(resp));
+          } catch (e)
+          {
+            onError && onError(resp as any);
+            return;
+          }
+          onLoad(respData);
+        },
+        onError,
+      ),
+      queryId: unique_id,
+    };
   },
 
   parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
