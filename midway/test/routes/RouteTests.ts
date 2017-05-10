@@ -426,6 +426,7 @@ describe('Query route tests', () =>
         const midwayError: MidwayError = MidwayError.fromJSON(response.text);
         expect(midwayError.getTitle())
           .toEqual(
+          // tslint:disable-next-line:max-line-length
           '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
       })
       .catch((error) =>
