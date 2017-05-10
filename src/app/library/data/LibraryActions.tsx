@@ -117,7 +117,7 @@ const Actions =
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
 
     status:
-      (variant: Variant, status: LibraryTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
+      (variant: Variant, status: LibraryTypes.ItemStatus, confirmed?: boolean, isDefault?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
 
     fetchVersion:

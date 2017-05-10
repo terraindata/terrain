@@ -47,7 +47,7 @@ import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import {LibraryState} from './LibraryStore';
-const {EVariantStatus} = LibraryTypes;
+const {ItemStatus} = LibraryTypes;
 
 const Immutable = require('immutable');
 
@@ -265,7 +265,7 @@ LibraryReducers[ActionTypes.variants.status] =
 
     if (
       !confirmed &&
-      (status === EVariantStatus.Live || variant.status === EVariantStatus.Live)
+      (status === ItemStatus.Live || variant.status === ItemStatus.Live)
     )
     {
       return state
@@ -315,7 +315,7 @@ const duplicateVariant = (variant, id, groupId?, algorithmId?) =>
     .set('name', 'Copy of ' + variant.name)
     .set('groupId', groupId || variant.groupId)
     .set('algorithmId', algorithmId || variant.algorithmId)
-    .set('status', LibraryTypes.EVariantStatus.Build)
+    .set('status', LibraryTypes.ItemStatus.Build)
     .set('isDefault', false)
     ;
 };

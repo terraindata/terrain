@@ -56,7 +56,7 @@ const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
-const {EVariantStatus} = LibraryTypes;
+const {ItemStatus} = LibraryTypes;
 
 const TEXT =
 {
@@ -84,7 +84,7 @@ const TEXT =
 
 export interface Props {
   variant: LibraryTypes.Variant;
-  status: LibraryTypes.EVariantStatus;
+  status: LibraryTypes.ItemStatus;
   defaultChecked: boolean;
   defaultVariant: LibraryTypes.Variant;
   onDefaultCheckedChange(defaultChecked: boolean);
@@ -137,12 +137,12 @@ class DeployModalColumn extends PureClasss<Props>
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
 
     // let title = 'Deploy "' + name + '" to Live';
-    // if(changingStatusTo !== EVariantStatus.Live)
+    // if(changingStatusTo !== ItemStatus.Live)
     // {
     //   title = 'Remove "' + name + '" from Live';
     // }
 
-    let text = status === EVariantStatus.Live ? TEXT.live : TEXT.notLive;
+    let text = status === ItemStatus.Live ? TEXT.live : TEXT.notLive;
     if (this.props.defaultChecked)
     {
       text = TEXT.default;
@@ -209,7 +209,7 @@ class DeployModalColumn extends PureClasss<Props>
             </span>
             <span className="deploy-modal-info-bold">
               {
-                EVariantStatus[variant.status]
+                ItemStatus[variant.status]
               }
             </span>
           </div>
@@ -219,13 +219,13 @@ class DeployModalColumn extends PureClasss<Props>
             </span>
             <span className="deploy-modal-info-bold">
               {
-                EVariantStatus[status]
+                ItemStatus[status]
               }
             </span>
           </div>
         </div>
         {
-          status === EVariantStatus.Live &&
+          status === ItemStatus.Live &&
             <div>
               <div
                 className={classNames({

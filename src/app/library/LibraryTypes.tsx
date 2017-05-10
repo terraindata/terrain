@@ -54,44 +54,64 @@ import {BaseClass, New} from '../Classes';
 
 export module LibraryTypes
 {
-  export enum EVariantStatus
+  export const ItemStatus =
   {
-    // This order must be consistent with Midway
-    Archive,
-    Build,
-    Approve,
-    Live,
-  }
+    Archive: 'ARCHIVE',
+    Build: 'BUILD',
+    Approve: 'APPROVE',
+    Live: 'LIVE',
+    Default: 'DEFAULT',
+  };
 
-  class VariantC
+  
+  class ItemC extends BaseClass
+  {
+    // TODO potentially consolidate with midway
+    id: number = 0;
+    parent: number = 0;
+    
+    name: string = '';
+    status: string = ItemStatus.Build;
+    type: string;
+    
+    dbFields = ['id', 'parent', 'name', 'status', 'type'];
+    excludeFields= ['dbFields', 'excludeFields'];
+    
+    modelVersion = 2; // 2 is for the first version of Node midway
+  }
+  export type Item = ItemC & IRecord<ItemC>;
+  export const _Item = (config?: {[key:string]: any}) => 
+    New<Item>(new ItemC(config), config);
+  
+
+  class VariantC extends ItemC
   {
     type = 'variant';
 
-    id = '';
-    name = '';
+    get algorithmId(): number
+    {
+      console.log('algid called')
+      return this.parent;
+    }
+    excludeFields= ['dbFields', 'excludeFields', 'algorithmId']; 
+    // TODO try super or prototype
+    
     lastEdited = '';
     lastUsername = '';
-    algorithmId = '';
-    groupId = '';
-    status = EVariantStatus.Build;
     version = false;
     db = 'urbansitter';
-    isDefault = false;
 
     // don't use this!
     // TODO remove when variants can be saved without queries
     query: BuilderTypes.Query = null;
-
-    // for DB storage, hopefully uneeded soon
-    dbFields = ['groupId', 'algorithmId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault', 'modelVersion'];
-    modelVersion = 1;
-    static getDb: (v: Variant) => string;
   }
-  VariantC.getDb = (v: Variant) => v.db;
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
   export const _Variant = (config?: any) => {
+    // NOTE: we do not want a default value for the config param because
+    //  we want to know the difference between creating a new variant with
+    //  no params vs. an old version with no modelVersion param
+    
     if (config && !config.modelVersion)
     {
       // from modelVersion 0 to 1
@@ -105,8 +125,16 @@ export module LibraryTypes
         variantId: config.id,
       };
     }
+    
+    if(config.modelVersion === 1)
+    {
+      // from 1 to 2
+      // TODO if necessary
+    }
+    
+    config = config || {};
 
-    config = Util.extendId(config || {});
+    // TODO change to standalone query Item
     config.query = BuilderTypes._Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
@@ -130,34 +158,38 @@ export module LibraryTypes
     return v.set('query', BuilderTypes.queryForSave(v.query));
   }
 
-  export enum EAlgorithmStatus
-  {
-    // This order must be consistent with Midway
-    Archive,
-    Live,
-  }
 
-  class AlgorithmC
+  class AlgorithmC extends ItemC
   {
-    id = '';
-    name = '';
+    type = 'algorithm';
+    
     lastEdited = '';
     lastUsername = '';
-    groupId = '';
     variantsOrder = List([]);
-    status = EAlgorithmStatus.Live;
     db = 'urbansitter';
-
-    // for DB storage
-    type = 'algorithm';
-    dbFields = ['groupId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder', 'db'];
+    
+    get groupId(): number
+    {
+      console.log('get gg');
+      return this.parent;
+    }
+    excludeFields= ['dbFields', 'excludeFields', 'groupId']; 
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
   export const _Algorithm = (config?: any) => {
-    config = Util.extendId(config || {});
-    config.variantsOrder = List(config.variantsOrder || []);
+    if(config && (!config.modelVersion || config.modelVersion === 1))
+    {
+      // from 0 and 1 to 2
+      // TODO
+    }
+    
+    if(!config)
+    
+    if(config)
+    {
+      config.variantsOrder = List(config.variantsOrder || []);
+    }
     return new Algorithm_Record(config) as any as Algorithm;
   };
 
@@ -207,17 +239,17 @@ export module LibraryTypes
     return new Group_Record(config) as any as Group;
   };
 
-  export function nameForStatus(status: EVariantStatus | string): string
+  export function nameForStatus(status: ItemStatus | string): string
   {
     switch (status)
     {
-      case EVariantStatus.Approve:
+      case ItemStatus.Approve:
         return 'Approve';
-      case EVariantStatus.Archive:
+      case ItemStatus.Archive:
         return 'Archive';
-      case EVariantStatus.Build:
+      case ItemStatus.Build:
         return 'Build';
-      case EVariantStatus.Live:
+      case ItemStatus.Live:
         return 'Live';
       case 'Default':
         return 'Default';
@@ -226,17 +258,17 @@ export module LibraryTypes
     }
   }
 
-  export function colorForStatus(status: EVariantStatus | string): string
+  export function colorForStatus(status: ItemStatus | string): string
   {
     switch (status)
     {
-      case EVariantStatus.Approve:
+      case ItemStatus.Approve:
         return '#bf5bff';
-      case EVariantStatus.Archive:
+      case ItemStatus.Archive:
         return '#ff735b';
-      case EVariantStatus.Build:
+      case ItemStatus.Build:
         return '#00a7f7';
-      case EVariantStatus.Live:
+      case ItemStatus.Live:
         return '#48b14b';
       case 'Default':
         return '#957048';

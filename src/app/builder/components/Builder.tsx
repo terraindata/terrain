@@ -495,7 +495,7 @@ class Builder extends PureClasss<Props>
     const variant = this.getVariant();
     if (variant)
     {
-      if (variant.status === LibraryTypes.EVariantStatus.Live)
+      if (variant.status === LibraryTypes.ItemStatus.Live)
       {
         return false;
       }
@@ -570,7 +570,7 @@ class Builder extends PureClasss<Props>
   canEdit(): boolean
   {
     const variant = this.getVariant();
-    return variant && (variant.status === LibraryTypes.EVariantStatus.Build
+    return variant && (variant.status === LibraryTypes.ItemStatus.Build
       && Util.canEdit(variant, UserStore, RolesStore));
   }
 
@@ -581,7 +581,7 @@ class Builder extends PureClasss<Props>
     {
       return '';
     }
-    if (variant.status !== LibraryTypes.EVariantStatus.Build)
+    if (variant.status !== LibraryTypes.ItemStatus.Build)
     {
       return 'This Variant is not in Build status';
     }

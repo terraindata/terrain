@@ -220,22 +220,22 @@ class AlgorithmsColumn extends PureClasss<Props>
     const scores = [
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Archive),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Archive),
         name: 'Variants in Archived Status',
       },
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Build),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Build),
         name: 'Variants in Build Status',
       },
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Approve),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Approve),
         name: 'Variants in Approve Status',
       },
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Live),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Live),
         name: 'Variants in Live Status',
       },
     ];

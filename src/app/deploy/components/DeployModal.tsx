@@ -58,7 +58,7 @@ import TQLEditor from '../../tql/components/TQLEditor';
 import TQLConverter from '../../tql/TQLConverter';
 import DeployModalColumn from './DeployModalColumn';
 
-const {EVariantStatus} = LibraryTypes;
+const {ItemStatus} = LibraryTypes;
 
 export interface Props {
 }
@@ -68,7 +68,7 @@ class DeployModal extends PureClasss<Props>
   state: {
     changingStatus: boolean;
     changingStatusOf: LibraryTypes.Variant;
-    changingStatusTo: LibraryTypes.EVariantStatus;
+    changingStatusTo: LibraryTypes.ItemStatus;
     defaultChecked: boolean;
   } = {
     changingStatus: false,
@@ -151,7 +151,7 @@ class DeployModal extends PureClasss<Props>
     const name = (changingStatusOf && changingStatusOf.name);
 
     let title = 'Deploy "' + name + '" to Live';
-    if (changingStatusTo !== EVariantStatus.Live)
+    if (changingStatusTo !== ItemStatus.Live)
     {
       title = 'Remove "' + name + '" from Live';
     }

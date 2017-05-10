@@ -79,7 +79,7 @@ class LibraryStateC
 
   changingStatus: boolean = false;
   changingStatusOf: LibraryTypes.Variant = null;
-  changingStatusTo: LibraryTypes.EVariantStatus = 0;
+  changingStatusTo: LibraryTypes.ItemStatus = 0;
   changingStatusDefault: boolean = false;
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());

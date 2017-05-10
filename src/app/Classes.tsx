@@ -48,7 +48,7 @@ import Util from './util/Util';
 
 export class BaseClass
 {
-  id = '';
+  id: string | number = '';
 
   constructor(config: {id?: string} = {})
   {
