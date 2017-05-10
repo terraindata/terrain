@@ -369,30 +369,30 @@ export const Ajax =
     }
   },
 
-  getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
+  getVersions(id: ID, onLoad: (versions: any) => void)
   {
-    const url = '/variant_versions/' + variantId;
+    const url = '/versions/' + id;
     return Ajax._get(url, '', (response: any) =>
     {
-      const variantVersions = JSON.parse(response);
-      onLoad(variantVersions);
+      const versions = JSON.parse(response);
+      onLoad(versions);
     });
   },
 
-  getVariantVersion(variantId: ID, onLoad: (variantVersion: any) => void)
+  getVersion(id: ID, onLoad: (version: any) => void)
   {
-    if (!variantId || variantId.indexOf('@') === -1)
+    if (!id || id.indexOf('@') === -1)
     {
       onLoad(null);
       return null;
     }
 
     // viewing an old version
-    const pieces = variantId.split('@');
-    const originalVariantId = pieces[0];
+    const pieces = id.split('@');
+    const originalId = pieces[0];
     const versionId = pieces[1];
 
-    const url = '/variant_versions/' + originalVariantId;
+    const url = '/versions/' + originalId;
     return Ajax._get(
       url,
       '',
@@ -402,15 +402,15 @@ export const Ajax =
         if (version)
         {
           const data = JSON.parse(version.data);
-          Ajax.getVariant(originalVariantId, (v: LibraryTypes.Variant) =>
+          Ajax.getVariant(originalId, (v: LibraryTypes.Variant) =>
           {
             if (v)
             {
               data['id'] = v.id;
-              data['groupId'] = v.groupId;
-              data['status'] = v.status;
-              data['algorithmId'] = v.algorithmId;
-              data['version'] = true;
+              data['createdByUserId'] = v.createdByUserId;
+              data['object'] = v['object'];
+              data['objectId'] = v.objectId;
+              data['objectType'] = v.objectType;
 
               onLoad(LibraryTypes._Variant(data));
             }
