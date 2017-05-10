@@ -151,8 +151,8 @@ export class Tasty
     const selectedColumns: TastyColumn[] = columns.map((col) => table[col]);
     query.select(selectedColumns);
 
-    const node: TastyNode = this.filterColumns(table, filter);
-    if (node)
+    const node: TastyNode | null = this.filterColumns(table, filter || {});
+    if (node !== null)
     {
       query.filter(node);
     }
@@ -200,7 +200,7 @@ export class Tasty
     }
     else if (obj instanceof Array)
     {
-      const promises = [];
+      const promises: Array<Promise<{}>> = [];
       obj.map(
         (o) =>
         {
@@ -210,8 +210,11 @@ export class Tasty
     }
     else if (typeof obj === 'object')
     {
-      const node: TastyNode = this.filterColumns(table, obj);
-      query.filter(node);
+      const node: TastyNode | null = this.filterColumns(table, obj);
+      if (node !== null)
+      {
+        query.filter(node);
+      }
       query.delete();
     }
     const queryString = this.generator.generate(query);
@@ -223,9 +226,9 @@ export class Tasty
     return this.executor.schema();
   }
 
-  private filterColumns(table: TastyTable, obj: object): TastyNode
+  private filterColumns(table: TastyTable, obj: object): TastyNode | null
   {
-    let node: TastyNode = null;
+    let node: TastyNode | null = null;
     const columns: string[] = table.getColumnNames();
 
     for (const col of columns)

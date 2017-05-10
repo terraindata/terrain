@@ -122,7 +122,7 @@ export default class ElasticGeneratorRunner
     // stored_fields clause
     if (!query.isSelectingAll())
     {
-      const sourceFields = [];
+      const sourceFields: any[] = [];
       for (let i = 0; i < query.selected.length; ++i)
       {
         const column = query.selected[i];

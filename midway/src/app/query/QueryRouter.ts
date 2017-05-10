@@ -78,7 +78,7 @@ QueryRouter.post(
     winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
       'body: ' + JSON.stringify(query.body));
 
-    const database: DatabaseController = DatabaseRegistry.get(query.database);
+    const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
       throw new Error('Database "' + query.database.toString() + '" not found.');

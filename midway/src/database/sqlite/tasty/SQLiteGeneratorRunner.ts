@@ -70,7 +70,7 @@ export default class SQLiteGeneratorRunner
       this.appendExpression(query.command);
       this.indent();
 
-      const columns = [];
+      const columns: TastyNode[] = [];
       if (query.isSelectingAll())
       {
         this.queryString += ' * '; // handle "select all" condition

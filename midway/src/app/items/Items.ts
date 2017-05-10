@@ -108,7 +108,6 @@ export class Items
       if (item.id !== undefined)
       {
         const items: ItemConfig[] = await this.get(item.id);
-
         if (items.length === 0)
         {
           // item id specified but item not found
@@ -116,15 +115,20 @@ export class Items
         }
 
         const status = items[0].status;
-
         if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
         {
           // only superusers can update live / default items
           return reject('Cannot update LIVE or DEFAULT item as non-superuser');
         }
 
+        const id = items[0].id;
+        if (id === undefined)
+        {
+          return reject('Item does not have an ID');
+        }
+
         // insert a version to save the past state of this item
-        await versions.create(user, 'items', items[0].id, items[0]);
+        await versions.create(user, 'items', id, items[0]);
 
         item = Util.updateObject(items[0], item);
       }

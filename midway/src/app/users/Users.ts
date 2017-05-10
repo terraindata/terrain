@@ -168,9 +168,9 @@ export class Users
     return App.DB.select(this.userTable, [], {}) as any;
   }
 
-  public async loginWithAccessToken(id: number, accessToken: string): Promise<UserConfig>
+  public async loginWithAccessToken(id: number, accessToken: string): Promise<UserConfig | null>
   {
-    return new Promise<UserConfig>(async (resolve, reject) =>
+    return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results: UserConfig[] = await App.DB.select(this.userTable, [], { id, accessToken }) as UserConfig[];
       if (results.length > 0)
@@ -184,18 +184,22 @@ export class Users
     });
   }
 
-  public async loginWithEmail(email: string, password: string)
+  public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>
   {
-    return new Promise(async (resolve, reject) =>
+    return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results: UserConfig[] = await App.DB.select(this.userTable, [], { email }) as UserConfig[];
       if (results.length === 0)
       {
-        resolve(null);
+        return resolve(null);
       }
       else
       {
-        const user: UserConfig = results[0] as UserConfig;
+        const user: UserConfig = results[0];
+        if (user.accessToken === undefined)
+        {
+          return resolve(null);
+        }
         const passwordsMatch: boolean = await this.comparePassword(password, user.password);
         if (passwordsMatch)
         {

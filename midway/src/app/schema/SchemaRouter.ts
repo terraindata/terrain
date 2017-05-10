@@ -57,7 +57,11 @@ const Router = new KoaRouter();
 
 async function getSchema(databaseID: number): Promise<string>
 {
-  const database: DatabaseController = DatabaseRegistry.get(databaseID);
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + databaseID.toString() + '" not found.');
+  }
   const schema: Tasty.Schema = await database.getTasty().schema();
   return schema.toString();
 }
