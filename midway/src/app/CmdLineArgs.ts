@@ -54,7 +54,7 @@ const optionList = [
     alias: 'c',
     defaultValue: 'config.json',
     name: 'config',
-    type: Boolean,
+    type: String,
     typeLabel: 'file',
     description: 'Configuration file to use.',
   },
