@@ -102,8 +102,14 @@ MidwayRouter.get('/', async (ctx, next) =>
 
 MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
 {
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/assets/bundle.js');
+  if (process.env.NODE_ENV === 'production')
+  {
+    await send(ctx, '/src/assets/bundle.js');
+  }
+  else
+  {
+    ctx.body = await Util.getRequest('http://localhost:8080/assets/bundle.js');
+  }
 });
 
 export default MidwayRouter;
