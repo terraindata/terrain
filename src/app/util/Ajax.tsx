@@ -61,8 +61,7 @@ export interface QueryResponse
 
 export const Ajax =
 {
-  _reqMidway2(
-    method: "post" | "get",
+  _reqMidway2(method: 'post' | 'get',
     url: string,
     data: string,
     onLoad: (response: any) => void,
@@ -72,17 +71,17 @@ export const Ajax =
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
-    } = {}
-  )
+      contentType? : string;
+    } = {})
   {
     return Ajax._req(
       method,
-      "/midway/v1/" + url,
+      '/midway/v1/' + url,
       data,
       onLoad,
       _.extend({
         host: 'http://localhost:3000',
-      }, config)
+      }, config),
     );
   },
 
@@ -120,8 +119,7 @@ export const Ajax =
     );
   },
 
-  _req(
-    method: string,
+  _req(method: string,
     url: string,
     data: string,
     onLoad: (response: any) => void,
@@ -132,8 +130,8 @@ export const Ajax =
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
-    } = {}
-  )
+      contentType?: string;
+    } = {})
   {
     const host = config.host || MIDWAY_HOST;
     const fullUrl = host + url;
@@ -198,6 +196,11 @@ export const Ajax =
     {
       xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
       xhr.setRequestHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
+    }
+
+    if (config.contentType !== undefined)
+    {
+      xhr.setRequestHeader('Content-Type', config.contentType);
     }
 
     xhr.send(data);
@@ -485,6 +488,7 @@ export const Ajax =
   },
 
 
+
   // run query, consider renaming
   query(tql: string,
     db: string,
@@ -545,7 +549,10 @@ export const Ajax =
           }
           onLoad(respData);
         },
-        onError,
+        {
+          onError,
+          contentType : 'application/json',
+        }
       ),
       queryId: unique_id,
     };
