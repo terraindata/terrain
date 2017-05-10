@@ -72,6 +72,7 @@ class Account extends Classs<Props>
     switch (this.props.location.pathname)
     {
       case '/account/profile':
+      case '/account/profile/edit':
         profileActive = true;
         title = 'Profile';
         // selected = '298px'; // use this when we add notifications back in
