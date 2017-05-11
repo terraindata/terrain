@@ -60,8 +60,8 @@ export interface UserConfig
   accessToken?: string;
   email: string;
   id?: number;
-  isDisabled?: boolean;
-  isSuperUser?: boolean;
+  isDisabled: boolean;
+  isSuperUser: boolean;
   name?: string;
   oldPassword?: string;
   password: string;

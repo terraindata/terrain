@@ -90,7 +90,7 @@ export default class ElasticQueryHandler extends QueryHandler
   {
     return (error: Error, response: any) =>
     {
-      if (error !== null)
+      if (error !== null && error !== undefined)
       {
         if (QueryError.isElasticQueryError(error))
         {

@@ -52,7 +52,7 @@ export function getRequest(url)
   {
     request(url, (error, res, body) =>
     {
-      if (error !== null && res.statusCode === 200)
+      if ((error === null || error === undefined) && res.statusCode === 200)
       {
         resolve(body);
       }
@@ -96,7 +96,7 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
 {
   return (error: Error, response: T) =>
   {
-    if (error !== null)
+    if (error !== null && error !== undefined)
     {
       reject(error);
     }

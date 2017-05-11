@@ -426,7 +426,7 @@ export default class SQLiteGeneratorRunner
   private sqlName(node: TastyNode): string
   {
     const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
-    if (sqlTypeInfo.sqlName !== null)
+    if (sqlTypeInfo.sqlName !== '')
     {
       return sqlTypeInfo.sqlName;
     }

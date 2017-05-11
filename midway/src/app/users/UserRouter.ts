@@ -87,7 +87,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 
   // if superuser or id to be updated is current user
   const isSuperUser: boolean = ctx.state.user.isSuperUser;
-  if (isSuperUser === true || ctx.request.body.id === ctx.params.id)
+  if (isSuperUser || ctx.request.body.id === ctx.params.id)
   {
     ctx.body = await users.update(isSuperUser, user);
   }
@@ -104,8 +104,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     throw new Error('Invalid parameter user ID');
   }
 
-  const isSuperUser: boolean = ctx.state.user.isSuperUser;
-  if (isSuperUser === true)
+  if (ctx.state.user.isSuperUser === true)
   {
     ctx.body = await users.create(user);
   }
