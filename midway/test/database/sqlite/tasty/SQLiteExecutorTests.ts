@@ -64,7 +64,7 @@ let sqliteController: SQLiteController;
 
 beforeAll(async () =>
 {
-  winston.transports.Console.level = 'debug';
+  winston.level = 'debug';
   const config: SQLiteConfig =
     {
       filename: 'moviesdb.db',
