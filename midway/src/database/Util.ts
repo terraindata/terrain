@@ -79,6 +79,7 @@ export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConf
 
 export function makeDatabaseController(type: string, dsn: string): SQLiteController | MySQLController | ElasticController
 {
+  type = type.toLowerCase();
   if (type === 'sqlite')
   {
     const config = DSNToConfig(type, dsn) as SQLiteConfig;

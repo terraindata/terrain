@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as http from 'http';
 import * as Koa from 'koa';
 import * as winston from 'winston';
@@ -55,14 +56,15 @@ import serve = require('koa-static-server');
 import cors = require('kcors');
 import srs = require('secure-random-string');
 
-import * as Util from '../database/Util';
+import * as DBUtil from '../database/Util';
 import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
-import CmdLineArgs from './CmdLineArgs';
+import { CmdLineArgs, CmdLineUsage } from './CmdLineArgs';
 import './Logging';
 import Middleware from './Middleware';
 import RouteError from './RouteError';
 import MidwayRouter from './Router';
+import * as Util from './Util';
 
 export let DB: Tasty.Tasty;
 
@@ -71,8 +73,34 @@ class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = Util.makeDatabaseController(type, dsn);
+    const controller = DBUtil.makeDatabaseController(type, dsn);
     return controller.getTasty();
+  }
+
+  private static handleConfig(config: any)
+  {
+    winston.debug('Using configuration: ' + JSON.stringify(config));
+    if (config.help === true)
+    {
+      // tslint:disable-next-line
+      console.log(CmdLineUsage);
+      process.exit();
+    }
+
+    // load options from a configuration file, if specified.
+    if (config.config !== undefined)
+    {
+      const settings = fs.readFileSync(config.config, 'utf8');
+      const cfgSettings = JSON.parse(settings);
+      config = Util.updateObject(config, cfgSettings);
+    }
+
+    if (config.debug === true)
+    {
+      winston.level = 'debug';
+    }
+
+    return config;
   }
 
   private static uncaughtExceptionHandler(err: Error): void
@@ -95,7 +123,10 @@ class App
     process.on('uncaughtException', App.uncaughtExceptionHandler);
     process.on('unhandledRejection', App.unhandledRejectionHandler);
 
-    this.DB = App.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
+    config = App.handleConfig(config);
+    winston.debug('Using configuration: ' + JSON.stringify(config));
+
+    this.DB = App.initializeDB(config.db, config.dsn);
     DB = this.DB;
 
     this.app = new Koa();
