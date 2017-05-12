@@ -63,7 +63,8 @@ function getExpectedFile(): string
 
 beforeAll(() =>
 {
-  winston.level = 'debug';
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
   const config: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };

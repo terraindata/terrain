@@ -64,7 +64,8 @@ let mysqlController: MySQLController;
 
 beforeAll(async () =>
 {
-  winston.level = 'debug';
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
   const config: MySQLConfig =
     {
       connectionLimit: 20,

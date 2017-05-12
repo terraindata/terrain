@@ -58,7 +58,8 @@ let elasticGenerator: ElasticGenerator;
 
 beforeAll(() =>
 {
-  winston.level = 'debug';
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
   const elasticConfig: ElasticConfig = {
     hosts: ['http://localhost:9200'],
   };

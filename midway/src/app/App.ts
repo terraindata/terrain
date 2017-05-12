@@ -97,7 +97,8 @@ class App
 
     if (config.debug === true)
     {
-      winston.level = 'debug';
+      // TODO: get rid of this monstrosity once @types/winston is updated.
+      (winston as any).level = 'debug';
     }
 
     return config;
