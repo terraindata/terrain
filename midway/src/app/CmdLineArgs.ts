@@ -51,7 +51,7 @@ import cmdLineUsage = require('command-line-usage');
 const optionList = [
   {
     alias: 'c',
-    defaultValue: 'config.json',
+    defaultValue: 'nodeway.json',
     name: 'config',
     type: String,
     typeLabel: 'file',
@@ -109,7 +109,18 @@ const sections = [
   },
 ];
 
-export let CmdLineArgs = cmdLineArgs(optionList,
+export interface Configuration
+{
+  config?: string;
+  port?: number;
+  db?: string;
+  dsn?: string;
+  debug?: boolean;
+  help?: boolean;
+  verbose?: boolean;
+}
+
+export let CmdLineArgs: Configuration = cmdLineArgs(optionList,
   {
     partial: true,
   });

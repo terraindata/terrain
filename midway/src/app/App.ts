@@ -59,7 +59,7 @@ import srs = require('secure-random-string');
 import * as DBUtil from '../database/Util';
 import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
-import { CmdLineArgs, CmdLineUsage } from './CmdLineArgs';
+import { CmdLineArgs, CmdLineUsage, Configuration } from './CmdLineArgs';
 import './Logging';
 import Middleware from './Middleware';
 import RouteError from './RouteError';
@@ -77,7 +77,7 @@ class App
     return controller.getTasty();
   }
 
-  private static handleConfig(config: any)
+  private static handleConfig(config: Configuration)
   {
     winston.debug('Using configuration: ' + JSON.stringify(config));
     if (config.help === true)
@@ -90,9 +90,22 @@ class App
     // load options from a configuration file, if specified.
     if (config.config !== undefined)
     {
-      const settings = fs.readFileSync(config.config, 'utf8');
-      const cfgSettings = JSON.parse(settings);
-      config = Util.updateObject(config, cfgSettings);
+      try
+      {
+        const settings = fs.readFileSync(config.config, 'utf8');
+        const cfgSettings = JSON.parse(settings);
+        config = Util.updateObject(config, cfgSettings);
+      }
+      catch (e)
+      {
+        winston.error('Failed to read configuration settings from ' + String(config.config));
+      }
+    }
+
+    if (config.verbose === true)
+    {
+      // TODO: get rid of this monstrosity once @types/winston is updated.
+      (winston as any).level = 'verbose';
     }
 
     if (config.debug === true)
@@ -119,7 +132,7 @@ class App
   private DB: Tasty.Tasty;
   private app: Koa;
 
-  constructor(config: any = CmdLineArgs)
+  constructor(config: Configuration = CmdLineArgs)
   {
     process.on('uncaughtException', App.uncaughtExceptionHandler);
     process.on('unhandledRejection', App.unhandledRejectionHandler);
@@ -127,7 +140,7 @@ class App
     config = App.handleConfig(config);
     winston.debug('Using configuration: ' + JSON.stringify(config));
 
-    this.DB = App.initializeDB(config.db, config.dsn);
+    this.DB = App.initializeDB(config.db as string, config.dsn as string);
     DB = this.DB;
 
     this.app = new Koa();
@@ -149,7 +162,7 @@ class App
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
   }
 
-  public listen(port: number = CmdLineArgs.port): http.Server
+  public listen(port: number | undefined = CmdLineArgs.port): http.Server
   {
     return this.app.listen(port);
   }
