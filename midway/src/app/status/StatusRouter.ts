@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
+import * as passport from 'koa-passport';
 
 const Router = new KoaRouter();
 
@@ -56,5 +57,16 @@ Router.get('/', async (ctx, next) =>
   });
   winston.info('status root');
 });
+
+Router.get('/login', passport.authenticate('local'), async (ctx, next) =>
+{
+  ctx.body =
+  {
+    accessToken: ctx.state.user.accessToken,
+    userId: ctx.state.user.userId,
+  };
+  winston.info('login status root');
+});
+
 
 export default Router;

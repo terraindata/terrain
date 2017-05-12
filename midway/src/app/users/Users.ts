@@ -186,6 +186,7 @@ export class Users
 
   public async loginWithEmail(email: string, password: string)
   {
+    winston.info('Logging in with email', email, password);
     return new Promise(async (resolve, reject) =>
     {
       const results: UserConfig[] = await App.DB.select(this.userTable, [], { email }) as UserConfig[];
@@ -241,7 +242,7 @@ export class Users
     return App.DB.upsert(this.userTable, newUser);
   }
 
-  private async hashPassword(password: string): Promise<string>
+  public async hashPassword(password: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
