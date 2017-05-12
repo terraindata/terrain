@@ -83,7 +83,7 @@ beforeAll((done) =>
         email: 'test@terraindata.com',
         name: 'Test Person',
         password: 'Flash Flash Hundred Yard Dash',
-        isAdmin: false,
+        isSuperUser: false,
         isDisabled: false,
         timezone: 'UTC',
       },
