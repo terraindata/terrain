@@ -184,7 +184,7 @@ class AccountDropdown extends PureClasss<Props>
       <div className="account-dropdown-top-bar" onClick={this.open} ref="accountDropdownButton">
         <UserThumbnail
           showName={true}
-          username={this.state.user && this.state.user.username}
+          userId={this.state.user && this.state.user.userId}
           hideAdmin={true}
         />
         <ArrowIcon className="account-arrow-icon" />

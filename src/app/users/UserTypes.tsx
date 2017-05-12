@@ -51,15 +51,15 @@ export module UserTypes
   class UserC extends BaseClass
   {
     // db-level fields
-    username = '';
+    userId = '';
     isAdmin = false;
     isDisabled = false;
+    email = '';
 
     // metadata fields
     firstName = '';
     lastName = '';
     whatIDo = '';
-    email = '';
     skype = '';
     timeZone = 158;
     phone = '';
@@ -74,15 +74,15 @@ export module UserTypes
     emailNews = 'on';
 
     // DB level fields
-    dbFields = ['isAdmin', 'username', 'disabled'];
+    dbFields = ['isAdmin', 'userId', 'disabled', 'email'];
     // "static" fields to exclude
-    excludeFields = ['name, dbFields', 'excludeFields'];
+    excludeFields = ['name', 'dbFields', 'excludeFields'];
 
     name: () => string = () =>
     {
       if (!this.firstName.length && !this.lastName.length)
       {
-        return this.username.substr(0, 1).toUpperCase() + this.username.substr(1);
+        return 'Anonymous';
       }
 
       return `${this.firstName} ${this.lastName}`;
@@ -116,7 +116,7 @@ export module UserTypes
       return user.imgSrc;
     }
 
-    const code = (user ? user.username : 'a').charCodeAt(0);
+    const code = (user ? user.userId : 'a').charCodeAt(0);
     const index = (code % numProfileImages) + 1;
     return '/dist/profiles/profile' + index + '.jpg';
   }

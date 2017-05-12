@@ -55,7 +55,7 @@ type User = UserTypes.User;
 
 export interface Props
 {
-  username: string;
+  userId: string;
   showName?: boolean;
   largest?: boolean;
   large?: boolean;
@@ -97,12 +97,12 @@ class UserThumbnail extends Classs<Props>
 
   getStoreKeyPath(props?: Props)
   {
-    return ['users', (props || this.props).username];
+    return ['users', (props || this.props).userId];
   }
 
   componentWillReceiveProps(nextProps)
   {
-    if (nextProps.username !== this.props.username)
+    if (nextProps.userId !== this.props.userId)
     {
       this.subscribeUser(nextProps);
     }
@@ -157,7 +157,7 @@ class UserThumbnail extends Classs<Props>
     if (this.props.link && user)
     {
       return (
-        <Link to={`/users/${user.username}`}>
+        <Link to={`/users/${user.userId}`}>
           { thumbnail }
         </Link>
       );
