@@ -649,6 +649,28 @@ export const Ajax =
       },
     );
   },
+  
+  login(
+    email: string,
+    password: string,
+    onLoad: (data: {
+      userId: number,
+      accessToken: string,
+    }) => void,
+    onError: (error) => void
+  ): XMLHttpRequest
+  {
+    return Ajax._reqMidway2(
+      'post',
+      'login',
+      JSON.stringify({
+        email,
+        password,
+      }),
+      onLoad,
+      onError
+    );
+  },
 
   _config()
   {

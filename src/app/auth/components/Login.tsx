@@ -73,6 +73,7 @@ class Login extends PureClasss<Props>
     showingLogo: false,
     opened: false,
     loggingIn: false,
+    xhr: null,
   };
 
   componentDidMount()
@@ -166,7 +167,6 @@ class Login extends PureClasss<Props>
     this.props.onLoadComplete();
   }
 
-  xhr: XMLHttpRequest;
   handleLogin()
   {
     if (this.state.loggingIn)
@@ -175,44 +175,29 @@ class Login extends PureClasss<Props>
       return;
     }
 
+    this.state.xhr && this.state.xhr.abort();
+    
     this.setState({
       loggingIn: true,
+      xhr: Ajax.login(
+        this.state.email,
+        this.state.password,
+        
+        (userData: { accessToken: string, userId: number }) => {
+          console.log('load', userData);
+          Actions.login(userData.accessToken, userData.userId);
+        },
+        
+        (ev: Event) => {
+          this.setState({
+            errorModalMessage: 'Error logging in:' + ev,
+            loggingIn: false,
+          });
+          this.toggleErrorModal();
+          this.xhr = null;
+        }
+      ),
     });
-    const { email } = this.state;
-    const login = (userData: { accessToken, userId }) => {
-      // TODO confirm with Jason / Midway that this works
-      Actions.login(userData.accessToken, userData.userId);
-    };
-
-    this.xhr && this.xhr.abort();
-    this.xhr = new XMLHttpRequest();
-    this.xhr.onerror = (ev: Event) => {
-      this.setState({
-        errorModalMessage: 'Error logging in:' + ev,
-        loggingIn: false,
-      });
-      this.toggleErrorModal();
-      this.xhr = null;
-    };
-    this.xhr.onload = (ev: Event) => {
-      if (this.xhr.status != 200) {
-        this.setState({
-          loggingIn: false,
-          errorModalMessage: 'Failed to log in: ' + this.xhr.responseText,
-        });
-        this.toggleErrorModal();
-        return;
-      }
-      this.xhr = null;
-      const loginData = JSON.parse(this.xhr.responseText);
-      login(loginData);
-    };
-    // NOTE: MIDWAY_HOST will be replaced by the build process.
-    this.xhr.open('POST', MIDWAY_HOST + '/auth', true);
-    this.xhr.send(JSON.stringify({
-      email,
-      password: this.state.password,
-    }));
   }
 
   handleForgotPassword()

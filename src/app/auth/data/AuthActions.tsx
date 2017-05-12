@@ -51,8 +51,8 @@ const $ = (type: string, payload: any) => Store.dispatch({type, payload});
 const AuthActions =
 {
   login:
-    (token: string, email: string) =>
-      $(ActionTypes.login, { token, email }),
+    (token: string, userId: number) =>
+      $(ActionTypes.login, { token, userId }),
   logout:
     () =>
       $(ActionTypes.logout, null),

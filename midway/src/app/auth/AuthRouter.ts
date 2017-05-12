@@ -65,10 +65,20 @@ Router.post('/', async (ctx, next) =>
 Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
 {
   ctx.body =
-    {
-      accessToken: ctx.state.user.accessToken,
-      userId: ctx.state.user.userId,
-    };
+  {
+    accessToken: ctx.state.user.accessToken,
+    userId: ctx.state.user.userId,
+  };
+  winston.info('User has successfully authenticated as ' + ctx.state.user.email);
+});
+
+Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
+{
+  ctx.body =
+  {
+    accessToken: ctx.state.user.accessToken,
+    userId: ctx.state.user.userId,
+  };
   winston.info('User has successfully authenticated as ' + ctx.state.user.email);
 });
 
