@@ -52,16 +52,6 @@ import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
 
-Router.get('/', async (ctx, next) =>
-{
-  ctx.body = '';
-});
-
-Router.post('/', async (ctx, next) =>
-{
-  ctx.body = '';
-});
-
 Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
 {
   ctx.body =

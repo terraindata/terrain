@@ -83,7 +83,7 @@ beforeAll((done) =>
         email: 'test@terraindata.com',
         name: 'Test Person',
         password: 'Flash Flash Hundred Yard Dash',
-        isAdmin: false,
+        isSuperUser: false,
         isDisabled: false,
         timezone: 'UTC',
       },
@@ -109,8 +109,8 @@ describe('User and auth route tests', () =>
   test('http login route: GET /midway/v1/auth/login', () =>
   {
     return request(server)
-      .get('/midway/v1/auth/login')
-      .query({
+      .post('/midway/v1/auth/login')
+      .send({
         email: 'test@terraindata.com',
         password: 'Flash Flash Hundred Yard Dash',
       })
