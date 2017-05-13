@@ -90,7 +90,7 @@ export class Users
       ],
     );
   }
-
+  
   public async create(user: UserConfig): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
@@ -242,7 +242,7 @@ export class Users
     return App.DB.upsert(this.userTable, newUser);
   }
 
-  public async hashPassword(password: string): Promise<string>
+  private async hashPassword(password: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -255,6 +255,20 @@ export class Users
     return new Promise<boolean>(async (resolve, reject) =>
     {
       bcrypt.compare(oldPassword, newPassword, Util.makePromiseCallback(resolve, reject));
+    });
+  }
+  
+  public static initializeDefaultUser()
+  {
+    // must be called after App.DB has been defined
+    (new Users()).upsert({
+      id: 1,
+      accessToken: 'ImALuser',
+      email: 'luser@terraindata.com',
+      isSuperUser: true,
+      name: 'Terrain Admin',
+      password: 'choppinwood1123',
+      isDisabled: false,
     });
   }
 }

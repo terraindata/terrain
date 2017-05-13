@@ -99,7 +99,7 @@ class App
     this.DB = App.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
     DB = this.DB;
     
-    this.initializeDefaultUser();
+    Users.initializeDefaultUser();
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -120,21 +120,6 @@ class App
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
   }
   
-  private async initializeDefaultUser()
-  {
-    const users = new Users();
-    const defaultPassword = await users.hashPassword('choppinwood1123');
-    return users.upsert({
-      id: 1,
-      accessToken: 'ImALuser',
-      email: 'luser@terraindata.com',
-      isSuperUser: true,
-      name: 'Terrain Admin',
-      password: defaultPassword,
-      isDisabled: false,
-    });
-  }
-
   public listen(port: number = CmdLineArgs.port): http.Server
   {
     return this.app.listen(port);
