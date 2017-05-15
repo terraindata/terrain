@@ -54,7 +54,7 @@ const optionList = [
     alias: 'c',
     defaultValue: 'config.json',
     name: 'config',
-    type: Boolean,
+    type: String,
     typeLabel: 'file',
     description: 'Configuration file to use.',
   },
@@ -115,14 +115,14 @@ const sections = [
   },
 ];
 
-if (CmdLineArgs.help)
+if (CmdLineArgs.help === true)
 {
   // tslint:disable-next-line
   console.log(cmdLineUsage(sections));
 }
 
 // load options from a configuration file, if specified.
-if (cmdLineArgs.config)
+if (cmdLineArgs.config !== undefined)
 {
   const data = fs.readFileSync(CmdLineArgs.config, 'utf8');
   CmdLineArgs = JSON.parse(data);

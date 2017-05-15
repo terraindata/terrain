@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-const SQLQueries: Array<[string, string]> = [
+const SQLQueries: Array<[string, [string]]> = [
   [
     'simple query (select all)',
     [`SELECT * \n  FROM movies\n  LIMIT 10;`],

@@ -55,7 +55,7 @@ const Router = new KoaRouter();
 Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
 {
   ctx.body = ctx.state.user.accessToken;
-  winston.info('User is successfully authenticated as ' + ctx.state.user.email);
+  winston.info('User is successfully authenticated as ' + String(ctx.state.user.email));
   ctx.redirect('/midway/v1/');
 });
 
@@ -66,12 +66,12 @@ Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
       accessToken: ctx.state.user.accessToken,
       email: ctx.state.user.email,
     };
-  winston.info('User has successfully authenticated as ' + ctx.state.user.email);
+  winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
 });
 
 Router.post('/api_logout', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('Logging out user ' + ctx.state.user.email);
+  winston.info('Logging out user ' + String(ctx.state.user.email));
   ctx.body = await users.logout(ctx.request.body.id, ctx.request.body.accessToken);
 });
 

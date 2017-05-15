@@ -61,7 +61,7 @@ class SQLiteController extends DatabaseController
   private client: SQLiteClient;
   private tasty: Tasty.Tasty;
 
-  constructor(config?: SQLiteConfig, id?: number, name?: string)
+  constructor(config: SQLiteConfig, id: number, name: string)
   {
     super('SQLiteController', id, name);
     this.client = new SQLiteClient(this, config);

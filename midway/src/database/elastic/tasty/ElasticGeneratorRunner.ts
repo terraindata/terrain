@@ -82,7 +82,7 @@ export default class ElasticGeneratorRunner
         esQuery.param = this.constructDeleteQuery(query);
         break;
       default:
-        throw new Error('Unknown command in the query:' + query);
+        throw new Error('Unknown command in the query:' + query.toString());
     }
   }
 
@@ -122,7 +122,7 @@ export default class ElasticGeneratorRunner
     // stored_fields clause
     if (!query.isSelectingAll())
     {
-      const sourceFields = [];
+      const sourceFields: any[] = [];
       for (let i = 0; i < query.selected.length; ++i)
       {
         const column = query.selected[i];

@@ -61,7 +61,7 @@ class MySQLController extends DatabaseController
   private client: MySQLClient;
   private tasty: Tasty.Tasty;
 
-  constructor(config?: MySQLConfig, id?: number, name?: string)
+  constructor(config: MySQLConfig, id: number, name: string)
   {
     super('MySQLController', id, name);
     this.client = new MySQLClient(this, config);
