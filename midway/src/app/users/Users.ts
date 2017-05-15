@@ -60,9 +60,9 @@ export interface UserConfig
   accessToken?: string;
   email: string;
   id?: number;
-  isDisabled: boolean;
-  isSuperUser: boolean;
-  name?: string;
+  isDisabled: number;
+  isSuperUser: number;
+  name: string;
   oldPassword?: string;
   password: string;
   timezone?: string;
@@ -70,6 +70,21 @@ export interface UserConfig
 
 export class Users
 {
+  public static initializeDefaultUser()
+  {
+    // tslint:disable-next-line
+    (new Users()).create({
+      accessToken: 'ImALuser',
+      email: 'luser@terraindata.com',
+      isSuperUser: 1,
+      name: 'Terrain Admin',
+      password: 'choppinwood1123',
+      isDisabled: 0,
+      timezone: '',
+    })
+    .catch(() => { /* user already exists */ });
+  }
+
   private readonly saltRounds = 10;
   private userTable: Tasty.Table;
 
@@ -114,9 +129,8 @@ export class Users
           isSuperUser: user.isSuperUser,
           name: user.name,
           password: await this.hashPassword(user.password),
-          timezone: user.timezone,
+          timezone: user.timezone === undefined ? '' : user.timezone,
         };
-
       await this.upsert(newUser);
       resolve('Success');
     });
@@ -268,20 +282,6 @@ export class Users
   private async comparePassword(oldPassword: string, newPassword: string): Promise<boolean>
   {
     return bcrypt.compare(oldPassword, newPassword);
-  }
-
-  public static initializeDefaultUser()
-  {
-    // must be called after App.DB has been defined
-    (new Users()).create({
-      id: 1,
-      accessToken: 'ImALuser',
-      email: 'luser@terraindata.com',
-      isSuperUser: true,
-      name: 'Terrain Admin',
-      password: 'choppinwood1123',
-      isDisabled: false,
-    }).catch(() => { /* user already exists */ });
   }
 }
 
