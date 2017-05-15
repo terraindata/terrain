@@ -20,3 +20,4 @@ yarn.lock
 nodeway.db
 moviesdb.db
 *.swp
+build/
