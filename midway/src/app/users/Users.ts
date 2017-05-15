@@ -103,7 +103,7 @@ export class Users
       const existingUsers = await this.select([], { email: user.email });
       if (existingUsers.length !== 0)
       {
-        reject('User with email ' + user.email + ' already exists.');
+        return reject('User with email ' + String(user.email) + ' already exists.');
       }
 
       const newUser: UserConfig =
