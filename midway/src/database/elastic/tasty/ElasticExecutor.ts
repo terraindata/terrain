@@ -52,7 +52,7 @@ import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticQuery from './ElasticQuery';
 
-export class ElasticExecutor implements TastyExecutor
+export default class ElasticExecutor implements TastyExecutor
 {
   private client: ElasticClient;
 
@@ -209,7 +209,6 @@ export class ElasticExecutor implements TastyExecutor
       default:
         throw new Error('Unknown query command ' + query);
     }
-
   }
 
   private async executeElasticTastySelectQuery(query: ElasticQuery)
@@ -248,8 +247,10 @@ export class ElasticExecutor implements TastyExecutor
 
   private makeID(table: TastyTable, element: object): string
   {
-    return table.getPrimaryKeys(element).join('-');
+    return table.getPrimaryKeys().map(
+      (key: string) =>
+      {
+        return element[key];
+      }).join('-');
   }
 }
-
-export default ElasticExecutor;

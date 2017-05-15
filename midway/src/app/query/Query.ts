@@ -44,55 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import passportLocal = require('passport-local');
-
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
-
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  async (req: any, id: string, accessToken: string, done) =>
-  {
-    const user = await users.loginWithAccessToken(Number(id), accessToken);
-    done(null, user);
-  }));
-
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  async (req: any, email: string, password: string, done) =>
-  {
-    const user = await users.loginWithEmail(email, password);
-    done(null, user);
-  }));
-
-Middleware.passport.serializeUser((user, done) =>
+export interface Query
 {
-  if (user)
-  {
-    done(null, user.id);
-  }
-});
+  database: number;
+  type: string;
+  body: object | string;
+}
 
-Middleware.passport.deserializeUser(async (id, done) =>
-{
-  try
-  {
-    const user = await users.get(id);
-    done(null, user);
-  }
-  catch (e)
-  {
-    done(e, null);
-  }
-
-});
+export default Query;

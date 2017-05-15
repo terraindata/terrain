@@ -46,14 +46,17 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import reqText = require('require-text');
+import * as send from 'koa-send';
+import * as winston from 'winston';
+
 import AuthRouter from './auth/AuthRouter';
+import DatabaseRouter from './database/DatabaseRouter';
 import ItemRouter from './items/ItemRouter';
 import QueryRouter from './query/QueryRouter';
 import SchemaRouter from './schema/SchemaRouter';
 import StatusRouter from './status/StatusRouter';
 import UserRouter from './users/UserRouter';
-import Util from './Util';
+import * as Util from './Util';
 import VersionRouter from './versions/VersionRouter';
 
 const AppRouter = new KoaRouter();
@@ -62,6 +65,7 @@ AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
 AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
 AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
 AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
+AppRouter.use('/database', DatabaseRouter.routes(), DatabaseRouter.allowedMethods());
 AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
 AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
@@ -73,9 +77,9 @@ AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 
 AppRouter.get('/', async (ctx, next) =>
 {
-  if (ctx.state.user)
+  if (ctx.state.user[0] !== undefined)
   {
-    ctx.body = 'authenticated as ' + ctx.state.user.username;
+    ctx.body = 'authenticated as ' + ctx.state.user[0].email;
   }
   else
   {
@@ -85,7 +89,7 @@ AppRouter.get('/', async (ctx, next) =>
 
 AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = 'authenticated as ' + ctx.state.user.username;
+  ctx.body = 'authenticated as ' + ctx.state.user[0].email;
 });
 
 const MidwayRouter = new KoaRouter();
@@ -93,14 +97,19 @@ MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
 MidwayRouter.get('/', async (ctx, next) =>
 {
-  const index = reqText('../../../index.html', require);
-  ctx.body = index.toString();
+  await send(ctx, '/src/app/index.html');
 });
 
-MidwayRouter.get('/bundle.js', async (ctx, next) =>
+MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
 {
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
+  if (process.env.NODE_ENV === 'production')
+  {
+    await send(ctx, '/src/assets/bundle.js');
+  }
+  else
+  {
+    ctx.body = await Util.getRequest('http://localhost:8080/assets/bundle.js');
+  }
 });
 
 export default MidwayRouter;

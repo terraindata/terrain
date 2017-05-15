@@ -48,36 +48,49 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import Util from '../Util';
+import * as Util from '../Util';
 import { UserConfig, Users } from './Users';
+export * from './Users';
 
 const Router = new KoaRouter();
+export const users = new Users();
 
 // Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 Router.get('/', async (ctx, next) =>
 {
   winston.info('getting all users');
-  ctx.body = await Users.get();
+  ctx.body = await users.get();
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting user ID ' + ctx.params.id);
-  ctx.body = await Users.get(ctx.params.id);
+  ctx.body = await users.get(ctx.params.id);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
-  const user = ctx.request.body;
-  Util.verifyParameters(user.body, ['email', 'password']);
-  user.body.id = ctx.params.id;
-  user.callingUser = ctx.state.user;
-  // if superuser or id to be updated is current user
-  if (ctx.state.user.isSuperUser || ctx.request.body.id === ctx.params.id)
+  const user: UserConfig = ctx.request.body.body;
+  Util.verifyParameters(user, ['email', 'password']);
+  if (!user.id)
   {
-    ctx.body = await Users.createOrUpdate(user);
+    user.id = Number(ctx.params.id);
+  }
+  else
+  {
+    if (user.id !== Number(ctx.params.id))
+    {
+      throw new Error('User ID does not match the supplied id in the URL');
+    }
+  }
+
+  // if superuser or id to be updated is current user
+  const isSuperUser: boolean = ctx.state.user.isSuperUser;
+  if (isSuperUser || ctx.request.body.id === ctx.params.id)
+  {
+    ctx.body = await users.update(isSuperUser, user);
   }
 });
 
@@ -85,16 +98,20 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   // create a user, must be admin
   winston.info('create user');
-  const user = ctx.request.body;
-  Util.verifyParameters(user.body, ['email', 'password']);
-  if (user.body.id)
+  const user: UserConfig = ctx.request.body.body;
+  Util.verifyParameters(user, ['email', 'password']);
+  if (user.id)
   {
-    throw Error('Invalid parameter user ID');
+    throw new Error('Invalid parameter user ID');
   }
 
   if (ctx.state.user.isSuperUser)
   {
-    ctx.body = await Users.createOrUpdate(user);
+    ctx.body = await users.create(user);
+  }
+  else
+  {
+    throw new Error('Only superuser can create new users.');
   }
 });
 

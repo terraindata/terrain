@@ -44,55 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import passportLocal = require('passport-local');
+import TastyColumn from './TastyColumn';
+import TastyTable from './TastyTable';
 
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
-
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  async (req: any, id: string, accessToken: string, done) =>
-  {
-    const user = await users.loginWithAccessToken(Number(id), accessToken);
-    done(null, user);
-  }));
-
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  async (req: any, email: string, password: string, done) =>
-  {
-    const user = await users.loginWithEmail(email, password);
-    done(null, user);
-  }));
-
-Middleware.passport.serializeUser((user, done) =>
+export default class TastyTableState
 {
-  if (user)
-  {
-    done(null, user.id);
-  }
-});
+  public table: TastyTable;
+  public databaseName: string;
+  public tableName: string;
+  public columns: Map<string, TastyColumn>;
+  public primaryKeys: string[];
+  public columnNames: string[]; // sorted list of columns
 
-Middleware.passport.deserializeUser(async (id, done) =>
-{
-  try
+  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[], database?: string)
   {
-    const user = await users.get(id);
-    done(null, user);
-  }
-  catch (e)
-  {
-    done(e, null);
+    // primary key is a list, so that composite keys can be supported
+    this.table = table;
+    this.databaseName = database;
+    this.tableName = name;
+    this.columns = new Map();
+    this.primaryKeys = primaryKeys;
+    this.columnNames = columns.concat(primaryKeys).sort();
   }
 
-});
+  public init(): void
+  {
+    this.addColumns(this.columnNames);
+  }
+
+  private addColumns(columns: string[]): void
+  {
+    columns.forEach(
+      (columnName) =>
+      {
+        this.columns.set(columnName, new TastyColumn(this.table, columnName));
+      });
+  }
+}

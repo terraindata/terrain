@@ -86,10 +86,19 @@ export class TastyQuery
     return this;
   }
 
-  public upsert(obj: object): TastyQuery
+  public upsert(value: object | object[]): TastyQuery
   {
     this.command = new TastyNode('upsert', null);
-    this.upserts.push(obj);
+
+    if (value instanceof Array)
+    {
+      this.upserts.concat(value);
+    }
+    else
+    {
+      this.upserts.push(value);
+    }
+
     return this;
   }
 
@@ -158,7 +167,7 @@ export class TastyQuery
   {
     if (!this.isTastyNode(node))
     {
-      throw Error('node argument is not a TastyNode.');
+      throw new Error('node argument is not a TastyNode.');
     }
   }
 }

@@ -45,43 +45,63 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'request';
-import * as _ from 'underscore';
-import * as Tasty from '../tasty/Tasty';
 
-export const Util =
+export function getRequest(url)
+{
+  return new Promise((resolve, reject) =>
   {
-    getRequest: (url) =>
+    request(url, (error, res, body) =>
     {
-      return new Promise((resolve, reject) =>
+      if (!error && res.statusCode === 200)
       {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
-      });
-    },
-    verifyParameters: (parameters: any, required: string[]): void =>
-    {
-      if (!parameters)
-      {
-        throw Error('No parameters found.');
+        resolve(body);
       }
+      else
+      {
+        reject(error);
+      }
+    });
+  });
+}
 
-      for (const key of required)
-      {
-        if (!parameters.hasOwnProperty(key))
-        {
-          throw new Error('Parameter "' + key + '" not found in request object.');
-        }
-      }
-    },
+export function verifyParameters(parameters: any, required: string[]): void
+{
+  if (!parameters)
+  {
+    throw new Error('No parameters found.');
+  }
+
+  for (const key of required)
+  {
+    if (!parameters.hasOwnProperty(key))
+    {
+      throw new Error('Parameter "' + key + '" not found in request object.');
+    }
+  }
+}
+
+export function updateObject<T>(obj: T, newObj: T): T
+{
+  for (const key in newObj)
+  {
+    if (newObj.hasOwnProperty(key) && obj.hasOwnProperty(key))
+    {
+      obj[key] = newObj[key];
+    }
+  }
+  return obj;
+}
+
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+{
+  return (error: Error, response: T) =>
+  {
+    if (error)
+    {
+      reject(error);
+    } else
+    {
+      resolve(response);
+    }
   };
-
-export default Util;
+}

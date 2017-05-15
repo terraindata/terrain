@@ -1,18 +1,5 @@
-# This file is a template, and might need editing before it works on your project.
-# Official framework image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/node/tags/
-image: node:latest
-
 variables:
   GIT_SSL_NO_VERIFY: "true"
-  
-# Pick zero or more services to be used on all builds.
-# Only needed when using a docker container to run your tests in.
-# Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-service
-services:
-  - terrain/moviesdb-elk:1.0a
-  - terrain/moviesdb-mysql:1.0a
-  - terrain/moviesdb-sqlite:1.0a
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -21,17 +8,27 @@ cache:
   - node_modules/
 
 before_script:
-  - apt-get update && apt --assume-yes install parallel
-  - yarn global add webpack
-  - yarn global add webpack-dev-server
-  - yarn install
+  - yarn
+
+stages:
+  - lint
+  - fix
+  - test-backend
 
 lint:
   script:
-    - yarn run lint
+   - yarn run lint
+  stage: lint
 
-test_backends:
+fix:
   script:
-   - yarn install
    - yarn run fix
-   - yarn run test-back
+  stage: lint
+
+test-backend:
+  script:
+   - yarn run test-back-all
+  stage: test-backend
+  artifacts:
+    paths:
+      - coverage

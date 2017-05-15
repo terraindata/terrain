@@ -43,56 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import MidwayError from './MidwayError';
 
-import * as passport from 'koa-passport';
-import passportLocal = require('passport-local');
-
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
-
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  async (req: any, id: string, accessToken: string, done) =>
-  {
-    const user = await users.loginWithAccessToken(Number(id), accessToken);
-    done(null, user);
-  }));
-
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  async (req: any, email: string, password: string, done) =>
-  {
-    const user = await users.loginWithEmail(email, password);
-    done(null, user);
-  }));
-
-Middleware.passport.serializeUser((user, done) =>
+class QueryError extends MidwayError
 {
-  if (user)
+  public static isElasticQueryError(err: object): boolean
   {
-    done(null, user.id);
-  }
-});
-
-Middleware.passport.deserializeUser(async (id, done) =>
-{
-  try
-  {
-    const user = await users.get(id);
-    done(null, user);
-  }
-  catch (e)
-  {
-    done(e, null);
+    return err['response'] ? true : false;
   }
 
-});
+  public static composeFromElasticError(err: object): QueryError
+  {
+    const status = err['statusCode'] || 400;
+    const title = err['message'] || 'The Elastic query has an error.';
+    const detail = err['response'] || JSON.stringify(err);
+    const source = err;
+    return new QueryError(status, title, detail, source);
+  }
+
+  public constructor(status, title, detail, source)
+  {
+    super(status, title, detail, source);
+  }
+}
+
+export default QueryError;

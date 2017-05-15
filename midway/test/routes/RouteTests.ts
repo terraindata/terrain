@@ -47,6 +47,8 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import { MidwayError } from '../../src/app/MidwayError';
+import QueryError from '../../src/app/QueryError';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
@@ -55,6 +57,7 @@ let testUserAccessToken: string;
 
 beforeAll((done) =>
 {
+  winston.transports.Console.level = 'debug';
   const options =
     {
       db: 'sqlite',
@@ -80,7 +83,7 @@ beforeAll((done) =>
         email: 'test@terraindata.com',
         name: 'Test Person',
         password: 'Flash Flash Hundred Yard Dash',
-        isAdmin: false,
+        isSuperUser: false,
         isDisabled: false,
         timezone: 'UTC',
       },
@@ -103,71 +106,72 @@ beforeAll((done) =>
 
 describe('User and auth route tests', () =>
 {
-  test('http login route: GET /midway/v1/auth/login', () =>
+  test('http login route: GET /midway/v1/auth/login', async () =>
   {
-    return request(server)
-      .get('/midway/v1/auth/login')
-      .query({
+    await request(server)
+      .post('/midway/v1/auth/login')
+      .send({
         email: 'test@terraindata.com',
         password: 'Flash Flash Hundred Yard Dash',
       })
-      .end((err, res) =>
+      .expect(302)
+      .then((response) =>
       {
-        if (err || res.status !== 302 || res.text === 'Unauthorized')
-        {
-          fail('GET /midway/v1/auth/login request returned an error: Expected 302 !Unauthorized , got ' +
-            res.status.toString() + ' ' + res.text + ' ' + err ? err : '');
-        }
+        expect(response.text)
+          .not.toBe('Unauthorized');
       });
   });
 
-  test('logout, attempt login with bad accessToken, get new accessToken', () =>
+  test('logout, attempt login with bad accessToken, get new accessToken', async () =>
   {
-    console.log('first level');
-    return request(server)
-      .post('/midway/v1/auth/api_logout')
-      .send({
-        id: '2',
-        accessToken: testUserAccessToken,
-      })
-      .end((err, res) => // access API route with bad accessToken: POST /midway/v1/auth/api_logout
-      {
-        console.log('second level');
-        if (err || res.status !== 200 || res.text !== 'Success')
-        {
-          fail('Error occurred while logging out: Expected 200 !Unauthorized , got ' +
-            res.status.toString() + ' ' + res.text + ' ' + err ? err : '');
-        }
-        request(server)
+    let passed: boolean = false;
+    await request(server)
+    .post('/midway/v1/auth/api_logout')
+    .send({
+      id: '2',
+      accessToken: testUserAccessToken,
+    })
+    .expect(200)
+    .then((response) =>
+    {
+      expect(response.text)
+        .toBe('Success');
+        passed = true;
+    });
+
+    if (passed)
+    {
+      passed = false;
+      await request(server)
         .post('/midway/v1/auth/api_logout')
         .send({
           id: '2',
           accessToken: testUserAccessToken,
         })
-        .end((err2, res2) => // get new accessToken: POST /midway/v1/auth/api_login
+        .expect(401)
+        .then((response) =>
         {
-          console.log('third level');
-          if (err2 || res2.status !== 401 || res2.text !== 'Unauthorized')
-          {
-            fail('Error occurred while accessing with bad accessToken: Expected 401 Unauthorized , got ' +
-              res2.status.toString() + ' ' + res2.text + ' ' + err2 ? err2 : '');
-          }
-          request(server)
-          .post('/midway/v1/auth/api_login')
-          .send({
-            email: 'test@terraindata.com',
-            password: 'Flash Flash Hundred Yard Dash',
-          })
-          .end((err3, res3) =>
-          {
-            if (err3 || res3.status !== 200 || res3.text !== 'Unauthorized')
-            {
-              fail('Error occurred while getting new accessToken: Expected 200 !Unauthorized , got ' +
-                res3.status.toString() + ' ' + res3.text + ' ' + err3 ? err3 : '');
-            }
-          });
+          expect(response.text)
+            .toBe('Unauthorized');
+            passed = true;
         });
-      });
+    }
+
+    if (passed)
+    {
+      passed = false;
+      await request(server)
+        .post('/midway/v1/auth/api_login')
+        .send({
+          email: 'test@terraindata.com',
+          password: 'Flash Flash Hundred Yard Dash',
+        })
+        .expect(200)
+        .then((response) =>
+        {
+          expect(response.text)
+            .not.toBe('Unauthorized');
+        });
   });
 });
 
@@ -186,7 +190,7 @@ describe('Version route tests', () =>
       {
         expect(response.text)
           .toBe(
-          '[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+          '[{\"createdAt\":\"2017-04-28 03:32:25\",\"createdByUserId\":1,\"id\":1,\"object\":\"[object Object]\",\"objectId\":2,\"objectType\":\"items\"}]');
       })
       .catch((error) =>
       {
@@ -226,6 +230,7 @@ describe('Item route tests', () =>
         accessToken: 'AccessToken',
         body: {
           name: 'Test Item',
+          status: 'LIVE',
         },
       })
       .expect(200)
@@ -294,7 +299,7 @@ describe('Item route tests', () =>
           name: 'Test Item',
         },
       })
-      .expect(500)
+      .expect(400)
       .then((response) =>
       {
         winston.info('response: "' + response + '"');
@@ -304,6 +309,31 @@ describe('Item route tests', () =>
         fail('POST /midway/v1/items/ request returned an error: ' + error);
       });
   });
+
+  // TODO update this test to reflect new changes to status changes in Items
+  // test('Update with invalid status: POST /midway/v1/items/', () =>
+  // {
+  //   return request(server)
+  //     .post('/midway/v1/items/2')
+  //     .send({
+  //       id: 2,
+  //       accessToken: testUserAccessToken,
+  //       body: {
+  //         id: 2,
+  //         name: 'Test Item',
+  //         status: 'BUILD',
+  //       },
+  //     })
+  //     .expect(400)
+  //     .then((response) =>
+  //     {
+  //       winston.info('response: "' + response + '"');
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/items/ request returned an error: ' + error);
+  //     });
+  // });
 });
 
 describe('Schema route tests', () =>
@@ -330,7 +360,7 @@ describe('Schema route tests', () =>
 
 describe('Query route tests', () =>
 {
-  test('POST /midway/v1/query', () =>
+  test('Elastic Search Query Result: POST /midway/v1/query', () =>
   {
     return request(server)
       .post('/midway/v1/query/')
@@ -352,12 +382,78 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        // winston.info(JSON.stringify(response));
-        expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        winston.info(JSON.stringify(response));
+        expect(JSON.parse(response.text).results[0].hits).toEqual({ total: 27278, max_score: 0, hits: [] });
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + error);
+      });
+  });
+
+  test('Elastic Search Query Error: POST /midway/v1/query', () =>
+  {
+    return request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        database: 0,
+        type: 'search',
+        body: {
+          index: 'wrongindex',
+          type: 'data',
+          from: 0,
+          size: 0,
+          body: {
+            query: {},
+          },
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(JSON.stringify(response));
+        const midwayError: MidwayError = MidwayError.fromJSON(response.text);
+        expect(midwayError.getTitle())
+          .toEqual(
+          '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + error);
+      });
+  });
+
+  test('Elastic Search Route Error: POST /midway/v1/query', () =>
+  {
+    return request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        database: 0,
+        type: 'wrongtype',
+        body: {
+          index: 'wrongindex',
+          type: 'data',
+          from: 0,
+          size: 0,
+          body: {
+            query: {},
+          },
+        },
+      })
+      .expect(400)
+      .then((response) =>
+      {
+        winston.info(JSON.stringify(response));
+        const midwayError: MidwayError = MidwayError.fromJSON(response.text);
+        expect(midwayError.getTitle()).toEqual('Route /midway/v1/query/ has an error.');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + error);
       });
   });
 });

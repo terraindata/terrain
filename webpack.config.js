@@ -47,39 +47,40 @@ var webpack = require('webpack');
 var path = require('path');
 var CircularDependencyPlugin = require('circular-dependency-plugin');
 
-module.exports = 
+module.exports =
 {
     entry: "./src/app/App.tsx",
     devtool: 'eval',
-    
-    output: 
+
+    output:
     {
         path: __dirname,
+        publicPath: "/assets/",
         filename: "bundle.js"
     },
-    
-    resolve: 
+
+    resolve:
     {
         // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly
         extensions: [ '', '.js', '.tsx', '.jsx', '.ts', '.css', '.less', '.json', '.svg' ],
     },
-    
-    module: 
+
+    module:
     {
-        loaders: 
+        loaders:
         [
             // note: this first loader string gets updated in webpack.config.prod.js
             //  keep it first in this list
-            { 
-                test: /\.tsx$/, 
+            {
+                test: /\.tsx$/,
                 exclude: /midway/,
-                loader: 
+                loader:
                     'babel?presets[]=react&presets[]=latest!ts-loader?'
                     + JSON.stringify({
                         compilerOptions: {
-                            
+
                         }
-                    }) 
+                    })
             },
             { test: /\.css$/, exclude: /midway/, loader: "style!css" },
             { test: /\.less$/, exclude: /midway/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
@@ -92,34 +93,34 @@ module.exports =
             { test: /\.png$/, loader: "url?limit=4000000" },
             { test: require.resolve('jquery'), loader: "expose?jQuery" },
             { test: /\.json$/, exclude: /midway/, loader: 'json' },
-            { 
-		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel?presets[]=react&presets[]=latest!svg-react' + 
+            {
+		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel?presets[]=react&presets[]=latest!svg-react' +
 		              // removes data-name attributes
 		              '!string-replace?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig'
 	        },
-            { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' }, 
+            { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' },
         ]
     },
-    
-    plugins: 
+
+    plugins:
     [
         new webpack.DefinePlugin({
         'MIDWAY_HOST': "'//" + process.env.MIDWAY_HOST + ":40080'",
         'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'",
         'DEV': "true"
         }),
-        
+
         // new CircularDependencyPlugin({
-        //   // exclude detection of files based on a RegExp 
+        //   // exclude detection of files based on a RegExp
         //   exclude: /node_modules/,
-        //   // add errors to webpack instead of warnings 
+        //   // add errors to webpack instead of warnings
         //   failOnError: true
         // }),
     ],
-    
-    historyApiFallback: 
+
+    historyApiFallback:
     {
-      rewrites: 
+      rewrites:
       [
         // shows favicon
         { from: /favicon.ico/, to: 'favicon.ico' },

@@ -58,7 +58,7 @@ export interface QueryResponse
   errorMessage?: string;
 }
 
-export const Ajax = 
+export const Ajax =
 {
   _reqMidway2(
     method: "post" | "get",
@@ -84,7 +84,7 @@ export const Ajax =
       }, config)
     );
   },
-  
+
   midwayStatus(
     success: () => void,
     failure: () => void
@@ -96,7 +96,7 @@ export const Ajax =
       '',
       (respStr: string) =>
       {
-        try 
+        try
         {
           const resp = JSON.parse(respStr);
           if(resp && resp.status === 'ok')
@@ -118,7 +118,7 @@ export const Ajax =
       }
     );
   },
-  
+
   _req(
     method: string,
     url: string,

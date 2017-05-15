@@ -48,11 +48,12 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import Util from '../Util';
-import { Items } from './Items';
+import * as Util from '../Util';
+import { ItemConfig, Items } from './Items';
+export * from './Items';
 
 const Router = new KoaRouter();
-const items = new Items();
+export const items: Items = new Items();
 
 // Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 Router.get('/', async (ctx, next) =>
@@ -70,11 +71,11 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('create items');
-  const item = ctx.request.body.body;
+  const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
   if (item.id)
   {
-    throw Error('Invalid parameter item ID');
+    throw new Error('Invalid parameter item ID');
   }
 
   ctx.body = await items.upsert(ctx.state.user, item);
@@ -83,17 +84,17 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('modify items');
-  const item = ctx.request.body.body;
+  const item: ItemConfig = ctx.request.body.body;
   Util.verifyParameters(item, ['name']);
   if (!item.id)
   {
-    item.id = ctx.params.id;
+    item.id = Number(ctx.params.id);
   }
   else
   {
     if (item.id !== Number(ctx.params.id))
     {
-      throw Error('Item ID does not match the supplied id in the URL');
+      throw new Error('Item ID does not match the supplied id in the URL');
     }
   }
 

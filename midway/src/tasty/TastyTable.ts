@@ -45,66 +45,53 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import TastyColumn from './TastyColumn';
+import TastyTableState from './TastyTableState';
 
-export class TastyTable
+export default class TastyTable
 {
-  private databaseName: string;
-  private tableName: string;
-  private primaryKeys: string[];
+  // tslint:disable:variable-name
+  private ___tastyTableState___: TastyTableState;
 
   constructor(name: string, primaryKeys: string[], columns: string[], database?: string)
   {
-    // primary key is a list, so that composite keys can be supported
-    this.databaseName = database;
-    this.tableName = name;
-    this.primaryKeys = primaryKeys;
+    this.___tastyTableState___ = new TastyTableState(
+      this, name, primaryKeys, columns, database);
+    this.___tastyTableState___.init();
 
-    primaryKeys.forEach(
-      (columnName) =>
+    this.___tastyTableState___.columns.forEach(
+      (value: TastyColumn, key: string) =>
       {
-        this[columnName] = new TastyColumn(this, columnName);
-      });
-
-    columns.forEach(
-      (columnName) =>
-      {
-        this[columnName] = new TastyColumn(this, columnName);
+        this[key] = value;
       });
   }
 
   public getTableName(): string
   {
-    return this.tableName;
+    return this.___tastyTableState___.tableName;
   }
 
   public getDatabaseName(): string
   {
-    return this.databaseName;
+    return this.___tastyTableState___.databaseName;
   }
 
-  public getPrimaryKeys(obj?: object): string[]
+  public getPrimaryKeys(): string[]
   {
-    if (obj === undefined)
-    {
-      return this.primaryKeys;
-    }
-
-    return this.primaryKeys.map(
-      (column) =>
-      {
-        return obj[column];
-      });
+    return this.___tastyTableState___.primaryKeys;
   }
 
+  public getColumns(): Map<string, TastyColumn>
+  {
+    return this.___tastyTableState___.columns;
+  }
+
+  /**
+   * Returns a sorted list of all column names
+   * @returns {string[]}
+   */
   public getColumnNames(): string[]
   {
-    return Object.keys(this).filter((item) =>
-    {
-      if (item !== 'tableName' && item !== 'primaryKeys' && item !== 'databaseName')
-      {
-        return item;
-      }
-    });
+    return this.___tastyTableState___.columnNames;
   }
 
   public toString(): string
@@ -112,5 +99,3 @@ export class TastyTable
     return JSON.stringify(this, null, 2);
   }
 }
-
-export default TastyTable;

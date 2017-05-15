@@ -43,56 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as winston from 'winston';
 
-import * as passport from 'koa-passport';
-import passportLocal = require('passport-local');
+import MidwayError from './MidwayError';
 
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
-
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  async (req: any, id: string, accessToken: string, done) =>
-  {
-    const user = await users.loginWithAccessToken(Number(id), accessToken);
-    done(null, user);
-  }));
-
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  async (req: any, email: string, password: string, done) =>
-  {
-    const user = await users.loginWithEmail(email, password);
-    done(null, user);
-  }));
-
-Middleware.passport.serializeUser((user, done) =>
+class RouteError extends MidwayError
 {
-  if (user)
+  public static async RouteErrorHandler(ctx, next)
   {
-    done(null, user.id);
+    try
+    {
+      await next();
+    }
+    catch (err)
+    {
+      const routeError = RouteError.composeFromRouteContext(ctx, err);
+      const status = routeError.getStatus();
+      winston.info(JSON.stringify(routeError));
+      ctx.status = status;
+      ctx.body = routeError.getMidwayErrorObject();
+    }
   }
-});
+  public static composeFromRouteContext(ctx, err): RouteError
+  {
+    if (typeof err !== 'object')
+    {
+      err = new Error(err);
+    }
+    const status = 'status' in err ? err['status'] : 400;
+    const title = 'title' in err ? err['title'] : 'Route ' + ctx.url + ' has an error.';
+    const detail = err['detail'] || err['message'] || JSON.stringify(err);
+    const source = { ctx, err };
+    return new RouteError(status, title, detail, source);
+  }
 
-Middleware.passport.deserializeUser(async (id, done) =>
-{
-  try
+  public constructor(status, title, detail, source)
   {
-    const user = await users.get(id);
-    done(null, user);
+    super(status, title, detail, source);
   }
-  catch (e)
-  {
-    done(e, null);
-  }
+}
 
-});
+export default RouteError;

@@ -42,64 +42,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Account.less');
-import * as React from 'react';
-import { Link } from 'react-router';
-import Classs from './../../common/components/Classs';
-import InfoArea from './../../common/components/InfoArea';
-import Actions from './../data/UserActions';
-import Store from './../data/UserStore';
-const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
+// Copyright 2017 Terrain Data, Inc.
 
-export interface Props
+import ElasticConfig from '../database/elastic/ElasticConfig';
+import ElasticController from '../database/elastic/ElasticController';
+
+import MySQLConfig from '../database/mysql/MySQLConfig';
+import MySQLController from '../database/mysql/MySQLController';
+
+import SQLiteConfig from '../database/sqlite/SQLiteConfig';
+import SQLiteController from '../database/sqlite/SQLiteController';
+
+import DatabaseController from './DatabaseController';
+
+export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
 {
-  params?: any;
-  history?: any;
-}
-
-class User extends Classs<Props>
-{
-  cancelSubscription = null;
-
-  constructor(props)
+  if (type === 'sqlite')
   {
-    super(props);
-
-    this.state = {
-      istate: Store.getState(),
-    };
-
-    this.cancelSubscription =
-      Store.subscribe(() => this.setState({
-        istate: Store.getState(),
-      }));
+    return {
+      filename: dsn,
+    } as SQLiteConfig;
   }
-
-  componentWillMount()
+  else if (type === 'mysql')
   {
-    // Actions.fetch();
+    // TODO: Convert DSN to a MySQLConfig object.
   }
-
-  componentWillUnmount()
+  else if (type === 'elasticsearch' || type === 'elastic')
   {
-    this.cancelSubscription && this.cancelSubscription();
+    // TODO: Convert DSN to a ElasticConfig object.
   }
-
-  render()
+  else
   {
-    const state = this.state.istate;
-
-    return (
-      <div className="account">
-        <div className="account-wrapper">
-          <div className="account-title">
-            <HomeIcon />
-            User!
-          </div>
-        </div>
-      </div>
-    );
+    throw new Error('Error parsing database connection parameters.');
   }
 }
 
-export default User;
+export function makeDatabaseController(type: string, dsn: string): SQLiteController | MySQLController | ElasticController
+{
+  if (type === 'sqlite')
+  {
+    const config = DSNToConfig(type, dsn) as SQLiteConfig;
+    return new SQLiteController(config, 0, 'SQLite');
+  }
+  else if (type === 'mysql')
+  {
+    const config = DSNToConfig(type, dsn) as MySQLConfig;
+    return new MySQLController(config, 0, 'MySQL');
+  }
+  else if (type === 'elasticsearch' || type === 'elastic')
+  {
+    const config = DSNToConfig(type, dsn) as ElasticConfig;
+    return new ElasticController(config, 0, 'Elastic');
+  }
+  else
+  {
+    throw new Error('Error making new database controller.');
+  }
+}

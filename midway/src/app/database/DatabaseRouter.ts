@@ -45,54 +45,75 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as passport from 'koa-passport';
-import passportLocal = require('passport-local');
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-import Middleware from '../Middleware';
-import { users } from '../users/UserRouter';
+import * as Util from '../Util';
+import { DatabaseConfig, Databases } from './Databases';
 
-// authenticate with id and accessToken
-Middleware.passport.use('access-token-local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    passwordField: 'accessToken',
-    usernameField: 'id',
-  },
-  async (req: any, id: string, accessToken: string, done) =>
-  {
-    const user = await users.loginWithAccessToken(Number(id), accessToken);
-    done(null, user);
-  }));
+const Router = new KoaRouter();
+const databases = new Databases();
 
-// authenticate with email and password
-Middleware.passport.use('local', new passportLocal.Strategy(
-  {
-    passReqToCallback: true,
-    usernameField: 'email',
-  },
-  async (req: any, email: string, password: string, done) =>
-  {
-    const user = await users.loginWithEmail(email, password);
-    done(null, user);
-  }));
-
-Middleware.passport.serializeUser((user, done) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  if (user)
-  {
-    done(null, user.id);
-  }
+  winston.info('getting all databases');
+  ctx.body = await databases.get();
 });
 
-Middleware.passport.deserializeUser(async (id, done) =>
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  try
+  winston.info('getting database ID ' + ctx.params.id);
+  ctx.body = await databases.get(ctx.params.id);
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add new database');
+  const db: DatabaseConfig = ctx.request.body.body;
+  Util.verifyParameters(db, ['name', 'dsn']);
+  if (db.id)
   {
-    const user = await users.get(id);
-    done(null, user);
-  }
-  catch (e)
-  {
-    done(e, null);
+    throw Error('Invalid parameter database ID');
   }
 
+  ctx.body = await databases.upsert(ctx.state.user, db);
 });
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('update existing database');
+  const db: DatabaseConfig = ctx.request.body.body;
+  if (!db.id)
+  {
+    db.id = ctx.params.id;
+  }
+  else
+  {
+    if (db.id !== Number(ctx.params.id))
+    {
+      throw Error('Database ID does not match the supplied id in the URL');
+    }
+  }
+
+  ctx.body = await databases.upsert(ctx.state.user, db);
+});
+
+Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('connect to database');
+  ctx.body = await databases.connect(ctx.state.user, ctx.params.id);
+});
+
+Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('disconnect from database');
+  ctx.body = await databases.disconnect(ctx.state.user, ctx.params.id);
+});
+
+Router.post('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('get database schema');
+  ctx.body = await databases.schema(ctx.params.id);
+});
+
+export default Router;
