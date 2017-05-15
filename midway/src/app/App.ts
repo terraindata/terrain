@@ -98,7 +98,7 @@ class App
 
     this.DB = App.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
     DB = this.DB;
-    
+
     Users.initializeDefaultUser();
 
     this.app = new Koa();
@@ -119,7 +119,7 @@ class App
     this.app.use(MidwayRouter.routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
   }
-  
+
   public listen(port: number = CmdLineArgs.port): http.Server
   {
     return this.app.listen(port);
