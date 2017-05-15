@@ -85,7 +85,7 @@
     "koa-response-time": "^2.0.0",
     "koa-router": "^7.1.0",
     "koa-send": "^4.1.0",
-    "koa-static-server": "DABH/koa-static-server",
+    "koa-static-server": ">=1.2.0",
     "moment": "^2.13.0",
     "mysql": "^2.13.0",
     "node-libs-browser": "0.6.0",

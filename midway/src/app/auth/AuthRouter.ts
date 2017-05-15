@@ -52,17 +52,7 @@ import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
 
-Router.get('/', async (ctx, next) =>
-{
-  ctx.body = '';
-});
-
-Router.post('/', async (ctx, next) =>
-{
-  ctx.body = '';
-});
-
-Router.get('/login', passport.authenticate('local'), async (ctx, next) =>
+Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
 {
   ctx.body = ctx.state.user.accessToken;
   winston.info('User is successfully authenticated as ' + String(ctx.state.user.email));
@@ -74,7 +64,7 @@ Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
   ctx.body =
     {
       accessToken: ctx.state.user.accessToken,
-      username: ctx.state.user.username,
+      email: ctx.state.user.email,
     };
   winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
 });
