@@ -77,7 +77,7 @@ Middleware.passport.use('local', new passportLocal.Strategy(
 
 Middleware.passport.serializeUser((user, done) =>
 {
-  if (user)
+  if (user !== undefined)
   {
     done(null, user.id);
   }

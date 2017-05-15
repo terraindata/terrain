@@ -43,25 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import MidwayError from './MidwayError';
 
-class QueryError extends MidwayError
+export interface ElasticQueryError
 {
-  public static isElasticQueryError(err: object): boolean
+  statusCode?: number;
+  message?: string;
+  response: string;
+}
+
+export class QueryError extends MidwayError
+{
+  public static isElasticQueryError(err: Error | ElasticQueryError): err is ElasticQueryError
   {
-    return err['response'] ? true : false;
+    return (err as ElasticQueryError).response !== undefined;
   }
 
-  public static composeFromElasticError(err: object): QueryError
+  public static fromElasticQueryError(err: ElasticQueryError): QueryError
   {
-    const status = err['statusCode'] || 400;
-    const title = err['message'] || 'The Elastic query has an error.';
-    const detail = err['response'] || JSON.stringify(err);
-    const source = err;
+    const status: number = (err.statusCode !== undefined) ? err.statusCode : 400;
+    const title: string = (err.message !== undefined) ? err.message : 'The Elastic query has an error.';
+    const detail: string = JSON.stringify(err.response);
+    const source: object = err;
     return new QueryError(status, title, detail, source);
   }
 
-  public constructor(status, title, detail, source)
+  public constructor(status: number, title: string, detail: string, source: object)
   {
     super(status, title, detail, source);
   }

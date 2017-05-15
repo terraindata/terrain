@@ -57,27 +57,29 @@ class RouteError extends MidwayError
     }
     catch (err)
     {
-      const routeError = RouteError.composeFromRouteContext(ctx, err);
+      const routeError = RouteError.fromRouteContext(ctx, err);
       const status = routeError.getStatus();
       winston.info(JSON.stringify(routeError));
       ctx.status = status;
       ctx.body = routeError.getMidwayErrorObject();
     }
   }
-  public static composeFromRouteContext(ctx, err): RouteError
+
+  public static fromRouteContext(ctx, err: string | object): RouteError
   {
     if (typeof err !== 'object')
     {
       err = new Error(err);
     }
-    const status = 'status' in err ? err['status'] : 400;
-    const title = 'title' in err ? err['title'] : 'Route ' + ctx.url + ' has an error.';
-    const detail = err['detail'] || err['message'] || JSON.stringify(err);
-    const source = { ctx, err };
+
+    const status: number = 'status' in err ? err['status'] : 400;
+    const title: string = 'title' in err ? err['title'] : 'Route ' + String(ctx.url) + ' has an error.';
+    const detail: string = 'detail' in err ? err['detail'] : ('message' in err ? err['message'] : JSON.stringify(err));
+    const source: object = { ctx, err };
     return new RouteError(status, title, detail, source);
   }
 
-  public constructor(status, title, detail, source)
+  public constructor(status: number, title: string, detail: string, source: object)
   {
     super(status, title, detail, source);
   }

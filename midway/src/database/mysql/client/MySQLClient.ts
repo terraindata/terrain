@@ -64,14 +64,14 @@ class MySQLClient
     this.config = config;
     this.delegate = mysql.createPool(config);
 
-    this.delegate.on('acquire', (connection) =>
+    this.delegate.on('acquire', (connection: mysql.IConnection) =>
     {
-      this.controller.log('MySQLClient', 'Connection %d acquired ' + connection.threadId);
+      this.controller.log('MySQLClient', 'Connection %d acquired ' + connection.threadId.toString());
     });
 
-    this.delegate.on('release', (connection) =>
+    this.delegate.on('release', (connection: mysql.IConnection) =>
     {
-      this.controller.log('MySQLClient', 'Connection %d released ' + connection.threadId);
+      this.controller.log('MySQLClient', 'Connection %d released ' + connection.threadId.toString());
     });
   }
 

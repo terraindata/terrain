@@ -52,7 +52,7 @@ export function getRequest(url)
   {
     request(url, (error, res, body) =>
     {
-      if (!error && res.statusCode === 200)
+      if ((error === null || error === undefined) && res.statusCode === 200)
       {
         resolve(body);
       }
@@ -66,14 +66,14 @@ export function getRequest(url)
 
 export function verifyParameters(parameters: any, required: string[]): void
 {
-  if (!parameters)
+  if (parameters === undefined)
   {
     throw new Error('No parameters found.');
   }
 
   for (const key of required)
   {
-    if (!parameters.hasOwnProperty(key))
+    if (parameters.hasOwnProperty(key) === false)
     {
       throw new Error('Parameter "' + key + '" not found in request object.');
     }
@@ -96,10 +96,11 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
 {
   return (error: Error, response: T) =>
   {
-    if (error)
+    if (error !== null && error !== undefined)
     {
       reject(error);
-    } else
+    }
+    else
     {
       resolve(response);
     }

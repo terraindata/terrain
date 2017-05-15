@@ -76,16 +76,16 @@ class App
     return controller.getTasty();
   }
 
-  private static uncaughtExceptionHandler(err: any): void
+  private static uncaughtExceptionHandler(err: Error): void
   {
-    winston.error('Uncaught Exception: ' + err);
+    winston.error('Uncaught Exception: ' + err.toString());
     // this is a good place to clean tangled resources
     process.abort();
   }
 
-  private static unhandledRejectionHandler(res: any): void
+  private static unhandledRejectionHandler(err: Error): void
   {
-    winston.error('Unhandled Promise Rejection: ' + res);
+    winston.error('Unhandled Promise Rejection: ' + err.toString());
   }
 
   private DB: Tasty.Tasty;
