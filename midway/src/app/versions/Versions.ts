@@ -67,6 +67,10 @@ export class Versions
 
   public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
   {
+    if (user.id === undefined)
+    {
+      throw new Error('User ID unknown');
+    }
     // can only insert
     const newVersion: VersionConfig =
       {

@@ -67,11 +67,11 @@ export class SQLGeneratorMapping
 
 export const TypeMap = Object.freeze(
   {
-    'boolean': new SQLGeneratorMapping(null, FixEnum.nullary),
+    'boolean': new SQLGeneratorMapping('', FixEnum.nullary),
     'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
-    'number': new SQLGeneratorMapping(null, FixEnum.nullary),
-    'reference': new SQLGeneratorMapping(null, FixEnum.nullary),
-    'string': new SQLGeneratorMapping(null, FixEnum.nullary),
+    'number': new SQLGeneratorMapping('', FixEnum.nullary),
+    'reference': new SQLGeneratorMapping('', FixEnum.nullary),
+    'string': new SQLGeneratorMapping('', FixEnum.nullary),
 
     'filter': new SQLGeneratorMapping('WHERE', FixEnum.nullary),
     'select': new SQLGeneratorMapping('SELECT', FixEnum.nullary),

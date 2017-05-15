@@ -6,6 +6,7 @@
         "sourceMap": false,
         "inlineSources": true,
         "inlineSourceMap": true,
+        "strictNullChecks": true,
         "target": "es6",
         "typeRoots": [
             "../src/typings",

@@ -74,14 +74,14 @@ QueryRouter.post(
 
     Util.verifyParameters(query, ['database', 'type', 'body']);
 
-    winston.info('query database: ' + query.database, +' type "' + query.type + '"');
-    winston.debug('query database debug: ' + query.database, +' type "' + query.type + '"' +
+    winston.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
+    winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
       'body: ' + JSON.stringify(query.body));
 
-    const database: DatabaseController = DatabaseRegistry.get(query.database);
+    const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
-      throw new Error('Database "' + query.database + '" not found.');
+      throw new Error('Database "' + query.database.toString() + '" not found.');
     }
 
     const qh: QueryHandler = database.getQueryHandler();

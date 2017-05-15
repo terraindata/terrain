@@ -52,7 +52,7 @@ import * as winston from 'winston';
 import Query from '../../../app/query/Query';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryResponse } from '../../../app/query/QueryRouter';
-import QueryError from '../../../app/QueryError';
+import { ElasticQueryError, QueryError } from '../../../app/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
 
@@ -90,17 +90,19 @@ export default class ElasticQueryHandler extends QueryHandler
   {
     return (error: Error, response: any) =>
     {
-      if (error)
+      if (error !== null && error !== undefined)
       {
         if (QueryError.isElasticQueryError(error))
         {
-          const res: QueryResponse = QueryError.composeFromElasticError(error).getMidwayErrorObject();
+          const res: QueryResponse = QueryError.fromElasticQueryError(error).getMidwayErrorObject();
           resolve(res);
-        } else
+        }
+        else
         {
           reject(error); // this will be handled by RouteError.RouteErrorHandler
         }
-      } else
+      }
+      else
       {
         if (typeof response !== 'object')
         {

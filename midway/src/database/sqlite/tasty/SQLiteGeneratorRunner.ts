@@ -70,7 +70,7 @@ export default class SQLiteGeneratorRunner
       this.appendExpression(query.command);
       this.indent();
 
-      const columns = [];
+      const columns: TastyNode[] = [];
       if (query.isSelectingAll())
       {
         this.queryString += ' * '; // handle "select all" condition
@@ -165,7 +165,7 @@ export default class SQLiteGeneratorRunner
 
         if (query.numTaken !== 0)
         {
-          this.queryString += 'LIMIT ' + query.numTaken;
+          this.queryString += 'LIMIT ' + query.numTaken.toString();
           if (query.numSkipped !== 0)
           {
             this.queryString += ' ';
@@ -174,7 +174,7 @@ export default class SQLiteGeneratorRunner
 
         if (query.numSkipped !== 0)
         {
-          this.queryString += 'OFFSET ' + query.numSkipped;
+          this.queryString += 'OFFSET ' + query.numSkipped.toString();
         }
       }
     } else if (query.command.tastyType === TastyNodeTypes.upsert)
@@ -302,7 +302,7 @@ export default class SQLiteGeneratorRunner
     this.indentation = Math.max(this.indentation - 1, 0);
   }
 
-  private appendStandardClause(clauseName, onNewLine, elements, onEach, onSeparator)
+  private appendStandardClause(clauseName: string | null, onNewLine: boolean, elements, onEach, onSeparator)
   {
     // skip empty clauses
     if (elements.length === 0)
@@ -426,7 +426,7 @@ export default class SQLiteGeneratorRunner
   private sqlName(node: TastyNode): string
   {
     const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
-    if (sqlTypeInfo.sqlName !== null)
+    if (sqlTypeInfo.sqlName !== '')
     {
       return sqlTypeInfo.sqlName;
     }
@@ -445,7 +445,7 @@ export default class SQLiteGeneratorRunner
     }
     if (node.type === 'boolean')
     {
-      return node.value ? '1' : '0';
+      return node.value === true ? '1' : '0';
     }
 
     throw new Error('Unsupported node type "' + node.type + '".');

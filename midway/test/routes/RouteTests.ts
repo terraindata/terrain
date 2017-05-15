@@ -139,7 +139,7 @@ describe('User and auth route tests', () =>
         passed = true;
       });
 
-    if (passed)
+    if (passed as boolean)
     {
       passed = false;
       await request(server)
@@ -157,7 +157,7 @@ describe('User and auth route tests', () =>
         });
     }
 
-    if (passed)
+    if (passed as boolean)
     {
       passed = false;
       await request(server)
@@ -172,7 +172,8 @@ describe('User and auth route tests', () =>
           expect(response.text)
             .not.toBe('Unauthorized');
         });
-    });
+    }
+  });
 });
 
 describe('Version route tests', () =>
@@ -190,11 +191,12 @@ describe('Version route tests', () =>
       {
         expect(response.text)
           .toBe(
+          // tslint:disable-next-line:max-line-length
           '[{\"createdAt\":\"2017-04-28 03:32:25\",\"createdByUserId\":1,\"id\":1,\"object\":\"[object Object]\",\"objectId\":2,\"objectType\":\"items\"}]');
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/versions/items/1 request returned an error: ' + error);
+        fail('GET /midway/v1/versions/items/1 request returned an error: ' + String(error));
       });
   });
 });
@@ -217,7 +219,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/items/ request returned an error: ' + error);
+        fail('GET /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -240,7 +242,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -260,7 +262,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/items/ request returned an error: ' + error);
+        fail('GET /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -283,7 +285,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -302,11 +304,11 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + response + '"');
+        winston.info('response: "' + String(response) + '"');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -331,7 +333,7 @@ describe('Item route tests', () =>
   //     })
   //     .catch((error) =>
   //     {
-  //       fail('POST /midway/v1/items/ request returned an error: ' + error);
+  //       fail('POST /midway/v1/items/ request returned an error: ' + String(error));
   //     });
   // });
 });
@@ -387,7 +389,7 @@ describe('Query route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 
@@ -417,11 +419,12 @@ describe('Query route tests', () =>
         const midwayError: MidwayError = MidwayError.fromJSON(response.text);
         expect(midwayError.getTitle())
           .toEqual(
+          // tslint:disable-next-line:max-line-length
           '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 
@@ -453,7 +456,7 @@ describe('Query route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 });

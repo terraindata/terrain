@@ -62,7 +62,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting database ID ' + ctx.params.id);
+  winston.info('getting database ID ' + String(ctx.params.id));
   ctx.body = await databases.get(ctx.params.id);
 });
 
@@ -71,7 +71,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   winston.info('add new database');
   const db: DatabaseConfig = ctx.request.body.body;
   Util.verifyParameters(db, ['name', 'dsn']);
-  if (db.id)
+  if (db.id !== undefined)
   {
     throw Error('Invalid parameter database ID');
   }
@@ -83,7 +83,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 {
   winston.info('update existing database');
   const db: DatabaseConfig = ctx.request.body.body;
-  if (!db.id)
+  if (db.id === undefined)
   {
     db.id = ctx.params.id;
   }

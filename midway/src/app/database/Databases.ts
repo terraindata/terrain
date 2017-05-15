@@ -125,6 +125,11 @@ export class Databases
     }
 
     const db: DatabaseConfig = results[0];
+    if (db.id === undefined)
+    {
+      return Promise.reject('Database does not have an ID');
+    }
+
     const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
     DatabaseRegistry.set(db.id, controller);
     db.status = 'CONNECTED';
@@ -142,7 +147,7 @@ export class Databases
 
   public async schema(id: number): Promise<string>
   {
-    const controller: DatabaseController = await DatabaseRegistry.get(id);
+    const controller = await DatabaseRegistry.get(id);
     if (controller === undefined)
     {
       return Promise.reject('Invalid db id passed');
