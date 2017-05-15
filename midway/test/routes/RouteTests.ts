@@ -126,18 +126,18 @@ describe('User and auth route tests', () =>
   {
     let passed: boolean = false;
     await request(server)
-    .post('/midway/v1/auth/api_logout')
-    .send({
-      id: '2',
-      accessToken: testUserAccessToken,
-    })
-    .expect(200)
-    .then((response) =>
-    {
-      expect(response.text)
-        .toBe('Success');
+      .post('/midway/v1/auth/api_logout')
+      .send({
+        id: '2',
+        accessToken: testUserAccessToken,
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text)
+          .toBe('Success');
         passed = true;
-    });
+      });
 
     if (passed)
     {
@@ -153,7 +153,7 @@ describe('User and auth route tests', () =>
         {
           expect(response.text)
             .toBe('Unauthorized');
-            passed = true;
+          passed = true;
         });
     }
 
@@ -172,7 +172,7 @@ describe('User and auth route tests', () =>
           expect(response.text)
             .not.toBe('Unauthorized');
         });
-  });
+    });
 });
 
 describe('Version route tests', () =>
