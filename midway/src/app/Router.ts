@@ -79,7 +79,7 @@ AppRouter.get('/', async (ctx, next) =>
 {
   if (ctx.state.user[0] !== undefined)
   {
-    ctx.body = 'authenticated as ' + (ctx.state.user[0].email as String);
+    ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   }
   else
   {
@@ -89,7 +89,7 @@ AppRouter.get('/', async (ctx, next) =>
 
 AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = 'authenticated as ' + (ctx.state.user[0].email as String);
+  ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
 });
 
 const MidwayRouter = new KoaRouter();
