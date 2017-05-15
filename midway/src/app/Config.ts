@@ -116,7 +116,8 @@ export async function handleConfig(config: Config): Promise<void>
         winston.info('Updating existing database item: ', db);
         db.id = results[0].id;
         await databases.upsert({} as UserConfig, db);
-      } else
+      }
+      else
       {
         winston.info('Registering new database item: ', db);
         await databases.upsert({} as UserConfig, db);
