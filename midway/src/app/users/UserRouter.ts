@@ -104,7 +104,8 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     throw new Error('Invalid parameter user ID');
   }
 
-  if (ctx.state.user.isSuperUser === true)
+  const isSuperUser: boolean = ctx.state.user.isSuperUser;
+  if (isSuperUser)
   {
     ctx.body = await users.create(user);
   }
