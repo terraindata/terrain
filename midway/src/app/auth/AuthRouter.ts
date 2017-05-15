@@ -67,7 +67,7 @@ Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
   ctx.body =
     {
       accessToken: ctx.state.user.accessToken,
-      userId: ctx.state.user.userId,
+      id: ctx.state.user.userId,
     };
   winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
 });
