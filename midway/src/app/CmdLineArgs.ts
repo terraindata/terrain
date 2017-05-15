@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { Config } from './Config';
 import cmdLineArgs = require('command-line-args');
 import cmdLineUsage = require('command-line-usage');
 
@@ -109,18 +110,7 @@ const sections = [
   },
 ];
 
-export interface Configuration
-{
-  config?: string;
-  port?: number;
-  db?: string;
-  dsn?: string;
-  debug?: boolean;
-  help?: boolean;
-  verbose?: boolean;
-}
-
-export let CmdLineArgs: Configuration = cmdLineArgs(optionList,
+export let CmdLineArgs: Config = cmdLineArgs(optionList,
   {
     partial: true,
   });

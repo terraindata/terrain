@@ -65,11 +65,15 @@ export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConf
   }
   else if (type === 'mysql')
   {
-    // TODO: Convert DSN to a MySQLConfig object.
+    return {
+      host: dsn,
+    } as MySQLConfig;
   }
   else if (type === 'elasticsearch' || type === 'elastic')
   {
-    // TODO: Convert DSN to a ElasticConfig object.
+    return {
+      hosts: [dsn],
+    } as ElasticConfig;
   }
   else
   {
