@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
@@ -55,6 +56,16 @@ Router.get('/', async (ctx, next) =>
     status: 'ok',
   });
   winston.info('status root');
+});
+
+Router.post('/loggedin', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+	// to check if you are correctly logged in
+  ctx.body =
+  {
+    loggedIn: true,
+  };
+  winston.info('login status root');
 });
 
 export default Router;

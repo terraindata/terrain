@@ -63,6 +63,7 @@ import './Logging';
 import Middleware from './Middleware';
 import RouteError from './RouteError';
 import MidwayRouter from './Router';
+import Users from './users/Users';
 
 export let DB: Tasty.Tasty;
 
@@ -97,6 +98,8 @@ class App
 
     this.DB = App.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
     DB = this.DB;
+
+    Users.initializeDefaultUser();
 
     this.app = new Koa();
     this.app.proxy = true;

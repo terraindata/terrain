@@ -100,6 +100,12 @@ export class Users
         return reject('Require both email and password for user creation');
       }
 
+      const existingUsers = await this.select([], { email: user.email });
+      if (existingUsers.length !== 0)
+      {
+        reject('User with email ' + user.email + ' already exists.');
+      }
+
       const newUser: UserConfig =
         {
           accessToken: '',
@@ -163,6 +169,11 @@ export class Users
       await this.upsert(user);
       resolve('Success');
     });
+  }
+
+  public async select(columns: string[], filter: object): Promise<UserConfig[]>
+  {
+    return App.DB.select(this.userTable, columns, filter) as Promise<UserConfig[]>;
   }
 
   public async get(id?: number): Promise<UserConfig[]>
@@ -257,6 +268,20 @@ export class Users
   private async comparePassword(oldPassword: string, newPassword: string): Promise<boolean>
   {
     return bcrypt.compare(oldPassword, newPassword);
+  }
+
+  public static initializeDefaultUser()
+  {
+    // must be called after App.DB has been defined
+    (new Users()).create({
+      id: 1,
+      accessToken: 'ImALuser',
+      email: 'luser@terraindata.com',
+      isSuperUser: true,
+      name: 'Terrain Admin',
+      password: 'choppinwood1123',
+      isDisabled: false,
+    }).catch(() => { /* user already exists */ });
   }
 }
 
