@@ -111,72 +111,62 @@ describe('User and auth route tests', () =>
         email: 'test@terraindata.com',
         password: 'Flash Flash Hundred Yard Dash',
       })
-      .expect(302)
-      .then((response) =>
+      .end((err, res) =>
       {
-        expect(response.text).not.toBe('Unauthorized');
-      })
-      .catch((error) =>
-      {
-        fail('GET /midway/v1/auth/login request returned an error: ' + error);
+        if (err || res.status !== 302 || res.text === 'Unauthorized')
+        {
+          fail('GET /midway/v1/auth/login request returned an error: Expected 302 !Unauthorized , got ' +
+            res.status.toString() + ' ' + res.text + ' ' + err ? err : '');
+        }
       });
   });
 
-  test('logout: POST /midway/v1/auth/api_logout', () =>
+  test('logout, attempt login with bad accessToken, get new accessToken', () =>
   {
+    console.log('first level');
     return request(server)
       .post('/midway/v1/auth/api_logout')
       .send({
         id: '2',
         accessToken: testUserAccessToken,
       })
-      .expect(200)
-      .then((response) =>
+      .end((err, res) => // access API route with bad accessToken: POST /midway/v1/auth/api_logout
       {
-        expect(response.text).toBe('Success');
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
-      });
-  });
-
-  test('access API route with bad accessToken: POST /midway/v1/auth/api_logout', () =>
-  {
-    return request(server)
-      .post('/midway/v1/auth/api_logout')
-      .send({
-        id: '2',
-        accessToken: testUserAccessToken,
-      })
-      .expect(401)
-      .then((response) =>
-      {
-        expect(response.text).toBe('Unauthorized');
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
-      });
-  });
-
-  test('get new accessToken : POST /midway/v1/auth/api_login', () =>
-  {
-    return request(server)
-      .post('/midway/v1/auth/api_login')
-      .send({
-        email: 'test@terraindata.com',
-        password: 'Flash Flash Hundred Yard Dash',
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        expect(response.text).not.toBe('Unauthorized');
-        testUserAccessToken = JSON.parse(response.text).accessToken;
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
+        console.log('second level');
+        if (err || res.status !== 200 || res.text !== 'Success')
+        {
+          fail('Error occurred while logging out: Expected 200 !Unauthorized , got ' +
+            res.status.toString() + ' ' + res.text + ' ' + err ? err : '');
+        }
+        request(server)
+        .post('/midway/v1/auth/api_logout')
+        .send({
+          id: '2',
+          accessToken: testUserAccessToken,
+        })
+        .end((err2, res2) => // get new accessToken: POST /midway/v1/auth/api_login
+        {
+          console.log('third level');
+          if (err2 || res2.status !== 401 || res2.text !== 'Unauthorized')
+          {
+            fail('Error occurred while accessing with bad accessToken: Expected 401 Unauthorized , got ' +
+              res2.status.toString() + ' ' + res2.text + ' ' + err2 ? err2 : '');
+          }
+          request(server)
+          .post('/midway/v1/auth/api_login')
+          .send({
+            email: 'test@terraindata.com',
+            password: 'Flash Flash Hundred Yard Dash',
+          })
+          .end((err3, res3) =>
+          {
+            if (err3 || res3.status !== 200 || res3.text !== 'Unauthorized')
+            {
+              fail('Error occurred while getting new accessToken: Expected 200 !Unauthorized , got ' +
+                res3.status.toString() + ' ' + res3.text + ' ' + err3 ? err3 : '');
+            }
+          });
+        });
       });
   });
 });
