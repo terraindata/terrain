@@ -54,17 +54,17 @@ AuthReducer[ActionTypes.login] =
   {
     const { token, userId } = action.payload;
     // store these values in localStorage so that the user is auto-logged in next time they visit
-    localStorage['authenticationToken'] = token;
+    localStorage['accessToken'] = token;
     localStorage['userId'] = userId;
-    return state.set('authenticationToken', token).set('userId', userId);
+    return state.set('accessToken', token).set('userId', userId);
   };
 
 AuthReducer[ActionTypes.logout] =
   (state: AuthTypes.AuthState, action) =>
   {
-    delete localStorage['authenticationToken'];
+    delete localStorage['accessToken'];
     delete localStorage['userId'];
-    return state.set('authenticationToken', null).set('userId', null);
+    return state.set('accessToken', null).set('userId', null);
   };
 
 export default AuthReducer;

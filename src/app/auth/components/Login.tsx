@@ -52,6 +52,7 @@ import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
+import Ajax from '../../util/Ajax';
 
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 
@@ -192,9 +193,9 @@ class Login extends PureClasss<Props>
           this.setState({
             errorModalMessage: 'Error logging in:' + ev,
             loggingIn: false,
+            xhr: null,
           });
           this.toggleErrorModal();
-          this.xhr = null;
         }
       ),
     });

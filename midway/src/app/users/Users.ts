@@ -283,20 +283,6 @@ export class Users
   {
     return bcrypt.compare(oldPassword, newPassword);
   }
-
-  public static initializeDefaultUser()
-  {
-    // must be called after App.DB has been defined
-    (new Users()).create({
-      id: 1,
-      accessToken: 'ImALuser',
-      email: 'luser@terraindata.com',
-      isSuperUser: true,
-      name: 'Terrain Admin',
-      password: 'choppinwood1123',
-      isDisabled: false,
-    }).catch(() => { /* user already exists */ });
-  }
 }
 
 export default Users;
