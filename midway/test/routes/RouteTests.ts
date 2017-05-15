@@ -171,6 +171,7 @@ describe('User and auth route tests', () =>
         {
           expect(response.text)
             .not.toBe('Unauthorized');
+          testUserAccessToken = JSON.parse(response.text).accessToken;
         });
     }
   });
@@ -276,6 +277,7 @@ describe('Item route tests', () =>
         body: {
           id: 2,
           name: 'Updated Item',
+          status: 'LIVE',
         },
       })
       .expect(200)
@@ -312,30 +314,29 @@ describe('Item route tests', () =>
       });
   });
 
-  // TODO update this test to reflect new changes to status changes in Items
-  // test('Update with invalid status: POST /midway/v1/items/', () =>
-  // {
-  //   return request(server)
-  //     .post('/midway/v1/items/2')
-  //     .send({
-  //       id: 2,
-  //       accessToken: testUserAccessToken,
-  //       body: {
-  //         id: 2,
-  //         name: 'Test Item',
-  //         status: 'BUILD',
-  //       },
-  //     })
-  //     .expect(400)
-  //     .then((response) =>
-  //     {
-  //       winston.info('response: "' + response + '"');
-  //     })
-  //     .catch((error) =>
-  //     {
-  //       fail('POST /midway/v1/items/ request returned an error: ' + String(error));
-  //     });
-  // });
+  test('Update with invalid status: POST /midway/v1/items/', () =>
+  {
+    return request(server)
+      .post('/midway/v1/items/2')
+      .send({
+        id: 2,
+        accessToken: testUserAccessToken,
+        body: {
+          id: 2,
+          name: 'Test Item',
+          status: 'BUILD',
+        },
+      })
+      .expect(400)
+      .then((response) =>
+      {
+        winston.info('response: "' + String(response) + '"');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+      });
+  });
 });
 
 describe('Schema route tests', () =>
