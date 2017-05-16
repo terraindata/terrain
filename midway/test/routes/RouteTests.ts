@@ -119,12 +119,15 @@ describe('User and auth route tests', () =>
       {
         expect(response.text)
           .not.toBe('Unauthorized');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
       });
   });
 
   test('logout, attempt login with bad accessToken, get new accessToken', async () =>
   {
-    let passed: boolean = false;
     await request(server)
       .post('/midway/v1/auth/api_logout')
       .send({
@@ -136,44 +139,46 @@ describe('User and auth route tests', () =>
       {
         expect(response.text)
           .toBe('Success');
-        passed = true;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
       });
 
-    if (passed as boolean)
-    {
-      passed = false;
-      await request(server)
-        .post('/midway/v1/auth/api_logout')
-        .send({
-          id: '2',
-          accessToken: testUserAccessToken,
-        })
-        .expect(401)
-        .then((response) =>
-        {
-          expect(response.text)
-            .toBe('Unauthorized');
-          passed = true;
-        });
-    }
+    await request(server)
+      .post('/midway/v1/auth/api_logout')
+      .send({
+        id: '2',
+        accessToken: testUserAccessToken,
+      })
+      .expect(401)
+      .then((response) =>
+      {
+        expect(response.text)
+          .toBe('Unauthorized');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
+      });
 
-    if (passed as boolean)
-    {
-      passed = false;
-      await request(server)
-        .post('/midway/v1/auth/api_login')
-        .send({
-          email: 'test@terraindata.com',
-          password: 'Flash Flash Hundred Yard Dash',
-        })
-        .expect(200)
-        .then((response) =>
-        {
-          expect(response.text)
-            .not.toBe('Unauthorized');
-          testUserAccessToken = JSON.parse(response.text).accessToken;
-        });
-    }
+    await request(server)
+      .post('/midway/v1/auth/api_login')
+      .send({
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text)
+          .not.toBe('Unauthorized');
+        testUserAccessToken = JSON.parse(response.text).accessToken;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+      });
   });
 });
 
