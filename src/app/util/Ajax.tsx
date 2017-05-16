@@ -98,7 +98,8 @@ export const Ajax =
       (response) =>
       {
         var responseData: object = null;
-        try {
+        try
+        {
           responseData = JSON.parse(response);
         }
         catch(e)
@@ -332,28 +333,46 @@ export const Ajax =
     );
   },
 
-  changePassword(id: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
+  changePassword(id: number, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
-    return Ajax._post(`/users/${id}`, JSON.stringify({
-      oldpassword: oldPassword,
-      password: newPassword,
-    }), onSave, onError);
+    return Ajax._reqMidway2(
+      'post',
+      `users/${id}`,
+      {
+        oldPassword: oldPassword,
+        password: newPassword,
+      },
+      onSave,
+      {
+        onError
+      });
   },
 
   adminSaveUser(user: UserTypes.User)
   {
-    return Ajax._post(`/users/${user.id}`, JSON.stringify({
-      isSuperUser: user.isSuperUser ? 1 : 0,
-      isDisabled: user.isDisabled ? 1 : 0,
-    }), _.noop);
+    return Ajax._reqMidway2(
+      'post',
+      `users/${user.id}`, 
+      {
+        isSuperUser: user.isSuperUser ? 1 : 0,
+        isDisabled: user.isDisabled ? 1 : 0,
+      },
+      _.noop
+    );
   },
 
   createUser(email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
-    return Ajax._post(`/users/`, JSON.stringify({
-      email,
-      password,
-    }), onSave, onError);
+    return Ajax._reqMidway2(
+      'post',
+      `users`,
+      {
+        email,
+        password,
+      },
+      onSave,
+      onError
+    );
   },
 
   getItems(
