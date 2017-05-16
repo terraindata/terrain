@@ -128,7 +128,7 @@ export class Users
       {
         return reject('User with email ' + String(user.email) + ' already exists.');
       }
-
+      
       const newUser: UserConfig =
         {
           accessToken: '',
@@ -138,6 +138,7 @@ export class Users
           name: user.name,
           password: await this.hashPassword(user.password),
           timezone: user.timezone === undefined ? '' : user.timezone,
+          meta: user.meta === undefined ? '{}' : user.meta,
         };
       await this.upsert(newUser);
       resolve('Success');

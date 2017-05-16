@@ -267,7 +267,7 @@ export const Ajax =
 
   getUsers(onLoad: (users: {[id: string]: any}) => void)
   {
-    return Ajax._get('/users/', '', (response: any) =>
+    return Ajax._get('users/', '', (response: any) =>
       {
         const usersArr = JSON.parse(response);
         const usersObj = {};
