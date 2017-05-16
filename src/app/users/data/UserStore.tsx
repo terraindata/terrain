@@ -47,6 +47,8 @@ import * as ReduxActions from 'redux-actions';
 import * as _ from 'underscore';
 const Redux = require('redux');
 
+import Ajax from './../../util/Ajax';
+
 import AuthStore from './../../auth/data/AuthStore';
 import Util from './../../util/Util';
 
@@ -70,5 +72,12 @@ UserStore.subscribe(() =>
     });
   }
 });
+
+window['test'] = () =>
+{
+  let users = UserStore.getState().users;
+  console.log('users', users);
+  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
+}
 
 export default UserStore;

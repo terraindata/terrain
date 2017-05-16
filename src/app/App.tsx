@@ -195,8 +195,8 @@ class App extends PureClasss<Props>
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
       updater: (state) => {
-        const token = AuthStore.getState().get('accessToken');
-        const loggedIn = token !== null;
+        const token = AuthStore.getState().accessToken;
+        const loggedIn = !!token;
         const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
 
         this.setState({
@@ -234,7 +234,7 @@ class App extends PureClasss<Props>
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];
     const id = localStorage['id'];
-    if (accessToken !== undefined && accessToken !== null)
+    if (accessToken !== undefined && id !== undefined)
     {
       AuthActions.login(accessToken, id);
     }

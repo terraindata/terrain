@@ -73,6 +73,7 @@ export module UserTypes
 
     // DB level fields
     dbFields = [
+      'id',
       'email',
       'isDisabled',
       'isSuperUser',

@@ -73,7 +73,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
   const user: UserConfig = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
+  
   if (user.id === undefined)
   {
     user.id = Number(ctx.params.id);
@@ -85,7 +85,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
       throw new Error('User ID does not match the supplied id in the URL');
     }
   }
-
+  
   // if superuser or id to be updated is current user
   const isSuperUser: boolean = ctx.state.user.isSuperUser;
   if (isSuperUser || ctx.request.body.id === ctx.params.id)

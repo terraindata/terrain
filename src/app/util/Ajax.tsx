@@ -63,9 +63,10 @@ export const Ajax =
   _reqMidway2(
     method: "post" | "get",
     url: string,
-    data: object,
+    body: object,
     onLoad: (response: object) => void,
     config: {
+      noCredentials?: boolean,
       onError?: (response: any) => void,
       // crossDomain?: boolean;
       download?: boolean;
@@ -73,6 +74,23 @@ export const Ajax =
     } = {}
   )
   {
+    let data: object;
+    if(config.noCredentials)
+    {
+      data = body;
+      console.log('none at all', data);
+    }
+    else
+    {
+      const authState = AuthStore.getState();
+      console.log('auth state', authState);
+      data = {
+        id: authState.id,
+        accessToken: authState.accessToken,
+        body,
+      };
+    }
+    
     return Ajax._req(
       method,
       "/midway/v1/" + url,
@@ -98,6 +116,7 @@ export const Ajax =
         host: 'http://localhost:3000',
         noToken: true,
         json: true,
+        crossDomain: false,
       }, config)
     );
   },
@@ -109,7 +128,7 @@ export const Ajax =
   {
     return Ajax._reqMidway2(
       "get",
-      "/status",
+      "status",
       {},
       (resp: { status: string }) =>
       {
@@ -201,7 +220,7 @@ export const Ajax =
     
     if (config.json)
     {
-      xhr.setRequestHeader('Content-type', 'application/json');
+      xhr.setRequestHeader('Content-Type', 'application/json');
     }
 
     if (!config.noToken)
@@ -270,24 +289,47 @@ export const Ajax =
     return Ajax._reqMidway2(
       'get',
       'users/',
-      '',
+      {},
       (response: object[]) =>
       {
-        console.log('got', response);
         const usersObj = {};
-        response.map((user) => usersObj[user.id] = user);
+        response.map((user) => usersObj[user['id']] = user);
         onLoad(usersObj);
-      });
+      }
+    );
   },
 
-  saveUser(user: UserTypes.User, onSave: (response: any) => void, onError: (response: any) => void)
+  saveUser(
+    user: UserTypes.User,
+    onSave: (response: any) => void,
+    onError: (response: any) => void
+  )
   {
-    const data = user.toJS();
-    user.excludeFields.map((field) => delete data[field]);
-    user.dbFields.map((field) => delete data[field]);
-    return Ajax._post(`/users/${user.id}`, JSON.stringify({
-      data: JSON.stringify(data),
-    }), onSave, onError);
+    const userData = user.toJS();
+    const meta = _.extend({}, userData);
+    user.excludeFields.map((field) =>
+    {
+      delete userData[field];
+      delete meta[field];
+    });
+    user.dbFields.map(
+      (field) => delete meta[field]
+    );
+    _.map(meta,
+      (v, key) => delete userData[key]
+    );
+    userData['meta'] = JSON.stringify(meta);
+    console.log('saving', userData);
+    
+    return Ajax._reqMidway2(
+      'post',
+      `users/${user.id}`, 
+      userData,
+      onSave,
+      {
+        onError
+      }
+    );
   },
 
   changePassword(id: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
@@ -683,7 +725,10 @@ export const Ajax =
         password,
       },
       onLoad,
-      onError
+      {
+        onError,
+        noCredentials: true,
+      }
     );
   },
   

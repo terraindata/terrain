@@ -67,13 +67,13 @@ UserReducers[ActionTypes.fetch] =
       {
         let meta = JSON.parse(userObj.meta || '{}');
         users = users.set(
-          userId,
+          +userId,
           UserTypes._User(
             _.extend(meta, userObj)
           )
         );
       });
-      action.payload.setUsers(users);
+      action.payload.setUsers(users);      
     });
     return state.set('loading', true);
   };

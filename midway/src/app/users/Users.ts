@@ -76,10 +76,11 @@ export class Users
     // tslint:disable-next-line
     (new Users()).create({
       accessToken: 'ImALuser',
-      email: 'luser@terraindata.com',
+      // email: 'luser@terraindata.com',
+      email: 'l',
       isSuperUser: 1,
       name: 'Terrain Admin',
-      password: 'choppinwood1123',
+      password: 'l',
       isDisabled: 0,
       timezone: '',
     })
