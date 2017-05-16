@@ -84,7 +84,7 @@ export function updateObject<T>(obj: T, newObj: T): T
 {
   for (const key in newObj)
   {
-    if (newObj.hasOwnProperty(key) && obj.hasOwnProperty(key))
+    if (newObj.hasOwnProperty(key))
     {
       obj[key] = newObj[key];
     }
