@@ -58,13 +58,13 @@ export const users = new Users();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all users');
-  ctx.body = await users.get();
+  ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone'], {});
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting user ID ' + String(ctx.params.id));
-  ctx.body = await users.get(ctx.params.id);
+  ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone'], { id: ctx.params.id });
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
