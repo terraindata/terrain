@@ -82,12 +82,13 @@ export class Users
       isDisabled: 0,
       timezone: '',
     })
-    .catch((error: string) => {
-      if (error !== 'User with email luser@terraindata.com already exists.')
+      .catch((error: string) =>
       {
-        throw new Error('Problem creating default user: ' + error);
-      }
-    });
+        if (error !== 'User with email luser@terraindata.com already exists.')
+        {
+          throw new Error('Problem creating default user: ' + error);
+        }
+      });
   }
 
   private readonly saltRounds = 10;

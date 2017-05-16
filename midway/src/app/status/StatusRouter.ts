@@ -60,11 +60,11 @@ Router.get('/', async (ctx, next) =>
 
 Router.post('/loggedin', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-	// to check if you are correctly logged in
+  // to check if you are correctly logged in
   ctx.body =
-  {
-    loggedIn: true,
-  };
+    {
+      loggedIn: true,
+    };
   winston.info('login status root');
 });
 
