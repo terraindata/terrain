@@ -221,12 +221,12 @@ export const Ajax =
 
   _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._reqMidway2('post', url, data, onLoad, {onError});
+    return Ajax._req('POST', url, data, onLoad, {onError});
   },
 
   _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._reqMidway2('get', url, data, onLoad, {onError});
+    return Ajax._req('GET', url, data, onLoad, {onError});
   },
 
   _postMidway1(
@@ -267,11 +267,15 @@ export const Ajax =
 
   getUsers(onLoad: (users: {[id: string]: any}) => void)
   {
-    return Ajax._get('users/', '', (response: any) =>
+    return Ajax._reqMidway2(
+      'get',
+      'users/',
+      '',
+      (response: object[]) =>
       {
-        const usersArr = JSON.parse(response);
+        console.log('got', response);
         const usersObj = {};
-        usersArr.map((user) => usersObj[user.id] = user);
+        response.map((user) => usersObj[user.id] = user);
         onLoad(usersObj);
       });
   },

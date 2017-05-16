@@ -65,21 +65,13 @@ UserReducers[ActionTypes.fetch] =
       let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
       _.map(usersObj, (userObj, userId) =>
       {
-        // TODO switch "data" this to "meta?"
-        const data = userObj.data && userObj.data.length ? JSON.parse(userObj.data) : {};
-        const isAdmin = userObj.admin === 1;
-        const isBuilder = userObj.builder === 1;
-        const isDisabled = userObj.disabled === 1;
-        const email = userObj.email;
-        users = users.set(userId, UserTypes._User(
-          _.extend(data, {
-            id: userId,
-            isAdmin,
-            isBuilder,
-            isDisabled,
-            email,
-          }),
-        ));
+        let meta = JSON.parse(userObj.meta || '{}');
+        users = users.set(
+          userId,
+          UserTypes._User(
+            _.extend(meta, userObj)
+          )
+        );
       });
       action.payload.setUsers(users);
     });
