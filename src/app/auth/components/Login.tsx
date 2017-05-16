@@ -184,9 +184,8 @@ class Login extends PureClasss<Props>
         this.state.email,
         this.state.password,
         
-        (userData: { accessToken: string, userId: number }) => {
-          console.log('load', userData);
-          Actions.login(userData.accessToken, userData.userId);
+        (userData: { accessToken: string, id: number }) => {
+          Actions.login(userData.accessToken, userData.id);
         },
         
         (ev: Event) => {
@@ -232,7 +231,6 @@ class Login extends PureClasss<Props>
           'login-wrapper-shifted': this.state.shifted,
           'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.props.loggedIn,
         })}
-        onKeyDown={this.handleKeyDown}
       >
         <div className="login-logo-container">
         {

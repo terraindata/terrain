@@ -64,12 +64,11 @@ export const Ajax =
   _reqMidway2(
     method: "post" | "get",
     url: string,
-    data: string,
+    data: object,
     onLoad: (response: object) => void,
     config: {
       onError?: (response: any) => void,
       // crossDomain?: boolean;
-      noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
     } = {}
@@ -78,7 +77,7 @@ export const Ajax =
     return Ajax._req(
       method,
       "/midway/v1/" + url,
-      data,
+      JSON.stringify(data),
       (response) =>
       {
         var responseData: object = null;
@@ -98,6 +97,8 @@ export const Ajax =
       },
       _.extend({
         host: 'http://localhost:3000',
+        noToken: true,
+        json: true,
       }, config)
     );
   },
@@ -140,6 +141,7 @@ export const Ajax =
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
+      json?: boolean;
     } = {}
   )
   {
@@ -197,6 +199,11 @@ export const Ajax =
 
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     xhr.open(method, fullUrl, true);
+    
+    if (config.json)
+    {
+      xhr.setRequestHeader('Content-type', 'application/json');
+    }
 
     if (!config.noToken)
     {
@@ -663,7 +670,7 @@ export const Ajax =
     email: string,
     password: string,
     onLoad: (data: {
-      userId: number,
+      id: number,
       accessToken: string,
     }) => void,
     onError: (error) => void
@@ -672,11 +679,35 @@ export const Ajax =
     return Ajax._reqMidway2(
       'post',
       'auth/login',
-      JSON.stringify({
+      {
         email,
         password,
-      }),
+      },
       onLoad,
+      onError
+    );
+  },
+  
+  checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
+  {
+    Ajax._reqMidway2(
+      'post',
+      'status/loggedIn',
+      {
+        accessToken,
+        id,
+      },
+      (data: {loggedIn: boolean}) =>
+      {
+        if (data && data.loggedIn)
+        {
+          onSuccess();
+        }
+        else
+        {
+          onError();
+        }
+      },
       onError
     );
   },
