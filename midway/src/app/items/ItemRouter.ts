@@ -60,7 +60,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   let getItems: ItemConfig[] = [];
   if (ctx.query.type !== undefined)
   {
-    const typeArr = ctx.query.type.split(',');
+    const typeArr: string[] = ctx.query.type.split(',');
     for (const type of typeArr)
     {
       getItems = getItems.concat(await items.select([], { type }));
