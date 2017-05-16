@@ -110,7 +110,7 @@ export const Ajax =
     return Ajax._reqMidway2(
       "get",
       "/status",
-      '',
+      {},
       (resp: { status: string }) =>
       {
         if(resp && resp.status === 'ok')
@@ -365,8 +365,9 @@ export const Ajax =
 
   getVariant(variantId: ID, onLoad: (variant: LibraryTypes.Variant) => void)
   {
-    if (variantId.indexOf('@') === -1)
-    {
+    // TODO
+    // if (variantId.indexOf('@') === -1)
+    // {
       return Ajax.getItem(
         'variant',
         variantId,
@@ -375,14 +376,15 @@ export const Ajax =
           onLoad(LibraryTypes._Variant(variantData));
         },
       );
-    }
-    else
-    {
-      return Ajax.getVariantVersion(
-        variantId,
-        onLoad,
-      );
-    }
+    // }
+    // else
+    // {
+    //   // TODO
+    //   // return Ajax.getVariantVersion(
+    //   //   variantId,
+    //   //   onLoad,
+    //   // );
+    // }
   },
 
   getVersions(id: ID, onLoad: (versions: any) => void)
@@ -397,52 +399,56 @@ export const Ajax =
 
   getVersion(id: ID, onLoad: (version: any) => void)
   {
-    if (!id || id.indexOf('@') === -1)
-    {
-      onLoad(null);
-      return null;
-    }
+    // TODO
+    onLoad(null);
+    return null;
+    
+    // if (!id || id.indexOf('@') === -1)
+    // {
+    //   onLoad(null);
+    //   return null;
+    // }
 
-    // viewing an old version
-    const pieces = id.split('@');
-    const originalId = pieces[0];
-    const versionId = pieces[1];
+    // // viewing an old version
+    // const pieces = id.split('@');
+    // const originalId = pieces[0];
+    // const versionId = pieces[1];
 
-    const url = '/versions/' + originalId;
-    return Ajax._get(
-      url,
-      '',
-      (response: any) =>
-      {
-        const version = JSON.parse(response).find((version) => version.id === versionId);
-        if (version)
-        {
-          const data = JSON.parse(version.data);
-          Ajax.getVariant(originalId, (v: LibraryTypes.Variant) =>
-          {
-            if (v)
-            {
-              data['id'] = v.id;
-              data['createdByUserId'] = v.createdByUserId;
-              data['object'] = v['object'];
-              data['objectId'] = v.objectId;
-              data['objectType'] = v.objectType;
+    // const url = '/versions/' + originalId;
+    // return Ajax._get(
+    //   url,
+    //   '',
+    //   (response: any) =>
+    //   {
+    //     const version = JSON.parse(response).find((version) => version.id === versionId);
+    //     if (version)
+    //     {
+    //       const data = JSON.parse(version.data);
+    //       Ajax.getVariant(originalId, (v: LibraryTypes.Variant) =>
+    //       {
+    //         if (v)
+    //         {
+    //           data['id'] = v.id;
+    //           data['createdByUserId'] = v.createdByUserId;
+    //           data['object'] = v['object'];
+    //           data['objectId'] = v.objectId;
+    //           data['objectType'] = v.objectType;
 
-              onLoad(LibraryTypes._Variant(data));
-            }
-            else
-            {
-              onLoad(null);
-            }
-          });
-        }
-        else
-        {
-          onLoad(null);
-        }
-      },
-      () => onLoad(null),
-    );
+    //           onLoad(LibraryTypes._Variant(data));
+    //         }
+    //         else
+    //         {
+    //           onLoad(null);
+    //         }
+    //       });
+    //     }
+    //     else
+    //     {
+    //       onLoad(null);
+    //     }
+    //   },
+    //   () => onLoad(null),
+    // );
   },
 
   getQuery(

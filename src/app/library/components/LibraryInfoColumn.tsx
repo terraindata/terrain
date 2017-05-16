@@ -403,14 +403,26 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
       return null;
     }
 
-    const gr = groupRoles && groupRoles.get(user.id);
-    const isSuperUser = gr && gr.isSuperUser;
-    const isBuilder = gr && gr.builder && !isSuperUser;
-    const isViewer = !isSuperUser && !isBuilder;
-    const roleText = isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
+    // TODO re-enable roles
+    
+    // const gr = groupRoles && groupRoles.get(user.id);
+    // const isSuperUser = gr && gr.isSuperUser;
+    // const isBuilder = gr && gr.builder && !isSuperUser;
+    // const isViewer = !isSuperUser && !isBuilder;
+    // const roleText = isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
+
+    // const imSysAdmin = me.isSuperUser;
+    // const imGroupAdmin = groupRoles && groupRoles.get(me.id) && groupRoles.get(me.id).admin;
+    
+    
+    const isSuperUser = user.isSuperUser;
+    const isBuilder = ! user.isSuperUser;
+    const isViewer = false;
+    const roleText = user.isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
     const imSysAdmin = me.isSuperUser;
-    const imGroupAdmin = groupRoles && groupRoles.get(me.id) && groupRoles.get(me.id).admin;
+    const imGroupAdmin = me.isSuperUser;
+
 
     // TODO
     const menuOptions =

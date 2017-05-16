@@ -55,7 +55,7 @@ type User = UserTypes.User;
 
 export interface Props
 {
-  userId: string;
+  userId: ID;
   showName?: boolean;
   largest?: boolean;
   large?: boolean;

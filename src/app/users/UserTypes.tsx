@@ -51,7 +51,6 @@ export module UserTypes
   class UserC extends BaseClass
   {
     // db-level fields
-    id = '';
     isSuperUser = false;
     isDisabled = false;
     email = '';
@@ -114,9 +113,17 @@ export module UserTypes
     {
       return user.imgSrc;
     }
-
-    const code = (user ? user.id : 'a').charCodeAt(0);
-    const index = (code % numProfileImages) + 1;
+    
+    let index: number;
+    if (typeof user.id === 'string')
+    {
+      index = (user.id.charCodeAt(0) % numProfileImages) + 1;
+    }
+    if (typeof user.id === 'number')
+    {
+      index = (user.id % numProfileImages) + 1;
+    }
+    
     return '/dist/profiles/profile' + index + '.jpg';
   }
 }

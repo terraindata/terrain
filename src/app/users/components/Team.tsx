@@ -130,7 +130,7 @@ class Team extends Classs<Props>
           <div className="team-item-names">
             <div className="team-name">
               {
-                user.name()
+                user.name
               }
             </div>
             <div className="team-role">
@@ -277,7 +277,7 @@ class Team extends Classs<Props>
 
   renderAddUser()
   {
-    const userId = AuthStore.getState().userId;
+    const userId = AuthStore.getState().id;
     const user = Store.getState().getIn(['users', userId]) as User;
 
     if (user && user.isSuperUser)

@@ -67,7 +67,7 @@ export module LibraryTypes
   {
     type = 'variant';
 
-    id = '';
+    id: ID = '';
     name = '';
     lastEdited = '';
     lastUserId = '';
@@ -139,7 +139,7 @@ export module LibraryTypes
 
   class AlgorithmC
   {
-    id = '';
+    id: ID = '';
     name = '';
     lastEdited = '';
     lastUserId = '';
@@ -184,7 +184,7 @@ export module LibraryTypes
 
   class GroupC
   {
-    id = '';
+    id: ID = '';
     name = '';
     lastEdited = '';
     lastUserId = '';

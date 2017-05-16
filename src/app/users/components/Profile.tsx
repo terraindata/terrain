@@ -247,8 +247,12 @@ immediately be logged out of any existing sessions. \
           />
         </div>
         <div className="profile-name">
-          { this.state.user.name() }
-          { this.state.user.isDisabled ? <b><br />Disabled</b> : null }
+          {
+            this.state.user.name
+          }
+          {
+            this.state.user.isDisabled ? <b><br />Disabled</b> : null
+          }
         </div>
         {
           this.state.isLoggedInUser ?
