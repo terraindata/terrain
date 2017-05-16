@@ -59,14 +59,14 @@ RolesReducer[ActionTypes.fetch] =
       let roles = Immutable.Map({});
       rolesData.map((role) =>
       {
-        const { groupId, username } = role;
+        const { groupId, userId } = role;
         if (!roles.get(groupId))
         {
           roles = roles.set(groupId, Immutable.Map({}));
         }
         role.admin = !! role.admin;
         role.builder = !! role.builder;
-        roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
+        roles = roles.setIn([groupId, userId], new RoleTypes.Role(role));
       });
 
       Actions.setRoles(roles);
@@ -90,7 +90,7 @@ RolesReducer[ActionTypes.change] =
     {
       state = state.set(role.groupId, Immutable.Map({}));
     }
-    return state.setIn([role.groupId, role.username], role);
+    return state.setIn([role.groupId, role.userId], role);
   };
 
 export default RolesReducer;

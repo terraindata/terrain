@@ -64,12 +64,11 @@ export const Ajax =
   _reqMidway2(
     method: "post" | "get",
     url: string,
-    data: string,
-    onLoad: (response: any) => void,
+    data: object,
+    onLoad: (response: object) => void,
     config: {
       onError?: (response: any) => void,
       // crossDomain?: boolean;
-      noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
     } = {}
@@ -78,10 +77,28 @@ export const Ajax =
     return Ajax._req(
       method,
       "/midway/v1/" + url,
-      data,
-      onLoad,
+      JSON.stringify(data),
+      (response) =>
+      {
+        var responseData: object = null;
+        try {
+          responseData = JSON.parse(response);
+        }
+        catch(e)
+        {
+          config.onError && config.onError(e);
+        }
+        
+        if(responseData !== undefined)
+        {
+          // needs to be outside of the try/catch so that any errors it throws aren't caught
+          onLoad(responseData)
+        }
+      },
       _.extend({
         host: 'http://localhost:3000',
+        noToken: true,
+        json: true,
       }, config)
     );
   },
@@ -95,21 +112,13 @@ export const Ajax =
       "get",
       "status",
       '',
-      (respStr: string) =>
+      (resp: { status: string }) =>
       {
-        try
+        if(resp && resp.status === 'ok')
         {
-          const resp = JSON.parse(respStr);
-          if(resp && resp.status === 'ok')
-          {
-            success();
-          }
-          else
-          {
-            failure();
-          }
+          success();
         }
-        catch(e)
+        else
         {
           failure();
         }
@@ -132,12 +141,13 @@ export const Ajax =
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
+      json?: boolean;
     } = {}
   )
   {
     const host = config.host || MIDWAY_HOST;
     const fullUrl = host + url;
-    const token = AuthStore.getState().get('authenticationToken');
+    const token = AuthStore.getState().get('accessToken');
 
     if (config.download)
     {
@@ -171,6 +181,7 @@ export const Ajax =
     {
       if (xhr.status === 401)
       {
+        // TODO re-enable
         Actions.logout();
         return;
       }
@@ -188,6 +199,11 @@ export const Ajax =
 
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     xhr.open(method, fullUrl, true);
+    
+    if (config.json)
+    {
+      xhr.setRequestHeader('Content-type', 'application/json');
+    }
 
     if (!config.noToken)
     {
@@ -252,7 +268,7 @@ export const Ajax =
 
   saveRole: (role: RoleTypes.Role) =>
     Ajax._post(
-      `/roles/${role.groupId}/${role.username}/${role.admin ? '1' : '0'}/${role.builder ? '1' : '0'}`,
+      `/roles/${role.groupId}/${role.userId}/${role.admin ? '1' : '0'}/${role.builder ? '1' : '0'}`,
       '',
       _.noop),
 
@@ -278,7 +294,7 @@ export const Ajax =
     const data = user.toJS();
     user.excludeFields.map((field) => delete data[field]);
     user.dbFields.map((field) => delete data[field]);
-    return Ajax._post(`/users/${user.username}`, JSON.stringify({
+    return Ajax._post(`/users/${user.userId}`, JSON.stringify({
       data: JSON.stringify(data),
     }), onSave, onError);
   },
@@ -293,7 +309,7 @@ export const Ajax =
 
   adminSaveUser(user: UserTypes.User)
   {
-    return Ajax._post(`/users/${user.username}`, JSON.stringify({
+    return Ajax._post(`/users/${user.userId}`, JSON.stringify({
       admin: user.isAdmin ? 1 : 0,
       disabled: user.isDisabled ? 1 : 0,
     }), _.noop);
@@ -647,6 +663,52 @@ export const Ajax =
       (resp) =>
       {
       },
+    );
+  },
+  
+  login(
+    email: string,
+    password: string,
+    onLoad: (data: {
+      id: number,
+      accessToken: string,
+    }) => void,
+    onError: (error) => void
+  ): XMLHttpRequest
+  {
+    return Ajax._reqMidway2(
+      'post',
+      'auth/login',
+      {
+        email,
+        password,
+      },
+      onLoad,
+      onError
+    );
+  },
+  
+  checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
+  {
+    Ajax._reqMidway2(
+      'post',
+      'status/loggedIn',
+      {
+        accessToken,
+        id,
+      },
+      (data: {loggedIn: boolean}) =>
+      {
+        if (data && data.loggedIn)
+        {
+          onSuccess();
+        }
+        else
+        {
+          onError();
+        }
+      },
+      onError
     );
   },
 

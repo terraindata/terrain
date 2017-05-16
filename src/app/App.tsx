@@ -195,7 +195,7 @@ class App extends PureClasss<Props>
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
       updater: (state) => {
-        const token = AuthStore.getState().get('authenticationToken');
+        const token = AuthStore.getState().get('accessToken');
         const loggedIn = token !== null;
         const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
 
@@ -232,10 +232,10 @@ class App extends PureClasss<Props>
     });
 
     // Retrieve logged-in state from persistent storage.
-    const token = localStorage['authenticationToken'];
-    const username = localStorage['username'];
+    const token = localStorage['accessToken'];
+    const userId = localStorage['userId'];
     if (token !== undefined && token !== null) {
-      AuthActions.login(token, username);
+      AuthActions.login(token, userId);
     }
   }
 
@@ -408,7 +408,7 @@ const router = (
       <Route path="/manual" component={ManualWrapper} />
       <Route path="/manual/:term" component={ManualWrapper} />
 
-      <Route path="/users/:username" component={Profile} />
+      <Route path="/users/:userId" component={Profile} />
 
       <Route path="/reporting" component={Placeholder} />
 
@@ -433,12 +433,12 @@ if (!DEV)
   window.onerror = (errorMsg, url, lineNo, columnNo, error) => {
 
     const user = UserStore.getState().get('currentUser');
-    const username = user && user.username;
+    const userId = user && user.userId;
     const libraryState = JSON.stringify(LibraryStore.getState().toJS());
     const builderState = JSON.stringify(BuilderStore.getState().toJS());
     const location = JSON.stringify(window.location);
 
-    const msg = `${errorMsg} by ${username}
+    const msg = `${errorMsg} by ${userId}
       Location:
       ${location}
 

@@ -190,7 +190,7 @@ class LibraryInfoColumn extends Classs<Props>
       groupRoles={groupRoles}
       me={this.state.me}
       groupId={this.props.group.id}
-      key={user.username}
+      key={user.userId}
     />;
   }
 
@@ -205,11 +205,11 @@ class LibraryInfoColumn extends Classs<Props>
 
     return groupRoles.toArray().map((role: Role) =>
       {
-        if (role.username === me.username)
+        if (role.userId === me.userId)
         {
           return null; // current user is always rendered at top
         }
-        return this.renderUser(users.get(role.username));
+        return this.renderUser(users.get(role.userId));
       });
   }
 
@@ -224,7 +224,7 @@ class LibraryInfoColumn extends Classs<Props>
 
     return users.toArray().map((user: User) =>
       {
-        if (user.username === me.username || (groupRoles && groupRoles.get(user.username)))
+        if (user.userId === me.userId || (groupRoles && groupRoles.get(user.userId)))
         {
           return null; // current user and existing roles are rendered at top
         }
@@ -369,10 +369,10 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
   changeRole(newRole: string)
   {
     const { user, groupRoles } = this.props;
-    let role = groupRoles && groupRoles.get(user.username);
+    let role = groupRoles && groupRoles.get(user.userId);
     if (!role)
     {
-      role = new RoleTypes.Role({ groupId: this.props.groupId, username: user.username });
+      role = new RoleTypes.Role({ groupId: this.props.groupId, userId: user.userId });
     }
 
     RolesActions.change(
@@ -403,14 +403,14 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
       return null;
     }
 
-    const gr = groupRoles && groupRoles.get(user.username);
+    const gr = groupRoles && groupRoles.get(user.userId);
     const isAdmin = gr && gr.admin;
     const isBuilder = gr && gr.builder && !isAdmin;
     const isViewer = !isAdmin && !isBuilder;
     const roleText = isAdmin ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
     const imSysAdmin = me.isAdmin;
-    const imGroupAdmin = groupRoles && groupRoles.get(me.username) && groupRoles.get(me.username).admin;
+    const imGroupAdmin = groupRoles && groupRoles.get(me.userId) && groupRoles.get(me.userId).admin;
     // TODO
     const menuOptions =
     Immutable.List([
@@ -432,9 +432,9 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
     ]);
 
     return (
-      <div key={user.username} className="library-info-user">
+      <div key={user.userId} className="library-info-user">
         <UserThumbnail
-          username={user.username}
+          userId={user.userId}
           showName={true}
           link={true}
         />

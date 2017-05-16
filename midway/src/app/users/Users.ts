@@ -223,11 +223,13 @@ export class Users
 
   public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>
   {
+    winston.info('logging in with email ' + email + ' and password ' + password);
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results: UserConfig[] = await App.DB.select(this.userTable, [], { email }) as UserConfig[];
       if (results.length === 0)
       {
+        winston.info('none');
         return resolve(null);
       }
       else
@@ -235,6 +237,7 @@ export class Users
         const user: UserConfig = results[0];
         if (user.accessToken === undefined)
         {
+          winston.info('no access token');
           return resolve(null);
         }
         const passwordsMatch: boolean = await this.comparePassword(password, user.password);
@@ -248,10 +251,12 @@ export class Users
               });
             await this.upsert(user);
           }
+          winston.info('user');
           resolve(user);
         }
         else
         {
+          winston.info('wrong pass');
           resolve(null);
         }
       }

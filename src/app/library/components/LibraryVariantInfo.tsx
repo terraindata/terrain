@@ -135,7 +135,7 @@ class LibraryInfoColumn extends PureClasss<Props>
               </div>
               <div className="biv-cell-second">
                 <UserThumbnail
-                  username={variant.lastUsername}
+                  userId={variant.lastUserId}
                   smallest={true}
                   showName={true}
                   link={true}

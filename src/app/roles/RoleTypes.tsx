@@ -49,24 +49,24 @@ export module RoleTypes
   const _Role = Immutable.Record(
   {
     groupId: '',
-    username: '',
+    userId: '',
     admin: false,
     builder: false,
   });
   export class Role extends _Role
   {
     groupId: ID;
-    username: string;
+    userId: string;
     admin: boolean;
     builder: boolean;
   }
-  // { { username: Role }
+  // { { userId: Role }
   export type GroupRoleMap = Immutable.Map<ID, Role>;
-  // { groupId: { username: Role }}
+  // { groupId: { userId: Role }}
   export type RoleMap = Immutable.Map<ID, GroupRoleMap>;
 
   // if
-  // roles.getIn([groupId, username])
+  // roles.getIn([groupId, userId])
 }
 
 export default RoleTypes;

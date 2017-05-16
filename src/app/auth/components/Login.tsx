@@ -52,6 +52,7 @@ import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
+import Ajax from '../../util/Ajax';
 
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 
@@ -65,7 +66,7 @@ class Login extends PureClasss<Props>
 {
   state = {
     shifted: false,
-    username: '',
+    email: '',
     password: '',
     token: '',
     loginErrorModalOpen: false,
@@ -73,6 +74,7 @@ class Login extends PureClasss<Props>
     showingLogo: false,
     opened: false,
     loggingIn: false,
+    xhr: null,
   };
 
   componentDidMount()
@@ -114,11 +116,11 @@ class Login extends PureClasss<Props>
     }
   }
 
-  handleUsernameChange(ev: any)
+  handleEmailChange(ev: any)
   {
     const {value} = ev.target;
     this.setState({
-      username: value,
+      email: value,
     });
 
     if (value.length)
@@ -153,7 +155,7 @@ class Login extends PureClasss<Props>
 
   handleBlur()
   {
-    if (!this.state.username && !this.state.password)
+    if (!this.state.email && !this.state.password)
     {
       this.setState({
         shifted: false,
@@ -166,7 +168,6 @@ class Login extends PureClasss<Props>
     this.props.onLoadComplete();
   }
 
-  xhr: XMLHttpRequest;
   handleLogin()
   {
     if (this.state.loggingIn)
@@ -175,43 +176,28 @@ class Login extends PureClasss<Props>
       return;
     }
 
+    this.state.xhr && this.state.xhr.abort();
+    
     this.setState({
       loggingIn: true,
+      xhr: Ajax.login(
+        this.state.email,
+        this.state.password,
+        
+        (userData: { accessToken: string, id: number }) => {
+          Actions.login(userData.accessToken, userData.id);
+        },
+        
+        (ev: Event) => {
+          this.setState({
+            errorModalMessage: 'Error logging in:' + ev,
+            loggingIn: false,
+            xhr: null,
+          });
+          this.toggleErrorModal();
+        }
+      ),
     });
-    const { username } = this.state;
-    const login = (token: string) => {
-      Actions.login(token, username);
-    };
-
-    this.xhr && this.xhr.abort();
-    this.xhr = new XMLHttpRequest();
-    this.xhr.onerror = (ev: Event) => {
-      this.setState({
-        errorModalMessage: 'Error logging in:' + ev,
-        loggingIn: false,
-      });
-      this.toggleErrorModal();
-      this.xhr = null;
-    };
-    this.xhr.onload = (ev: Event) => {
-      if (this.xhr.status != 200) {
-        this.setState({
-          loggingIn: false,
-          errorModalMessage: 'Failed to log in: ' + this.xhr.responseText,
-        });
-        this.toggleErrorModal();
-        return;
-      }
-      const token = this.xhr.responseText;
-      this.xhr = null;
-      login(token);
-    };
-    // NOTE: MIDWAY_HOST will be replaced by the build process.
-    this.xhr.open('POST', MIDWAY_HOST + '/auth', true);
-    this.xhr.send(JSON.stringify({
-      username,
-      password: this.state.password,
-    }));
   }
 
   handleForgotPassword()
@@ -245,7 +231,6 @@ class Login extends PureClasss<Props>
           'login-wrapper-shifted': this.state.shifted,
           'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.props.loggedIn,
         })}
-        onKeyDown={this.handleKeyDown}
       >
         <div className="login-logo-container">
         {
@@ -268,7 +253,7 @@ class Login extends PureClasss<Props>
               <input
                 id="login-email"
                 type="text"
-                onChange={this.handleUsernameChange}
+                onChange={this.handleEmailChange}
                 className="login-input-field"
                 placeholder=""
                 onFocus={this.handleFocus}
