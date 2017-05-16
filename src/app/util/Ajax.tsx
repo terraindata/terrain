@@ -201,7 +201,7 @@ export const Ajax =
       if (xhr.status === 401)
       {
         // TODO re-enable
-        Actions.logout();
+        // Actions.logout();
         return;
       }
 

@@ -162,9 +162,10 @@ class App extends PureClasss<Props>
     loggedInAndLoaded: false,
 
     libraryLoaded: false,
-    usersLoaded: false,
     rolesLoaded: false,
     schemaLoaded: false,
+    
+    usersLoaded: false,
 
     noLocalStorage: false,
   };
