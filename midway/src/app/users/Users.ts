@@ -83,9 +83,9 @@ export class Users
       timezone: '',
     })
     .catch((error: string) => {
-      if(error !== 'User with email luser@terraindata.com already exists.')
+      if (error !== 'User with email luser@terraindata.com already exists.')
       {
-        throw new Error("Problem creating default user: " + error);
+        throw new Error('Problem creating default user: ' + error);
       }
     });
   }

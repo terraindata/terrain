@@ -105,10 +105,10 @@ class App
 
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
-    
+
     // tslint:disable-next-line:no-floating-promises
     (async () => { await Config.handleConfig(config); })();
-    
+
     Users.initializeDefaultUser();
 
     this.app = new Koa();

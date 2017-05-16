@@ -118,7 +118,7 @@ describe('User and auth route tests', () =>
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response);
+        const respData = JSON.parse(String(response));
         expect(typeof respData['id']).toBe('string');
         expect(typeof respData['accessToken']).toBe('string');
       })
