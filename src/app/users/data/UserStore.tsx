@@ -61,7 +61,7 @@ const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
 UserStore.subscribe(() =>
 {
   const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
+  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
   {
     // currentUser object changed
     UserStore.dispatch({

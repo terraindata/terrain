@@ -90,7 +90,7 @@ RolesReducer[ActionTypes.change] =
     {
       state = state.set(role.groupId, Immutable.Map({}));
     }
-    return state.setIn([role.groupId, role.username], role);
+    return state.setIn([role.groupId, role.userId], role);
   };
 
 export default RolesReducer;

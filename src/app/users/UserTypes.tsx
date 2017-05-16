@@ -52,15 +52,13 @@ export module UserTypes
   {
     // db-level fields
     id = '';
-    username = '';
     isSuperUser = false;
     isDisabled = false;
+    email = '';
 
     // metadata fields
-    firstName = '';
-    lastName = '';
+    name = '';
     whatIDo = '';
-    email = '';
     skype = '';
     timeZone = 158;
     phone = '';
@@ -75,19 +73,19 @@ export module UserTypes
     emailNews = 'on';
 
     // DB level fields
-    dbFields = ['isSuperUser', 'username', 'disabled'];
+    dbFields = [
+      'email',
+      'isDisabled',
+      'isSuperUser',
+      'name',
+      'oldPassword',
+      'password',
+      'timezone',
+    ];
+
     // "static" fields to exclude
-    excludeFields = ['name, dbFields', 'excludeFields'];
+    excludeFields = ['dbFields', 'excludeFields'];
 
-    name: () => string = () =>
-    {
-      if (!this.firstName.length && !this.lastName.length)
-      {
-        return this.username.substr(0, 1).toUpperCase() + this.username.substr(1);
-      }
-
-      return `${this.firstName} ${this.lastName}`;
-    }
     // groupRoles: Immutable.Map({}),
   }
   export type User = UserC & IRecord<UserC>;
@@ -117,7 +115,7 @@ export module UserTypes
       return user.imgSrc;
     }
 
-    const code = (user ? user.username : 'a').charCodeAt(0);
+    const code = (user ? user.id : 'a').charCodeAt(0);
     const index = (code % numProfileImages) + 1;
     return '/dist/profiles/profile' + index + '.jpg';
   }

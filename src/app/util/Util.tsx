@@ -131,7 +131,7 @@ const Util = {
       return false;
     }
 
-    return !! RolesStore.getState().getIn([groupId, me.username, role]);
+    return !! RolesStore.getState().getIn([groupId, me.id, role]);
   },
 
   canEdit(item: { type: string, id: string }, UserStore, RolesStore)

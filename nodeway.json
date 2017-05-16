@@ -1,0 +1,15 @@
+{
+    "debug": true,
+    "databases": [
+        {
+            "name": "My ElasticSearch Instance",
+            "type": "elastic",
+            "dsn": "127.0.0.1:9200"
+        },
+        {
+            "name": "My MySQL Instance",
+            "type": "mysql",
+            "dsn": "127.0.0.1:3306"
+        }
+    ]
+}

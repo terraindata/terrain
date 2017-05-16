@@ -70,7 +70,8 @@ let sqliteGenerator: SQLiteGenerator;
 
 beforeAll(async () =>
 {
-  winston.transports.Console.level = 'debug';
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
   const config: SQLiteConfig =
     {
       filename: 'moviesdb.db',

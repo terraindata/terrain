@@ -117,8 +117,14 @@ describe('User and auth route tests', () =>
       .expect(302)
       .then((response) =>
       {
-        expect(response.text)
-          .not.toBe('Unauthorized');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(String(response));
+        expect(typeof respData['id']).toBe('string');
+        expect(typeof respData['accessToken']).toBe('string');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
       });
   });
 
@@ -136,43 +142,46 @@ describe('User and auth route tests', () =>
       {
         expect(response.text)
           .toBe('Success');
-        passed = true;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
       });
 
-    if (passed as boolean)
-    {
-      passed = false;
-      await request(server)
-        .post('/midway/v1/auth/api_logout')
-        .send({
-          id: '2',
-          accessToken: testUserAccessToken,
-        })
-        .expect(401)
-        .then((response) =>
-        {
-          expect(response.text)
-            .toBe('Unauthorized');
-          passed = true;
-        });
-    }
+    await request(server)
+      .post('/midway/v1/auth/api_logout')
+      .send({
+        id: '2',
+        accessToken: testUserAccessToken,
+      })
+      .expect(401)
+      .then((response) =>
+      {
+        expect(response.text)
+          .toBe('Unauthorized');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
+      });
 
-    if (passed as boolean)
-    {
-      passed = false;
-      await request(server)
-        .post('/midway/v1/auth/api_login')
-        .send({
-          email: 'test@terraindata.com',
-          password: 'Flash Flash Hundred Yard Dash',
-        })
-        .expect(200)
-        .then((response) =>
-        {
-          expect(response.text)
-            .not.toBe('Unauthorized');
-        });
-    }
+    await request(server)
+      .post('/midway/v1/auth/api_login')
+      .send({
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text)
+          .not.toBe('Unauthorized');
+        testUserAccessToken = JSON.parse(response.text).accessToken;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+      });
   });
 });
 
@@ -276,6 +285,7 @@ describe('Item route tests', () =>
         body: {
           id: 2,
           name: 'Updated Item',
+          status: 'LIVE',
         },
       })
       .expect(200)
@@ -312,30 +322,29 @@ describe('Item route tests', () =>
       });
   });
 
-  // TODO update this test to reflect new changes to status changes in Items
-  // test('Update with invalid status: POST /midway/v1/items/', () =>
-  // {
-  //   return request(server)
-  //     .post('/midway/v1/items/2')
-  //     .send({
-  //       id: 2,
-  //       accessToken: testUserAccessToken,
-  //       body: {
-  //         id: 2,
-  //         name: 'Test Item',
-  //         status: 'BUILD',
-  //       },
-  //     })
-  //     .expect(400)
-  //     .then((response) =>
-  //     {
-  //       winston.info('response: "' + response + '"');
-  //     })
-  //     .catch((error) =>
-  //     {
-  //       fail('POST /midway/v1/items/ request returned an error: ' + String(error));
-  //     });
-  // });
+  test('Update with invalid status: POST /midway/v1/items/', () =>
+  {
+    return request(server)
+      .post('/midway/v1/items/2')
+      .send({
+        id: 2,
+        accessToken: testUserAccessToken,
+        body: {
+          id: 2,
+          name: 'Test Item',
+          status: 'BUILD',
+        },
+      })
+      .expect(400)
+      .then((response) =>
+      {
+        winston.info('response: "' + String(response) + '"');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+      });
+  });
 });
 
 describe('Schema route tests', () =>

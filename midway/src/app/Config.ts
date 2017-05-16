@@ -44,76 +44,93 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
+import * as fs from 'fs';
 import * as winston from 'winston';
+import { CmdLineUsage } from './CmdLineArgs';
+import { databases } from './database/DatabaseRouter';
+import { DatabaseConfig } from './database/Databases';
+import { UserConfig } from './users/Users';
+import * as Util from './Util';
 
-import * as Util from '../Util';
-import { DatabaseConfig, Databases } from './Databases';
-
-export const Router = new KoaRouter();
-export const databases = new Databases();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export interface Config
 {
-  winston.info('getting all databases');
-  ctx.body = await databases.get();
-});
+  config?: string;
+  port?: number;
+  db?: string;
+  dsn?: string;
+  debug?: boolean;
+  help?: boolean;
+  verbose?: boolean;
+  databases?: object[];
+}
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+export function loadConfigFromFile(config: Config): Config
 {
-  winston.info('getting database ID ' + String(ctx.params.id));
-  ctx.body = await databases.get(ctx.params.id);
-});
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('add new database');
-  const db: DatabaseConfig = ctx.request.body.body;
-  Util.verifyParameters(db, ['name', 'dsn']);
-  if (db.id !== undefined)
+  // load options from a configuration file, if specified.
+  if (config.config !== undefined)
   {
-    throw Error('Invalid parameter database ID');
-  }
-
-  ctx.body = await databases.upsert(ctx.state.user, db);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('update existing database');
-  const db: DatabaseConfig = ctx.request.body.body;
-  if (db.id === undefined)
-  {
-    db.id = ctx.params.id;
-  }
-  else
-  {
-    if (db.id !== Number(ctx.params.id))
+    try
     {
-      throw Error('Database ID does not match the supplied id in the URL');
+      const settings = fs.readFileSync(config.config, 'utf8');
+      const cfgSettings = JSON.parse(settings);
+      config = Util.updateObject(config, cfgSettings);
+    }
+    catch (e)
+    {
+      winston.error('Failed to read configuration settings from ' + String(config.config));
     }
   }
+  return config;
+}
 
-  ctx.body = await databases.upsert(ctx.state.user, db);
-});
-
-Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
+export async function handleConfig(config: Config): Promise<void>
 {
-  winston.info('connect to database');
-  ctx.body = await databases.connect(ctx.state.user, ctx.params.id);
-});
+  winston.debug('Using configuration: ' + JSON.stringify(config));
+  if (config.help === true)
+  {
+    // tslint:disable-next-line
+    console.log(CmdLineUsage);
+    process.exit();
+  }
 
-Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('disconnect from database');
-  ctx.body = await databases.disconnect(ctx.state.user, ctx.params.id);
-});
+  if (config.verbose === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'verbose';
+  }
 
-Router.post('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get database schema');
-  ctx.body = await databases.schema(ctx.params.id);
-});
+  if (config.debug === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'debug';
+  }
 
-export default Router;
+  if (config.databases !== undefined)
+  {
+    for (const database of config.databases)
+    {
+      const db = database as DatabaseConfig;
+      const results = await databases.select([], { name: db.name });
+      if (results.length > 0 && results[0].id !== undefined)
+      {
+        winston.info('Updating existing database item: ', db);
+        db.id = results[0].id;
+        await databases.upsert({} as UserConfig, db);
+      }
+      else
+      {
+        winston.info('Registering new database item: ', db);
+        await databases.upsert({} as UserConfig, db);
+        const insertedDB = await databases.select([], { name: db.name });
+        db.id = insertedDB[0].id;
+      }
+
+      if (db.id !== undefined)
+      {
+        await databases.connect({} as UserConfig, db.id);
+      }
+    }
+  }
+}
+
+export default Config;

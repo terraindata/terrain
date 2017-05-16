@@ -148,7 +148,7 @@ class GroupsColumn extends Classs<Props>
     const group = this.props.groups.get(id);
     const {me, roles} = this.state;
     const groupRoles = roles && roles.get(id);
-    const canCreate = (me && groupRoles && groupRoles.getIn([me.username, 'admin']));
+    const canCreate = (me && groupRoles && groupRoles.getIn([me.id, 'admin']));
     const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
 
@@ -178,13 +178,13 @@ class GroupsColumn extends Classs<Props>
       >
         <div className="group-library-info-wrapper">
           {
-            groupRoles && me && (groupRoles.getIn([me.username, 'builder']) || groupRoles.getIn([me.username, 'admin'])) &&
+            groupRoles && me && (groupRoles.getIn([me.id, 'builder']) || groupRoles.getIn([me.id, 'admin'])) &&
               <UserThumbnail
-                username={me.username}
+                userId={me.id}
                 medium={true}
                 extra={
-                  groupRoles.getIn([me.username, 'admin']) ? 'Admin' :
-                    (groupRoles.getIn([me.username, 'builder']) ? 'Builder' : 'Viewer')
+                  groupRoles.getIn([me.id, 'admin']) ? 'Admin' :
+                    (groupRoles.getIn([me.id, 'builder']) ? 'Builder' : 'Viewer')
                 }
               />
           }
@@ -193,14 +193,14 @@ class GroupsColumn extends Classs<Props>
             .filter((role) => role.builder || role.admin)
             .map(
               (role, index) =>
-                index > 8 || (me && role.username === me.username) ? null :
+                index > 8 || (me && role.userId === me.id) ? null :
                   <UserThumbnail
-                    username={role.username}
-                    key={role.username}
+                    userId={role.userId}
+                    key={role.userId}
                     medium={true}
                     extra={
-                      groupRoles.getIn([role.username, 'admin']) ? 'Admin' :
-                        (groupRoles.getIn([role.username, 'builder']) ? 'Builder' : 'Viewer')
+                      groupRoles.getIn([role.userId, 'admin']) ? 'Admin' :
+                        (groupRoles.getIn([role.userId, 'builder']) ? 'Builder' : 'Viewer')
                     }
                   />,
             )
