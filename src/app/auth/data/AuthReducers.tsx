@@ -50,21 +50,22 @@ import AuthTypes from '../AuthTypes';
 const AuthReducer = {};
 
 AuthReducer[ActionTypes.login] =
-  (state: AuthTypes.AuthState, action) =>
+  (state: AuthTypes.AuthState, action: Action<{ accessToken: string, id: number }>) =>
   {
-    const { token, userId } = action.payload;
+    const { accessToken, id } = action.payload;
     // store these values in localStorage so that the user is auto-logged in next time they visit
-    localStorage['accessToken'] = token;
-    localStorage['userId'] = userId;
-    return state.set('accessToken', token).set('userId', userId);
+    // TODO reenable
+    // localStorage['accessToken'] = accessToken;
+    // localStorage['id'] = id;
+    return state.set('accessToken', accessToken).set('id', id);
   };
 
 AuthReducer[ActionTypes.logout] =
   (state: AuthTypes.AuthState, action) =>
   {
     delete localStorage['accessToken'];
-    delete localStorage['userId'];
-    return state.set('accessToken', null).set('userId', null);
+    delete localStorage['id'];
+    return state.set('accessToken', null).set('id', null);
   };
 
 export default AuthReducer;

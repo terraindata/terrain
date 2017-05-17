@@ -72,7 +72,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
   const user: UserConfig = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
+
   if (user.id === undefined)
   {
     user.id = Number(ctx.params.id);

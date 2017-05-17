@@ -130,6 +130,7 @@ describe('User and auth route tests', () =>
 
   test('logout, attempt login with bad accessToken, get new accessToken', async () =>
   {
+    const passed: boolean = false;
     await request(server)
       .post('/midway/v1/auth/api_logout')
       .send({

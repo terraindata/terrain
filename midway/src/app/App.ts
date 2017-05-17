@@ -118,7 +118,7 @@ class App
     this.app.use(convert(session()));
 
     this.app.use(Middleware.bodyParser());
-    this.app.use(Middleware.favicon('../src/app/favicon.ico'));
+    this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());

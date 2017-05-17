@@ -123,17 +123,18 @@ const Actions =
     fetchVersion:
       (variantId: string, onNoVersion: (variantId: string) => void) =>
       {
-        Ajax.getVariantVersion(variantId, (variantVersion: LibraryTypes.Variant) =>
-        {
-          if (!variantVersion)
-          {
-            onNoVersion(variantId);
-          }
-          else
-          {
-            Actions.variants.loadVersion(variantId, variantVersion);
-          }
-        });
+        // TODO
+        // Ajax.getVariantVersion(variantId, (variantVersion: LibraryTypes.Variant) =>
+        // {
+        //   if (!variantVersion)
+        //   {
+        //     onNoVersion(variantId);
+        //   }
+        //   else
+        //   {
+        //     Actions.variants.loadVersion(variantId, variantVersion);
+        //   }
+        // });
       },
 
     loadVersion:

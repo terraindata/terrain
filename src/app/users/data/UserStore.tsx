@@ -47,6 +47,8 @@ import * as ReduxActions from 'redux-actions';
 import * as _ from 'underscore';
 const Redux = require('redux');
 
+import Ajax from './../../util/Ajax';
+
 import AuthStore from './../../auth/data/AuthStore';
 import Util from './../../util/Util';
 
@@ -61,7 +63,7 @@ const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
 UserStore.subscribe(() =>
 {
   const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().get('userId')]) !== state.get('currentUser'))
+  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
   {
     // currentUser object changed
     UserStore.dispatch({
@@ -70,5 +72,12 @@ UserStore.subscribe(() =>
     });
   }
 });
+
+window['test'] = () =>
+{
+  let users = UserStore.getState().users;
+  console.log('users', users);
+  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
+}
 
 export default UserStore;

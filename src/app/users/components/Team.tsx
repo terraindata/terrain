@@ -118,19 +118,19 @@ class Team extends Classs<Props>
     }
 
     return (
-      <Link to={`/users/${user.userId}`} className="team-link" key={user.userId}>
+      <Link to={`/users/${user.id}`} className="team-link" key={user.id}>
         <div className="team-row">
           <div>
             <UserThumbnail
               large={true}
-              userId={user.userId}
+              userId={user.id}
               square={true}
             />
           </div>
           <div className="team-item-names">
             <div className="team-name">
               {
-                user.name()
+                user.name
               }
             </div>
             <div className="team-role">
@@ -277,10 +277,10 @@ class Team extends Classs<Props>
 
   renderAddUser()
   {
-    const userId = AuthStore.getState().userId;
+    const userId = AuthStore.getState().id;
     const user = Store.getState().getIn(['users', userId]) as User;
 
-    if (user && user.isAdmin)
+    if (user && user.isSuperUser)
     {
       if (this.state.addingUser)
       {
