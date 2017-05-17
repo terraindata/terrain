@@ -64,39 +64,38 @@ export default class ElasticGeneratorRunner
     this.esQuery = {} as ElasticQuery;
     const esQuery = this.esQuery;
 
-    esQuery.index = query.table.getDatabaseName();
-    esQuery.table = query.table.getTableName();
+    esQuery.table = query.table;
 
     switch (query.command.tastyType)
     {
       case (TastyNodeTypes.select):
         esQuery.op = 'select';
-        esQuery.param = this.constructSelectQuery(query);
+        esQuery.params = this.constructSelectQuery(query);
         break;
       case (TastyNodeTypes.upsert):
         esQuery.op = 'upsert';
-        esQuery.param = this.constructUpsertQuery(query);
+        esQuery.params = this.constructUpsertQuery(query);
         break;
       case (TastyNodeTypes.delete):
         esQuery.op = 'delete';
-        esQuery.param = this.constructDeleteQuery(query);
+        esQuery.params = this.constructDeleteQuery(query);
         break;
       default:
         throw new Error('Unknown command in the query:' + query.toString());
     }
   }
 
-  private constructDeleteQuery(query: TastyQuery): object
+  private constructDeleteQuery(query: TastyQuery): object[]
   {
     return this.constructSelectQuery(query);
   }
 
-  private constructUpsertQuery(query: TastyQuery): object
+  private constructUpsertQuery(query: TastyQuery): object[]
   {
     return query.upserts;
   }
 
-  private constructSelectQuery(query: TastyQuery): object
+  private constructSelectQuery(query: TastyQuery): object[]
   {
     const queryParam: Elastic.SearchParams = {} as Elastic.SearchParams;
 
@@ -158,7 +157,7 @@ export default class ElasticGeneratorRunner
       }
     }
     queryParam['body'] = body.build();
-    return queryParam;
+    return [queryParam];
   }
 
   private accumulateFilters(body: bodybuilder, expression: TastyNode)
