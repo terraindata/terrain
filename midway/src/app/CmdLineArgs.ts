@@ -116,5 +116,4 @@ export let CmdLineArgs: Config = cmdLineArgs(optionList,
   });
 
 export const CmdLineUsage = cmdLineUsage(sections);
-
 export default CmdLineArgs;

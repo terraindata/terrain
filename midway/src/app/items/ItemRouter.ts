@@ -58,8 +58,21 @@ export const items: Items = new Items();
 // Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 Router.get('/', async (ctx, next) =>
 {
-  winston.info('getting all items');
-  ctx.body = await items.get();
+  let getItems: ItemConfig[] = [];
+  if (ctx.query.type !== undefined)
+  {
+    const typeArr: string[] = ctx.query.type.split(',');
+    for (const type of typeArr)
+    {
+      getItems = getItems.concat(await items.select([], { type }));
+    }
+  }
+  else
+  {
+    winston.info('getting all items');
+    getItems = await items.get();
+  }
+  ctx.body = getItems;
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
