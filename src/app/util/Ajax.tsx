@@ -62,7 +62,7 @@ export interface QueryResponse
 export const Ajax =
 {
   _reqMidway2(
-    method: "post" | "get",
+    method: 'post' | 'get',
     url: string,
     data: string,
     onLoad: (response: any) => void,
@@ -72,35 +72,35 @@ export const Ajax =
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
-    } = {}
+    } = {},
   )
   {
     return Ajax._req(
       method,
-      "/midway/v1/" + url,
+      '/midway/v1/' + url,
       data,
       onLoad,
       _.extend({
         host: 'http://localhost:3000',
-      }, config)
+      }, config),
     );
   },
 
   midwayStatus(
     success: () => void,
-    failure: () => void
+    failure: () => void,
   )
   {
     return Ajax._reqMidway2(
-      "get",
-      "status",
+      'get',
+      'status',
       '',
       (respStr: string) =>
       {
         try
         {
-          const resp = JSON.parse(respStr);
-          if(resp && resp.status === 'ok')
+          const resp: object = JSON.parse(respStr);
+          if (resp && resp.status === 'ok')
           {
             success();
           }
@@ -109,14 +109,14 @@ export const Ajax =
             failure();
           }
         }
-        catch(e)
+        catch (e)
         {
           failure();
         }
       },
       {
         onError: failure,
-      }
+      },
     );
   },
 
@@ -132,7 +132,7 @@ export const Ajax =
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
-    } = {}
+    } = {},
   )
   {
     const host = config.host || MIDWAY_HOST;
@@ -175,7 +175,7 @@ export const Ajax =
         return;
       }
 
-      if (xhr.status != 200)
+      if (xhr.status !== 200)
       {
         config && config.onError && config.onError({
           error: xhr.responseText,
@@ -226,13 +226,13 @@ export const Ajax =
     } = {},
   ): { xhr: XMLHttpRequest, queryId: string }
   {
-    const unique_id = '' + Math.random();
+    const uniqueId = '' + Math.random();
     return {
       xhr:
         Ajax._req('POST', url, JSON.stringify(_.extend(
           {
             timestamp: (new Date()).toISOString(),
-            unique_id,
+            uniqueId,
           }, reqFields)),
 
           onLoad,
@@ -246,7 +246,7 @@ export const Ajax =
             downloadFilename: options.downloadFilename,
           },
         ),
-      queryId: unique_id,
+      queryId: uniqueId,
     };
   },
 
@@ -365,7 +365,7 @@ export const Ajax =
       return Ajax.getItem(
         'variant',
         variantId,
-        (variantData: Object) =>
+        (variantData: object) =>
         {
           onLoad(LibraryTypes._Variant(variantData));
         },
@@ -409,7 +409,7 @@ export const Ajax =
       '',
       (response: any) =>
       {
-        const version = JSON.parse(response).find((version) => version.id === versionId);
+        const version = JSON.parse(response).find((v) => v.id === versionId);
         if (version)
         {
           const data = JSON.parse(version.data);
@@ -572,15 +572,28 @@ export const Ajax =
 
   schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._postMidway1('/get_schema', {
-        db,
-      },
-      (resp: string) =>
+    /*_reqMidway2(
+    method: 'post' | 'get',
+    url: string,
+    data: string,
+    onLoad: (response: any) => void,
+    config: {
+      onError?: (response: any) => void,
+      // crossDomain?: boolean;
+      noToken?: boolean;
+      download?: boolean;
+      downloadFilename?: string;
+    } = {}, */
+    const dbId: number = 0;
+    return Ajax._reqMidway2('get', '/database/' + dbId + '/schema', '', (response: any) => {
+      console.log('got schema for database ' + dbId + ':\n' + response.toString());
+    });
+      /*(resp: string) =>
       {
-        const cols: any = null;
+        let cols: any = null;
         try
         {
-          const cols = JSON.parse(resp).results;
+          cols = JSON.parse(resp).results;
           // var tables: {[name:string]: {name: string; columns: any[];}} = {};
 
           // cols.map(
@@ -617,7 +630,7 @@ export const Ajax =
         }
       },
       onError,
-      );
+      );*/
   },
 
   getDbs(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
