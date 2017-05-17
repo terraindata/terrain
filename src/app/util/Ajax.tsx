@@ -78,12 +78,10 @@ export const Ajax =
     if(config.noCredentials)
     {
       data = body;
-      console.log('none at all', data);
     }
     else
     {
       const authState = AuthStore.getState();
-      console.log('auth state', authState);
       data = {
         id: authState.id,
         accessToken: authState.accessToken,
@@ -320,7 +318,6 @@ export const Ajax =
       (v, key) => delete userData[key]
     );
     userData['meta'] = JSON.stringify(meta);
-    console.log('saving', userData);
     
     return Ajax._reqMidway2(
       'post',
