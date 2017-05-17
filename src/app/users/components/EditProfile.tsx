@@ -128,7 +128,7 @@ class Profile extends Classs<Props>
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
     this.setState({
-      user: userState.getIn(['users', authState.get('userId')]),
+      user: userState.getIn(['users', authState.id]),
       loading: userState.get('loading'),
     });
   }

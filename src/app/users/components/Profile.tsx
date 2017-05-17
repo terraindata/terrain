@@ -101,7 +101,7 @@ class Profile extends Classs<Props>
   {
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
-    let userId = authState.get('userId');
+    let userId = authState.id;
     const routeUserId = this.props.params.userId;
     let isLoggedInUser = true;
     let routeIsDirect = false;
@@ -155,7 +155,7 @@ class Profile extends Classs<Props>
   toggleAdmin()
   {
     if (window.confirm(
-      this.state.user.isAdmin ?
+      this.state.user.isSuperUser ?
         'Are you sure you want to revoke this user\'s administrative privileges?'
       :
       'Are you sure you want to make this user a system-level administrator? \
@@ -165,7 +165,7 @@ any existing system administrator privileges, including your own. \
 (You can revoke their administator privileges later, as long as you \
 are still a system administrator yourself.)'))
     {
-      const user = this.state.user.set('isAdmin', !this.state.user.isAdmin) as UserTypes.User;
+      const user = this.state.user.set('isSuperUser', !this.state.user.isSuperUser) as UserTypes.User;
       Actions.change(user);
       Ajax.adminSaveUser(user);
     }
@@ -191,7 +191,7 @@ immediately be logged out of any existing sessions. \
   renderAdminTools()
   {
     const {me, user} = this.state;
-    if (!me || !me.isAdmin || me.userId === user.userId)
+    if (!me || !me.isSuperUser || me.id === user.id)
     {
       return null;
     }
@@ -201,11 +201,11 @@ immediately be logged out of any existing sessions. \
         <div
           className={classNames({
             'profile-admin-button': true,
-            'profile-admin-button-red': user.isAdmin,
+            'profile-admin-button-red': user.isSuperUser,
           })}
           onClick={this.toggleAdmin}
         >
-          { user.isAdmin ? 'Revoke System Administratorship' : 'Make System Administrator' }
+          { user.isSuperUser ? 'Revoke System Administratorship' : 'Make System Administrator' }
         </div>
         <div
           className={classNames({
@@ -247,8 +247,12 @@ immediately be logged out of any existing sessions. \
           />
         </div>
         <div className="profile-name">
-          { this.state.user.name() }
-          { this.state.user.isDisabled ? <b><br />Disabled</b> : null }
+          {
+            this.state.user.name
+          }
+          {
+            this.state.user.isDisabled ? <b><br />Disabled</b> : null
+          }
         </div>
         {
           this.state.isLoggedInUser ?

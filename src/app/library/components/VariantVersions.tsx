@@ -97,16 +97,17 @@ class VariantVersions extends PureClasss<Props>
   xhr: XMLHttpRequest = null;
   fetchVariants(props)
   {
-    this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
-    {
-      if (versions)
-      {
-        versions.reverse();
-        this.setState({
-          versions,
-        });
-      }
-    });
+    // TODO
+    // this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
+    // {
+    //   if (versions)
+    //   {
+    //     versions.reverse();
+    //     this.setState({
+    //       versions,
+    //     });
+    //   }
+    // });
   }
 
   componentWillMount()

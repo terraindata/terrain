@@ -246,11 +246,11 @@ class VariantsColumn extends Classs<Props>
     
     if (me && roles)
     {
-      canEdit = roles.getIn([this.props.groupId, me.userId, 'builder'])
-        || roles.getIn([this.props.groupId, me.userId, 'admin']);
+      canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
+        || roles.getIn([this.props.groupId, me.id, 'admin']);
       canDrag = canEdit &&
         (variant.status !== LibraryTypes.EVariantStatus.Live ||
-          roles.getIn([this.props.groupId, me.userId, 'admin']));
+          roles.getIn([this.props.groupId, me.id, 'admin']));
     }
 
     let role = 'Viewer';
@@ -334,11 +334,11 @@ class VariantsColumn extends Classs<Props>
   renderVariants(archived?: boolean)
   {
     const {me, roles} = this.state;
-    const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.userId, 'admin']);
+    const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
     const canCreate = canMakeLive;
     // TODO maybe on the new middle tier, builders can create variants
     //  || (
-    //   me && roles && roles.getIn([this.props.groupId, me.userId, 'builder'])
+    //   me && roles && roles.getIn([this.props.groupId, me.id, 'builder'])
     // );
 
     let fadeIndex = 0;

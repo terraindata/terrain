@@ -67,7 +67,7 @@ export module LibraryTypes
   {
     type = 'variant';
 
-    id = '';
+    id: ID = '';
     name = '';
     lastEdited = '';
     lastUserId = '';
@@ -121,7 +121,7 @@ export module LibraryTypes
   {
     return v
       .set('lastEdited', new Date())
-      .set('lastUserId', localStorage['userId'])
+      .set('lastUserId', localStorage['id'])
     ;
   }
 
@@ -139,7 +139,7 @@ export module LibraryTypes
 
   class AlgorithmC
   {
-    id = '';
+    id: ID = '';
     name = '';
     lastEdited = '';
     lastUserId = '';
@@ -184,7 +184,7 @@ export module LibraryTypes
 
   class GroupC
   {
-    id = '';
+    id: ID = '';
     name = '';
     lastEdited = '';
     lastUserId = '';

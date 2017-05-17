@@ -100,7 +100,7 @@ declare interface IMap<T>
 
 declare interface IRecord<T> extends IMap<T>
 {
-  id: string;
+  id: ID;
   type: string;
 }
 
@@ -109,7 +109,7 @@ declare type Ref = React.Component<any, any> | Element;
 
 declare type MEvent = React.MouseEvent<any>;
 
-declare type ID = string;
+declare type ID = string | number;
 declare interface IId
 {
   id: ID;
