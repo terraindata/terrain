@@ -76,11 +76,10 @@ export class Users
     // tslint:disable-next-line
     (new Users()).create({
       accessToken: 'ImALuser',
-      // email: 'luser@terraindata.com',
-      email: 'l',
+      email: 'luser@terraindata.com',
       isSuperUser: 1,
       name: 'Terrain Admin',
-      password: 'l',
+      password: 'secret',
       isDisabled: 0,
       timezone: '',
     })
@@ -129,7 +128,7 @@ export class Users
       {
         return reject('User with email ' + String(user.email) + ' already exists.');
       }
-      
+
       const newUser: UserConfig =
         {
           accessToken: '',

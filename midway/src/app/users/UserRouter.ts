@@ -55,17 +55,16 @@ export * from './Users';
 const Router = new KoaRouter();
 export const users = new Users();
 
-// Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-Router.get('/', async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all users');
-  ctx.body = await users.get();
+  ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone'], {});
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting user ID ' + String(ctx.params.id));
-  ctx.body = await users.get(ctx.params.id);
+  ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone'], { id: ctx.params.id });
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -73,7 +72,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
   const user: UserConfig = ctx.request.body.body;
-  
+
   if (user.id === undefined)
   {
     user.id = Number(ctx.params.id);
@@ -85,7 +84,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
       throw new Error('User ID does not match the supplied id in the URL');
     }
   }
-  
+
   // if superuser or id to be updated is current user
   const isSuperUser: boolean = ctx.state.user.isSuperUser;
   if (isSuperUser || ctx.request.body.id === ctx.params.id)
