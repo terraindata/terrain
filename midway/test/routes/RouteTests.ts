@@ -57,12 +57,18 @@ let testUserAccessToken: string;
 
 beforeAll((done) =>
 {
-  winston.transports.Console.level = 'debug';
   const options =
     {
+      debug: true,
       db: 'sqlite',
       dsn: 'nodewaytest.db',
       port: 3000,
+      databases: [
+      {
+        name: 'My ElasticSearch Instance',
+        type: 'elastic',
+        dsn: '127.0.0.1:9200',
+      }],
     };
 
   const app = new App(options);
