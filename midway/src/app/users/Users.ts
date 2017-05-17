@@ -128,7 +128,7 @@ export class Users
       {
         return reject('User with email ' + String(user.email) + ' already exists.');
       }
-      
+
       const newUser: UserConfig =
         {
           accessToken: '',
