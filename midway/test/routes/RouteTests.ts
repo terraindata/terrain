@@ -112,20 +112,20 @@ beforeAll((done) =>
 
 describe('User and auth route tests', () =>
 {
-  test('http login route: GET /midway/v1/auth/login', async () =>
+  test('http login route: GET /midway/v1/auth/login', () =>
   {
-    await request(server)
+    request(server)
       .post('/midway/v1/auth/login')
       .send({
         email: 'test@terraindata.com',
         password: 'Flash Flash Hundred Yard Dash',
       })
-      .expect(302)
+      .expect(200)
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(String(response));
-        expect(typeof respData['id']).toBe('string');
+        const respData = JSON.parse(response.text);
+        expect(typeof respData['id']).toBe('number');
         expect(typeof respData['accessToken']).toBe('string');
       })
       .catch((error) =>
