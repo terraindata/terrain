@@ -135,12 +135,12 @@ class LibraryInfoColumn extends Classs<Props>
     });
   }
 
-  renderVariant(isAdmin, isBuilder)
+  renderVariant(isSuperUser, isBuilder)
   {
     return (
       <LibraryVariantInfo
         variant={this.props.variant}
-        isAdmin={isAdmin}
+        isSuperUser={isSuperUser}
         isBuilder={isBuilder}
         dbs={this.state.dbs}
       />
@@ -152,7 +152,7 @@ class LibraryInfoColumn extends Classs<Props>
     Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
   }
 
-  renderAlgorithm(isAdmin, isBuilder)
+  renderAlgorithm(isSuperUser, isBuilder)
   {
     if (! this.props.algorithm || this.props.variant)
     {
@@ -169,7 +169,7 @@ class LibraryInfoColumn extends Classs<Props>
             selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.algorithm.db)}
             options={this.state.dbs}
             onChange={this.handleAlgorithmDbChange}
-            canEdit={isBuilder || isAdmin}
+            canEdit={isBuilder || isSuperUser}
             className="bic-db-dropdown"
           />
         </div>
@@ -190,7 +190,7 @@ class LibraryInfoColumn extends Classs<Props>
       groupRoles={groupRoles}
       me={this.state.me}
       groupId={this.props.group.id}
-      key={user.userId}
+      key={user.id}
     />;
   }
 
@@ -205,7 +205,7 @@ class LibraryInfoColumn extends Classs<Props>
 
     return groupRoles.toArray().map((role: Role) =>
       {
-        if (role.userId === me.userId)
+        if (role.userId === me.id)
         {
           return null; // current user is always rendered at top
         }
@@ -224,7 +224,7 @@ class LibraryInfoColumn extends Classs<Props>
 
     return users.toArray().map((user: User) =>
       {
-        if (user.userId === me.userId || (groupRoles && groupRoles.get(user.userId)))
+        if (user.id === me.id || (groupRoles && groupRoles.get(user.id)))
         {
           return null; // current user and existing roles are rendered at top
         }
@@ -237,7 +237,7 @@ class LibraryInfoColumn extends Classs<Props>
     Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
   }
 
-  renderGroup(isAdmin, isBuilder)
+  renderGroup(isSuperUser, isBuilder)
   {
     const { group } = this.props;
     if (!group || this.props.algorithm || this.props.variant)
@@ -249,7 +249,7 @@ class LibraryInfoColumn extends Classs<Props>
     // let me: UserTypes.User = UserStore.getState().get('currentUser');
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
 
-    const isSysAdmin = this.state.me && this.state.me.isAdmin;
+    const isSysAdmin = this.state.me && this.state.me.isSuperUser;
 
     return (
       <div>
@@ -261,7 +261,7 @@ class LibraryInfoColumn extends Classs<Props>
             selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.group.db)}
             options={this.state.dbs}
             onChange={this.handleGroupDbChange}
-            canEdit={isBuilder || isAdmin}
+            canEdit={isBuilder || isSuperUser}
             className="bic-db-dropdown"
           />
         </div>
@@ -300,7 +300,7 @@ class LibraryInfoColumn extends Classs<Props>
         break;
     }
 
-    const isAdmin = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
+    const isSuperUser = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
     const isBuilder = Util.haveRole(groupId, 'builder', UserStore, RolesStore);
 
     return (
@@ -334,13 +334,13 @@ class LibraryInfoColumn extends Classs<Props>
                 }
               </div>
               {
-                this.renderVariant(isAdmin, isBuilder)
+                this.renderVariant(isSuperUser, isBuilder)
               }
               {
-                this.renderAlgorithm(isAdmin, isBuilder)
+                this.renderAlgorithm(isSuperUser, isBuilder)
               }
               {
-                this.renderGroup(isAdmin, isBuilder)
+                this.renderGroup(isSuperUser, isBuilder)
               }
             </div>
           :
@@ -369,10 +369,10 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
   changeRole(newRole: string)
   {
     const { user, groupRoles } = this.props;
-    let role = groupRoles && groupRoles.get(user.userId);
+    let role = groupRoles && groupRoles.get(user.id);
     if (!role)
     {
-      role = new RoleTypes.Role({ groupId: this.props.groupId, userId: user.userId });
+      role = new RoleTypes.Role({ groupId: this.props.groupId, userId: user.id });
     }
 
     RolesActions.change(
@@ -403,14 +403,27 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
       return null;
     }
 
-    const gr = groupRoles && groupRoles.get(user.userId);
-    const isAdmin = gr && gr.admin;
-    const isBuilder = gr && gr.builder && !isAdmin;
-    const isViewer = !isAdmin && !isBuilder;
-    const roleText = isAdmin ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
+    // TODO re-enable roles
+    
+    // const gr = groupRoles && groupRoles.get(user.id);
+    // const isSuperUser = gr && gr.isSuperUser;
+    // const isBuilder = gr && gr.builder && !isSuperUser;
+    // const isViewer = !isSuperUser && !isBuilder;
+    // const roleText = isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
-    const imSysAdmin = me.isAdmin;
-    const imGroupAdmin = groupRoles && groupRoles.get(me.userId) && groupRoles.get(me.userId).admin;
+    // const imSysAdmin = me.isSuperUser;
+    // const imGroupAdmin = groupRoles && groupRoles.get(me.id) && groupRoles.get(me.id).admin;
+    
+    
+    const isSuperUser = user.isSuperUser;
+    const isBuilder = ! user.isSuperUser;
+    const isViewer = false;
+    const roleText = user.isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
+
+    const imSysAdmin = me.isSuperUser;
+    const imGroupAdmin = me.isSuperUser;
+
+
     // TODO
     const menuOptions =
     Immutable.List([
@@ -427,14 +440,14 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
       {
         text: 'Admin',
         onClick: this.changeToAdmin,
-        disabled: isAdmin,
+        disabled: isSuperUser,
       },
     ]);
 
     return (
-      <div key={user.userId} className="library-info-user">
+      <div key={user.id} className="library-info-user">
         <UserThumbnail
-          userId={user.userId}
+          userId={user.id}
           showName={true}
           link={true}
         />

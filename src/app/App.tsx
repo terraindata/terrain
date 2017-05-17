@@ -162,9 +162,10 @@ class App extends PureClasss<Props>
     loggedInAndLoaded: false,
 
     libraryLoaded: false,
-    usersLoaded: false,
     rolesLoaded: false,
     schemaLoaded: false,
+    
+    usersLoaded: false,
 
     noLocalStorage: false,
   };
@@ -195,8 +196,8 @@ class App extends PureClasss<Props>
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
       updater: (state) => {
-        const token = AuthStore.getState().get('accessToken');
-        const loggedIn = token !== null;
+        const token = AuthStore.getState().accessToken;
+        const loggedIn = !!token;
         const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
 
         this.setState({
@@ -232,10 +233,11 @@ class App extends PureClasss<Props>
     });
 
     // Retrieve logged-in state from persistent storage.
-    const token = localStorage['accessToken'];
-    const userId = localStorage['userId'];
-    if (token !== undefined && token !== null) {
-      AuthActions.login(token, userId);
+    const accessToken = localStorage['accessToken'];
+    const id = localStorage['id'];
+    if (accessToken !== undefined && id !== undefined)
+    {
+      AuthActions.login(accessToken, id);
     }
   }
 
@@ -433,7 +435,7 @@ if (!DEV)
   window.onerror = (errorMsg, url, lineNo, columnNo, error) => {
 
     const user = UserStore.getState().get('currentUser');
-    const userId = user && user.userId;
+    const userId = user && user.id;
     const libraryState = JSON.stringify(LibraryStore.getState().toJS());
     const builderState = JSON.stringify(BuilderStore.getState().toJS());
     const location = JSON.stringify(window.location);

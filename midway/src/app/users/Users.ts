@@ -66,6 +66,7 @@ export interface UserConfig
   oldPassword?: string;
   password: string;
   timezone?: string;
+  meta?: string;
 }
 
 export class Users
@@ -78,7 +79,7 @@ export class Users
       email: 'luser@terraindata.com',
       isSuperUser: 1,
       name: 'Terrain Admin',
-      password: 'choppinwood1123',
+      password: 'secret',
       isDisabled: 0,
       timezone: '',
     })
@@ -108,6 +109,7 @@ export class Users
         'oldPassword',
         'password',
         'timezone',
+        'meta',
       ],
     );
   }
@@ -136,6 +138,7 @@ export class Users
           name: user.name,
           password: await this.hashPassword(user.password),
           timezone: user.timezone === undefined ? '' : user.timezone,
+          meta: user.meta === undefined ? '{}' : user.meta,
         };
       await this.upsert(newUser);
       resolve('Success');

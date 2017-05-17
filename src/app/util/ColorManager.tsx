@@ -88,14 +88,15 @@ class ColorManager
 
   private static keyToIndex: { [s: string]: number; } = {};
 
-  private static secondaryKeyToKey: { [s: string]: string; } = {};
+  private static secondaryKeyToKey: { [s: string]: ID; } = {};
 
-  private static keyToSecondaryKey: { [s: string]: string; } = {};
+  private static keyToSecondaryKey: { [s: string]: ID; } = {};
 
   private static currentIndex: number = 0;
 
-  private static readIndexForKey(key: string): number
+  private static readIndexForKey(_key: ID): number
   {
+    const key = _key + '';
     if (this.keyToIndex[key] !== undefined)
     {
       return this.keyToIndex[key];
@@ -114,8 +115,10 @@ class ColorManager
   //  it will assign a color to that key, and also map
   //  the secondaryKey passed to that key
   // Limit of one secondaryKey per Key
-  private static indexForKey(key: string, secondaryKey?: string): number
+  private static indexForKey(_key: ID, _secondaryKey?: ID): number
   {
+    const key = _key + '';
+    const secondaryKey = _secondaryKey + '';
     if (this.keyToIndex[key] !== undefined)
     {
       if (secondaryKey && this.keyToSecondaryKey[key] !== secondaryKey)
@@ -146,23 +149,30 @@ class ColorManager
 
   // Public
 
-  static colorForKey(key: string, secondaryKey?: string): string
+  static colorForKey(_key: ID, _secondaryKey?: string): string
   {
+    const key = _key + '';
+    const secondaryKey = _secondaryKey + '';
     return this.COLORS[this.indexForKey(key, secondaryKey)];
   }
 
-  static altColorForKey(key: string, secondaryKey?: string): string
+  static altColorForKey(_key: ID, _secondaryKey?: string): string
   {
+    const key = _key + '';
+    const secondaryKey = _secondaryKey + '';
     return this.ALT_COLORS[this.indexForKey(key, secondaryKey)];
   }
 
-  static darkerColorForKey(key: string, secondaryKey?: string): string
+  static darkerColorForKey(_key: ID, _secondaryKey?: string): string
   {
+    const key = _key + '';
+    const secondaryKey = _secondaryKey + '';
     return this.DARKER_COLORS[this.indexForKey(key)];
   }
 
-  static readColorForKey(key: string)
+  static readColorForKey(_key: ID)
   {
+    const key = _key + '';
     const index = this.readIndexForKey(key);
     if (index === null)
     {
@@ -172,8 +182,9 @@ class ColorManager
     return this.COLORS[index];
   }
 
-  static readDarkerColorForKey(key: string)
+  static readDarkerColorForKey(_key: ID)
   {
+    const key = _key + '';
     const index = this.readIndexForKey(key);
     if (index === null)
     {

@@ -55,7 +55,7 @@ type User = UserTypes.User;
 
 export interface Props
 {
-  userId: string;
+  userId: ID;
   showName?: boolean;
   largest?: boolean;
   large?: boolean;
@@ -116,7 +116,7 @@ class UserThumbnail extends Classs<Props>
   render()
   {
     const { user } = this.state;
-    const name: string = user ? user.name() : 'Loading...';
+    const name: string = user ? user.name : 'Loading...';
     const src: string = UserTypes.profileUrlFor(user);
     const tip = this.props.showName ? null :
       '<div class="user-thumbnail-tip-name">' + name + '</div>' +
@@ -132,7 +132,7 @@ class UserThumbnail extends Classs<Props>
           'user-thumbnail-small': this.props.small,
           'user-thumbnail-smallest': this.props.smallest,
           'user-thumbnail-square': this.props.square,
-          'user-thumbnail-admin': user && user.isAdmin && !this.props.hideAdmin,
+          'user-thumbnail-admin': user && user.isSuperUser && !this.props.hideAdmin,
         })}
         data-tip={tip}
         data-html={true}
@@ -157,7 +157,7 @@ class UserThumbnail extends Classs<Props>
     if (this.props.link && user)
     {
       return (
-        <Link to={`/users/${user.userId}`}>
+        <Link to={`/users/${user.id}`}>
           { thumbnail }
         </Link>
       );

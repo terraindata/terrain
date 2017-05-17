@@ -49,7 +49,7 @@ import Util from '../../util/Util';
 interface Config
 {
   stateKey?: string;
-  storeKeyPath?: string[] | (() => string[]);
+  storeKeyPath?: ID[] | (() => ID[]);
   isMounted?: boolean;
   updater?: (storeState: any) => void;
 }
@@ -145,14 +145,28 @@ class Classs<T> extends React.Component<T, any>
     }
 
     let stateKey = config.stateKey;
-    let keyPath: KeyPath | string[], value: any;
+    let keyPath: KeyPath | ID[], value: any;
 
     if (config.storeKeyPath)
     {
-      keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
+      if (typeof config.storeKeyPath === 'function')
+      {
+        keyPath = config.storeKeyPath();
+      }
+      else
+      {
+        keyPath = config.storeKeyPath;
+      }
+      
       value = store.getState().getIn(keyPath);
-      stateKey = stateKey || keyPath[keyPath.length - 1];
-    } else {
+      
+      if (!stateKey)
+      {
+        stateKey = keyPath[(keyPath['size'] || keyPath['length']) - 1] + '';
+      }
+    }
+    else
+    {
       value = store.getState();
     }
 
