@@ -81,7 +81,7 @@ class Profile extends Classs<Props>
   };
 
   infoKeys = [
-    'username',
+    'userId',
     'whatIDo',
     'phone',
     'skype',
@@ -101,20 +101,20 @@ class Profile extends Classs<Props>
   {
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
-    let username = authState.get('username');
-    const routeUsername = this.props.params.username;
+    let userId = authState.get('userId');
+    const routeUserId = this.props.params.userId;
     let isLoggedInUser = true;
     let routeIsDirect = false;
 
-    if (routeUsername && routeUsername.length)
+    if (routeUserId && routeUserId.length)
     {
-      isLoggedInUser = routeUsername === username;
-      username = routeUsername;
+      isLoggedInUser = routeUserId === userId;
+      userId = routeUserId;
       routeIsDirect = true;
     }
 
     this.setState({
-      user: userState.getIn(['users', username]),
+      user: userState.getIn(['users', userId]),
       loading: userState.get('loading'),
       isLoggedInUser,
       routeIsDirect,
@@ -191,7 +191,7 @@ immediately be logged out of any existing sessions. \
   renderAdminTools()
   {
     const {me, user} = this.state;
-    if (!me || !me.isAdmin || me.username === user.username)
+    if (!me || !me.isAdmin || me.userId === user.userId)
     {
       return null;
     }

@@ -60,9 +60,9 @@ export interface UserConfig
   accessToken?: string;
   email: string;
   id?: number;
-  isDisabled: boolean;
-  isSuperUser: boolean;
-  name?: string;
+  isDisabled: number;
+  isSuperUser: number;
+  name: string;
   oldPassword?: string;
   password: string;
   timezone?: string;
@@ -70,6 +70,27 @@ export interface UserConfig
 
 export class Users
 {
+  public static initializeDefaultUser()
+  {
+    // tslint:disable-next-line
+    (new Users()).create({
+      accessToken: 'ImALuser',
+      email: 'luser@terraindata.com',
+      isSuperUser: 1,
+      name: 'Terrain Admin',
+      password: 'choppinwood1123',
+      isDisabled: 0,
+      timezone: '',
+    })
+      .catch((error: string) =>
+      {
+        if (error !== 'User with email luser@terraindata.com already exists.')
+        {
+          throw new Error('Problem creating default user: ' + error);
+        }
+      });
+  }
+
   private readonly saltRounds = 10;
   private userTable: Tasty.Table;
 
@@ -100,6 +121,12 @@ export class Users
         return reject('Require both email and password for user creation');
       }
 
+      const existingUsers = await this.select([], { email: user.email });
+      if (existingUsers.length !== 0)
+      {
+        return reject('User with email ' + String(user.email) + ' already exists.');
+      }
+
       const newUser: UserConfig =
         {
           accessToken: '',
@@ -108,9 +135,8 @@ export class Users
           isSuperUser: user.isSuperUser,
           name: user.name,
           password: await this.hashPassword(user.password),
-          timezone: user.timezone,
+          timezone: user.timezone === undefined ? '' : user.timezone,
         };
-
       await this.upsert(newUser);
       resolve('Success');
     });
@@ -165,6 +191,11 @@ export class Users
     });
   }
 
+  public async select(columns: string[], filter: object): Promise<UserConfig[]>
+  {
+    return App.DB.select(this.userTable, columns, filter) as Promise<UserConfig[]>;
+  }
+
   public async get(id?: number): Promise<UserConfig[]>
   {
     if (id !== undefined)
@@ -192,11 +223,13 @@ export class Users
 
   public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>
   {
+    winston.info('logging in with email ' + email + ' and password ' + password);
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results: UserConfig[] = await App.DB.select(this.userTable, [], { email }) as UserConfig[];
       if (results.length === 0)
       {
+        winston.info('none');
         return resolve(null);
       }
       else
@@ -204,6 +237,7 @@ export class Users
         const user: UserConfig = results[0];
         if (user.accessToken === undefined)
         {
+          winston.info('no access token');
           return resolve(null);
         }
         const passwordsMatch: boolean = await this.comparePassword(password, user.password);
@@ -217,10 +251,12 @@ export class Users
               });
             await this.upsert(user);
           }
+          winston.info('user');
           resolve(user);
         }
         else
         {
+          winston.info('wrong pass');
           resolve(null);
         }
       }

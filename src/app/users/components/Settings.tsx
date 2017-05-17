@@ -84,7 +84,6 @@ class Settings extends Classs<Props>
 
     this.state = {
       istate: Store.getState(),
-      username: authState.get('username'),
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
@@ -125,42 +124,6 @@ class Settings extends Classs<Props>
      });
   }
 
-  saveUsername()
-  {
-    this.setState({
-      modalMessage: 'Not able to change your username at this time',
-      errorModal: true,
-    });
-    this.toggleModal();
-  }
-
-  renderUsernameContent()
-  {
-    return (
-      <div>
-        <div className="username-topbar">
-          <input
-            type="text"
-            defaultValue={'@' + this.state.username}
-            className="settings-input"
-            disabled={true}
-          />
-          <div className="button settings-save-button" onClick={this.saveUsername}>
-            Save
-          </div>
-        </div>
-        <div className="settings-field-info">
-          Usernames must be all lowercase.They cannot be longer than 21 characters and can only contain letters, periods, hyphens, and underscores.
-          Most people choose to use their first name, last name, nickname, or some combination of those with initials.
-          <br />
-          <b>
-            Note that you can only change your username twice per hour.
-          </b> Choose wisely.
-        </div>
-      </div>
-    );
-  }
-
   handleCurrentPasswordChange(ev)
   {
     this.setState({
@@ -184,7 +147,7 @@ class Settings extends Classs<Props>
 
   createNewPassword()
   {
-    const username: string = localStorage['username'];
+    const userId: string = localStorage['userId'];
     const currentPassword: string = this.state.currentPassword;
     const newPassword: string = this.state.newPassword;
     const confirmPassword: string = this.state.confirmPassword;
@@ -216,7 +179,7 @@ class Settings extends Classs<Props>
       confirmPassword: '',
     });
 
-    Ajax.changePassword(username, currentPassword, newPassword, () => {
+    Ajax.changePassword(userId, currentPassword, newPassword, () => {
       Actions.fetch();
       this.setState({
         modalMessage: 'Your password has been changed.',
@@ -504,7 +467,7 @@ class Settings extends Classs<Props>
         <br />
         <span className="settings-font-small">
           <b>Note:</b> Don't deactivate your account if you just want to change your <span className="settings-blue-font">email
-          address </span> or <span className="settings-blue-font">username</span>.
+          address </span>.
         </span>
       </div>
     );
@@ -537,8 +500,8 @@ class Settings extends Classs<Props>
 
   // add these back when ready
       // <AccountEntry
-      //   title='Username'
-      //   content= {this.renderUsernameContent()}
+      //   title='UserId'
+      //   content= {this.renderUserIdContent()}
       // />
       // <AccountEntry
       //   title='Two-Factor Authentication'

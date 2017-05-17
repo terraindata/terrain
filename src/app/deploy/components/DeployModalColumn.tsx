@@ -191,7 +191,7 @@ class DeployModalColumn extends PureClasss<Props>
           <div className="deploy-modal-info-row-lower">
             <span className="deploy-modal-info-bold">
               <UserThumbnail
-                username={variant.lastUsername}
+                userId={variant.lastUserId}
                 showName={true}
               />
             </span>

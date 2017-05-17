@@ -253,11 +253,11 @@ class AlgorithmsColumn extends PureClasss<Props>
     scores.splice(0, 1); // remove Archived count
 
     const {me, roles} = this.state;
-    const canArchive = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
+    const canArchive = me && roles && roles.getIn([algorithm.groupId, me.userId, 'admin']);
     const canDuplicate = canArchive;
     const canDrag = canArchive; // TODO change to enable Library drag and drop
     const canEdit = canDrag ||
-      (me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']));
+      (me && roles && roles.getIn([algorithm.groupId, me.userId, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -274,20 +274,20 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
 
     let date = 'There are no variants';
-    let username = 'There are no variants';
+    let userId = 'There are no variants';
     if (lastTouched) {
       date = lastTouched.lastEdited;
-      username = lastTouched.lastUsername;
+      userId = lastTouched.lastUserId;
     }
 
     let role = 'Viewer';
-    if (roles && roles.getIn([this.props.groupId, username]))
+    if (roles && roles.getIn([this.props.groupId, userId]))
     {
-      if (roles && roles.getIn([this.props.groupId, username]).admin)
+      if (roles && roles.getIn([this.props.groupId, userId]).admin)
       {
         role = 'Admin';
       }
-      else if (roles && roles.getIn([this.props.groupId, username]).builder)
+      else if (roles && roles.getIn([this.props.groupId, userId]).builder)
       {
         role = 'Builder';
       }
@@ -321,7 +321,7 @@ class AlgorithmsColumn extends PureClasss<Props>
         canDuplicate={canDuplicate}
       >
         <div className="flex-container">
-          <UserThumbnail username={username} medium={true} extra={role}/>
+          <UserThumbnail userId={userId} medium={true} extra={role}/>
           <div className="flex-grow">
             <div className="library-item-line">
               <Scoreline
@@ -356,7 +356,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     const {algorithms} = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const {me, roles} = this.state;
-    const canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
+    const canCreate = me && roles && roles.getIn([this.props.groupId, me.userId, 'admin']);
 
     return (
       <LibraryItemCategory

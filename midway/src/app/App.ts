@@ -64,6 +64,7 @@ import './Logging';
 import Middleware from './Middleware';
 import RouteError from './RouteError';
 import MidwayRouter from './Router';
+import Users from './users/Users';
 
 export let DB: Tasty.Tasty;
 
@@ -107,6 +108,8 @@ class App
 
     // tslint:disable-next-line:no-floating-promises
     (async () => { await Config.handleConfig(config); })();
+
+    Users.initializeDefaultUser();
 
     this.app = new Koa();
     this.app.proxy = true;

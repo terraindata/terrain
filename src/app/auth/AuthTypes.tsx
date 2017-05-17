@@ -54,8 +54,8 @@ export module AuthTypes
   // This type represents the state of the AuthStore
   class AuthStateC extends BaseClass
   {
-    authenticationToken: string;
-    username: string;
+    accessToken: string;
+    userId: number;
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
   //  This first line exports a type that you will actually use in other files.
