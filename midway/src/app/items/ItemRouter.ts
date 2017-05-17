@@ -55,8 +55,7 @@ export * from './Items';
 const Router = new KoaRouter();
 export const items: Items = new Items();
 
-// Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-Router.get('/', async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   let getItems: ItemConfig[] = [];
   if (ctx.query.type !== undefined)

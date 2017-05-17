@@ -55,8 +55,7 @@ export * from './Users';
 const Router = new KoaRouter();
 export const users = new Users();
 
-// Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-Router.get('/', async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all users');
   ctx.body = await users.select(['email', 'id', 'isDisabled', 'isSuperUser', 'name', 'timezone'], {});
