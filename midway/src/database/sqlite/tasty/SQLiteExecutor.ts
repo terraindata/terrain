@@ -111,26 +111,6 @@ export class SQLiteExecutor implements TastyExecutor
     }
   }
 
-  // /**
-  //  * executes statements sequentially
-  //  * @param statements
-  //  * @returns {Promise<Array>} appended result objects
-  //  */
-  // public async upsert(statements: string[]): Promise<object[]>
-  // {
-  //   const result : object[] = [];
-  //
-  //   for (const statement of statements)
-  //   {
-  //     const result = await new Promise<object[]>((resolve, reject) =>
-  //     {
-  //       this.client.all(statement, makePromiseCallback(resolve, reject));
-  //     });
-  //
-  //     result.concat();
-  //   }
-  // }
-
   public async destroy(): Promise<void>
   {
     return new Promise<void>((resolve, reject) =>

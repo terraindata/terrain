@@ -227,6 +227,10 @@ export default class SQLiteGeneratorRunner
       this.queryString = '';
     }
 
+    if (query.lastID === true) {
+      this.accumulateStatement('SELECT last_insert_rowid() as id');
+    }
+
     this.accumulateStatement(this.queryString);
   }
 

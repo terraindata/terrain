@@ -351,3 +351,19 @@ test('stored PWL transform sort query using function_score', async (done) =>
   }
   done();
 });
+
+test('Elastic: insert', async (done) =>
+{
+  try
+  {
+    const movie = { title: 'Arrival', releasedate: new Date('01/01/17') };
+    const results = await elasticController.getTasty().upsert(DBMovies, movie);
+    console.log(results);
+    // expect(results[0]).toMatchObject({releasedate: '2017-01-01', title: 'Arrival'});
+    // expect(results[0]['id']).toBeGreaterThan(0);
+  } catch (e)
+  {
+    fail(e);
+  }
+  done();
+});

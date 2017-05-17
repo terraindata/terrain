@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Util from '../app/Util';
 import DatabaseController from '../database/DatabaseController';
 import TastyColumn from './TastyColumn';
 import TastyExecutor from './TastyExecutor';
@@ -174,10 +175,23 @@ export class Tasty
   {
     const query = new TastyQuery(table);
     query.upsert(value);
+    query.selectLastID();
 
     const generatedQuery = this.generator.generate(query);
-    // return this.executor.upsert(generatedQuery);
-    return this.executor.query(generatedQuery);
+
+    const results = await this.executor.query(generatedQuery);
+    if (value instanceof Array)
+    {
+      for (let i = 0; i < value.length; i++)
+      {
+        results[i] = Util.updateObject(results[i], value[i]);
+      }
+    }
+    else if (typeof value === 'object')
+    {
+      results[0] = Util.updateObject(results[0], value);
+    }
+    return results;
   }
 
   /**

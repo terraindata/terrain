@@ -60,6 +60,7 @@ export class TastyQuery
   public upserts: object[];
   public numTaken: number;
   public numSkipped: number;
+  public lastID: boolean;
 
   constructor(table: TastyTable)
   {
@@ -83,6 +84,12 @@ export class TastyQuery
   public select(columns: TastyColumn[]): TastyQuery
   {
     this.selected = columns;
+    return this;
+  }
+
+  public selectLastID(): TastyQuery
+  {
+    this.lastID = true;
     return this;
   }
 

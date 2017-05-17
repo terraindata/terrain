@@ -106,7 +106,6 @@ for (let i = 0; i < SQLQueries.length; i++)
 
 test('tasty select', async (done) =>
 {
-  const movieid = 123;
   const results = await tasty.select(DBMovies, [], { movieid: 123 });
   expect(results[0])
     .toEqual({
@@ -114,6 +113,21 @@ test('tasty select', async (done) =>
       releasedate: '1994-07-14 00:00:00',
       title: 'Chungking Express (Chung Hing sam lam) (1994)',
     });
+  done();
+});
+
+test('SQLite: insert', async (done) =>
+{
+  try
+  {
+    const movie = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    const results = await tasty.upsert(DBMovies, movie);
+    expect(results[0]).toMatchObject({releasedate: '2017-01-01', title: 'Arrival'});
+    expect(results[0]['id']).toBeGreaterThan(0);
+  } catch (e)
+  {
+    fail(e);
+  }
   done();
 });
 
