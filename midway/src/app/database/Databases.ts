@@ -118,18 +118,26 @@ export class Databases
 
   public async connect(user: UserConfig, id: number): Promise<string>
   {
-    const results: DatabaseConfig[] = await this.get(id);
-    if (results.length === 0)
+    return new Promise<string>(async (resolve, reject) =>
     {
-      return Promise.reject('Invalid db id passed');
-    }
+      const results: DatabaseConfig[] = await this.get(id);
+      if (results.length === 0)
+      {
+        return reject('Invalid db id passed');
+      }
 
-    const db: DatabaseConfig = results[0];
-    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
-    DatabaseRegistry.set(db.id, controller);
-    db.status = 'CONNECTED';
-    await this.upsert(user, db);
-    return Promise.resolve('Success');
+      const db: DatabaseConfig = results[0];
+      if (db.id === undefined)
+      {
+        return reject('Database does not have an ID');
+      }
+
+      const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
+      DatabaseRegistry.set(db.id, controller);
+      db.status = 'CONNECTED';
+      await this.upsert(user, db);
+      resolve('Success');
+    });
   }
 
   public async disconnect(user: UserConfig, id: number): Promise<string>
@@ -142,7 +150,7 @@ export class Databases
 
   public async schema(id: number): Promise<string>
   {
-    const controller: DatabaseController = await DatabaseRegistry.get(id);
+    const controller = await DatabaseRegistry.get(id);
     if (controller === undefined)
     {
       return Promise.reject('Invalid db id passed');

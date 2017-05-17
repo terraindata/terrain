@@ -68,7 +68,7 @@ export interface Props
 class StatusDropdown extends PureClasss<Props>
 {
   state = {
-    isAdmin: false,
+    isSuperUser: false,
     isBuilder: false,
   };
 
@@ -77,12 +77,12 @@ class StatusDropdown extends PureClasss<Props>
     this._subscribe(RolesStore, {
       updater: () =>
       {
-        const isAdmin = Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
+        const isSuperUser = Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
         const isBuilder = Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
-        if (isAdmin !== this.state.isAdmin || isBuilder !== this.state.isBuilder)
+        if (isSuperUser !== this.state.isSuperUser || isBuilder !== this.state.isBuilder)
         {
           this.setState({
-            isAdmin,
+            isSuperUser,
             isBuilder,
           });
         }
@@ -106,7 +106,7 @@ class StatusDropdown extends PureClasss<Props>
   canEdit(): boolean
   {
     const {variant} = this.props;
-    return this.state.isAdmin ||
+    return this.state.isSuperUser ||
       (this.state.isBuilder && variant.status !== Status.Live);
   }
 
@@ -170,7 +170,7 @@ class StatusDropdown extends PureClasss<Props>
       {
         tooltip = "You aren't a Builder in this group,<br />so you can't edit this Variant's status.";
       }
-      else if (!this.state.isAdmin)
+      else if (!this.state.isSuperUser)
       {
         tooltip = "This Variant is Live and you aren't<br />an Admin in this Group, so you<br />can't edit its status.";
       }

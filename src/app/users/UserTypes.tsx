@@ -51,15 +51,13 @@ export module UserTypes
   class UserC extends BaseClass
   {
     // db-level fields
-    username = '';
-    isAdmin = false;
+    isSuperUser = false;
     isDisabled = false;
+    email = '';
 
     // metadata fields
-    firstName = '';
-    lastName = '';
+    name = '';
     whatIDo = '';
-    email = '';
     skype = '';
     timeZone = 158;
     phone = '';
@@ -74,19 +72,20 @@ export module UserTypes
     emailNews = 'on';
 
     // DB level fields
-    dbFields = ['isAdmin', 'username', 'disabled'];
+    dbFields = [
+      'id',
+      'email',
+      'isDisabled',
+      'isSuperUser',
+      'name',
+      'oldPassword',
+      'password',
+      'timezone',
+    ];
+
     // "static" fields to exclude
-    excludeFields = ['name, dbFields', 'excludeFields'];
+    excludeFields = ['dbFields', 'excludeFields'];
 
-    name: () => string = () =>
-    {
-      if (!this.firstName.length && !this.lastName.length)
-      {
-        return this.username.substr(0, 1).toUpperCase() + this.username.substr(1);
-      }
-
-      return `${this.firstName} ${this.lastName}`;
-    }
     // groupRoles: Immutable.Map({}),
   }
   export type User = UserC & IRecord<UserC>;
@@ -115,9 +114,17 @@ export module UserTypes
     {
       return user.imgSrc;
     }
-
-    const code = (user ? user.username : 'a').charCodeAt(0);
-    const index = (code % numProfileImages) + 1;
+    
+    let index: number;
+    if (typeof user.id === 'string')
+    {
+      index = (user.id.charCodeAt(0) % numProfileImages) + 1;
+    }
+    if (typeof user.id === 'number')
+    {
+      index = (user.id % numProfileImages) + 1;
+    }
+    
     return '/dist/profiles/profile' + index + '.jpg';
   }
 }

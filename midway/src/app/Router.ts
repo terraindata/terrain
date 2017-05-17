@@ -77,9 +77,9 @@ AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 
 AppRouter.get('/', async (ctx, next) =>
 {
-  if (ctx.state.user)
+  if (ctx.state.user[0] !== undefined)
   {
-    ctx.body = 'authenticated as ' + ctx.state.user.username;
+    ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
   }
   else
   {
@@ -89,7 +89,7 @@ AppRouter.get('/', async (ctx, next) =>
 
 AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = 'authenticated as ' + ctx.state.user.username;
+  ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
 });
 
 const MidwayRouter = new KoaRouter();
@@ -102,8 +102,14 @@ MidwayRouter.get('/', async (ctx, next) =>
 
 MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
 {
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/assets/bundle.js');
+  if (process.env.NODE_ENV === 'production')
+  {
+    await send(ctx, '/src/assets/bundle.js');
+  }
+  else
+  {
+    ctx.body = await Util.getRequest('http://localhost:8080/assets/bundle.js');
+  }
 });
 
 export default MidwayRouter;

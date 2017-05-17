@@ -83,7 +83,7 @@ beforeAll((done) =>
         email: 'test@terraindata.com',
         name: 'Test Person',
         password: 'Flash Flash Hundred Yard Dash',
-        isAdmin: false,
+        isSuperUser: false,
         isDisabled: false,
         timezone: 'UTC',
       },
@@ -106,11 +106,11 @@ beforeAll((done) =>
 
 describe('User and auth route tests', () =>
 {
-  test('http login route: GET /midway/v1/auth/login', () =>
+  test('http login route: GET /midway/v1/auth/login', async () =>
   {
-    return request(server)
-      .get('/midway/v1/auth/login')
-      .query({
+    await request(server)
+      .post('/midway/v1/auth/login')
+      .send({
         email: 'test@terraindata.com',
         password: 'Flash Flash Hundred Yard Dash',
       })
@@ -118,16 +118,20 @@ describe('User and auth route tests', () =>
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(String(response));
+        expect(typeof respData['id']).toBe('string');
+        expect(typeof respData['accessToken']).toBe('string');
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/auth/login request returned an error: ' + error);
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
       });
   });
 
-  test('logout: POST /midway/v1/auth/api_logout', () =>
+  test('logout, attempt login with bad accessToken, get new accessToken', async () =>
   {
-    return request(server)
+    let passed: boolean = false;
+    await request(server)
       .post('/midway/v1/auth/api_logout')
       .send({
         id: '2',
@@ -136,17 +140,15 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Success');
+        expect(response.text)
+          .toBe('Success');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
       });
-  });
 
-  test('access API route with bad accessToken: POST /midway/v1/auth/api_logout', () =>
-  {
-    return request(server)
+    await request(server)
       .post('/midway/v1/auth/api_logout')
       .send({
         id: '2',
@@ -155,17 +157,15 @@ describe('User and auth route tests', () =>
       .expect(401)
       .then((response) =>
       {
-        expect(response.text).toBe('Unauthorized');
+        expect(response.text)
+          .toBe('Unauthorized');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
       });
-  });
 
-  test('get new accessToken : POST /midway/v1/auth/api_login', () =>
-  {
-    return request(server)
+    await request(server)
       .post('/midway/v1/auth/api_login')
       .send({
         email: 'test@terraindata.com',
@@ -174,12 +174,13 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).not.toBe('Unauthorized');
+        expect(response.text)
+          .not.toBe('Unauthorized');
         testUserAccessToken = JSON.parse(response.text).accessToken;
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
       });
   });
 });
@@ -199,11 +200,12 @@ describe('Version route tests', () =>
       {
         expect(response.text)
           .toBe(
+          // tslint:disable-next-line:max-line-length
           '[{\"createdAt\":\"2017-04-28 03:32:25\",\"createdByUserId\":1,\"id\":1,\"object\":\"[object Object]\",\"objectId\":2,\"objectType\":\"items\"}]');
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/versions/items/1 request returned an error: ' + error);
+        fail('GET /midway/v1/versions/items/1 request returned an error: ' + String(error));
       });
   });
 });
@@ -226,7 +228,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/items/ request returned an error: ' + error);
+        fail('GET /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -249,7 +251,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -269,7 +271,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/items/ request returned an error: ' + error);
+        fail('GET /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -283,6 +285,7 @@ describe('Item route tests', () =>
         body: {
           id: 2,
           name: 'Updated Item',
+          status: 'LIVE',
         },
       })
       .expect(200)
@@ -292,7 +295,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -311,11 +314,11 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + response + '"');
+        winston.info('response: "' + String(response) + '"');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 
@@ -335,11 +338,11 @@ describe('Item route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info('response: "' + response + '"');
+        winston.info('response: "' + String(response) + '"');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 });
@@ -395,7 +398,7 @@ describe('Query route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 
@@ -425,11 +428,12 @@ describe('Query route tests', () =>
         const midwayError: MidwayError = MidwayError.fromJSON(response.text);
         expect(midwayError.getTitle())
           .toEqual(
+          // tslint:disable-next-line:max-line-length
           '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 
@@ -461,7 +465,7 @@ describe('Query route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/query/ request returned an error: ' + error);
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
 });

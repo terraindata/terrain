@@ -158,7 +158,7 @@ class AccountDropdown extends PureClasss<Props>
           </div>
         </div>
         {
-          this.state.user && this.state.user.isAdmin &&
+          this.state.user && this.state.user.isSuperUser &&
             <div className="account-dropdown-row" onMouseDown={this._toggle('commitLogOpen')}>
               <div className="account-dropdown-icon account-dropdown-icon-blue">
                 <InfoIcon />
@@ -184,7 +184,7 @@ class AccountDropdown extends PureClasss<Props>
       <div className="account-dropdown-top-bar" onClick={this.open} ref="accountDropdownButton">
         <UserThumbnail
           showName={true}
-          username={this.state.user && this.state.user.username}
+          userId={this.state.user && this.state.user.id}
           hideAdmin={true}
         />
         <ArrowIcon className="account-arrow-icon" />

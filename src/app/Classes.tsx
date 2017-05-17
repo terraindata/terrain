@@ -48,11 +48,11 @@ import Util from './util/Util';
 
 export class BaseClass
 {
-  id: string | number = '';
-
-  constructor(config: {id?: string} = {})
+  id: string | number = -1;
+  
+  constructor(config: {id?: ID, [field: string]: any} = {})
   {
-    this.id = Util.extendId(config)['id'];
+    // nada
   }
 }
 
@@ -65,12 +65,21 @@ export class BaseClass
 
 const records: {[class_name: string]: Immutable.Record.Class} = {};
 
-export function New<T>(instance, config: {[field: string]: any} = {}): T & IRecord<T>
+export function New<T>(
+  instance, 
+  config: {[field: string]: any} = {},
+  extendId?: boolean | 'string' // if true, generate an ID on instantiation
+): T & IRecord<T>
 {
   const class_name = instance.__proto__.constructor.name;
   if (!records[class_name])
   {
     records[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
+  }
+  
+  if(extendId)
+  {
+    config = Util.extendId(config, extendId === 'string');
   }
 
   _.map(config,

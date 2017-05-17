@@ -246,21 +246,21 @@ class VariantsColumn extends Classs<Props>
     
     if (me && roles)
     {
-      canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
-        || roles.getIn([this.props.groupId, me.username, 'admin']);
+      canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
+        || roles.getIn([this.props.groupId, me.id, 'admin']);
       canDrag = canEdit &&
         (variant.status !== LibraryTypes.ItemStatus.Live ||
-          roles.getIn([this.props.groupId, me.username, 'admin']));
+          roles.getIn([this.props.groupId, me.id, 'admin']));
     }
 
     let role = 'Viewer';
-    if (roles && roles.getIn([this.props.groupId, variant.lastUsername]))
+    if (roles && roles.getIn([this.props.groupId, variant.lastUserId]))
     {
-      if (roles && roles.getIn([this.props.groupId, variant.lastUsername]).admin)
+      if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).admin)
       {
         role = 'Admin';
       }
-      else if (roles && roles.getIn([this.props.groupId, variant.lastUsername]).builder)
+      else if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).builder)
       {
         role = 'Builder';
       }
@@ -296,7 +296,7 @@ class VariantsColumn extends Classs<Props>
         isStarred={variant.isDefault}
       >
         <div className="flex-container">
-          <UserThumbnail username={variant.lastUsername} medium={true} extra = {role}/>
+          <UserThumbnail userId={variant.lastUserId} medium={true} extra = {role}/>
 
           <div className="flex-grow">
             <StatusDropdown
@@ -334,11 +334,11 @@ class VariantsColumn extends Classs<Props>
   renderVariants(archived?: boolean)
   {
     const {me, roles} = this.state;
-    const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
+    const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
     const canCreate = canMakeLive;
     // TODO maybe on the new middle tier, builders can create variants
     //  || (
-    //   me && roles && roles.getIn([this.props.groupId, me.username, 'builder'])
+    //   me && roles && roles.getIn([this.props.groupId, me.id, 'builder'])
     // );
 
     let fadeIndex = 0;

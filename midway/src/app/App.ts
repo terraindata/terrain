@@ -55,14 +55,16 @@ import serve = require('koa-static-server');
 import cors = require('kcors');
 import srs = require('secure-random-string');
 
-import * as Util from '../database/Util';
+import * as DBUtil from '../database/Util';
 import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
-import CmdLineArgs from './CmdLineArgs';
+import { CmdLineArgs } from './CmdLineArgs';
+import * as Config from './Config';
 import './Logging';
 import Middleware from './Middleware';
 import RouteError from './RouteError';
 import MidwayRouter from './Router';
+import Users from './users/Users';
 
 export let DB: Tasty.Tasty;
 
@@ -71,32 +73,43 @@ class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = Util.makeDatabaseController(type, dsn);
+    const controller = DBUtil.makeDatabaseController(type, dsn);
     return controller.getTasty();
   }
 
-  private static uncaughtExceptionHandler(err: any): void
+  private static uncaughtExceptionHandler(err: Error): void
   {
-    winston.error('Uncaught Exception: ' + err);
+    winston.error('Uncaught Exception: ' + err.toString());
     // this is a good place to clean tangled resources
     process.abort();
   }
 
-  private static unhandledRejectionHandler(res: any): void
+  private static unhandledRejectionHandler(err: Error): void
   {
-    winston.error('Unhandled Promise Rejection: ' + res);
+    winston.error('Unhandled Promise Rejection: ' + err.toString());
   }
 
   private DB: Tasty.Tasty;
   private app: Koa;
+  private config: Config.Config;
 
-  constructor(config: any = CmdLineArgs)
+  constructor(config: Config.Config = CmdLineArgs)
   {
     process.on('uncaughtException', App.uncaughtExceptionHandler);
     process.on('unhandledRejection', App.unhandledRejectionHandler);
 
-    this.DB = App.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
+    // first, load config from a config file, if one is specified
+    config = Config.loadConfigFromFile(config);
+    this.DB = App.initializeDB(config.db as string, config.dsn as string);
     DB = this.DB;
+
+    winston.debug('Using configuration: ' + JSON.stringify(config));
+    this.config = config;
+
+    // tslint:disable-next-line:no-floating-promises
+    (async () => { await Config.handleConfig(config); })();
+
+    Users.initializeDefaultUser();
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -105,7 +118,7 @@ class App
     this.app.use(convert(session()));
 
     this.app.use(Middleware.bodyParser());
-    this.app.use(Middleware.favicon('../src/app/favicon.ico'));
+    this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());
@@ -117,9 +130,14 @@ class App
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
   }
 
-  public listen(port: number = CmdLineArgs.port): http.Server
+  public listen(port: number | undefined = this.config.port): http.Server
   {
     return this.app.listen(port);
+  }
+
+  public getConfig(): Config.Config
+  {
+    return this.config;
   }
 }
 

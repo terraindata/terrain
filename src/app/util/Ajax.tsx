@@ -49,7 +49,6 @@ import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
-import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 
@@ -64,24 +63,61 @@ export const Ajax =
   _reqMidway2(
     method: "post" | "get",
     url: string,
-    data: string,
-    onLoad: (response: any) => void,
+    body: object,
+    onLoad: (response: object) => void,
     config: {
+      noCredentials?: boolean,
       onError?: (response: any) => void,
       // crossDomain?: boolean;
-      noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
     } = {}
   )
   {
+    let data: object;
+    if(config.noCredentials)
+    {
+      data = body;
+      console.log('none at all', data);
+    }
+    else
+    {
+      const authState = AuthStore.getState();
+      console.log('auth state', authState);
+      data = {
+        id: authState.id,
+        accessToken: authState.accessToken,
+        body,
+      };
+    }
+    
     return Ajax._req(
       method,
       "/midway/v1/" + url,
-      data,
-      onLoad,
+      JSON.stringify(data),
+      (response) =>
+      {
+        var responseData: object = null;
+        try
+        {
+          responseData = JSON.parse(response);
+        }
+        catch(e)
+        {
+          config.onError && config.onError(e);
+        }
+        
+        if(responseData !== undefined)
+        {
+          // needs to be outside of the try/catch so that any errors it throws aren't caught
+          onLoad(responseData)
+        }
+      },
       _.extend({
         host: 'http://localhost:3000',
+        noToken: true,
+        json: true,
+        crossDomain: false,
       }, config)
     );
   },
@@ -94,22 +130,14 @@ export const Ajax =
     return Ajax._reqMidway2(
       "get",
       "status",
-      '',
-      (respStr: string) =>
+      {},
+      (resp: { status: string }) =>
       {
-        try
+        if(resp && resp.status === 'ok')
         {
-          const resp = JSON.parse(respStr);
-          if(resp && resp.status === 'ok')
-          {
-            success();
-          }
-          else
-          {
-            failure();
-          }
+          success();
         }
-        catch(e)
+        else
         {
           failure();
         }
@@ -132,12 +160,13 @@ export const Ajax =
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
+      json?: boolean;
     } = {}
   )
   {
     const host = config.host || MIDWAY_HOST;
     const fullUrl = host + url;
-    const token = AuthStore.getState().get('authenticationToken');
+    const token = AuthStore.getState().get('accessToken');
 
     if (config.download)
     {
@@ -171,7 +200,8 @@ export const Ajax =
     {
       if (xhr.status === 401)
       {
-        Actions.logout();
+        // TODO re-enable
+        // Actions.logout();
         return;
       }
 
@@ -188,6 +218,11 @@ export const Ajax =
 
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     xhr.open(method, fullUrl, true);
+    
+    if (config.json)
+    {
+      xhr.setRequestHeader('Content-Type', 'application/json');
+    }
 
     if (!config.noToken)
     {
@@ -250,60 +285,94 @@ export const Ajax =
     };
   },
 
-  saveRole: (role: RoleTypes.Role) =>
-    Ajax._post(
-      `/roles/${role.groupId}/${role.username}/${role.admin ? '1' : '0'}/${role.builder ? '1' : '0'}`,
-      '',
-      _.noop),
-
-  getRoles: (onLoad: (roles: any[]) => void) =>
-    Ajax._get('/roles/', '', (response: any) => {
-      onLoad(JSON.parse(response));
-    })
-  ,
-
   getUsers(onLoad: (users: {[id: string]: any}) => void)
   {
-    return Ajax._get('/users/', '', (response: any) =>
+    return Ajax._reqMidway2(
+      'get',
+      'users/',
+      {},
+      (response: object[]) =>
       {
-        const usersArr = JSON.parse(response);
         const usersObj = {};
-        usersArr.map((user) => usersObj[user.username] = user);
+        response.map((user) => usersObj[user['id']] = user);
         onLoad(usersObj);
+      }
+    );
+  },
+
+  saveUser(
+    user: UserTypes.User,
+    onSave: (response: any) => void,
+    onError: (response: any) => void
+  )
+  {
+    const userData = user.toJS();
+    const meta = _.extend({}, userData);
+    user.excludeFields.map((field) =>
+    {
+      delete userData[field];
+      delete meta[field];
+    });
+    user.dbFields.map(
+      (field) => delete meta[field]
+    );
+    _.map(meta,
+      (v, key) => delete userData[key]
+    );
+    userData['meta'] = JSON.stringify(meta);
+    console.log('saving', userData);
+    
+    return Ajax._reqMidway2(
+      'post',
+      `users/${user.id}`, 
+      userData,
+      onSave,
+      {
+        onError
+      }
+    );
+  },
+
+  changePassword(id: number, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
+  {
+    return Ajax._reqMidway2(
+      'post',
+      `users/${id}`,
+      {
+        oldPassword: oldPassword,
+        password: newPassword,
+      },
+      onSave,
+      {
+        onError
       });
-  },
-
-  saveUser(user: UserTypes.User, onSave: (response: any) => void, onError: (response: any) => void)
-  {
-    const data = user.toJS();
-    user.excludeFields.map((field) => delete data[field]);
-    user.dbFields.map((field) => delete data[field]);
-    return Ajax._post(`/users/${user.username}`, JSON.stringify({
-      data: JSON.stringify(data),
-    }), onSave, onError);
-  },
-
-  changePassword(username: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
-  {
-    return Ajax._post(`/users/${username}`, JSON.stringify({
-      oldpassword: oldPassword,
-      password: newPassword,
-    }), onSave, onError);
   },
 
   adminSaveUser(user: UserTypes.User)
   {
-    return Ajax._post(`/users/${user.username}`, JSON.stringify({
-      admin: user.isAdmin ? 1 : 0,
-      disabled: user.isDisabled ? 1 : 0,
-    }), _.noop);
+    return Ajax._reqMidway2(
+      'post',
+      `users/${user.id}`, 
+      {
+        isSuperUser: user.isSuperUser ? 1 : 0,
+        isDisabled: user.isDisabled ? 1 : 0,
+      },
+      _.noop
+    );
   },
 
-  createUser(username: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
+  createUser(email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
-    return Ajax._post(`/users/${username}`, JSON.stringify({
-      password,
-    }), onSave, onError);
+    return Ajax._reqMidway2(
+      'post',
+      `users`,
+      {
+        email,
+        password,
+      },
+      onSave,
+      onError
+    );
   },
 
   getItems(
@@ -322,7 +391,7 @@ export const Ajax =
         groups: {},
         groupsOrder: [],
       };
-      const keys = ['groups', 'algorithms', 'variants'];
+      const keys = ['id', 'meta', 'name', 'parent', 'status', 'type'];
       keys.map((key) =>
         items[key].map((item) =>
         {
@@ -346,22 +415,24 @@ export const Ajax =
     return Ajax._get(`/items/${id}`, '', (response: any) =>
     {
       // TODO change if the middle tier format changes
-      const r = JSON.parse(response);
-      const all = r && r[type + 's'];
-      const item = all && all.find((i) => i.id === id);
-      if (item)
-      {
-        _.extend(item, JSON.parse(item.data));
-        delete item.data;
-      }
-      onLoad(item);
+      // const r = JSON.parse(response);
+      // const all = r && r[type + 's'];
+      // const item = all && all.find((i) => i.id === id);
+      // if (item)
+      // {
+      //   _.extend(item, JSON.parse(item.data));
+      //   delete item.data;
+      // }
+      // onLoad(item);
+      onLoad(JSON.parse(response));
     }, onError);
   },
 
   getVariant(variantId: ID, onLoad: (variant: LibraryTypes.Variant) => void)
   {
-    if (variantId.indexOf('@') === -1)
-    {
+    // TODO
+    // if (variantId.indexOf('@') === -1)
+    // {
       return Ajax.getItem(
         'variant',
         variantId,
@@ -370,74 +441,79 @@ export const Ajax =
           onLoad(LibraryTypes._Variant(variantData));
         },
       );
-    }
-    else
-    {
-      return Ajax.getVariantVersion(
-        variantId,
-        onLoad,
-      );
-    }
+    // }
+    // else
+    // {
+    //   // TODO
+    //   // return Ajax.getVariantVersion(
+    //   //   variantId,
+    //   //   onLoad,
+    //   // );
+    // }
   },
 
-  getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
+  getVersions(id: ID, onLoad: (versions: any) => void)
   {
-    const url = '/variant_versions/' + variantId;
+    const url = '/versions/' + id;
     return Ajax._get(url, '', (response: any) =>
     {
-      const variantVersions = JSON.parse(response);
-      onLoad(variantVersions);
+      const versions = JSON.parse(response);
+      onLoad(versions);
     });
   },
 
-  getVariantVersion(variantId: ID, onLoad: (variantVersion: any) => void)
+  getVersion(id: ID, onLoad: (version: any) => void)
   {
-    if (!variantId || variantId.indexOf('@') === -1)
-    {
-      onLoad(null);
-      return null;
-    }
+    // TODO
+    onLoad(null);
+    return null;
+    
+    // if (!id || id.indexOf('@') === -1)
+    // {
+    //   onLoad(null);
+    //   return null;
+    // }
 
-    // viewing an old version
-    const pieces = variantId.split('@');
-    const originalVariantId = pieces[0];
-    const versionId = pieces[1];
+    // // viewing an old version
+    // const pieces = id.split('@');
+    // const originalId = pieces[0];
+    // const versionId = pieces[1];
 
-    const url = '/variant_versions/' + originalVariantId;
-    return Ajax._get(
-      url,
-      '',
-      (response: any) =>
-      {
-        const version = JSON.parse(response).find((version) => version.id === versionId);
-        if (version)
-        {
-          const data = JSON.parse(version.data);
-          Ajax.getVariant(originalVariantId, (v: LibraryTypes.Variant) =>
-          {
-            if (v)
-            {
-              data['id'] = v.id;
-              data['groupId'] = v.groupId;
-              data['status'] = v.status;
-              data['algorithmId'] = v.algorithmId;
-              data['version'] = true;
+    // const url = '/versions/' + originalId;
+    // return Ajax._get(
+    //   url,
+    //   '',
+    //   (response: any) =>
+    //   {
+    //     const version = JSON.parse(response).find((version) => version.id === versionId);
+    //     if (version)
+    //     {
+    //       const data = JSON.parse(version.data);
+    //       Ajax.getVariant(originalId, (v: LibraryTypes.Variant) =>
+    //       {
+    //         if (v)
+    //         {
+    //           data['id'] = v.id;
+    //           data['createdByUserId'] = v.createdByUserId;
+    //           data['object'] = v['object'];
+    //           data['objectId'] = v.objectId;
+    //           data['objectType'] = v.objectType;
 
-              onLoad(LibraryTypes._Variant(data));
-            }
-            else
-            {
-              onLoad(null);
-            }
-          });
-        }
-        else
-        {
-          onLoad(null);
-        }
-      },
-      () => onLoad(null),
-    );
+    //           onLoad(LibraryTypes._Variant(data));
+    //         }
+    //         else
+    //         {
+    //           onLoad(null);
+    //         }
+    //       });
+    //     }
+    //     else
+    //     {
+    //       onLoad(null);
+    //     }
+    //   },
+    //   () => onLoad(null),
+    // );
   },
 
   getQuery(
@@ -647,6 +723,55 @@ export const Ajax =
       (resp) =>
       {
       },
+    );
+  },
+  
+  login(
+    email: string,
+    password: string,
+    onLoad: (data: {
+      id: number,
+      accessToken: string,
+    }) => void,
+    onError: (error) => void
+  ): XMLHttpRequest
+  {
+    return Ajax._reqMidway2(
+      'post',
+      'auth/login',
+      {
+        email,
+        password,
+      },
+      onLoad,
+      {
+        onError,
+        noCredentials: true,
+      }
+    );
+  },
+  
+  checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
+  {
+    Ajax._reqMidway2(
+      'post',
+      'status/loggedIn',
+      {
+        accessToken,
+        id,
+      },
+      (data: {loggedIn: boolean}) =>
+      {
+        if (data && data.loggedIn)
+        {
+          onSuccess();
+        }
+        else
+        {
+          onError();
+        }
+      },
+      onError
     );
   },
 

@@ -118,28 +118,25 @@ class Team extends Classs<Props>
     }
 
     return (
-      <Link to={`/users/${user.username}`} className="team-link" key={user.username}>
+      <Link to={`/users/${user.id}`} className="team-link" key={user.id}>
         <div className="team-row">
           <div>
             <UserThumbnail
               large={true}
-              username={user.username}
+              userId={user.id}
               square={true}
             />
           </div>
           <div className="team-item-names">
             <div className="team-name">
               {
-                user.name()
+                user.name
               }
             </div>
             <div className="team-role">
               {
                 user.isDisabled ? <b>Disabled</b> : user.whatIDo
               }
-            </div>
-            <div className="team-username">
-              @{ user.username }
             </div>
           </div>
           <div className="team-item-info">
@@ -219,28 +216,29 @@ class Team extends Classs<Props>
 
   createNewUser()
   {
-    const username: string = this.refs['newUsername']['value'];
+    const email: string = this.refs['newEmail']['value'];
     const password: string = this.refs['newPassword']['value'];
     const confirmPassword: string = this.refs['confirmPassword']['value'];
 
-    const usernameCheck = username.replace(/[a-zA-Z]/g, '');
-    if (usernameCheck.length)
+    const emailCheck = email.length >= 5 && email.indexOf('@') > 0;
+    if (!emailCheck)
     {
       this.setState({
-        errorModalMessage: 'Only letters are allowed in the username',
+        errorModalMessage: 'Not a valid email address.',
       });
       this.toggleErrorModal();
       return;
     }
 
-    if (this.state.users.get(username))
-    {
-      this.setState({
-        errorModalMessage: 'That username is already taken',
-      });
-      this.toggleErrorModal();
-      return;
-    }
+    // TODO check that a user with that email does not already exist
+    // if (this.state.users.get(username))
+    // {
+    //   this.setState({
+    //     errorModalMessage: 'That username is already taken',
+    //   });
+    //   this.toggleErrorModal();
+    //   return;
+    // }
 
     if (password.length < 6)
     {
@@ -260,14 +258,14 @@ class Team extends Classs<Props>
       return;
     }
 
-    this.refs['newUsername']['value'] = '';
+    this.refs['newEmail']['value'] = '';
     this.refs['newPassword']['value'] = '';
     this.refs['confirmPassword']['value'] = '';
     this.setState({
       addingUser: false,
     });
 
-    Ajax.createUser(username, password, () => {
+    Ajax.createUser(email, password, () => {
       Actions.fetch();
     }, (error) => {
       this.setState({
@@ -279,10 +277,10 @@ class Team extends Classs<Props>
 
   renderAddUser()
   {
-    const username = AuthStore.getState().get('username');
-    const user = Store.getState().getIn(['users', username]) as User;
+    const userId = AuthStore.getState().id;
+    const user = Store.getState().getIn(['users', userId]) as User;
 
-    if (user && user.isAdmin)
+    if (user && user.isSuperUser)
     {
       if (this.state.addingUser)
       {
@@ -295,9 +293,9 @@ class Team extends Classs<Props>
 
             <div className="flex-container">
               <div className="flex-grow">
-                <b>Username</b> (this cannot be changed)
+                <b>Email</b>
                 <div>
-                  <input ref="newUsername" placeholder="Username" />
+                  <input ref="newEmail" placeholder="Email" />
                 </div>
               </div>
               <div className="flex-grow">

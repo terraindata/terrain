@@ -66,7 +66,7 @@ export interface Props
 {
   variant: Variant;
   dbs: List<string>;
-  isAdmin: boolean;
+  isSuperUser: boolean;
   isBuilder: boolean;
 }
 
@@ -84,7 +84,7 @@ class LibraryInfoColumn extends PureClasss<Props>
       return null;
     }
 
-    const {isBuilder, isAdmin} = this.props;
+    const {isBuilder, isSuperUser} = this.props;
     const {variant} = this.props;
 
     return (
@@ -114,7 +114,7 @@ class LibraryInfoColumn extends PureClasss<Props>
                   selectedIndex={this.props.dbs && this.props.dbs.indexOf(this.props.variant.db)}
                   options={this.props.dbs}
                   onChange={this.handleDbChange}
-                  canEdit={isBuilder || isAdmin}
+                  canEdit={isBuilder || isSuperUser}
                   className="bic-db-dropdown"
                 />
               </div>
@@ -135,7 +135,7 @@ class LibraryInfoColumn extends PureClasss<Props>
               </div>
               <div className="biv-cell-second">
                 <UserThumbnail
-                  username={variant.lastUsername}
+                  userId={variant.lastUserId}
                   smallest={true}
                   showName={true}
                   link={true}

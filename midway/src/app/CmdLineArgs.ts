@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
+import { Config } from './Config';
 import cmdLineArgs = require('command-line-args');
 import cmdLineUsage = require('command-line-usage');
 
@@ -52,9 +52,9 @@ import cmdLineUsage = require('command-line-usage');
 const optionList = [
   {
     alias: 'c',
-    defaultValue: 'config.json',
+    defaultValue: 'nodeway.json',
     name: 'config',
-    type: Boolean,
+    type: String,
     typeLabel: 'file',
     description: 'Configuration file to use.',
   },
@@ -99,11 +99,6 @@ const optionList = [
   },
 ];
 
-let CmdLineArgs = cmdLineArgs(optionList,
-  {
-    partial: true,
-  });
-
 const sections = [
   {
     header: 'Nodeway',
@@ -115,17 +110,11 @@ const sections = [
   },
 ];
 
-if (CmdLineArgs.help)
-{
-  // tslint:disable-next-line
-  console.log(cmdLineUsage(sections));
-}
+export let CmdLineArgs: Config = cmdLineArgs(optionList,
+  {
+    partial: true,
+  });
 
-// load options from a configuration file, if specified.
-if (cmdLineArgs.config)
-{
-  const data = fs.readFileSync(CmdLineArgs.config, 'utf8');
-  CmdLineArgs = JSON.parse(data);
-}
+export const CmdLineUsage = cmdLineUsage(sections);
 
 export default CmdLineArgs;

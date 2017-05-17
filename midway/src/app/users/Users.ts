@@ -60,16 +60,39 @@ export interface UserConfig
   accessToken?: string;
   email: string;
   id?: number;
-  isDisabled?: boolean;
-  isSuperUser?: boolean;
-  name?: string;
+  isDisabled: number;
+  isSuperUser: number;
+  name: string;
   oldPassword?: string;
   password: string;
   timezone?: string;
+  meta?: string;
 }
 
 export class Users
 {
+  public static initializeDefaultUser()
+  {
+    // tslint:disable-next-line
+    (new Users()).create({
+      accessToken: 'ImALuser',
+      // email: 'luser@terraindata.com',
+      email: 'l',
+      isSuperUser: 1,
+      name: 'Terrain Admin',
+      password: 'l',
+      isDisabled: 0,
+      timezone: '',
+    })
+      .catch((error: string) =>
+      {
+        if (error !== 'User with email luser@terraindata.com already exists.')
+        {
+          throw new Error('Problem creating default user: ' + error);
+        }
+      });
+  }
+
   private readonly saltRounds = 10;
   private userTable: Tasty.Table;
 
@@ -87,6 +110,7 @@ export class Users
         'oldPassword',
         'password',
         'timezone',
+        'meta',
       ],
     );
   }
@@ -95,22 +119,28 @@ export class Users
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (!user.email || !user.password)
+      if (user.email === undefined || user.password === undefined)
       {
         return reject('Require both email and password for user creation');
       }
 
+      const existingUsers = await this.select([], { email: user.email });
+      if (existingUsers.length !== 0)
+      {
+        return reject('User with email ' + String(user.email) + ' already exists.');
+      }
+      
       const newUser: UserConfig =
         {
           accessToken: '',
           email: user.email,
-          isDisabled: user.isDisabled || false,
-          isSuperUser: user.isSuperUser || false,
-          name: user.name || '',
+          isDisabled: user.isDisabled,
+          isSuperUser: user.isSuperUser,
+          name: user.name,
           password: await this.hashPassword(user.password),
-          timezone: user.timezone || '',
+          timezone: user.timezone === undefined ? '' : user.timezone,
+          meta: user.meta === undefined ? '{}' : user.meta,
         };
-
       await this.upsert(newUser);
       resolve('Success');
     });
@@ -133,19 +163,25 @@ export class Users
       }
 
       // authenticate if email change or password change
-      if (user.email !== oldUser.email || user.oldPassword)
+      if (user.email !== oldUser.email || user.oldPassword !== undefined)
       {
-        if (!user.password)
+        if (user.password === undefined)
         {
           return reject('Must provide password if updating email or password');
         }
 
         user.password = await this.hashPassword(user.password);
-        if (user.oldPassword)
+        let hashedPassword: string;
+        if (user.oldPassword !== undefined)
         {
           user.oldPassword = await this.hashPassword(user.oldPassword);
+          hashedPassword = user.oldPassword;
         }
-        const hashedPassword = user.oldPassword || user.password;
+        else
+        {
+          hashedPassword = user.password;
+        }
+
         const passwordsMatch: boolean = await this.comparePassword(hashedPassword, oldUser.password);
         if (!passwordsMatch)
         {
@@ -159,6 +195,11 @@ export class Users
     });
   }
 
+  public async select(columns: string[], filter: object): Promise<UserConfig[]>
+  {
+    return App.DB.select(this.userTable, columns, filter) as Promise<UserConfig[]>;
+  }
+
   public async get(id?: number): Promise<UserConfig[]>
   {
     if (id !== undefined)
@@ -168,9 +209,9 @@ export class Users
     return App.DB.select(this.userTable, [], {}) as any;
   }
 
-  public async loginWithAccessToken(id: number, accessToken: string): Promise<UserConfig>
+  public async loginWithAccessToken(id: number, accessToken: string): Promise<UserConfig | null>
   {
-    return new Promise<UserConfig>(async (resolve, reject) =>
+    return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results: UserConfig[] = await App.DB.select(this.userTable, [], { id, accessToken }) as UserConfig[];
       if (results.length > 0)
@@ -184,37 +225,44 @@ export class Users
     });
   }
 
-  public async loginWithEmail(email: string, password: string)
+  public async loginWithEmail(email: string, password: string): Promise<UserConfig | null>
   {
-    return new Promise(async (resolve, reject) =>
+    winston.info('logging in with email ' + email + ' and password ' + password);
+    return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results: UserConfig[] = await App.DB.select(this.userTable, [], { email }) as UserConfig[];
       if (results.length === 0)
       {
-        resolve(null);
+        winston.info('none');
+        return resolve(null);
       }
       else
       {
-        const user: UserConfig = results[0] as UserConfig;
-        bcrypt.compare(password, user.password, async (err, res) =>
+        const user: UserConfig = results[0];
+        if (user.accessToken === undefined)
         {
-          if (res)
+          winston.info('no access token');
+          return resolve(null);
+        }
+        const passwordsMatch: boolean = await this.comparePassword(password, user.password);
+        if (passwordsMatch)
+        {
+          if (user.accessToken.length === 0)
           {
-            if (user.accessToken.length === 0)
-            {
-              user.accessToken = srs(
-                {
-                  length: 256,
-                });
-              await this.upsert(user);
-            }
-            resolve(user);
+            user.accessToken = srs(
+              {
+                length: 256,
+              });
+            await this.upsert(user);
           }
-          else
-          {
-            resolve(null);
-          }
-        });
+          winston.info('user');
+          resolve(user);
+        }
+        else
+        {
+          winston.info('wrong pass');
+          resolve(null);
+        }
       }
     });
   }
@@ -243,18 +291,12 @@ export class Users
 
   private async hashPassword(password: string): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      bcrypt.hash(password, this.saltRounds, Util.makePromiseCallback(resolve, reject));
-    });
+    return bcrypt.hash(password, this.saltRounds);
   }
 
   private async comparePassword(oldPassword: string, newPassword: string): Promise<boolean>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      bcrypt.compare(oldPassword, newPassword, Util.makePromiseCallback(resolve, reject));
-    });
+    return bcrypt.compare(oldPassword, newPassword);
   }
 }
 

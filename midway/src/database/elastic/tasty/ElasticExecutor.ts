@@ -134,7 +134,7 @@ export default class ElasticExecutor implements TastyExecutor
       return this.bulkUpsert(table, elements);
     }
 
-    const promises = [];
+    const promises: Array<Promise<any>> = [];
 
     for (const element of elements)
     {
@@ -179,7 +179,7 @@ export default class ElasticExecutor implements TastyExecutor
    */
   public async deleteDocumentsByID(table: TastyTable, elements: object[])
   {
-    const promises = [];
+    const promises: Array<Promise<any>> = [];
     for (const element of elements)
     {
       promises.push(
@@ -205,9 +205,9 @@ export default class ElasticExecutor implements TastyExecutor
     switch (query.op)
     {
       case 'select':
-        return await this.executeElasticTastySelectQuery(query);
+        return this.executeElasticTastySelectQuery(query);
       default:
-        throw new Error('Unknown query command ' + query);
+        throw new Error('Unknown query command ' + JSON.stringify(query));
     }
   }
 
@@ -218,7 +218,7 @@ export default class ElasticExecutor implements TastyExecutor
 
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
   {
-    const body = [];
+    const body: any[] = [];
     for (let i = 0; i < elements.length; ++i)
     {
       const element = elements[i];

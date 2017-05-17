@@ -97,16 +97,17 @@ class VariantVersions extends PureClasss<Props>
   xhr: XMLHttpRequest = null;
   fetchVariants(props)
   {
-    this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
-    {
-      if (versions)
-      {
-        versions.reverse();
-        this.setState({
-          versions,
-        });
-      }
-    });
+    // TODO
+    // this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
+    // {
+    //   if (versions)
+    //   {
+    //     versions.reverse();
+    //     this.setState({
+    //       versions,
+    //     });
+    //   }
+    // });
   }
 
   componentWillMount()
@@ -140,13 +141,13 @@ class VariantVersions extends PureClasss<Props>
     const {roles} = this.state;
     const groupId = this.props.variant.groupId;
     let role = 'Viewer';
-    if (roles && roles.getIn([groupId, version.username]))
+    if (roles && roles.getIn([groupId, version.userId]))
     {
-      if (roles && roles.getIn([groupId, version.username]).admin)
+      if (roles && roles.getIn([groupId, version.userId]).admin)
       {
         role = 'Admin';
       }
-      else if (roles && roles.getIn([groupId, version.username]).builder)
+      else if (roles && roles.getIn([groupId, version.userId]).builder)
       {
         role = 'Builder';
       }
@@ -165,7 +166,7 @@ class VariantVersions extends PureClasss<Props>
       >
         <div className="versions-table-element">
           <UserThumbnail
-            username={version.username}
+            userId={version.userId}
             small={true}
             showName={true}
             extra={role}

@@ -44,74 +44,93 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// import ElasticConfig from '../ElasticConfig';
-// import ElasticCluster from '../client/ElasticCluster';
-// import ElasticIndices from '../client/ElasticIndices';
+import * as fs from 'fs';
 import * as winston from 'winston';
+import { CmdLineUsage } from './CmdLineArgs';
+import { databases } from './database/DatabaseRouter';
+import { DatabaseConfig } from './database/Databases';
+import { UserConfig } from './users/Users';
+import * as Util from './Util';
 
-import Query from '../../../app/query/Query';
-import QueryHandler from '../../../app/query/QueryHandler';
-import { QueryResponse } from '../../../app/query/QueryRouter';
-import { ElasticQueryError, QueryError } from '../../../app/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
-import ElasticController from '../ElasticController';
-
-/**
- * Implements the QueryHandler interface for ElasticSearch
- */
-export default class ElasticQueryHandler extends QueryHandler
+export interface Config
 {
-  private controller: ElasticController;
+  config?: string;
+  port?: number;
+  db?: string;
+  dsn?: string;
+  debug?: boolean;
+  help?: boolean;
+  verbose?: boolean;
+  databases?: object[];
+}
 
-  constructor(controller: ElasticController)
+export function loadConfigFromFile(config: Config): Config
+{
+  // load options from a configuration file, if specified.
+  if (config.config !== undefined)
   {
-    super();
-    this.controller = controller;
-  }
-
-  public async handleQuery(request: Query): Promise<QueryResponse>
-  {
-    const type = request.type;
-    const body = request.body;
-
-    if (type === 'search')
+    try
     {
-      // NB: streaming not yet implemented
-      return new Promise<QueryResponse>((resolve, reject) =>
-      {
-        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
-      });
+      const settings = fs.readFileSync(config.config, 'utf8');
+      const cfgSettings = JSON.parse(settings);
+      config = Util.updateObject(config, cfgSettings);
     }
+    catch (e)
+    {
+      winston.error('Failed to read configuration settings from ' + String(config.config));
+    }
+  }
+  return config;
+}
 
-    throw new Error('Query type "' + type + '" is not currently supported.');
+export async function handleConfig(config: Config): Promise<void>
+{
+  winston.debug('Using configuration: ' + JSON.stringify(config));
+  if (config.help === true)
+  {
+    // tslint:disable-next-line
+    console.log(CmdLineUsage);
+    process.exit();
   }
 
-  private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
+  if (config.verbose === true)
   {
-    return (error: Error, response: any) =>
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'verbose';
+  }
+
+  if (config.debug === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'debug';
+  }
+
+  if (config.databases !== undefined)
+  {
+    for (const database of config.databases)
     {
-      if (error !== null && error !== undefined)
+      const db = database as DatabaseConfig;
+      const results = await databases.select([], { name: db.name });
+      if (results.length > 0 && results[0].id !== undefined)
       {
-        if (QueryError.isElasticQueryError(error))
-        {
-          const res: QueryResponse = QueryError.fromElasticQueryError(error).getMidwayErrorObject();
-          resolve(res);
-        }
-        else
-        {
-          reject(error); // this will be handled by RouteError.RouteErrorHandler
-        }
+        winston.info('Updating existing database item: ', db);
+        db.id = results[0].id;
+        await databases.upsert({} as UserConfig, db);
       }
       else
       {
-        if (typeof response !== 'object')
-        {
-          winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
-          response = { response };
-        }
-        const res: QueryResponse = { results: [response] };
-        resolve(res);
+        winston.info('Registering new database item: ', db);
+        await databases.upsert({} as UserConfig, db);
+        const insertedDB = await databases.select([], { name: db.name });
+        db.id = insertedDB[0].id;
       }
-    };
+
+      if (db.id !== undefined)
+      {
+        await databases.connect({} as UserConfig, db.id);
+      }
+    }
   }
 }
+
+export default Config;
