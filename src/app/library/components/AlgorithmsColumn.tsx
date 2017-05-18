@@ -253,11 +253,11 @@ class AlgorithmsColumn extends PureClasss<Props>
     scores.splice(0, 1); // remove Archived count
 
     const {me, roles} = this.state;
-    const canArchive = me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
+    const canArchive = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     const canDuplicate = canArchive;
-    const canDrag = canArchive; // TODO change to enable Library drag and drop
-    const canEdit = canDrag ||
-      (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    const canDrag = canArchive;
+    const canEdit = canDrag; // ||
+      //(me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -356,7 +356,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     const {algorithms} = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const {me, roles} = this.state;
-    const canCreate = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+    const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
 
     return (
       <LibraryItemCategory
@@ -373,7 +373,7 @@ class AlgorithmsColumn extends PureClasss<Props>
           ids.size === 0 && <div className="library-category-none">None</div>
         }
         {
-          status === LibraryTypes.ItemStatus.Live && canCreate &&
+          status === LibraryTypes.ItemStatus.Build && canCreate &&
             <CreateItem
               name="algorithm"
               onCreate={this.handleCreate}
