@@ -56,13 +56,13 @@ import cors = require('kcors');
 import srs = require('secure-random-string');
 
 import * as DBUtil from '../database/Util';
+import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import './Logging';
 import Middleware from './Middleware';
-import RouteError from '../error/RouteError';
 import MidwayRouter from './Router';
 import Users from './users/Users';
 

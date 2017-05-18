@@ -47,9 +47,9 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import QueryResponse from '../../src/app/query/QueryResponse';
 import { MidwayError } from '../../src/error/MidwayError';
 import QueryError from '../../src/error/QueryError';
-import QueryResponse from '../../src/app/query/QueryResponse';
 
 let server;
 
@@ -458,16 +458,11 @@ describe('Query route tests', () =>
             errors: [
               {
                 status: 404,
+                // tslint:disable-next-line:max-line-length
                 title: '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }',
               },
             ],
           });
-        // const responseObject : QueryResponse = JSON.parse(response.text) as QueryResponse;
-        // const midwayError: MidwayError = MidwayError.fromJSON(responseObject.error);
-        // expect(midwayError.getTitle())
-        //   .toEqual(
-        //     // tslint:disable-next-line:max-line-length
-        //     '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
       })
       .catch((error) =>
       {

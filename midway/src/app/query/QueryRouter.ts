@@ -51,8 +51,6 @@ import * as winston from 'winston';
 import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { MidwayErrorObject } from '../../error/MidwayError';
-import QueryError from '../../error/QueryError';
 import * as Util from '../Util';
 import { QueryHandler } from './QueryHandler';
 import QueryResponse from './QueryResponse';
