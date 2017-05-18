@@ -59,6 +59,7 @@ function getExpectedFile(): string
   return __filename.split('.')[0] + '.expected';
 }
 
+const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
 let tasty: Tasty.Tasty;
 let mysqlController: MySQLController;
 
@@ -80,7 +81,8 @@ beforeAll(async () =>
   {
     mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
     tasty = mysqlController.getTasty();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -95,7 +97,8 @@ function runTest(index: number)
     {
       const results = await tasty.getExecutor().query(SQLQueries[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
-    } catch (e)
+    }
+    catch (e)
     {
       fail(e);
     }
@@ -114,9 +117,27 @@ test('MySQL: schema', async (done) =>
   {
     const result = await tasty.schema();
     await Utils.checkResults(getExpectedFile(), 'MySQL: schema', result);
-  } catch (e)
+  }
+  catch (e)
   {
-    // fail(e);
+    fail(e);
+  }
+  done();
+});
+
+test('MySQL: insert', async (done) =>
+{
+  try
+  {
+    const movie = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    const results = await tasty.upsert(DBMovies, movie);
+    expect(results[0]).toMatchObject({ releasedate: '2017-01-01', title: 'Arrival' });
+    // TODO: fix last insert ID in MySQL
+    expect(results[0]['movieid']).toBeGreaterThanOrEqual(0);
+  }
+  catch (e)
+  {
+    fail(e);
   }
   done();
 });
@@ -126,7 +147,8 @@ afterAll(async () =>
   try
   {
     await tasty.destroy();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }

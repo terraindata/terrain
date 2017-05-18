@@ -75,7 +75,8 @@ beforeAll(async () =>
   {
     sqliteController = new SQLiteController(config, 0, 'SQLiteExecutorTests');
     tasty = sqliteController.getTasty();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -91,7 +92,8 @@ function runTest(index: number)
       const results = await tasty.getExecutor().query(SQLQueries[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
 
-    } catch (e)
+    }
+    catch (e)
     {
       fail(e);
     }
@@ -123,8 +125,9 @@ test('SQLite: insert', async (done) =>
     const movie = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
     const results = await tasty.upsert(DBMovies, movie);
     expect(results[0]).toMatchObject({ releasedate: '2017-01-01', title: 'Arrival' });
-    expect(results[0]['id']).toBeGreaterThan(0);
-  } catch (e)
+    expect(results[0]['movieid']).toBeGreaterThan(0);
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -162,7 +165,8 @@ test('SQLite: schema', async (done) =>
       },
     };
     expect(result).toEqual(expected);
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -174,7 +178,8 @@ afterAll(async () =>
   try
   {
     await tasty.destroy();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as winston from 'winston';
 
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
@@ -61,7 +62,7 @@ function getExpectedFile(): string
 let elasticController: ElasticController;
 let elasticExecutor: ElasticExecutor;
 
-const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate'], 'movies');
+const DBMovies = new Tasty.Table('data', ['movieid'], ['title', 'releasedate'], 'movies');
 
 beforeAll(async () =>
 {
@@ -86,7 +87,7 @@ test('basic query', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.fullQuery([
+    const result: any = await elasticExecutor.fullQuery([
       {
         index: 'movies',
         type: 'data',
@@ -97,10 +98,8 @@ test('basic query', async (done) =>
         size: 1,
       },
     ]);
-    // winston.info(JSON.stringify(result, null, 2));
-    // console.log(h.hits.hits.forEach(
-    //     (result) => {console.log(JSON.stringify(result, null, 2));}));
-    await Utils.checkResults(getExpectedFile(), 'basic query', result['hits']);
+
+    await Utils.checkResults(getExpectedFile(), 'basic query', result.hits);
   }
   catch (e)
   {
@@ -359,8 +358,8 @@ test('Elastic: insert', async (done) =>
     const movie = { title: 'Arrival', releasedate: new Date('01/01/17') };
     const results = await elasticController.getTasty().upsert(DBMovies, movie);
     expect(results[0]).toMatchObject(movie);
-    expect(results[0]['id']).toBeDefined();
-    expect(results[0]['id']).not.toBe('');
+    expect(results[0]['movieid']).toBeDefined();
+    expect(results[0]['movieid']).not.toBe('');
   } catch (e)
   {
     fail(e);

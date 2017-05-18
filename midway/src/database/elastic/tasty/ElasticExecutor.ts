@@ -112,9 +112,12 @@ export default class ElasticExecutor implements TastyExecutor
       case 'upsert':
         const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
         result = await this.upsertObjects(table, query.params);
+        const primaryKey = query.primaryKeys[0];
         return result.map((r) =>
         {
-          return { id: r['_id'] };
+          const obj = {};
+          obj[primaryKey] = r['_id'];
+          return obj;
         });
       default:
         throw new Error('Unknown query command ' + JSON.stringify(query));
