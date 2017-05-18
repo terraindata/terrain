@@ -61,19 +61,6 @@ export default class ElasticExecutor implements TastyExecutor
     this.client = client;
   }
 
-  /**
-   * ES specific extension -- gets the health of the ES cluster
-   */
-  public async health(): Promise<any>
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.client.cluster.health(
-        {},
-        makePromiseCallback(resolve, reject));
-    });
-  }
-
   public async schema(): Promise<TastySchema>
   {
     const result = await new Promise((resolve, reject) =>
@@ -89,23 +76,45 @@ export default class ElasticExecutor implements TastyExecutor
   /**
    * Returns the entire ES response object.
    */
-  public async fullQuery(queryObject: Elastic.SearchParams): Promise<any>
+  public async fullQuery(queries: Elastic.SearchParams[]): Promise<object>
   {
-    return new Promise((resolve, reject) =>
+    if (queries.length === 0)
     {
-      this.client.search(
-        queryObject,
-        makePromiseCallback(resolve, reject));
-    });
+      return [];
+    }
+
+    for (let i = 0; ; ++i)
+    {
+      const result = new Promise<object>((resolve, reject) =>
+      {
+        this.client.search(
+          queries[i],
+          makePromiseCallback(resolve, reject));
+      });
+
+      if (i === queries.length - 1)
+      {
+        return result;
+      }
+
+      await result;
+    }
   }
 
-  /**
-   * returns only the query hits
-   */
-  public async query(queryObject: Elastic.SearchParams)
+  public async query(query: ElasticQuery)
   {
-    const result = await this.fullQuery(queryObject);
-    return result.hits.hits;
+    let result: any;
+    switch (query.op)
+    {
+      case 'select':
+        result = await this.fullQuery(query.params as Elastic.SearchParams[]);
+        return result.hits.hits;
+      case 'upsert':
+        result = await this.upsertObjects(query.table, query.params);
+        return result;
+      default:
+        throw new Error('Unknown query command ' + JSON.stringify(query));
+    }
   }
 
   public async destroy()
@@ -135,7 +144,6 @@ export default class ElasticExecutor implements TastyExecutor
     }
 
     const promises: Array<Promise<any>> = [];
-
     for (const element of elements)
     {
       promises.push(
@@ -198,22 +206,6 @@ export default class ElasticExecutor implements TastyExecutor
         }));
     }
     await Promise.all(promises);
-  }
-
-  public async executeElasticTastyQuery(query: ElasticQuery)
-  {
-    switch (query.op)
-    {
-      case 'select':
-        return this.executeElasticTastySelectQuery(query);
-      default:
-        throw new Error('Unknown query command ' + JSON.stringify(query));
-    }
-  }
-
-  private async executeElasticTastySelectQuery(query: ElasticQuery)
-  {
-    return await this.query(query.param as Elastic.SearchParams);
   }
 
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
