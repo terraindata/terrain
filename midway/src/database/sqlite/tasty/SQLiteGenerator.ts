@@ -55,7 +55,7 @@ export default class SQLiteGenerator extends TastyGenerator
 {
   public generate(query: TastyQuery): string[]
   {
-    return new SQLiteGeneratorRunner(query).statements;
+    return new SQLiteGeneratorRunner(query).getStatements();
   }
 
   public generateString(query: TastyQuery): string
