@@ -391,7 +391,7 @@ export const Ajax =
       groups: IMMap<number, LibraryTypes.Group>,
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
       variants: IMMap<number, LibraryTypes.Variant>,
-      groupsOrder: Immutable.List<number>
+      groupsOrder: IMList<number, any>
     ) => void,
     onError?: (ev: Event) => void,
   )
@@ -469,8 +469,7 @@ export const Ajax =
       {
         if(response && response[0])
         {
-          const config = _.extend(response[0], response[0].meta);
-          const item = LibraryTypes._Item(config);
+          const item = LibraryTypes._Item(responseToRecordConfig(response[0]));
           onLoad(item);
         }
         else
@@ -605,6 +604,10 @@ export const Ajax =
     onLoad?: (resp: any) => void, onError?: (ev: Event) => void
   )
   {
+    if(item.type === LibraryTypes.ItemType.Variant)
+    {
+      item = LibraryTypes.variantForSave(item as LibraryTypes.Variant);
+    }
     const itemData = recordForSave(item);
     const id = itemData['id'];
     let route = `items/${id}`

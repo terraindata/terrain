@@ -243,28 +243,30 @@ class VariantsColumn extends Classs<Props>
     const index = this.props.variantsOrder.indexOf(id);
     const {me, roles} = this.state;
     let canEdit: boolean, canDrag: boolean;
+    canEdit = true;
+    canDrag = true;
     
-    if (me && roles)
-    {
-      canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
-        || roles.getIn([this.props.groupId, me.id, 'admin']);
-      canDrag = canEdit &&
-        (variant.status !== LibraryTypes.ItemStatus.Live ||
-          roles.getIn([this.props.groupId, me.id, 'admin']));
-    }
+    // if (me && roles)
+    // {
+    //   canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
+    //     || roles.getIn([this.props.groupId, me.id, 'admin']);
+    //   canDrag = canEdit &&
+    //     (variant.status !== LibraryTypes.ItemStatus.Live ||
+    //       roles.getIn([this.props.groupId, me.id, 'admin']));
+    // }
 
-    let role = 'Viewer';
-    if (roles && roles.getIn([this.props.groupId, variant.lastUserId]))
-    {
-      if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).admin)
-      {
-        role = 'Admin';
-      }
-      else if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).builder)
-      {
-        role = 'Builder';
-      }
-    }
+    // let role = 'Viewer';
+    // if (roles && roles.getIn([this.props.groupId, variant.lastUserId]))
+    // {
+    //   if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).admin)
+    //   {
+    //     role = 'Admin';
+    //   }
+    //   else if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).builder)
+    //   {
+    //     role = 'Builder';
+    //   }
+    // }
 
     return (
       <LibraryItem
@@ -296,7 +298,7 @@ class VariantsColumn extends Classs<Props>
         isStarred={variant.status === 'DEFAULT'}
       >
         <div className="flex-container">
-          <UserThumbnail userId={variant.lastUserId} medium={true} extra = {role}/>
+          <UserThumbnail userId={variant.lastUserId} medium={true} />
 
           <div className="flex-grow">
             <StatusDropdown
