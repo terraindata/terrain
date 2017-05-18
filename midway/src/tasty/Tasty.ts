@@ -175,7 +175,12 @@ export class Tasty
   {
     const query = new TastyQuery(table);
     query.upsert(value);
-    query.selectLastID();
+
+    const primaryKeys = table.getPrimaryKeys();
+    if ((primaryKeys.length > 0) && value[primaryKeys[0]] === undefined)
+    {
+      query.selectLastID();
+    }
 
     const generatedQuery = this.generator.generate(query);
 
