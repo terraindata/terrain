@@ -383,7 +383,7 @@ export const Ajax =
       'get',
       'items/',
       {},
-      (items: any) =>
+      (items: object[]) =>
       {
         console.log('got items', items);
 
@@ -394,6 +394,13 @@ export const Ajax =
           groups: {},
           groupsOrder: [],
         };
+        
+        items.map(
+          (itemObj) =>
+          {
+            const item = LibraryTypes._Item(itemObj);
+          }
+        );
         
         // TODO
         // const keys = ['id', 'meta', 'name', 'parent', 'status', 'type'];
