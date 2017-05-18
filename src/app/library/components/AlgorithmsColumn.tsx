@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -217,28 +219,38 @@ class AlgorithmsColumn extends PureClasss<Props>
   {
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
-    const scores = [
+    const scores = {
+      [LibraryTypes.ItemStatus.Archive]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Archive),
         name: 'Variants in Archived Status',
       },
+      [LibraryTypes.ItemStatus.Build]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Build),
         name: 'Variants in Build Status',
       },
+      [LibraryTypes.ItemStatus.Approve]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Approve),
         name: 'Variants in Approve Status',
       },
+      [LibraryTypes.ItemStatus.Live]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Live),
         name: 'Variants in Live Status',
       },
-    ];
+      [LibraryTypes.ItemStatus.Default]:
+      {
+        score: 0,
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Default),
+        name: 'Variants in Live Status',
+      },
+    };
 
     const variants = this.props.variants.filter(
       (v: Variant) =>
@@ -250,7 +262,7 @@ class AlgorithmsColumn extends PureClasss<Props>
         scores[v.status].score ++,
     );
 
-    scores.splice(0, 1); // remove Archived count
+    // scores.splice(0, 1); // remove Archived count
 
     const {me, roles} = this.state;
     const canArchive = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
@@ -325,7 +337,7 @@ class AlgorithmsColumn extends PureClasss<Props>
           <div className="flex-grow">
             <div className="library-item-line">
               <Scoreline
-                scores={scores}
+                scores={_.values(scores)}
                 hideZeroes={true}
               />
             </div>
@@ -357,7 +369,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const {me, roles} = this.state;
     const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
-
+    console.log(status, canCreate);
     return (
       <LibraryItemCategory
         status={LibraryTypes.ItemStatus[status]}

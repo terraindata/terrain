@@ -465,11 +465,18 @@ export const Ajax =
       'get',
       `items/${id}`,
       {},
-      (response: any) =>
+      (response: object[]) =>
       {
-        const config = _.extend(response, response.meta);
-        const item = LibraryTypes._Item(config);
-        onLoad(item);
+        if(response && response[0])
+        {
+          const config = _.extend(response[0], response[0].meta);
+          const item = LibraryTypes._Item(config);
+          onLoad(item);
+        }
+        else
+        {
+          onError('Nothing found' as any);
+        }
       },
       {
         onError,

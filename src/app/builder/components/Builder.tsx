@@ -390,7 +390,7 @@ class Builder extends PureClasss<Props>
 
     const variantId = this.getSelectedId(props);
     const variant = this.state.variants &&
-      this.state.variants.get(variantId);
+    this.state.variants.get(+variantId);
     if (variantId && !variant)
     {
       LibraryActions.variants.fetchVersion(variantId, () =>

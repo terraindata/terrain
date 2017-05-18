@@ -270,7 +270,7 @@ export module LibraryTypes
     }
   }
 
-  export function colorForStatus(status: ItemStatus | string): string
+  export function colorForStatus(status: ItemStatus): string
   {
     switch (status)
     {
@@ -282,7 +282,7 @@ export module LibraryTypes
         return '#00a7f7';
       case ItemStatus.Live:
         return '#48b14b';
-      case 'Default':
+      case ItemStatus.Default:
         return '#957048';
       default:
         return '#000';
