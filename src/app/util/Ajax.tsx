@@ -88,7 +88,7 @@ export const Ajax =
         body,
       };
     }
-    
+
     return Ajax._req(
       method,
       "/midway/v1/" + url,
@@ -104,7 +104,7 @@ export const Ajax =
         {
           config.onError && config.onError(e);
         }
-        
+
         if(responseData !== undefined)
         {
           // needs to be outside of the try/catch so that any errors it throws aren't caught
@@ -216,7 +216,7 @@ export const Ajax =
 
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     xhr.open(method, fullUrl, true);
-    
+
     if (config.json)
     {
       xhr.setRequestHeader('Content-Type', 'application/json');
@@ -318,10 +318,10 @@ export const Ajax =
       (v, key) => delete userData[key]
     );
     userData['meta'] = JSON.stringify(meta);
-    
+
     return Ajax._reqMidway2(
       'post',
-      `users/${user.id}`, 
+      `users/${user.id}`,
       userData,
       onSave,
       {
@@ -349,7 +349,7 @@ export const Ajax =
   {
     return Ajax._reqMidway2(
       'post',
-      `users/${user.id}`, 
+      `users/${user.id}`,
       {
         isSuperUser: user.isSuperUser ? 1 : 0,
         isDisabled: user.isDisabled ? 1 : 0,
@@ -464,7 +464,7 @@ export const Ajax =
     // TODO
     onLoad(null);
     return null;
-    
+
     // if (!id || id.indexOf('@') === -1)
     // {
     //   onLoad(null);
@@ -612,6 +612,72 @@ export const Ajax =
     );
   },
 
+  // run query, consider renaming
+  query2(
+    tql: string,
+    db: string,
+    onLoad: (response: QueryResponse) => void,
+    onError?: (ev: Event) => void,
+    sqlQuery?: boolean,
+    options: {
+      csv?: boolean,
+      csvName?: string,
+    } = {}): { xhr: XMLHttpRequest, queryId: string }
+  {
+    // kill queries running under the same id
+    // Ajax.killQueries(); // TODO add id
+
+    // const dest = '/query';
+    // temporarily disabled for M2 conversion
+    // if (options.csv)
+    // {
+    //   dest = '/query_csv';
+    // }
+    // else if (sqlQuery)
+    // {
+    //   dest = '/sql_query';
+    // }
+
+    //alert(tql);
+    const body = JSON.parse(tql);
+    // alert(JSON.stringify(body));
+
+    const unique_id = '' + Math.random();
+    return {
+      xhr:     Ajax._reqMidway2(
+        'post',
+        'query/',
+        {
+          id:          1, // not sure if this is right...
+          accessToken: 'AccessToken', // not sure if this is right...
+          type:        'search', // can be other things in the future
+          database:    0, // should be passed by caller
+          body:        body,
+          // temporarily disabled for M2 conversion
+          // db,
+          // format: options.csv ? 'csv' : undefined,
+        },
+        (resp: object) =>
+        {
+          try
+          {
+            alert(JSON.stringify(resp));
+          } catch (e)
+          {
+            onError && onError(resp as any);
+            return;
+          }
+          onLoad(resp);
+        },
+        {
+          onError,
+          //contentType : 'application/json',
+        }
+      ),
+      queryId: unique_id,
+    };
+  },
+
   parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
   {
     return Ajax._postMidway1('/get_tql_tree', {
@@ -722,7 +788,7 @@ export const Ajax =
       },
     );
   },
-  
+
   login(
     email: string,
     password: string,
@@ -747,7 +813,7 @@ export const Ajax =
       }
     );
   },
-  
+
   checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
   {
     Ajax._reqMidway2(

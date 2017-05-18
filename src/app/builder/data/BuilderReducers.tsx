@@ -319,14 +319,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           .set('tqlCardsInSync', false)
           .set('parseTreeError', null),
       )
-      .set('parseTreeReq',
-        Ajax.parseTree(
-          action.payload.tql,
-          state.db,
-          Actions.parseTreeLoaded,
-          Actions.parseTreeError,
-        ).xhr,
-      );
+      // .set('parseTreeReq',  // for SQL parsing
+      //   Ajax.parseTree(
+      //     action.payload.tql,
+      //     state.db,
+      //     Actions.parseTreeLoaded,
+      //     Actions.parseTreeError,
+      //   ).xhr,
+      // );
   },
 
 [ActionTypes.parseTreeLoaded]:

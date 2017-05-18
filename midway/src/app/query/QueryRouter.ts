@@ -65,13 +65,24 @@ export interface QueryResultObject
 
 export type QueryResponse = MidwayErrorObject | QueryResultObject;
 
+// QueryRouter.post(
+//   '/',
+//   passport.authenticate('access-token-local'),
+//   async (ctx, next) =>
+//   {
+//     const query: Query = ctx.request.body.body as Query;
+//
+//     winston.info(JSON.stringify(query, null, 1));
+//     Util.verifyParameters(query, ['database', 'type', 'body']);
 QueryRouter.post(
   '/',
   passport.authenticate('access-token-local'),
   async (ctx, next) =>
   {
-    const query: Query = ctx.request.body as Query;
+    winston.info(JSON.stringify(ctx.request, null, 1));
+    const query: Query = ctx.request.body.body as Query;
 
+    winston.info(JSON.stringify(ctx.request.body, null, 1));
     Util.verifyParameters(query, ['database', 'type', 'body']);
 
     winston.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
