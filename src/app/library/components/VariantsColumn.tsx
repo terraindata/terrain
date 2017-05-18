@@ -293,7 +293,7 @@ class VariantsColumn extends Classs<Props>
         canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
-        isStarred={variant.isDefault}
+        isStarred={variant.status === 'DEFAULT'}
       >
         <div className="flex-container">
           <UserThumbnail userId={variant.lastUserId} medium={true} extra = {role}/>
@@ -354,12 +354,12 @@ class VariantsColumn extends Classs<Props>
         {
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
-              (archived ? this.hasStatus(id, LibraryTypes.ItemStatus.Archive) : !this.hasStatus(id, LibraryTypes.ItemStatus.Archive))
+              (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
               && this.renderVariant(id, fadeIndex ++),
           )
         }
         {
-          this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, LibraryTypes.ItemStatus.Archive) : !this.hasStatus(id, LibraryTypes.ItemStatus.Archive))
+          this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
           ? null
           : <div className="library-category-none">None</div>
         }

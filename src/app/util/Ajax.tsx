@@ -51,6 +51,7 @@ import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
+import {recordForSave, responseToRecordConfig} from '../Classes';
 
 export interface QueryResponse
 {
@@ -163,7 +164,7 @@ export const Ajax =
   )
   {
     const host = config.host || MIDWAY_HOST;
-    const fullUrl = host + url;
+    let fullUrl = host + url;
     const token = AuthStore.getState().get('accessToken');
 
     if (config.download)
@@ -215,6 +216,15 @@ export const Ajax =
     };
 
     // NOTE: MIDWAY_HOST will be replaced by the build process.
+    if (method === 'get')
+    {
+      try {
+        const dataObj = JSON.parse(data);
+        fullUrl += '?' + $.param(dataObj);
+      }
+      catch (e) {}
+    }
+    
     xhr.open(method, fullUrl, true);
     
     if (config.json)
@@ -292,7 +302,12 @@ export const Ajax =
       (response: object[]) =>
       {
         const usersObj = {};
-        response.map((user) => usersObj[user['id']] = user);
+        response.map(
+          (user) =>
+          {
+            usersObj[user['id']] = responseToRecordConfig(user)
+          }
+        );
         onLoad(usersObj);
       }
     );
@@ -304,20 +319,7 @@ export const Ajax =
     onError: (response: any) => void
   )
   {
-    const userData = user.toJS();
-    const meta = _.extend({}, userData);
-    user.excludeFields.map((field) =>
-    {
-      delete userData[field];
-      delete meta[field];
-    });
-    user.dbFields.map(
-      (field) => delete meta[field]
-    );
-    _.map(meta,
-      (v, key) => delete userData[key]
-    );
-    userData['meta'] = JSON.stringify(meta);
+    const userData = recordForSave(user);
     
     return Ajax._reqMidway2(
       'post',
@@ -377,68 +379,87 @@ export const Ajax =
     onError?: (ev: Event) => void,
   )
   {
-    return Ajax._get('/items/', '', (response: any) =>
-    {
-      const items = JSON.parse(response);
-
-      const mapping =
+    return Ajax._reqMidway2(
+      'get',
+      'items/',
+      {},
+      (items: any) =>
       {
-        variants: {},
-        algorithms: {},
-        groups: {},
-        groupsOrder: [],
-      };
-      const keys = ['id', 'meta', 'name', 'parent', 'status', 'type'];
-      keys.map((key) =>
-        items[key].map((item) =>
+        console.log('got items', items);
+
+        const mapping =
         {
-          const data = item.data && item.data.length ? item.data : '{}';
-          item = _.extend({}, JSON.parse(item.data), item);
-          delete item.data;
-          mapping[key][item.id] = item;
-          if (key === 'groups')
-          {
-            mapping.groupsOrder.push(item.id);
-          }
-        }),
-      );
+          variants: {},
+          algorithms: {},
+          groups: {},
+          groupsOrder: [],
+        };
+        
+        // TODO
+        // const keys = ['id', 'meta', 'name', 'parent', 'status', 'type'];
+        // keys.map((key) =>
+        //   items[key].map((item) =>
+        //   {
+        //     const data = item.data && item.data.length ? item.data : '{}';
+        //     item = _.extend({}, JSON.parse(item.data), item);
+        //     delete item.data;
+        //     mapping[key][item.id] = item;
+        //     if (key === 'groups')
+        //     {
+        //       mapping.groupsOrder.push(item.id);
+        //     }
+        //   }),
+        // );
 
-      onLoad(mapping.groups, mapping.algorithms, mapping.variants, mapping.groupsOrder);
-    }, onError);
+        onLoad(mapping.groups, mapping.algorithms, mapping.variants, mapping.groupsOrder);
+      },
+      {
+        onError
+      }
+    );
   },
 
-  getItem(type: string, id: ID, onLoad: (item: any) => void, onError?: (ev: Event) => void)
+  getItem(
+    type: LibraryTypes.ItemType,
+    id: ID,
+    onLoad: (item: LibraryTypes.Item) => void,
+    onError?: (ev: Event) => void
+  )
   {
-    return Ajax._get(`/items/${id}`, '', (response: any) =>
-    {
-      // TODO change if the middle tier format changes
-      // const r = JSON.parse(response);
-      // const all = r && r[type + 's'];
-      // const item = all && all.find((i) => i.id === id);
-      // if (item)
-      // {
-      //   _.extend(item, JSON.parse(item.data));
-      //   delete item.data;
-      // }
-      // onLoad(item);
-      onLoad(JSON.parse(response));
-    }, onError);
+    return Ajax._reqMidway2(
+      'get',
+      `items/${id}`,
+      {},
+      (response: any) =>
+      {
+        console.log('got response', response);
+        const config = _.extend(response, response.meta);
+        const item = LibraryTypes._Item(config);
+        console.log(item);
+        onLoad(item);
+      },
+      {
+        onError,
+      });
   },
 
-  getVariant(variantId: ID, onLoad: (variant: LibraryTypes.Variant) => void)
+  getVariant(
+    variantId: ID,
+    onLoad: (variant: LibraryTypes.Variant) => void
+  )
   {
+    return Ajax.getItem(
+      'VARIANT',
+      variantId,
+      (variantItem: LibraryTypes.Item) =>
+      {
+        onLoad(variantItem as LibraryTypes.Variant);
+      },
+    );
+  // }
     // TODO
     // if (variantId.indexOf('@') === -1)
     // {
-      return Ajax.getItem(
-        'variant',
-        variantId,
-        (variantData: Object) =>
-        {
-          onLoad(LibraryTypes._Variant(variantData));
-        },
-      );
-    // }
     // else
     // {
     //   // TODO
@@ -451,12 +472,14 @@ export const Ajax =
 
   getVersions(id: ID, onLoad: (versions: any) => void)
   {
-    const url = '/versions/' + id;
-    return Ajax._get(url, '', (response: any) =>
-    {
-      const versions = JSON.parse(response);
-      onLoad(versions);
-    });
+    // TODO
+    
+    // const url = '/versions/' + id;
+    // return Ajax._get(url, '', (response: any) =>
+    // {
+    //   const versions = JSON.parse(response);
+    //   onLoad(versions);
+    // });
   },
 
   getVersion(id: ID, onLoad: (version: any) => void)
@@ -524,37 +547,43 @@ export const Ajax =
     }
 
     // TODO change if we store queries separate from variants
-    const load = (v: LibraryTypes.Variant) =>
-    {
-      if (!v || !v.query)
-      {
-        onLoad(null, v);
-      }
-      onLoad(v.query, v);
-    };
-
     return Ajax.getVariant(
       variantId,
-      load,
+      (v: LibraryTypes.Variant) =>
+      {
+        if (!v || !v.query)
+        {
+          onLoad(null, v);
+        }
+        onLoad(v.query, v);
+      }
     );
   },
 
-  saveItem(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
+  saveItem(
+    item: LibraryTypes.Item,
+    onLoad?: (resp: any) => void, onError?: (ev: Event) => void
+  )
   {
-    const id = item.get('id');
-    const type = item.get('type');
-    const obj = {
-      data: {},
-    };
-    item.get('dbFields').map((field) =>
-      obj[field] = Util.asJS(item.get(field)),
-    );
-    item.get('dataFields').map((field) =>
-        obj.data[field] = Util.asJS(item.get(field)),
-    );
-    obj.data = JSON.stringify(obj.data);
+    const itemData = recordForSave(item);
+    const id = itemData['id'];
+    let route = `items/${id}`
+    if(id === -1)
+    {
+      delete itemData['id'];
+      route = "items";
+    }
     onLoad = onLoad || _.noop;
-    return Ajax._req('POST', `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
+    
+    return Ajax._reqMidway2(
+      'post',
+      route,
+      itemData,
+      onLoad,
+      {
+        onError,
+      }
+    );
   },
 
   // run query, consider renaming

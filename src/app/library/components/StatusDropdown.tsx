@@ -94,13 +94,7 @@ class StatusDropdown extends PureClasss<Props>
   handleChange(index: number)
   {
     let status = this.getOrder()[index];
-    let isDefault = false;
-    if (status === DEFAULT)
-    {
-      status = Status.Live;
-      isDefault = true;
-    }
-    LibraryActions.variants.status(this.props.variant, status as Status, false, isDefault);
+    LibraryActions.variants.status(this.props.variant, status as Status, false);
   }
 
   canEdit(): boolean
@@ -116,7 +110,7 @@ class StatusDropdown extends PureClasss<Props>
 
     if (!this.canEdit())
     {
-      if (variant.isDefault)
+      if (variant.status === 'DEFAULT')
       {
         return LockedOptionDefault;
       }
@@ -149,12 +143,7 @@ class StatusDropdown extends PureClasss<Props>
       return 0;
     }
 
-    const {status, isDefault} = this.props.variant;
-
-    if (isDefault)
-    {
-      return this.getOrder().indexOf(DEFAULT);
-    }
+    const {status} = this.props.variant;
 
     return this.getOrder().indexOf(status);
   }
@@ -226,7 +215,7 @@ function getOption(status: Status | string)
         className="status-dropdown-option-text"
       >
         {
-          LibraryTypes.nameForStatus(status)
+          LibraryTypes.nameForStatus(status as LibraryTypes.ItemStatus)
         }
       </div>
     </div>

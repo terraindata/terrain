@@ -115,14 +115,17 @@ export module UserTypes
       return user.imgSrc;
     }
     
-    let index: number;
-    if (typeof user.id === 'string')
+    let index: number = 0;
+    if (user)
     {
-      index = (user.id.charCodeAt(0) % numProfileImages) + 1;
-    }
-    if (typeof user.id === 'number')
-    {
-      index = (user.id % numProfileImages) + 1;
+      if (typeof user.id === 'string')
+      {
+        index = (user.id.charCodeAt(0) % numProfileImages) + 1;
+      }
+      if (typeof user.id === 'number')
+      {
+        index = (user.id % numProfileImages) + 1;
+      }
     }
     
     return '/dist/profiles/profile' + index + '.jpg';

@@ -79,8 +79,7 @@ class LibraryStateC
 
   changingStatus: boolean = false;
   changingStatusOf: LibraryTypes.Variant = null;
-  changingStatusTo: LibraryTypes.ItemStatus = 0;
-  changingStatusDefault: boolean = false;
+  changingStatusTo: LibraryTypes.ItemStatus = 'BUILD';
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}

@@ -82,7 +82,7 @@ class DeployModal extends PureClasss<Props>
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        const {changingStatus, changingStatusOf, changingStatusTo, changingStatusDefault} = state;
+        const {changingStatus, changingStatusOf, changingStatusTo} = state;
         if (
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
@@ -92,7 +92,7 @@ class DeployModal extends PureClasss<Props>
             changingStatus,
             changingStatusOf,
             changingStatusTo,
-            defaultChecked: changingStatusDefault,
+            defaultChecked: changingStatusTo === 'DEFAULT',
           });
         }
       },
@@ -108,7 +108,7 @@ class DeployModal extends PureClasss<Props>
   handleDeploy()
   {
     LibraryActions.variants.status(
-      this.state.changingStatusOf, this.state.changingStatusTo, true, this.state.defaultChecked,
+      this.state.changingStatusOf, this.state.changingStatusTo, true
     );
   }
 
@@ -161,7 +161,7 @@ class DeployModal extends PureClasss<Props>
     {
       const libraryState = LibraryStore.getState();
       defaultVariant = libraryState.variants.find(
-        (v) => v.algorithmId === changingStatusOf.algorithmId && v.isDefault,
+        (v) => v.algorithmId === changingStatusOf.algorithmId && v.status === 'DEFAULT',
       );
     }
 

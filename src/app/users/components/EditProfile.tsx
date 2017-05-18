@@ -87,13 +87,8 @@ class Profile extends Classs<Props>
 
   infoKeys = [
     {
-      key: 'firstName',
-      label: 'First Name',
-      subText: '',
-    },
-    {
-      key: 'lastName',
-      label: 'Last Name',
+      key: 'name',
+      label: 'Your Name',
       subText: '',
     },
     {

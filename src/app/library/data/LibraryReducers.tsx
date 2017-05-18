@@ -255,8 +255,7 @@ LibraryReducers[ActionTypes.variants.change] =
 LibraryReducers[ActionTypes.variants.status] =
   (state, action) =>
   {
-    let {variant, status, confirmed, isDefault} = action.payload;
-    isDefault = !! isDefault;
+    let {variant, status, confirmed} = action.payload;
 
     if (variant === null)
     {
@@ -272,11 +271,10 @@ LibraryReducers[ActionTypes.variants.status] =
         .set('changingStatus', true)
         .set('changingStatusOf', variant)
         .set('changingStatusTo', status)
-        .set('changingStatusDefault', isDefault)
         ;
     }
 
-    if (isDefault)
+    if (status === 'DEFAULT')
     {
       // remove any currently default variants
       state = state.updateIn(
@@ -284,10 +282,13 @@ LibraryReducers[ActionTypes.variants.status] =
         (variants) =>
           variants.map(
             (v: LibraryTypes.Variant) =>
-              v.algorithmId === variant.algorithmId ?
-                v.set('isDefault', false)
-              :
-                v,
+            {
+              if(v.algorithmId === variant.algorithmId && v.status === 'DEFAULT')
+              {
+                return v.set('status', 'LIVE');
+              }
+              return v;
+            }
           ),
         );
     }
@@ -295,8 +296,7 @@ LibraryReducers[ActionTypes.variants.status] =
     return state
       .updateIn(
         ['variants', variant.id],
-        (v) => v.set('status', status)
-                .set('isDefault', isDefault),
+        (v) => v.set('status', status),
       )
       .set('changingStatus', false);
   };
@@ -316,7 +316,6 @@ const duplicateVariant = (variant, id, groupId?, algorithmId?) =>
     .set('groupId', groupId || variant.groupId)
     .set('algorithmId', algorithmId || variant.algorithmId)
     .set('status', LibraryTypes.ItemStatus.Build)
-    .set('isDefault', false)
     ;
 };
 

@@ -143,7 +143,7 @@ class AlgorithmsColumn extends PureClasss<Props>
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
-        .set('status', LibraryTypes.EAlgorithmStatus.Archive) as Algorithm,
+        .set('status', LibraryTypes.ItemStatus.Archive) as Algorithm,
       );
   }
 
@@ -274,7 +274,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
 
     let date = 'There are no variants';
-    let userId = 'There are no variants';
+    let userId: string | number = 'There are no variants';
     if (lastTouched) {
       date = lastTouched.lastEdited;
       userId = lastTouched.lastUserId;
@@ -344,14 +344,14 @@ class AlgorithmsColumn extends PureClasss<Props>
   handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
-    const status = LibraryTypes.EAlgorithmStatus[statusString];
+    const status = LibraryTypes.ItemStatus[statusString];
     if (a.status !== status)
     {
       Actions.algorithms.change(a.set('status', status) as Algorithm);
     }
   }
 
-  renderCategory(status: LibraryTypes.EAlgorithmStatus)
+  renderCategory(status: LibraryTypes.ItemStatus)
   {
     const {algorithms} = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
@@ -360,11 +360,11 @@ class AlgorithmsColumn extends PureClasss<Props>
 
     return (
       <LibraryItemCategory
-        status={LibraryTypes.EAlgorithmStatus[status]}
+        status={LibraryTypes.ItemStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
         type="algorithm"
-        titleHidden={status === LibraryTypes.EAlgorithmStatus.Live}
+        titleHidden={status === LibraryTypes.ItemStatus.Live}
       >
         {
           ids.map(this.renderAlgorithm)
@@ -373,7 +373,7 @@ class AlgorithmsColumn extends PureClasss<Props>
           ids.size === 0 && <div className="library-category-none">None</div>
         }
         {
-          status === LibraryTypes.EAlgorithmStatus.Live && canCreate &&
+          status === LibraryTypes.ItemStatus.Live && canCreate &&
             <CreateItem
               name="algorithm"
               onCreate={this.handleCreate}
@@ -396,8 +396,12 @@ class AlgorithmsColumn extends PureClasss<Props>
               this.props.algorithmsOrder.size ?
               (
                 <div>
-                  { this.renderCategory(LibraryTypes.EAlgorithmStatus.Live) }
-                  { this.renderCategory(LibraryTypes.EAlgorithmStatus.Archive) }
+                  {
+                    this.renderCategory('BUILD')
+                  }
+                  {
+                    this.renderCategory('ARCHIVE')
+                  }
                 </div>
               )
               :

@@ -179,7 +179,7 @@ class Settings extends Classs<Props>
       confirmPassword: '',
     });
 
-    Ajax.changePassword(userId, currentPassword, newPassword, () => {
+    Ajax.changePassword(+userId, currentPassword, newPassword, () => {
       Actions.fetch();
       this.setState({
         modalMessage: 'Your password has been changed.',

@@ -54,7 +54,27 @@ import {BaseClass, New} from '../Classes';
 
 export module LibraryTypes
 {
-  export const ItemStatus =
+  export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
+  export const ItemType: {
+    Query: ItemType;
+    Variant: ItemType;
+    Algorithm: ItemType;
+    Group: ItemType;
+  } = {
+    Query: 'QUERY',
+    Variant: 'VARIANT',
+    Algorithm: 'ALGORITHM',
+    Group: 'GROUP',
+  };
+  
+  export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT';
+  export const ItemStatus: {
+    Archive: ItemStatus;
+    Build: ItemStatus;
+    Approve: ItemStatus;
+    Live: ItemStatus;
+    Default: ItemStatus;
+  } =
   {
     Archive: 'ARCHIVE',
     Build: 'BUILD',
@@ -62,17 +82,18 @@ export module LibraryTypes
     Live: 'LIVE',
     Default: 'DEFAULT',
   };
+  
 
   
   class ItemC extends BaseClass
   {
     // TODO potentially consolidate with midway
-    id: number = 0;
+    id: ID = -1;
     parent: number = 0;
     
     name: string = '';
-    status: string = ItemStatus.Build;
-    type: string;
+    status: ItemStatus = 'BUILD';
+    type: ItemType;
     
     dbFields = ['id', 'parent', 'name', 'status', 'type'];
     excludeFields= ['dbFields', 'excludeFields'];
@@ -81,12 +102,18 @@ export module LibraryTypes
   }
   export type Item = ItemC & IRecord<ItemC>;
   export const _Item = (config?: {[key:string]: any}) => 
-    New<Item>(new ItemC(config), config);
+  {
+    if(config && typeToConstructor[config.type])
+    {
+      return New<Item>(typeToConstructor[config.type](config), config);
+    }
+    return New<Item>(new ItemC(config), config);
+  }
   
 
   class VariantC extends ItemC
   {
-    type = 'variant';
+    type = ItemType.Variant;
 
     algorithmId: number = -1;
     groupId: number = -1;
@@ -95,7 +122,7 @@ export module LibraryTypes
     // TODO try super or prototype
     
     lastEdited = '';
-    lastUsername = '';
+    lastUserId = -1;
     version = false;
     db = 'urbansitter';
 
@@ -159,7 +186,7 @@ export module LibraryTypes
 
   class AlgorithmC extends ItemC
   {
-    type = 'algorithm';
+    type = ItemType.Algorithm;
     
     groupId = -1;
     
@@ -180,12 +207,8 @@ export module LibraryTypes
       // TODO
     }
     
-    if(!config)
-    
-    if(config)
-    {
-      config.variantsOrder = List(config.variantsOrder || []);
-    }
+    config = config || {};
+    config.variantsOrder = List(config.variantsOrder || []);
     return new Algorithm_Record(config) as any as Algorithm;
   };
 
@@ -203,39 +226,32 @@ export module LibraryTypes
     '#5F7D8C',
   ];
 
-  export enum EGroupStatus
+  class GroupC extends ItemC
   {
-    // This order must be consistent with Midway
-    Archive,
-    Live,
-  }
-
-  class GroupC
-  {
-    id: ID = '';
-    name = '';
+    type = ItemType.Group;
+    
     lastEdited = '';
     lastUserId = '';
     userIds = List([]);
     algorithmsOrder = List([]);
-    status = EGroupStatus.Live;
     db = 'urbansitter';
-
-    // for DB storage
-    type = 'group';
-    dbFields = ['status'];
-    dataFields = ['name', 'lastEdited', 'lastUserId', 'algorithmsOrder', 'db'];
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}
-  export const _Group = (config?: any) => {
-    config = Util.extendId(config || {});
+  export const _Group = (config: any = {}) => {
+    if(config && (!config.modelVersion || config.modelVersion === 1))
+    {
+      // from 0 and 1 to 2
+      // TODO
+    }
+    
+    config = config || {};
     config.userIds = List(config.userIds || []);
     config.algorithmsOrder = List(config.algorithmsOrder || []);
     return new Group_Record(config) as any as Group;
   };
 
-  export function nameForStatus(status: ItemStatus | string): string
+  export function nameForStatus(status: ItemStatus): string
   {
     switch (status)
     {
@@ -247,7 +263,7 @@ export module LibraryTypes
         return 'Build';
       case ItemStatus.Live:
         return 'Live';
-      case 'Default':
+      case ItemStatus.Default:
         return 'Default';
       default:
         return 'None';
@@ -272,24 +288,16 @@ export module LibraryTypes
         return '#000';
     }
   }
-
-  export function getDbFor(item: Variant | Algorithm | Group | BuilderTypes.Query): string
+  
+  export const typeToConstructor: {
+    [key: string]: (...args) => Item,
+  } =
   {
-    // TODO change when DB is at algorithm level
-    switch (item && item.type)
-    {
-      case 'query':
-        // const variantId = (item as BuilderTypes.Query).variantId;
-        return null;
-      case 'variant':
-        return (item as Variant).db;
-      case 'algorithm':
-        return null;
-      case 'group':
-      default:
-        return null;
-    }
-  }
+    [ItemType.Query]: BuilderTypes._Query,
+    [ItemType.Variant]: _Variant,
+    [ItemType.Algorithm]: _Algorithm,
+    [ItemType.Group]: _Group,
+  };
 }
 
 export default LibraryTypes;
