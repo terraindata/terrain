@@ -147,7 +147,7 @@ class Settings extends Classs<Props>
 
   createNewPassword()
   {
-    const userId: string = localStorage['id'];
+    const userId: number = localStorage['id'];
     const currentPassword: string = this.state.currentPassword;
     const newPassword: string = this.state.newPassword;
     const confirmPassword: string = this.state.confirmPassword;
@@ -362,7 +362,7 @@ class Settings extends Classs<Props>
   renderTimeZoneDescription()
   {
     let timeZone: number;
-    
+
     if (this.state.istate.currentUser)
     {
       timeZone = this.state.istate.currentUser.timeZone || 158;

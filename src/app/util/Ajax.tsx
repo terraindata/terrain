@@ -613,16 +613,13 @@ export const Ajax =
   },
 
   // run query, consider renaming
-  query2(
-    tql: string,
-    db: string,
+  query2(body: string,
+    db: string, // unused
     onLoad: (response: QueryResponse) => void,
     onError?: (ev: Event) => void,
-    sqlQuery?: boolean,
-    options: {
-      csv?: boolean,
-      csvName?: string,
-    } = {}): { xhr: XMLHttpRequest, queryId: string }
+    sqlQuery?: boolean, // unused
+    options?: object // unused
+  ): { xhr: XMLHttpRequest, queryId: string }
   {
     // kill queries running under the same id
     // Ajax.killQueries(); // TODO add id
@@ -638,44 +635,31 @@ export const Ajax =
     //   dest = '/sql_query';
     // }
 
-    //alert(tql);
-    const body = JSON.parse(tql);
-    // alert(JSON.stringify(body));
+    const bodyObject = JSON.parse(body);
 
-    const unique_id = '' + Math.random();
-    return {
-      xhr:     Ajax._reqMidway2(
-        'post',
-        'query/',
-        {
-          id:          1, // not sure if this is right...
-          accessToken: 'AccessToken', // not sure if this is right...
-          type:        'search', // can be other things in the future
-          database:    0, // should be passed by caller
-          body:        body,
-          // temporarily disabled for M2 conversion
-          // db,
-          // format: options.csv ? 'csv' : undefined,
-        },
-        (resp: object) =>
-        {
-          try
-          {
-            alert(JSON.stringify(resp));
-          } catch (e)
-          {
-            onError && onError(resp as any);
-            return;
-          }
-          onLoad(resp);
-        },
-        {
-          onError,
-          //contentType : 'application/json',
-        }
-      ),
-      queryId: unique_id,
+    const queryId = '' + Math.random();
+
+    const payload = {
+      type:     'search', // can be other things in the future
+      database: 0, // should be passed by caller
+      body:     bodyObject,
     };
+
+    const onLoadHandler = (resp: object) =>
+    {
+      console.log(resp);
+      onLoad(resp as QueryResponse);
+    };
+
+    const xhr = Ajax._reqMidway2(
+      'post',
+      'query/',
+      payload,
+      onLoadHandler,
+      {onError},
+    );
+
+    return {queryId, xhr};
   },
 
   parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
