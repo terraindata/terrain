@@ -134,6 +134,22 @@ test('SQLite: insert', async (done) =>
   done();
 });
 
+test('SQLite: insert with id', async (done) =>
+{
+  try
+  {
+    const movie = { movieid: 213213, title: 'Two One Three', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    const results = await tasty.upsert(DBMovies, movie);
+    expect(results[0]).toMatchObject({ releasedate: '2017-01-01', title: 'Two One Three' });
+    expect(results[0]['movieid']).toBe(213213);
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
+
 test('SQLite: schema', async (done) =>
 {
   try
