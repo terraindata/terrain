@@ -49,8 +49,6 @@ import * as winston from 'winston';
 import App from '../../src/app/App';
 import { MidwayError } from '../../src/app/MidwayError';
 import QueryError from '../../src/app/QueryError';
-import ElasticController from '../../src/database/elastic/ElasticController';
-import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
 let server;
 
