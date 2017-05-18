@@ -61,7 +61,7 @@ function getExpectedFile(): string
 let elasticController: ElasticController;
 let elasticExecutor: ElasticExecutor;
 
-const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate'], 'movies');
 
 beforeAll(async () =>
 {
@@ -358,9 +358,9 @@ test('Elastic: insert', async (done) =>
   {
     const movie = { title: 'Arrival', releasedate: new Date('01/01/17') };
     const results = await elasticController.getTasty().upsert(DBMovies, movie);
-    console.log(results);
-    // expect(results[0]).toMatchObject({releasedate: '2017-01-01', title: 'Arrival'});
-    // expect(results[0]['id']).toBeGreaterThan(0);
+    expect(results[0]).toMatchObject(movie);
+    expect(results[0]['id']).toBeDefined();
+    expect(results[0]['id']).not.toBe('');
   } catch (e)
   {
     fail(e);

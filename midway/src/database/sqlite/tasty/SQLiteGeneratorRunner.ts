@@ -228,7 +228,8 @@ export default class SQLiteGeneratorRunner
     }
 
     if (query.lastID === true) {
-      this.accumulateStatement('SELECT last_insert_rowid() as id');
+      const primaryKeys: string[] = query.table.getPrimaryKeys();
+      this.accumulateStatement('SELECT last_insert_rowid() as ' + primaryKeys[0]);
     }
 
     this.accumulateStatement(this.queryString);

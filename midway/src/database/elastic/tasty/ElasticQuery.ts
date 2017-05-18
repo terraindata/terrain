@@ -50,6 +50,7 @@ export interface ElasticQuery
 {
   index: string;
   table: string;
+  primaryKeys: string[];
   fields: string[];
   op: string;
   params: object[];
