@@ -63,6 +63,7 @@ interface Action<T> {
 }
 
 declare type List<T> = Immutable.List<T>;
+declare type IMList<T, K> = Immutable.List<T>; // TODO remove second arg when highlighting is fixed
 declare type IMMap<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
 declare type SetFn<T> = (f: string, v: any) => T & IRecord<T>;

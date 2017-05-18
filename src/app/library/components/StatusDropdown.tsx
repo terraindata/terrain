@@ -110,7 +110,7 @@ class StatusDropdown extends PureClasss<Props>
 
     if (!this.canEdit())
     {
-      if (variant.status === 'DEFAULT')
+      if (variant.status === LibraryTypes.ItemStatus.Default)
       {
         return LockedOptionDefault;
       }
@@ -188,7 +188,7 @@ class StatusDropdown extends PureClasss<Props>
   }
 }
 
-function getOption(status: Status | string)
+function getOption(status: Status)
 {
   return (
     <div
@@ -198,7 +198,7 @@ function getOption(status: Status | string)
       }}
     >
       {
-        status === DEFAULT
+        status === LibraryTypes.ItemStatus.Default
         ?
           <StarIcon
             className="status-dropdown-option-star"
@@ -222,11 +222,9 @@ function getOption(status: Status | string)
   );
 }
 
-const DEFAULT = 'Default';
-
 const AdminOptionsOrder =
 [
-  DEFAULT,
+  Status.Default,
   Status.Live,
   Status.Approve,
   Status.Build,
@@ -247,7 +245,7 @@ const LockedOptions = Util.mapEnum(Status, (status) =>
   return List([getOption(+status as any)]);
 });
 const LockedOptionDefault = List([
-  getOption(DEFAULT),
+  getOption(LibraryTypes.ItemStatus.Default),
 ]);
 
 export default StatusDropdown;
