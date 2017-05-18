@@ -64,7 +64,21 @@ const Actions =
   {
     create:
       () =>
-        $(ActionTypes.groups.create, {}),
+      {
+        Ajax.saveItem(
+          LibraryTypes._Group(),
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.groups.create, {
+              group: LibraryTypes._Group({
+                id,
+              })
+            });
+          }
+        );
+      },
 
     change:
       (group: Group) =>
@@ -83,7 +97,25 @@ const Actions =
   {
     create:
       (groupId: ID) =>
-        $(ActionTypes.algorithms.create, { groupId }),
+      {
+        Ajax.saveItem(
+          LibraryTypes._Algorithm({
+            parent: groupId,
+          }),
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.algorithms.create, {
+              algorithm: LibraryTypes._Algorithm({
+                id,
+                parent: groupId,
+                groupId,
+              })
+            });
+          }
+        );
+      },
 
     change:
       (algorithm: Algorithm) =>
@@ -102,7 +134,26 @@ const Actions =
   {
     create:
       (groupId: ID, algorithmId: ID) =>
-        $(ActionTypes.variants.create, { groupId, algorithmId }),
+      {
+        Ajax.saveItem(
+          LibraryTypes._Variant({
+            parent: algorithmId,
+          }),
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.variants.create, {
+              variant: LibraryTypes._Variant({
+                id,
+                parent: algorithmId,
+                groupId,
+                algorithmId,
+              })
+            });
+          }
+        );
+      },
 
     change:
       (variant: Variant) =>

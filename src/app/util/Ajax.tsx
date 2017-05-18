@@ -73,6 +73,7 @@ export const Ajax =
       // crossDomain?: boolean;
       download?: boolean;
       downloadFilename?: string;
+      urlArgs?: object;
     } = {}
   )
   {
@@ -161,6 +162,7 @@ export const Ajax =
       download?: boolean;
       downloadFilename?: string;
       json?: boolean;
+      urlArgs?: object;
     } = {}
   )
   {
@@ -215,15 +217,24 @@ export const Ajax =
 
       onLoad(xhr.responseText);
     };
-
+    
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     if (method === 'get')
     {
       try {
         const dataObj = JSON.parse(data);
         fullUrl += '?' + $.param(dataObj);
+        
+        if (config.urlArgs)
+        {
+          fullUrl += '&' + $.param(config.urlArgs);
+        }
       }
       catch (e) {}
+    }
+    else if(config.urlArgs)
+    {
+      fullUrl += '?' + $.param(config.urlArgs);
     }
     
     xhr.open(method, fullUrl, true);
@@ -391,8 +402,6 @@ export const Ajax =
       {},
       (items: object[]) =>
       {
-        console.log('got items', items);
-
         const mapping =
         {
           VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
@@ -416,8 +425,19 @@ export const Ajax =
           }
         );
         
-        console.log(mapping);
-
+        mapping.ALGORITHM = mapping.ALGORITHM.map(
+          alg => alg.set('groupId', alg.parent)
+        ).toMap();
+        
+        mapping.VARIANT = mapping.VARIANT.map(
+          v =>
+          {
+            v = v.set('algorithmId', v.parent);
+            v = v.set('groupId', mapping.ALGORITHM.get(v.algorithmId).groupId);
+            return v;
+          }
+        ).toMap();
+        
         onLoad(
           mapping.GROUP,
           mapping.ALGORITHM,
@@ -426,7 +446,10 @@ export const Ajax =
         );
       },
       {
-        onError
+        onError,
+        urlArgs: {
+          type: 'GROUP,ALGORITHM,VARIANT',
+        }
       }
     );
   },
@@ -444,10 +467,8 @@ export const Ajax =
       {},
       (response: any) =>
       {
-        console.log('got response', response);
         const config = _.extend(response, response.meta);
         const item = LibraryTypes._Item(config);
-        console.log(item);
         onLoad(item);
       },
       {

@@ -82,8 +82,10 @@ const addGroup = (state: LibraryState, group, index?: number) =>
   addItem(state, group, [], 'group', index);
 
 LibraryReducers[ActionTypes.groups.create] =
-  (state, action) =>
-    addGroup(state, LibraryTypes._Group());
+  (state, action: Action<{
+    group: LibraryTypes.Group,
+  }>) =>
+    addGroup(state, action.payload.group);
 
 LibraryReducers[ActionTypes.groups.change] =
   (state, action) =>
@@ -123,24 +125,13 @@ LibraryReducers[ActionTypes.groups.move] =
 //   }
 
 LibraryReducers[ActionTypes.algorithms.create] =
-  (state, action) =>
+  (state, action: Action<{
+    algorithm: LibraryTypes.Algorithm,
+  }>) =>
   {
-    const algId = Util.getId();
-    const db = state.groups.get(action.payload.groupId).db || undefined;
-    return addVariant(
-      addAlgorithm(
-        state,
-        LibraryTypes._Algorithm({
-          groupId: action.payload.groupId,
-          id: algId,
-          db,
-        }),
-      ),
-      LibraryTypes._Variant({
-        algorithmId: algId,
-        groupId: action.payload.groupId,
-        db,
-      }),
+    return addAlgorithm(
+      state,
+      action.payload.algorithm
     );
   };
 
@@ -173,7 +164,7 @@ LibraryReducers[ActionTypes.algorithms.move] =
 
     return addAlgorithm(
         removeAlgorithm(state, algorithm),
-        algorithm.set('groupId', groupId),
+        algorithm.set('groupId', groupId).set('parent', groupId),
         action.payload.index,
     );
   };
@@ -236,13 +227,12 @@ LibraryReducers[ActionTypes.algorithms.duplicate] =
   };
 
 LibraryReducers[ActionTypes.variants.create] =
-  (state, action) =>
-    addVariant(state,
-      LibraryTypes._Variant({
-        algorithmId: action.payload.algorithmId,
-        groupId: action.payload.groupId,
-        db: state.algorithms.get(action.payload.algorithmId).db || undefined,
-      }),
+  (state, action: Action<{
+    variant: LibraryTypes.Variant,
+  }>) =>
+    addVariant(
+      state,
+      action.payload.variant
     );
 
 LibraryReducers[ActionTypes.variants.change] =
@@ -303,11 +293,14 @@ LibraryReducers[ActionTypes.variants.status] =
 
 LibraryReducers[ActionTypes.variants.move] =
   (state, action) =>
-    addVariant(removeVariant(state, action.payload.variant),
+    addVariant(
+      removeVariant(state, action.payload.variant),
       action.payload.variant
         .set('groupId', action.payload.groupId)
-        .set('algorithmId', action.payload.algorithmId),
-      action.payload.index);
+        .set('algorithmId', action.payload.algorithmId)
+        .set('parent', action.payload.algorithmId),
+      action.payload.index
+    );
 
 const duplicateVariant = (variant, id, groupId?, algorithmId?) =>
 {
