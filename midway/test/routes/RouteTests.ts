@@ -49,30 +49,27 @@ import * as winston from 'winston';
 import App from '../../src/app/App';
 import { MidwayError } from '../../src/app/MidwayError';
 import QueryError from '../../src/app/QueryError';
-import ElasticController from '../../src/database/elastic/ElasticController';
-import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
 let server;
-let testUserAccessToken: string;
 
 beforeAll((done) =>
 {
-  winston.transports.Console.level = 'debug';
   const options =
     {
+      debug: true,
       db: 'sqlite',
       dsn: 'nodewaytest.db',
       port: 3000,
+      databases: [
+        {
+          name: 'My ElasticSearch Instance',
+          type: 'elastic',
+          dsn: 'http://127.0.0.1:9200',
+        }],
     };
 
   const app = new App(options);
   server = app.listen();
-
-  DatabaseRegistry.set(
-    0,
-    new ElasticController({
-      hosts: ['http://localhost:9200'],
-    }, 0, 'RouteTests'));
 
   request(server)
     .post('/midway/v1/users/')
@@ -90,17 +87,7 @@ beforeAll((done) =>
     })
     .end(() =>
     {
-      request(server)
-        .post('/midway/v1/auth/api_login')
-        .send({
-          email: 'test@terraindata.com',
-          password: 'Flash Flash Hundred Yard Dash',
-        })
-        .end((err, res) =>
-        {
-          testUserAccessToken = res.body.accessToken;
-          done();
-        });
+      done();
     });
 });
 
@@ -114,12 +101,12 @@ describe('User and auth route tests', () =>
         email: 'test@terraindata.com',
         password: 'Flash Flash Hundred Yard Dash',
       })
-      .expect(302)
+      .expect(200)
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(String(response));
-        expect(typeof respData['id']).toBe('string');
+        const respData = JSON.parse(response.text);
+        expect(typeof respData['id']).toBe('number');
         expect(typeof respData['accessToken']).toBe('string');
       })
       .catch((error) =>
@@ -130,11 +117,32 @@ describe('User and auth route tests', () =>
 
   test('logout, attempt login with bad accessToken, get new accessToken', async () =>
   {
+    let id: number = 0;
+    let accessToken: string = '';
     await request(server)
-      .post('/midway/v1/auth/api_logout')
+      .post('/midway/v1/auth/login')
       .send({
-        id: '2',
-        accessToken: testUserAccessToken,
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const resp = JSON.parse(response.text);
+        id = resp.id;
+        accessToken = resp.accessToken;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+      });
+
+    await request(server)
+      .post('/midway/v1/auth/logout')
+      .send({
+        id,
+        accessToken,
       })
       .expect(200)
       .then((response) =>
@@ -144,14 +152,14 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/logout request returned an error: ' + String(error));
       });
 
     await request(server)
-      .post('/midway/v1/auth/api_logout')
+      .post('/midway/v1/auth/logout')
       .send({
-        id: '2',
-        accessToken: testUserAccessToken,
+        id,
+        accessToken,
       })
       .expect(401)
       .then((response) =>
@@ -161,34 +169,16 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_logout request returned an error: ' + String(error));
-      });
-
-    await request(server)
-      .post('/midway/v1/auth/api_login')
-      .send({
-        email: 'test@terraindata.com',
-        password: 'Flash Flash Hundred Yard Dash',
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        expect(response.text)
-          .not.toBe('Unauthorized');
-        testUserAccessToken = JSON.parse(response.text).accessToken;
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/logout request returned an error: ' + String(error));
       });
   });
 });
 
 describe('Version route tests', () =>
 {
-  test('Get all versions: GET /midway/v1/versions', () =>
+  test('Get all versions: GET /midway/v1/versions', async () =>
   {
-    return request(server)
+    await request(server)
       .get('/midway/v1/versions')
       .query({
         id: 1,
@@ -211,9 +201,9 @@ describe('Version route tests', () =>
 
 describe('Item route tests', () =>
 {
-  test('Get all items: GET /midway/v1/items/', () =>
+  test('Get all items: GET /midway/v1/items/', async () =>
   {
-    return request(server)
+    await request(server)
       .get('/midway/v1/items/')
       .query({
         id: 1,
@@ -231,9 +221,9 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Create item: POST /midway/v1/items/', () =>
+  test('Create item: POST /midway/v1/items/', async () =>
   {
-    return request(server)
+    await request(server)
       .post('/midway/v1/items/')
       .send({
         id: 1,
@@ -254,9 +244,9 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Get item: GET /midway/v1/items/:id', () =>
+  test('Get item: GET /midway/v1/items/:id', async () =>
   {
-    return request(server)
+    await request(server)
       .get('/midway/v1/items/1')
       .query({
         id: 1,
@@ -274,9 +264,9 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Update item: POST /midway/v1/items/', () =>
+  test('Update item: POST /midway/v1/items/', async () =>
   {
-    return request(server)
+    await request(server)
       .post('/midway/v1/items/2')
       .send({
         id: 1,
@@ -298,9 +288,9 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Invalid update: POST /midway/v1/items/', () =>
+  test('Invalid update: POST /midway/v1/items/', async () =>
   {
-    return request(server)
+    await request(server)
       .post('/midway/v1/items/314159265359')
       .send({
         id: 1,
@@ -321,13 +311,34 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Update with invalid status: POST /midway/v1/items/', () =>
+  test('Update with invalid status: POST /midway/v1/items/', async () =>
   {
-    return request(server)
+    let id: number = 0;
+    let accessToken: string = '';
+    await request(server)
+      .post('/midway/v1/auth/login')
+      .send({
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const resp = JSON.parse(response.text);
+        id = resp.id;
+        accessToken = resp.accessToken;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+      });
+
+    await request(server)
       .post('/midway/v1/items/2')
       .send({
-        id: 2,
-        accessToken: testUserAccessToken,
+        id,
+        accessToken,
         body: {
           id: 2,
           name: 'Test Item',
@@ -348,9 +359,9 @@ describe('Item route tests', () =>
 
 describe('Schema route tests', () =>
 {
-  test('GET /midway/v1/schema/', () =>
+  test('GET /midway/v1/schema/', async () =>
   {
-    return request(server)
+    await request(server)
       .get('/midway/v1/schema/')
       .query({
         id: 1,
@@ -370,14 +381,14 @@ describe('Schema route tests', () =>
 
 describe('Query route tests', () =>
 {
-  test('Elastic Search Query Result: POST /midway/v1/query', () =>
+  test('Elastic Search Query Result: POST /midway/v1/query', async () =>
   {
-    return request(server)
+    await request(server)
       .post('/midway/v1/query/')
       .send({
         id: 1,
         accessToken: 'AccessToken',
-        database: 0,
+        database: 1,
         type: 'search',
         body: {
           index: 'movies',
@@ -401,14 +412,14 @@ describe('Query route tests', () =>
       });
   });
 
-  test('Elastic Search Query Error: POST /midway/v1/query', () =>
+  test('Elastic Search Query Error: POST /midway/v1/query', async () =>
   {
-    return request(server)
+    await request(server)
       .post('/midway/v1/query/')
       .send({
         id: 1,
         accessToken: 'AccessToken',
-        database: 0,
+        database: 1,
         type: 'search',
         body: {
           index: 'wrongindex',
@@ -436,14 +447,14 @@ describe('Query route tests', () =>
       });
   });
 
-  test('Elastic Search Route Error: POST /midway/v1/query', () =>
+  test('Elastic Search Route Error: POST /midway/v1/query', async () =>
   {
-    return request(server)
+    await request(server)
       .post('/midway/v1/query/')
       .send({
         id: 1,
         accessToken: 'AccessToken',
-        database: 0,
+        database: 1,
         type: 'wrongtype',
         body: {
           index: 'wrongindex',

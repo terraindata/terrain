@@ -62,23 +62,22 @@ export default class ElasticGeneratorRunner
   constructor(query: TastyQuery)
   {
     this.esQuery = {} as ElasticQuery;
-    const esQuery = this.esQuery;
-
-    esQuery.table = query.table;
-
+    this.esQuery.index = query.table.getDatabaseName();
+    this.esQuery.table = query.table.getTableName();
+    this.esQuery.fields = query.table.getColumnNames();
     switch (query.command.tastyType)
     {
       case (TastyNodeTypes.select):
-        esQuery.op = 'select';
-        esQuery.params = this.constructSelectQuery(query);
+        this.esQuery.op = 'select';
+        this.esQuery.params = this.constructSelectQuery(query);
         break;
       case (TastyNodeTypes.upsert):
-        esQuery.op = 'upsert';
-        esQuery.params = this.constructUpsertQuery(query);
+        this.esQuery.op = 'upsert';
+        this.esQuery.params = this.constructUpsertQuery(query);
         break;
       case (TastyNodeTypes.delete):
-        esQuery.op = 'delete';
-        esQuery.params = this.constructDeleteQuery(query);
+        this.esQuery.op = 'delete';
+        this.esQuery.params = this.constructDeleteQuery(query);
         break;
       default:
         throw new Error('Unknown command in the query:' + query.toString());
@@ -106,13 +105,13 @@ export default class ElasticGeneratorRunner
     // from clause
     if (query.numSkipped !== 0)
     {
-      queryParam['from'] = query.numSkipped;
+      queryParam.from = query.numSkipped;
     }
 
     // size clause
     if (query.numTaken !== 0)
     {
-      queryParam['size'] = query.numTaken;
+      queryParam.size = query.numTaken;
     }
 
     // start the body

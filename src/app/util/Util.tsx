@@ -131,10 +131,10 @@ const Util = {
       return false;
     }
 
-    return !! RolesStore.getState().getIn([groupId, me.userId, role]);
+    return !! RolesStore.getState().getIn([groupId, me.id, role]);
   },
 
-  canEdit(item: { type: string, id: string }, UserStore, RolesStore)
+  canEdit(item: { type: string, id: ID }, UserStore, RolesStore)
   {
     const me = UserStore.getState().get('currentUser');
     if (!me)
@@ -292,20 +292,22 @@ const Util = {
     return sign + n.toExponential(precision);
   },
 
-  getId(): ID
+  getId(isString: boolean = false): ID
   {
-    // TODO have this fetch a list of IDs from server,
-    // give IDs from that list
-    return _.range(0, 5).map((i) => chars[Util.randInt(chars.length)]).join('');
+    if(isString)
+    {
+      return _.range(0, 5).map((i) => chars[Util.randInt(chars.length)]).join('');
+    }
+    return Math.random();
   },
 
-  extendId(obj: Object): Object
+  extendId(obj: Object, isString?: boolean): Object
   {
     if (obj['id'])
     {
       return obj;
     }
-    return _.extend({}, { id: Util.getId() }, _.omit(obj, (value) => value === undefined));
+    return _.extend({}, { id: Util.getId(isString) }, _.omit(obj, (value) => value === undefined));
   },
 
   moveIndexOffset(index: number, newIndex: number): number

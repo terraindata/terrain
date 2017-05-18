@@ -147,7 +147,7 @@ class Settings extends Classs<Props>
 
   createNewPassword()
   {
-    const userId: string = localStorage['userId'];
+    const userId: string = localStorage['id'];
     const currentPassword: string = this.state.currentPassword;
     const newPassword: string = this.state.newPassword;
     const confirmPassword: string = this.state.confirmPassword;

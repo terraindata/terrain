@@ -69,7 +69,7 @@ class ResultClass extends BaseClass
 }
 export type Result = ResultClass & IRecord<ResultClass>;
 const _Result = (config: Object = {}) =>
-  New<Result>(new ResultClass(config), config);
+  New<Result>(new ResultClass(config), config, true); // generates unique IDs
 
 export type Results = List<Result>;
 

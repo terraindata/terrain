@@ -110,7 +110,8 @@ export default class ElasticExecutor implements TastyExecutor
         result = await this.fullQuery(query.params as Elastic.SearchParams[]);
         return result.hits.hits;
       case 'upsert':
-        result = await this.upsertObjects(query.table, query.params);
+        const table: TastyTable = new TastyTable(query.table, [], query.fields, query.index);
+        result = await this.upsertObjects(table, query.params);
         return result;
       default:
         throw new Error('Unknown query command ' + JSON.stringify(query));

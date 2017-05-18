@@ -27,7 +27,9 @@ fix:
 
 test-backend:
   script:
-   - yarn run test-back-all
+   - yarn run test-back-setup
+   - yarn run test-back
+   - yarn run test-back-teardown
   stage: test-backend
   artifacts:
     paths:
