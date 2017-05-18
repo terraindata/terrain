@@ -162,8 +162,14 @@ export default class ElasticExecutor implements TastyExecutor
             type: table.getTableName(),
           };
 
+          const compositePrimaryKey = this.makeID(table, element);
+          if (compositePrimaryKey !== '')
+          {
+            query['id'] = compositePrimaryKey;
+          }
+
           this.client.index(
-            query,
+            query as any,
             makePromiseCallback(resolve, reject));
         }),
       );
@@ -199,10 +205,9 @@ export default class ElasticExecutor implements TastyExecutor
       promises.push(
         new Promise((resolve, reject) =>
         {
-          const primaryKeys = table.getPrimaryKeys();
           const params =
             {
-              id: primaryKeys[0],
+              id: this.makeID(table, element),
               index: table.getDatabaseName(),
               type: table.getTableName(),
             };
@@ -240,5 +245,14 @@ export default class ElasticExecutor implements TastyExecutor
         },
         makePromiseCallback(resolve, reject));
     });
+  }
+
+  private makeID(table: TastyTable, element: object): string
+  {
+    return table.getPrimaryKeys().map(
+      (key: string) =>
+      {
+        return element[key];
+      }).join('-');
   }
 }
