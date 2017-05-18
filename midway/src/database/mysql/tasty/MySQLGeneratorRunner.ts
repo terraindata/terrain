@@ -50,10 +50,10 @@ import TastyQuery from '../../../tasty/TastyQuery';
 import SQLGenerator from '../../SQLGenerator';
 
 /**
- * Generates SQLite queries from TastyQuery objects.
- * Don't use this class directly: use SQLiteGenerator instead.
+ * Generates MySQL queries from TastyQuery objects.
+ * Don't use this class directly: use MySQLGenerator instead.
  */
-export default class SQLiteGeneratorRunner
+export default class MySQLGeneratorRunner
 {
   private generator: SQLGenerator;
 
@@ -220,12 +220,6 @@ export default class SQLiteGeneratorRunner
         this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
       }
       this.generator.queryString = '';
-
-      if (query.lastID === true)
-      {
-        const primaryKeys: string[] = query.table.getPrimaryKeys();
-        this.generator.accumulateStatement('SELECT last_insert_rowid() as ' + primaryKeys[0]);
-      }
     }
 
     this.generator.accumulateStatement(this.generator.queryString);

@@ -122,7 +122,7 @@ test('SQLite: insert', async (done) =>
   {
     const movie = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
     const results = await tasty.upsert(DBMovies, movie);
-    expect(results[0]).toMatchObject({releasedate: '2017-01-01', title: 'Arrival'});
+    expect(results[0]).toMatchObject({ releasedate: '2017-01-01', title: 'Arrival' });
     expect(results[0]['id']).toBeGreaterThan(0);
   } catch (e)
   {
