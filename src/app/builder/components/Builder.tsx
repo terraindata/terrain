@@ -515,12 +515,13 @@ class Builder extends PureClasss<Props>
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
-    Ajax.saveItem(
-      LibraryTypes.variantForSave(variant),
-      this.onSaveSuccess.bind(this, variant),
-      this.onSaveError.bind(this, variant),
-    );
-    Actions.save();
+    this.onSaveSuccess(variant);
+    // Ajax.saveItem(
+    //   LibraryTypes.variantForSave(variant),
+    //   this.onSaveSuccess.bind(this, variant),
+    //   this.onSaveError.bind(this, variant),
+    // );
+    // Actions.save();
 
     let configArr = window.location.pathname.split('/')[2].split(',');
     let currentVariant;
