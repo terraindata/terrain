@@ -85,12 +85,12 @@ test('t1', () =>
       table: 'data',
       op: 'select',
       params: [
-      {
-        index: 'movies',
-        type: 'data',
-        size: 10,
-        body: {},
-      }],
+        {
+          index: 'movies',
+          type: 'data',
+          size: 10,
+          body: {},
+        }],
     });
 });
 
