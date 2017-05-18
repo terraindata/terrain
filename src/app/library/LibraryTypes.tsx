@@ -105,9 +105,9 @@ export module LibraryTypes
   {
     if(config && typeToConstructor[config.type])
     {
-      return New<Item>(typeToConstructor[config.type](config), config);
+      return typeToConstructor[config.type](config);
     }
-    return New<Item>(new ItemC(config), config);
+    throw new Error('Unrecognized item type: ' + (config && config.type));
   }
   
 

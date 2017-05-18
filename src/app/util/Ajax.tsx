@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import * as $ from 'jquery';
 import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
@@ -375,7 +376,12 @@ export const Ajax =
   },
 
   getItems(
-    onLoad: (groups: {[id: string]: any}, algorithms: {[id: string]: any}, variants: {[id: string]: any}, groupsOrder: ID[]) => void,
+    onLoad: (
+      groups: IMMap<number, LibraryTypes.Group>,
+      algorithms: IMMap<number, LibraryTypes.Algorithm>,
+      variants: IMMap<number, LibraryTypes.Variant>,
+      groupsOrder: Immutable.List<number>
+    ) => void,
     onError?: (ev: Event) => void,
   )
   {
@@ -389,36 +395,35 @@ export const Ajax =
 
         const mapping =
         {
-          variants: {},
-          algorithms: {},
-          groups: {},
-          groupsOrder: [],
+          VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
+          ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}),
+          GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
+          QUERY: Immutable.Map<number, BuilderTypes.Query>({}),
         };
+        let groupsOrder = [];
         
         items.map(
           (itemObj) =>
           {
-            const item = LibraryTypes._Item(itemObj);
+            const item = LibraryTypes._Item(
+              responseToRecordConfig(itemObj)
+            );
+            mapping[item.type] = mapping[item.type].set(item.id, item);
+            if(item.type === LibraryTypes.ItemType.Group)
+            {
+              groupsOrder.push(item.id);
+            }
           }
         );
         
-        // TODO
-        // const keys = ['id', 'meta', 'name', 'parent', 'status', 'type'];
-        // keys.map((key) =>
-        //   items[key].map((item) =>
-        //   {
-        //     const data = item.data && item.data.length ? item.data : '{}';
-        //     item = _.extend({}, JSON.parse(item.data), item);
-        //     delete item.data;
-        //     mapping[key][item.id] = item;
-        //     if (key === 'groups')
-        //     {
-        //       mapping.groupsOrder.push(item.id);
-        //     }
-        //   }),
-        // );
+        console.log(mapping);
 
-        onLoad(mapping.groups, mapping.algorithms, mapping.variants, mapping.groupsOrder);
+        onLoad(
+          mapping.GROUP,
+          mapping.ALGORITHM,
+          mapping.VARIANT,
+          Immutable.List(groupsOrder)
+        );
       },
       {
         onError

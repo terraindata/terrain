@@ -155,37 +155,13 @@ const Actions =
   fetch:
     () =>
     {
-      Ajax.getItems((groupsData, algorithmsData, variantsData, groupsOrder) =>
+      Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
       {
-        let variants = Immutable.Map({});
-        _.map(variantsData, (variantData) => {
-          variants = variants.set(
-            variantData.id,
-            LibraryTypes._Variant(variantData),
-          );
-        });
-
-        let algorithms = Immutable.Map({});
-        _.map(algorithmsData, (algorithmData) => {
-          algorithms = algorithms.set(
-            algorithmData.id,
-            LibraryTypes._Algorithm(algorithmData),
-          );
-        });
-
-        let groups = Immutable.Map({});
-        _.map(groupsData, (groupData) => {
-          groups = groups.set(
-            groupData.id,
-            LibraryTypes._Group(groupData),
-          );
-        });
-
         Actions.loadState(_LibraryState({
           groups,
           algorithms,
           variants,
-          groupsOrder: Immutable.List(groupsOrder),
+          groupsOrder: groupsOrder,
           loading: false,
         }));
       });
