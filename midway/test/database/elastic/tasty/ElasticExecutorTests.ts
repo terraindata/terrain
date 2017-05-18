@@ -82,25 +82,11 @@ beforeAll(async () =>
   }
 });
 
-test('elastic health', async (done) =>
-{
-  try
-  {
-    const h = await elasticExecutor.health();
-    winston.debug(h);
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
-
 test('basic query', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.fullQuery(
+    const result = await elasticExecutor.fullQuery([
       {
         index: 'movies',
         type: 'data',
@@ -110,11 +96,11 @@ test('basic query', async (done) =>
         },
         size: 1,
       },
-    );
+    ]);
     // winston.info(JSON.stringify(result, null, 2));
     // console.log(h.hits.hits.forEach(
     //     (result) => {console.log(JSON.stringify(result, null, 2));}));
-    await Utils.checkResults(getExpectedFile(), 'basic query', result.hits);
+    await Utils.checkResults(getExpectedFile(), 'basic query', result['hits']);
   }
   catch (e)
   {
@@ -194,7 +180,7 @@ test('stored PWL transform sort query', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.query(
+    const result = await elasticExecutor.fullQuery([
       {
         index: 'movies',
         type: 'data',
@@ -264,9 +250,9 @@ test('stored PWL transform sort query', async (done) =>
             },
           },
         },
-      });
+      }]);
 
-    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query', result);
+    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query', result['hits']['hits']);
   }
   catch (e)
   {
@@ -279,7 +265,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.query(
+    const result = await elasticExecutor.fullQuery([
       {
         index: 'movies',
         type: 'data',
@@ -355,9 +341,9 @@ test('stored PWL transform sort query using function_score', async (done) =>
             },
           },
         },
-      });
+      }]);
 
-    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', result);
+    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', result['hits']['hits']);
   }
   catch (e)
   {

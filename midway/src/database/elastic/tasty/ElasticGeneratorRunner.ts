@@ -62,41 +62,39 @@ export default class ElasticGeneratorRunner
   constructor(query: TastyQuery)
   {
     this.esQuery = {} as ElasticQuery;
-    const esQuery = this.esQuery;
-
-    esQuery.index = query.table.getDatabaseName();
-    esQuery.table = query.table.getTableName();
-
+    this.esQuery.index = query.table.getDatabaseName();
+    this.esQuery.table = query.table.getTableName();
+    this.esQuery.fields = query.table.getColumnNames();
     switch (query.command.tastyType)
     {
       case (TastyNodeTypes.select):
-        esQuery.op = 'select';
-        esQuery.param = this.constructSelectQuery(query);
+        this.esQuery.op = 'select';
+        this.esQuery.params = this.constructSelectQuery(query);
         break;
       case (TastyNodeTypes.upsert):
-        esQuery.op = 'upsert';
-        esQuery.param = this.constructUpsertQuery(query);
+        this.esQuery.op = 'upsert';
+        this.esQuery.params = this.constructUpsertQuery(query);
         break;
       case (TastyNodeTypes.delete):
-        esQuery.op = 'delete';
-        esQuery.param = this.constructDeleteQuery(query);
+        this.esQuery.op = 'delete';
+        this.esQuery.params = this.constructDeleteQuery(query);
         break;
       default:
         throw new Error('Unknown command in the query:' + query.toString());
     }
   }
 
-  private constructDeleteQuery(query: TastyQuery): object
+  private constructDeleteQuery(query: TastyQuery): object[]
   {
     return this.constructSelectQuery(query);
   }
 
-  private constructUpsertQuery(query: TastyQuery): object
+  private constructUpsertQuery(query: TastyQuery): object[]
   {
     return query.upserts;
   }
 
-  private constructSelectQuery(query: TastyQuery): object
+  private constructSelectQuery(query: TastyQuery): object[]
   {
     const queryParam: Elastic.SearchParams = {} as Elastic.SearchParams;
 
@@ -107,13 +105,13 @@ export default class ElasticGeneratorRunner
     // from clause
     if (query.numSkipped !== 0)
     {
-      queryParam['from'] = query.numSkipped;
+      queryParam.from = query.numSkipped;
     }
 
     // size clause
     if (query.numTaken !== 0)
     {
-      queryParam['size'] = query.numTaken;
+      queryParam.size = query.numTaken;
     }
 
     // start the body
@@ -158,7 +156,7 @@ export default class ElasticGeneratorRunner
       }
     }
     queryParam['body'] = body.build();
-    return queryParam;
+    return [queryParam];
   }
 
   private accumulateFilters(body: bodybuilder, expression: TastyNode)
