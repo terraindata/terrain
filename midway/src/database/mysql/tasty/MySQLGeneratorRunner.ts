@@ -222,6 +222,12 @@ export default class MySQLGeneratorRunner
       this.generator.queryString = '';
     }
 
+    if (query.lastID === true)
+    {
+      const primaryKeys: string[] = query.table.getPrimaryKeys();
+      this.generator.accumulateStatement('SELECT LAST_INSERT_ID() as ' + primaryKeys[0]);
+    }
+
     this.generator.accumulateStatement(this.generator.queryString);
   }
 
