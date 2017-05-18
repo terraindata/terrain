@@ -47,10 +47,6 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
-import QueryResponse from '../../src/app/query/QueryResponse';
-import { MidwayError } from '../../src/error/MidwayError';
-import QueryError from '../../src/error/QueryError';
-
 let server;
 
 beforeAll((done) =>
@@ -505,8 +501,6 @@ describe('Query route tests', () =>
               },
             ],
           });
-        // const midwayError: MidwayError = MidwayError.fromJSON(response.text);
-        // expect(midwayError.getTitle()).toEqual('Route /midway/v1/query/ has an error.');
       })
       .catch((error) =>
       {
