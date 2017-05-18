@@ -190,7 +190,7 @@ describe('Version route tests', () =>
         expect(response.text)
           .toBe(
           // tslint:disable-next-line:max-line-length
-          '[{\"createdAt\":\"2017-04-28 03:32:25\",\"createdByUserId\":1,\"id\":1,\"object\":\"[object Object]\",\"objectId\":2,\"objectType\":\"items\"}]');
+          '[{"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"id":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
       })
       .catch((error) =>
       {
@@ -213,7 +213,8 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
+          // tslint:disable-next-line:max-line-length
+          .toEqual('[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"},{"id":2,"meta":"#realmusician","name":"Bob Dylan","parent":0,"status":"Hearts beatin","type":"GROUP"},{"id":3,"meta":"Are we an item?","name":"Justin Bieber","parent":0,"status":"Baby","type":"VARIANT"}]');
       })
       .catch((error) =>
       {
@@ -256,7 +257,8 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
+          // tslint:disable-next-line:max-line-length
+          .toEqual('[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"}]');
       })
       .catch((error) =>
       {

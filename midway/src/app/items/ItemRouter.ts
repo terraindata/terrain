@@ -90,7 +90,9 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     throw new Error('Invalid parameter item ID');
   }
 
-  ctx.body = await items.upsert(ctx.state.user, item);
+  await items.upsert(ctx.state.user, item);
+  const allItems = await items.get();
+  ctx.body = allItems[allItems.length - 1];
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

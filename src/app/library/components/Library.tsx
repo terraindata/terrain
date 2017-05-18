@@ -118,14 +118,17 @@ class Library extends PureClasss<any>
     const {libraryState} = this.state;
 
     const { groups, algorithms, variants, groupsOrder } = libraryState;
-    const { groupId, algorithmId, variantId } = this.props.params;
+    const { params } = this.props;
+    const groupId = +params.groupId;
+    const algorithmId = +params.algorithmId;
+    const variantId = +params.variantId;
     
     let group: LibraryTypes.Group, algorithm: LibraryTypes.Algorithm, variant: LibraryTypes.Variant;
     let algorithmsOrder: List<ID>, variantsOrder: List<ID>;
 
     if (groupId)
     {
-      group = libraryState.getIn(['groups', groupId]);
+      group = groups.get(groupId);
 
       if (group)
       {

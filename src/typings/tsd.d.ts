@@ -101,7 +101,6 @@ declare interface IMap<T>
 declare interface IRecord<T> extends IMap<T>
 {
   id: ID;
-  type: string;
 }
 
 declare type El = JSX.Element;

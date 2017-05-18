@@ -283,17 +283,17 @@ class LibraryInfoColumn extends Classs<Props>
     
     switch (item && item.type)
     {
-      case 'group':
+      case 'GROUP':
         groupId = item.id;
         opacity = 1;
         icon = <GroupIcon />;
         break;
-      case 'algorithm':
+      case 'ALGORITHM':
         groupId = item['groupId'];
         opacity = 0.75;
         icon = <AlgorithmIcon />;
         break;
-      case 'variant':
+      case 'VARIANT':
         groupId = item['groupId'];
         opacity = 0.5;
         icon = <VariantIcon />;

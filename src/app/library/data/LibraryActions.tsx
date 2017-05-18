@@ -64,7 +64,21 @@ const Actions =
   {
     create:
       () =>
-        $(ActionTypes.groups.create, {}),
+      {
+        Ajax.saveItem(
+          LibraryTypes._Group(),
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.groups.create, {
+              group: LibraryTypes._Group({
+                id,
+              })
+            });
+          }
+        );
+      },
 
     change:
       (group: Group) =>
@@ -83,7 +97,25 @@ const Actions =
   {
     create:
       (groupId: ID) =>
-        $(ActionTypes.algorithms.create, { groupId }),
+      {
+        Ajax.saveItem(
+          LibraryTypes._Algorithm({
+            parent: groupId,
+          }),
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.algorithms.create, {
+              algorithm: LibraryTypes._Algorithm({
+                id,
+                parent: groupId,
+                groupId,
+              })
+            });
+          }
+        );
+      },
 
     change:
       (algorithm: Algorithm) =>
@@ -102,7 +134,26 @@ const Actions =
   {
     create:
       (groupId: ID, algorithmId: ID) =>
-        $(ActionTypes.variants.create, { groupId, algorithmId }),
+      {
+        Ajax.saveItem(
+          LibraryTypes._Variant({
+            parent: algorithmId,
+          }),
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.variants.create, {
+              variant: LibraryTypes._Variant({
+                id,
+                parent: algorithmId,
+                groupId,
+                algorithmId,
+              })
+            });
+          }
+        );
+      },
 
     change:
       (variant: Variant) =>
@@ -117,8 +168,8 @@ const Actions =
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
 
     status:
-      (variant: Variant, status: LibraryTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
-        $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
+      (variant: Variant, status: LibraryTypes.ItemStatus, confirmed?: boolean) =>
+        $(ActionTypes.variants.status, { variant, status, confirmed }),
 
     fetchVersion:
       (variantId: string, onNoVersion: (variantId: string) => void) =>
@@ -155,37 +206,13 @@ const Actions =
   fetch:
     () =>
     {
-      Ajax.getItems((groupsData, algorithmsData, variantsData, groupsOrder) =>
+      Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
       {
-        let variants = Immutable.Map({});
-        _.map(variantsData, (variantData) => {
-          variants = variants.set(
-            variantData.id,
-            LibraryTypes._Variant(variantData),
-          );
-        });
-
-        let algorithms = Immutable.Map({});
-        _.map(algorithmsData, (algorithmData) => {
-          algorithms = algorithms.set(
-            algorithmData.id,
-            LibraryTypes._Algorithm(algorithmData),
-          );
-        });
-
-        let groups = Immutable.Map({});
-        _.map(groupsData, (groupData) => {
-          groups = groups.set(
-            groupData.id,
-            LibraryTypes._Group(groupData),
-          );
-        });
-
         Actions.loadState(_LibraryState({
           groups,
           algorithms,
           variants,
-          groupsOrder: Immutable.List(groupsOrder),
+          groupsOrder: groupsOrder,
           loading: false,
         }));
       });

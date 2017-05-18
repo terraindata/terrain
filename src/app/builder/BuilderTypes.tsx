@@ -120,8 +120,13 @@ export module BuilderTypes
   // currently, only Variants have Queries, 1:1, but that may change
   class QueryC
   {
-    id: ID = '';
-    variantId: ID = '';
+    type: 'QUERY' = 'QUERY';
+    parent: number = -1;
+    name: string = '';
+    status: 'BUILD' | 'LIVE' = 'BUILD';
+    
+    id: ID = -1;
+    variantId: number = -1;
 
     cards: ICards = List([]);
     inputs: List<any> = List([]);
@@ -131,6 +136,12 @@ export module BuilderTypes
 
     tqlCardsInSync: boolean = false;
     parseTreeError: string = null;
+    
+    
+    dbFields = ['id', 'parent', 'name', 'status', 'type'];
+    excludeFields= ['dbFields', 'excludeFields'];
+    
+    modelVersion = 2; // 2 is for the first version of Node midway
   }
   const Query_Record = Immutable.Record(new QueryC());
   export interface Query extends QueryC, IRecord<Query> {}

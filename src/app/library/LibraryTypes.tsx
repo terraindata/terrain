@@ -54,44 +54,89 @@ import {BaseClass, New} from '../Classes';
 
 export module LibraryTypes
 {
-  export enum EVariantStatus
+  export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
+  export const ItemType: {
+    Query: ItemType;
+    Variant: ItemType;
+    Algorithm: ItemType;
+    Group: ItemType;
+  } = {
+    Query: 'QUERY',
+    Variant: 'VARIANT',
+    Algorithm: 'ALGORITHM',
+    Group: 'GROUP',
+  };
+  
+  export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT';
+  export const ItemStatus: {
+    Archive: ItemStatus;
+    Build: ItemStatus;
+    Approve: ItemStatus;
+    Live: ItemStatus;
+    Default: ItemStatus;
+  } =
   {
-    // This order must be consistent with Midway
-    Archive,
-    Build,
-    Approve,
-    Live,
+    Archive: 'ARCHIVE',
+    Build: 'BUILD',
+    Approve: 'APPROVE',
+    Live: 'LIVE',
+    Default: 'DEFAULT',
+  };
+  
+
+  
+  class ItemC extends BaseClass
+  {
+    // TODO potentially consolidate with midway
+    id: ID = -1;
+    parent: number = 0;
+    
+    name: string = '';
+    status: ItemStatus = 'BUILD';
+    type: ItemType;
+    
+    dbFields = ['id', 'parent', 'name', 'status', 'type'];
+    excludeFields= ['dbFields', 'excludeFields'];
+    
+    modelVersion = 2; // 2 is for the first version of Node midway
   }
-
-  class VariantC
+  export type Item = ItemC & IRecord<ItemC>;
+  export const _Item = (config?: {[key:string]: any}) => 
   {
-    type = 'variant';
+    if(config && typeToConstructor[config.type])
+    {
+      return typeToConstructor[config.type](config);
+    }
+    throw new Error('Unrecognized item type: ' + (config && config.type));
+  }
+  
 
-    id: ID = '';
-    name = '';
+  class VariantC extends ItemC
+  {
+    type = ItemType.Variant;
+
+    algorithmId: number = -1;
+    groupId: number = -1;
+
+    excludeFields= ['dbFields', 'excludeFields', 'algorithmId', 'groupId']; 
+    // TODO try super or prototype
+    
     lastEdited = '';
-    lastUserId = '';
-    algorithmId = '';
-    groupId = '';
-    status = EVariantStatus.Build;
+    lastUserId = -1;
     version = false;
     db = 'urbansitter';
-    isDefault = false;
 
     // don't use this!
     // TODO remove when variants can be saved without queries
     query: BuilderTypes.Query = null;
-
-    // for DB storage, hopefully uneeded soon
-    dbFields = ['groupId', 'algorithmId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUserId', 'query', 'db', 'isDefault', 'modelVersion'];
-    modelVersion = 1;
-    static getDb: (v: Variant) => string;
   }
-  VariantC.getDb = (v: Variant) => v.db;
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
   export const _Variant = (config?: any) => {
+    // NOTE: we do not want a default value for the config param because
+    //  we want to know the difference between creating a new variant with
+    //  no params vs. an old version with no modelVersion param
+    
     if (config && !config.modelVersion)
     {
       // from modelVersion 0 to 1
@@ -105,8 +150,16 @@ export module LibraryTypes
         variantId: config.id,
       };
     }
+    
+    if(config.modelVersion === 1)
+    {
+      // from 1 to 2
+      // TODO if necessary
+    }
+    
+    config = config || {};
 
-    config = Util.extendId(config || {});
+    // TODO change to standalone query Item
     config.query = BuilderTypes._Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
@@ -130,33 +183,31 @@ export module LibraryTypes
     return v.set('query', BuilderTypes.queryForSave(v.query));
   }
 
-  export enum EAlgorithmStatus
-  {
-    // This order must be consistent with Midway
-    Archive,
-    Live,
-  }
 
-  class AlgorithmC
+  class AlgorithmC extends ItemC
   {
-    id: ID = '';
-    name = '';
+    type = ItemType.Algorithm;
+    
+    groupId = -1;
+    
     lastEdited = '';
-    lastUserId = '';
-    groupId = '';
-    variantsOrder = List([]);
-    status = EAlgorithmStatus.Live;
-    db = 'urbansitter';
+    lastUsername = '';
 
-    // for DB storage
-    type = 'algorithm';
-    dbFields = ['groupId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUserId', 'variantsOrder', 'db'];
+    variantsOrder = List([]);
+    db = 'urbansitter'; // TODO change
+
+    excludeFields= ['dbFields', 'excludeFields', 'groupId']; 
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
   export const _Algorithm = (config?: any) => {
-    config = Util.extendId(config || {});
+    if(config && (!config.modelVersion || config.modelVersion === 1))
+    {
+      // from 0 and 1 to 2
+      // TODO
+    }
+    
+    config = config || {};
     config.variantsOrder = List(config.variantsOrder || []);
     return new Algorithm_Record(config) as any as Algorithm;
   };
@@ -175,68 +226,61 @@ export module LibraryTypes
     '#5F7D8C',
   ];
 
-  export enum EGroupStatus
+  class GroupC extends ItemC
   {
-    // This order must be consistent with Midway
-    Archive,
-    Live,
-  }
-
-  class GroupC
-  {
-    id: ID = '';
-    name = '';
+    type = ItemType.Group;
+    
     lastEdited = '';
     lastUserId = '';
     userIds = List([]);
     algorithmsOrder = List([]);
-    status = EGroupStatus.Live;
     db = 'urbansitter';
-
-    // for DB storage
-    type = 'group';
-    dbFields = ['status'];
-    dataFields = ['name', 'lastEdited', 'lastUserId', 'algorithmsOrder', 'db'];
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}
-  export const _Group = (config?: any) => {
-    config = Util.extendId(config || {});
+  export const _Group = (config: any = {}) => {
+    if(config && (!config.modelVersion || config.modelVersion === 1))
+    {
+      // from 0 and 1 to 2
+      // TODO
+    }
+    
+    config = config || {};
     config.userIds = List(config.userIds || []);
     config.algorithmsOrder = List(config.algorithmsOrder || []);
     return new Group_Record(config) as any as Group;
   };
 
-  export function nameForStatus(status: EVariantStatus | string): string
+  export function nameForStatus(status: ItemStatus): string
   {
     switch (status)
     {
-      case EVariantStatus.Approve:
+      case ItemStatus.Approve:
         return 'Approve';
-      case EVariantStatus.Archive:
+      case ItemStatus.Archive:
         return 'Archive';
-      case EVariantStatus.Build:
+      case ItemStatus.Build:
         return 'Build';
-      case EVariantStatus.Live:
+      case ItemStatus.Live:
         return 'Live';
-      case 'Default':
+      case ItemStatus.Default:
         return 'Default';
       default:
         return 'None';
     }
   }
 
-  export function colorForStatus(status: EVariantStatus | string): string
+  export function colorForStatus(status: ItemStatus | string): string
   {
     switch (status)
     {
-      case EVariantStatus.Approve:
+      case ItemStatus.Approve:
         return '#bf5bff';
-      case EVariantStatus.Archive:
+      case ItemStatus.Archive:
         return '#ff735b';
-      case EVariantStatus.Build:
+      case ItemStatus.Build:
         return '#00a7f7';
-      case EVariantStatus.Live:
+      case ItemStatus.Live:
         return '#48b14b';
       case 'Default':
         return '#957048';
@@ -244,24 +288,16 @@ export module LibraryTypes
         return '#000';
     }
   }
-
-  export function getDbFor(item: Variant | Algorithm | Group | BuilderTypes.Query): string
+  
+  export const typeToConstructor: {
+    [key: string]: (...args) => Item,
+  } =
   {
-    // TODO change when DB is at algorithm level
-    switch (item && item.type)
-    {
-      case 'query':
-        // const variantId = (item as BuilderTypes.Query).variantId;
-        return null;
-      case 'variant':
-        return (item as Variant).db;
-      case 'algorithm':
-        return null;
-      case 'group':
-      default:
-        return null;
-    }
-  }
+    [ItemType.Query]: BuilderTypes._Query,
+    [ItemType.Variant]: _Variant,
+    [ItemType.Algorithm]: _Algorithm,
+    [ItemType.Group]: _Group,
+  };
 }
 
 export default LibraryTypes;

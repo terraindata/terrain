@@ -144,7 +144,7 @@ class VariantsColumn extends Classs<Props>
   {
     Actions.variants.change(
       this.props.variants.get(id)
-        .set('status', LibraryTypes.EVariantStatus.Archive) as Variant,
+        .set('status', LibraryTypes.ItemStatus.Archive) as Variant,
     );
   }
 
@@ -249,7 +249,7 @@ class VariantsColumn extends Classs<Props>
       canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
         || roles.getIn([this.props.groupId, me.id, 'admin']);
       canDrag = canEdit &&
-        (variant.status !== LibraryTypes.EVariantStatus.Live ||
+        (variant.status !== LibraryTypes.ItemStatus.Live ||
           roles.getIn([this.props.groupId, me.id, 'admin']));
     }
 
@@ -293,7 +293,7 @@ class VariantsColumn extends Classs<Props>
         canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
-        isStarred={variant.isDefault}
+        isStarred={variant.status === 'DEFAULT'}
       >
         <div className="flex-container">
           <UserThumbnail userId={variant.lastUserId} medium={true} extra = {role}/>
@@ -316,17 +316,17 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleVariantStatusHover(statusString: string, id: ID)
+  handlItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
-    const status = LibraryTypes.EVariantStatus[statusString];
+    const status = LibraryTypes.ItemStatus[statusString];
     if (v.status !== status)
     {
       Actions.variants.change(v.set('status', status) as Variant);
     }
   }
 
-  hasStatus(id: ID, status: LibraryTypes.EVariantStatus)
+  hasStatus(id: ID, status: LibraryTypes.ItemStatus)
   {
     return this.props.variants.getIn([id, 'status']) === status;
   }
@@ -348,18 +348,18 @@ class VariantsColumn extends Classs<Props>
         status={archived ? 'Archive' : 'Build'}
         key={archived ? '1' : '0'}
         type="variant"
-        onHover={this.handleVariantStatusHover}
+        onHover={this.handlItemStatusHover}
         titleHidden={!archived}
       >
         {
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
-              (archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
+              (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
               && this.renderVariant(id, fadeIndex ++),
           )
         }
         {
-          this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
+          this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
           ? null
           : <div className="library-category-none">None</div>
         }
