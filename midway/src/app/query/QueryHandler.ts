@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import Query from './Query';
-import { QueryResponse } from './QueryRouter';
+import QueryResponse from './QueryResponse';
 
 export abstract class QueryHandler
 {

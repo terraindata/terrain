@@ -62,7 +62,7 @@ import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import './Logging';
 import Middleware from './Middleware';
-import RouteError from './RouteError';
+import RouteError from '../error/RouteError';
 import MidwayRouter from './Router';
 import Users from './users/Users';
 
