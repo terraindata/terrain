@@ -48,7 +48,9 @@ import TastyTable from '../../../tasty/TastyTable';
 
 export interface ElasticQuery
 {
-  table: TastyTable;
+  index: string;
+  table: string;
+  fields: string[];
   op: string;
   params: object[];
 }
