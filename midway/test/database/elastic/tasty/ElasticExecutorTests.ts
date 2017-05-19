@@ -351,16 +351,24 @@ test('stored PWL transform sort query using function_score', async (done) =>
   done();
 });
 
-test('Elastic: insert', async (done) =>
+test('MySQL: upsert', async (done) =>
 {
   try
   {
-    const movie = { title: 'Arrival', releasedate: new Date('01/01/17') };
-    const results = await elasticController.getTasty().upsert(DBMovies, movie);
-    expect(results[0]).toMatchObject(movie);
-    expect(results[0]['movieid']).toBeDefined();
-    expect(results[0]['movieid']).not.toBe('');
-  } catch (e)
+    const movies: object[] = [];
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[2] = { movieid: 232323, title: 'Guardians of the Galaxy 2', releasedate: new Date('04/04/17').toISOString().substring(0, 10) };
+
+    const results: any = await elasticController.getTasty().upsert(DBMovies, movies);
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
+    {
+      expect(results[i]).toMatchObject(movies[i]);
+      expect(results[i]['movieid']).toBeGreaterThan(0);
+    }
+  }
+  catch (e)
   {
     fail(e);
   }

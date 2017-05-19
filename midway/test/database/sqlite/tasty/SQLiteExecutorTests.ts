@@ -118,30 +118,22 @@ test('tasty select', async (done) =>
   done();
 });
 
-test('SQLite: insert', async (done) =>
+test('SQLite: upsert', async (done) =>
 {
   try
   {
-    const movie = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
-    const results = await tasty.upsert(DBMovies, movie);
-    expect(results[0]).toMatchObject({ releasedate: '2017-01-01', title: 'Arrival' });
-    expect(results[0]['movieid']).toBeGreaterThan(0);
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
+    const movies: object[] = [];
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[2] = { movieid: 232323, title: 'Guardians of the Galaxy 2', releasedate: new Date('04/04/17').toISOString().substring(0, 10) };
 
-test('SQLite: insert with id', async (done) =>
-{
-  try
-  {
-    const movie = { movieid: 213213, title: 'Two One Three', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
-    const results = await tasty.upsert(DBMovies, movie);
-    expect(results[0]).toMatchObject({ releasedate: '2017-01-01', title: 'Two One Three' });
-    expect(results[0]['movieid']).toBe(213213);
+    const results: any = await tasty.upsert(DBMovies, movies);
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
+    {
+      expect(results[i]).toMatchObject(movies[i]);
+      expect(results[i]['movieid']).toBeGreaterThan(0);
+    }
   }
   catch (e)
   {
