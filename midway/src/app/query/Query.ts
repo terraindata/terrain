@@ -49,6 +49,7 @@ export interface Query
   database: number;
   type: string;
   body: object | string;
+  streaming?: boolean;
 }
 
 export default Query;

@@ -81,6 +81,7 @@ QueryRouter.post(
     winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
       'body: ' + JSON.stringify(query.body));
 
+    winston.info('database ID is ' + query.database + '  ' + Number(query.database).toString());
     const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
@@ -91,6 +92,24 @@ QueryRouter.post(
     const result: QueryResponse = await qh.handleQuery(query);
     ctx.body = result;
     ctx.status = 200;
+  });
+
+QueryRouter.get(
+  '/database/:databaseID/stream/:streamID',
+  async (ctx, next) =>
+  {
+    // fetching and streaming the results back
+    const databaseID: number = Number(ctx.params.databaseID);
+    const streamID: number = Number(ctx.params.streamID);
+    winston.info('fetching stream result database: ' + databaseID.toString() + ' stream ' + streamID.toString());
+    const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
+    if (database === undefined)
+    {
+      throw new Error('Database "' + databaseID + '" not found.');
+    }
+    const qh: QueryHandler = database.getQueryHandler();
+    ctx.type = 'text/plain'
+    ctx.body = qh.consumeStream(streamID);
   });
 
 export default QueryRouter;

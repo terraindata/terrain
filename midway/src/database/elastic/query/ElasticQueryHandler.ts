@@ -54,6 +54,8 @@ import QueryHandler from '../../../app/query/QueryHandler';
 import QueryResponse from '../../../app/query/QueryResponse';
 import QueryError from '../../../error/QueryError';
 import ElasticController from '../ElasticController';
+import ElasticsearchScrollStream = require('elasticsearch-scroll-stream');
+import {Readable} from 'stream';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -61,11 +63,16 @@ import ElasticController from '../ElasticController';
 export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
+  private streamQueries: Map<number, Readable>;
+  private nextStreamQueryID: number;
+  private readonly STREAM_QUERY_MIN_ID = 12345;
 
   constructor(controller: ElasticController)
   {
     super();
     this.controller = controller;
+    this.streamQueries = new Map<number, Readable>();
+    this.nextStreamQueryID = this.STREAM_QUERY_MIN_ID;
   }
 
   public async handleQuery(request: Query): Promise<QueryResponse>
@@ -75,14 +82,61 @@ export default class ElasticQueryHandler extends QueryHandler
 
     if (type === 'search')
     {
-      // NB: streaming not yet implemented
-      return new Promise<QueryResponse>((resolve, reject) =>
+      if (request.streaming === true)
       {
-        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
-      });
+        const qid = this.createStreamQuery(request);
+        const path = '/database/1/stream/' + qid;
+        const r: object = {url: path};
+        return new QueryResponse(r);
+      } else
+      {
+        // NB: streaming not yet implemented
+        return new Promise<QueryResponse>((resolve, reject) =>
+        {
+          this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
+        });
+      }
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');
+  }
+
+  // remove the Stream from the streamQueries map if it is available
+  public consumeStream(streamID: number): Readable
+  {
+    const r = this.streamQueries.get(streamID);
+    if (r === undefined)
+    {
+      throw new Error('StreamID: ' + streamID.toString() + ' is wrong.');
+    }
+
+    winston.debug('Delete StreamID ' + streamID.toString() + ' from the map.');
+    this.streamQueries.delete(streamID);
+    return r;
+  }
+
+
+  private createStreamQuery(request: Query): number
+  {
+    const client = this.controller.getClient();
+    if (client['nodes'] === undefined)
+    {
+      const to: any = client;
+      to['nodes'] = true;
+    }
+    const sq: Readable = new ElasticsearchScrollStream(client, request.body);
+    if (this.nextStreamQueryID === Number.MAX_SAFE_INTEGER)
+    {
+      this.nextStreamQueryID = this.STREAM_QUERY_MIN_ID;
+    }
+    if (this.streamQueries.has(this.nextStreamQueryID))
+    {
+      throw new Error('No Available Streaming ID.');
+    }
+    const r = this.nextStreamQueryID;
+    this.streamQueries.set(r, sq);
+    this.nextStreamQueryID += 1;
+    return r;
   }
 
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)

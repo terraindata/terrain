@@ -46,10 +46,12 @@ THE SOFTWARE.
 
 import Query from './Query';
 import QueryResponse from './QueryResponse';
+import {Readable} from 'stream';
 
 export abstract class QueryHandler
 {
   public async abstract handleQuery(request: Query): Promise<QueryResponse>;
+  public abstract consumeStream(streamID: number): Readable;
 }
 
 export default QueryHandler;

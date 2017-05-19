@@ -72,7 +72,7 @@ export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConf
   else if (type === 'elasticsearch' || type === 'elastic')
   {
     return {
-      hosts: [dsn],
+      hosts: ['http://td1:9200'],
     } as ElasticConfig;
   }
   else
