@@ -114,6 +114,8 @@ class Builder extends PureClasss<Props>
     tabActions: List<TabAction>;
 
     nonexistentVariantIds: List<ID>;
+    
+    saving?: boolean;
 
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
   } = {
@@ -158,6 +160,7 @@ class Builder extends PureClasss<Props>
         }
       },
     });
+    
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
       storeKeyPath: ['variants'],
@@ -337,7 +340,7 @@ class Builder extends PureClasss<Props>
     }
     if (newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
-      let variant = this.state.variants.get(variantId);
+      let variant = this.state.variants.get(+variantId);
       // need to fetch data for new query
       Actions.fetchQuery(variantId, this.handleNoVariant, variant && variant.db);
     }
@@ -466,9 +469,6 @@ class Builder extends PureClasss<Props>
       'info',
       4,
     );
-
-    //TODO remove if queries/variants model changes
-    LibraryActions.variants.change(variant);
   }
 
   onSaveError(variant: Variant)
@@ -515,13 +515,15 @@ class Builder extends PureClasss<Props>
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
+    
+    this.setState({
+      saving: true,
+    });
+    
+    //TODO remove if queries/variants model changes
+    LibraryActions.variants.change(variant);    
     this.onSaveSuccess(variant);
-    // Ajax.saveItem(
-    //   LibraryTypes.variantForSave(variant),
-    //   this.onSaveSuccess.bind(this, variant),
-    //   this.onSaveError.bind(this, variant),
-    // );
-    // Actions.save();
+    Actions.save(); // register that we are saving
 
     let configArr = window.location.pathname.split('/')[2].split(',');
     let currentVariant;

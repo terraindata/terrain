@@ -337,7 +337,7 @@ class VariantsColumn extends Classs<Props>
   {
     const {me, roles} = this.state;
     const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
-    const canCreate = canMakeLive;
+    const canCreate = true; // canMakeLive;
     // TODO maybe on the new middle tier, builders can create variants
     //  || (
     //   me && roles && roles.getIn([this.props.groupId, me.id, 'builder'])
@@ -347,7 +347,7 @@ class VariantsColumn extends Classs<Props>
 
     return (
       <LibraryItemCategory
-        status={archived ? 'Archive' : 'Build'}
+        status={archived ? LibraryTypes.ItemStatus.Archive : LibraryTypes.ItemStatus.Build}
         key={archived ? '1' : '0'}
         type="variant"
         onHover={this.handlItemStatusHover}
