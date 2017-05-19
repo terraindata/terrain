@@ -54,6 +54,10 @@ import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 import {recordForSave, responseToRecordConfig} from '../Classes';
 
+/**
+ * Note: This is the old query response type.
+ * For the new QueryResponse definition, see /midway/src/app/query/QueryResponse.ts
+ */
 export interface QueryResponse
 {
   results?: any[];
@@ -629,8 +633,10 @@ export const Ajax =
     );
   },
 
-  // run query, consider renaming
-  query(
+  /**
+   * Old query interface. Queries M1.
+   */
+  query_m1(
     tql: string,
     db: string,
     onLoad: (response: QueryResponse) => void,
@@ -684,8 +690,11 @@ export const Ajax =
     );
   },
 
-  // run query, consider renaming
-  query2(body: string,
+  /**
+   * Intermediate query interface. Queries M2.
+   * Transforms result into old format.
+   */
+    query(body: string,
     db: string, // unused
     onLoad: (response: QueryResponse) => void,
     onError?: (ev: Event) => void,
@@ -693,34 +702,39 @@ export const Ajax =
     options?: object // unused
   ): { xhr: XMLHttpRequest, queryId: string }
   {
-    // kill queries running under the same id
-    // Ajax.killQueries(); // TODO add id
-
-    // const dest = '/query';
-    // temporarily disabled for M2 conversion
-    // if (options.csv)
-    // {
-    //   dest = '/query_csv';
-    // }
-    // else if (sqlQuery)
-    // {
-    //   dest = '/sql_query';
-    // }
-
     const bodyObject = JSON.parse(body);
-
     const queryId = '' + Math.random();
-
     const payload = {
       type:     'search', // can be other things in the future
-      database: 0, // should be passed by caller
+      database: 1, // should be passed by caller
       body:     bodyObject,
     };
 
-    const onLoadHandler = (resp: object) =>
+    const onLoadHandler = (resp) =>
     {
       console.log(resp);
-      onLoad(resp as QueryResponse);
+
+      const hits = resp.result.hits.hits;
+      const results = hits.map((hit) =>
+      {
+        let source = hit._source;
+        source._index = hit._index;
+        source._type = hit._type;
+        source._id = hit._id;
+        source._score = hit._score;
+        source._sort = hit._sort;
+        return source;
+      });
+
+      let result: QueryResponse = {results};
+
+      // This could be improved
+      if (resp.errors.length > 0)
+      {
+        result.errorMessage = resp.errors[0].title;
+      }
+
+      onLoad(result);
     };
 
     const xhr = Ajax._reqMidway2(
