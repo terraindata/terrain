@@ -48,7 +48,7 @@ import * as Tasty from '../../tasty/Tasty';
 
 import QueryHandler from '../../app/query/QueryHandler';
 import DatabaseController from '../DatabaseController';
-import SQLiteGenerator from '../sqlite/tasty/SQLiteGenerator';
+import MySQLGenerator from '../mysql/tasty/MySQLGenerator';
 import MySQLClient from './client/MySQLClient';
 import MySQLConfig from './MySQLConfig';
 import MySQLExecutor from './tasty/MySQLExecutor';
@@ -68,7 +68,7 @@ class MySQLController extends DatabaseController
     this.tasty = new Tasty.Tasty(
       this,
       new MySQLExecutor(this.client),
-      new SQLiteGenerator()); // currently shares SQLite's generator
+      new MySQLGenerator()); // currently shares SQLite's generator
   }
 
   public getClient(): MySQLClient
