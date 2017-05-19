@@ -50,10 +50,10 @@ import TastyQuery from '../../../tasty/TastyQuery';
 import SQLGenerator from '../../SQLGenerator';
 
 /**
- * Generates SQLite queries from TastyQuery objects.
- * Don't use this class directly: use SQLiteGenerator instead.
+ * Generates MySQL queries from TastyQuery objects.
+ * Don't use this class directly: use MySQLGenerator instead.
  */
-export default class SQLiteGeneratorRunner
+export default class MySQLGeneratorRunner
 {
   private generator: SQLGenerator;
 
