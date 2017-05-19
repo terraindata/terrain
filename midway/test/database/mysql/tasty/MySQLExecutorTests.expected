@@ -1283,7 +1283,7 @@
       "votecount": 6
     }
   ],
-  "MySQL: execute simple query (upsert)": {
+  "MySQL: execute simple query (upsert)": [{
     "affectedRows": 1,
     "changedRows": 0,
     "fieldCount": 0,
@@ -1292,8 +1292,8 @@
     "protocol41": true,
     "serverStatus": 2,
     "warningCount": 0
-  },
-  "MySQL: execute simple query (delete)": {
+  }],
+  "MySQL: execute simple query (delete)": [{
     "affectedRows": 1,
     "changedRows": 0,
     "fieldCount": 0,
@@ -1302,7 +1302,7 @@
     "protocol41": true,
     "serverStatus": 2,
     "warningCount": 0
-  },
+  }],
   "MySQL: execute complex query": [
     {
       "movieid": 127974,

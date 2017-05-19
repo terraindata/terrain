@@ -64,6 +64,7 @@ export default class ElasticGeneratorRunner
     this.esQuery = {} as ElasticQuery;
     this.esQuery.index = query.table.getDatabaseName();
     this.esQuery.table = query.table.getTableName();
+    this.esQuery.primaryKeys = query.table.getPrimaryKeys();
     this.esQuery.fields = query.table.getColumnNames();
     switch (query.command.tastyType)
     {

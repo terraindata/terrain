@@ -404,7 +404,7 @@ describe('Query route tests', () =>
       .then((response) =>
       {
         winston.info(JSON.stringify(response));
-        expect(JSON.parse(response.text).results[0].hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        expect(JSON.parse(response.text).results[0].hits).toMatchObject({ max_score: 0, hits: [] });
       })
       .catch((error) =>
       {

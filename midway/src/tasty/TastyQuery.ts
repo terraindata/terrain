@@ -89,10 +89,9 @@ export class TastyQuery
   public upsert(value: object | object[]): TastyQuery
   {
     this.command = new TastyNode('upsert', null);
-
     if (value instanceof Array)
     {
-      this.upserts.concat(value);
+      this.upserts = this.upserts.concat(value);
     }
     else
     {
@@ -119,7 +118,8 @@ export class TastyQuery
     if (order === 'ascending')
     {
       order = 'asc';
-    } else if (order === 'descending')
+    }
+    else if (order === 'descending')
     {
       order = 'desc';
     }
