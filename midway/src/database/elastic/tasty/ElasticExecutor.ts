@@ -118,7 +118,9 @@ export default class ElasticExecutor implements TastyExecutor
           if ((query.primaryKeys.length > 0) &&
             (query.params[i][query.primaryKeys[0]] === undefined))
           {
-            result.push({ _id: upserted[i]['_id'] });
+            const obj = {};
+            obj[query.primaryKeys[0]] = upserted[i]['_id'];
+            result.push(obj);
           }
         }
         return result;
