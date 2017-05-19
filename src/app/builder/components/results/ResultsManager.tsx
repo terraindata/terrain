@@ -257,14 +257,11 @@ export class ResultsManager extends PureClasss<Props>
 
   componentWillReceiveProps(nextProps: Props)
   {
+    console.log('this props: ', this.props, 'next: ', nextProps);
     if (
-      nextProps.query &&
-      (
-        (!this.props.query && !nextProps.resultsState.loading)
-        || nextProps.query.cards !== this.props.query.cards
-        || nextProps.query.inputs !== this.props.query.inputs
-        || nextProps.db !== this.props.db
-      )
+      nextProps.query != null
+      && nextProps.query.tql != null
+      && (this.props.query == null || this.props.query.tql !== nextProps.query.tql)
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
