@@ -111,14 +111,17 @@ export default class ElasticExecutor implements TastyExecutor
         return result.hits.hits;
       case 'upsert':
         const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
-        result = await this.upsertObjects(table, query.params);
-        const primaryKey = query.primaryKeys[0];
-        return result.map((r) =>
+        const upserted = await this.upsertObjects(table, query.params);
+        result = [];
+        for (let i = 0; i < upserted.length; i++)
         {
-          const obj = {};
-          obj[primaryKey] = r['_id'];
-          return obj;
-        });
+          if ((query.primaryKeys.length > 0) &&
+            (query.params[i][query.primaryKeys[0]] === undefined))
+          {
+            result.push({ _id: upserted[i]['_id'] });
+          }
+        }
+        return result;
       default:
         throw new Error('Unknown query command ' + JSON.stringify(query));
     }
@@ -232,6 +235,12 @@ export default class ElasticExecutor implements TastyExecutor
             _type: table.getTableName(),
           },
         };
+
+      const compositePrimaryKey = this.makeID(table, element);
+      if (compositePrimaryKey !== '')
+      {
+        command.index['_id'] = compositePrimaryKey;
+      }
 
       body.push(command);
       body.push(element);
