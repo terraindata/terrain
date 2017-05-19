@@ -162,11 +162,11 @@ export class Tasty
     return this.executor.query(generatedQuery);
   }
 
-/**
- * Update or insert an object or a list of objects.
- * @param {TastyTable} table The table to upsert the objects in.
- * @param {object | object[]} objs An object or an array of objects to upsert.
- */
+  /**
+   * Update or insert an object or a list of objects.
+   * @param {TastyTable} table The table to upsert the objects in.
+   * @param {object | object[]} objs An object or an array of objects to upsert.
+   */
   public async upsert(table: TastyTable, objs: object | object[]): Promise<object | object[]>
   {
     if (objs instanceof Array)
