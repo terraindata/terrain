@@ -298,7 +298,10 @@ class VariantsColumn extends Classs<Props>
         isStarred={variant.status === 'DEFAULT'}
       >
         <div className="flex-container">
-          <UserThumbnail userId={variant.lastUserId} medium={true} />
+          <UserThumbnail
+            userId={variant.lastUserId}
+            medium={true}
+          />
 
           <div className="flex-grow">
             <StatusDropdown
