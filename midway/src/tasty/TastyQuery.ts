@@ -60,7 +60,6 @@ export class TastyQuery
   public upserts: object[];
   public numTaken: number;
   public numSkipped: number;
-  public lastID: boolean;
 
   constructor(table: TastyTable)
   {
@@ -87,19 +86,12 @@ export class TastyQuery
     return this;
   }
 
-  public selectLastID(): TastyQuery
-  {
-    this.lastID = true;
-    return this;
-  }
-
   public upsert(value: object | object[]): TastyQuery
   {
     this.command = new TastyNode('upsert', null);
-
     if (value instanceof Array)
     {
-      this.upserts.concat(value);
+      this.upserts = this.upserts.concat(value);
     }
     else
     {
@@ -126,7 +118,8 @@ export class TastyQuery
     if (order === 'ascending')
     {
       order = 'asc';
-    } else if (order === 'descending')
+    }
+    else if (order === 'descending')
     {
       order = 'desc';
     }
