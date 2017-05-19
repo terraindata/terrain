@@ -162,41 +162,37 @@ export class Tasty
     return this.executor.query(generatedQuery);
   }
 
-  /**
-   * Update or insert an object or a list of objects.
-   *
-   * @param {TastyTable} table The table to upsert the object in.
-   * @param {(object | object[])} value An object or a list of objects to upsert.
-   * @returns {Promise<object[]>}
-   *
-   * @memberOf TastyInterface
-   */
-  public async upsert(table: TastyTable, value: object | object[]): Promise<object[]>
+/**
+ * Update or insert an object or a list of objects.
+ * @param {TastyTable} table The table to upsert the objects in.
+ * @param {object | object[]} objs An object or an array of objects to upsert.
+ */
+  public async upsert(table: TastyTable, objs: object | object[]): Promise<object | object[]>
   {
-    const query = new TastyQuery(table);
-    query.upsert(value);
-
-    const primaryKeys = table.getPrimaryKeys();
-    if ((primaryKeys.length > 0) && value[primaryKeys[0]] === undefined)
+    if (objs instanceof Array)
     {
-      query.selectLastID();
-    }
+      const query = new TastyQuery(table).upsert(objs);
+      const generatedQuery = this.generator.generate(query);
+      const upserted = await this.executor.query(generatedQuery);
 
-    const generatedQuery = this.generator.generate(query);
-
-    const results = await this.executor.query(generatedQuery);
-    if (value instanceof Array)
-    {
-      for (let i = 0; i < value.length; i++)
+      // map auto-generated result ids to objects without primary keys
+      const primaryKeys = table.getPrimaryKeys();
+      const results = new Array(objs.length);
+      for (let i = 0, j = 0; i < objs.length; i++)
       {
-        results[i] = Util.updateObject(results[i], value[i]);
+        results[i] = objs[i];
+        if ((primaryKeys.length > 0) && results[i][primaryKeys[0]] === undefined)
+        {
+          results[i][primaryKeys[0]] = upserted[j++][primaryKeys[0]];
+        }
       }
+      return results;
     }
-    else if (typeof value === 'object')
+    else if (typeof objs === 'object')
     {
-      results[0] = Util.updateObject(results[0], value);
+      return this.upsert(table, [objs]);
     }
-    return results;
+    throw new Error('Invalid object type');
   }
 
   /**
