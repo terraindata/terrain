@@ -151,7 +151,7 @@ test('SQLite: schema', async (done) =>
       tree: {
         'moviesdb.db': {
           movies: {
-            movieid: { type: 'int(11)' },
+            movieid: { type: 'INTEGER' },
             title: { type: 'varchar(255)' },
             genres: { type: 'varchar(255)' },
             backdroppath: { type: 'varchar(255)' },
@@ -168,6 +168,14 @@ test('SQLite: schema', async (done) =>
             homepage: { type: 'varchar(255)' },
             language: { type: 'varchar(255)' },
             runtime: { type: 'int(11)' },
+          },
+          sqlite_sequence: {
+            name: {
+              type: '',
+            },
+            seq: {
+              type: '',
+            },
           },
         },
       },

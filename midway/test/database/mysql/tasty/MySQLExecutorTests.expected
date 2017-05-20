@@ -1287,7 +1287,7 @@
     "affectedRows": 1,
     "changedRows": 0,
     "fieldCount": 0,
-    "insertId": 0,
+    "insertId": 13371337,
     "message": "",
     "protocol41": true,
     "serverStatus": 2,

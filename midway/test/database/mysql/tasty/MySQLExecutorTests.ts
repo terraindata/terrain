@@ -134,7 +134,7 @@ test('MySQL: schema', async (done) =>
 //     movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
 //     movies[2] = { movieid: 232323, title: 'Guardians of the Galaxy 2',
 //         releasedate: new Date('04/04/17').toISOString().substring(0, 10) };
-//
+
 //     const results: any = await tasty.upsert(DBMovies, movies);
 //     expect(results).not.toBeUndefined();
 //     for (let i = 0; i < results.length; i++)
