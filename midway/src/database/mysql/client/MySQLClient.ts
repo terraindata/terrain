@@ -66,12 +66,12 @@ class MySQLClient
 
     this.delegate.on('acquire', (connection: mysql.IConnection) =>
     {
-      this.controller.log('MySQLClient', 'Connection %d acquired ' + connection.threadId.toString());
+      this.controller.log('MySQLClient', 'Connection ' + connection.threadId.toString() + ' acquired ');
     });
 
     this.delegate.on('release', (connection: mysql.IConnection) =>
     {
-      this.controller.log('MySQLClient', 'Connection %d released ' + connection.threadId.toString());
+      this.controller.log('MySQLClient', 'Connection ' + connection.threadId.toString() + ' released ');
     });
   }
 

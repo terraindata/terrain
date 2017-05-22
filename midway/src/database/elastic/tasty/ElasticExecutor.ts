@@ -111,18 +111,7 @@ export default class ElasticExecutor implements TastyExecutor
         return result.hits.hits;
       case 'upsert':
         const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
-        const upserted = await this.upsertObjects(table, query.params);
-        result = [];
-        for (let i = 0; i < upserted.length; i++)
-        {
-          if ((query.primaryKeys.length > 0) &&
-            (query.params[i][query.primaryKeys[0]] === undefined))
-          {
-            const obj = {};
-            obj[query.primaryKeys[0]] = upserted[i]['_id'];
-            result.push(obj);
-          }
-        }
+        result = await this.upsert(table, query, query.params);
         return result;
       default:
         throw new Error('Unknown query command ' + JSON.stringify(query));
@@ -148,38 +137,22 @@ export default class ElasticExecutor implements TastyExecutor
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsertObjects(table: TastyTable, elements: object[])
+  public async upsert(table: TastyTable, query: ElasticQuery, elements: object[])
   {
-    if (elements.length > 2)
+    const upserted = await this.upsertObjects(table, elements);
+    const primaryKeys = table.getPrimaryKeys();
+    const results = new Array(upserted.length);
+    for (let i = 0; i < upserted.length; i++)
     {
-      return this.bulkUpsert(table, elements);
+      results[i] = elements[i];
+      if ((primaryKeys.length > 0) &&
+        (elements[i][primaryKeys[0]] === undefined))
+      {
+        results[i][primaryKeys[0]] = upserted[i]['_id'];
+      }
     }
 
-    const promises: Array<Promise<any>> = [];
-    for (const element of elements)
-    {
-      promises.push(
-        new Promise((resolve, reject) =>
-        {
-          const query = {
-            body: element,
-            index: table.getDatabaseName(),
-            type: table.getTableName(),
-          };
-
-          const compositePrimaryKey = this.makeID(table, element);
-          if (compositePrimaryKey !== '')
-          {
-            query['id'] = compositePrimaryKey;
-          }
-
-          this.client.index(
-            query as any,
-            makePromiseCallback(resolve, reject));
-        }),
-      );
-    }
-    return Promise.all(promises);
+    return results;
   }
 
   /*
@@ -221,6 +194,40 @@ export default class ElasticExecutor implements TastyExecutor
             params,
             makePromiseCallback(resolve, reject));
         }));
+    }
+    return Promise.all(promises);
+  }
+
+  private async upsertObjects(table: TastyTable, elements: object[])
+  {
+    if (elements.length > 2)
+    {
+      return this.bulkUpsert(table, elements);
+    }
+
+    const promises: Array<Promise<any>> = [];
+    for (const element of elements)
+    {
+      promises.push(
+        new Promise((resolve, reject) =>
+        {
+          const query = {
+            body: element,
+            index: table.getDatabaseName(),
+            type: table.getTableName(),
+          };
+
+          const compositePrimaryKey = this.makeID(table, element);
+          if (compositePrimaryKey !== '')
+          {
+            query['id'] = compositePrimaryKey;
+          }
+
+          this.client.index(
+            query as any,
+            makePromiseCallback(resolve, reject));
+        }),
+      );
     }
     return Promise.all(promises);
   }

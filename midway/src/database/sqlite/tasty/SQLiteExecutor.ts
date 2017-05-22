@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import TastyExecutor from '../../../tasty/TastyExecutor';
 import TastySchema from '../../../tasty/TastySchema';
+import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
 import SQLiteClient from '../client/SQLiteClient';
 import SQLiteConfig from '../SQLiteConfig';
@@ -99,6 +100,25 @@ export class SQLiteExecutor implements TastyExecutor
 
       results = results.concat(result);
     }
+    return results;
+  }
+
+  public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
+  {
+    const upserted = await this.query(statements);
+    const primaryKeys = table.getPrimaryKeys();
+    const results = new Array(elements.length);
+    let lastID = upserted[0]['id'];
+    for (let i = elements.length - 1; i >= 0; i--)
+    {
+      results[i] = elements[i];
+      if ((primaryKeys.length > 0) &&
+        (elements[i][primaryKeys[0]] === undefined))
+      {
+        results[i][primaryKeys[0]] = lastID--;
+      }
+    }
+
     return results;
   }
 
