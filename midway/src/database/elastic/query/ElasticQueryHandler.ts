@@ -165,12 +165,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
   private createStreamQuery(request: Query): number
   {
-    const client = this.controller.getClient();
-    if (client['nodes'] === undefined)
-    {
-      const to: any = client;
-      to['nodes'] = true;
-    }
+    const client = this.controller.getClient().getDelegate();
     const sq: Readable = new ElasticsearchScrollStream(client, request.body);
     if (this.nextStreamQueryID === Number.MAX_SAFE_INTEGER)
     {

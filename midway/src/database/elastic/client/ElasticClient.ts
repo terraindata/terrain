@@ -124,6 +124,11 @@ class ElasticClient
     return this.delegate.search(params, callback);
   }
 
+  public getDelegate(): Elastic.Client
+  {
+    return this.delegate;
+  }
+
   private log(methodName: string, info: any)
   {
     this.controller.log('ElasticClient.' + methodName, info);
