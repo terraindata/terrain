@@ -211,6 +211,11 @@ export default class SQLiteGeneratorRunner
 
   private generateUpsertQuery(query: TastyQuery, upserts: object[], lastId: boolean)
   {
+    if (upserts.length === 0)
+    {
+      return;
+    }
+
     this.generator.appendExpression(query.command);
     this.generator.queryString += ' ';
     this.generator.indent();
