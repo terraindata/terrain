@@ -44,53 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import QueryResult from './QueryResult';
 
-import Query from '../../app/query/Query';
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Util from '../Util';
-import { QueryHandler } from './QueryHandler';
-import QueryResponse from './QueryResponse';
+export default class QueryResponse
+{
+  public result: QueryResult;
+  public errors: MidwayErrorItem[];
 
-const QueryRouter = new KoaRouter();
-
-// QueryRouter.post(
-//   '/',
-//   passport.authenticate('access-token-local'),
-//   async (ctx, next) =>
-//   {
-//     const query: Query = ctx.request.body.body as Query;
-//
-//     winston.info(JSON.stringify(query, null, 1));
-//     Util.verifyParameters(query, ['database', 'type', 'body']);
-QueryRouter.post(
-  '/',
-  passport.authenticate('access-token-local'),
-  async (ctx, next) =>
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [])
   {
-    winston.info(JSON.stringify(ctx.request, null, 1));
-    const query: Query = ctx.request.body.body as Query;
-
-    winston.info(JSON.stringify(ctx.request.body, null, 1));
-    Util.verifyParameters(query, ['database', 'type', 'body']);
-
-    winston.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
-    winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
-      'body: ' + JSON.stringify(query.body));
-
-    const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
-    if (database === undefined)
-    {
-      throw new Error('Database "' + query.database.toString() + '" not found.');
-    }
-
-    const qh: QueryHandler = database.getQueryHandler();
-    const result: QueryResponse = await qh.handleQuery(query);
-    ctx.body = result;
-    ctx.status = 200;
-  });
-
-export default QueryRouter;
+    this.result = result;
+    this.errors = errors;
+  }
+}

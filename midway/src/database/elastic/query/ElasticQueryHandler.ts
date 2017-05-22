@@ -51,10 +51,13 @@ import * as winston from 'winston';
 
 import Query from '../../../app/query/Query';
 import QueryHandler from '../../../app/query/QueryHandler';
-import { QueryResponse } from '../../../app/query/QueryRouter';
-import { ElasticQueryError, QueryError } from '../../../app/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
+import QueryResponse from '../../../app/query/QueryResponse';
+import { MidwayErrorItem } from '../../../error/MidwayErrorItem';
+import QueryError from '../../../error/QueryError';
 import ElasticController from '../ElasticController';
+
+// tslint:disable-next-line
+const clarinet = require('clarinet');
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -72,7 +75,51 @@ export default class ElasticQueryHandler extends QueryHandler
   public async handleQuery(request: Query): Promise<QueryResponse>
   {
     const type = request.type;
-    const body = request.body;
+    let body = request.body;
+
+    /* if the body is a string, parse it as JSON
+     * NB: this is normally used to detect JSON errors, but could be used generally,
+     * although it is less efficient than just sending the JSON.
+     */
+    if (typeof body === 'string')
+    {
+      try
+      {
+        body = JSON.parse(body);
+      }
+      catch (_e)
+      {
+        // absorb the error and retry using clarinet so we can get a good error message
+
+        const parser = clarinet.parser();
+
+        const errors: MidwayErrorItem[] = [];
+
+        parser.onerror =
+          (e) =>
+          {
+            const title: string = String(parser.line) + ':' + String(parser.column)
+              + ':' + String(parser.position) + ' ' + String(e.message);
+            errors.push({ status: -1, title, detail: '', source: {} });
+          };
+
+        try
+        {
+          parser.write(body).close();
+        }
+        catch (e)
+        {
+          // absorb
+        }
+
+        if (errors.length === 0)
+        {
+          errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
+        }
+
+        return new QueryResponse(null, errors);
+      }
+    }
 
     if (type === 'search')
     {
@@ -94,7 +141,10 @@ export default class ElasticQueryHandler extends QueryHandler
       {
         if (QueryError.isElasticQueryError(error))
         {
-          const res: QueryResponse = QueryError.fromElasticQueryError(error).getMidwayErrorObject();
+          const res: QueryResponse =
+            new QueryResponse(
+              null,
+              QueryError.fromElasticQueryError(error).getMidwayErrors());
           resolve(res);
         }
         else
@@ -109,7 +159,7 @@ export default class ElasticQueryHandler extends QueryHandler
           winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
           response = { response };
         }
-        const res: QueryResponse = { results: [response] };
+        const res: QueryResponse = new QueryResponse(response);
         resolve(res);
       }
     };
