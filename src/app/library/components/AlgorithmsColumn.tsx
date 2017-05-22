@@ -369,14 +369,14 @@ class AlgorithmsColumn extends PureClasss<Props>
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const {me, roles} = this.state;
     const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
-    console.log(status, canCreate);
+    
     return (
       <LibraryItemCategory
-        status={LibraryTypes.ItemStatus[status]}
+        status={status}
         key={status}
         onHover={this.handleCategoryHover}
         type="algorithm"
-        titleHidden={status === LibraryTypes.ItemStatus.Live}
+        titleHidden={status === LibraryTypes.ItemStatus.Build}
       >
         {
           ids.map(this.renderAlgorithm)

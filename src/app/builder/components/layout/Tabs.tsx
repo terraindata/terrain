@@ -260,14 +260,14 @@ export class Tabs extends PureClasss<TabsProps> {
     const tabs = config && variants && config.split(',').map((vId) =>
     {
       const id = this.getId(vId);
-      const variant = variants.get(id);
+      const variant = variants.get(+id);
       let name = 'Loading...';
       if (variant)
       {
         name = variant.name || 'Untitled';
         if (variant.version)
         {
-          name += ' @ ' + moment(variants.get(id).lastEdited).format('ha M/D/YY');
+          name += ' @ ' + moment(variants.get(+id).lastEdited).format('ha M/D/YY');
         }
       }
       else

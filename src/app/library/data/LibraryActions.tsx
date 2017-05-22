@@ -165,7 +165,25 @@ const Actions =
 
     duplicate:
       (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) =>
-        $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
+      {
+        let newVariant = variant.set('id', -1)
+          .set('parent', algorithmId || variant.parent)
+          .set('groupId', groupId || variant.groupId)
+          .set('name', variant.name + ' Copy')
+          ;
+        newVariant = LibraryTypes.touchVariant(newVariant);
+          
+        Ajax.saveItem(
+          newVariant,
+          (response) =>
+          {
+            let id = response.id; // TODO
+            $(ActionTypes.variants.create, {
+              variant: newVariant.set('id', id)
+            });
+          }
+        );
+      },
 
     status:
       (variant: Variant, status: LibraryTypes.ItemStatus, confirmed?: boolean) =>

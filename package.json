@@ -4,7 +4,7 @@
   "description": "The one search front-end to rule them all.",
   "main": "index.js",
   "scripts": {
-    "start": "yarn run build-midway:live",
+    "start": "yarn run $NODE_DEBUG_OPTION build-midway:live",
     "start-front": "MIDWAY_HOST=localhost:3000 webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
     "start-front-m1": "MIDWAY_HOST=localhost webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
     "start-front-m1-prod": "MIDWAY_HOST=pa-terraformer02.terrain.int webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
@@ -62,6 +62,7 @@
   "dependencies": {
     "bcrypt": "^1.0.2",
     "bodybuilder": "^2.1.0",
+    "clarinet": "^0.11.0",
     "classnames": "^2.2.5",
     "codemirror": "^5.16.0",
     "color": "^1.0.3",

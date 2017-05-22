@@ -174,7 +174,7 @@ export module LibraryTypes
   {
     return v
       .set('lastEdited', new Date())
-      .set('lastUserId', localStorage['id'])
+      .set('lastUserId', +localStorage['id'])
     ;
   }
 
