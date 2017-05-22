@@ -70,6 +70,13 @@ class SQLiteClient
     return this.config.filename;
   }
 
+  public run(sql: string, params?: any[], callback?: (err: Error, resolve: object) => void): sqlite3.Database
+  {
+    this.controller.log('run', sql);
+    return this.delegate.run(sql, params, callback);
+  }
+
+
   public all(sql: string, callback?: (err: Error, rows: any[]) => void): sqlite3.Database
   {
     this.controller.log('all', sql);
