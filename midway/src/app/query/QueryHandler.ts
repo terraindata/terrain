@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import {Readable} from 'stream';
+import { Readable } from 'stream';
 import Query from './Query';
 import QueryResponse from './QueryResponse';
 

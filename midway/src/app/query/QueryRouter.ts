@@ -54,7 +54,7 @@ import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
 import { QueryHandler } from './QueryHandler';
 import QueryResponse from './QueryResponse';
-import {Readable} from 'stream';
+import { Readable } from 'stream';
 
 const QueryRouter = new KoaRouter();
 
@@ -110,10 +110,12 @@ QueryRouter.get(
     }
     const qh: QueryHandler = database.getQueryHandler();
     const queryStream: Readable = qh.consumeStream(streamID);
-    queryStream.on('end', () => {
-      winston.info('Streaming ' + streamID.toString() +  ' is finished.');
+    queryStream.on('end', () =>
+    {
+      winston.info('Streaming ' + streamID.toString() + ' is finished.');
     });
-    queryStream.on('error', (err) => {
+    queryStream.on('error', (err) =>
+    {
       winston.error('Streaming ' + streamID.toString() + ' has an error ' + err);
     });
     ctx.type = 'text/plain';

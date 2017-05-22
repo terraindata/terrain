@@ -56,7 +56,7 @@ import { MidwayErrorItem } from '../../../error/MidwayErrorItem';
 import QueryError from '../../../error/QueryError';
 import ElasticController from '../ElasticController';
 import ElasticsearchScrollStream = require('elasticsearch-scroll-stream');
-import {Readable} from 'stream';
+import { Readable } from 'stream';
 
 // tslint:disable-next-line
 const clarinet = require('clarinet');
@@ -134,7 +134,7 @@ export default class ElasticQueryHandler extends QueryHandler
       {
         const qid = this.createStreamQuery(request);
         const path = '/database/1/stream/' + qid;
-        const r: object = {url: path};
+        const r: object = { url: path };
         return new QueryResponse(r);
       } else
       {
