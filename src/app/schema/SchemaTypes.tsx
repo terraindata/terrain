@@ -51,190 +51,190 @@ type stringList = string[] | List<string>;
 
 export module SchemaTypes
 {
-	export class SchemaBaseClass extends BaseClass
-	{
-		id: string;
-		type = '';
-		name = '';
-	}
+  export class SchemaBaseClass extends BaseClass
+  {
+    id: string;
+    type = '';
+    name = '';
+  }
 
-	class SchemaStateC
-	{
-		databases: DatabaseMap= Map<string, Database>({});
-		tables: TableMap = Map<string, Table>({});
-		columns: ColumnMap = Map<string, Column>({});
-		indexes: IndexMap = Map<string, Index>({});
+  class SchemaStateC
+  {
+    databases: DatabaseMap= Map<string, Database>({});
+    tables: TableMap = Map<string, Table>({});
+    columns: ColumnMap = Map<string, Column>({});
+    indexes: IndexMap = Map<string, Index>({});
 
-		dbCount: number = -1;
-		loading: boolean = false;
-		loaded: boolean = false;
-		schemaError: boolean = false;
+    dbCount: number = -1;
+    loading: boolean = false;
+    loaded: boolean = false;
+    schemaError: boolean = false;
 
-		// view state
-		selectedId: string = null;
-		highlightedId: string = null;
-		highlightedInSearchResults: boolean = false;
+    // view state
+    selectedId: string = null;
+    highlightedId: string = null;
+    highlightedInSearchResults: boolean = false;
 
-		// for the builder, a list of names for each db
-		tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
-		columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
-	}
-	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
-	export const _SchemaState = (config?: {[key: string]: any}) =>
-	  New<SchemaState>(new SchemaStateC(), config);
+    // for the builder, a list of names for each db
+    tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
+    columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
+  }
+  export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
+  export const _SchemaState = (config?: {[key: string]: any}) =>
+    New<SchemaState>(new SchemaStateC(), config);
 
-	export function databaseId(databaseName: string)
-	{
-		return databaseName;
-	}
+  export function databaseId(databaseName: string)
+  {
+    return databaseName;
+  }
 
-	class DatabaseC extends SchemaBaseClass
-	{
-		type = 'database';
-		name = '';
+  class DatabaseC extends SchemaBaseClass
+  {
+    type = 'database';
+    name = '';
 
-		tableIds: List<string> = List([]);
-	}
-	export type Database = DatabaseC & IRecord<DatabaseC>;
-	export const _Database =
-		(config: {
-			name: string,
-			id?: string,
-		}) => {
-		  config.id = databaseId(config.name);
-		  return New<Database>(
-		  	new DatabaseC(config), 
-		  	config, 'string');
-		};
-	export type DatabaseMap = IMMap<string, Database>;
+    tableIds: List<string> = List([]);
+  }
+  export type Database = DatabaseC & IRecord<DatabaseC>;
+  export const _Database =
+    (config: {
+      name: string,
+      id?: string,
+    }) => {
+      config.id = databaseId(config.name);
+      return New<Database>(
+        new DatabaseC(config),
+        config, 'string');
+    };
+  export type DatabaseMap = IMMap<string, Database>;
 
-	export function tableId(databaseName: string, tableName: string): string
-	{
-		return databaseName + '.' + tableName;
-	}
+  export function tableId(databaseName: string, tableName: string): string
+  {
+    return databaseName + '.' + tableName;
+  }
 
-	class TableC extends SchemaBaseClass
-	{
-		type = 'table';
-		name = '';
-		databaseId: string = '';
+  class TableC extends SchemaBaseClass
+  {
+    type = 'table';
+    name = '';
+    databaseId: string = '';
 
-		columnIds: List<string> = List([]);
-		indexIds: List<string> = List([]);
-	}
-	export type Table = TableC & IRecord<TableC>;
-	export const _Table = (config: {
-		name: string,
-		databaseId: string,
-		id?: string,
-	}) => {
-	  config.id = tableId(config.databaseId, config.name);
-	  return New<Table>(new TableC(config), config, 'string');
-	};
-	export type TableMap = IMMap<string, Table>;
+    columnIds: List<string> = List([]);
+    indexIds: List<string> = List([]);
+  }
+  export type Table = TableC & IRecord<TableC>;
+  export const _Table = (config: {
+    name: string,
+    databaseId: string,
+    id?: string,
+  }) => {
+    config.id = tableId(config.databaseId, config.name);
+    return New<Table>(new TableC(config), config, 'string');
+  };
+  export type TableMap = IMMap<string, Table>;
 
-	export function columnId(tableId: string, columnName: string)
-	{
-		return tableId + '.c.' + columnName;
-	}
+  export function columnId(tableId: string, columnName: string)
+  {
+    return tableId + '.c.' + columnName;
+  }
 
-	class ColumnC extends SchemaBaseClass
-	{
-		type = 'column';
-		name = '';
-		databaseId: string = '';
-		tableId: string = '';
+  class ColumnC extends SchemaBaseClass
+  {
+    type = 'column';
+    name = '';
+    databaseId: string = '';
+    tableId: string = '';
 
-		indexIds: List<string> = List([]);
-		datatype = '';
-		defaultValue = '';
-		isNullable = false;
-		isPrimaryKey = false;
-	}
-	export type Column = ColumnC & IRecord<ColumnC>;
-	export const _Column = (config: {
-		name: string,
-		databaseId: string,
-		tableId: string,
+    indexIds: List<string> = List([]);
+    datatype = '';
+    defaultValue = '';
+    isNullable = false;
+    isPrimaryKey = false;
+  }
+  export type Column = ColumnC & IRecord<ColumnC>;
+  export const _Column = (config: {
+    name: string,
+    databaseId: string,
+    tableId: string,
 
-		defaultValue: string,
-		datatype: string,
-		isNullable: boolean,
-		isPrimaryKey: boolean,
+    defaultValue?: string,
+    datatype: string,
+    isNullable?: boolean,
+    isPrimaryKey?: boolean,
 
-		id?: string,
-	}) => {
-	  config.id = columnId(config.tableId, config.name);
-	  return New<Column>(new ColumnC(config), config, 'string');
-	};
-	export type ColumnMap = IMMap<string, Column>;
+    id?: string,
+  }) => {
+    config.id = columnId(config.tableId, config.name);
+    return New<Column>(new ColumnC(config), config, 'string');
+  };
+  export type ColumnMap = IMMap<string, Column>;
 
-	export function indexId(databaseName: string, tableName: string, indexName: string)
-	{
-		return databaseName + '.' + tableName + '.i.' + indexName;
-	}
+  export function indexId(databaseName: string, tableName: string, indexName: string)
+  {
+    return databaseName + '.' + tableName + '.i.' + indexName;
+  }
 
-	class IndexC extends SchemaBaseClass
-	{
-		type = 'index';
-		name = '';
-		databaseId: string = '';
-		tableId: string = '';
+  class IndexC extends SchemaBaseClass
+  {
+    type = 'index';
+    name = '';
+    databaseId: string = '';
+    tableId: string = '';
 
-		indexType = '';
-		columnIds: List<string> = List([]);
-	}
-	export type Index = IndexC & IRecord<IndexC>;
-	export const _Index = (config: {
-		name: string,
-		databaseId: string,
-		tableId: string,
+    indexType = '';
+    columnIds: List<string> = List([]);
+  }
+  export type Index = IndexC & IRecord<IndexC>;
+  export const _Index = (config: {
+    name: string,
+    databaseId: string,
+    tableId: string,
 
-		indexType: string,
-		id?: string,
-	}) => {
-	  config.id = indexId(config.databaseId, config.tableId, config.tableId);
-	  return New<Index>(new IndexC(config), config, 'string');
-	};
-	export type IndexMap = IMMap<string, Index>;
+    indexType: string,
+    id?: string,
+  }) => {
+    config.id = indexId(config.databaseId, config.tableId, config.tableId);
+    return New<Index>(new IndexC(config), config, 'string');
+  };
+  export type IndexMap = IMMap<string, Index>;
 
-	export const typeToStoreKey =
-	{
-		database: 'databases',
-		table: 'tables',
-		column: 'columns',
-		index: 'indexes',
-	};
+  export const typeToStoreKey =
+    {
+      database: 'databases',
+      table: 'tables',
+      column: 'columns',
+      index: 'indexes',
+    };
 
-	export function searchIncludes(item: SchemaBaseClass, search: string): boolean
-	{
-		return !search ||
-  		(
-  			item && typeof item.name === 'string' &&
-	  			item.name.toLowerCase().indexOf(
-	  				search.toLowerCase(),
-	  			) !== -1
-  		);
-	}
+  export function searchIncludes(item: SchemaBaseClass, search: string): boolean
+  {
+    return !search ||
+      (
+        item && typeof item.name === 'string' &&
+        item.name.toLowerCase().indexOf(
+          search.toLowerCase(),
+        ) !== -1
+      );
+  }
 
-	// used to define how to render tree item children in tree list
-	export type ISchemaTreeChildrenConfig = [
-		{
-			label?: string;
-			type: string;
-		}
-	];
+  // used to define how to render tree item children in tree list
+  export type ISchemaTreeChildrenConfig = [
+    {
+      label?: string;
+      type: string;
+    }
+    ];
 
-	export type TableNamesByDb = IMMap<string, List<string>>;
-	export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
-	export interface SetDbActionPayload
-	{
-		database: Database;
-		tables: IMMap<string, Table>;
-		columns: IMMap<string, Column>;
-		indexes: IMMap<string, Index>;
-		columnNames: IMMap<string, List<string>>;
-		tableNames: List<string>;
+  export type TableNamesByDb = IMMap<string, List<string>>;
+  export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
+  export interface SetDbActionPayload
+  {
+    database: Database;
+    tables: IMMap<string, Table>;
+    columns: IMMap<string, Column>;
+    indexes: IMMap<string, Index>;
+    columnNames: IMMap<string, List<string>>;
+    tableNames: List<string>;
   }
 }
 

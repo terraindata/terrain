@@ -63,7 +63,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting database ID ' + String(ctx.params.id));
-  ctx.body = await databases.get(ctx.params.id);
+  ctx.body = await databases.get(Number(ctx.params.id));
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -85,7 +85,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   const db: DatabaseConfig = ctx.request.body.body;
   if (db.id === undefined)
   {
-    db.id = ctx.params.id;
+    db.id = Number(ctx.params.id);
   }
   else
   {
@@ -101,19 +101,19 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('connect to database');
-  ctx.body = await databases.connect(ctx.state.user, ctx.params.id);
+  ctx.body = await databases.connect(ctx.state.user, Number(ctx.params.id));
 });
 
 Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('disconnect from database');
-  ctx.body = await databases.disconnect(ctx.state.user, ctx.params.id);
+  ctx.body = await databases.disconnect(ctx.state.user, Number(ctx.params.id));
 });
 
-Router.post('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('get database schema');
-  ctx.body = await databases.schema(ctx.params.id);
+  ctx.body = await databases.schema(Number(ctx.params.id));
 });
 
 export default Router;

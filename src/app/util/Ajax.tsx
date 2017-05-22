@@ -88,7 +88,7 @@ export const Ajax =
         body,
       };
     }
-    
+
     return Ajax._req(
       method,
       "/midway/v1/" + url,
@@ -322,10 +322,10 @@ export const Ajax =
       (v, key) => delete userData[key]
     );
     userData['meta'] = JSON.stringify(meta);
-    
+
     return Ajax._reqMidway2(
       'post',
-      `users/${user.id}`, 
+      `users/${user.id}`,
       userData,
       onSave,
       {
@@ -334,7 +334,7 @@ export const Ajax =
     );
   },
 
-  changePassword(id: number, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
+  changePassword(id: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
     return Ajax._reqMidway2(
       'post',
@@ -353,7 +353,7 @@ export const Ajax =
   {
     return Ajax._reqMidway2(
       'post',
-      `users/${user.id}`, 
+      `users/${user.id}`,
       {
         isSuperUser: user.isSuperUser ? 1 : 0,
         isDisabled: user.isDisabled ? 1 : 0,
@@ -468,7 +468,7 @@ export const Ajax =
     // TODO
     onLoad(null);
     return null;
-    
+
     // if (!id || id.indexOf('@') === -1)
     // {
     //   onLoad(null);
@@ -662,6 +662,7 @@ export const Ajax =
       downloadFilename?: string;
     } = {}, */
     return Ajax._reqMidway2('get', '/database/' + dbId + '/schema', {}, (response: any) => {
+      let cols: object = JSON.parse(response);
       console.log('got schema for database ' + dbId + ':\n' + response.toString());
     });
       /*(resp: string) =>
@@ -670,29 +671,7 @@ export const Ajax =
         try
         {
           cols = JSON.parse(resp).results;
-          // var tables: {[name:string]: {name: string; columns: any[];}} = {};
 
-          // cols.map(
-          // (
-          //   col: { TABLE_NAME: string; COLUMN_NAME: string; }
-          // ) =>
-          // {
-          //   let column = _.extend(col, { name: col.COLUMN_NAME });
-          //   let table = col.TABLE_NAME;
-
-          //   if(!tables[table])
-          //   {
-          //     console.log('add table', table);
-          //     tables[table] = {
-          //       name: table,
-          //       columns: [],
-          //     };
-          //   }
-
-          //   tables[table].columns.push(column);
-          // });
-
-          // onLoad(_.toArray(tables) as any);
           onLoad(cols);
         }
         catch (e)
@@ -709,7 +688,7 @@ export const Ajax =
       );*/
   },
 
-  getDbs(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
+  getDbs(onLoad: (dbs: object) => void, onError?: (ev: Event) => void)
   {
     Ajax._postMidway1('/get_databases', {
       db: 'information_schema',
@@ -718,7 +697,7 @@ export const Ajax =
       try
       {
         const list = JSON.parse(resp);
-        onLoad(list.results.map((obj) => obj.schema_name));
+        onLoad(list.map((obj) => ({id: obj.id, name: obj.name, type: obj.type})));
       }
       catch (e)
       {

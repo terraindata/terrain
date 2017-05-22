@@ -51,7 +51,6 @@ import * as App from '../App';
 import DatabaseController from '../../database/DatabaseController';
 import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { ItemConfig, items } from '../items/ItemRouter';
 import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
 
@@ -150,10 +149,10 @@ export class Databases
 
   public async schema(id: number): Promise<string>
   {
-    const controller = await DatabaseRegistry.get(id);
+    const controller = DatabaseRegistry.get(id);
     if (controller === undefined)
     {
-      return Promise.reject('Invalid db id passed');
+      return Promise.reject('Invalid db id passed (schema)');
     }
 
     const schema: Tasty.Schema = await controller.getTasty().schema();

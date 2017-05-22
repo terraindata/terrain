@@ -45,6 +45,7 @@ THE SOFTWARE.
 require('./LibraryInfoColumn.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
 const {List} = Immutable;
 import CreateItem from '../../common/components/CreateItem';
 import BuilderStore from './../../builder/data/BuilderStore';
@@ -127,10 +128,10 @@ class LibraryInfoColumn extends Classs<Props>
       storeKeyPath: ['dbs'],
     });
 
-    Ajax.getDbs((dbs: string[]) =>
+    Ajax.getDbs((dbs: object) =>
     {
       LibraryActions.setDbs(
-        List(dbs),
+        List(_.map(dbs as any, (db) : string => db['name'])),
       );
     });
   }
@@ -280,7 +281,7 @@ class LibraryInfoColumn extends Classs<Props>
       this.props.variant || this.props.algorithm || this.props.group;
 
     let groupId: ID, opacity: number, icon: any;
-    
+
     switch (item && item.type)
     {
       case 'group':
@@ -404,7 +405,7 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
     }
 
     // TODO re-enable roles
-    
+
     // const gr = groupRoles && groupRoles.get(user.id);
     // const isSuperUser = gr && gr.isSuperUser;
     // const isBuilder = gr && gr.builder && !isSuperUser;
@@ -413,8 +414,8 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
 
     // const imSysAdmin = me.isSuperUser;
     // const imGroupAdmin = groupRoles && groupRoles.get(me.id) && groupRoles.get(me.id).admin;
-    
-    
+
+
     const isSuperUser = user.isSuperUser;
     const isBuilder = ! user.isSuperUser;
     const isViewer = false;
