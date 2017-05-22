@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'object-assign';
 import Util from '../../../util/Util';
 import Classs from './../../../common/components/Classs';
 
 const Constants = require('./constants');
 const Helpers = require('./helpers');
-const merge = require('object-assign');
 const CloseIcon = require('./../../../../images/icon_close.svg');
 const TerrainLogo = require('./../../../../images/logo_terrainCircle.svg');
 /* From Modernizr */
@@ -335,7 +335,7 @@ class NotificationItem extends Classs<Props> {
   {
     const notification = this.props.notification;
     let notificationClassName = 'notification notification-' + notification.level;
-    const notificationStyle = merge({}, this._styles.notification);
+    const notificationStyle = _.extend({}, this._styles.notification);
     const cssByPos: any = this._getCssPropertyByPosition();
 
     if (this.state.visible) {
