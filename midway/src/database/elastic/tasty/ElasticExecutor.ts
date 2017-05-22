@@ -61,19 +61,6 @@ export default class ElasticExecutor implements TastyExecutor
     this.client = client;
   }
 
-  /**
-   * ES specific extension -- gets the health of the ES cluster
-   */
-  public async health(): Promise<any>
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.client.cluster.health(
-        {},
-        makePromiseCallback(resolve, reject));
-    });
-  }
-
   public async schema(): Promise<TastySchema>
   {
     const result = await new Promise((resolve, reject) =>
@@ -89,23 +76,57 @@ export default class ElasticExecutor implements TastyExecutor
   /**
    * Returns the entire ES response object.
    */
-  public async fullQuery(queryObject: Elastic.SearchParams): Promise<any>
+  public async fullQuery(queries: Elastic.SearchParams[]): Promise<object>
   {
-    return new Promise((resolve, reject) =>
+    if (queries.length === 0)
     {
-      this.client.search(
-        queryObject,
-        makePromiseCallback(resolve, reject));
-    });
+      return [];
+    }
+
+    for (let i = 0; ; ++i)
+    {
+      const result = new Promise<object>((resolve, reject) =>
+      {
+        this.client.search(
+          queries[i],
+          makePromiseCallback(resolve, reject));
+      });
+
+      if (i === queries.length - 1)
+      {
+        return result;
+      }
+
+      await result;
+    }
   }
 
-  /**
-   * returns only the query hits
-   */
-  public async query(queryObject: Elastic.SearchParams)
+  public async query(query: ElasticQuery)
   {
-    const result = await this.fullQuery(queryObject);
-    return result.hits.hits;
+    let result: any;
+    switch (query.op)
+    {
+      case 'select':
+        result = await this.fullQuery(query.params as Elastic.SearchParams[]);
+        return result.hits.hits;
+      case 'upsert':
+        const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
+        const upserted = await this.upsertObjects(table, query.params);
+        result = [];
+        for (let i = 0; i < upserted.length; i++)
+        {
+          if ((query.primaryKeys.length > 0) &&
+            (query.params[i][query.primaryKeys[0]] === undefined))
+          {
+            const obj = {};
+            obj[query.primaryKeys[0]] = upserted[i]['_id'];
+            result.push(obj);
+          }
+        }
+        return result;
+      default:
+        throw new Error('Unknown query command ' + JSON.stringify(query));
+    }
   }
 
   public async destroy()
@@ -135,7 +156,6 @@ export default class ElasticExecutor implements TastyExecutor
     }
 
     const promises: Array<Promise<any>> = [];
-
     for (const element of elements)
     {
       promises.push(
@@ -143,18 +163,23 @@ export default class ElasticExecutor implements TastyExecutor
         {
           const query = {
             body: element,
-            id: this.makeID(table, element),
             index: table.getDatabaseName(),
             type: table.getTableName(),
           };
 
+          const compositePrimaryKey = this.makeID(table, element);
+          if (compositePrimaryKey !== '')
+          {
+            query['id'] = compositePrimaryKey;
+          }
+
           this.client.index(
-            query,
+            query as any,
             makePromiseCallback(resolve, reject));
         }),
       );
     }
-    await Promise.all(promises);
+    return Promise.all(promises);
   }
 
   /*
@@ -177,7 +202,7 @@ export default class ElasticExecutor implements TastyExecutor
   /*
    * Deletes the given objects based on their primary key
    */
-  public async deleteDocumentsByID(table: TastyTable, elements: object[])
+  public async deleteObjects(table: TastyTable, elements: object[])
   {
     const promises: Array<Promise<any>> = [];
     for (const element of elements)
@@ -197,39 +222,27 @@ export default class ElasticExecutor implements TastyExecutor
             makePromiseCallback(resolve, reject));
         }));
     }
-    await Promise.all(promises);
-  }
-
-  public async executeElasticTastyQuery(query: ElasticQuery)
-  {
-    switch (query.op)
-    {
-      case 'select':
-        return this.executeElasticTastySelectQuery(query);
-      default:
-        throw new Error('Unknown query command ' + JSON.stringify(query));
-    }
-  }
-
-  private async executeElasticTastySelectQuery(query: ElasticQuery)
-  {
-    return await this.query(query.param as Elastic.SearchParams);
+    return Promise.all(promises);
   }
 
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
   {
     const body: any[] = [];
-    for (let i = 0; i < elements.length; ++i)
+    for (const element of elements)
     {
-      const element = elements[i];
       const command =
         {
           index: {
-            _id: this.makeID(table, element),
             _index: table.getDatabaseName(),
             _type: table.getTableName(),
           },
         };
+
+      const compositePrimaryKey = this.makeID(table, element);
+      if (compositePrimaryKey !== '')
+      {
+        command.index['_id'] = compositePrimaryKey;
+      }
 
       body.push(command);
       body.push(element);

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Util from '../app/Util';
 import DatabaseController from '../database/DatabaseController';
 import TastyColumn from './TastyColumn';
 import TastyExecutor from './TastyExecutor';
@@ -163,21 +164,35 @@ export class Tasty
 
   /**
    * Update or insert an object or a list of objects.
-   *
-   * @param {TastyTable} table The table to upsert the object in.
-   * @param {(object | object[])} value An object or a list of objects to upsert.
-   * @returns {Promise<object[]>}
-   *
-   * @memberOf TastyInterface
+   * @param {TastyTable} table The table to upsert the objects in.
+   * @param {object | object[]} objs An object or an array of objects to upsert.
    */
-  public async upsert(table: TastyTable, value: object | object[]): Promise<object[]>
+  public async upsert(table: TastyTable, objs: object | object[]): Promise<object | object[]>
   {
-    const query = new TastyQuery(table);
-    query.upsert(value);
+    if (objs instanceof Array)
+    {
+      const query = new TastyQuery(table).upsert(objs);
+      const generatedQuery = this.generator.generate(query);
+      const upserted = await this.executor.query(generatedQuery);
 
-    const generatedQuery = this.generator.generate(query);
-    // return this.executor.upsert(generatedQuery);
-    return this.executor.query(generatedQuery);
+      // map auto-generated result ids to objects without primary keys
+      const primaryKeys = table.getPrimaryKeys();
+      const results = new Array(objs.length);
+      for (let i = 0, j = 0; i < objs.length; i++)
+      {
+        results[i] = objs[i];
+        if ((primaryKeys.length > 0) && results[i][primaryKeys[0]] === undefined)
+        {
+          results[i][primaryKeys[0]] = upserted[j++][primaryKeys[0]];
+        }
+      }
+      return results;
+    }
+    else if (typeof objs === 'object')
+    {
+      return this.upsert(table, [objs]);
+    }
+    throw new Error('Invalid object type');
   }
 
   /**

@@ -69,7 +69,5 @@ export async function checkResults(fileName: string, testName: string, results: 
   });
 
   const expected = JSON.parse(contents);
-  expect(results).toEqual(expected[testName]);
+  expect(results).toMatchObject(expected[testName]);
 }
-
-export default checkResults;

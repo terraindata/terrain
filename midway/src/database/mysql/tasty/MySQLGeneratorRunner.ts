@@ -242,7 +242,7 @@ export default class SQLiteGeneratorRunner
           {
             for (let i = accumulatedUpdates.length - 1; i >= 0; i--)
             {
-              this.generator.accumulateStatement('SELECT last_insert_rowid()-' + String(i) + ' as ' + primaryKeys[0]);
+              this.generator.accumulateStatement('SELECT LAST_INSERT_ID()-' + String(i) + ' as ' + primaryKeys[0]);
             }
           }
 
@@ -265,7 +265,7 @@ export default class SQLiteGeneratorRunner
     {
       for (let i = accumulatedUpdates.length - 1; i >= 0; i--)
       {
-        this.generator.accumulateStatement('SELECT last_insert_rowid()-' + String(i) + ' as ' + primaryKeys[0]);
+        this.generator.accumulateStatement('SELECT LAST_INSERT_ID()-' + String(i) + ' as ' + primaryKeys[0]);
       }
     }
   }

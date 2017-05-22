@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as winston from 'winston';
 
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
@@ -61,7 +62,7 @@ function getExpectedFile(): string
 let elasticController: ElasticController;
 let elasticExecutor: ElasticExecutor;
 
-const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+const DBMovies = new Tasty.Table('data', ['movieid'], ['title', 'releasedate'], 'movies');
 
 beforeAll(async () =>
 {
@@ -82,25 +83,11 @@ beforeAll(async () =>
   }
 });
 
-test('elastic health', async (done) =>
-{
-  try
-  {
-    const h = await elasticExecutor.health();
-    winston.debug(h);
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
-
 test('basic query', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.fullQuery(
+    const result: any = await elasticExecutor.fullQuery([
       {
         index: 'movies',
         type: 'data',
@@ -110,10 +97,8 @@ test('basic query', async (done) =>
         },
         size: 1,
       },
-    );
-    // winston.info(JSON.stringify(result, null, 2));
-    // console.log(h.hits.hits.forEach(
-    //     (result) => {console.log(JSON.stringify(result, null, 2));}));
+    ]);
+
     await Utils.checkResults(getExpectedFile(), 'basic query', result.hits);
   }
   catch (e)
@@ -194,7 +179,7 @@ test('stored PWL transform sort query', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.query(
+    const result = await elasticExecutor.fullQuery([
       {
         index: 'movies',
         type: 'data',
@@ -264,9 +249,9 @@ test('stored PWL transform sort query', async (done) =>
             },
           },
         },
-      });
+      }]);
 
-    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query', result);
+    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query', result['hits']['hits']);
   }
   catch (e)
   {
@@ -279,7 +264,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.query(
+    const result = await elasticExecutor.fullQuery([
       {
         index: 'movies',
         type: 'data',
@@ -355,9 +340,32 @@ test('stored PWL transform sort query using function_score', async (done) =>
             },
           },
         },
-      });
+      }]);
 
-    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', result);
+    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', result['hits']['hits']);
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
+
+test('Elastic: upsert', async (done) =>
+{
+  try
+  {
+    const movies: object[] = [];
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+
+    const results: any = await elasticController.getTasty().upsert(DBMovies, movies);
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
+    {
+      expect(results[i]).toMatchObject(movies[i]);
+      expect(results[i]['movieid']).not.toBe('');
+    }
   }
   catch (e)
   {
