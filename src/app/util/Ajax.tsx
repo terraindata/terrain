@@ -429,7 +429,11 @@ export const Ajax =
             v =>
             {
               v = v.set('algorithmId', v.parent);
-              v = v.set('groupId', mapping.ALGORITHM.get(v.algorithmId).groupId);
+              const alg = mapping.ALGORITHM.get(v.algorithmId);
+              if(alg)
+              {
+                v = v.set('groupId', alg.groupId);
+              }
               return v;
             },
           ).toMap();
