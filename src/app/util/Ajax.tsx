@@ -647,45 +647,18 @@ export const Ajax =
     );
   },
 
-  schema(dbId: number, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
+  schema(dbId: number, onLoad: (columns: object, error?: any) => void, onError?: (ev: Event) => void)
   {
-    /*_reqMidway2(
-    method: 'post' | 'get',
-    url: string,
-    data: object,
-    onLoad: (response: any) => void,
-    config: {
-      onError?: (response: any) => void,
-      // crossDomain?: boolean;
-      noToken?: boolean;
-      download?: boolean;
-      downloadFilename?: string;
-    } = {}, */
     return Ajax._reqMidway2('get', '/database/' + dbId + '/schema', {}, (response: any) => {
-      let cols: object = JSON.parse(response);
-      console.log('got schema for database ' + dbId + ':\n' + response.toString());
-    });
-      /*(resp: string) =>
+      try {
+        const cols: object = JSON.parse(response);
+        onLoad(cols);
+      }
+      catch (e)
       {
-        let cols: any = null;
-        try
-        {
-          cols = JSON.parse(resp).results;
-
-          onLoad(cols);
-        }
-        catch (e)
-        {
-          onError && onError(resp as any);
-        }
-
-        if (cols)
-        {
-          onLoad(cols as any);
-        }
-      },
-      onError,
-      );*/
+        onError && onError(response as any);
+      }
+    });
   },
 
   getDbs(onLoad: (dbs: object) => void, onError?: (ev: Event) => void)

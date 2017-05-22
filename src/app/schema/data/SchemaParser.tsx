@@ -58,7 +58,7 @@ export module SchemaParser
 {
   export function parseMySQLDb(
     db: object,
-    colsData: any[],
+    colsData: object,
     setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void,
   ) {
     let database = SchemaTypes._Database({
@@ -73,7 +73,7 @@ export module SchemaParser
     let tableNames = List<string>([]);
     let columnNamesByTable = Map<string, List<string>>([]);
 
-    colsData.map(
+    _.map((colsData as any),
       (
         col: {
           TABLE_CATALOG: string,

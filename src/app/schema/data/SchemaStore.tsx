@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
 import Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
 import SchemaTypes from '../SchemaTypes';
