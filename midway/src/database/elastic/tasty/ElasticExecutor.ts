@@ -145,7 +145,7 @@ export default class ElasticExecutor implements TastyExecutor
     for (let i = 0; i < upserted.length; i++)
     {
       results[i] = elements[i];
-      if ((primaryKeys.length > 0) &&
+      if ((primaryKeys.length === 1) &&
         (elements[i][primaryKeys[0]] === undefined))
       {
         results[i][primaryKeys[0]] = upserted[i]['_id'];

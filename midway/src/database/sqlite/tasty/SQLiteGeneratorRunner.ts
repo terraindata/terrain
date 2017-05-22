@@ -184,7 +184,7 @@ export default class SQLiteGeneratorRunner
         const primaryKeys = query.table.getPrimaryKeys();
         for (const obj of query.upserts)
         {
-          if ((primaryKeys.length > 0) && (obj[primaryKeys[0]] === undefined))
+          if ((primaryKeys.length === 1) && (obj[primaryKeys[0]] === undefined))
           {
             inserts.push(obj);
           }

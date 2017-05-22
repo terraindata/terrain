@@ -118,7 +118,7 @@ export class SQLiteExecutor implements TastyExecutor
     for (let i = elements.length - 1; i >= 0; i--)
     {
       results[i] = elements[i];
-      if ((primaryKeys.length > 0) &&
+      if ((primaryKeys.length === 1) &&
         (elements[i][primaryKeys[0]] === undefined))
       {
         results[i][primaryKeys[0]] = lastID--;
