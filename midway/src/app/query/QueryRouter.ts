@@ -108,7 +108,7 @@ QueryRouter.get(
       throw new Error('Database "' + databaseID + '" not found.');
     }
     const qh: QueryHandler = database.getQueryHandler();
-    ctx.type = 'text/plain'
+    ctx.type = 'text/plain';
     ctx.body = qh.consumeStream(streamID);
   });
 

@@ -115,7 +115,6 @@ export default class ElasticQueryHandler extends QueryHandler
     return r;
   }
 
-
   private createStreamQuery(request: Query): number
   {
     const client = this.controller.getClient();
