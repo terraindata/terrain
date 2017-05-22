@@ -129,6 +129,7 @@ test('SQLite: upsert', async (done) =>
 
     const results: any = await tasty.upsert(DBMovies, movies);
     expect(results).not.toBeUndefined();
+    expect(results.length).toBe(movies.length);
     for (let i = 0; i < results.length; i++)
     {
       expect(results[i]).toMatchObject(movies[i]);
