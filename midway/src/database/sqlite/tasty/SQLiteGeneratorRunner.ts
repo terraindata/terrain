@@ -177,26 +177,7 @@ export default class SQLiteGeneratorRunner
     {
       if (query.upserts.length > 0)
       {
-        const inserts: object[] = [];
-        const upserts: object[] = [];
-
-        // partition upsert objects into those which have primary keys and those which do not
-        const primaryKeys = query.table.getPrimaryKeys();
-        for (const obj of query.upserts)
-        {
-          if ((primaryKeys.length === 1) && (obj[primaryKeys[0]] === undefined))
-          {
-            inserts.push(obj);
-          }
-          else
-          {
-            upserts.push(obj);
-          }
-        }
-
-        this.generateUpsertQuery(query, upserts, false);
-        this.generator.queryString = '';
-        this.generateUpsertQuery(query, inserts, true);
+        this.generateUpsertQuery(query, query.upserts);
       }
       this.generator.queryString = '';
     }
@@ -209,13 +190,8 @@ export default class SQLiteGeneratorRunner
     return this.generator.statements;
   }
 
-  private generateUpsertQuery(query: TastyQuery, upserts: object[], lastId: boolean)
+  private generateUpsertQuery(query: TastyQuery, upserts: object[])
   {
-    if (upserts.length === 0)
-    {
-      return;
-    }
-
     this.generator.appendExpression(query.command);
     this.generator.queryString += ' ';
     this.generator.indent();
@@ -258,9 +234,5 @@ export default class SQLiteGeneratorRunner
     }
 
     this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
-    if (lastId)
-    {
-      this.generator.accumulateStatement('SELECT last_insert_rowid() as id');
-    }
   }
 }

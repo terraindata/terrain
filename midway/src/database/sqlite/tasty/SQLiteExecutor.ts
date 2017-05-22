@@ -105,23 +105,39 @@ export class SQLiteExecutor implements TastyExecutor
 
   public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
   {
-    const upserted = await this.query(statements);
     const primaryKeys = table.getPrimaryKeys();
-    const results = new Array(elements.length);
 
-    let lastID: number = 0;
-    if (upserted.length > 0 && upserted[0]['id'] !== undefined)
+    const lastIDs: number[] = [];
+    for (const statement of statements)
     {
-      lastID = upserted[0]['id'];
+      const result = await new Promise<number>((resolve, reject) =>
+      {
+        this.client.run(statement, [], function(error: Error, ctx: any)
+        {
+          if (error !== null && error !== undefined)
+          {
+            reject(error);
+          }
+          else
+          {
+            if (this['lastID'] !== undefined)
+            {
+              resolve(this['lastID']);
+            }
+          }
+        });
+      });
+      lastIDs.push(result);
     }
 
-    for (let i = elements.length - 1; i >= 0; i--)
+    const results = new Array(elements.length);
+    for (let i = 0, j = 0; i < results.length; i++)
     {
       results[i] = elements[i];
       if ((primaryKeys.length === 1) &&
         (elements[i][primaryKeys[0]] === undefined))
       {
-        results[i][primaryKeys[0]] = lastID--;
+        results[i][primaryKeys[0]] = lastIDs[j++];
       }
     }
 

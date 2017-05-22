@@ -76,7 +76,6 @@ class SQLiteClient
     return this.delegate.run(sql, params, callback);
   }
 
-
   public all(sql: string, callback?: (err: Error, rows: any[]) => void): sqlite3.Database
   {
     this.controller.log('all', sql);
