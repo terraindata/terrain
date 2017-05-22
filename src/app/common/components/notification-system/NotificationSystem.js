@@ -45,7 +45,7 @@ THE SOFTWARE.
 /* Adapted from https://github.com/igorprado/react-notification-system */
 
 var React = require('react');
-const _  = require('underscore');
+var merge = require('object-assign');
 var NotificationContainer = require('./NotificationContainer');
 var Constants = require('./constants');
 var Styles = require('./styles');
@@ -65,7 +65,7 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
 
     wrapper: function() {
       if (!this.overrideStyle) return {};
-      return _.extend({}, Styles.Wrapper, this.overrideStyle.Wrapper);
+      return merge({}, Styles.Wrapper, this.overrideStyle.Wrapper);
     },
 
     container: function(position) {
@@ -82,7 +82,7 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
         this.overrideWidth = override[position].width;
       }
 
-      return _.extend({}, Styles.Containers.DefaultStyle, Styles.Containers[position], override.DefaultStyle, override[position]);
+      return merge({}, Styles.Containers.DefaultStyle, Styles.Containers[position], override.DefaultStyle, override[position]);
     },
 
     elements: {
@@ -100,7 +100,7 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
         var _element = self.elements[element];
         var override = self.overrideStyle[_element] || {};
         if (!self.overrideStyle) return {};
-        return _.extend({}, Styles[_element].DefaultStyle, Styles[_element][level], override.DefaultStyle, override[level]);
+        return merge({}, Styles[_element].DefaultStyle, Styles[_element][level], override.DefaultStyle, override[level]);
       };
     }
   },
@@ -145,7 +145,7 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
   },
 
   addNotification: function(notification) {
-    var _notification = _.extend({}, Constants.notification, notification);
+    var _notification = merge({}, Constants.notification, notification);
     var notifications = JSON.parse(JSON.stringify(this.state.notifications));
     var i;
 

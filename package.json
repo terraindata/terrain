@@ -90,7 +90,7 @@
     "moment": "^2.13.0",
     "mysql": "^2.13.0",
     "node-libs-browser": "0.6.0",
-    "object-assign": "4.1.1",
+    "object-assign": "^4.1.1",
     "passport-local": "^1.0.0",
     "radium": "^0.18.2",
     "react": "^15.0.1",
