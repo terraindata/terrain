@@ -108,7 +108,13 @@ export class SQLiteExecutor implements TastyExecutor
     const upserted = await this.query(statements);
     const primaryKeys = table.getPrimaryKeys();
     const results = new Array(elements.length);
-    let lastID = upserted[0]['id'];
+
+    let lastID: number = 0;
+    if (upserted.length > 0 && upserted[0]['id'] !== undefined)
+    {
+      lastID = upserted[0]['id'];
+    }
+
     for (let i = elements.length - 1; i >= 0; i--)
     {
       results[i] = elements[i];
