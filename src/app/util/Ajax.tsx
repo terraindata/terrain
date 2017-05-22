@@ -703,39 +703,6 @@ export const Ajax =
         body,
       };
 
-      const parseResult = (resp) =>
-      {
-        let result: QueryResponse = {results: []};
-        try
-        {
-          const hits = resp.result.hits.hits;
-          const results = hits.map((hit) =>
-          {
-            let source = hit._source;
-            source._index = hit._index;
-            source._type = hit._type;
-            source._id = hit._id;
-            source._score = hit._score;
-            source._sort = hit._sort;
-            return source;
-          });
-
-          result = {results};
-        }
-        catch (e)
-        {
-          // absorb
-        }
-
-        // This could be improved
-        if (resp.errors.length > 0)
-        {
-          result.errorMessage = resp.errors[0].title;
-        }
-
-        return result;
-      };
-
       const onLoadHandler = (resp) =>
       {
         let result: QueryResponse = {results: []};
