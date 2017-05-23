@@ -148,7 +148,7 @@ describe('User and auth route tests', () =>
       .then((response) =>
       {
         expect(JSON.parse(response.text))
-          .toMatchObject([{accessToken: '', email: 'test@terraindata.com', id}]);
+          .toMatchObject([{ accessToken: '', email: 'test@terraindata.com', id }]);
       })
       .catch((error) =>
       {
