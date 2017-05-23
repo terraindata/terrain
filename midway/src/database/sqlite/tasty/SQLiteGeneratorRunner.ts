@@ -177,26 +177,7 @@ export default class SQLiteGeneratorRunner
     {
       if (query.upserts.length > 0)
       {
-        const inserts: object[] = [];
-        const upserts: object[] = [];
-
-        // partition upsert objects into those which have primary keys and those which do not
-        const primaryKeys = query.table.getPrimaryKeys();
-        for (const obj of query.upserts)
-        {
-          if ((primaryKeys.length > 0) && (obj[primaryKeys[0]] === undefined))
-          {
-            inserts.push(obj);
-          }
-          else
-          {
-            upserts.push(obj);
-          }
-        }
-
-        this.generateUpsertQuery(query, upserts, false);
-        this.generator.queryString = '';
-        this.generateUpsertQuery(query, inserts, true);
+        this.generateUpsertQuery(query, query.upserts);
       }
       this.generator.queryString = '';
     }
@@ -209,7 +190,7 @@ export default class SQLiteGeneratorRunner
     return this.generator.statements;
   }
 
-  private generateUpsertQuery(query: TastyQuery, upserts: object[], lastId: boolean)
+  private generateUpsertQuery(query: TastyQuery, upserts: object[])
   {
     this.generator.appendExpression(query.command);
     this.generator.queryString += ' ';
@@ -222,7 +203,6 @@ export default class SQLiteGeneratorRunner
 
     const baseQuery = this.generator.queryString;
 
-    const primaryKeys = query.table.getPrimaryKeys();
     const columns: string[] = query.table.getColumnNames();
     let definedColumnsList: string[] = [];
     let definedColumnsSet: Set<string> = new Set();
@@ -238,13 +218,6 @@ export default class SQLiteGeneratorRunner
         if (isInObj !== isInDefined)
         {
           this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
-          if (lastId)
-          {
-            for (let i = accumulatedUpdates.length - 1; i >= 0; i--)
-            {
-              this.generator.accumulateStatement('SELECT last_insert_rowid()-' + String(i) + ' as ' + primaryKeys[0]);
-            }
-          }
 
           this.generator.queryString = baseQuery;
           definedColumnsList = this.generator.getDefinedColumns(columns, obj);
@@ -261,12 +234,5 @@ export default class SQLiteGeneratorRunner
     }
 
     this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
-    if (lastId)
-    {
-      for (let i = accumulatedUpdates.length - 1; i >= 0; i--)
-      {
-        this.generator.accumulateStatement('SELECT last_insert_rowid()-' + String(i) + ' as ' + primaryKeys[0]);
-      }
-    }
   }
 }

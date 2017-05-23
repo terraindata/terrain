@@ -68,7 +68,7 @@ class MySQLController extends DatabaseController
     this.tasty = new Tasty.Tasty(
       this,
       new MySQLExecutor(this.client),
-      new MySQLGenerator()); // currently shares SQLite's generator
+      new MySQLGenerator());
   }
 
   public getClient(): MySQLClient

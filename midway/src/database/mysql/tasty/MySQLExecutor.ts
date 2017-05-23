@@ -47,8 +47,10 @@ THE SOFTWARE.
 import * as mysql from 'mysql';
 import TastyExecutor from '../../../tasty/TastyExecutor';
 import TastySchema from '../../../tasty/TastySchema';
+import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import MySQLClient from '../client/MySQLClient';
+import MySQLGenerator from './MySQLGenerator';
 
 export class MySQLExecutor implements TastyExecutor
 {
@@ -85,6 +87,24 @@ export class MySQLExecutor implements TastyExecutor
 
       results = results.concat(result);
     }
+    return results;
+  }
+
+  public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
+  {
+    const primaryKeys = table.getPrimaryKeys();
+    const upserted = await this.query(statements);
+    const results = new Array(upserted.length);
+    for (let i = 0; i < results.length; i++)
+    {
+      results[i] = elements[i];
+      if ((primaryKeys.length === 1) &&
+        (elements[i][primaryKeys[0]] === undefined))
+      {
+        results[i][primaryKeys[0]] = upserted[i]['insertId'];
+      }
+    }
+
     return results;
   }
 

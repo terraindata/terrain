@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import TastyExecutor from '../../../tasty/TastyExecutor';
 import TastySchema from '../../../tasty/TastySchema';
+import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
 import SQLiteClient from '../client/SQLiteClient';
 import SQLiteConfig from '../SQLiteConfig';
@@ -99,6 +100,47 @@ export class SQLiteExecutor implements TastyExecutor
 
       results = results.concat(result);
     }
+    return results;
+  }
+
+  public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
+  {
+    const primaryKeys = table.getPrimaryKeys();
+
+    const lastIDs: number[] = [];
+    for (const statement of statements)
+    {
+      const result = await new Promise<number>((resolve, reject) =>
+      {
+        this.client.run(statement, [], function(error: Error, ctx: any)
+        {
+          if (error !== null && error !== undefined)
+          {
+            reject(error);
+          }
+          else
+          {
+            if (this['lastID'] !== undefined)
+            {
+              resolve(this['lastID']);
+            }
+          }
+        });
+      });
+      lastIDs.push(result);
+    }
+
+    const results = new Array(elements.length);
+    for (let i = 0, j = 0; i < results.length; i++)
+    {
+      results[i] = elements[i];
+      if ((primaryKeys.length === 1) &&
+        (elements[i][primaryKeys[0]] === undefined))
+      {
+        results[i][primaryKeys[0]] = lastIDs[j++];
+      }
+    }
+
     return results;
   }
 

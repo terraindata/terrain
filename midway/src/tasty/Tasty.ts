@@ -172,21 +172,8 @@ export class Tasty
     if (objs instanceof Array)
     {
       const query = new TastyQuery(table).upsert(objs);
-      const generatedQuery = this.generator.generate(query);
-      const upserted = await this.executor.query(generatedQuery);
-
-      // map auto-generated result ids to objects without primary keys
-      const primaryKeys = table.getPrimaryKeys();
-      const results = new Array(objs.length);
-      for (let i = 0, j = 0; i < objs.length; i++)
-      {
-        results[i] = objs[i];
-        if ((primaryKeys.length > 0) && results[i][primaryKeys[0]] === undefined)
-        {
-          results[i][primaryKeys[0]] = upserted[j++][primaryKeys[0]];
-        }
-      }
-      return results;
+      const queryString: string[] = this.generator.generate(query);
+      return this.executor.upsert(table, queryString, objs);
     }
     else if (typeof objs === 'object')
     {
