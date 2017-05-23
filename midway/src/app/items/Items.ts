@@ -69,10 +69,20 @@ export class Items
 
   constructor()
   {
-    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parent', 'status', 'type']);
+    this.itemTable = new Tasty.Table(
+      'items',
+      ['id'],
+      [
+        'meta',
+        'name',
+        'parent',
+        'status',
+        'type',
+      ],
+    );
   }
 
-  public async delete(id: number): Promise<object[]>
+  public async delete(id: number): Promise<object>
   {
     return App.DB.delete(this.itemTable, { id } as ItemConfig);
   }
@@ -94,9 +104,9 @@ export class Items
   // both regular and superusers can create items
   // only superusers can change existing items that are not BUILD status
   // both regular and superusers can change items that are not LIVE or DEFAULT status
-  public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
+  public async upsert(user: UserConfig, item: ItemConfig): Promise<ItemConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<ItemConfig>(async (resolve, reject) =>
     {
       // check privileges if setting to live/default
       if (user.isSuperUser === 0 && (item.status === 'LIVE' || item.status === 'DEFAULT'))
@@ -133,15 +143,7 @@ export class Items
         item = Util.updateObject(items[0], item);
       }
 
-      try
-      {
-        await App.DB.upsert(this.itemTable, item);
-        resolve('Success');
-      }
-      catch (e)
-      {
-        reject(e);
-      }
+      resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
     });
   }
 }

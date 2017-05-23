@@ -248,7 +248,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       {
         score: 0,
         color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Default),
-        name: 'Variants in Live Status',
+        name: 'Variants in Default Status',
       },
     };
 
@@ -256,7 +256,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       (v: Variant) =>
         v.algorithmId === id,
     );
-
+    
     variants.map(
       (v: Variant) =>
         scores[v.status].score ++,

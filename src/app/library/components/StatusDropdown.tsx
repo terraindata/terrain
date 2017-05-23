@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./StatusDropdown.less');
+import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 const {List} = Immutable;
@@ -110,12 +111,12 @@ class StatusDropdown extends PureClasss<Props>
 
     if (!this.canEdit())
     {
-      if (variant.status === LibraryTypes.ItemStatus.Default)
-      {
-        return LockedOptionDefault;
-      }
-
       return LockedOptions[variant.status];
+    }
+    
+    if (this.state.isSuperUser)
+    {
+      return AdminOptions;
     }
 
     if (this.state.isBuilder)
@@ -128,12 +129,17 @@ class StatusDropdown extends PureClasss<Props>
 
   getOrder(): Array<Status | string>
   {
+    if (this.state.isSuperUser)
+    {
+      return AdminOptionsOrder;
+    }
+    
     if (this.state.isBuilder)
     {
       return BuilderOptionsOrder;
     }
 
-    return AdminOptionsOrder;
+    return [];
   }
 
   getSelectedIndex(): number
@@ -240,12 +246,9 @@ const BuilderOptionsOrder =
 ];
 const BuilderOptions = List(BuilderOptionsOrder.map(getOption));
 
-const LockedOptions = Util.mapEnum(Status, (status) =>
+const LockedOptions = _.map(Status, (status) =>
 {
-  return List([getOption(+status as any)]);
+  return List([getOption(status)]);
 });
-const LockedOptionDefault = List([
-  getOption(LibraryTypes.ItemStatus.Default),
-]);
 
 export default StatusDropdown;

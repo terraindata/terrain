@@ -225,6 +225,7 @@ class DeployModalColumn extends PureClasss<Props>
           </div>
         </div>
         {
+          false && /* temp disable */
           status === ItemStatus.Live &&
             <div>
               <div

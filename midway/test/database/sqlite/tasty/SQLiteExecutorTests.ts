@@ -75,7 +75,8 @@ beforeAll(async () =>
   {
     sqliteController = new SQLiteController(config, 0, 'SQLiteExecutorTests');
     tasty = sqliteController.getTasty();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -91,7 +92,8 @@ function runTest(index: number)
       const results = await tasty.getExecutor().query(SQLQueries[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
 
-    } catch (e)
+    }
+    catch (e)
     {
       fail(e);
     }
@@ -106,7 +108,6 @@ for (let i = 0; i < SQLQueries.length; i++)
 
 test('tasty select', async (done) =>
 {
-  const movieid = 123;
   const results = await tasty.select(DBMovies, [], { movieid: 123 });
   expect(results[0])
     .toEqual({
@@ -114,6 +115,31 @@ test('tasty select', async (done) =>
       releasedate: '1994-07-14 00:00:00',
       title: 'Chungking Express (Chung Hing sam lam) (1994)',
     });
+  done();
+});
+
+test('SQLite: upsert', async (done) =>
+{
+  try
+  {
+    const movies: object[] = [];
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[2] = { movieid: 232323, title: 'Guardians of the Galaxy 2', releasedate: new Date('04/04/17').toISOString().substring(0, 10) };
+
+    const results: any = await tasty.upsert(DBMovies, movies);
+    expect(results).not.toBeUndefined();
+    expect(results.length).toBe(movies.length);
+    for (let i = 0; i < results.length; i++)
+    {
+      expect(results[i]).toMatchObject(movies[i]);
+      expect(results[i]['movieid']).toBeGreaterThan(0);
+    }
+  }
+  catch (e)
+  {
+    fail(e);
+  }
   done();
 });
 
@@ -126,7 +152,7 @@ test('SQLite: schema', async (done) =>
       tree: {
         'moviesdb.db': {
           movies: {
-            movieid: { type: 'int(11)' },
+            movieid: { type: 'INTEGER' },
             title: { type: 'varchar(255)' },
             genres: { type: 'varchar(255)' },
             backdroppath: { type: 'varchar(255)' },
@@ -144,11 +170,20 @@ test('SQLite: schema', async (done) =>
             language: { type: 'varchar(255)' },
             runtime: { type: 'int(11)' },
           },
+          sqlite_sequence: {
+            name: {
+              type: '',
+            },
+            seq: {
+              type: '',
+            },
+          },
         },
       },
     };
     expect(result).toEqual(expected);
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -160,7 +195,8 @@ afterAll(async () =>
   try
   {
     await tasty.destroy();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }

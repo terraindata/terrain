@@ -49,11 +49,12 @@ THE SOFTWARE.
 // import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
 
-import Query from '../../../app/query/Query';
 import QueryHandler from '../../../app/query/QueryHandler';
+import QueryRequest from '../../../app/query/QueryRequest';
 import QueryResponse from '../../../app/query/QueryResponse';
-import { MidwayErrorItem } from '../../../error/MidwayErrorItem';
-import QueryError from '../../../error/QueryError';
+import MidwayErrorItem from '../../../error/MidwayErrorItem';
+import { ElasticQueryError, QueryError } from '../../../error/QueryError';
+import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
 import ElasticsearchScrollStream = require('elasticsearch-scroll-stream');
 import { Readable } from 'stream';
@@ -74,7 +75,7 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: Query): Promise<QueryResponse | Readable>
+  public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
   {
     const type = request.type;
     let body = request.body;

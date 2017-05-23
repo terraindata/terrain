@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import MidwayError from '../../src/error/MidwayError';
 let server;
 
 beforeAll((done) =>
@@ -145,8 +146,8 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          .toBe('Success');
+        expect(JSON.parse(response.text))
+          .toMatchObject([{ accessToken: '', email: 'test@terraindata.com', id }]);
       })
       .catch((error) =>
       {

@@ -117,9 +117,9 @@ export const Ajax =
           }
         },
         _.extend({
-          host:        'http://localhost:3000',
-          noToken:     true,
-          json:        true,
+          host: NODEWAY_HOST,
+          noToken: true,
+          json: true,
           crossDomain: false,
         }, config),
       );
@@ -272,7 +272,8 @@ export const Ajax =
       return Ajax._req('GET', url, data, onLoad, {onError});
     },
 
-    _postMidway1(url: string,
+    _postMidway1(
+      url: string,
       reqFields: { [f: string]: any },
       onLoad: (resp: string) => void,
       onError?: (ev: Event) => void,
@@ -280,14 +281,15 @@ export const Ajax =
         download?: boolean;
         downloadFilename?: string;
         useMidway?: boolean;
-      } = {},): { xhr: XMLHttpRequest, queryId: string }
+      } = {}
+    ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const unique_id = '' + Math.random();
+      const uniqueId = '' + Math.random();
       return {
-        xhr:     Ajax._req('POST', url, JSON.stringify(_.extend(
+        xhr: Ajax._req('POST', url, JSON.stringify(_.extend(
           {
             timestamp: (new Date()).toISOString(),
-            unique_id,
+            uniqueId,
           }, reqFields)),
 
           onLoad,
@@ -301,7 +303,7 @@ export const Ajax =
             downloadFilename: options.downloadFilename,
           },
         ),
-        queryId: unique_id,
+        queryId: uniqueId,
       };
     },
 
@@ -793,8 +795,40 @@ export const Ajax =
         onError,
       );
     },
+    
+    schema(dbId: number, onLoad: (columns: object, error?: any) => void, onError?: (ev: Event) => void)
+    {
+      return Ajax._reqMidway2('get', '/database/' + dbId + '/schema', {}, (response: any) => {
+        try {
+          const cols: object = JSON.parse(response);
+          onLoad(cols);
+        }
+        catch (e)
+        {
+          onError && onError(response as any);
+        }
+      });
+    },
 
-    schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
+    getDbs(onLoad: (dbs: object) => void, onError?: (ev: Event) => void)
+    {
+      Ajax._postMidway1('/get_databases', {
+        db: 'information_schema',
+      }, (resp) =>
+      {
+        try
+        {
+          const list = JSON.parse(resp);
+          onLoad(list.map((obj) => ({id: obj.id, name: obj.name, type: obj.type})));
+        }
+        catch (e)
+        {
+          onError && onError(e as any);
+        }
+      }, onError);
+    },
+
+    schema_m1(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       return Ajax._postMidway1('/get_schema', {
           db,
@@ -844,7 +878,7 @@ export const Ajax =
       );
     },
 
-    getDbs(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
+    getDbs_m1(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
     {
       Ajax._postMidway1('/get_databases', {
         db: 'information_schema',

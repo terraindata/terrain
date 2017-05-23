@@ -49,11 +49,11 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import { Readable } from 'stream';
-import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
 import { QueryHandler } from './QueryHandler';
+import QueryRequest from './QueryRequest';
 import QueryResponse from './QueryResponse';
 
 const QueryRouter = new KoaRouter();
@@ -73,13 +73,13 @@ QueryRouter.post(
   async (ctx, next) =>
   {
     winston.info(JSON.stringify(ctx.request, null, 1));
-    let query: Query;
+    let query: QueryRequest;
     if (ctx.request.type === 'application/json')
     {
-      query = ctx.request.body.body as Query;
+      query = ctx.request.body.body as QueryRequest;
     } else if (ctx.request.type === 'application/x-www-form-urlencoded')
     {
-      query = JSON.parse(ctx.request.body.data).body as Query;
+      query = JSON.parse(ctx.request.body.data).body as QueryRequest;
     } else
     {
       throw new Error('Unknown Request Type ' + String(ctx.request.body));

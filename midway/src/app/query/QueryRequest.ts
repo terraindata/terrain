@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface Query
+export interface QueryRequest
 {
   database: number;
   type: string;
@@ -52,4 +52,4 @@ export interface Query
   streaming?: boolean;
 }
 
-export default Query;
+export default QueryRequest;

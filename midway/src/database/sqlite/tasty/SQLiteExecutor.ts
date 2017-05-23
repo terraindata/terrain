@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import TastyExecutor from '../../../tasty/TastyExecutor';
 import TastySchema from '../../../tasty/TastySchema';
+import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
 import SQLiteClient from '../client/SQLiteClient';
 import SQLiteConfig from '../SQLiteConfig';
@@ -85,51 +86,63 @@ export class SQLiteExecutor implements TastyExecutor
   /**
    * executes statements sequentially
    * @param statements
-   * @returns {Promise<Array>} the result of the last one
+   * @returns {Promise<Array>} appended result objects
    */
   public async query(statements: string[]): Promise<object[]>
   {
-    if (statements.length === 0)
+    let results: object[] = [];
+    for (const statement of statements)
     {
-      return [];
-    }
-
-    for (let i = 0; ; ++i)
-    {
-      const statement: string = statements[i];
-      const result: Promise<object[]> = new Promise<object[]>((resolve, reject) =>
+      const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
         this.client.all(statement, makePromiseCallback(resolve, reject));
       });
 
-      if (i === statements.length - 1)
-      {
-        return result;
-      }
-
-      await result;
+      results = results.concat(result);
     }
+    return results;
   }
 
-  // /**
-  //  * executes statements sequentially
-  //  * @param statements
-  //  * @returns {Promise<Array>} appended result objects
-  //  */
-  // public async upsert(statements: string[]): Promise<object[]>
-  // {
-  //   const result : object[] = [];
-  //
-  //   for (const statement of statements)
-  //   {
-  //     const result = await new Promise<object[]>((resolve, reject) =>
-  //     {
-  //       this.client.all(statement, makePromiseCallback(resolve, reject));
-  //     });
-  //
-  //     result.concat();
-  //   }
-  // }
+  public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
+  {
+    const primaryKeys = table.getPrimaryKeys();
+
+    const lastIDs: number[] = [];
+    for (const statement of statements)
+    {
+      const result = await new Promise<number>((resolve, reject) =>
+      {
+        this.client.run(statement, [], function(error: Error, ctx: any)
+        {
+          if (error !== null && error !== undefined)
+          {
+            reject(error);
+          }
+          else
+          {
+            if (this['lastID'] !== undefined)
+            {
+              resolve(this['lastID']);
+            }
+          }
+        });
+      });
+      lastIDs.push(result);
+    }
+
+    const results = new Array(elements.length);
+    for (let i = 0, j = 0; i < results.length; i++)
+    {
+      results[i] = elements[i];
+      if ((primaryKeys.length === 1) &&
+        (elements[i][primaryKeys[0]] === undefined))
+      {
+        results[i][primaryKeys[0]] = lastIDs[j++];
+      }
+    }
+
+    return results;
+  }
 
   public async destroy(): Promise<void>
   {

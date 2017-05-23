@@ -51,7 +51,8 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
     if (error !== null && error !== undefined)
     {
       reject(error);
-    } else
+    }
+    else
     {
       resolve(response);
     }
@@ -65,7 +66,8 @@ export function makePromiseCallback0(resolve: () => void, reject: (Error) => voi
     if (error !== null && error !== undefined)
     {
       reject(error);
-    } else
+    }
+    else
     {
       resolve();
     }

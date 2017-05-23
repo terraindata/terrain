@@ -1,6 +1,5 @@
 {
   "search" : {
-    "total" : 27278,
     "max_score" : null,
     "hits" : [
       {
@@ -160,7 +159,6 @@
     }
   },
   "putScript" : {
-    "total" : 27278,
     "max_score" : null,
     "hits" : [
       {

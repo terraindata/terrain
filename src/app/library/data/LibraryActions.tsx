@@ -98,23 +98,26 @@ const Actions =
   algorithms:
   {
     create:
-      (groupId: ID) =>
+      (
+        groupId: ID,
+        algorithm = LibraryTypes._Algorithm(),
+        idCallback?: (id: ID) => void
+      ) =>
       {
+        algorithm = algorithm
+          .set('parent', groupId)
+          .set('groupId', groupId);
+          
         Ajax.saveItem(
-          LibraryTypes._Algorithm({
-            parent: groupId,
-          }),
+          algorithm,
           (response) =>
           {
             // on load
             let id = response.id; //??
             $(ActionTypes.algorithms.create, {
-              algorithm: LibraryTypes._Algorithm({
-                id,
-                parent: groupId,
-                groupId,
-              })
+              algorithm: algorithm.set('id', id),
             });
+            idCallback(id);
           }
         );
       },
@@ -129,7 +132,33 @@ const Actions =
 
     duplicate:
       (algorithm: Algorithm, index: number, groupId?: ID) =>
-        $(ActionTypes.algorithms.duplicate, { algorithm, index, groupId }),
+      {
+        let {variantsOrder} = algorithm;
+        
+        groupId = groupId || algorithm.groupId;
+        algorithm = algorithm
+          .set('parent', groupId)
+          .set('groupId', groupId)
+          .set('id', -1)
+          .set('name', Util.duplicateNameFor(algorithm.name))
+          .set('variantsOrder', Immutable.List([]));
+          
+        Actions.algorithms.create(
+          algorithm.groupId,
+          algorithm,
+          (algorithmId: ID) =>
+          {
+            const variants = LibraryStore.getState().variants;
+            variantsOrder.map(
+              (variantId, index) =>
+              {
+                let variant = variants.get(variantId);
+                setTimeout(() => Actions.variants.duplicate(variant, 0, groupId, algorithmId), index * 200);
+              }
+            );
+          }
+        );
+      }
   },
 
   variants:
@@ -169,11 +198,13 @@ const Actions =
         groupId = groupId || variant.groupId;
         algorithmId = algorithmId || variant.algorithmId;
         
-        let newVariant = variant.set('id', -1)
+        let newVariant = variant
+          .set('id', -1)
           .set('parent', algorithmId)
+          .set('algorithmId', algorithmId)
           .set('groupId', groupId)
           .set('name', Util.duplicateNameFor(variant.name))
-          ;
+          .set('status', LibraryTypes.ItemStatus.Build);
         newVariant = LibraryTypes.touchVariant(newVariant);
         
         Actions.variants.create(groupId, algorithmId, newVariant);
