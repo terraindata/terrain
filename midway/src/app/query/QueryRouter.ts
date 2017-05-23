@@ -82,7 +82,7 @@ QueryRouter.post(
       query = JSON.parse(ctx.request.body.data).body as Query;
     } else
     {
-      throw new Error('Unknown Request Type ' + ctx.request.body.toString());
+      throw new Error('Unknown Request Type ' + String(ctx.request.body));
     }
 
     winston.info(JSON.stringify(ctx.request.body, null, 1));
@@ -94,7 +94,7 @@ QueryRouter.post(
 
     if (query.streaming === true)
     {
-      winston.info('Streaming query result to ' + ctx.request.body.filename.toString());
+      winston.info('Streaming query result to ' + String(ctx.request.body.filename));
     }
 
     const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);

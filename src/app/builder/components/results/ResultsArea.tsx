@@ -285,7 +285,7 @@ class ResultsArea extends PureClasss<Props>
               <Result
                 result={result}
                 resultsConfig={resultsConfig}
-                onExpand={this.handleESresultExport}
+                onExpand={this.handleExpand}
                 index={index}
                 key={index}
                 primaryKey={getPrimaryKeyFor(result, resultsConfig)}
