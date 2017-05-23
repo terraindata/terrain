@@ -431,7 +431,11 @@ export const Ajax =
             v =>
             {
               v = v.set('algorithmId', v.parent);
-              v = v.set('groupId', mapping.ALGORITHM.get(v.algorithmId).groupId);
+              const alg = mapping.ALGORITHM.get(v.algorithmId);
+              if(alg)
+              {
+                v = v.set('groupId', alg.groupId);
+              }
               return v;
             },
           ).toMap();
@@ -707,39 +711,6 @@ export const Ajax =
         database: 1, // should be passed by caller
         streaming: options.streaming,
         body,
-      };
-
-      const parseResult = (resp) =>
-      {
-        let result: QueryResponse = {results: []};
-        try
-        {
-          const hits = resp.result.hits.hits;
-          const results = hits.map((hit) =>
-          {
-            let source = hit._source;
-            source._index = hit._index;
-            source._type = hit._type;
-            source._id = hit._id;
-            source._score = hit._score;
-            source._sort = hit._sort;
-            return source;
-          });
-
-          result = {results};
-        }
-        catch (e)
-        {
-          // absorb
-        }
-
-        // This could be improved
-        if (resp.errors.length > 0)
-        {
-          result.errorMessage = resp.errors[0].title;
-        }
-
-        return result;
       };
 
       const onLoadHandler = (resp) =>

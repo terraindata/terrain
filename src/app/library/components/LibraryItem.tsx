@@ -128,6 +128,10 @@ class LibraryItem extends Classs<Props>
         text: 'Archive',
         onClick: this.handleArchive,
       },
+      {
+        text: 'Rename',
+        onClick: this.showTextfield,
+      },
     ]),
     duplicateArchive:
     List([
@@ -316,7 +320,6 @@ class LibraryItem extends Classs<Props>
                   </div>
                   <div
                     className="library-item-name"
-                    onDoubleClick={this.showTextfield}
                   >
                     {
                       this.props.name.length ? this.props.name : <em>Untitled</em>

@@ -1715,7 +1715,6 @@ export module BuilderTypes
   // Prepare cards/records for save, trimming static values
   export const cardsForServer = (value: any) =>
   {
-    console.log('in', value);
     if (Immutable.Iterable.isIterable(value))
     {
       value = value.toJS();
@@ -1737,7 +1736,6 @@ export module BuilderTypes
         cardsForServer(value[i]);
       }
     }
-    console.log('out', value);
     return value;
   };
 

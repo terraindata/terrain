@@ -257,7 +257,6 @@ export class ResultsManager extends PureClasss<Props>
 
   componentWillReceiveProps(nextProps: Props)
   {
-    console.log('this props: ', this.props, 'next: ', nextProps);
     if (
       nextProps.query != null
       && nextProps.query.tql != null

@@ -44,17 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from '../../error/MidwayErrorItem';
-import QueryResult from './QueryResult';
+type QueryResult = object[] | object | null;
 
-export default class QueryResponse
-{
-  public result: QueryResult;
-  public errors: MidwayErrorItem[];
-
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [])
-  {
-    this.result = result;
-    this.errors = errors;
-  }
-}
+export default QueryResult;

@@ -146,7 +146,7 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
 
   addNotification: function(notification) {
     var _notification = merge({}, Constants.notification, notification);
-    var notifications = this.state.notifications;
+    var notifications = JSON.parse(JSON.stringify(this.state.notifications));
     var i;
 
     if (!_notification.level) {
@@ -216,7 +216,6 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
     var self = this;
     var containers = null;
     var notifications = this.state.notifications;
-
     if (notifications.length) {
       containers = Object.keys(Constants.positions).map(function(position) {
         var _notifications = notifications.filter(function(notification) {
