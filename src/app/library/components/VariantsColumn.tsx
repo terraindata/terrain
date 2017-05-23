@@ -157,10 +157,16 @@ class VariantsColumn extends Classs<Props>
   {
     if (this.props.variants.get(id).name !== name)
     {
-      const oldName = this.props.variants.get(id).name || 'Untitled';
+      const oldName = this.props.variants.get(id).name;
+      let message = '"' + oldName + '" is now "' + name + '"';
+      if (!oldName)
+      {
+        message = 'To "' + name + '"';
+      }
+      
       notificationManager.addNotification(
         'Renamed',
-        '"' + oldName + '" is now "' + name + '"',
+        message,
         'info',
         5,
       );

@@ -151,7 +151,7 @@ export module LibraryTypes
       };
     }
     
-    if(config.modelVersion === 1)
+    if(config && config.modelVersion === 1)
     {
       // from 1 to 2
       // TODO if necessary
