@@ -52,8 +52,8 @@ import * as winston from 'winston';
 import QueryHandler from '../../../app/query/QueryHandler';
 import QueryRequest from '../../../app/query/QueryRequest';
 import QueryResponse from '../../../app/query/QueryResponse';
-import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import MidwayErrorItem from '../../../error/MidwayErrorItem';
+import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
 

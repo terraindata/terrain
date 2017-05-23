@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import MidwayError from '../../src/error/MidwayError';
 let server;
 
 beforeAll((done) =>
