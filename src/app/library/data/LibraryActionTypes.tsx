@@ -61,12 +61,12 @@ export let LibraryActionTypes =
 
   algorithms:
   {
-    create, change, move, duplicate,
+    create, change, move,
   },
 
   variants:
   {
-    create, change, move, duplicate,
+    create, change, move,
     status: '',
     fetchVersion: '',
     loadVersion: '',

@@ -125,6 +125,7 @@ export module LibraryTypes
     lastUserId = -1;
     version = false;
     db = 'urbansitter';
+    language = 'elastic';
 
     // don't use this!
     // TODO remove when variants can be saved without queries
@@ -195,6 +196,7 @@ export module LibraryTypes
 
     variantsOrder = List([]);
     db = 'urbansitter'; // TODO change
+    language = 'elastic';
 
     excludeFields= ['dbFields', 'excludeFields', 'groupId']; 
   }
@@ -235,6 +237,7 @@ export module LibraryTypes
     userIds = List([]);
     algorithmsOrder = List([]);
     db = 'urbansitter';
+    defaultLanguage = 'elastic';
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}

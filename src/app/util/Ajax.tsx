@@ -117,9 +117,9 @@ export const Ajax =
           }
         },
         _.extend({
-          host:        'http://localhost:3000',
-          noToken:     true,
-          json:        true,
+          host: NODEWAY_HOST,
+          noToken: true,
+          json: true,
           crossDomain: false,
         }, config),
       );
@@ -810,6 +810,74 @@ export const Ajax =
         {
           const list = JSON.parse(resp);
           onLoad(list.map((obj) => ({id: obj.id, name: obj.name, type: obj.type})));
+        }
+        catch (e)
+        {
+          onError && onError(e as any);
+        }
+      }, onError);
+    },
+
+    schema_m1(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
+    {
+      return Ajax._postMidway1('/get_schema', {
+          db,
+        },
+        (resp: string) =>
+        {
+          const cols: any = null;
+          try
+          {
+            const cols = JSON.parse(resp).results;
+            // var tables: {[name:string]: {name: string; columns: any[];}} = {};
+
+            // cols.map(
+            // (
+            //   col: { TABLE_NAME: string; COLUMN_NAME: string; }
+            // ) =>
+            // {
+            //   let column = _.extend(col, { name: col.COLUMN_NAME });
+            //   let table = col.TABLE_NAME;
+
+            //   if(!tables[table])
+            //   {
+            //     console.log('add table', table);
+            //     tables[table] = {
+            //       name: table,
+            //       columns: [],
+            //     };
+            //   }
+
+            //   tables[table].columns.push(column);
+            // });
+
+            // onLoad(_.toArray(tables) as any);
+            onLoad(cols);
+          }
+          catch (e)
+          {
+            onError && onError(resp as any);
+          }
+
+          if (cols)
+          {
+            onLoad(cols as any);
+          }
+        },
+        onError,
+      );
+    },
+
+    getDbs_m1(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
+    {
+      Ajax._postMidway1('/get_databases', {
+        db: 'information_schema',
+      }, (resp) =>
+      {
+        try
+        {
+          const list = JSON.parse(resp);
+          onLoad(list.results.map((obj) => obj.schema_name));
         }
         catch (e)
         {

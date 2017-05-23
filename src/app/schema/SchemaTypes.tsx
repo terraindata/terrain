@@ -90,6 +90,7 @@ export module SchemaTypes {
   class DatabaseC extends SchemaBaseClass {
     public type = 'database';
     public name = '';
+    public databaseType = 'mysql';
 
     public tableIds: List<string> = List([]);
   }
