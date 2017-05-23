@@ -82,7 +82,7 @@ QueryRouter.post(
       query = JSON.parse(ctx.request.body.data).body as Query;
     } else
     {
-      throw new Error('Unknow Request Type ' + ctx.request.body);
+      throw new Error('Unknow Request Type ' + ctx.request.body.toString());
     }
 
     winston.info(JSON.stringify(ctx.request.body, null, 1));
@@ -92,10 +92,9 @@ QueryRouter.post(
     winston.debug('query database debug: ' + query.database.toString() + ' type "' + query.type + '"' +
       'body: ' + JSON.stringify(query.body));
 
-    winston.info('database ID is ' + query.database + '  ' + Number(query.database).toString());
     if (query.streaming === true)
     {
-      winston.info('Streaming query result to ' + ctx.request.body.filename);
+      winston.info('Streaming query result to ' + ctx.request.body.filename.toString());
     }
 
     const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
@@ -104,7 +103,8 @@ QueryRouter.post(
       throw new Error('Database "' + query.database.toString() + '" not found.');
     }
 
-    if (query.streaming === true) {
+    if (query.streaming === true)
+    {
       const qh: QueryHandler = database.getQueryHandler();
       const queryStream: Readable = await qh.handleQuery(query) as Readable;
       ctx.type = 'text/plain';
