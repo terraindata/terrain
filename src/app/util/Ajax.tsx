@@ -61,7 +61,7 @@ export interface QueryResponse
 export const Ajax =
 {
   _reqMidway2(
-    method: "post" | "get",
+    method: 'post' | 'get',
     url: string,
     body: object,
     onLoad: (response: object) => void,
@@ -71,7 +71,7 @@ export const Ajax =
       // crossDomain?: boolean;
       download?: boolean;
       downloadFilename?: string;
-    } = {}
+    } = {},
   )
   {
     let data: object;
@@ -88,7 +88,7 @@ export const Ajax =
         body,
       };
     }
-    
+
     return Ajax._req(
       method,
       "/midway/v1/" + url,
@@ -104,7 +104,7 @@ export const Ajax =
         {
           config.onError && config.onError(e);
         }
-        
+
         if(responseData !== undefined)
         {
           // needs to be outside of the try/catch so that any errors it throws aren't caught
@@ -122,12 +122,12 @@ export const Ajax =
 
   midwayStatus(
     success: () => void,
-    failure: () => void
+    failure: () => void,
   )
   {
     return Ajax._reqMidway2(
-      "get",
-      "status",
+      'get',
+      'status',
       {},
       (resp: { status: string }) =>
       {
@@ -142,7 +142,7 @@ export const Ajax =
       },
       {
         onError: failure,
-      }
+      },
     );
   },
 
@@ -159,10 +159,13 @@ export const Ajax =
       download?: boolean;
       downloadFilename?: string;
       json?: boolean;
-    } = {}
+    } = {},
   )
   {
-    const host = config.host || MIDWAY_HOST;
+    let host = config.host || MIDWAY_HOST;
+    console.log("config.host = " + config.host);
+    console.log("MIDWAY_HOST = " + MIDWAY_HOST);
+    // host = MIDWAY_HOST;
     const fullUrl = host + url;
     const token = AuthStore.getState().get('accessToken');
 
@@ -203,7 +206,7 @@ export const Ajax =
         return;
       }
 
-      if (xhr.status != 200)
+      if (xhr.status !== 200)
       {
         config && config.onError && config.onError({
           error: xhr.responseText,
@@ -215,8 +218,9 @@ export const Ajax =
     };
 
     // NOTE: MIDWAY_HOST will be replaced by the build process.
+    console.log("fullUrl = " + fullUrl);
     xhr.open(method, fullUrl, true);
-    
+
     if (config.json)
     {
       xhr.setRequestHeader('Content-Type', 'application/json');
@@ -259,13 +263,13 @@ export const Ajax =
     } = {},
   ): { xhr: XMLHttpRequest, queryId: string }
   {
-    const unique_id = '' + Math.random();
+    const uniqueId = '' + Math.random();
     return {
       xhr:
         Ajax._req('POST', url, JSON.stringify(_.extend(
           {
             timestamp: (new Date()).toISOString(),
-            unique_id,
+            uniqueId,
           }, reqFields)),
 
           onLoad,
@@ -279,7 +283,7 @@ export const Ajax =
             downloadFilename: options.downloadFilename,
           },
         ),
-      queryId: unique_id,
+      queryId: uniqueId,
     };
   },
 
@@ -318,10 +322,10 @@ export const Ajax =
       (v, key) => delete userData[key]
     );
     userData['meta'] = JSON.stringify(meta);
-    
+
     return Ajax._reqMidway2(
       'post',
-      `users/${user.id}`, 
+      `users/${user.id}`,
       userData,
       onSave,
       {
@@ -330,7 +334,7 @@ export const Ajax =
     );
   },
 
-  changePassword(id: number, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
+  changePassword(id: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
     return Ajax._reqMidway2(
       'post',
@@ -349,7 +353,7 @@ export const Ajax =
   {
     return Ajax._reqMidway2(
       'post',
-      `users/${user.id}`, 
+      `users/${user.id}`,
       {
         isSuperUser: user.isSuperUser ? 1 : 0,
         isDisabled: user.isDisabled ? 1 : 0,
@@ -433,7 +437,7 @@ export const Ajax =
       return Ajax.getItem(
         'variant',
         variantId,
-        (variantData: Object) =>
+        (variantData: object) =>
         {
           onLoad(LibraryTypes._Variant(variantData));
         },
@@ -464,7 +468,7 @@ export const Ajax =
     // TODO
     onLoad(null);
     return null;
-    
+
     // if (!id || id.indexOf('@') === -1)
     // {
     //   onLoad(null);
@@ -643,57 +647,21 @@ export const Ajax =
     );
   },
 
-  schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
+  schema(dbId: number, onLoad: (columns: object, error?: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._postMidway1('/get_schema', {
-        db,
-      },
-      (resp: string) =>
+    return Ajax._reqMidway2('get', '/database/' + dbId + '/schema', {}, (response: any) => {
+      try {
+        const cols: object = JSON.parse(response);
+        onLoad(cols);
+      }
+      catch (e)
       {
-        const cols: any = null;
-        try
-        {
-          const cols = JSON.parse(resp).results;
-          // var tables: {[name:string]: {name: string; columns: any[];}} = {};
-
-          // cols.map(
-          // (
-          //   col: { TABLE_NAME: string; COLUMN_NAME: string; }
-          // ) =>
-          // {
-          //   let column = _.extend(col, { name: col.COLUMN_NAME });
-          //   let table = col.TABLE_NAME;
-
-          //   if(!tables[table])
-          //   {
-          //     console.log('add table', table);
-          //     tables[table] = {
-          //       name: table,
-          //       columns: [],
-          //     };
-          //   }
-
-          //   tables[table].columns.push(column);
-          // });
-
-          // onLoad(_.toArray(tables) as any);
-          onLoad(cols);
-        }
-        catch (e)
-        {
-          onError && onError(resp as any);
-        }
-
-        if (cols)
-        {
-          onLoad(cols as any);
-        }
-      },
-      onError,
-      );
+        onError && onError(response as any);
+      }
+    });
   },
 
-  getDbs(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
+  getDbs(onLoad: (dbs: object) => void, onError?: (ev: Event) => void)
   {
     Ajax._postMidway1('/get_databases', {
       db: 'information_schema',
@@ -702,7 +670,7 @@ export const Ajax =
       try
       {
         const list = JSON.parse(resp);
-        onLoad(list.results.map((obj) => obj.schema_name));
+        onLoad(list.map((obj) => ({id: obj.id, name: obj.name, type: obj.type})));
       }
       catch (e)
       {
@@ -722,7 +690,7 @@ export const Ajax =
       },
     );
   },
-  
+
   login(
     email: string,
     password: string,
@@ -747,7 +715,7 @@ export const Ajax =
       }
     );
   },
-  
+
   checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
   {
     Ajax._reqMidway2(
