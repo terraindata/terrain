@@ -73,7 +73,17 @@ QueryRouter.post(
   async (ctx, next) =>
   {
     winston.info(JSON.stringify(ctx.request, null, 1));
-    const query: Query = ctx.request.body.body as Query;
+    let query: Query;
+    if (ctx.request.type === 'application/json')
+    {
+      query = ctx.request.body.body as Query;
+    } else if (ctx.request.type === 'application/x-www-form-urlencoded')
+    {
+      query = JSON.parse(ctx.request.body.data).body as Query;
+    } else
+    {
+      throw new Error('Unknow Request Type ' + ctx.request.body);
+    }
 
     winston.info(JSON.stringify(ctx.request.body, null, 1));
     Util.verifyParameters(query, ['database', 'type', 'body']);
@@ -83,43 +93,30 @@ QueryRouter.post(
       'body: ' + JSON.stringify(query.body));
 
     winston.info('database ID is ' + query.database + '  ' + Number(query.database).toString());
+    if (query.streaming === true)
+    {
+      winston.info('Streaming query result to ' + ctx.request.body.filename);
+    }
+
     const database: DatabaseController | undefined = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
       throw new Error('Database "' + query.database.toString() + '" not found.');
     }
 
-    const qh: QueryHandler = database.getQueryHandler();
-    const result: QueryResponse = await qh.handleQuery(query);
-    ctx.body = result;
-    ctx.status = 200;
-  });
-
-QueryRouter.get(
-  '/database/:databaseID/stream/:streamID',
-  async (ctx, next) =>
-  {
-    // fetching and streaming the results back
-    const databaseID: number = Number(ctx.params.databaseID);
-    const streamID: number = Number(ctx.params.streamID);
-    winston.info('fetching stream result database: ' + databaseID.toString() + ' stream ' + streamID.toString());
-    const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
-    if (database === undefined)
+    if (query.streaming === true) {
+      const qh: QueryHandler = database.getQueryHandler();
+      const queryStream: Readable = await qh.handleQuery(query) as Readable;
+      ctx.type = 'text/plain';
+      ctx.attachment(ctx.request.body.filename);
+      ctx.body = queryStream;
+    } else
     {
-      throw new Error('Database "' + databaseID + '" not found.');
+      const qh: QueryHandler = database.getQueryHandler();
+      const result: QueryResponse = await qh.handleQuery(query) as QueryResponse;
+      ctx.body = result;
+      ctx.status = 200;
     }
-    const qh: QueryHandler = database.getQueryHandler();
-    const queryStream: Readable = qh.consumeStream(streamID);
-    queryStream.on('end', () =>
-    {
-      winston.info('Streaming ' + streamID.toString() + ' is finished.');
-    });
-    queryStream.on('error', (err) =>
-    {
-      winston.error('Streaming ' + streamID.toString() + ' has an error ' + err);
-    });
-    ctx.type = 'text/plain';
-    ctx.body = queryStream;
   });
 
 export default QueryRouter;

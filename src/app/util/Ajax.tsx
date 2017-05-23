@@ -166,7 +166,8 @@ export const Ajax =
     {
       const host = config.host || MIDWAY_HOST;
       let fullUrl = host + url;
-      const token = AuthStore.getState().get('accessToken');
+      const accessToken = AuthStore.getState().get('accessToken');
+      const id = AuthStore.getState().get('id');
 
       if (config.download)
       {
@@ -175,8 +176,9 @@ export const Ajax =
         form.setAttribute('method', 'post');
 
         const dataObj: _.Dictionary<string> = {
+          id,
+          accessToken,
           data,
-          token,
           filename: config.downloadFilename,
         };
         _.map(dataObj, (value, key) =>
@@ -246,7 +248,7 @@ export const Ajax =
 
       if (!config.noToken)
       {
-        xhr.setRequestHeader('token', token);
+        xhr.setRequestHeader('token', accessToken);
       }
 
       if (config.crossDomain)
@@ -683,7 +685,10 @@ export const Ajax =
       onLoad: (response: QueryResponse) => void,
       onError?: (ev: Event) => void,
       sqlQuery?: boolean, // unused
-      options?: object // unused
+      options: {
+        streaming?: boolean,
+        streamingTo?: string,
+      } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       // TODO: For MySQL and other string queries, we should skip this step and send it as a string
@@ -700,6 +705,7 @@ export const Ajax =
       const payload = {
         type:     'search', // can be other things in the future
         database: 1, // should be passed by caller
+        streaming: options.streaming,
         body,
       };
 
@@ -774,7 +780,11 @@ export const Ajax =
         'query/',
         payload,
         onLoadHandler,
-        {onError},
+        {
+          onError,
+          download: options.streaming,
+          downloadFilename: options.streamingTo,
+         },
       );
 
       return {queryId, xhr};

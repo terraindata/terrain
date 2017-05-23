@@ -50,8 +50,7 @@ import QueryResponse from './QueryResponse';
 
 export abstract class QueryHandler
 {
-  public async abstract handleQuery(request: Query): Promise<QueryResponse>;
-  public abstract consumeStream(streamID: number): Readable;
+  public async abstract handleQuery(request: Query): Promise<QueryResponse | Readable>;
 }
 
 export default QueryHandler;
