@@ -48,13 +48,13 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { MidwayErrorObject } from '../MidwayError';
 import QueryError from '../QueryError';
 import * as Util from '../Util';
 import { QueryHandler } from './QueryHandler';
+import QueryRequest from './QueryRequest';
 
 const QueryRouter = new KoaRouter();
 
@@ -70,7 +70,7 @@ QueryRouter.post(
   passport.authenticate('access-token-local'),
   async (ctx, next) =>
   {
-    const query: Query = ctx.request.body as Query;
+    const query: QueryRequest = ctx.request.body as QueryRequest;
 
     Util.verifyParameters(query, ['database', 'type', 'body']);
 
