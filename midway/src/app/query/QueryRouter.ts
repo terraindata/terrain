@@ -48,13 +48,13 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import { Readable } from 'stream';
 import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
 import { QueryHandler } from './QueryHandler';
 import QueryResponse from './QueryResponse';
-import { Readable } from 'stream';
 
 const QueryRouter = new KoaRouter();
 
@@ -82,7 +82,7 @@ QueryRouter.post(
       query = JSON.parse(ctx.request.body.data).body as Query;
     } else
     {
-      throw new Error('Unknow Request Type ' + ctx.request.body.toString());
+      throw new Error('Unknown Request Type ' + ctx.request.body.toString());
     }
 
     winston.info(JSON.stringify(ctx.request.body, null, 1));
