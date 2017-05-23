@@ -114,9 +114,9 @@ export class Users
     );
   }
 
-  public async create(user: UserConfig): Promise<string>
+  public async create(user: UserConfig): Promise<UserConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<UserConfig>(async (resolve, reject) =>
     {
       if (user.email === undefined || user.password === undefined)
       {
@@ -140,14 +140,13 @@ export class Users
           timezone: user.timezone === undefined ? '' : user.timezone,
           meta: user.meta === undefined ? '{}' : user.meta,
         };
-      await this.upsert(newUser);
-      resolve('Success');
+      resolve(await this.upsert(newUser));
     });
   }
 
-  public async update(isSuperUser: boolean, user: UserConfig): Promise<string>
+  public async update(isSuperUser: boolean, user: UserConfig): Promise<UserConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<UserConfig>(async (resolve, reject) =>
     {
       const results = await this.get(user.id);
       if (results.length === 0)
@@ -189,8 +188,7 @@ export class Users
       }
 
       user = Util.updateObject(oldUser, user);
-      await this.upsert(user);
-      resolve('Success');
+      resolve(await this.upsert(user));
     });
   }
 
@@ -266,26 +264,25 @@ export class Users
     });
   }
 
-  public async logout(id: number, accessToken: string): Promise<string>
+  public async logout(id: number, accessToken: string): Promise<UserConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<UserConfig>(async (resolve, reject) =>
     {
       const results = await App.DB.select(this.userTable, [], { id, accessToken });
       if (results.length === 0)
       {
-        reject('Cannot find user');
+        return reject('Cannot find user');
       }
 
       const user: UserConfig = results[0] as UserConfig;
       user.accessToken = '';
-      await this.upsert(user);
-      resolve('Success');
+      resolve(await this.upsert(user));
     });
   }
 
-  public async upsert(newUser: UserConfig)
+  public async upsert(newUser: UserConfig): Promise<UserConfig>
   {
-    return App.DB.upsert(this.userTable, newUser);
+    return App.DB.upsert(this.userTable, newUser) as Promise<UserConfig>;
   }
 
   private async hashPassword(password: string): Promise<string>

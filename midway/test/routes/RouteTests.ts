@@ -147,8 +147,8 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          .toBe('Success');
+        expect(JSON.parse(response.text))
+          .toMatchObject([{accessToken: '', email: 'test@terraindata.com', id}]);
       })
       .catch((error) =>
       {
@@ -190,7 +190,7 @@ describe('Version route tests', () =>
         expect(response.text)
           .toBe(
           // tslint:disable-next-line:max-line-length
-          '[{\"createdAt\":\"2017-04-28 03:32:25\",\"createdByUserId\":1,\"id\":1,\"object\":\"[object Object]\",\"objectId\":2,\"objectType\":\"items\"}]');
+          '[{"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"id":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
       })
       .catch((error) =>
       {
@@ -213,7 +213,7 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
+          .toBe('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -236,7 +236,7 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Success');
+        expect(response.text).toBe('[{"name":"Test Item","status":"LIVE","id":2}]');
       })
       .catch((error) =>
       {
@@ -256,7 +256,7 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
+          .toBe('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -280,7 +280,7 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Success');
+        expect(response.text).toBe('[{"id":2,"meta":null,"name":"Updated Item","parent":null,"status":"LIVE","type":null}]');
       })
       .catch((error) =>
       {
@@ -437,7 +437,7 @@ describe('Query route tests', () =>
         winston.info(JSON.stringify(response));
         const midwayError: MidwayError = MidwayError.fromJSON(response.text);
         expect(midwayError.getTitle())
-          .toEqual(
+          .toBe(
           // tslint:disable-next-line:max-line-length
           '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
       })
@@ -471,7 +471,7 @@ describe('Query route tests', () =>
       {
         winston.info(JSON.stringify(response));
         const midwayError: MidwayError = MidwayError.fromJSON(response.text);
-        expect(midwayError.getTitle()).toEqual('Route /midway/v1/query/ has an error.');
+        expect(midwayError.getTitle()).toBe('Route /midway/v1/query/ has an error.');
       })
       .catch((error) =>
       {
