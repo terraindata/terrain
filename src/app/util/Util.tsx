@@ -134,6 +134,30 @@ const Util = {
 
     // return !! RolesStore.getState().getIn([groupId, me.id, role]);
   },
+  
+  duplicateNameFor(name: string): string
+  {
+    if (Util.stringIsNumber(name.charAt(name.length - 1)))
+    {
+      let strNum = '';
+      while(Util.stringIsNumber(name.charAt(name.length - 1)))
+      {
+        strNum = name.charAt(name.length - 1) + strNum;
+        name = name.substr(0, name.length - 1);
+      }
+      
+      return name + ((+strNum) + 1);
+    }
+    else
+    {
+      return name + ' 2';
+    }
+  },
+  
+  stringIsNumber(str: string): boolean
+  {
+    return str && str !== " " && !Number.isNaN(+str);
+  },
 
   canEdit(item: { type: string, id: ID }, UserStore, RolesStore)
   {

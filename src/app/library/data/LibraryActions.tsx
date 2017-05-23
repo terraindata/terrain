@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 const _ = require('underscore');
-import '../../util/Ajax';
+import Util from '../../util/Util';
 import BuilderTypes from './../../builder/BuilderTypes';
 import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
@@ -63,19 +63,21 @@ const Actions =
   groups:
   {
     create:
-      () =>
+      (
+        group: LibraryTypes.Group = LibraryTypes._Group(),
+        idCallBack?: (id: ID) => void
+      ) =>
       {
         Ajax.saveItem(
-          LibraryTypes._Group(),
+          group,
           (response) =>
           {
             // on load
             let id = response.id; //??
             $(ActionTypes.groups.create, {
-              group: LibraryTypes._Group({
-                id,
-              })
+              group: group.set('id', id),
             });
+            idCallBack && idCallBack(id);
           }
         );
       },
@@ -133,23 +135,21 @@ const Actions =
   variants:
   {
     create:
-      (groupId: ID, algorithmId: ID) =>
+      (groupId: ID, algorithmId: ID, variant = LibraryTypes._Variant()) =>
       {
+        variant = variant
+          .set('parent', algorithmId)
+          .set('algorithmId', algorithmId)
+          .set('groupId', groupId);
+          
         Ajax.saveItem(
-          LibraryTypes._Variant({
-            parent: algorithmId,
-          }),
+          variant,
           (response) =>
           {
             // on load
             let id = response.id; //??
             $(ActionTypes.variants.create, {
-              variant: LibraryTypes._Variant({
-                id,
-                parent: algorithmId,
-                groupId,
-                algorithmId,
-              })
+              variant: variant.set('id', id),
             });
           }
         );
@@ -166,23 +166,17 @@ const Actions =
     duplicate:
       (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) =>
       {
+        groupId = groupId || variant.groupId;
+        algorithmId = algorithmId || variant.algorithmId;
+        
         let newVariant = variant.set('id', -1)
-          .set('parent', algorithmId || variant.parent)
-          .set('groupId', groupId || variant.groupId)
-          .set('name', variant.name + ' Copy')
+          .set('parent', algorithmId)
+          .set('groupId', groupId)
+          .set('name', Util.duplicateNameFor(variant.name))
           ;
         newVariant = LibraryTypes.touchVariant(newVariant);
-          
-        Ajax.saveItem(
-          newVariant,
-          (response) =>
-          {
-            let id = response.id; // TODO
-            $(ActionTypes.variants.create, {
-              variant: newVariant.set('id', id)
-            });
-          }
-        );
+        
+        Actions.variants.create(groupId, algorithmId, newVariant);
       },
 
     status:
