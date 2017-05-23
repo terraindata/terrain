@@ -49,6 +49,7 @@ export interface QueryRequest
   database: number;
   type: string;
   body: object | string;
+  streaming?: boolean;
 }
 
 export default QueryRequest;
