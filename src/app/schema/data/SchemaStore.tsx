@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import Redux = require('redux');
+import {Store} from 'redux';
 import * as ReduxActions from 'redux-actions';
 import SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
@@ -53,7 +54,6 @@ import Ajax from './../../util/Ajax';
 import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
-import {Store} from 'redux';
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;

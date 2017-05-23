@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 const {List, Map} = Immutable;
 import {BaseClass, New} from '../Classes';
@@ -49,51 +51,47 @@ import Util from '../util/Util';
 
 type stringList = string[] | List<string>;
 
-export module SchemaTypes
-{
-  export class SchemaBaseClass extends BaseClass
-  {
-    id: string;
-    type = '';
-    name = '';
+export module SchemaTypes {
+
+  export class SchemaBaseClass extends BaseClass {
+    public id: string;
+    public type: string = '';
+    public name: string = '';
   }
 
-  class SchemaStateC
-  {
-    databases: DatabaseMap= Map<string, Database>({});
-    tables: TableMap = Map<string, Table>({});
-    columns: ColumnMap = Map<string, Column>({});
-    indexes: IndexMap = Map<string, Index>({});
+  class SchemaStateC {
+    public databases: DatabaseMap = Map<string, Database>({});
+    public tables: TableMap = Map<string, Table>({});
+    public columns: ColumnMap = Map<string, Column>({});
+    public indexes: IndexMap = Map<string, Index>({});
 
-    dbCount: number = -1;
-    loading: boolean = false;
-    loaded: boolean = false;
-    schemaError: boolean = false;
+    public dbCount: number = -1;
+    public loading: boolean = false;
+    public loaded: boolean = false;
+    public schemaError: boolean = false;
 
     // view state
-    selectedId: string = null;
-    highlightedId: string = null;
-    highlightedInSearchResults: boolean = false;
+    public selectedId: string = null;
+    public highlightedId: string = null;
+    public highlightedInSearchResults: boolean = false;
 
     // for the builder, a list of names for each db
-    tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
-    columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
+    public tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
+    public columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
   }
   export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
-  export const _SchemaState = (config?: {[key: string]: any}) =>
+  export const _SchemaState = (config?: { [key: string]: any }) =>
     New<SchemaState>(new SchemaStateC(), config);
 
-  export function databaseId(databaseName: string)
-  {
+  export function databaseId(databaseName: string) {
     return databaseName;
   }
 
-  class DatabaseC extends SchemaBaseClass
-  {
-    type = 'database';
-    name = '';
+  class DatabaseC extends SchemaBaseClass {
+    public type = 'database';
+    public name = '';
 
-    tableIds: List<string> = List([]);
+    public tableIds: List<string> = List([]);
   }
   export type Database = DatabaseC & IRecord<DatabaseC>;
   export const _Database =
@@ -108,13 +106,11 @@ export module SchemaTypes
     };
   export type DatabaseMap = IMMap<string, Database>;
 
-  export function tableId(databaseName: string, tableName: string): string
-  {
+  export function tableId(databaseName: string, tableName: string): string {
     return databaseName + '.' + tableName;
   }
 
-  class TableC extends SchemaBaseClass
-  {
+  class TableC extends SchemaBaseClass {
     type = 'table';
     name = '';
     databaseId: string = '';
@@ -133,23 +129,21 @@ export module SchemaTypes
   };
   export type TableMap = IMMap<string, Table>;
 
-  export function columnId(tableId: string, columnName: string)
-  {
+  export function columnId(tableId: string, columnName: string) {
     return tableId + '.c.' + columnName;
   }
 
-  class ColumnC extends SchemaBaseClass
-  {
-    type = 'column';
-    name = '';
-    databaseId: string = '';
-    tableId: string = '';
+  class ColumnC extends SchemaBaseClass {
+    public type = 'column';
+    public name = '';
+    public databaseId: string = '';
+    public tableId: string = '';
 
-    indexIds: List<string> = List([]);
-    datatype = '';
-    defaultValue = '';
-    isNullable = false;
-    isPrimaryKey = false;
+    public indexIds: List<string> = List([]);
+    public datatype = '';
+    public defaultValue = '';
+    public isNullable = false;
+    public isPrimaryKey = false;
   }
   export type Column = ColumnC & IRecord<ColumnC>;
   export const _Column = (config: {
@@ -169,20 +163,18 @@ export module SchemaTypes
   };
   export type ColumnMap = IMMap<string, Column>;
 
-  export function indexId(databaseName: string, tableName: string, indexName: string)
-  {
+  export function indexId(databaseName: string, tableName: string, indexName: string) {
     return databaseName + '.' + tableName + '.i.' + indexName;
   }
 
-  class IndexC extends SchemaBaseClass
-  {
-    type = 'index';
-    name = '';
-    databaseId: string = '';
-    tableId: string = '';
+  class IndexC extends SchemaBaseClass {
+    public type = 'index';
+    public name = '';
+    public databaseId: string = '';
+    public tableId: string = '';
 
-    indexType = '';
-    columnIds: List<string> = List([]);
+    public indexType = '';
+    public columnIds: List<string> = List([]);
   }
   export type Index = IndexC & IRecord<IndexC>;
   export const _Index = (config: {
@@ -206,8 +198,7 @@ export module SchemaTypes
       index: 'indexes',
     };
 
-  export function searchIncludes(item: SchemaBaseClass, search: string): boolean
-  {
+  export function searchIncludes(item: SchemaBaseClass, search: string): boolean {
     return !search ||
       (
         item && typeof item.name === 'string' &&
@@ -217,7 +208,7 @@ export module SchemaTypes
       );
   }
 
-  // used to define how to render tree item children in tree list
+// used to define how to render tree item children in tree list
   export type ISchemaTreeChildrenConfig = [
     {
       label?: string;
@@ -227,8 +218,7 @@ export module SchemaTypes
 
   export type TableNamesByDb = IMMap<string, List<string>>;
   export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
-  export interface SetDbActionPayload
-  {
+  export interface SetDbActionPayload {
     database: Database;
     tables: IMMap<string, Table>;
     columns: IMMap<string, Column>;
