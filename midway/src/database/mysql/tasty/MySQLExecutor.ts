@@ -47,8 +47,10 @@ THE SOFTWARE.
 import * as mysql from 'mysql';
 import TastyExecutor from '../../../tasty/TastyExecutor';
 import TastySchema from '../../../tasty/TastySchema';
+import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import MySQLClient from '../client/MySQLClient';
+import MySQLGenerator from './MySQLGenerator';
 
 export class MySQLExecutor implements TastyExecutor
 {
@@ -71,30 +73,39 @@ export class MySQLExecutor implements TastyExecutor
   /**
    * executes statements sequentially
    * @param statements
-   * @returns {Promise<Array>} the result of the last one
+   * @returns {Promise<Array>} appended result objects
    */
   public async query(statements: string[]): Promise<object[]>
   {
-    if (statements.length === 0)
+    let results: object[] = [];
+    for (const statement of statements)
     {
-      return [];
-    }
-
-    for (let i = 0; ; ++i)
-    {
-      const statement: string = statements[i];
-      const result: Promise<object[]> = new Promise<object[]>((resolve, reject) =>
+      const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
         this.client.query(statement, makePromiseCallback(resolve, reject));
       });
 
-      if (i === statements.length - 1)
-      {
-        return result;
-      }
-
-      await result;
+      results = results.concat(result);
     }
+    return results;
+  }
+
+  public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
+  {
+    const primaryKeys = table.getPrimaryKeys();
+    const upserted = await this.query(statements);
+    const results = new Array(upserted.length);
+    for (let i = 0; i < results.length; i++)
+    {
+      results[i] = elements[i];
+      if ((primaryKeys.length === 1) &&
+        (elements[i][primaryKeys[0]] === undefined))
+      {
+        results[i][primaryKeys[0]] = upserted[i]['insertId'];
+      }
+    }
+
+    return results;
   }
 
   public async destroy(): Promise<void>

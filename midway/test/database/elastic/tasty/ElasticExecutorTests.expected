@@ -1,6 +1,5 @@
 {
   "basic query" : {
-    "total" : 27278,
     "max_score" : null,
     "hits" : [
       {

@@ -49,11 +49,12 @@ THE SOFTWARE.
 // import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
 
-import Query from '../../../app/query/Query';
 import QueryHandler from '../../../app/query/QueryHandler';
+import QueryRequest from '../../../app/query/QueryRequest';
 import QueryResponse from '../../../app/query/QueryResponse';
-import { MidwayErrorItem } from '../../../error/MidwayErrorItem';
-import QueryError from '../../../error/QueryError';
+import { ElasticQueryError, QueryError } from '../../../error/QueryError';
+import MidwayErrorItem from '../../../error/MidwayErrorItem';
+import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
 
 // tslint:disable-next-line
@@ -72,7 +73,7 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: Query): Promise<QueryResponse>
+  public async handleQuery(request: QueryRequest): Promise<QueryResponse>
   {
     const type = request.type;
     let body = request.body;

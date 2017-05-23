@@ -270,7 +270,8 @@ export const Ajax =
       return Ajax._req('GET', url, data, onLoad, {onError});
     },
 
-    _postMidway1(url: string,
+    _postMidway1(
+      url: string,
       reqFields: { [f: string]: any },
       onLoad: (resp: string) => void,
       onError?: (ev: Event) => void,
@@ -278,14 +279,15 @@ export const Ajax =
         download?: boolean;
         downloadFilename?: string;
         useMidway?: boolean;
-      } = {},): { xhr: XMLHttpRequest, queryId: string }
+      } = {}
+    ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const unique_id = '' + Math.random();
+      const uniqueId = '' + Math.random();
       return {
-        xhr:     Ajax._req('POST', url, JSON.stringify(_.extend(
+        xhr: Ajax._req('POST', url, JSON.stringify(_.extend(
           {
             timestamp: (new Date()).toISOString(),
-            unique_id,
+            uniqueId,
           }, reqFields)),
 
           onLoad,
@@ -299,7 +301,7 @@ export const Ajax =
             downloadFilename: options.downloadFilename,
           },
         ),
-        queryId: unique_id,
+        queryId: uniqueId,
       };
     },
 
@@ -783,58 +785,22 @@ export const Ajax =
         onError,
       );
     },
-
-    schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
+    
+    schema(dbId: number, onLoad: (columns: object, error?: any) => void, onError?: (ev: Event) => void)
     {
-      return Ajax._postMidway1('/get_schema', {
-          db,
-        },
-        (resp: string) =>
+      return Ajax._reqMidway2('get', '/database/' + dbId + '/schema', {}, (response: any) => {
+        try {
+          const cols: object = JSON.parse(response);
+          onLoad(cols);
+        }
+        catch (e)
         {
-          const cols: any = null;
-          try
-          {
-            const cols = JSON.parse(resp).results;
-            // var tables: {[name:string]: {name: string; columns: any[];}} = {};
-
-            // cols.map(
-            // (
-            //   col: { TABLE_NAME: string; COLUMN_NAME: string; }
-            // ) =>
-            // {
-            //   let column = _.extend(col, { name: col.COLUMN_NAME });
-            //   let table = col.TABLE_NAME;
-
-            //   if(!tables[table])
-            //   {
-            //     console.log('add table', table);
-            //     tables[table] = {
-            //       name: table,
-            //       columns: [],
-            //     };
-            //   }
-
-            //   tables[table].columns.push(column);
-            // });
-
-            // onLoad(_.toArray(tables) as any);
-            onLoad(cols);
-          }
-          catch (e)
-          {
-            onError && onError(resp as any);
-          }
-
-          if (cols)
-          {
-            onLoad(cols as any);
-          }
-        },
-        onError,
-      );
+          onError && onError(response as any);
+        }
+      });
     },
 
-    getDbs(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
+    getDbs(onLoad: (dbs: object) => void, onError?: (ev: Event) => void)
     {
       Ajax._postMidway1('/get_databases', {
         db: 'information_schema',
@@ -843,7 +809,7 @@ export const Ajax =
         try
         {
           const list = JSON.parse(resp);
-          onLoad(list.results.map((obj) => obj.schema_name));
+          onLoad(list.map((obj) => ({id: obj.id, name: obj.name, type: obj.type})));
         }
         catch (e)
         {

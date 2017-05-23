@@ -53,7 +53,7 @@ export interface ElasticQueryError
   response: string;
 }
 
-export default class QueryError extends MidwayError
+export class QueryError extends MidwayError
 {
   public static isElasticQueryError(err: Error | ElasticQueryError): err is ElasticQueryError
   {
@@ -74,3 +74,5 @@ export default class QueryError extends MidwayError
     super(status, title, detail, source);
   }
 }
+
+export default QueryError;

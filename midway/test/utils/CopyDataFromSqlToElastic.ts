@@ -87,7 +87,7 @@ async function copyTable(table, mysql: MySQLController, elastic: ElasticControll
 {
   const elements: object[] = await readTable(table, mysql);
   winston.info('Copying ' + elements.length.toString() + ' elements');
-  return elastic.getTasty().upsert(table, elements);
+  return elastic.getTasty().upsert(table, elements) as Promise<object[]>;
 }
 
 export const _async = (async () =>

@@ -172,10 +172,10 @@ class App extends PureClasss<Props>
   constructor(props: Props)
   {
     super(props);
-    
+
     Ajax.midwayStatus(
       () => console.log('Midway is running'),
-      () => console.log('Midway 2 is not running.')
+      () => console.log('Midway 2 is not running.'),
     );
 
     try {

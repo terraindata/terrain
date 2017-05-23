@@ -42,21 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./LibraryInfoColumn.less');
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
 const {List} = Immutable;
-import CreateItem from '../../common/components/CreateItem';
-import BuilderStore from './../../builder/data/BuilderStore';
 import Classs from './../../common/components/Classs';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
-import Menu from './../../common/components/Menu';
-import RolesActions from './../../roles/data/RolesActions';
 import RolesStore from './../../roles/data/RolesStore';
 import RoleTypes from './../../roles/RoleTypes';
-import UserThumbnail from './../../users/components/UserThumbnail';
-import UserActions from './../../users/data/UserActions';
 import UserStore from './../../users/data/UserStore';
 import UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
@@ -67,12 +63,12 @@ import Actions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
 import LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
-import LibraryItem from './LibraryItem';
-import LibraryItemCategory from './LibraryItemCategory';
+import './LibraryInfoColumn.less';
+import LibraryInfoUser from './LibraryInfoUser';
 import LibraryVariantInfo from './LibraryVariantInfo';
 
-const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
+const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
 type Group = LibraryTypes.Group;
@@ -81,7 +77,6 @@ type Variant = LibraryTypes.Variant;
 
 type Role = RoleTypes.Role;
 type RoleMap = RoleTypes.RoleMap;
-type GroupRoleMap = RoleTypes.GroupRoleMap;
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
@@ -94,7 +89,7 @@ export interface Props
 
 class LibraryInfoColumn extends Classs<Props>
 {
-  state: {
+  public state: {
     users: UserMap,
     roles: RoleMap,
     me: User,
@@ -127,15 +122,15 @@ class LibraryInfoColumn extends Classs<Props>
       storeKeyPath: ['dbs'],
     });
 
-    Ajax.getDbs((dbs: string[]) =>
+    Ajax.getDbs((dbs: object) =>
     {
       LibraryActions.setDbs(
-        List(dbs),
+        List(_.map(dbs as any, (db) : string => db['name'])),
       );
     });
   }
 
-  renderVariant(isSuperUser, isBuilder)
+  public renderVariant(isSuperUser, isBuilder)
   {
     return (
       <LibraryVariantInfo
@@ -147,12 +142,12 @@ class LibraryInfoColumn extends Classs<Props>
     );
   }
 
-  handleAlgorithmDbChange(dbIndex: number)
+  public handleAlgorithmDbChange(dbIndex: number)
   {
     Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
   }
 
-  renderAlgorithm(isSuperUser, isBuilder)
+  public renderAlgorithm(isSuperUser, isBuilder)
   {
     if (! this.props.algorithm || this.props.variant)
     {
@@ -177,7 +172,7 @@ class LibraryInfoColumn extends Classs<Props>
     );
   }
 
-  renderUser(user: User): JSX.Element
+  public renderUser(user: User): JSX.Element
   {
     const {roles} = this.state;
     const groupRoles = roles && roles.get(this.props.group.id);
@@ -194,7 +189,7 @@ class LibraryInfoColumn extends Classs<Props>
     />;
   }
 
-  renderGroupRoles(): JSX.Element | JSX.Element[]
+  public renderGroupRoles(): JSX.Element | JSX.Element[]
   {
     const { me, users, roles } = this.state;
     const groupRoles = roles && roles.get(this.props.group.id);
@@ -213,7 +208,7 @@ class LibraryInfoColumn extends Classs<Props>
       });
   }
 
-  renderRemainingUsers()
+  public renderRemainingUsers()
   {
     const { me, roles, users } = this.state;
     const groupRoles = roles && roles.get(this.props.group.id);
@@ -232,12 +227,12 @@ class LibraryInfoColumn extends Classs<Props>
       });
   }
 
-  handleGroupDbChange(dbIndex: number)
+  public handleGroupDbChange(dbIndex: number)
   {
     Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
   }
 
-  renderGroup(isSuperUser, isBuilder)
+  public renderGroup(isSuperUser, isBuilder)
   {
     const { group } = this.props;
     if (!group || this.props.algorithm || this.props.variant)
@@ -274,13 +269,15 @@ class LibraryInfoColumn extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     const item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group =
       this.props.variant || this.props.algorithm || this.props.group;
 
-    let groupId: ID, opacity: number, icon: any;
-    
+    let groupId: ID;
+    let opacity: number;
+    let icon: any;
+
     switch (item && item.type)
     {
       case 'GROUP':
@@ -297,6 +294,8 @@ class LibraryInfoColumn extends Classs<Props>
         groupId = item['groupId'];
         opacity = 0.5;
         icon = <VariantIcon />;
+        break;
+      default:
         break;
     }
 
@@ -352,112 +351,6 @@ class LibraryInfoColumn extends Classs<Props>
 
         }
       </LibraryColumn>
-    );
-  }
-}
-
-interface LibraryInfoUserProps
-{
-  me: User;
-  user: User;
-  groupRoles: GroupRoleMap;
-  groupId: ID;
-}
-
-class LibraryInfoUser extends Classs<LibraryInfoUserProps>
-{
-  changeRole(newRole: string)
-  {
-    const { user, groupRoles } = this.props;
-    let role = groupRoles && groupRoles.get(user.id);
-    if (!role)
-    {
-      role = new RoleTypes.Role({ groupId: this.props.groupId, userId: user.id });
-    }
-
-    RolesActions.change(
-      role.set('builder', newRole === 'Builder').set('admin', newRole === 'Admin') as RoleTypes.Role,
-    );
-  }
-
-  changeToAdmin()
-  {
-    this.changeRole('Admin');
-  }
-
-  changeToBuilder()
-  {
-    this.changeRole('Builder');
-  }
-
-  changeToViewer()
-  {
-    this.changeRole('Viewer');
-  }
-
-  render()
-  {
-    const { me, user, groupRoles } = this.props;
-    if (!user)
-    {
-      return null;
-    }
-
-    // TODO re-enable roles
-    
-    // const gr = groupRoles && groupRoles.get(user.id);
-    // const isSuperUser = gr && gr.isSuperUser;
-    // const isBuilder = gr && gr.builder && !isSuperUser;
-    // const isViewer = !isSuperUser && !isBuilder;
-    // const roleText = isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
-
-    // const imSysAdmin = me.isSuperUser;
-    // const imGroupAdmin = groupRoles && groupRoles.get(me.id) && groupRoles.get(me.id).admin;
-    
-    
-    const isSuperUser = user.isSuperUser;
-    const isBuilder = ! user.isSuperUser;
-    const isViewer = false;
-    const roleText = user.isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
-
-    const imSysAdmin = me.isSuperUser;
-    const imGroupAdmin = me.isSuperUser;
-
-
-    // TODO
-    const menuOptions =
-    Immutable.List([
-      {
-        text: 'Viewer',
-        onClick: this.changeToViewer,
-        disabled: isViewer,
-      },
-      {
-        text: 'Builder',
-        onClick: this.changeToBuilder,
-        disabled: isBuilder,
-      },
-      {
-        text: 'Admin',
-        onClick: this.changeToAdmin,
-        disabled: isSuperUser,
-      },
-    ]);
-
-    return (
-      <div key={user.id} className="library-info-user">
-        <UserThumbnail
-          userId={user.id}
-          showName={true}
-          link={true}
-        />
-        <div className="library-info-user-roles">
-          {
-            roleText
-          }
-        </div>
-        { (imGroupAdmin || imSysAdmin) ? <Menu options={menuOptions} small={true} /> : null }
-      </div>
     );
   }
 }

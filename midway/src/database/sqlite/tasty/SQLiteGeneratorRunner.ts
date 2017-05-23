@@ -172,52 +172,12 @@ export default class SQLiteGeneratorRunner
           this.generator.queryString += 'OFFSET ' + query.numSkipped.toString();
         }
       }
-    } else if (query.command.tastyType === TastyNodeTypes.upsert)
+    }
+    else if (query.command.tastyType === TastyNodeTypes.upsert)
     {
       if (query.upserts.length > 0)
       {
-        this.generator.appendExpression(query.command);
-        this.generator.queryString += ' ';
-        this.generator.indent();
-
-        // write INTO clause
-        this.generator.newLine();
-        this.generator.queryString += 'INTO ';
-        this.generator.queryString += this.generator.escapeString(query.table.getTableName());
-
-        const baseQuery = this.generator.queryString;
-
-        const columns: string[] = query.table.getColumnNames();
-        let definedColumnsList: string[] = [];
-        let definedColumnsSet: Set<string> = new Set();
-        let accumulatedUpdates: object[] = [];
-
-        for (const obj of query.upserts)
-        {
-          // check if this object has the same set of defined cols as the previous one
-          for (const col of columns)
-          {
-            const isInObj: boolean = obj.hasOwnProperty(col);
-            const isInDefined: boolean = definedColumnsSet.has(col);
-            if (isInObj !== isInDefined)
-            {
-              this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
-
-              this.generator.queryString = baseQuery;
-              definedColumnsList = this.generator.getDefinedColumns(columns, obj);
-              definedColumnsSet = new Set();
-              for (const definedCol of definedColumnsList)
-              {
-                definedColumnsSet.add(definedCol);
-              }
-              accumulatedUpdates = [];
-            }
-          }
-
-          accumulatedUpdates.push(obj);
-        }
-
-        this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
+        this.generateUpsertQuery(query, query.upserts);
       }
       this.generator.queryString = '';
     }
@@ -228,5 +188,51 @@ export default class SQLiteGeneratorRunner
   public getStatements()
   {
     return this.generator.statements;
+  }
+
+  private generateUpsertQuery(query: TastyQuery, upserts: object[])
+  {
+    this.generator.appendExpression(query.command);
+    this.generator.queryString += ' ';
+    this.generator.indent();
+
+    // write INTO clause
+    this.generator.newLine();
+    this.generator.queryString += 'INTO ';
+    this.generator.queryString += this.generator.escapeString(query.table.getTableName());
+
+    const baseQuery = this.generator.queryString;
+
+    const columns: string[] = query.table.getColumnNames();
+    let definedColumnsList: string[] = [];
+    let definedColumnsSet: Set<string> = new Set();
+    let accumulatedUpdates: object[] = [];
+
+    for (const obj of upserts)
+    {
+      // check if this object has the same set of defined cols as the previous one
+      for (const col of columns)
+      {
+        const isInObj: boolean = obj.hasOwnProperty(col);
+        const isInDefined: boolean = definedColumnsSet.has(col);
+        if (isInObj !== isInDefined)
+        {
+          this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
+
+          this.generator.queryString = baseQuery;
+          definedColumnsList = this.generator.getDefinedColumns(columns, obj);
+          definedColumnsSet = new Set();
+          for (const definedCol of definedColumnsList)
+          {
+            definedColumnsSet.add(definedCol);
+          }
+          accumulatedUpdates = [];
+        }
+      }
+
+      accumulatedUpdates.push(obj);
+    }
+
+    this.generator.accumulateUpsert(definedColumnsList, accumulatedUpdates);
   }
 }

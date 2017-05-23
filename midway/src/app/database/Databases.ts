@@ -51,7 +51,6 @@ import * as App from '../App';
 import DatabaseController from '../../database/DatabaseController';
 import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { ItemConfig, items } from '../items/ItemRouter';
 import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
 
@@ -73,10 +72,19 @@ export class Databases
 
   constructor()
   {
-    this.databaseTable = new Tasty.Table('databases', ['id'], ['name', 'type', 'dsn', 'status']);
+    this.databaseTable = new Tasty.Table(
+      'databases',
+      ['id'],
+      [
+        'name',
+        'type',
+        'dsn',
+        'status',
+      ],
+    );
   }
 
-  public async delete(id: number): Promise<object[]>
+  public async delete(id: number): Promise<object>
   {
     return App.DB.delete(this.databaseTable, { id } as DatabaseConfig);
   }
@@ -95,9 +103,9 @@ export class Databases
     return this.select([], {});
   }
 
-  public async upsert(user: UserConfig, db: DatabaseConfig): Promise<string>
+  public async upsert(user: UserConfig, db: DatabaseConfig): Promise<DatabaseConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<DatabaseConfig>(async (resolve, reject) =>
     {
       if (db.id !== undefined)
       {
@@ -111,14 +119,13 @@ export class Databases
         db = Util.updateObject(results[0], db);
       }
 
-      await App.DB.upsert(this.databaseTable, db);
-      resolve('Success');
+      resolve(await App.DB.upsert(this.databaseTable, db) as DatabaseConfig);
     });
   }
 
-  public async connect(user: UserConfig, id: number): Promise<string>
+  public async connect(user: UserConfig, id: number): Promise<DatabaseConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<DatabaseConfig>(async (resolve, reject) =>
     {
       const results: DatabaseConfig[] = await this.get(id);
       if (results.length === 0)
@@ -135,25 +142,23 @@ export class Databases
       const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
       DatabaseRegistry.set(db.id, controller);
       db.status = 'CONNECTED';
-      await this.upsert(user, db);
-      resolve('Success');
+      resolve(await this.upsert(user, db));
     });
   }
 
-  public async disconnect(user: UserConfig, id: number): Promise<string>
+  public async disconnect(user: UserConfig, id: number): Promise<DatabaseConfig>
   {
     await DatabaseRegistry.remove(id);
     // TODO: clean up controller?
-    await this.upsert(user, { id, status: 'DISCONNECTED' } as DatabaseConfig);
-    return Promise.resolve('Success');
+    return this.upsert(user, { id, status: 'DISCONNECTED' } as DatabaseConfig);
   }
 
   public async schema(id: number): Promise<string>
   {
-    const controller = await DatabaseRegistry.get(id);
+    const controller = DatabaseRegistry.get(id);
     if (controller === undefined)
     {
-      return Promise.reject('Invalid db id passed');
+      return Promise.reject('Invalid db id passed (schema)');
     }
 
     const schema: Tasty.Schema = await controller.getTasty().schema();

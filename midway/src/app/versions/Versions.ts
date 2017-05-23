@@ -63,9 +63,19 @@ export interface VersionConfig
 
 export class Versions
 {
-  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
+  private Version = new Tasty.Table(
+    'versions',
+    ['id'],
+    [
+      'createdAt',
+      'createdByUserId',
+      'object',
+      'objectId',
+      'objectType',
+    ],
+  );
 
-  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
+  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig>
   {
     if (user.id === undefined)
     {
@@ -79,25 +89,30 @@ export class Versions
         objectId: id,
         objectType: type,
       };
-    return App.DB.upsert(this.Version, newVersion) as any;
+    return App.DB.upsert(this.Version, newVersion) as Promise<VersionConfig>;
   }
 
   public async find(id: number): Promise<VersionConfig[]>
   {
-    return App.DB.select(this.Version, [], { id }) as any;
+    return App.DB.select(this.Version, [], { id }) as Promise<VersionConfig[]>;
   }
 
   public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
   {
+    let result: Promise<VersionConfig[]>;
     if (objectId !== undefined && objectType !== undefined)
     {
-      return App.DB.select(this.Version, [], { objectType, objectId }) as any;
+      result = App.DB.select(this.Version, [], { objectType, objectId });
     }
     else if (objectId !== undefined)
     {
-      return App.DB.select(this.Version, [], { objectType }) as any;
+      result = App.DB.select(this.Version, [], { objectType });
     }
-    return App.DB.select(this.Version, [], {}) as any;
+    else
+    {
+      result = App.DB.select(this.Version, [], {});
+    }
+    return result;
   }
 }
 

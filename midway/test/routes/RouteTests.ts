@@ -145,8 +145,8 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          .toBe('Success');
+        expect(JSON.parse(response.text))
+          .toMatchObject([{ accessToken: '', email: 'test@terraindata.com', id }]);
       })
       .catch((error) =>
       {
@@ -211,9 +211,7 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          // tslint:disable-next-line:max-line-length
-          .toEqual(
-          '[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"},{"id":2,"meta":"#realmusician","name":"Bob Dylan","parent":0,"status":"Hearts beatin","type":"GROUP"},{"id":3,"meta":"Are we an item?","name":"Justin Bieber","parent":0,"status":"Baby","type":"VARIANT"}]');
+          .toBe('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -236,7 +234,7 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Success');
+        expect(response.text).toBe('[{"name":"Test Item","status":"LIVE","id":2}]');
       })
       .catch((error) =>
       {
@@ -256,9 +254,7 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          // tslint:disable-next-line:max-line-length
-          .toEqual(
-          '[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"}]');
+          .toBe('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -282,7 +278,7 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Success');
+        expect(response.text).toBe('[{"id":2,"meta":null,"name":"Updated Item","parent":null,"status":"LIVE","type":null}]');
       })
       .catch((error) =>
       {
@@ -407,15 +403,8 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
-        expect(JSON.parse(response.text))
-          .toMatchObject({
-            result: {
-              timed_out: false,
-              _shards: { failed: 0 },
-              hits: { total: 27278, max_score: 0, hits: [] },
-            }, errors: [],
-          });
+        winston.info(JSON.stringify(response));
+        expect(JSON.parse(response.text).results[0].hits).toMatchObject({ max_score: 0, hits: [] });
       })
       .catch((error) =>
       {
@@ -447,18 +436,12 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
-        expect(JSON.parse(response.text)).toMatchObject(
-          {
-            result: null,
-            errors: [
-              {
-                status: 404,
-                // tslint:disable-next-line:max-line-length
-                title: '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }',
-              },
-            ],
-          });
+        winston.info(JSON.stringify(response));
+        const midwayError: MidwayError = MidwayError.fromJSON(response.text);
+        expect(midwayError.getTitle())
+          .toBe(
+          // tslint:disable-next-line:max-line-length
+          '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }');
       })
       .catch((error) =>
       {
@@ -490,17 +473,9 @@ describe('Query route tests', () =>
       .expect(400)
       .then((response) =>
       {
-        winston.info(response.text);
-        expect(JSON.parse(response.text)).toMatchObject(
-          {
-            errors: [
-              {
-                status: 400,
-                title: 'Route /midway/v1/query/ has an error.',
-                detail: 'Query type "wrongtype" is not currently supported.',
-              },
-            ],
-          });
+        winston.info(JSON.stringify(response));
+        const midwayError: MidwayError = MidwayError.fromJSON(response.text);
+        expect(midwayError.getTitle()).toBe('Route /midway/v1/query/ has an error.');
       })
       .catch((error) =>
       {

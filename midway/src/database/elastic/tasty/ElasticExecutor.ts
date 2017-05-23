@@ -110,8 +110,8 @@ export default class ElasticExecutor implements TastyExecutor
         result = await this.fullQuery(query.params as Elastic.SearchParams[]);
         return result.hits.hits;
       case 'upsert':
-        const table: TastyTable = new TastyTable(query.table, [], query.fields, query.index);
-        result = await this.upsertObjects(table, query.params);
+        const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
+        result = await this.upsert(table, query, query.params);
         return result;
       default:
         throw new Error('Unknown query command ' + JSON.stringify(query));
@@ -137,33 +137,22 @@ export default class ElasticExecutor implements TastyExecutor
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsertObjects(table: TastyTable, elements: object[])
+  public async upsert(table: TastyTable, query: ElasticQuery, elements: object[])
   {
-    if (elements.length > 2)
+    const upserted = await this.upsertObjects(table, elements);
+    const primaryKeys = table.getPrimaryKeys();
+    const results = new Array(upserted.length);
+    for (let i = 0; i < upserted.length; i++)
     {
-      return this.bulkUpsert(table, elements);
+      results[i] = elements[i];
+      if ((primaryKeys.length === 1) &&
+        (elements[i][primaryKeys[0]] === undefined))
+      {
+        results[i][primaryKeys[0]] = upserted[i]['_id'];
+      }
     }
 
-    const promises: Array<Promise<any>> = [];
-    for (const element of elements)
-    {
-      promises.push(
-        new Promise((resolve, reject) =>
-        {
-          const query = {
-            body: element,
-            id: this.makeID(table, element),
-            index: table.getDatabaseName(),
-            type: table.getTableName(),
-          };
-
-          this.client.index(
-            query,
-            makePromiseCallback(resolve, reject));
-        }),
-      );
-    }
-    await Promise.all(promises);
+    return results;
   }
 
   /*
@@ -186,7 +175,7 @@ export default class ElasticExecutor implements TastyExecutor
   /*
    * Deletes the given objects based on their primary key
    */
-  public async deleteDocumentsByID(table: TastyTable, elements: object[])
+  public async deleteObjects(table: TastyTable, elements: object[])
   {
     const promises: Array<Promise<any>> = [];
     for (const element of elements)
@@ -206,23 +195,61 @@ export default class ElasticExecutor implements TastyExecutor
             makePromiseCallback(resolve, reject));
         }));
     }
-    await Promise.all(promises);
+    return Promise.all(promises);
+  }
+
+  private async upsertObjects(table: TastyTable, elements: object[])
+  {
+    if (elements.length > 2)
+    {
+      return this.bulkUpsert(table, elements);
+    }
+
+    const promises: Array<Promise<any>> = [];
+    for (const element of elements)
+    {
+      promises.push(
+        new Promise((resolve, reject) =>
+        {
+          const query = {
+            body: element,
+            index: table.getDatabaseName(),
+            type: table.getTableName(),
+          };
+
+          const compositePrimaryKey = this.makeID(table, element);
+          if (compositePrimaryKey !== '')
+          {
+            query['id'] = compositePrimaryKey;
+          }
+
+          this.client.index(
+            query as any,
+            makePromiseCallback(resolve, reject));
+        }),
+      );
+    }
+    return Promise.all(promises);
   }
 
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
   {
     const body: any[] = [];
-    for (let i = 0; i < elements.length; ++i)
+    for (const element of elements)
     {
-      const element = elements[i];
       const command =
         {
           index: {
-            _id: this.makeID(table, element),
             _index: table.getDatabaseName(),
             _type: table.getTableName(),
           },
         };
+
+      const compositePrimaryKey = this.makeID(table, element);
+      if (compositePrimaryKey !== '')
+      {
+        command.index['_id'] = compositePrimaryKey;
+      }
 
       body.push(command);
       body.push(element);
