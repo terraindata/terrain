@@ -58,15 +58,6 @@ import QueryResponse from './QueryResponse';
 
 const QueryRouter = new KoaRouter();
 
-// QueryRouter.post(
-//   '/',
-//   passport.authenticate('access-token-local'),
-//   async (ctx, next) =>
-//   {
-//     const query: Query = ctx.request.body.body as Query;
-//
-//     winston.info(JSON.stringify(query, null, 1));
-//     Util.verifyParameters(query, ['database', 'type', 'body']);
 QueryRouter.post(
   '/',
   passport.authenticate('access-token-local'),
@@ -77,10 +68,12 @@ QueryRouter.post(
     if (ctx.request.type === 'application/json')
     {
       query = ctx.request.body.body as QueryRequest;
-    } else if (ctx.request.type === 'application/x-www-form-urlencoded')
+    }
+    else if (ctx.request.type === 'application/x-www-form-urlencoded')
     {
       query = JSON.parse(ctx.request.body.data).body as QueryRequest;
-    } else
+    }
+    else
     {
       throw new Error('Unknown Request Type ' + String(ctx.request.body));
     }
@@ -111,7 +104,8 @@ QueryRouter.post(
       ctx.type = 'text/plain';
       ctx.attachment(ctx.request.body.filename);
       ctx.body = queryStream;
-    } else
+    }
+    else
     {
       const qh: QueryHandler = database.getQueryHandler();
       const result: QueryResponse = await qh.handleQuery(query) as QueryResponse;
