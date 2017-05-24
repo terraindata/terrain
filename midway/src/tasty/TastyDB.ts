@@ -45,21 +45,76 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import TastyQuery from './TastyQuery';
+import TastySchema from './TastySchema';
+import TastyTable from './TastyTable';
 
-/**
- * Abstract generator class for making queries from TastyQuery objects.
- */
-export abstract class TastyGenerator
+abstract class TastyDB
 {
   /**
    * makes a database specific query from a TastyQuery
+   *
+   * @abstract
+   * @param {TastyQuery} query
+   * @returns {*}
+   *
+   * @memberof TastyDB
    */
   public abstract generate(query: TastyQuery): any;
 
   /**
    * makes the generated query into a string
+   *
+   * @abstract
+   * @param {TastyQuery} query
+   * @returns {string}
+   *
+   * @memberof TastyDB
    */
   public abstract generateString(query: TastyQuery): string;
+
+  /**
+   * execute a database specific query
+   *
+   * @abstract
+   * @param {*} query
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract execute(query: any): Promise<object[]>;
+
+  /**
+   * update or insert an array of objects in a TastyTable
+   *
+   * @abstract
+   * @param {TastyTable} table
+   * @param {*} query
+   * @param {object[]} elements
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract upsert(table: TastyTable, query: any, elements: object[]): Promise<object[]>;
+
+  /**
+   * returns schema information for a database
+   *
+   * @abstract
+   * @returns {Promise<TastySchema>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract schema(): Promise<TastySchema>;
+
+  /**
+   * destroy an instance of tasty db
+   *
+   * @abstract
+   * @returns {Promise<void>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract destroy(): Promise<void>;
 }
 
-export default TastyGenerator;
+export default TastyDB;

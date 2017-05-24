@@ -45,20 +45,32 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import TastyExecutor from '../../../tasty/TastyExecutor';
+import TastyDB from '../../../tasty/TastyDB';
+import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
+import ElasticGenerator from './ElasticGenerator';
 import ElasticQuery from './ElasticQuery';
 
-export default class ElasticExecutor implements TastyExecutor
+export class ElasticDB implements TastyDB
 {
   private client: ElasticClient;
 
   constructor(client: ElasticClient)
   {
     this.client = client;
+  }
+
+  public generate(query: TastyQuery)
+  {
+    return new ElasticGenerator(query).esQuery;
+  }
+
+  public generateString(query: TastyQuery)
+  {
+    return JSON.stringify(this.generate(query));
   }
 
   public async schema(): Promise<TastySchema>
@@ -76,7 +88,7 @@ export default class ElasticExecutor implements TastyExecutor
   /**
    * Returns the entire ES response object.
    */
-  public async fullQuery(queries: Elastic.SearchParams[]): Promise<object>
+  public async query(queries: Elastic.SearchParams[]): Promise<object>
   {
     if (queries.length === 0)
     {
@@ -101,13 +113,13 @@ export default class ElasticExecutor implements TastyExecutor
     }
   }
 
-  public async query(query: ElasticQuery)
+  public async execute(query: ElasticQuery)
   {
     let result: any;
     switch (query.op)
     {
       case 'select':
-        result = await this.fullQuery(query.params as Elastic.SearchParams[]);
+        result = await this.query(query.params as Elastic.SearchParams[]);
         return result.hits.hits;
       case 'upsert':
         const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
@@ -123,7 +135,7 @@ export default class ElasticExecutor implements TastyExecutor
     // do nothing
   }
 
-  public storeProcedure(procedure)
+  public async storeProcedure(procedure)
   {
     return new Promise(
       (resolve, reject) =>
@@ -274,3 +286,5 @@ export default class ElasticExecutor implements TastyExecutor
       }).join('-');
   }
 }
+
+export default ElasticDB;

@@ -49,7 +49,7 @@ import * as winston from 'winston';
 
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
-import ElasticExecutor from '../../../../src/database/elastic/tasty/ElasticExecutor';
+import ElasticDB from '../../../../src/database/elastic/tasty/ElasticDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import * as Utils from '../../../Utils';
@@ -60,7 +60,7 @@ function getExpectedFile(): string
 }
 
 let elasticController: ElasticController;
-let elasticExecutor: ElasticExecutor;
+let elasticDB: ElasticDB;
 
 const DBMovies = new Tasty.Table('data', ['movieid'], ['title', 'releasedate'], 'movies');
 
@@ -75,7 +75,7 @@ beforeAll(async () =>
     };
 
     elasticController = new ElasticController(config, 0, 'ElasticExecutorTest');
-    elasticExecutor = elasticController.getTasty().getExecutor() as ElasticExecutor;
+    elasticDB = elasticController.getTasty().getDB() as ElasticDB;
   }
   catch (e)
   {
@@ -87,7 +87,7 @@ test('basic query', async (done) =>
 {
   try
   {
-    const result: any = await elasticExecutor.fullQuery([
+    const result: any = await elasticDB.query([
       {
         index: 'movies',
         type: 'data',
@@ -112,7 +112,7 @@ test('store terrain_PWLScore script', async (done) =>
 {
   try
   {
-    await elasticExecutor.storeProcedure(
+    await elasticDB.storeProcedure(
       {
         id: 'terrain_PWLScore',
         lang: 'painless',
@@ -179,7 +179,7 @@ test('stored PWL transform sort query', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.fullQuery([
+    const result = await elasticDB.query([
       {
         index: 'movies',
         type: 'data',
@@ -264,7 +264,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
 {
   try
   {
-    const result = await elasticExecutor.fullQuery([
+    const result = await elasticDB.query([
       {
         index: 'movies',
         type: 'data',
