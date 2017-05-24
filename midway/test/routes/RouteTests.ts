@@ -241,7 +241,7 @@ describe('Item route tests', () =>
           .toMatchObject({
             name: 'Test Item',
             status: 'LIVE',
-            });
+          });
       })
       .catch((error) =>
       {
@@ -273,7 +273,7 @@ describe('Item route tests', () =>
 
   test('Update item: POST /midway/v1/items/', async () =>
   {
-    const insertOjbect = { id: 2, name: 'Updated Item', status: 'LIVE'};
+    const insertOjbect = { id: 2, name: 'Updated Item', status: 'LIVE' };
     await request(server)
       .post('/midway/v1/items/2')
       .send({
