@@ -140,7 +140,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           .set('tqlCardsInSync', true);
       }
     }
-
+    console.log(action.payload.db);
     return state
       .set('query', action.payload.query)
       .set('loading', false)

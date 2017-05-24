@@ -64,7 +64,7 @@ class LibraryStateC
 {
   loaded = false;
   loading = true;
-  dbs: List<string> = Immutable.List([]);
+  dbs: List<LibraryTypes.Database> = Immutable.List([]);
 
   groups: IMMap<ID, Group> = null;
   algorithms: IMMap<ID, Algorithm> = null;

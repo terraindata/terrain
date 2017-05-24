@@ -54,6 +54,7 @@ import Ajax from './../../util/Ajax';
 import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
+import LibraryTypes from '../../library/LibraryTypes';
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
@@ -71,8 +72,9 @@ export const SchemaStore: Store<SchemaState> =
             {
               SchemaActions.dbCount(Object.keys(dbs).length);
               _.map((dbs as any),
-                (db) =>
-                  Ajax.schema(db['id'],
+                (db: LibraryTypes.Database) =>
+                  (db.source === 'm1' ? Ajax.schema_m1 : Ajax.schema)(
+                    db['id'],
                     (colsData, error) =>
                     {
                       if (!error)

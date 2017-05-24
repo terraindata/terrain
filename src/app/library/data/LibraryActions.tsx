@@ -242,7 +242,7 @@ const Actions =
       $(ActionTypes.loadState, { state }),
 
   setDbs:
-    (dbs: List<string>) =>
+    (dbs: List<LibraryTypes.Database>) =>
       $(ActionTypes.setDbs, { dbs }),
 
   // overwrites current state with state from server

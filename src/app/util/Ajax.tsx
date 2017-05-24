@@ -50,6 +50,7 @@ import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
+import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 import {recordForSave, responseToRecordConfig} from '../Classes';
@@ -166,7 +167,7 @@ export const Ajax =
     {
       const host = config.host || MIDWAY_HOST;
       let fullUrl = host + url;
-      const token = AuthStore.getState().get('accessToken');
+      const token = 'L9DcAxWyyeAuZXwb-bJRtA'; // hardcoded token in pa-terraformer02. TODO change?
 
       if (config.download)
       {
@@ -684,14 +685,25 @@ export const Ajax =
      * Intermediate query interface. Queries M2.
      * Transforms result into old format.
      */
-      query(body: string,
-      db: string, // unused
+    query(body: string,
+      db: number | string,
       onLoad: (response: QueryResponse) => void,
       onError?: (ev: Event) => void,
       sqlQuery?: boolean, // unused
       options?: object // unused
     ): { xhr: XMLHttpRequest, queryId: string }
     {
+      // TODO make this hack not so bad
+      const dbs = LibraryStore.getState().dbs;
+      console.log(dbs);
+      const database = dbs.find(d => d.id === db);
+      console.log(database);
+      if (database && database.source === 'm1')
+      {
+        console.log('q m1');
+        return Ajax.query_m1(body, db as any, onLoad, onError, sqlQuery, options as any);
+      }
+      
       // TODO: For MySQL and other string queries, we should skip this step and send it as a string
       try
       {
@@ -701,11 +713,11 @@ export const Ajax =
       {
         // on parse failure, absorb error and send query as a string
       }
-
+      console.log(db);
       const queryId = '' + Math.random();
       const payload = {
-        type:     'search', // can be other things in the future
-        database: 1, // should be passed by caller
+        type: 'search', // can be other things in the future
+        database: db, // should be passed by caller
         body,
       };
 
@@ -786,9 +798,9 @@ export const Ajax =
       );
     },
     
-    schema(dbId: number, onLoad: (columns: object, error?: any) => void, onError?: (ev: Event) => void)
+    schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
-      return Ajax._reqMidway2('get', '/database/' + dbId + '/schema', {}, (response: any) => {
+      return Ajax._reqMidway2('get', 'database/' + dbId + '/schema', {}, (response: any) => {
         try {
           const cols: object = JSON.parse(response);
           onLoad(cols);
@@ -800,25 +812,89 @@ export const Ajax =
       });
     },
 
-    getDbs(onLoad: (dbs: object) => void, onError?: (ev: Event) => void)
+    getDbs(onLoad: (dbs: LibraryTypes.Database[]) => void, onError?: (ev: Event) => void)
     {
-      Ajax._postMidway1('/get_databases', {
-        db: 'information_schema',
-      }, (resp) =>
+      let m1Dbs: LibraryTypes.Database[] = null;
+      let m2Dbs: LibraryTypes.Database[] = null;
+      
+      const checkForLoaded = () =>
       {
-        try
+        console.log(m1Dbs, m2Dbs);
+        if(!m1Dbs || !m2Dbs)
         {
-          const list = JSON.parse(resp);
-          onLoad(list.map((obj) => ({id: obj.id, name: obj.name, type: obj.type})));
+          return;
         }
-        catch (e)
+        
+        let dbs: LibraryTypes.Database[] = [];
+        if(m1Dbs)
         {
-          onError && onError(e as any);
+          dbs = m1Dbs;
         }
-      }, onError);
+        if(m2Dbs)
+        {
+          dbs = dbs.concat(m2Dbs);
+        }
+        onLoad(dbs);
+      }
+      
+      Ajax._postMidway1(
+        '/get_databases', 
+        {
+          db: 'information_schema',
+        },
+        (resp) =>
+        {
+          let data;
+          try
+          {
+            data = JSON.parse(resp);
+          }
+          catch(e)
+          {}
+          
+          m1Dbs = [] as any;
+          if(data)
+          {
+            m1Dbs = data.results.map(
+              (r: {schema_name: string}) =>
+              ({
+                id: r.schema_name,
+                name: r.schema_name,
+                type: 'mysql',
+                source: 'm1',
+              })
+            );
+          }
+          
+          checkForLoaded();
+        }
+      );
+      
+      Ajax._reqMidway2(
+        'get',
+        'database', 
+        { },
+        (dbs: [LibraryTypes.Database]) =>
+        {
+          m2Dbs = dbs.map(db =>
+          {
+            db['source'] = 'm2';
+            return db;
+          });
+          checkForLoaded();
+        },
+        {
+          onError: (e) =>
+          {
+            onError && onError(e)
+            m2Dbs = [] as any;
+            checkForLoaded();
+          }
+        }
+      );
     },
 
-    schema_m1(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
+    schema_m1(db: string | number, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       return Ajax._postMidway1('/get_schema', {
           db,

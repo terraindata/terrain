@@ -54,6 +54,15 @@ import {BaseClass, New} from '../Classes';
 
 export module LibraryTypes
 {
+  // TODO move to the back-ends section
+  export interface Database
+  {
+    id: string | number;
+    name: string;
+    type: string;
+    source: 'm1' | 'm2';
+  }
+  
   export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
   export const ItemType: {
     Query: ItemType;

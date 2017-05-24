@@ -65,16 +65,23 @@ type Variant = LibraryTypes.Variant;
 export interface Props
 {
   variant: Variant;
-  dbs: List<string>;
+  dbs: List<LibraryTypes.Database>;
   isSuperUser: boolean;
   isBuilder: boolean;
 }
+
+const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends PureClasss<Props>
 {
   handleDbChange(dbIndex: number)
   {
-    Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)) as Variant);
+    Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex).id));
+  }
+  
+  handleLanguageChange(langIndex: number)
+  {
+    Actions.variants.change(this.props.variant.set('language', LANGUAGES.get(langIndex)));
   }
 
   render()
@@ -107,12 +114,28 @@ class LibraryInfoColumn extends PureClasss<Props>
             </div>
             <div className="biv-row">
               <div className="biv-cell-first">
+                Language
+              </div>
+              <div className="biv-cell-second">
+                <Dropdown
+                  selectedIndex={LANGUAGES.indexOf(this.props.variant.language)}
+                  options={LANGUAGES}
+                  onChange={this.handleLanguageChange}
+                  canEdit={isBuilder || isSuperUser}
+                  className="bic-db-dropdown"
+                />
+              </div>
+            </div>
+            <div className="biv-row">
+              <div className="biv-cell-first">
                 Database
               </div>
               <div className="biv-cell-second">
                 <Dropdown
-                  selectedIndex={this.props.dbs && this.props.dbs.indexOf(this.props.variant.db)}
-                  options={this.props.dbs}
+                  selectedIndex={this.props.dbs && this.props.dbs.findIndex(
+                    db => db.id === this.props.variant.db
+                  )}
+                  options={this.props.dbs.map(db => db.name + ' (' + db.type + ')').toList()}
                   onChange={this.handleDbChange}
                   canEdit={isBuilder || isSuperUser}
                   className="bic-db-dropdown"

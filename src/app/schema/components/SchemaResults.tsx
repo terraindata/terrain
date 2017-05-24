@@ -50,6 +50,7 @@ import * as React from 'react';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
+import LibraryTypes from '../../library/LibraryTypes';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;

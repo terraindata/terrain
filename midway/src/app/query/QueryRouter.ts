@@ -71,9 +71,10 @@ QueryRouter.post(
   passport.authenticate('access-token-local'),
   async (ctx, next) =>
   {
-    const query: QueryRequest = ctx.request.body as QueryRequest;
+    const query: QueryRequest = ctx.request.body.body as QueryRequest;
 
     winston.info(JSON.stringify(ctx.request.body, null, 1));
+    winston.info('db ' + JSON.stringify(query));
     Util.verifyParameters(query, ['database', 'type', 'body']);
 
     winston.info('query database: ' + query.database.toString() + ' type "' + query.type + '"');
