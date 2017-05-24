@@ -75,7 +75,7 @@ class SchemaResults extends PureClasss<Props>
 
 		resultsState?: ResultsState;
 		resultsQuery?: BuilderTypes.Query;
-		resultsDb?: string;
+		resultsDb?: LibraryTypes.Database;
 	} = {
 		resultsState: _ResultsState(),
 	};
@@ -107,8 +107,8 @@ class SchemaResults extends PureClasss<Props>
 						const resultsDb =
 							selectedItem.type === 'database' ? selectedItem.name :
 								this.props.databases
-									&& this.props.databases.get(selectedItem['databaseId']).name;
-
+									&& this.props.databases.get(selectedItem['databaseId']);
+					  console.log('schema resultsDb', resultsDb);
 						let field: string, table: string, where: string;
 
 						switch (selectedItem.type)

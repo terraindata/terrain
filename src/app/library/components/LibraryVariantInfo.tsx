@@ -76,7 +76,7 @@ class LibraryInfoColumn extends PureClasss<Props>
 {
   handleDbChange(dbIndex: number)
   {
-    Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex).id));
+    Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)));
   }
   
   handleLanguageChange(langIndex: number)
@@ -133,7 +133,7 @@ class LibraryInfoColumn extends PureClasss<Props>
               <div className="biv-cell-second">
                 <Dropdown
                   selectedIndex={this.props.dbs && this.props.dbs.findIndex(
-                    db => db.id === this.props.variant.db
+                    db => db.id === this.props.variant.db.id
                   )}
                   options={this.props.dbs.map(db => db.name + ' (' + db.type + ')').toList()}
                   onChange={this.handleDbChange}

@@ -10,6 +10,11 @@
             "name": "My MySQL Instance",
             "type": "mysql",
             "dsn": "127.0.0.1:3306"
+        },
+        {
+            "name": "Zazzle ES 1",
+            "type": "elastic",
+            "dsn": "10.1.0.30:9200"
         }
     ]
 }

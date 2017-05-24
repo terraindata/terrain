@@ -56,6 +56,8 @@ import MidwayErrorItem from '../../../error/MidwayErrorItem';
 import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
+import ElasticsearchScrollStream = require('elasticsearch-scroll-stream');
+import { Readable } from 'stream';
 
 // tslint:disable-next-line
 const clarinet = require('clarinet');
@@ -73,7 +75,7 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: QueryRequest): Promise<QueryResponse>
+  public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
   {
     const type = request.type;
     let body = request.body;
@@ -124,11 +126,19 @@ export default class ElasticQueryHandler extends QueryHandler
 
     if (type === 'search')
     {
-      // NB: streaming not yet implemented
-      return new Promise<QueryResponse>((resolve, reject) =>
+      if (request.streaming === true)
       {
-        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
-      });
+        const client = this.controller.getClient().getDelegate();
+        const sq: Readable = new ElasticsearchScrollStream(client, request.body);
+        return sq;
+      } else
+      {
+        // NB: streaming not yet implemented
+        return new Promise<QueryResponse>((resolve, reject) =>
+        {
+          this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
+        });
+      }
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');

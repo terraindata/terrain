@@ -127,6 +127,14 @@ export module BuilderTypes
     
     id: ID = -1;
     variantId: number = -1;
+    
+    // TODO change?
+    db: {
+      id: ID;
+      name: string;
+      source: 'm1' | 'm2';
+      type: string;
+    } = {} as any;
 
     cards: ICards = List([]);
     inputs: List<any> = List([]);
@@ -153,7 +161,6 @@ export module BuilderTypes
     config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
 
     let query = new Query_Record(config) as any as Query;
-
     switch (config['mode'])
     {
       case 'tql':
@@ -814,7 +821,7 @@ export module BuilderTypes
             card['tables'].reduce(
               (list: List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
-                const dbName = Store.getState().db;
+                const dbName = Store.getState().db.name;
                 let columnNames = schemaState.columnNamesByDb.getIn(
                   [dbName, dbName + '.' + tableBlock.table],
                 ) || Immutable.List([]);
@@ -851,7 +858,7 @@ export module BuilderTypes
                 showWhenCards: true,
                 getAutoTerms: (comp: React.Component<any, any>, schemaState: SchemaTypes.SchemaState) =>
                 {
-                  const db = Store.getState().db;
+                  const db = Store.getState().db.name; // TODO correct?
                   const tableNames = schemaState.tableNamesByDb.get(db);
                   // if (!tableNames)
                   // {

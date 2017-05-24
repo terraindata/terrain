@@ -167,7 +167,6 @@ export const Ajax =
     {
       const host = config.host || MIDWAY_HOST;
       let fullUrl = host + url;
-      const token = 'L9DcAxWyyeAuZXwb-bJRtA'; // hardcoded token in pa-terraformer02. TODO change?
 
       if (config.download)
       {
@@ -175,17 +174,21 @@ export const Ajax =
         form.setAttribute('action', fullUrl);
         form.setAttribute('method', 'post');
 
-        const dataObj: _.Dictionary<string> = {
+        // TODO move
+        const accessToken = AuthStore.getState().accessToken;
+        const id = AuthStore.getState().id;
+        const dataObj = {
+          id,
+          accessToken,
           data,
-          token,
           filename: config.downloadFilename,
         };
-        _.map(dataObj, (value, key) =>
+        _.map(dataObj as any, (value, key) =>
         {
           const input = document.createElement('input');
           input.setAttribute('type', 'hidden');
           input.setAttribute('name', key + '');
-          input.setAttribute('value', value);
+          input.setAttribute('value', value as any);
           form.appendChild(input);
         });
 
@@ -247,6 +250,7 @@ export const Ajax =
 
       if (!config.noToken)
       {
+        const token = 'L9DcAxWyyeAuZXwb-bJRtA'; // hardcoded token in pa-terraformer02. TODO change?
         xhr.setRequestHeader('token', token);
       }
 
@@ -627,15 +631,17 @@ export const Ajax =
     /**
      * Old query interface. Queries M1.
      */
-      query_m1(tql: string,
-      db: string,
+    query_m1(
+      tql: string,
+      db: string | number,
       onLoad: (response: QueryResponse) => void,
       onError?: (ev: Event) => void,
       sqlQuery?: boolean,
       options: {
         csv?: boolean,
         csvName?: string,
-      } = {},)
+      } = {}
+    )
     {
       // kill queries running under the same id
       // Ajax.killQueries(); // TODO add id
@@ -686,22 +692,21 @@ export const Ajax =
      * Transforms result into old format.
      */
     query(body: string,
-      db: number | string,
+      db: LibraryTypes.Database,
       onLoad: (response: QueryResponse) => void,
       onError?: (ev: Event) => void,
       sqlQuery?: boolean, // unused
-      options?: object // unused
+      options: {
+        streaming?: boolean,
+        streamingTo?: string,
+      } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       // TODO make this hack not so bad
       const dbs = LibraryStore.getState().dbs;
-      console.log(dbs);
-      const database = dbs.find(d => d.id === db);
-      console.log(database);
-      if (database && database.source === 'm1')
+      if (db && db.source === 'm1')
       {
-        console.log('q m1');
-        return Ajax.query_m1(body, db as any, onLoad, onError, sqlQuery, options as any);
+        return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
       }
       
       // TODO: For MySQL and other string queries, we should skip this step and send it as a string
@@ -713,11 +718,11 @@ export const Ajax =
       {
         // on parse failure, absorb error and send query as a string
       }
-      console.log(db);
       const queryId = '' + Math.random();
       const payload = {
         type: 'search', // can be other things in the future
-        database: db, // should be passed by caller
+        database: db.id, // should be passed by caller
+        streaming: options.streaming,
         body,
       };
 
@@ -759,7 +764,11 @@ export const Ajax =
         'query/',
         payload,
         onLoadHandler,
-        {onError},
+        {
+          onError,
+          download: options.streaming,
+          downloadFilename: options.streamingTo,
+         },
       );
 
       return {queryId, xhr};
@@ -819,7 +828,6 @@ export const Ajax =
       
       const checkForLoaded = () =>
       {
-        console.log(m1Dbs, m2Dbs);
         if(!m1Dbs || !m2Dbs)
         {
           return;

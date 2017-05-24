@@ -51,6 +51,7 @@ import TQLConverter from '../../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import BuilderTypes from '../../BuilderTypes';
+import LibraryTypes from '../../../library/LibraryTypes';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
@@ -107,7 +108,7 @@ export interface Props
 {
   query: BuilderTypes.Query;
   resultsState: ResultsState;
-  db: string;
+  db: LibraryTypes.Database;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
@@ -162,7 +163,7 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  queryResults(query: BuilderTypes.Query, db: string)
+  queryResults(query: BuilderTypes.Query, db: LibraryTypes.Database)
   {
     if (!query || !db)
     {

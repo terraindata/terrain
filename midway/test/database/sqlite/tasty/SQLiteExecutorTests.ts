@@ -89,7 +89,7 @@ function runTest(index: number)
   {
     try
     {
-      const results = await tasty.getExecutor().query(SQLQueries[index][1]);
+      const results = await tasty.getDB().execute(SQLQueries[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
 
     }

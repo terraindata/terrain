@@ -50,6 +50,7 @@ import {BuilderTypes} from './../BuilderTypes';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import {BuilderState} from './BuilderStore';
+import LibraryTypes from '../../library/LibraryTypes';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 {
@@ -61,7 +62,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       payload?: {
         variantId: ID,
         handleNoVariant: (id: ID) => void,
-        db: string,
+        db: LibraryTypes.Database,
       },
     },
   ) =>
@@ -109,7 +110,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     action: Action<{
       query: BuilderTypes.Query,
       xhr: XMLHttpRequest,
-      db: string,
+      db: LibraryTypes.Database,
     }>,
   ) =>
   {
@@ -127,7 +128,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           .set('parseTreeReq',
             Ajax.parseTree(
               action.payload.query.tql,
-              state.db,
+              state.db.id + "",
               Actions.parseTreeLoaded,
               Actions.parseTreeError,
             ).xhr,
@@ -140,7 +141,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           .set('tqlCardsInSync', true);
       }
     }
-    console.log(action.payload.db);
+
     return state
       .set('query', action.payload.query)
       .set('loading', false)

@@ -48,13 +48,13 @@ import * as winston from 'winston';
 
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
-import ElasticGenerator from '../../../../src/database/elastic/tasty/ElasticGenerator';
+import ElasticDB from '../../../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../../../src/tasty/Tasty';
 import TastyTable from '../../../../src/tasty/TastyTable';
 
 let DBMovies: TastyTable;
 let elasticController: ElasticController;
-let elasticGenerator: ElasticGenerator;
+let elasticDB: ElasticDB;
 
 beforeAll(() =>
 {
@@ -67,13 +67,13 @@ beforeAll(() =>
   DBMovies = new Tasty.Table('data', ['movieid'], ['title', 'releasedate'], 'movies');
 
   elasticController = new ElasticController(elasticConfig, 0, 'ElasticGeneratorTests');
-  elasticGenerator = elasticController.getTasty().getGenerator() as ElasticGenerator;
+  elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 });
 
 test('t1', () =>
 {
   const query = new Tasty.Query(DBMovies).take(10);
-  const qstr = elasticGenerator.generateString(query);
+  const qstr = elasticDB.generateString(query);
   expect(JSON.parse(qstr)).toEqual(
     {
       fields: [
@@ -101,7 +101,7 @@ test('t2', () =>
 {
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).take(10);
-  const qstr = elasticGenerator.generateString(query);
+  const qstr = elasticDB.generateString(query);
   // tslint:disable-next-line:max-line-length
   expect(qstr).toEqual('{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","size":10,"body":{"_source":["movieid","title","releasedate"]}}]}');
 });
@@ -110,7 +110,7 @@ test('t3', () =>
 {
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['movieid'].equals(123));
-  const qstr = elasticGenerator.generateString(query);
+  const qstr = elasticDB.generateString(query);
   // tslint:disable-next-line:max-line-length
   expect(qstr).toEqual('{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","body":{"query":{"bool":{"filter":{"match":{"movieid":123}}}}}}]}');
 });
@@ -119,7 +119,7 @@ test('t4', () =>
 {
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['title'].doesNotEqual('Toy Story (1995)')).take(10);
-  const qstr = elasticGenerator.generateString(query);
+  const qstr = elasticDB.generateString(query);
   // tslint:disable-next-line:max-line-length
   expect(qstr).toEqual('{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","size":10,"body":{"query":{"bool":{"must_not":[{"match":{"title":"Toy Story (1995)"}}]}}}}]}');
 });
@@ -128,7 +128,7 @@ test('t5', () =>
 {
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['movieid'], 'asc').take(10);
-  const qstr = elasticGenerator.generateString(query);
+  const qstr = elasticDB.generateString(query);
   // tslint:disable-next-line:max-line-length
   expect(qstr).toEqual('{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","size":10,"body":{"sort":[{"movieid":{"order":"asc"}}]}}]}');
 });
@@ -137,7 +137,7 @@ test('t6', () =>
 {
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['movieid'], 'desc').take(10);
-  const qstr = elasticGenerator.generateString(query);
+  const qstr = elasticDB.generateString(query);
   // tslint:disable-next-line:max-line-length
   expect(qstr).toEqual('{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","size":10,"body":{"sort":[{"movieid":{"order":"desc"}}]}}]}');
 });
@@ -150,7 +150,7 @@ test('t7', () =>
   query.sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
-  const qstr = elasticGenerator.generateString(query);
+  const qstr = elasticDB.generateString(query);
   // tslint:disable-next-line:max-line-length
   expect(qstr)
     .toEqual('{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","from":20,"size":10,"body":{"_source":["movieid","title","releasedate"],"sort":[{"movieid":{"order":"desc"}},{"releasedate":{"order":"asc"}}],"query":{"bool":{"filter":{"bool":{"must":[{"range":{"releasedate":{"gte":"2007-03-24"}}},{"range":{"releasedate":{"lt":"2017-03-24"}}}]}},"must_not":[{"match":{"movieid":2134}}]}}}}]}');

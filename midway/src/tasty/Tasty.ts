@@ -47,8 +47,7 @@ THE SOFTWARE.
 import * as Util from '../app/Util';
 import DatabaseController from '../database/DatabaseController';
 import TastyColumn from './TastyColumn';
-import TastyExecutor from './TastyExecutor';
-import TastyGenerator from './TastyGenerator';
+import TastyDB from './TastyDB';
 import TastyNode from './TastyNode';
 import TastyQuery from './TastyQuery';
 import TastySchema from './TastySchema';
@@ -78,29 +77,20 @@ export type Schema = TastySchema;
 export class Tasty
 {
   private controller: DatabaseController;
-  private generator: TastyGenerator;
-  private executor: TastyExecutor;
+  private db: TastyDB;
 
   /**
    * Creates an instance of Tasty.
    */
-  public constructor(controller: DatabaseController,
-    executor: TastyExecutor,
-    generator: TastyGenerator)
+  public constructor(controller: DatabaseController, database: TastyDB)
   {
     this.controller = controller;
-    this.executor = executor;
-    this.generator = generator;
+    this.db = database;
   }
 
-  public getGenerator(): TastyGenerator
+  public getDB(): TastyDB
   {
-    return this.generator;
-  }
-
-  public getExecutor(): TastyExecutor
-  {
-    return this.executor;
+    return this.db;
   }
 
   /**
@@ -113,8 +103,8 @@ export class Tasty
    */
   public async execute(query: TastyQuery): Promise<object[]>
   {
-    const queryString = this.generator.generate(query);
-    return this.executor.query(queryString);
+    const queryString = this.db.generate(query);
+    return this.db.execute(queryString);
   }
 
   /**
@@ -126,7 +116,7 @@ export class Tasty
    */
   public async destroy(): Promise<void>
   {
-    return this.executor.destroy();
+    return this.db.destroy();
   }
 
   /**
@@ -158,8 +148,8 @@ export class Tasty
       query.filter(node);
     }
 
-    const generatedQuery: string[] = this.generator.generate(query);
-    return this.executor.query(generatedQuery);
+    const generatedQuery: string[] = this.db.generate(query);
+    return this.db.execute(generatedQuery);
   }
 
   /**
@@ -172,8 +162,8 @@ export class Tasty
     if (objs instanceof Array)
     {
       const query = new TastyQuery(table).upsert(objs);
-      const queryString: string[] = this.generator.generate(query);
-      return this.executor.upsert(table, queryString, objs);
+      const queryString: string[] = this.db.generate(query);
+      return this.db.upsert(table, queryString, objs);
     }
     else if (typeof objs === 'object')
     {
@@ -219,13 +209,13 @@ export class Tasty
       }
       query.delete();
     }
-    const queryString = this.generator.generate(query);
-    return this.executor.query(queryString);
+    const queryString = this.db.generate(query);
+    return this.db.execute(queryString);
   }
 
   public async schema(): Promise<TastySchema>
   {
-    return this.executor.schema();
+    return this.db.schema();
   }
 
   private filterColumns(table: TastyTable, obj?: object): TastyNode | null

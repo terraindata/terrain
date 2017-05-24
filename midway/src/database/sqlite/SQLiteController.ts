@@ -50,8 +50,7 @@ import QueryHandler from '../../app/query/QueryHandler';
 import DatabaseController from '../DatabaseController';
 import SQLiteClient from './client/SQLiteClient';
 import SQLiteConfig from './SQLiteConfig';
-import SQLiteExecutor from './tasty/SQLiteExecutor';
-import SQLiteGenerator from './tasty/SQLiteGenerator';
+import SQLiteDB from './tasty/SQLiteDB';
 
 /**
  * The central controller for communicating with SQLite.
@@ -67,8 +66,7 @@ class SQLiteController extends DatabaseController
     this.client = new SQLiteClient(this, config);
     this.tasty = new Tasty.Tasty(
       this,
-      new SQLiteExecutor(this.client),
-      new SQLiteGenerator());
+      new SQLiteDB(this.client));
   }
 
   public getClient(): SQLiteClient

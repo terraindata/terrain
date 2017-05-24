@@ -48,7 +48,7 @@ import * as winston from 'winston';
 
 import SQLiteConfig from '../../../../src/database/sqlite/SQLiteConfig';
 import SQLiteController from '../../../../src/database/sqlite/SQLiteController';
-import SQLiteGenerator from '../../../../src/database/sqlite/tasty/SQLiteGenerator';
+import SQLiteDB from '../../../../src/database/sqlite/tasty/SQLiteDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import TastyNodeTypes from '../../../../src/tasty/TastyNodeTypes';
@@ -66,7 +66,7 @@ function testQuery(index: number)
 
 const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate'], 'movies');
 let sqliteController: SQLiteController;
-let sqliteGenerator: SQLiteGenerator;
+let sqliteDB: SQLiteDB;
 
 beforeAll(async () =>
 {
@@ -80,7 +80,7 @@ beforeAll(async () =>
   try
   {
     sqliteController = new SQLiteController(config, 0, 'SQLiteGeneratorTests');
-    sqliteGenerator = sqliteController.getTasty().getGenerator();
+    sqliteDB = sqliteController.getTasty().getDB() as SQLiteDB;
   } catch (e)
   {
     fail(e);
@@ -97,7 +97,7 @@ test('node type: skip', (done) =>
 test(testName(0), (done) =>
 {
   const query = new Tasty.Query(DBMovies).take(10);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(0));
   done();
 });
@@ -106,7 +106,7 @@ test(testName(1), (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).take(10);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(1));
   done();
 });
@@ -115,7 +115,7 @@ test(testName(2), (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['movieid'].equals(123));
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(2));
   done();
 });
@@ -124,7 +124,7 @@ test(testName(3), (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['title'].doesNotEqual('Toy Story (1995)')).take(10);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(3));
   done();
 });
@@ -133,7 +133,7 @@ test(testName(4), (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['title'], 'asc').take(10);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(4));
   done();
 });
@@ -142,7 +142,7 @@ test(testName(5), (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['title'], 'desc').take(10);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(5));
   done();
 });
@@ -151,7 +151,7 @@ test(testName(6), (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.take(10);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(6));
   done();
 });
@@ -161,7 +161,7 @@ test(testName(7), (done) =>
   const query = new Tasty.Query(DBMovies);
   query.take(10);
   query.skip(20);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(7));
   done();
 });
@@ -174,7 +174,7 @@ test(testName(8), (done) =>
     title: 'My New Movie',
   };
   const query = new Tasty.Query(DBMovies).upsert(movie);
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(8));
   done();
 });
@@ -182,10 +182,10 @@ test(testName(8), (done) =>
 test(testName(9), (done) =>
 {
   const query = new Tasty.Query(DBMovies).delete();
-  const qstr1 = sqliteGenerator.generate(query);
+  const qstr1 = sqliteDB.generate(query);
   expect(qstr1).toEqual([`DELETE \n  FROM movies;`]);
   query.filter(DBMovies['movieid'].equals(13371337));
-  const qstr2 = sqliteGenerator.generate(query);
+  const qstr2 = sqliteDB.generate(query);
   expect(qstr2).toEqual(testQuery(9));
   done();
 });
@@ -198,7 +198,7 @@ test(testName(10), (done) =>
   query.sort(DBMovies['title'], 'asc').sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
-  const qstr = sqliteGenerator.generate(query);
+  const qstr = sqliteDB.generate(query);
   /* tslint:disable-next-line:max-line-length */
   expect(qstr).toEqual(testQuery(10));
   done();

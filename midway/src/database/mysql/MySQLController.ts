@@ -48,10 +48,9 @@ import * as Tasty from '../../tasty/Tasty';
 
 import QueryHandler from '../../app/query/QueryHandler';
 import DatabaseController from '../DatabaseController';
-import MySQLGenerator from '../mysql/tasty/MySQLGenerator';
 import MySQLClient from './client/MySQLClient';
 import MySQLConfig from './MySQLConfig';
-import MySQLExecutor from './tasty/MySQLExecutor';
+import MySQLDB from './tasty/MySQLDB';
 
 /**
  * The central controller for communicating with MySQL.
@@ -67,8 +66,7 @@ class MySQLController extends DatabaseController
     this.client = new MySQLClient(this, config);
     this.tasty = new Tasty.Tasty(
       this,
-      new MySQLExecutor(this.client),
-      new MySQLGenerator());
+      new MySQLDB(this.client));
   }
 
   public getClient(): MySQLClient

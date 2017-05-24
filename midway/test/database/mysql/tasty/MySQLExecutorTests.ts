@@ -48,7 +48,6 @@ import * as winston from 'winston';
 
 import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../../../src/database/mysql/MySQLController';
-import MySQLExecutor from '../../../../src/database/mysql/tasty/MySQLExecutor';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import SQLQueries from '../../../tasty/SQLQueries';
@@ -95,7 +94,7 @@ function runTest(index: number)
   {
     try
     {
-      const results = await tasty.getExecutor().query(SQLQueries[index][1]);
+      const results = await tasty.getDB().execute(SQLQueries[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     }
     catch (e)

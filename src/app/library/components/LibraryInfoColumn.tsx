@@ -162,7 +162,7 @@ class LibraryInfoColumn extends Classs<Props>
           </div>
           <Dropdown
             selectedIndex={this.state.dbs && this.state.dbs.findIndex(
-              db => db.id === this.props.algorithm.db
+              db => db.id === this.props.algorithm.db.id
             )}
             options={this.state.dbs.map(db => db.name + ' (' + db.type + ')').toList()}
             onChange={this.handleAlgorithmDbChange}
@@ -256,7 +256,7 @@ class LibraryInfoColumn extends Classs<Props>
           </div>
           <Dropdown
             selectedIndex={this.state.dbs && this.state.dbs.findIndex(
-              db => db.id === this.props.group.db
+              db => db.id === this.props.group.db.id
             )}
             options={this.state.dbs.map(db => db.name).toList()}
             onChange={this.handleGroupDbChange}

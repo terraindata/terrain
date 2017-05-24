@@ -47,16 +47,17 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
-import MidwayError from '../../src/error/MidwayError';
+import fse = require('fs-extra');
 let server;
 
 beforeAll((done) =>
 {
+  fse.copySync('./nodewaytest.db', './nodewayCItest.db');
   const options =
     {
       debug: true,
       db: 'sqlite',
-      dsn: 'nodewaytest.db',
+      dsn: 'nodewayCItest.db',
       port: 3000,
       databases: [
         {
@@ -237,7 +238,11 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Success');
+        expect(JSON.parse(response.text))
+          .toMatchObject({
+            name: 'Test Item',
+            status: 'LIVE',
+          });
       })
       .catch((error) =>
       {
@@ -269,21 +274,19 @@ describe('Item route tests', () =>
 
   test('Update item: POST /midway/v1/items/', async () =>
   {
+    const insertOjbect = { id: 2, name: 'Updated Item', status: 'LIVE' };
     await request(server)
       .post('/midway/v1/items/2')
       .send({
         id: 1,
         accessToken: 'AccessToken',
-        body: {
-          id: 2,
-          name: 'Updated Item',
-          status: 'LIVE',
-        },
+        body: insertOjbect,
       })
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Success');
+        expect(JSON.parse(response.text)[0])
+          .toMatchObject(insertOjbect);
       })
       .catch((error) =>
       {
@@ -414,7 +417,7 @@ describe('Query route tests', () =>
             result: {
               timed_out: false,
               _shards: { failed: 0 },
-              hits: { total: 27278, max_score: 0, hits: [] },
+              hits: { max_score: 0, hits: [] },
             }, errors: [],
           });
       })

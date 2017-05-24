@@ -127,11 +127,12 @@ export function responseToRecordConfig(response: object): object
     try
     {
       // somewhere along the line, \ get added to the text and not removed correctly
-      let meta = JSON.parse(response['meta'].replace(/\\/g, '') || '{}');
+      // TODO update if the backend escaping is fixed
+      let meta = JSON.parse(response['meta'].replace(/\\([^\\])/g, (a,b) => b).replace(/\\\\/g, "\\") || '{}');
       response = _.extend(meta, response);
       delete response['meta'];
     }
-    catch (e) {}
+    catch (e) {  }
   }
   
   return response;
