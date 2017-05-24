@@ -44,43 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyExecutor from '../../../tasty/TastyExecutor';
+import * as mysql from 'mysql';
+import TastyDB from '../../../tasty/TastyDB';
+import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
+import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
-import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
-import SQLiteClient from '../client/SQLiteClient';
-import SQLiteConfig from '../SQLiteConfig';
+import { makePromiseCallback } from '../../../tasty/Utils';
+import SQLGenerator from '../../SQLGenerator';
+import MySQLClient from '../client/MySQLClient';
 
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+export class MySQLDB implements TastyDB
 {
-  private client: SQLiteClient;
+  private client: MySQLClient;
 
-  constructor(client: SQLiteClient)
+  constructor(client: MySQLClient)
   {
     this.client = client;
   }
 
+  /**
+   * Generates MySQL queries from TastyQuery objects.
+   */
+  public generate(query: TastyQuery): string[]
+  {
+    const generator = new SQLGenerator();
+    if (query.command.tastyType === TastyNodeTypes.select || query.command.tastyType === TastyNodeTypes.delete)
+    {
+      generator.generateSelectQuery(query);
+    }
+    else if (query.command.tastyType === TastyNodeTypes.upsert && query.upserts.length > 0)
+    {
+      generator.generateUpsertQuery(query, query.upserts);
+    }
+
+    generator.accumulateStatement(generator.queryString);
+    return generator.statements;
+  }
+
+  public generateString(query: TastyQuery): string
+  {
+    return this.generate(query).join('\n');
+  }
+
   public async schema(): Promise<TastySchema>
   {
-    const results = {};
-    results[this.client.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query(['SELECT name FROM sqlite_master WHERE Type=\'table\';']);
-    for (const table of tableListResult)
-    {
-      results[this.client.getFilename()][table.name] = {};
-      const colResult: any = await this.query([`pragma table_info(${table.name});`]);
-      for (const col of colResult)
-      {
-        results[this.client.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
+    const result = await this.execute(
+      ['SELECT table_schema, table_name, column_name, data_type ' +
+        'FROM information_schema.columns ' +
+        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');']);
+    return TastySchema.fromMySQLResultSet(result);
   }
 
   /**
@@ -88,14 +101,14 @@ export class SQLiteExecutor implements TastyExecutor
    * @param statements
    * @returns {Promise<Array>} appended result objects
    */
-  public async query(statements: string[]): Promise<object[]>
+  public async execute(statements: string[]): Promise<object[]>
   {
     let results: object[] = [];
     for (const statement of statements)
     {
       const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.all(statement, makePromiseCallback(resolve, reject));
+        this.client.query(statement, makePromiseCallback(resolve, reject));
       });
 
       results = results.concat(result);
@@ -106,38 +119,15 @@ export class SQLiteExecutor implements TastyExecutor
   public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
   {
     const primaryKeys = table.getPrimaryKeys();
-
-    const lastIDs: number[] = [];
-    for (const statement of statements)
-    {
-      const result = await new Promise<number>((resolve, reject) =>
-      {
-        this.client.run(statement, [], function(error: Error, ctx: any)
-        {
-          if (error !== null && error !== undefined)
-          {
-            reject(error);
-          }
-          else
-          {
-            if (this['lastID'] !== undefined)
-            {
-              resolve(this['lastID']);
-            }
-          }
-        });
-      });
-      lastIDs.push(result);
-    }
-
-    const results = new Array(elements.length);
-    for (let i = 0, j = 0; i < results.length; i++)
+    const upserted = await this.execute(statements);
+    const results = new Array(upserted.length);
+    for (let i = 0; i < results.length; i++)
     {
       results[i] = elements[i];
       if ((primaryKeys.length === 1) &&
         (elements[i][primaryKeys[0]] === undefined))
       {
-        results[i][primaryKeys[0]] = lastIDs[j++];
+        results[i][primaryKeys[0]] = upserted[i]['insertId'];
       }
     }
 
@@ -148,9 +138,17 @@ export class SQLiteExecutor implements TastyExecutor
   {
     return new Promise<void>((resolve, reject) =>
     {
-      this.client.close(makePromiseCallback0(resolve, reject));
+      this.client.end(makePromiseCallback(resolve, reject));
+    });
+  }
+
+  private async getConnection(): Promise<mysql.IConnection>
+  {
+    return new Promise<mysql.IConnection>((resolve, reject) =>
+    {
+      this.client.getConnection(makePromiseCallback(resolve, reject));
     });
   }
 }
 
-export default SQLiteExecutor;
+export default MySQLDB;

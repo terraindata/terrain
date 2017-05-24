@@ -50,8 +50,7 @@ import DatabaseController from '../DatabaseController';
 import ElasticClient from './client/ElasticClient';
 import ElasticConfig from './ElasticConfig';
 import ElasticQueryHandler from './query/ElasticQueryHandler';
-import ElasticExecutor from './tasty/ElasticExecutor';
-import ElasticGenerator from './tasty/ElasticGenerator';
+import ElasticDB from './tasty/ElasticDB';
 
 /**
  * The central controller for communicating with ElasticSearch.
@@ -70,8 +69,7 @@ class ElasticController extends DatabaseController
 
     this.tasty = new Tasty.Tasty(
       this,
-      new ElasticExecutor(this.client),
-      new ElasticGenerator());
+      new ElasticDB(this.client));
 
     this.queryHandler = new ElasticQueryHandler(this);
   }

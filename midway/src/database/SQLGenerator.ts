@@ -121,6 +121,168 @@ export default class SQLGenerator
     this.indentation = 0;
   }
 
+  public generateSelectQuery(query: TastyQuery)
+  {
+    this.appendExpression(query.command);
+    this.indent();
+
+    const columns: TastyNode[] = [];
+    if (query.isSelectingAll())
+    {
+      this.queryString += ' * '; // handle "select all" condition
+    }
+    else
+    {
+      // put selected vars into the select list
+      if (query.selected.length > 0)
+      {
+        this.queryString += ' ';
+        this.appendStandardClause(
+          null,
+          false,
+          query.selected,
+          (column) =>
+          {
+            columns.push(column);
+            this.appendSubexpression(column);
+          },
+          () =>
+          {
+            this.queryString += ', ';
+          });
+      }
+
+      // put alias expressions into the select list
+      this.appendStandardClause(
+        null,
+        true,
+        query.aliases,
+        (alias) =>
+        {
+          columns.push(alias.name);
+          this.appendSubexpression(alias.query);
+          this.queryString += ' AS ';
+          this.queryString += this.escapeString(alias.name);
+        },
+        () =>
+        {
+          this.queryString += ', ';
+          this.newLine();
+        });
+
+      this.queryString += ' ';
+    }
+
+    // write FROM clause
+    this.newLine();
+    this.queryString += 'FROM ';
+    this.queryString += this.escapeString(query.table.getTableName());
+
+    // write WHERE clause
+    if (query.filters.length > 0)
+    {
+      this.appendStandardClause(
+        'WHERE',
+        true,
+        query.filters,
+        (filter) =>
+        {
+          this.appendSubexpression(filter);
+        },
+        () =>
+        {
+          this.newLine();
+          this.queryString += ' AND ';
+        });
+    }
+
+    // write ORDER BY clause
+    if (query.sorts.length > 0)
+    {
+      this.appendStandardClause(
+        'ORDER BY',
+        true,
+        query.sorts,
+        (sort) =>
+        {
+          this.appendSubexpression(sort.node);
+          this.queryString += ' ';
+          this.queryString += (sort.order === 'asc' ? 'ASC' : 'DESC');
+        },
+        () =>
+        {
+          this.queryString += ', ';
+        });
+    }
+
+    if (query.numTaken !== 0 || query.numSkipped !== 0)
+    {
+      this.newLine();
+
+      if (query.numTaken !== 0)
+      {
+        this.queryString += 'LIMIT ' + query.numTaken.toString();
+        if (query.numSkipped !== 0)
+        {
+          this.queryString += ' ';
+        }
+      }
+
+      if (query.numSkipped !== 0)
+      {
+        this.queryString += 'OFFSET ' + query.numSkipped.toString();
+      }
+    }
+  }
+
+  public generateUpsertQuery(query: TastyQuery, upserts: object[])
+  {
+    this.appendExpression(query.command);
+    this.queryString += ' ';
+    this.indent();
+
+    // write INTO clause
+    this.newLine();
+    this.queryString += 'INTO ';
+    this.queryString += this.escapeString(query.table.getTableName());
+
+    const baseQuery = this.queryString;
+
+    const primaryKeys = query.table.getPrimaryKeys();
+    const columns: string[] = query.table.getColumnNames();
+    let definedColumnsList: string[] = [];
+    let definedColumnsSet: Set<string> = new Set();
+    let accumulatedUpdates: object[] = [];
+
+    for (const obj of upserts)
+    {
+      // check if this object has the same set of defined cols as the previous one
+      for (const col of columns)
+      {
+        const isInObj: boolean = obj.hasOwnProperty(col);
+        const isInDefined: boolean = definedColumnsSet.has(col);
+        if (isInObj !== isInDefined)
+        {
+          this.accumulateUpsert(definedColumnsList, accumulatedUpdates);
+
+          this.queryString = baseQuery;
+          definedColumnsList = this.getDefinedColumns(columns, obj);
+          definedColumnsSet = new Set();
+          for (const definedCol of definedColumnsList)
+          {
+            definedColumnsSet.add(definedCol);
+          }
+          accumulatedUpdates = [];
+        }
+      }
+
+      accumulatedUpdates.push(obj);
+    }
+
+    this.accumulateUpsert(definedColumnsList, accumulatedUpdates);
+    this.queryString = '';
+  }
+
   public accumulateStatement(queryString: string): void
   {
     if (queryString !== '')

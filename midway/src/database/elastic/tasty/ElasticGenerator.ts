@@ -44,27 +44,211 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyGenerator from '../../../tasty/TastyGenerator';
+import * as Elastic from 'elasticsearch';
+import TastyNode from '../../../tasty/TastyNode';
+import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
-import ElasticGeneratorRunner from './ElasticGeneratorRunner';
+import ElasticQuery from './ElasticQuery';
+import bodybuilder = require('bodybuilder');
 
 /**
  * Generates elastic queries from TastyQuery objects.
+ * Don't use this class directly: use ElasticGenerator instead.
  */
-export default class ElasticGenerator extends TastyGenerator
+export class ElasticGenerator
 {
-  constructor()
+  public esQuery: ElasticQuery;
+
+  constructor(query: TastyQuery)
   {
-    super();
+    this.esQuery = {} as ElasticQuery;
+    this.esQuery.index = query.table.getDatabaseName();
+    this.esQuery.table = query.table.getTableName();
+    this.esQuery.primaryKeys = query.table.getPrimaryKeys();
+    this.esQuery.fields = query.table.getColumnNames();
+    switch (query.command.tastyType)
+    {
+      case (TastyNodeTypes.select):
+        this.esQuery.op = 'select';
+        this.esQuery.params = this.constructSelectQuery(query);
+        break;
+      case (TastyNodeTypes.upsert):
+        this.esQuery.op = 'upsert';
+        this.esQuery.params = this.constructUpsertQuery(query);
+        break;
+      case (TastyNodeTypes.delete):
+        this.esQuery.op = 'delete';
+        this.esQuery.params = this.constructDeleteQuery(query);
+        break;
+      default:
+        throw new Error('Unknown command in the query:' + query.toString());
+    }
   }
 
-  public generate(query: TastyQuery)
+  private constructDeleteQuery(query: TastyQuery): object[]
   {
-    return new ElasticGeneratorRunner(query).esQuery;
+    return this.constructSelectQuery(query);
   }
 
-  public generateString(query: TastyQuery)
+  private constructUpsertQuery(query: TastyQuery): object[]
   {
-    return JSON.stringify(this.generate(query));
+    return query.upserts;
+  }
+
+  private constructSelectQuery(query: TastyQuery): object[]
+  {
+    const queryParam: Elastic.SearchParams = {} as Elastic.SearchParams;
+
+    // set table (index) name
+    queryParam.index = query.table.getDatabaseName();
+    queryParam.type = query.table.getTableName();
+
+    // from clause
+    if (query.numSkipped !== 0)
+    {
+      queryParam.from = query.numSkipped;
+    }
+
+    // size clause
+    if (query.numTaken !== 0)
+    {
+      queryParam.size = query.numTaken;
+    }
+
+    // start the body
+    const body = bodybuilder();
+
+    // stored_fields clause
+    if (!query.isSelectingAll())
+    {
+      const sourceFields: any[] = [];
+      for (let i = 0; i < query.selected.length; ++i)
+      {
+        const column = query.selected[i];
+        const columnName = this.getColumnName(column);
+        sourceFields.push(columnName);
+      }
+      body.rawOption('_source', sourceFields);
+    }
+
+    if (query.aliases.length !== 0)
+    {
+      throw new Error('Aliases are not yet supported by ElasticGenerator.');
+    }
+
+    if (query.filters.length > 0)
+    {
+      for (let i = 0; i < query.filters.length; ++i)
+      {
+        const filter = query.filters[i];
+        this.accumulateFilters(body, filter);
+      }
+    }
+
+    // sort clause
+    if (query.sorts.length > 0)
+    {
+      for (let i = 0; i < query.sorts.length; ++i)
+      {
+        const sort = query.sorts[i];
+        const column = this.getColumnName(sort.node);
+        const order = (sort.order === 'asc' ? 'asc' : 'desc');
+        body.sort(column, order);
+      }
+    }
+    queryParam['body'] = body.build();
+    return [queryParam];
+  }
+
+  private accumulateFilters(body: bodybuilder, expression: TastyNode)
+  {
+    // https://www.elastic.co/guide/en/elasticsearch/guide/current/combining-filters.html#bool-filter
+    // currently only supports the basic operators, with the column on the lhs, as well as && and ||
+
+    if (expression.numChildren !== 2)
+    {
+      throw new Error('Filtering on non-binary expression "' + JSON.stringify(expression) + '".');
+    }
+
+    // NB: could be made to accept the column on the rhs too, but currently only supports column on lhs
+    const columnName = this.getColumnName(expression.lhs);
+    const value = expression.rhs.value; // could be checked for validity
+
+    if (expression.type === '==')
+    {
+      body.filter('match', columnName, value);
+    }
+    else if (expression.type === '!=')
+    {
+      body.notQuery('match', columnName, value);
+    }
+    else if (expression.type === '<')
+    {
+      body.filter('range', columnName, { lt: value });
+    }
+    else if (expression.type === '<=')
+    {
+      body.filter('range', columnName, { lte: value });
+    }
+    else if (expression.type === '>')
+    {
+      body.filter('range', columnName, { gt: value });
+    }
+    else if (expression.type === '>=')
+    {
+      body.filter('range', columnName, { gte: value });
+    }
+    else if (expression.type === '&&')
+    {
+      const leftQuery = bodybuilder();
+      this.accumulateFilters(leftQuery, expression.lhs);
+      const rightQuery = bodybuilder();
+      this.accumulateFilters(rightQuery, expression.rhs);
+      body.andFilter(leftQuery);
+      body.andFilter(rightQuery);
+    }
+    else if (expression.type === '||')
+    {
+      const leftQuery = bodybuilder();
+      this.accumulateFilters(leftQuery, expression.lhs);
+      const rightQuery = bodybuilder();
+      this.accumulateFilters(rightQuery, expression.rhs);
+      body.orFilter(leftQuery);
+      body.orFilter(rightQuery);
+    }
+    else
+    {
+      throw new Error('Filtering on unsupported expression "' + JSON.stringify(expression) + '".');
+    }
+  }
+
+  private getColumnName(expression: TastyNode)
+  {
+    if (expression.type !== '.' || expression.numChildren !== 2)
+    {
+      throw new Error('Could not find column name in expression "' + JSON.stringify(expression) + '".');
+    }
+
+    const table = expression.lhs;
+    const column = expression.rhs;
+
+    if (table.type !== 'reference')
+    {
+      throw new Error('Could not find table name in expression "' + JSON.stringify(expression) + '".');
+    }
+    if (table.value !== this.esQuery.table)
+    {
+      throw new Error('Filter expression filters on something other than the queried table "' +
+        JSON.stringify(expression) + '".');
+    }
+
+    if (column.type !== 'reference')
+    {
+      throw new Error('Could not find column name in expression "' + JSON.stringify(expression) + '".');
+    }
+
+    return column.value;
   }
 }
+
+export default ElasticGenerator;
