@@ -622,7 +622,10 @@ export const Ajax =
         'post',
         route,
         itemData,
-        onLoad,
+        (respArray) =>
+        {
+          onLoad(respArray[0]);
+        },
         {
           onError,
         },

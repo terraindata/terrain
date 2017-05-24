@@ -118,7 +118,7 @@ const Actions =
             $(ActionTypes.algorithms.create, {
               algorithm: algorithm.set('id', id),
             });
-            idCallback(id);
+            idCallback && idCallback(id);
           }
         );
       },
