@@ -47,16 +47,17 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
-import MidwayError from '../../src/error/MidwayError';
+import fse = require('fs-extra');
 let server;
 
 beforeAll((done) =>
 {
+  fse.copySync('./nodewaytest.db', './nodewayCItest.db');
   const options =
     {
       debug: true,
       db: 'sqlite',
-      dsn: 'nodewaytest.db',
+      dsn: 'nodewayCItest.db',
       port: 3000,
       databases: [
         {
