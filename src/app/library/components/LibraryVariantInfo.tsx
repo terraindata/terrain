@@ -59,13 +59,14 @@ import LibraryActions from './../data/LibraryActions';
 import LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
+import SharedTypes from './../../../../shared/SharedTypes';
 
 type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   variant: Variant;
-  dbs: List<LibraryTypes.Database>;
+  dbs: List<SharedTypes.Database>;
   isSuperUser: boolean;
   isBuilder: boolean;
 }

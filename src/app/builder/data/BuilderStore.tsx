@@ -53,7 +53,7 @@ import Util from '../../util/Util';
 import {_ResultsState, ResultsState} from '../components/results/ResultsManager';
 import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes';
 
-import LibraryTypes from '../../library/LibraryTypes';
+import SharedTypes from '../../../../shared/SharedTypes';
 import BuilderTypes from './../BuilderTypes';
 
 export class BuilderStateClass
@@ -76,7 +76,7 @@ export class BuilderStateClass
 
   selectedCardIds = Map<ID, boolean>({});
 
-  db: LibraryTypes.Database = {} as any;
+  db: SharedTypes.Database = {} as any;
 
   // TODO move
   manual = Map<ID, BuilderTypes.ICards>({});

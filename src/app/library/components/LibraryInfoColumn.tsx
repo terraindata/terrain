@@ -62,6 +62,7 @@ import LibraryActions from './../data/LibraryActions';
 import Actions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
 import LibraryTypes from './../LibraryTypes';
+import SharedTypes from './../../../../shared/SharedTypes';
 import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
 import LibraryInfoUser from './LibraryInfoUser';
@@ -93,7 +94,7 @@ class LibraryInfoColumn extends Classs<Props>
     users: UserMap,
     roles: RoleMap,
     me: User,
-    dbs: List<LibraryTypes.Database>,
+    dbs: List<SharedTypes.Database>,
   } = {
     users: null,
     roles: null,
@@ -122,7 +123,7 @@ class LibraryInfoColumn extends Classs<Props>
       storeKeyPath: ['dbs'],
     });
 
-    Ajax.getDbs((dbs: LibraryTypes.Database[]) =>
+    Ajax.getDbs((dbs: SharedTypes.Database[]) =>
     {
       LibraryActions.setDbs(
         List(dbs),

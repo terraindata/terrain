@@ -463,7 +463,6 @@ class Builder extends PureClasss<Props>
 
   onSaveSuccess(variant: Variant)
   {
-    console.log('a');
     notificationManager.addNotification(
       'Saved',
       variant.name,

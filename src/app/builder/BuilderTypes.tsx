@@ -1380,7 +1380,7 @@ export module BuilderTypes
           },
           {
             displayType: DisplayType.COMPONENT,
-            component: require('./components/charts/TransformCard').default, //TransformCardComponent,
+            component: null, // component filled in at bottom of file
             requiresBuilderState: true,
             key: null,
             help: ManualConfig.help['scorePoints'],
@@ -1878,10 +1878,15 @@ export module BuilderTypes
   }
 }
 
-import {_IResultsConfig, IResultsConfig} from './components/results/ResultsConfig';
-import Actions from './data/BuilderActions';
-import Store from './data/BuilderStore';
 
 export default BuilderTypes;
 
+import {_IResultsConfig, IResultsConfig} from './components/results/ResultsConfig';
+import Actions from './data/BuilderActions';
+import Store from './data/BuilderStore';
 import TQLConverter from '../tql/TQLConverter';
+
+// This import has to be down here in order to stop a circular dependency from breaking the app
+// TODO restructure to avoid the circular dependency.
+import TransformCard from './components/charts/TransformCard';
+BuilderTypes.Blocks.transform.static.display[2].component = TransformCard;

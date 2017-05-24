@@ -50,6 +50,7 @@ import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
+import SharedTypes from './../../../shared/SharedTypes';
 import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
@@ -692,7 +693,7 @@ export const Ajax =
      * Transforms result into old format.
      */
     query(body: string,
-      db: LibraryTypes.Database,
+      db: SharedTypes.Database,
       onLoad: (response: QueryResponse) => void,
       onError?: (ev: Event) => void,
       sqlQuery?: boolean, // unused
@@ -821,10 +822,10 @@ export const Ajax =
       });
     },
 
-    getDbs(onLoad: (dbs: LibraryTypes.Database[]) => void, onError?: (ev: Event) => void)
+    getDbs(onLoad: (dbs: SharedTypes.Database[]) => void, onError?: (ev: Event) => void)
     {
-      let m1Dbs: LibraryTypes.Database[] = null;
-      let m2Dbs: LibraryTypes.Database[] = null;
+      let m1Dbs: SharedTypes.Database[] = null;
+      let m2Dbs: SharedTypes.Database[] = null;
       
       const checkForLoaded = () =>
       {
@@ -833,7 +834,7 @@ export const Ajax =
           return;
         }
         
-        let dbs: LibraryTypes.Database[] = [];
+        let dbs: SharedTypes.Database[] = [];
         if(m1Dbs)
         {
           dbs = m1Dbs;
@@ -882,7 +883,7 @@ export const Ajax =
         'get',
         'database', 
         { },
-        (dbs: [LibraryTypes.Database]) =>
+        (dbs: [SharedTypes.Database]) =>
         {
           m2Dbs = dbs.map(db =>
           {

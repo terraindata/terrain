@@ -51,18 +51,10 @@ import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const {List, Map} = Immutable;
 import {BaseClass, New} from '../Classes';
+import SharedTypes from '../../../shared/SharedTypes';
 
 export module LibraryTypes
 {
-  // TODO move to the back-ends section
-  export interface Database
-  {
-    id: string | number;
-    name: string;
-    type: string;
-    source: 'm1' | 'm2';
-  }
-  
   export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
   export const ItemType: {
     Query: ItemType;
@@ -104,7 +96,7 @@ export module LibraryTypes
     status: ItemStatus = 'BUILD';
     type: ItemType;
     
-    db: LibraryTypes.Database = {} as any;
+    db: SharedTypes.Database = {} as any;
     
     dbFields = ['id', 'parent', 'name', 'status', 'type'];
     excludeFields= ['dbFields', 'excludeFields'];

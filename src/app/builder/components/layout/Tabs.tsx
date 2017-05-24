@@ -58,7 +58,6 @@ import Classs from './../../../common/components/Classs';
 import InfoArea from './../../../common/components/InfoArea';
 import PureClasss from './../../../common/components/PureClasss';
 import {LibraryState, LibraryStore} from './../../../library/data/LibraryStore';
-import LibraryTypes from './../../../library/LibraryTypes';
 const {browserHistory} = require('react-router');
 const ReactTooltip = require('react-tooltip');
 

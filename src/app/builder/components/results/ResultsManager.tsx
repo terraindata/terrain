@@ -51,7 +51,7 @@ import TQLConverter from '../../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import BuilderTypes from '../../BuilderTypes';
-import LibraryTypes from '../../../library/LibraryTypes';
+import SharedTypes from './../../../../../shared/SharedTypes';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
@@ -108,7 +108,7 @@ export interface Props
 {
   query: BuilderTypes.Query;
   resultsState: ResultsState;
-  db: LibraryTypes.Database;
+  db: SharedTypes.Database;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
@@ -163,19 +163,22 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  queryResults(query: BuilderTypes.Query, db: LibraryTypes.Database)
+  queryResults(query: BuilderTypes.Query, db: SharedTypes.Database)
   {
     if (!query || !db)
     {
       return;
     }
 
-    // skip tql conversion step for now
-    // const tql = TQLConverter.toTQL(query, {
-    //   limit: MAX_RESULTS,
-    //   replaceInputs: true,
-    // });
-    const tql = query.tql;
+    let tql = query.tql;
+    
+    if(db.source === 'm1')
+    {
+      tql = TQLConverter.toTQL(query, {
+        limit: MAX_RESULTS,
+        replaceInputs: true,
+      });
+    }
 
     if (tql !== this.state.queriedTql)
     {
@@ -191,49 +194,51 @@ export class ResultsManager extends PureClasss<Props>
           ),
       });
 
-      // disabled for elastic support
-      // const selectCard = query.cards.get(0);
-      // if (
-      //   !this.props.noExtraFields
-      //   && selectCard
-      //   && !selectCard['cards'].some(
-      //       (card) => card.type === 'groupBy',
-      //     )
-      //   && !selectCard['fields'].some(
-      //       (field) => field.field.static && field.field.static.isAggregate,
-      //     )
-      // )
-      // {
-      //   // temporary, don't dispatch select * if query has group by
-      //
-      //   this.setState({
-      //     allQuery: Ajax.query(
-      //       TQLConverter.toTQL(query, {
-      //         allFields: true,
-      //         transformAliases: true,
-      //         limit: MAX_RESULTS,
-      //         replaceInputs: true,
-      //       }),
-      //       db,
-      //       this.handleAllFieldsResponse,
-      //       this.handleAllFieldsError,
-      //     ),
-      //   });
-      // }
+      if(this.props.db.source === 'm1')
+      {
+        const selectCard = query.cards.get(0);
+        if (
+          !this.props.noExtraFields
+          && selectCard
+          && !selectCard['cards'].some(
+              (card) => card.type === 'groupBy',
+            )
+          && !selectCard['fields'].some(
+              (field) => field.field.static && field.field.static.isAggregate,
+            )
+        )
+        {
+          // temporary, don't dispatch select * if query has group by
+        
+          this.setState({
+            allQuery: Ajax.query(
+              TQLConverter.toTQL(query, {
+                allFields: true,
+                transformAliases: true,
+                limit: MAX_RESULTS,
+                replaceInputs: true,
+              }),
+              db,
+              this.handleAllFieldsResponse,
+              this.handleAllFieldsError,
+            ),
+          });
+        }
 
-      // temporarily disable count
-      // this.setState({
-      //   countXhr:
-      //     Ajax.query(
-      //       TQLConverter.toTQL(query, {
-      //         count: true,
-      //         replaceInputs: true,
-      //       }),
-      //       db,
-      //       this.handleCountResponse,
-      //       this.handleCountError
-      //     ),
-      // });
+        // temporarily disable count
+        // this.setState({
+        //   countXhr:
+        //     Ajax.query(
+        //       TQLConverter.toTQL(query, {
+        //         count: true,
+        //         replaceInputs: true,
+        //       }),
+        //       db,
+        //       this.handleCountResponse,
+        //       this.handleCountError
+        //     ),
+        // });
+      }
 
       this.changeResults({
         loading: true,

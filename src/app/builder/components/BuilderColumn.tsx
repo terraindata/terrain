@@ -52,7 +52,6 @@ const {List} = Immutable;
 import InfoArea from '../../common/components/InfoArea';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
-import LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
