@@ -238,8 +238,9 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(JSON.parse(response.text))
+        expect(JSON.parse(response.text)[0])
           .toMatchObject({
+            id: 4,
             name: 'Test Item',
             status: 'LIVE',
           });
