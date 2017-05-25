@@ -228,7 +228,8 @@ LibraryReducers[ActionTypes.loadState] =
 
 LibraryReducers[ActionTypes.setDbs] =
   (state, action) =>
-    state.set('dbs', action.payload.dbs);
+    state.set('dbs', action.payload.dbs)
+      .set('dbsLoaded', action.payload.dbLoadFinished);
 
 LibraryReducers[ActionTypes.variants.loadVersion] =
   (

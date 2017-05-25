@@ -243,8 +243,8 @@ const Actions =
       $(ActionTypes.loadState, { state }),
 
   setDbs:
-    (dbs: List<SharedTypes.Database>) =>
-      $(ActionTypes.setDbs, { dbs }),
+    (dbs: List<SharedTypes.Database>, dbLoadFinished: boolean) =>
+      $(ActionTypes.setDbs, { dbs, dbLoadFinished }),
 
   // overwrites current state with state from server
   fetch:

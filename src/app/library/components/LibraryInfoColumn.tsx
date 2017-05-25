@@ -123,10 +123,11 @@ class LibraryInfoColumn extends Classs<Props>
       storeKeyPath: ['dbs'],
     });
 
-    Ajax.getDbs((dbs: SharedTypes.Database[]) =>
+    Ajax.getDbs((dbs: SharedTypes.Database[], loadFinished: boolean) =>
     {
       LibraryActions.setDbs(
         List(dbs),
+        loadFinished
       );
     });
   }

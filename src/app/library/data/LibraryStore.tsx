@@ -66,6 +66,7 @@ class LibraryStateC
   loaded = false;
   loading = true;
   dbs: List<SharedTypes.Database> = Immutable.List([]);
+  dbsLoaded: boolean = false;
 
   groups: IMMap<ID, Group> = null;
   algorithms: IMMap<ID, Algorithm> = null;
