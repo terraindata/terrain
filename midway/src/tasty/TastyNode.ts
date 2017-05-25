@@ -60,6 +60,11 @@ export class TastyNode
       return new TastyNode('null', value);
     }
 
+    if (value instanceof Date)
+    {
+      return new TastyNode('date', value);
+    }
+
     const valueType = typeof value;
     if (valueType === 'number')
     {

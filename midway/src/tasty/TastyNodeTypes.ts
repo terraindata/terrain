@@ -51,6 +51,7 @@ enum TastyNodeTypes
   'string',
   'number',
   'boolean',
+  'date',
 
   'select',
   'upsert',

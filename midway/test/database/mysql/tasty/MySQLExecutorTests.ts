@@ -129,8 +129,8 @@ test('MySQL: upsert', async (done) =>
   try
   {
     const movies: object[] = [];
-    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
-    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17') };
+    movies[1] = { title: "Schindler's List", releasedate: new Date('01/01/17') };
     movies[2] = {
       movieid: 232323, title: 'Guardians of the Galaxy 2',
       releasedate: new Date('04/04/17').toISOString().substring(0, 10),

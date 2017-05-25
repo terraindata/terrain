@@ -74,6 +74,7 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
   ['number', newSQLGeneratorMapping('', FixEnum.nullary)],
   ['reference', newSQLGeneratorMapping('', FixEnum.nullary)],
   ['string', newSQLGeneratorMapping('', FixEnum.nullary)],
+  ['date', newSQLGeneratorMapping('', FixEnum.nullary)],
 
   ['filter', newSQLGeneratorMapping('WHERE', FixEnum.nullary)],
   ['select', newSQLGeneratorMapping('SELECT', FixEnum.nullary)],
@@ -535,6 +536,10 @@ export default class SQLGenerator
     if (node.type === 'boolean')
     {
       return node.value === true ? '1' : '0';
+    }
+    if (node.type === 'date')
+    {
+      return '\'' + this.escapeString(node.value.toISOString().slice(0, 19).replace('T', ' ')) + '\'';
     }
 
     throw new Error('Unsupported node type "' + node.type + '".');

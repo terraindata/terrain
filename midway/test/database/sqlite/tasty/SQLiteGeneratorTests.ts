@@ -90,7 +90,7 @@ beforeAll(async () =>
 test('node type: skip', (done) =>
 {
   expect(TastyNodeTypes[TastyNodeTypes.skip]).toEqual('skip');
-  expect(TastyNodeTypes.skip).toEqual(11);
+  expect(TastyNodeTypes.skip).toEqual(12);
   done();
 });
 
