@@ -44,21 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
-import fse = require('fs-extra');
+
 let server;
 
 beforeAll((done) =>
 {
-  fse.copySync('./nodewaytest.db', './nodewayCItest.db');
+  fs.writeFileSync('./nodewaytest.db', fs.readFileSync('./midway/test/scripts/nodewaytest.db'));
   const options =
     {
       debug: true,
       db: 'sqlite',
-      dsn: 'nodewayCItest.db',
-      port: 3000,
+      dsn: 'nodewaytest.db',
+      port: 3001,
       databases: [
         {
           name: 'My ElasticSearch Instance',

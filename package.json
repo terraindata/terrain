@@ -71,7 +71,6 @@
     "diff-match-patch": "^1.0.0",
     "elasticsearch": "^13.0.1",
     "elasticsearch-scroll-stream": "^1.1.1",
-    "fs-extra": "^3.0.1",
     "global": "^4.3.2",
     "immutable": "^3.7.3",
     "jquery": "^2.1.3",
