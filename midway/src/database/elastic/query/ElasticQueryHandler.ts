@@ -51,10 +51,16 @@ import * as winston from 'winston';
 
 import QueryHandler from '../../../app/query/QueryHandler';
 import QueryRequest from '../../../app/query/QueryRequest';
-import { QueryResponse } from '../../../app/query/QueryRouter';
-import { ElasticQueryError, QueryError } from '../../../app/QueryError';
+import QueryResponse from '../../../app/query/QueryResponse';
+import MidwayErrorItem from '../../../error/MidwayErrorItem';
+import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
+import ElasticsearchScrollStream = require('elasticsearch-scroll-stream');
+import { Readable } from 'stream';
+
+// tslint:disable-next-line
+const clarinet = require('clarinet');
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -69,18 +75,70 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: QueryRequest): Promise<QueryResponse>
+  public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
   {
     const type = request.type;
-    const body = request.body;
+    let body = request.body;
+
+    /* if the body is a string, parse it as JSON
+     * NB: this is normally used to detect JSON errors, but could be used generally,
+     * although it is less efficient than just sending the JSON.
+     */
+    if (typeof body === 'string')
+    {
+      try
+      {
+        body = JSON.parse(body);
+      }
+      catch (_e)
+      {
+        // absorb the error and retry using clarinet so we can get a good error message
+
+        const parser = clarinet.parser();
+
+        const errors: MidwayErrorItem[] = [];
+
+        parser.onerror =
+          (e) =>
+          {
+            const title: string = String(parser.line) + ':' + String(parser.column)
+              + ':' + String(parser.position) + ' ' + String(e.message);
+            errors.push({ status: -1, title, detail: '', source: {} });
+          };
+
+        try
+        {
+          parser.write(body).close();
+        }
+        catch (e)
+        {
+          // absorb
+        }
+
+        if (errors.length === 0)
+        {
+          errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
+        }
+
+        return new QueryResponse(null, errors);
+      }
+    }
 
     if (type === 'search')
     {
-      // NB: streaming not yet implemented
-      return new Promise<QueryResponse>((resolve, reject) =>
+      if (request.streaming === true)
       {
-        this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
-      });
+        const client = this.controller.getClient().getDelegate();
+        const sq: Readable = new ElasticsearchScrollStream(client, request.body);
+        return sq;
+      } else
+      {
+        // NB: streaming not yet implemented
+        return new Promise<QueryResponse>((resolve, reject) =>
+        {
+          this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
+        });
+      }
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');
@@ -94,7 +152,10 @@ export default class ElasticQueryHandler extends QueryHandler
       {
         if (QueryError.isElasticQueryError(error))
         {
-          const res: QueryResponse = QueryError.fromElasticQueryError(error).getMidwayErrorObject();
+          const res: QueryResponse =
+            new QueryResponse(
+              null,
+              QueryError.fromElasticQueryError(error).getMidwayErrors());
           resolve(res);
         }
         else
@@ -109,7 +170,7 @@ export default class ElasticQueryHandler extends QueryHandler
           winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
           response = { response };
         }
-        const res: QueryResponse = { results: [response] };
+        const res: QueryResponse = new QueryResponse(response);
         resolve(res);
       }
     };

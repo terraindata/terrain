@@ -46,6 +46,7 @@ const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { CardItem } from '../components/cards/Card';
 import { BuilderTypes } from './../BuilderTypes';
+import SharedTypes from './../../../../shared/SharedTypes';
 import ActionTypes from './BuilderActionTypes';
 import Store from './BuilderStore';
 import List = Immutable.List;
@@ -105,12 +106,12 @@ const BuilderActions =
 
   // fetches the query from the server
   fetchQuery:
-    (variantId: ID, handleNoVariant: (variantId: ID) => void, db: string) =>
+    (variantId: ID, handleNoVariant: (variantId: ID) => void, db: SharedTypes.Database) =>
       $(ActionTypes.fetchQuery, { variantId, handleNoVariant, db }),
 
   // load query from server into state
   queryLoaded:
-    (query: BuilderTypes.Query, xhr: XMLHttpRequest, db: string) =>
+    (query: BuilderTypes.Query, xhr: XMLHttpRequest, db: SharedTypes.Database) =>
       $(ActionTypes.queryLoaded, { query, xhr, db }),
 
   save:

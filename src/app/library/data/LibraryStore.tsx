@@ -50,6 +50,7 @@ import AuthStore from './../../auth/data/AuthStore';
 import RoleStore from './../../roles/data/RolesStore';
 import UserStore from './../../users/data/UserStore';
 import LibraryTypes from './../LibraryTypes';
+import SharedTypes from './../../../../shared/SharedTypes';
 import Actions from './LibraryActions';
 import {CleanLibraryActionTypes, LibraryActionTypes} from './LibraryActionTypes';
 type Group = LibraryTypes.Group;
@@ -64,7 +65,7 @@ class LibraryStateC
 {
   loaded = false;
   loading = true;
-  dbs: List<string> = Immutable.List([]);
+  dbs: List<SharedTypes.Database> = Immutable.List([]);
 
   groups: IMMap<ID, Group> = null;
   algorithms: IMMap<ID, Algorithm> = null;
@@ -79,8 +80,7 @@ class LibraryStateC
 
   changingStatus: boolean = false;
   changingStatusOf: LibraryTypes.Variant = null;
-  changingStatusTo: LibraryTypes.EVariantStatus = 0;
-  changingStatusDefault: boolean = false;
+  changingStatusTo: LibraryTypes.ItemStatus = 'BUILD';
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}

@@ -62,6 +62,7 @@ import LibraryActions from './../data/LibraryActions';
 import Actions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
 import LibraryTypes from './../LibraryTypes';
+import SharedTypes from './../../../../shared/SharedTypes';
 import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
 import LibraryInfoUser from './LibraryInfoUser';
@@ -93,7 +94,7 @@ class LibraryInfoColumn extends Classs<Props>
     users: UserMap,
     roles: RoleMap,
     me: User,
-    dbs: List<string>,
+    dbs: List<SharedTypes.Database>,
   } = {
     users: null,
     roles: null,
@@ -122,10 +123,10 @@ class LibraryInfoColumn extends Classs<Props>
       storeKeyPath: ['dbs'],
     });
 
-    Ajax.getDbs((dbs: object) =>
+    Ajax.getDbs((dbs: SharedTypes.Database[]) =>
     {
       LibraryActions.setDbs(
-        List(_.map(dbs as any, (db) : string => db['name'])),
+        List(dbs),
       );
     });
   }
@@ -161,8 +162,10 @@ class LibraryInfoColumn extends Classs<Props>
           Default Database
           </div>
           <Dropdown
-            selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.algorithm.db)}
-            options={this.state.dbs}
+            selectedIndex={this.state.dbs && this.state.dbs.findIndex(
+              db => db.id === this.props.algorithm.db.id
+            )}
+            options={this.state.dbs.map(db => db.name + ' (' + db.type + ')').toList()}
             onChange={this.handleAlgorithmDbChange}
             canEdit={isBuilder || isSuperUser}
             className="bic-db-dropdown"
@@ -253,8 +256,10 @@ class LibraryInfoColumn extends Classs<Props>
             Default Database
           </div>
           <Dropdown
-            selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.group.db)}
-            options={this.state.dbs}
+            selectedIndex={this.state.dbs && this.state.dbs.findIndex(
+              db => db.id === this.props.group.db.id
+            )}
+            options={this.state.dbs.map(db => db.name).toList()}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isSuperUser}
             className="bic-db-dropdown"
@@ -280,17 +285,17 @@ class LibraryInfoColumn extends Classs<Props>
 
     switch (item && item.type)
     {
-      case 'group':
+      case 'GROUP':
         groupId = item.id;
         opacity = 1;
         icon = <GroupIcon />;
         break;
-      case 'algorithm':
+      case 'ALGORITHM':
         groupId = item['groupId'];
         opacity = 0.75;
         icon = <AlgorithmIcon />;
         break;
-      case 'variant':
+      case 'VARIANT':
         groupId = item['groupId'];
         opacity = 0.5;
         icon = <VariantIcon />;

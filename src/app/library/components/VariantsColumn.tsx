@@ -144,7 +144,7 @@ class VariantsColumn extends Classs<Props>
   {
     Actions.variants.change(
       this.props.variants.get(id)
-        .set('status', LibraryTypes.EVariantStatus.Archive) as Variant,
+        .set('status', LibraryTypes.ItemStatus.Archive) as Variant,
     );
   }
 
@@ -157,10 +157,16 @@ class VariantsColumn extends Classs<Props>
   {
     if (this.props.variants.get(id).name !== name)
     {
-      const oldName = this.props.variants.get(id).name || 'Untitled';
+      const oldName = this.props.variants.get(id).name;
+      let message = '"' + oldName + '" is now "' + name + '"';
+      if (!oldName)
+      {
+        message = 'To "' + name + '"';
+      }
+      
       notificationManager.addNotification(
         'Renamed',
-        '"' + oldName + '" is now "' + name + '"',
+        message,
         'info',
         5,
       );
@@ -243,28 +249,30 @@ class VariantsColumn extends Classs<Props>
     const index = this.props.variantsOrder.indexOf(id);
     const {me, roles} = this.state;
     let canEdit: boolean, canDrag: boolean;
+    canEdit = true;
+    canDrag = true;
     
-    if (me && roles)
-    {
-      canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
-        || roles.getIn([this.props.groupId, me.id, 'admin']);
-      canDrag = canEdit &&
-        (variant.status !== LibraryTypes.EVariantStatus.Live ||
-          roles.getIn([this.props.groupId, me.id, 'admin']));
-    }
+    // if (me && roles)
+    // {
+    //   canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
+    //     || roles.getIn([this.props.groupId, me.id, 'admin']);
+    //   canDrag = canEdit &&
+    //     (variant.status !== LibraryTypes.ItemStatus.Live ||
+    //       roles.getIn([this.props.groupId, me.id, 'admin']));
+    // }
 
-    let role = 'Viewer';
-    if (roles && roles.getIn([this.props.groupId, variant.lastUserId]))
-    {
-      if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).admin)
-      {
-        role = 'Admin';
-      }
-      else if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).builder)
-      {
-        role = 'Builder';
-      }
-    }
+    // let role = 'Viewer';
+    // if (roles && roles.getIn([this.props.groupId, variant.lastUserId]))
+    // {
+    //   if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).admin)
+    //   {
+    //     role = 'Admin';
+    //   }
+    //   else if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).builder)
+    //   {
+    //     role = 'Builder';
+    //   }
+    // }
 
     return (
       <LibraryItem
@@ -293,10 +301,13 @@ class VariantsColumn extends Classs<Props>
         canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
-        isStarred={variant.isDefault}
+        isStarred={variant.status === 'DEFAULT'}
       >
         <div className="flex-container">
-          <UserThumbnail userId={variant.lastUserId} medium={true} extra = {role}/>
+          <UserThumbnail
+            userId={variant.lastUserId}
+            medium={true}
+          />
 
           <div className="flex-grow">
             <StatusDropdown
@@ -316,17 +327,17 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleVariantStatusHover(statusString: string, id: ID)
+  handlItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
-    const status = LibraryTypes.EVariantStatus[statusString];
+    const status = LibraryTypes.ItemStatus[statusString];
     if (v.status !== status)
     {
       Actions.variants.change(v.set('status', status) as Variant);
     }
   }
 
-  hasStatus(id: ID, status: LibraryTypes.EVariantStatus)
+  hasStatus(id: ID, status: LibraryTypes.ItemStatus)
   {
     return this.props.variants.getIn([id, 'status']) === status;
   }
@@ -335,7 +346,7 @@ class VariantsColumn extends Classs<Props>
   {
     const {me, roles} = this.state;
     const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
-    const canCreate = canMakeLive;
+    const canCreate = true; // canMakeLive;
     // TODO maybe on the new middle tier, builders can create variants
     //  || (
     //   me && roles && roles.getIn([this.props.groupId, me.id, 'builder'])
@@ -345,21 +356,21 @@ class VariantsColumn extends Classs<Props>
 
     return (
       <LibraryItemCategory
-        status={archived ? 'Archive' : 'Build'}
+        status={archived ? LibraryTypes.ItemStatus.Archive : LibraryTypes.ItemStatus.Build}
         key={archived ? '1' : '0'}
         type="variant"
-        onHover={this.handleVariantStatusHover}
+        onHover={this.handlItemStatusHover}
         titleHidden={!archived}
       >
         {
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
-              (archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
+              (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
               && this.renderVariant(id, fadeIndex ++),
           )
         }
         {
-          this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
+          this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
           ? null
           : <div className="library-category-none">None</div>
         }

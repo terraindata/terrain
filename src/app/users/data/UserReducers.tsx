@@ -65,12 +65,9 @@ UserReducers[ActionTypes.fetch] =
       let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
       _.map(usersObj, (userObj, userId) =>
       {
-        let meta = JSON.parse(userObj.meta || '{}');
         users = users.set(
           +userId,
-          UserTypes._User(
-            _.extend(meta, userObj)
-          )
+          UserTypes._User(userObj)
         );
       });
       action.payload.setUsers(users);      
@@ -80,10 +77,12 @@ UserReducers[ActionTypes.fetch] =
 
 UserReducers[ActionTypes.setUsers] =
   (state, action) =>
-    state.set('users', action.payload.users)
+  {
+    return state.set('users', action.payload.users)
       .set('currentUser', action.payload.users.get(AuthStore.getState().id))
       .set('loading', false)
       .set('loaded', true);
+  }
 
 // This currentUser reference is hacky, and we should change it.
 UserReducers[ActionTypes.updateCurrentUser] =

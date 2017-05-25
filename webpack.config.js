@@ -107,6 +107,7 @@ module.exports =
         new webpack.DefinePlugin({
         'MIDWAY_HOST': "'//" + process.env.MIDWAY_HOST + ":40080'",
         'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'",
+	'NODEWAY_HOST': "'http://" + process.env.NODEWAY_HOST + "'",
         'DEV': "true"
         }),
 

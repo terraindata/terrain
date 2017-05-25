@@ -44,13 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-import QueryRequest from './QueryRequest';
-import QueryResponse from './QueryResponse';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import QueryResult from './QueryResult';
 
-export abstract class QueryHandler
+export default class QueryResponse
 {
-  public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
-}
+  public result: QueryResult;
+  public errors: MidwayErrorItem[];
 
-export default QueryHandler;
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [])
+  {
+    this.result = result;
+    this.errors = errors;
+  }
+}

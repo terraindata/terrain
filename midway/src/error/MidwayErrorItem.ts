@@ -44,13 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-import QueryRequest from './QueryRequest';
-import QueryResponse from './QueryResponse';
-
-export abstract class QueryHandler
+export interface MidwayErrorItem
 {
-  public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
+  status: number;
+  title: string;
+  detail: string;
+  source: object;
 }
 
-export default QueryHandler;
+export default MidwayErrorItem;

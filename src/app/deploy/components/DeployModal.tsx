@@ -58,7 +58,7 @@ import TQLEditor from '../../tql/components/TQLEditor';
 import TQLConverter from '../../tql/TQLConverter';
 import DeployModalColumn from './DeployModalColumn';
 
-const {EVariantStatus} = LibraryTypes;
+const {ItemStatus} = LibraryTypes;
 
 export interface Props {
 }
@@ -68,7 +68,7 @@ class DeployModal extends PureClasss<Props>
   state: {
     changingStatus: boolean;
     changingStatusOf: LibraryTypes.Variant;
-    changingStatusTo: LibraryTypes.EVariantStatus;
+    changingStatusTo: LibraryTypes.ItemStatus;
     defaultChecked: boolean;
   } = {
     changingStatus: false,
@@ -82,7 +82,7 @@ class DeployModal extends PureClasss<Props>
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        const {changingStatus, changingStatusOf, changingStatusTo, changingStatusDefault} = state;
+        const {changingStatus, changingStatusOf, changingStatusTo} = state;
         if (
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
@@ -92,7 +92,7 @@ class DeployModal extends PureClasss<Props>
             changingStatus,
             changingStatusOf,
             changingStatusTo,
-            defaultChecked: changingStatusDefault,
+            defaultChecked: changingStatusTo === 'DEFAULT',
           });
         }
       },
@@ -108,7 +108,7 @@ class DeployModal extends PureClasss<Props>
   handleDeploy()
   {
     LibraryActions.variants.status(
-      this.state.changingStatusOf, this.state.changingStatusTo, true, this.state.defaultChecked,
+      this.state.changingStatusOf, this.state.changingStatusTo, true
     );
   }
 
@@ -151,7 +151,7 @@ class DeployModal extends PureClasss<Props>
     const name = (changingStatusOf && changingStatusOf.name);
 
     let title = 'Deploy "' + name + '" to Live';
-    if (changingStatusTo !== EVariantStatus.Live)
+    if (changingStatusTo !== ItemStatus.Live)
     {
       title = 'Remove "' + name + '" from Live';
     }
@@ -161,7 +161,7 @@ class DeployModal extends PureClasss<Props>
     {
       const libraryState = LibraryStore.getState();
       defaultVariant = libraryState.variants.find(
-        (v) => v.algorithmId === changingStatusOf.algorithmId && v.isDefault,
+        (v) => v.algorithmId === changingStatusOf.algorithmId && v.status === 'DEFAULT',
       );
     }
 

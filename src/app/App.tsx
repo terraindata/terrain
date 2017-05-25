@@ -97,8 +97,8 @@ import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
-import RolesActions from './roles/data/RolesActions';
-import RolesStore from './roles/data/RolesStore';
+// import RolesActions from './roles/data/RolesActions';
+// import RolesStore from './roles/data/RolesStore';
 import {SchemaActions, SchemaStore} from './schema/data/SchemaStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
@@ -162,7 +162,6 @@ class App extends PureClasss<Props>
     loggedInAndLoaded: false,
 
     libraryLoaded: false,
-    rolesLoaded: false,
     schemaLoaded: false,
     
     usersLoaded: false,
@@ -222,10 +221,10 @@ class App extends PureClasss<Props>
       storeKeyPath: ['loaded'],
     });
 
-    this._subscribe(RolesStore, {
-      stateKey: 'rolesLoaded',
-      storeKeyPath: ['loaded'],
-    });
+    // this._subscribe(RolesStore, {
+    //   stateKey: 'rolesLoaded',
+    //   storeKeyPath: ['loaded'],
+    // });
 
     this._subscribe(SchemaStore, {
       stateKey: 'schemaLoaded',
@@ -245,8 +244,8 @@ class App extends PureClasss<Props>
   {
     UserActions.fetch();
     LibraryActions.fetch();
-    RolesActions.fetch();
     SchemaActions.fetch();
+    // RolesActions.fetch();
   }
 
   toggleSidebar()
@@ -266,8 +265,8 @@ class App extends PureClasss<Props>
   isAppStateLoaded(): boolean
   {
     return this.state.libraryLoaded
-      && this.state.rolesLoaded
       && this.state.usersLoaded;
+      // && this.state.rolesLoaded
   }
 
   renderApp()

@@ -44,13 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-import QueryRequest from './QueryRequest';
-import QueryResponse from './QueryResponse';
+type QueryResult = object[] | object | null;
 
-export abstract class QueryHandler
-{
-  public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
-}
-
-export default QueryHandler;
+export default QueryResult;

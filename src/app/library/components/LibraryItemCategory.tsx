@@ -47,6 +47,7 @@ require('./LibraryItemCategory.less');
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import Classs from './../../common/components/Classs';
+import LibraryTypes from '../LibraryTypes';
 
 export interface Props
 {
@@ -67,7 +68,7 @@ class LibraryItemCategory extends Classs<Props>
   constructor(props: Props)
   {
     super(props);
-    this.state.open = this.props.status !== 'Archive';
+    this.state.open = props.status !== LibraryTypes.ItemStatus.Archive;
   }
 
   toggleOpen()

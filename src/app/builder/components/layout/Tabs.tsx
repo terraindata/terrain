@@ -58,7 +58,6 @@ import Classs from './../../../common/components/Classs';
 import InfoArea from './../../../common/components/InfoArea';
 import PureClasss from './../../../common/components/PureClasss';
 import {LibraryState, LibraryStore} from './../../../library/data/LibraryStore';
-import LibraryTypes from './../../../library/LibraryTypes';
 const {browserHistory} = require('react-router');
 const ReactTooltip = require('react-tooltip');
 
@@ -260,14 +259,14 @@ export class Tabs extends PureClasss<TabsProps> {
     const tabs = config && variants && config.split(',').map((vId) =>
     {
       const id = this.getId(vId);
-      const variant = variants.get(id);
+      const variant = variants.get(+id);
       let name = 'Loading...';
       if (variant)
       {
         name = variant.name || 'Untitled';
         if (variant.version)
         {
-          name += ' @ ' + moment(variants.get(id).lastEdited).format('ha M/D/YY');
+          name += ' @ ' + moment(variants.get(+id).lastEdited).format('ha M/D/YY');
         }
       }
       else

@@ -108,7 +108,7 @@ class GroupsColumn extends Classs<Props>
   handleArchive(id: ID)
   {
     Actions.groups.change(this.props.groups.find((g) => g.id === id)
-      .set('status', LibraryTypes.EGroupStatus.Archive) as Group);
+      .set('status', LibraryTypes.ItemStatus.Archive) as Group);
   }
 
   handleNameChange(id: ID, name: string)
@@ -213,25 +213,25 @@ class GroupsColumn extends Classs<Props>
   handleCategoryHover(statusString: string, id: ID)
   {
     const g = this.props.groups.get(id);
-    const status = LibraryTypes.EGroupStatus[statusString];
+    const status = LibraryTypes.ItemStatus[statusString];
     if (g.status !== status)
     {
       Actions.groups.change(g.set('status', status) as Group);
     }
   }
 
-  renderCategory(status: LibraryTypes.EGroupStatus)
+  renderCategory(status: LibraryTypes.ItemStatus)
   {
     const ids = this.props.groupsOrder.filter((id) => this.props.groups.get(id).status === status);
     const canCreate = this.state.me && this.state.me.isSuperUser;
 
     return (
       <LibraryItemCategory
-        status={LibraryTypes.EGroupStatus[status]}
+        status={LibraryTypes.ItemStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
         type="group"
-        titleHidden={status === LibraryTypes.EGroupStatus.Live}
+        titleHidden={status === LibraryTypes.ItemStatus.Build}
       >
         {
           ids.map(this.renderGroup)
@@ -240,7 +240,7 @@ class GroupsColumn extends Classs<Props>
           ids.size === 0 && <div className="library-category-none">None</div>
         }
         {
-          status === LibraryTypes.EGroupStatus.Live && canCreate &&
+          status === LibraryTypes.ItemStatus.Build && canCreate &&
             <CreateItem
               name="group"
               onCreate={this.handleCreate}
@@ -261,8 +261,8 @@ class GroupsColumn extends Classs<Props>
           this.props.groups.size ?
             (
               <div>
-                { this.renderCategory(LibraryTypes.EGroupStatus.Live) }
-                { this.renderCategory(LibraryTypes.EGroupStatus.Archive) }
+                { this.renderCategory(LibraryTypes.ItemStatus.Build) }
+                { this.renderCategory(LibraryTypes.ItemStatus.Archive) }
               </div>
             )
             :

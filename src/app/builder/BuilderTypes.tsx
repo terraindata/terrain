@@ -120,8 +120,21 @@ export module BuilderTypes
   // currently, only Variants have Queries, 1:1, but that may change
   class QueryC
   {
-    id: ID = '';
-    variantId: ID = '';
+    type: 'QUERY' = 'QUERY';
+    parent: number = -1;
+    name: string = '';
+    status: 'BUILD' | 'LIVE' = 'BUILD';
+    
+    id: ID = -1;
+    variantId: number = -1;
+    
+    // TODO change?
+    db: {
+      id: ID;
+      name: string;
+      source: 'm1' | 'm2';
+      type: string;
+    } = {} as any;
 
     cards: ICards = List([]);
     inputs: List<any> = List([]);
@@ -131,6 +144,12 @@ export module BuilderTypes
 
     tqlCardsInSync: boolean = false;
     parseTreeError: string = null;
+    
+    
+    dbFields = ['id', 'parent', 'name', 'status', 'type'];
+    excludeFields= ['dbFields', 'excludeFields'];
+    
+    modelVersion = 2; // 2 is for the first version of Node midway
   }
   const Query_Record = Immutable.Record(new QueryC());
   export interface Query extends QueryC, IRecord<Query> {}
@@ -142,7 +161,6 @@ export module BuilderTypes
     config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
 
     let query = new Query_Record(config) as any as Query;
-
     switch (config['mode'])
     {
       case 'tql':
@@ -803,7 +821,7 @@ export module BuilderTypes
             card['tables'].reduce(
               (list: List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
-                const dbName = Store.getState().db;
+                const dbName = Store.getState().db.name;
                 let columnNames = schemaState.columnNamesByDb.getIn(
                   [dbName, dbName + '.' + tableBlock.table],
                 ) || Immutable.List([]);
@@ -840,7 +858,7 @@ export module BuilderTypes
                 showWhenCards: true,
                 getAutoTerms: (comp: React.Component<any, any>, schemaState: SchemaTypes.SchemaState) =>
                 {
-                  const db = Store.getState().db;
+                  const db = Store.getState().db.name; // TODO correct?
                   const tableNames = schemaState.tableNamesByDb.get(db);
                   // if (!tableNames)
                   // {
@@ -1362,7 +1380,7 @@ export module BuilderTypes
           },
           {
             displayType: DisplayType.COMPONENT,
-            component: require('./components/charts/TransformCard').default, //TransformCardComponent,
+            component: null, // component filled in at bottom of file
             requiresBuilderState: true,
             key: null,
             help: ManualConfig.help['scorePoints'],
@@ -1720,12 +1738,11 @@ export module BuilderTypes
     }
     else if (typeof value === 'object')
     {
-      for (const v of value)
+      for (const i in value)
       {
-        cardsForServer(v);
+        cardsForServer(value[i]);
       }
     }
-
     return value;
   };
 
@@ -1861,10 +1878,15 @@ export module BuilderTypes
   }
 }
 
-import {_IResultsConfig, IResultsConfig} from './components/results/ResultsConfig';
-import Actions from './data/BuilderActions';
-import Store from './data/BuilderStore';
 
 export default BuilderTypes;
 
+import {_IResultsConfig, IResultsConfig} from './components/results/ResultsConfig';
+import Actions from './data/BuilderActions';
+import Store from './data/BuilderStore';
 import TQLConverter from '../tql/TQLConverter';
+
+// This import has to be down here in order to stop a circular dependency from breaking the app
+// TODO restructure to avoid the circular dependency.
+import TransformCard from './components/charts/TransformCard';
+BuilderTypes.Blocks.transform.static.display[2].component = TransformCard;

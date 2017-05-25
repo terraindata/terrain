@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -143,7 +145,7 @@ class AlgorithmsColumn extends PureClasss<Props>
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
-        .set('status', LibraryTypes.EAlgorithmStatus.Archive) as Algorithm,
+        .set('status', LibraryTypes.ItemStatus.Archive) as Algorithm,
       );
   }
 
@@ -217,47 +219,57 @@ class AlgorithmsColumn extends PureClasss<Props>
   {
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
-    const scores = [
+    const scores = {
+      [LibraryTypes.ItemStatus.Archive]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Archive),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Archive),
         name: 'Variants in Archived Status',
       },
+      [LibraryTypes.ItemStatus.Build]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Build),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Build),
         name: 'Variants in Build Status',
       },
+      [LibraryTypes.ItemStatus.Approve]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Approve),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Approve),
         name: 'Variants in Approve Status',
       },
+      [LibraryTypes.ItemStatus.Live]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Live),
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Live),
         name: 'Variants in Live Status',
       },
-    ];
+      [LibraryTypes.ItemStatus.Default]:
+      {
+        score: 0,
+        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Default),
+        name: 'Variants in Default Status',
+      },
+    };
 
     const variants = this.props.variants.filter(
       (v: Variant) =>
         v.algorithmId === id,
     );
-
+    
     variants.map(
       (v: Variant) =>
         scores[v.status].score ++,
     );
 
-    scores.splice(0, 1); // remove Archived count
+    // scores.splice(0, 1); // remove Archived count
 
     const {me, roles} = this.state;
-    const canArchive = me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
+    const canArchive = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     const canDuplicate = canArchive;
-    const canDrag = canArchive; // TODO change to enable Library drag and drop
-    const canEdit = canDrag ||
-      (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    const canDrag = canArchive;
+    const canEdit = canDrag; // ||
+      //(me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -274,7 +286,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
 
     let date = 'There are no variants';
-    let userId = 'There are no variants';
+    let userId: string | number = 'There are no variants';
     if (lastTouched) {
       date = lastTouched.lastEdited;
       userId = lastTouched.lastUserId;
@@ -325,7 +337,7 @@ class AlgorithmsColumn extends PureClasss<Props>
           <div className="flex-grow">
             <div className="library-item-line">
               <Scoreline
-                scores={scores}
+                scores={_.values(scores)}
                 hideZeroes={true}
               />
             </div>
@@ -344,27 +356,27 @@ class AlgorithmsColumn extends PureClasss<Props>
   handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
-    const status = LibraryTypes.EAlgorithmStatus[statusString];
+    const status = LibraryTypes.ItemStatus[statusString];
     if (a.status !== status)
     {
       Actions.algorithms.change(a.set('status', status) as Algorithm);
     }
   }
 
-  renderCategory(status: LibraryTypes.EAlgorithmStatus)
+  renderCategory(status: LibraryTypes.ItemStatus)
   {
     const {algorithms} = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const {me, roles} = this.state;
-    const canCreate = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
-
+    const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+    
     return (
       <LibraryItemCategory
-        status={LibraryTypes.EAlgorithmStatus[status]}
+        status={status}
         key={status}
         onHover={this.handleCategoryHover}
         type="algorithm"
-        titleHidden={status === LibraryTypes.EAlgorithmStatus.Live}
+        titleHidden={status === LibraryTypes.ItemStatus.Build}
       >
         {
           ids.map(this.renderAlgorithm)
@@ -373,7 +385,7 @@ class AlgorithmsColumn extends PureClasss<Props>
           ids.size === 0 && <div className="library-category-none">None</div>
         }
         {
-          status === LibraryTypes.EAlgorithmStatus.Live && canCreate &&
+          status === LibraryTypes.ItemStatus.Build && canCreate &&
             <CreateItem
               name="algorithm"
               onCreate={this.handleCreate}
@@ -396,8 +408,12 @@ class AlgorithmsColumn extends PureClasss<Props>
               this.props.algorithmsOrder.size ?
               (
                 <div>
-                  { this.renderCategory(LibraryTypes.EAlgorithmStatus.Live) }
-                  { this.renderCategory(LibraryTypes.EAlgorithmStatus.Archive) }
+                  {
+                    this.renderCategory('BUILD')
+                  }
+                  {
+                    this.renderCategory('ARCHIVE')
+                  }
                 </div>
               )
               :

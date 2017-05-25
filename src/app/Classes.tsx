@@ -89,3 +89,51 @@ export function New<T>(
 
   return new records[class_name](instance) as any;
 }
+
+export function recordForSave(record: IRecord<any>)
+{
+  const recordData = record.toJS();
+  const meta = _.extend({}, recordData);
+  
+  if(record['excludeFields'])
+  {
+    record['excludeFields'].map((field) =>
+    {
+      delete recordData[field];
+      delete meta[field];
+    });
+  }
+  
+  if(record['dbFields'])
+  {
+    record['dbFields'].map(
+      (field) => delete meta[field]
+    );
+    
+    _.map(meta,
+      (v, key) => delete recordData[key]
+    );
+    
+    recordData['meta'] = JSON.stringify(meta);
+  }
+  
+  return recordData;
+}
+
+export function responseToRecordConfig(response: object): object
+{
+  if (response['meta'])
+  {
+    try
+    {
+      // somewhere along the line, \ get added to the text and not removed correctly
+      // TODO update if the backend escaping is fixed
+      let meta = JSON.parse(response['meta'].replace(/\\([^\\])/g, (a,b) => b).replace(/\\\\/g, "\\") || '{}');
+      response = _.extend(meta, response);
+      delete response['meta'];
+    }
+    catch (e) {  }
+  }
+  
+  return response;
+}

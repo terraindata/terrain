@@ -43,78 +43,46 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as winston from 'winston';
 
-export interface MidwayErrorItem
-{
-  status: number;
-  title: string;
-  detail: string;
-  source: object;
-}
+import MidwayError from './MidwayError';
 
-export interface MidwayErrorObject
+class RouteError extends MidwayError
 {
-  errors: MidwayErrorItem[];
-}
-
-export class MidwayError
-{
-  public static fromJSON(json: string | MidwayErrorObject)
+  public static async RouteErrorHandler(ctx, next)
   {
-    const midwayError = Object.create(MidwayError.prototype);
-    if (typeof json === 'string')
+    try
     {
-      const jobject = JSON.parse(json);
-      midwayError.errorObject = jobject;
-    } else
-    {
-      midwayError.errorObject = json;
+      await next();
     }
-    return midwayError;
+    catch (err)
+    {
+      const routeError = RouteError.fromRouteContext(ctx, err);
+      const status = routeError.getStatus();
+      winston.info(JSON.stringify(routeError));
+      ctx.status = status;
+      ctx.body = { errors: routeError.getMidwayErrors() };
+    }
   }
 
-  public errorObject: MidwayErrorObject;
+  public static fromRouteContext(ctx, err: string | object): RouteError
+  {
+    if (typeof err !== 'object')
+    {
+      err = new Error(err);
+    }
+
+    const status: number = 'status' in err ? err['status'] : 400;
+    const title: string = 'title' in err ? err['title'] : 'Route ' + String(ctx.url) + ' has an error.';
+    const detail: string = 'detail' in err ? err['detail'] : ('message' in err ? err['message'] : JSON.stringify(err));
+    const source: object = { ctx, err };
+    return new RouteError(status, title, detail, source);
+  }
 
   public constructor(status: number, title: string, detail: string, source: object)
   {
-    const o: MidwayErrorItem = { status, title, detail, source };
-    this.errorObject = { errors: [o] };
-  }
-
-  public getMidwayErrorObject(): MidwayErrorObject
-  {
-    return this.errorObject;
-  }
-
-  // we may provide a iterator interface later
-  public getNthMidwayErrorItem(index): MidwayErrorItem
-  {
-    return this.errorObject.errors[index];
-  }
-
-  // get the first error object's status
-  public getStatus(): number
-  {
-    return this.getNthMidwayErrorItem(0).status;
-  }
-
-  // get the first error object's title
-  public getTitle(): string
-  {
-    return this.getNthMidwayErrorItem(0).title;
-  }
-
-  // get the first error object's detail
-  public getDetail(): string
-  {
-    return this.getNthMidwayErrorItem(0).detail;
-  }
-
-  // get the first error object's source
-  public getSource(): object
-  {
-    return this.getNthMidwayErrorItem(0).source;
+    super(status, title, detail, source);
   }
 }
 
-export default MidwayError;
+export default RouteError;

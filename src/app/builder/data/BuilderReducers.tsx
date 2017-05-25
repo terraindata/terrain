@@ -50,6 +50,7 @@ import {BuilderTypes} from './../BuilderTypes';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import {BuilderState} from './BuilderStore';
+import SharedTypes from '../../../../shared/SharedTypes';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 {
@@ -61,7 +62,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       payload?: {
         variantId: ID,
         handleNoVariant: (id: ID) => void,
-        db: string,
+        db: SharedTypes.Database,
       },
     },
   ) =>
@@ -109,7 +110,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     action: Action<{
       query: BuilderTypes.Query,
       xhr: XMLHttpRequest,
-      db: string,
+      db: SharedTypes.Database,
     }>,
   ) =>
   {
@@ -127,7 +128,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           .set('parseTreeReq',
             Ajax.parseTree(
               action.payload.query.tql,
-              state.db,
+              state.db.id + "",
               Actions.parseTreeLoaded,
               Actions.parseTreeError,
             ).xhr,
@@ -312,6 +313,18 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
   ) =>
   {
     state.parseTreeReq && state.parseTreeReq.abort();
+    if(state.db.source === 'm1')
+    {
+      state = state
+        .set('parseTreeReq',  // for SQL parsing
+          Ajax.parseTree(
+            action.payload.tql,
+            state.db.id + "",
+            Actions.parseTreeLoaded,
+            Actions.parseTreeError,
+          ).xhr,
+        );
+    }
     return state
       .update('query', (query) =>
         query
@@ -319,14 +332,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           .set('tqlCardsInSync', false)
           .set('parseTreeError', null),
       )
-      .set('parseTreeReq',
-        Ajax.parseTree(
-          action.payload.tql,
-          state.db,
-          Actions.parseTreeLoaded,
-          Actions.parseTreeError,
-        ).xhr,
-      );
   },
 
 [ActionTypes.parseTreeLoaded]:

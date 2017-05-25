@@ -63,6 +63,7 @@ interface Action<T> {
 }
 
 declare type List<T> = Immutable.List<T>;
+declare type IMList<T, K> = Immutable.List<T>; // TODO remove second arg when highlighting is fixed
 declare type IMMap<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
 declare type SetFn<T> = (f: string, v: any) => T & IRecord<T>;
@@ -101,7 +102,6 @@ declare interface IMap<T>
 declare interface IRecord<T> extends IMap<T>
 {
   id: ID;
-  type: string;
 }
 
 declare type El = JSX.Element;
@@ -119,9 +119,10 @@ declare interface IName
   name: string;
 }
 
-// this is a / these are build time substition(s) done by Webpack.
-declare var DEV: boolean;
-declare var MIDWAY_HOST: string;
+// these are build time substitions done by Webpack
+declare const DEV: boolean;
+declare const MIDWAY_HOST: string;
+declare const NODEWAY_HOST: string;
 
 declare const escape: (s: string) => string;
 declare const unescape: (s: string) => string;

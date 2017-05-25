@@ -114,6 +114,8 @@ class Builder extends PureClasss<Props>
     tabActions: List<TabAction>;
 
     nonexistentVariantIds: List<ID>;
+    
+    saving?: boolean;
 
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
   } = {
@@ -158,6 +160,7 @@ class Builder extends PureClasss<Props>
         }
       },
     });
+    
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
       storeKeyPath: ['variants'],
@@ -337,7 +340,7 @@ class Builder extends PureClasss<Props>
     }
     if (newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
-      let variant = this.state.variants.get(variantId);
+      let variant = this.state.variants.get(+variantId);
       // need to fetch data for new query
       Actions.fetchQuery(variantId, this.handleNoVariant, variant && variant.db);
     }
@@ -390,7 +393,7 @@ class Builder extends PureClasss<Props>
 
     const variantId = this.getSelectedId(props);
     const variant = this.state.variants &&
-      this.state.variants.get(variantId);
+    this.state.variants.get(+variantId);
     if (variantId && !variant)
     {
       LibraryActions.variants.fetchVersion(variantId, () =>
@@ -466,9 +469,6 @@ class Builder extends PureClasss<Props>
       'info',
       4,
     );
-
-    //TODO remove if queries/variants model changes
-    LibraryActions.variants.change(variant);
   }
 
   onSaveError(variant: Variant)
@@ -495,7 +495,7 @@ class Builder extends PureClasss<Props>
     const variant = this.getVariant();
     if (variant)
     {
-      if (variant.status === LibraryTypes.EVariantStatus.Live)
+      if (variant.status === LibraryTypes.ItemStatus.Live)
       {
         return false;
       }
@@ -515,12 +515,15 @@ class Builder extends PureClasss<Props>
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
-    Ajax.saveItem(
-      LibraryTypes.variantForSave(variant),
-      this.onSaveSuccess.bind(this, variant),
-      this.onSaveError.bind(this, variant),
-    );
-    Actions.save();
+    
+    this.setState({
+      saving: true,
+    });
+    
+    //TODO remove if queries/variants model changes
+    LibraryActions.variants.change(variant);    
+    this.onSaveSuccess(variant);
+    Actions.save(); // register that we are saving
 
     let configArr = window.location.pathname.split('/')[2].split(',');
     let currentVariant;
@@ -570,7 +573,7 @@ class Builder extends PureClasss<Props>
   canEdit(): boolean
   {
     const variant = this.getVariant();
-    return variant && (variant.status === LibraryTypes.EVariantStatus.Build
+    return variant && (variant.status === LibraryTypes.ItemStatus.Build
       && Util.canEdit(variant, UserStore, RolesStore));
   }
 
@@ -581,7 +584,7 @@ class Builder extends PureClasss<Props>
     {
       return '';
     }
-    if (variant.status !== LibraryTypes.EVariantStatus.Build)
+    if (variant.status !== LibraryTypes.ItemStatus.Build)
     {
       return 'This Variant is not in Build status';
     }

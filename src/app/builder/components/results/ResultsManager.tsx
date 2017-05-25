@@ -51,6 +51,7 @@ import TQLConverter from '../../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import BuilderTypes from '../../BuilderTypes';
+import SharedTypes from './../../../../../shared/SharedTypes';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
@@ -107,7 +108,7 @@ export interface Props
 {
   query: BuilderTypes.Query;
   resultsState: ResultsState;
-  db: string;
+  db: SharedTypes.Database;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
@@ -162,17 +163,22 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  queryResults(query: BuilderTypes.Query, db: string)
+  queryResults(query: BuilderTypes.Query, db: SharedTypes.Database)
   {
     if (!query || !db)
     {
       return;
     }
 
-    const tql = TQLConverter.toTQL(query, {
-      limit: MAX_RESULTS,
-      replaceInputs: true,
-    });
+    let tql = query.tql;
+    
+    if(db.source === 'm1')
+    {
+      tql = TQLConverter.toTQL(query, {
+        limit: MAX_RESULTS,
+        replaceInputs: true,
+      });
+    }
 
     if (tql !== this.state.queriedTql)
     {
@@ -188,48 +194,51 @@ export class ResultsManager extends PureClasss<Props>
           ),
       });
 
-      const selectCard = query.cards.get(0);
-      if (
-        !this.props.noExtraFields
-        && selectCard
-        && !selectCard['cards'].some(
-            (card) => card.type === 'groupBy',
-          )
-        && !selectCard['fields'].some(
-            (field) => field.field.static && field.field.static.isAggregate,
-          )
-      )
+      if(this.props.db.source === 'm1')
       {
-        // temporary, don't dispatch select * if query has group by
+        const selectCard = query.cards.get(0);
+        if (
+          !this.props.noExtraFields
+          && selectCard
+          && !selectCard['cards'].some(
+              (card) => card.type === 'groupBy',
+            )
+          && !selectCard['fields'].some(
+              (field) => field.field.static && field.field.static.isAggregate,
+            )
+        )
+        {
+          // temporary, don't dispatch select * if query has group by
+        
+          this.setState({
+            allQuery: Ajax.query(
+              TQLConverter.toTQL(query, {
+                allFields: true,
+                transformAliases: true,
+                limit: MAX_RESULTS,
+                replaceInputs: true,
+              }),
+              db,
+              this.handleAllFieldsResponse,
+              this.handleAllFieldsError,
+            ),
+          });
+        }
 
-        this.setState({
-          allQuery: Ajax.query(
-            TQLConverter.toTQL(query, {
-              allFields: true,
-              transformAliases: true,
-              limit: MAX_RESULTS,
-              replaceInputs: true,
-            }),
-            db,
-            this.handleAllFieldsResponse,
-            this.handleAllFieldsError,
-          ),
-        });
+        // temporarily disable count
+        // this.setState({
+        //   countXhr:
+        //     Ajax.query(
+        //       TQLConverter.toTQL(query, {
+        //         count: true,
+        //         replaceInputs: true,
+        //       }),
+        //       db,
+        //       this.handleCountResponse,
+        //       this.handleCountError
+        //     ),
+        // });
       }
-
-      // temporarily disable count
-      // this.setState({
-      //   countXhr:
-      //     Ajax.query(
-      //       TQLConverter.toTQL(query, {
-      //         count: true,
-      //         replaceInputs: true,
-      //       }),
-      //       db,
-      //       this.handleCountResponse,
-      //       this.handleCountError
-      //     ),
-      // });
 
       this.changeResults({
         loading: true,
@@ -255,13 +264,9 @@ export class ResultsManager extends PureClasss<Props>
   componentWillReceiveProps(nextProps: Props)
   {
     if (
-      nextProps.query &&
-      (
-        (!this.props.query && !nextProps.resultsState.loading)
-        || nextProps.query.cards !== this.props.query.cards
-        || nextProps.query.inputs !== this.props.query.inputs
-        || nextProps.db !== this.props.db
-      )
+      nextProps.query != null
+      && nextProps.query.tql != null
+      && (this.props.query == null || this.props.query.tql !== nextProps.query.tql)
     )
     {
       this.queryResults(nextProps.query, nextProps.db);

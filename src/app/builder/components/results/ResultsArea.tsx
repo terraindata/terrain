@@ -65,13 +65,14 @@ import InfiniteScroll from './../../../common/components/InfiniteScroll';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import {getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass} from './ResultsManager';
+import SharedTypes from './../../../../../shared/SharedTypes';
 
 const RESULTS_PAGE_SIZE = 20;
 
 export interface Props
 {
   resultsState: ResultsState;
-  db: string;
+  db: SharedTypes.Database;
   query: BuilderTypes.Query;
   canEdit: boolean;
   variantName: string;
@@ -136,7 +137,7 @@ class ResultsArea extends PureClasss<Props>
     const {resultsConfig} = this.props.query;
 
     let result: ResultClass;
-    
+
     if (results)
     {
       const result = results.get(expandedResultIndex);
@@ -303,7 +304,34 @@ class ResultsArea extends PureClasss<Props>
     );
   }
 
-  handleExport()
+  handleESresultExport()
+  {
+    this.props.onNavigationException();
+
+    const {xhr, queryId} = Ajax.query(
+        this.props.query.tql,
+      this.props.db,
+      _.noop,
+      _.noop,
+      false,
+      {
+        streaming: true,
+        streamingTo: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.json'
+      },
+    );
+
+    // TODO kill this on unmount
+    this.setState({
+      csvXhr: xhr,
+      csvQueryId: queryId,
+    });
+
+    alert('Your data are being prepared for export, and will automatically download when ready.\n\
+Note: this exports the results of your query, which may be different from the results in the Results \
+column if you have set a custom results view.');
+  }
+
+/*  handleExport()
   {
     this.props.onNavigationException();
 
@@ -333,7 +361,7 @@ class ResultsArea extends PureClasss<Props>
     alert('Your data are being prepared for export, and will automatically download when ready.\n\
 Note: this exports the results of your query, which may be different from the results in the Results \
 column if you have set a custom results view.');
-  }
+  }*/
 
   toggleView()
   {
@@ -378,7 +406,7 @@ column if you have set a custom results view.');
 
         <div
           className="results-top-config"
-          onClick={this.handleExport}
+          onClick={this.handleESresultExport}
         >
           Export
         </div>

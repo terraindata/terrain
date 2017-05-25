@@ -43,9 +43,10 @@ THE SOFTWARE.
 */
 
 const _ = require('underscore');
-import '../../util/Ajax';
+import Util from '../../util/Util';
 import BuilderTypes from './../../builder/BuilderTypes';
 import LibraryTypes from './../LibraryTypes';
+import SharedTypes from './../../../../shared/SharedTypes';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
 import {_LibraryState, LibraryState, LibraryStore} from './LibraryStore';
@@ -63,8 +64,24 @@ const Actions =
   groups:
   {
     create:
-      () =>
-        $(ActionTypes.groups.create, {}),
+      (
+        group: LibraryTypes.Group = LibraryTypes._Group(),
+        idCallBack?: (id: ID) => void
+      ) =>
+      {
+        Ajax.saveItem(
+          group,
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.groups.create, {
+              group: group.set('id', id),
+            });
+            idCallBack && idCallBack(id);
+          }
+        );
+      },
 
     change:
       (group: Group) =>
@@ -82,8 +99,29 @@ const Actions =
   algorithms:
   {
     create:
-      (groupId: ID) =>
-        $(ActionTypes.algorithms.create, { groupId }),
+      (
+        groupId: ID,
+        algorithm = LibraryTypes._Algorithm(),
+        idCallback?: (id: ID) => void
+      ) =>
+      {
+        algorithm = algorithm
+          .set('parent', groupId)
+          .set('groupId', groupId);
+          
+        Ajax.saveItem(
+          algorithm,
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.algorithms.create, {
+              algorithm: algorithm.set('id', id),
+            });
+            idCallback && idCallback(id);
+          }
+        );
+      },
 
     change:
       (algorithm: Algorithm) =>
@@ -95,14 +133,57 @@ const Actions =
 
     duplicate:
       (algorithm: Algorithm, index: number, groupId?: ID) =>
-        $(ActionTypes.algorithms.duplicate, { algorithm, index, groupId }),
+      {
+        let {variantsOrder} = algorithm;
+        
+        groupId = groupId || algorithm.groupId;
+        algorithm = algorithm
+          .set('parent', groupId)
+          .set('groupId', groupId)
+          .set('id', -1)
+          .set('name', Util.duplicateNameFor(algorithm.name))
+          .set('variantsOrder', Immutable.List([]));
+          
+        Actions.algorithms.create(
+          algorithm.groupId,
+          algorithm,
+          (algorithmId: ID) =>
+          {
+            const variants = LibraryStore.getState().variants;
+            variantsOrder.map(
+              (variantId, index) =>
+              {
+                let variant = variants.get(variantId);
+                setTimeout(() => Actions.variants.duplicate(variant, 0, groupId, algorithmId), index * 200);
+              }
+            );
+          }
+        );
+      }
   },
 
   variants:
   {
     create:
-      (groupId: ID, algorithmId: ID) =>
-        $(ActionTypes.variants.create, { groupId, algorithmId }),
+      (groupId: ID, algorithmId: ID, variant = LibraryTypes._Variant()) =>
+      {
+        variant = variant
+          .set('parent', algorithmId)
+          .set('algorithmId', algorithmId)
+          .set('groupId', groupId);
+          
+        Ajax.saveItem(
+          variant,
+          (response) =>
+          {
+            // on load
+            let id = response.id; //??
+            $(ActionTypes.variants.create, {
+              variant: variant.set('id', id),
+            });
+          }
+        );
+      },
 
     change:
       (variant: Variant) =>
@@ -114,11 +195,25 @@ const Actions =
 
     duplicate:
       (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) =>
-        $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
+      {
+        groupId = groupId || variant.groupId;
+        algorithmId = algorithmId || variant.algorithmId;
+        
+        let newVariant = variant
+          .set('id', -1)
+          .set('parent', algorithmId)
+          .set('algorithmId', algorithmId)
+          .set('groupId', groupId)
+          .set('name', Util.duplicateNameFor(variant.name))
+          .set('status', LibraryTypes.ItemStatus.Build);
+        newVariant = LibraryTypes.touchVariant(newVariant);
+        
+        Actions.variants.create(groupId, algorithmId, newVariant);
+      },
 
     status:
-      (variant: Variant, status: LibraryTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
-        $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
+      (variant: Variant, status: LibraryTypes.ItemStatus, confirmed?: boolean) =>
+        $(ActionTypes.variants.status, { variant, status, confirmed }),
 
     fetchVersion:
       (variantId: string, onNoVersion: (variantId: string) => void) =>
@@ -148,44 +243,20 @@ const Actions =
       $(ActionTypes.loadState, { state }),
 
   setDbs:
-    (dbs: List<string>) =>
+    (dbs: List<SharedTypes.Database>) =>
       $(ActionTypes.setDbs, { dbs }),
 
   // overwrites current state with state from server
   fetch:
     () =>
     {
-      Ajax.getItems((groupsData, algorithmsData, variantsData, groupsOrder) =>
+      Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
       {
-        let variants = Immutable.Map({});
-        _.map(variantsData, (variantData) => {
-          variants = variants.set(
-            variantData.id,
-            LibraryTypes._Variant(variantData),
-          );
-        });
-
-        let algorithms = Immutable.Map({});
-        _.map(algorithmsData, (algorithmData) => {
-          algorithms = algorithms.set(
-            algorithmData.id,
-            LibraryTypes._Algorithm(algorithmData),
-          );
-        });
-
-        let groups = Immutable.Map({});
-        _.map(groupsData, (groupData) => {
-          groups = groups.set(
-            groupData.id,
-            LibraryTypes._Group(groupData),
-          );
-        });
-
         Actions.loadState(_LibraryState({
           groups,
           algorithms,
           variants,
-          groupsOrder: Immutable.List(groupsOrder),
+          groupsOrder: groupsOrder,
           loading: false,
         }));
       });

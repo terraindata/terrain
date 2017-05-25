@@ -121,9 +121,17 @@ class LibraryItem extends Classs<Props>
         // icon: '',
         onClick: this.handleDuplicate,
       },
+      {
+        text: 'Rename',
+        onClick: this.showTextfield,
+      },
     ]),
     archive:
     List([
+      {
+        text: 'Rename',
+        onClick: this.showTextfield,
+      },
       {
         text: 'Archive',
         onClick: this.handleArchive,
@@ -135,6 +143,10 @@ class LibraryItem extends Classs<Props>
         text: 'Duplicate',
         // icon: '',
         onClick: this.handleDuplicate,
+      },
+      {
+        text: 'Rename',
+        onClick: this.showTextfield,
       },
       {
         text: 'Archive',
@@ -187,7 +199,7 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  showTextfield(event?)
+  showTextfield()
   {
     if (!this.props.canEdit)
     {
@@ -198,8 +210,6 @@ class LibraryItem extends Classs<Props>
       nameEditing: true,
       focusField: true,
     });
-    event && event.preventDefault();
-    event && event.stopPropagation();
   }
 
   componentDidUpdate()
@@ -316,7 +326,6 @@ class LibraryItem extends Classs<Props>
                   </div>
                   <div
                     className="library-item-name"
-                    onDoubleClick={this.showTextfield}
                   >
                     {
                       this.props.name.length ? this.props.name : <em>Untitled</em>
