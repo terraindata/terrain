@@ -203,12 +203,12 @@ export const Ajax =
       xhr.onerror = config && config.onError;
       xhr.onload = (ev: Event) =>
       {
-        if (xhr.status === 401)
-        {
-          // TODO re-enable
-          // Actions.logout();
-          return;
-        }
+        // TODO re-enable
+        // if (xhr.status === 401)
+        // {
+        //   // Actions.logout();
+        //   return;
+        // }
 
         if (xhr.status != 200)
         {
