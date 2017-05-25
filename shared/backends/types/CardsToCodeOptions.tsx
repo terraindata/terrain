@@ -42,30 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import CardsToCodeOptions from './CardsToCodeOptions';
-
-export default interface Backend
+interface CardsToCodeOptions
 {
-	type: string;
-	name: string;
-	
-	blocks:
-	{
-		[type: string]: BlockConfig
-	};
-	
-	// Ordering of the cards deck
-	cardsDeckOrder: List<List<string>>;
-	
-	queryToCode(
-		query: Query,
-		options: CardstoCodeOptions
-  ): string;
-	
-	codeToQuery(code: string): Query;
-	
-	// TODO syntax highlighting
-	
-	// function to get transform bars?
-	// autocomplete?
+  allFields?: boolean; // amend the final Select card to include all possible fields.
+  limit?: number;
+  count?: boolean;
+  transformAliases?: boolean; // if true, scan the top Select for Transforms, and add an alias row using the transform's ID
+  replaceInputs?: boolean; // replaces occurences of inputs with their values
 }
+
+export default CardsToCodeOptions;
