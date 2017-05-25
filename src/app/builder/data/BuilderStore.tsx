@@ -88,8 +88,6 @@ export class BuilderStateClass
 
   isDirty: boolean = false;
 
-  parseTreeReq: XMLHttpRequest = null;
-
   resultsState: ResultsState = _ResultsState();
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}

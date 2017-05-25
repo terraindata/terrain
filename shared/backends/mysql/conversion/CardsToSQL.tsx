@@ -63,9 +63,9 @@ export interface Options {
   replaceInputs?: boolean; // replaces occurences of inputs with their values
 }
 
-class TQLConverter
+class CardsToSQL
 {
-  static toTQL(query: BuilderTypes.Query, options: Options = {}): string
+  static toSQL(query: BuilderTypes.Query, options: Options = {}): string
   {
     let {cards, inputs} = query;
 
@@ -199,7 +199,7 @@ class TQLConverter
             let {alias, value} = field;
             if (typeof value !== 'string')
             {
-              value = TQLConverter._parse(value);
+              value = CardsToSQL._parse(value);
             }
             // replace all instances in the transform inputs with the alias'd content
             transformInputs = transformInputs.map((transformInput) =>
@@ -329,4 +329,4 @@ class TQLConverter
 
 }
 
-export default TQLConverter;
+export default CardsToSQL;

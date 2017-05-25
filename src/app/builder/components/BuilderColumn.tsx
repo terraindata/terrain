@@ -214,7 +214,7 @@ const BuilderColumn = React.createClass<any, any>(
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
           tqlCardsInSync={query.tqlCardsInSync}
-          parseTreeError={query.parseTreeError}
+          parseError={query.parseError}
         />;
 
       case COLUMNS.Inputs:

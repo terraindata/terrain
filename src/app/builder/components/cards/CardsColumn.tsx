@@ -74,7 +74,7 @@ export interface Props
   addColumn: (number, string?) => void;
   columnIndex: number;
   tqlCardsInSync: boolean;
-  parseTreeError: string;
+  parseError: string;
 
   containerWidth?: number;
   containerHeight?: number;
@@ -190,7 +190,7 @@ class CardsColumn extends PureClasss<Props>
         className={classNames({
           'cards-column': true,
           'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
-          'cards-column-has-tql-parse-error': !!this.props.parseTreeError,
+          'cards-column-has-tql-parse-error': !!this.props.parseError,
         })}
       >
         {

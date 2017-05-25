@@ -115,36 +115,29 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     }>,
   ) =>
   {
+    let {query} = action.payload;
     if (state.loadingXhr !== action.payload.xhr)
     {
       // wrong XHR
       return state;
     }
 
-    if (!action.payload.query.tqlCardsInSync)
+    if (!action.payload.query.cardsAndCodeInSync)
     {
       if (action.payload.query.tql)
       {
-        state = state
-          .set('parseTreeReq',
-            AjaxM1.parseTree(
-              action.payload.query.tql,
-              state.db.id + "",
-              Actions.parseTreeLoaded,
-              Actions.parseTreeError,
-            ).xhr,
-          );
+        // TODO MOD convert
       }
       else
       {
         // blank
-        action.payload.query = action.payload.query
-          .set('tqlCardsInSync', true);
+        query = query
+          .set('cardsAndCodeInSync', true);
       }
     }
 
     return state
-      .set('query', action.payload.query)
+      .set('query', query)
       .set('loading', false)
       .set('loadingXhr', null)
       .set('loadingVariantId', '')
@@ -313,71 +306,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     }>,
   ) =>
   {
-    state.parseTreeReq && state.parseTreeReq.abort();
-    if(state.db.source === 'm1')
-    {
-      state = state
-        .set('parseTreeReq',  // for SQL parsing
-          AjaxM1.parseTree(
-            action.payload.tql,
-            state.db.id + "",
-            Actions.parseTreeLoaded,
-            Actions.parseTreeError,
-          ).xhr,
-        );
-    }
+    // TODO MOD convert
+    
     return state
       .update('query', (query) =>
         query
-          .set('tql', action.payload.tql)
-          .set('tqlCardsInSync', false)
-          .set('parseTreeError', null),
+          .set('tql', action.payload.tql),
       )
   },
-
-[ActionTypes.parseTreeLoaded]:
-  (
-    state: BuilderState,
-    action: Action<{
-      response: {
-        result?: any,
-        error?: string,
-      },
-    }>,
-  ) =>
-  {
-    const {error, result} = action.payload.response;
-    if (error)
-    {
-      return state
-        .setIn(['query', 'parseTreeError'], error)
-        .set('parseTreeReq', null)
-        .setIn(['query', 'tqlCardsInSync'], false);
-    }
-
-    return state
-      .update('query',
-        (query) =>
-          query
-            .set('cards',
-              TQLToCards.convert(result, state.query.cards),
-            )
-            .set('tqlCardsInSync', true),
-      )
-      .set('parseTreeReq', null);
-  },
-
-[ActionTypes.parseTreeError]:
-  (
-    state: BuilderState,
-    action: Action<{
-      errorMessage: string,
-    }>,
-  ) =>
-    state
-      .setIn(['query', 'parseTreeError'], action.payload.errorMessage || true)
-      .set('parseTreeReq', null)
-      .setIn(['query', 'tqlCardsInSync'], false),
 
 [ActionTypes.hoverCard]:
   (state: BuilderState, action: Action<{

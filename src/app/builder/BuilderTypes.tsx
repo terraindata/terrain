@@ -142,8 +142,8 @@ export module BuilderTypes
     tql: string = '';
     deckOpen: boolean = true;
 
-    tqlCardsInSync: boolean = false;
-    parseTreeError: string = null;
+    cardsAndCodeInSync: boolean = false;
+    parseError: string = null;
     
     
     dbFields = ['id', 'parent', 'name', 'status', 'type'];
@@ -1555,51 +1555,6 @@ export module BuilderTypes
 
   // Set the "type" field for all blocks equal to its key
   _.map(Blocks as ({[card: string]: any}), (v, i) => Blocks[i].type = i);
-
-  export const CardsDeckOrdering =
-  [
-    [
-      Blocks.sfw,
-      Blocks.from,
-    ],
-    [
-      Blocks.as,
-      Blocks.count,
-      Blocks.avg,
-      Blocks.min,
-      Blocks.max,
-      Blocks.sum,
-      Blocks.distinct,
-    ],
-    [
-      Blocks.where,
-      Blocks.groupBy,
-      Blocks.having,
-      Blocks.sort,
-      Blocks.take,
-      Blocks.skip,
-    ],
-    [
-      Blocks.comparison,
-      Blocks.and,
-      Blocks.or,
-      Blocks.exists,
-      Blocks.not,
-    ],
-    [
-      Blocks.transform,
-      Blocks.score,
-    ],
-    [
-      Blocks.add,
-      Blocks.subtract,
-      Blocks.multiply,
-      Blocks.divide,
-    ],
-    [
-      Blocks.tql,
-    ],
-  ];
 
   // This creates a new instance of a card / block
   // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)

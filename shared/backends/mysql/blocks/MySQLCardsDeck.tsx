@@ -42,33 +42,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import CardsToCodeOptions from './CardsToCodeOptions';
+import * as Immutable from 'immutable';
 
-export default interface Backend
-{
-	type: string;
-	name: string;
-	
-	blocks:
-	{
-		[type: string]: BlockConfig
-	};
-	
-	// Ordering of the cards deck
-	cardsDeck: List<List<string>>;
-	
-	queryToCode(
-		query: Query,
-		options: CardstoCodeOptions
-  ): string;
-	
-	codeToQuery(
-		query: Query,
-		queryReady: (query: Query) => void
-	): Query;
-	
-	syntaxConfig: object;
-	
-	// function to get transform bars?
-	// autocomplete?
-}
+export default const MySQLCardsDeck =
+  Immutable.fromJS(
+  [
+    [
+      Blocks.sfw,
+      Blocks.from,
+    ],
+    [
+      Blocks.as,
+      Blocks.count,
+      Blocks.avg,
+      Blocks.min,
+      Blocks.max,
+      Blocks.sum,
+      Blocks.distinct,
+    ],
+    [
+      Blocks.where,
+      Blocks.groupBy,
+      Blocks.having,
+      Blocks.sort,
+      Blocks.take,
+      Blocks.skip,
+    ],
+    [
+      Blocks.comparison,
+      Blocks.and,
+      Blocks.or,
+      Blocks.exists,
+      Blocks.not,
+    ],
+    [
+      Blocks.transform,
+      Blocks.score,
+    ],
+    [
+      Blocks.add,
+      Blocks.subtract,
+      Blocks.multiply,
+      Blocks.divide,
+    ],
+    [
+      Blocks.tql,
+    ],
+  ]
+  );

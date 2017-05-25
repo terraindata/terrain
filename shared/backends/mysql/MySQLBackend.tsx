@@ -42,52 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// import * as _ from 'underscore';
-// import * as Immutable from 'immutable';
-// import Actions from './BuilderActions';
-// import { BuilderTypes } from './../BuilderTypes';
-// import List = Immutable.List;
-// import Map = Immutable.Map;
-// import Ajax from '../../util/Ajax';
-// import TQLToCards from '../../tql/TQLToCards';
-// import BuilderStore from './BuilderStore';
-// import Util from '../../util/Util';
 
-// export class BuilderCoordinator
-// {
-//   req: XMLHttpRequest = null;
+import CardsToCodeOptions from '../types/CardsToCodeOptions';
+import Backend from '../types/Backend';
+import MySQLCardsDeck from './blocks/MySQLCardsDeck';
+import CardsToSQL from './conversion/CardsToSQL';
+import MySQLBlocks from './blocks/MySQLBlocks';
+const synatxConfig = require('./syntax/SQLSyntaxConfig.json');
 
-//   constructor()
-//   {
-//     Util.bindAll(this);
-//   }
-
-//   handleTQLChange(tql: string)
-//   {
-//     if(this.req)
-//     {
-//       this.req.abort();
-//     }
-//     this.req = Ajax.parseTree(
-//       tql,
-//       BuilderStore.getState().db,
-//       this.handleParseTreeLoad,
-//       this.handleParseTreeError
-//     );
-//   }
-
-//   handleParseTreeLoad(response)
-//   {
-//     this.req = null;
-//     let cards = TQLToCards.convert(response.result);
-//     console.log(cards);
-//     Actions.change(Immutable.List(['query', 'cards']), cards);
-//   }
-
-//   handleParseTreeError(error)
-//   {
-//     console.log('error', error);
-//   }
-// }
-
-// export default BuilderCoordinator;
+export default class MySQLBackend implements Backend
+{
+	type = 'mysql';
+	name = 'MySQL';
+	
+	blocks = MySQLBlocks;
+	
+	// Ordering of the cards deck
+	cardsDeck = MySQLCardsDeck;
+	
+	queryToCode = CardsToSQL.toSQL;
+	
+	codeToQuery = SQLToCards;
+	
+	syntaxConfig = syntaxConfig;
+	
+	// function to get transform bars?
+	// autocomplete?
+}

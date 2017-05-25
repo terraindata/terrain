@@ -130,18 +130,6 @@ const BuilderActions =
     () =>
       $(ActionTypes.checkpoint, { }),
 
-  parseTreeLoaded:
-    (response) =>
-      $(ActionTypes.parseTreeLoaded, {
-        response,
-      }),
-
-  parseTreeError:
-    (error) =>
-      $(ActionTypes.parseTreeError, {
-        error,
-      }),
-
   changeResultsConfig:
     (resultsConfig) =>
       $(ActionTypes.changeResultsConfig, {

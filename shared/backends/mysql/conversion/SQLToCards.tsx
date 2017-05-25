@@ -53,7 +53,70 @@ import List = Immutable.List;
 import Map = Immutable.Map;
 const {Blocks, make} = BuilderTypes;
 
-export const TQLToCards =
+export default function SQLToCards(
+  query: Query,
+  queryReady: (query: Query) => void
+): Query
+{
+  const prevReq = query.getIn(['meta', 'parseTreeReq']);
+  prevReq && typeof prevReq.abort === 'function' && prevReq.abort();
+  
+  const req = AjaxM1.parseTree(
+    code,
+    query.db.id + "",
+    parseTreeLoaded,
+    parseTreeError,
+    query
+  ).xhr;
+  
+  return query
+    .set('code', code)
+    .set('cardsAndCodeInSync', false)
+    .setIn(['meta', 'parseTreeReq'], req);
+}
+
+
+const parseTreeLoaded = (response, query: Query) =>
+{
+  const {error, result} = response;
+  if (error)
+  {
+    return state
+      .setIn(['query', 'parseTreeError'], error)
+      .set('parseTreeReq', null)
+      .setIn(['query', 'tqlCardsInSync'], false);
+    return;
+  }
+
+  return state
+    .update('query',
+      (query) =>
+        query
+          .set('cards',
+            TQLToCards.convert(result, state.query.cards),
+          )
+          .set('tqlCardsInSync', true),
+    )
+    .set('parseTreeReq', null);
+    return;
+}
+
+  },
+
+[ActionTypes.parseTreeError]:
+  (
+    state: BuilderState,
+    action: Action<{
+      errorMessage: string,
+    }>,
+  ) =>
+    state
+      .setIn(['query', 'parseTreeError'], action.payload.errorMessage || true)
+      .set('parseTreeReq', null)
+      .setIn(['query', 'tqlCardsInSync'], false),
+
+
+const TQLToCards =
 {
   convert(statement: Statement, currentCards?: Cards): Cards
   {

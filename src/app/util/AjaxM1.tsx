@@ -272,7 +272,7 @@ export const Ajax =
       );
     },
 
-    parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
+    parseTree(tql: string, db: string, onLoad: (response: QueryResponse, context?: any) => void, onError?: (ev: Event, context?: any) => void, context?: any)
     {
       return Ajax._postMidway1('/get_tql_tree', {
           query_string: encode_utf8(tql),
@@ -288,20 +288,23 @@ export const Ajax =
             respData = JSON.parse(resp);
           } catch (e)
           {
-            onError && onError(resp as any);
+            onError && onError(resp as any, context);
             return;
           }
 
           if (respData.errorMessage)
           {
-            onError(respData);
+            onError(respData, context);
             return;
           }
 
-          onLoad(respData);
+          onLoad(respData, context);
         },
 
-        onError,
+        (e) =>
+        {
+          onError && onError(e, context);
+        }
       );
     },
 
