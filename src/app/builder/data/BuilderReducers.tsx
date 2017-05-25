@@ -46,11 +46,12 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
+import AjaxM1 from './../../util/AjaxM1';
 import {BuilderTypes} from './../BuilderTypes';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import {BuilderState} from './BuilderStore';
-import SharedTypes from '../../../../shared/SharedTypes';
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 {
@@ -62,7 +63,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       payload?: {
         variantId: ID,
         handleNoVariant: (id: ID) => void,
-        db: SharedTypes.Database,
+        db: BackendInstance,
       },
     },
   ) =>
@@ -110,7 +111,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     action: Action<{
       query: BuilderTypes.Query,
       xhr: XMLHttpRequest,
-      db: SharedTypes.Database,
+      db: BackendInstance,
     }>,
   ) =>
   {
@@ -126,7 +127,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       {
         state = state
           .set('parseTreeReq',
-            Ajax.parseTree(
+            AjaxM1.parseTree(
               action.payload.query.tql,
               state.db.id + "",
               Actions.parseTreeLoaded,
@@ -317,7 +318,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     {
       state = state
         .set('parseTreeReq',  // for SQL parsing
-          Ajax.parseTree(
+          AjaxM1.parseTree(
             action.payload.tql,
             state.db.id + "",
             Actions.parseTreeLoaded,

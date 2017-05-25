@@ -50,7 +50,7 @@ import * as React from 'react';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
@@ -75,7 +75,7 @@ class SchemaResults extends PureClasss<Props>
 
 		resultsState?: ResultsState;
 		resultsQuery?: BuilderTypes.Query;
-		resultsDb?: SharedTypes.Database;
+		resultsDb?: BackendInstance;
 	} = {
 		resultsState: _ResultsState(),
 	};

@@ -42,16 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-export module SharedTypes
+interface BackendInstance
 {
-	// TODO move to the back-ends section
-  export interface Database
-  {
-    id: string | number;
-    name: string;
-    type: string;
-    source: 'm1' | 'm2';
-  }
+  id: string | number;
+  name: string;
+  type: string;
+  source: 'm1' | 'm2';
 }
 
-export default SharedTypes;
+export default BackendInstance;

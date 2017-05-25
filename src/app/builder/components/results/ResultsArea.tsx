@@ -65,14 +65,14 @@ import InfiniteScroll from './../../../common/components/InfiniteScroll';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import {getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass} from './ResultsManager';
-import SharedTypes from './../../../../../shared/SharedTypes';
+import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 
 const RESULTS_PAGE_SIZE = 20;
 
 export interface Props
 {
   resultsState: ResultsState;
-  db: SharedTypes.Database;
+  db: BackendInstance;
   query: BuilderTypes.Query;
   canEdit: boolean;
   variantName: string;

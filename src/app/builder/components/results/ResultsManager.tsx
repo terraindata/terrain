@@ -51,7 +51,7 @@ import TQLConverter from '../../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import BuilderTypes from '../../BuilderTypes';
-import SharedTypes from './../../../../../shared/SharedTypes';
+import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
@@ -108,7 +108,7 @@ export interface Props
 {
   query: BuilderTypes.Query;
   resultsState: ResultsState;
-  db: SharedTypes.Database;
+  db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
@@ -163,7 +163,7 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  queryResults(query: BuilderTypes.Query, db: SharedTypes.Database)
+  queryResults(query: BuilderTypes.Query, db: BackendInstance)
   {
     if (!query || !db)
     {

@@ -50,7 +50,7 @@ import AuthStore from './../../auth/data/AuthStore';
 import RoleStore from './../../roles/data/RolesStore';
 import UserStore from './../../users/data/UserStore';
 import LibraryTypes from './../LibraryTypes';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Actions from './LibraryActions';
 import {CleanLibraryActionTypes, LibraryActionTypes} from './LibraryActionTypes';
 type Group = LibraryTypes.Group;
@@ -65,7 +65,7 @@ class LibraryStateC
 {
   loaded = false;
   loading = true;
-  dbs: List<SharedTypes.Database> = Immutable.List([]);
+  dbs: List<BackendInstance> = Immutable.List([]);
   dbsLoaded: boolean = false;
 
   groups: IMMap<ID, Group> = null;

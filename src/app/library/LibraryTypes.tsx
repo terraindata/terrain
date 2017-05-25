@@ -51,7 +51,7 @@ import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const {List, Map} = Immutable;
 import {BaseClass, New} from '../Classes';
-import SharedTypes from '../../../shared/SharedTypes';
+import BackendInstance from '../../../shared/backends/types/BackendInstance';
 
 export module LibraryTypes
 {
@@ -96,7 +96,7 @@ export module LibraryTypes
     status: ItemStatus = 'BUILD';
     type: ItemType;
     
-    db: SharedTypes.Database = {} as any;
+    db: BackendInstance = {} as any;
     
     dbFields = ['id', 'parent', 'name', 'status', 'type'];
     excludeFields= ['dbFields', 'excludeFields'];

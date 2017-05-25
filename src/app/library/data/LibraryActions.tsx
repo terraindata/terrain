@@ -46,7 +46,7 @@ const _ = require('underscore');
 import Util from '../../util/Util';
 import BuilderTypes from './../../builder/BuilderTypes';
 import LibraryTypes from './../LibraryTypes';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
 import {_LibraryState, LibraryState, LibraryStore} from './LibraryStore';
@@ -243,7 +243,7 @@ const Actions =
       $(ActionTypes.loadState, { state }),
 
   setDbs:
-    (dbs: List<SharedTypes.Database>, dbLoadFinished: boolean) =>
+    (dbs: List<BackendInstance>, dbLoadFinished: boolean) =>
       $(ActionTypes.setDbs, { dbs, dbLoadFinished }),
 
   // overwrites current state with state from server
