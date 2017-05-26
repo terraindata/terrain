@@ -132,6 +132,7 @@ class App
 
   public listen(port: number | undefined = this.config.port): http.Server
   {
+    winston.info('Listening on port ' + String(port));
     return this.app.listen(port);
   }
 
