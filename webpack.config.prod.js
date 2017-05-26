@@ -47,7 +47,6 @@ THE SOFTWARE.
 var webpack = require('webpack');
 var conf = require('./webpack.config');
 
-
 // Disable source map.
 delete conf.devtool;
 
@@ -58,11 +57,11 @@ conf.plugins = [
       'NODE_ENV': "'production'"
     },
     
-    'DEV': "false",
+    DEV: "false",
     
     // The server simultaneously serves the client and the client's requests.
-    'MIDWAY_HOST': "'//" + process.env.MIDWAY_HOST + ":40080'",
-    'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'"
+    MIDWAY_HOST: "'//" + process.env.MIDWAY_HOST + ":40080'",
+    TDB_HOST: "'//" + process.env.TDB_HOST + ":7344'"
   }),
 
   // Minify code.
@@ -70,12 +69,12 @@ conf.plugins = [
 ];
 
 // enable babel plugins on tsx loader
-if(conf.module.loaders[0].loader !== 'babel?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
+if(conf.module.rules[0].loader !== 'babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
 {
-  throw new Error('Expected first loader to be babel?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}} but found '
-    + conf.module.loaders[0].loader);
+  throw new Error('Expected first loader to be babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}} but found '
+    + conf.module.rules[0].loader);
 }
-conf.module.loaders[0].loader =
-  'babel?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements&minified=true!ts-loader?{"compilerOptions":{}}';
+conf.module.rules[0].loader =
+  'babel-loader?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements&minified=true!ts-loader?{"compilerOptions":{}}';
 
 module.exports = conf;
