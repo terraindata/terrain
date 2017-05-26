@@ -140,7 +140,7 @@ class ResultsArea extends PureClasss<Props>
 
     if (results)
     {
-      const result = results.get(expandedResultIndex);
+      result = results.get(expandedResultIndex);
     }
 
     if (!result)

@@ -99,7 +99,7 @@ export default class ResultsTable extends PureClasss<Props>
     const {resultsConfig} = props;
     let cols: IColumn[] = [];
 
-    if (resultsConfig)
+    if (resultsConfig.enabled)
     {
 
       if (resultsConfig.name)
