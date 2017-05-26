@@ -66,7 +66,10 @@ export default function SQLToCards(
     query.db.id + "",
     parseTreeLoaded,
     parseTreeError,
-    query
+    { // context
+      query,
+      queryReady,
+    }
   ).xhr;
   
   return query
@@ -76,44 +79,48 @@ export default function SQLToCards(
 }
 
 
-const parseTreeLoaded = (response, query: Query) =>
+const parseTreeLoaded = (response, context) =>
 {
+  const query: Query = context.query;
+  const queryReady: (query: Query) => void = context.queryReady;
+  
   const {error, result} = response;
+  
+  query = query.setIn(['meta', 'parseTreeReq'], null);
+  
   if (error)
   {
-    return state
-      .setIn(['query', 'parseTreeError'], error)
-      .set('parseTreeReq', null)
-      .setIn(['query', 'tqlCardsInSync'], false);
-    return;
+    query = query
+      .set('parseError', error)
+      .set('cardsAndCodeInSync', false);
+  }
+  else
+  {
+    query = query
+      .set('cards', TQLToCards.convert(result, state.query.cards))
+      .set('cardsAndCodeInSync', true);
   }
 
-  return state
-    .update('query',
-      (query) =>
-        query
-          .set('cards',
-            TQLToCards.convert(result, state.query.cards),
-          )
-          .set('tqlCardsInSync', true),
-    )
-    .set('parseTreeReq', null);
-    return;
+  // alert the state that the query needs to change
+  queryReady(query);
 }
 
-  },
+const parseTreeError = (error, context) =>
+{
+  // TODO MOD confirm what format the error comes back as
+  const query: Query = context.query;
+  const queryReady: (query: Query) => void = context.queryReady;
+  
+  const {error} = response;
+  
+  query = query.setIn(['meta', 'parseTreeReq'], null);
+  query = query
+    .set('parseError', (error && error.errorMessage) || error)
+    .set('cardsAndCodeInSync', false);
 
-[ActionTypes.parseTreeError]:
-  (
-    state: BuilderState,
-    action: Action<{
-      errorMessage: string,
-    }>,
-  ) =>
-    state
-      .setIn(['query', 'parseTreeError'], action.payload.errorMessage || true)
-      .set('parseTreeReq', null)
-      .setIn(['query', 'tqlCardsInSync'], false),
+  // alert the state that the query needs to change
+  queryReady(query);
+}
 
 
 const TQLToCards =
