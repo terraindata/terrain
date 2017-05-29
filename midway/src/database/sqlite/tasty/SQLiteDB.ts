@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import SQLGenerator from '../../../tasty/SQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
-import SQLGenerator from '../../SQLGenerator';
 import SQLiteClient from '../client/SQLiteClient';
 import SQLiteConfig from '../SQLiteConfig';
 

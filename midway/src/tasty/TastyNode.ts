@@ -60,6 +60,11 @@ export class TastyNode
       return new TastyNode('null', value);
     }
 
+    if (value instanceof Date)
+    {
+      return new TastyNode('date', value);
+    }
+
     const valueType = typeof value;
     if (valueType === 'number')
     {
@@ -74,7 +79,7 @@ export class TastyNode
       return new TastyNode('boolean', value);
     }
 
-    throw new Error('Trying to make a TastyNode from an unsupported value type.');
+    throw new Error('Trying to make a TastyNode from an unsupported value type: ' + valueType);
   }
 
   public type: string;
