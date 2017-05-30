@@ -211,7 +211,7 @@ Contains unit tests for Midway. test's directory structure mirrors that of midwa
 
 ## Packages and Imports
 
-### To install a package from npm
+### To install a package from npm (This is obsolete, use yarn instead)
 
 `npm install [package-name] --save`
 
