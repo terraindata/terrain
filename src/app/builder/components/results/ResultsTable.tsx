@@ -138,6 +138,7 @@ export default class ResultsTable extends PureClasss<Props>
             key: field,
             name: field,
             resizable: true,
+            width:120,
           }),
       );
     }
