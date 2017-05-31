@@ -197,14 +197,24 @@ class ResultsArea extends PureClasss<Props>
     return !query || (!query.tql && !query.cards.size);
   }
 
+  private isDatabaseEmpty(): boolean
+  {
+    return !this.props.db || !this.props.db.id;
+  }
+
   resultsFodderRange = _.range(0, 25);
 
   renderResults()
   {
-    if (this.isQueryEmpty())
+    if (this.isDatabaseEmpty())
     {
       return <InfoArea
-        large="Results will display here as you build your query."
+        large='The database is empty, please select the database.'
+      />;
+    } else if (this.isQueryEmpty())
+    {
+      return <InfoArea
+        large='Results will display here as you build your query.'
       />;
     }
 
@@ -377,6 +387,10 @@ column if you have set a custom results view.');
     if (resultsState.loading)
     {
       text = <span className="loading-text" />;
+    }
+    else if (this.isDatabaseEmpty())
+    {
+      text = 'Database is not selected';
     }
     else if (this.isQueryEmpty())
     {
