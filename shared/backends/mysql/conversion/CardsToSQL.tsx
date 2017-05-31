@@ -45,8 +45,10 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonSQL from '../syntax/CommonSQL';
-type ICard = BuilderTypes.ICard;
-type IBlock = BuilderTypes.IBlock;
+
+import {Block} from '../../../blocks/types/Block';
+import {Card} from '../../../blocks/types/Card';
+
 type IInput = BuilderTypes.IInput;
 
 const join = (j, index) => (index === 0 ? '' : j);
@@ -106,7 +108,7 @@ class CardsToSQL
     return cardsTql;
   }
 
-  private static _topFromCard(cards: List<ICard>, fn: (fromCard: ICard) => ICard): List<ICard>
+  private static _topFromCard(cards: List<Card>, fn: (fromCard: Card) => Card): List<Card>
   {
     // find top-level 'from' cards
     return cards.map((topCard) =>
@@ -123,14 +125,14 @@ class CardsToSQL
         }
       }
       return topCard;
-    }) as List<ICard>;
+    }) as List<Card>;
   }
 
-  private static applyOptions(cards, options): List<ICard>
+  private static applyOptions(cards, options): List<Card>
   {
     if (options.allFields)
     {
-      cards = this._topFromCard(cards, (fromCard: ICard) =>
+      cards = this._topFromCard(cards, (fromCard: Card) =>
         fromCard.update('fields',
           (fields: List<any>) =>
           {
@@ -145,7 +147,7 @@ class CardsToSQL
       );
     }
 
-    cards = this._topFromCard(cards, (fromCard: ICard) =>
+    cards = this._topFromCard(cards, (fromCard: Card) =>
     {
       // add a take card if none are present
       if (options.limit && !fromCard['cards'].some((card) => card.type === 'take'))
@@ -238,7 +240,7 @@ class CardsToSQL
     return cards;
   }
 
-  private static _cards(cards: List<ICard>, append?: string, options?: Options, isTop?: boolean): string
+  private static _cards(cards: List<Card>, append?: string, options?: Options, isTop?: boolean): string
   {
     const glue = append || '\n';
     return addTabs(cards.map(
@@ -246,7 +248,7 @@ class CardsToSQL
       ).join(glue)) + (options && options['excludeSuffix'] ? '' : glue);
   }
 
-  static _parse(block: IBlock, index?: number, isLast?: boolean, isTop?: boolean): string
+  static _parse(block: Block, index?: number, isLast?: boolean, isTop?: boolean): string
   {
     if (!block)
     {
@@ -278,7 +280,7 @@ class CardsToSQL
     return str;
   }
 
-  private static _value(field: string, block: IBlock)
+  private static _value(field: string, block: Block)
   {
     if (field === 'cards')
     {

@@ -42,80 +42,70 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import {Block} from '../../../shared/blocks/types/Block';
-import {Card} from '../../../shared/blocks/types/Card';
-
-import * as Immutable from 'immutable';
-import BuilderTypes from './BuilderTypes';
-import {BuilderState, BuilderStore} from './data/BuilderStore';
-import SchemaStore from '../schema/data/SchemaStore';
-
-export module BuilderHelpers
+// A Block is a card or a distinct piece / group of card pieces
+export interface Block extends IRecord<Block>
 {
-  export function getTermsForKeyPath(keyPath: KeyPath): List<string>
-  {
-    const state = BuilderStore.getState();
+  id: string;
+  type: string;
+  _isBlock: boolean;
 
-    const terms = getTermsForKeyPathHelper(keyPath, state);
+  // fields not saved on server
+  static: {
+    tql: TQLFn;
+    tqlGlue?: string;
+    topTql?: string;
+    accepts?: List<string>;
 
-    // TODO migrate inputs reduction to the Query class if we get a query class
-    const inputs = state.query && state.query.inputs;
-    if (inputs && inputs.size)
-    {
-      const inputTerms = inputs.map(
-        (input: BuilderTypes.IInput) => 'input.' + input.key,
-      ).toList();
-      if (terms)
-      {
-        return inputTerms.concat(terms).toList();
-      }
-      return inputTerms;
-    }
+    // remove this block if it contains a card and the card is removed
+    //  will not remove field if it is the last in its parents' list
+    removeOnCardRemove?: boolean;
 
-    return terms;
-  }
+    metaFields: string[];
 
-  function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
-  {
-    if (!keyPath.size)
-    {
-      return Immutable.List([]);
-    }
+    [field: string]: any;
+  };
 
-    let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
-
-    const block = BuilderStore.getState().getIn(keyPath);
-
-    if (block._isCard)
-    {
-      const card = block as Card;
-
-      if (card.static.getChildTerms)
-      {
-        terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
-      }
-
-      if (card.static.getNeighborTerms)
-      {
-        terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
-      }
-
-      if (card['cards'])
-      {
-        card['cards'].map(
-          (childCard: Card) =>
-          {
-            if (childCard.static.getParentTerms)
-            {
-              terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
-            }
-          },
-        );
-      }
-    }
-
-    return terms;
-  }
+  [field: string]: any;
 }
 
-export default BuilderHelpers;
+
+export interface BlockConfig
+{
+  static: {
+    tql: TQLFn;
+    tqlGlue?: string;
+    accepts?: List<string>;
+    removeOnCardRemove?: boolean;
+    metaFields?: string[];
+  };
+
+  [field: string]: any;
+}
+
+export const allBlocksMetaFields = ['id'];
+
+// helper function to populate common fields for an IBlock
+export const _block = (config: BlockConfig): Block =>
+{
+  const blockConfig: Block = _.extend({
+    id: '',
+    type: '',
+    _isBlock: true,
+  }, config);
+
+  if (blockConfig.static.metaFields)
+  {
+    blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
+  }
+  else
+  {
+    blockConfig.static.metaFields = allBlocksMetaFields;
+  }
+
+  return blockConfig;
+};
+
+export type TQLFn = string | ((block: Block) => string);
+
+
+export default Block;
