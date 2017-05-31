@@ -167,6 +167,7 @@ export module SchemaParser
     const indexes: IMMap<string, Index> = Map<string, Index>({});
 
     let tableNames = List<string>([]);
+    let columnIds = List<string>([]);
     let columnNamesByTable = Map<string, List<string>>([]);
 
     _.each((colsData as any),
@@ -185,6 +186,9 @@ export module SchemaParser
           tableNames = tableNames.push(table.name);
           database = database.set(
             'tableIds', database.tableIds.push(tableId),
+          );
+          database = database.set(
+            'databaseType', 'elastic',
           );
         }
 
@@ -207,11 +211,13 @@ export module SchemaParser
             (list) => list.push(column.name),
           );
 
-          tables = tables.setIn(
-            [tableId, 'columnIds'],
-            table.columnIds.push(column.id),
-          );
+          columnIds = columnIds.push(column.id);
         });
+
+        tables = tables.setIn(
+          [tableId, 'columnIds'],
+          columnIds,
+        );
       });
 
     setDbAction({

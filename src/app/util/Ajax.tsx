@@ -712,7 +712,7 @@ export const Ajax =
       {
         return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
       }
-      
+
       // TODO: For MySQL and other string queries, we should skip this step and send it as a string
       try
       {
@@ -810,12 +810,20 @@ export const Ajax =
         onError,
       );
     },
-    
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       return Ajax._reqMidway2('get', 'database/' + dbId + '/schema', {}, (response: any) => {
         try {
-          const cols: object = JSON.parse(response);
+          let cols: object = {};
+          if (typeof response === 'object')
+          {
+            cols = response;
+          }
+          else
+          {
+            cols = JSON.parse(response);
+          }
           onLoad(cols);
         }
         catch (e)
@@ -829,14 +837,14 @@ export const Ajax =
     {
       let m1Dbs: SharedTypes.Database[] = null;
       let m2Dbs: SharedTypes.Database[] = null;
-      
+
       const checkForLoaded = () =>
       {
         if(!m1Dbs || !m2Dbs)
         {
           return;
         }
-        
+
         let dbs: SharedTypes.Database[] = [];
         if(m1Dbs)
         {
@@ -847,10 +855,10 @@ export const Ajax =
           dbs = dbs.concat(m2Dbs);
         }
         onLoad(dbs, !!(m1Dbs && m2Dbs));
-      }
-      
+      };
+
       Ajax._postMidway1(
-        '/get_databases', 
+        '/get_databases',
         {
           db: 'information_schema',
         },
@@ -863,7 +871,7 @@ export const Ajax =
           }
           catch(e)
           {}
-          
+
           m1Dbs = [] as any;
           if(data)
           {
@@ -877,14 +885,14 @@ export const Ajax =
               })
             );
           }
-          
+
           checkForLoaded();
         }
       );
-      
+
       Ajax._reqMidway2(
         'get',
-        'database', 
+        'database',
         { },
         (dbs: [SharedTypes.Database]) =>
         {
