@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import {Block, TQLFn, allBlocksMetaFields} from './Block';
+import {Display} from '../displays/Display';
 
 export interface Card extends IRecord<Card>
 {
@@ -54,6 +55,7 @@ export interface Card extends IRecord<Card>
 
   // the following fields are excluded from the server save
   static: {
+    language: string;
     colors: string[];
     title: string;
     display: Display | Display[];
@@ -101,26 +103,27 @@ export interface Card extends IRecord<Card>
 }
 
 // Every Card definition must follow this interface
-export interface ICardConfig
+export interface CardConfig
 {
   [field: string]: any;
 
   static: {
+    language: string;
     colors: string[];
     title: string;
-    preview: string | ((c: ICard) => string);
+    preview: string | ((c: Card) => string);
     display: Display | Display[];
     isAggregate?: boolean;
-    manualEntry: IManualEntry;
+    // manualEntry: IManualEntry;
     tql: TQLFn;
     tqlGlue?: string;
-    topTql?: string | ((block: IBlock) => string);
+    topTql?: string | ((block: Block) => string);
     accepts?: List<string>;
     anythingAccepts?: boolean; // if any card accepts this card
 
-    getChildTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-    getNeighborTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-    getParentTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
+    getChildTerms?: (card: Card, schemaState) => List<string>;
+    getNeighborTerms?: (card: Card, schemaState) => List<string>;
+    getParentTerms?: (card: Card, schemaState) => List<string>;
 
     metaFields?: string[];
 
@@ -133,7 +136,7 @@ export interface ICardConfig
 export const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
 
 // helper function to populate random card fields
-export const _card = (config: ICardConfig) =>
+export const _card = (config: CardConfig) =>
 {
   config = _.extend(config, {
     id: '',

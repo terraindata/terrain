@@ -51,10 +51,10 @@ import Query from '../../../items/types/Query';
 import CommonSQL from '../syntax/CommonSQL';
 import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 
-type Cards = BuilderTypes.ICards;
-type Card = BuilderTypes.ICard;
-type CardString = BuilderTypes.CardString;
-type Block = BuilderTypes.IBlock;
+import {Card, Cards, CardString} from '../../../blocks/types/Card';
+import {Block} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
+
 const {Blocks, make} = BuilderTypes;
 
 export default function SQLToCards(
@@ -66,7 +66,7 @@ export default function SQLToCards(
   prevReq && typeof prevReq.abort === 'function' && prevReq.abort();
   
   const req = AjaxM1.parseTree(
-    code,
+    query.tql,
     query.db.id + "",
     parseTreeLoaded,
     parseTreeError,
@@ -77,7 +77,6 @@ export default function SQLToCards(
   ).xhr;
   
   return query
-    .set('code', code)
     .set('cardsAndCodeInSync', false)
     .setIn(['meta', 'parseTreeReq'], req);
 }
@@ -101,7 +100,7 @@ const parseTreeLoaded = (response, context) =>
   else
   {
     query = query
-      .set('cards', TQLToCards.convert(result, state.query.cards))
+      .set('cards', TQLToCards.convert(result, query.cards))
       .set('cardsAndCodeInSync', true);
   }
 

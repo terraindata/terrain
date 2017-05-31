@@ -42,72 +42,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// A Block is a card or a distinct piece / group of card pieces
-export interface Block extends IRecord<Block>
+import Backend from './types/Backend';
+import MySQLBackend from './mysql/MySQLBackend';
+import ElasticBackend from './elastic/ElasticBackend';
+
+export const AllBackendsArray: Backend[] = 
+[
+	MySQLBackend
+];
+
+export const AllBackendsMap: { [type: string]: Backend } =
 {
-  id: string;
-  type: string;
-  _isBlock: boolean;
-
-  // fields not saved on server
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    topTql?: string;
-    accepts?: List<string>;
-
-    // remove this block if it contains a card and the card is removed
-    //  will not remove field if it is the last in its parents' list
-    removeOnCardRemove?: boolean;
-
-    metaFields: string[];
-
-    [field: string]: any;
-  };
-
-  [field: string]: any;
-}
-
-
-export interface BlockConfig
-{
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    accepts?: List<string>;
-    removeOnCardRemove?: boolean;
-    metaFields?: string[];
-  };
-
-  [field: string]: any;
-}
-
-export const allBlocksMetaFields = ['id'];
-
-// helper function to populate common fields for an Block
-export const _block = (config: BlockConfig): Block =>
-{
-  const blockConfig: Block = _.extend({
-    id: '',
-    type: '',
-    _isBlock: true,
-  }, config);
-
-  if (blockConfig.static.metaFields)
-  {
-    blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
-  }
-  else
-  {
-    blockConfig.static.metaFields = allBlocksMetaFields;
-  }
-
-  return blockConfig;
+	mysql: MySQLBackend,
 };
 
-export type TQLFn = string | ((block: Block) => string);
-
-
-export default Block;
+AllBackendsArray.map(
+	backend =>
+	{
+		if(!AllBackendsMap[backend.type])
+		{
+			throw new Error('missing backend in map for backend ' + backend.type);
+		}
+	}
+);

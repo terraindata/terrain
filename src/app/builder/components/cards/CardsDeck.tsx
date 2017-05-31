@@ -53,10 +53,9 @@ import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-type ICard = BuilderTypes.ICard;
-type ICards = BuilderTypes.ICards;
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 
-const {CardsDeckOrdering} = BuilderTypes;
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 const {List, Map} = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
@@ -65,6 +64,7 @@ import { DragSource } from 'react-dnd';
 export interface Props
 {
   open: boolean;
+  language: string;
 }
 
 class CardsDeck extends PureClasss<Props>
@@ -92,6 +92,13 @@ class CardsDeck extends PureClasss<Props>
 
   render()
   {
+    const ordering = AllBackendsMap[this.props.language];
+    
+    if (ordering === undefined)
+    {
+      throw new Error('Unable to find backend of type ' + this.props.language);
+    }
+    
     return (
       <div
         className="cards-deck"
@@ -112,13 +119,13 @@ class CardsDeck extends PureClasss<Props>
           className="cards-deck-inner"
         >
           {
-            CardsDeckOrdering.map((group: ICard[], index) =>
+            ordering.map((group: Card[], index) =>
               <div
                 className="cards-deck-group"
                 key={index}
               >
                 {
-                  group.map((card: ICard) =>
+                  group.map((card: Card) =>
                     <CardDeckCard
                       card={card}
                       search={this.state.search}
@@ -137,7 +144,7 @@ class CardsDeck extends PureClasss<Props>
 
 interface CardProps
 {
-  card: ICard;
+  card: Card;
   search: string;
   key: string;
 

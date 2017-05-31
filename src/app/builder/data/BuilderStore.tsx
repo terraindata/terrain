@@ -54,6 +54,7 @@ import {_ResultsState, ResultsState} from '../components/results/ResultsManager'
 import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes';
 
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import { Card, Cards } from '../../../../shared/blocks/types/Card';
 import BuilderTypes from './../BuilderTypes';
 
 export class BuilderStateClass
@@ -79,7 +80,7 @@ export class BuilderStateClass
   db: BackendInstance = {} as any;
 
   // TODO move
-  manual = Map<ID, BuilderTypes.ICards>({});
+  manual = Map<ID, Cards>({});
   // Card examples used in the manual are stored here.
 
   draggingCardItem: CardItem = false;

@@ -42,18 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import {Card, CardString} from '../../../../shared/blocks/types/Card';
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import { Display } from '../../builder/BuilderDisplays';
 import { BuilderTypes } from '../../builder/BuilderTypes';
-import Card from '../../builder/components/cards/Card';
+import CardComponent from '../../builder/components/cards/CardComponent';
 import Util from '../../util/Util';
 
 export interface Props
 {
-  value: BuilderTypes.CardString;
+  value: CardString;
   keyPath: KeyPath;
   canEdit: boolean;
   className: string;
@@ -80,7 +82,8 @@ class BuilderTextboxCards extends React.Component<Props, any>
     // return this.props.value && this.props.value['type'] === 'creating';
   }
 
-  render() {
+  render()
+  {
     if (this.isText() || this.isCreating() || this.props.value['closed'])
     {
       return null;
@@ -92,10 +95,10 @@ class BuilderTextboxCards extends React.Component<Props, any>
         'builder-tb-cards-area': true,
         [this.props.className]: !!this.props.className,
       })} ref="tb">
-        <Card
+        <CardComponent
           {...this.props}
           singleCard={true}
-          card={this.props.value as BuilderTypes.ICard}
+          card={this.props.value as Card}
           index={null}
           display={this.props.display}
         />

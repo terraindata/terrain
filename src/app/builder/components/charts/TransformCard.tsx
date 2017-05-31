@@ -54,6 +54,7 @@ import PureClasss from './../../../common/components/PureClasss';
 import { BuilderTypes } from './../../BuilderTypes';
 import TransformCardChart from './TransformCardChart';
 const Dimensions = require('react-dimensions');
+import { Card, CardString } from '../../../../../shared/blocks/types/Card';
 
 const NUM_BARS = 1000;
 
@@ -151,11 +152,11 @@ class TransformCard extends PureClasss<Props>
     ]);
   }
 
-  findTableForAlias(data: BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias: string): string
+  findTableForAlias(data: Block | List<Block>, alias: string): string
   {
     if (Immutable.List.isList(data))
     {
-      const list = data as List<BuilderTypes.IBlock>;
+      const list = data as List<Block>;
       for (let i = 0; i < list.size; i ++)
       {
         const table = this.findTableForAlias(list.get(i), alias);
@@ -194,7 +195,7 @@ class TransformCard extends PureClasss<Props>
   }
 
   // TODO move the bars computation to a higher level
-  computeBars(input: BuilderTypes.CardString)
+  computeBars(input: CardString)
   {
     // TODO consider putting the query in context
     const {builderState} = this.props;
@@ -228,7 +229,7 @@ class TransformCard extends PureClasss<Props>
     }
     else if (input && input._isCard)
     {
-      const card = input as BuilderTypes.ICard;
+      const card = input as Card;
       if (card.type === 'score' && card['weights'].size)
       {
         // only case we know how to handle so far is a score card with a bunch of fields

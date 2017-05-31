@@ -65,7 +65,7 @@ export interface Props
   keyPath: KeyPath;
   data: any; // record
   display?: Display | Display[];
-
+  language: string;
   canEdit: boolean;
 
   parentData?: any;
@@ -115,6 +115,7 @@ class BuilderComponent extends PureClasss<Props>
             helpOn={this.props.helpOn}
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
+            language={this.props.language}
           />,
         ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -182,6 +183,7 @@ class BuilderComponent extends PureClasss<Props>
           columnIndex={this.props.columnIndex}
           accepts={st && st.accepts}
           singleChild={d.singleChild}
+          language={this.props.language}
         />;
       break;
       case DisplayType.CARDTEXT:
@@ -199,6 +201,7 @@ class BuilderComponent extends PureClasss<Props>
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
           display={d}
+          language={this.props.language}
         />;
       break;
       case DisplayType.DROPDOWN:
@@ -234,6 +237,7 @@ class BuilderComponent extends PureClasss<Props>
                 data={data}
                 canEdit={this.props.canEdit}
                 parentData={this.props.parentData}
+                language={this.props.language}
               />
             }
             <div
@@ -248,6 +252,7 @@ class BuilderComponent extends PureClasss<Props>
                 helpOn={this.props.helpOn}
                 addColumn={this.props.addColumn}
                 columnIndex={this.props.columnIndex}
+                language={this.props.language}
               />
             </div>
             { !d.below ? null :
@@ -263,6 +268,7 @@ class BuilderComponent extends PureClasss<Props>
                   helpOn={this.props.helpOn}
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
+                  language={this.props.language}
                 />
               </div>
             }
@@ -376,6 +382,7 @@ class BuilderComponent extends PureClasss<Props>
           display={d}
           autoDisabled={d.autoDisabled}
           autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}
+          language={this.props.language}
           {...{
             keyPath,
             value,

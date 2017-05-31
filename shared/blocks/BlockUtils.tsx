@@ -46,9 +46,12 @@ import * as Immutable from 'immutable';
 import Map = Immutable;
 import List = Immutable;
 
+import {Block} from './types/Block';
+import {Card} from './types/Card';
+
 module BlockUtils
 {
-  export function getChildIds(_block: IBlock): IMMap<ID, boolean>
+  export function getChildIds(_block: Block): IMMap<ID, boolean>
   {
     let map = Map<ID, boolean>({});
 
@@ -66,12 +69,12 @@ module BlockUtils
   }
 
   export function forAllCards(
-    block: IBlock | List<IBlock>,
-    fn: (card: ICard, keyPath: KeyPath) => void,
+    block: Block | List<Block>,
+    fn: (card: Card, keyPath: KeyPath) => void,
   ) {
     forAllBlocks(
       block,
-      (block: IBlock, keyPath: KeyPath) =>
+      (block: Block, keyPath: KeyPath) =>
       {
         if (block['_isCard'])
         {
@@ -82,8 +85,8 @@ module BlockUtils
   }
 
   export function forAllBlocks(
-    block: IBlock | List<IBlock>,
-    fn: (block: IBlock, keyPath: KeyPath) => void,
+    block: Block | List<Block>,
+    fn: (block: Block, keyPath: KeyPath) => void,
     keyPath: KeyPath = List([]),
     stopAtFirstBlock?: boolean,
     excludeWrappedCards?: boolean,
@@ -93,7 +96,7 @@ module BlockUtils
     {
       if (block['_isBlock'])
       {
-        fn(block as IBlock, keyPath);
+        fn(block as Block, keyPath);
       }
       if (
         Immutable.Iterable.isIterable(block)
@@ -106,7 +109,7 @@ module BlockUtils
             if (!excludeWrappedCards || key !== 'cards')
             {
               forAllBlocks(
-                b as IBlock,
+                b as Block,
                 fn,
                 keyPath.push(key),
                 stopAtFirstBlock,
@@ -119,7 +122,7 @@ module BlockUtils
     }
   }
 
-  export function transformAlias(transformCard: ICard): string
+  export function transformAlias(transformCard: Card): string
   {
     return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
   }

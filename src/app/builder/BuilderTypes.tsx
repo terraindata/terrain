@@ -49,6 +49,9 @@ const List = Immutable.List;
 const L = () => List([]);
 const Map = Immutable.Map;
 
+import {Block, TQLFn} from '../../../shared/blocks/types/Block';
+import {Card, Cards} from '../../../shared/blocks/types/Card';
+
 import Util from '../util/Util';
 import ScoreBar from './components/charts/ScoreBar';
 // import TransformCardComponent from './components/charts/TransformCard';
@@ -88,184 +91,11 @@ export module BuilderTypes
   // The following large section defines every card
   //  and every piece of every card.
 
-  // IBlock is a card or a distinct piece / group of card pieces
-  export interface IBlock extends IRecord<IBlock>
-  {
-    id: string;
-    type: string;
-    _isBlock: boolean;
-
-    // fields not saved on server
-    static: {
-      tql: (string | ((block: IBlock) => string));
-      tqlGlue?: string;
-      topTql?: string;
-      accepts?: List<string>;
-
-      // remove this block if it contains a card and the card is removed
-      //  will not remove field if it is the last in its parents' list
-      removeOnCardRemove?: boolean;
-
-      metaFields: string[];
-
-      [field: string]: any;
-    };
-
-    [field: string]: any;
-  }
-
-  export interface ICard extends IRecord<ICard>
-  {
-    id: string;
-    type: string;
-    _isCard: boolean;
-    _isBlock: boolean;
-    closed: boolean;
-
-    // the following fields are excluded from the server save
-    static: {
-      colors: string[];
-      title: string;
-      display: Display | Display[];
-
-      isAggregate: boolean;
-
-      // the format string used for generating tql
-      // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
-      // - arrays/Lists are joined with "," by default
-      // - to join List with something else, specify a tqlGlue
-      // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map in CommonSQL
-      //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
-      // - topTql is the tql to use if this card is at the top level of a query
-      tql: string | ((block: IBlock) => string);
-      tqlGlue?: string;
-      topTql?: string;
-
-      anythingAccepts?: boolean;
-
-      // returns an object with default values for a new card
-      init?: () => {
-        [k: string]: any;
-      };
-
-      // given a card, return the "terms" it generates for autocomplete
-      getChildTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-      getNeighborTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-      getParentTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-        // returns terms for its parent and its neighbors (but not its parent's neighbors)
-
-      preview: string | ((c: ICard) => string);
-      // The BuilderTypes.getPreview function constructs
-      // a preview from a card object based on this string.
-      // It replaces anything within [] with the value for that key.
-      // If an array of objects, you can specify: [arrayKey.objectKey]
-      // and it will map through and join the values with ", ";
-      manualEntry: IManualEntry;
-
-      // a list of which fields on this card are just metadata, e.g. 'closed'
-      metaFields: string[];
-    };
-  }
-
-  export type ICards = List<ICard>;
-  export type CardString = string | ICard;
-
-  interface IBlockConfig
-  {
-    static: {
-      tql: TQLFn;
-      tqlGlue?: string;
-      accepts?: List<string>;
-      removeOnCardRemove?: boolean;
-      metaFields?: string[];
-    };
-
-    [field: string]: any;
-  }
-
-  const allBlocksMetaFields = ['id'];
-
-  // helper function to populate common fields for an IBlock
-  const _block = (config: IBlockConfig): IBlock =>
-  {
-    const blockConfig: IBlock = _.extend({
-      id: '',
-      type: '',
-      _isBlock: true,
-    }, config);
-
-    if (blockConfig.static.metaFields)
-    {
-      blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
-    }
-    else
-    {
-      blockConfig.static.metaFields = allBlocksMetaFields;
-    }
-
-    return blockConfig;
-  };
-
-  type TQLFn = string | ((block: IBlock) => string);
-
-  // Every Card definition must follow this interface
-  interface ICardConfig
-  {
-    [field: string]: any;
-
-    static: {
-      colors: string[];
-      title: string;
-      preview: string | ((c: ICard) => string);
-      display: Display | Display[];
-      isAggregate?: boolean;
-      manualEntry: IManualEntry;
-      tql: TQLFn;
-      tqlGlue?: string;
-      topTql?: string | ((block: IBlock) => string);
-      accepts?: List<string>;
-      anythingAccepts?: boolean; // if any card accepts this card
-
-      getChildTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-      getNeighborTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-      getParentTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
-
-      metaFields?: string[];
-
-      init?: () => {
-        [k: string]: any;
-      };
-    };
-  }
-
-  const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
-
-  // helper function to populate random card fields
-  const _card = (config: ICardConfig) =>
-  {
-    config = _.extend(config, {
-      id: '',
-      _isCard: true,
-      _isBlock: true,
-      closed: false,
-    });
-
-    if (config.static.metaFields)
-    {
-      config.static.metaFields = config.static.metaFields.concat(allCardsMetaFields);
-    }
-    else
-    {
-      config.static.metaFields = allCardsMetaFields;
-    }
-
-    return config;
-  };
-
+  
   // a card that contains other cards
-  export interface IWrapperCard extends ICard
+  export interface IWrapperCard extends Card
   {
-    cards: ICards;
+    cards: Cards;
   }
 
   // config to define such a card
@@ -274,8 +104,8 @@ export module BuilderTypes
     colors: string[];
     title: string;
     manualEntry: IManualEntry;
-    getChildTerms?: (card: ICard) => List<string>;
-    getNeighborTerms?: (card: ICard) => List<string>;
+    getChildTerms?: (card: Card) => List<string>;
+    getNeighborTerms?: (card: Card) => List<string>;
     display?: Display | Display[];
     tql: TQLFn;
     tqlGlue?: string;
@@ -574,7 +404,7 @@ export module BuilderTypes
       aliasWasSuggested: false,
 
       static: {
-        tql: (tableBlock: IBlock) =>
+        tql: (tableBlock: Block) =>
         {
           let suffix = '';
           if (tableBlock['alias'])
@@ -630,7 +460,7 @@ export module BuilderTypes
         ]),
 
         getChildTerms:
-          (card: ICard) =>
+          (card: Card) =>
             card['fields'].reduce(
               (list: List<string>, fieldBlock: {field: CardString}): List<string> =>
               {
@@ -696,7 +526,7 @@ export module BuilderTypes
         }),
 
         getParentTerms:
-          (card: ICard, schemaState: SchemaTypes.SchemaState) =>
+          (card: Card, schemaState: SchemaTypes.SchemaState) =>
             card['tables'].reduce(
               (list: List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
@@ -861,7 +691,7 @@ export module BuilderTypes
       static: {
         title: 'Compare',
         colors: ['#476aa3', '#a5c6fc'],
-        preview: (c: ICard) => {
+        preview: (c: Card) => {
           let first = c['first'];
           let second = c['second'];
           if (first._isCard)
@@ -1437,7 +1267,7 @@ export module BuilderTypes
 
   // This creates a new instance of a card / block
   // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
-  export const make = (block: IBlock, extraConfig?: {[key: string]: any}) =>
+  export const make = (block: Block, extraConfig?: {[key: string]: any}) =>
   {
     const {type} = block;
 
@@ -1581,7 +1411,7 @@ export module BuilderTypes
   };
 
   // returns preview for a given card
-  export function getPreview(card: ICard): string
+  export function getPreview(card: Card): string
   {
     if (!card)
     {

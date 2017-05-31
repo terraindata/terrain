@@ -59,7 +59,7 @@ import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import BuilderTypes from '../BuilderTypes';
 import Ajax from './../../util/Ajax';
-type Query = BuilderTypes.Query;
+import Query from '../../../../shared/items/types/Query';
 
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -208,6 +208,7 @@ const BuilderColumn = React.createClass<any, any>(
     {
       case COLUMNS.Builder:
         return <CardsColumn
+          queryType={query.language}
           cards={query.cards}
           deckOpen={query.deckOpen}
           canEdit={canEdit}

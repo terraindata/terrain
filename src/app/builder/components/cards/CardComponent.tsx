@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Card.less');
+require('./CardStyle.less');
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -58,7 +58,8 @@ import Actions from '../../data/BuilderActions';
 import LayoutManager from '../layout/LayoutManager';
 import PureClasss from './../../../common/components/PureClasss';
 import ManualPopup from './../../../manual/components/ManualPopup';
-import { Display } from './../../BuilderDisplays';
+import { Display } from './../../../../../shared/blocks/displays/Display';
+import { Card } from '../../../../../shared/blocks/types/Card';
 import BuilderTypes from './../../BuilderTypes';
 import {BuilderScrollState, BuilderScrollStore} from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
@@ -75,7 +76,7 @@ const CARD_HEIGHT_MAP: {[id: string]: number} = {};
 
 export interface Props
 {
-  card: BuilderTypes.ICard;
+  card: Card;
   index: number;
   singleCard?: boolean; // for BuilderTextboxCards
   singleChild?: boolean; // for cards like Where that are wrappers but only accept 1 child
@@ -95,7 +96,7 @@ export interface Props
   display?: Display;
 }
 
-class _Card extends PureClasss<Props>
+class _CardComponent extends PureClasss<Props>
 {
   state: {
     selected: boolean;
@@ -180,7 +181,7 @@ class _Card extends PureClasss<Props>
     });
   }
 
-  getCardTerms(card: BuilderTypes.ICard): List<string>
+  getCardTerms(card: Card): List<string>
   {
     let terms: List<string> = Immutable.List([]);
 
@@ -462,6 +463,7 @@ class _Card extends PureClasss<Props>
             open={true}
             onClose={this.handleCardToolClose}
             accepts={this.props.display && this.props.display.accepts}
+            language={this.props.card.lanugage}
           />
         </div>
       );
@@ -474,6 +476,7 @@ class _Card extends PureClasss<Props>
       addColumn={this.props.addColumn}
       columnIndex={this.props.columnIndex}
       keyPath={this.getKeyPath()}
+      language={this.props.card.lanugage}
     />;
 
     const {card} = this.props;
@@ -631,6 +634,6 @@ const dragCollect = (connect, monitor) =>
   connectDragPreview: connect.dragPreview(),
 });
 
-export const Card = DragSource('CARD', cardSource, dragCollect)(_Card);
+export const CardComponent = DragSource('CARD', cardSource, dragCollect)(_CardComponent);
 
-export default Card;
+export default CardComponent;

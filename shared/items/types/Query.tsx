@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import {Cards} from '../../blocks/types/Card';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -51,6 +52,7 @@ class QueryC
   parent: number = -1;
   name: string = '';
   status: 'BUILD' | 'LIVE' = 'BUILD';
+  language: 'elastic';
   
   id: ID = -1;
   variantId: number = -1;
@@ -63,7 +65,7 @@ class QueryC
     type: string;
   } = {} as any;
 
-  cards: ICards = List([]);
+  cards: Cards = List([]);
   inputs: List<any> = List([]);
   resultsConfig: IResultsConfig = null;
   tql: string = '';
@@ -82,7 +84,7 @@ const Query_Record = Immutable.Record(new QueryC());
 export interface Query extends QueryC, IRecord<Query> {}
 
 export const _Query = (config?: Object) => {
-  config = Util.extendId(config || {});
+  config = config || {};
   config['cards'] = BuilderTypes.recordFromJS(config['cards'] || []);
   config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || []);
   config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);

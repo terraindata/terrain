@@ -61,8 +61,9 @@ import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
+import {Block} from '../../../../shared/blocks/types/Block';
 
-type CardString = BuilderTypes.CardString;
+type CardString = CardString;
 
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
@@ -71,9 +72,10 @@ const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon')
 
 export interface Props
 {
-  value: BuilderTypes.CardString | number;
+  value: CardString | number;
   keyPath: KeyPath; // keypath of value
   onChange?: (value: string | number) => void;
+  language: string;
 
   id?: string; // TODO remove
 
@@ -354,7 +356,7 @@ class BuilderTextbox extends PureClasss<Props>
       return null;
     }
 
-    const card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
+    const card: Card = this.props.value as Card;
     // var cards = this.props.value['cards'];
     // if(cards.size)
     // {

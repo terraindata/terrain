@@ -60,14 +60,14 @@ import CardsArea from './CardsArea';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 
-type ICard = BuilderTypes.ICard;
-type ICards = BuilderTypes.ICards;
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 const {List, Map} = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props
 {
-  cards: ICards;
+  cards: Cards;
+  language: string;
   deckOpen: boolean;
   queryId: ID;
   canEdit: boolean;
@@ -197,6 +197,7 @@ class CardsColumn extends PureClasss<Props>
           canHaveDeck &&
             <CardsDeck
               open={this.props.deckOpen}
+              language={this.props.language}
             />
         }
         <div
@@ -220,6 +221,7 @@ class CardsColumn extends PureClasss<Props>
             />
             <CardsArea
               cards={cards}
+              language={this.props.language}
               keyPath={keyPath}
               canEdit={canEdit}
               addColumn={this.props.addColumn}
