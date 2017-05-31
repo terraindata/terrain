@@ -127,8 +127,10 @@ export class SQLiteDB implements TastyDB
     return results;
   }
 
-  public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
+  public async upsert(table: TastyTable, elements: object[]): Promise<object[]>
   {
+    const query = new TastyQuery(table).upsert(elements);
+    const statements: string[] = this.generate(query);
     const primaryKeys = table.getPrimaryKeys();
 
     const lastIDs: number[] = [];

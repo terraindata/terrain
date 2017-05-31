@@ -123,7 +123,7 @@ export class ElasticDB implements TastyDB
         return result.hits.hits;
       case 'upsert':
         const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
-        result = await this.upsert(table, query, query.params);
+        result = await this.upsert(table, query.params);
         return result;
       default:
         throw new Error('Unknown query command ' + JSON.stringify(query));
@@ -149,7 +149,7 @@ export class ElasticDB implements TastyDB
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsert(table: TastyTable, query: ElasticQuery, elements: object[])
+  public async upsert(table: TastyTable, elements: object[])
   {
     const upserted = await this.upsertObjects(table, elements);
     const primaryKeys = table.getPrimaryKeys();
