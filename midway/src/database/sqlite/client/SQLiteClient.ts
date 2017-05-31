@@ -72,19 +72,19 @@ class SQLiteClient
 
   public run(sql: string, params?: any[], callback?: (err: Error, resolve: object) => void): sqlite3.Database
   {
-    this.controller.log('run', sql);
+    this.controller.log('SQLiteClient.run', sql, params);
     return this.delegate.run(sql, params, callback);
   }
 
-  public all(sql: string, callback?: (err: Error, rows: any[]) => void): sqlite3.Database
+  public all(sql: string, params?: any[], callback?: (err: Error, rows: any[]) => void): sqlite3.Database
   {
-    this.controller.log('all', sql);
-    return this.delegate.all(sql, callback);
+    this.controller.log('SQLiteClient.all', sql, params);
+    return this.delegate.all(sql, params, callback);
   }
 
   public close(callback?: (err: Error) => void): void
   {
-    this.controller.log('close');
+    this.controller.log('SQLiteClient.close');
     return this.delegate.close(callback);
   }
 }
