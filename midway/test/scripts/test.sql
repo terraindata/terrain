@@ -1,0 +1,17 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE versions (id integer PRIMARY KEY, objectType text NOT NULL, objectId integer NOT NULL, object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
+INSERT INTO "versions" VALUES(1,'items',2,'{""id"":2,""meta"":""#realmusician"",""name"":""Updated Item"",""parent"":0,""status"":""LIVE"",""type"":""GROUP""}','2017-05-31 00:22:04',1);
+CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, parent integer, status text, type text);
+INSERT INTO "items" VALUES(1,'I won a Nobel prize! But Im more proud of my music','Al Gore',0,'Still Alive','ALGORITHM');
+INSERT INTO "items" VALUES(2,'#realmusician','Updated Item',0,'LIVE','GROUP');
+INSERT INTO "items" VALUES(3,'Are we an item?','Justin Bieber',0,'Baby','VARIANT');
+INSERT INTO "items" VALUES(4,NULL,'Test Item',NULL,'LIVE',NULL);
+INSERT INTO "items" VALUES(5,NULL,'Test Item',NULL,'LIVE',NULL);
+CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, dsn text NOT NULL, status text);
+INSERT INTO "databases" VALUES(1,'My ElasticSearch Instance','elastic','http://127.0.0.1:9200','CONNECTED');
+CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL, isSuperUser bool NOT NULL, name text NOT NULL, oldPassword text, password text NOT NULL, timezone string, meta text);
+INSERT INTO "users" VALUES(1,'AccessToken','barry.allen@speedforce.net',0,1,'Barry Allen','','$2a$10$yT0EuOUNSkIE6Mu04DcqAeM0Yhgz9YzZTncIGMGi7dLzEUTJtmOv6','EST','');
+INSERT INTO "users" VALUES(2,'','luser@terraindata.com',0,1,'Terrain Admin',NULL,'$2a$10$S6xM2V1JAzjzeL85PJFnEOpF9K0jfLaBcrfuyDNIg9B/mGJPfroW.','','{}');
+INSERT INTO "users" VALUES(3,'','test@terraindata.com',0,0,'Test Person',NULL,'$2a$10$Bov3ZgCLKd2l/4bu0cXP2OEofcknNO1mhW9Tt.MjFzQdqRUK//NXe','UTC','{}');
+COMMIT;

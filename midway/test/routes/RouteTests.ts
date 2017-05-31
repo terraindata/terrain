@@ -45,21 +45,35 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
+import * as sqlite3 from 'sqlite3';
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
 
 let server;
 
-beforeAll((done) =>
+beforeAll(async (done) =>
 {
-  fs.writeFileSync('./nodewaytest.db', fs.readFileSync('./midway/test/scripts/nodewaytest.db'));
+  const sql = fs.readFileSync('./midway/test/scripts/test.sql').toString();
+  const db = new sqlite3.Database('midwaytest.db');
+  const results = await new Promise((resolve, reject) =>
+  {
+    return db.exec(sql, (error: Error) =>
+    {
+      if (error !== null && error !== undefined)
+      {
+        reject(error);
+      }
+      resolve();
+    });
+  });
+
   const options =
     {
       debug: true,
       db: 'sqlite',
-      dsn: 'nodewaytest.db',
-      port: 3001,
+      dsn: 'midwaytest.db',
+      port: 43001,
       databases: [
         {
           name: 'My ElasticSearch Instance',
@@ -90,6 +104,11 @@ beforeAll((done) =>
     {
       done();
     });
+});
+
+afterAll(() =>
+{
+  fs.unlinkSync('midwaytest.db');
 });
 
 describe('User and auth route tests', () =>
@@ -191,7 +210,7 @@ describe('Version route tests', () =>
         expect(response.text)
           .toBe(
           // tslint:disable-next-line:max-line-length
-          '[{"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"id":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+          '');
       })
       .catch((error) =>
       {
