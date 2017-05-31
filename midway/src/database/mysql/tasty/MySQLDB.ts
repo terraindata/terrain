@@ -67,20 +67,24 @@ export class MySQLDB implements TastyDB
   /**
    * Generates MySQL queries from TastyQuery objects.
    */
-  public generate(query: TastyQuery): string[]
+  public generateQuery(query: TastyQuery, placeholder: boolean): [string[], any[][]]
   {
     const generator = new SQLGenerator();
     if (query.command.tastyType === TastyNodeTypes.select || query.command.tastyType === TastyNodeTypes.delete)
     {
-      generator.generateSelectQuery(query);
+      generator.generateSelectQuery(query, placeholder);
     }
     else if (query.command.tastyType === TastyNodeTypes.upsert && query.upserts.length > 0)
     {
-      generator.generateUpsertQuery(query, query.upserts);
+      generator.generateUpsertQuery(query, query.upserts, placeholder);
     }
+    return [generator.statements, generator.values];
+  }
 
-    generator.accumulateStatement(generator.queryString);
-    return generator.statements;
+  public generate(query: TastyQuery): string[]
+  {
+    const [statements, values] = this.generateQuery(query, false);
+    return statements;
   }
 
   public generateString(query: TastyQuery): string
@@ -109,7 +113,7 @@ export class MySQLDB implements TastyDB
     {
       const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.query(statement, makePromiseCallback(resolve, reject));
+        this.client.query(statement, [], makePromiseCallback(resolve, reject));
       });
 
       results = results.concat(result);
@@ -120,9 +124,22 @@ export class MySQLDB implements TastyDB
   public async upsert(table: TastyTable, elements: object[]): Promise<object[]>
   {
     const query = new TastyQuery(table).upsert(elements);
-    const statements: string[] = this.generate(query);
+    const [statements, values] = this.generateQuery(query, true);
     const primaryKeys = table.getPrimaryKeys();
-    const upserted = await this.execute(statements);
+
+    let upserted: object[] = [];
+    for (let i = 0; i < statements.length; ++i)
+    {
+      const statement = statements[i];
+      const value = values[i];
+      const result = await new Promise<object[]>((resolve, reject) =>
+      {
+        this.client.query(statement, value, makePromiseCallback(resolve, reject));
+      });
+
+      upserted = upserted.concat(result);
+    }
+
     const results = new Array(upserted.length);
     for (let i = 0; i < results.length; i++)
     {
