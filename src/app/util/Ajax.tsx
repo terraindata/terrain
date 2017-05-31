@@ -480,7 +480,7 @@ export const Ajax =
           }
           else
           {
-            onError('Nothing found' as any);
+            onError && onError('Nothing found' as any);
           }
         },
         {
@@ -513,16 +513,17 @@ export const Ajax =
       // }
     },
 
-    getVersions(id: ID, onLoad: (versions: any) => void)
+    getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
-      // TODO
-
-      // const url = '/versions/' + id;
-      // return Ajax._get(url, '', (response: any) =>
-      // {
-      //   const versions = JSON.parse(response);
-      //   onLoad(versions);
-      // });
+      return Ajax._reqMidway2('get', 'versions/items/' + id, {}, (response: any) => {
+        try {
+          onLoad(response);
+        }
+        catch (e)
+        {
+          onError && onError(response as any);
+        }
+      });
     },
 
     getVersion(id: ID, onLoad: (version: any) => void)
@@ -800,7 +801,7 @@ export const Ajax =
 
           if (respData.errorMessage)
           {
-            onError(respData);
+            onError && onError(respData);
             return;
           }
 
