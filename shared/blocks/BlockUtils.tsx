@@ -42,62 +42,87 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as Immutable from 'immutable';
+import Map = Immutable;
+import List = Immutable;
 
-// A query can be viewed and edited in the Builder
-// currently, only Variants have Queries, 1:1, but that may change
-class QueryC
+module BlockUtils
 {
-  type: 'QUERY' = 'QUERY';
-  parent: number = -1;
-  name: string = '';
-  status: 'BUILD' | 'LIVE' = 'BUILD';
-  
-  id: ID = -1;
-  variantId: number = -1;
-  
-  // TODO change?
-  db: {
-    id: ID;
-    name: string;
-    source: 'm1' | 'm2';
-    type: string;
-  } = {} as any;
+  export function getChildIds(_block: IBlock): IMMap<ID, boolean>
+  {
+    let map = Map<ID, boolean>({});
 
-  cards: ICards = List([]);
-  inputs: List<any> = List([]);
-  resultsConfig: IResultsConfig = null;
-  tql: string = '';
-  deckOpen: boolean = true;
+    if (Immutable.Iterable.isIterable(_block))
+    {
+      const block = _block.toMap();
+      if (block.get('id'))
+      {
+        map = map.set(block.get('id'), true);
+      }
+      block.map((value) => map = map.merge(getChildIds(value)));
+    }
 
-  cardsAndCodeInSync: boolean = false;
-  parseError: string = null;
-  
-  
-  dbFields = ['id', 'parent', 'name', 'status', 'type'];
-  excludeFields= ['dbFields', 'excludeFields'];
-  
-  modelVersion = 2; // 2 is for the first version of Node midway
+    return map;
+  }
+
+  export function forAllCards(
+    block: IBlock | List<IBlock>,
+    fn: (card: ICard, keyPath: KeyPath) => void,
+  ) {
+    forAllBlocks(
+      block,
+      (block: IBlock, keyPath: KeyPath) =>
+      {
+        if (block['_isCard'])
+        {
+          fn(block as any, keyPath);
+        }
+      },
+    );
+  }
+
+  export function forAllBlocks(
+    block: IBlock | List<IBlock>,
+    fn: (block: IBlock, keyPath: KeyPath) => void,
+    keyPath: KeyPath = List([]),
+    stopAtFirstBlock?: boolean,
+    excludeWrappedCards?: boolean,
+  )
+  {
+    if (block)
+    {
+      if (block['_isBlock'])
+      {
+        fn(block as IBlock, keyPath);
+      }
+      if (
+        Immutable.Iterable.isIterable(block)
+        && (!stopAtFirstBlock || !block['_isBlock'] || !keyPath.size)
+      )
+      {
+        (block.toMap() as any).map(
+          (b, key) =>
+          {
+            if (!excludeWrappedCards || key !== 'cards')
+            {
+              forAllBlocks(
+                b as IBlock,
+                fn,
+                keyPath.push(key),
+                stopAtFirstBlock,
+                excludeWrappedCards,
+              );
+            }
+          },
+        );
+      }
+    }
+  }
+
+  export function transformAlias(transformCard: ICard): string
+  {
+    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
+  }
 }
-const Query_Record = Immutable.Record(new QueryC());
-export interface Query extends QueryC, IRecord<Query> {}
 
-export const _Query = (config?: Object) => {
-  config = Util.extendId(config || {});
-  config['cards'] = BuilderTypes.recordFromJS(config['cards'] || []);
-  config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || []);
-  config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
-
-  let query = new Query_Record(config) as any as Query;
-
-  return query;
-};
-
-export function queryForSave(query: Query): Object
-{
-  query = query
-    .set('cards', cardsForServer(query.cards))
-    .set('resultsConfig', query.resultsConfig.toJS());
-  return query.toJS();
-}
-
-export default Query;
+export default BlockUtils;

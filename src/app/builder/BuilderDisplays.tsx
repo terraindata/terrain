@@ -45,7 +45,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import PureClasss from './../common/components/PureClasss';
-import {Combinators, Operators} from './BuilderTypes';
+import CommonSQL from '../../../shared/backends/mysql/syntax/CommonSQL';
+const {Combinators, Operators} = CommonSQL;
 
 import SchemaTypes from '../schema/SchemaTypes';
 const ManualConfig = require('./../manual/ManualConfig.json');

@@ -69,6 +69,8 @@ export default interface Backend
 	
 	syntaxConfig: object;
 	
+	// schema?
+	
 	// function to get transform bars?
 	// autocomplete?
 }

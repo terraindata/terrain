@@ -42,62 +42,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-
-// A query can be viewed and edited in the Builder
-// currently, only Variants have Queries, 1:1, but that may change
-class QueryC
+module CommonSQL
 {
-  type: 'QUERY' = 'QUERY';
-  parent: number = -1;
-  name: string = '';
-  status: 'BUILD' | 'LIVE' = 'BUILD';
-  
-  id: ID = -1;
-  variantId: number = -1;
-  
-  // TODO change?
-  db: {
-    id: ID;
-    name: string;
-    source: 'm1' | 'm2';
-    type: string;
-  } = {} as any;
+  export const Directions: string[] = ['ascending', 'descending'];
+  export const Combinators: string[] = ['&', 'or'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
 
-  cards: ICards = List([]);
-  inputs: List<any> = List([]);
-  resultsConfig: IResultsConfig = null;
-  tql: string = '';
-  deckOpen: boolean = true;
+	export enum Operator {
+    EQ,
+    NE,
+    GE,
+    GT,
+    LE,
+    LT,
+    IN,
+    NIN,
+    LIKE,
+  }
 
-  cardsAndCodeInSync: boolean = false;
-  parseError: string = null;
-  
-  
-  dbFields = ['id', 'parent', 'name', 'status', 'type'];
-  excludeFields= ['dbFields', 'excludeFields'];
-  
-  modelVersion = 2; // 2 is for the first version of Node midway
-}
-const Query_Record = Immutable.Record(new QueryC());
-export interface Query extends QueryC, IRecord<Query> {}
+  export const OperatorTQL = {
+    [Operator.EQ]: '=',
+    [Operator.NE]: '!=',
+    [Operator.GE]: '>=',
+    [Operator.GT]: '>',
+    [Operator.LE]: '<=',
+    [Operator.LT]: '<',
+    [Operator.IN]: 'IN',
+    [Operator.NIN]: 'NOT IN',
+    [Operator.LIKE]: 'LIKE',
+  };
 
-export const _Query = (config?: Object) => {
-  config = Util.extendId(config || {});
-  config['cards'] = BuilderTypes.recordFromJS(config['cards'] || []);
-  config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || []);
-  config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
+  export enum Direction {
+    ASC,
+    DESC,
+  }
 
-  let query = new Query_Record(config) as any as Query;
+  export const DirectionTQL = {
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC',
+  };
 
-  return query;
-};
+  export enum Combinator {
+    AND,
+    OR,
+  }
 
-export function queryForSave(query: Query): Object
-{
-  query = query
-    .set('cards', cardsForServer(query.cards))
-    .set('resultsConfig', query.resultsConfig.toJS());
-  return query.toJS();
+  export const CombinatorTQL = {
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR',
+  };
 }
 
-export default Query;
+export default CommonSQL;

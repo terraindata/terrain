@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import CommonSQL from '../syntax/CommonSQL';
 type ICard = BuilderTypes.ICard;
 type IBlock = BuilderTypes.IBlock;
 type IInput = BuilderTypes.IInput;
@@ -321,7 +322,7 @@ class CardsToSQL
     if (field.toUpperCase() === field)
     {
       // all caps, look up value from corresponding map
-      return BuilderTypes[field.charAt(0) + field.substr(1).toLowerCase() + 'TQL'][block[field.toLowerCase()]];
+      return CommonSQL[field.charAt(0) + field.substr(1).toLowerCase() + 'TQL'][block[field.toLowerCase()]];
     }
 
     return block[field];

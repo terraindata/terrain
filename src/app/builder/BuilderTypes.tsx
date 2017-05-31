@@ -54,61 +54,11 @@ import ScoreBar from './components/charts/ScoreBar';
 // import TransformCardComponent from './components/charts/TransformCard';
 import SchemaTypes from '../schema/SchemaTypes';
 
-// These have to be above the BuilderDisplays import
-//  since the import itself imports them
-export const Directions: string[] = ['ascending', 'descending'];
-export const Combinators: string[] = ['&', 'or'];
-export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
-
 import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from './BuilderDisplays';
 const ManualConfig = require('./../manual/ManualConfig.json');
 
 export module BuilderTypes
 {
-  export enum Operator {
-    EQ,
-    NE,
-    GE,
-    GT,
-    LE,
-    LT,
-    IN,
-    NIN,
-    LIKE,
-  }
-
-  export const OperatorTQL = {
-    [Operator.EQ]: '=',
-    [Operator.NE]: '!=',
-    [Operator.GE]: '>=',
-    [Operator.GT]: '>',
-    [Operator.LE]: '<=',
-    [Operator.LT]: '<',
-    [Operator.IN]: 'IN',
-    [Operator.NIN]: 'NOT IN',
-    [Operator.LIKE]: 'LIKE',
-  };
-
-  export enum Direction {
-    ASC,
-    DESC,
-  }
-
-  export const DirectionTQL = {
-    [Direction.ASC]: 'ASC',
-    [Direction.DESC]: 'DESC',
-  };
-
-  export enum Combinator {
-    AND,
-    OR,
-  }
-
-  export const CombinatorTQL = {
-    [Combinator.AND]: 'AND',
-    [Combinator.OR]: 'OR',
-  };
-
   export enum InputType
   {
     TEXT,
@@ -184,7 +134,7 @@ export module BuilderTypes
       // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
       // - arrays/Lists are joined with "," by default
       // - to join List with something else, specify a tqlGlue
-      // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
+      // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map in CommonSQL
       //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
       // - topTql is the tql to use if this card is at the top level of a query
       tql: string | ((block: IBlock) => string);
@@ -1683,82 +1633,6 @@ export module BuilderTypes
       return preview(card);
     }
     return 'No preview';
-  }
-
-  export function getChildIds(_block: IBlock): IMMap<ID, boolean>
-  {
-    let map = Map<ID, boolean>({});
-
-    if (Immutable.Iterable.isIterable(_block))
-    {
-      const block = _block.toMap();
-      if (block.get('id'))
-      {
-        map = map.set(block.get('id'), true);
-      }
-      block.map((value) => map = map.merge(getChildIds(value)));
-    }
-
-    return map;
-  }
-
-  export function forAllCards(
-    block: IBlock | List<IBlock>,
-    fn: (card: ICard, keyPath: KeyPath) => void,
-  ) {
-    forAllBlocks(
-      block,
-      (block: IBlock, keyPath: KeyPath) =>
-      {
-        if (block['_isCard'])
-        {
-          fn(block as any, keyPath);
-        }
-      },
-    );
-  }
-
-  export function forAllBlocks(
-    block: IBlock | List<IBlock>,
-    fn: (block: IBlock, keyPath: KeyPath) => void,
-    keyPath: KeyPath = List([]),
-    stopAtFirstBlock?: boolean,
-    excludeWrappedCards?: boolean,
-  )
-  {
-    if (block)
-    {
-      if (block['_isBlock'])
-      {
-        fn(block as IBlock, keyPath);
-      }
-      if (
-        Immutable.Iterable.isIterable(block)
-        && (!stopAtFirstBlock || !block['_isBlock'] || !keyPath.size)
-      )
-      {
-        (block.toMap() as any).map(
-          (b, key) =>
-          {
-            if (!excludeWrappedCards || key !== 'cards')
-            {
-              forAllBlocks(
-                b as IBlock,
-                fn,
-                keyPath.push(key),
-                stopAtFirstBlock,
-                excludeWrappedCards,
-              );
-            }
-          },
-        );
-      }
-    }
-  }
-
-  export function transformAlias(transformCard: ICard): string
-  {
-    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
   }
 }
 

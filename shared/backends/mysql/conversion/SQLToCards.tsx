@@ -44,13 +44,17 @@ THE SOFTWARE.
 
 const _ = require('underscore');
 import * as Immutable from 'immutable';
-import { BuilderTypes } from '../builder/BuilderTypes';
+import List = Immutable.List;
+import Map = Immutable.Map;
+
+import Query from '../../../items/types/Query';
+import CommonSQL from '../syntax/CommonSQL';
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
+
 type Cards = BuilderTypes.ICards;
 type Card = BuilderTypes.ICard;
 type CardString = BuilderTypes.CardString;
 type Block = BuilderTypes.IBlock;
-import List = Immutable.List;
-import Map = Immutable.Map;
 const {Blocks, make} = BuilderTypes;
 
 export default function SQLToCards(
@@ -81,7 +85,7 @@ export default function SQLToCards(
 
 const parseTreeLoaded = (response, context) =>
 {
-  const query: Query = context.query;
+  let query: Query = context.query;
   const queryReady: (query: Query) => void = context.queryReady;
   
   const {error, result} = response;
@@ -108,10 +112,8 @@ const parseTreeLoaded = (response, context) =>
 const parseTreeError = (error, context) =>
 {
   // TODO MOD confirm what format the error comes back as
-  const query: Query = context.query;
+  let query: Query = context.query;
   const queryReady: (query: Query) => void = context.queryReady;
-  
-  const {error} = response;
   
   query = query.setIn(['meta', 'parseTreeReq'], null);
   query = query
@@ -514,7 +516,7 @@ function parseMathNode(node: Node, op: string, mathCardBlock): Card
 }
 
 const comparisonProcessors = _.reduce(
-  BuilderTypes.OperatorTQL,
+  CommonSQL.OperatorTQL,
   (memo, val: string) =>
   {
     memo[val.toUpperCase()] = true;
@@ -527,7 +529,7 @@ function comparisonProcessor(node: Node): Card
   return make(Blocks.comparison, {
     first: parseNode(node.left_child),
     second: parseNode(node.right_child),
-    operator: + _.findKey(BuilderTypes.OperatorTQL,
+    operator: + _.findKey(CommonSQL.OperatorTQL,
       (op: string) => op.toUpperCase() === node.op.toUpperCase(),
     ),
   });
@@ -568,7 +570,7 @@ const sfwProcessors: {
               {
                 config = {
                   property: parseNode(node.child),
-                  direction: node.op === 'ASC' ? BuilderTypes.Direction.ASC : BuilderTypes.Direction.DESC,
+                  direction: node.op === 'ASC' ? CommonSQL.Direction.ASC : CommonSQL.Direction.DESC,
                 };
               }
               return make(Blocks.sortBlock, config);
@@ -701,7 +703,7 @@ function reconcileBlock(currentBlock: Block, newBlock: Block): Block
     );
   }
 
-  BuilderTypes.forAllBlocks(
+  BlockUtils.forAllBlocks(
     block,
     (childBlock, keyPath) =>
     {
@@ -718,5 +720,3 @@ function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 
   return block;
 }
-
-export default TQLToCards;
