@@ -171,7 +171,7 @@ export class ResultsManager extends PureClasss<Props>
     }
 
     let tql = query.tql;
-    
+
     if(db.source === 'm1')
     {
       tql = TQLConverter.toTQL(query, {
@@ -209,7 +209,6 @@ export class ResultsManager extends PureClasss<Props>
         )
         {
           // temporary, don't dispatch select * if query has group by
-        
           this.setState({
             allQuery: Ajax.query(
               TQLConverter.toTQL(query, {
