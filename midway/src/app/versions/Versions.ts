@@ -85,7 +85,7 @@ export class Versions
     const newVersion: VersionConfig =
       {
         createdByUserId: user.id,
-        object: obj.toString(),
+        object: JSON.stringify(obj),
         objectId: id,
         objectType: type,
       };
