@@ -17,8 +17,7 @@ midway/**/*.jsx
 .idea
 .vscode
 yarn.lock
-nodeway.db
-nodewaytest.db
+midway.db
 moviesdb.db
 *.swp
 build/
