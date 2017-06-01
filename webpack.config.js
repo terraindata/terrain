@@ -49,7 +49,7 @@ var path = require('path');
 module.exports =
 {
     entry: "./src/app/App.tsx",
-    devtool: 'eval-source-map',
+    devtool: 'cheap-module-source-map',
 
     output:
     {
@@ -72,12 +72,11 @@ module.exports =
             //  keep it first in this list
             {
                 test: /\.tsx$/,
-                exclude: /midway/,
+                exclude: [/midway/, /node_modules/],
                 loader:
                     'babel-loader?presets[]=react&presets[]=latest!ts-loader?'
                     + JSON.stringify({
                         compilerOptions: {
-
                         }
                     })
             },
@@ -108,5 +107,6 @@ module.exports =
             NODEWAY_HOST: "'http://" + process.env.NODEWAY_HOST + "'",
             DEV: true,
         }),
+        new webpack.optimize.AggressiveMergingPlugin(),
     ],
 };
