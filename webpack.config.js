@@ -102,9 +102,9 @@ module.exports =
     plugins:
     [
         new webpack.DefinePlugin({
-            MIDWAY_HOST: "'//" + process.env.MIDWAY_HOST + ":40080'",
+            OLD_MIDWAY_HOST: "'//" + process.env.OLD_MIDWAY_HOST + ":40080'",
             TDB_HOST: "'//" + process.env.TDB_HOST + ":7344'",
-            NODEWAY_HOST: "'http://" + process.env.NODEWAY_HOST + "'",
+            MIDWAY_HOST: "'http://" + process.env.MIDWAY_HOST + "'",
             DEV: true,
         }),
         new webpack.optimize.AggressiveMergingPlugin(),

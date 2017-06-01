@@ -128,7 +128,7 @@ export module UserTypes
       }
     }
     
-    return  NODEWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
+    return  MIDWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
   }
 }
 
