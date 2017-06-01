@@ -352,7 +352,7 @@ class SchemaTreeItem extends PureClasss<Props>
   	const {item, isSelected, isHighlighted} = this.state;
 
   	const showing = SchemaTypes.searchIncludes(item, this.props.search);
-
+  	
     return (
       <div
       	style={Styles.treeItem}

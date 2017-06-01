@@ -98,7 +98,7 @@ class SchemaTreeList extends PureClasss<Props>
 
   componentWillReceiveProps(nextProps: Props)
   {
-    if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
+    if (nextProps.itemIds && nextProps.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
     {
       this.setState({
         intervalId: setInterval(this.increaseRenderCount),
@@ -109,17 +109,19 @@ class SchemaTreeList extends PureClasss<Props>
   increaseRenderCount()
   {
     const renderCount = this.state.renderCount + 10;
-    this.setState({
-      renderCount,
-    });
+
+    let {intervalId} = this.state;
 
     if (this.props.itemIds.size < renderCount)
     {
       clearInterval(this.state.intervalId);
-      this.setState({
-        intervalId: -1,
-      });
+      intervalId = -1;
     }
+    
+    this.setState({
+      renderCount,
+      intervalId,
+    });
   }
 
   render()
