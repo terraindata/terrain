@@ -149,9 +149,11 @@ describe('User and auth route tests', () =>
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const resp = JSON.parse(response.text);
-        id = resp.id;
-        accessToken = resp.accessToken;
+        const respData = JSON.parse(response.text);
+        expect(typeof respData['id']).toBe('number');
+        expect(typeof respData['accessToken']).toBe('string');
+        id = respData.id;
+        accessToken = respData.accessToken;
       })
       .catch((error) =>
       {
@@ -167,8 +169,11 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(JSON.parse(response.text))
-          .toMatchObject([{ accessToken: '', email: 'test@terraindata.com', id }]);
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({ accessToken: '', email: 'test@terraindata.com', id });
       })
       .catch((error) =>
       {
@@ -184,8 +189,7 @@ describe('User and auth route tests', () =>
       .expect(401)
       .then((response) =>
       {
-        expect(response.text)
-          .toBe('Unauthorized');
+        expect(response.text).toBe('Unauthorized');
       })
       .catch((error) =>
       {
@@ -207,10 +211,18 @@ describe('Version route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          .toBe(
-          // tslint:disable-next-line:max-line-length
-          '');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            createdAt: '2017-05-31 00:22:04',
+            createdByUserId: 1,
+            id: 1,
+            object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"GROUP"}',
+            objectId: 2,
+            objectType: 'items',
+          });
       })
       .catch((error) =>
       {
@@ -232,10 +244,34 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          // tslint:disable-next-line:max-line-length
-          .toEqual(
-          '[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"},{"id":2,"meta":"#realmusician","name":"Bob Dylan","parent":0,"status":"Hearts beatin","type":"GROUP"},{"id":3,"meta":"Are we an item?","name":"Justin Bieber","parent":0,"status":"Baby","type":"VARIANT"}]');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData)
+          .toMatchObject([
+            {
+              id: 1,
+              meta: 'I won a Nobel prize! But Im more proud of my music',
+              name: 'Al Gore',
+              parent: 0,
+              status: 'Still Alive',
+              type: 'ALGORITHM',
+            },
+            {
+              id: 2,
+              meta: '#realmusician',
+              parent: 0,
+              type: 'GROUP',
+            },
+            {
+              id: 3,
+              meta: 'Are we an item?',
+              name: 'Justin Bieber',
+              parent: 0,
+              status: 'Baby',
+              type: 'VARIANT',
+            },
+          ]);
       })
       .catch((error) =>
       {
@@ -258,7 +294,10 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(JSON.parse(response.text)[0])
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
           .toMatchObject({
             id: 4,
             name: 'Test Item',
@@ -282,10 +321,17 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          // tslint:disable-next-line:max-line-length
-          .toEqual(
-          '[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"}]');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0]).toMatchObject({
+          id: 1,
+          meta: 'I won a Nobel prize! But Im more proud of my music',
+          name: 'Al Gore',
+          parent: 0,
+          status: 'Still Alive',
+          type: 'ALGORITHM',
+        });
       })
       .catch((error) =>
       {
@@ -306,8 +352,10 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(JSON.parse(response.text)[0])
-          .toMatchObject(insertOjbect);
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0]).toMatchObject(insertOjbect);
       })
       .catch((error) =>
       {
@@ -352,9 +400,11 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const resp = JSON.parse(response.text);
-        id = resp.id;
-        accessToken = resp.accessToken;
+        const respData = JSON.parse(response.text);
+        expect(typeof respData['id']).toBe('number');
+        expect(typeof respData['accessToken']).toBe('string');
+        id = respData.id;
+        accessToken = respData.accessToken;
       })
       .catch((error) =>
       {
