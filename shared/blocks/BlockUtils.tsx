@@ -126,6 +126,213 @@ module BlockUtils
   {
     return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
   }
+  
+  
+  // This creates a new instance of a card / block
+  // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
+  export const make = (block: Block, extraConfig?: {[key: string]: any}) =>
+  {
+    const {type} = block;
+
+    block = _.extend({}, block); // shallow clone
+
+    if (Blocks[type].static.init)
+    {
+      block = _.extend({}, block, Blocks[type].static.init());
+    }
+
+    if (extraConfig)
+    {
+      block = _.extend(block, extraConfig);
+
+      if (block.type === 'sfw' && block['tables'] && block['tables'].size && block['tables'].get(0).table !== 'none')
+      {
+        // convert old format, where tables were included, to new format with separate from card
+        // TODO remove once sufficiently antiquated
+        block['cards'] = block['cards'].unshift(
+          make(Blocks.from, {
+            tables: block['tables'],
+          }),
+        );
+      }
+    }
+
+    if (block.static)
+    {
+      delete block.static;
+    }
+
+    if (!block.id || !block.id.length)
+    {
+      block.id = 'block-' + Math.random();
+    }
+
+    return typeToRecord[type](block);
+  };
+
+  // array of different card types
+  export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block['_isCard'] && k ));
+
+  // TODO remove
+  const cards = {};
+  for (const key in Blocks)
+  {
+    if (Blocks[key]._isCard && Blocks[key].static.manualEntry)
+    {
+      cards[Blocks[key].static.manualEntry.name] = key;
+    }
+  }
+  export const cardList = cards;
+
+  // private, maps a type (string) to the backing Immutable Record
+  const typeToRecord = _.reduce(Blocks as ({[card: string]: any}),
+    (memo, v, i) => {
+      memo[i] = Immutable.Record(v);
+      return memo;
+    }
+  , {});
+
+  // Given a plain JS object, construct the Record for it and its children
+  export const recordFromJS = (value: any) =>
+  {
+    if (value && value.static && Immutable.Iterable.isIterable(value))
+    {
+      // already a block / record
+      // TODO change to a better way of checking
+      return value;
+    }
+
+    if (Array.isArray(value) || typeof value === 'object')
+    {
+      if (Immutable.Iterable.isIterable(value))
+      {
+        value = value.map((v) => recordFromJS(v));
+      }
+      else
+      {
+        value = _.reduce(value, (memo, v, key) =>
+        {
+          memo[key] = recordFromJS(v);
+          return memo;
+        }, Array.isArray(value) ? [] : {});
+      }
+
+      // conversion, remove when appropriate
+      // if(value.type === 'multiand' || value.type === 'multior')
+      // {
+      //   value.type = value.type.substr(5);
+      //   value.cards = value.clauses.map(block =>
+      //   {
+      //     let clause = block.get('clause');
+      //     if(typeof clause === 'string')
+      //     {
+      //       return make(Blocks.tql, { clause });
+      //     }
+      //     return clause;
+      //   });
+      // }
+
+      const type = value.type || (typeof value.get === 'function' && value.get('type'));
+      if (type && Blocks[type])
+      {
+        value = make(Blocks[type], value);
+      }
+      else
+      {
+        value = Immutable.fromJS(value);
+      }
+    }
+
+    return value;
+  };
+
+  // Prepare cards/records for save, trimming static values
+  export const cardsForServer = (value: any) =>
+  {
+    if (Immutable.Iterable.isIterable(value))
+    {
+      value = value.toJS();
+    }
+
+    if (value && value.static)
+    {
+      delete value.static;
+    }
+
+    if (Array.isArray(value))
+    {
+      value.map(cardsForServer);
+    }
+    else if (typeof value === 'object')
+    {
+      for (const i in value)
+      {
+        cardsForServer(value[i]);
+      }
+    }
+    return value;
+  };
+
+  // returns preview for a given card
+  export function getPreview(card: Card): string
+  {
+    if (!card)
+    {
+      return;
+    }
+
+    if (!card.static)
+    {
+      if (typeof card === 'string' || typeof card === 'number')
+      {
+        return card + '';
+      }
+
+      try {
+        return JSON.stringify(card);
+      } catch (e) {
+        return 'No preview';
+      }
+    }
+
+    const {preview} = card.static;
+    if (typeof preview === 'string')
+    {
+      return preview.replace(/\[[a-z\.]*\]/g, (str) =>
+      {
+        const pattern = str.substr(1, str.length - 2);
+        const keys = pattern.split('.');
+        if (keys.length === 1)
+        {
+          const value = card[keys[0]];
+          if (value['_isCard'])
+          {
+            return getPreview(value);
+          }
+          return value;
+        }
+        if (keys[1] === 'length' || keys[1] === 'size')
+        {
+          return card[keys[0]].size;
+        }
+        return card[keys[0]].toArray().map(
+          (v) =>
+            getPreview(v[keys[1]]),
+        ).join(', ');
+      });
+    }
+    else if (typeof preview === 'function')
+    {
+      return preview(card);
+    }
+    return 'No preview';
+  }
+  
+  export function addTypeToBlocks(Blocks)
+  {
+    // Set the "type" field for all blocks equal to its key
+    _.map(Blocks as ({[card: string]: any}), (v, i) => Blocks[i].type = i);
+  }
 }
 
 export default BlockUtils;

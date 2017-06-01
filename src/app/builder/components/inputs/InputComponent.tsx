@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Input.less');
+require('./InputStyle.less');
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -62,10 +62,9 @@ const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-type IInput = BuilderTypes.IInput;
-const InputType = BuilderTypes.InputType;
+import Input from '../../../../../shared/blocks/types/Input';
 
-const Input = React.createClass<any, any>({
+const InputComponent = React.createClass<any, any>({
 	mixins: [PanelMixin],
 
 	propTypes:
@@ -244,4 +243,4 @@ const Input = React.createClass<any, any>({
 	},
 });
 
-export default Input;
+export default InputComponent;
