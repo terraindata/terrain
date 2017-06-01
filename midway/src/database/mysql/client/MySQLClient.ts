@@ -75,10 +75,10 @@ class MySQLClient
     });
   }
 
-  public query(queryString: string, callback: any): mysql.IQuery
+  public query(queryString: string, params?: any[], callback?: any): mysql.IQuery
   {
-    this.controller.log('MySQLClient.query', queryString);
-    return this.delegate.query(queryString, callback);
+    this.controller.log('MySQLClient.query', queryString, params);
+    return this.delegate.query(queryString, params, callback);
   }
 
   public end(callback: (err: mysql.IError, ...args: any[]) => void): void

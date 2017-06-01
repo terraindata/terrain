@@ -112,22 +112,23 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
 export default class SQLGenerator
 {
   public statements: string[];
+  public values: any[][];
   public queryString: string;
   private indentation: number;
 
   constructor()
   {
     this.statements = [];
+    this.values = [];
     this.queryString = '';
     this.indentation = 0;
   }
 
-  public generateSelectQuery(query: TastyQuery)
+  public generateSelectQuery(query: TastyQuery, placeholder: boolean)
   {
     this.appendExpression(query.command);
     this.indent();
 
-    const columns: TastyNode[] = [];
     if (query.isSelectingAll())
     {
       this.queryString += ' * '; // handle "select all" condition
@@ -144,7 +145,6 @@ export default class SQLGenerator
           query.selected,
           (column) =>
           {
-            columns.push(column);
             this.appendSubexpression(column);
           },
           () =>
@@ -160,7 +160,6 @@ export default class SQLGenerator
         query.aliases,
         (alias) =>
         {
-          columns.push(alias.name);
           this.appendSubexpression(alias.query);
           this.queryString += ' AS ';
           this.queryString += this.escapeString(alias.name);
@@ -234,9 +233,10 @@ export default class SQLGenerator
         this.queryString += 'OFFSET ' + query.numSkipped.toString();
       }
     }
+    this.accumulateStatement(this.queryString);
   }
 
-  public generateUpsertQuery(query: TastyQuery, upserts: object[])
+  public generateUpsertQuery(query: TastyQuery, upserts: object[], placeholder: boolean)
   {
     this.appendExpression(query.command);
     this.queryString += ' ';
@@ -264,7 +264,7 @@ export default class SQLGenerator
         const isInDefined: boolean = definedColumnsSet.has(col);
         if (isInObj !== isInDefined)
         {
-          this.accumulateUpsert(definedColumnsList, accumulatedUpdates);
+          this.accumulateUpsert(definedColumnsList, accumulatedUpdates, placeholder);
 
           this.queryString = baseQuery;
           definedColumnsList = this.getDefinedColumns(columns, obj);
@@ -280,7 +280,7 @@ export default class SQLGenerator
       accumulatedUpdates.push(obj);
     }
 
-    this.accumulateUpsert(definedColumnsList, accumulatedUpdates);
+    this.accumulateUpsert(definedColumnsList, accumulatedUpdates, placeholder);
     this.queryString = '';
   }
 
@@ -306,13 +306,14 @@ export default class SQLGenerator
     return definedColumns;
   }
 
-  public accumulateUpsert(columns: string[], accumulatedUpdates: object[]): void
+  public accumulateUpsert(columns: string[], accumulatedUpdates: object[], placeholder: boolean): void
   {
     if (accumulatedUpdates.length <= 0)
     {
       return;
     }
 
+    const values: any[] = [];
     let query = this.queryString;
     query += ' (' + columns.join(', ') + ') VALUES ';
 
@@ -329,10 +330,19 @@ export default class SQLGenerator
       query += columns.map(
         (col: string) =>
         {
-          return this.sqlName(TastyNode.make(obj[col]));
+          if (placeholder === true)
+          {
+            values.push(obj[col]);
+            return '?';
+          }
+          else
+          {
+            return this.sqlName(TastyNode.make(obj[col]));
+          }
         }).join(', ');
       query += ')';
     }
+    this.values.push(values);
     this.accumulateStatement(query);
   }
 

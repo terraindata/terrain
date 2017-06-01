@@ -88,13 +88,12 @@ abstract class TastyDB
    *
    * @abstract
    * @param {TastyTable} table
-   * @param {*} query
    * @param {object[]} elements
    * @returns {Promise<object[]>}
    *
    * @memberof TastyDB
    */
-  public async abstract upsert(table: TastyTable, query: any, elements: object[]): Promise<object[]>;
+  public async abstract upsert(table: TastyTable, elements: object[]): Promise<object[]>;
 
   /**
    * returns schema information for a database

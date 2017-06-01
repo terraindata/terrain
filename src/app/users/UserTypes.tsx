@@ -120,15 +120,15 @@ export module UserTypes
     {
       if (typeof user.id === 'string')
       {
-        index = (user.id.charCodeAt(0) % numProfileImages) + 1;
+        index = (user.id.charCodeAt(0) % numProfileImages);
       }
       if (typeof user.id === 'number')
       {
-        index = (user.id % numProfileImages) + 1;
+        index = (user.id % numProfileImages);
       }
     }
     
-    return '/dist/profiles/profile' + index + '.jpg';
+    return  NODEWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
   }
 }
 
