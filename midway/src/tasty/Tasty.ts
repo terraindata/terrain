@@ -161,13 +161,11 @@ export class Tasty
   {
     if (objs instanceof Array)
     {
-      const query = new TastyQuery(table).upsert(objs);
-      const queryString: string[] = this.db.generate(query);
-      return this.db.upsert(table, queryString, objs);
+      return this.db.upsert(table, objs);
     }
     else if (typeof objs === 'object')
     {
-      return this.upsert(table, [objs]);
+      return this.db.upsert(table, [objs]);
     }
     throw new Error('Invalid object type');
   }
