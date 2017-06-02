@@ -119,7 +119,7 @@ export const Ajax =
           }
         },
         _.extend({
-          host: NODEWAY_HOST,
+          host: MIDWAY_HOST,
           noToken: true,
           json: true,
           crossDomain: false,
@@ -166,7 +166,7 @@ export const Ajax =
         urlArgs?: object;
       } = {})
     {
-      const host = config.host || MIDWAY_HOST;
+      const host = config.host || OLD_MIDWAY_HOST;
       let fullUrl = host + url;
 
       if (config.download)
@@ -221,7 +221,7 @@ export const Ajax =
         onLoad(xhr.responseText);
       };
 
-      // NOTE: MIDWAY_HOST will be replaced by the build process.
+      // NOTE: OLD_MIDWAY_HOST will be replaced by the build process.
       if (method === 'get')
       {
         try
