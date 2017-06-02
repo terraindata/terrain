@@ -45,6 +45,7 @@ THE SOFTWARE.
 import {Card, Cards, _card} from './types/Card';
 import {Block, TQLFn} from './types/Block';
 import {Display} from './displays/Display';
+import BlockUtils from './BlockUtils';
 
 export module CommonBlocks
 {
@@ -96,7 +97,7 @@ export module CommonBlocks
           if (c.cards.size)
           {
             const card = c.cards.get(0);
-            return getPreview(card);
+            return BlockUtils.getPreview(card);
           }
           return 'Nothing';
         },

@@ -49,7 +49,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import {BuilderState, BuilderStore} from '../../data/BuilderStore';
 import {CardComponent, CardItem} from '../cards/CardComponent';
@@ -58,7 +57,6 @@ import CreateCardTool from './CreateCardTool';
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 const {List} = Immutable;
 import CardDragPreview from './CardDragPreview';
-import CardDropArea from './CardDropArea';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props

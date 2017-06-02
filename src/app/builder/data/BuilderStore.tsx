@@ -55,16 +55,16 @@ import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} fro
 
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { Card, Cards } from '../../../../shared/blocks/types/Card';
-import BuilderTypes from './../BuilderTypes';
+import Query from '../../../../shared/items/types/Query';
 
 export class BuilderStateClass
 {
   variantId: ID = '';
-  query: BuilderTypes.Query = null;
+  query: Query = null;
 
   // for undo/redo
-  pastQueries: List<BuilderTypes.Query> = Immutable.List([]);
-  nextQueries: List<BuilderTypes.Query> = Immutable.List([]);
+  pastQueries: List<Query> = Immutable.List([]);
+  nextQueries: List<Query> = Immutable.List([]);
   lastActionType: string = '';
   lastActionKeyPath: KeyPath = null;
   lastActionTime: number = 0;

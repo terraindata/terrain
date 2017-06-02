@@ -45,12 +45,12 @@ THE SOFTWARE.
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { CardItem } from '../components/cards/Card';
-import { BuilderTypes } from './../BuilderTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './BuilderActionTypes';
 import Store from './BuilderStore';
 import List = Immutable.List;
 import Map = Immutable.Map;
+import Query from '../../../../shared/items/types/Query';
 
 const $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
@@ -111,7 +111,7 @@ const BuilderActions =
 
   // load query from server into state
   queryLoaded:
-    (query: BuilderTypes.Query, xhr: XMLHttpRequest, db: BackendInstance) =>
+    (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
       $(ActionTypes.queryLoaded, { query, xhr, db }),
 
   save:

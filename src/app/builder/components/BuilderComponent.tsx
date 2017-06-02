@@ -52,7 +52,6 @@ import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
 import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
-import BuilderTypes from '../BuilderTypes';
 import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
 import {Display, DisplayType} from './../BuilderDisplays';
@@ -290,6 +289,7 @@ class BuilderComponent extends PureClasss<Props>
                   onMove={this._fn(this.moveRow, keyPath)}
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
+                  language={this.props.language}
 
                   row={d.row}
                   keyPath={this._ikeyPath(keyPath, i)}
@@ -327,6 +327,7 @@ class BuilderComponent extends PureClasss<Props>
                   className,
                   onChange: BuilderActions.change,
                   builderState: d.requiresBuilderState && BuilderStore.getState(),
+                  language: this.props.language,
                 },
               )
             }

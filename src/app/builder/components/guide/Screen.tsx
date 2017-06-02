@@ -50,7 +50,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import Card from '../cards/Card';
 import PureClasss from './../../../common/components/PureClasss';

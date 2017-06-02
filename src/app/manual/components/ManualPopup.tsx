@@ -48,7 +48,6 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import BuilderTypes from './../../builder/BuilderTypes';
 import Classs from './../../common/components/Classs';
 const InfoIcon = require('./../../../images/icon_info.svg');
 const OpenIcon = require('./../../../images/icon_open.svg');
@@ -109,8 +108,8 @@ class ManualPopup extends Classs<Props>
   render()
   {
 
-    const manualEntry = BuilderTypes.cardList[this.props.cardName]
-        && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
+    // const manualEntry = cardList[this.props.cardName]
+    //     && Blocks[cardList[this.props.cardName]].static.manualEntry;
     const content = manualEntry ? manualEntry.snippet : 'No description available';
     return (
     <div

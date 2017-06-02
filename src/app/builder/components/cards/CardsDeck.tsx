@@ -49,7 +49,6 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';

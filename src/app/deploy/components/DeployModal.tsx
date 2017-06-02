@@ -49,7 +49,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
 
-import BuilderTypes from '../../builder/BuilderTypes';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
 import LibraryStore from '../../library/data/LibraryStore';

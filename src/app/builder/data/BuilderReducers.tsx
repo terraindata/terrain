@@ -47,11 +47,13 @@ import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
-import {BuilderTypes} from './../BuilderTypes';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import {BuilderState} from './BuilderStore';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import Query from '../../../../shared/items/types/Query';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 {
@@ -84,7 +86,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
     const xhr: XMLHttpRequest = Ajax.getQuery(
       variantId,
-      (query: BuilderTypes.Query) =>
+      (query: Query) =>
       {
         if (query)
         {
@@ -109,7 +111,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
   (
     state: BuilderState,
     action: Action<{
-      query: BuilderTypes.Query,
+      query: Query,
       xhr: XMLHttpRequest,
       db: BackendInstance,
     }>,
@@ -180,7 +182,9 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       (arr) =>
       {
         const item = action.payload.data ? action.payload.data :
-            BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType]);
+            BlockUtils.make(
+              AllBackendsMap[state.query.language].blocks[action.payload.factoryType]
+            );
 
         if (action.payload.index === null)
         {

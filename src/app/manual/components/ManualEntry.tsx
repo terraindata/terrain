@@ -52,9 +52,8 @@ import Classs from './../../common/components/Classs';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 import * as Immutable from 'immutable';
-import TQLConverter from '../../tql/TQLConverter';
-import BuilderTypes from './../../builder/BuilderTypes';
-import Card from './../../builder/components/cards/Card';
+import Card from './../../builder/components/cards/CardComponent';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');
 require('./../../tql/components/tql.js');
@@ -62,6 +61,8 @@ import './../../tql/components/codemirror.less';
 import './../../tql/components/monokai.less';
 
 const reactStringReplace = require('react-string-replace');
+
+import {cardList} from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {
@@ -78,7 +79,7 @@ export interface Props
 class ManualEntry extends Classs<Props>
 {
 
-  allTqlCards = BuilderTypes.cardList;
+  allTqlCards = cardList;
 
   constructor(props: Props)
   {
@@ -86,8 +87,8 @@ class ManualEntry extends Classs<Props>
     this.state =
       {
         expanded: this.props.expanded,
-        manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[this.props.entryName] :
-          BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry,
+        // manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[this.props.entryName] :
+        //   Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry,
       };
   }
 
@@ -95,8 +96,8 @@ class ManualEntry extends Classs<Props>
   {
     this.setState({
       expanded: newProps.expanded,
-      manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[newProps.entryName] :
-        BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry,
+      // manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[newProps.entryName] :
+      //   Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry,
     });
   }
 
@@ -225,10 +226,10 @@ class ManualEntry extends Classs<Props>
   renderCardExample(index)
   {
     return <div>Temporarily disabled</div>;
-    // if(BuilderTypes.Blocks[this.state.manualEntry.text[index].type])
+    // if(Blocks[this.state.manualEntry.text[index].type])
     // {
-    //   var card = BuilderTypes.make(
-    //     BuilderTypes.Blocks[this.state.manualEntry.text[index].type],
+    //   var card = BlockUtils.make(
+    //     Blocks[this.state.manualEntry.text[index].type],
     //     this.state.manualEntry.text[index]
     //   );
     //   return (
@@ -258,7 +259,7 @@ class ManualEntry extends Classs<Props>
     //   foldGutter: true,
     //   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     // }
-    // var cards = Immutable.List([BuilderTypes.recordFromJS(this.state.manualEntry.text[index])]);
+    // var cards = Immutable.List([BlockUtils.recordFromJS(this.state.manualEntry.text[index])]);
     // var query: any = {
     //   id: 'a',
     //   cards: cards,

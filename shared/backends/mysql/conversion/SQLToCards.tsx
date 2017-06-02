@@ -54,8 +54,9 @@ import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import {Card, Cards, CardString} from '../../../blocks/types/Card';
 import {Block} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
+const { make } = BlockUtils;
 
-const {Blocks, make} = BuilderTypes;
+import Blocks from '../blocks/MySQLBlocks';
 
 export default function SQLToCards(
   query: Query,

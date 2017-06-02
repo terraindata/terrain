@@ -114,7 +114,7 @@ const _mathCard = (config: {
         (card) =>
           card['fields'].map(
             (field) =>
-              typeof field.field !== 'object' ? field.field : getPreview(field.field),
+              typeof field.field !== 'object' ? field.field : BlockUtils.getPreview(field.field),
           ).join(config.tqlGlue),
 
       tql: '($fields )',
@@ -485,11 +485,11 @@ export const MySQLBlocks =
         let second = c['second'];
         if (first._isCard)
         {
-          first = getPreview(first);
+          first = BlockUtils.getPreview(first);
         }
         if (second._isCard)
         {
-          second = getPreview(second);
+          second = BlockUtils.getPreview(second);
         }
 
         return `${first} ${CommonSQL.OperatorTQL[c['operator']]} ${second}`;
@@ -529,7 +529,7 @@ export const MySQLBlocks =
           {
             return property;
           }
-          return getPreview(property);
+          return BlockUtils.getPreview(property);
         }
         return sorts.size + ' Factors';
       },
@@ -865,7 +865,7 @@ export const MySQLBlocks =
       preview: (card: any) => {
         if (card.input._isCard)
         {
-          return '' + getPreview(card.input);
+          return '' + BlockUtils.getPreview(card.input);
         }
         return '' + card.input;
       },
@@ -1064,6 +1064,22 @@ export const MySQLBlocks =
   }),
 };
 
-BlockUtils.addTypeToBlocks(MySQLBlocks);
+BlockUtils.initBlocks(MySQLBlocks);
+
+
+// array of different card types
+export const CardTypes = _.compact(_.map(MySQLBlocks, (block, k: string) => block['_isCard'] && k ));
+
+// TODO remove
+const cards = {};
+for (const key in MySQLBlocks)
+{
+  if (MySQLBlocks[key]._isCard && MySQLBlocks[key].static.manualEntry)
+  {
+    cards[MySQLBlocks[key].static.manualEntry.name] = key;
+  }
+}
+export const cardList = cards;
+
 
 export default MySQLBlocks;

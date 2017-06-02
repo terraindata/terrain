@@ -49,11 +49,12 @@ import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss';
 const classNames = require('classnames');
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
-import { CardItem } from './Card';
+import { CardItem } from './CardComponent';
 import {cardWillWrap, onCardDrop} from './CardDropArea';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 interface CDPProps
 {
@@ -79,9 +80,20 @@ class CardDragPreview extends PureClasss<CDPProps>
 
   state: {
     justDropped: boolean;
+    language: string;
   } = {
     justDropped: false,
+    language: Store.getState().query.language,
   };
+  
+  componentDidMount()
+  {
+    this._subscribe(Store,
+    {
+      stateKey: 'language',
+      storeKeyPath: ['query', 'language'],
+    })
+  }
 
   timeout: any;
 
@@ -106,6 +118,8 @@ class CardDragPreview extends PureClasss<CDPProps>
   {
     const item = this.props.cardItem;
     let colors: string[], title: string, preview: string;
+    
+    const Blocks = AllBackendsMap[this.state.language].blocks;
 
     if (!item)
     {
@@ -115,14 +129,14 @@ class CardDragPreview extends PureClasss<CDPProps>
     if (item)
     {
       const {type} = item;
-      if (BuilderTypes.Blocks[type])
+      if (Blocks[type])
       {
-        colors = BuilderTypes.Blocks[type].static.colors;
-        title = BuilderTypes.Blocks[type].static.title;
+        colors = Blocks[type].static.colors;
+        title = Blocks[type].static.title;
         preview = 'New';
         if (!item['new'])
         {
-          preview = BuilderTypes.getPreview(item.props.card);
+          preview = BlockUtils.getPreview(item.props.card);
         }
       }
     }

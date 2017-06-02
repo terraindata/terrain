@@ -43,15 +43,18 @@ THE SOFTWARE.
 */
 
 import CardsToCodeOptions from './CardsToCodeOptions';
+import Block from '../../blocks/types/Block';
+import Query from '../../items/types/Query';
 
-export default interface Backend
+export interface Backend
 {
 	type: string;
 	name: string;
 	
+	// each type should be unique among the whole scope of cards in all languages
 	blocks:
 	{
-		[type: string]: BlockConfig
+		[type: string]: Block
 	};
 	
 	// Ordering of the cards deck
@@ -59,7 +62,7 @@ export default interface Backend
 	
 	queryToCode(
 		query: Query,
-		options: CardstoCodeOptions
+		options: CardsToCodeOptions
   ): string;
 	
 	codeToQuery(
@@ -74,3 +77,5 @@ export default interface Backend
 	// function to get transform bars?
 	// autocomplete?
 }
+
+export default Backend;

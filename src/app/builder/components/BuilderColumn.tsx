@@ -57,7 +57,6 @@ import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
-import BuilderTypes from '../BuilderTypes';
 import Ajax from './../../util/Ajax';
 import Query from '../../../../shared/items/types/Query';
 
@@ -202,7 +201,7 @@ const BuilderColumn = React.createClass<any, any>(
       );
     }
 
-    const query: BuilderTypes.Query = this.props.query;
+    const query: Query = this.props.query;
     const {canEdit} = this.props;
     switch (this.state.column)
     {

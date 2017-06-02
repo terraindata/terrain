@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import Map = Immutable;
 import List = Immutable;
@@ -53,7 +54,7 @@ module BlockUtils
 {
   export function getChildIds(_block: Block): IMMap<ID, boolean>
   {
-    let map = Map<ID, boolean>({});
+    let map = IMMap<ID, boolean>({});
 
     if (Immutable.Iterable.isIterable(_block))
     {
@@ -129,32 +130,21 @@ module BlockUtils
   
   
   // This creates a new instance of a card / block
-  // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
+  // Usage: BlockUtils.make(MySQLBlocks.sort)
   export const make = (block: Block, extraConfig?: {[key: string]: any}) =>
   {
     const {type} = block;
 
     block = _.extend({}, block); // shallow clone
 
-    if (Blocks[type].static.init)
+    if (block.static.init)
     {
-      block = _.extend({}, block, Blocks[type].static.init());
+      block = _.extend({}, block, block.static.init());
     }
 
     if (extraConfig)
     {
       block = _.extend(block, extraConfig);
-
-      if (block.type === 'sfw' && block['tables'] && block['tables'].size && block['tables'].get(0).table !== 'none')
-      {
-        // convert old format, where tables were included, to new format with separate from card
-        // TODO remove once sufficiently antiquated
-        block['cards'] = block['cards'].unshift(
-          make(Blocks.from, {
-            tables: block['tables'],
-          }),
-        );
-      }
     }
 
     if (block.static)
@@ -167,38 +157,20 @@ module BlockUtils
       block.id = 'block-' + Math.random();
     }
 
-    return typeToRecord[type](block);
+    return blockTypeToBlockRecord[block.type](block);
   };
 
-  // array of different card types
-  export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block['_isCard'] && k ));
-
-  // TODO remove
-  const cards = {};
-  for (const key in Blocks)
-  {
-    if (Blocks[key]._isCard && Blocks[key].static.manualEntry)
-    {
-      cards[Blocks[key].static.manualEntry.name] = key;
-    }
-  }
-  export const cardList = cards;
-
   // private, maps a type (string) to the backing Immutable Record
-  const typeToRecord = _.reduce(Blocks as ({[card: string]: any}),
-    (memo, v, i) => {
-      memo[i] = Immutable.Record(v);
-      return memo;
-    }
-  , {});
-
+  // types are added when initBlocks is called
+  const blockTypeToBlockRecord: any = {}; 
+  
   // Given a plain JS object, construct the Record for it and its children
-  export const recordFromJS = (value: any) =>
+  export const recordFromJS = (value: any, Blocks) =>
   {
     if (value && value.static && Immutable.Iterable.isIterable(value))
     {
       // already a block / record
-      // TODO change to a better way of checking
+      // change to a better way of checking if you can think of one
       return value;
     }
 
@@ -206,31 +178,16 @@ module BlockUtils
     {
       if (Immutable.Iterable.isIterable(value))
       {
-        value = value.map((v) => recordFromJS(v));
+        value = value.map((v) => recordFromJS(v, Blocks));
       }
       else
       {
         value = _.reduce(value, (memo, v, key) =>
         {
-          memo[key] = recordFromJS(v);
+          memo[key] = recordFromJS(v, Blocks);
           return memo;
         }, Array.isArray(value) ? [] : {});
       }
-
-      // conversion, remove when appropriate
-      // if(value.type === 'multiand' || value.type === 'multior')
-      // {
-      //   value.type = value.type.substr(5);
-      //   value.cards = value.clauses.map(block =>
-      //   {
-      //     let clause = block.get('clause');
-      //     if(typeof clause === 'string')
-      //     {
-      //       return make(Blocks.tql, { clause });
-      //     }
-      //     return clause;
-      //   });
-      // }
 
       const type = value.type || (typeof value.get === 'function' && value.get('type'));
       if (type && Blocks[type])
@@ -328,10 +285,21 @@ module BlockUtils
     return 'No preview';
   }
   
-  export function addTypeToBlocks(Blocks)
+  // Must be called on the Blocks def for each language
+  // Used to add types to the Blocks and add them to the typeToRecord config
+  //  if you can think of a better way to do this, be my guest.
+  export function initBlocks(Blocks)
   {
-    // Set the "type" field for all blocks equal to its key
-    _.map(Blocks as ({[card: string]: any}), (v, i) => Blocks[i].type = i);
+    _.map(
+      Blocks as ({[card: string]: any}), 
+      (v, i) => 
+      {
+        // Set the "type" field for all blocks equal to its key
+        Blocks[i].type = i
+        // finally, add Blocks to the blockTypeToBlockRecord map
+        blockTypeToBlockRecord[i] = Immutable.Record(Blocks[i]);
+      }
+    );
   }
 }
 

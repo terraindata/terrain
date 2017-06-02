@@ -49,7 +49,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import { Display } from '../../builder/BuilderDisplays';
-import { BuilderTypes } from '../../builder/BuilderTypes';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import Util from '../../util/Util';
 

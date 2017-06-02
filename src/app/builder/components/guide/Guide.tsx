@@ -56,7 +56,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import Card from '../cards/Card';
 import PureClasss from './../../../common/components/PureClasss';
@@ -111,13 +110,13 @@ export interface ICondition
 {
   first: IExpression;
   second: IExpression;
-  operator: BuilderTypes.Operator;
+  // operator: Operator;
 }
 
 export interface IConditions
 {
   conditions: Array<ICondition | IConditions>;
-  combinator: BuilderTypes.Combinator;
+  // combinator: Combinator;
 }
 
 // DIFFERENT FROM BROWSERTYPES
@@ -132,7 +131,7 @@ class QueryClass
 
   where: IConditions = {
     conditions: [],
-    combinator: BuilderTypes.Combinator.AND,
+    // combinator: Combinator.AND,
   };
 }
 export interface IQuery extends QueryClass, IRecord<IQuery> {}

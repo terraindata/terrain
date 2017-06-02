@@ -48,11 +48,13 @@ import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 
+import Query from '../../../shared/items/types/Query';
+
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
-import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
 import BackendInstance from './../../../shared/backends/types/BackendInstance';
+import {Item, ItemType} from '../../../shared/items/types/Item';
 import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
@@ -254,18 +256,18 @@ export const Ajax =
               VARIANT:   Immutable.Map<number, LibraryTypes.Variant>({}) as any,
               ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}),
               GROUP:     Immutable.Map<number, LibraryTypes.Group>({}),
-              QUERY:     Immutable.Map<number, BuilderTypes.Query>({}),
+              QUERY:     Immutable.Map<number, Query>({}),
             };
           let groupsOrder = [];
 
           items.map(
             (itemObj) =>
             {
-              const item = LibraryTypes._Item(
+              const item = LibraryTypes.typeToConstructor[itemObj['type']](
                 responseToRecordConfig(itemObj),
               );
               mapping[item.type] = mapping[item.type].set(item.id, item);
-              if (item.type === LibraryTypes.ItemType.Group)
+              if (item.type === ItemType.Group)
               {
                 groupsOrder.push(item.id);
               }
@@ -305,9 +307,9 @@ export const Ajax =
       );
     },
 
-    getItem(type: LibraryTypes.ItemType,
+    getItem(type: ItemType,
       id: ID,
-      onLoad: (item: LibraryTypes.Item) => void,
+      onLoad: (item: Item) => void,
       onError?: (ev: Event) => void)
     {
       return Ajax.req(
@@ -318,7 +320,7 @@ export const Ajax =
         {
           if (response && response[0])
           {
-            const item = LibraryTypes._Item(responseToRecordConfig(response[0]));
+            const item = LibraryTypes.typeToConstructor[response[0]['type']](responseToRecordConfig(response[0]));
             onLoad(item);
           }
           else
@@ -423,7 +425,7 @@ export const Ajax =
     },
 
     getQuery(variantId: ID,
-      onLoad: (query: BuilderTypes.Query, variant: LibraryTypes.Variant) => void,)
+      onLoad: (query: Query, variant: LibraryTypes.Variant) => void,)
     {
       if (!variantId)
       {

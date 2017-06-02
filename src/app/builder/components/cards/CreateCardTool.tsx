@@ -48,10 +48,10 @@ import * as _ from 'underscore';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import BuilderTypes from './../../BuilderTypes';
 import CardDropArea from './CardDropArea';
 import { Card } from '../../../../../shared/blocks/types/Card';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 
 const cardsOrderings: { [type: string]: string[] } =
   _.mapObject(AllBackendsMap,
@@ -104,7 +104,10 @@ class CreateCardTool extends PureClasss<Props>
     const type = Util.rel(event.target);
     if (this.props.index === null)
     {
-      Actions.change(this.props.keyPath, BuilderTypes.make(BuilderTypes.Blocks[type]));
+      Actions.change(
+        this.props.keyPath, 
+        BlockUtils.make(AllBackendsMap[this.props.language].blocks[type])
+      );
     }
     else
     {
@@ -168,7 +171,9 @@ class CreateCardTool extends PureClasss<Props>
                return null;
              }
 
-             const card = BuilderTypes.make(BuilderTypes.Blocks[type]);
+             const card = BlockUtils.make(
+               AllBackendsMap[this.props.language].blocks[type]
+             );
                  // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
              return (
                <a
@@ -277,6 +282,7 @@ class CreateCardTool extends PureClasss<Props>
           keyPath={this.props.keyPath}
           accepts={this.props.accepts}
           renderPreview={typeof this.props.index !== 'number'}
+          language={this.props.language}
         />
      </div>
    );

@@ -54,7 +54,6 @@ import Menu from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
-import { BuilderTypes } from './../../BuilderTypes';
 const shallowCompare = require('react-addons-shallow-compare');
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
@@ -62,7 +61,7 @@ const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-import Input from '../../../../../shared/blocks/types/Input';
+import {Input, InputType} from '../../../../../shared/blocks/types/Input';
 
 const InputComponent = React.createClass<any, any>({
 	mixins: [PanelMixin],
@@ -170,7 +169,7 @@ const InputComponent = React.createClass<any, any>({
 
   renderInputValue()
   {
-    if (this.props.input.inputType === BuilderTypes.InputType.DATE)
+    if (this.props.input.inputType === InputType.DATE)
     {
       return (
         <div>
@@ -189,7 +188,7 @@ const InputComponent = React.createClass<any, any>({
         value={this.props.input.value}
         className="input-text input-text-second"
         keyPath={this.getKeyPath('value')}
-        isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
+        isNumber={this.props.input.inputType === InputType.NUMBER}
         typeErrorMessage="This input is in number mode\nthis should be a number."
         placeholder="Sample value"
         autoDisabled={true}

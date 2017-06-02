@@ -46,7 +46,6 @@ require('./TQLResultsBar.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
-import BuilderTypes from '../../builder/BuilderTypes';
 import {ResultsState} from '../../builder/components/results/ResultsManager';
 import Actions from '../../builder/data/BuilderActions';
 import TQLConverter from '../../tql/TQLConverter';

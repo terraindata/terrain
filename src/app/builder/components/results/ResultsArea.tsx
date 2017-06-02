@@ -55,7 +55,6 @@ import InfoArea from '../../../common/components/InfoArea';
 import TQLConverter from '../../../tql/TQLConverter';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import Result from '../results/Result';
@@ -66,6 +65,7 @@ import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import {getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass} from './ResultsManager';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
+import Query from '../../../../../shared/items/types/Query';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -73,7 +73,7 @@ export interface Props
 {
   resultsState: ResultsState;
   db: BackendInstance;
-  query: BuilderTypes.Query;
+  query: Query;
   canEdit: boolean;
   variantName: string;
 

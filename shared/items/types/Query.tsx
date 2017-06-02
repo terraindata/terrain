@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import {Cards} from '../../blocks/types/Card';
+import BlockUtils from '../../blocks/BlockUtils';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -85,8 +86,8 @@ export interface Query extends QueryC, IRecord<Query> {}
 
 export const _Query = (config?: Object) => {
   config = config || {};
-  config['cards'] = BuilderTypes.recordFromJS(config['cards'] || []);
-  config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || []);
+  config['cards'] = BlockUtils.recordFromJS(config['cards'] || []);
+  config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || []);
   config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
 
   let query = new Query_Record(config) as any as Query;

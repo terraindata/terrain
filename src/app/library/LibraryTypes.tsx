@@ -45,17 +45,19 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import {IResultsConfig} from '../builder/components/results/ResultsConfig';
-import BuilderTypes from './../builder/BuilderTypes';
 import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const {List, Map} = Immutable;
 import {BaseClass, New} from '../Classes';
 import BackendInstance from '../../../shared/backends/types/BackendInstance';
+import {Query, _Query, queryForSave} from '../../../shared/items/types/Query';
+import {ItemStatus, ItemType, ItemC, Item} from '../../../shared/items/types/Item';
+
+// TODO MOD refactor
 
 export module LibraryTypes
 {
-  
   class VariantC extends ItemC
   {
     type = ItemType.Variant;
@@ -73,7 +75,7 @@ export module LibraryTypes
 
     // don't use this!
     // TODO remove when variants can be saved without queries
-    query: BuilderTypes.Query = null;
+    query: Query = null;
   }
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
@@ -104,7 +106,7 @@ export module LibraryTypes
     config = config || {};
 
     // TODO change to standalone query Item
-    config.query = BuilderTypes._Query(config.query);
+    config.query = _Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
     if (!config || !config.lastUserId || !config.lastEdited)
@@ -124,7 +126,7 @@ export module LibraryTypes
 
   export function variantForSave(v: Variant): Variant
   {
-    return v.set('query', BuilderTypes.queryForSave(v.query));
+    return v.set('query', queryForSave(v.query));
   }
 
 
@@ -233,15 +235,17 @@ export module LibraryTypes
     }
   }
   
+  
   export const typeToConstructor: {
     [key: string]: (...args) => Item,
   } =
   {
-    [ItemType.Query]: BuilderTypes._Query,
+    [ItemType.Query]: _Query,
     [ItemType.Variant]: _Variant,
     [ItemType.Algorithm]: _Algorithm,
     [ItemType.Group]: _Group,
   };
+
 }
 
 export default LibraryTypes;

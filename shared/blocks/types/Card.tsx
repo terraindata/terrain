@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import {Block, TQLFn, allBlocksMetaFields} from './Block';
 import {Display} from '../displays/Display';
+import BlockUtils from '../BlockUtils';
 
 export interface Card extends IRecord<Card>
 {
@@ -67,7 +68,7 @@ export interface Card extends IRecord<Card>
     // - arrays/Lists are joined with "," by default
     // - to join List with something else, specify a tqlGlue
     // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map in CommonSQL
-    //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
+    //    e.g. "$DIRECTION" will look up "DirectionTQL" in CommonSQL and pass the value into it
     // - topTql is the tql to use if this card is at the top level of a query
     tql: TQLFn;
     tqlGlue?: string;
@@ -88,7 +89,7 @@ export interface Card extends IRecord<Card>
       // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
     preview: string | ((c: Card) => string);
-    // The BuilderTypes.getPreview function constructs
+    // The BlockUtils.getPreview function constructs
     // a preview from a card object based on this string.
     // It replaces anything within [] with the value for that key.
     // If an array of objects, you can specify: [arrayKey.objectKey]

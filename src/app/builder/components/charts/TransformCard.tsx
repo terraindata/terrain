@@ -46,15 +46,14 @@ import * as Immutable from 'immutable';
 const {Map, List} = Immutable;
 import * as React from 'react';
 import * as _ from 'underscore';
-import TQLConverter from '../../../tql/TQLConverter';
 import { Ajax, QueryResponse } from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
-import { BuilderTypes } from './../../BuilderTypes';
 import TransformCardChart from './TransformCardChart';
 const Dimensions = require('react-dimensions');
 import { Card, CardString } from '../../../../../shared/blocks/types/Card';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 
 const NUM_BARS = 1000;
 
@@ -64,6 +63,7 @@ export interface Props
   data: any; // transform card
   onChange: (keyPath: KeyPath, value: any, isDirty?: boolean) => void;
   builderState: any;
+  language: string;
 
   canEdit?: boolean;
   spotlights?: any;
@@ -426,9 +426,10 @@ class TransformCard extends PureClasss<Props>
           domain={this.state.domain}
           range={this.state.range}
           spotlights={spotlights && spotlights.toList().toJS()}
-          inputKey={BuilderTypes.transformAlias(this.props.data)}
+          inputKey={BlockUtils.transformAlias(this.props.data)}
           updatePoints={this.handleUpdatePoints}
           width={width}
+          language={this.props.language}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}

@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 import {Block} from '../../../shared/blocks/types/Block';
 import {Card} from '../../../shared/blocks/types/Card';
+import {Input} from '../../../shared/blocks/types/Input';
 
 import * as Immutable from 'immutable';
-import BuilderTypes from './BuilderTypes';
 import {BuilderState, BuilderStore} from './data/BuilderStore';
 import SchemaStore from '../schema/data/SchemaStore';
 
@@ -63,7 +63,7 @@ export module BuilderHelpers
     if (inputs && inputs.size)
     {
       const inputTerms = inputs.map(
-        (input: BuilderTypes.IInput) => 'input.' + input.key,
+        (input: Input) => 'input.' + input.key,
       ).toList();
       if (terms)
       {

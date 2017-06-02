@@ -47,16 +47,16 @@ import * as _ from 'underscore';
 import CommonSQL from '../syntax/CommonSQL';
 
 import {Block} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
 import {Card} from '../../../blocks/types/Card';
-
-type IInput = BuilderTypes.IInput;
+import {Input, InputType} from '../../../blocks/types/Input';
+import Query from '../../../items/types/Query';
+import MySQLBlocks from '../blocks/MySQLBlocks';
 
 const join = (j, index) => (index === 0 ? '' : j);
 const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
 const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
-
-import { BuilderTypes } from '../builder/BuilderTypes';
 
 export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.
@@ -68,7 +68,7 @@ export interface Options {
 
 class CardsToSQL
 {
-  static toSQL(query: BuilderTypes.Query, options: Options = {}): string
+  static toSQL(query: Query, options: Options = {}): string
   {
     let {cards, inputs} = query;
 
@@ -83,14 +83,14 @@ class CardsToSQL
     // var inputsTql = "";
     if (inputs && inputs.size && options.replaceInputs)
     {
-      inputs.map((input: IInput) =>
+      inputs.map((input: Input) =>
         {
           let {value} = input;
-          if (input.inputType === BuilderTypes.InputType.TEXT)
+          if (input.inputType === InputType.TEXT)
           {
             value = `"${value}"`;
           }
-          if (input.inputType == BuilderTypes.InputType.DATE)
+          if (input.inputType == InputType.DATE)
           {
             value = `'${value}'`;
           }
@@ -138,7 +138,7 @@ class CardsToSQL
           {
             fields = fields.filter((v) => v.field !== '*').toList();
             return fields.unshift(
-              BuilderTypes.make(BuilderTypes.Blocks.field, {
+              BlockUtils.make(MySQLBlocks.field, {
                 field: '*',
               }),
             );
@@ -152,7 +152,7 @@ class CardsToSQL
       // add a take card if none are present
       if (options.limit && !fromCard['cards'].some((card) => card.type === 'take'))
       {
-        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.make(BuilderTypes.Blocks.take, {
+        return fromCard.set('cards', fromCard['cards'].push(BlockUtils.make(MySQLBlocks.take, {
           value: options.limit,
         })));
       }
@@ -164,7 +164,7 @@ class CardsToSQL
         fromCard = fromCard.update('fields',
           (fields) =>
             fields.filter((v) => v.field !== '*').toList()
-              .unshift(BuilderTypes.make(BuilderTypes.Blocks.field, {
+              .unshift(BlockUtils.make(MySQLBlocks.field, {
                 field: 'COUNT(*)',
               })),
         );
@@ -175,7 +175,7 @@ class CardsToSQL
         // TODO find score fields. Score fields!
 
         let transformInputs: Array<{input: string, alias: string}> = [];
-        BuilderTypes.forAllCards(fromCard, (card) =>
+        BlockUtils.forAllCards(fromCard, (card) =>
         {
           if (card.type === 'transform')
           {
@@ -186,7 +186,7 @@ class CardsToSQL
             }
             transformInputs.push({
               input,
-              alias: BuilderTypes.transformAlias(card),
+              alias: BlockUtils.transformAlias(card),
             }); // need to filter out any non-letters-or-numbers
           }
         });
@@ -226,7 +226,7 @@ class CardsToSQL
         {
           fromCard = fromCard.update('fields',
             (fields) => fields.push(
-                BuilderTypes.make(BuilderTypes.Blocks.field, {
+                BlockUtils.make(MySQLBlocks.field, {
                   field: transformInput.input + ' as ' + transformInput.alias,
                 }),
               ),

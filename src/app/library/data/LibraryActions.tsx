@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 const _ = require('underscore');
 import Util from '../../util/Util';
-import BuilderTypes from './../../builder/BuilderTypes';
 import LibraryTypes from './../LibraryTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './LibraryActionTypes';

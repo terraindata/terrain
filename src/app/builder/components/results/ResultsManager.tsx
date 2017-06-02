@@ -50,11 +50,11 @@ import {BaseClass, New} from '../../../Classes';
 import TQLConverter from '../../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
+import Query from '../../../../../shared/items/types/Query';
 
 export const MAX_RESULTS = 200;
 
@@ -106,7 +106,7 @@ export let _ResultsState = (config: Object = {}) =>
 
 export interface Props
 {
-  query: BuilderTypes.Query;
+  query: Query;
   resultsState: ResultsState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
@@ -163,7 +163,7 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  queryResults(query: BuilderTypes.Query, db: BackendInstance)
+  queryResults(query: Query, db: BackendInstance)
   {
     if (!query || !db)
     {

@@ -50,7 +50,6 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import {scrollAction} from '../../data/BuilderScrollStore';
 import PureClasss from './../../../common/components/PureClasss';
@@ -218,6 +217,7 @@ class CardsColumn extends PureClasss<Props>
               keyPath={keyPath}
               heightOffset={12}
               accepts={_topLevelAccepts}
+              language={this.props.language}
             />
             <CardsArea
               cards={cards}

@@ -50,10 +50,9 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { Display } from '../../builder/BuilderDisplays';
+import Display from '../../../../shared/blocks/displays/Display';
 import BuilderHelpers from '../../builder/BuilderHelpers';
-import { BuilderTypes } from '../../builder/BuilderTypes';
-import Card from '../../builder/components/cards/Card';
+import Card from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
@@ -62,8 +61,9 @@ import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
 import {Block} from '../../../../shared/blocks/types/Block';
-
-type CardString = CardString;
+import {CardString} from '../../../../shared/blocks/types/Card';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
@@ -211,7 +211,7 @@ class BuilderTextbox extends PureClasss<Props>
 
   handleSwitch()
   {
-    const value = this.isText() ? BuilderTypes.make(BuilderTypes.Blocks.creating) : '';
+    const value = this.isText() ? BlockUtils.make(AllBackendsMap[this.props.language].blocks.creating) : '';
     this.setState({
       value,
       backupString: typeof this.props.value === 'string' ? this.props.value : null,
@@ -343,6 +343,7 @@ class BuilderTextbox extends PureClasss<Props>
                 accepts={this.props.display && this.props.display.accepts}
                 renderPreview={true}
                 afterDrop={this.handleCardDrop}
+                language={this.props.language}
               />
           }
         </div>
@@ -363,7 +364,7 @@ class BuilderTextbox extends PureClasss<Props>
       // var card = cards.get(0);
       const color = card.static.colors[0] as string;
       const title: string = card.closed ? card.static.title : '';
-      const preview = BuilderTypes.getPreview(card);
+      const preview = BlockUtils.getPreview(card);
     // }
     // else
     // {

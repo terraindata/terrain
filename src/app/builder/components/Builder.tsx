@@ -62,11 +62,10 @@ import RolesActions from '../../roles/data/RolesActions';
 import RolesStore from '../../roles/data/RolesStore';
 import UserActions from '../../users/data/UserActions';
 import UserStore from '../../users/data/UserStore';
-import Types from '../BuilderTypes';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
 import { BuilderState, BuilderStore } from './../data/BuilderStore';
-type Query = Types.Query;
+import Query from '../../../../shared/items/types/Query';
 type Variant = LibraryTypes.Variant;
 
 // Components

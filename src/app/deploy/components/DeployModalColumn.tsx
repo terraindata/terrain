@@ -48,7 +48,6 @@ import UserThumbnail from '../../users/components/UserThumbnail';
 import Util from  '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 
-import BuilderTypes from '../../builder/BuilderTypes';
 import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
 

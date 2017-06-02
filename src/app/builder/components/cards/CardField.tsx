@@ -64,6 +64,8 @@ const STANDARD_MARGIN = 6;
 export interface Props
 {
   index: number;
+  language: string;
+  
   onAdd: (index: number) => void;
   onRemove: (index: number) => void;
   onMove: (index: number, newIndex: number) => void;
@@ -365,6 +367,7 @@ class CardField extends PureClasss<Props>
                   beforeDrop={this.beforeTopAddDrop}
                   renderPreview={true}
                   accepts={(this.props.row.inner as Display).accepts}
+                  language={this.props.language}
                 />
               </div>
           }
