@@ -48,7 +48,7 @@ THE SOFTWARE.
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
 import clarinet = require('clarinet');
-import ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
+import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
