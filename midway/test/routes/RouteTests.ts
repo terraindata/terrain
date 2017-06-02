@@ -55,13 +55,17 @@ let server;
 
 beforeAll(async (done) =>
 {
-  fs.unlinkSync('midwaytest.db');
-  const db = new sqlite3.Database('midwaytest.db');
+  const testDBName = 'midwaytest.db';
+  if (fs.existsSync(testDBName)) {
+    fs.unlinkSync(testDBName);
+  }
+
+  const db = new sqlite3.Database(testDBName);
   const options =
     {
       debug: true,
       db: 'sqlite',
-      dsn: 'midwaytest.db',
+      dsn: testDBName,
       port: 43001,
       databases: [
         {
