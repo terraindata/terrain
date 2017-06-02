@@ -111,7 +111,7 @@ class TQLConverter
     if (options.allFields === true)
     {
       const o = JSON.parse(query.tql);
-      if (o.body._source)
+      if (o.body && o.body._source)
       {
         o.body._source  = [];
       }
