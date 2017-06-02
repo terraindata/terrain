@@ -64,6 +64,7 @@ import * as Config from './Config';
 import './Logging';
 import Middleware from './Middleware';
 import MidwayRouter from './Router';
+import * as Schema from './Schema';
 import Users from './users/Users';
 
 export let DB: Tasty.Tasty;
@@ -106,11 +107,6 @@ class App
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
 
-    // tslint:disable-next-line:no-floating-promises
-    (async () => { await Config.handleConfig(config); })();
-
-    Users.initializeDefaultUser();
-
     this.app = new Koa();
     this.app.proxy = true;
     this.app.keys = [srs({ length: 256 })];
@@ -130,10 +126,15 @@ class App
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
   }
 
-  public listen(port: number | undefined = this.config.port): http.Server
+  public async start(): Promise<http.Server>
   {
-    winston.info('Listening on port ' + String(port));
-    return this.app.listen(port);
+    // tslint:disable-next-line:no-floating-promises
+    await Schema.createAppSchema(this.config.db as string, this.DB).then().catch();
+    await Config.handleConfig(this.config).then().catch();
+    await Users.initializeDefaultUser();
+
+    winston.info('Listening on port ' + String(this.config.port));
+    return this.app.listen(this.config.port);
   }
 
   public getConfig(): Config.Config

@@ -44,10 +44,53 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import App from './app/App';
-import CmdLineArgs from './app/CmdLineArgs';
+import * as winston from 'winston';
+import * as Tasty from '../tasty/Tasty';
 
-const app = new App(CmdLineArgs);
-const server = app.start();
+const appSchemaSQL: string[] = [
+  `CREATE TABLE IF NOT EXISTS versions
+    (id integer PRIMARY KEY,
+     objectType text NOT NULL,
+     objectId integer NOT NULL,
+     object text NOT NULL,
+     createdAt datetime DEFAULT CURRENT_TIMESTAMP,
+     createdByUserId integer NOT NULL);`,
+  `CREATE TABLE IF NOT EXISTS items
+    (id integer PRIMARY KEY,
+     meta text,
+     name text NOT NULL,
+     parent integer,
+     status text,
+     type text);`,
+  `CREATE TABLE IF NOT EXISTS databases
+    (id integer PRIMARY KEY,
+     name text NOT NULL,
+     type text NOT NULL,
+     dsn text NOT NULL,
+     status text);`,
+  `CREATE TABLE IF NOT EXISTS users
+    (id integer PRIMARY KEY,
+     accessToken text NOT NULL,
+     email text NOT NULL,
+     isDisabled bool NOT NULL,
+     isSuperUser bool NOT NULL,
+     name text NOT NULL,
+     oldPassword text,
+     password text NOT NULL,
+     timezone string,
+     meta text);`,
+];
 
-export default server;
+export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
+{
+  if (dbtype === 'sqlite' || dbtype === 'mysql')
+  {
+    return tasty.getDB().execute(appSchemaSQL);
+  }
+  else
+  {
+    winston.info('WARNING: Auto-provisioning of app schema not supported for DB of type ' + dbtype);
+  }
+}
+
+export default createAppSchema;

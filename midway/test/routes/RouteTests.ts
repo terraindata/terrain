@@ -54,20 +54,7 @@ let server;
 
 beforeAll(async (done) =>
 {
-  const sql = fs.readFileSync('./midway/test/scripts/test.sql').toString();
   const db = new sqlite3.Database('midwaytest.db');
-  const results = await new Promise((resolve, reject) =>
-  {
-    return db.exec(sql, (error: Error) =>
-    {
-      if (error !== null && error !== undefined)
-      {
-        reject(error);
-      }
-      resolve();
-    });
-  });
-
   const options =
     {
       debug: true,
@@ -84,7 +71,21 @@ beforeAll(async (done) =>
     };
 
   const app = new App(options);
-  server = app.listen();
+
+  const sql = fs.readFileSync('./midway/test/scripts/test.sql').toString();
+  const results = await new Promise((resolve, reject) =>
+  {
+    return db.exec(sql, (error: Error) =>
+    {
+      if (error !== null && error !== undefined)
+      {
+        reject(error);
+      }
+      resolve();
+    });
+  });
+
+  server = await app.start();
 
   request(server)
     .post('/midway/v1/users/')
@@ -108,7 +109,7 @@ beforeAll(async (done) =>
 
 afterAll(() =>
 {
-  fs.unlinkSync('midwaytest.db');
+  // fs.unlinkSync('midwaytest.db');
 });
 
 describe('User and auth route tests', () =>
