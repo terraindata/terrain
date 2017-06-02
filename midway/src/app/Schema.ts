@@ -44,76 +44,53 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyQuery from './TastyQuery';
-import TastySchema from './TastySchema';
-import TastyTable from './TastyTable';
+import * as winston from 'winston';
+import * as Tasty from '../tasty/Tasty';
 
-abstract class TastyDB
+const appSchemaSQL: string[] = [
+  `CREATE TABLE IF NOT EXISTS versions
+    (id integer PRIMARY KEY,
+     objectType text NOT NULL,
+     objectId integer NOT NULL,
+     object text NOT NULL,
+     createdAt datetime DEFAULT CURRENT_TIMESTAMP,
+     createdByUserId integer NOT NULL);`,
+  `CREATE TABLE IF NOT EXISTS items
+    (id integer PRIMARY KEY,
+     meta text,
+     name text NOT NULL,
+     parent integer,
+     status text,
+     type text);`,
+  `CREATE TABLE IF NOT EXISTS databases
+    (id integer PRIMARY KEY,
+     name text NOT NULL,
+     type text NOT NULL,
+     dsn text NOT NULL,
+     status text);`,
+  `CREATE TABLE IF NOT EXISTS users
+    (id integer PRIMARY KEY,
+     accessToken text NOT NULL,
+     email text NOT NULL,
+     isDisabled bool NOT NULL,
+     isSuperUser bool NOT NULL,
+     name text NOT NULL,
+     oldPassword text,
+     password text NOT NULL,
+     timezone string,
+     meta text);`,
+];
+
+export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
 {
-  /**
-   * makes a database specific query from a TastyQuery
-   *
-   * @abstract
-   * @param {TastyQuery} query
-   * @returns {*}
-   *
-   * @memberof TastyDB
-   */
-  public abstract generate(query: TastyQuery): any;
-
-  /**
-   * makes the generated query into a string
-   *
-   * @abstract
-   * @param {TastyQuery} query
-   * @returns {string}
-   *
-   * @memberof TastyDB
-   */
-  public abstract generateString(query: TastyQuery): string;
-
-  /**
-   * execute a database specific query
-   *
-   * @abstract
-   * @param {*} queries
-   * @returns {Promise<object[]>}
-   *
-   * @memberof TastyDB
-   */
-  public async abstract execute(queries: any[]): Promise<object[]>;
-
-  /**
-   * update or insert an array of objects in a TastyTable
-   *
-   * @abstract
-   * @param {TastyTable} table
-   * @param {object[]} elements
-   * @returns {Promise<object[]>}
-   *
-   * @memberof TastyDB
-   */
-  public async abstract upsert(table: TastyTable, elements: object[]): Promise<object[]>;
-
-  /**
-   * returns schema information for a database
-   *
-   * @abstract
-   * @returns {Promise<TastySchema>}
-   *
-   * @memberof TastyDB
-   */
-  public async abstract schema(): Promise<TastySchema>;
-
-  /**
-   * destroy an instance of tasty db
-   *
-   * @abstract
-   * @returns {Promise<void>}
-   *
-   * @memberof TastyDB
-   */
-  public async abstract destroy(): Promise<void>;
+  if (dbtype === 'sqlite' || dbtype === 'mysql')
+  {
+    return tasty.getDB().execute(appSchemaSQL);
+  }
+  else
+  {
+    winston.info('WARNING: Auto-provisioning of app schema not supported for DB of type ' + dbtype);
+  }
 }
 
-export default TastyDB;
+export default createAppSchema;
