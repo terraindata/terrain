@@ -48,7 +48,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { Display } from '../../builder/BuilderDisplays';
+import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import Util from '../../util/Util';
 
@@ -62,6 +62,7 @@ export interface Props
   addColumn?: (number, string?) => void;
   columnIndex: number;
   display: Display;
+  language: string;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>

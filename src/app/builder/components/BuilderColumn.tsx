@@ -213,7 +213,7 @@ const BuilderColumn = React.createClass<any, any>(
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
-          tqlCardsInSync={query.tqlCardsInSync}
+          cardsAndCodeInSync={query.cardsAndCodeInSync}
           parseError={query.parseError}
         />;
 

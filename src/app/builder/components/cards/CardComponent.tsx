@@ -227,7 +227,7 @@ class _CardComponent extends PureClasss<Props>
     }
 
     this.dragPreview = createDragPreview(
-      this.props.card.static.title + ' (' + BlockUtils.BlockUtils.getPreview(this.props.card) + ')',
+      this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')',
     {
       backgroundColor: this.props.card.static.colors[0],
       borderColor: this.props.card.static.colors[0],
@@ -350,7 +350,10 @@ class _CardComponent extends PureClasss<Props>
       return block;
     };
 
-    const card = BlockUtils.recordFromJS(BlockUtils.cardsForServer(removeId(this.props.card)).toJS());
+    const card = BlockUtils.recordFromJS(
+      BlockUtils.cardsForServer(removeId(this.props.card)).toJS(),
+      this.props.card.static.language
+    );
 
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
 
@@ -463,7 +466,7 @@ class _CardComponent extends PureClasss<Props>
             open={true}
             onClose={this.handleCardToolClose}
             accepts={this.props.display && this.props.display.accepts}
-            language={this.props.card.lanugage}
+            language={this.props.card.static.language}
           />
         </div>
       );
@@ -476,7 +479,7 @@ class _CardComponent extends PureClasss<Props>
       addColumn={this.props.addColumn}
       columnIndex={this.props.columnIndex}
       keyPath={this.getKeyPath()}
-      language={this.props.card.lanugage}
+      language={this.props.card.static.language}
     />;
 
     const {card} = this.props;

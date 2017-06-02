@@ -192,6 +192,7 @@ const InputComponent = React.createClass<any, any>({
         typeErrorMessage="This input is in number mode\nthis should be a number."
         placeholder="Sample value"
         autoDisabled={true}
+        language={null}
       />
     );
   },
@@ -223,6 +224,7 @@ const InputComponent = React.createClass<any, any>({
               keyPath={this.getKeyPath('key')}
               placeholder="Input name"
               autoDisabled={true}
+              language={null}
             />
             <Menu
               options={this.getMenuOptions()}

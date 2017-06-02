@@ -48,9 +48,17 @@ const {List, Map} = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
 import {_block, Block, TQLFn} from '../../../blocks/types/Block';
-import {_card} from '../../../blocks/types/Card';
+import {_card, Card, CardString} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
 import CommonSQL from '../syntax/CommonSQL';
 import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
+import CommonBlocks from '../../../blocks/CommonBlocks';
+
+import Util from '../../../../src/app/util/Util';
+
+const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
+
+const {make} = BlockUtils;
 
 // TODO is there a better way to do these things?
 import ScoreBar from '../../../../src/app/builder/components/charts/ScoreBar';
@@ -107,6 +115,7 @@ const _mathCard = (config: {
 
     static:
     {
+      language: 'mysql',
       // manualEntry: null,
       colors: config.colors,
       title: config.title,
@@ -122,7 +131,7 @@ const _mathCard = (config: {
 
       init: () => ({
         fields: List([
-          make(Blocks.field, { field: '' }),
+          make(MySQLBlocks.field, { field: '' }),
         ]),
       }),
 
@@ -230,10 +239,10 @@ export const MySQLBlocks =
 
       init: () => ({
         fields: List([
-          make(Blocks.field, { field: '*' }),
+          make(MySQLBlocks.field, { field: '*' }),
         ]),
         cards: List([
-          make(Blocks.from),
+          make(MySQLBlocks.from),
         ]),
       }),
 
@@ -303,6 +312,7 @@ export const MySQLBlocks =
 
     static:
     {
+      language: 'mysql',
       // manualEntry: ManualConfig.cards['sfw'],
       colors: ['#3a7dcf', '#94b9f6'],
       title: 'From',
@@ -310,11 +320,11 @@ export const MySQLBlocks =
       tql: 'FROM\n$tables',
 
       init: () => ({
-        tables: List([ make(Blocks.table )]),
+        tables: List([ make(MySQLBlocks.table )]),
       }),
 
       getParentTerms:
-        (card: Card, schemaState: SchemaTypes.SchemaState) =>
+        (card: Card, schemaState) =>
           card['tables'].reduce(
             (list: List<string>, tableBlock: {table: string, alias: string}): List<string> =>
             {
@@ -353,7 +363,7 @@ export const MySQLBlocks =
               // help: ManualConfig.help['table'],
               accepts: List(['sfw']),
               showWhenCards: true,
-              getAutoTerms: (comp: React.Component<any, any>, schemaState: SchemaTypes.SchemaState) =>
+              getAutoTerms: (comp: React.Component<any, any>, schemaState) =>
               {
                 const db = Store.getState().db.name; // TODO correct?
                 const tableNames = schemaState.tableNamesByDb.get(db);
@@ -442,6 +452,7 @@ export const MySQLBlocks =
     tql: 'WHERE\n$cards',
     // manualEntry: ManualConfig.cards.where,
     singleChild: true,
+    language: 'mysql',
 
     accepts: List([
       'and',
@@ -459,6 +470,7 @@ export const MySQLBlocks =
     // manualEntry: ManualConfig.cards.and,
     colors: ['#824ba1', '#ecc9ff'],
     accepts: List(['or', 'comparison', 'exists', 'not']),
+    language: 'mysql',
   }),
 
   or: _wrapperCard({
@@ -468,6 +480,7 @@ export const MySQLBlocks =
     // manualEntry: ManualConfig.cards.or,
     colors: ['#b161bc', '#f8cefe'],
     accepts: List(['and', 'comparison', 'exists', 'not']),
+    language: 'mysql',
   }),
 
   comparison: _card(
@@ -518,6 +531,7 @@ export const MySQLBlocks =
 
     static:
     {
+      language: 'mysql',
       title: 'Order By',
       preview: (c: any) =>
       {
@@ -541,7 +555,7 @@ export const MySQLBlocks =
       {
         return {
           sorts: List([
-            make(Blocks.sortBlock),
+            make(MySQLBlocks.sortBlock),
           ]),
         };
       },
@@ -566,7 +580,7 @@ export const MySQLBlocks =
             {
               displayType: DisplayType.DROPDOWN,
               key: 'direction',
-              options: Immutable.List(Directions),
+              options: Immutable.List(CommonSQL.Directions),
               // help: ManualConfig.help['direction'],
             },
           ],
@@ -589,7 +603,7 @@ export const MySQLBlocks =
   //   expression: "",
 
   //   static: {
-      language: 'mysql',
+      // language: 'mysql',
   //     title: "Let",
   //     preview: "[field]",
   //     colors: ["#a4b356", "#f1fbbf"],
@@ -606,7 +620,7 @@ export const MySQLBlocks =
   //   expression: "",
 
   //   static: {
-      language: 'mysql',
+      // language: 'mysql',
   //     title: "Var",
   //     preview: "[field]",
   //     display: letVarDisplay,
@@ -672,6 +686,7 @@ export const MySQLBlocks =
     tql: 'COUNT($value)',
     accepts: List(['distinct']),
     init: () => ({ value: '*' }),
+    language: 'mysql',
   }),
 
   avg: _aggregateCard(
@@ -680,6 +695,7 @@ export const MySQLBlocks =
     colors: ['#db6746', '#f9bcab'],
     // manualEntry: ManualConfig.cards['avg'],
     tql: 'AVG($value)',
+    language: 'mysql',
   }),
 
   min: _aggregateCard(
@@ -688,6 +704,7 @@ export const MySQLBlocks =
     colors: ['#dd7547', '#fdcdb8'],
     // manualEntry: ManualConfig.cards['min'],
     tql: 'MIN($value)',
+    language: 'mysql',
   }),
 
   max: _aggregateCard(
@@ -695,6 +712,7 @@ export const MySQLBlocks =
     title: 'Max',
     colors: ['#dd8846', '#f9cba8'],
     // manualEntry: ManualConfig.cards['max'],
+    language: 'mysql',
     tql: 'MAX($value)',
   }),
 
@@ -704,6 +722,7 @@ export const MySQLBlocks =
     colors: ['#dba043', '#eedebe'],
     // manualEntry: ManualConfig.cards['sum'],
     tql: 'SUM($value)',
+    language: 'mysql',
   }),
 
   distinct: _aggregateCard(
@@ -712,6 +731,7 @@ export const MySQLBlocks =
     colors: ['#d9b540', '#f8e8b3'],
     // manualEntry: ManualConfig.cards['count'], // TODO
     tql: 'DISTINCT $value',
+    language: 'mysql',
   }),
 
   exists: _wrapperCard(
@@ -721,6 +741,7 @@ export const MySQLBlocks =
     // manualEntry: ManualConfig.cards['exists'],
     tql: 'EXISTS\n$cards',
     accepts: List(['sfw']),
+    language: 'mysql',
   }),
 
   not: _wrapperCard(
@@ -738,6 +759,7 @@ export const MySQLBlocks =
       return 'NOT (\n$cards)';
     },
     accepts: List(['exists', 'compare', 'and', 'or']),
+    language: 'mysql',
   }),
 
   // remove
@@ -748,6 +770,7 @@ export const MySQLBlocks =
     // manualEntry: ManualConfig.cards['parentheses'],
     tql: '\n(\n$cards)',
     accepts: List(['and', 'or', 'exists', 'tql', 'not']),
+    language: 'mysql',
   }),
 
   weight: _block(
@@ -775,7 +798,7 @@ export const MySQLBlocks =
       tql: 'linear_score($weights)',
       init: () => ({
         weights: List([
-          make(Blocks.weight),
+          make(MySQLBlocks.weight),
         ]),
       }),
       display:
@@ -897,17 +920,17 @@ export const MySQLBlocks =
         {
           scorePoints:
             List([
-              make(Blocks.scorePoint, {
+              make(MySQLBlocks.scorePoint, {
                 id: 'a',
                 value: 0,
                 score: 0.0,
               }),
-              make(Blocks.scorePoint, {
+              make(MySQLBlocks.scorePoint, {
               id: 'b',
                 value: 50,
                 score: 0.5,
               }),
-              make(Blocks.scorePoint, {
+              make(MySQLBlocks.scorePoint, {
                 id: 'c',
                 value: 100,
                 score: 1.0,
@@ -927,6 +950,7 @@ export const MySQLBlocks =
     // manualEntry: ManualConfig.cards['take'],
     tql: 'LIMIT $value',
     defaultValue: 25,
+    language: 'mysql',
   }),
 
   skip: _valueCard(
@@ -936,6 +960,7 @@ export const MySQLBlocks =
     // manualEntry: ManualConfig.cards['skip'],
     tql: 'OFFSET $value',
     defaultValue: 25,
+    language: 'mysql',
   }),
 
   groupBy: _card(
@@ -951,7 +976,7 @@ export const MySQLBlocks =
       tql: 'GROUP BY\n$fields',
 
       init: () => ({
-        fields: List([ make(Blocks.field)]),
+        fields: List([ make(MySQLBlocks.field)]),
       }),
 
       display:
@@ -985,6 +1010,7 @@ export const MySQLBlocks =
       'exists',
       'comparison',
     ]),
+    language: 'mysql',
   }),
 
   tql: _card({

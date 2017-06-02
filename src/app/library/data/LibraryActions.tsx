@@ -53,6 +53,7 @@ type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 import * as Immutable from 'immutable';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
@@ -204,14 +205,14 @@ const Actions =
           .set('algorithmId', algorithmId)
           .set('groupId', groupId)
           .set('name', Util.duplicateNameFor(variant.name))
-          .set('status', LibraryTypes.ItemStatus.Build);
+          .set('status', ItemStatus.Build);
         newVariant = LibraryTypes.touchVariant(newVariant);
         
         Actions.variants.create(groupId, algorithmId, newVariant);
       },
 
     status:
-      (variant: Variant, status: LibraryTypes.ItemStatus, confirmed?: boolean) =>
+      (variant: Variant, status: ItemStatus, confirmed?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed }),
 
     fetchVersion:

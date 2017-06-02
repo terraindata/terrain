@@ -49,9 +49,9 @@ import * as _ from 'underscore';
 import PureClasss from '../../../common/components/PureClasss';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
-import {Display, RowDisplay} from '../../BuilderDisplays';
+import {Display, DisplayType, RowDisplay} from '../../../../../shared/blocks/displays/Display';
 import BuilderComponent from '../BuilderComponent';
-import { CardItem } from './Card';
+import { CardItem } from './CardComponent';
 import CardDropArea from './CardDropArea';
 const classNames = require('classnames');
 
@@ -341,6 +341,7 @@ class CardField extends PureClasss<Props>
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
+              language={this.props.language}
             />
         }
         <div
@@ -403,6 +404,7 @@ class CardField extends PureClasss<Props>
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
+              language={this.props.language}
             />
   				</div>
           {
@@ -458,6 +460,7 @@ class CardField extends PureClasss<Props>
                 helpOn={this.props.helpOn}
                 addColumn={this.props.addColumn}
                 columnIndex={this.props.columnIndex}
+                language={this.props.language}
               />
             </div>
         }

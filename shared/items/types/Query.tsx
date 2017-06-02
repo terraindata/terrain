@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 import {Cards} from '../../blocks/types/Card';
 import BlockUtils from '../../blocks/BlockUtils';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
+import {ResultsConfig, _ResultsConfig} from '../../results/types/ResultsConfig';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -68,7 +71,7 @@ class QueryC
 
   cards: Cards = List([]);
   inputs: List<any> = List([]);
-  resultsConfig: IResultsConfig = null;
+  resultsConfig = null; //: ResultsConfig = null;
   tql: string = '';
   deckOpen: boolean = true;
 
@@ -86,9 +89,9 @@ export interface Query extends QueryC, IRecord<Query> {}
 
 export const _Query = (config?: Object) => {
   config = config || {};
-  config['cards'] = BlockUtils.recordFromJS(config['cards'] || []);
-  config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || []);
-  config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
+  config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], config['language'] || 'elastic');
+  config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], config['language'] || 'elastic');
+  config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
 
   let query = new Query_Record(config) as any as Query;
 
@@ -98,7 +101,7 @@ export const _Query = (config?: Object) => {
 export function queryForSave(query: Query): Object
 {
   query = query
-    .set('cards', cardsForServer(query.cards))
+    .set('cards', BlockUtils.cardsForServer(query.cards))
     .set('resultsConfig', query.resultsConfig.toJS());
   return query.toJS();
 }

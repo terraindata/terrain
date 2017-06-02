@@ -44,17 +44,17 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-import Map = Immutable;
-import List = Immutable;
+const {Map, List} = Immutable;
 
-import {Block} from './types/Block';
+import {Block, BlockConfig} from './types/Block';
 import {Card} from './types/Card';
+import { AllBackendsMap } from '../backends/AllBackends';
 
 module BlockUtils
 {
   export function getChildIds(_block: Block): IMMap<ID, boolean>
   {
-    let map = IMMap<ID, boolean>({});
+    let map = Map<ID, boolean>({});
 
     if (Immutable.Iterable.isIterable(_block))
     {
@@ -131,7 +131,7 @@ module BlockUtils
   
   // This creates a new instance of a card / block
   // Usage: BlockUtils.make(MySQLBlocks.sort)
-  export const make = (block: Block, extraConfig?: {[key: string]: any}) =>
+  export const make = (block: BlockConfig, extraConfig?: {[key: string]: any}) =>
   {
     const {type} = block;
 
@@ -165,8 +165,10 @@ module BlockUtils
   const blockTypeToBlockRecord: any = {}; 
   
   // Given a plain JS object, construct the Record for it and its children
-  export const recordFromJS = (value: any, Blocks) =>
+  export const recordFromJS = (value: any, language: string) =>
   {
+    const Blocks = AllBackendsMap[language].blocks;
+    
     if (value && value.static && Immutable.Iterable.isIterable(value))
     {
       // already a block / record
@@ -178,13 +180,13 @@ module BlockUtils
     {
       if (Immutable.Iterable.isIterable(value))
       {
-        value = value.map((v) => recordFromJS(v, Blocks));
+        value = value.map((v) => recordFromJS(v, language));
       }
       else
       {
         value = _.reduce(value, (memo, v, key) =>
         {
-          memo[key] = recordFromJS(v, Blocks);
+          memo[key] = recordFromJS(v, language);
           return memo;
         }, Array.isArray(value) ? [] : {});
       }

@@ -65,6 +65,7 @@ interface CDPProps
   index: number;
   beforeDrop?: (item: CardItem, targetProps: CDPProps) => void;
   accepts?: List<string>;
+  language: string;
 
   // if set, wrapper cards which can wrap this type of card can be dropped to wrap it
   wrapType?: string;

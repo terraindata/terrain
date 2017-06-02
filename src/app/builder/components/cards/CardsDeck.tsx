@@ -91,7 +91,8 @@ class CardsDeck extends PureClasss<Props>
 
   render()
   {
-    const ordering = AllBackendsMap[this.props.language];
+    const ordering = AllBackendsMap[this.props.language].cardsDeck;
+    const cards = AllBackendsMap[this.props.language].blocks;
     
     if (ordering === undefined)
     {
@@ -118,17 +119,17 @@ class CardsDeck extends PureClasss<Props>
           className="cards-deck-inner"
         >
           {
-            ordering.map((group: Card[], index) =>
+            ordering.map((group: List<string>, index) =>
               <div
                 className="cards-deck-group"
                 key={index}
               >
                 {
-                  group.map((card: Card) =>
+                  group.map((cardType: string) =>
                     <CardDeckCard
-                      card={card}
+                      card={cards[cardType]}
                       search={this.state.search}
-                      key={card.type}
+                      key={cardType}
                     />,
                   )
                 }

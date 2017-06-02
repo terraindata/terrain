@@ -203,6 +203,7 @@ class CardDropArea extends PureClasss<Props>
         visible={this.props.isOver && this.props.canDrop && !!this.state.draggingCardItem}
         keyPath={this.props.keyPath}
         index={this.props.index}
+        language={this.props.language}
       />
     );
   }

@@ -54,6 +54,9 @@ import TransformCardChart from './TransformCardChart';
 const Dimensions = require('react-dimensions');
 import { Card, CardString } from '../../../../../shared/blocks/types/Card';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import Block from '../../../../../shared/blocks/types/Block';
+
+import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
 
 const NUM_BARS = 1000;
 
@@ -197,6 +200,12 @@ class TransformCard extends PureClasss<Props>
   // TODO move the bars computation to a higher level
   computeBars(input: CardString)
   {
+    if (this.props.language !== 'mysql')
+    {
+      // TODO MOD adapt Transform card for elastic.
+      return;
+    }
+    
     // TODO consider putting the query in context
     const {builderState} = this.props;
     const {cards} = builderState.query;
@@ -277,7 +286,7 @@ class TransformCard extends PureClasss<Props>
           // convert the score to TQL, do the query
           this.setState(
             Ajax.query(
-              `SELECT ${TQLConverter._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+              `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
               db,
               this.handleQueryResponse,
               this.handleQueryError,

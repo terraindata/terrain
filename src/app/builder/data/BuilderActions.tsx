@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 const _ = require('underscore');
 import * as Immutable from 'immutable';
-import { CardItem } from '../components/cards/Card';
+import { CardItem } from '../components/cards/CardComponent';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './BuilderActionTypes';
 import Store from './BuilderStore';

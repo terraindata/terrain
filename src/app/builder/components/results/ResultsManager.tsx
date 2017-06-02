@@ -47,14 +47,14 @@ const {Map, List} = Immutable;
 import * as React from 'react';
 import * as _ from 'underscore';
 import {BaseClass, New} from '../../../Classes';
-import TQLConverter from '../../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
-import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
 import Query from '../../../../../shared/items/types/Query';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
 
 export const MAX_RESULTS = 200;
 
@@ -174,10 +174,13 @@ export class ResultsManager extends PureClasss<Props>
     
     if(db.source === 'm1')
     {
-      tql = TQLConverter.toTQL(query, {
-        limit: MAX_RESULTS,
-        replaceInputs: true,
-      });
+      tql = AllBackendsMap[query.language].queryToCode(
+        query, 
+        {
+          limit: MAX_RESULTS,
+          replaceInputs: true,
+        }
+      );
     }
 
     if (tql !== this.state.queriedTql)
@@ -212,12 +215,15 @@ export class ResultsManager extends PureClasss<Props>
         
           this.setState({
             allQuery: Ajax.query(
-              TQLConverter.toTQL(query, {
-                allFields: true,
-                transformAliases: true,
-                limit: MAX_RESULTS,
-                replaceInputs: true,
-              }),
+              AllBackendsMap[query.language].queryToCode(
+                query,
+                {
+                  allFields: true,
+                  transformAliases: true,
+                  limit: MAX_RESULTS,
+                  replaceInputs: true,
+                }
+              ),
               db,
               this.handleAllFieldsResponse,
               this.handleAllFieldsError,
@@ -229,7 +235,7 @@ export class ResultsManager extends PureClasss<Props>
         // this.setState({
         //   countXhr:
         //     Ajax.query(
-        //       TQLConverter.toTQL(query, {
+        //       .toTQL(query, {
         //         count: true,
         //         replaceInputs: true,
         //       }),
@@ -518,7 +524,7 @@ export class ResultsManager extends PureClasss<Props>
 	}
 }
 
-export function getPrimaryKeyFor(result: any, config: IResultsConfig): string
+export function getPrimaryKeyFor(result: any, config: ResultsConfig): string
 {
   if (config && config.primaryKeys.size)
   {

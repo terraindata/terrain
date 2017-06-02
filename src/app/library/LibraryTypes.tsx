@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import {IResultsConfig} from '../builder/components/results/ResultsConfig';
 import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
@@ -53,6 +52,7 @@ import {BaseClass, New} from '../Classes';
 import BackendInstance from '../../../shared/backends/types/BackendInstance';
 import {Query, _Query, queryForSave} from '../../../shared/items/types/Query';
 import {ItemStatus, ItemType, ItemC, Item} from '../../../shared/items/types/Item';
+import {ResultsConfig, _ResultsConfig} from '../../../shared/results/types/ResultsConfig';
 
 // TODO MOD refactor
 
@@ -94,6 +94,7 @@ export module LibraryTypes
         tql: config.tql,
         deckOpen: config.deckOpen,
         variantId: config.id,
+        language: 'mysql',
       };
     }
     

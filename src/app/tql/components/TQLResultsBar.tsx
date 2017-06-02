@@ -48,7 +48,6 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import {ResultsState} from '../../builder/components/results/ResultsManager';
 import Actions from '../../builder/data/BuilderActions';
-import TQLConverter from '../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../util/Ajax';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';

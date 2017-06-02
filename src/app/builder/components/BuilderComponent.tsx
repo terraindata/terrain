@@ -54,7 +54,7 @@ import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
-import {Display, DisplayType} from './../BuilderDisplays';
+import {Display, DisplayType} from '../../../../shared/blocks/displays/Display';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 import SchemaStore from '../../schema/data/SchemaStore';

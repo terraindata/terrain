@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import {BaseClass, New} from '../../../src/app/Classes';
+import BackendInstance from '../../backends/types/BackendInstance';
 
 export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
 export const ItemType: {

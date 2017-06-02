@@ -231,6 +231,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
+            language={null}
           />
           <BuilderTextbox
             value={this.props.maxDomain.get(1)}
@@ -240,6 +241,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
+            language={null}
           />
         </div>
 

@@ -42,10 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
+
 import {Card, Cards, _card} from './types/Card';
 import {Block, TQLFn} from './types/Block';
-import {Display} from './displays/Display';
+import {Display, getCardStringDisplay, valueDisplay, stringValueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from './displays/Display';
 import BlockUtils from './BlockUtils';
+const {List, Map} = Immutable;
+const L = () => List([]);
+const {make} = BlockUtils;
 
 export module CommonBlocks
 {
@@ -72,7 +77,7 @@ export module CommonBlocks
     language: string;
   }
 
-  const _wrapperCard = (config: IWrapperCardConfig) =>
+  export const _wrapperCard = (config: IWrapperCardConfig) =>
   {
     return _card({
       cards: L(),
@@ -112,18 +117,18 @@ export module CommonBlocks
     });
   };
 
-  const _aggregateCard = (config: {
+  export const _aggregateCard = (config: {
     colors: string[];
     title: string;
     // manualEntry: IManualEntry;
     tql: string;
     defaultValue?: string;
     language: string;
-      language: config.language;
   }) => _card({
     value: '',
 
     static: {
+      language: config.language,
       title: config.title,
       colors: config.colors,
       // manualEntry: config.manualEntry,
@@ -144,17 +149,19 @@ export module CommonBlocks
     },
   });
 
-  const _aggregateNestedCard = (config: {
+  export const _aggregateNestedCard = (config: {
     colors: string[],
     title: string,
     // manualEntry: IManualEntry,
     tql: string,
     accepts: List<string>,
     init?: () => any,
+    language: string,
   }) => _card({
     value: '',
 
     static: {
+      language: config.language,
       title: config.title,
       colors: config.colors,
       // manualEntry: config.manualEntry,
@@ -169,68 +176,19 @@ export module CommonBlocks
     },
   });
 
-  const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card({
-      clauses: L(),
-
-      static: {
-        title: config.title,
-        preview: '[clauses.length] ' + config.english + ' clauses',
-        colors: config.colors,
-        tql: '(\n$clauses\n)',
-        tqlGlue: config.tqlGlue,
-        // manualEntry: config.manualEntry,
-
-        init: () => ({
-          clauses: List([
-            make(Blocks[config.factoryType]),
-            make(Blocks[config.factoryType]),
-          ]),
-        }),
-
-        display: {
-          displayType: DisplayType.ROWS,
-          key: 'clauses',
-          english: "'" + config.english + "'",
-          factoryType: config.factoryType,
-          // className: (card) => {
-          //   if(card['clauses'].size && typeof card['clauses'].get(0) !== 'string')
-          //   {
-          //     return 'multi-field-card-padding';
-          //   }
-          //   return '';
-          // },
-
-          row: {
-            below:
-            {
-              displayType: DisplayType.CARDSFORTEXT,
-              key: 'clause',
-            },
-
-            inner:
-            {
-              displayType: DisplayType.CARDTEXT,
-              key: 'clause',
-              top: false,
-            },
-
-            hideToolsWhenNotString: true,
-          },
-        },
-      },
-    });
-
-  const _valueCard = (config: { 
+  export const _valueCard = (config: { 
     title: string, 
     colors: string[], 
     // manualEntry: IManualEntry, 
     tql: string, 
-    defaultValue: number 
+    defaultValue: number,
+    language: string,
   }) => (
     _card({
       value: config.defaultValue,
 
       static: {
+        language: config.language,
         title: config.title,
         colors: config.colors,
         preview: '[value]',
@@ -242,3 +200,5 @@ export module CommonBlocks
   );
   
 }
+
+export default CommonBlocks;

@@ -47,10 +47,11 @@ import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import Backend from '../types/Backend';
 import MySQLCardsDeck from './blocks/MySQLCardsDeck';
 import CardsToSQL from './conversion/CardsToSQL';
+import SQLToCards from './conversion/SQLToCards';
 import MySQLBlocks from './blocks/MySQLBlocks';
-const synatxConfig = require('./syntax/SQLSyntaxConfig.json');
+const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
 
-export default class MySQLBackend implements Backend
+class MySQLBackend implements Backend
 {
 	type = 'mysql';
 	name = 'MySQL';
@@ -69,3 +70,5 @@ export default class MySQLBackend implements Backend
 	// function to get transform bars?
 	// autocomplete?
 }
+
+export default new MySQLBackend();

@@ -42,8 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// A generic type of backend, e.g. mysql or elastic
+
 import CardsToCodeOptions from './CardsToCodeOptions';
-import Block from '../../blocks/types/Block';
+import { BlockConfig } from '../../blocks/types/Block';
 import Query from '../../items/types/Query';
 
 export interface Backend
@@ -54,7 +56,7 @@ export interface Backend
 	// each type should be unique among the whole scope of cards in all languages
 	blocks:
 	{
-		[type: string]: Block
+		[type: string]: BlockConfig
 	};
 	
 	// Ordering of the cards deck

@@ -51,14 +51,14 @@ import PureClasss from '../../../common/components/PureClasss';
 import {IColumn, Table} from '../../../common/components/Table';
 import ColorManager from '../../../util/ColorManager';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
-import {_IResultsConfig, IResultsConfig} from '../results/ResultsConfig';
 import {getResultFields, getResultName, getResultValue} from './Result';
 import {getPrimaryKeyFor, MAX_RESULTS, Results} from './ResultsManager';
+import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
 
 export interface Props
 {
   results: Results;
-  resultsConfig?: IResultsConfig;
+  resultsConfig?: ResultsConfig;
   onExpand: (index: number) => void;
   resultsLoading: boolean;
 }

@@ -58,6 +58,7 @@ type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 import BuilderActions from '../../builder/data/BuilderActions';
 import Util from './../../util/Util';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
@@ -81,7 +82,7 @@ class LibraryStateC
 
   changingStatus: boolean = false;
   changingStatusOf: LibraryTypes.Variant = null;
-  changingStatusTo: LibraryTypes.ItemStatus = 'BUILD';
+  changingStatusTo: ItemStatus = 'BUILD';
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}

@@ -42,14 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// a specific instance of a database or backend
+import * as Immutable from 'immutable';
+const {List, Map} = Immutable;
 
-interface BackendInstance
+export class Format
 {
-  id: string | number;
-  name: string;
-  type: string;
-  source: 'm1' | 'm2';
-}
+  type: string = '';
+  template: string = '';
+  showRaw: boolean = false;
+  showField: boolean = false;
 
-export default BackendInstance;
+  set: (f: string, v: any) => Format;
+  setIn: (f: string[], v: any) => Format;
+}
+const Format_Record = Immutable.Record(new Format());
+export const _Format = (config?: any) => {
+  return new Format_Record(config || {}) as any as Format;
+};
+
+export class ResultsConfig
+{
+  name: string = '';
+  score: string = '';
+  fields: List<string> = List([]);
+  enabled: boolean = false;
+  formats: IMMap<string, Format> = Map<string, Format>({});
+  primaryKeys: List<string> = List([]);
+
+  set: (f: string, v: any) => ResultsConfig;
+  setIn: (f: string[], v: any) => ResultsConfig;
+  toJS: () => any;
+}
+const ResultsConfig_Record = Immutable.Record(new ResultsConfig());
+export const _ResultsConfig = (config?: any) => {
+  let conf = new ResultsConfig_Record(config || {}) as any as ResultsConfig;
+
+  conf = conf.set('formats', Map<string, Format>(conf.formats));
+  conf = conf
+    .set('formats', conf.formats.map((format) => _Format(format)))
+    .set('fields', List(conf.fields))
+    .set('primaryKeys', List(conf.primaryKeys));
+
+  return conf;
+};
+export const DefaultResultsConfig = _ResultsConfig();
+
+export default ResultsConfig;

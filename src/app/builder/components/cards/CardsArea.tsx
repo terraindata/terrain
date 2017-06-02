@@ -196,6 +196,7 @@ class CardsArea extends PureClasss<Props>
                   accepts={this.props.accepts}
                   singleChild={this.props.singleChild}
                   wrapType={card.type}
+                  language={this.props.language}
                 />
                 <CardComponent
                   card={card}
@@ -225,6 +226,7 @@ class CardsArea extends PureClasss<Props>
             singleChild={this.props.singleChild}
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
+            language={this.props.language}
           />
 
           {

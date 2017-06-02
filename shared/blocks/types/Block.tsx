@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
+
 // A Block is a card or a distinct piece / group of card pieces
 export interface Block extends IRecord<Block>
 {
@@ -79,6 +81,7 @@ export interface BlockConfig
     accepts?: List<string>;
     removeOnCardRemove?: boolean;
     metaFields?: string[];
+    [field: string]: any;
   };
 
   [field: string]: any;

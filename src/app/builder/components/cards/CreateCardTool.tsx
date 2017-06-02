@@ -164,7 +164,7 @@ class CreateCardTool extends PureClasss<Props>
      <div className="create-card-selector" ref="selector">
        <div className="create-card-selector-inner">
          {
-           cardsOrdering[this.props.language].map((type: string) =>
+           cardsOrderings[this.props.language].map((type: string) =>
            {
              if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
              {

@@ -43,8 +43,9 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
+import Blocks from './MySQLBlocks';
 
-export default const MySQLCardsDeck =
+export const MySQLCardsDeck =
   Immutable.fromJS(
   [
     [
@@ -90,3 +91,5 @@ export default const MySQLCardsDeck =
     ],
   ]
   );
+  
+export default MySQLCardsDeck;

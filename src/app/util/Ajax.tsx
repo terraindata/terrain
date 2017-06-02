@@ -339,7 +339,7 @@ export const Ajax =
       return Ajax.getItem(
         'VARIANT',
         variantId,
-        (variantItem: LibraryTypes.Item) =>
+        (variantItem: Item) =>
         {
           onLoad(variantItem as LibraryTypes.Variant);
         },
@@ -446,10 +446,10 @@ export const Ajax =
       );
     },
 
-    saveItem(item: LibraryTypes.Item,
+    saveItem(item: Item,
       onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
     {
-      if (item.type === LibraryTypes.ItemType.Variant)
+      if (item.type === ItemType.Variant)
       {
         item = LibraryTypes.variantForSave(item as LibraryTypes.Variant);
       }

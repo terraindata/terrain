@@ -72,7 +72,7 @@ export interface Props
   canEdit: boolean;
   addColumn: (number, string?) => void;
   columnIndex: number;
-  tqlCardsInSync: boolean;
+  cardsAndCodeInSync: boolean;
   parseError: string;
 
   containerWidth?: number;
@@ -202,7 +202,7 @@ class CardsColumn extends PureClasss<Props>
         <div
           className={classNames({
             'cards-column-cards-area': true,
-            'cards-column-cards-area-faded': !this.props.tqlCardsInSync,
+            'cards-column-cards-area-faded': !this.props.cardsAndCodeInSync,
           })}
           onScroll={this.handleScroll}
           id="cards-column"

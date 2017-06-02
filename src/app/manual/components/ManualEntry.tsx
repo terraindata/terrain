@@ -275,7 +275,7 @@ class ManualEntry extends Classs<Props>
     //   isDefault: false,
     // };
 
-    // var value = TQLConverter.toTQL(query);
+    // var value = .toTQL(query);
 
     // var numLines = value.split('\n').length;
     // var padding = numLines === 1 ? 2 : 8;

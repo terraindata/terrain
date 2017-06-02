@@ -52,13 +52,12 @@ import * as _ from 'underscore';
 const moment = require('moment');
 
 import InfoArea from '../../../common/components/InfoArea';
-import TQLConverter from '../../../tql/TQLConverter';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import Result from '../results/Result';
-import {IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
+import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 import InfiniteScroll from './../../../common/components/InfiniteScroll';
 import PureClasss from './../../../common/components/PureClasss';
@@ -66,6 +65,8 @@ import Switch from './../../../common/components/Switch';
 import {getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass} from './ResultsManager';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import Query from '../../../../../shared/items/types/Query';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -336,7 +337,7 @@ column if you have set a custom results view.');
     this.props.onNavigationException();
 
     const {xhr, queryId} = Ajax.query(
-      TQLConverter.toTQL(
+      .toTQL(
         this.props.query,
         {
           replaceInputs: true,
@@ -447,7 +448,7 @@ column if you have set a custom results view.');
   {
     if (this.state.showingConfig)
     {
-      return <ResultsConfig
+      return <ResultsConfigComponent
         config={this.props.query.resultsConfig}
         fields={this.props.resultsState.fields}
         onClose={this.hideConfig}
@@ -456,7 +457,7 @@ column if you have set a custom results view.');
     }
   }
 
-  handleConfigChange(config: IResultsConfig)
+  handleConfigChange(config: ResultsConfig)
   {
     Actions.changeResultsConfig(config);
   }

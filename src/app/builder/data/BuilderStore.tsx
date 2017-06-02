@@ -46,9 +46,8 @@ const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-import {CardItem} from '../components/cards/Card';
+import {CardItem} from '../components/cards/CardComponent';
 const Redux = require('redux');
-import TQLConverter from '../../tql/TQLConverter';
 import Util from '../../util/Util';
 import {_ResultsState, ResultsState} from '../components/results/ResultsManager';
 import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes';
@@ -56,6 +55,7 @@ import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} fro
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { Card, Cards } from '../../../../shared/blocks/types/Card';
 import Query from '../../../../shared/items/types/Query';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 export class BuilderStateClass
 {
@@ -148,9 +148,9 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
       //  needs to be after the card change has affected the state
       state = state
         .setIn(['query', 'tql'],
-          TQLConverter.toTQL(state.query),
+          AllBackendsMap[state.query.language].queryToCode(state.query, {}),
         )
-        .setIn(['query', 'tqlCardsInSync'], true);
+        .setIn(['query', 'cardsAndCodeInSync'], true);
     }
 
     return state;
