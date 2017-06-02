@@ -62,13 +62,17 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
   };
 }
 
-export async function checkResults(fileName: string, testName: string, results: any)
+export async function readFile(fileName: string)
 {
-  const contents: any = await new Promise((resolve, reject) =>
+  return new Promise((resolve, reject) =>
   {
     fs.readFile(fileName, makePromiseCallback(resolve, reject));
   });
+}
 
+export async function checkResults(fileName: string, testName: string, results: any)
+{
+  const contents: any = await readFile(fileName);
   const expected = JSON.parse(contents);
   expect(results).toMatchObject(expected[testName]);
 }
