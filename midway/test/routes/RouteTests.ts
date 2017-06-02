@@ -49,11 +49,13 @@ import * as sqlite3 from 'sqlite3';
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import { readFile } from '../Utils';
 
 let server;
 
 beforeAll(async (done) =>
 {
+  fs.unlinkSync('midwaytest.db');
   const db = new sqlite3.Database('midwaytest.db');
   const options =
     {
@@ -71,11 +73,12 @@ beforeAll(async (done) =>
     };
 
   const app = new App(options);
+  server = await app.start();
 
-  const sql = fs.readFileSync('./midway/test/scripts/test.sql').toString();
+  const sql = await readFile('./midway/test/scripts/test.sql');
   const results = await new Promise((resolve, reject) =>
   {
-    return db.exec(sql, (error: Error) =>
+    return db.exec(sql.toString(), (error: Error) =>
     {
       if (error !== null && error !== undefined)
       {
@@ -84,8 +87,6 @@ beforeAll(async (done) =>
       resolve();
     });
   });
-
-  server = await app.start();
 
   request(server)
     .post('/midway/v1/users/')
@@ -109,7 +110,7 @@ beforeAll(async (done) =>
 
 afterAll(() =>
 {
-  // fs.unlinkSync('midwaytest.db');
+  fs.unlinkSync('midwaytest.db');
 });
 
 describe('User and auth route tests', () =>

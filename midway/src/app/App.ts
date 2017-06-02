@@ -129,8 +129,8 @@ class App
   public async start(): Promise<http.Server>
   {
     // tslint:disable-next-line:no-floating-promises
-    await Schema.createAppSchema(this.config.db as string, this.DB).then().catch();
-    await Config.handleConfig(this.config).then().catch();
+    await Schema.createAppSchema(this.config.db as string, this.DB);
+    await Config.handleConfig(this.config);
     await Users.initializeDefaultUser();
 
     winston.info('Listening on port ' + String(this.config.port));
