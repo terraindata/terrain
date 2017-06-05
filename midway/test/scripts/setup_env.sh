@@ -84,10 +84,10 @@ docker pull $elastic_image &
 wait
 
 docker run -v${sqlite_path}:/data/ -u$(id -u):$(id -g) $sqlite_image
-docker run -d --name midway-mysql -p $mysql_port:$mysql_port $mysql_image
-docker run -d --name midway-elastic -p $elastic_port:$elastic_port $elastic_image
+docker run -d --name moviesdb-mysql -p $mysql_port:$mysql_port $mysql_image
+docker run -d --name moviesdb-elk -p $elastic_port:$elastic_port $elastic_image
 
 echo "Waiting on services to be ready..."
 
-while [ "`docker inspect -f {{.State.Health.Status}} midway-mysql`" != "healthy" -o "`docker inspect -f {{.State.Health.Status}} midway-elastic`" != "healthy" ]; do sleep 0.1; done;
+while [ "`docker inspect -f {{.State.Health.Status}} moviesdb-mysql`" != "healthy" -o "`docker inspect -f {{.State.Health.Status}} moviesdb-elk`" != "healthy" ]; do sleep 0.1; done;
 
