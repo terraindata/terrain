@@ -44,76 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Config } from './Config';
-import cmdLineArgs = require('command-line-args');
-import cmdLineUsage = require('command-line-usage');
+import App from './app/App';
+import CmdLineArgs from './app/CmdLineArgs';
 
-// process command-line arguments
-const optionList = [
-  {
-    alias: 'c',
-    defaultValue: 'midway.json',
-    name: 'config',
-    type: String,
-    typeLabel: 'file',
-    description: 'Configuration file to use.',
-  },
-  {
-    alias: 'p',
-    defaultValue: 3000,
-    name: 'port',
-    type: Number,
-    typeLabel: 'number',
-    description: 'Port to listen on.',
-  },
-  {
-    alias: 'd',
-    defaultValue: 'sqlite',
-    name: 'db',
-    type: String,
-    typeLabel: 'type',
-    description: 'System database backend to use.',
-  },
-  {
-    alias: 'n',
-    defaultValue: 'midway.db',
-    name: 'dsn',
-    type: String,
-    description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
-  },
-  {
-    name: 'debug',
-    type: Boolean,
-    description: 'Turn on debug mode.',
-  },
-  {
-    name: 'help',
-    type: Boolean,
-    description: 'Show help and usage information.',
-  },
-  {
-    alias: 'v',
-    name: 'verbose',
-    type: Boolean,
-    description: 'Print verbose information.',
-  },
-];
+const app = new App(CmdLineArgs);
+const server = app.start();
 
-const sections = [
-  {
-    header: 'Midway 2.0',
-    content: 'Refreshingly good.',
-  },
-  {
-    header: 'Options',
-    optionList,
-  },
-];
-
-export let CmdLineArgs: Config = cmdLineArgs(optionList,
-  {
-    partial: true,
-  });
-
-export const CmdLineUsage = cmdLineUsage(sections);
-export default CmdLineArgs;
+export default server;

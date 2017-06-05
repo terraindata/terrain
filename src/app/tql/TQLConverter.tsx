@@ -104,6 +104,23 @@ class TQLConverter
 
     return cardsTql;
   }
+  public static toEQL(query: BuilderTypes.Query, options: Options = {}): string
+  {
+    let q: string = query.tql;
+
+    if (options.allFields === true)
+    {
+      const o = JSON.parse(query.tql);
+      if (o.body && o.body._source)
+      {
+        o.body._source  = [];
+      }
+      q = JSON.stringify(o);
+    }
+
+    return q;
+  }
+
 
   private static _topFromCard(cards: List<ICard>, fn: (fromCard: ICard) => ICard): List<ICard>
   {

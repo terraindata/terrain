@@ -194,7 +194,19 @@ export class ResultsManager extends PureClasss<Props>
           ),
       });
 
-      if(this.props.db.source === 'm1')
+      if (this.props.db.source === 'm2')
+      {
+        this.setState({
+          allQuery: Ajax.query(
+            TQLConverter.toEQL(query, {
+              allFields: true,
+            }),
+            db,
+            this.handleAllFieldsResponse,
+            this.handleAllFieldsError,
+          ),
+        });
+      } else if (this.props.db.source === 'm1')
       {
         const selectCard = query.cards.get(0);
         if (
