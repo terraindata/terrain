@@ -71,7 +71,7 @@ module.exports =
             // note: this first loader string gets updated in webpack.config.prod.js
             //  keep it first in this list
             {
-                test: /\.tsx$/,
+                test: /\.(ts|tsx)$/,
                 exclude: [/midway/, /node_modules/],
                 loader:
                     'babel-loader?presets[]=react&presets[]=latest!ts-loader?'
@@ -80,16 +80,6 @@ module.exports =
                         }
                     })
             },
-          {
-            test: /\.ts$/,
-            exclude: [/node_modules/],
-            loader:
-            'babel-loader?presets[]=react&presets[]=latest!ts-loader?'
-            + JSON.stringify({
-              compilerOptions: {
-              }
-            })
-          },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },
             { test: /\.less$/, exclude: /midway/, loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
             { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel-loader?presets[]=react&presets[]=latest' },

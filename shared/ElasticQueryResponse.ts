@@ -44,75 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from '../../error/MidwayErrorItem';
-import QueryResult from './QueryResult';
+interface ElasticQueryHitSource {
+  [key: string]: any;
+}
 
-export default class QueryResponse
-{
-  public static fromJSON(json: string)
-  {
-    const responseObject = JSON.parse(json);
-    return new QueryResponse(responseObject.result, responseObject.errors);
-  }
-
-  public static fromParsedJsonObject(obj: any)
-  {
-    return new QueryResponse(obj.result, obj.errors);
-  }
-
-  public result: QueryResult;
-  public errors: MidwayErrorItem[];
-
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [])
-  {
-    if (result === null)
-    {
-      this.result = {};
-    } else
-    {
-      this.result = result;
-    }
-
-    if (errors instanceof Array === false)
-    {
-      this.errors = [];
-    } else
-    {
-      this.errors = errors;
-    }
-  }
-
-  public hasError(): boolean
-  {
-    if (this.errors.length > 0)
-    {
-      return true;
-    } else
-    {
-      return false;
-    }
-  }
-
-  public getResultsData()
-  {
-    let ret = [];
-    if (this.result !== null)
-    {
-      const r = this.result as any;
-      const hits = r.hits.hits;
-      const results = hits.map((hit) =>
-      {
-        const source = hit._source;
-        source._index = hit._index;
-        source._type = hit._type;
-        source._id = hit._id;
-        source._score = hit._score;
-        source._sort = hit._sort;
-        return source;
-      });
-      ret = results;
-    }
-
-    return  ret;
-  }
+interface ElasticQueryHit {
+  _index: string;
+  _type: string;
+  _id: string;
+  _score: number;
+  _source: ElasticQueryHitSource;
+  _sort?: boolean;
+}
+export interface ElasticQueryResult {
+  total: number;
+  max_score: number;
+  hits: ElasticQueryHit[];
 }

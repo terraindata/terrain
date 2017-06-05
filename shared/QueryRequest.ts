@@ -48,6 +48,7 @@ export interface QueryRequest
 {
   database: number;
   type: string;
+  // this body should be named 'query'
   body: object | string;
   streaming?: boolean;
 }

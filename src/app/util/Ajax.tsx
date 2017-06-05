@@ -52,7 +52,7 @@ import LibraryTypes from './../library/LibraryTypes';
 import SharedTypes from './../../../shared/SharedTypes';
 import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
-import QueryResponse from './../../../midway/src/app/query/QueryResponse';
+import QueryResponse from '../../../shared/QueryResponse';
 import {recordForSave, responseToRecordConfig} from '../Classes';
 
 /**

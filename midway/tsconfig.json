@@ -17,9 +17,12 @@
         "declaration": false,
         "outDir": "./build/"
     },
+    "include": [
+        "src",
+        "../shared"
+    ],
     "exclude": [
         "node_modules",
-        "src",
         "build"
     ]
 }

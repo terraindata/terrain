@@ -57,9 +57,9 @@ import Util from './../../util/Util';
 import Actions from './../data/LibraryActions';
 import LibraryActions from './../data/LibraryActions';
 import LibraryTypes from './../LibraryTypes';
+import SharedTypes from './../../../../shared/SharedTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
-import SharedTypes from './../../../../shared/SharedTypes';
 
 type Variant = LibraryTypes.Variant;
 
@@ -79,7 +79,7 @@ class LibraryInfoColumn extends PureClasss<Props>
   {
     Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)));
   }
-  
+
   handleLanguageChange(langIndex: number)
   {
     Actions.variants.change(this.props.variant.set('language', LANGUAGES.get(langIndex)));

@@ -55,8 +55,8 @@ import SharedTypes from './../../../../../shared/SharedTypes';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
-import QueryResponse from '../../../../../midway/src/app/query/QueryResponse';
-import {MidwayErrorItem} from '../../../../../midway/src/error/MidwayErrorItem';
+import QueryResponse from '../../../../../shared/QueryResponse';
+import {MidwayErrorItem} from '../../../../../shared/MidwayErrorItem';
 import {line} from 'd3-shape';
 import {MidwayError} from '../../../../../midway/src/error/MidwayError';
 
