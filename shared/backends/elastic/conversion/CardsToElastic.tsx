@@ -70,7 +70,7 @@ class CardsToElastic
 {
   static toElastic(query: Query, options: Options = {}): string
   {
-    return 'not yet';
+    return 'not yet implemented';
   }
 }
 

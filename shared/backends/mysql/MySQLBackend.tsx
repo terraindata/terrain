@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-
+import * as Immutable from 'immutable';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import {Backend, cardsDeckToList} from '../types/Backend';
 import MySQLCardsDeck from './blocks/MySQLCardsDeck';
@@ -57,6 +57,8 @@ class MySQLBackend implements Backend
 	name = 'MySQL';
 	
 	blocks = MySQLBlocks;
+	creatingType = MySQLBlocks.creating.type;
+	topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
 	
 	// Ordering of the cards deck
 	cardsDeck = MySQLCardsDeck;

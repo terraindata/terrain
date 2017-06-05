@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-
+import * as Immutable from 'immutable';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import {Backend, cardsDeckToList} from '../types/Backend';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
@@ -57,6 +57,10 @@ class ElasticBackend implements Backend
 	name = 'Elastic';
 	
 	blocks = ElasticBlocks;
+	creatingType = ElasticBlocks.elasticCreating.type;
+	topLevelCards = Immutable.List<string>([
+			ElasticBlocks.elasticKeyValue.type,
+	]);
 	
 	// Ordering of the cards deck
 	cardsDeck = ElasticCardsDeck;

@@ -46,58 +46,94 @@ import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 const {List, Map} = Immutable;
 const L = () => List([]);
-import BlockUtils from '../../../blocks/BlockUtils';
 import {_block, Block, TQLFn} from '../../../blocks/types/Block';
 import {_card, Card, CardString} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
 import CommonElastic from '../syntax/CommonElastic';
 import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-
-import Util from '../../../../src/app/util/Util';
-
 const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
 
-const {make} = BlockUtils;
-
-import {elasticKeyValue, elasticValue, elasticObject, elasticArray} from './ElasticJSONBlocks';
-
-export const ElasticBlocks =
-{
-  // JSON blocks
-  elasticKeyValue,
-  elasticValue,
-  elasticObject,
-  elasticArray,
-
-  elasticCreating: _card( // a placeholder for when a card is being created
-  {
-    static:
+export const elasticKeyValue = _card({
+  key: '',
+  value: '',
+  valueType: CommonElastic.valueTypes[0],
+  
+  static: {
+    language: 'elastic',
+    tql: '{ "$key": "$value" }',
+    title: 'Key / Value',
+    colors: ['#789', '#abc'],
+    preview: '[key]: [value]',
+    
+    display:
     {
-      language: 'elastic',
-      tql: '',
-      title: 'New Card',
-      colors: ['#777', '#777'],
-      preview: '',
-      display: null,
-      // manualEntry: null,
-    },
-  }),
-};
+      displayType: DisplayType.FLEX,
+      key: null,
 
-BlockUtils.initBlocks(ElasticBlocks);
+      flex:
+      [
+        {
+          displayType: DisplayType.TEXT,
+          key: 'key',
+          autoDisabled: true,
+        },
+        {
+          displayType: DisplayType.DROPDOWN,
+          key: 'valueType',
+          options: Immutable.List(CommonElastic.valueTypes),
+          centerDropdown: true,
+        },
+        {
+          displayType: DisplayType.CARDTEXT,
+          key: 'value',
+          top: false,
+          showWhenCards: true,
+          accepts: CommonElastic.acceptsValues,
+        },
+      ],
 
-
-// TODO remove
-const cards = {};
-for (const key in ElasticBlocks)
-{
-  if (ElasticBlocks[key]._isCard && ElasticBlocks[key].static.manualEntry)
-  {
-    cards[ElasticBlocks[key].static.manualEntry.name] = key;
+      below:
+      {
+        displayType: DisplayType.CARDSFORTEXT,
+        key: 'value',
+        accepts: CommonElastic.acceptsValues,
+      },
+    }
   }
-}
-export const cardList = cards;
+});
+  
+export const elasticValue = _card({
+  key: '',
+  value: '',
+  valueType: CommonElastic.valueTypes[0],
+  
+  static: {
+    language: 'elastic',
+    tql: '"$value"',
+    title: 'Value',
+    colors: ['#798', '#acb'],
+    preview: '[value]',
+    display:
+    {
+      displayType: DisplayType.TEXT,
+      key: 'value',
+    },
+  }
+});
+  
+export const elasticObject = _wrapperCard({
+  language: 'elastic',
+  tql: '{ $cards }',
+  title: 'Object',
+  colors: ['#123', '#456'],
+  accepts: List(['elasticKeyValue']),
+});
 
-
-export default ElasticBlocks;
+export const elasticArray = _wrapperCard({
+  language: 'elastic',
+  tql: '[ $cards ]',
+  title: 'Array',
+  colors: ['#123', '#456'],
+  accepts: List(['elasticValue']),
+});

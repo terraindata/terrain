@@ -58,6 +58,7 @@ import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
+import {AllBackendsMap} from '../../../../../shared/backends/AllBackends';
 
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 const {List, Map} = Immutable;
@@ -78,8 +79,6 @@ export interface Props
   containerWidth?: number;
   containerHeight?: number;
 }
-
-const _topLevelAccepts = Immutable.List(['sfw']);
 
 class CardsColumn extends PureClasss<Props>
 {
@@ -116,10 +115,21 @@ class CardsColumn extends PureClasss<Props>
       this.handleScroll();
     }
   }
-
-  createFromCard()
+  
+  getPossibleCards()
   {
-    Actions.create(this.state.keyPath, 0, 'sfw');
+    return AllBackendsMap[this.props.language].topLevelCards;
+  }
+  
+  getFirstCard()
+  {
+    const type = AllBackendsMap[this.props.language].topLevelCards.get(0);
+    return AllBackendsMap[this.props.language].blocks[type];
+  }
+
+  createCard()
+  {
+    Actions.create(this.state.keyPath, 0, this.getFirstCard().type);
   }
 
   toggleLearningMode()
@@ -216,7 +226,7 @@ class CardsColumn extends PureClasss<Props>
               index={cards.size}
               keyPath={keyPath}
               heightOffset={12}
-              accepts={_topLevelAccepts}
+              accepts={this.getPossibleCards()}
               language={this.props.language}
             />
             <CardsArea
@@ -227,14 +237,14 @@ class CardsColumn extends PureClasss<Props>
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               noCardTool={true}
-              accepts={_topLevelAccepts}
+              accepts={this.getPossibleCards()}
             />
             {
               !cards.size ? /* "Create your first card." */
                 <InfoArea
                   large={"There aren't any cards in this query."}
-                  button={canEdit && 'Create a Select Card'}
-                  onClick={this.createFromCard}
+                  button={canEdit && 'Create a ' + this.getFirstCard().static.title + ' Card'}
+                  onClick={this.createCard}
                   inline={false}
                 />
               : null
@@ -272,7 +282,7 @@ class CardsColumn extends PureClasss<Props>
             //   index={0}
             //   keyPath={keyPath}
             //   height={12}
-            //   accepts={_topLevelAccepts}
+            //   accepts={this.getPossibleCards()}
             // />
 
 // wasn't able to get this to work but will leave it around in case some

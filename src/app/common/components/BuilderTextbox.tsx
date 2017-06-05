@@ -134,6 +134,11 @@ class BuilderTextbox extends PureClasss<Props>
     backupString: CardString;
     options: List<string>;
   };
+  
+  getCreatingType(): string
+  {
+    return AllBackendsMap[this.props.language].creatingType;
+  }
 
   // TODO
   componentWillReceiveProps(newProps)
@@ -141,9 +146,9 @@ class BuilderTextbox extends PureClasss<Props>
     const value: any = newProps.value;
 
     // If you want two-way backups, use this line
-      // (value && this.props.value === '' && value['type'] === 'creating') ||
+      // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
-      (this.props.value && this.props.value['type'] === 'creating' && value === '')
+      (this.props.value && this.props.value['type'] === this.getCreatingType() && value === '')
     )
     {
       if (this.state.backupString)
@@ -211,7 +216,9 @@ class BuilderTextbox extends PureClasss<Props>
 
   handleSwitch()
   {
-    const value = this.isText() ? BlockUtils.make(AllBackendsMap[this.props.language].blocks.creating) : '';
+    const value = this.isText() ? BlockUtils.make(
+      AllBackendsMap[this.props.language].blocks[this.getCreatingType()]
+    ) : '';
     this.setState({
       value,
       backupString: typeof this.props.value === 'string' ? this.props.value : null,

@@ -54,15 +54,20 @@ export interface Backend
 	type: string;
 	name: string;
 	
-	// each type should be unique among the whole scope of cards in all languages
+	// The Building Blocks of Terraformer
+	// Blocks are either a card or some inside part of a card.
+	// Note: each type should be unique among the whole scope of cards in all languages.
 	blocks:
 	{
 		[type: string]: BlockConfig
 	};
+	creatingType: string; // type of the block that marks where a card is being created
+	
+	// Cards that can go at the root level
+	topLevelCards: List<string>;
 	
 	// Ordering of the cards deck
 	cardsDeck: List<List<string>>;
-	
 	cardsList: List<string>;
 	
 	queryToCode(

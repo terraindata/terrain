@@ -1093,9 +1093,6 @@ export const MySQLBlocks =
 BlockUtils.initBlocks(MySQLBlocks);
 
 
-// array of different card types
-export const CardTypes = _.compact(_.map(MySQLBlocks, (block, k: string) => block['_isCard'] && k ));
-
 // TODO remove
 const cards = {};
 for (const key in MySQLBlocks)

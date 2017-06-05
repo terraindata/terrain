@@ -213,6 +213,8 @@ class BuilderComponent extends PureClasss<Props>
               options={d.options}
               selectedIndex={value}
               centerAlign={d.centerDropdown}
+              optionsDisplayName={d.optionsDisplayName}
+              values={d.dropdownUsesRawValues ? d.options : undefined}
             />
             { this.props.helpOn && d.help ?
               <ManualInfo

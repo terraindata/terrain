@@ -43,9 +43,28 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 
 module CommonElastic
 {
+  export const valueTypes = ['text', 'number', 'object', 'array', 'bool', 'null'];
+  export const valueTypesDisplayNames =
+  {
+    text: 'Text',
+    number: 'Number',
+    object: 'Map',
+    array: 'List',
+    bool: 'True / False',
+    null: 'Null',
+  };
+  
+  
+  export const acceptsValues = List(
+    ['elasticValue', 'elasticObject', 'elasticArray']
+  );
+  
+  
   export const Directions: string[] = ['ascending', 'descending'];
   export const Combinators: string[] = ['&', 'or'];
   export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
