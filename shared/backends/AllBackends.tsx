@@ -44,15 +44,17 @@ THE SOFTWARE.
 
 import Backend from './types/Backend';
 import MySQLBackend from './mysql/MySQLBackend';
-// import ElasticBackend from './elastic/ElasticBackend';
+import ElasticBackend from './elastic/ElasticBackend';
 
 export const AllBackendsArray: Backend[] = 
 [
-	MySQLBackend
+	ElasticBackend,
+	MySQLBackend,
 ];
 
 export const AllBackendsMap: { [type: string]: Backend } =
 {
+	elastic: ElasticBackend,
 	mysql: MySQLBackend,
 };
 

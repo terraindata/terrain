@@ -47,6 +47,7 @@ THE SOFTWARE.
 import CardsToCodeOptions from './CardsToCodeOptions';
 import { BlockConfig } from '../../blocks/types/Block';
 import Query from '../../items/types/Query';
+import * as Immutable from 'immutable';
 
 export interface Backend
 {
@@ -61,6 +62,8 @@ export interface Backend
 	
 	// Ordering of the cards deck
 	cardsDeck: List<List<string>>;
+	
+	cardsList: List<string>;
 	
 	queryToCode(
 		query: Query,
@@ -79,5 +82,16 @@ export interface Backend
 	// function to get transform bars?
 	// autocomplete?
 }
+
+export const cardsDeckToList = (cardsDeck: List<List<string>>) =>
+{
+	return cardsDeck.reduce(
+		(memo: List<string>, miniList: List<string>) =>
+		{
+			return memo.concat(miniList);
+		},
+		Immutable.List<string>([])
+	).toList();
+};
 
 export default Backend;

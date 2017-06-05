@@ -42,34 +42,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+import CommonElastic from '../syntax/CommonElastic';
 
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import {Backend, cardsDeckToList} from '../types/Backend';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-import MySQLBlocks from './blocks/MySQLBlocks';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
+import {Block} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
+import {Card} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
+import Query from '../../../items/types/Query';
+import ElasticBlocks from '../blocks/ElasticBlocks';
 
-class MySQLBackend implements Backend
-{
-	type = 'mysql';
-	name = 'MySQL';
-	
-	blocks = MySQLBlocks;
-	
-	// Ordering of the cards deck
-	cardsDeck = MySQLCardsDeck;
-	cardsList = cardsDeckToList(MySQLCardsDeck);
-	
-	queryToCode = CardsToSQL.toSQL;
-	
-	codeToQuery = SQLToCards;
-	
-	syntaxConfig = syntaxConfig;
-	
-	// function to get transform bars?
-	// autocomplete?
+const join = (j, index) => (index === 0 ? '' : j);
+const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
+const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
+type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
+
+export interface Options {
+  allFields?: boolean; // amend the final Select card to include all possible fields.
+  limit?: number;
+  count?: boolean;
+  transformAliases?: boolean; // if true, scan the top Select for Transforms, and add an alias row using the transform's ID
+  replaceInputs?: boolean; // replaces occurences of inputs with their values
 }
 
-export default new MySQLBackend();
+class CardsToElastic
+{
+  static toElastic(query: Query, options: Options = {}): string
+  {
+    return 'not yet';
+  }
+}
+
+export default CardsToElastic;

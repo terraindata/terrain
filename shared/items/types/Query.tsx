@@ -47,6 +47,7 @@ import BlockUtils from '../../blocks/BlockUtils';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
 import {ResultsConfig, _ResultsConfig} from '../../results/types/ResultsConfig';
+import { AllBackendsMap } from '../../backends/AllBackends';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -56,7 +57,8 @@ class QueryC
   parent: number = -1;
   name: string = '';
   status: 'BUILD' | 'LIVE' = 'BUILD';
-  language: 'elastic';
+  
+  language: 'elastic' | 'mysql' = 'elastic';
   
   id: ID = -1;
   variantId: number = -1;
@@ -89,8 +91,9 @@ export interface Query extends QueryC, IRecord<Query> {}
 
 export const _Query = (config?: Object) => {
   config = config || {};
-  config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], config['language'] || 'elastic');
-  config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], config['language'] || 'elastic');
+  const Blocks = AllBackendsMap[config['language'] || 'elastic'].blocks;
+  config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);
+  config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
 
   let query = new Query_Record(config) as any as Query;

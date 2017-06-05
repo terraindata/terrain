@@ -215,6 +215,7 @@ const BuilderColumn = React.createClass<any, any>(
           columnIndex={this.props.index}
           cardsAndCodeInSync={query.cardsAndCodeInSync}
           parseError={query.parseError}
+          language={query.language}
         />;
 
       case COLUMNS.Inputs:

@@ -45,26 +45,26 @@ THE SOFTWARE.
 
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import {Backend, cardsDeckToList} from '../types/Backend';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-import MySQLBlocks from './blocks/MySQLBlocks';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
+import ElasticCardsDeck from './blocks/ElasticCardsDeck';
+import CardsToElastic from './conversion/CardsToElastic';
+import ElasticToCards from './conversion/ElasticToCards';
+import ElasticBlocks from './blocks/ElasticBlocks';
+const syntaxConfig = require('./syntax/ElasticSyntaxConfig.json');
 
-class MySQLBackend implements Backend
+class ElasticBackend implements Backend
 {
-	type = 'mysql';
-	name = 'MySQL';
+	type = 'elastic';
+	name = 'Elastic';
 	
-	blocks = MySQLBlocks;
+	blocks = ElasticBlocks;
 	
 	// Ordering of the cards deck
-	cardsDeck = MySQLCardsDeck;
-	cardsList = cardsDeckToList(MySQLCardsDeck);
+	cardsDeck = ElasticCardsDeck;
+	cardsList = cardsDeckToList(ElasticCardsDeck);
 	
-	queryToCode = CardsToSQL.toSQL;
+	queryToCode = CardsToElastic.toElastic;
 	
-	codeToQuery = SQLToCards;
+	codeToQuery = ElasticToCards;
 	
 	syntaxConfig = syntaxConfig;
 	
@@ -72,4 +72,4 @@ class MySQLBackend implements Backend
 	// autocomplete?
 }
 
-export default new MySQLBackend();
+export default new ElasticBackend();

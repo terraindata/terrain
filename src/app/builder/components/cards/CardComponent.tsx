@@ -68,6 +68,7 @@ import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -352,7 +353,7 @@ class _CardComponent extends PureClasss<Props>
 
     const card = BlockUtils.recordFromJS(
       BlockUtils.cardsForServer(removeId(this.props.card)).toJS(),
-      this.props.card.static.language
+      AllBackendsMap[this.props.card.static.language].blocks
     );
 
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);

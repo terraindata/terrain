@@ -53,15 +53,6 @@ import { Card } from '../../../../../shared/blocks/types/Card';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 
-const cardsOrderings: { [type: string]: string[] } =
-  _.mapObject(AllBackendsMap,
-    backend =>
-      _.flatten(backend.cardsDeck.toJS())
-        .map(
-          (cardConfig) => cardConfig.type,
-        )
-  );
-
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const AddCardIcon = require('./../../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
@@ -159,12 +150,12 @@ class CreateCardTool extends PureClasss<Props>
     {
       return null;
     }
-
+    
     return (
      <div className="create-card-selector" ref="selector">
        <div className="create-card-selector-inner">
          {
-           cardsOrderings[this.props.language].map((type: string) =>
+           AllBackendsMap[this.props.language].cardsList.map((type: string) =>
            {
              if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
              {

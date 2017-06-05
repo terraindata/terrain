@@ -75,8 +75,8 @@ class CardsToSQL
     let cardsTql = '';
     if (cards && cards.size)
     {
-      cards = this.applyOptions(cards, options);
-      cardsTql = removeBlanks(this._cards(cards, ';\n', options, true));
+      cards = CardsToSQL.applyOptions(cards, options);
+      cardsTql = removeBlanks(CardsToSQL._cards(cards, ';\n', options, true));
     }
 
     // TODO update inputs when back-end is ready
@@ -132,7 +132,7 @@ class CardsToSQL
   {
     if (options.allFields)
     {
-      cards = this._topFromCard(cards, (fromCard: Card) =>
+      cards = CardsToSQL._topFromCard(cards, (fromCard: Card) =>
         fromCard.update('fields',
           (fields: List<any>) =>
           {
@@ -147,7 +147,7 @@ class CardsToSQL
       );
     }
 
-    cards = this._topFromCard(cards, (fromCard: Card) =>
+    cards = CardsToSQL._topFromCard(cards, (fromCard: Card) =>
     {
       // add a take card if none are present
       if (options.limit && !fromCard['cards'].some((card) => card.type === 'take'))
@@ -182,7 +182,7 @@ class CardsToSQL
             let input = card['input'];
             if (input._isCard)
             {
-              input = this._parse(input);
+              input = CardsToSQL._parse(input);
             }
             transformInputs.push({
               input,
@@ -244,7 +244,7 @@ class CardsToSQL
   {
     const glue = append || '\n';
     return addTabs(cards.map(
-        (card, i) => this._parse(card, i, i === cards.size, isTop),
+        (card, i) => CardsToSQL._parse(card, i, i === cards.size, isTop),
       ).join(glue)) + (options && options['excludeSuffix'] ? '' : glue);
   }
 
@@ -274,7 +274,7 @@ class CardsToSQL
     while (repIndex !== -1)
     {
       const f = str.match('\\$[a-zA-Z]+')[0].substr(1);
-      str = str.replace('\$' + f, this._value(f, block));
+      str = str.replace('\$' + f, CardsToSQL._value(f, block));
       repIndex = str.indexOf('$');
     }
     return str;
@@ -291,7 +291,7 @@ class CardsToSQL
         append = block.static.tqlGlue;
         options['excludeSuffix'] = true;
       }
-      return this._cards(block['cards'], append, options);
+      return CardsToSQL._cards(block['cards'], append, options);
     }
 
     if (Array.isArray(block[field]) || Immutable.List.isList(block[field]))
@@ -299,7 +299,7 @@ class CardsToSQL
       const pieces =
         block[field].map(
           (v, index) =>
-            this._parse(v, index, index === block[field].size - 1),
+            CardsToSQL._parse(v, index, index === block[field].size - 1),
         );
 
       let glue = ', ';
@@ -318,7 +318,7 @@ class CardsToSQL
 
     if (typeof block[field] === 'object')
     {
-      return this._parse(block[field]);
+      return CardsToSQL._parse(block[field]);
     }
 
     if (field.toUpperCase() === field)

@@ -173,7 +173,7 @@ class CardsArea extends PureClasss<Props>
 
     const {isDraggingCardOver, draggingCardItem, draggingOverIndex} = this.state;
     const {keyPath} = this.props;
-
+    
     return (
       <div>
         <div

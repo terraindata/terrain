@@ -98,7 +98,6 @@ class CardsDeck extends PureClasss<Props>
     {
       throw new Error('Unable to find backend of type ' + this.props.language);
     }
-    
     return (
       <div
         className="cards-deck"
@@ -130,6 +129,7 @@ class CardsDeck extends PureClasss<Props>
                       card={cards[cardType]}
                       search={this.state.search}
                       key={cardType}
+                      type={cardType}
                     />,
                   )
                 }

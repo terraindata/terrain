@@ -909,7 +909,7 @@ export const MySQLBlocks =
         },
         {
           displayType: DisplayType.COMPONENT,
-          component: null, // component filled in at bottom of file
+          component: TransformCard,
           requiresBuilderState: true,
           key: null,
           // help: ManualConfig.help['scorePoints'],

@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 
 import {Card, Cards, _card} from './types/Card';
 import {Block, TQLFn} from './types/Block';

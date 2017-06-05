@@ -48,7 +48,7 @@ const {Map, List} = Immutable;
 
 import {Block, BlockConfig} from './types/Block';
 import {Card} from './types/Card';
-import { AllBackendsMap } from '../backends/AllBackends';
+// import { AllBackendsMap } from '../backends/AllBackends';
 
 module BlockUtils
 {
@@ -165,10 +165,8 @@ module BlockUtils
   const blockTypeToBlockRecord: any = {}; 
   
   // Given a plain JS object, construct the Record for it and its children
-  export const recordFromJS = (value: any, language: string) =>
+  export const recordFromJS = (value: any, Blocks) =>
   {
-    const Blocks = AllBackendsMap[language].blocks;
-    
     if (value && value.static && Immutable.Iterable.isIterable(value))
     {
       // already a block / record
@@ -180,13 +178,13 @@ module BlockUtils
     {
       if (Immutable.Iterable.isIterable(value))
       {
-        value = value.map((v) => recordFromJS(v, language));
+        value = value.map((v) => recordFromJS(v, Blocks));
       }
       else
       {
         value = _.reduce(value, (memo, v, key) =>
         {
-          memo[key] = recordFromJS(v, language);
+          memo[key] = recordFromJS(v, Blocks);
           return memo;
         }, Array.isArray(value) ? [] : {});
       }

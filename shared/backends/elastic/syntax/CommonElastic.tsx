@@ -42,34 +42,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as React from 'react';
 
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import {Backend, cardsDeckToList} from '../types/Backend';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-import MySQLBlocks from './blocks/MySQLBlocks';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
-
-class MySQLBackend implements Backend
+module CommonElastic
 {
-	type = 'mysql';
-	name = 'MySQL';
-	
-	blocks = MySQLBlocks;
-	
-	// Ordering of the cards deck
-	cardsDeck = MySQLCardsDeck;
-	cardsList = cardsDeckToList(MySQLCardsDeck);
-	
-	queryToCode = CardsToSQL.toSQL;
-	
-	codeToQuery = SQLToCards;
-	
-	syntaxConfig = syntaxConfig;
-	
-	// function to get transform bars?
-	// autocomplete?
+  export const Directions: string[] = ['ascending', 'descending'];
+  export const Combinators: string[] = ['&', 'or'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
+
+	export enum Operator {
+    EQ,
+    NE,
+    GE,
+    GT,
+    LE,
+    LT,
+    IN,
+    NIN,
+    LIKE,
+  }
+
+  export const OperatorTQL = {
+    [Operator.EQ]: '=',
+    [Operator.NE]: '!=',
+    [Operator.GE]: '>=',
+    [Operator.GT]: '>',
+    [Operator.LE]: '<=',
+    [Operator.LT]: '<',
+    [Operator.IN]: 'IN',
+    [Operator.NIN]: 'NOT IN',
+    [Operator.LIKE]: 'LIKE',
+  };
+
+  export enum Direction {
+    ASC,
+    DESC,
+  }
+
+  export const DirectionTQL = {
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC',
+  };
+
+  export enum Combinator {
+    AND,
+    OR,
+  }
+
+  export const CombinatorTQL = {
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR',
+  };
 }
 
-export default new MySQLBackend();
+export default CommonElastic;

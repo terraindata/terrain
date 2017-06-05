@@ -42,34 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as Immutable from 'immutable';
+import Blocks from './ElasticBlocks';
 
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import {Backend, cardsDeckToList} from '../types/Backend';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-import MySQLBlocks from './blocks/MySQLBlocks';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
-
-class MySQLBackend implements Backend
-{
-	type = 'mysql';
-	name = 'MySQL';
-	
-	blocks = MySQLBlocks;
-	
-	// Ordering of the cards deck
-	cardsDeck = MySQLCardsDeck;
-	cardsList = cardsDeckToList(MySQLCardsDeck);
-	
-	queryToCode = CardsToSQL.toSQL;
-	
-	codeToQuery = SQLToCards;
-	
-	syntaxConfig = syntaxConfig;
-	
-	// function to get transform bars?
-	// autocomplete?
-}
-
-export default new MySQLBackend();
+export const ElasticCardsDeck =
+  Immutable.fromJS(
+  [
+    [
+      
+    ],
+    [
+      
+    ],
+  ]
+  );
+  
+export default ElasticCardsDeck;

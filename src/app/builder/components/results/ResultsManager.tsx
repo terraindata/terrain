@@ -174,6 +174,7 @@ export class ResultsManager extends PureClasss<Props>
     
     if(db.source === 'm1')
     {
+      console.log(query.language);
       tql = AllBackendsMap[query.language].queryToCode(
         query, 
         {
@@ -200,9 +201,11 @@ export class ResultsManager extends PureClasss<Props>
       if(this.props.db.source === 'm1')
       {
         const selectCard = query.cards.get(0);
+
         if (
           !this.props.noExtraFields
           && selectCard
+          && selectCard.type === 'sfw'
           && !selectCard['cards'].some(
               (card) => card.type === 'groupBy',
             )

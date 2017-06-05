@@ -42,34 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+const _ = require('underscore');
+import * as Immutable from 'immutable';
+import List = Immutable.List;
+import Map = Immutable.Map;
 
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import {Backend, cardsDeckToList} from '../types/Backend';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-import MySQLBlocks from './blocks/MySQLBlocks';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
+import Query from '../../../items/types/Query';
+import CommonElastic from '../syntax/CommonElastic';
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 
-class MySQLBackend implements Backend
+import {Card, Cards, CardString} from '../../../blocks/types/Card';
+import {Block} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
+const { make } = BlockUtils;
+
+import Blocks from '../blocks/ElasticBlocks';
+
+export default function ElasticToCards(
+  query: Query,
+  queryReady: (query: Query) => void
+): Query
 {
-	type = 'mysql';
-	name = 'MySQL';
-	
-	blocks = MySQLBlocks;
-	
-	// Ordering of the cards deck
-	cardsDeck = MySQLCardsDeck;
-	cardsList = cardsDeckToList(MySQLCardsDeck);
-	
-	queryToCode = CardsToSQL.toSQL;
-	
-	codeToQuery = SQLToCards;
-	
-	syntaxConfig = syntaxConfig;
-	
-	// function to get transform bars?
-	// autocomplete?
+  
+  return query
+    .set('cardsAndCodeInSync', false);
 }
 
-export default new MySQLBackend();

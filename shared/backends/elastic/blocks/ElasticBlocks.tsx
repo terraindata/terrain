@@ -42,34 +42,64 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
+const {List, Map} = Immutable;
+const L = () => List([]);
+import BlockUtils from '../../../blocks/BlockUtils';
+import {_block, Block, TQLFn} from '../../../blocks/types/Block';
+import {_card, Card, CardString} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
+import CommonElastic from '../syntax/CommonElastic';
+import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
+import CommonBlocks from '../../../blocks/CommonBlocks';
 
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import {Backend, cardsDeckToList} from '../types/Backend';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-import MySQLBlocks from './blocks/MySQLBlocks';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
+import Util from '../../../../src/app/util/Util';
 
-class MySQLBackend implements Backend
+const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
+
+const {make} = BlockUtils;
+
+// TODO is there a better way to do these things?
+import ScoreBar from '../../../../src/app/builder/components/charts/ScoreBar';
+import TransformCard from '../../../../src/app/builder/components/charts/TransformCard';
+import Actions from '../../../../src/app/builder/data/BuilderActions';
+import Store from '../../../../src/app/builder/data/BuilderStore';
+
+export const ElasticBlocks =
 {
-	type = 'mysql';
-	name = 'MySQL';
-	
-	blocks = MySQLBlocks;
-	
-	// Ordering of the cards deck
-	cardsDeck = MySQLCardsDeck;
-	cardsList = cardsDeckToList(MySQLCardsDeck);
-	
-	queryToCode = CardsToSQL.toSQL;
-	
-	codeToQuery = SQLToCards;
-	
-	syntaxConfig = syntaxConfig;
-	
-	// function to get transform bars?
-	// autocomplete?
-}
+  
 
-export default new MySQLBackend();
+  elasticCreating: _card( // a placeholder for when a card is being created
+  {
+    static: {
+      language: 'elastic',
+      tql: '',
+      title: 'New Card',
+      colors: ['#777', '#777'],
+      preview: '',
+      display: null,
+      // manualEntry: null,
+    },
+  }),
+};
+
+BlockUtils.initBlocks(ElasticBlocks);
+
+
+// array of different card types
+export const CardTypes = _.compact(_.map(ElasticBlocks, (block, k: string) => block['_isCard'] && k ));
+
+// TODO remove
+const cards = {};
+for (const key in ElasticBlocks)
+{
+  if (ElasticBlocks[key]._isCard && ElasticBlocks[key].static.manualEntry)
+  {
+    cards[ElasticBlocks[key].static.manualEntry.name] = key;
+  }
+}
+export const cardList = cards;
+
+
+export default ElasticBlocks;
