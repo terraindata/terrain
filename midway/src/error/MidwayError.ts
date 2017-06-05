@@ -48,18 +48,11 @@ import MidwayErrorItem from './MidwayErrorItem';
 
 export class MidwayError
 {
-  public static fromJSON(json: string | MidwayErrorItem[])
+  public static fromJSON(json: string)
   {
     const midwayError = Object.create(MidwayError.prototype);
-    if (typeof json === 'string')
-    {
-      const jobject = JSON.parse(json);
-      midwayError.errors = jobject;
-    } else
-    {
-      midwayError.errors = json;
-    }
-    return midwayError;
+    const jobject = JSON.parse(json);
+    midwayError.errors = jobject.errors;
   }
 
   public errors: MidwayErrorItem[];

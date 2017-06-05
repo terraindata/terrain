@@ -46,21 +46,20 @@ import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 
-import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
 import SharedTypes from './../../../shared/SharedTypes';
 import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
-import Util from './../util/Util';
+import QueryResponse from './../../../midway/src/app/query/QueryResponse';
 import {recordForSave, responseToRecordConfig} from '../Classes';
 
 /**
  * Note: This is the old query response type.
  * For the new QueryResponse definition, see /midway/src/app/query/QueryResponse.ts
  */
-export interface QueryResponse
+export interface M1QueryResponse
 {
   results?: any[];
   errorMessage?: string;
@@ -109,6 +108,8 @@ export const Ajax =
           }
           catch (e)
           {
+            // parsing error, we create a new QueryResponse so that callers wont need to worry about the format
+            // anymore.
             config.onError && config.onError(e);
           }
 
@@ -638,7 +639,7 @@ export const Ajax =
     query_m1(
       tql: string,
       db: string | number,
-      onLoad: (response: QueryResponse) => void,
+      onLoad: (response: M1QueryResponse) => void,
       onError?: (ev: Event) => void,
       sqlQuery?: boolean,
       options: {
@@ -692,6 +693,92 @@ export const Ajax =
     },
 
     /**
+     * Transforms result into old format.
+     */
+      queryM1(body: string,
+            db: SharedTypes.Database,
+            onLoad: (response: M1QueryResponse) => void,
+            onError?: (ev: Event) => void,
+            sqlQuery?: boolean, // unused
+            options: {
+              streaming?: boolean,
+              streamingTo?: string,
+            } = {},
+    ): { xhr: XMLHttpRequest, queryId: string }
+    {
+      // TODO make this hack not so bad
+      const dbs = LibraryStore.getState().dbs;
+      if (db && db.source === 'm1')
+      {
+        return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
+      }
+
+      // TODO: For MySQL and other string queries, we should skip this step and send it as a string
+      try
+      {
+        body = JSON.parse(body);
+      }
+      catch (e)
+      {
+        // on parse failure, absorb error and send query as a string
+      }
+      const queryId = '' + Math.random();
+      const payload = {
+        type: 'search', // can be other things in the future
+        database: db.id, // should be passed by caller
+        streaming: options.streaming,
+        body,
+      };
+
+      const onLoadHandler = (resp) =>
+      {
+        let result: M1QueryResponse = {results: []};
+        try
+        {
+          const hits = resp.result.hits.hits;
+          const results = hits.map((hit) =>
+          {
+            let source = hit._source;
+            source._index = hit._index;
+            source._type = hit._type;
+            source._id = hit._id;
+            source._score = hit._score;
+            source._sort = hit._sort;
+            return source;
+          });
+
+          result = {results};
+        }
+        catch (e)
+        {
+          // absorb
+        }
+
+        // This could be improved
+        if (resp.errors.length > 0)
+        {
+          result.errorMessage = resp.errors[0].title;
+        }
+
+        onLoad(result);
+      };
+
+      const xhr = Ajax._reqMidway2(
+        'post',
+        'query/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+          download: options.streaming,
+          downloadFilename: options.streamingTo,
+        },
+      );
+
+      return {queryId, xhr};
+    },
+
+    /**
      * Intermediate query interface. Queries M2.
      * Transforms result into old format.
      */
@@ -732,35 +819,35 @@ export const Ajax =
 
       const onLoadHandler = (resp) =>
       {
-        let result: QueryResponse = {results: []};
-        try
-        {
-          const hits = resp.result.hits.hits;
-          const results = hits.map((hit) =>
-          {
-            let source = hit._source;
-            source._index = hit._index;
-            source._type = hit._type;
-            source._id = hit._id;
-            source._score = hit._score;
-            source._sort = hit._sort;
-            return source;
-          });
-
-          result = {results};
-        }
-        catch (e)
-        {
-          // absorb
-        }
+        const queryResult: QueryResponse = QueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+        //
+        // try
+        // {
+        //   const hits = resp.result.hits.hits;
+        //   const results = hits.map((hit) =>
+        //   {
+        //     let source = hit._source;
+        //     source._index = hit._index;
+        //     source._type = hit._type;
+        //     source._id = hit._id;
+        //     source._score = hit._score;
+        //     source._sort = hit._sort;
+        //     return source;
+        //   });
+        //
+        //   result = {results};
+        // }
+        // catch (e)
+        // {
+        //   // absorb
+        // }
 
         // This could be improved
-        if (resp.errors.length > 0)
-        {
-          result.errorMessage = resp.errors[0].title;
-        }
-
-        onLoad(result);
+        // if (resp.errors.length > 0)
+        // {
+        //   result.errorMessage = resp.errors[0].title;
+        // }
       };
 
       const xhr = Ajax._reqMidway2(
@@ -778,7 +865,7 @@ export const Ajax =
       return {queryId, xhr};
     },
 
-    parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
+    parseTree(tql: string, db: string, onLoad: (response: M1QueryResponse) => void, onError?: (ev: Event) => void)
     {
       return Ajax._postMidway1('/get_tql_tree', {
           query_string: encode_utf8(tql),

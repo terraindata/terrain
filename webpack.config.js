@@ -80,6 +80,16 @@ module.exports =
                         }
                     })
             },
+          {
+            test: /\.ts$/,
+            exclude: [/node_modules/],
+            loader:
+            'babel-loader?presets[]=react&presets[]=latest!ts-loader?'
+            + JSON.stringify({
+              compilerOptions: {
+              }
+            })
+          },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },
             { test: /\.less$/, exclude: /midway/, loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
             { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel-loader?presets[]=react&presets[]=latest' },

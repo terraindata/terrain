@@ -48,13 +48,17 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import {BaseClass, New} from '../../../Classes';
 import TQLConverter from '../../../tql/TQLConverter';
-import {Ajax, QueryResponse} from '../../../util/Ajax';
+import {Ajax, M1QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import BuilderTypes from '../../BuilderTypes';
 import SharedTypes from './../../../../../shared/SharedTypes';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
+import QueryResponse from '../../../../../midway/src/app/query/QueryResponse';
+import {MidwayErrorItem} from '../../../../../midway/src/error/MidwayErrorItem';
+import {line} from 'd3-shape';
+import {MidwayError} from '../../../../../midway/src/error/MidwayError';
 
 export const MAX_RESULTS = 200;
 
@@ -122,7 +126,8 @@ interface ResultsQuery
 interface State
 {
   queriedTql?: string;
-
+  queryMidwayResponse?: QueryResponse;
+  allQueryMidwayResponse?: QueryResponse;
   query?: ResultsQuery;
   allQuery?: ResultsQuery;
   countQuery?: ResultsQuery;
@@ -328,7 +333,7 @@ export class ResultsManager extends PureClasss<Props>
     // }
   }
 
-  handleResultsResponse(response: QueryResponse, isAllFields?: boolean)
+  private handleResultsResponse(response: M1QueryResponse | QueryResponse, isAllFields?: boolean)
   {
     const queryKey = isAllFields ? 'allQuery' : 'query';
     this.setState({
@@ -336,14 +341,28 @@ export class ResultsManager extends PureClasss<Props>
     });
 
     const {resultsState} = this.props;
+    let resultsData;
 
-    if (!response || response.errorMessage)
+    if (response instanceof QueryResponse)
     {
-      this.handleError(response, isAllFields);
-      return;
+      // m2
+      if (response.hasError())
+      {
+        this.handleError(response);
+        return;
+      }
+      resultsData = response.getResultsData();
+    } else
+    {
+      // m1
+      if (!response || response.errorMessage)
+      {
+        this.handleError(response, isAllFields);
+        return;
+      }
+      resultsData = response.results;
     }
 
-    const resultsData = response.results;
     const resultsCount = resultsData.length;
     if (resultsData.length > MAX_RESULTS)
     {
@@ -397,12 +416,12 @@ export class ResultsManager extends PureClasss<Props>
     this.changeResults(changes);
   }
 
-  handleAllFieldsResponse(response: QueryResponse)
+  handleAllFieldsResponse(response: M1QueryResponse)
   {
     this.handleResultsResponse(response, true);
   }
 
-  handleCountResponse(response: QueryResponse)
+  handleCountResponse(response: M1QueryResponse)
   {
     this.setState({
       countQuery: null,
@@ -446,7 +465,18 @@ export class ResultsManager extends PureClasss<Props>
     // );
   }
 
-  handleError(response: QueryResponse, isAllFields?: boolean)
+  private handleError(response: M1QueryResponse | QueryResponse, isAllFields?: boolean)
+  {
+    if (response instanceof QueryResponse)
+    {
+      this.handleM2Error(response, isAllFields);
+    } else
+    {
+      this.handleM1Error(response, isAllFields);
+    }
+  }
+
+  private handleM1Error(response: M1QueryResponse, isAllFields?: boolean)
   {
     let {errorMessage} = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
@@ -505,7 +535,43 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  handleAllFieldsError(response: QueryResponse)
+  private handleM2Error(response: QueryResponse, isAllFields?: boolean)
+  {
+    const err: MidwayErrorItem = response.errors[0];
+    let {resultsState} = this.props;
+    if (!isAllFields)
+    {
+      resultsState = resultsState
+        .set('mainErrorMessage', err.title)
+        .set('subErrorMessage', err.detail);
+    }
+
+    this.setState({
+      [isAllFields ? 'query' : 'allQuery']: null,
+    });
+
+    this.props.onResultsStateChange(
+      resultsState
+        .set(
+          isAllFields ? 'hasAllFieldsError' : 'hasError',
+          true,
+        )
+        .set(
+          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+          err.title,
+        )
+        .set(
+          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+          true,
+        )
+        .set(
+          'loading',
+          false,
+        ),
+    );
+  }
+
+  handleAllFieldsError(response: M1QueryResponse)
   {
     this.handleError(response, true);
   }

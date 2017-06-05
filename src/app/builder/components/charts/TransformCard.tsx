@@ -45,15 +45,15 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const {Map, List} = Immutable;
 import * as React from 'react';
+import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
 import TQLConverter from '../../../tql/TQLConverter';
-import { Ajax, QueryResponse } from '../../../util/Ajax';
+import { Ajax, M1QueryResponse } from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
 import { BuilderTypes } from './../../BuilderTypes';
 import TransformCardChart from './TransformCardChart';
-const Dimensions = require('react-dimensions');
 
 const NUM_BARS = 1000;
 
@@ -305,7 +305,7 @@ class TransformCard extends PureClasss<Props>
       Ajax.killQuery(this.state.queryId);
   }
 
-  handleQueryResponse(response: QueryResponse)
+  handleQueryResponse(response: M1QueryResponse)
   {
     this.setState({
       queryXhr: null,
