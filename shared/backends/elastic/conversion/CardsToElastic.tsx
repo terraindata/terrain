@@ -70,6 +70,18 @@ class CardsToElastic
 {
   static toElastic(query: Query, options: Options = {}): string
   {
+  	let q: string = query.tql;
+
+    if (options.allFields === true)
+    {
+      const o = JSON.parse(query.tql);
+      if (o.body && o.body._source)
+      {
+        o.body._source  = [];
+      }
+      q = JSON.stringify(o);
+    }
+
     return 'not yet implemented';
   }
 }

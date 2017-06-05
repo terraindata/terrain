@@ -311,12 +311,15 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
   ) =>
   {
     // TODO MOD convert
+    let {query} = state;
+    query = query.set('tql', action.payload.tql);
+    query = AllBackendsMap[query.language].codeToQuery(
+      query,
+      (newQuery) =>
+        Actions.change(Immutable.List(['query']), newQuery)
+    );
     
-    return state
-      .update('query', (query) =>
-        query
-          .set('tql', action.payload.tql),
-      )
+    return state.set('query', query);
   },
 
 [ActionTypes.hoverCard]:

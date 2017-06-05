@@ -84,7 +84,6 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * `yarn`
 * `yarn global add webpack-dev-server`
 * `yarn start` - starts the Midway server, now running at localhost:3000
-  * You may need to copy a valid sqlite db file into nodeway.db: `cp nodewaytest.db nodeway.db`
 * `yarn run start-front` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
 * Alternatively, `yarn run start-front-m1` will run the front-end pointed at Midway 1 (in Go)
@@ -211,7 +210,7 @@ Contains unit tests for Midway. test's directory structure mirrors that of midwa
 
 ## Packages and Imports
 
-### To install a package from npm
+### To install a package from npm (This is obsolete, use yarn instead)
 
 `npm install [package-name] --save`
 

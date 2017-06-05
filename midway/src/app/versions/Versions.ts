@@ -63,17 +63,22 @@ export interface VersionConfig
 
 export class Versions
 {
-  private Version = new Tasty.Table(
-    'versions',
-    ['id'],
-    [
-      'createdAt',
-      'createdByUserId',
-      'object',
-      'objectId',
-      'objectType',
-    ],
-  );
+  private versionTable: Tasty.Table;
+
+  constructor()
+  {
+    this.versionTable = new Tasty.Table(
+      'versions',
+      ['id'],
+      [
+        'createdAt',
+        'createdByUserId',
+        'object',
+        'objectId',
+        'objectType',
+      ],
+    );
+  }
 
   public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig>
   {
@@ -85,16 +90,16 @@ export class Versions
     const newVersion: VersionConfig =
       {
         createdByUserId: user.id,
-        object: obj.toString(),
+        object: JSON.stringify(obj),
         objectId: id,
         objectType: type,
       };
-    return App.DB.upsert(this.Version, newVersion) as Promise<VersionConfig>;
+    return App.DB.upsert(this.versionTable, newVersion) as Promise<VersionConfig>;
   }
 
   public async find(id: number): Promise<VersionConfig[]>
   {
-    return App.DB.select(this.Version, [], { id }) as Promise<VersionConfig[]>;
+    return App.DB.select(this.versionTable, [], { id }) as Promise<VersionConfig[]>;
   }
 
   public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
@@ -102,15 +107,15 @@ export class Versions
     let result: Promise<VersionConfig[]>;
     if (objectId !== undefined && objectType !== undefined)
     {
-      result = App.DB.select(this.Version, [], { objectType, objectId });
+      result = App.DB.select(this.versionTable, [], { objectType, objectId });
     }
     else if (objectId !== undefined)
     {
-      result = App.DB.select(this.Version, [], { objectType });
+      result = App.DB.select(this.versionTable, [], { objectType });
     }
     else
     {
-      result = App.DB.select(this.Version, [], {});
+      result = App.DB.select(this.versionTable, [], {});
     }
     return result;
   }

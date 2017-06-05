@@ -47,6 +47,9 @@ THE SOFTWARE.
 // import ElasticConfig from '../ElasticConfig';
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
+import clarinet = require('clarinet');
+import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
+import { Readable } from 'stream';
 import * as winston from 'winston';
 
 import QueryHandler from '../../../app/query/QueryHandler';
@@ -56,11 +59,6 @@ import MidwayErrorItem from '../../../error/MidwayErrorItem';
 import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
-import ElasticsearchScrollStream = require('elasticsearch-scroll-stream');
-import { Readable } from 'stream';
-
-// tslint:disable-next-line
-const clarinet = require('clarinet');
 
 /**
  * Implements the QueryHandler interface for ElasticSearch

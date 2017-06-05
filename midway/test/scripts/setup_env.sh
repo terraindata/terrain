@@ -61,6 +61,7 @@ do
 done
 
 # stop any existing instances
+${DIR}/teardown_env.sh --mysql-port=$mysql_port --elastic-port=$elastic_port
 
 if [ "$mysql_port" == 3306 ];
 then
@@ -76,8 +77,6 @@ else
 	 echo "Starting elastic on NON-STANDARD port $elastic_port..."
 fi
 
-${DIR}/teardown_env.sh --mysql-port=$mysql_port --elastic-port=$elastic_port
-
 # Pull images in parallel in order to minimize latency...
 docker pull $sqlite_image &
 docker pull $mysql_image &
@@ -85,14 +84,10 @@ docker pull $elastic_image &
 wait
 
 docker run -v${sqlite_path}:/data/ -u$(id -u):$(id -g) $sqlite_image
-
-docker run -d -p $mysql_port:$mysql_port $mysql_image
-
-docker run -d -p $elastic_port:$elastic_port $elastic_image
+docker run -d --name moviesdb-mysql -p $mysql_port:$mysql_port $mysql_image
+docker run -d --name moviesdb-elk -p $elastic_port:$elastic_port $elastic_image
 
 echo "Waiting on services to be ready..."
 
-while ! mysqladmin ping -h127.0.0.1 -uroot --port=$mysql_port --silent; do sleep 0.1; done
-while [ $(curl -v --silent "http://127.0.0.1:$elastic_port"/_cluster/health 2>&1 | grep "\"status\":\"green\"" | wc -l) == 0 ]; do sleep 0.1; done
-# assume sqlite is up and running by this point...
+while [ "`docker inspect -f {{.State.Health.Status}} moviesdb-mysql`" != "healthy" -o "`docker inspect -f {{.State.Health.Status}} moviesdb-elk`" != "healthy" ]; do sleep 0.1; done;
 

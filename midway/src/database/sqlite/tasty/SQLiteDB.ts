@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import SQLGenerator from '../../../tasty/SQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
-import SQLGenerator from '../../SQLGenerator';
 import SQLiteClient from '../client/SQLiteClient';
 import SQLiteConfig from '../SQLiteConfig';
 
@@ -65,20 +65,24 @@ export class SQLiteDB implements TastyDB
     this.client = client;
   }
 
-  public generate(query: TastyQuery): string[]
+  public generateQuery(query: TastyQuery, placeholder: boolean): [string[], any[][]]
   {
     const generator = new SQLGenerator();
     if (query.command.tastyType === TastyNodeTypes.select || query.command.tastyType === TastyNodeTypes.delete)
     {
-      generator.generateSelectQuery(query);
+      generator.generateSelectQuery(query, placeholder);
     }
     else if (query.command.tastyType === TastyNodeTypes.upsert && query.upserts.length > 0)
     {
-      generator.generateUpsertQuery(query, query.upserts);
+      generator.generateUpsertQuery(query, query.upserts, placeholder);
     }
+    return [generator.statements, generator.values];
+  }
 
-    generator.accumulateStatement(generator.queryString);
-    return generator.statements;
+  public generate(query: TastyQuery): string[]
+  {
+    const [statements, values] = this.generateQuery(query, false);
+    return statements;
   }
 
   public generateString(query: TastyQuery): string
@@ -119,7 +123,7 @@ export class SQLiteDB implements TastyDB
     {
       const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.all(statement, makePromiseCallback(resolve, reject));
+        this.client.all(statement, [], makePromiseCallback(resolve, reject));
       });
 
       results = results.concat(result);
@@ -127,16 +131,20 @@ export class SQLiteDB implements TastyDB
     return results;
   }
 
-  public async upsert(table: TastyTable, statements: string[], elements: object[]): Promise<object[]>
+  public async upsert(table: TastyTable, elements: object[]): Promise<object[]>
   {
+    const query = new TastyQuery(table).upsert(elements);
+    const [statements, values] = this.generateQuery(query, true);
     const primaryKeys = table.getPrimaryKeys();
 
     const lastIDs: number[] = [];
-    for (const statement of statements)
+    for (let i = 0; i < statements.length; ++i)
     {
+      const statement = statements[i];
+      const value = values[i];
       const result = await new Promise<number>((resolve, reject) =>
       {
-        this.client.run(statement, [], function(error: Error, ctx: any)
+        this.client.run(statement, value, function(error: Error, ctx: any)
         {
           if (error !== null && error !== undefined)
           {

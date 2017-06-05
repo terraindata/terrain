@@ -418,16 +418,9 @@ const canDrop = (props, monitor) =>
 
   const itemType = monitor.getItem().type;
   const targetType = props.type;
-  switch (itemType)
-  {
-    case 'variant':
-      return targetType === 'variant' || targetType === 'algorithm';
-    case 'algorithm':
-      return targetType === 'algorithm' || targetType === 'group';
-    case 'group':
-      return targetType === 'group';
-  }
-  return false;
+  
+  // can only drag and drop within the same column / type
+  return itemType === targetType;
 };
 const target =
 {

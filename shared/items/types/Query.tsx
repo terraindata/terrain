@@ -79,7 +79,8 @@ class QueryC
 
   cardsAndCodeInSync: boolean = false;
   parseError: string = null;
-  
+
+  meta: IMMap<string, any> = Immutable.Map<string, any>({});
   
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields= ['dbFields', 'excludeFields'];

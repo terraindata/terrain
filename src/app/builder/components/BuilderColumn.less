@@ -7,12 +7,12 @@
 
 .builder-column {
   height: 100%;
-  
+
   input {
     font-size: 12px;
   }
   .builder-title-bar {
-    
+
     background: @dark-moss;
     padding: 9px;
     height: @title-bar-height;
@@ -28,16 +28,16 @@
         opacity: 1;
       }
     }
-    
+
     .builder-title-bar-title {
      .title-white-text;
      line-height: 16px;
-      
+
       text-shadow: 0px 0px 3px rgba(0,0,0,0.15);
       display: inline-block;
       position: relative;
       left: @handle-width / 2;
-    
+
       svg {
         width: 10px;
         fill: #fff;
@@ -49,7 +49,7 @@
         }
       }
     }
-    
+
     .builder-resize-handle {
       position: absolute;
       top: 0px;
@@ -59,7 +59,7 @@
       box-sizing: border-box;
       cursor: col-resize;
       .transition;
-      
+
       .builder-resize-handle-line {
         top: 33%;
         height: 33%;
@@ -68,34 +68,34 @@
         position: absolute;
         pointer-events: none;
       }
-      
+
       @line-offset: 3px;
       .builder-resize-handle-line:first-child {
         // left: calc(@handle-width / 3);
         left: @handle-width / 2 - @line-offset - 1px;
       }
-      
+
       .builder-resize-handle-line:last-child {
         // left: calc(@handle-width * 2 / 3);
         left: @handle-width / 2 + @line-offset - 1px;
       }
-      
+
       &:hover {
         background: rgba(255,255,255,0.15);
       }
-      
+
       &.active {
         background: rgba(255,255,255,0.5);
       }
     }
   }
-  
+
   .builder-title-bar-options {
     display: inline-block;
     float: right;
     position: relative;
     top: -6px;
-    
+
     .bc-options-svg {
       display: inline-block;
       vertical-align: middle;
@@ -113,8 +113,8 @@
       }
 
     }
-    
-    
+
+
     .menu-wrapper {
       position: relative;
       top: 5px;
@@ -135,13 +135,13 @@
       }
     }
   }
-  
+
   &:not(.builder-column-0) {
     .builder-column-content {
       border-left: 1px solid @side-border-color;
     }
   }
-  
+
   .builder-column-content {
     background: @builder-bg;
     z-index: 0;
@@ -150,17 +150,21 @@
     padding-left: 12px !important;
     cursor: auto;
     overflow: hidden;
-    
+
     &.builder-column-content-scroll {
       overflow-y: auto;
       overflow-x: auto;
       margin-right: 3px;
       padding-right: 0px;
     }
-  
+
     .standard-margin-container;
+
+    .react-grid-HeaderCell {
+      box-sizing: border-box;
+    }
   }
-  
+
   .builder-column-loading {
     display: inline-block;
     margin-left: 10px;

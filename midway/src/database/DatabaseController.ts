@@ -69,13 +69,17 @@ abstract class DatabaseController
     this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
   }
 
-  public log(methodName: string, info?: any)
+  public log(methodName: string, info?: any, moreInfo?: any)
   {
     const header = this.header + (++this.lsn).toString() + ':' + methodName;
     winston.info(header);
-    if (info !== 'undefined')
+    if (info !== undefined)
     {
       winston.debug(header + ': ' + JSON.stringify(info, null, 1));
+    }
+    if (moreInfo !== undefined)
+    {
+      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
     }
   }
 

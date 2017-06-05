@@ -124,7 +124,7 @@ export const Ajax =
           }
         },
         _.extend({
-          host: NODEWAY_HOST,
+          host: MIDWAY_HOST,
           noToken: true,
           json: true,
           crossDomain: false,
@@ -498,7 +498,7 @@ export const Ajax =
       {
         return AjaxM1.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
       }
-      
+
       // TODO: For MySQL and other string queries, we should skip this step and send it as a string
       try
       {
@@ -583,7 +583,6 @@ export const Ajax =
     {
       let m1Dbs: BackendInstance[] = null;
       let m2Dbs: BackendInstance[] = null;
-      
       const checkForLoaded = () =>
       {
         if(!m1Dbs || !m2Dbs)
@@ -626,7 +625,7 @@ export const Ajax =
       
       Ajax.req(
         'get',
-        'database', 
+        'database',
         { },
         (dbs: [BackendInstance]) =>
         {
@@ -757,8 +756,7 @@ export const Ajax =
         if (xhr.status === 401)
         {
           // TODO re-enable
-          // Actions.logout();
-          return;
+          Actions.logout();
         }
 
         if (xhr.status != 200)

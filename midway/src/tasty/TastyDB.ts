@@ -76,25 +76,24 @@ abstract class TastyDB
    * execute a database specific query
    *
    * @abstract
-   * @param {*} query
+   * @param {*} queries
    * @returns {Promise<object[]>}
    *
    * @memberof TastyDB
    */
-  public async abstract execute(query: any): Promise<object[]>;
+  public async abstract execute(queries: any[]): Promise<object[]>;
 
   /**
    * update or insert an array of objects in a TastyTable
    *
    * @abstract
    * @param {TastyTable} table
-   * @param {*} query
    * @param {object[]} elements
    * @returns {Promise<object[]>}
    *
    * @memberof TastyDB
    */
-  public async abstract upsert(table: TastyTable, query: any, elements: object[]): Promise<object[]>;
+  public async abstract upsert(table: TastyTable, elements: object[]): Promise<object[]>;
 
   /**
    * returns schema information for a database

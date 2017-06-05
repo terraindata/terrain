@@ -171,10 +171,9 @@ export class ResultsManager extends PureClasss<Props>
     }
 
     let tql = query.tql;
-    
+
     if(db.source === 'm1')
     {
-      console.log(query.language);
       tql = AllBackendsMap[query.language].queryToCode(
         query, 
         {
@@ -198,7 +197,19 @@ export class ResultsManager extends PureClasss<Props>
           ),
       });
 
-      if(this.props.db.source === 'm1')
+      if (this.props.db.source === 'm2')
+      {
+        // this.setState({
+        //   allQuery: Ajax.query(
+        //     AllBackendsMap[query.language].toEQL(query, {
+        //       allFields: true,
+        //     }),
+        //     db,
+        //     this.handleAllFieldsResponse,
+        //     this.handleAllFieldsError,
+        //   ),
+        // });
+      } else if (this.props.db.source === 'm1')
       {
         const selectCard = query.cards.get(0);
 
@@ -215,7 +226,6 @@ export class ResultsManager extends PureClasss<Props>
         )
         {
           // temporary, don't dispatch select * if query has group by
-        
           this.setState({
             allQuery: Ajax.query(
               AllBackendsMap[query.language].queryToCode(
@@ -273,9 +283,15 @@ export class ResultsManager extends PureClasss<Props>
   componentWillReceiveProps(nextProps: Props)
   {
     if (
-      nextProps.query != null
-      && nextProps.query.tql != null
-      && (this.props.query == null || this.props.query.tql !== nextProps.query.tql)
+      nextProps.query
+      && nextProps.query.tql
+      && (!this.props.query ||
+        (
+          this.props.query.tql !== nextProps.query.tql || 
+          this.props.query.cards !== nextProps.query.cards ||
+          this.props.query.inputs !== nextProps.query.inputs
+        )
+      )
     )
     {
       this.queryResults(nextProps.query, nextProps.db);

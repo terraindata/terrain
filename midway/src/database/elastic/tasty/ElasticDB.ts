@@ -113,21 +113,29 @@ export class ElasticDB implements TastyDB
     }
   }
 
-  public async execute(query: ElasticQuery)
+  public async execute(queries: ElasticQuery[])
   {
-    let result: any;
-    switch (query.op)
+    let results: object[] = [];
+    for (const query of queries)
     {
-      case 'select':
-        result = await this.query(query.params as Elastic.SearchParams[]);
-        return result.hits.hits;
-      case 'upsert':
-        const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
-        result = await this.upsert(table, query, query.params);
-        return result;
-      default:
-        throw new Error('Unknown query command ' + JSON.stringify(query));
+      let result: any;
+      switch (query.op)
+      {
+        case 'select':
+          result = await this.query(query.params as Elastic.SearchParams[]);
+          results = results.concat(result.hits.hits);
+          break;
+        case 'upsert':
+          const table: TastyTable = new TastyTable(query.table, query.primaryKeys, query.fields, query.index);
+          result = await this.upsert(table, query.params);
+          results = results.concat(result);
+          break;
+        default:
+          throw new Error('Unknown query command ' + JSON.stringify(query));
+      }
     }
+
+    return results;
   }
 
   public async destroy()
@@ -149,7 +157,7 @@ export class ElasticDB implements TastyDB
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsert(table: TastyTable, query: ElasticQuery, elements: object[])
+  public async upsert(table: TastyTable, elements: object[])
   {
     const upserted = await this.upsertObjects(table, elements);
     const primaryKeys = table.getPrimaryKeys();

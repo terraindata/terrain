@@ -42,42 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Production build configuration for webpack.
+// Copyright 2017 Terrain Data, Inc.
 
-var webpack = require('webpack');
-var conf = require('./webpack.config');
+import App from './app/App';
+import CmdLineArgs from './app/CmdLineArgs';
 
+const app = new App(CmdLineArgs);
+const server = app.start();
 
-// Disable source map.
-delete conf.devtool;
-
-conf.plugins = [
-  new webpack.DefinePlugin({
-    // Signal to React not to include detailed checks.
-	  //    'process.env': {
-	  //      'NODE_ENV': "'production'"
-	  //    },
-    
-	      'DEV': "false",
-    
-    // Keep this blank, since the default midway host would be the one serving this page.
-    'MIDWAY_HOST': "''",
-
-    // TDB_HOST would be set at runtime...
-    // 'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'"
-  }),
-
-  // Minify code.
-  //  new webpack.optimize.UglifyJsPlugin()
-];
-
-// enable babel plugins on tsx loader
-if(conf.module.loaders[0].loader !== 'babel?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
-{
-  throw new Error('Expected first loader to be babel?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}} but found '
-    + conf.module.loaders[0].loader);
-}
-conf.module.loaders[0].loader =
-  'babel?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements&minified=true!ts-loader?{"compilerOptions":{}}';
-
-module.exports = conf;
+export default server;

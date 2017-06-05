@@ -72,7 +72,8 @@ export const Ajax =
         urlArgs?: object;
       } = {})
     {
-      const host = config.host || MIDWAY_HOST;
+      // NOTE: OLD_MIDWAY_HOST will be replaced by the build process.
+      const host = config.host || OLD_MIDWAY_HOST;
       let fullUrl = host + url;
 
       if (config.download)
@@ -123,7 +124,6 @@ export const Ajax =
         onLoad(xhr.responseText);
       };
 
-      // NOTE: MIDWAY_HOST will be replaced by the build process.
       if (method === 'get')
       {
         try

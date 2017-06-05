@@ -190,7 +190,7 @@ class Login extends PureClasss<Props>
         
         (ev: Event) => {
           this.setState({
-            errorModalMessage: 'Error logging in:' + ev,
+            errorModalMessage: 'Error logging in:' + JSON.stringify(ev),
             loggingIn: false,
             xhr: null,
           });

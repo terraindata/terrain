@@ -108,6 +108,7 @@ class CardsToSQL
     return cardsTql;
   }
 
+
   private static _topFromCard(cards: List<Card>, fn: (fromCard: Card) => Card): List<Card>
   {
     // find top-level 'from' cards
