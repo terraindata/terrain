@@ -44,12 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESParserValueInfo from './ESParserValueInfo';
-
-type TokenResult = any; // string | null;
 
 /**
  * An instrumented JSON parser for parsing ES queries
@@ -70,20 +67,26 @@ type TokenResult = any; // string | null;
  */
 export default class ESParser
 {
-  private queryString: string;
-  private charNumber: number;
+  private queryString: string; // string being parsed
 
-  private lastCheckedRowChar: number;
-  private lastRowChar: number;
-  private lastRowNumber: number;
+  private charNumber: number; // current parser/tokenizer position in the queryString
 
-  private value: any;
+  private lastCheckedRowChar: number; // last char checked for row count
+  private lastRowChar: number; // position of last newline
+  private lastRowNumber: number; // row number of last newline
 
-  private tokens: ESParserToken[];
-  private valueStack: ESParserValueInfo[];
-  private valueInfos: ESParserValueInfo[];
-  private errors: ESParserError[];
+  private value: any; // parsed value
 
+  private tokens: ESParserToken[]; // accumulated tokens, in order
+  private valueStack: ESParserValueInfo[]; // stack of current value info's
+  private valueInfos: ESParserValueInfo[]; // accumulated value info's, in order
+  private errors: ESParserError[]; // accumulated errors, in order
+
+  /**
+   * Runs the parser on the given query string. Read needed data by calling the
+   * public member functions below.
+   * @param queryString query to parse
+   */
   public constructor(queryString: string)
   {
     this.queryString = queryString;
@@ -101,21 +104,33 @@ export default class ESParser
     this.value = this.readValue();
   }
 
+  /**
+   * @returns {any} the parsed value
+   */
   public getValue(): any
   {
     return this.value;
   }
 
+  /**
+   * @returns {ESParserToken[]} the tokens encountered, in order
+   */
   public getTokens(): ESParserToken[]
   {
     return this.tokens;
   }
 
+  /**
+   * @returns {ESParserValueInfo[]} metadata value info's for each value parsed, in order
+   */
   public getValueInfos(): ESParserValueInfo[]
   {
     return this.valueInfos;
   }
 
+  /**
+   * @returns {ESParserError[]} errors encountered, in order
+   */
   public getErrors(): ESParserError[]
   {
     return this.errors;
@@ -401,7 +416,7 @@ export default class ESParser
     }
 
     // try to capture an invalid token
-    this.accumulateError('Unknown boolean or null value');
+    this.accumulateError('Unknown value type, possibly a boolean null (true, false, and null, are valid).');
     this.match(/^\w+/);
     return false;
   }

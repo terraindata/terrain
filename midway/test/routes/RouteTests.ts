@@ -56,7 +56,8 @@ let server;
 beforeAll(async (done) =>
 {
   const testDBName = 'midwaytest.db';
-  if (fs.existsSync(testDBName)) {
+  if (fs.existsSync(testDBName))
+  {
     fs.unlinkSync(testDBName);
   }
 

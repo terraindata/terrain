@@ -79,7 +79,7 @@ function testParse(testString: string,
   const parser: ESParser = new ESParser(testString);
   const value = parser.getValue();
 
-  winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
+  // winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
   expect(value).toEqual(expectedValue);
   expect(parser.getErrors()).toEqual(expectedErrors);
 }
@@ -92,9 +92,9 @@ test('parse valid json objects', () =>
       const testValue: any = expected[testName];
 
       // test parsing the value using a few spacing options
-      // testParse(JSON.stringify(testValue), testValue);
+      testParse(JSON.stringify(testValue), testValue);
       testParse(JSON.stringify(testValue, null, 1), testValue);
-      // testParse(JSON.stringify(testValue, null, 2), testValue);
-      // testParse(JSON.stringify(testValue, null, 4), testValue);
+      testParse(JSON.stringify(testValue, null, 2), testValue);
+      testParse(JSON.stringify(testValue, null, 4), testValue);
     });
 });

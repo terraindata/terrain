@@ -45,10 +45,14 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESParserToken from './ESParserToken';
+
+/**
+ * Represents information about a value that was parsed by ESParser
+ */
 export default class ESParserValueInfo
 {
-  public value: any;
-  public tokens: ESParserToken[];
+  public value: any; // the parsed value
+  public tokens: ESParserToken[]; // the tokens belonging to the value, in order of appearance
 
   public constructor(value: any = null, tokens: ESParserToken[] = [])
   {
