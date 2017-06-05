@@ -1,0 +1,81 @@
+[
+	{
+  		"keywords":
+    	[
+      		"from",
+      		"select",
+          "where",
+      		"sort", 
+      		"filter",
+      		"score",
+      		"linearTransform",
+      		"if",
+      		"max",
+      		"min",
+      		"sum",
+      		"avg",
+      		"count",
+      		"exists",
+          "distinct",
+      		"take",
+          "limit",
+          "offset",
+      		"skip",
+      		"desc",
+      		"asc",
+      		"from",
+      		"function",
+          "having",
+          "order",
+          "group",
+          "by"
+    	],
+		"keywords2":
+		[
+			"&&",
+			"||",
+      "and",
+      "or",
+      "AND",
+      "OR"
+		],
+		"operators":
+		[
+			"*",
+			"+",
+			"-",
+			"=",
+      "!=",
+			"<",
+			">",
+			"?",
+      "like",
+      "LIKE",
+      "in",
+      "IN",
+      "not",
+      "NOT"
+		],
+		"atom":
+		[
+			"false",
+      "FALSE",
+			"null",
+      "NULL",
+			"true",
+      "TRUE"
+		],
+		"var":
+		[
+			"let",
+			"var",
+			"as"
+		]
+	}
+]
+
+
+
+
+
+   
