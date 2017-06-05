@@ -45,42 +45,53 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss';
-const HTML5Backend = require('react-dnd-html5-backend');
-import { DragDropContext } from 'react-dnd';
-const {browserHistory} = require('react-router');
-
-import SchemaView from './SchemaView';
+import SchemaTypes from '../../SchemaTypes';
+import Styles from '../SchemaTreeStyles';
+import PureClasss from './../../../common/components/PureClasss';
+const Radium = require('radium');
 
 export interface Props
 {
-  params?: any;
-  location?: {
-    pathname: string;
-  };
+  item: SchemaTypes.Server;
 }
 
-class SchemaPage extends PureClasss<Props>
+class State
 {
-  public state: {
-    on: boolean;
-    name?: string;
-  } = {
-    on: false,
-  };
+}
+
+@Radium
+export class ServerTreeInfo extends PureClasss<Props>
+{
+  public state: State = new State();
 
   public render()
   {
+    const server = this.props.item;
+
     return (
-      <SchemaView
-        fullPage={true}
-        showSearch={true}
-      />
+      <div
+        style={Styles.infoPieces}
+      >
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            { server.databaseIds.size }
+          </span> tables
+        </div>
+      </div>
     );
   }
 }
 
-// ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const SchemaExport = DragDropContext(HTML5Backend)(SchemaPage) as any;
+export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
+[
+  {
+    label: 'Databases',
+    type: 'database',
+  },
+];
 
-export default SchemaExport;
+export default ServerTreeInfo;

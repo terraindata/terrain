@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 const Radium = require('radium');
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -55,11 +57,10 @@ import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';
 
-export interface Props
-{
-	fullPage: boolean;
-	showSearch: boolean;
-	search?: string;
+export interface Props {
+  fullPage: boolean;
+  showSearch: boolean;
+  search?: string;
 }
 
 const horizontalDivide = 50;
@@ -67,66 +68,61 @@ const verticalDivide = 75;
 const searchHeight = 42;
 
 @Radium
-class SchemaView extends PureClasss<Props>
-{
-	state: {
-		highlightedIndex: number;
-		search: string;
+class SchemaView extends PureClasss<Props> {
+  public state: {
+    highlightedIndex: number;
+    search: string;
 
-		// from Store
-		databases?: SchemaTypes.DatabaseMap;
-		highlightedId?: ID;
-	} = {
-		highlightedIndex: -1,
-		search: '',
-	};
+    // from Store
+    databases?: SchemaTypes.DatabaseMap;
+    highlightedId?: ID;
+  } = {
+    highlightedIndex: -1,
+    search: '',
+  };
 
-	constructor(props: Props)
-	{
-		super(props);
+  constructor(props: Props) {
+    super(props);
 
-		this._subscribe(SchemaStore, {
-			stateKey: 'databases',
-			storeKeyPath: ['databases'],
-		});
+    this._subscribe(SchemaStore, {
+      stateKey: 'databases',
+      storeKeyPath: ['databases'],
+    });
 
-		this._subscribe(SchemaStore, {
-			stateKey: 'highlightedId',
-			storeKeyPath: ['highlightedId'],
-		});
-	}
+    this._subscribe(SchemaStore, {
+      stateKey: 'highlightedId',
+      storeKeyPath: ['highlightedId'],
+    });
+  }
 
-	handleSearchChange(event)
-	{
-		const search = event.target.value as string;
-		this.setState({
-			search,
-			highlightedIndex: -1,
-		});
-		SchemaActions.highlightId(null, false);
-	}
+  public handleSearchChange(event) {
+    const search = event.target.value as string;
+    this.setState({
+      search,
+      highlightedIndex: -1,
+    });
+    SchemaActions.highlightId(null, false);
+  }
 
-	handleSearchKeyDown(event)
-	{
-		const {highlightedIndex} = this.state;
-		let offset: number = 0;
+  public handleSearchKeyDown(event) {
+    const {highlightedIndex} = this.state;
+    let offset: number = 0;
 
-		switch (event.keyCode)
-    {
+    switch (event.keyCode) {
       case 38:
         // up
         offset = -1;
       case 40:
         // down
         offset = offset || 1;
-				const items = $("[data-rel='schema-item']");
+        const items = $("[data-rel='schema-item']");
         const index = Util.valueMinMax(highlightedIndex + offset, 0, items.length);
         const el = $(items[index]);
         const id = el.attr('data-id');
         const inSearchResults = !!el.attr('data-search');
 
         this.setState({
-        	highlightedIndex: index,
+          highlightedIndex: index,
         });
 
         SchemaActions.highlightId(id, inSearchResults);
@@ -137,10 +133,9 @@ class SchemaView extends PureClasss<Props>
       case 9:
         // enter or tab
 
-      	if (this.state.highlightedId)
-      	{
-      		SchemaActions.selectId(this.state.highlightedId);
-      	}
+        if (this.state.highlightedId) {
+          SchemaActions.selectId(this.state.highlightedId);
+        }
 
         // var value = visibleOptions.get(this.state.selectedIndex);
         // if(!value || this.state.selectedIndex === -1)
@@ -160,122 +155,131 @@ class SchemaView extends PureClasss<Props>
         // esc
         // this.refs['input']['blur']();
         break;
+      default:
+        break;
     }
-	}
+  }
 
-  render()
-  {
-  	const search = this.props.search || this.state.search;
-  	const {showSearch} = this.props;
+  public render() {
+    const search = this.props.search || this.state.search;
+    const {showSearch} = this.props;
 
     return (
       <div
-      	style={Styles.schemaView as any}
+        style={Styles.schemaView as any}
       >
-      	<div
-      		style={[
-      			SECTION_STYLE,
-      			this.props.fullPage ? SCHEMA_STYLE_FULL_PAGE : SCHEMA_STYLE_COLUMN,
-      			{
-      				padding: Styles.margin,
-							overflow: 'auto',
-      			} as any,
-      		]}
-      	>
-      		{
-      			showSearch &&
-		      		<div
-		      			style={{
-		      				height: searchHeight,
-		      			}}
-		      		>
-		      			<input
-		      				type="text"
-		      				placeholder="Search schema"
-		      				value={search}
-		      				onChange={this.handleSearchChange}
-		      				onKeyDown={this.handleSearchKeyDown}
-		      				style={{
-		      					borderColor: '#ccc',
-		      				}}
-		      			/>
-		      		</div>
-      		}
-      		<div
-      			style={showSearch && {
-      				height: 'calc(100% - ' + searchHeight + ')px',
-      			}}
-      		>
-      			<FadeInOut
-      				open={!!this.state.search}
-      			>
-      				<div
-			      		style={Styles.schemaHeading}
-			      	>
-			      		Visible Results
-			      	</div>
-      			</FadeInOut>
+        <div
+          style={[
+            SECTION_STYLE,
+            this.props.fullPage ? SCHEMA_STYLE_FULL_PAGE : SCHEMA_STYLE_COLUMN,
+            {
+              padding: Styles.margin,
+              overflow: 'auto',
+            } as any,
+          ]}
+        >
+          {
+            showSearch &&
+            <div
+              style={{
+                height: searchHeight,
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Search schema"
+                value={search}
+                onChange={this.handleSearchChange}
+                onKeyDown={this.handleSearchKeyDown}
+                style={{
+                  borderColor: '#ccc',
+                }}
+              />
+            </div>
+          }
+          <div
+            style={showSearch && {
+              height: 'calc(100% - ' + searchHeight + ')px',
+            }}
+          >
+            <FadeInOut
+              open={!!this.state.search}
+            >
+              <div
+                style={Styles.schemaHeading}
+              >
+                Visible Results
+              </div>
+            </FadeInOut>
 
-		      	<SchemaTreeList
-		      		itemType="database"
-		      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}
-		      		label={'Databases'}
-		      		topLevel={true}
-		      		search={search}
-		      	/>
+            <!-- <SchemaTreeList
+              itemType="database"
+              itemIds={this.state.databases && this.state.databases.keySeq().toList()}
+              label={'Databases'}
+              topLevel={true}
+              search={search}
+            /> -->
 
-			      <SchemaSearchResults
-			      	search={this.state.search}
-			      />
-		      </div>
-	      </div>
+            <SchemaTreeList
+              itemType="server"
+              itemIds={this.state.servers && this.state.servers.keySeq().toList()}
+              label={'Servers'}
+              topLevel={true}
+              search={search}
+            />
 
-	      <div
-	      	style={[
-      			SECTION_STYLE,
-      			this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
-      		]}
-	      >
-	      	<SchemaResults
-	      		databases={this.state.databases}
-	      	/>
-	      </div>
+            <SchemaSearchResults
+              search={this.state.search}
+            />
+          </div>
+        </div>
+
+        <div
+          style={[
+            SECTION_STYLE,
+            this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
+          ]}
+        >
+          <SchemaResults
+            servers={this.state.servers}
+          />
+        </div>
       </div>
     );
   }
 }
 
 const SECTION_STYLE = {
-	position: 'absolute',
-	boxSizing: 'border-box',
+  position: 'absolute',
+  boxSizing: 'border-box',
 };
 
 const SCHEMA_STYLE_FULL_PAGE = {
-	left: 0,
-	top: 0,
-	width: horizontalDivide + '%',
-	height: '100%',
+  left: 0,
+  top: 0,
+  width: horizontalDivide + '%',
+  height: '100%',
 };
 
 const SCHEMA_STYLE_COLUMN = {
-	left: 0,
-	top: 0,
-	width: 'calc(100% - 6px)',
-	height: verticalDivide + '%',
+  left: 0,
+  top: 0,
+  width: 'calc(100% - 6px)',
+  height: verticalDivide + '%',
 };
 
 const RESULTS_STYLE_FULL_PAGE = {
-	left: horizontalDivide + '%',
-	top: 0,
-	width: (100 - horizontalDivide) + '%',
-	height: '100%',
+  left: horizontalDivide + '%',
+  top: 0,
+  width: (100 - horizontalDivide) + '%',
+  height: '100%',
 };
 
 const RESULTS_STYLE_COLUMN = {
-	left: 0,
-	top: verticalDivide + '%',
-	width: '100%',
-	height: (100 - verticalDivide) + '%',
+  left: 0,
+  top: verticalDivide + '%',
+  width: '100%',
+  height: (100 - verticalDivide) + '%',
 };
 
 export default SchemaView;

@@ -56,6 +56,7 @@ import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
 import SharedTypes from './../../../../shared/SharedTypes';
 
+type Server = SchemaTypes.Server;
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
@@ -68,9 +69,16 @@ export const SchemaStore: Store<SchemaState> =
         (state: SchemaState) =>
         {
           Ajax.getDbs(
-            (dbs: object) =>
+            (m1Dbs: object, m2Dbs: object) =>
             {
-              SchemaActions.dbCount(Object.keys(dbs).length);
+              console.log('m1Dbs:');
+              console.log(m1Dbs);
+              // Group all m1Dbs under a server e.g. "Other Databases"
+              console.log('m2Dbs:');
+              console.log(m2Dbs);
+              // The m2Dbs are servers, so need to do parsing differently
+              return;
+              SchemaActions.serverCount(Object.keys(dbs).length);
               _.map((dbs as any),
                 (db: SharedTypes.Database) =>
                   (db.source === 'm1' ? Ajax.schema_m1 : Ajax.schema)(
@@ -105,28 +113,29 @@ export const SchemaStore: Store<SchemaState> =
             .set('loading', true);
         },
 
-      [SchemaActionTypes.dbCount]:
+      [SchemaActionTypes.serverCount]:
         (
           state: SchemaState,
           action: Action<{
-            dbCount: number,
+            serverCount: number,
           }>,
         ) =>
-          state.set('dbCount', action.payload.dbCount),
+          state.set('serverCount', action.payload.serverCount),
 
-      [SchemaActionTypes.setDatabase]:
+      [SchemaActionTypes.setServer]:
         (
           state: SchemaState,
-          action: Action<SchemaTypes.SetDbActionPayload>,
+          action: Action<SchemaTypes.SetServerActionPayload>,
         ) => {
-          const {database, tables, columns, indexes, tableNames, columnNames} = action.payload;
-          if (state.databases.size === state.dbCount - 1)
+          const {server, databases, tables, columns, indexes, tableNames, columnNames} = action.payload;
+          if (state.servers.size === state.serverCount - 1)
           {
             state = state.set('loading', false).set('loaded', true);
           }
 
           return state
-            .setIn(['databases', database.id], database)
+            .setIn(['servers', server.id], server)
+            .set('databases', state.databases.merge(databases)
             .set('tables', state.tables.merge(tables))
             .set('columns', state.columns.merge(columns))
             .set('indexes', state.indexes.merge(indexes))
@@ -159,7 +168,7 @@ export const SchemaActions =
 
     dbCount:
       (dbCount: number) =>
-        $(SchemaActionTypes.dbCount, { dbCount }),
+        $(SchemaActionTypes.serverCount, { serverCount }),
 
     error:
       (error: string) =>
@@ -167,9 +176,9 @@ export const SchemaActions =
 
     setDatabase:
       (
-        payload: SchemaTypes.SetDbActionPayload,
+        payload: SchemaTypes.SetServerActionPayload,
       ) =>
-        $(SchemaActionTypes.setDatabase, payload),
+        $(SchemaActionTypes.setServer, payload),
 
     highlightId:
       (id: ID, inSearchResults: boolean) =>

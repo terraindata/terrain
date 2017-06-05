@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as _ from 'underscore';
 import Styles from '../../Styles';
 const color = require('color');
@@ -49,132 +51,126 @@ const color = require('color');
 const itemHeaderHeight = 22;
 
 const arrowSvgStyles = {
-	width: '12px',
-	fill: Styles.colors.transBlack,
-	// fill: 'rgba(0,0,0,0)',
-	// stroke: Styles.colors.transBlack,
-	// strokeWidth: 20,
-	cursor: 'pointer',
-	marginLeft: 6,
+  width: '12px',
+  fill: Styles.colors.transBlack,
+  // fill: 'rgba(0,0,0,0)',
+  // stroke: Styles.colors.transBlack,
+  // strokeWidth: 20,
+  cursor: 'pointer',
+  marginLeft: 6,
 };
 
 const headerHighlightedColor = color(Styles.colors.active).fade('0.85').string();
 const headerSelectedColor = color(Styles.colors.active).fade('0.75').string();
 
 const SchemaTreeStyles =
-{
-	schemaView: {
-		height: '100%',
-		overflow: 'auto',
-	},
+  {
+    schemaView: {
+      height: '100%',
+      overflow: 'auto',
+    },
 
-	schemaHeading: [
-		Styles.font.big,
-	],
+    schemaHeading: [
+      Styles.font.big,
+    ],
 
-	label: Styles.font.semiBoldNormal,
+    label: Styles.font.semiBoldNormal,
 
-	none: {
+    none: {},
 
-	},
+    treeItem: [
+      Styles.transition,
+    ],
 
-	treeItem: [
-		Styles.transition,
-	],
+    arrow: _.extend(
+      arrowSvgStyles,
+      Styles.rotate90,
+      Styles.transition,
+    ),
 
-	arrow: _.extend(
-		arrowSvgStyles,
-		Styles.rotate90,
-		Styles.transition,
-	),
+    arrowOpen: _.extend(
+      {},
+      arrowSvgStyles,
+      {
+        fill: Styles.colors.active,
+        // stroke: Styles.colors.active,
+      },
+      Styles.rotate180,
+      Styles.transition,
+    ),
 
-	arrowOpen: _.extend(
-		{},
-		arrowSvgStyles,
-		{
-			fill: Styles.colors.active,
-			// stroke: Styles.colors.active,
-		},
-		Styles.rotate180,
-		Styles.transition,
-	),
+    treeItemHeader: [{
+      'display': 'flex',
+      'cursor': 'pointer',
+      'height': itemHeaderHeight,
 
-	treeItemHeader: [{
-			'display': 'flex',
-			'cursor': 'pointer',
-			'height': itemHeaderHeight,
+      'borderRadius': 4,
 
-			'borderRadius': 4,
+      ':hover': {
+        background: headerHighlightedColor,
+      },
+    },
+      Styles.transition,
+    ],
 
-			':hover': {
-				background: headerHighlightedColor,
-			},
-		},
-		Styles.transition,
-	],
+    treeItemHeaderSelected: {
+      'background': headerSelectedColor,
+      ':hover': {
+        background: headerSelectedColor,
+      },
+    },
 
-	treeItemHeaderSelected:
-	{
-		'background': headerSelectedColor,
-		':hover': {
-			background: headerSelectedColor,
-		},
-	},
+    treeItemHeaderHighlighted: {
+      background: headerHighlightedColor,
+    },
 
-	treeItemHeaderHighlighted:
-	{
-		background: headerHighlightedColor,
-	},
+    name: {
+      marginRight: Styles.margin * 3,
+      marginLeft: Styles.margin,
+      fontSize: 16,
+    },
 
-	name: {
-		marginRight: Styles.margin * 3,
-		marginLeft: Styles.margin,
-		fontSize: 16,
-	},
+    itemInfoRow: {
+      flexGrow: '1',
+    },
 
-	itemInfoRow: {
-		flexGrow: '1',
-	},
+    childrenWrapper: {
+      normal: [
+        {
+          paddingLeft: 11,
+          // marginBottom: 6,
+          // paddingBottom: 6,
+          // borderBottom: '0.5px solid rgba(0,0,0,0.1)',
+          // margin: '0px 6px',
+        },
+        Styles.transition,
+      ],
 
-	childrenWrapper: {
-		normal: [
-			{
-				paddingLeft: 11,
-				// marginBottom: 6,
-				// paddingBottom: 6,
-				// borderBottom: '0.5px solid rgba(0,0,0,0.1)',
-				// margin: '0px 6px',
-			},
-			Styles.transition,
-		],
+      search: Styles.transition,
+    },
 
-		search: Styles.transition,
-	},
+    childSection: {},
 
-	childSection: {
+    // SchemaTreeInfo
+    infoPieces: {
+      display: 'flex',
+      paddingTop: '2px',
+    },
 
-	},
+    infoPiece: {
+      marginRight: Styles.margin * 2,
+    },
 
-	// SchemaTreeInfo
-	infoPieces: {
-		display: 'flex',
-		paddingTop: '2px',
-	},
+    infoPieceNumber: {
+      fontWeight: 1000,
+    },
 
-	infoPiece: {
-		marginRight: Styles.margin * 2,
-	},
+    searchTextEmphasis: {
+      fontWeight: 1000,
+      color: Styles.colors.active,
+    },
 
-	infoPieceNumber: {
-		fontWeight: 1000,
-	},
-
-	searchTextEmphasis: {
-		fontWeight: 1000,
-		color: Styles.colors.active,
-	},
-
-	margin: Styles.margin,
-};
+    margin: Styles.margin,
+  };
 
 export default SchemaTreeStyles;

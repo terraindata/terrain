@@ -834,28 +834,29 @@ export const Ajax =
       });
     },
 
-    getDbs(onLoad: (dbs: SharedTypes.Database[], loadFinished: boolean) => void, onError?: (ev: Event) => void)
+    getDbs(onLoad: (m1Dbs: SharedTypes.Database[], m2Dbs: SharedTypes.Database[],
+                    loadFinished: boolean) => void, onError?: (ev: Event) => void)
     {
       let m1Dbs: SharedTypes.Database[] = null;
       let m2Dbs: SharedTypes.Database[] = null;
 
       const checkForLoaded = () =>
       {
-        if(!m1Dbs || !m2Dbs)
+        if (!m1Dbs || !m2Dbs)
         {
           return;
         }
 
         let dbs: SharedTypes.Database[] = [];
-        if(m1Dbs)
+        if (m1Dbs)
         {
           dbs = m1Dbs;
         }
-        if(m2Dbs)
+        if (m2Dbs)
         {
           dbs = dbs.concat(m2Dbs);
         }
-        onLoad(dbs, !!(m1Dbs && m2Dbs));
+        onLoad(m1Dbs, m2Dbs, !!(m1Dbs && m2Dbs));
       };
 
       Ajax._postMidway1(
@@ -870,11 +871,11 @@ export const Ajax =
           {
             data = JSON.parse(resp);
           }
-          catch(e)
+          catch (e)
           {}
 
           m1Dbs = [] as any;
-          if(data)
+          if (data)
           {
             m1Dbs = data.results.map(
               (r: {schema_name: string}) =>
@@ -883,12 +884,12 @@ export const Ajax =
                 name: r.schema_name,
                 type: 'mysql',
                 source: 'm1',
-              })
+              }),
             );
           }
 
           checkForLoaded();
-        }
+        },
       );
 
       Ajax._reqMidway2(
@@ -897,7 +898,7 @@ export const Ajax =
         { },
         (dbs: [SharedTypes.Database]) =>
         {
-          m2Dbs = dbs.map(db =>
+          m2Dbs = dbs.map((db) =>
           {
             db['source'] = 'm2';
             return db;
@@ -907,11 +908,11 @@ export const Ajax =
         {
           onError: (e) =>
           {
-            onError && onError(e)
+            onError && onError(e);
             m2Dbs = [] as any;
             checkForLoaded();
-          }
-        }
+          },
+        },
       );
     },
 

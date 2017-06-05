@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const {List, Map} = Immutable;
@@ -61,219 +63,207 @@ import InfoArea from '../../common/components/InfoArea';
 
 const NUM_ROWS = 200;
 
-export interface Props
-{
-	databases: SchemaTypes.DatabaseMap;
+export interface Props {
+  databases: SchemaTypes.DatabaseMap;
 }
 
 @Radium
-class SchemaResults extends PureClasss<Props>
-{
-	state: {
-		selectedId?: ID,
-		selectedItem?: SchemaBaseClass,
+class SchemaResults extends PureClasss<Props> {
+  public state: {
+    selectedId?: ID,
+    selectedItem?: SchemaBaseClass,
 
-		resultsState?: ResultsState;
-		resultsQuery?: BuilderTypes.Query;
-		resultsDb?: SharedTypes.Database;
-	} = {
-		resultsState: _ResultsState(),
-	};
+    resultsState?: ResultsState;
+    resultsQuery?: BuilderTypes.Query;
+    resultsDb?: SharedTypes.Database;
+  } = {
+    resultsState: _ResultsState(),
+  };
 
-	constructor(props: Props)
-	{
-		super(props);
+  constructor(props: Props) {
+    super(props);
 
-		this._subscribe(SchemaStore, {
-			updater: (storeState: SchemaTypes.SchemaState) =>
-			{
-				const {selectedId} = storeState;
-				// TODO change if store changes
-				const selectedItem =
-					storeState.getIn(['databases', selectedId]) ||
-					storeState.getIn(['tables', selectedId]) ||
-					storeState.getIn(['columns', selectedId]) ||
-					storeState.getIn(['indexes', selectedId]);
+    this._subscribe(SchemaStore, {
+      updater: (storeState: SchemaTypes.SchemaState) => {
+        const {selectedId} = storeState;
+        // TODO change if store changes
+        const selectedItem =
+          storeState.getIn(['databases', selectedId]) ||
+          storeState.getIn(['tables', selectedId]) ||
+          storeState.getIn(['columns', selectedId]) ||
+          storeState.getIn(['indexes', selectedId]);
 
-				if (selectedItem !== this.state.selectedItem)
-				{
-					this.setState({
-						selectedId,
-						selectedItem,
-					});
+        if (selectedItem !== this.state.selectedItem) {
+          this.setState({
+            selectedId,
+            selectedItem,
+          });
 
-					if (this.showsResults(selectedItem))
-					{
-						const resultsDb =
-							selectedItem.type === 'database' ? selectedItem.name :
-								this.props.databases
-									&& this.props.databases.get(selectedItem['databaseId']);
-					  console.log('schema resultsDb', resultsDb);
-						let field: string, table: string, where: string;
+          if (this.showsResults(selectedItem)) {
+            const resultsDb =
+              selectedItem.type === 'database' ? selectedItem.name :
+                this.props.databases
+                && this.props.databases.get(selectedItem['databaseId']);
+            console.log('schema resultsDb', resultsDb);
+            let field: string, table: string, where: string;
 
-						switch (selectedItem.type)
-						{
-							case 'database':
-								field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
-								table = 'INFORMATION_SCHEMA.TABLES';
-								where = `TABLE_SCHEMA = '${selectedItem.name}'`;
-								break;
-							case 'table':
-								field = '*';
-								table = selectedItem.name;
-								break;
-							case 'column':
-								field = selectedItem.name;
-								table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
-								break;
-							case 'index':
-								//TODO
-								break;
-						}
+            switch (selectedItem.type) {
+              case 'database':
+                field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
+                table = 'INFORMATION_SCHEMA.TABLES';
+                where = `TABLE_SCHEMA = '${selectedItem.name}'`;
+                break;
+              case 'table':
+                field = '*';
+                table = selectedItem.name;
+                break;
+              case 'column':
+                field = selectedItem.name;
+                table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
+                break;
+              case 'index':
+                // TODO
+                break;
+            }
 
-						const resultsQuery = this.getQuery(field, table, where);
+            const resultsQuery = this.getQuery(field, table, where);
 
-						this.setState({
-							resultsQuery,
-							resultsDb,
-							resultsState: _ResultsState(),
-						});
-					}
-					else
-					{
-						this.handleResultsStateChange(_ResultsState());
-					}
-				}
-			},
-		});
-	}
+            this.setState({
+              resultsQuery,
+              resultsDb,
+              resultsState: _ResultsState(),
+            });
+          }
+          else {
+            this.handleResultsStateChange(_ResultsState());
+          }
+        }
+      },
+    });
+  }
 
-	getQuery(field: string, table: string, where: string = '1'): BuilderTypes.Query
-	{
-		const tql = 'SELECT ' + field + ' FROM ' + table + ' ' + where + ' LIMIT ' + NUM_ROWS + ';';
+  public getQuery(field: string, table: string, where: string = '1'): BuilderTypes.Query {
+    const tql = 'SELECT ' + field + ' FROM ' + table + ' ' + where + ' LIMIT ' + NUM_ROWS + ';';
 
-		const inputs = [
-			{
-				key: 'table',
-				value: table,
-			},
-			{
-				key: 'field',
-				value: field,
-			},
-			{
-				key: 'numRows',
-				value: NUM_ROWS,
-			},
-		].map(
-			(inputConfig) =>
-				BuilderTypes.make(
-					BuilderTypes.Blocks.input,
-					inputConfig,
-				),
-		);
+    const inputs = [
+      {
+        key: 'table',
+        value: table,
+      },
+      {
+        key: 'field',
+        value: field,
+      },
+      {
+        key: 'numRows',
+        value: NUM_ROWS,
+      },
+    ].map(
+      (inputConfig) =>
+        BuilderTypes.make(
+          BuilderTypes.Blocks.input,
+          inputConfig,
+        ),
+    );
 
-		return BuilderTypes._Query({
-			inputs: List(inputs),
+    return BuilderTypes._Query({
+      inputs: List(inputs),
 
-			cards: List([
-				BuilderTypes.make(
-					BuilderTypes.Blocks.sfw,
-					{
-						fields: List([
-							BuilderTypes.make(
-								BuilderTypes.Blocks.field,
-								{
-									field: 'input.field',
-								},
-							),
-						]),
+      cards: List([
+        BuilderTypes.make(
+          BuilderTypes.Blocks.sfw,
+          {
+            fields: List([
+              BuilderTypes.make(
+                BuilderTypes.Blocks.field,
+                {
+                  field: 'input.field',
+                },
+              ),
+            ]),
 
-						cards: List([
-							BuilderTypes.make(
-								BuilderTypes.Blocks.from,
-								{
-									tables: List([
-										BuilderTypes.make(
-											BuilderTypes.Blocks.table,
-											{
-												table: 'input.table',
-											},
-										),
-									]),
-								},
-							),
+            cards: List([
+              BuilderTypes.make(
+                BuilderTypes.Blocks.from,
+                {
+                  tables: List([
+                    BuilderTypes.make(
+                      BuilderTypes.Blocks.table,
+                      {
+                        table: 'input.table',
+                      },
+                    ),
+                  ]),
+                },
+              ),
 
-							BuilderTypes.make(
-								BuilderTypes.Blocks.where,
-								{
-									cards: List([
-										BuilderTypes.make(
-											BuilderTypes.Blocks.tql,
-											{
-												clause: where,
-											},
-										),
-									]),
-								},
-							),
+              BuilderTypes.make(
+                BuilderTypes.Blocks.where,
+                {
+                  cards: List([
+                    BuilderTypes.make(
+                      BuilderTypes.Blocks.tql,
+                      {
+                        clause: where,
+                      },
+                    ),
+                  ]),
+                },
+              ),
 
-							BuilderTypes.make(
-								BuilderTypes.Blocks.take,
-								{
-									value: 'input.numRows',
-								},
-							),
-						]),
-					},
-				),
-			]),
-		});
-	}
+              BuilderTypes.make(
+                BuilderTypes.Blocks.take,
+                {
+                  value: 'input.numRows',
+                },
+              ),
+            ]),
+          },
+        ),
+      ]),
+    });
+  }
 
-	showsResults(selectedItem: SchemaBaseClass): boolean
-	{
-		return selectedItem && selectedItem.type !== 'index';
-	}
+  public showsResults(selectedItem: SchemaBaseClass): boolean {
+    return selectedItem && selectedItem.type !== 'index';
+  }
 
-	handleResultsStateChange(resultsState: ResultsState)
-	{
-		this.setState({
-			resultsState,
-		});
-	}
+  public handleResultsStateChange(resultsState: ResultsState) {
+    this.setState({
+      resultsState,
+    });
+  }
 
-  render()
-  {
+  public render() {
     return (
-    	<div
-    		style={{
-    			width: '100%',
-    			height: '100%',
-    			background: '#fff',
-    		}}
-    	>
-    		{
-    			this.showsResults(this.state.selectedItem) ?
-		    		<ResultsTable
-		    			results={this.state.resultsState.results}
-		    			onExpand={_.noop}
-		    			resultsLoading={this.state.resultsState.loading}
-		    		/>
-		    	:
-    				<InfoArea
-    					large="Select an item to see its contents here."
-    				/>
-    		}
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: '#fff',
+        }}
+      >
+        {
+          this.showsResults(this.state.selectedItem) ?
+            <ResultsTable
+              results={this.state.resultsState.results}
+              onExpand={_.noop}
+              resultsLoading={this.state.resultsState.loading}
+            />
+            :
+            <InfoArea
+              large="Select an item to see its contents here."
+            />
+        }
 
-    		<ResultsManager
-    			db={this.state.resultsDb}
-    			onResultsStateChange={this.handleResultsStateChange}
-    			resultsState={this.state.resultsState}
-    			query={this.state.resultsQuery}
-    			noExtraFields={true}
-    		/>
-    	</div>
+        <ResultsManager
+          db={this.state.resultsDb}
+          onResultsStateChange={this.handleResultsStateChange}
+          resultsState={this.state.resultsState}
+          query={this.state.resultsQuery}
+          noExtraFields={true}
+        />
+      </div>
     );
   }
 }

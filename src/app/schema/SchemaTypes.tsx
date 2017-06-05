@@ -83,14 +83,38 @@ export module SchemaTypes {
   export const _SchemaState = (config?: { [key: string]: any }) =>
     New<SchemaState>(new SchemaStateC(), config);
 
-  export function databaseId(databaseName: string) {
-    return databaseName;
+  export function serverId(serverName: string) {
+    return serverName;
+  }
+
+  class ServerC extends SchemaBaseClass {
+    public type = 'server';
+    public name = '';
+
+    public databaseIds: List<string> = List([]);
+  }
+  export type Server = ServerC & IRecord<ServerC>;
+  export const _Server =
+    (config: {
+      name: string,
+      id?: string,
+    }) => {
+      config.id = serverId(config.name);
+      return New<Server>(
+        new ServerC(config),
+        config, 'string');
+    };
+  export type ServerMap = IMMap<string, Server>;
+
+  export function databaseId(serverName: string, databaseName: string) {
+    return serverName + '/' + databaseName;
   }
 
   class DatabaseC extends SchemaBaseClass {
     public type = 'database';
     public name = '';
     public databaseType = 'mysql';
+    public serverId: string = '';
 
     public tableIds: List<string> = List([]);
   }
@@ -98,22 +122,24 @@ export module SchemaTypes {
   export const _Database =
     (config: {
       name: string,
+      serverId: string,
       id?: string,
     }) => {
-      config.id = databaseId(config.name);
+      config.id = databaseId(config.serverId, config.name);
       return New<Database>(
         new DatabaseC(config),
         config, 'string');
     };
   export type DatabaseMap = IMMap<string, Database>;
 
-  export function tableId(databaseName: string, tableName: string): string {
-    return databaseName + '.' + tableName;
+  export function tableId(serverName: string, databaseName: string, tableName: string): string {
+    return serverName + '/' + databaseName + '.' + tableName;
   }
 
   class TableC extends SchemaBaseClass {
     public type = 'table';
     public name = '';
+    public serverId: string = '';
     public databaseId: string = '';
 
     public columnIds: List<string> = List([]);
@@ -122,10 +148,11 @@ export module SchemaTypes {
   export type Table = TableC & IRecord<TableC>;
   export const _Table = (config: {
     name: string,
+    serverId: string,
     databaseId: string,
     id?: string,
   }) => {
-    config.id = tableId(config.databaseId, config.name);
+    config.id = tableId(config.serverId, config.databaseId, config.name);
     return New<Table>(new TableC(config), config, 'string');
   };
   export type TableMap = IMMap<string, Table>;
@@ -137,6 +164,7 @@ export module SchemaTypes {
   class ColumnC extends SchemaBaseClass {
     public type = 'column';
     public name = '';
+    public serverId: string = '';
     public databaseId: string = '';
     public tableId: string = '';
 
@@ -149,6 +177,7 @@ export module SchemaTypes {
   export type Column = ColumnC & IRecord<ColumnC>;
   export const _Column = (config: {
     name: string,
+    serverId: string,
     databaseId: string,
     tableId: string,
 
@@ -164,13 +193,14 @@ export module SchemaTypes {
   };
   export type ColumnMap = IMMap<string, Column>;
 
-  export function indexId(databaseName: string, tableName: string, indexName: string) {
-    return databaseName + '.' + tableName + '.i.' + indexName;
+  export function indexId(serverId: string, databaseName: string, tableName: string, indexName: string) {
+    return serverId + '/' + databaseName + '.' + tableName + '.i.' + indexName;
   }
 
   class IndexC extends SchemaBaseClass {
     public type = 'index';
     public name = '';
+    public serverId: string = '';
     public databaseId: string = '';
     public tableId: string = '';
 
@@ -180,19 +210,21 @@ export module SchemaTypes {
   export type Index = IndexC & IRecord<IndexC>;
   export const _Index = (config: {
     name: string,
+    serverId: string,
     databaseId: string,
     tableId: string,
 
     indexType: string,
     id?: string,
   }) => {
-    config.id = indexId(config.databaseId, config.tableId, config.tableId);
+    config.id = indexId(config.serverId, onfig.databaseId, config.tableId, config.tableId);
     return New<Index>(new IndexC(config), config, 'string');
   };
   export type IndexMap = IMMap<string, Index>;
 
   export const typeToStoreKey =
     {
+      server: 'servers',
       database: 'databases',
       table: 'tables',
       column: 'columns',
@@ -220,7 +252,9 @@ export module SchemaTypes {
   export type TableNamesByDb = IMMap<string, List<string>>;
   export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
   export interface SetDbActionPayload {
+    server: Server;
     database: Database;
+    databases: IMMap<string, Database>;
     tables: IMMap<string, Table>;
     columns: IMMap<string, Column>;
     indexes: IMMap<string, Index>;
