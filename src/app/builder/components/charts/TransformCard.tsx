@@ -45,13 +45,14 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const {Map, List} = Immutable;
 import * as React from 'react';
+import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
-import { Ajax, QueryResponse } from '../../../util/Ajax';
+import AjaxM1 from '../../../util/AjaxM1';
+import {M1QueryResponse} from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
 import TransformCardChart from './TransformCardChart';
-const Dimensions = require('react-dimensions');
 import { Card, CardString } from '../../../../../shared/blocks/types/Card';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import Block from '../../../../../shared/blocks/types/Block';
@@ -205,7 +206,7 @@ class TransformCard extends PureClasss<Props>
       // TODO MOD adapt Transform card for elastic.
       return;
     }
-    
+
     // TODO consider putting the query in context
     const {builderState} = this.props;
     const {cards} = builderState.query;
@@ -225,7 +226,7 @@ class TransformCard extends PureClasss<Props>
         if (table)
         {
           this.setState(
-            Ajax.query(
+            AjaxM1.queryM1(
               `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
               db,
               this.handleQueryResponse,
@@ -285,7 +286,7 @@ class TransformCard extends PureClasss<Props>
         {
           // convert the score to TQL, do the query
           this.setState(
-            Ajax.query(
+            AjaxM1.queryM1(
               `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
               db,
               this.handleQueryResponse,
@@ -312,10 +313,10 @@ class TransformCard extends PureClasss<Props>
   killQuery()
   {
     this && this.state && this.state.queryId &&
-      Ajax.killQuery(this.state.queryId);
+      AjaxM1.killQuery(this.state.queryId);
   }
 
-  handleQueryResponse(response: QueryResponse)
+  handleQueryResponse(response: M1QueryResponse)
   {
     this.setState({
       queryXhr: null,

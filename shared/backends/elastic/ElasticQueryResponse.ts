@@ -43,46 +43,42 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as winston from 'winston';
 
-import MidwayError from '../../../shared/error/MidwayError';
-
-class RouteError extends MidwayError
+export interface ElasticQueryHitSource
 {
-  public static async RouteErrorHandler(ctx, next)
-  {
-    try
-    {
-      await next();
-    }
-    catch (err)
-    {
-      const routeError = RouteError.fromRouteContext(ctx, err);
-      const status = routeError.getStatus();
-      winston.info(JSON.stringify(routeError));
-      ctx.status = status;
-      ctx.body = { errors: routeError.getMidwayErrors() };
-    }
-  }
-
-  public static fromRouteContext(ctx, err: string | object): RouteError
-  {
-    if (typeof err !== 'object')
-    {
-      err = new Error(err);
-    }
-
-    const status: number = 'status' in err ? err['status'] : 400;
-    const title: string = 'title' in err ? err['title'] : 'Route ' + String(ctx.url) + ' has an error.';
-    const detail: string = 'detail' in err ? err['detail'] : ('message' in err ? err['message'] : JSON.stringify(err));
-    const source: object = { ctx, err };
-    return new RouteError(status, title, detail, source);
-  }
-
-  public constructor(status: number, title: string, detail: string, source: object)
-  {
-    super(status, title, detail, source);
-  }
+  [key: string]: any;
 }
 
-export default RouteError;
+export interface ElasticQueryHit
+{
+  _index: string;
+  _type: string;
+  _id: string;
+  _score: number;
+  _source: ElasticQueryHitSource;
+  _sort?: boolean;
+}
+
+export interface ElasticQueryShards
+{
+  total: number;
+  successful: number;
+  failed: number;
+}
+
+export interface ElasticQueryHits {
+  total: number;
+  max_score: number;
+  hits: ElasticQueryHit[];
+}
+
+export interface ElasticQueryResult
+{
+  took: number;
+  timed_out: boolean;
+  hits: ElasticQueryHits;
+  _shards: ElasticQueryShards;
+
+}
+
+export default ElasticQueryResult;

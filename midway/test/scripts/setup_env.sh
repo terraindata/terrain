@@ -61,7 +61,7 @@ do
 done
 
 # stop any existing instances
-${DIR}/teardown_env.sh --mysql-port=$mysql_port --elastic-port=$elastic_port
+${DIR}/teardown_env.sh
 
 if [ "$mysql_port" == 3306 ];
 then
@@ -84,10 +84,15 @@ docker pull $elastic_image &
 wait
 
 docker run -v${sqlite_path}:/data/ -u$(id -u):$(id -g) $sqlite_image
-docker run -d --name moviesdb-mysql -p $mysql_port:$mysql_port $mysql_image
-docker run -d --name moviesdb-elk -p $elastic_port:$elastic_port $elastic_image
+MYSQL_ID=$(docker run --rm -d --name moviesdb-mysql -p $mysql_port:$mysql_port $mysql_image)
+ELASTIC_ID=$(docker run --rm -d --name moviesdb-elk -p $elastic_port:$elastic_port $elastic_image)
+
+if [ -z "$ELASTIC_ID" -o -z "$MYSQL_ID" ]; then
+	echo "Docker services failed to start..."
+	exit 1
+fi
 
 echo "Waiting on services to be ready..."
 
-while [ "`docker inspect -f {{.State.Health.Status}} moviesdb-mysql`" != "healthy" -o "`docker inspect -f {{.State.Health.Status}} moviesdb-elk`" != "healthy" ]; do sleep 0.1; done;
+while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-mysql)" != "healthy" -o "$(docker inspect -f {{.State.Health.Status}} moviesdb-elk)" != "healthy" ]; do sleep 0.1; done;
 

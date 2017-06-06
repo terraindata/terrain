@@ -56,7 +56,8 @@ let server;
 beforeAll(async (done) =>
 {
   const testDBName = 'midwaytest.db';
-  if (fs.existsSync(testDBName)) {
+  if (fs.existsSync(testDBName))
+  {
     fs.unlinkSync(testDBName);
   }
 
@@ -531,7 +532,7 @@ describe('Query route tests', () =>
         winston.info(response.text);
         expect(JSON.parse(response.text)).toMatchObject(
           {
-            result: null,
+            result: {},
             errors: [
               {
                 status: 404,
