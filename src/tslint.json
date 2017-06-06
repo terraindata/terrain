@@ -4,7 +4,6 @@
   },
   "extends" : "tslint:recommended",
   "rules" : {
-    "trailing-comma": false,
     "max-line-length": [true, 140],
     "quotemark" : [
       false,
@@ -33,9 +32,7 @@
       "statements"
     ],
     "newline-before-return" : false,
-    "new-parens" : true,
     "return-undefined" : true,
-    "semicolon" : [true, "always"],
     "no-floating-promises" : true,
     "no-invalid-template-strings" : true,
     "no-invalid-this" : true,
@@ -50,6 +47,10 @@
     "interface-name" : [
       true,
       "never-prefix"
-    ]
+    ],
+    
+    "trailing-comma": false,
+    "new-parens" : false,
+    "semicolon" : [false, "always"]
   }
 }
