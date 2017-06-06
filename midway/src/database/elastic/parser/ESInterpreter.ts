@@ -44,20 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESParserError from './ESParserError';
+import ESParserPropertyInfo from './ESPropertyInfo';
 import ESParserToken from './ESParserToken';
-import ESParserValueInfo from './ESParserValueInfo';
+import ESValueInfo from './ESValueInfo';
+import ESJSONParser from './ESJSONParser';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * An instrumented interpreter that takes the output of ESJSONParser and
+ * decorates the results with ES-specific information.
  */
-export default class ESParserPropertyInfo
+export default class ESInterpreter
 {
-  public name: ESParserValueInfo; // the value info for the property name
-  public value: ESParserValueInfo | null; // the value info for the property value
+  private parser: ESJSONParser; // source parser
 
-  public constructor(name: ESParserValueInfo)
+  /**
+   * Runs the interpreter on the given query string. Read needed data by calling the
+   * public member functions below. You can also pass in an existing ESJSONParser
+   * to run the interpreter on it's result.
+   * @param query the query string or parser to interpret
+   */
+  public constructor(query: string | ESJSONParser)
   {
-    this.name = name;
-    this.value = null;
+    if (typeof query === 'string')
+    {
+      this.parser = new ESJSONParser(query);
+    } else
+    {
+      this.parser = query;
+    }
+
+    this.interpretRoot(this.parser.get);
+  }
+
+  /**
+   * @returns {any} the delegate parser, from which the results can be retrieved
+   */
+  public getParser(): ESJSONParser
+  {
+    return this.parser;
+  }
+
+  private interpretRoot(info: ESValueInfo): void
+  {
+    if (typeof info.value !== 'object')
+    {
+      this.accumulateError(info, 'Queries must be objects');
+      return;
+    }
+  }
+
+  private accumulateError(info: ESValueInfo, message: string): void
+  {
+    this.parser.accumulateError(new ESParserError(info.tokens[0], message));
   }
 }
