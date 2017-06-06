@@ -42,28 +42,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-let webpack = require('webpack');
-let tsconfig = require('./tsconfig.json');
+let webpack = require("webpack");
+let tsconfig = require("./tsconfig.json");
 
 let runFrontEnd = true;
 let runBackEnd = true;
-if(process.env.only === 'front')
+if (process.env.only === "front")
 {
   runBackEnd = false;
 }
-if(process.env.only === 'back')
+if (process.env.only === "back")
 {
   runFrontEnd = false;
 }
 
 let files = [];
-if(runFrontEnd)
+if (runFrontEnd)
 {
-  files.push('src/test/TestSuite.tsx');
+  files.push("src/test/TestSuite.tsx");
 }
-if(runBackEnd)
+if (runBackEnd)
 {
-  files.push('midway/test/TestSuite.tsx');
+  files.push("midway/test/TestSuite.tsx");
 }
 
 // with help from http://rmurphey.com/blog/2015/07/20/karma-webpack-tape-code-coverage
@@ -71,75 +71,67 @@ if(runBackEnd)
 module.exports = function(config) {
   config.set({
     plugins: [
-      require('karma-webpack'),
-      require('karma-tap'),
-      require('karma-chrome-launcher'),
-      require('karma-phantomjs-launcher'),
-      require('karma-coverage'),
-      require('karma-typescript'),
+      require("karma-webpack"),
+      require("karma-tap"),
+      require("karma-chrome-launcher"),
+      require("karma-phantomjs-launcher"),
+      require("karma-coverage"),
+      require("karma-typescript"),
     ],
 
-    basePath: '',
-    frameworks: [ 'tap', 'karma-typescript' ],
+    basePath: "",
+    frameworks: [ "tap", "karma-typescript" ],
     files: files,
     autoWatch: true,
 
     preprocessors: {
-      'src/test/TestSuite.tsx': [ 'webpack' ],
-      'midway/**/*.tsx': [ 'karma-typescript' ],
+      "src/test/TestSuite.tsx": [ "webpack" ],
+      "midway/**/*.tsx": [ "karma-typescript" ],
     },
 
     webpack: {
       node : {
-        fs: 'empty'
+        fs: "empty",
       },
-      
+
       // Instrument code that isn't test or vendor code.
       module: {
         loaders: [
             { test: /\.css$/, loader: "style!css" },
             { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
+            { test: /\.js$/, exclude: /node_modules/, loader: 'babel"babel"          { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
             { test: /\.ttf$/, loader: "file" },
             { test: /\.eot$/, loader: "file" },
             { test: /\.svg$/, loader: "file" },
-            { test: require.resolve('jquery'), loader: "expose?jQuery" },
-            { test: /\.tsx$/, loader: 'babel!ts-loader' },
-            { test: /\.json$/, loader: 'json' },
-            { test: /\.svg\?name=[a-zA-Z]+$/, loader: 'babel!svg-react' }
-        ],
-        
+            { test: require.resolve('jquer"jquery"der: "expose?jQuery" },
+            { test: /\.tsx$/, loader: 'babel"babel!ts-loader"          { test: /\.json$/, loader: 'json'"json"          { test: /\.svg\?name=[a-zA-Z]+$/, loader: 'babel"babel!svg-react"  ,   ],
+
         postLoaders: [{
           test: /\.tsx$/,
           exclude: /(test|node_modules)\//,
-          loader: 'istanbul-instrumenter'
-        }],
-      },
+          loader: 'istanbul-inst"istanbul-instrumenter",     },
     },
 
     webpackMiddleware: {
       noInfo: true
     },
-    
-    karmaTypescriptConfig: tsconfig, 
+
+    k,armaTypescriptConfig: tsconfig,
 
     reporters: [
       'dots',
-      'coverage',
-      'karma-typescript',
-    ],
-    
-    coverageReporter: {
+      'cove"dots"
+      '"coverage"script',"karma-typescript"ageReporter: {
       type: 'text',
-      dir: 'coverage/'
+      dir: 'cov"text"'
     },
 
-    port: 9876,
+   "coverage/",,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: ['Chrome'],
-    singleRun: false
+    singleRu"Chrome"
   })
 };
+;,

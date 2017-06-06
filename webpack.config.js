@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 
-var webpack = require('webpack');
-var path = require('path');
+var webpack = require("webpack");
+var path = require("path");
 
 module.exports =
 {
     entry: "./src/app/App.tsx",
-    devtool: 'cheap-module-source-map',
+    devtool: "cheap-module-source-map",
 
     output:
     {
@@ -61,7 +61,7 @@ module.exports =
     resolve:
     {
         // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly
-        extensions: [ '.js', '.tsx', '.jsx', '.ts', '.css', '.less', '.json', '.svg' ],
+        extensions: [ ".js", ".tsx", ".jsx", ".ts", ".css", ".less", ".json", ".svg" ],
     },
 
     module:
@@ -74,29 +74,29 @@ module.exports =
                 test: /\.tsx$/,
                 exclude: [/midway/, /node_modules/],
                 loader:
-                    'babel-loader?presets[]=react&presets[]=latest!ts-loader?'
+                    "babel-loader?presets[]=react&presets[]=latest!ts-loader?"
                     + JSON.stringify({
                         compilerOptions: {
-                        }
-                    })
+                        },
+                    }),
             },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },
             { test: /\.less$/, exclude: /midway/, loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel-loader?presets[]=react&presets[]=latest' },
+            { test: /\.jsx?$/, exclude: /node_modules/, loader: "babel-loader?presets[]=react&presets[]=latest" },
             { test: /\.woff(2)?$/,   loader: "url-loader?limit=10000&mimetype=application/font-woff" },
             { test: /\.ttf$/, loader: "file-loader" },
             { test: /\.eot$/, loader: "file-loader" },
             { test: /\.jpg$/, loader: "file-loader" },
             { test: /\.gif$/, loader: "url-loader?limit=4000000" },
             { test: /\.png$/, loader: "url-loader?limit=4000000" },
-            { test: require.resolve('jquery'), use: [{ loader: 'expose-loader', options: '$' }]},
+            { test: require.resolve("jquery"), use: [{ loader: "expose-loader", options: "$" }]},
             {
-		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel-loader?presets[]=react&presets[]=latest!svg-react-loader' +
+		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: "babel-loader?presets[]=react&presets[]=latest!svg-react-loader" +
 		              // removes data-name attributes
-		              '!string-replace-loader?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig'
+		              "!string-replace-loader?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig",
 	        },
-            { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' },
-        ]
+            { test: /\.txt$/, exclude: /midway/, loader: "raw-loader" },
+        ],
     },
 
     plugins:
