@@ -54,7 +54,7 @@ import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
-import {Display, DisplayType} from '../../../../shared/blocks/displays/Display';
+import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 import SchemaStore from '../../schema/data/SchemaStore';
@@ -105,18 +105,18 @@ class BuilderComponent extends PureClasss<Props>
     if (Array.isArray(displayArg))
     {
       return displayArg.map((di) =>
-          <BuilderComponent
-            display={di}
-            keyPath={parentKeyPath}
-            data={data}
-            canEdit={this.props.canEdit}
-            parentData={this.props.parentData}
-            helpOn={this.props.helpOn}
-            addColumn={this.props.addColumn}
-            columnIndex={this.props.columnIndex}
-            language={this.props.language}
-          />,
-        ) as El[];
+        <BuilderComponent
+          display={di}
+          keyPath={parentKeyPath}
+          data={data}
+          canEdit={this.props.canEdit}
+          parentData={this.props.parentData}
+          helpOn={this.props.helpOn}
+          addColumn={this.props.addColumn}
+          columnIndex={this.props.columnIndex}
+          language={this.props.language}
+        />,
+      ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
     }
 
@@ -145,10 +145,10 @@ class BuilderComponent extends PureClasss<Props>
       return <div
         className="builder-label"
         key={keySeed + '-label'}
-        >
-          {d.label}
-        </div>
-      ;
+      >
+        {d.label}
+      </div>
+        ;
     }
 
     const keyPath = d.key !== null ? this._ikeyPath(parentKeyPath, d.key) : parentKeyPath;
@@ -184,11 +184,11 @@ class BuilderComponent extends PureClasss<Props>
           singleChild={d.singleChild}
           language={this.props.language}
         />;
-      break;
+        break;
       case DisplayType.CARDTEXT:
         isTextbox = true;
         acceptsCards = true;
-      break;
+        break;
       case DisplayType.CARDSFORTEXT:
         content = <BuilderTextboxCards
           value={value}
@@ -202,7 +202,7 @@ class BuilderComponent extends PureClasss<Props>
           display={d}
           language={this.props.language}
         />;
-      break;
+        break;
       case DisplayType.DROPDOWN:
         content = (
           <div key={key} className="builder-component-wrapper">
@@ -216,7 +216,7 @@ class BuilderComponent extends PureClasss<Props>
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}
             />
-            { this.props.helpOn && d.help ?
+            {this.props.helpOn && d.help ?
               <ManualInfo
                 information={d.help as string}
                 className="builder-component-help-right"
@@ -225,13 +225,13 @@ class BuilderComponent extends PureClasss<Props>
             }
           </div>
         );
-      break;
+        break;
       case DisplayType.FLEX:
         content = (
           <div
             key={key}
           >
-            { !d.above ? null :
+            {!d.above ? null :
               <BuilderComponent
                 display={d.above}
                 keyPath={this.props.keyPath}
@@ -256,7 +256,7 @@ class BuilderComponent extends PureClasss<Props>
                 language={this.props.language}
               />
             </div>
-            { !d.below ? null :
+            {!d.below ? null :
               <div
                 className="card-flex-below"
               >
@@ -275,7 +275,7 @@ class BuilderComponent extends PureClasss<Props>
             }
           </div>
         );
-      break;
+        break;
       case DisplayType.ROWS:
         content = (
           <div
@@ -333,33 +333,34 @@ class BuilderComponent extends PureClasss<Props>
                 },
               )
             }
-            { this.props.helpOn && d.help ?
+            {this.props.helpOn && d.help ?
               (
                 isTransformCard ?
-                (d.help as string[]).map((info, index) => {
-                  return <ManualInfo
-                    information={info as string}
-                    wide={index === 0}
-                    key={'info' + index}
-                    leftSide={index === 2}
-                    className={classNames({
-                      'builder-component-help-transform-center': index === 0,
-                      'builder-component-help-transform-left': index === 1,
-                      'builder-component-help-transform-bottom': index === 2,
-                    })}
-                  />;
-                })
-                :
-                <ManualInfo
-                  information={d.help as string}
-                  className="builder-component-help-right"
-                />
+                  (d.help as string[]).map((info, index) =>
+                  {
+                    return <ManualInfo
+                      information={info as string}
+                      wide={index === 0}
+                      key={'info' + index}
+                      leftSide={index === 2}
+                      className={classNames({
+                        'builder-component-help-transform-center': index === 0,
+                        'builder-component-help-transform-left': index === 1,
+                        'builder-component-help-transform-bottom': index === 2,
+                      })}
+                    />;
+                  })
+                  :
+                  <ManualInfo
+                    information={d.help as string}
+                    className="builder-component-help-right"
+                  />
               )
               : null
             }
           </div>
-          );
-      break;
+        );
+        break;
       default:
         content = (
           <div key={key}>
@@ -375,34 +376,34 @@ class BuilderComponent extends PureClasss<Props>
           key={key}
           className="builder-component-wrapper builder-component-wrapper-wide"
         >
-        <BuilderTextbox
-          canEdit={this.props.canEdit}
-          top={d.top}
-          placeholder={d.placeholder || d.key}
-          showWhenCards={d.showWhenCards}
-          onFocus={d.onFocus}
-          onBlur={d.onBlur}
-          display={d}
-          autoDisabled={d.autoDisabled}
-          autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}
-          language={this.props.language}
-          {...{
-            keyPath,
-            value,
-            acceptsCards,
-            isNumber,
-            typeErrorMessage,
-            className,
-          }}
-        />
-        {
-          this.props.helpOn && d.help ?
-          <ManualInfo
-            information={d.help as string}
-            className="builder-component-help-right"
+          <BuilderTextbox
+            canEdit={this.props.canEdit}
+            top={d.top}
+            placeholder={d.placeholder || d.key}
+            showWhenCards={d.showWhenCards}
+            onFocus={d.onFocus}
+            onBlur={d.onBlur}
+            display={d}
+            autoDisabled={d.autoDisabled}
+            autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}
+            language={this.props.language}
+            {...{
+              keyPath,
+              value,
+              acceptsCards,
+              isNumber,
+              typeErrorMessage,
+              className,
+            }}
           />
-          : null
-        }
+          {
+            this.props.helpOn && d.help ?
+              <ManualInfo
+                information={d.help as string}
+                className="builder-component-help-right"
+              />
+              : null
+          }
         </div>
       );
     }
@@ -412,7 +413,7 @@ class BuilderComponent extends PureClasss<Props>
 
   render()
   {
-    let {data, display} = this.props;
+    let { data, display } = this.props;
     if (!display)
     {
       if (!data.static || !data.static.display)
@@ -437,7 +438,7 @@ class BuilderComponent extends PureClasss<Props>
               {
                 className: 'builder-comp-list-item',
               },
-              ),
+            ),
             )
           }
         </div>

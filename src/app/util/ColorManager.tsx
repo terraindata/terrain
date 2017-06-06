@@ -137,7 +137,7 @@ class ColorManager
     }
 
     // Insert
-    this.keyToIndex[key] = (this.currentIndex ++) % this.COLORS.length;
+    this.keyToIndex[key] = (this.currentIndex++) % this.COLORS.length;
     if (secondaryKey)
     {
       this.keyToSecondaryKey[key] = secondaryKey;

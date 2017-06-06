@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./ResultsArea.less');
 import * as Immutable from 'immutable';
-const {Map, List} = Immutable;
+const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -55,18 +55,18 @@ import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import Result from '../results/Result';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 import InfiniteScroll from './../../../common/components/InfiniteScroll';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import {getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass} from './ResultsManager';
+import { getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass } from './ResultsManager';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import Query from '../../../../../shared/items/types/Query';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -133,9 +133,9 @@ class ResultsArea extends PureClasss<Props>
 
   renderExpandedResult()
   {
-    const {expandedResultIndex} = this.state;
-    const {results} = this.props.resultsState;
-    const {resultsConfig} = this.props.query;
+    const { expandedResultIndex } = this.state;
+    const { results } = this.props.resultsState;
+    const { resultsConfig } = this.props.query;
 
     let result: ResultClass;
 
@@ -166,7 +166,7 @@ class ResultsArea extends PureClasss<Props>
 
   handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
-    const {resultsPages} = this.state;
+    const { resultsPages } = this.state;
 
     if (resultsPages * RESULTS_PAGE_SIZE < MAX_RESULTS)
     {
@@ -194,7 +194,7 @@ class ResultsArea extends PureClasss<Props>
 
   isQueryEmpty(): boolean
   {
-    const {query} = this.props;
+    const { query } = this.props;
     return !query || (!query.tql && !query.cards.size);
   }
 
@@ -219,7 +219,7 @@ class ResultsArea extends PureClasss<Props>
       />;
     }
 
-    const {resultsState} = this.props;
+    const { resultsState } = this.props;
 
     if (resultsState.hasError)
     {
@@ -254,7 +254,7 @@ class ResultsArea extends PureClasss<Props>
       />;
     }
 
-    const {results} = resultsState;
+    const { results } = resultsState;
 
     if (!results.size)
     {
@@ -278,7 +278,7 @@ class ResultsArea extends PureClasss<Props>
       );
     }
 
-    const {resultsConfig} = this.props.query;
+    const { resultsConfig } = this.props.query;
 
     return (
       <InfiniteScroll
@@ -319,8 +319,8 @@ class ResultsArea extends PureClasss<Props>
   {
     this.props.onNavigationException();
 
-    const {xhr, queryId} = Ajax.query(
-        this.props.query.tql,
+    const { xhr, queryId } = Ajax.query(
+      this.props.query.tql,
       this.props.db,
       _.noop,
       _.noop,
@@ -342,37 +342,37 @@ Note: this exports the results of your query, which may be different from the re
 column if you have set a custom results view.');
   }
 
-/*  handleExport()
-  {
-    this.props.onNavigationException();
-
-    const {xhr, queryId} = Ajax.query(
-      .toTQL(
-        this.props.query,
+  /*  handleExport()
+    {
+      this.props.onNavigationException();
+  
+      const {xhr, queryId} = Ajax.query(
+        .toTQL(
+          this.props.query,
+          {
+            replaceInputs: true,
+          },
+        ),
+        this.props.db,
+        _.noop,
+        _.noop,
+        false,
         {
-          replaceInputs: true,
+          csv: true,
+          csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
         },
-      ),
-      this.props.db,
-      _.noop,
-      _.noop,
-      false,
-      {
-        csv: true,
-        csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
-      },
-    );
-
-    // TODO kill this on unmount
-    this.setState({
-      csvXhr: xhr,
-      csvQueryId: queryId,
-    });
-
-    alert('Your data are being prepared for export, and will automatically download when ready.\n\
-Note: this exports the results of your query, which may be different from the results in the Results \
-column if you have set a custom results view.');
-  }*/
+      );
+  
+      // TODO kill this on unmount
+      this.setState({
+        csvXhr: xhr,
+        csvQueryId: queryId,
+      });
+  
+      alert('Your data are being prepared for export, and will automatically download when ready.\n\
+  Note: this exports the results of your query, which may be different from the results in the Results \
+  column if you have set a custom results view.');
+    }*/
 
   toggleView()
   {
@@ -383,7 +383,7 @@ column if you have set a custom results view.');
 
   renderTopbar()
   {
-    const {resultsState} = this.props;
+    const { resultsState } = this.props;
     let text: any = '';
     if (resultsState.loading)
     {
@@ -403,7 +403,7 @@ column if you have set a custom results view.');
     }
     else if (resultsState.results)
     {
-      const {count} = resultsState;
+      const { count } = resultsState;
       text = `${count || 'No'}${count === MAX_RESULTS ? '+' : ''} result${count === 1 ? '' : 's'}`;
     }
     else
@@ -476,7 +476,7 @@ column if you have set a custom results view.');
     Actions.changeResultsConfig(config);
   }
 
-	render()
+  render()
   {
     return (
       <div className={classNames({
@@ -484,13 +484,13 @@ column if you have set a custom results view.');
         'results-area-config-open': this.state.showingConfig,
         'results-area-table': this.state.resultFormat === 'table',
       })}>
-        { this.renderTopbar() }
-        { this.renderResults() }
-        { this.renderExpandedResult() }
-        { this.renderConfig() }
+        {this.renderTopbar()}
+        {this.renderResults()}
+        {this.renderExpandedResult()}
+        {this.renderConfig()}
       </div>
     );
-	}
+  }
 }
 
 export default ResultsArea;

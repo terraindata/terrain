@@ -53,7 +53,8 @@ const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 const optionHeight = 30; // coordinate with Menu.less
 
-export interface MenuOption {
+export interface MenuOption
+{
   text: string;
   onClick: (index: number, id: string) => void;
   disabled?: boolean;
@@ -85,17 +86,18 @@ export class Menu extends PureClasss<Props>
     }
 
     let onClick: any = _.noop;
-    
+
     if (!option.disabled)
     {
       // TODO
-      onClick = (event) => {
+      onClick = (event) =>
+      {
         event.preventDefault();
         event.stopPropagation();
         option.onClick(index, this.props.id);
       };
     }
-    
+
     return (
       <div
         className={'menu-option' + (option.disabled ? ' menu-option-disabled' : '')}
@@ -114,8 +116,8 @@ export class Menu extends PureClasss<Props>
         <div
           className={option.icon ? 'menu-text-padding' : 'menu-text-padding-no-icon'}
         >
-          { 
-            option.text 
+          {
+            option.text
           }
         </div>
       </div>
@@ -149,7 +151,7 @@ export class Menu extends PureClasss<Props>
 
   render()
   {
-    const {options} = this.props;
+    const { options } = this.props;
     if (!options || !options.size)
     {
       return null;
@@ -161,7 +163,7 @@ export class Menu extends PureClasss<Props>
       multiplier = 14;
     }
     const width = multiplier * options.reduce((max, option) =>
-        option.text && (option.text.length > max) ? option.text.length : max, 1);
+      option.text && (option.text.length > max) ? option.text.length : max, 1);
 
     const style = {
       width,
@@ -169,31 +171,31 @@ export class Menu extends PureClasss<Props>
     };
 
     return (
-    <div
-      className={classNames({
-        'menu-wrapper': true,
-        'menu-wrapper-small': this.props.small,
-        'menu-open': this.state.open,
-      })}
-      style={this.props.style ? this.props.style : null}
-    >
       <div
-        className="menu-icon-wrapper"
-        onClick={this.toggleOpen}
+        className={classNames({
+          'menu-wrapper': true,
+          'menu-wrapper-small': this.props.small,
+          'menu-open': this.state.open,
+        })}
+        style={this.props.style ? this.props.style : null}
       >
-        <MoreIcon className="menu-icon" />
-       </div>
+        <div
+          className="menu-icon-wrapper"
+          onClick={this.toggleOpen}
+        >
+          <MoreIcon className="menu-icon" />
+        </div>
         {
           this.state.open &&
-            <div
-              className="menu-options-wrapper"
-              style={style}
-              onClick={this.toggleOpen}
-            >
-              {
-                options.map(this.renderOption)
-              }
-            </div>
+          <div
+            className="menu-options-wrapper"
+            style={style}
+            onClick={this.toggleOpen}
+          >
+            {
+              options.map(this.renderOption)
+            }
+          </div>
         }
       </div>
     );

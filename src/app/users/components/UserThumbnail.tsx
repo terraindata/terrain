@@ -145,11 +145,11 @@ class UserThumbnail extends Classs<Props>
         />
         {
           text &&
-            <div className="user-thumbnail-text">
-              {
-                text
-              }
-            </div>
+          <div className="user-thumbnail-text">
+            {
+              text
+            }
+          </div>
         }
       </div>
     );
@@ -158,7 +158,7 @@ class UserThumbnail extends Classs<Props>
     {
       return (
         <Link to={`/users/${user.id}`}>
-          { thumbnail }
+          {thumbnail}
         </Link>
       );
     }

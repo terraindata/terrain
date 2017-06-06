@@ -95,15 +95,15 @@ class Account extends Classs<Props>
         break;
     }
 
-      // add this back in when ready
-            // <Link
-            //   to={'/account/notifications'}
-            //   className={classNames({
-            //     'account-link': true,
-            //     'active': notificationsActive,
-            //   })}  >
-            //   Notifications
-            // </Link>
+    // add this back in when ready
+    // <Link
+    //   to={'/account/notifications'}
+    //   className={classNames({
+    //     'account-link': true,
+    //     'active': notificationsActive,
+    //   })}  >
+    //   Notifications
+    // </Link>
     return (
       <div className="account">
         <div className="account-wrapper">

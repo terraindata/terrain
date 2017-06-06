@@ -52,7 +52,8 @@ import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 const r = 3;
-export interface Props {
+export interface Props
+{
 }
 
 class EasterEggs extends PureClasss<Props>
@@ -89,7 +90,7 @@ class EasterEggs extends PureClasss<Props>
 
   dropSnow()
   {
-    let {buckets, snow, w, h} = this.state;
+    let { buckets, snow, w, h } = this.state;
     if (!buckets || !snow) return;
 
     // new snow
@@ -109,7 +110,7 @@ class EasterEggs extends PureClasss<Props>
         return s;
       }
 
-      let {x, y} = s;
+      let { x, y } = s;
       if (buckets.get(x) >= y)
       {
         buckets = buckets.set(x, buckets.get(x) + 1);
@@ -118,7 +119,7 @@ class EasterEggs extends PureClasss<Props>
         };
       }
 
-      y --;
+      y--;
       const newx = Util.valueMinMax(x + Util.randInt(3) - 1, 0, Math.floor(w / r));
       if (buckets.get(newx) < y)
       {

@@ -52,7 +52,7 @@ import UserStore from './../../users/data/UserStore';
 import LibraryTypes from './../LibraryTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Actions from './LibraryActions';
-import {CleanLibraryActionTypes, LibraryActionTypes} from './LibraryActionTypes';
+import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
@@ -85,8 +85,9 @@ class LibraryStateC
   changingStatusTo: ItemStatus = 'BUILD';
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
-export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}
-export const _LibraryState = (config?: any) => {
+export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
+export const _LibraryState = (config?: any) =>
+{
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 
@@ -133,6 +134,6 @@ export const LibraryStore: IStore<LibraryState> = Redux.createStore(
 
     return state;
   }
-, DefaultState);
+  , DefaultState);
 
 export default LibraryStore;

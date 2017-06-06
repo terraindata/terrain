@@ -138,7 +138,7 @@ export const Ajax =
           }
         }
         catch (e)
-        {}
+        { }
       }
       else if (config.urlArgs)
       {
@@ -171,12 +171,12 @@ export const Ajax =
 
     _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
     {
-      return Ajax._req('POST', url, data, onLoad, {onError});
+      return Ajax._req('POST', url, data, onLoad, { onError });
     },
 
     _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
     {
-      return Ajax._req('GET', url, data, onLoad, {onError});
+      return Ajax._req('GET', url, data, onLoad, { onError });
     },
 
     _postMidway1(
@@ -206,7 +206,7 @@ export const Ajax =
             onError,
             // host: options.useMidway ? undefined : TDB_HOST,
             // crossDomain: ! options.useMidway,
-            download:         options.download,
+            download: options.download,
             downloadFilename: options.downloadFilename,
           },
         ),
@@ -215,14 +215,14 @@ export const Ajax =
     },
 
     queryM1(body: string,
-          db: BackendInstance,
-          onLoad: (response: M1QueryResponse) => void,
-          onError?: (ev: Event) => void,
-          sqlQuery?: boolean, // unused
-          options: {
-            streaming?: boolean,
-            streamingTo?: string,
-          } = {},
+      db: BackendInstance,
+      onLoad: (response: M1QueryResponse) => void,
+      onError?: (ev: Event) => void,
+      sqlQuery?: boolean, // unused
+      options: {
+        streaming?: boolean,
+        streamingTo?: string,
+      } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
@@ -256,10 +256,10 @@ export const Ajax =
       }
 
       return Ajax._postMidway1(dest, {
-          query_string: encode_utf8(tql),
-          db,
-          format:       options.csv ? 'csv' : undefined,
-        },
+        query_string: encode_utf8(tql),
+        db,
+        format: options.csv ? 'csv' : undefined,
+      },
 
         (resp) =>
         {
@@ -279,9 +279,9 @@ export const Ajax =
         onError,
 
         {
-          download:         options.csv,
+          download: options.csv,
           downloadFilename: options.csvName || 'Results.csv',
-          useMidway:        options.csv,
+          useMidway: options.csv,
         },
       );
     },
@@ -289,9 +289,9 @@ export const Ajax =
     parseTree(tql: string, db: string, onLoad: (response: M1QueryResponse, context?: any) => void, onError?: (ev: Event, context?: any) => void, context?: any)
     {
       return Ajax._postMidway1('/get_tql_tree', {
-          query_string: encode_utf8(tql),
-          db,
-        },
+        query_string: encode_utf8(tql),
+        db,
+      },
 
         (resp) =>
         {
@@ -325,8 +325,8 @@ export const Ajax =
     schema_m1(db: string | number, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       return Ajax._postMidway1('/get_schema', {
-          db,
-        },
+        db,
+      },
         (resp: string) =>
         {
           const cols: any = null;
@@ -377,17 +377,17 @@ export const Ajax =
       Ajax._postMidway1('/get_databases', {
         db: 'information_schema',
       }, (resp) =>
-      {
-        try
         {
-          const list = JSON.parse(resp);
-          onLoad(list.results.map((obj) => obj.schema_name));
-        }
-        catch (e)
-        {
-          onError && onError(e as any);
-        }
-      }, onError);
+          try
+          {
+            const list = JSON.parse(resp);
+            onLoad(list.results.map((obj) => obj.schema_name));
+          }
+          catch (e)
+          {
+            onError && onError(e as any);
+          }
+        }, onError);
     },
     killQuery(id: string)
     {
@@ -397,8 +397,8 @@ export const Ajax =
     killQuery_m1(id: string)
     {
       return Ajax._postMidway1('/kill_query_by_id', {
-          query_id: id,
-        },
+        query_id: id,
+      },
 
         (resp) =>
         {

@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
-const {VelocityTransitionGroup, VelocityComponent} = require('velocity-react');
+const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
 
 export interface Props
 {
-	open: boolean;
-	children?: any;
+  open: boolean;
+  children?: any;
 }
 
 class FadeInOut extends PureClasss<Props>
@@ -57,28 +57,28 @@ class FadeInOut extends PureClasss<Props>
   render()
   {
     return (
-    	<VelocityComponent
-    		animation={{
-    			opacity: this.props.open ? 1 : 0,
-    			translateY: this.props.open ? 0 : 20,
-    		}}
-    		duration={250}
-    	>
-    		<div>
-	      	<VelocityTransitionGroup
-	      		enter={
-	      			{animation: 'slideDown', duration: 250, easing: 'easeOut' }
-	      		}
-	      		leave={
-	      			{animation: 'slideUp', duration: 250, easing: 'easeOut' }
-	      		}
-	      	>
-		      	{
-		      		this.props.open &&
-		    				this.props.children
-		      	}
-	      	</VelocityTransitionGroup>
-	      </div>
+      <VelocityComponent
+        animation={{
+          opacity: this.props.open ? 1 : 0,
+          translateY: this.props.open ? 0 : 20,
+        }}
+        duration={250}
+      >
+        <div>
+          <VelocityTransitionGroup
+            enter={
+              { animation: 'slideDown', duration: 250, easing: 'easeOut' }
+            }
+            leave={
+              { animation: 'slideUp', duration: 250, easing: 'easeOut' }
+            }
+          >
+            {
+              this.props.open &&
+              this.props.children
+            }
+          </VelocityTransitionGroup>
+        </div>
       </VelocityComponent>
     );
   }

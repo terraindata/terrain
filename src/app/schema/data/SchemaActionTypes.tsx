@@ -45,15 +45,15 @@ THE SOFTWARE.
 import Util from './../../util/Util';
 
 export let SchemaActionTypes =
-{
-  fetch: '',
-  setDatabase: '', // sets the schema for a database
-  error: '',
-  dbCount: '',
+  {
+    fetch: '',
+    setDatabase: '', // sets the schema for a database
+    error: '',
+    dbCount: '',
 
-  highlightId: '',
-  selectId: '',
-};
+    highlightId: '',
+    selectId: '',
+  };
 
 Util.setValuesToKeys(SchemaActionTypes, '');
 

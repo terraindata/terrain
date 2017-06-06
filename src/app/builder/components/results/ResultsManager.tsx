@@ -43,23 +43,23 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-const {Map, List} = Immutable;
+const { Map, List } = Immutable;
 import * as React from 'react';
 import * as _ from 'underscore';
-import {BaseClass, New} from '../../../Classes';
-import AjaxM1, {M1QueryResponse} from '../../../util/AjaxM1';
-import {Ajax} from '../../../util/Ajax';
+import { BaseClass, New } from '../../../Classes';
+import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
+import { Ajax } from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
-import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
-import {MidwayErrorItem} from '../../../../../shared/error/MidwayErrorItem';
-import {line} from 'd3-shape';
+import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
+import { line } from 'd3-shape';
 import MidwayQueryResponse from '../../../../../shared/backends/types/MidwayQueryResponse';
 import MidwayError from '../../../../../shared/error/MidwayError';
 import Query from '../../../../../shared/items/types/Query';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 
 export const MAX_RESULTS = 200;
 
@@ -147,7 +147,7 @@ export class ResultsManager extends PureClasss<Props>
     stateQueries.map(
       (stateKey) =>
         this && this.state && this.state[stateKey] &&
-          fn(this.state[stateKey], stateKey),
+        fn(this.state[stateKey], stateKey),
     );
   }
 
@@ -274,7 +274,7 @@ export class ResultsManager extends PureClasss<Props>
       {
         allfieldEql = AllBackendsMap[query.language].queryToCode(
           query,
-          {allFields: true},
+          { allFields: true },
         );
       }
       catch (err)
@@ -327,18 +327,18 @@ export class ResultsManager extends PureClasss<Props>
     {
       console.log('Unknown Database ' + query);
     }
-      // temporarily disable count
-          // this.setState({
-          //   countXhr:
-          //     Ajax.query(
-          //       TQLConverter.toTQL(query, {
-          //         count: true,
-          //         replaceInputs: true,
-          //       }),
-          //       db,
-          //       this.handleCountResponse,
-          //       this.handleCountError
-          //     ),
+    // temporarily disable count
+    // this.setState({
+    //   countXhr:
+    //     Ajax.query(
+    //       TQLConverter.toTQL(query, {
+    //         count: true,
+    //         replaceInputs: true,
+    //       }),
+    //       db,
+    //       this.handleCountResponse,
+    //       this.handleCountError
+    //     ),
     // });
   }
 
@@ -419,7 +419,7 @@ export class ResultsManager extends PureClasss<Props>
 
   private updateResults(resultsData: any[], isAllFields: boolean)
   {
-    const {resultsState} = this.props;
+    const { resultsState } = this.props;
 
     const resultsCount = resultsData.length;
     if (resultsData.length > MAX_RESULTS)
@@ -510,9 +510,9 @@ export class ResultsManager extends PureClasss<Props>
 
   private handleM1Error(response: M1QueryResponse, isAllFields?: boolean)
   {
-    let {errorMessage} = response || { errorMessage: '' };
+    let { errorMessage } = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
-    let {resultsState} = this.props;
+    let { resultsState } = this.props;
 
     if (typeof errorMessage === 'string')
     {
@@ -549,21 +549,21 @@ export class ResultsManager extends PureClasss<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-          isAllFields ? 'hasAllFieldsError' : 'hasError',
-          true,
-        )
+        isAllFields ? 'hasAllFieldsError' : 'hasError',
+        true,
+      )
         .set(
-          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-          errorMessage,
-        )
+        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+        errorMessage,
+      )
         .set(
-          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-          true,
-        )
+        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+        true,
+      )
         .set(
-          'loading',
-          false,
-        ),
+        'loading',
+        false,
+      ),
     );
   }
 
@@ -571,7 +571,7 @@ export class ResultsManager extends PureClasss<Props>
   {
     // TODO: handle myltiple errors.
     const err = errors[0];
-    let {resultsState} = this.props;
+    let { resultsState } = this.props;
     if (!isAllFields)
     {
       resultsState = resultsState
@@ -586,21 +586,21 @@ export class ResultsManager extends PureClasss<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-          isAllFields ? 'hasAllFieldsError' : 'hasError',
-          true,
-        )
+        isAllFields ? 'hasAllFieldsError' : 'hasError',
+        true,
+      )
         .set(
-          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-          err.title,
-        )
+        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+        err.title,
+      )
         .set(
-          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-          true,
-        )
+        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+        true,
+      )
         .set(
-          'loading',
-          false,
-        ),
+        'loading',
+        false,
+      ),
     );
   }
 
@@ -677,7 +677,7 @@ export class ResultsManager extends PureClasss<Props>
 
   changeResults(changes: { [key: string]: any })
   {
-    let {resultsState} = this.props;
+    let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
         resultsState = resultsState.set(key, value),
@@ -686,12 +686,12 @@ export class ResultsManager extends PureClasss<Props>
     this.props.onResultsStateChange(resultsState);
   }
 
-	render()
+  render()
   {
     return (
       <div />
     );
-	}
+  }
 }
 
 export function getPrimaryKeyFor(result: any, config: ResultsConfig): string

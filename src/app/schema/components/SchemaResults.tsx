@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 const Radium = require('radium');
 import * as React from 'react';
 import Styles from '../../Styles';
@@ -54,7 +54,7 @@ import BackendInstance from './../../../../shared/backends/types/BackendInstance
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
-import {_ResultsState, ResultsManager, ResultsState} from '../../builder/components/results/ResultsManager';
+import { _ResultsState, ResultsManager, ResultsState } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import InfoArea from '../../common/components/InfoArea';
 import { Query, _Query } from '../../../../shared/items/types/Query';
@@ -66,237 +66,237 @@ const NUM_ROWS = 200;
 
 export interface Props
 {
-	databases: SchemaTypes.DatabaseMap;
+  databases: SchemaTypes.DatabaseMap;
 }
 
 @Radium
 class SchemaResults extends PureClasss<Props>
 {
-	state: {
-		selectedId?: ID,
-		selectedItem?: SchemaBaseClass,
+  state: {
+    selectedId?: ID,
+    selectedItem?: SchemaBaseClass,
 
-		resultsState?: ResultsState;
-		resultsQuery?: Query;
-		resultsDb?: BackendInstance;
-		resultsErrorMessage?: string;
-	} = {
-		resultsState: _ResultsState(),
-	};
+    resultsState?: ResultsState;
+    resultsQuery?: Query;
+    resultsDb?: BackendInstance;
+    resultsErrorMessage?: string;
+  } = {
+    resultsState: _ResultsState(),
+  };
 
-	constructor(props: Props)
-	{
-		super(props);
+  constructor(props: Props)
+  {
+    super(props);
 
-		this._subscribe(SchemaStore, {
-			updater: (storeState: SchemaTypes.SchemaState) =>
-			{
-				const {selectedId} = storeState;
-				// TODO change if store changes
-				const selectedItem =
-					storeState.getIn(['databases', selectedId]) ||
-					storeState.getIn(['tables', selectedId]) ||
-					storeState.getIn(['columns', selectedId]) ||
-					storeState.getIn(['indexes', selectedId]);
+    this._subscribe(SchemaStore, {
+      updater: (storeState: SchemaTypes.SchemaState) =>
+      {
+        const { selectedId } = storeState;
+        // TODO change if store changes
+        const selectedItem =
+          storeState.getIn(['databases', selectedId]) ||
+          storeState.getIn(['tables', selectedId]) ||
+          storeState.getIn(['columns', selectedId]) ||
+          storeState.getIn(['indexes', selectedId]);
 
-				if (selectedItem !== this.state.selectedItem)
-				{
-					this.setState({
-						selectedId,
-						selectedItem,
-					});
+        if (selectedItem !== this.state.selectedItem)
+        {
+          this.setState({
+            selectedId,
+            selectedItem,
+          });
 
-					if (this.showsResults(selectedItem))
-					{
-						const resultsDb =
-							selectedItem.type === 'database' ? selectedItem.name :
-								this.props.databases
-									&& this.props.databases.get(selectedItem['databaseId']);
-					  console.log('schema resultsDb', resultsDb);
-						let field: string, table: string, where: string;
+          if (this.showsResults(selectedItem))
+          {
+            const resultsDb =
+              selectedItem.type === 'database' ? selectedItem.name :
+                this.props.databases
+                && this.props.databases.get(selectedItem['databaseId']);
+            console.log('schema resultsDb', resultsDb);
+            let field: string, table: string, where: string;
 
-						switch (selectedItem.type)
-						{
-							case 'database':
-								field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
-								table = 'INFORMATION_SCHEMA.TABLES';
-								where = `TABLE_SCHEMA = '${selectedItem.name}'`;
-								break;
-							case 'table':
-								field = '*';
-								table = selectedItem.name;
-								break;
-							case 'column':
-								field = selectedItem.name;
-								table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
-								break;
-							case 'index':
-								//TODO
-								break;
-						}
+            switch (selectedItem.type)
+            {
+              case 'database':
+                field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
+                table = 'INFORMATION_SCHEMA.TABLES';
+                where = `TABLE_SCHEMA = '${selectedItem.name}'`;
+                break;
+              case 'table':
+                field = '*';
+                table = selectedItem.name;
+                break;
+              case 'column':
+                field = selectedItem.name;
+                table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
+                break;
+              case 'index':
+                //TODO
+                break;
+            }
 
-						const resultsQuery = this.getQuery(resultsDb, field, table, where);
-						let resultsErrorMessage = null;
-						
-						if (!resultsQuery)
-						{
-							resultsErrorMessage = 'Unsupported DB type: ' + resultsDb.type;
-						}
+            const resultsQuery = this.getQuery(resultsDb, field, table, where);
+            let resultsErrorMessage = null;
 
-						this.setState({
-							resultsQuery,
-							resultsDb,
-							resultsState: _ResultsState(),
-							resultsErrorMessage,
-						});
-					}
-					else
-					{
-						this.handleResultsStateChange(_ResultsState());
-					}
-				}
-			},
-		});
-	}
+            if (!resultsQuery)
+            {
+              resultsErrorMessage = 'Unsupported DB type: ' + resultsDb.type;
+            }
 
-	getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
-	{
-		if(resultsDb.type !== 'mysql')
-		{
-			// TODO MOD
-			return null;
-		}
-		
-		const inputs = [
-			{
-				key: 'table',
-				value: table,
-			},
-			{
-				key: 'field',
-				value: field,
-			},
-			{
-				key: 'numRows',
-				value: NUM_ROWS,
-			},
-		].map(
-			(inputConfig) =>
-				BlockUtils.make(
-					AllBackendsMap.mysql.blocks.input,
-					inputConfig,
-				),
-		);
+            this.setState({
+              resultsQuery,
+              resultsDb,
+              resultsState: _ResultsState(),
+              resultsErrorMessage,
+            });
+          }
+          else
+          {
+            this.handleResultsStateChange(_ResultsState());
+          }
+        }
+      },
+    });
+  }
 
-		return _Query({
-			inputs: List(inputs),
+  getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
+  {
+    if (resultsDb.type !== 'mysql')
+    {
+      // TODO MOD
+      return null;
+    }
 
-			cards: List([
-				BlockUtils.make(
-					AllBackendsMap.mysql.blocks.sfw,
-					{
-						fields: List([
-							BlockUtils.make(
-								AllBackendsMap.mysql.blocks.field,
-								{
-									field: 'input.field',
-								},
-							),
-						]),
+    const inputs = [
+      {
+        key: 'table',
+        value: table,
+      },
+      {
+        key: 'field',
+        value: field,
+      },
+      {
+        key: 'numRows',
+        value: NUM_ROWS,
+      },
+    ].map(
+      (inputConfig) =>
+        BlockUtils.make(
+          AllBackendsMap.mysql.blocks.input,
+          inputConfig,
+        ),
+    );
 
-						cards: List([
-							BlockUtils.make(
-								AllBackendsMap.mysql.blocks.from,
-								{
-									tables: List([
-										BlockUtils.make(
-											AllBackendsMap.mysql.blocks.table,
-											{
-												table: 'input.table',
-											},
-										),
-									]),
-								},
-							),
+    return _Query({
+      inputs: List(inputs),
 
-							BlockUtils.make(
-								AllBackendsMap.mysql.blocks.where,
-								{
-									cards: List([
-										BlockUtils.make(
-											AllBackendsMap.mysql.blocks.tql,
-											{
-												clause: where,
-											},
-										),
-									]),
-								},
-							),
+      cards: List([
+        BlockUtils.make(
+          AllBackendsMap.mysql.blocks.sfw,
+          {
+            fields: List([
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.field,
+                {
+                  field: 'input.field',
+                },
+              ),
+            ]),
 
-							BlockUtils.make(
-								AllBackendsMap.mysql.blocks.take,
-								{
-									value: 'input.numRows',
-								},
-							),
-						]),
-					},
-				),
-			]),
-		});
-	}
+            cards: List([
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.from,
+                {
+                  tables: List([
+                    BlockUtils.make(
+                      AllBackendsMap.mysql.blocks.table,
+                      {
+                        table: 'input.table',
+                      },
+                    ),
+                  ]),
+                },
+              ),
 
-	showsResults(selectedItem: SchemaBaseClass): boolean
-	{
-		return selectedItem && selectedItem.type !== 'index';
-	}
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.where,
+                {
+                  cards: List([
+                    BlockUtils.make(
+                      AllBackendsMap.mysql.blocks.tql,
+                      {
+                        clause: where,
+                      },
+                    ),
+                  ]),
+                },
+              ),
 
-	handleResultsStateChange(resultsState: ResultsState)
-	{
-		this.setState({
-			resultsState,
-		});
-	}
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.take,
+                {
+                  value: 'input.numRows',
+                },
+              ),
+            ]),
+          },
+        ),
+      ]),
+    });
+  }
+
+  showsResults(selectedItem: SchemaBaseClass): boolean
+  {
+    return selectedItem && selectedItem.type !== 'index';
+  }
+
+  handleResultsStateChange(resultsState: ResultsState)
+  {
+    this.setState({
+      resultsState,
+    });
+  }
 
   render()
   {
-   	return (
-    	<div
-    		style={{
-    			width: '100%',
-    			height: '100%',
-    			background: '#fff',
-    		}}
-    	>
-    		{
-    			this.showsResults(this.state.selectedItem) ?
-    				(
-    					this.state.resultsErrorMessage ?
-    						<InfoArea
-    							large="Error retrieving results"
-    							small={this.state.resultsErrorMessage}
-    						/>
-    					:
-				    		<ResultsTable
-				    			results={this.state.resultsState.results}
-				    			onExpand={_.noop}
-				    			resultsLoading={this.state.resultsState.loading}
-				    		/>
-    				)
-		    	:
-    				<InfoArea
-    					large="Select an item to see its contents here."
-    				/>
-    		}
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: '#fff',
+        }}
+      >
+        {
+          this.showsResults(this.state.selectedItem) ?
+            (
+              this.state.resultsErrorMessage ?
+                <InfoArea
+                  large="Error retrieving results"
+                  small={this.state.resultsErrorMessage}
+                />
+                :
+                <ResultsTable
+                  results={this.state.resultsState.results}
+                  onExpand={_.noop}
+                  resultsLoading={this.state.resultsState.loading}
+                />
+            )
+            :
+            <InfoArea
+              large="Select an item to see its contents here."
+            />
+        }
 
-    		<ResultsManager
-    			db={this.state.resultsDb}
-    			onResultsStateChange={this.handleResultsStateChange}
-    			resultsState={this.state.resultsState}
-    			query={this.state.resultsQuery}
-    			noExtraFields={true}
-    		/>
-    	</div>
+        <ResultsManager
+          db={this.state.resultsDb}
+          onResultsStateChange={this.handleResultsStateChange}
+          resultsState={this.state.resultsState}
+          query={this.state.resultsQuery}
+          noExtraFields={true}
+        />
+      </div>
     );
   }
 }

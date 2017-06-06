@@ -55,7 +55,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
 window['PerfStart'] = Perf.start;
@@ -99,7 +99,7 @@ import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
-import {SchemaActions, SchemaStore} from './schema/data/SchemaStore';
+import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
 
@@ -110,41 +110,41 @@ const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
-const ManualIcon = require ('./../images/icon_info.svg');
+const ManualIcon = require('./../images/icon_info.svg');
 
 const links =
-[
-  // {
-  //   icon: <HomeIcon />,
-  //   text: 'Account',
-  //   route: '/account',
-  // },
-  // {
-  //   icon: <ReportingIcon />,
-  //   text: 'Reporting',
-  //   route: '/reporting',
-  // },
-  {
-    icon: <LibraryIcon />,
-    text: 'Library',
-    route: '/library',
-  },
-  {
-    icon: <BuilderIcon />,
-    text: 'Builder',
-    route: '/builder',
-  },
-  {
-    icon: <ReportingIcon />,
-    text: 'Schema',
-    route: '/schema',
-  },
-  // {
-  //   icon: <ManualIcon />,
-  //   text: 'Manual',
-  //   route: '/manual',
-  // }
-];
+  [
+    // {
+    //   icon: <HomeIcon />,
+    //   text: 'Account',
+    //   route: '/account',
+    // },
+    // {
+    //   icon: <ReportingIcon />,
+    //   text: 'Reporting',
+    //   route: '/reporting',
+    // },
+    {
+      icon: <LibraryIcon />,
+      text: 'Library',
+      route: '/library',
+    },
+    {
+      icon: <BuilderIcon />,
+      text: 'Builder',
+      route: '/builder',
+    },
+    {
+      icon: <ReportingIcon />,
+      text: 'Schema',
+      route: '/schema',
+    },
+    // {
+    //   icon: <ManualIcon />,
+    //   text: 'Manual',
+    //   route: '/manual',
+    // }
+  ];
 
 interface Props
 {
@@ -163,7 +163,7 @@ class App extends PureClasss<Props>
 
     libraryLoaded: false,
     schemaLoaded: false,
-    
+
     usersLoaded: false,
 
     noLocalStorage: false,
@@ -178,7 +178,8 @@ class App extends PureClasss<Props>
       () => console.log('Midway 2 is not running.'),
     );
 
-    try {
+    try
+    {
       // check to see if we can use localStorage
       localStorage['test'] = 'test';
     } catch (e)
@@ -194,7 +195,8 @@ class App extends PureClasss<Props>
 
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
-      updater: (state) => {
+      updater: (state) =>
+      {
         const token = AuthStore.getState().accessToken;
         const loggedIn = !!token;
         const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
@@ -266,7 +268,7 @@ class App extends PureClasss<Props>
   {
     return this.state.libraryLoaded
       && this.state.usersLoaded;
-      // && this.state.rolesLoaded
+    // && this.state.rolesLoaded
   }
 
   renderApp()
@@ -283,7 +285,7 @@ class App extends PureClasss<Props>
     }
 
     const sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
-    const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0 );
+    const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
 
     const layout =
       {
@@ -303,13 +305,13 @@ class App extends PureClasss<Props>
           {
             noProps: true,
             content:
-              <div
-                className="app-inner"
-              >
-                {
-                  this.props.children
-                }
-              </div>
+            <div
+              className="app-inner"
+            >
+              {
+                this.props.children
+              }
+            </div>
             ,
           },
         ],
@@ -341,14 +343,14 @@ class App extends PureClasss<Props>
       >
         {
           this.state.loggedInAndLoaded &&
-            <div
-              className="app-top-bar"
-            >
-              <TerrainIcon
-                className="app-top-bar-icon"
-              />
-               <AccountDropdown />
-            </div>
+          <div
+            className="app-top-bar"
+          >
+            <TerrainIcon
+              className="app-top-bar-icon"
+            />
+            <AccountDropdown />
+          </div>
         }
         <div
           className="app-wrapper"
@@ -431,7 +433,8 @@ const router = (
 if (!DEV)
 {
   // report uncaught errors in production
-  window.onerror = (errorMsg, url, lineNo, columnNo, error) => {
+  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
+  {
 
     const user = UserStore.getState().get('currentUser');
     const userId = user && user.id;
@@ -454,14 +457,15 @@ if (!DEV)
     `;
 
     $.post('http://lukeknepper.com/email.php', {
-        msg,
-        secret: '11235813',
+      msg,
+      secret: '11235813',
     });
 
     return false;
   };
 }
 
-ReactDOM.render(router, document.getElementById('app'), () => {
+ReactDOM.render(router, document.getElementById('app'), () =>
+{
   // tests can go here
 });

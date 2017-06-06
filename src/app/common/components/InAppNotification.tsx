@@ -83,7 +83,8 @@ const notificationManager = {
 
   addNotification: function(title: string, message: string, level: string, timeOut?: number)
   {
-    if (this.system) {
+    if (this.system)
+    {
       this.system.addNotification({
         title,
         message,
@@ -106,10 +107,11 @@ class InAppNotification extends Classs<Props>
     };
   }
 
-  componentDidMount() {
+  componentDidMount()
+  {
     notificationManager.system = this.refs['notificationSystem'];
     this.setState({
-       notificationManager,
+      notificationManager,
     });
   }
 
@@ -117,7 +119,7 @@ class InAppNotification extends Classs<Props>
   {
     return (
       <div>
-        <NotificationSystem allowHTML={true} style={styles} ref="notificationSystem"/>
+        <NotificationSystem allowHTML={true} style={styles} ref="notificationSystem" />
       </div>
     );
   }

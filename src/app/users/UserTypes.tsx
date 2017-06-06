@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import RoleTypes from './../roles/RoleTypes';
-import {BaseClass, New} from '../Classes';
+import { BaseClass, New } from '../Classes';
 
 export module UserTypes
 {
@@ -89,7 +89,7 @@ export module UserTypes
     // groupRoles: Immutable.Map({}),
   }
   export type User = UserC & IRecord<UserC>;
-  export const _User = (config: {[key:string]: any} = {}) => 
+  export const _User = (config: { [key: string]: any } = {}) => 
   {
     config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
     return New<User>(new UserC(config), config);
@@ -105,7 +105,7 @@ export module UserTypes
     currentUser: UserTypes.User = null;
   }
   export type UserState = UserStateC & IRecord<UserStateC>;
-  export const _UserState = (config?: {[key:string]: any}) => 
+  export const _UserState = (config?: { [key: string]: any }) =>
     New<UserState>(new UserStateC(config), config);
 
   export function profileUrlFor(user: User): string
@@ -114,7 +114,7 @@ export module UserTypes
     {
       return user.imgSrc;
     }
-    
+
     let index: number = 0;
     if (user)
     {
@@ -127,8 +127,8 @@ export module UserTypes
         index = (user.id % numProfileImages);
       }
     }
-    
-    return  MIDWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
+
+    return MIDWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
   }
 }
 

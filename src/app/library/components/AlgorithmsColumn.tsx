@@ -147,7 +147,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     Actions.algorithms.change(
       this.props.algorithms.get(id)
         .set('status', ItemStatus.Archive) as Algorithm,
-      );
+    );
   }
 
   handleCreate()
@@ -179,7 +179,8 @@ class AlgorithmsColumn extends PureClasss<Props>
 
   handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
-    switch (targetType) {
+    switch (targetType)
+    {
       case 'group':
         if (shiftKey)
         {
@@ -257,20 +258,20 @@ class AlgorithmsColumn extends PureClasss<Props>
       (v: Variant) =>
         v.algorithmId === id,
     );
-    
+
     variants.map(
       (v: Variant) =>
-        scores[v.status].score ++,
+        scores[v.status].score++,
     );
 
     // scores.splice(0, 1); // remove Archived count
 
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     const canArchive = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     const canDuplicate = canArchive;
     const canDrag = canArchive;
     const canEdit = canDrag; // ||
-      //(me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    //(me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -288,7 +289,8 @@ class AlgorithmsColumn extends PureClasss<Props>
 
     let date = 'There are no variants';
     let userId: string | number = 'There are no variants';
-    if (lastTouched) {
+    if (lastTouched)
+    {
       date = lastTouched.lastEdited;
       userId = lastTouched.lastUserId;
     }
@@ -334,7 +336,7 @@ class AlgorithmsColumn extends PureClasss<Props>
         canDuplicate={canDuplicate}
       >
         <div className="flex-container">
-          <UserThumbnail userId={userId} medium={true} extra={role}/>
+          <UserThumbnail userId={userId} medium={true} extra={role} />
           <div className="flex-grow">
             <div className="library-item-line">
               <Scoreline
@@ -345,7 +347,7 @@ class AlgorithmsColumn extends PureClasss<Props>
             <div
               className="library-item-line"
             >
-              { Util.formatDate(date) }
+              {Util.formatDate(date)}
 
             </div>
           </div>
@@ -366,11 +368,11 @@ class AlgorithmsColumn extends PureClasss<Props>
 
   renderCategory(status: ItemStatus)
   {
-    const {algorithms} = this.props;
+    const { algorithms } = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
-    
+
     return (
       <LibraryItemCategory
         status={status}
@@ -387,10 +389,10 @@ class AlgorithmsColumn extends PureClasss<Props>
         }
         {
           status === ItemStatus.Build && canCreate &&
-            <CreateItem
-              name="algorithm"
-              onCreate={this.handleCreate}
-            />
+          <CreateItem
+            name="algorithm"
+            onCreate={this.handleCreate}
+          />
         }
       </LibraryItemCategory>
     );
@@ -407,27 +409,27 @@ class AlgorithmsColumn extends PureClasss<Props>
           this.props.algorithmsOrder ?
             (
               this.props.algorithmsOrder.size ?
-              (
-                <div>
-                  {
-                    this.renderCategory('BUILD')
+                (
+                  <div>
+                    {
+                      this.renderCategory('BUILD')
+                    }
+                    {
+                      this.renderCategory('ARCHIVE')
+                    }
+                  </div>
+                )
+                :
+                <InfoArea
+                  large="No algorithms created, yet."
+                  button={
+                    Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                      ? 'Create a algorithm' : null
                   }
-                  {
-                    this.renderCategory('ARCHIVE')
-                  }
-                </div>
-              )
-              :
-              <InfoArea
-                large="No algorithms created, yet."
-                button={
-                  Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
-                    ? 'Create a algorithm' : null
-                  }
-                onClick={this.handleCreate}
-              />
+                  onClick={this.handleCreate}
+                />
             )
-          : null
+            : null
         }
       </LibraryColumn>
     );

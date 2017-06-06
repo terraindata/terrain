@@ -67,17 +67,18 @@ export interface Props
 
 class Dropdown extends PureClasss<Props>
 {
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
 
     this.state =
-    {
-      up: false,
-      open: false,
-    };
+      {
+        up: false,
+        open: false,
+      };
   }
 
-  _clickHandlers: {[index: number]: () => void} = {};
+  _clickHandlers: { [index: number]: () => void } = {};
   clickHandler(index)
   {
     if (!this._clickHandlers[index])
@@ -149,16 +150,16 @@ class Dropdown extends PureClasss<Props>
       up: cr.bottom > windowBottom / 2,
     });
   }
-  
+
   getOptionName(option, index: number): string
   {
-    if(this.props.optionsDisplayName)
+    if (this.props.optionsDisplayName)
     {
       return this.props.optionsDisplayName.get(option);
     }
     return option;
   }
-  
+
   render()
   {
     // Element with options, rendered at the top or bottom of the dropdown
@@ -171,7 +172,7 @@ class Dropdown extends PureClasss<Props>
           {
             this.props.options ?
               this.props.options.map(this.renderOption)
-            :
+              :
               'No options available'
           }
         </div>;
@@ -191,7 +192,7 @@ class Dropdown extends PureClasss<Props>
       >
         {
           this.state.up && this.state.open
-            && optionsEl
+          && optionsEl
         }
         <div
           className="dropdown-value"
@@ -217,7 +218,7 @@ class Dropdown extends PureClasss<Props>
         </div>
         {
           !this.state.up && this.state.open
-            && optionsEl
+          && optionsEl
         }
       </div>
     );

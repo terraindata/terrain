@@ -49,14 +49,14 @@ import PureClasss from './../../../common/components/PureClasss';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
-{
-  POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#88C33E'],
-  NEGATIVE: ['#F8B14A', '#FF735B', '#DD333C', '#A50808'],
-};
+  {
+    POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#88C33E'],
+    NEGATIVE: ['#F8B14A', '#FF735B', '#DD333C', '#A50808'],
+  };
 
 class ScoreBar extends PureClasss<{
   parentData: {
-    weights: Array<{weight: number}>;
+    weights: Array<{ weight: number }>;
   };
   data: {
     weight: number;
@@ -70,7 +70,8 @@ class ScoreBar extends PureClasss<{
     const weight = this.props.data;
 
     let max = 0;
-    weights.map((w) => {
+    weights.map((w) =>
+    {
       if (Math.abs(w.weight) > max)
       {
         max = Math.abs(w.weight);

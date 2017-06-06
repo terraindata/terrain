@@ -147,13 +147,13 @@ class GroupsColumn extends Classs<Props>
   renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     const groupRoles = roles && roles.get(id);
     const canCreate = (me && groupRoles && groupRoles.getIn([me.id, 'admin']));
     const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
 
-        // onDuplicate={this.handleDuplicate}
+    // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
         index={index}
@@ -180,19 +180,19 @@ class GroupsColumn extends Classs<Props>
         <div className="group-library-info-wrapper">
           {
             groupRoles && me && (groupRoles.getIn([me.id, 'builder']) || groupRoles.getIn([me.id, 'admin'])) &&
-              <UserThumbnail
-                userId={me.id}
-                medium={true}
-                extra={
-                  groupRoles.getIn([me.id, 'admin']) ? 'Admin' :
-                    (groupRoles.getIn([me.id, 'builder']) ? 'Builder' : 'Viewer')
-                }
-              />
+            <UserThumbnail
+              userId={me.id}
+              medium={true}
+              extra={
+                groupRoles.getIn([me.id, 'admin']) ? 'Admin' :
+                  (groupRoles.getIn([me.id, 'builder']) ? 'Builder' : 'Viewer')
+              }
+            />
           }
           {
             groupRoles && groupRoles.toArray()
-            .filter((role) => role.builder || role.admin)
-            .map(
+              .filter((role) => role.builder || role.admin)
+              .map(
               (role, index) =>
                 index > 8 || (me && role.userId === me.id) ? null :
                   <UserThumbnail
@@ -242,10 +242,10 @@ class GroupsColumn extends Classs<Props>
         }
         {
           status === ItemStatus.Build && canCreate &&
-            <CreateItem
-              name="group"
-              onCreate={this.handleCreate}
-            />
+          <CreateItem
+            name="group"
+            onCreate={this.handleCreate}
+          />
         }
       </LibraryItemCategory>
     );
@@ -262,8 +262,8 @@ class GroupsColumn extends Classs<Props>
           this.props.groups.size ?
             (
               <div>
-                { this.renderCategory(ItemStatus.Build) }
-                { this.renderCategory(ItemStatus.Archive) }
+                {this.renderCategory(ItemStatus.Build)}
+                {this.renderCategory(ItemStatus.Archive)}
               </div>
             )
             :

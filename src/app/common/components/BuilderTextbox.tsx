@@ -60,8 +60,8 @@ import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
-import {Block} from '../../../../shared/blocks/types/Block';
-import {CardString, Card} from '../../../../shared/blocks/types/Card';
+import { Block } from '../../../../shared/blocks/types/Block';
+import { CardString, Card } from '../../../../shared/blocks/types/Card';
 import BlockUtils from '../../../../shared/blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
@@ -134,7 +134,7 @@ class BuilderTextbox extends PureClasss<Props>
     backupString: CardString;
     options: List<string>;
   };
-  
+
   getCreatingType(): string
   {
     return AllBackendsMap[this.props.language].creatingType;
@@ -146,7 +146,7 @@ class BuilderTextbox extends PureClasss<Props>
     const value: any = newProps.value;
 
     // If you want two-way backups, use this line
-      // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
+    // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
       (this.props.value && this.props.value['type'] === this.getCreatingType() && value === '')
     )
@@ -162,7 +162,7 @@ class BuilderTextbox extends PureClasss<Props>
       return;
     }
 
-    this.setState ({
+    this.setState({
       wrongType: newProps.isNumber ? isNaN(value) : false,
     });
     if (this.refs['input'])
@@ -297,7 +297,7 @@ class BuilderTextbox extends PureClasss<Props>
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
 
-      let {options} = this.state;
+      let { options } = this.state;
       if (this.props.autoTerms)
       {
         options = this.props.autoTerms;
@@ -328,7 +328,7 @@ class BuilderTextbox extends PureClasss<Props>
                 placeholder={placeholder}
                 rel={this.props.rel}
               />
-            :
+              :
               <Autocomplete
                 ref="input"
                 disabled={!this.props.canEdit}
@@ -342,16 +342,16 @@ class BuilderTextbox extends PureClasss<Props>
                 onBlur={this.handleBlur}
               />
           }
-          { this.props.acceptsCards && this.renderSwitch() }
-          { this.props.acceptsCards &&
-              <CardDropArea
-                keyPath={this.props.keyPath}
-                index={null}
-                accepts={this.props.display && this.props.display.accepts}
-                renderPreview={true}
-                afterDrop={this.handleCardDrop}
-                language={this.props.language}
-              />
+          {this.props.acceptsCards && this.renderSwitch()}
+          {this.props.acceptsCards &&
+            <CardDropArea
+              keyPath={this.props.keyPath}
+              index={null}
+              accepts={this.props.display && this.props.display.accepts}
+              renderPreview={true}
+              afterDrop={this.handleCardDrop}
+              language={this.props.language}
+            />
           }
         </div>
       );
@@ -368,10 +368,10 @@ class BuilderTextbox extends PureClasss<Props>
     // var cards = this.props.value['cards'];
     // if(cards.size)
     // {
-      // var card = cards.get(0);
-      const color = card.static.colors[0] as string;
-      const title: string = card.closed ? card.static.title : '';
-      const preview = BlockUtils.getPreview(card);
+    // var card = cards.get(0);
+    const color = card.static.colors[0] as string;
+    const title: string = card.closed ? card.static.title : '';
+    const preview = BlockUtils.getPreview(card);
     // }
     // else
     // {
@@ -380,17 +380,17 @@ class BuilderTextbox extends PureClasss<Props>
     // }
 
     const chipStyle =
-    {
-      background: color,
-    };
+      {
+        background: color,
+      };
     const arrowLineStyle =
-    {
-      borderColor: color,
-    };
+      {
+        borderColor: color,
+      };
     const arrowHeadStyle =
-    {
-      borderLeftColor: color,
-    };
+      {
+        borderLeftColor: color,
+      };
 
     return (
       <div className={classNames({
@@ -408,14 +408,14 @@ class BuilderTextbox extends PureClasss<Props>
               <ArrowIcon />
             </div>
             <div className="builder-tb-cards-input-value-text">
-              { title }
+              {title}
             </div>
-            { !preview ? null :
+            {!preview ? null :
               <div className="card-preview">
-                { preview }
+                {preview}
               </div>
             }
-            { this.renderSwitch() }
+            {this.renderSwitch()}
           </div>
           <div className="builder-tb-cards-arrow" style={arrowLineStyle}>
             <div className="builder-tb-cards-arrow-inner" style={arrowHeadStyle} />

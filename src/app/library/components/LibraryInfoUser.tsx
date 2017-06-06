@@ -115,7 +115,7 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
     // const imGroupAdmin = groupRoles && groupRoles.get(me.id) && groupRoles.get(me.id).admin;
 
     const isSuperUser = user.isSuperUser;
-    const isBuilder = ! user.isSuperUser;
+    const isBuilder = !user.isSuperUser;
     const isViewer = false;
     const roleText = user.isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
@@ -154,7 +154,7 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
             roleText
           }
         </div>
-        { (imGroupAdmin || imSysAdmin) ? <Menu options={menuOptions} small={true} /> : null }
+        {(imGroupAdmin || imSysAdmin) ? <Menu options={menuOptions} small={true} /> : null}
       </div>
     );
   }

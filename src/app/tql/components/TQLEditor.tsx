@@ -47,7 +47,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-const {List} = Immutable;
+const { List } = Immutable;
 import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
 const CodeMirror = require('./Codemirror.js');
@@ -98,23 +98,23 @@ class TQLEditor extends PureClasss<Props>
   render()
   {
     const options =
-    {
-      readOnly: !this.props.canEdit,
-      lineNumbers: true,
-      extraKeys: { 'Ctrl-F': 'findPersistent' },
-      lineWrapping: true,
-      theme: this.props.theme || localStorage.getItem('theme') || 'default',
-      matchBrackets: true,
-      autoCloseBrackets: true,
-      foldGutter: true,
-      lint: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+      {
+        readOnly: !this.props.canEdit,
+        lineNumbers: true,
+        extraKeys: { 'Ctrl-F': 'findPersistent' },
+        lineWrapping: true,
+        theme: this.props.theme || localStorage.getItem('theme') || 'default',
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        foldGutter: true,
+        lint: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
 
-      revertButtons: false,
-      connect: 'align',
+        revertButtons: false,
+        connect: 'align',
 
-      origLeft: this.props.diffTql,
-    };
+        origLeft: this.props.diffTql,
+      };
 
     if (this.props.isDiff)
     {
