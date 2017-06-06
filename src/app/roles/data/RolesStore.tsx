@@ -52,6 +52,6 @@ import RolesReducers from './RolesReducers';
 
 const RolesStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   RolesReducers,
-{}), Immutable.Map({})), Immutable.Map({}));
+  {}), Immutable.Map({})), Immutable.Map({}));
 
 export default RolesStore;

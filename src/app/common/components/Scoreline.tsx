@@ -80,7 +80,7 @@ class Scoreline extends Classs<Props>
           className="scoreline-score-score"
           style={{ color: score.color }}
         >
-          { score.score }
+          {score.score}
         </div>
       </div>
     );
@@ -96,11 +96,11 @@ class Scoreline extends Classs<Props>
 
     return (
       <div className="scoreline">
-        { 
-          this.props.scores.map(this.renderScore) 
+        {
+          this.props.scores.map(this.renderScore)
         }
-        { 
-          none 
+        {
+          none
         }
       </div>
     );

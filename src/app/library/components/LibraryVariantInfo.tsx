@@ -45,17 +45,12 @@ THE SOFTWARE.
 require('./LibraryVariantInfo.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
-const {List} = Immutable;
+const { List } = Immutable;
 import Dropdown from './../../common/components/Dropdown';
-import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';
-import RolesStore from './../../roles/data/RolesStore';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import UserStore from './../../users/data/UserStore';
-import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import Actions from './../data/LibraryActions';
-import LibraryActions from './../data/LibraryActions';
 import LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
@@ -80,7 +75,7 @@ class LibraryInfoColumn extends PureClasss<Props>
   {
     Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)));
   }
-  
+
   handleLanguageChange(langIndex: number)
   {
     const language = LANGUAGES.get(langIndex);
@@ -99,8 +94,8 @@ class LibraryInfoColumn extends PureClasss<Props>
       return null;
     }
 
-    const {isBuilder, isSuperUser} = this.props;
-    const {variant} = this.props;
+    const { isBuilder, isSuperUser } = this.props;
+    const { variant } = this.props;
 
     return (
       <div

@@ -58,7 +58,7 @@ import ActionTypes from './UserActionTypes';
 
 const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
-{}), UserTypes._UserState({})), UserTypes._UserState({}));
+  {}), UserTypes._UserState({})), UserTypes._UserState({}));
 
 UserStore.subscribe(() =>
 {
@@ -67,8 +67,8 @@ UserStore.subscribe(() =>
   {
     // currentUser object changed
     UserStore.dispatch({
-    	type: ActionTypes.updateCurrentUser,
-    	payload: {},
+      type: ActionTypes.updateCurrentUser,
+      payload: {},
     });
   }
 });

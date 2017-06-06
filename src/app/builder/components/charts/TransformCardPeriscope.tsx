@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./TransformCardPeriscope.less');
 import * as Immutable from 'immutable';
-const {Map, List} = Immutable;
+const { Map, List } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
@@ -53,7 +53,7 @@ import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Periscope from './Periscope';
-import {Bar, Bars} from './TransformCard';
+import { Bar, Bars } from './TransformCard';
 
 export interface Props
 {
@@ -171,16 +171,16 @@ class TransformCardPeriscope extends PureClasss<Props>
         this.state.initialDomain.get(handleIndex) + newVal - this.state.initialVal,
       );
 
-    const {maxDomain} = this.props;
+    const { maxDomain } = this.props;
     const buffer = (maxDomain.get(1) - maxDomain.get(0)) * 0.01;
     domain = domain.set(0,
-        Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer),
-      );
+      Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer),
+    );
     domain = domain.set(1,
       Util.valueMinMax(domain.get(1),
         this.state.initialDomain.get(0) + buffer,
         maxDomain.get(1)),
-      );
+    );
     this.props.onDomainChange(domain);
     this.update({
       domain,

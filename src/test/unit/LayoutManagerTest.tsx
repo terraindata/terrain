@@ -55,7 +55,8 @@ import LayoutManager from '../../app/builder/components/layout/LayoutManager';
 // Because some of these tests will test size and positioning,
 //  we need to render them into a real document, because the
 //  React Test Utils does not render elements with size and position
-const createFrame = (width, height) => {
+const createFrame = (width, height) =>
+{
   const frame = document.createElement('div');
   frame.style.position = 'absolute';
   frame.style.top = '0';
@@ -66,27 +67,29 @@ const createFrame = (width, height) => {
   return frame;
 };
 
-const cleanupFrame = (frame) => {
+const cleanupFrame = (frame) =>
+{
   document.body.removeChild(frame);
 };
 
-test('LayoutManager renders columns', function(t) {
+test('LayoutManager renders columns', function(t)
+{
   const layout = {
     fullHeight: true,
     columns: [
       {
-        content: <div className="test-col" style={{height: '100%'}}>1</div>,
+        content: <div className="test-col" style={{ height: '100%' }}>1</div>,
         width: 20,
       },
       {
-        content: <div className="test-col" style={{height: '100%'}}>2</div>,
+        content: <div className="test-col" style={{ height: '100%' }}>2</div>,
       },
       {
-        content: <div className="test-col" style={{height: '100%'}}>3</div>,
+        content: <div className="test-col" style={{ height: '100%' }}>3</div>,
         colSpan: 2,
       },
       {
-        content: <div className="test-col" style={{height: '100%'}}>4</div>,
+        content: <div className="test-col" style={{ height: '100%' }}>4</div>,
       },
     ],
   };
@@ -103,7 +106,8 @@ test('LayoutManager renders columns', function(t) {
   const divs = frame.querySelectorAll('.test-col');
   t.equal(divs.length, 4, 'renders all columns');
 
-  _.map(divs, (div, index) => {
+  _.map(divs, (div, index) =>
+  {
     t.equal(div.textContent, (index + 1) + '', 'correct content');
     t.equal(div.getBoundingClientRect().height, height, 'full height');
     if (colLeftFactor[index] === -1)
@@ -128,18 +132,19 @@ test('LayoutManager renders columns', function(t) {
   t.end();
 });
 
-test('LayoutManager renders rows', function(t) {
+test('LayoutManager renders rows', function(t)
+{
   const layout = {
     rows: [
       {
-        content: <div className="test-row" style={{height: '20px'}}>1</div>,
+        content: <div className="test-row" style={{ height: '20px' }}>1</div>,
       },
       {
-        content: <div className="test-row" style={{height: '40px'}}>2</div>,
+        content: <div className="test-row" style={{ height: '40px' }}>2</div>,
         rowSpan: 2,
       },
       {
-        content: <div className="test-row" style={{height: '20px'}}>3</div>,
+        content: <div className="test-row" style={{ height: '20px' }}>3</div>,
       },
     ],
   };
@@ -156,7 +161,8 @@ test('LayoutManager renders rows', function(t) {
   const divs = frame.querySelectorAll('.test-row');
   t.equal(divs.length, 3, 'renders all rows');
 
-  _.map(divs, (div, index) => {
+  _.map(divs, (div, index) =>
+  {
     t.equal(div.textContent, (index + 1) + '', 'correct content');
     t.equal(div.getBoundingClientRect().left, 0, 'correct left');
     t.equal(div.getBoundingClientRect().width, width, 'correct width');

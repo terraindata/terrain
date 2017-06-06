@@ -46,7 +46,7 @@ require('./LibraryItem.less');
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-const {List} = Immutable;
+const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
@@ -98,7 +98,7 @@ export interface Props
   connectDragSource?: (html: any) => JSX.Element;
   draggingItemId?: ID;
   isOver?: boolean;
-  dragItemType? : string;
+  dragItemType?: string;
   isDragging?: boolean;
 }
 
@@ -159,12 +159,12 @@ class LibraryItem extends Classs<Props>
   {
     this.setState({
       timeout:
-        setTimeout(() =>
-        {
-          this.setState({
-            mounted: true,
-          });
-        }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
+      setTimeout(() =>
+      {
+        this.setState({
+          mounted: true,
+        });
+      }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
     });
 
     if (!this.props.name.length)
@@ -252,18 +252,18 @@ class LibraryItem extends Classs<Props>
     const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
-    const {canArchive, canDuplicate} = this.props;
+    const { canArchive, canDuplicate } = this.props;
     const menuOptions =
       (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
-      (
-        canArchive ? this.menuOptions.archive :
         (
-          canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
-        )
-      );
+          canArchive ? this.menuOptions.archive :
+            (
+              canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+            )
+        );
 
     let shiftedUp: boolean, shiftedDown: boolean;
-    
+
     if (this.props.draggingOverIndex !== -1)
     {
       // could be shifted
@@ -304,7 +304,7 @@ class LibraryItem extends Classs<Props>
               borderColor: this.props.color,
             }}
           >
-            { connectDragSource(
+            {connectDragSource(
               <div
                 className={'library-item ' + this.props.className}
                 style={{
@@ -333,20 +333,20 @@ class LibraryItem extends Classs<Props>
                   </div>
                   <input
                     className="library-item-name-input"
-                    defaultValue={ this.props.name }
+                    defaultValue={this.props.name}
                     placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
-                    onBlur={ this.hideTextfield }
+                    onBlur={this.hideTextfield}
                     onFocus={this.handleFocus}
-                    onKeyDown={ this.handleKeyDown }
+                    onKeyDown={this.handleKeyDown}
                     ref="input"
                   />
                   {
                     this.props.isStarred &&
-                      <div
-                        className="library-item-star"
-                      >
-                        <StarIcon />
-                      </div>
+                    <div
+                      className="library-item-star"
+                    >
+                      <StarIcon />
+                    </div>
                   }
                   <Menu
                     options={menuOptions}
@@ -369,45 +369,45 @@ class LibraryItem extends Classs<Props>
 // DnD stuff
 
 let shifted = false;
-$(document).on('dragover dragend', function(e){shifted = e.shiftKey; return true; } );
+$(document).on('dragover dragend', function(e) { shifted = e.shiftKey; return true; });
 // http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
 
 const source =
-{
-  canDrag(props, monitor)
   {
-    return props.canDrag;
-  },
-
-  beginDrag(props)
-  {
-    const item = {
-      id: props.id,
-      type: props.type,
-      index: props.index,
-    };
-    return item;
-  },
-
-  endDrag(props, monitor, component)
-  {
-    if (!monitor.didDrop())
+    canDrag(props, monitor)
     {
-      return;
-    }
-    const item = monitor.getItem();
-    const { type, targetItem } = monitor.getDropResult();
-    props.onDropped(item.id, type, targetItem, shifted);
-  },
-};
+      return props.canDrag;
+    },
+
+    beginDrag(props)
+    {
+      const item = {
+        id: props.id,
+        type: props.type,
+        index: props.index,
+      };
+      return item;
+    },
+
+    endDrag(props, monitor, component)
+    {
+      if (!monitor.didDrop())
+      {
+        return;
+      }
+      const item = monitor.getItem();
+      const { type, targetItem } = monitor.getDropResult();
+      props.onDropped(item.id, type, targetItem, shifted);
+    },
+  };
 
 const dragCollect = (connect, monitor) =>
-({
-  connectDragSource: connect.dragSource(),
-  draggingItemId: monitor.getItem() && monitor.getItem().id,
-  isDragging: monitor.isDragging(),
-  // built-in `isDragging` unreliable if the component is being inserted into other parts of the app during drag
-});
+  ({
+    connectDragSource: connect.dragSource(),
+    draggingItemId: monitor.getItem() && monitor.getItem().id,
+    isDragging: monitor.isDragging(),
+    // built-in `isDragging` unreliable if the component is being inserted into other parts of the app during drag
+  });
 
 const canDrop = (props, monitor) =>
 {
@@ -418,41 +418,41 @@ const canDrop = (props, monitor) =>
 
   const itemType = monitor.getItem().type;
   const targetType = props.type;
-  
+
   // can only drag and drop within the same column / type
   return itemType === targetType;
 };
 const target =
-{
-  canDrop,
-
-  hover(props, monitor, component)
   {
-    if (canDrop(props, monitor))
-    {
-      const item = monitor.getItem();
-      props.onHover(props.index, item.type, item.id);
-    }
-  },
+    canDrop,
 
-  drop(props, monitor, component)
-  {
-    if (monitor.isOver({ shallow: true}))
+    hover(props, monitor, component)
     {
-      return {
-        targetItem: props.item,
-        type: props.type,
-      };
-    }
-  },
-};
+      if (canDrop(props, monitor))
+      {
+        const item = monitor.getItem();
+        props.onHover(props.index, item.type, item.id);
+      }
+    },
+
+    drop(props, monitor, component)
+    {
+      if (monitor.isOver({ shallow: true }))
+      {
+        return {
+          targetItem: props.item,
+          type: props.type,
+        };
+      }
+    },
+  };
 
 const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver() && monitor.canDrop(),
-  dragItemType: monitor.getItem() && monitor.getItem().type,
-});
+  ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver() && monitor.canDrop(),
+    dragItemType: monitor.getItem() && monitor.getItem().type,
+  });
 
 const LI = DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem)) as any;
 

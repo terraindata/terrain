@@ -63,12 +63,13 @@ export interface Props
 
 class ManualPopup extends Classs<Props>
 {
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
     this.state =
-    {
-      open: false,
-    };
+      {
+        open: false,
+      };
   }
 
   shouldComponentUpdate(nextProps, nextState)
@@ -113,22 +114,22 @@ class ManualPopup extends Classs<Props>
     //     && Blocks[cardList[this.props.cardName]].static.manualEntry;
     // const content = manualEntry ? manualEntry.snippet : 'No description available';
     const content = 'No description available';
-    
+
     return (
-    <div
-      className={classNames({
-        'manual-popup-wrapper': true,
-        'manual-popup-open': this.state.open,
-        'manual-popup-wrapper-right-align': this.props.rightAlign,
-      })}
-    >
       <div
-        className="manual-popup-icon-wrapper"
-        onClick={this.toggleOpen}
+        className={classNames({
+          'manual-popup-wrapper': true,
+          'manual-popup-open': this.state.open,
+          'manual-popup-wrapper-right-align': this.props.rightAlign,
+        })}
       >
-        <InfoIcon className="manual-popup-icon" />
-       </div>
-        { !this.state.open ? null :
+        <div
+          className="manual-popup-icon-wrapper"
+          onClick={this.toggleOpen}
+        >
+          <InfoIcon className="manual-popup-icon" />
+        </div>
+        {!this.state.open ? null :
           <div
             className="manual-popup-content-wrapper"
             onClick={this.toggleOpen}

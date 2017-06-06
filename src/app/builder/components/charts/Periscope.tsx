@@ -145,7 +145,8 @@ const Periscope = {
 
     const xPadding = 0;
 
-    const barWidth = (d) => {
+    const barWidth = (d) =>
+    {
       let width = scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding;
       if (width < 1)
       {
@@ -182,7 +183,8 @@ const Periscope = {
   },
 
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, scale, domain, onMoveStart) => function(event) {
+  _mousedownFactory: (el, onMove, scale, domain, onMoveStart) => function(event)
+  {
     const del = d3.select(el);
     const handle = d3.select(this);
     const startX = scale.invert(d3.mouse(this)[0]);
@@ -192,7 +194,8 @@ const Periscope = {
     const initialClasses = handle.attr('class');
     handle.attr('class', initialClasses + ' handle-active');
 
-    const move = function(event) {
+    const move = function(event)
+    {
       onMove(handle.attr('_id'), scale.invert(d3.mouse(t)[0]));
     };
 
@@ -200,7 +203,8 @@ const Periscope = {
     bd.on('mousemove', move);
     bd.on('touchmove', move);
 
-    const offFn = () => {
+    const offFn = () =>
+    {
       bd.on('mousemove', null);
       bd.on('touchmove', null);
       handle.attr('class', initialClasses);
@@ -226,7 +230,7 @@ const Periscope = {
       .attr('fill', '#fff')
       .attr('stroke', '#f00')
       .attr('stroke-width', '3px')
-      .attr('r',  10);
+      .attr('r', 10);
 
     handle
       .attr('_id', (d, i) => i);

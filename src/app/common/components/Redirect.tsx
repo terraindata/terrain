@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
 import InfoArea from './InfoArea';
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 
 export interface Props
 {
@@ -59,10 +59,11 @@ class Placeholder extends PureClasss<Props>
     browserHistory.replace('/library');
   }
 
-  render() {
+  render()
+  {
     return (
-       <InfoArea large="Redirecting..." />
-     );
+      <InfoArea large="Redirecting..." />
+    );
   }
 }
 export default Placeholder;

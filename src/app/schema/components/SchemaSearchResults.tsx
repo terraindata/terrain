@@ -57,204 +57,204 @@ type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 
 export interface Props
 {
-	search: string;
+  search: string;
 }
 
 let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
 let INIT_ITEMS: IMMap<string, List<SchemaBaseClass>> =
-	Immutable.Map<string, List<SchemaBaseClass>>({});
+  Immutable.Map<string, List<SchemaBaseClass>>({});
 let INIT_PREV_ITEMS: IMMap<string, IMMap<string, SchemaBaseClass>> =
-	Immutable.Map<string, IMMap<string, SchemaBaseClass>>({});
+  Immutable.Map<string, IMMap<string, SchemaBaseClass>>({});
 
 _.map(SchemaTypes.typeToStoreKey as any,
-	(storeKey: string, type) =>
-	{
-		INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
-		INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
-		INIT_PREV_ITEMS = INIT_PREV_ITEMS.set(storeKey, Immutable.Map<any, any>({}));
-	},
+  (storeKey: string, type) =>
+  {
+    INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
+    INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
+    INIT_PREV_ITEMS = INIT_PREV_ITEMS.set(storeKey, Immutable.Map<any, any>({}));
+  },
 );
 const SHOW_MORE_INCREMENT = 50;
 
 @Radium
 class SchemaSearchResults extends PureClasss<Props>
 {
-	state: {
-		// since search results are rendered as a list, we want
-		//  to store them in a list, instead of the Map stored in the SchemaState
-		items: IMMap<string, List<SchemaBaseClass>>,
-		// but we need to memoize the Map reference so that we can avoid unnecessarily
-		//  generating the lists
-		prevItems: IMMap<string, IMMap<string, SchemaBaseClass>>,
-		showingCount: IMMap<string, number>;
-	} = {
-		showingCount: INIT_SHOWING_COUNT,
-		items: INIT_ITEMS,
-		prevItems: INIT_PREV_ITEMS,
-	};
+  state: {
+    // since search results are rendered as a list, we want
+    //  to store them in a list, instead of the Map stored in the SchemaState
+    items: IMMap<string, List<SchemaBaseClass>>,
+    // but we need to memoize the Map reference so that we can avoid unnecessarily
+    //  generating the lists
+    prevItems: IMMap<string, IMMap<string, SchemaBaseClass>>,
+    showingCount: IMMap<string, number>;
+  } = {
+    showingCount: INIT_SHOWING_COUNT,
+    items: INIT_ITEMS,
+    prevItems: INIT_PREV_ITEMS,
+  };
 
-	constructor(props: Props)
-	{
-		super(props);
+  constructor(props: Props)
+  {
+    super(props);
 
-		this._subscribe(SchemaStore, {
-			updater: (storeState: SchemaTypes.SchemaState) =>
-			{
-				let {items, prevItems} = this.state;
-				items.map((v, storeKey) =>
-				{
-					const storeValue = storeState.get(storeKey);
-					if (prevItems.get(storeKey) !== storeValue)
-					{
-						// reference changed
-						items = items.set(storeKey, storeValue.valueSeq().toList());
-						prevItems = prevItems.set(storeKey, storeValue);
-					}
-				});
+    this._subscribe(SchemaStore, {
+      updater: (storeState: SchemaTypes.SchemaState) =>
+      {
+        let { items, prevItems } = this.state;
+        items.map((v, storeKey) =>
+        {
+          const storeValue = storeState.get(storeKey);
+          if (prevItems.get(storeKey) !== storeValue)
+          {
+            // reference changed
+            items = items.set(storeKey, storeValue.valueSeq().toList());
+            prevItems = prevItems.set(storeKey, storeValue);
+          }
+        });
 
-				this.setState({
-					items,
-					prevItems,
-				});
-			},
-		});
-	}
+        this.setState({
+          items,
+          prevItems,
+        });
+      },
+    });
+  }
 
-	componentWillReceiveProps(nextProps: Props)
-	{
-		if (nextProps.search !== this.props.search)
-		{
-			this.setState({
-				showingCount: INIT_SHOWING_COUNT,
-			});
-		}
-	}
+  componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.search !== this.props.search)
+    {
+      this.setState({
+        showingCount: INIT_SHOWING_COUNT,
+      });
+    }
+  }
 
-	renderSection(stateKey: string, type: string, label: string)
-	{
-		let index = 0;
-		const max = this.state.showingCount.get(stateKey);
-		const items = this.state.items.get(stateKey);
-		const renderItems: SchemaBaseClass[] = [];
-		let couldShowMore = false; // are there additional entries to show?
+  renderSection(stateKey: string, type: string, label: string)
+  {
+    let index = 0;
+    const max = this.state.showingCount.get(stateKey);
+    const items = this.state.items.get(stateKey);
+    const renderItems: SchemaBaseClass[] = [];
+    let couldShowMore = false; // are there additional entries to show?
 
-		while (renderItems.length <= max && index < items.size && !couldShowMore)
-		{
-			const item = items.get(index);
+    while (renderItems.length <= max && index < items.size && !couldShowMore)
+    {
+      const item = items.get(index);
 
-			if (SchemaTypes.searchIncludes(item, this.props.search))
-			{
-				if (renderItems.length < max)
-				{
-					renderItems.push(item);
-				}
-				else
-				{
-					couldShowMore = true;
-				}
-			}
-			index ++;
-		}
+      if (SchemaTypes.searchIncludes(item, this.props.search))
+      {
+        if (renderItems.length < max)
+        {
+          renderItems.push(item);
+        }
+        else
+        {
+          couldShowMore = true;
+        }
+      }
+      index++;
+    }
 
-		const showSection = !!renderItems.length;
+    const showSection = !!renderItems.length;
 
-		return (
-			<FadeInOut
-				open={showSection}
-			>
-				<div
-					style={{
-						marginTop: Styles.margin,
-						marginLeft: Styles.margin,
-					}}
-				>
-					<div
-						style={Styles.font.semiBoldNormal as any}
-					>
-						{
-							label
-						}
-					</div>
+    return (
+      <FadeInOut
+        open={showSection}
+      >
+        <div
+          style={{
+            marginTop: Styles.margin,
+            marginLeft: Styles.margin,
+          }}
+        >
+          <div
+            style={Styles.font.semiBoldNormal as any}
+          >
+            {
+              label
+            }
+          </div>
 
-					{
-						renderItems.map(
-							(item, index) =>
-								<SchemaTreeItem
-									id={item.id}
-									type={type}
-									search={this.props.search || '!@#$%^&*&%$!%!$#%!@'}
-									key={item.id}
-									inSearchResults={true}
-								/>,
-						)
-					}
+          {
+            renderItems.map(
+              (item, index) =>
+                <SchemaTreeItem
+                  id={item.id}
+                  type={type}
+                  search={this.props.search || '!@#$%^&*&%$!%!$#%!@'}
+                  key={item.id}
+                  inSearchResults={true}
+                />,
+            )
+          }
 
-					<FadeInOut
-						open={couldShowMore}
-					>
-						<div
-							style={Styles.link}
-							onClick={this._fn(this.handleShowMore, stateKey)}
-							key={'show-more-' + stateKey}
-						>
-							Show More
+          <FadeInOut
+            open={couldShowMore}
+          >
+            <div
+              style={Styles.link}
+              onClick={this._fn(this.handleShowMore, stateKey)}
+              key={'show-more-' + stateKey}
+            >
+              Show More
 						</div>
-					</FadeInOut>
-				</div>
-			</FadeInOut>
-		);
-	}
+          </FadeInOut>
+        </div>
+      </FadeInOut>
+    );
+  }
 
-	handleShowMore(stateKey: string)
-	{
-		let {showingCount} = this.state;
-		showingCount = showingCount.set(stateKey, showingCount.get(stateKey) + SHOW_MORE_INCREMENT);
-		this.setState({
-			showingCount,
-		});
-	}
+  handleShowMore(stateKey: string)
+  {
+    let { showingCount } = this.state;
+    showingCount = showingCount.set(stateKey, showingCount.get(stateKey) + SHOW_MORE_INCREMENT);
+    this.setState({
+      showingCount,
+    });
+  }
 
   render()
   {
-  	const {search} = this.props;
+    const { search } = this.props;
 
     return (
-    	<div
-    		style={[
-    			Styles.transition,
-    			{
-    				opacity: search ? 1 : 0,
-    			},
-    		]}
-    	>
-		      <div
-		      	style={{
-		      		marginTop: 2 * Styles.margin,
-		      	}}
-		      >
-		      	<div
-		      		style={SchemaTreeStyles.schemaHeading}
-		      	>
-		      		All Results
+      <div
+        style={[
+          Styles.transition,
+          {
+            opacity: search ? 1 : 0,
+          },
+        ]}
+      >
+        <div
+          style={{
+            marginTop: 2 * Styles.margin,
+          }}
+        >
+          <div
+            style={SchemaTreeStyles.schemaHeading}
+          >
+            All Results
 		      	</div>
 
-		      	{
-		      		this.renderSection('databases', 'database', 'Databases')
-		      	}
+          {
+            this.renderSection('databases', 'database', 'Databases')
+          }
 
-		      	{
-		      		this.renderSection('tables', 'table', 'Tables')
-		      	}
+          {
+            this.renderSection('tables', 'table', 'Tables')
+          }
 
-		      	{
-		      		this.renderSection('columns', 'column', 'Columns')
-		      	}
+          {
+            this.renderSection('columns', 'column', 'Columns')
+          }
 
-		      	{
-		      		this.renderSection('indexes', 'index', 'Indexes')
-		      	}
-		      </div>
-    	</div>
+          {
+            this.renderSection('indexes', 'index', 'Indexes')
+          }
+        </div>
+      </div>
     );
   }
 }

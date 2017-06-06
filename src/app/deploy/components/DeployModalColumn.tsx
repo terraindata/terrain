@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import UserThumbnail from '../../users/components/UserThumbnail';
-import Util from  '../../util/Util';
+import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 
@@ -57,30 +57,31 @@ const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
 const TEXT =
+  {
+    live:
+    {
+      main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, and it will be accessible for production queries.',
+      confirm: 'I approve of deploying this TQL to Live for this variant.',
+      button: 'Deploy to Live',
+    },
+
+    default:
+    {
+      main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, it will be indexed, and it will be accessible for production queries.',
+      confirm: 'I approve of deploying this TQL to Live for this variant, and making it the Default for this algorithm.',
+      button: 'Deploy to Live and Make Default',
+    },
+
+    notLive:
+    {
+      main: 'You are removing the following variant from Live. Its TQL will be removed from production servers, and it will not be accessible for production queries.',
+      confirm: 'I approve of removing this TQL from Live for this variant.',
+      button: 'Remove from Live',
+    },
+  };
+
+export interface Props
 {
-  live:
-  {
-    main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, and it will be accessible for production queries.',
-    confirm: 'I approve of deploying this TQL to Live for this variant.',
-    button: 'Deploy to Live',
-  },
-
-  default:
-  {
-    main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, it will be indexed, and it will be accessible for production queries.',
-    confirm: 'I approve of deploying this TQL to Live for this variant, and making it the Default for this algorithm.',
-    button: 'Deploy to Live and Make Default',
-  },
-
-  notLive:
-  {
-    main: 'You are removing the following variant from Live. Its TQL will be removed from production servers, and it will not be accessible for production queries.',
-    confirm: 'I approve of removing this TQL from Live for this variant.',
-    button: 'Remove from Live',
-  },
-};
-
-export interface Props {
   variant: LibraryTypes.Variant;
   status: ItemStatus;
   defaultChecked: boolean;
@@ -129,7 +130,7 @@ class DeployModalColumn extends PureClasss<Props>
 
   render()
   {
-    const {variant, status} = this.props;
+    const { variant, status } = this.props;
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
@@ -225,46 +226,46 @@ class DeployModalColumn extends PureClasss<Props>
         {
           false && /* temp disable */
           status === ItemStatus.Live &&
-            <div>
-              <div
-                className={classNames({
-                  'deploy-modal-check-wrapper': true,
-                  'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
-                })}
+          <div>
+            <div
+              className={classNames({
+                'deploy-modal-check-wrapper': true,
+                'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
+              })}
+            >
+              <input
+                type="checkbox"
+                checked={this.props.defaultChecked}
+                onChange={this.handleDefaultCheckedChange}
+                id="deploy-modal-default-check"
+              />
+              <label
+                htmlFor="deploy-modal-default-check"
               >
-                <input
-                  type="checkbox"
-                  checked={this.props.defaultChecked}
-                  onChange={this.handleDefaultCheckedChange}
-                  id="deploy-modal-default-check"
-                />
-                <label
-                  htmlFor="deploy-modal-default-check"
-                >
-                  Make default for algorithm <b>{algorithm.name}</b>
-                </label>
-              </div>
-              {
-                this.props.defaultChecked &&
-                  <div
-                    className="info"
-                  >
-                    <b>{variant.name}</b> will be served for any requests to algorithm <b>{algorithm.name}.</b> &nbsp;
+                Make default for algorithm <b>{algorithm.name}</b>
+              </label>
+            </div>
+            {
+              this.props.defaultChecked &&
+              <div
+                className="info"
+              >
+                <b>{variant.name}</b> will be served for any requests to algorithm <b>{algorithm.name}.</b> &nbsp;
                     {
-                      this.props.defaultVariant
-                      ?
-                        <span>
-                          This will replace the current default variant <b>{this.props.defaultVariant.name}</b>,
+                  this.props.defaultVariant
+                    ?
+                    <span>
+                      This will replace the current default variant <b>{this.props.defaultVariant.name}</b>,
                           which will remain Live.
                         </span>
-                      :
-                        <span>
-                          There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
+                    :
+                    <span>
+                      There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
                         </span>
-                    }
-                  </div>
-              }
-            </div>
+                }
+              </div>
+            }
+          </div>
         }
         <div
           className={classNames({

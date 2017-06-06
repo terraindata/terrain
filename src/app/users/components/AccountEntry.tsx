@@ -89,7 +89,7 @@ class AccountEntry extends Classs<Props>
   renderDescription()
   {
     if (this.props.description)
-     {
+    {
       return <div className="account-entry-description">{this.props.description}</div>;
     }
   }
@@ -97,10 +97,10 @@ class AccountEntry extends Classs<Props>
   renderDefaultButton()
   {
     return (
-        <div className="account-entry-expand-button button" onClick={this.expand}>
-            {this.state.expanded ? 'Collapse' : 'Expand'}
-        </div>
-      );
+      <div className="account-entry-expand-button button" onClick={this.expand}>
+        {this.state.expanded ? 'Collapse' : 'Expand'}
+      </div>
+    );
   }
 
   renderButton()
@@ -120,27 +120,28 @@ class AccountEntry extends Classs<Props>
   {
     if (!this.props.lastEntry)
     {
-      return (<hr className ="account-entry-line"/>);
+      return (<hr className="account-entry-line" />);
     }
-    return <hr className ="account-entry-line settings-line-hidden"/>;
+    return <hr className="account-entry-line settings-line-hidden" />;
   }
 
-  render() {
+  render()
+  {
     return (
       <div className="account-entry">
-      <div className="account-entry-top-bar">
-        <div className="account-entry-title">
-          {this.props.title}
+        <div className="account-entry-top-bar">
+          <div className="account-entry-title">
+            {this.props.title}
+          </div>
+          <div className="account-entry-white-space" />
+          {this.renderButton()}
         </div>
-        <div className="account-entry-white-space" />
-        {this.renderButton()}
+        {this.renderDescription()}
+        <div className="account-entry-expanded-info">
+          {this.renderContent()}
+        </div>
+        {this.renderLine()}
       </div>
-      {this.renderDescription()}
-      <div className="account-entry-expanded-info">
-        {this.renderContent()}
-      </div>
-      {this.renderLine()}
-    </div>
     );
   }
 }

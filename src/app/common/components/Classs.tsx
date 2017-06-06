@@ -72,7 +72,8 @@ class Classs<T> extends React.Component<T, any>
     {
       const val = self[key];
 
-      if (key !== 'constructor' && typeof val === 'function') {
+      if (key !== 'constructor' && typeof val === 'function')
+      {
         self[key] = val.bind(self);
       }
     }
@@ -115,7 +116,8 @@ class Classs<T> extends React.Component<T, any>
     {
       subscribe();
       update();
-    } else {
+    } else
+    {
       const mountFn = this['componentDidMount'];
       this['componentDidMount'] = () =>
       {
@@ -157,9 +159,9 @@ class Classs<T> extends React.Component<T, any>
       {
         keyPath = config.storeKeyPath;
       }
-      
+
       value = store.getState().getIn(keyPath);
-      
+
       if (!stateKey)
       {
         stateKey = keyPath[(keyPath['size'] || keyPath['length']) - 1] + '';
@@ -184,7 +186,7 @@ class Classs<T> extends React.Component<T, any>
   //  this function accepts arguments from which to
   //  construct an array keyPath, and memoizes that array
   //  so as to allow for pure rendering
-  _keyPaths: {[key: string]: Array<string | number>} = {};
+  _keyPaths: { [key: string]: Array<string | number> } = {};
   _keyPath(...keys: Array<string | number>)
   {
     const key = keys.join('.');
@@ -273,7 +275,7 @@ class Classs<T> extends React.Component<T, any>
     }
   }
 
-  _togMap: {[stateKey: string]: () => void} = {};
+  _togMap: { [stateKey: string]: () => void } = {};
   _toggle(stateKey: string): (() => void)
   {
     return this._togMap[stateKey] || (

@@ -50,6 +50,7 @@ export interface QueryRequest
   type: string;
   body: object | string;
   streaming?: boolean;
+  databasetype?: string;
 }
 
 export default QueryRequest;

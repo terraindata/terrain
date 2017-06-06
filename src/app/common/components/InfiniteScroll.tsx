@@ -51,14 +51,14 @@ const SCROLL_SENSITIVITY = 500;
 export interface Props
 {
   onRequestMoreItems:
-    (
-      onItemsLoaded: (unchanged?: boolean) => void,
-      // parent calls this when items are loaded
-      //  if there is no change in the items, parent can pass 'true'
-      //  to prevent InfinteScroll from making infinite requests.
-      //  If the data later change, the parent can simply call the handler again
-      //  without 'true'
-    ) => void;
+  (
+    onItemsLoaded: (unchanged?: boolean) => void,
+    // parent calls this when items are loaded
+    //  if there is no change in the items, parent can pass 'true'
+    //  to prevent InfinteScroll from making infinite requests.
+    //  If the data later change, the parent can simply call the handler again
+    //  without 'true'
+  ) => void;
 
   className?: string;
   children?: any;
@@ -120,8 +120,8 @@ class Library extends Classs<Props>
       return;
     }
 
-    const {height} = el.getBoundingClientRect();
-    const {scrollHeight, scrollTop} = el;
+    const { height } = el.getBoundingClientRect();
+    const { scrollHeight, scrollTop } = el;
 
     if (height + scrollTop + SCROLL_SENSITIVITY > scrollHeight)
     {
@@ -137,7 +137,7 @@ class Library extends Classs<Props>
         onScroll={this.handleScroll}
         ref="is"
       >
-        { this.props.children }
+        {this.props.children}
       </div>
     );
   }

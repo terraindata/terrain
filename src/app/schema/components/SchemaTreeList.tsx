@@ -54,9 +54,9 @@ import SchemaTreeStyles from './SchemaTreeStyles';
 
 export interface Props
 {
-	itemIds: List<ID>;
-	itemType: string;
-	label?: string;
+  itemIds: List<ID>;
+  itemType: string;
+  label?: string;
   topLevel?: boolean;
   search: string;
 }
@@ -124,63 +124,63 @@ class SchemaTreeList extends PureClasss<Props>
 
   render()
   {
-  	if (!this.props.itemIds)
-  	{
-  		return (
-  			<div
+    if (!this.props.itemIds)
+    {
+      return (
+        <div
           className="loading-text"
         />
-  		);
-  	}
+      );
+    }
 
-    const {itemIds, itemType, search, label, topLevel} = this.props;
+    const { itemIds, itemType, search, label, topLevel } = this.props;
 
     return (
       <div
-      	style={[
+        style={[
           NORMAL_STYLE,
           this.props.search && SEARCH_STYLE,
           this.props.topLevel && TOP_LEVEL_STYLE,
         ]}
       >
-      	{
-      		label &&
-            <FadeInOut
-              open={!this.props.search}
+        {
+          label &&
+          <FadeInOut
+            open={!this.props.search}
+          >
+            <div
+              style={
+                SchemaTreeStyles.label as any
+              }
             >
-  		      	<div
-  		      		style={
-  		      			SchemaTreeStyles.label as any
-  		      		}
-  		      	>
-  		      		{
-  		      			label
-  		      		}
-  		      	</div>
+              {
+                label
+              }
+            </div>
 
-            	{
-            		!itemIds.size &&
-            			<div
-            				style={SchemaTreeStyles.none}
-            			>
-            				None
+            {
+              !itemIds.size &&
+              <div
+                style={SchemaTreeStyles.none}
+              >
+                None
             			</div>
-            	}
-            </FadeInOut>
+            }
+          </FadeInOut>
         }
 
-      	{
-      		itemIds.map(
-      			(id, index) =>
+        {
+          itemIds.map(
+            (id, index) =>
               index < this.state.renderCount &&
-        				<SchemaTreeItem
-        					id={id}
-        					type={itemType}
-        					key={id}
-                  search={search}
-        				/>,
-      		)
-      	}
+              <SchemaTreeItem
+                id={id}
+                type={itemType}
+                key={id}
+                search={search}
+              />,
+          )
+        }
       </div>
     );
   }

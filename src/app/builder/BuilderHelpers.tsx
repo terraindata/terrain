@@ -42,12 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import {Block} from '../../../shared/blocks/types/Block';
-import {Card} from '../../../shared/blocks/types/Card';
-import {Input} from '../../../shared/blocks/types/Input';
+import { Block } from '../../../shared/blocks/types/Block';
+import { Card } from '../../../shared/blocks/types/Card';
+import { Input } from '../../../shared/blocks/types/Input';
 
 import * as Immutable from 'immutable';
-import {BuilderState, BuilderStore} from './data/BuilderStore';
+import { BuilderState, BuilderStore } from './data/BuilderStore';
 import SchemaStore from '../schema/data/SchemaStore';
 
 export module BuilderHelpers

@@ -70,7 +70,7 @@ class CardsToElastic
 {
   static toElastic(query: Query, options: Options = {}): string
   {
-  	let q: string = query.tql;
+    let q: string = query.tql;
 
     if (options.allFields === true)
     {
@@ -82,7 +82,7 @@ class CardsToElastic
       q = JSON.stringify(o);
     }
 
-    return 'not yet implemented';
+    return q;
   }
 }
 

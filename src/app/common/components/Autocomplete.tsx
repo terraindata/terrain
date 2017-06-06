@@ -82,11 +82,11 @@ class Autocomplete extends PureClasss<Props>
     super(props);
     this.value = props.value;
     this.state =
-    {
-      value: props.value,
-      open: false,
-      selectedIndex: -1,
-    };
+      {
+        value: props.value,
+        open: false,
+        selectedIndex: -1,
+      };
   }
 
   componentWillReceiveProps(nextProps)
@@ -99,13 +99,13 @@ class Autocomplete extends PureClasss<Props>
 
   handleChange(event)
   {
-    let {target} = event;
+    let { target } = event;
     while (target && target.value === undefined)
     {
       target = target.parentNode;
     }
 
-    const {value} = target;
+    const { value } = target;
     this.value = value;
     this.props.onChange(value);
     this.setState({
@@ -152,7 +152,7 @@ class Autocomplete extends PureClasss<Props>
     if (ac && opt)
     {
       const acMin = ac.scrollTop;
-      const acMax = ac.scrollTop +  ac.clientHeight;
+      const acMax = ac.scrollTop + ac.clientHeight;
       const oMin = opt['offsetTop'];
       const oMax = opt['offsetTop'] + opt.clientHeight;
 
@@ -210,10 +210,10 @@ class Autocomplete extends PureClasss<Props>
         this.refs['input']['blur']();
         break;
       default:
-        // nada
-        // this.setState({
-        //   selectedIndex: 0,
-        // })
+      // nada
+      // this.setState({
+      //   selectedIndex: 0,
+      // })
     }
   }
 
@@ -259,7 +259,7 @@ class Autocomplete extends PureClasss<Props>
         key={option}
         ref={'opt' + index}
       >
-        { first }<b>{ second }</b>{ third }
+        {first}<b>{second}</b>{third}
       </div>
     );
   }
@@ -284,7 +284,7 @@ class Autocomplete extends PureClasss<Props>
           data-tip={this.props.help}
           data-html={true}
         />
-        { !options || !this.state.open ? null :
+        {!options || !this.state.open ? null :
           <div
             className={classNames({
               'ac-options': true,
@@ -303,9 +303,9 @@ class Autocomplete extends PureClasss<Props>
       </div>
     );
   }
-            // {
-            //   !options.size ? null :
-            //     this.renderOption("", -1)
-            // }
+  // {
+  //   !options.size ? null :
+  //     this.renderOption("", -1)
+  // }
 }
 export default Autocomplete;

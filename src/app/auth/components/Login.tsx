@@ -56,7 +56,8 @@ import Ajax from '../../util/Ajax';
 
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 
-export interface Props {
+export interface Props
+{
   appStateLoaded: boolean;
   loggedIn: boolean;
   onLoadComplete: () => void;
@@ -118,7 +119,7 @@ class Login extends PureClasss<Props>
 
   handleEmailChange(ev: any)
   {
-    const {value} = ev.target;
+    const { value } = ev.target;
     this.setState({
       email: value,
     });
@@ -133,7 +134,7 @@ class Login extends PureClasss<Props>
 
   handlePasswordChange(ev: any)
   {
-    const {value} = ev.target;
+    const { value } = ev.target;
     this.setState({
       password: value,
     });
@@ -177,18 +178,20 @@ class Login extends PureClasss<Props>
     }
 
     this.state.xhr && this.state.xhr.abort();
-    
+
     this.setState({
       loggingIn: true,
       xhr: Ajax.login(
         this.state.email,
         this.state.password,
-        
-        (userData: { accessToken: string, id: number }) => {
+
+        (userData: { accessToken: string, id: number }) =>
+        {
           Actions.login(userData.accessToken, userData.id);
         },
-        
-        (ev: Event) => {
+
+        (ev: Event) =>
+        {
           this.setState({
             errorModalMessage: 'Error logging in:' + JSON.stringify(ev),
             loggingIn: false,
@@ -212,12 +215,12 @@ class Login extends PureClasss<Props>
 
   toggleErrorModal()
   {
-    this.setState ({
+    this.setState({
       loginErrorModalOpen: !this.state.loginErrorModalOpen,
     });
   }
 
-          // <TerrainIcon className='login-logo'/>
+  // <TerrainIcon className='login-logo'/>
   render()
   {
     // show loading if you are logging in, or if you are already logged in
@@ -233,8 +236,8 @@ class Login extends PureClasss<Props>
         })}
       >
         <div className="login-logo-container">
-        {
-          this.state.showingLogo &&
+          {
+            this.state.showingLogo &&
             <Loading
               width={150}
               height={150}
@@ -242,7 +245,7 @@ class Login extends PureClasss<Props>
               loaded={this.props.loggedIn && this.props.appStateLoaded}
               onLoadedEnd={this.handleAnimationEnded}
             />
-        }
+          }
         </div>
         <div
           className="login-container"
@@ -299,24 +302,24 @@ class Login extends PureClasss<Props>
         </div>
       </div>
     );
-   }
+  }
 }
 // <div className='login-bottom-toolbar'>
-        //   <div
-        //     className='login-forgot-password'
-        //     onClick={this.handleForgotPassword}
-        //   >
-        //     Forgot Password?
-        //   </div>
-        //   <div className='login-no-account'>
-        //     Don't have an account yet? &nbsp;
-        //       <span
-        //         className='login-green'
-        //         onClick={this.registerNewUser}
-        //       >
-        //          Sign Up
-        //       </span>
-        //   </div>
-        // </div>
+//   <div
+//     className='login-forgot-password'
+//     onClick={this.handleForgotPassword}
+//   >
+//     Forgot Password?
+//   </div>
+//   <div className='login-no-account'>
+//     Don't have an account yet? &nbsp;
+//       <span
+//         className='login-green'
+//         onClick={this.registerNewUser}
+//       >
+//          Sign Up
+//       </span>
+//   </div>
+// </div>
 
 export default Login;

@@ -143,10 +143,10 @@ class Profile extends Classs<Props>
     return (
       <div className="profile-info-item" key={key}>
         <div className="profile-info-item-name">
-          { key.replace(/([A-Z])/g, (v) => ' ' + v) }
+          {key.replace(/([A-Z])/g, (v) => ' ' + v)}
         </div>
         <div className="profile-info-item-value">
-          { this.state.user[key] }
+          {this.state.user[key]}
         </div>
       </div>
     );
@@ -157,8 +157,8 @@ class Profile extends Classs<Props>
     if (window.confirm(
       this.state.user.isSuperUser ?
         'Are you sure you want to revoke this user\'s administrative privileges?'
-      :
-      'Are you sure you want to make this user a system-level administrator? \
+        :
+        'Are you sure you want to make this user a system-level administrator? \
 The user will be able to create new user accounts, create new groups, \
 disable existing users, add new system administrators, and revoke \
 any existing system administrator privileges, including your own. \
@@ -190,7 +190,7 @@ immediately be logged out of any existing sessions. \
 
   renderAdminTools()
   {
-    const {me, user} = this.state;
+    const { me, user } = this.state;
     if (!me || !me.isSuperUser || me.id === user.id)
     {
       return null;
@@ -205,7 +205,7 @@ immediately be logged out of any existing sessions. \
           })}
           onClick={this.toggleAdmin}
         >
-          { user.isSuperUser ? 'Revoke System Administratorship' : 'Make System Administrator' }
+          {user.isSuperUser ? 'Revoke System Administratorship' : 'Make System Administrator'}
         </div>
         <div
           className={classNames({
@@ -214,7 +214,7 @@ immediately be logged out of any existing sessions. \
           })}
           onClick={this.toggleDisabled}
         >
-          { user.isDisabled ? 'Re-Enable User' : 'Disable User' }
+          {user.isDisabled ? 'Re-Enable User' : 'Disable User'}
         </div>
       </div>
     );
@@ -261,14 +261,14 @@ immediately be logged out of any existing sessions. \
                 Edit
               </Link>
             </div>
-          : null
+            : null
         }
         <div className="profile-info">
           {
             this.infoKeys.map(this.renderInfoItem)
           }
         </div>
-        { this.renderAdminTools() }
+        {this.renderAdminTools()}
         <Link to="/account/team" className="profile-team-button">
           Team Directory
         </Link>

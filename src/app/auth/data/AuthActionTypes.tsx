@@ -47,10 +47,10 @@ const Immutable = require('immutable');
 import Util from './../../util/Util';
 
 const AuthActionTypes =
-{
-  login: '',
-  logout: '',
-};
+  {
+    login: '',
+    logout: '',
+  };
 
 Util.setValuesToKeys(AuthActionTypes, '');
 

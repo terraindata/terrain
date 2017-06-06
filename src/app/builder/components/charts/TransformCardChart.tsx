@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
@@ -105,8 +105,8 @@ class TransformCardChart extends PureClasss<Props>
 
   onSelect(pointId: string, selectRange: boolean): void
   {
-    const {points} = this.props;
-    let {selectedPointIds} = this.state;
+    const { points } = this.props;
+    let { selectedPointIds } = this.state;
 
     if (pointId)
     {
@@ -128,7 +128,7 @@ class TransformCardChart extends PureClasss<Props>
       else
       {
         // clicking on a single point with shift or ctrl
-        selectedPointIds = selectedPointIds.set(pointId, ! selectedPointIds.get(pointId));
+        selectedPointIds = selectedPointIds.set(pointId, !selectedPointIds.get(pointId));
       }
     }
     else
@@ -178,8 +178,9 @@ class TransformCardChart extends PureClasss<Props>
     pointValues.sort(this.sortNumber);
     const pointIndex = this.props.points.findIndex((scorePoint) => scorePoint.id === pointId);
     let min: number, max: number;
-    
-    const points = this.state.initialPoints.map((scorePoint) => {
+
+    const points = this.state.initialPoints.map((scorePoint) =>
+    {
       if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
       {
         scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1));
@@ -194,11 +195,11 @@ class TransformCardChart extends PureClasss<Props>
           else
           {
             min = (index - 1) >= 0 ?
-                    Math.max(this.props.domain.get(0), pointValues[index - 1] + .01)
-                    : this.props.domain.get(0);
+              Math.max(this.props.domain.get(0), pointValues[index - 1] + .01)
+              : this.props.domain.get(0);
             max = (index + 1) < pointValues.length ?
-                    Math.min(this.props.domain.get(1), pointValues[index + 1] - .01)
-                    : this.props.domain.get(1);
+              Math.min(this.props.domain.get(1), pointValues[index + 1] - .01)
+              : this.props.domain.get(1);
           }
           scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
         }
@@ -244,11 +245,11 @@ class TransformCardChart extends PureClasss<Props>
 
   onCreate(value, score)
   {
-    const {points} = this.props;
+    const { points } = this.props;
     let index = 0;
     while (points.get(index) && points.get(index).value < value)
     {
-      index ++;
+      index++;
     }
 
     this.updatePoints(
@@ -269,14 +270,15 @@ class TransformCardChart extends PureClasss<Props>
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());
   }
 
-  getChartState(overrideState?: any) {
+  getChartState(overrideState?: any)
+  {
     overrideState = overrideState || {};
 
     const points = (overrideState.points || this.props.points).map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
-      selected: !! this.state.selectedPointIds.get(scorePoint.id),
+      selected: !!this.state.selectedPointIds.get(scorePoint.id),
     }));
 
     const chartState = {
@@ -304,15 +306,17 @@ class TransformCardChart extends PureClasss<Props>
     return chartState;
   }
 
-  componentWillUnmount() {
+  componentWillUnmount()
+  {
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
   }
 
-	render() {
+  render()
+  {
     return (
       <div />
-		);
-	}
+    );
+  }
 }
 export default TransformCardChart;

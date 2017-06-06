@@ -44,6 +44,60 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-type QueryResult = object[] | object | null;
+import ElasticQueryResult from '../elastic/ElasticQueryResponse';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import QueryRequest from './QueryRequest';
+import QueryResponse, {QueryResult} from './QueryResponse';
 
-export default QueryResult;
+export default class MidwayQueryResponse extends QueryResponse
+{
+  public static fromJSON(json: string)
+  {
+    const responseObject = JSON.parse(json);
+    return new MidwayQueryResponse(responseObject.result, responseObject.errors, responseObject.request);
+  }
+
+  public static fromParsedJsonObject(obj: any)
+  {
+    return new MidwayQueryResponse(obj.result, obj.errors, obj.request);
+  }
+
+  public static formatElasticResult(result: QueryResult): any[]
+  {
+    let ret = [];
+    const r = result as ElasticQueryResult;
+    const hits = r.hits.hits;
+    const results = hits.map((hit) =>
+    {
+      const source = hit._source;
+      source._index = hit._index;
+      source._type = hit._type;
+      source._id = hit._id;
+      source._score = hit._score;
+      source._sort = hit._sort;
+      return source;
+    });
+    ret = results;
+    return  ret;
+  }
+
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
+  {
+    super(result, errors, request);
+  }
+
+  public getResultsData(): any[]
+  {
+    let result;
+    switch (this.request.databasetype)
+    {
+      case 'elastic':
+        result = MidwayQueryResponse.formatElasticResult(this.result);
+        break;
+      default:
+        result = [];
+        console.log('Unknown request type when extracting results from midway query response ' + this.request.type);
+    }
+    return result;
+  }
+}

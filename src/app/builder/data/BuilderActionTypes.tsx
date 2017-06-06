@@ -53,38 +53,38 @@ const Immutable = require('immutable');
 // So you end up with ActionTypes.cards.move === 'cards.move'
 
 export let BuilderActionTypes =
-{
-  fetchQuery: '', // triggers server xhr
-  queryLoaded: '', // when the call to the server returns
+  {
+    fetchQuery: '', // triggers server xhr
+    queryLoaded: '', // when the call to the server returns
 
-  // these apply to the state's query
-  create: '',
-  change: '',
-  move: '', // within the same parent
-  nestedMove: '', // can occur between different parts of the tree
-  remove: '',
-  dragCard: '',
-  dragCardOver: '',
-  dropCard: '',
+    // these apply to the state's query
+    create: '',
+    change: '',
+    move: '', // within the same parent
+    nestedMove: '', // can occur between different parts of the tree
+    remove: '',
+    dragCard: '',
+    dragCardOver: '',
+    dropCard: '',
 
-  hoverCard: '',
+    hoverCard: '',
 
-  selectCard: '',
+    selectCard: '',
 
-  // Change the hand-writen TQL
-  changeTQL: '',
+    // Change the hand-writen TQL
+    changeTQL: '',
 
-  toggleDeck: '',
+    toggleDeck: '',
 
-  changeResultsConfig: '',
-  results: '',
+    changeResultsConfig: '',
+    results: '',
 
-  save: '', // just tells the store that something was saved
+    save: '', // just tells the store that something was saved
 
-  undo: '',
-  redo: '',
-  checkpoint: '', // inserts an undo checkpoint
-};
+    undo: '',
+    redo: '',
+    checkpoint: '', // inserts an undo checkpoint
+  };
 
 // I tried using this type to correclty classify this function,
 //  but because of how object literals work in TypeScript,

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import {Card, CardString} from '../../../../shared/blocks/types/Card';
+import { Card, CardString } from '../../../../shared/blocks/types/Card';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -67,7 +67,8 @@ export interface Props
 
 class BuilderTextboxCards extends React.Component<Props, any>
 {
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
   }
 

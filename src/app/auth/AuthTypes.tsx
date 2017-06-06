@@ -45,8 +45,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../util/Util';
-const {List, Map} = Immutable;
-import {BaseClass, New} from '../Classes';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
 export module AuthTypes
@@ -65,7 +65,7 @@ export module AuthTypes
   //  It's a replacement for a constructor.
   //  This is necessary because simply doing `new AuthStateC` will not create an Immutable version
   //   and you can't use `new` simply with Immutable Records.
-  export const _AuthState = (config?: {[key:string]: any}) => 
+  export const _AuthState = (config?: { [key: string]: any }) =>
     New<AuthState>(new AuthStateC(config), config);
 }
 

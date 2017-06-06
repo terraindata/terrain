@@ -50,22 +50,24 @@ import Util from '../../util/Util';
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-export interface Props {
+export interface Props
+{
   open: boolean;
   onClick: () => void;
 }
 
 class CreateLine extends PureClasss<Props>
 {
-  render() {
+  render()
+  {
     return (
-     <div className="create-line-row" onClick={this.props.onClick}>
-       <div className="create-line-line"></div>
-       <div className="create-line-plus">
-         { this.props.open ? <CloseIcon /> : <AddIcon /> }
-       </div>
-     </div>
-     );
+      <div className="create-line-row" onClick={this.props.onClick}>
+        <div className="create-line-line"></div>
+        <div className="create-line-plus">
+          {this.props.open ? <CloseIcon /> : <AddIcon />}
+        </div>
+      </div>
+    );
   }
 }
 export default CreateLine;
