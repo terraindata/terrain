@@ -42,18 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 
-import {Card, Cards, _card} from './types/Card';
-import {Block, TQLFn} from './types/Block';
-import {Display, getCardStringDisplay, valueDisplay, stringValueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from './displays/Display';
 import BlockUtils from './BlockUtils';
+import {Display, getCardStringDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from './displays/Display';
+import {Block, TQLFn} from './types/Block';
+import {_card, Card, Cards} from './types/Card';
 const {List, Map} = Immutable;
 const L = () => List([]);
 const {make} = BlockUtils;
 
-export module CommonBlocks
+export namespace CommonBlocks
 {
   // a card that contains other cards
   export interface IWrapperCard extends Card
@@ -177,11 +177,11 @@ export module CommonBlocks
     },
   });
 
-  export const _valueCard = (config: { 
-    title: string, 
-    colors: string[], 
-    // manualEntry: IManualEntry, 
-    tql: string, 
+  export const _valueCard = (config: {
+    title: string,
+    colors: string[],
+    // manualEntry: IManualEntry,
+    tql: string,
     defaultValue: number,
     language: string,
   }) => (
@@ -199,7 +199,7 @@ export module CommonBlocks
       },
     })
   );
-  
+
 }
 
 export default CommonBlocks;

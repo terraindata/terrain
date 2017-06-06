@@ -44,46 +44,46 @@ THE SOFTWARE.
 
 // A generic type of backend, e.g. mysql or elastic
 
-import CardsToCodeOptions from './CardsToCodeOptions';
+import * as Immutable from 'immutable';
 import { BlockConfig } from '../../blocks/types/Block';
 import Query from '../../items/types/Query';
-import * as Immutable from 'immutable';
+import CardsToCodeOptions from './CardsToCodeOptions';
 
 export interface Backend
 {
 	type: string;
 	name: string;
-	
+
 	// The Building Blocks of Terraformer
 	// Blocks are either a card or some inside part of a card.
 	// Note: each type should be unique among the whole scope of cards in all languages.
 	blocks:
 	{
-		[type: string]: BlockConfig
+		[type: string]: BlockConfig,
 	};
 	creatingType: string; // type of the block that marks where a card is being created
-	
+
 	// Cards that can go at the root level
 	topLevelCards: List<string>;
-	
+
 	// Ordering of the cards deck
 	cardsDeck: List<List<string>>;
 	cardsList: List<string>;
-	
+
 	queryToCode(
 		query: Query,
-		options: CardsToCodeOptions
+		options: CardsToCodeOptions,
   ): string;
-	
+
 	codeToQuery(
 		query: Query,
-		queryReady: (query: Query) => void
+		queryReady: (query: Query) => void,
 	): Query;
-	
+
 	syntaxConfig: object;
-	
+
 	// schema?
-	
+
 	// function to get transform bars?
 	// autocomplete?
 }
@@ -95,7 +95,7 @@ export const cardsDeckToList = (cardsDeck: List<List<string>>) =>
 		{
 			return memo.concat(miniList);
 		},
-		Immutable.List<string>([])
+		Immutable.List<string>([]),
 	).toList();
 };
 

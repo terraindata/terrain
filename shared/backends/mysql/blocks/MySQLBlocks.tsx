@@ -42,17 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 const {List, Map} = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
+import CommonBlocks from '../../../blocks/CommonBlocks';
+import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
 import {_block, Block, TQLFn} from '../../../blocks/types/Block';
 import {_card, Card, CardString} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
 import CommonSQL from '../syntax/CommonSQL';
-import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
-import CommonBlocks from '../../../blocks/CommonBlocks';
 
 import Util from '../../../../src/app/util/Util';
 
@@ -1092,7 +1092,6 @@ export const MySQLBlocks =
 
 BlockUtils.initBlocks(MySQLBlocks);
 
-
 // TODO remove
 const cards = {};
 for (const key in MySQLBlocks)
@@ -1103,6 +1102,5 @@ for (const key in MySQLBlocks)
   }
 }
 export const cardList = cards;
-
 
 export default MySQLBlocks;

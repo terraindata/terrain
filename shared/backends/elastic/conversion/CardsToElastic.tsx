@@ -46,8 +46,8 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonElastic from '../syntax/CommonElastic';
 
-import {Block} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
+import {Block} from '../../../blocks/types/Block';
 import {Card} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';

@@ -55,7 +55,7 @@ export const ElasticCardsDeck =
       Blocks.elasticObject.type,
       Blocks.elasticArray.type,
     ],
-  ]
+  ],
   );
-  
+
 export default ElasticCardsDeck;

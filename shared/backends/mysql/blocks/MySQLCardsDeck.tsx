@@ -89,7 +89,7 @@ export const MySQLCardsDeck =
     [
       Blocks.tql.type,
     ],
-  ]
+  ],
   );
-  
+
 export default MySQLCardsDeck;

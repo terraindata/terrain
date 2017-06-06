@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import {Block, TQLFn, allBlocksMetaFields} from './Block';
-import {Display} from '../displays/Display';
 import BlockUtils from '../BlockUtils';
+import {Display} from '../displays/Display';
+import {allBlocksMetaFields, Block, TQLFn} from './Block';
 
 export interface Card extends IRecord<Card>
 {
@@ -95,7 +95,7 @@ export interface Card extends IRecord<Card>
     // It replaces anything within [] with the value for that key.
     // If an array of objects, you can specify: [arrayKey.objectKey]
     // and it will map through and join the values with ", ";
-    
+
     // TODO bring back manualEntry
     // manualEntry: IManualEntry;
 
@@ -158,7 +158,6 @@ export const _card = (config: CardConfig) =>
 
   return config;
 };
-
 
 export type Cards = List<Card>;
 export type CardString = string | Card;

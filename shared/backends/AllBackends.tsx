@@ -42,11 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import Backend from './types/Backend';
-import MySQLBackend from './mysql/MySQLBackend';
 import ElasticBackend from './elastic/ElasticBackend';
+import MySQLBackend from './mysql/MySQLBackend';
+import Backend from './types/Backend';
 
-export const AllBackendsArray: Backend[] = 
+export const AllBackendsArray: Backend[] =
 [
 	ElasticBackend,
 	MySQLBackend,
@@ -59,13 +59,11 @@ export const AllBackendsMap: { [type: string]: Backend } =
 };
 
 AllBackendsArray.map(
-	backend =>
+	(backend) =>
 	{
-		if(!AllBackendsMap[backend.type])
+		if (!AllBackendsMap[backend.type])
 		{
 			throw new Error('missing backend in map for backend ' + backend.type);
 		}
-	}
+	},
 );
-
-

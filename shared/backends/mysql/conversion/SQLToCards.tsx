@@ -47,51 +47,50 @@ import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import CommonSQL from '../syntax/CommonSQL';
-import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 
-import {Card, Cards, CardString} from '../../../blocks/types/Card';
-import {Block} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
+import {Block} from '../../../blocks/types/Block';
+import {Card, Cards, CardString} from '../../../blocks/types/Card';
 const { make } = BlockUtils;
 
 import Blocks from '../blocks/MySQLBlocks';
 
 export default function SQLToCards(
   query: Query,
-  queryReady: (query: Query) => void
+  queryReady: (query: Query) => void,
 ): Query
 {
   const prevReq = query.getIn(['meta', 'parseTreeReq']);
   prevReq && typeof prevReq.abort === 'function' && prevReq.abort();
-  
+
   const req = AjaxM1.parseTree(
     query.tql,
-    query.db.id + "",
+    query.db.id + '',
     parseTreeLoaded,
     parseTreeError,
     { // context
       query,
       queryReady,
-    }
+    },
   ).xhr;
-  
+
   return query
     .set('cardsAndCodeInSync', false)
     .setIn(['meta', 'parseTreeReq'], req);
 }
 
-
 const parseTreeLoaded = (response, context) =>
 {
   let query: Query = context.query;
   const queryReady: (query: Query) => void = context.queryReady;
-  
+
   const {error, result} = response;
-  
+
   query = query.setIn(['meta', 'parseTreeReq'], null);
-  
+
   if (error)
   {
     query = query
@@ -107,14 +106,14 @@ const parseTreeLoaded = (response, context) =>
 
   // alert the state that the query needs to change
   queryReady(query);
-}
+};
 
 const parseTreeError = (error, context) =>
 {
   // TODO MOD confirm what format the error comes back as
   let query: Query = context.query;
   const queryReady: (query: Query) => void = context.queryReady;
-  
+
   query = query.setIn(['meta', 'parseTreeReq'], null);
   query = query
     .set('parseError', (error && error.errorMessage) || error)
@@ -122,8 +121,7 @@ const parseTreeError = (error, context) =>
 
   // alert the state that the query needs to change
   queryReady(query);
-}
-
+};
 
 const TQLToCards =
 {

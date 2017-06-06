@@ -127,7 +127,7 @@ export interface Display
   provideParentData?: boolean;
   // if true, it passes the parent data down
   // this will cause unnecessary re-rendering, so avoid if possible
-  
+
   // the transform card currently requires the full builder state
   //  let's change that in the future by having the histogram bars be
   //  computed at a higher level

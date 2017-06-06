@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 import * as React from 'react';
 
-module CommonSQL
+namespace CommonSQL
 {
   export const Directions: string[] = ['ascending', 'descending'];
   export const Combinators: string[] = ['&', 'or'];
-  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
 	export enum Operator {
     EQ,

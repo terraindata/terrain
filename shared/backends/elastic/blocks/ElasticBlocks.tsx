@@ -42,17 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 const {List, Map} = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
+import CommonBlocks from '../../../blocks/CommonBlocks';
+import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
 import {_block, Block, TQLFn} from '../../../blocks/types/Block';
 import {_card, Card, CardString} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
 import CommonElastic from '../syntax/CommonElastic';
-import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
-import CommonBlocks from '../../../blocks/CommonBlocks';
 
 import Util from '../../../../src/app/util/Util';
 
@@ -60,7 +60,7 @@ const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonB
 
 const {make} = BlockUtils;
 
-import {elasticKeyValue, elasticValue, elasticObject, elasticArray} from './ElasticJSONBlocks';
+import {elasticArray, elasticKeyValue, elasticObject, elasticValue} from './ElasticJSONBlocks';
 
 export const ElasticBlocks =
 {
@@ -87,7 +87,6 @@ export const ElasticBlocks =
 
 BlockUtils.initBlocks(ElasticBlocks);
 
-
 // TODO remove
 const cards = {};
 for (const key in ElasticBlocks)
@@ -98,6 +97,5 @@ for (const key in ElasticBlocks)
   }
 }
 export const cardList = cards;
-
 
 export default ElasticBlocks;

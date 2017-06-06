@@ -42,15 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 const {Map, List} = Immutable;
 
 import {Block, BlockConfig} from './types/Block';
 import {Card} from './types/Card';
 // import { AllBackendsMap } from '../backends/AllBackends';
 
-module BlockUtils
+namespace BlockUtils
 {
   export function getChildIds(_block: Block): IMMap<ID, boolean>
   {
@@ -127,8 +127,7 @@ module BlockUtils
   {
     return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
   }
-  
-  
+
   // This creates a new instance of a card / block
   // Usage: BlockUtils.make(MySQLBlocks.sort)
   export const make = (block: BlockConfig, extraConfig?: {[key: string]: any}) =>
@@ -162,8 +161,8 @@ module BlockUtils
 
   // private, maps a type (string) to the backing Immutable Record
   // types are added when initBlocks is called
-  const blockTypeToBlockRecord: any = {}; 
-  
+  const blockTypeToBlockRecord: any = {};
+
   // Given a plain JS object, construct the Record for it and its children
   export const recordFromJS = (value: any, Blocks) =>
   {
@@ -284,21 +283,21 @@ module BlockUtils
     }
     return 'No preview';
   }
-  
+
   // Must be called on the Blocks def for each language
   // Used to add types to the Blocks and add them to the typeToRecord config
   //  if you can think of a better way to do this, be my guest.
   export function initBlocks(Blocks)
   {
     _.map(
-      Blocks as ({[card: string]: any}), 
-      (v, i) => 
+      Blocks as ({[card: string]: any}),
+      (v, i) =>
       {
         // Set the "type" field for all blocks equal to its key
-        Blocks[i].type = i
+        Blocks[i].type = i;
         // finally, add Blocks to the blockTypeToBlockRecord map
         blockTypeToBlockRecord[i] = Immutable.Record(Blocks[i]);
-      }
+      },
     );
   }
 }

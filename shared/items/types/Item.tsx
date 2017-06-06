@@ -74,28 +74,26 @@ export const ItemStatus: {
   Default: 'DEFAULT',
 };
 
-
-
 export class ItemC extends BaseClass
 {
   // TODO potentially consolidate with midway
   id: ID = -1;
   parent: number = 0;
-  
+
   name: string = '';
   status: ItemStatus = 'BUILD';
   type: ItemType;
-  
+
   db: BackendInstance = {} as any;
-  
+
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields= ['dbFields', 'excludeFields'];
-  
+
   modelVersion = 2; // 2 is for the first version of Node midway
 }
 export type Item = ItemC & IRecord<ItemC>;
 // remove?
-// export const _Item = (config?: {[key:string]: any}) => 
+// export const _Item = (config?: {[key:string]: any}) =>
 // {
 //   if(config && typeToConstructor[config.type])
 //   {

@@ -42,12 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import {Cards} from '../../blocks/types/Card';
-import BlockUtils from '../../blocks/BlockUtils';
 import * as Immutable from 'immutable';
+import BlockUtils from '../../blocks/BlockUtils';
+import {Cards} from '../../blocks/types/Card';
 const {List} = Immutable;
-import {ResultsConfig, _ResultsConfig} from '../../results/types/ResultsConfig';
 import { AllBackendsMap } from '../../backends/AllBackends';
+import {_ResultsConfig, ResultsConfig} from '../../results/types/ResultsConfig';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -57,12 +57,12 @@ class QueryC
   parent: number = -1;
   name: string = '';
   status: 'BUILD' | 'LIVE' = 'BUILD';
-  
+
   language: 'elastic' | 'mysql' = 'elastic';
-  
+
   id: ID = -1;
   variantId: number = -1;
-  
+
   // TODO change?
   db: {
     id: ID;
@@ -81,10 +81,10 @@ class QueryC
   parseError: string = null;
 
   meta: IMMap<string, any> = Immutable.Map<string, any>({});
-  
+
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields= ['dbFields', 'excludeFields'];
-  
+
   modelVersion = 2; // 2 is for the first version of Node midway
 }
 const Query_Record = Immutable.Record(new QueryC());
@@ -97,7 +97,7 @@ export const _Query = (config?: Object) => {
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
 
-  let query = new Query_Record(config) as any as Query;
+  const query = new Query_Record(config) as any as Query;
 
   return query;
 };

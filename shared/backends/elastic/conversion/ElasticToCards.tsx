@@ -47,24 +47,23 @@ import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import CommonElastic from '../syntax/CommonElastic';
-import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 
-import {Card, Cards, CardString} from '../../../blocks/types/Card';
-import {Block} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
+import {Block} from '../../../blocks/types/Block';
+import {Card, Cards, CardString} from '../../../blocks/types/Card';
 const { make } = BlockUtils;
 
 import Blocks from '../blocks/ElasticBlocks';
 
 export default function ElasticToCards(
   query: Query,
-  queryReady: (query: Query) => void
+  queryReady: (query: Query) => void,
 ): Query
 {
-  
+
   return query
     .set('cardsAndCodeInSync', false);
 }
-
