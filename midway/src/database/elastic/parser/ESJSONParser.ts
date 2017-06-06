@@ -66,7 +66,7 @@ import ESParserValueInfo from './ESParserValueInfo';
  * myModeWithTokens(tokenizeWholeFile(cm.getValue())), starting a new highlight."
  *
  */
-export default class ESParser
+export default class ESJSONParser
 {
   private queryString: string; // string being parsed
 

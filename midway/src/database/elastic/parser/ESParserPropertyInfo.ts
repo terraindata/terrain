@@ -48,7 +48,7 @@ import ESParserToken from './ESParserToken';
 import ESParserValueInfo from './ESParserValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESParser
+ * Represents information about a property that was parsed by ESJSONParser
  */
 export default class ESParserPropertyInfo
 {

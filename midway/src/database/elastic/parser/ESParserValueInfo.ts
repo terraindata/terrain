@@ -47,7 +47,7 @@ THE SOFTWARE.
 import ESParserToken from './ESParserToken';
 
 /**
- * Represents information about a value that was parsed by ESParser
+ * Represents information about a value that was parsed by ESJSONParser
  */
 export default class ESParserValueInfo
 {

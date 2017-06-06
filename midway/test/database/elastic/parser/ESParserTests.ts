@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as winston from 'winston';
-import ESParser from '../../../../src/database/elastic/parser/ESParser';
+import ESParser from '../../../../src/database/elastic/parser/ESJSONParser';
 import ESParserError from '../../../../src/database/elastic/parser/ESParserError';
 import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
