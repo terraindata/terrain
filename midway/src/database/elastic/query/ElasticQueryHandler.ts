@@ -52,9 +52,9 @@ import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
-import MidwayErrorItem from '../../../../../shared/MidwayErrorItem';
-import QueryRequest from '../../../../../shared/QueryRequest';
-import QueryResponse from '../../../../../shared/QueryResponse';
+import QueryRequest from '../../../../../shared/backends/types/QueryRequest';
+import QueryResponse from '../../../../../shared/backends/types/QueryResponse';
+import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';

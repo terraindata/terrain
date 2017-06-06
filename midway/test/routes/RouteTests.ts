@@ -72,7 +72,7 @@ beforeAll(async (done) =>
         {
           name: 'My ElasticSearch Instance',
           type: 'elastic',
-          dsn: 'http://127.0.0.1:9200',
+          dsn: 'http://td1:9200',
         },
       ],
     };

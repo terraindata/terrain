@@ -58,10 +58,10 @@ import {Item, ItemType} from '../../../shared/items/types/Item';
 import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
 
-import MidwayQueryResponse from '../builder/components/results/MidwayQueryResponse';
+import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
 
 import {recordForSave, responseToRecordConfig} from '../Classes';
-import {QueryRequest} from '../../../shared/QueryRequest';
+import {QueryRequest} from '../../../shared/backends/types/QueryRequest';
 import {MidwayError} from '../../../shared/error/MidwayError';
 import {routerShape} from 'react-router';
 import AjaxM1 from './AjaxM1';

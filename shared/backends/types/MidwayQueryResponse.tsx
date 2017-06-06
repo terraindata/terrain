@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ElasticQueryResult from '../../../../../shared/ElasticQueryResponse';
-import MidwayErrorItem from '../../../../../shared/MidwayErrorItem';
-import QueryRequest from '../../../../../shared/QueryRequest';
-import QueryResponse, {QueryResult} from '../../../../../shared/QueryResponse';
+import ElasticQueryResult from '../elastic/ElasticQueryResponse';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import QueryRequest from './QueryRequest';
+import QueryResponse, {QueryResult} from './QueryResponse';
 
 export default class MidwayQueryResponse extends QueryResponse
 {

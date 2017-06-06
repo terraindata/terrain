@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from './MidwayErrorItem';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
 import QueryRequest from './QueryRequest';
 
 export interface QueryResult {

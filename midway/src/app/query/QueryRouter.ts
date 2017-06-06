@@ -51,8 +51,8 @@ import * as Util from '../Util';
 
 import { Readable } from 'stream';
 
-import QueryRequest from '../../../../shared/QueryRequest';
-import QueryResponse from '../../../../shared/QueryResponse';
+import QueryRequest from '../../../../shared/backends/types/QueryRequest';
+import QueryResponse from '../../../../shared/backends/types/QueryResponse';
 import { QueryHandler } from './QueryHandler';
 
 import DatabaseController from '../../database/DatabaseController';
