@@ -44,66 +44,34 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from './MidwayErrorItem';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import QueryRequest from './QueryRequest';
 
-export class MidwayError
-{
-  public static fromJSON(json: string | MidwayErrorItem[])
-  {
-    const midwayError = Object.create(MidwayError.prototype);
-    if (typeof json === 'string')
-    {
-      const jobject = JSON.parse(json);
-      midwayError.errors = jobject;
-    } else
-    {
-      midwayError.errors = json;
-    }
-    return midwayError;
-  }
-
-  public errors: MidwayErrorItem[];
-
-  public constructor(status: number, title: string, detail: string, source: object)
-  {
-    const o: MidwayErrorItem = { status, title, detail, source };
-    this.errors = [o];
-  }
-
-  public getMidwayErrors(): MidwayErrorItem[]
-  {
-    return this.errors;
-  }
-
-  // we may provide a iterator interface later
-  public getNthMidwayErrorItem(index): MidwayErrorItem
-  {
-    return this.errors[index];
-  }
-
-  // get the first error object's status
-  public getStatus(): number
-  {
-    return this.getNthMidwayErrorItem(0).status;
-  }
-
-  // get the first error object's title
-  public getTitle(): string
-  {
-    return this.getNthMidwayErrorItem(0).title;
-  }
-
-  // get the first error object's detail
-  public getDetail(): string
-  {
-    return this.getNthMidwayErrorItem(0).detail;
-  }
-
-  // get the first error object's source
-  public getSource(): object
-  {
-    return this.getNthMidwayErrorItem(0).source;
-  }
+export interface QueryResult {
+  [key: string]: any;
 }
 
-export default MidwayError;
+export default class QueryResponse
+{
+  public request?: QueryRequest;
+  public result: QueryResult;
+  public errors: MidwayErrorItem[];
+
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request?: QueryRequest)
+  {
+    // QueryResult can't be null
+    this.result = result;
+    this.errors = errors;
+    this.request = request;
+  }
+
+  public setQueryRequest(req: QueryRequest)
+  {
+    this.request = req;
+  }
+
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
+  }
+}

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // Note: If anyone would like to take the time to clean up this file, be my guest.
 
 import * as $ from 'jquery';
@@ -49,7 +50,6 @@ import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 
 import Query from '../../../shared/items/types/Query';
-
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import LibraryTypes from './../library/LibraryTypes';
@@ -57,19 +57,14 @@ import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import {Item, ItemType} from '../../../shared/items/types/Item';
 import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
-import Util from './../util/Util';
-import {recordForSave, responseToRecordConfig} from '../Classes';
-import AjaxM1 from './AjaxM1';
 
-/**
- * Note: This is the old query response type.
- * For the new QueryResponse definition, see /midway/src/app/query/QueryResponse.ts
- */
-export interface QueryResponse
-{
-  results?: any[];
-  errorMessage?: string;
-}
+import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
+
+import {recordForSave, responseToRecordConfig} from '../Classes';
+import {QueryRequest} from '../../../shared/backends/types/QueryRequest';
+import {MidwayError} from '../../../shared/error/MidwayError';
+import {routerShape} from 'react-router';
+import AjaxM1 from './AjaxM1';
 
 export const Ajax =
   {
@@ -114,6 +109,8 @@ export const Ajax =
           }
           catch (e)
           {
+            // parsing error, we create a new QueryResponse so that callers wont need to worry about the format
+            // anymore.
             config.onError && config.onError(e);
           }
 
@@ -124,12 +121,130 @@ export const Ajax =
           }
         },
         _.extend({
+          onError: config.onError,
           host: MIDWAY_HOST,
           noToken: true,
           json: true,
           crossDomain: false,
         }, config),
       );
+    },
+
+    _reqGeneric(method: string,
+                url: string,
+                data: string,
+                onLoad: (response: any) => void,
+                config: {
+                  onError?: (response: any) => void,
+                  host?: string,
+                  crossDomain?: boolean;
+                  noToken?: boolean;
+                  download?: boolean;
+                  downloadFilename?: string;
+                  json?: boolean;
+                  urlArgs?: object;
+                } = {})
+    {
+      const host = config.host || MIDWAY_HOST;
+      let fullUrl = host + url;
+
+      if (config.download)
+      {
+        const form = document.createElement('form');
+        form.setAttribute('action', fullUrl);
+        form.setAttribute('method', 'post');
+
+        // TODO move
+        const accessToken = AuthStore.getState().accessToken;
+        const id = AuthStore.getState().id;
+        const dataObj = {
+          id,
+          accessToken,
+          data,
+          filename: config.downloadFilename,
+        };
+        _.map(dataObj as any, (value, key) =>
+        {
+          const input = document.createElement('input');
+          input.setAttribute('type', 'hidden');
+          input.setAttribute('name', key + '');
+          input.setAttribute('value', value as any);
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form); // Required for FF
+        form.submit();
+        form.remove();
+        return;
+      }
+
+      const xhr = new XMLHttpRequest();
+      xhr.onerror = (err: any) =>
+      {
+        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+        config && config.onError && config.onError(routeError);
+      };
+
+      xhr.onload = (ev: Event) =>
+      {
+        if (xhr.status === 401)
+        {
+          // TODO re-enable
+          Actions.logout();
+        }
+
+        if (xhr.status != 200)
+        {
+          config && config.onError && config.onError(xhr.responseText);
+          return;
+        }
+
+        onLoad(xhr.responseText);
+      };
+
+      // NOTE: MIDWAY_HOST will be replaced by the build process.
+      if (method === 'get')
+      {
+        try
+        {
+          const dataObj = JSON.parse(data);
+          fullUrl += '?' + $.param(dataObj);
+
+          if (config.urlArgs)
+          {
+            fullUrl += '&' + $.param(config.urlArgs);
+          }
+        }
+        catch (e)
+        {}
+      }
+      else if (config.urlArgs)
+      {
+        fullUrl += '?' + $.param(config.urlArgs);
+      }
+
+      xhr.open(method, fullUrl, true);
+
+      if (config.json)
+      {
+        xhr.setRequestHeader('Content-Type', 'application/json');
+      }
+
+      if (!config.noToken)
+      {
+        const token = 'L9DcAxWyyeAuZXwb-bJRtA'; // hardcoded token in pa-terraformer02. TODO change?
+        xhr.setRequestHeader('token', token);
+      }
+
+      if (config.crossDomain)
+      {
+        xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+        xhr.setRequestHeader('Access-Control-Allow-Headers',
+          'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
+      }
+
+      xhr.send(data);
+      return xhr;
     },
 
     midwayStatus(success: () => void,
@@ -476,15 +591,13 @@ export const Ajax =
         },
       );
     },
-
     /**
-     * Intermediate query interface. Queries M2.
-     * Transforms result into old format.
+     * Query M2
      */
     query(body: string,
       db: BackendInstance,
-      onLoad: (response: QueryResponse) => void,
-      onError?: (ev: Event) => void,
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: string | MidwayError) => void,
       sqlQuery?: boolean, // unused
       options: {
         streaming?: boolean,
@@ -492,63 +605,20 @@ export const Ajax =
       } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      // TODO make this hack not so bad
-      const dbs = LibraryStore.getState().dbs;
-      if (db && db.source === 'm1')
-      {
-        return AjaxM1.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
-      }
-
-      // TODO: For MySQL and other string queries, we should skip this step and send it as a string
-      try
-      {
-        body = JSON.parse(body);
-      }
-      catch (e)
-      {
-        // on parse failure, absorb error and send query as a string
-      }
       const queryId = '' + Math.random();
-      const payload = {
+      const payload: QueryRequest = {
         type: 'search', // can be other things in the future
-        database: db.id, // should be passed by caller
+        database: db.id as number, // should be passed by caller
         streaming: options.streaming,
+        databasetype: 'elastic',
         body,
       };
 
       const onLoadHandler = (resp) =>
       {
-        let result: QueryResponse = {results: []};
-        try
-        {
-          const hits = resp.result.hits.hits;
-          const results = hits.map((hit) =>
-          {
-            let source = hit._source;
-            source._index = hit._index;
-            source._type = hit._type;
-            source._id = hit._id;
-            source._score = hit._score;
-            source._sort = hit._sort;
-            return source;
-          });
-
-          result = {results};
-        }
-        catch (e)
-        {
-          // absorb
-        }
-
-        // This could be improved
-        if (resp.errors.length > 0)
-        {
-          result.errorMessage = resp.errors[0].title;
-        }
-
-        onLoad(result);
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
       };
-
       const xhr = Ajax.req(
         'post',
         'query/',
@@ -563,7 +633,6 @@ export const Ajax =
 
       return {queryId, xhr};
     },
-
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1
@@ -589,7 +658,7 @@ export const Ajax =
         {
           return;
         }
-        
+
         let dbs: BackendInstance[] = [];
         if(m1Dbs)
         {
@@ -601,7 +670,7 @@ export const Ajax =
         }
         onLoad(dbs, !!(m1Dbs && m2Dbs));
       }
-      
+
       AjaxM1.getDbs_m1(
         (dbNames: string[]) =>
         {
@@ -622,7 +691,7 @@ export const Ajax =
           checkForLoaded();
         }
       );
-      
+
       Ajax.req(
         'get',
         'database',
@@ -646,13 +715,6 @@ export const Ajax =
         }
       );
     },
-
-    killQuery(id: string)
-    {
-      // TODO integrate query killing with M2
-      return AjaxM1.killQuery_m1(id);
-    },
-
     login(email: string,
       password: string,
       onLoad: (data: {
@@ -699,122 +761,6 @@ export const Ajax =
         onError,
       );
     },
-    
-    
-    _reqGeneric(method: string,
-      url: string,
-      data: string,
-      onLoad: (response: any) => void,
-      config: {
-        onError?: (response: any) => void,
-        host?: string,
-        crossDomain?: boolean;
-        noToken?: boolean;
-        download?: boolean;
-        downloadFilename?: string;
-        json?: boolean;
-        urlArgs?: object;
-      } = {})
-    {
-      const host = config.host || MIDWAY_HOST;
-      let fullUrl = host + url;
-
-      if (config.download)
-      {
-        const form = document.createElement('form');
-        form.setAttribute('action', fullUrl);
-        form.setAttribute('method', 'post');
-
-        // TODO move
-        const accessToken = AuthStore.getState().accessToken;
-        const id = AuthStore.getState().id;
-        const dataObj = {
-          id,
-          accessToken,
-          data,
-          filename: config.downloadFilename,
-        };
-        _.map(dataObj as any, (value, key) =>
-        {
-          const input = document.createElement('input');
-          input.setAttribute('type', 'hidden');
-          input.setAttribute('name', key + '');
-          input.setAttribute('value', value as any);
-          form.appendChild(input);
-        });
-
-        document.body.appendChild(form); // Required for FF
-        form.submit();
-        form.remove();
-        return;
-      }
-
-      const xhr = new XMLHttpRequest();
-      xhr.onerror = config && config.onError;
-      xhr.onload = (ev: Event) =>
-      {
-        if (xhr.status === 401)
-        {
-          // TODO re-enable
-          Actions.logout();
-        }
-
-        if (xhr.status != 200)
-        {
-          config && config.onError && config.onError({
-            error: xhr.responseText,
-          });
-          return;
-        }
-
-        onLoad(xhr.responseText);
-      };
-
-      // NOTE: MIDWAY_HOST will be replaced by the build process.
-      if (method === 'get')
-      {
-        try
-        {
-          const dataObj = JSON.parse(data);
-          fullUrl += '?' + $.param(dataObj);
-
-          if (config.urlArgs)
-          {
-            fullUrl += '&' + $.param(config.urlArgs);
-          }
-        }
-        catch (e)
-        {}
-      }
-      else if (config.urlArgs)
-      {
-        fullUrl += '?' + $.param(config.urlArgs);
-      }
-
-      xhr.open(method, fullUrl, true);
-
-      if (config.json)
-      {
-        xhr.setRequestHeader('Content-Type', 'application/json');
-      }
-
-      if (!config.noToken)
-      {
-        const token = 'L9DcAxWyyeAuZXwb-bJRtA'; // hardcoded token in pa-terraformer02. TODO change?
-        xhr.setRequestHeader('token', token);
-      }
-
-      if (config.crossDomain)
-      {
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-        xhr.setRequestHeader('Access-Control-Allow-Headers',
-          'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
-      }
-
-      xhr.send(data);
-      return xhr;
-    },
-
   };
 
 export default Ajax;

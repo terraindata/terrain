@@ -44,17 +44,59 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from '../../error/MidwayErrorItem';
-import QueryResult from './QueryResult';
+import MidwayErrorItem from './MidwayErrorItem';
 
-export default class QueryResponse
+export class MidwayError
 {
-  public result: QueryResult;
+  public static fromJSON(json: string): MidwayError
+  {
+    const midwayError = Object.create(MidwayError.prototype);
+    const jobject = JSON.parse(json);
+    midwayError.errors = jobject.errors;
+    return midwayError;
+  }
   public errors: MidwayErrorItem[];
 
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [])
+  public constructor(status: number, title: string, detail: string, source: object)
   {
-    this.result = result;
-    this.errors = errors;
+    const o: MidwayErrorItem = { status, title, detail, source };
+    this.errors = [o];
+  }
+
+  public getMidwayErrors(): MidwayErrorItem[]
+  {
+    return this.errors;
+  }
+
+  // we may provide a iterator interface later
+  public getNthMidwayErrorItem(index): MidwayErrorItem
+  {
+    return this.errors[index];
+  }
+
+  // get the first error object's status
+  public getStatus(): number
+  {
+    return this.getNthMidwayErrorItem(0).status;
+  }
+
+  // get the first error object's title
+  public getTitle(): string
+  {
+    return this.getNthMidwayErrorItem(0).title;
+  }
+
+  // get the first error object's detail
+  public getDetail(): string
+  {
+    return this.getNthMidwayErrorItem(0).detail;
+  }
+
+  // get the first error object's source
+  public getSource(): object
+  {
+    return this.getNthMidwayErrorItem(0).source;
   }
 }
+
+export default MidwayError;

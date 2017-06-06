@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 import * as $ from 'jquery';
 import * as _ from 'underscore';
+import BackendInstance from '../../../shared/backends/types/BackendInstance';
 
 /**
  * Note: This is the old query response type.
  * For the new QueryResponse definition, see /midway/src/app/query/QueryResponse.ts
  */
-export interface QueryResponse
+export interface M1QueryResponse
 {
   results?: any[];
   errorMessage?: string;
@@ -213,13 +214,26 @@ export const Ajax =
       };
     },
 
+    queryM1(body: string,
+          db: BackendInstance,
+          onLoad: (response: M1QueryResponse) => void,
+          onError?: (ev: Event) => void,
+          sqlQuery?: boolean, // unused
+          options: {
+            streaming?: boolean,
+            streamingTo?: string,
+          } = {},
+    ): { xhr: XMLHttpRequest, queryId: string }
+    {
+      return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
+    },
     /**
      * Old query interface. Queries M1.
      */
     query_m1(
       tql: string,
       db: string | number,
-      onLoad: (response: QueryResponse) => void,
+      onLoad: (response: M1QueryResponse) => void,
       onError?: (ev: Event) => void,
       sqlQuery?: boolean,
       options: {
@@ -272,7 +286,7 @@ export const Ajax =
       );
     },
 
-    parseTree(tql: string, db: string, onLoad: (response: QueryResponse, context?: any) => void, onError?: (ev: Event, context?: any) => void, context?: any)
+    parseTree(tql: string, db: string, onLoad: (response: M1QueryResponse, context?: any) => void, onError?: (ev: Event, context?: any) => void, context?: any)
     {
       return Ajax._postMidway1('/get_tql_tree', {
           query_string: encode_utf8(tql),
@@ -375,7 +389,11 @@ export const Ajax =
         }
       }, onError);
     },
-
+    killQuery(id: string)
+    {
+      // TODO integrate query killing with M2
+      return Ajax.killQuery_m1(id);
+    },
     killQuery_m1(id: string)
     {
       return Ajax._postMidway1('/kill_query_by_id', {

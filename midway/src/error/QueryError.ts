@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayError from './MidwayError';
+import MidwayError from '../../../shared/error/MidwayError';
 
 export interface ElasticQueryError
 {
