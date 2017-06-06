@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESParserError from './ESParserError';
-import ESParserPropertyInfo from './ESPropertyInfo';
 import ESParserToken from './ESParserToken';
+import ESParserPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
 /**
@@ -145,6 +145,11 @@ export default class ESJSONParser
   public getErrors(): ESParserError[]
   {
     return this.errors;
+  }
+
+  public accumulateError(error: ESParserError): void
+  {
+    this.errors.push(error);
   }
 
   private peek(): string
@@ -308,9 +313,9 @@ export default class ESJSONParser
     const arrayInfo: ESValueInfo = this.getCurrentValueInfo();
     arrayInfo.children = [];
 
-    for ( let element = this.readValue();
-          element !== undefined;
-          element = this.readValue() )
+    for (let element = this.readValue();
+      element !== undefined;
+      element = this.readValue())
     {
       array.push(element);
 
@@ -347,9 +352,9 @@ export default class ESJSONParser
     const objInfo: ESValueInfo = this.getCurrentValueInfo();
     objInfo.children = {};
 
-    for ( let propertyName = this.readValue();
-          propertyName !== undefined;
-          propertyName = this.readValue() )
+    for (let propertyName = this.readValue();
+      propertyName !== undefined;
+      propertyName = this.readValue())
     {
       if (typeof propertyName !== 'string')
       {
@@ -528,11 +533,6 @@ export default class ESJSONParser
   private accumulateErrorOnCurrentToken(message: string): void
   {
     this.errors.push(new ESParserError(this.getCurrentToken(), message));
-  }
-
-  public accumulateError(error: ESParserError): void
-  {
-    this.errors.push(error);
   }
 
   private getRow(): number
