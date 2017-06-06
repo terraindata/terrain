@@ -45,7 +45,6 @@ THE SOFTWARE.
 require('./ScoreBar.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import BuilderTypes from '../../BuilderTypes';
 import PureClasss from './../../../common/components/PureClasss';
 
 const BORDER_RADIUS = '5px';
@@ -63,8 +62,6 @@ class ScoreBar extends PureClasss<{
     weight: number;
   }
   keyPath: KeyPath;
-  // weights: List<BuilderTypes.IWeight>,
-  // index: number,
 }>
 {
   render()

@@ -46,11 +46,14 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
-import {BuilderTypes} from './../BuilderTypes';
+import AjaxM1 from './../../util/AjaxM1';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import {BuilderState} from './BuilderStore';
-import SharedTypes from '../../../../shared/SharedTypes';
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import Query from '../../../../shared/items/types/Query';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 {
@@ -62,7 +65,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       payload?: {
         variantId: ID,
         handleNoVariant: (id: ID) => void,
-        db: SharedTypes.Database,
+        db: BackendInstance,
       },
     },
   ) =>
@@ -83,7 +86,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
     const xhr: XMLHttpRequest = Ajax.getQuery(
       variantId,
-      (query: BuilderTypes.Query) =>
+      (query: Query) =>
       {
         if (query)
         {
@@ -108,42 +111,35 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
   (
     state: BuilderState,
     action: Action<{
-      query: BuilderTypes.Query,
+      query: Query,
       xhr: XMLHttpRequest,
-      db: SharedTypes.Database,
+      db: BackendInstance,
     }>,
   ) =>
   {
+    let {query} = action.payload;
     if (state.loadingXhr !== action.payload.xhr)
     {
       // wrong XHR
       return state;
     }
 
-    if (!action.payload.query.tqlCardsInSync)
+    if (!action.payload.query.cardsAndCodeInSync)
     {
       if (action.payload.query.tql)
       {
-        state = state
-          .set('parseTreeReq',
-            Ajax.parseTree(
-              action.payload.query.tql,
-              state.db.id + "",
-              Actions.parseTreeLoaded,
-              Actions.parseTreeError,
-            ).xhr,
-          );
+        // TODO MOD convert
       }
       else
       {
         // blank
-        action.payload.query = action.payload.query
-          .set('tqlCardsInSync', true);
+        query = query
+          .set('cardsAndCodeInSync', true);
       }
     }
 
     return state
-      .set('query', action.payload.query)
+      .set('query', query)
       .set('loading', false)
       .set('loadingXhr', null)
       .set('loadingVariantId', '')
@@ -186,7 +182,9 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       (arr) =>
       {
         const item = action.payload.data ? action.payload.data :
-            BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType]);
+            BlockUtils.make(
+              AllBackendsMap[state.query.language].blocks[action.payload.factoryType]
+            );
 
         if (action.payload.index === null)
         {
@@ -312,71 +310,17 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     }>,
   ) =>
   {
-    state.parseTreeReq && state.parseTreeReq.abort();
-    if(state.db.source === 'm1')
-    {
-      state = state
-        .set('parseTreeReq',  // for SQL parsing
-          Ajax.parseTree(
-            action.payload.tql,
-            state.db.id + "",
-            Actions.parseTreeLoaded,
-            Actions.parseTreeError,
-          ).xhr,
-        );
-    }
-    return state
-      .update('query', (query) =>
-        query
-          .set('tql', action.payload.tql)
-          .set('tqlCardsInSync', false)
-          .set('parseTreeError', null),
-      )
+    // TODO MOD convert
+    let {query} = state;
+    query = query.set('tql', action.payload.tql);
+    query = AllBackendsMap[query.language].codeToQuery(
+      query,
+      (newQuery) =>
+        Actions.change(Immutable.List(['query']), newQuery)
+    );
+    
+    return state.set('query', query);
   },
-
-[ActionTypes.parseTreeLoaded]:
-  (
-    state: BuilderState,
-    action: Action<{
-      response: {
-        result?: any,
-        error?: string,
-      },
-    }>,
-  ) =>
-  {
-    const {error, result} = action.payload.response;
-    if (error)
-    {
-      return state
-        .setIn(['query', 'parseTreeError'], error)
-        .set('parseTreeReq', null)
-        .setIn(['query', 'tqlCardsInSync'], false);
-    }
-
-    return state
-      .update('query',
-        (query) =>
-          query
-            .set('cards',
-              TQLToCards.convert(result, state.query.cards),
-            )
-            .set('tqlCardsInSync', true),
-      )
-      .set('parseTreeReq', null);
-  },
-
-[ActionTypes.parseTreeError]:
-  (
-    state: BuilderState,
-    action: Action<{
-      errorMessage: string,
-    }>,
-  ) =>
-    state
-      .setIn(['query', 'parseTreeError'], action.payload.errorMessage || true)
-      .set('parseTreeReq', null)
-      .setIn(['query', 'tqlCardsInSync'], false),
 
 [ActionTypes.hoverCard]:
   (state: BuilderState, action: Action<{
@@ -522,8 +466,6 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
 
   return state;
 }
-
-import TQLToCards from '../../tql/TQLToCards';
 
 Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
 

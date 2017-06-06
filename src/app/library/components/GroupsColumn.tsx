@@ -58,6 +58,7 @@ import LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
@@ -108,7 +109,7 @@ class GroupsColumn extends Classs<Props>
   handleArchive(id: ID)
   {
     Actions.groups.change(this.props.groups.find((g) => g.id === id)
-      .set('status', LibraryTypes.ItemStatus.Archive) as Group);
+      .set('status', ItemStatus.Archive) as Group);
   }
 
   handleNameChange(id: ID, name: string)
@@ -213,25 +214,25 @@ class GroupsColumn extends Classs<Props>
   handleCategoryHover(statusString: string, id: ID)
   {
     const g = this.props.groups.get(id);
-    const status = LibraryTypes.ItemStatus[statusString];
+    const status = ItemStatus[statusString];
     if (g.status !== status)
     {
       Actions.groups.change(g.set('status', status) as Group);
     }
   }
 
-  renderCategory(status: LibraryTypes.ItemStatus)
+  renderCategory(status: ItemStatus)
   {
     const ids = this.props.groupsOrder.filter((id) => this.props.groups.get(id).status === status);
     const canCreate = this.state.me && this.state.me.isSuperUser;
 
     return (
       <LibraryItemCategory
-        status={LibraryTypes.ItemStatus[status]}
+        status={ItemStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
         type="group"
-        titleHidden={status === LibraryTypes.ItemStatus.Build}
+        titleHidden={status === ItemStatus.Build}
       >
         {
           ids.map(this.renderGroup)
@@ -240,7 +241,7 @@ class GroupsColumn extends Classs<Props>
           ids.size === 0 && <div className="library-category-none">None</div>
         }
         {
-          status === LibraryTypes.ItemStatus.Build && canCreate &&
+          status === ItemStatus.Build && canCreate &&
             <CreateItem
               name="group"
               onCreate={this.handleCreate}
@@ -261,8 +262,8 @@ class GroupsColumn extends Classs<Props>
           this.props.groups.size ?
             (
               <div>
-                { this.renderCategory(LibraryTypes.ItemStatus.Build) }
-                { this.renderCategory(LibraryTypes.ItemStatus.Archive) }
+                { this.renderCategory(ItemStatus.Build) }
+                { this.renderCategory(ItemStatus.Archive) }
               </div>
             )
             :

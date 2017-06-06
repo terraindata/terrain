@@ -42,52 +42,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// import * as _ from 'underscore';
-// import * as Immutable from 'immutable';
-// import Actions from './BuilderActions';
-// import { BuilderTypes } from './../BuilderTypes';
-// import List = Immutable.List;
-// import Map = Immutable.Map;
-// import Ajax from '../../util/Ajax';
-// import TQLToCards from '../../tql/TQLToCards';
-// import BuilderStore from './BuilderStore';
-// import Util from '../../util/Util';
+import * as React from 'react';
 
-// export class BuilderCoordinator
-// {
-//   req: XMLHttpRequest = null;
+module CommonSQL
+{
+  export const Directions: string[] = ['ascending', 'descending'];
+  export const Combinators: string[] = ['&', 'or'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
 
-//   constructor()
-//   {
-//     Util.bindAll(this);
-//   }
+	export enum Operator {
+    EQ,
+    NE,
+    GE,
+    GT,
+    LE,
+    LT,
+    IN,
+    NIN,
+    LIKE,
+  }
 
-//   handleTQLChange(tql: string)
-//   {
-//     if(this.req)
-//     {
-//       this.req.abort();
-//     }
-//     this.req = Ajax.parseTree(
-//       tql,
-//       BuilderStore.getState().db,
-//       this.handleParseTreeLoad,
-//       this.handleParseTreeError
-//     );
-//   }
+  export const OperatorTQL = {
+    [Operator.EQ]: '=',
+    [Operator.NE]: '!=',
+    [Operator.GE]: '>=',
+    [Operator.GT]: '>',
+    [Operator.LE]: '<=',
+    [Operator.LT]: '<',
+    [Operator.IN]: 'IN',
+    [Operator.NIN]: 'NOT IN',
+    [Operator.LIKE]: 'LIKE',
+  };
 
-//   handleParseTreeLoad(response)
-//   {
-//     this.req = null;
-//     let cards = TQLToCards.convert(response.result);
-//     console.log(cards);
-//     Actions.change(Immutable.List(['query', 'cards']), cards);
-//   }
+  export enum Direction {
+    ASC,
+    DESC,
+  }
 
-//   handleParseTreeError(error)
-//   {
-//     console.log('error', error);
-//   }
-// }
+  export const DirectionTQL = {
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC',
+  };
 
-// export default BuilderCoordinator;
+  export enum Combinator {
+    AND,
+    OR,
+  }
+
+  export const CombinatorTQL = {
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR',
+  };
+}
+
+export default CommonSQL;

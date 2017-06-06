@@ -47,18 +47,19 @@ const {Map, List} = Immutable;
 import * as React from 'react';
 import * as _ from 'underscore';
 import {BaseClass, New} from '../../../Classes';
-import TQLConverter from '../../../tql/TQLConverter';
-import {Ajax, M1QueryResponse} from '../../../util/Ajax';
+import AjaxM1, {M1QueryResponse} from '../../../util/AjaxM1';
+import {Ajax} from '../../../util/Ajax';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
-import SharedTypes from './../../../../../shared/SharedTypes';
+import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
-import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
 import {MidwayErrorItem} from '../../../../../shared/MidwayErrorItem';
 import {line} from 'd3-shape';
 import MidwayQueryResponse from './MidwayQueryResponse';
 import MidwayError from '../../../../../shared/error/MidwayError';
+import Query from '../../../../../shared/items/types/Query';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
 
 export const MAX_RESULTS = 200;
 
@@ -110,9 +111,9 @@ export let _ResultsState = (config: Object = {}) =>
 
 export interface Props
 {
-  query: BuilderTypes.Query;
+  query: Query;
   resultsState: ResultsState;
-  db: SharedTypes.Database;
+  db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
@@ -168,19 +169,22 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  private queryM1Results(query: BuilderTypes.Query, db: SharedTypes.Database)
+  private queryM1Results(query: Query, db: BackendInstance)
   {
-    const tql = TQLConverter.toTQL(query, {
-      limit: MAX_RESULTS,
-      replaceInputs: true,
-    });
+    const tql = AllBackendsMap[query.language].queryToCode(
+      query,
+      {
+        limit: MAX_RESULTS,
+        replaceInputs: true,
+      },
+    );
 
     if (tql !== this.state.queriedTql)
     {
       this.killQueries();
       this.setState({
         queriedTql: tql,
-        query: Ajax.queryM1(
+        query: AjaxM1.queryM1(
           tql,
           db,
           (resp) =>
@@ -197,6 +201,7 @@ export class ResultsManager extends PureClasss<Props>
       if (
         !this.props.noExtraFields
         && selectCard
+        && selectCard.type === 'sfw'
         && !selectCard['cards'].some(
           (card) => card.type === 'groupBy',
         )
@@ -206,14 +211,17 @@ export class ResultsManager extends PureClasss<Props>
       )
       {
         // temporary, don't dispatch select * if query has group by
+        const alltql = AllBackendsMap[query.language].queryToCode(
+          query,
+          {
+            allFields: true,
+            transformAliases: true,
+            limit: MAX_RESULTS,
+            replaceInputs: true,
+          });
         this.setState({
-          allQuery: Ajax.queryM1(
-            TQLConverter.toTQL(query, {
-              allFields: true,
-              transformAliases: true,
-              limit: MAX_RESULTS,
-              replaceInputs: true,
-            }),
+          allQuery: AjaxM1.queryM1(
+            alltql,
             db,
             (resp) =>
             {
@@ -237,15 +245,19 @@ export class ResultsManager extends PureClasss<Props>
     }
   }
 
-  private queryM2Results(query: BuilderTypes.Query, db: SharedTypes.Database)
+  private queryM2Results(query: Query, db: BackendInstance)
   {
-    const tql = TQLConverter.toEQL(query);
-    if (tql && tql !== this.state.queriedTql)
+    const eql = AllBackendsMap[query.language].queryToCode(
+      query,
+      {},
+    );
+
+    if (eql && eql !== this.state.queriedTql)
     {
       this.setState({
-        queriedTql: tql,
+        queriedTql: eql,
         query: Ajax.query(
-          tql,
+          eql,
           db,
           (resp) =>
           {
@@ -257,24 +269,23 @@ export class ResultsManager extends PureClasss<Props>
           },
         ),
       });
-      let allfieldTql;
+      let allfieldEql;
       try
       {
-        allfieldTql = TQLConverter.toEQL(query, {
-          allFields: true,
-        });
+        allfieldEql = AllBackendsMap[query.language].queryToCode(
+          query,
+          {allFields: true},
+        );
       }
       catch (err)
       {
         console.log('Could not generate all field Elastic request, reason:' + err);
       }
-      if (allfieldTql)
+      if (allfieldEql)
       {
         this.setState({
           allQuery: Ajax.query(
-            TQLConverter.toEQL(query, {
-              allFields: true,
-            }),
+            allfieldEql,
             db,
             (resp) =>
             {
@@ -286,6 +297,7 @@ export class ResultsManager extends PureClasss<Props>
             },
           ),
         });
+
       }
 
       this.changeResults({
@@ -298,7 +310,7 @@ export class ResultsManager extends PureClasss<Props>
     }
   }
 
-  public queryResults(query: BuilderTypes.Query, db: SharedTypes.Database)
+  public queryResults(query: Query, db: BackendInstance)
   {
     if (!query || !db)
     {
@@ -335,7 +347,7 @@ export class ResultsManager extends PureClasss<Props>
     this.mapQueries(
       (query) =>
       {
-        Ajax.killQuery(query.queryId);
+        AjaxM1.killQuery(query.queryId);
         query.xhr.abort();
       },
     );
@@ -344,9 +356,15 @@ export class ResultsManager extends PureClasss<Props>
   componentWillReceiveProps(nextProps: Props)
   {
     if (
-      nextProps.query != null
-      && nextProps.query.tql != null
-      && (this.props.query == null || this.props.query.tql !== nextProps.query.tql)
+      nextProps.query
+      && nextProps.query.tql
+      && (!this.props.query ||
+        (
+          this.props.query.tql !== nextProps.query.tql ||
+          this.props.query.cards !== nextProps.query.cards ||
+          this.props.query.inputs !== nextProps.query.inputs
+        )
+      )
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
@@ -676,7 +694,7 @@ export class ResultsManager extends PureClasss<Props>
 	}
 }
 
-export function getPrimaryKeyFor(result: any, config: IResultsConfig): string
+export function getPrimaryKeyFor(result: any, config: ResultsConfig): string
 {
   if (config && config.primaryKeys.size)
   {

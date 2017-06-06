@@ -52,10 +52,9 @@ import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
 import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
-import BuilderTypes from '../BuilderTypes';
 import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
-import {Display, DisplayType} from './../BuilderDisplays';
+import {Display, DisplayType} from '../../../../shared/blocks/displays/Display';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 import SchemaStore from '../../schema/data/SchemaStore';
@@ -65,7 +64,7 @@ export interface Props
   keyPath: KeyPath;
   data: any; // record
   display?: Display | Display[];
-
+  language: string;
   canEdit: boolean;
 
   parentData?: any;
@@ -115,6 +114,7 @@ class BuilderComponent extends PureClasss<Props>
             helpOn={this.props.helpOn}
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
+            language={this.props.language}
           />,
         ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -182,6 +182,7 @@ class BuilderComponent extends PureClasss<Props>
           columnIndex={this.props.columnIndex}
           accepts={st && st.accepts}
           singleChild={d.singleChild}
+          language={this.props.language}
         />;
       break;
       case DisplayType.CARDTEXT:
@@ -199,6 +200,7 @@ class BuilderComponent extends PureClasss<Props>
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
           display={d}
+          language={this.props.language}
         />;
       break;
       case DisplayType.DROPDOWN:
@@ -211,6 +213,8 @@ class BuilderComponent extends PureClasss<Props>
               options={d.options}
               selectedIndex={value}
               centerAlign={d.centerDropdown}
+              optionsDisplayName={d.optionsDisplayName}
+              values={d.dropdownUsesRawValues ? d.options : undefined}
             />
             { this.props.helpOn && d.help ?
               <ManualInfo
@@ -234,6 +238,7 @@ class BuilderComponent extends PureClasss<Props>
                 data={data}
                 canEdit={this.props.canEdit}
                 parentData={this.props.parentData}
+                language={this.props.language}
               />
             }
             <div
@@ -248,6 +253,7 @@ class BuilderComponent extends PureClasss<Props>
                 helpOn={this.props.helpOn}
                 addColumn={this.props.addColumn}
                 columnIndex={this.props.columnIndex}
+                language={this.props.language}
               />
             </div>
             { !d.below ? null :
@@ -263,6 +269,7 @@ class BuilderComponent extends PureClasss<Props>
                   helpOn={this.props.helpOn}
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
+                  language={this.props.language}
                 />
               </div>
             }
@@ -284,6 +291,7 @@ class BuilderComponent extends PureClasss<Props>
                   onMove={this._fn(this.moveRow, keyPath)}
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
+                  language={this.props.language}
 
                   row={d.row}
                   keyPath={this._ikeyPath(keyPath, i)}
@@ -321,6 +329,7 @@ class BuilderComponent extends PureClasss<Props>
                   className,
                   onChange: BuilderActions.change,
                   builderState: d.requiresBuilderState && BuilderStore.getState(),
+                  language: this.props.language,
                 },
               )
             }
@@ -376,6 +385,7 @@ class BuilderComponent extends PureClasss<Props>
           display={d}
           autoDisabled={d.autoDisabled}
           autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}
+          language={this.props.language}
           {...{
             keyPath,
             value,

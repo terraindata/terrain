@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import PureClasss from './../common/components/PureClasss';
-import {Combinators, Operators} from './BuilderTypes';
+import CommonSQL from '../../backends/mysql/syntax/CommonSQL';
+const {Combinators, Operators} = CommonSQL;
 
-import SchemaTypes from '../schema/SchemaTypes';
-const ManualConfig = require('./../manual/ManualConfig.json');
+// import SchemaTypes from '../schema/SchemaTypes';
+// const ManualConfig = require('./../manual/ManualConfig.json');
 
 export enum DisplayType
 {
@@ -88,6 +88,8 @@ export interface Display
   // for dropdown
   options?: List<(string | El)>;
   centerDropdown?: boolean;
+  optionsDisplayName?: Map<any, string>; // maps value to display name
+  dropdownUsesRawValues?: boolean; // use the raw values, instead of the indices
 
   // for labels
   label?: string;
@@ -97,7 +99,7 @@ export interface Display
   defaultValue?: string;
   // for textboxes with cards
   top?: boolean;
-  getAutoTerms?: (comp: React.Component<any, any>, schemaState: SchemaTypes.SchemaState) => List<string>; // overrides standard terms
+  getAutoTerms?: (comp: React.Component<any, any>, schemaState) => List<string>; // overrides standard terms
   autoDisabled?: boolean;
   showWhenCards?: boolean;
   onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
@@ -116,7 +118,7 @@ export interface Display
   flex?: Display | Display[];
 
   // for components
-  component?: (typeof PureClasss);
+  component?: any; // PureClasss?
 
   // for cards areas
   singleChild?: boolean;
@@ -137,7 +139,7 @@ export interface Display
 export const valueDisplay: Display =
 {
   displayType: NUM,
-  help: ManualConfig.help['value'],
+  // help: ManualConfig.help['value'],
   key: 'value',
   placeholder: 'value',
 };
@@ -193,7 +195,7 @@ export const firstSecondDisplay = (middle: Display, accepts: List<string>): Disp
       key: 'first',
       top: true,
       showWhenCards: true,
-      help: ManualConfig.help['first'],
+      // help: ManualConfig.help['first'],
       accepts,
     },
 
@@ -203,7 +205,7 @@ export const firstSecondDisplay = (middle: Display, accepts: List<string>): Disp
       displayType: CARDTEXT,
       key: 'second',
       showWhenCards: true,
-      help: ManualConfig.help['second'],
+      // help: ManualConfig.help['second'],
       accepts,
     },
   ],
@@ -232,7 +234,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
-      help: ManualConfig.help['let-var-field'],
+      // help: ManualConfig.help['let-var-field'],
       key: 'field',
     },
     {
@@ -242,7 +244,7 @@ export const letVarDisplay =
     },
     {
       displayType: CARDTEXT,
-      help: ManualConfig.help['expression'],
+      // help: ManualConfig.help['expression'],
       key: 'expression',
     },
   ],

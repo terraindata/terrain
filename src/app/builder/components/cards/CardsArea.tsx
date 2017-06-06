@@ -49,24 +49,22 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import {BuilderState, BuilderStore} from '../../data/BuilderStore';
-import {Card, CardItem} from '../cards/Card';
+import {CardComponent, CardItem} from '../cards/CardComponent';
 import PureClasss from './../../../common/components/PureClasss';
 import CreateCardTool from './CreateCardTool';
-type ICard = BuilderTypes.ICard;
-type ICards = BuilderTypes.ICards;
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 const {List} = Immutable;
 import CardDragPreview from './CardDragPreview';
-import CardDropArea from './CardDropArea';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props
 {
-  cards: ICards;
+  cards: Cards;
   canEdit: boolean;
   keyPath: KeyPath;
+  language: string;
 
   addColumn?: (number, string?) => void;
   columnIndex?: number;
@@ -175,7 +173,7 @@ class CardsArea extends PureClasss<Props>
 
     const {isDraggingCardOver, draggingCardItem, draggingOverIndex} = this.state;
     const {keyPath} = this.props;
-
+    
     return (
       <div>
         <div
@@ -185,7 +183,7 @@ class CardsArea extends PureClasss<Props>
           })}
         >
           {
-            cards.map((card: ICard, index: number) =>
+            cards.map((card: Card, index: number) =>
               <div
                 key={card.id}
               >
@@ -198,9 +196,11 @@ class CardsArea extends PureClasss<Props>
                   accepts={this.props.accepts}
                   singleChild={this.props.singleChild}
                   wrapType={card.type}
+                  language={this.props.language}
                 />
-                <Card
+                <CardComponent
                   card={card}
+                  language={this.props.language}
                   index={index}
                   singleCard={false}
                   canEdit={this.props.canEdit}
@@ -226,11 +226,13 @@ class CardsArea extends PureClasss<Props>
             singleChild={this.props.singleChild}
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
+            language={this.props.language}
           />
 
           {
             renderCardTool &&
               <CreateCardTool
+                language={this.props.language}
                 canEdit={this.props.canEdit}
                 keyPath={this.props.keyPath}
                 index={props.cards.size}

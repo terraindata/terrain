@@ -47,7 +47,7 @@ import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import {LibraryState} from './LibraryStore';
-const {ItemStatus} = LibraryTypes;
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const Immutable = require('immutable');
 

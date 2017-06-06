@@ -46,24 +46,25 @@ const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-import {CardItem} from '../components/cards/Card';
+import {CardItem} from '../components/cards/CardComponent';
 const Redux = require('redux');
-import TQLConverter from '../../tql/TQLConverter';
 import Util from '../../util/Util';
 import {_ResultsState, ResultsState} from '../components/results/ResultsManager';
 import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes';
 
-import SharedTypes from '../../../../shared/SharedTypes';
-import BuilderTypes from './../BuilderTypes';
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import { Card, Cards } from '../../../../shared/blocks/types/Card';
+import Query from '../../../../shared/items/types/Query';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 export class BuilderStateClass
 {
   variantId: ID = '';
-  query: BuilderTypes.Query = null;
+  query: Query = null;
 
   // for undo/redo
-  pastQueries: List<BuilderTypes.Query> = Immutable.List([]);
-  nextQueries: List<BuilderTypes.Query> = Immutable.List([]);
+  pastQueries: List<Query> = Immutable.List([]);
+  nextQueries: List<Query> = Immutable.List([]);
   lastActionType: string = '';
   lastActionKeyPath: KeyPath = null;
   lastActionTime: number = 0;
@@ -76,10 +77,10 @@ export class BuilderStateClass
 
   selectedCardIds = Map<ID, boolean>({});
 
-  db: SharedTypes.Database = {} as any;
+  db: BackendInstance = {} as any;
 
   // TODO move
-  manual = Map<ID, BuilderTypes.ICards>({});
+  manual = Map<ID, Cards>({});
   // Card examples used in the manual are stored here.
 
   draggingCardItem: CardItem = false;
@@ -87,8 +88,6 @@ export class BuilderStateClass
   draggingOverIndex: number = -1;
 
   isDirty: boolean = false;
-
-  parseTreeReq: XMLHttpRequest = null;
 
   resultsState: ResultsState = _ResultsState();
 }
@@ -149,9 +148,9 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
       //  needs to be after the card change has affected the state
       state = state
         .setIn(['query', 'tql'],
-          TQLConverter.toTQL(state.query),
+          AllBackendsMap[state.query.language].queryToCode(state.query, {}),
         )
-        .setIn(['query', 'tqlCardsInSync'], true);
+        .setIn(['query', 'cardsAndCodeInSync'], true);
     }
 
     return state;

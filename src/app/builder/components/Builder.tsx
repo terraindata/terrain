@@ -62,11 +62,11 @@ import RolesActions from '../../roles/data/RolesActions';
 import RolesStore from '../../roles/data/RolesStore';
 import UserActions from '../../users/data/UserActions';
 import UserStore from '../../users/data/UserStore';
-import Types from '../BuilderTypes';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
 import { BuilderState, BuilderStore } from './../data/BuilderStore';
-type Query = Types.Query;
+import Query from '../../../../shared/items/types/Query';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 type Variant = LibraryTypes.Variant;
 
 // Components
@@ -77,7 +77,6 @@ import {notificationManager} from './../../common/components/InAppNotification';
 import PureClasss from './../../common/components/PureClasss';
 import Ajax from './../../util/Ajax';
 import BuilderColumn from './BuilderColumn';
-import Card from './cards/Card';
 import LayoutManager from './layout/LayoutManager';
 import {TabAction, Tabs} from './layout/Tabs';
 import ResultsManager from './results/ResultsManager';
@@ -495,7 +494,7 @@ class Builder extends PureClasss<Props>
     const variant = this.getVariant();
     if (variant)
     {
-      if (variant.status === LibraryTypes.ItemStatus.Live)
+      if (variant.status === ItemStatus.Live)
       {
         return false;
       }
@@ -573,7 +572,7 @@ class Builder extends PureClasss<Props>
   canEdit(): boolean
   {
     const variant = this.getVariant();
-    return variant && (variant.status === LibraryTypes.ItemStatus.Build
+    return variant && (variant.status === ItemStatus.Build
       && Util.canEdit(variant, UserStore, RolesStore));
   }
 
@@ -584,7 +583,7 @@ class Builder extends PureClasss<Props>
     {
       return '';
     }
-    if (variant.status !== LibraryTypes.ItemStatus.Build)
+    if (variant.status !== ItemStatus.Build)
     {
       return 'This Variant is not in Build status';
     }

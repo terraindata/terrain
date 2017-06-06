@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ResultsConfig.less');
+require('./ResultsConfigStyle.less');
 import * as Immutable from 'immutable';
 const {List, Map} = Immutable;
 import * as classNames from 'classnames';
@@ -56,6 +56,7 @@ import Result from '../results/Result';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import {MAX_RESULTS, Results} from './ResultsManager';
+import {ResultsConfig, _ResultsConfig, Format, _Format} from '../../../../../shared/results/types/ResultsConfig';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
@@ -63,61 +64,19 @@ const TextIcon = require('./../../../../images/icon_text_12x18.svg?name=TextIcon
 const ImageIcon = require('./../../../../images/icon_profile_16x16.svg?name=ImageIcon');
 const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
 
-class Format
-{
-  type: string = '';
-  template: string = '';
-  showRaw: boolean = false;
-  showField: boolean = false;
-
-  set: (f: string, v: any) => Format;
-  setIn: (f: string[], v: any) => Format;
-}
-const Format_Record = Immutable.Record(new Format());
-const _Format = (config?: any) => {
-  return new Format_Record(config || {}) as any as Format;
-};
-
-export class IResultsConfig
-{
-  name: string = '';
-  score: string = '';
-  fields: List<string> = List([]);
-  enabled: boolean = false;
-  formats: IMMap<string, Format> = Map<string, Format>({});
-  primaryKeys: List<string> = List([]);
-
-  set: (f: string, v: any) => IResultsConfig;
-  setIn: (f: string[], v: any) => IResultsConfig;
-  toJS: () => any;
-}
-const IResultsConfig_Record = Immutable.Record(new IResultsConfig());
-export const _IResultsConfig = (config?: any) => {
-  let conf = new IResultsConfig_Record(config || {}) as any as IResultsConfig;
-
-  conf = conf.set('formats', Map<string, Format>(conf.formats));
-  conf = conf
-    .set('formats', conf.formats.map((format) => _Format(format)))
-    .set('fields', List(conf.fields))
-    .set('primaryKeys', List(conf.primaryKeys));
-
-  return conf;
-};
-export const DefaultIResultsConfig = _IResultsConfig();
-
 export interface Props
 {
   fields: List<string>;
-  config: IResultsConfig;
-  onConfigChange: (config: IResultsConfig) => void;
+  config: ResultsConfig;
+  onConfigChange: (config: ResultsConfig) => void;
   onClose: () => void;
 }
 
-export class ResultsConfig extends PureClasss<Props>
+export class ResultsConfigComponent extends PureClasss<Props>
 {
   state: {
     lastHover: {index: number, field: string},
-    config: IResultsConfig;
+    config: ResultsConfig;
   } = {
     lastHover: {index: null, field: null},
     config: null,
@@ -194,7 +153,7 @@ export class ResultsConfig extends PureClasss<Props>
     }
   }
 
-  changeConfig(config: IResultsConfig)
+  changeConfig(config: ResultsConfig)
   {
     this.setState({
       config,
@@ -721,4 +680,4 @@ const crDropCollect = (connect, monitor) =>
 
 const CRTarget = DropTarget('RESULTCONFIG', crTarget, crDropCollect)(CRTargetC);
 
-export default ResultsConfig;
+export default ResultsConfigComponent;

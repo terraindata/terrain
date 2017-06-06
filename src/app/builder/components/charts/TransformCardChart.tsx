@@ -49,7 +49,8 @@ import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
-import { BuilderTypes } from './../../BuilderTypes';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 type ScorePoint = {
   id: string;
@@ -71,6 +72,7 @@ export interface Props
   inputKey: string;
   updatePoints: (points: ScorePoints, released?: boolean) => void;
   width: number;
+  language: string;
 
   spotlights: any; // TODO spawtlights
 }
@@ -249,12 +251,17 @@ class TransformCardChart extends PureClasss<Props>
       index ++;
     }
 
-    this.updatePoints(points.splice(index, 0,
-      BuilderTypes.make(BuilderTypes.Blocks.scorePoint, {
-        value,
-        score,
-      }),
-    ).toList(), true);
+    this.updatePoints(
+      points.splice(index, 0,
+        BlockUtils.make(
+          AllBackendsMap[this.props.language].blocks.scorePoint, {
+            value,
+            score,
+          }
+        ),
+      ).toList(),
+      true
+    );
   }
 
   componentDidUpdate()

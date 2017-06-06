@@ -61,6 +61,7 @@ import LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
@@ -145,7 +146,7 @@ class AlgorithmsColumn extends PureClasss<Props>
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
-        .set('status', LibraryTypes.ItemStatus.Archive) as Algorithm,
+        .set('status', ItemStatus.Archive) as Algorithm,
       );
   }
 
@@ -220,34 +221,34 @@ class AlgorithmsColumn extends PureClasss<Props>
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
     const scores = {
-      [LibraryTypes.ItemStatus.Archive]:
+      [ItemStatus.Archive]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Archive),
+        color: LibraryTypes.colorForStatus(ItemStatus.Archive),
         name: 'Variants in Archived Status',
       },
-      [LibraryTypes.ItemStatus.Build]:
+      [ItemStatus.Build]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Build),
+        color: LibraryTypes.colorForStatus(ItemStatus.Build),
         name: 'Variants in Build Status',
       },
-      [LibraryTypes.ItemStatus.Approve]:
+      [ItemStatus.Approve]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Approve),
+        color: LibraryTypes.colorForStatus(ItemStatus.Approve),
         name: 'Variants in Approve Status',
       },
-      [LibraryTypes.ItemStatus.Live]:
+      [ItemStatus.Live]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Live),
+        color: LibraryTypes.colorForStatus(ItemStatus.Live),
         name: 'Variants in Live Status',
       },
-      [LibraryTypes.ItemStatus.Default]:
+      [ItemStatus.Default]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Default),
+        color: LibraryTypes.colorForStatus(ItemStatus.Default),
         name: 'Variants in Default Status',
       },
     };
@@ -356,14 +357,14 @@ class AlgorithmsColumn extends PureClasss<Props>
   handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
-    const status = LibraryTypes.ItemStatus[statusString];
+    const status = ItemStatus[statusString];
     if (a.status !== status)
     {
       Actions.algorithms.change(a.set('status', status) as Algorithm);
     }
   }
 
-  renderCategory(status: LibraryTypes.ItemStatus)
+  renderCategory(status: ItemStatus)
   {
     const {algorithms} = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
@@ -376,7 +377,7 @@ class AlgorithmsColumn extends PureClasss<Props>
         key={status}
         onHover={this.handleCategoryHover}
         type="algorithm"
-        titleHidden={status === LibraryTypes.ItemStatus.Build}
+        titleHidden={status === ItemStatus.Build}
       >
         {
           ids.map(this.renderAlgorithm)
@@ -385,7 +386,7 @@ class AlgorithmsColumn extends PureClasss<Props>
           ids.size === 0 && <div className="library-category-none">None</div>
         }
         {
-          status === LibraryTypes.ItemStatus.Build && canCreate &&
+          status === ItemStatus.Build && canCreate &&
             <CreateItem
               name="algorithm"
               onCreate={this.handleCreate}

@@ -47,30 +47,26 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 const {List} = Immutable;
 import Dropdown from './../../common/components/Dropdown';
-import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';
-import RolesStore from './../../roles/data/RolesStore';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import UserStore from './../../users/data/UserStore';
-import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import Actions from './../data/LibraryActions';
-import LibraryActions from './../data/LibraryActions';
 import LibraryTypes from './../LibraryTypes';
-import SharedTypes from './../../../../shared/SharedTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 
 type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   variant: Variant;
-  dbs: List<SharedTypes.Database>;
+  dbs: List<BackendInstance>;
   isSuperUser: boolean;
   isBuilder: boolean;
 }
 
+// TODO MOD centralize
 const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends PureClasss<Props>
@@ -82,7 +78,13 @@ class LibraryInfoColumn extends PureClasss<Props>
 
   handleLanguageChange(langIndex: number)
   {
-    Actions.variants.change(this.props.variant.set('language', LANGUAGES.get(langIndex)));
+    const language = LANGUAGES.get(langIndex);
+    console.log(this.props.variant.query);
+    Actions.variants.change(
+      this.props.variant
+        .set('language', language)
+        .setIn(['query', 'language'], language) // TODO change once we remove query from variant
+    );
   }
 
   render()
