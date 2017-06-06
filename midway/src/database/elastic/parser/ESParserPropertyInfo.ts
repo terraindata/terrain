@@ -45,27 +45,19 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESParserToken from './ESParserToken';
+import ESParserValueInfo from './ESParserValueInfo';
 
 /**
- * Represents information about a value that was parsed by ESParser
+ * Represents information about a property that was parsed by ESParser
  */
-export default class ESParserValueInfo
+export default class ESParserPropertyInfo
 {
-  public value: any; // the parsed value
-  public tokens: ESParserToken[]; // the tokens belonging to the value, in order of appearance
+  public name: ESParserValueInfo; // the value info for the property name
+  public value: ESParserValueInfo | null; // the value info for the property value
 
-  /**
-   * If value is a terminal node, children is null
-   * If value is an array, children is a corresponding ESParserValueInfo[]
-   * If value is an object, children is a corresponding object mapping keys
-   *  to {name:ESParserValueInfo, value:ESParserValueInfo} tuples.
-   */
-  public children: any;
-
-  public constructor(value: any = null, tokens: ESParserToken[] = [])
+  public constructor(name: ESParserValueInfo)
   {
-    this.value = value;
-    this.tokens = tokens;
-    this.children = null;
+    this.name = name;
+    this.value = null;
   }
 }

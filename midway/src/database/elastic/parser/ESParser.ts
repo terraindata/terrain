@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESParserError from './ESParserError';
+import ESParserPropertyInfo from './ESParserPropertyInfo';
 import ESParserToken from './ESParserToken';
 import ESParserValueInfo from './ESParserValueInfo';
 
@@ -286,12 +287,17 @@ export default class ESParser
 
   private readArray(): any[]
   {
-    const value: any[] = [];
+    const array: any[] = [];
+    const arrayInfo: ESParserValueInfo = this.getCurrentValueInfo();
+    arrayInfo.children = [];
+
     for (let element = this.readValue();
       element !== undefined;
       element = this.readValue())
     {
-      value.push(element);
+      array.push(element);
+
+      arrayInfo.children.push(this.getCurrentValueInfo());
 
       // read next delimiter
       const propertyDelimiter: string = this.peek();
@@ -315,12 +321,15 @@ export default class ESParser
       this.accumulateError('Missing or misplaced array closing bracket, "]"');
     }
 
-    return value;
+    return array;
   }
 
   private readObject(): object
   {
     const obj: object = {};
+    const objInfo: ESParserValueInfo = this.getCurrentValueInfo();
+    objInfo.children = {};
+
     for (let propertyName = this.readValue();
       propertyName !== undefined;
       propertyName = this.readValue())
@@ -331,6 +340,15 @@ export default class ESParser
           'Object property names must be strings, but found a ' + typeof propertyName + ' instead');
         propertyName = String(propertyName);
       }
+
+      if (obj.hasOwnProperty(propertyName))
+      {
+        this.accumulateError('Duplicate property names are not allowed');
+      }
+
+      const propertyInfo: ESParserPropertyInfo =
+        new ESParserPropertyInfo(this.getCurrentValueInfo());
+      objInfo.children[propertyName] = propertyInfo;
 
       // read delimiter between property name and value
       const kvpDelimiter: string = this.peek();
@@ -354,6 +372,7 @@ export default class ESParser
 
       // read property value
       const propertyValue = this.readValue();
+      propertyInfo.value = this.getCurrentValueInfo();
 
       // check for errors in the property value
       if (propertyValue === undefined)
