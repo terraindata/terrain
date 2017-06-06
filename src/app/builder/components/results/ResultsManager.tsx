@@ -55,10 +55,10 @@ import SharedTypes from './../../../../../shared/SharedTypes';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
 import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
-import QueryResponse from '../../../../../shared/QueryResponse';
 import {MidwayErrorItem} from '../../../../../shared/MidwayErrorItem';
 import {line} from 'd3-shape';
-import {MidwayError} from '../../../../../midway/src/error/MidwayError';
+import MidwayQueryResponse from './MidwayQueryResponse';
+import MidwayError from '../../../../../shared/error/MidwayError';
 
 export const MAX_RESULTS = 200;
 
@@ -126,8 +126,8 @@ interface ResultsQuery
 interface State
 {
   queriedTql?: string;
-  queryMidwayResponse?: QueryResponse;
-  allQueryMidwayResponse?: QueryResponse;
+  midwayQueryResponse?: MidwayQueryResponse;
+  midwayAllQueryResponse?: MidwayQueryResponse;
   query?: ResultsQuery;
   allQuery?: ResultsQuery;
   countQuery?: ResultsQuery;
@@ -168,92 +168,63 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  queryResults(query: BuilderTypes.Query, db: SharedTypes.Database)
+  private queryM1Results(query: BuilderTypes.Query, db: SharedTypes.Database)
   {
-    if (!query || !db)
-    {
-      return;
-    }
-
-    let tql = query.tql;
-
-    if(db.source === 'm1')
-    {
-      tql = TQLConverter.toTQL(query, {
-        limit: MAX_RESULTS,
-        replaceInputs: true,
-      });
-    }
+    const tql = TQLConverter.toTQL(query, {
+      limit: MAX_RESULTS,
+      replaceInputs: true,
+    });
 
     if (tql !== this.state.queriedTql)
     {
       this.killQueries();
       this.setState({
         queriedTql: tql,
-        query:
-          Ajax.query(
-            tql,
-            db,
-            this.handleResultsResponse,
-            this.handleError,
-          ),
+        query: Ajax.queryM1(
+          tql,
+          db,
+          (resp) =>
+          {
+            this.handleM1QueryResponse(resp, false);
+          },
+          (err) =>
+          {
+            this.handleM1Error(err, false);
+          },
+        ),
       });
-
-      if (this.props.db.source === 'm2')
+      const selectCard = query.cards.get(0);
+      if (
+        !this.props.noExtraFields
+        && selectCard
+        && !selectCard['cards'].some(
+          (card) => card.type === 'groupBy',
+        )
+        && !selectCard['fields'].some(
+          (field) => field.field.static && field.field.static.isAggregate,
+        )
+      )
       {
+        // temporary, don't dispatch select * if query has group by
         this.setState({
-          allQuery: Ajax.query(
-            TQLConverter.toEQL(query, {
+          allQuery: Ajax.queryM1(
+            TQLConverter.toTQL(query, {
               allFields: true,
+              transformAliases: true,
+              limit: MAX_RESULTS,
+              replaceInputs: true,
             }),
             db,
-            this.handleAllFieldsResponse,
-            this.handleAllFieldsError,
+            (resp) =>
+            {
+              this.handleM1QueryResponse(resp, false);
+            },
+            (err) =>
+            {
+              this.handleM1Error(err, false);
+            },
           ),
         });
-      } else if (this.props.db.source === 'm1')
-      {
-        const selectCard = query.cards.get(0);
-        if (
-          !this.props.noExtraFields
-          && selectCard
-          && !selectCard['cards'].some(
-              (card) => card.type === 'groupBy',
-            )
-          && !selectCard['fields'].some(
-              (field) => field.field.static && field.field.static.isAggregate,
-            )
-        )
-        {
-          // temporary, don't dispatch select * if query has group by
-          this.setState({
-            allQuery: Ajax.query(
-              TQLConverter.toTQL(query, {
-                allFields: true,
-                transformAliases: true,
-                limit: MAX_RESULTS,
-                replaceInputs: true,
-              }),
-              db,
-              this.handleAllFieldsResponse,
-              this.handleAllFieldsError,
-            ),
-          });
-        }
-
-        // temporarily disable count
-        // this.setState({
-        //   countXhr:
-        //     Ajax.query(
-        //       TQLConverter.toTQL(query, {
-        //         count: true,
-        //         replaceInputs: true,
-        //       }),
-        //       db,
-        //       this.handleCountResponse,
-        //       this.handleCountError
-        //     ),
-        // });
       }
 
       this.changeResults({
@@ -264,6 +235,99 @@ export class ResultsManager extends PureClasss<Props>
         hasLoadedTransform: false,
       });
     }
+  }
+
+  private queryM2Results(query: BuilderTypes.Query, db: SharedTypes.Database)
+  {
+    const tql = TQLConverter.toEQL(query);
+    if (tql && tql !== this.state.queriedTql)
+    {
+      this.setState({
+        queriedTql: tql,
+        query: Ajax.query(
+          tql,
+          db,
+          (resp) =>
+          {
+            this.handleM2QueryResponse(resp, false);
+          },
+          (err) =>
+          {
+            this.handleM2RouteError(err, false);
+          },
+        ),
+      });
+      let allfieldTql;
+      try
+      {
+        allfieldTql = TQLConverter.toEQL(query, {
+          allFields: true,
+        });
+      }
+      catch (err)
+      {
+        console.log('Could not generate all field Elastic request, reason:' + err);
+      }
+      if (allfieldTql)
+      {
+        this.setState({
+          allQuery: Ajax.query(
+            TQLConverter.toEQL(query, {
+              allFields: true,
+            }),
+            db,
+            (resp) =>
+            {
+              this.handleM2QueryResponse(resp, true);
+            },
+            (err) =>
+            {
+              this.handleM2RouteError(err, true);
+            },
+          ),
+        });
+      }
+
+      this.changeResults({
+        loading: true,
+        hasLoadedResults: false,
+        hasLoadedAllFields: false,
+        hasLoadedCount: false,
+        hasLoadedTransform: false,
+      });
+    }
+  }
+
+  public queryResults(query: BuilderTypes.Query, db: SharedTypes.Database)
+  {
+    if (!query || !db)
+    {
+      return;
+    }
+
+    if (db.source === 'm1')
+    {
+      this.queryM1Results(query, db);
+    } else if (db.source === 'm2')
+    {
+      this.queryM2Results(query, db);
+    } else
+    {
+      console.log('Unknown Database ' + query);
+    }
+      // temporarily disable count
+          // this.setState({
+          //   countXhr:
+          //     Ajax.query(
+          //       TQLConverter.toTQL(query, {
+          //         count: true,
+          //         replaceInputs: true,
+          //       }),
+          //       db,
+          //       this.handleCountResponse,
+          //       this.handleCountError
+          //     ),
+    // });
   }
 
   killQueries()
@@ -333,46 +397,20 @@ export class ResultsManager extends PureClasss<Props>
     // }
   }
 
-  private handleResultsResponse(response: M1QueryResponse | QueryResponse, isAllFields?: boolean)
+
+
+  private updateResults(resultsData: any[], isAllFields: boolean)
   {
-    const queryKey = isAllFields ? 'allQuery' : 'query';
-    this.setState({
-      [queryKey]: null,
-    });
-
     const {resultsState} = this.props;
-    let resultsData;
-
-    if (response instanceof QueryResponse)
-    {
-      // m2
-      if (response.hasError())
-      {
-        this.handleError(response);
-        return;
-      }
-      resultsData = response.getResultsData();
-    } else
-    {
-      // m1
-      if (!response || response.errorMessage)
-      {
-        this.handleError(response, isAllFields);
-        return;
-      }
-      resultsData = response.results;
-    }
 
     const resultsCount = resultsData.length;
     if (resultsData.length > MAX_RESULTS)
     {
       resultsData.splice(MAX_RESULTS, resultsData.length - MAX_RESULTS);
     }
-
     let results: Results =
       (resultsState.hasLoadedResults || resultsState.hasLoadedAllFields)
         ? resultsState.results : List([]);
-
     resultsData.map(
       (resultData, index) =>
       {
@@ -401,7 +439,8 @@ export class ResultsManager extends PureClasss<Props>
       results,
       fields,
       hasError: false,
-      loading: (isAllFields && !resultsState.hasLoadedResults) || (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
+      loading: (isAllFields && !resultsState.hasLoadedResults) ||
+      (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
       errorLine: null,
       mainErrorMessage: null,
@@ -416,64 +455,39 @@ export class ResultsManager extends PureClasss<Props>
     this.changeResults(changes);
   }
 
-  handleAllFieldsResponse(response: M1QueryResponse)
+  private handleM1QueryResponse(response: M1QueryResponse, isAllFields: boolean)
   {
-    this.handleResultsResponse(response, true);
-  }
-
-  handleCountResponse(response: M1QueryResponse)
-  {
+    const queryKey = isAllFields ? 'allQuery' : 'query';
     this.setState({
-      countQuery: null,
+      [queryKey]: null,
     });
-
-    // let results = response.results;
-    // if(results)
-    // {
-    //   if(results.length === 1)
-    //   {
-    //     this.setState({
-    //       resultsCount: results[0]['COUNT(*)']
-    //     });
-    //   }
-    //   else if(results.length > 1)
-    //   {
-    //     this.setState({
-    //       resultsCount: results.length,
-    //     })
-    //   }
-    //   else
-    //   {
-    //     this.handleCountError();
-    //   }
-    // }
-    // else
-    // {
-    //   this.handleCountError();
-    // }
-  }
-
-  handleCountError()
-  {
-    this.setState({
-      countQuery: null,
-    });
-    // probably not needed
-    // this.props.onResultsStateChange(
-    //   this.props.resultsState
-    //     .set('resultsLongCount', 0)
-    // );
-  }
-
-  private handleError(response: M1QueryResponse | QueryResponse, isAllFields?: boolean)
-  {
-    if (response instanceof QueryResponse)
-    {
-      this.handleM2Error(response, isAllFields);
-    } else
+    if (!response || response.errorMessage)
     {
       this.handleM1Error(response, isAllFields);
+      return;
     }
+    const resultsData = response.results as any[];
+    this.updateResults(resultsData, isAllFields);
+  }
+
+  private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean)
+  {
+    const queryKey = isAllFields ? 'allQuery' : 'query';
+    this.setState({
+      [queryKey]: null,
+    });
+    const k = isAllFields ? 'midwayAllQueryResponse' : 'midwayQueryResponse';
+    this.setState({
+      [k]: response,
+    });
+    // m2
+    if (response.hasError())
+    {
+      this.handleM2QueryError(response, isAllFields);
+      return;
+    }
+    const resultsData = response.getResultsData();
+    this.updateResults(resultsData, isAllFields);
   }
 
   private handleM1Error(response: M1QueryResponse, isAllFields?: boolean)
@@ -535,9 +549,10 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  private handleM2Error(response: QueryResponse, isAllFields?: boolean)
+  private updateM2ErrorState(errors: MidwayErrorItem[], isAllFields?: boolean)
   {
-    const err: MidwayErrorItem = response.errors[0];
+    // TODO: handle myltiple errors.
+    const err = errors[0];
     let {resultsState} = this.props;
     if (!isAllFields)
     {
@@ -571,9 +586,75 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  handleAllFieldsError(response: M1QueryResponse)
+  private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean, )
   {
-    this.handleError(response, true);
+    this.updateM2ErrorState(response.errors, isAllFields);
+  }
+
+  private handleM2RouteError(response: MidwayError | string, isAllFields: boolean)
+  {
+    let errorItems: MidwayErrorItem[];
+    if (typeof response === 'string')
+    {
+      let error: MidwayError;
+      try
+      {
+        error = MidwayError.fromJSON(response);
+      } catch (err)
+      {
+        console.log('The error message does not match MidwayError.' + response);
+        error = new MidwayError(-1, 'Unknow Route Error', response, {});
+      }
+      errorItems = error.getMidwayErrors();
+    } else
+    {
+      errorItems = response.errors;
+    }
+    this.updateM2ErrorState(errorItems, isAllFields);
+  }
+
+  handleCountResponse(response: M1QueryResponse)
+  {
+    this.setState({
+      countQuery: null,
+    });
+
+    // let results = response.results;
+    // if(results)
+    // {
+    //   if(results.length === 1)
+    //   {
+    //     this.setState({
+    //       resultsCount: results[0]['COUNT(*)']
+    //     });
+    //   }
+    //   else if(results.length > 1)
+    //   {
+    //     this.setState({
+    //       resultsCount: results.length,
+    //     })
+    //   }
+    //   else
+    //   {
+    //     this.handleCountError();
+    //   }
+    // }
+    // else
+    // {
+    //   this.handleCountError();
+    // }
+  }
+
+  handleCountError()
+  {
+    this.setState({
+      countQuery: null,
+    });
+    // probably not needed
+    // this.props.onResultsStateChange(
+    //   this.props.resultsState
+    //     .set('resultsLongCount', 0)
+    // );
   }
 
   changeResults(changes: { [key: string]: any })

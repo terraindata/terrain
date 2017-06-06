@@ -44,11 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-interface ElasticQueryHitSource {
+export interface ElasticQueryHitSource
+{
   [key: string]: any;
 }
 
-interface ElasticQueryHit {
+export interface ElasticQueryHit
+{
   _index: string;
   _type: string;
   _id: string;
@@ -56,8 +58,27 @@ interface ElasticQueryHit {
   _source: ElasticQueryHitSource;
   _sort?: boolean;
 }
-export interface ElasticQueryResult {
+
+export interface ElasticQueryShards
+{
+  total: number;
+  successful: number;
+  failed: number;
+}
+
+export interface ElasticQueryHits {
   total: number;
   max_score: number;
   hits: ElasticQueryHit[];
 }
+
+export interface ElasticQueryResult
+{
+  took: number;
+  timed_out: boolean;
+  hits: ElasticQueryHits;
+  _shards: ElasticQueryShards;
+
+}
+
+export default ElasticQueryResult;

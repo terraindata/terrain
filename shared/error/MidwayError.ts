@@ -43,46 +43,60 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as winston from 'winston';
 
-import MidwayError from '../../../shared/error/MidwayError';
+import MidwayErrorItem from '../MidwayErrorItem';
 
-class RouteError extends MidwayError
+export class MidwayError
 {
-  public static async RouteErrorHandler(ctx, next)
+  public static fromJSON(json: string): MidwayError
   {
-    try
-    {
-      await next();
-    }
-    catch (err)
-    {
-      const routeError = RouteError.fromRouteContext(ctx, err);
-      const status = routeError.getStatus();
-      winston.info(JSON.stringify(routeError));
-      ctx.status = status;
-      ctx.body = { errors: routeError.getMidwayErrors() };
-    }
+    const midwayError = Object.create(MidwayError.prototype);
+    const jobject = JSON.parse(json);
+    midwayError.errors = jobject.errors;
+    return midwayError;
   }
-
-  public static fromRouteContext(ctx, err: string | object): RouteError
-  {
-    if (typeof err !== 'object')
-    {
-      err = new Error(err);
-    }
-
-    const status: number = 'status' in err ? err['status'] : 400;
-    const title: string = 'title' in err ? err['title'] : 'Route ' + String(ctx.url) + ' has an error.';
-    const detail: string = 'detail' in err ? err['detail'] : ('message' in err ? err['message'] : JSON.stringify(err));
-    const source: object = { ctx, err };
-    return new RouteError(status, title, detail, source);
-  }
+  public errors: MidwayErrorItem[];
 
   public constructor(status: number, title: string, detail: string, source: object)
   {
-    super(status, title, detail, source);
+    const o: MidwayErrorItem = { status, title, detail, source };
+    this.errors = [o];
+  }
+
+  public getMidwayErrors(): MidwayErrorItem[]
+  {
+    return this.errors;
+  }
+
+  // we may provide a iterator interface later
+  public getNthMidwayErrorItem(index): MidwayErrorItem
+  {
+    return this.errors[index];
+  }
+
+  // get the first error object's status
+  public getStatus(): number
+  {
+    return this.getNthMidwayErrorItem(0).status;
+  }
+
+  // get the first error object's title
+  public getTitle(): string
+  {
+    return this.getNthMidwayErrorItem(0).title;
+  }
+
+  // get the first error object's detail
+  public getDetail(): string
+  {
+    return this.getNthMidwayErrorItem(0).detail;
+  }
+
+  // get the first error object's source
+  public getSource(): object
+  {
+    return this.getNthMidwayErrorItem(0).source;
   }
 }
 
-export default RouteError;
+export default MidwayError;

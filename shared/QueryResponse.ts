@@ -53,26 +53,16 @@ export interface QueryResult {
 
 export default class QueryResponse
 {
-  public static fromJSON(json: string)
-  {
-    const responseObject = JSON.parse(json);
-    return new QueryResponse(responseObject.result, responseObject.errors);
-  }
-
-  public static fromParsedJsonObject(obj: any)
-  {
-    return new QueryResponse(obj.result, obj.errors);
-  }
-
   public request: QueryRequest;
   public result: QueryResult;
   public errors: MidwayErrorItem[];
 
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [])
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request?: QueryRequest)
   {
     // QueryResult can't be null
     this.result = result;
     this.errors = errors;
+    this.request = request;
   }
 
   public setQueryRequest(req: QueryRequest)
@@ -82,35 +72,6 @@ export default class QueryResponse
 
   public hasError(): boolean
   {
-    if (this.errors.length > 0)
-    {
-      return true;
-    } else
-    {
-      return false;
-    }
-  }
-
-  public getResultsData()
-  {
-    let ret = [];
-    if (this.result !== null)
-    {
-      const r = this.result as any;
-      const hits = r.hits.hits;
-      const results = hits.map((hit) =>
-      {
-        const source = hit._source;
-        source._index = hit._index;
-        source._type = hit._type;
-        source._id = hit._id;
-        source._score = hit._score;
-        source._sort = hit._sort;
-        return source;
-      });
-      ret = results;
-    }
-
-    return  ret;
+    return this.errors.length > 0;
   }
 }

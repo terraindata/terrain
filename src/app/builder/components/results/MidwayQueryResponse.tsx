@@ -44,59 +44,60 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from '../../../shared/MidwayErrorItem';
+import ElasticQueryResult from '../../../../../shared/ElasticQueryResponse';
+import MidwayErrorItem from '../../../../../shared/MidwayErrorItem';
+import QueryRequest from '../../../../../shared/QueryRequest';
+import QueryResponse, {QueryResult} from '../../../../../shared/QueryResponse';
 
-export class MidwayError
+export default class MidwayQueryResponse extends QueryResponse
 {
   public static fromJSON(json: string)
   {
-    const midwayError = Object.create(MidwayError.prototype);
-    const jobject = JSON.parse(json);
-    midwayError.errors = jobject.errors;
+    const responseObject = JSON.parse(json);
+    return new MidwayQueryResponse(responseObject.result, responseObject.errors, responseObject.request);
   }
 
-  public errors: MidwayErrorItem[];
-
-  public constructor(status: number, title: string, detail: string, source: object)
+  public static fromParsedJsonObject(obj: any)
   {
-    const o: MidwayErrorItem = { status, title, detail, source };
-    this.errors = [o];
+    return new MidwayQueryResponse(obj.result, obj.errors, obj.request);
   }
 
-  public getMidwayErrors(): MidwayErrorItem[]
+  public static formatElasticResult(result: QueryResult): any[]
   {
-    return this.errors;
+    let ret = [];
+    const r = result as ElasticQueryResult;
+    const hits = r.hits.hits;
+    const results = hits.map((hit) =>
+    {
+      const source = hit._source;
+      source._index = hit._index;
+      source._type = hit._type;
+      source._id = hit._id;
+      source._score = hit._score;
+      source._sort = hit._sort;
+      return source;
+    });
+    ret = results;
+    return  ret;
   }
 
-  // we may provide a iterator interface later
-  public getNthMidwayErrorItem(index): MidwayErrorItem
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
   {
-    return this.errors[index];
+    super(result, errors, request);
   }
 
-  // get the first error object's status
-  public getStatus(): number
+  public getResultsData(): any[]
   {
-    return this.getNthMidwayErrorItem(0).status;
-  }
-
-  // get the first error object's title
-  public getTitle(): string
-  {
-    return this.getNthMidwayErrorItem(0).title;
-  }
-
-  // get the first error object's detail
-  public getDetail(): string
-  {
-    return this.getNthMidwayErrorItem(0).detail;
-  }
-
-  // get the first error object's source
-  public getSource(): object
-  {
-    return this.getNthMidwayErrorItem(0).source;
+    let result;
+    switch (this.request.databasetype)
+    {
+      case 'elastic':
+        result = MidwayQueryResponse.formatElasticResult(this.result);
+        break;
+      default:
+        result = [];
+        console.log('Unknown request type when extracting results from midway query response ' + this.request.type);
+    }
+    return result;
   }
 }
-
-export default MidwayError;

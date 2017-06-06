@@ -52,12 +52,17 @@ import LibraryTypes from './../library/LibraryTypes';
 import SharedTypes from './../../../shared/SharedTypes';
 import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
-import QueryResponse from '../../../shared/QueryResponse';
+
+import MidwayQueryResponse from '../builder/components/results/MidwayQueryResponse';
+
 import {recordForSave, responseToRecordConfig} from '../Classes';
+import {QueryRequest} from '../../../shared/QueryRequest';
+import {MidwayError} from '../../../shared/error/MidwayError';
+import {routerShape} from 'react-router';
 
 /**
  * Note: This is the old query response type.
- * For the new QueryResponse definition, see /midway/src/app/query/QueryResponse.ts
+ * For the new QueryResponse definition, see MidwayQueryResponse
  */
 export interface M1QueryResponse
 {
@@ -120,6 +125,7 @@ export const Ajax =
           }
         },
         _.extend({
+          onError: config.onError,
           host: MIDWAY_HOST,
           noToken: true,
           json: true,
@@ -201,7 +207,11 @@ export const Ajax =
       }
 
       const xhr = new XMLHttpRequest();
-      xhr.onerror = config && config.onError;
+      xhr.onerror = (err: any) =>
+      {
+        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+        config && config.onError && config.onError(routeError);
+      };
       xhr.onload = (ev: Event) =>
       {
         // TODO re-enable
@@ -213,9 +223,7 @@ export const Ajax =
 
         if (xhr.status !== 200)
         {
-          // this is a route error, the error format is in m2/midway/src/error/MidwayError.ts
-          const message: string = JSON.parse(xhr.responseText).errors[0].detail;
-          config && config.onError && config.onError({errorMessage: message});
+          config && config.onError && config.onError(xhr.responseText);
           return;
         }
 
@@ -640,7 +648,7 @@ export const Ajax =
       tql: string,
       db: string | number,
       onLoad: (response: M1QueryResponse) => void,
-      onError?: (ev: Event) => void,
+      onError?: (ev: M1QueryResponse) => void,
       sqlQuery?: boolean,
       options: {
         csv?: boolean,
@@ -676,7 +684,7 @@ export const Ajax =
             respData = JSON.parse(resp);
           } catch (e)
           {
-            onError && onError(resp as any);
+            onError && onError({errorMessage: resp});
             return;
           }
           onLoad(respData);
@@ -693,7 +701,7 @@ export const Ajax =
     },
 
     /**
-     * Transforms result into old format.
+     * Query M1 via the old query_m1 interface
      */
       queryM1(body: string,
             db: SharedTypes.Database,
@@ -707,85 +715,16 @@ export const Ajax =
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       // TODO make this hack not so bad
-      const dbs = LibraryStore.getState().dbs;
-      if (db && db.source === 'm1')
-      {
         return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
-      }
-
-      // TODO: For MySQL and other string queries, we should skip this step and send it as a string
-      try
-      {
-        body = JSON.parse(body);
-      }
-      catch (e)
-      {
-        // on parse failure, absorb error and send query as a string
-      }
-      const queryId = '' + Math.random();
-      const payload = {
-        type: 'search', // can be other things in the future
-        database: db.id, // should be passed by caller
-        streaming: options.streaming,
-        body,
-      };
-
-      const onLoadHandler = (resp) =>
-      {
-        let result: M1QueryResponse = {results: []};
-        try
-        {
-          const hits = resp.result.hits.hits;
-          const results = hits.map((hit) =>
-          {
-            let source = hit._source;
-            source._index = hit._index;
-            source._type = hit._type;
-            source._id = hit._id;
-            source._score = hit._score;
-            source._sort = hit._sort;
-            return source;
-          });
-
-          result = {results};
-        }
-        catch (e)
-        {
-          // absorb
-        }
-
-        // This could be improved
-        if (resp.errors.length > 0)
-        {
-          result.errorMessage = resp.errors[0].title;
-        }
-
-        onLoad(result);
-      };
-
-      const xhr = Ajax._reqMidway2(
-        'post',
-        'query/',
-        payload,
-        onLoadHandler,
-        {
-          onError,
-          download: options.streaming,
-          downloadFilename: options.streamingTo,
-        },
-      );
-
-      return {queryId, xhr};
     },
 
     /**
-     * Intermediate query interface. Queries M2.
-     * Transforms result into old format.
+     * Query M2
      */
     query(body: string,
       db: SharedTypes.Database,
-      onLoad: (response: QueryResponse) => void,
-      onError?: (ev: Event) => void,
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: any) => void,
       sqlQuery?: boolean, // unused
       options: {
         streaming?: boolean,
@@ -793,63 +732,29 @@ export const Ajax =
       } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      // TODO make this hack not so bad
-      const dbs = LibraryStore.getState().dbs;
-      if (db && db.source === 'm1')
-      {
-        return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
-      }
-
-      // TODO: For MySQL and other string queries, we should skip this step and send it as a string
       try
       {
         body = JSON.parse(body);
       }
       catch (e)
       {
+        console.log('The query is not a JSON object ' + body);
         // on parse failure, absorb error and send query as a string
       }
       const queryId = '' + Math.random();
-      const payload = {
+      const payload: QueryRequest = {
         type: 'search', // can be other things in the future
-        database: db.id, // should be passed by caller
+        database: db.id as number, // should be passed by caller
         streaming: options.streaming,
+        databasetype: 'elastic',
         body,
       };
 
       const onLoadHandler = (resp) =>
       {
-        const queryResult: QueryResponse = QueryResponse.fromParsedJsonObject(resp);
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
         onLoad(queryResult);
-        //
-        // try
-        // {
-        //   const hits = resp.result.hits.hits;
-        //   const results = hits.map((hit) =>
-        //   {
-        //     let source = hit._source;
-        //     source._index = hit._index;
-        //     source._type = hit._type;
-        //     source._id = hit._id;
-        //     source._score = hit._score;
-        //     source._sort = hit._sort;
-        //     return source;
-        //   });
-        //
-        //   result = {results};
-        // }
-        // catch (e)
-        // {
-        //   // absorb
-        // }
-
-        // This could be improved
-        // if (resp.errors.length > 0)
-        // {
-        //   result.errorMessage = resp.errors[0].title;
-        // }
       };
-
       const xhr = Ajax._reqMidway2(
         'post',
         'query/',
