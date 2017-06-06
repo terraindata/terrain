@@ -181,11 +181,11 @@ class Loading extends PureClasss<Props>
       >
         <img
           src={Sprites}
-          className="moutain-loading-img"
+          className='moutain-loading-img'
           style={{
             height: this.props.height,
           }}
-          ref="sprites"
+          ref='sprites'
         />
       </div>
     );

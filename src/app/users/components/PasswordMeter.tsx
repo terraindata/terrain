@@ -82,7 +82,7 @@ class PasswordMeter extends Classs<Props>
   render()
   {
     return (
-      <div className="password-meter">
+      <div className='password-meter'>
         {meterSectionValues.map(this.renderMeterSection)}
       </div>
     );

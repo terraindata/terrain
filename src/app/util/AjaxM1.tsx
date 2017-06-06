@@ -188,7 +188,7 @@ export const Ajax =
         download?: boolean;
         downloadFilename?: string;
         useMidway?: boolean;
-      } = {}
+      } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const uniqueId = '' + Math.random();
@@ -239,7 +239,7 @@ export const Ajax =
       options: {
         csv?: boolean,
         csvName?: string,
-      } = {}
+      } = {},
     )
     {
       // kill queries running under the same id
@@ -318,7 +318,7 @@ export const Ajax =
         (e) =>
         {
           onError && onError(e, context);
-        }
+        },
       );
     },
 

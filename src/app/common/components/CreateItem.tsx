@@ -58,7 +58,7 @@ class CreateItem extends Classs<Props>
   render()
   {
     return (
-      <div className="create-item" onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
+      <div className='create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
         <AddIcon />
       </div>
     );

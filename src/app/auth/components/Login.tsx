@@ -48,11 +48,11 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import PureClasss from '../../common/components/PureClasss';
+import Ajax from '../../util/Ajax';
 import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
-import Ajax from '../../util/Ajax';
 
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 
@@ -198,7 +198,7 @@ class Login extends PureClasss<Props>
             xhr: null,
           });
           this.toggleErrorModal();
-        }
+        },
       ),
     });
   }
@@ -235,7 +235,7 @@ class Login extends PureClasss<Props>
           'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.props.loggedIn,
         })}
       >
-        <div className="login-logo-container">
+        <div className='login-logo-container'>
           {
             this.state.showingLogo &&
             <Loading
@@ -248,48 +248,48 @@ class Login extends PureClasss<Props>
           }
         </div>
         <div
-          className="login-container"
-          ref="container"
+          className='login-container'
+          ref='container'
         >
-          <div className="login-info">
-            <div className="login-row">
+          <div className='login-info'>
+            <div className='login-row'>
               <input
-                id="login-email"
-                type="text"
+                id='login-email'
+                type='text'
                 onChange={this.handleEmailChange}
-                className="login-input-field"
-                placeholder=""
+                className='login-input-field'
+                placeholder=''
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
               <label
-                htmlFor="login-email"
-                className="login-label"
+                htmlFor='login-email'
+                className='login-label'
               >
                 Email
               </label>
             </div>
-            <div className="login-row">
+            <div className='login-row'>
               <input
-                className="login-input-field"
-                type="password"
-                id="login-password"
-                placeholder=""
+                className='login-input-field'
+                type='password'
+                id='login-password'
+                placeholder=''
                 onKeyDown={this.handleKeyDown}
                 onChange={this.handlePasswordChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
               <label
-                className="login-label"
-                htmlFor="login-password"
+                className='login-label'
+                htmlFor='login-password'
               >
                 Password
               </label>
             </div>
           </div>
-          <div className="login-submit-button-wrapper" >
-            <div className="login-submit-button button" onClick={this.handleLogin}>
+          <div className='login-submit-button-wrapper' >
+            <div className='login-submit-button button' onClick={this.handleLogin}>
               Login
             </div>
           </div>

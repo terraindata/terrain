@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import RoleTypes from './../roles/RoleTypes';
 import { BaseClass, New } from '../Classes';
+import RoleTypes from './../roles/RoleTypes';
 
-export module UserTypes
+export namespace UserTypes
 {
   class UserC extends BaseClass
   {
@@ -89,7 +89,7 @@ export module UserTypes
     // groupRoles: Immutable.Map({}),
   }
   export type User = UserC & IRecord<UserC>;
-  export const _User = (config: { [key: string]: any } = {}) => 
+  export const _User = (config: { [key: string]: any } = {}) =>
   {
     config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
     return New<User>(new UserC(config), config);

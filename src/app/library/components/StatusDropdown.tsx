@@ -43,19 +43,19 @@ THE SOFTWARE.
 */
 
 require('./StatusDropdown.less');
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
 const { List } = Immutable;
 import * as classNames from 'classnames';
+import { ItemStatus as Status } from '../../../../shared/items/types/Item';
+import RolesStore from '../../roles/data/RolesStore';
+import UserStore from '../../users/data/UserStore';
+import Util from '../../util/Util';
 import LibraryActions from '../data/LibraryActions';
 import LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
-import RolesStore from '../../roles/data/RolesStore';
-import UserStore from '../../users/data/UserStore';
-import Util from '../../util/Util';
-import { ItemStatus as Status } from '../../../../shared/items/types/Item';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -93,7 +93,7 @@ class StatusDropdown extends PureClasss<Props>
 
   handleChange(index: number)
   {
-    let status = this.getOrder()[index];
+    const status = this.getOrder()[index];
     LibraryActions.variants.status(this.props.variant, status as Status, false);
   }
 
@@ -171,7 +171,7 @@ class StatusDropdown extends PureClasss<Props>
     }
 
     return (
-      <div className="status-dropdown-wrapper">
+      <div className='status-dropdown-wrapper'>
         <div
           className={classNames({
             'status-dropdown': true,
@@ -197,7 +197,7 @@ function getOption(status: Status)
 {
   return (
     <div
-      className="status-dropdown-option"
+      className='status-dropdown-option'
       style={{
         color: LibraryTypes.colorForStatus(status),
       }}
@@ -206,18 +206,18 @@ function getOption(status: Status)
         status === Status.Default
           ?
           <StarIcon
-            className="status-dropdown-option-star"
+            className='status-dropdown-option-star'
           />
           :
           <div
-            className="status-dropdown-option-marker"
+            className='status-dropdown-option-marker'
             style={{
               background: LibraryTypes.colorForStatus(status),
             }}
           />
       }
       <div
-        className="status-dropdown-option-text"
+        className='status-dropdown-option-text'
       >
         {
           LibraryTypes.nameForStatus(status as Status)

@@ -47,17 +47,17 @@ const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
-type ScorePoint = {
+interface ScorePoint {
   id: string;
   score: number;
   value: number;
   set: (f: string, v: any) => ScorePoint;
-};
+}
 type ScorePoints = List<ScorePoint>;
 
 import TransformChart from './TransformChart';
@@ -258,10 +258,10 @@ class TransformCardChart extends PureClasss<Props>
           AllBackendsMap[this.props.language].blocks.scorePoint, {
             value,
             score,
-          }
+          },
         ),
       ).toList(),
-      true
+      true,
     );
   }
 

@@ -69,7 +69,7 @@ class CheckBox extends Classs<Props>
         })}
         onClick={this.props.onChange}
       >
-        {this.props.checked ? <CheckMark className="check-mark-icon" /> : 'O'}
+        {this.props.checked ? <CheckMark className='check-mark-icon' /> : 'O'}
       </div>
     );
   }

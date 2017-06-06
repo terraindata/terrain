@@ -64,7 +64,7 @@ class Logout extends PureClasss<Props>
   render()
   {
     return (
-      <InfoArea large="Logging out..." />
+      <InfoArea large='Logging out...' />
     );
   }
 }

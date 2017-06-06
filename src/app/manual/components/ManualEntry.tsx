@@ -52,8 +52,8 @@ import Classs from './../../common/components/Classs';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 import * as Immutable from 'immutable';
-import Card from './../../builder/components/cards/CardComponent';
 import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import Card from './../../builder/components/cards/CardComponent';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');
 require('./../../tql/components/tql.js');
@@ -147,14 +147,14 @@ class ManualEntry extends Classs<Props>
   renderTqlCardEntryDetail()
   {
     return (
-      <div className="manual-entry-expanded-area">
-        <div className="manual-entry-row">
+      <div className='manual-entry-expanded-area'>
+        <div className='manual-entry-row'>
           <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.notation)}
         </div>
-        <div className="manual-entry-row">
+        <div className='manual-entry-row'>
           <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.syntax)}
         </div>
-        <div className="maunual-entry-indepth">
+        <div className='maunual-entry-indepth'>
           {this.renderInDepthDescription()}
         </div>
       </div>
@@ -164,8 +164,8 @@ class ManualEntry extends Classs<Props>
   renderPhraseTypeEntryDetail()
   {
     return (
-      <div className="manual-entry-expanded-area">
-        <div className="maunual-entry-indepth">
+      <div className='manual-entry-expanded-area'>
+        <div className='maunual-entry-indepth'>
           {this.renderPhraseTypeInDepth()}
         </div>
       </div>
@@ -180,7 +180,7 @@ class ManualEntry extends Classs<Props>
           this.state.manualEntry.text.map((result, index) =>
           {
             return (
-              <div key={index} className="manual-entry-row">
+              <div key={index} className='manual-entry-row'>
                 {this.highlightKeyWords(result)}
                 <br />
               </div>
@@ -195,10 +195,10 @@ class ManualEntry extends Classs<Props>
   {
     return (
       <div>
-        <div className="manual-entry-row">
+        <div className='manual-entry-row'>
           <div
             onClick={this.expand}
-            className="manual-entry-expand"
+            className='manual-entry-expand'
           >
             <ArrowIcon className={classNames({
               'manual-entry-arrow-icon': true,
@@ -217,7 +217,7 @@ class ManualEntry extends Classs<Props>
           </div>
         </div>
 
-        <div className="manual-entry-summary">
+        <div className='manual-entry-summary'>
           {this.highlightKeyWords(this.state.manualEntry.summary)}
         </div>
       </div>
@@ -321,7 +321,7 @@ class ManualEntry extends Classs<Props>
                     'manual-entry-in-depth': !this.props.manualTab,
                   })}
                 >
-                  {this.state.manualEntry.text[index].title ? <b className="manual-entry-demo-title"> {this.state.manualEntry.text[index].title} </b> : null}
+                  {this.state.manualEntry.text[index].title ? <b className='manual-entry-demo-title'> {this.state.manualEntry.text[index].title} </b> : null}
                   {this.renderCardExample(index)}
                   {this.renderCodeMirrorExample(index)}
 
@@ -357,9 +357,9 @@ class ManualEntry extends Classs<Props>
   render()
   {
     return (
-      <div className="manual-entry">
+      <div className='manual-entry'>
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
-        {this.props.bottomLine ? <hr className="manual-entry-line" /> : null}
+        {this.props.bottomLine ? <hr className='manual-entry-line' /> : null}
       </div>
     );
   }

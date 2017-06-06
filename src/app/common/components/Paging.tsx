@@ -218,7 +218,7 @@ class Paging extends PureClasss<Props>
           'paging-open': this.state.open,
         })}>
         <div
-          className="paging-first"
+          className='paging-first'
           onClick={this.goFirst}
           onMouseOver={this.handleFirstHover}
           onMouseOut={this.handleMouseOut}
@@ -226,14 +226,14 @@ class Paging extends PureClasss<Props>
           &lt;&lt;
         </div>
         <div
-          className="paging-previous"
+          className='paging-previous'
           onClick={this.goPrevious}
           onMouseOver={this.handlePreviousHover}
           onMouseOut={this.handleMouseOut}
         >
           &lt;
         </div>
-        <div className="paging-pages">
+        <div className='paging-pages'>
           {
             _.range(1, this.props.pages + 1).map((page) =>
             {
@@ -262,11 +262,11 @@ class Paging extends PureClasss<Props>
             })
           }
         </div>
-        <div className="paging-all-pages" onClick={this.handleAllPages}>
+        <div className='paging-all-pages' onClick={this.handleAllPages}>
           {this.state.open ? '-' : '...'}
         </div>
         <div
-          className="paging-next"
+          className='paging-next'
           onClick={this.goNext}
           onMouseOver={this.handleNextHover}
           onMouseOut={this.handleMouseOut}
@@ -274,7 +274,7 @@ class Paging extends PureClasss<Props>
           &gt;
         </div>
         <div
-          className="paging-last"
+          className='paging-last'
           onClick={this.goLast}
           onMouseOver={this.handleLastHover}
           onMouseOut={this.handleMouseOut}

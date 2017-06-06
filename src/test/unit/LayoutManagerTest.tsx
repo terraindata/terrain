@@ -78,18 +78,18 @@ test('LayoutManager renders columns', function(t)
     fullHeight: true,
     columns: [
       {
-        content: <div className="test-col" style={{ height: '100%' }}>1</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>1</div>,
         width: 20,
       },
       {
-        content: <div className="test-col" style={{ height: '100%' }}>2</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>2</div>,
       },
       {
-        content: <div className="test-col" style={{ height: '100%' }}>3</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>3</div>,
         colSpan: 2,
       },
       {
-        content: <div className="test-col" style={{ height: '100%' }}>4</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>4</div>,
       },
     ],
   };
@@ -137,14 +137,14 @@ test('LayoutManager renders rows', function(t)
   const layout = {
     rows: [
       {
-        content: <div className="test-row" style={{ height: '20px' }}>1</div>,
+        content: <div className='test-row' style={{ height: '20px' }}>1</div>,
       },
       {
-        content: <div className="test-row" style={{ height: '40px' }}>2</div>,
+        content: <div className='test-row' style={{ height: '40px' }}>2</div>,
         rowSpan: 2,
       },
       {
-        content: <div className="test-row" style={{ height: '20px' }}>3</div>,
+        content: <div className='test-row' style={{ height: '20px' }}>3</div>,
       },
     ],
   };

@@ -48,13 +48,13 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
 import PureClasss from './../../../common/components/PureClasss';
 import CreateCardTool from './CreateCardTool';
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -239,7 +239,7 @@ class CardsArea extends PureClasss<Props>
               keyPath={this.props.keyPath}
               index={props.cards.size}
               open={this.state.cardToolOpen}
-              className="nested-create-card-tool-wrapper"
+              className='nested-create-card-tool-wrapper'
               accepts={this.props.accepts}
               onToggle={this._toggle('cardToolOpen')}
               hidePlaceholder={this.props.singleChild || cards.size === 0}

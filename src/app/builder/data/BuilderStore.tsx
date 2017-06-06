@@ -52,10 +52,10 @@ import Util from '../../util/Util';
 import { _ResultsState, ResultsState } from '../components/results/ResultsManager';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { Card, Cards } from '../../../../shared/blocks/types/Card';
 import Query from '../../../../shared/items/types/Query';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 export class BuilderStateClass
 {

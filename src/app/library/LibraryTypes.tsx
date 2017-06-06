@@ -48,15 +48,15 @@ import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
-import { BaseClass, New } from '../Classes';
 import BackendInstance from '../../../shared/backends/types/BackendInstance';
-import { Query, _Query, queryForSave } from '../../../shared/items/types/Query';
-import { ItemStatus, ItemType, ItemC, Item } from '../../../shared/items/types/Item';
-import { ResultsConfig, _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
+import { _Query, Query, queryForSave } from '../../../shared/items/types/Query';
+import { _ResultsConfig, ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { BaseClass, New } from '../Classes';
 
 // TODO MOD refactor
 
-export module LibraryTypes
+export namespace LibraryTypes
 {
   class VariantC extends ItemC
   {
@@ -130,7 +130,6 @@ export module LibraryTypes
   {
     return v.set('query', queryForSave(v.query));
   }
-
 
   class AlgorithmC extends ItemC
   {
@@ -238,7 +237,6 @@ export module LibraryTypes
         return '#000';
     }
   }
-
 
   export const typeToConstructor: {
     [key: string]: (...args) => Item,

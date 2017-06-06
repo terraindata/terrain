@@ -141,10 +141,10 @@ const Tab = React.createClass<any, any>({
 
     return (
       <div
-        className="tabs-close"
+        className='tabs-close'
         onClick={this.close}
       >
-        <CloseIcon className="close close-icon" />
+        <CloseIcon className='close close-icon' />
       </div>
     );
   },
@@ -179,11 +179,11 @@ const Tab = React.createClass<any, any>({
           {
             !this.props.fixed &&
               <TabIcon
-                className="tab-icon tab-icon-left"
+                className='tab-icon tab-icon-left'
               />
           }
           <div
-            className="tab-inner"
+            className='tab-inner'
             style={{top: topStyle}}
           >
             {
@@ -196,7 +196,7 @@ const Tab = React.createClass<any, any>({
           {
             !this.props.fixed &&
               <TabIcon
-                className="tab-icon tab-icon-right"
+                className='tab-icon tab-icon-right'
               />
           }
       </div>,
@@ -305,7 +305,7 @@ export class Tabs extends PureClasss<TabsProps> {
   renderActions()
   {
     return (
-      <div className="tabs-actions">
+      <div className='tabs-actions'>
         {
           this.props.actions.map((action, index) =>
             <a
@@ -318,13 +318,13 @@ export class Tabs extends PureClasss<TabsProps> {
             >
               {
                 action.icon &&
-                  <div className="tabs-action-piece">
+                  <div className='tabs-action-piece'>
                     {
                       action.icon
                     }
                   </div>
               }
-              <div className="tabs-action-piece">
+              <div className='tabs-action-piece'>
                 {
                   action.text
                 }
@@ -406,16 +406,16 @@ export class Tabs extends PureClasss<TabsProps> {
     };
 
     return (
-      <div className="tabs-container">
-        <div className="tabs-row-wrapper">
-          <div className="tabs-row">
-            <div className="tabs-inner-wrapper">
+      <div className='tabs-container'>
+        <div className='tabs-row-wrapper'>
+          <div className='tabs-row'>
+            <div className='tabs-inner-wrapper'>
               <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
             </div>
             {
               this.renderActions()
             }
-            <div className="tabs-shadow"></div>
+            <div className='tabs-shadow'></div>
           </div>
         </div>
       </div>

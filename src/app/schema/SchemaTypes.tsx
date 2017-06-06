@@ -51,7 +51,7 @@ import Util from '../util/Util';
 
 type stringList = string[] | List<string>;
 
-export module SchemaTypes
+export namespace SchemaTypes
 {
 
   export class SchemaBaseClass extends BaseClass

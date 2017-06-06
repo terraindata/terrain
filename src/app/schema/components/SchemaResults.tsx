@@ -54,11 +54,11 @@ import BackendInstance from './../../../../shared/backends/types/BackendInstance
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import { _Query, Query } from '../../../../shared/items/types/Query';
 import { _ResultsState, ResultsManager, ResultsState } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import InfoArea from '../../common/components/InfoArea';
-import { Query, _Query } from '../../../../shared/items/types/Query';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
 
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
@@ -273,7 +273,7 @@ class SchemaResults extends PureClasss<Props>
             (
               this.state.resultsErrorMessage ?
                 <InfoArea
-                  large="Error retrieving results"
+                  large='Error retrieving results'
                   small={this.state.resultsErrorMessage}
                 />
                 :
@@ -285,7 +285,7 @@ class SchemaResults extends PureClasss<Props>
             )
             :
             <InfoArea
-              large="Select an item to see its contents here."
+              large='Select an item to see its contents here.'
             />
         }
 

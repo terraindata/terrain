@@ -45,25 +45,25 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // Note: If anyone would like to take the time to clean up this file, be my guest.
 
+import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
 
+import { Item, ItemType } from '../../../shared/items/types/Item';
 import Query from '../../../shared/items/types/Query';
+import LibraryStore from '../library/data/LibraryStore';
+import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import LibraryTypes from './../library/LibraryTypes';
-import BackendInstance from './../../../shared/backends/types/BackendInstance';
-import { Item, ItemType } from '../../../shared/items/types/Item';
-import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
 
-import { recordForSave, responseToRecordConfig } from '../Classes';
+import { routerShape } from 'react-router';
 import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
-import { routerShape } from 'react-router';
+import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
 
 export const Ajax =
@@ -102,7 +102,7 @@ export const Ajax =
         JSON.stringify(data),
         (response) =>
         {
-          var responseData: object = null;
+          let responseData: object = null;
           try
           {
             responseData = JSON.parse(response);
@@ -318,7 +318,7 @@ export const Ajax =
         'post',
         `users/${id}`,
         {
-          oldPassword: oldPassword,
+          oldPassword,
           password: newPassword,
         },
         onSave,
@@ -358,7 +358,7 @@ export const Ajax =
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
       variants: IMMap<number, LibraryTypes.Variant>,
       groupsOrder: IMList<number, any>) => void,
-      onError?: (ev: Event) => void, )
+      onError?: (ev: Event) => void )
     {
       return Ajax.req(
         'get',
@@ -373,7 +373,7 @@ export const Ajax =
               GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
               QUERY: Immutable.Map<number, Query>({}),
             };
-          let groupsOrder = [];
+          const groupsOrder = [];
 
           items.map(
             (itemObj) =>
@@ -390,11 +390,11 @@ export const Ajax =
           );
 
           mapping.ALGORITHM = mapping.ALGORITHM.map(
-            alg => alg.set('groupId', alg.parent),
+            (alg) => alg.set('groupId', alg.parent),
           ).toMap();
 
           mapping.VARIANT = mapping.VARIANT.map(
-            v =>
+            (v) =>
             {
               v = v.set('algorithmId', v.parent);
               const alg = mapping.ALGORITHM.get(v.algorithmId);
@@ -540,7 +540,7 @@ export const Ajax =
     },
 
     getQuery(variantId: ID,
-      onLoad: (query: Query, variant: LibraryTypes.Variant) => void, )
+      onLoad: (query: Query, variant: LibraryTypes.Variant) => void )
     {
       if (!variantId)
       {
@@ -671,7 +671,7 @@ export const Ajax =
           dbs = dbs.concat(m2Dbs);
         }
         onLoad(dbs, !!(m1Dbs && m2Dbs));
-      }
+      };
 
       AjaxM1.getDbs_m1(
         (dbNames: string[]) =>
@@ -683,7 +683,7 @@ export const Ajax =
                 name: dbName,
                 type: 'mysql',
                 source: 'm1' as ('m1' | 'm2'),
-              })
+              }),
           );
           checkForLoaded();
         },
@@ -691,7 +691,7 @@ export const Ajax =
         {
           m1Dbs = [];
           checkForLoaded();
-        }
+        },
       );
 
       Ajax.req(
@@ -700,7 +700,7 @@ export const Ajax =
         {},
         (dbs: [BackendInstance]) =>
         {
-          m2Dbs = dbs.map(db =>
+          m2Dbs = dbs.map((db) =>
           {
             db['source'] = 'm2';
             return db;
@@ -710,11 +710,11 @@ export const Ajax =
         {
           onError: (e) =>
           {
-            onError && onError(e)
+            onError && onError(e);
             m2Dbs = [] as any;
             checkForLoaded();
-          }
-        }
+          },
+        },
       );
     },
     login(email: string,

@@ -182,18 +182,18 @@ class Profile extends Classs<Props>
   renderInfoItem(infoKey: { key: string, label: string, subText: string })
   {
     return (
-      <div className="profile-info-item-edit" key={infoKey.key}>
-        <div className="profile-info-item-name">
+      <div className='profile-info-item-edit' key={infoKey.key}>
+        <div className='profile-info-item-name'>
           {infoKey.label}
         </div>
-        <div className="profile-info-item-value">
+        <div className='profile-info-item-value'>
           <input
-            type="text"
+            type='text'
             defaultValue={this.state.user[infoKey.key]}
             ref={infoKey.key}
           />
         </div>
-        <div className="profile-info-item-subtext">
+        <div className='profile-info-item-subtext'>
           {infoKey.subText}
         </div>
       </div>
@@ -264,42 +264,42 @@ class Profile extends Classs<Props>
   {
     return (
       <div
-        className="edit-profile-pic"
+        className='edit-profile-pic'
         onClick={this.handleProfilePicClick}
       >
         <div className={this.state.showDropDown ? 'dropdown' : 'dropdown-hidden'}>
           <div
             onClick={this.handleUploadImage}
-            className="menu-item"
+            className='menu-item'
           >
             Upload an image
           </div>
           <div
             onClick={this.removeProfilePicture}
-            className="menu-item"
+            className='menu-item'
           >
             Remove photo
           </div>
         </div>
         <img
-          className="profile-pic-image"
+          className='profile-pic-image'
           src={UserTypes.profileUrlFor(this.state.user)}
-          ref="profilePicImg"
+          ref='profilePicImg'
         />
-        <div className="profile-pic-overlay">
-          <div className="profile-pic-overlay-message">
-            <div className="camera-icon">
+        <div className='profile-pic-overlay'>
+          <div className='profile-pic-overlay-message'>
+            <div className='camera-icon'>
               <CameraIcon />
             </div>
             Change your profile picture
           </div>
         </div>
         <input
-          ref="imageInput"
-          type="file"
-          className="profile-pic-upload"
+          ref='imageInput'
+          type='file'
+          className='profile-pic-upload'
           onChange={this.handleProfilePicChange}
-          id="profile-image-input"
+          id='profile-image-input'
         />
       </div>
     );
@@ -316,32 +316,32 @@ class Profile extends Classs<Props>
   {
     if (this.state.loading)
     {
-      return <InfoArea large="Loading..." />;
+      return <InfoArea large='Loading...' />;
     }
 
     if (!this.state.user)
     {
-      return <InfoArea large="No such user found." />;
+      return <InfoArea large='No such user found.' />;
     }
 
     return (
-      <div className="profile profile-edit" onClick={this.hidePictureMenu}>
-        <div className="profile-save-row">
-          <div className="edit-profile-title">
+      <div className='profile profile-edit' onClick={this.hidePictureMenu}>
+        <div className='profile-save-row'>
+          <div className='edit-profile-title'>
             Edit your profile
           </div>
-          <div className="edit-profile-close-icon" onClick={this.handleSave}>
+          <div className='edit-profile-close-icon' onClick={this.handleSave}>
             <CloseIcon />
           </div>
         </div>
-        <div className="profile-edit-container">
-          <div className="profile-info">
+        <div className='profile-edit-container'>
+          <div className='profile-info'>
             {
               this.infoKeys.map(this.renderInfoItem)
             }
           </div>
-          <div className="profile-pic-column">
-            <div className="profile-pic-name"> Profile Picture </div>
+          <div className='profile-pic-column'>
+            <div className='profile-pic-name'> Profile Picture </div>
             {this.renderProfilePicture()}
           </div>
         </div>

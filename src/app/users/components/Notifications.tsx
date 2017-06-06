@@ -221,40 +221,40 @@ class Notifications extends Classs<Props>
     }
 
     return (
-      <div className="notification-expansion">
-        <div className="notification-subtitle">
+      <div className='notification-expansion'>
+        <div className='notification-subtitle'>
           Send me desktop notifications for:
        </div>
         <Select
           clearable={false}
-          name="desktop-notification"
+          name='desktop-notification'
           value={desktopNotification}
           options={this.notificationTypes}
           onChange={this.onDesktopNotificationChange}
-          className="notifications-select"
+          className='notifications-select'
           searchable={false}
         />
-        <div className="notification-subtitle">
+        <div className='notification-subtitle'>
           Desktop notifications use this sound:
        </div>
-        <div className="notification-row">
+        <div className='notification-row'>
           <Select
-            name="desktop-notification-sound"
+            name='desktop-notification-sound'
             value={sound}
             clearable={false}
             options={this.desktopNotificationSounds}
             onChange={this.onDesktopNotificationsSoundChange}
-            className="notifications-select"
+            className='notifications-select'
             searchable={false}
           />
           <div
             className={sound === 'none' ? 'disabled' : 'preview-button'}
             onClick={sound === 'none' ? null : this.playSound}
           >
-            <div className="notification-sound-icon">
+            <div className='notification-sound-icon'>
               <SoundIcon />
             </div>
-            <div className="notification-preview-button-text">
+            <div className='notification-preview-button-text'>
               Preview
           </div>
           </div>
@@ -295,25 +295,25 @@ class Notifications extends Classs<Props>
     }
 
     return (
-      <div className="notification-expansion">
+      <div className='notification-expansion'>
         <div>Send me email notifications:</div>
         <br />
-        <div className="expanded-section-indent">
+        <div className='expanded-section-indent'>
           <RadioButtons
             selected={emailTiming}
             options={this.emailNotificationOptions}
           />
         </div>
-        <div className="notification-subtitle-small">
+        <div className='notification-subtitle-small'>
           Send me email notifications for:
        </div>
         <Select
           clearable={false}
-          name="email-notification"
+          name='email-notification'
           value={emailNotification}
           options={this.notificationTypes}
           onChange={this.onEmailNotificationTypeChange}
-          className="notifications-select"
+          className='notifications-select'
           searchable={false}
         />
         {this.renderEmail()}
@@ -338,10 +338,10 @@ class Notifications extends Classs<Props>
     }
 
     return (
-      <div className="notification-expansion">
+      <div className='notification-expansion'>
         <div>You can choose which of these updates you'd like to receive:</div>
         <br />
-        <span className="expanded-section-indent">
+        <span className='expanded-section-indent'>
           <CheckBox
             checked={emailNewsOn}
             onChange={this.toggleEmailNews}
@@ -365,7 +365,7 @@ class Notifications extends Classs<Props>
       return (
         <div>
           Your email is currently set to
-        <span className="notification-email-blue">
+        <span className='notification-email-blue'>
             {this.state.istate.currentUser.email}
           </span>
           .
@@ -435,19 +435,19 @@ class Notifications extends Classs<Props>
   {
     return (
       <div>
-        <div className="notifications-page-title">Update your notifications</div>
+        <div className='notifications-page-title'>Update your notifications</div>
         <AccountEntry
-          title="Desktop Notifications"
+          title='Desktop Notifications'
           description={this.renderDesktopDescription()}
           content={this.renderDesktopNotificationsContent()}
         />
         <AccountEntry
-          title="Email Notifications"
+          title='Email Notifications'
           description={this.renderEmailDescription()}
           content={this.renderEmailNotificationsContent()}
         />
         <AccountEntry
-          title="Email News & Updates"
+          title='Email News & Updates'
           description={this.renderEmailNewsDescription()}
           content={this.renderEmailNewsContent()}
           lastEntry={true}

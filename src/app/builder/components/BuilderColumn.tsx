@@ -57,8 +57,8 @@ import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
-import Ajax from './../../util/Ajax';
 import Query from '../../../../shared/items/types/Query';
+import Ajax from './../../util/Ajax';
 
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -195,7 +195,7 @@ const BuilderColumn = React.createClass<any, any>(
       {
         return (
           <div
-            className="builder-column-loading"
+            className='builder-column-loading'
           >
             Loading...
         </div>
@@ -312,17 +312,17 @@ const BuilderColumn = React.createClass<any, any>(
 
       return this.renderPanel((
         <div className={'builder-column builder-column-' + this.props.index}>
-          <div className="builder-title-bar">
+          <div className='builder-title-bar'>
             {
               this.props.index === 0 ? null : (
-                <div className="builder-resize-handle" ref="resize-handle">
-                  <div className="builder-resize-handle-line"></div>
-                  <div className="builder-resize-handle-line"></div>
+                <div className='builder-resize-handle' ref='resize-handle'>
+                  <div className='builder-resize-handle-line'></div>
+                  <div className='builder-resize-handle-line'></div>
                 </div>
               )
             }
-            <div className="builder-title-bar-title">
-              <span ref="handle">
+            <div className='builder-title-bar-title'>
+              <span ref='handle'>
                 {
                   COLUMNS[this.state.column]
                 }
@@ -334,21 +334,21 @@ const BuilderColumn = React.createClass<any, any>(
                 }
               </span>
             </div>
-            <div className="builder-title-bar-options">
+            <div className='builder-title-bar-options'>
               {
                 this.props.canCloseColumn &&
                 <CloseIcon
                   onClick={this.handleCloseColumn}
-                  className="close close-builder-title-bar"
-                  data-tip="Close Column"
+                  className='close close-builder-title-bar'
+                  data-tip='Close Column'
                 />
               }
               {
                 this.props.canAddColumn &&
                 <SplitScreenIcon
                   onClick={this.handleAddColumn}
-                  className="bc-options-svg builder-split-screen"
-                  data-tip="Add Column"
+                  className='bc-options-svg builder-split-screen'
+                  data-tip='Add Column'
                 />
               }
               <Menu

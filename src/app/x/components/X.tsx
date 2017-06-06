@@ -84,14 +84,14 @@ class X extends Classs<Props>
     }
 
     return (
-      <div className="x-area">
-        <div className="x-title">
+      <div className='x-area'>
+        <div className='x-title'>
           Experiments
         </div>
         {
           _.keys(xes).map((indX) =>
             <Link to={`/x/${indX}`} key={indX}>
-              <div className="x-x">
+              <div className='x-x'>
                 {xes[indX].name}
               </div>
             </Link>,

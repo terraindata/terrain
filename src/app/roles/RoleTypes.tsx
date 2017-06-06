@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 
-export module RoleTypes
+export namespace RoleTypes
 {
   const _Role = Immutable.Record(
     {

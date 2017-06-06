@@ -65,7 +65,7 @@ class RadioButtons extends Classs<Props>
   renderOption(option)
   {
     return (
-      <div key={option.value} className="radio-button-option">
+      <div key={option.value} className='radio-button-option'>
         <div
           onClick={option.onClick}
           className={classNames({

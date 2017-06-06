@@ -70,7 +70,7 @@ const records: { [class_name: string]: Immutable.Record.Class } = {};
 export function New<T>(
   instance,
   config: { [field: string]: any } = {},
-  extendId?: boolean | 'string' // if true, generate an ID on instantiation
+  extendId?: boolean | 'string', // if true, generate an ID on instantiation
 ): T & IRecord<T>
 {
   const class_name = instance.__proto__.constructor.name;
@@ -109,11 +109,11 @@ export function recordForSave(record: IRecord<any>)
   if (record['dbFields'])
   {
     record['dbFields'].map(
-      (field) => delete meta[field]
+      (field) => delete meta[field],
     );
 
     _.map(meta,
-      (v, key) => delete recordData[key]
+      (v, key) => delete recordData[key],
     );
 
     recordData['meta'] = JSON.stringify(meta);
@@ -130,7 +130,7 @@ export function responseToRecordConfig(response: object): object
     {
       // somewhere along the line, \ get added to the text and not removed correctly
       // TODO update if the backend escaping is fixed
-      let meta = JSON.parse(response['meta'].replace(/\\([^\\])/g, (a, b) => b).replace(/\\\\/g, "\\") || '{}');
+      const meta = JSON.parse(response['meta'].replace(/\\([^\\])/g, (a, b) => b).replace(/\\\\/g, '\\') || '{}');
       response = _.extend(meta, response);
       delete response['meta'];
     }

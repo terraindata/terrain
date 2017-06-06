@@ -156,11 +156,11 @@ class EasterEggs extends PureClasss<Props>
     if (this.state.christmas)
     {
       return (
-        <div className="snow-egg">
+        <div className='snow-egg'>
           {
             this.state.snow && this.state.snow.map((s) =>
               <div
-                className="snow"
+                className='snow'
                 style={{
                   width: r,
                   height: r,
@@ -170,7 +170,7 @@ class EasterEggs extends PureClasss<Props>
               />,
             )
           }
-          <iframe className="youtube-player" type="text/html" src="http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1">&lt;br /&gt;</iframe>
+          <iframe className='youtube-player' type='text/html' src='http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1'>&lt;br /&gt;</iframe>
         </div>
       );
     }

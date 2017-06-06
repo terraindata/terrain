@@ -158,7 +158,7 @@ class Library extends PureClasss<any>
           }
         }
       }
-      else 
+      else
       {
         // !group
         browserHistory.replace('/library');
@@ -168,7 +168,7 @@ class Library extends PureClasss<any>
     localStorage.setItem('lastLibraryPath', this.props.location.pathname);
 
     return (
-      <div className="library">
+      <div className='library'>
         <GroupsColumn
           {...{
             groups,

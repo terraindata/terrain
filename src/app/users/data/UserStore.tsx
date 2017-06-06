@@ -53,8 +53,8 @@ import AuthStore from './../../auth/data/AuthStore';
 import Util from './../../util/Util';
 
 import UserTypes from './../UserTypes';
-import UserReducers from './UserReducers';
 import ActionTypes from './UserActionTypes';
+import UserReducers from './UserReducers';
 
 const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
@@ -75,9 +75,9 @@ UserStore.subscribe(() =>
 
 window['test'] = () =>
 {
-  let users = UserStore.getState().users;
+  const users = UserStore.getState().users;
   console.log('users', users);
   Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-}
+};
 
 export default UserStore;

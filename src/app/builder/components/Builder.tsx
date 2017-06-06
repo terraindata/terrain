@@ -55,6 +55,8 @@ const { browserHistory } = require('react-router');
 const { withRouter } = require('react-router');
 
 // Data
+import { ItemStatus } from '../../../../shared/items/types/Item';
+import Query from '../../../../shared/items/types/Query';
 import LibraryActions from '../../library/data/LibraryActions';
 import { LibraryState, LibraryStore } from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
@@ -65,8 +67,6 @@ import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
 import { BuilderState, BuilderStore } from './../data/BuilderStore';
-import Query from '../../../../shared/items/types/Query';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 type Variant = LibraryTypes.Variant;
 
 // Components
@@ -339,7 +339,7 @@ class Builder extends PureClasss<Props>
     }
     if (newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
-      let variant = this.state.variants.get(+variantId);
+      const variant = this.state.variants.get(+variantId);
       // need to fetch data for new query
       Actions.fetchQuery(variantId, this.handleNoVariant, variant && variant.db);
     }
@@ -737,15 +737,15 @@ class Builder extends PureClasss<Props>
       const lastEdited = Util.formatDate(variant.lastEdited);
 
       return (
-        <div className="builder-revert-toolbar">
-          <div className="builder-revert-time-message">
+        <div className='builder-revert-toolbar'>
+          <div className='builder-revert-time-message'>
             Version from {lastEdited}
           </div>
-          <div className="builder-white-space" />
+          <div className='builder-white-space' />
           {
             this.canEdit() &&
             <div
-              className="button builder-revert-button"
+              className='button builder-revert-button'
               onClick={this.revertVersion}
               data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
             >
@@ -804,9 +804,9 @@ class Builder extends PureClasss<Props>
         {
           !config || !config.length ?
             <InfoArea
-              large="No variants open"
-              small="You can open one in the Library"
-              button="Go to the Library"
+              large='No variants open'
+              small='You can open one in the Library'
+              button='Go to the Library'
               onClick={this.goToLibrary}
             />
             :
@@ -814,10 +814,10 @@ class Builder extends PureClasss<Props>
               <Tabs
                 actions={this.state.tabActions}
                 config={config}
-                ref="tabs"
+                ref='tabs'
                 onNoVariant={this.handleNoVariant}
               />
-              <div className="tabs-content">
+              <div className='tabs-content'>
                 {
                   this.renderVersionToolbar()
                 }
@@ -828,8 +828,8 @@ class Builder extends PureClasss<Props>
         <Modal
           open={this.state.leaving}
           message={'Save changes' + (variant ? ' to ' + variant.name : '') + ' before leaving?'}
-          title="Unsaved Changes"
-          confirmButtonText="Save"
+          title='Unsaved Changes'
+          confirmButtonText='Save'
           confirm={true}
           onClose={this.handleModalCancel}
           onConfirm={this.handleModalSave}
