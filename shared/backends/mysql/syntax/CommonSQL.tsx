@@ -42,16 +42,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-export module SharedTypes
+import * as React from 'react';
+
+module CommonSQL
 {
-	// TODO move to the back-ends section
-  export interface Database
-  {
-    id: string | number;
-    name: string;
-    type: string;
-    source: 'm1' | 'm2';
+  export const Directions: string[] = ['ascending', 'descending'];
+  export const Combinators: string[] = ['&', 'or'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
+
+	export enum Operator {
+    EQ,
+    NE,
+    GE,
+    GT,
+    LE,
+    LT,
+    IN,
+    NIN,
+    LIKE,
   }
+
+  export const OperatorTQL = {
+    [Operator.EQ]: '=',
+    [Operator.NE]: '!=',
+    [Operator.GE]: '>=',
+    [Operator.GT]: '>',
+    [Operator.LE]: '<=',
+    [Operator.LT]: '<',
+    [Operator.IN]: 'IN',
+    [Operator.NIN]: 'NOT IN',
+    [Operator.LIKE]: 'LIKE',
+  };
+
+  export enum Direction {
+    ASC,
+    DESC,
+  }
+
+  export const DirectionTQL = {
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC',
+  };
+
+  export enum Combinator {
+    AND,
+    OR,
+  }
+
+  export const CombinatorTQL = {
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR',
+  };
 }
 
-export default SharedTypes;
+export default CommonSQL;

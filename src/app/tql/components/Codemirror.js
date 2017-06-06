@@ -365,7 +365,7 @@ var CodeMirror = React.createClass({
 		{
 			this.codeMirror.setValue(nextProps.value);
 		}
-		if (typeof nextProps.options === 'object' && this.codeMirror.setOption)
+		if (typeof nextProps.options === 'object' && this.codeMirror && this.codeMirror.setOption)
 		{
 			for (var optionName in nextProps.options)
 			{

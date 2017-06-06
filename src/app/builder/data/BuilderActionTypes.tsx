@@ -73,8 +73,6 @@ export let BuilderActionTypes =
 
   // Change the hand-writen TQL
   changeTQL: '',
-  parseTreeLoaded: '',
-  parseTreeError: '',
 
   toggleDeck: '',
 

@@ -47,16 +47,14 @@ import * as React from 'react';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import Util from  '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
-import BuilderTypes from '../../builder/BuilderTypes';
 import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
 
 const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
-
-const {ItemStatus} = LibraryTypes;
 
 const TEXT =
 {
@@ -84,7 +82,7 @@ const TEXT =
 
 export interface Props {
   variant: LibraryTypes.Variant;
-  status: LibraryTypes.ItemStatus;
+  status: ItemStatus;
   defaultChecked: boolean;
   defaultVariant: LibraryTypes.Variant;
   onDefaultCheckedChange(defaultChecked: boolean);

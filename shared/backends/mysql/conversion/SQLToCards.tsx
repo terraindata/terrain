@@ -44,16 +44,88 @@ THE SOFTWARE.
 
 const _ = require('underscore');
 import * as Immutable from 'immutable';
-import { BuilderTypes } from '../builder/BuilderTypes';
-type Cards = BuilderTypes.ICards;
-type Card = BuilderTypes.ICard;
-type CardString = BuilderTypes.CardString;
-type Block = BuilderTypes.IBlock;
 import List = Immutable.List;
 import Map = Immutable.Map;
-const {Blocks, make} = BuilderTypes;
 
-export const TQLToCards =
+import Query from '../../../items/types/Query';
+import CommonSQL from '../syntax/CommonSQL';
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
+
+import {Card, Cards, CardString} from '../../../blocks/types/Card';
+import {Block} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
+const { make } = BlockUtils;
+
+import Blocks from '../blocks/MySQLBlocks';
+
+export default function SQLToCards(
+  query: Query,
+  queryReady: (query: Query) => void
+): Query
+{
+  const prevReq = query.getIn(['meta', 'parseTreeReq']);
+  prevReq && typeof prevReq.abort === 'function' && prevReq.abort();
+  
+  const req = AjaxM1.parseTree(
+    query.tql,
+    query.db.id + "",
+    parseTreeLoaded,
+    parseTreeError,
+    { // context
+      query,
+      queryReady,
+    }
+  ).xhr;
+  
+  return query
+    .set('cardsAndCodeInSync', false)
+    .setIn(['meta', 'parseTreeReq'], req);
+}
+
+
+const parseTreeLoaded = (response, context) =>
+{
+  let query: Query = context.query;
+  const queryReady: (query: Query) => void = context.queryReady;
+  
+  const {error, result} = response;
+  
+  query = query.setIn(['meta', 'parseTreeReq'], null);
+  
+  if (error)
+  {
+    query = query
+      .set('parseError', error)
+      .set('cardsAndCodeInSync', false);
+  }
+  else
+  {
+    query = query
+      .set('cards', TQLToCards.convert(result, query.cards))
+      .set('cardsAndCodeInSync', true);
+  }
+
+  // alert the state that the query needs to change
+  queryReady(query);
+}
+
+const parseTreeError = (error, context) =>
+{
+  // TODO MOD confirm what format the error comes back as
+  let query: Query = context.query;
+  const queryReady: (query: Query) => void = context.queryReady;
+  
+  query = query.setIn(['meta', 'parseTreeReq'], null);
+  query = query
+    .set('parseError', (error && error.errorMessage) || error)
+    .set('cardsAndCodeInSync', false);
+
+  // alert the state that the query needs to change
+  queryReady(query);
+}
+
+
+const TQLToCards =
 {
   convert(statement: Statement, currentCards?: Cards): Cards
   {
@@ -444,7 +516,7 @@ function parseMathNode(node: Node, op: string, mathCardBlock): Card
 }
 
 const comparisonProcessors = _.reduce(
-  BuilderTypes.OperatorTQL,
+  CommonSQL.OperatorTQL,
   (memo, val: string) =>
   {
     memo[val.toUpperCase()] = true;
@@ -457,7 +529,7 @@ function comparisonProcessor(node: Node): Card
   return make(Blocks.comparison, {
     first: parseNode(node.left_child),
     second: parseNode(node.right_child),
-    operator: + _.findKey(BuilderTypes.OperatorTQL,
+    operator: + _.findKey(CommonSQL.OperatorTQL,
       (op: string) => op.toUpperCase() === node.op.toUpperCase(),
     ),
   });
@@ -498,7 +570,7 @@ const sfwProcessors: {
               {
                 config = {
                   property: parseNode(node.child),
-                  direction: node.op === 'ASC' ? BuilderTypes.Direction.ASC : BuilderTypes.Direction.DESC,
+                  direction: node.op === 'ASC' ? CommonSQL.Direction.ASC : CommonSQL.Direction.DESC,
                 };
               }
               return make(Blocks.sortBlock, config);
@@ -631,7 +703,7 @@ function reconcileBlock(currentBlock: Block, newBlock: Block): Block
     );
   }
 
-  BuilderTypes.forAllBlocks(
+  BlockUtils.forAllBlocks(
     block,
     (childBlock, keyPath) =>
     {
@@ -648,5 +720,3 @@ function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 
   return block;
 }
-
-export default TQLToCards;

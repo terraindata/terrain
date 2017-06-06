@@ -54,13 +54,14 @@ const {browserHistory} = require('react-router');
 
 import * as Immutable from 'immutable';
 const {List} = Immutable;
-import BuilderTypes from './../../builder/BuilderTypes';
 
 const CloseIcon = require('./../../../images/icon_close.svg');
 const SearchIcon = require('./../../../images/icon_search.svg');
 const HomeIcon = require('./../../../images/icon_home.svg');
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
+
+import {cardList} from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {
@@ -73,7 +74,7 @@ export interface Props
 
 class Manual extends Classs<Props>
 {
-  allTqlCards = Object.keys(BuilderTypes.cardList).sort();
+  allTqlCards = Object.keys(cardList).sort();
 
   allPhraseTypes = Object.keys(ManualConfig.phraseTypes).sort();
   autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());

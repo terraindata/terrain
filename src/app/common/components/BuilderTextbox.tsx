@@ -50,10 +50,9 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { Display } from '../../builder/BuilderDisplays';
+import { Display } from '../../../../shared/blocks/displays/Display';
 import BuilderHelpers from '../../builder/BuilderHelpers';
-import { BuilderTypes } from '../../builder/BuilderTypes';
-import Card from '../../builder/components/cards/Card';
+import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
@@ -61,8 +60,10 @@ import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
-
-type CardString = BuilderTypes.CardString;
+import {Block} from '../../../../shared/blocks/types/Block';
+import {CardString, Card} from '../../../../shared/blocks/types/Card';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
@@ -71,9 +72,10 @@ const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon')
 
 export interface Props
 {
-  value: BuilderTypes.CardString | number;
+  value: CardString | number;
   keyPath: KeyPath; // keypath of value
   onChange?: (value: string | number) => void;
+  language: string;
 
   id?: string; // TODO remove
 
@@ -132,6 +134,11 @@ class BuilderTextbox extends PureClasss<Props>
     backupString: CardString;
     options: List<string>;
   };
+  
+  getCreatingType(): string
+  {
+    return AllBackendsMap[this.props.language].creatingType;
+  }
 
   // TODO
   componentWillReceiveProps(newProps)
@@ -139,9 +146,9 @@ class BuilderTextbox extends PureClasss<Props>
     const value: any = newProps.value;
 
     // If you want two-way backups, use this line
-      // (value && this.props.value === '' && value['type'] === 'creating') ||
+      // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
-      (this.props.value && this.props.value['type'] === 'creating' && value === '')
+      (this.props.value && this.props.value['type'] === this.getCreatingType() && value === '')
     )
     {
       if (this.state.backupString)
@@ -209,7 +216,9 @@ class BuilderTextbox extends PureClasss<Props>
 
   handleSwitch()
   {
-    const value = this.isText() ? BuilderTypes.make(BuilderTypes.Blocks.creating) : '';
+    const value = this.isText() ? BlockUtils.make(
+      AllBackendsMap[this.props.language].blocks[this.getCreatingType()]
+    ) : '';
     this.setState({
       value,
       backupString: typeof this.props.value === 'string' ? this.props.value : null,
@@ -341,6 +350,7 @@ class BuilderTextbox extends PureClasss<Props>
                 accepts={this.props.display && this.props.display.accepts}
                 renderPreview={true}
                 afterDrop={this.handleCardDrop}
+                language={this.props.language}
               />
           }
         </div>
@@ -354,14 +364,14 @@ class BuilderTextbox extends PureClasss<Props>
       return null;
     }
 
-    const card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
+    const card: Card = this.props.value as Card;
     // var cards = this.props.value['cards'];
     // if(cards.size)
     // {
       // var card = cards.get(0);
       const color = card.static.colors[0] as string;
       const title: string = card.closed ? card.static.title : '';
-      const preview = BuilderTypes.getPreview(card);
+      const preview = BlockUtils.getPreview(card);
     // }
     // else
     // {

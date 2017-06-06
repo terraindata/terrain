@@ -62,6 +62,7 @@ export interface Props
   canEdit?: boolean;
   className?: string;
   centerAlign?: boolean;
+  optionsDisplayName?: Map<any, string>; // maps value to display name
 }
 
 class Dropdown extends PureClasss<Props>
@@ -113,7 +114,7 @@ class Dropdown extends PureClasss<Props>
       >
         <div className="dropdown-option-inner">
           {
-            option
+            this.getOptionName(option, index)
           }
         </div>
       </div>
@@ -148,7 +149,16 @@ class Dropdown extends PureClasss<Props>
       up: cr.bottom > windowBottom / 2,
     });
   }
-
+  
+  getOptionName(option, index: number): string
+  {
+    if(this.props.optionsDisplayName)
+    {
+      return this.props.optionsDisplayName.get(option);
+    }
+    return option;
+  }
+  
   render()
   {
     // Element with options, rendered at the top or bottom of the dropdown
@@ -199,7 +209,7 @@ class Dropdown extends PureClasss<Props>
                 })}
               >
                 {
-                  option
+                  this.getOptionName(option, index)
                 }
               </div>,
             )

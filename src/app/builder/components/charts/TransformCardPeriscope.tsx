@@ -52,7 +52,6 @@ import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import { BuilderTypes } from './../../BuilderTypes';
 import Periscope from './Periscope';
 import {Bar, Bars} from './TransformCard';
 
@@ -232,6 +231,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
+            language={null}
           />
           <BuilderTextbox
             value={this.props.maxDomain.get(1)}
@@ -241,6 +241,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
+            language={null}
           />
         </div>
 

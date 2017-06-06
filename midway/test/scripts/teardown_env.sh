@@ -11,8 +11,17 @@ then
 	 shift
 fi
 
-docker stop moviesdb-mysql && docker rm moviesdb-mysql
-docker stop moviesdb-elk && docker rm moviesdb-elk
+if [ $(docker ps -aq -f name=moviesdb-mysql | wc -l) != 0 ] ; then
+        echo "Stopping moviesdb docker mysql image..."
+        docker stop moviesdb-mysql
+        docker rm moviesdb-mysql || true
+fi
+
+if [ $(docker ps -aq -f name=moviesdb-elk | wc -l) != 0 ] ; then
+        echo "Stopping moviesdb docker elk image..."
+        docker stop moviesdb-elk
+        docker rm moviesdb-elk || true
+fi
 
 if [ -f ${sqlite_path} ] ; then
         echo "Deleting moviesdb sqlite database..."

@@ -42,66 +42,65 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Guide.less');
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
-import Actions from '../../data/BuilderActions';
-import Card from '../cards/Card';
-import PureClasss from './../../../common/components/PureClasss';
-import {EExpressionType, EScreen, ICondition, IExpression, IQuery} from './Guide';
-import SelectScreen from './SelectScreen';
-const L = Immutable.List;
-const M = Immutable.Map;
+// require('./Guide.less');
+// import * as classNames from 'classnames';
+// import * as Immutable from 'immutable';
+// import * as $ from 'jquery';
+// import * as React from 'react';
+// import * as ReactDOM from 'react-dom';
+// import * as _ from 'underscore';
+// import Util from '../../../util/Util';
+// import Actions from '../../data/BuilderActions';
+// import Card from '../cards/Card';
+// import PureClasss from './../../../common/components/PureClasss';
+// import {EExpressionType, EScreen, ICondition, IExpression, IQuery} from './Guide';
+// import SelectScreen from './SelectScreen';
+// const L = Immutable.List;
+// const M = Immutable.Map;
 
-export interface Props
-{
-  screen: EScreen;
-  query: IQuery;
-  onChange: (something) => void;
-}
+// export interface Props
+// {
+//   screen: EScreen;
+//   query: IQuery;
+//   onChange: (something) => void;
+// }
 
-interface State
-{
+// interface State
+// {
 
-}
+// }
 
-class Screen extends PureClasss<Props>
-{
-  state: State = {
-  };
+// class Screen extends PureClasss<Props>
+// {
+//   state: State = {
+//   };
 
-  constructor(props: Props)
-  {
-    super(props);
-  }
+//   constructor(props: Props)
+//   {
+//     super(props);
+//   }
 
-  render()
-  {
-    const {screen, query} = this.props;
+//   render()
+//   {
+//     const {screen, query} = this.props;
 
-    return (
-      <div
-        className="guide"
-      >
-        <div className="guide-left">
-          <div className="guide-title">
-            Guide
-          </div>
-        </div>
-        <div className="guide-right">
-          <div className="guide-title">
-            Your Query
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
+//     return (
+//       <div
+//         className="guide"
+//       >
+//         <div className="guide-left">
+//           <div className="guide-title">
+//             Guide
+//           </div>
+//         </div>
+//         <div className="guide-right">
+//           <div className="guide-title">
+//             Your Query
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+// }
 
-export default Screen;
+// export default Screen;

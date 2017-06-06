@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// TODO MOD maybe move?
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './util/Util';

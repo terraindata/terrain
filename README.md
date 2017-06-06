@@ -397,6 +397,7 @@ console.log(catchphrase); // ERROR: cannot find name catchphrase
 
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
 - Do not call any methods that fetch data from the server and then update a redux store (e.g. `Actions.fetch()`) from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method). You can put these in `componentDidMount`
+- `key` is a reserved name in props, so you can't use it as a prop in your component.
 
 #### ES6 gotchas
 

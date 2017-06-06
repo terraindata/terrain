@@ -49,10 +49,10 @@ import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss';
 const classNames = require('classnames');
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
-import { CardItem } from './Card';
+import { CardItem } from './CardComponent';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 export const cardWillWrap = (targetProps: Props, cardType: string) =>
 {
@@ -133,6 +133,8 @@ export interface Props
 {
   keyPath: KeyPath;
   index: number;
+  
+  language: string;
 
   half?: boolean;
   lower?: boolean;
@@ -159,8 +161,10 @@ class CardDropArea extends PureClasss<Props>
 {
   state: {
     draggingCardItem: CardItem;
+    language: string;
   } = {
     draggingCardItem: null,
+    language: Store.getState().query.language,
   };
 
   constructor(props)
@@ -170,6 +174,11 @@ class CardDropArea extends PureClasss<Props>
     this._subscribe(Store, {
       stateKey: 'draggingCardItem',
       storeKeyPath: ['draggingCardItem'],
+    });
+    
+    this._subscribe(Store, {
+      stateKey: 'language',
+      storeKeyPath: ['query', 'language'],
     });
   }
 
@@ -194,6 +203,7 @@ class CardDropArea extends PureClasss<Props>
         visible={this.props.isOver && this.props.canDrop && !!this.state.draggingCardItem}
         keyPath={this.props.keyPath}
         index={this.props.index}
+        language={this.props.language}
       />
     );
   }
@@ -204,7 +214,7 @@ class CardDropArea extends PureClasss<Props>
     let color = 'rgba(0,0,0,0)';
     if (this.state.draggingCardItem)
     {
-      color = BuilderTypes.Blocks[this.state.draggingCardItem.type].static.colors[0];
+      color = AllBackendsMap[this.state.language].blocks[this.state.draggingCardItem.type].static.colors[0];
     }
 
     return (
@@ -282,8 +292,10 @@ const cardCanWrap = (targetProps: Props, cardType: string) =>
       // this card doesn't fit in this area
       return false;
     }
+    
+    const Blocks = AllBackendsMap[targetProps.language].blocks;
 
-    const {accepts} = BuilderTypes.Blocks[cardType].static;
+    const {accepts} = Blocks[cardType].static;
     if (accepts && accepts.indexOf(targetProps.wrapType) !== -1)
     {
       return true;
@@ -295,8 +307,9 @@ const cardCanWrap = (targetProps: Props, cardType: string) =>
 // as neighbor
 const cardCanAccept = (targetProps: Props, cardType: string) =>
 {
+  const Blocks = AllBackendsMap[targetProps.language].blocks;
   return (targetProps.accepts && targetProps.accepts.indexOf(cardType) !== -1)
-    || BuilderTypes.Blocks[cardType].static.anythingAccepts;
+    || Blocks[cardType].static.anythingAccepts;
 };
 
 const cardCouldWrap = (targetProps: Props, item: CardItem) =>

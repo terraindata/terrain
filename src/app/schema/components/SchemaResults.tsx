@@ -50,14 +50,17 @@ import * as React from 'react';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
-import BuilderTypes from '../../builder/BuilderTypes';
 import {_ResultsState, ResultsManager, ResultsState} from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import InfoArea from '../../common/components/InfoArea';
+import { Query, _Query } from '../../../../shared/items/types/Query';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 const NUM_ROWS = 200;
 
@@ -74,8 +77,9 @@ class SchemaResults extends PureClasss<Props>
 		selectedItem?: SchemaBaseClass,
 
 		resultsState?: ResultsState;
-		resultsQuery?: BuilderTypes.Query;
-		resultsDb?: SharedTypes.Database;
+		resultsQuery?: Query;
+		resultsDb?: BackendInstance;
+		resultsErrorMessage?: string;
 	} = {
 		resultsState: _ResultsState(),
 	};
@@ -131,12 +135,19 @@ class SchemaResults extends PureClasss<Props>
 								break;
 						}
 
-						const resultsQuery = this.getQuery(field, table, where);
+						const resultsQuery = this.getQuery(resultsDb, field, table, where);
+						let resultsErrorMessage = null;
+						
+						if (!resultsQuery)
+						{
+							resultsErrorMessage = 'Unsupported DB type: ' + resultsDb.type;
+						}
 
 						this.setState({
 							resultsQuery,
 							resultsDb,
 							resultsState: _ResultsState(),
+							resultsErrorMessage,
 						});
 					}
 					else
@@ -148,10 +159,14 @@ class SchemaResults extends PureClasss<Props>
 		});
 	}
 
-	getQuery(field: string, table: string, where: string = '1'): BuilderTypes.Query
+	getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
 	{
-		const tql = 'SELECT ' + field + ' FROM ' + table + ' ' + where + ' LIMIT ' + NUM_ROWS + ';';
-
+		if(resultsDb.type !== 'mysql')
+		{
+			// TODO MOD
+			return null;
+		}
+		
 		const inputs = [
 			{
 				key: 'table',
@@ -167,22 +182,22 @@ class SchemaResults extends PureClasss<Props>
 			},
 		].map(
 			(inputConfig) =>
-				BuilderTypes.make(
-					BuilderTypes.Blocks.input,
+				BlockUtils.make(
+					AllBackendsMap.mysql.blocks.input,
 					inputConfig,
 				),
 		);
 
-		return BuilderTypes._Query({
+		return _Query({
 			inputs: List(inputs),
 
 			cards: List([
-				BuilderTypes.make(
-					BuilderTypes.Blocks.sfw,
+				BlockUtils.make(
+					AllBackendsMap.mysql.blocks.sfw,
 					{
 						fields: List([
-							BuilderTypes.make(
-								BuilderTypes.Blocks.field,
+							BlockUtils.make(
+								AllBackendsMap.mysql.blocks.field,
 								{
 									field: 'input.field',
 								},
@@ -190,12 +205,12 @@ class SchemaResults extends PureClasss<Props>
 						]),
 
 						cards: List([
-							BuilderTypes.make(
-								BuilderTypes.Blocks.from,
+							BlockUtils.make(
+								AllBackendsMap.mysql.blocks.from,
 								{
 									tables: List([
-										BuilderTypes.make(
-											BuilderTypes.Blocks.table,
+										BlockUtils.make(
+											AllBackendsMap.mysql.blocks.table,
 											{
 												table: 'input.table',
 											},
@@ -204,12 +219,12 @@ class SchemaResults extends PureClasss<Props>
 								},
 							),
 
-							BuilderTypes.make(
-								BuilderTypes.Blocks.where,
+							BlockUtils.make(
+								AllBackendsMap.mysql.blocks.where,
 								{
 									cards: List([
-										BuilderTypes.make(
-											BuilderTypes.Blocks.tql,
+										BlockUtils.make(
+											AllBackendsMap.mysql.blocks.tql,
 											{
 												clause: where,
 											},
@@ -218,8 +233,8 @@ class SchemaResults extends PureClasss<Props>
 								},
 							),
 
-							BuilderTypes.make(
-								BuilderTypes.Blocks.take,
+							BlockUtils.make(
+								AllBackendsMap.mysql.blocks.take,
 								{
 									value: 'input.numRows',
 								},
@@ -245,7 +260,7 @@ class SchemaResults extends PureClasss<Props>
 
   render()
   {
-    return (
+   	return (
     	<div
     		style={{
     			width: '100%',
@@ -255,11 +270,19 @@ class SchemaResults extends PureClasss<Props>
     	>
     		{
     			this.showsResults(this.state.selectedItem) ?
-		    		<ResultsTable
-		    			results={this.state.resultsState.results}
-		    			onExpand={_.noop}
-		    			resultsLoading={this.state.resultsState.loading}
-		    		/>
+    				(
+    					this.state.resultsErrorMessage ?
+    						<InfoArea
+    							large="Error retrieving results"
+    							small={this.state.resultsErrorMessage}
+    						/>
+    					:
+				    		<ResultsTable
+				    			results={this.state.resultsState.results}
+				    			onExpand={_.noop}
+				    			resultsLoading={this.state.resultsState.loading}
+				    		/>
+    				)
 		    	:
     				<InfoArea
     					large="Select an item to see its contents here."

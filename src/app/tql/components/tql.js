@@ -42,11 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+"use strict";
+
 // Adapted from javascript syntax codemirror file
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
-var TqlConfig = require('../TQLConfig.json');
+var TqlConfig = require('../../../../shared/backends/mysql/syntax/SQLSyntaxConfig.json');
 
 (function(mod)
 {
@@ -58,7 +60,6 @@ var TqlConfig = require('../TQLConfig.json');
     mod(CodeMirror);
 })(function(CodeMirror)
 {
-"use strict";
 
 CodeMirror.defineMode("tql", function(config, parserConfig)
 {

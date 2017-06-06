@@ -47,14 +47,14 @@ const {Map, List} = Immutable;
 import * as React from 'react';
 import * as _ from 'underscore';
 import {BaseClass, New} from '../../../Classes';
-import TQLConverter from '../../../tql/TQLConverter';
 import {Ajax, QueryResponse} from '../../../util/Ajax';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
-import SharedTypes from './../../../../../shared/SharedTypes';
+import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
-import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
+import Query from '../../../../../shared/items/types/Query';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
 
 export const MAX_RESULTS = 200;
 
@@ -106,9 +106,9 @@ export let _ResultsState = (config: Object = {}) =>
 
 export interface Props
 {
-  query: BuilderTypes.Query;
+  query: Query;
   resultsState: ResultsState;
-  db: SharedTypes.Database;
+  db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
@@ -163,7 +163,7 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  queryResults(query: BuilderTypes.Query, db: SharedTypes.Database)
+  queryResults(query: Query, db: BackendInstance)
   {
     if (!query || !db)
     {
@@ -174,10 +174,13 @@ export class ResultsManager extends PureClasss<Props>
 
     if(db.source === 'm1')
     {
-      tql = TQLConverter.toTQL(query, {
-        limit: MAX_RESULTS,
-        replaceInputs: true,
-      });
+      tql = AllBackendsMap[query.language].queryToCode(
+        query, 
+        {
+          limit: MAX_RESULTS,
+          replaceInputs: true,
+        }
+      );
     }
 
     if (tql !== this.state.queriedTql)
@@ -196,22 +199,24 @@ export class ResultsManager extends PureClasss<Props>
 
       if (this.props.db.source === 'm2')
       {
-        this.setState({
-          allQuery: Ajax.query(
-            TQLConverter.toEQL(query, {
-              allFields: true,
-            }),
-            db,
-            this.handleAllFieldsResponse,
-            this.handleAllFieldsError,
-          ),
-        });
+        // this.setState({
+        //   allQuery: Ajax.query(
+        //     AllBackendsMap[query.language].toEQL(query, {
+        //       allFields: true,
+        //     }),
+        //     db,
+        //     this.handleAllFieldsResponse,
+        //     this.handleAllFieldsError,
+        //   ),
+        // });
       } else if (this.props.db.source === 'm1')
       {
         const selectCard = query.cards.get(0);
+
         if (
           !this.props.noExtraFields
           && selectCard
+          && selectCard.type === 'sfw'
           && !selectCard['cards'].some(
               (card) => card.type === 'groupBy',
             )
@@ -223,12 +228,15 @@ export class ResultsManager extends PureClasss<Props>
           // temporary, don't dispatch select * if query has group by
           this.setState({
             allQuery: Ajax.query(
-              TQLConverter.toTQL(query, {
-                allFields: true,
-                transformAliases: true,
-                limit: MAX_RESULTS,
-                replaceInputs: true,
-              }),
+              AllBackendsMap[query.language].queryToCode(
+                query,
+                {
+                  allFields: true,
+                  transformAliases: true,
+                  limit: MAX_RESULTS,
+                  replaceInputs: true,
+                }
+              ),
               db,
               this.handleAllFieldsResponse,
               this.handleAllFieldsError,
@@ -240,7 +248,7 @@ export class ResultsManager extends PureClasss<Props>
         // this.setState({
         //   countXhr:
         //     Ajax.query(
-        //       TQLConverter.toTQL(query, {
+        //       .toTQL(query, {
         //         count: true,
         //         replaceInputs: true,
         //       }),
@@ -275,9 +283,15 @@ export class ResultsManager extends PureClasss<Props>
   componentWillReceiveProps(nextProps: Props)
   {
     if (
-      nextProps.query != null
-      && nextProps.query.tql != null
-      && (this.props.query == null || this.props.query.tql !== nextProps.query.tql)
+      nextProps.query
+      && nextProps.query.tql
+      && (!this.props.query ||
+        (
+          this.props.query.tql !== nextProps.query.tql || 
+          this.props.query.cards !== nextProps.query.cards ||
+          this.props.query.inputs !== nextProps.query.inputs
+        )
+      )
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
@@ -529,7 +543,7 @@ export class ResultsManager extends PureClasss<Props>
 	}
 }
 
-export function getPrimaryKeyFor(result: any, config: IResultsConfig): string
+export function getPrimaryKeyFor(result: any, config: ResultsConfig): string
 {
   if (config && config.primaryKeys.size)
   {

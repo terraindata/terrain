@@ -54,8 +54,8 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import {spotlightAction} from '../../data/SpotlightStore';
 import Classs from './../../../common/components/Classs';
-import {IResultsConfig} from './ResultsConfig';
 import {MAX_RESULTS, Result} from './ResultsManager';
+import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -66,7 +66,7 @@ export interface Props
 {
   result: Result;
 
-  resultsConfig: IResultsConfig;
+  resultsConfig: ResultsConfig;
   index: number;
   primaryKey: string;
   onExpand: (index: number) => void;
@@ -297,7 +297,7 @@ class ResultComponent extends Classs<Props> {
     ));
 	}
 }
-export function getResultValue(result: Result, field: string, config: IResultsConfig, overrideFormat?: any): string
+export function getResultValue(result: Result, field: string, config: ResultsConfig, overrideFormat?: any): string
 {
   let value: any;
   if (result)
@@ -307,12 +307,12 @@ export function getResultValue(result: Result, field: string, config: IResultsCo
   return ResultFormatValue(field, value, config, overrideFormat);
 }
 
-export function resultsConfigHasFields(config: IResultsConfig): boolean
+export function resultsConfigHasFields(config: ResultsConfig): boolean
 {
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(result: Result, config: IResultsConfig): string[]
+export function getResultFields(result: Result, config: ResultsConfig): string[]
 {
   let fields: string[];
   
@@ -328,7 +328,7 @@ export function getResultFields(result: Result, config: IResultsConfig): string[
   return fields;
 }
 
-export function getResultName(result: Result, config: IResultsConfig)
+export function getResultName(result: Result, config: ResultsConfig)
 {
   let nameField: string;
   
@@ -344,7 +344,7 @@ export function getResultName(result: Result, config: IResultsConfig)
   return getResultValue(result, nameField, config);
 }
 
-export function ResultFormatValue(field: string, value: string | number, config: IResultsConfig, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, overrideFormat?: any): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const {showRaw} = overrideFormat || format || { showRaw: false };

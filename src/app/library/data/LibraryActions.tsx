@@ -44,9 +44,8 @@ THE SOFTWARE.
 
 const _ = require('underscore');
 import Util from '../../util/Util';
-import BuilderTypes from './../../builder/BuilderTypes';
 import LibraryTypes from './../LibraryTypes';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
 import {_LibraryState, LibraryState, LibraryStore} from './LibraryStore';
@@ -54,6 +53,7 @@ type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 import * as Immutable from 'immutable';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
@@ -205,14 +205,14 @@ const Actions =
           .set('algorithmId', algorithmId)
           .set('groupId', groupId)
           .set('name', Util.duplicateNameFor(variant.name))
-          .set('status', LibraryTypes.ItemStatus.Build);
+          .set('status', ItemStatus.Build);
         newVariant = LibraryTypes.touchVariant(newVariant);
         
         Actions.variants.create(groupId, algorithmId, newVariant);
       },
 
     status:
-      (variant: Variant, status: LibraryTypes.ItemStatus, confirmed?: boolean) =>
+      (variant: Variant, status: ItemStatus, confirmed?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed }),
 
     fetchVersion:
@@ -243,7 +243,7 @@ const Actions =
       $(ActionTypes.loadState, { state }),
 
   setDbs:
-    (dbs: List<SharedTypes.Database>, dbLoadFinished: boolean) =>
+    (dbs: List<BackendInstance>, dbLoadFinished: boolean) =>
       $(ActionTypes.setDbs, { dbs, dbLoadFinished }),
 
   // overwrites current state with state from server

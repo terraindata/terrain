@@ -49,11 +49,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 const {List} = Immutable;
 import * as _ from 'underscore';
-import BuilderTypes from '../../builder/BuilderTypes';
+import Query from '../../../../shared/items/types/Query';
 import {ResultsState} from '../../builder/components/results/ResultsManager';
 import { MenuOption } from '../../common/components/Menu';
 import LibraryTypes from '../../library/LibraryTypes';
-import TQLConverter from '../TQLConverter';
+import {cardList} from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';
@@ -64,7 +64,7 @@ import TQLResultsBar from './TQLResultsBar';
 
 export interface Props {
   variant?: LibraryTypes.Variant;
-  query?: BuilderTypes.Query;
+  query?: Query;
   canEdit?: boolean;
   resultsState: ResultsState;
 
@@ -264,7 +264,7 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   findKeyword(line: string)
   {
-    const keywords = Object.keys(BuilderTypes.cardList);
+    const keywords = Object.keys(cardList);
     let cardName = '';
     keywords.map(function(word) {
       const words = word.split(' ');
@@ -333,8 +333,9 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   render()
   {
-    const manualEntry = BuilderTypes.cardList[this.state.cardName] &&
-        BuilderTypes.Blocks[BuilderTypes.cardList[this.state.cardName]].static.manualEntry;
+    const manualEntry = null;
+     // cardList[this.state.cardName] &&
+     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
 
     return (
       <div

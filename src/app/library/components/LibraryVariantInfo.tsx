@@ -59,18 +59,19 @@ import LibraryActions from './../data/LibraryActions';
 import LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 
 type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   variant: Variant;
-  dbs: List<SharedTypes.Database>;
+  dbs: List<BackendInstance>;
   isSuperUser: boolean;
   isBuilder: boolean;
 }
 
+// TODO MOD centralize
 const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends PureClasss<Props>
@@ -82,7 +83,13 @@ class LibraryInfoColumn extends PureClasss<Props>
   
   handleLanguageChange(langIndex: number)
   {
-    Actions.variants.change(this.props.variant.set('language', LANGUAGES.get(langIndex)));
+    const language = LANGUAGES.get(langIndex);
+    console.log(this.props.variant.query);
+    Actions.variants.change(
+      this.props.variant
+        .set('language', language)
+        .setIn(['query', 'language'], language) // TODO change once we remove query from variant
+    );
   }
 
   render()

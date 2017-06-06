@@ -50,7 +50,6 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import {scrollAction} from '../../data/BuilderScrollStore';
 import PureClasss from './../../../common/components/PureClasss';
@@ -59,28 +58,27 @@ import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
+import {AllBackendsMap} from '../../../../../shared/backends/AllBackends';
 
-type ICard = BuilderTypes.ICard;
-type ICards = BuilderTypes.ICards;
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 const {List, Map} = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props
 {
-  cards: ICards;
+  cards: Cards;
+  language: string;
   deckOpen: boolean;
   queryId: ID;
   canEdit: boolean;
   addColumn: (number, string?) => void;
   columnIndex: number;
-  tqlCardsInSync: boolean;
-  parseTreeError: string;
+  cardsAndCodeInSync: boolean;
+  parseError: string;
 
   containerWidth?: number;
   containerHeight?: number;
 }
-
-const _topLevelAccepts = Immutable.List(['sfw']);
 
 class CardsColumn extends PureClasss<Props>
 {
@@ -117,10 +115,21 @@ class CardsColumn extends PureClasss<Props>
       this.handleScroll();
     }
   }
-
-  createFromCard()
+  
+  getPossibleCards()
   {
-    Actions.create(this.state.keyPath, 0, 'sfw');
+    return AllBackendsMap[this.props.language].topLevelCards;
+  }
+  
+  getFirstCard()
+  {
+    const type = AllBackendsMap[this.props.language].topLevelCards.get(0);
+    return AllBackendsMap[this.props.language].blocks[type];
+  }
+
+  createCard()
+  {
+    Actions.create(this.state.keyPath, 0, this.getFirstCard().type);
   }
 
   toggleLearningMode()
@@ -190,19 +199,20 @@ class CardsColumn extends PureClasss<Props>
         className={classNames({
           'cards-column': true,
           'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
-          'cards-column-has-tql-parse-error': !!this.props.parseTreeError,
+          'cards-column-has-tql-parse-error': !!this.props.parseError,
         })}
       >
         {
           canHaveDeck &&
             <CardsDeck
               open={this.props.deckOpen}
+              language={this.props.language}
             />
         }
         <div
           className={classNames({
             'cards-column-cards-area': true,
-            'cards-column-cards-area-faded': !this.props.tqlCardsInSync,
+            'cards-column-cards-area-faded': !this.props.cardsAndCodeInSync,
           })}
           onScroll={this.handleScroll}
           id="cards-column"
@@ -216,23 +226,25 @@ class CardsColumn extends PureClasss<Props>
               index={cards.size}
               keyPath={keyPath}
               heightOffset={12}
-              accepts={_topLevelAccepts}
+              accepts={this.getPossibleCards()}
+              language={this.props.language}
             />
             <CardsArea
               cards={cards}
+              language={this.props.language}
               keyPath={keyPath}
               canEdit={canEdit}
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               noCardTool={true}
-              accepts={_topLevelAccepts}
+              accepts={this.getPossibleCards()}
             />
             {
               !cards.size ? /* "Create your first card." */
                 <InfoArea
                   large={"There aren't any cards in this query."}
-                  button={canEdit && 'Create a Select Card'}
-                  onClick={this.createFromCard}
+                  button={canEdit && 'Create a ' + this.getFirstCard().static.title + ' Card'}
+                  onClick={this.createCard}
                   inline={false}
                 />
               : null
@@ -270,7 +282,7 @@ class CardsColumn extends PureClasss<Props>
             //   index={0}
             //   keyPath={keyPath}
             //   height={12}
-            //   accepts={_topLevelAccepts}
+            //   accepts={this.getPossibleCards()}
             // />
 
 // wasn't able to get this to work but will leave it around in case some

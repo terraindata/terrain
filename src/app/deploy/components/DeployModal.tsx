@@ -49,16 +49,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
 
-import BuilderTypes from '../../builder/BuilderTypes';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
 import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
-import TQLConverter from '../../tql/TQLConverter';
 import DeployModalColumn from './DeployModalColumn';
-
-const {ItemStatus} = LibraryTypes;
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 export interface Props {
 }
@@ -68,7 +65,7 @@ class DeployModal extends PureClasss<Props>
   state: {
     changingStatus: boolean;
     changingStatusOf: LibraryTypes.Variant;
-    changingStatusTo: LibraryTypes.ItemStatus;
+    changingStatusTo: ItemStatus;
     defaultChecked: boolean;
   } = {
     changingStatus: false,

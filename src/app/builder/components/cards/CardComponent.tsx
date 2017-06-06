@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Card.less');
+require('./CardStyle.less');
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -58,8 +58,8 @@ import Actions from '../../data/BuilderActions';
 import LayoutManager from '../layout/LayoutManager';
 import PureClasss from './../../../common/components/PureClasss';
 import ManualPopup from './../../../manual/components/ManualPopup';
-import { Display } from './../../BuilderDisplays';
-import BuilderTypes from './../../BuilderTypes';
+import { Display } from './../../../../../shared/blocks/displays/Display';
+import { Card } from '../../../../../shared/blocks/types/Card';
 import {BuilderScrollState, BuilderScrollStore} from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
@@ -67,6 +67,8 @@ const CDA = CardDropArea as any;
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
 import SchemaStore from '../../../schema/data/SchemaStore';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -75,7 +77,7 @@ const CARD_HEIGHT_MAP: {[id: string]: number} = {};
 
 export interface Props
 {
-  card: BuilderTypes.ICard;
+  card: Card;
   index: number;
   singleCard?: boolean; // for BuilderTextboxCards
   singleChild?: boolean; // for cards like Where that are wrappers but only accept 1 child
@@ -95,7 +97,7 @@ export interface Props
   display?: Display;
 }
 
-class _Card extends PureClasss<Props>
+class _CardComponent extends PureClasss<Props>
 {
   state: {
     selected: boolean;
@@ -180,7 +182,7 @@ class _Card extends PureClasss<Props>
     });
   }
 
-  getCardTerms(card: BuilderTypes.ICard): List<string>
+  getCardTerms(card: Card): List<string>
   {
     let terms: List<string> = Immutable.List([]);
 
@@ -226,7 +228,7 @@ class _Card extends PureClasss<Props>
     }
 
     this.dragPreview = createDragPreview(
-      this.props.card.static.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
+      this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')',
     {
       backgroundColor: this.props.card.static.colors[0],
       borderColor: this.props.card.static.colors[0],
@@ -349,7 +351,10 @@ class _Card extends PureClasss<Props>
       return block;
     };
 
-    const card = BuilderTypes.recordFromJS(BuilderTypes.cardsForServer(removeId(this.props.card)).toJS());
+    const card = BlockUtils.recordFromJS(
+      BlockUtils.cardsForServer(removeId(this.props.card)).toJS(),
+      AllBackendsMap[this.props.card.static.language].blocks
+    );
 
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
 
@@ -462,6 +467,7 @@ class _Card extends PureClasss<Props>
             open={true}
             onClose={this.handleCardToolClose}
             accepts={this.props.display && this.props.display.accepts}
+            language={this.props.card.static.language}
           />
         </div>
       );
@@ -474,6 +480,7 @@ class _Card extends PureClasss<Props>
       addColumn={this.props.addColumn}
       columnIndex={this.props.columnIndex}
       keyPath={this.getKeyPath()}
+      language={this.props.card.static.language}
     />;
 
     const {card} = this.props;
@@ -512,6 +519,7 @@ class _Card extends PureClasss<Props>
           accepts={this.props.accepts}
           wrapType={this.props.card.type}
           singleChild={this.props.singleChild || this.props.singleCard}
+          language={card.static.language}
         />
         <div
           className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
@@ -548,7 +556,7 @@ class _Card extends PureClasss<Props>
                       'card-preview': true,
                       'card-preview-hidden': this.state.opening,
                     })}>
-                      { BuilderTypes.getPreview(card) }
+                      { BlockUtils.getPreview(card) }
                     </div>
                 }
                 {
@@ -579,6 +587,7 @@ class _Card extends PureClasss<Props>
           accepts={this.props.accepts}
           wrapType={this.props.card.type}
           singleChild={this.props.singleChild || this.props.singleCard}
+          language={card.static.language}
         />
       </div>
     );
@@ -605,7 +614,7 @@ const cardSource =
     setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
     const item: CardItem = {
       props,
-      childIds: BuilderTypes.getChildIds(props.card)
+      childIds: BlockUtils.getChildIds(props.card)
         .remove(props.card.id),
       type: props.card.type,
     };
@@ -631,6 +640,6 @@ const dragCollect = (connect, monitor) =>
   connectDragPreview: connect.dragPreview(),
 });
 
-export const Card = DragSource('CARD', cardSource, dragCollect)(_Card);
+export const CardComponent = DragSource('CARD', cardSource, dragCollect)(_CardComponent);
 
-export default Card;
+export default CardComponent;

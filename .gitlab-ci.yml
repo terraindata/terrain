@@ -23,7 +23,7 @@ lint:
 fix:
   script:
    - yarn run fix
-  stage: lint
+  stage: fix
 
 test-backend:
   script:

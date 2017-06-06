@@ -44,76 +44,20 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import {IResultsConfig} from '../builder/components/results/ResultsConfig';
-import BuilderTypes from './../builder/BuilderTypes';
 import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const {List, Map} = Immutable;
 import {BaseClass, New} from '../Classes';
-import SharedTypes from '../../../shared/SharedTypes';
+import BackendInstance from '../../../shared/backends/types/BackendInstance';
+import {Query, _Query, queryForSave} from '../../../shared/items/types/Query';
+import {ItemStatus, ItemType, ItemC, Item} from '../../../shared/items/types/Item';
+import {ResultsConfig, _ResultsConfig} from '../../../shared/results/types/ResultsConfig';
+
+// TODO MOD refactor
 
 export module LibraryTypes
 {
-  export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
-  export const ItemType: {
-    Query: ItemType;
-    Variant: ItemType;
-    Algorithm: ItemType;
-    Group: ItemType;
-  } = {
-    Query: 'QUERY',
-    Variant: 'VARIANT',
-    Algorithm: 'ALGORITHM',
-    Group: 'GROUP',
-  };
-  
-  export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT';
-  export const ItemStatus: {
-    Archive: ItemStatus;
-    Build: ItemStatus;
-    Approve: ItemStatus;
-    Live: ItemStatus;
-    Default: ItemStatus;
-  } =
-  {
-    Archive: 'ARCHIVE',
-    Build: 'BUILD',
-    Approve: 'APPROVE',
-    Live: 'LIVE',
-    Default: 'DEFAULT',
-  };
-  
-
-  
-  class ItemC extends BaseClass
-  {
-    // TODO potentially consolidate with midway
-    id: ID = -1;
-    parent: number = 0;
-    
-    name: string = '';
-    status: ItemStatus = 'BUILD';
-    type: ItemType;
-    
-    db: SharedTypes.Database = {} as any;
-    
-    dbFields = ['id', 'parent', 'name', 'status', 'type'];
-    excludeFields= ['dbFields', 'excludeFields'];
-    
-    modelVersion = 2; // 2 is for the first version of Node midway
-  }
-  export type Item = ItemC & IRecord<ItemC>;
-  export const _Item = (config?: {[key:string]: any}) => 
-  {
-    if(config && typeToConstructor[config.type])
-    {
-      return typeToConstructor[config.type](config);
-    }
-    throw new Error('Unrecognized item type: ' + (config && config.type));
-  }
-  
-
   class VariantC extends ItemC
   {
     type = ItemType.Variant;
@@ -131,7 +75,7 @@ export module LibraryTypes
 
     // don't use this!
     // TODO remove when variants can be saved without queries
-    query: BuilderTypes.Query = null;
+    query: Query = null;
   }
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
@@ -150,6 +94,7 @@ export module LibraryTypes
         tql: config.tql,
         deckOpen: config.deckOpen,
         variantId: config.id,
+        language: 'mysql',
       };
     }
     
@@ -162,7 +107,7 @@ export module LibraryTypes
     config = config || {};
 
     // TODO change to standalone query Item
-    config.query = BuilderTypes._Query(config.query);
+    config.query = _Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
     if (!config || !config.lastUserId || !config.lastEdited)
@@ -182,7 +127,7 @@ export module LibraryTypes
 
   export function variantForSave(v: Variant): Variant
   {
-    return v.set('query', BuilderTypes.queryForSave(v.query));
+    return v.set('query', queryForSave(v.query));
   }
 
 
@@ -291,15 +236,17 @@ export module LibraryTypes
     }
   }
   
+  
   export const typeToConstructor: {
     [key: string]: (...args) => Item,
   } =
   {
-    [ItemType.Query]: BuilderTypes._Query,
+    [ItemType.Query]: _Query,
     [ItemType.Variant]: _Variant,
     [ItemType.Algorithm]: _Algorithm,
     [ItemType.Group]: _Group,
   };
+
 }
 
 export default LibraryTypes;

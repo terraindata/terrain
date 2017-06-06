@@ -52,11 +52,10 @@ import LibraryActions from '../data/LibraryActions';
 import LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
-type Status = LibraryTypes.ItemStatus;
-const Status = LibraryTypes.ItemStatus;
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
+import { ItemStatus as Status } from '../../../../shared/items/types/Item';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -204,7 +203,7 @@ function getOption(status: Status)
       }}
     >
       {
-        status === LibraryTypes.ItemStatus.Default
+        status === Status.Default
         ?
           <StarIcon
             className="status-dropdown-option-star"
@@ -221,7 +220,7 @@ function getOption(status: Status)
         className="status-dropdown-option-text"
       >
         {
-          LibraryTypes.nameForStatus(status as LibraryTypes.ItemStatus)
+          LibraryTypes.nameForStatus(status as Status)
         }
       </div>
     </div>
