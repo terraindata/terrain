@@ -54,7 +54,7 @@ import UserStore from '../../users/data/UserStore';
 import UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import {notificationManager} from './../../common/components/InAppNotification';
+import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
@@ -64,7 +64,7 @@ import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 import StatusDropdown from './StatusDropdown';
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
@@ -164,7 +164,7 @@ class VariantsColumn extends Classs<Props>
       {
         message = 'To "' + name + '"';
       }
-      
+
       notificationManager.addNotification(
         'Renamed',
         message,
@@ -199,7 +199,8 @@ class VariantsColumn extends Classs<Props>
 
   handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
-    switch (targetType) {
+    switch (targetType)
+    {
       case 'group':
         // move this one to the new group
         // and create a new group
@@ -207,7 +208,7 @@ class VariantsColumn extends Classs<Props>
         break;
       case 'algorithm':
         const algorithmName = targetItem.name || 'Untitled';
-        const vrntName = this.props.variants.get(id).name  || 'Untitled';
+        const vrntName = this.props.variants.get(id).name || 'Untitled';
         notificationManager.addNotification(
           'Moved',
           '"' + vrntName + '" was moved to algorithm "' + algorithmName + '"',
@@ -248,11 +249,11 @@ class VariantsColumn extends Classs<Props>
   {
     const variant = this.props.variants.get(id);
     const index = this.props.variantsOrder.indexOf(id);
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     let canEdit: boolean, canDrag: boolean;
     canEdit = true;
     canDrag = true;
-    
+
     // if (me && roles)
     // {
     //   canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
@@ -345,7 +346,7 @@ class VariantsColumn extends Classs<Props>
 
   renderVariants(archived?: boolean)
   {
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
     const canCreate = true; // canMakeLive;
     // TODO maybe on the new middle tier, builders can create variants
@@ -366,21 +367,21 @@ class VariantsColumn extends Classs<Props>
         {
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
-              (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
-              && this.renderVariant(id, fadeIndex ++),
+            (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
+            && this.renderVariant(id, fadeIndex++),
           )
         }
         {
           this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
-          ? null
-          : <div className="library-category-none">None</div>
+            ? null
+            : <div className="library-category-none">None</div>
         }
         {
           canCreate && !archived &&
-            <CreateItem
-              name="variant"
-              onCreate={this.handleCreate}
-            />
+          <CreateItem
+            name="variant"
+            onCreate={this.handleCreate}
+          />
         }
       </LibraryItemCategory>
     );
@@ -397,24 +398,24 @@ class VariantsColumn extends Classs<Props>
           this.props.variantsOrder ?
             (
               this.props.variantsOrder.size ?
-              (
-                <div>
-                  { this.renderVariants() }
-                  { this.renderVariants(true) }
-                </div>
-              )
-              :
-              <InfoArea
-                large="No variants created, yet."
-                button={
-                  Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore) ||
-                  Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
-                    ? 'Create a variant' : null
-                }
-                onClick={this.handleCreate}
-              />
+                (
+                  <div>
+                    {this.renderVariants()}
+                    {this.renderVariants(true)}
+                  </div>
+                )
+                :
+                <InfoArea
+                  large="No variants created, yet."
+                  button={
+                    Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore) ||
+                      Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                      ? 'Create a variant' : null
+                  }
+                  onClick={this.handleCreate}
+                />
             )
-          : null
+            : null
         }
       </LibraryColumn>
     );

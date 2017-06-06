@@ -54,43 +54,44 @@ const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 const suffixes = ['', ' k', ' M', ' B'];
 
 const keyPathForId = (node: any, id: string): (Array<string | number> | boolean) =>
+{
+  if (node.get('id') === id)
   {
-    if (node.get('id') === id)
+    return true;
+  }
+
+  return node.reduce((keyPath, value, key) =>
+  {
+    if (keyPath)
     {
-      return true;
+      return keyPath;
     }
 
-    return node.reduce((keyPath, value, key) =>
+    if (Immutable.Iterable.isIterable(value))
     {
-      if (keyPath)
+      const kp = keyPathForId(value, id);
+      if (kp)
       {
-        return keyPath;
+        return ([key]).concat(kp === true ? [] : kp);
       }
-
-      if (Immutable.Iterable.isIterable(value))
-      {
-        const kp = keyPathForId(value, id);
-        if (kp)
-        {
-          return ([key]).concat(kp === true ? [] : kp);
-        }
-      }
-    }, false);
-  };
+    }
+  }, false);
+};
 
 const Util = {
-	// Return a random integer [min, max)
-	// assumes min of 0 if not passed.
-	randInt(...args: number[]): number
-	{
-		let min: number = arguments[0], max: number = arguments[1];
-		if (arguments.length === 1) {
-			min = 0;
-			max = arguments[0];
-		}
+  // Return a random integer [min, max)
+  // assumes min of 0 if not passed.
+  randInt(...args: number[]): number
+  {
+    let min: number = arguments[0], max: number = arguments[1];
+    if (arguments.length === 1)
+    {
+      min = 0;
+      max = arguments[0];
+    }
 
-		return Math.floor(Math.random() * (max - min)) + min;
-	},
+    return Math.floor(Math.random() * (max - min)) + min;
+  },
 
   moment(str: string)
   {
@@ -134,18 +135,18 @@ const Util = {
 
     // return !! RolesStore.getState().getIn([groupId, me.id, role]);
   },
-  
+
   duplicateNameFor(name: string): string
   {
     if (Util.stringIsNumber(name.charAt(name.length - 1)))
     {
       let strNum = '';
-      while(Util.stringIsNumber(name.charAt(name.length - 1)))
+      while (Util.stringIsNumber(name.charAt(name.length - 1)))
       {
         strNum = name.charAt(name.length - 1) + strNum;
         name = name.substr(0, name.length - 1);
       }
-      
+
       return name + ((+strNum) + 1);
     }
     else
@@ -153,7 +154,7 @@ const Util = {
       return name + ' 2';
     }
   },
-  
+
   stringIsNumber(str: string): boolean
   {
     return str && str !== " " && !Number.isNaN(+str);
@@ -188,8 +189,10 @@ const Util = {
   mapEnum(_enum: any, fn: (e: string) => any)
   {
     const ans = [];
-    for (const item in _enum) {
-      if (_enum.hasOwnProperty(item) && /^\d+$/.test(item)) {
+    for (const item in _enum)
+    {
+      if (_enum.hasOwnProperty(item) && /^\d+$/.test(item))
+      {
         ans.push(fn(item));
       }
     }
@@ -218,7 +221,8 @@ const Util = {
     return then.format('MM/DD/YY') + hour;
   },
 
-  roundNumber(num, decimalPoints) {
+  roundNumber(num, decimalPoints)
+  {
     return Math.round(num * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints);
   },
 
@@ -226,9 +230,10 @@ const Util = {
   {
     // from http://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
     let csvContent = 'data:text/csv;charset=utf-8,';
-    data.forEach((infoArray, index) => {
-       const dataString = infoArray.join(',');
-       csvContent += index < data.length ? dataString + '\n' : dataString;
+    data.forEach((infoArray, index) =>
+    {
+      const dataString = infoArray.join(',');
+      csvContent += index < data.length ? dataString + '\n' : dataString;
     });
 
     const encodedUri = encodeURI(csvContent);
@@ -319,7 +324,7 @@ const Util = {
 
   getId(isString: boolean = false): ID
   {
-    if(isString)
+    if (isString)
     {
       return _.range(0, 5).map((i) => chars[Util.randInt(chars.length)]).join('');
     }
@@ -388,7 +393,8 @@ const Util = {
   },
 
   // still needed?
-  immutableMove: (arr: any, id: any, index: number) => {
+  immutableMove: (arr: any, id: any, index: number) =>
+  {
     const curIndex = arr.findIndex((obj) =>
       (typeof obj.get === 'function' && (obj.get('id') === id))
       || (obj.id === id));
@@ -399,48 +405,52 @@ const Util = {
 
   keyPathForId,
 
-	isInt(num): boolean
-	{
-		return num === parseInt(num, 10);
-	},
+  isInt(num): boolean
+  {
+    return num === parseInt(num, 10);
+  },
 
-	isArray(arr: any): boolean
-	{
-		return arr.length !== undefined;
-	},
+  isArray(arr: any): boolean
+  {
+    return arr.length !== undefined;
+  },
 
-	parentNode(reactNode): Node
-	{
-		return ReactDOM.findDOMNode(reactNode).parentNode;
-	},
+  parentNode(reactNode): Node
+  {
+    return ReactDOM.findDOMNode(reactNode).parentNode;
+  },
 
   siblings(reactNode): NodeList
   {
     return Util.parentNode(reactNode).childNodes;
   },
 
-  selectText(field, start, end) {
-    if ( field.createTextRange ) {
+  selectText(field, start, end)
+  {
+    if (field.createTextRange)
+    {
       const selRange = field.createTextRange();
       selRange.collapse(true);
       selRange.moveStart('character', start);
       selRange.moveEnd('character', end);
       selRange.select();
       field.focus();
-    } else if ( field.setSelectionRange ) {
+    } else if (field.setSelectionRange)
+    {
       field.focus();
       field.setSelectionRange(start, end);
-    } else if ( typeof field.selectionStart != 'undefined' ) {
+    } else if (typeof field.selectionStart != 'undefined')
+    {
       field.selectionStart = start;
       field.selectionEnd = end;
       field.focus();
     }
   },
 
-	valueMinMax(value: number, min: number, max: number)
-	{
-		return Math.min(Math.max(value, min), max);
-	},
+  valueMinMax(value: number, min: number, max: number)
+  {
+    return Math.min(Math.max(value, min), max);
+  },
 
   deeperCloneArr(obj): any
   {
@@ -460,7 +470,8 @@ const Util = {
     const curHeight = el.height();
 
     el.css('overflow', 'hidden');
-    el.height(curHeight).animate({ height }, 250, () => {
+    el.height(curHeight).animate({ height }, 250, () =>
+    {
       onComplete && onComplete();
     });
   },
@@ -471,7 +482,8 @@ const Util = {
     const curHeight = el.height();
     const autoHeight = el.css('height', 'auto').height();
 
-    el.height(curHeight).animate({ height: autoHeight }, duration || 250, function() {
+    el.height(curHeight).animate({ height: autoHeight }, duration || 250, function()
+    {
       el.css('height', 'auto');
       el.css('overflow-y', 'visible');
       onComplete && onComplete();
@@ -512,9 +524,11 @@ const Util = {
   {
     // For throttling methods on a react component
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
-    fields.map((field) => {
+    fields.map((field) =>
+    {
       component['_throttled_' + field] = _.throttle(component[field], 1000);
-      component[field] = (event) => {
+      component[field] = (event) =>
+      {
         if (event && typeof event.persist === 'function')
         {
           // must call persist to keep the event around
@@ -527,17 +541,18 @@ const Util = {
   },
 
   // REMOVE
-	// accepts object of key/vals like this: { 'className': include? }
-	objToClassname(obj: { [className: string]: boolean }): string
-	{
-		return _.reduce(obj, (classNameArray: string[], include: boolean, className: string) => {
-				if (include)
-				{
-					classNameArray.unshift(className);
-				}
-				return classNameArray;
-			}, []).join(' ');
-	},
+  // accepts object of key/vals like this: { 'className': include? }
+  objToClassname(obj: { [className: string]: boolean }): string
+  {
+    return _.reduce(obj, (classNameArray: string[], include: boolean, className: string) =>
+    {
+      if (include)
+      {
+        classNameArray.unshift(className);
+      }
+      return classNameArray;
+    }, []).join(' ');
+  },
 
   cardIndex: (cards, action) =>
   {
@@ -552,19 +567,20 @@ const Util = {
 
     if (transformCard.scorePoints.length === 0)
     {
-      for (let i: any = 0; i < 5; i ++)
+      for (let i: any = 0; i < 5; i++)
       {
         transformCard.scorePoints.push(
-        {
-          value: transformCard.range[0] + (transformCard.range[1] - transformCard.range[0]) / 4 * i,
-          score: 0.5,
-          id: 'p' + i,
-        });
+          {
+            value: transformCard.range[0] + (transformCard.range[1] - transformCard.range[0]) / 4 * i,
+            score: 0.5,
+            id: 'p' + i,
+          });
       }
     }
   },
 
-  getIEVersion() {
+  getIEVersion()
+  {
     // from https://jsfiddle.net/jquerybyexample/gk7xA/
     const sAgent = window.navigator.userAgent;
     const Idx = sAgent.indexOf('MSIE');

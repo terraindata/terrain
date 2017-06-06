@@ -52,36 +52,36 @@ const move = '';
 const duplicate = '';
 
 export let LibraryActionTypes =
-{
-  groups:
   {
-    create, change, move,
-    // duplicate,
-  },
+    groups:
+    {
+      create, change, move,
+      // duplicate,
+    },
 
-  algorithms:
-  {
-    create, change, move,
-  },
+    algorithms:
+    {
+      create, change, move,
+    },
 
-  variants:
-  {
-    create, change, move,
-    status: '',
-    fetchVersion: '',
-    loadVersion: '',
-  },
+    variants:
+    {
+      create, change, move,
+      status: '',
+      fetchVersion: '',
+      loadVersion: '',
+    },
 
-  loadState: '',
-  setDbs: '',
-};
+    loadState: '',
+    setDbs: '',
+  };
 
 Util.setValuesToKeys(LibraryActionTypes, '');
 
 export const CleanLibraryActionTypes = // not dirty
-[
-  LibraryActionTypes.loadState,
-  LibraryActionTypes.setDbs,
-];
+  [
+    LibraryActionTypes.loadState,
+    LibraryActionTypes.setDbs,
+  ];
 
 export default LibraryActionTypes;

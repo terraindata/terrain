@@ -82,7 +82,7 @@ class TQLPopup extends Classs<Props>
           className="manual-popup-link"
           onClick={this.openManual}
         >
-            See full description in Manual
+          See full description in Manual
           <OpenIcon
             className="manual-popup-open-icon"
             onClick={this.openManual}

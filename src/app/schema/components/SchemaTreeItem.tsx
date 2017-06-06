@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import {SchemaActions, SchemaStore} from '../data/SchemaStore';
+import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
-import {columnChildrenConfig, ColumnTreeInfo} from './items/ColumnTreeInfo';
-import {databaseChildrenConfig, DatabaseTreeInfo} from './items/DatabaseTreeInfo';
-import {indexChildrenConfig, IndexTreeInfo} from './items/IndexTreeInfo';
-import {tableChildrenConfig, TableTreeInfo} from './items/TableTreeInfo';
+import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
+import { databaseChildrenConfig, DatabaseTreeInfo } from './items/DatabaseTreeInfo';
+import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
+import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
@@ -58,8 +58,8 @@ import SchemaTreeList from './SchemaTreeList';
 
 export interface Props
 {
-	id: ID;
-	type: string;
+  id: ID;
+  type: string;
   search: string;
 
   inSearchResults?: boolean;
@@ -67,348 +67,348 @@ export interface Props
 
 class State
 {
-	open: boolean = false;
-	item: SchemaTypes.SchemaBaseClass = null;
-	childCount: number = -1;
-	isSelected = false;
-	isHighlighted = false;
+  open: boolean = false;
+  item: SchemaTypes.SchemaBaseClass = null;
+  childCount: number = -1;
+  isSelected = false;
+  isHighlighted = false;
 }
 
 const typeToRendering: {
-	[type: string]: {
-		component: any,
-		childConfig: SchemaTypes.ISchemaTreeChildrenConfig,
-		canSelect: boolean,
-	},
+  [type: string]: {
+    component: any,
+    childConfig: SchemaTypes.ISchemaTreeChildrenConfig,
+    canSelect: boolean,
+  },
 } = {
-	database:
-	{
-		component: DatabaseTreeInfo,
-		childConfig: databaseChildrenConfig,
-		canSelect: false,
-	},
+    database:
+    {
+      component: DatabaseTreeInfo,
+      childConfig: databaseChildrenConfig,
+      canSelect: false,
+    },
 
-	table:
-	{
-		component: TableTreeInfo,
-		childConfig: tableChildrenConfig,
-		canSelect: true,
-	},
+    table:
+    {
+      component: TableTreeInfo,
+      childConfig: tableChildrenConfig,
+      canSelect: true,
+    },
 
-	column:
-	{
-		component: ColumnTreeInfo,
-		childConfig: columnChildrenConfig,
-		canSelect: true,
-	},
+    column:
+    {
+      component: ColumnTreeInfo,
+      childConfig: columnChildrenConfig,
+      canSelect: true,
+    },
 
-	index:
-	{
-		component: IndexTreeInfo,
-		childConfig: indexChildrenConfig,
-		canSelect: true,
-	},
-};
+    index:
+    {
+      component: IndexTreeInfo,
+      childConfig: indexChildrenConfig,
+      canSelect: true,
+    },
+  };
 
 @Radium
 class SchemaTreeItem extends PureClasss<Props>
 {
-	state: State = new State();
+  state: State = new State();
 
-	constructor(props: Props)
-	{
-		super(props);
-
-		this._subscribe(SchemaStore, {
-			stateKey: 'item',
-			storeKeyPath:
-				[ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ],
-
-			updater: (state: SchemaTypes.SchemaState) =>
-			{
-				if (this.state.childCount === -1) // assumes that schema data does not change
-				{
-					const item = state.getIn([ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ]);
-					if (item)
-					{
-						let childCount = 0;
-						typeToRendering[item['type']].childConfig.map(
-							(section) =>
-								childCount += item[section.type + 'Ids'].size,
-						);
-
-						this.setState({
-							childCount,
-						});
-					}
-				}
-
-				const isHighlighted = this.props.id === state.highlightedId
-					&& !!this.props.inSearchResults == state.highlightedInSearchResults;
-				const isSelected = this.props.id === state.selectedId;
-
-				if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
-				{
-					this.setState({
-						isHighlighted,
-						isSelected,
-					});
-				}
-			},
-		});
-	}
-
-	renderItemInfo()
-	{
-		const {item} = this.state;
-
-		if (!item)
-		{
-			return null;
-		}
-
-		if (typeToRendering[item.type])
-		{
-			const Comp = typeToRendering[item.type].component;
-			return (
-				<Comp
-					item={item}
-				/>
-			);
-		}
-
-		return <div>No item type information</div>;
-	}
-
-	renderItemChildren()
-	{
-		const {item} = this.state;
-
-		if (!this.state.open)
-		{
-			return null;
-		}
-
-		if (!item)
-		{
-			return (
-				<div
-					className="loading-text"
-				/>
-			);
-		}
-
-		return (
-			<div
-				style={
-					this.props.search ? Styles.childrenWrapper.search
-						: Styles.childrenWrapper.normal
-				}
-			>
-				{
-					typeToRendering[item.type].childConfig.map(
-						(childSection, index) =>
-							<SchemaTreeList
-								itemType={childSection.type}
-								label={childSection.label}
-								itemIds={item[childSection.type + 'Ids']}
-								key={index}
-								search={this.props.search}
-							/>,
-					)
-				}
-			</div>
-		);
-	}
-
-	lastHeaderClickTime: number = 0;
-
-	handleHeaderClick()
-	{
-		const time = (new Date()).getTime();
-		if (time - this.lastHeaderClickTime > 1000)
-		{
-			this.lastHeaderClickTime = time;
-			const {item, isSelected} = this.state;
-			if (!isSelected)
-			{
-				this.setState({
-					isSelected: true,
-					// open: !this.state.open, // need to decide whether or not to keep this in
-				});
-				SchemaActions.selectId(this.props.id);
-			}
-			else
-			{
-				this.setState({
-					isSelected: false,
-				});
-				SchemaActions.selectId(null);
-			}
-		}
-
-		// if(item && typeToRendering[item.type].canSelect)
-		// {
-		// }
-		// else
-		// {
-		// 	// can't select
-		// 	this.setState({
-		// 		open: !this.state.open,
-		// 	});
-		// }
-	}
-
-	lastArrowClickTime: number = 0;
-	handleArrowClick(event)
-	{
-		this.setState({
-			open: !this.state.open,
-		});
-		event.stopPropagation();
-		this.lastArrowClickTime = (new Date()).getTime();
-		// used to stop triggering of double click handler
-	}
-
-	handleHeaderDoubleClick(event)
-	{
-		if ((new Date()).getTime() - this.lastArrowClickTime > 100)
-		{
-			// ^ need to double check this wasn't trigged for the arrow
-			this.setState({
-				open: !this.state.open,
-			});
-			event.stopPropagation();
-		}
-	}
-
-	renderName()
-	{
-		const {item} = this.state;
-
-		let nameText: string | El = <span className="loading-text" />;
-
-		if (item)
-		{
-			if (this.props.search)
-			{
-				// show search details
-				const {name} = item;
-				const searchStartIndex = item.name.indexOf(this.props.search);
-				const searchEndIndex = searchStartIndex + this.props.search.length;
-				nameText = (
-					<div>
-						{
-							['table', 'database'].map(
-								(type) =>
-								{
-									const id = item[type + 'Id'];
-
-									if (id)
-									{
-										const parentItem = SchemaStore.getState().getIn([type + 's', id]);
-										return parentItem && parentItem.name + ' > ';
-									}
-								},
-							)
-						}
-
-						{
-							name.substr(0, searchStartIndex)
-						}
-						<span
-							style={Styles.searchTextEmphasis as any}
-						>
-							{
-								name.substring(searchStartIndex, searchEndIndex)
-							}
-						</span>
-						{
-							name.substr(searchEndIndex)
-						}
-					</div>
-				);
-			}
-			else
-			{
-				// show plain name
-				nameText = item.name;
-			}
-		}
-
-		return (
-			<div
-	  		style={Styles.name}
-	  	>
-	  		{
-	  			nameText
-	  		}
-	  	</div>
-		);
-	}
-
-  render()
+  constructor(props: Props)
   {
-  	const {item, isSelected, isHighlighted} = this.state;
+    super(props);
 
-  	const showing = SchemaTypes.searchIncludes(item, this.props.search);
+    this._subscribe(SchemaStore, {
+      stateKey: 'item',
+      storeKeyPath:
+      [SchemaTypes.typeToStoreKey[this.props.type], this.props.id],
+
+      updater: (state: SchemaTypes.SchemaState) =>
+      {
+        if (this.state.childCount === -1) // assumes that schema data does not change
+        {
+          const item = state.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+          if (item)
+          {
+            let childCount = 0;
+            typeToRendering[item['type']].childConfig.map(
+              (section) =>
+                childCount += item[section.type + 'Ids'].size,
+            );
+
+            this.setState({
+              childCount,
+            });
+          }
+        }
+
+        const isHighlighted = this.props.id === state.highlightedId
+          && !!this.props.inSearchResults == state.highlightedInSearchResults;
+        const isSelected = this.props.id === state.selectedId;
+
+        if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
+        {
+          this.setState({
+            isHighlighted,
+            isSelected,
+          });
+        }
+      },
+    });
+  }
+
+  renderItemInfo()
+  {
+    const { item } = this.state;
+
+    if (!item)
+    {
+      return null;
+    }
+
+    if (typeToRendering[item.type])
+    {
+      const Comp = typeToRendering[item.type].component;
+      return (
+        <Comp
+          item={item}
+        />
+      );
+    }
+
+    return <div>No item type information</div>;
+  }
+
+  renderItemChildren()
+  {
+    const { item } = this.state;
+
+    if (!this.state.open)
+    {
+      return null;
+    }
+
+    if (!item)
+    {
+      return (
+        <div
+          className="loading-text"
+        />
+      );
+    }
 
     return (
       <div
-      	style={Styles.treeItem}
+        style={
+          this.props.search ? Styles.childrenWrapper.search
+            : Styles.childrenWrapper.normal
+        }
       >
-      	<FadeInOut
-      		open={showing}
-      		key="one"
-      	>
-      		{
-      			showing &&
-      				<div
-      					data-rel="schema-item"
-				      	data-id={this.props.id}
-				      	data-search={this.props.inSearchResults}
-      				>
-				      	<div
-				      		style={[
-				      			Styles.treeItemHeader,
-				      			isHighlighted && Styles.treeItemHeaderHighlighted,
-				      			isSelected && Styles.treeItemHeaderSelected,
-				      		]}
-				      		onClick={this.handleHeaderClick}
-				      		onDoubleClick={this.handleHeaderDoubleClick}
-				      	>
-					      	<ArrowIcon
-					      		onClick={this.handleArrowClick}
-					      		style={
-					      			this.state.open ? Styles.arrowOpen : Styles.arrow
-					      		}
-					      	/>
+        {
+          typeToRendering[item.type].childConfig.map(
+            (childSection, index) =>
+              <SchemaTreeList
+                itemType={childSection.type}
+                label={childSection.label}
+                itemIds={item[childSection.type + 'Ids']}
+                key={index}
+                search={this.props.search}
+              />,
+          )
+        }
+      </div>
+    );
+  }
 
-					      	{
-					      		this.renderName()
-					      	}
+  lastHeaderClickTime: number = 0;
 
-					      	<div
-					      		style={Styles.itemInfoRow as any}
-					      	>
-						    		{
-						    			this.renderItemInfo()
-						    		}
-						    	</div>
-					      </div>
-					    </div>
-      		}
-      	</FadeInOut>
+  handleHeaderClick()
+  {
+    const time = (new Date()).getTime();
+    if (time - this.lastHeaderClickTime > 1000)
+    {
+      this.lastHeaderClickTime = time;
+      const { item, isSelected } = this.state;
+      if (!isSelected)
+      {
+        this.setState({
+          isSelected: true,
+          // open: !this.state.open, // need to decide whether or not to keep this in
+        });
+        SchemaActions.selectId(this.props.id);
+      }
+      else
+      {
+        this.setState({
+          isSelected: false,
+        });
+        SchemaActions.selectId(null);
+      }
+    }
 
-      	<FadeInOut
-      		open={this.state.open}
-      		key="two"
-      	>
-	      	{
-	    			this.renderItemChildren()
-	      	}
-		    </FadeInOut>
-		  </div>
+    // if(item && typeToRendering[item.type].canSelect)
+    // {
+    // }
+    // else
+    // {
+    // 	// can't select
+    // 	this.setState({
+    // 		open: !this.state.open,
+    // 	});
+    // }
+  }
+
+  lastArrowClickTime: number = 0;
+  handleArrowClick(event)
+  {
+    this.setState({
+      open: !this.state.open,
+    });
+    event.stopPropagation();
+    this.lastArrowClickTime = (new Date()).getTime();
+    // used to stop triggering of double click handler
+  }
+
+  handleHeaderDoubleClick(event)
+  {
+    if ((new Date()).getTime() - this.lastArrowClickTime > 100)
+    {
+      // ^ need to double check this wasn't trigged for the arrow
+      this.setState({
+        open: !this.state.open,
+      });
+      event.stopPropagation();
+    }
+  }
+
+  renderName()
+  {
+    const { item } = this.state;
+
+    let nameText: string | El = <span className="loading-text" />;
+
+    if (item)
+    {
+      if (this.props.search)
+      {
+        // show search details
+        const { name } = item;
+        const searchStartIndex = item.name.indexOf(this.props.search);
+        const searchEndIndex = searchStartIndex + this.props.search.length;
+        nameText = (
+          <div>
+            {
+              ['table', 'database'].map(
+                (type) =>
+                {
+                  const id = item[type + 'Id'];
+
+                  if (id)
+                  {
+                    const parentItem = SchemaStore.getState().getIn([type + 's', id]);
+                    return parentItem && parentItem.name + ' > ';
+                  }
+                },
+              )
+            }
+
+            {
+              name.substr(0, searchStartIndex)
+            }
+            <span
+              style={Styles.searchTextEmphasis as any}
+            >
+              {
+                name.substring(searchStartIndex, searchEndIndex)
+              }
+            </span>
+            {
+              name.substr(searchEndIndex)
+            }
+          </div>
+        );
+      }
+      else
+      {
+        // show plain name
+        nameText = item.name;
+      }
+    }
+
+    return (
+      <div
+        style={Styles.name}
+      >
+        {
+          nameText
+        }
+      </div>
+    );
+  }
+
+  render()
+  {
+    const { item, isSelected, isHighlighted } = this.state;
+
+    const showing = SchemaTypes.searchIncludes(item, this.props.search);
+
+    return (
+      <div
+        style={Styles.treeItem}
+      >
+        <FadeInOut
+          open={showing}
+          key="one"
+        >
+          {
+            showing &&
+            <div
+              data-rel="schema-item"
+              data-id={this.props.id}
+              data-search={this.props.inSearchResults}
+            >
+              <div
+                style={[
+                  Styles.treeItemHeader,
+                  isHighlighted && Styles.treeItemHeaderHighlighted,
+                  isSelected && Styles.treeItemHeaderSelected,
+                ]}
+                onClick={this.handleHeaderClick}
+                onDoubleClick={this.handleHeaderDoubleClick}
+              >
+                <ArrowIcon
+                  onClick={this.handleArrowClick}
+                  style={
+                    this.state.open ? Styles.arrowOpen : Styles.arrow
+                  }
+                />
+
+                {
+                  this.renderName()
+                }
+
+                <div
+                  style={Styles.itemInfoRow as any}
+                >
+                  {
+                    this.renderItemInfo()
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </FadeInOut>
+
+        <FadeInOut
+          open={this.state.open}
+          key="two"
+        >
+          {
+            this.renderItemChildren()
+          }
+        </FadeInOut>
+      </div>
     );
   }
 }

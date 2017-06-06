@@ -63,14 +63,15 @@ export interface Props
 
 class Paging extends PureClasss<Props>
 {
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
     Util.bind(this, 'changePage', 'handlePageClick', 'handleAllPages',
       'goFirst', 'goPrevious', 'goNext', 'goLast',
       'handlePageMouseOver', 'handleMouseOut',
       'goHover', 'handleFirstHover', 'handlePreviousHover',
       'handleNextHover', 'handleLastHover');
-      // 'handleHoverTimeout', 'clearHoverTimeout');
+    // 'handleHoverTimeout', 'clearHoverTimeout');
     this.state = {
       open: false,
 
@@ -104,7 +105,7 @@ class Paging extends PureClasss<Props>
   handleAllPages(): void
   {
     this.setState({
-      open: ! this.state.open,
+      open: !this.state.open,
     });
   }
 
@@ -208,7 +209,8 @@ class Paging extends PureClasss<Props>
   //   this.clearHoverTimeout();
   // }
 
-  render() {
+  render()
+  {
     return (
       <div className={Util.objToClassname(
         {
@@ -220,63 +222,64 @@ class Paging extends PureClasss<Props>
           onClick={this.goFirst}
           onMouseOver={this.handleFirstHover}
           onMouseOut={this.handleMouseOut}
-          >
-            &lt;&lt;
+        >
+          &lt;&lt;
         </div>
         <div
           className="paging-previous"
           onClick={this.goPrevious}
           onMouseOver={this.handlePreviousHover}
           onMouseOut={this.handleMouseOut}
-          >
-            &lt;
+        >
+          &lt;
         </div>
         <div className="paging-pages">
           {
             _.range(1, this.props.pages + 1).map((page) =>
             {
-              if (!this.state.open && this.props.page - page > 3) {
+              if (!this.state.open && this.props.page - page > 3)
+              {
                 return null;
               }
 
               return (
-              <div
-                className={Util.objToClassname(
-                {
-                  'paging-page': true,
-                  'paging-page-selected': page === this.props.page,
-                  'paging-page-hover': page === this.state.overPage,
-                })}
-                onClick={this.handlePageClick}
-                onMouseOver={this.handlePageMouseOver}
-                onMouseOut={this.handleMouseOut}
-                key={page}
-                rel={page + ''}
+                <div
+                  className={Util.objToClassname(
+                    {
+                      'paging-page': true,
+                      'paging-page-selected': page === this.props.page,
+                      'paging-page-hover': page === this.state.overPage,
+                    })}
+                  onClick={this.handlePageClick}
+                  onMouseOver={this.handlePageMouseOver}
+                  onMouseOut={this.handleMouseOut}
+                  key={page}
+                  rel={page + ''}
                 >
-                {page}
-              </div>
+                  {page}
+                </div>
               );
             })
           }
         </div>
         <div className="paging-all-pages" onClick={this.handleAllPages}>
-          { this.state.open ? '-' : '...' }
+          {this.state.open ? '-' : '...'}
         </div>
         <div
           className="paging-next"
           onClick={this.goNext}
           onMouseOver={this.handleNextHover}
           onMouseOut={this.handleMouseOut}
-          >
-            &gt;
+        >
+          &gt;
         </div>
         <div
           className="paging-last"
           onClick={this.goLast}
           onMouseOver={this.handleLastHover}
           onMouseOut={this.handleMouseOut}
-          >
-            &gt;&gt;
+        >
+          &gt;&gt;
         </div>
       </div>
     );

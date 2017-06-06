@@ -56,7 +56,7 @@ import LibraryTypes from './../LibraryTypes';
 const moment = require('moment');
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 
 type Variant = LibraryTypes.Variant;
 type User = UserTypes.User;
@@ -84,14 +84,14 @@ class VariantVersions extends PureClasss<Props>
     super(props);
 
     this._subscribe(UserStore,
-    {
-      stateKey: 'users',
-      storeKeyPath: ['users'],
-    });
+      {
+        stateKey: 'users',
+        storeKeyPath: ['users'],
+      });
     this._subscribe(RolesStore,
-    {
-      stateKey: 'roles',
-    });
+      {
+        stateKey: 'roles',
+      });
   }
 
   xhr: XMLHttpRequest = null;
@@ -138,7 +138,7 @@ class VariantVersions extends PureClasss<Props>
 
   renderVersion(version, i)
   {
-    const {roles} = this.state;
+    const { roles } = this.state;
     const groupId = this.props.variant.groupId;
     let role = 'Viewer';
     if (roles && roles.getIn([groupId, version.userId]))
@@ -185,7 +185,7 @@ class VariantVersions extends PureClasss<Props>
 
   render()
   {
-    return(
+    return (
       <div className="versions-table-wrapper">
         <div className="versions-table-title">
           Version History
@@ -198,7 +198,7 @@ class VariantVersions extends PureClasss<Props>
             <div className="loading">
               Loading...
             </div>
-          :
+            :
             <div className="versions-table">
               {
                 this.state.versions.map(this.renderVersion)

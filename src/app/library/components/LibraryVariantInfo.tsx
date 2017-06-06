@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./LibraryVariantInfo.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
-const {List} = Immutable;
+const { List } = Immutable;
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
 import UserThumbnail from './../../users/components/UserThumbnail';
@@ -94,8 +94,8 @@ class LibraryInfoColumn extends PureClasss<Props>
       return null;
     }
 
-    const {isBuilder, isSuperUser} = this.props;
-    const {variant} = this.props;
+    const { isBuilder, isSuperUser } = this.props;
+    const { variant } = this.props;
 
     return (
       <div

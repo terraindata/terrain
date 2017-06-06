@@ -51,7 +51,8 @@ import Util from '../../util/Util';
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-export interface Props {
+export interface Props
+{
   large?: string;
   small?: string;
   button?: string;
@@ -67,7 +68,8 @@ class InfoArea extends PureClasss<Props>
     Util.bind(this, 'renderThing');
   }
 
-  renderThing(thing: string, onClick?: boolean) {
+  renderThing(thing: string, onClick?: boolean)
+  {
     if (!this.props[thing])
     {
       return null;
@@ -75,22 +77,23 @@ class InfoArea extends PureClasss<Props>
 
     return (
       <div className={'info-area-' + thing} onClick={onClick ? this.props.onClick : null}>
-        { this.props[thing] }
+        {this.props[thing]}
       </div>
     );
   }
 
-  render() {
+  render()
+  {
     return (
-     <div className={classNames({
-       'info-area': true,
-       'info-area-inline': this.props.inline,
-     })}>
-       { this.renderThing('large') }
-       { this.renderThing('small') }
-       { this.renderThing('button', true) }
-     </div>
-     );
+      <div className={classNames({
+        'info-area': true,
+        'info-area-inline': this.props.inline,
+      })}>
+        {this.renderThing('large')}
+        {this.renderThing('small')}
+        {this.renderThing('button', true)}
+      </div>
+    );
   }
 }
 export default InfoArea;

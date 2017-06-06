@@ -47,15 +47,15 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-const {List} = Immutable;
+const { List } = Immutable;
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import {spotlightAction} from '../../data/SpotlightStore';
+import { spotlightAction } from '../../data/SpotlightStore';
 import Classs from './../../../common/components/Classs';
-import {MAX_RESULTS, Result} from './ResultsManager';
-import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
+import { MAX_RESULTS, Result } from './ResultsManager';
+import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -110,11 +110,11 @@ class ResultComponent extends Classs<Props> {
       <div className="result-field" key={field}>
         {
           showField &&
-            <div className="result-field-name">
-              {
-                field
-              }
-            </div>
+          <div className="result-field-name">
+            {
+              field
+            }
+          </div>
         }
         <div
           className={classNames({
@@ -194,7 +194,7 @@ class ResultComponent extends Classs<Props> {
     this.props.onExpand(this.props.index);
   }
 
-	render()
+  render()
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, result } = this.props;
 
@@ -204,7 +204,7 @@ class ResultComponent extends Classs<Props> {
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
-    
+
     let scoreArea: any;
 
     if (resultsConfig && resultsConfig.score && resultsConfig.enabled)
@@ -214,21 +214,21 @@ class ResultComponent extends Classs<Props> {
           {
             this.renderField(resultsConfig.score)
           }
-    		</div>
+        </div>
       );
     }
 
     const name = getResultName(result, resultsConfig);
     const fields = getResultFields(result, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
-    
+
     let bottomContent: any;
 
     if (!configHasFields && fields.length > 4 && !this.props.expanded)
     {
       bottomContent = (
         <div className="result-bottom" onClick={this.expand}>
-          { fields.length - MAX_DEFAULT_FIELDS } more field{ fields.length - 4 === 1 ? '' : 's' }
+          {fields.length - MAX_DEFAULT_FIELDS} more field{fields.length - 4 === 1 ? '' : 's'}
         </div>
       );
     }
@@ -283,7 +283,7 @@ class ResultComponent extends Classs<Props> {
 
           <div className="result-fields-wrapper">
             {
-                _.map(fields, this.renderField)
+              _.map(fields, this.renderField)
             }
             {
               bottomContent
@@ -295,7 +295,7 @@ class ResultComponent extends Classs<Props> {
         </div>
       </div>
     ));
-	}
+  }
 }
 export function getResultValue(result: Result, field: string, config: ResultsConfig, overrideFormat?: any): string
 {
@@ -315,7 +315,7 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
 export function getResultFields(result: Result, config: ResultsConfig): string[]
 {
   let fields: string[];
-  
+
   if (resultsConfigHasFields(config))
   {
     fields = config.fields.toArray();
@@ -331,7 +331,7 @@ export function getResultFields(result: Result, config: ResultsConfig): string[]
 export function getResultName(result: Result, config: ResultsConfig)
 {
   let nameField: string;
-  
+
   if (config && config.name && config.enabled)
   {
     nameField = config.name;
@@ -347,7 +347,7 @@ export function getResultName(result: Result, config: ResultsConfig)
 export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, overrideFormat?: any): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
-  const {showRaw} = overrideFormat || format || { showRaw: false };
+  const { showRaw } = overrideFormat || format || { showRaw: false };
   let italics = false;
   if (value === undefined)
   {
@@ -375,32 +375,32 @@ export function ResultFormatValue(field: string, value: string | number, config:
     switch (format.type)
     {
       case 'image':
-      const url = format.template.replace(/\[value\]/g, value as string);
-      return (
-        <div
-          className="result-field-value-image-wrapper"
-        >
+        const url = format.template.replace(/\[value\]/g, value as string);
+        return (
           <div
-            className="result-field-value-image"
-            style={{
-              backgroundImage: `url(${url})`,
-              // give the div the background image, to make use of the "cover" CSS positioning,
-              // but also include the <img> tag below (with opacity 0) so that right-click options still work
-            }}
+            className="result-field-value-image-wrapper"
           >
-            <img src={url} />
+            <div
+              className="result-field-value-image"
+              style={{
+                backgroundImage: `url(${url})`,
+                // give the div the background image, to make use of the "cover" CSS positioning,
+                // but also include the <img> tag below (with opacity 0) so that right-click options still work
+              }}
+            >
+              <img src={url} />
+            </div>
+            <div className="result-field-value">
+              {
+                showRaw ? value : null
+              }
+            </div>
           </div>
-          <div className="result-field-value">
-            {
-              showRaw ? value : null
-            }
-          </div>
-        </div>
-      );
+        );
 
       case 'text':
 
-      break;
+        break;
     }
   }
 

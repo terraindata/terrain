@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
 import InfoArea from './InfoArea';
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 import AuthActions from '../../auth/data/AuthActions';
 
 export interface Props
@@ -61,10 +61,11 @@ class Logout extends PureClasss<Props>
     browserHistory.replace('/');
   }
 
-  render() {
+  render()
+  {
     return (
-       <InfoArea large="Logging out..." />
-     );
+      <InfoArea large="Logging out..." />
+    );
   }
 }
 export default Logout;

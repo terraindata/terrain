@@ -49,13 +49,13 @@ import * as _ from 'underscore';
 import Classs from './../../common/components/Classs';
 
 const xes =
-{
-  // cards:
-  // {
-  //   name: 'Immutable Builder',
-  //   component: XCards,
-  // },
-};
+  {
+    // cards:
+    // {
+    //   name: 'Immutable Builder',
+    //   component: XCards,
+    // },
+  };
 
 export interface Props
 {
@@ -79,7 +79,7 @@ class X extends Classs<Props>
 
     if (x && xes[x])
     {
-      const C =  xes[x].component;
+      const C = xes[x].component;
       return <C {...this.props} />;
     }
 
@@ -92,7 +92,7 @@ class X extends Classs<Props>
           _.keys(xes).map((indX) =>
             <Link to={`/x/${indX}`} key={indX}>
               <div className="x-x">
-                { xes[indX].name }
+                {xes[indX].name}
               </div>
             </Link>,
           )

@@ -54,7 +54,7 @@ import UserStore from './../data/UserStore';
 import UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8_gray.svg');
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 
 export interface Props
 {
@@ -144,7 +144,8 @@ class Profile extends Classs<Props>
   handleSave()
   {
     let newUser = this.state.user;
-    this.infoKeys.map((infoKey) => {
+    this.infoKeys.map((infoKey) =>
+    {
       newUser = newUser.set(infoKey.key, this.refs[infoKey.key]['value']) as UserTypes.User;
     });
 
@@ -183,17 +184,17 @@ class Profile extends Classs<Props>
     return (
       <div className="profile-info-item-edit" key={infoKey.key}>
         <div className="profile-info-item-name">
-          { infoKey.label }
+          {infoKey.label}
         </div>
         <div className="profile-info-item-value">
           <input
             type="text"
             defaultValue={this.state.user[infoKey.key]}
             ref={infoKey.key}
-            />
+          />
         </div>
         <div className="profile-info-item-subtext">
-          { infoKey.subText }
+          {infoKey.subText}
         </div>
       </div>
     );
@@ -222,9 +223,10 @@ class Profile extends Classs<Props>
 
   handleProfilePicChange(event)
   {
-    const reader  = new FileReader();
+    const reader = new FileReader();
 
-    reader.addEventListener('load', () => {
+    reader.addEventListener('load', () =>
+    {
       this.refs['profilePicImg']['src'] = reader.result;
       this.setState({
         user: this.state.user.set('imgSrc', reader.result),
@@ -233,7 +235,8 @@ class Profile extends Classs<Props>
 
     const file = event.target.files[0];
 
-    if (file) {
+    if (file)
+    {
       if (file.size > 3000000)
       {
         this.setState({
@@ -259,7 +262,7 @@ class Profile extends Classs<Props>
 
   renderProfilePicture()
   {
-    return(
+    return (
       <div
         className="edit-profile-pic"
         onClick={this.handleProfilePicClick}
@@ -304,7 +307,7 @@ class Profile extends Classs<Props>
 
   toggleErrorModal()
   {
-    this.setState ({
+    this.setState({
       errorModalOpen: !this.state.errorModalOpen,
     });
   }

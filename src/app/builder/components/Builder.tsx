@@ -51,7 +51,7 @@ import { DragDropContext } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 const HTML5Backend = require('react-dnd-html5-backend');
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 const { withRouter } = require('react-router');
 
 // Data
@@ -73,12 +73,12 @@ type Variant = LibraryTypes.Variant;
 
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
-import {notificationManager} from './../../common/components/InAppNotification';
+import { notificationManager } from './../../common/components/InAppNotification';
 import PureClasss from './../../common/components/PureClasss';
 import Ajax from './../../util/Ajax';
 import BuilderColumn from './BuilderColumn';
 import LayoutManager from './layout/LayoutManager';
-import {TabAction, Tabs} from './layout/Tabs';
+import { TabAction, Tabs } from './layout/Tabs';
 import ResultsManager from './results/ResultsManager';
 
 const NewIcon = require('./../../../images/icon_new_21x17.svg?name=NewIcon');
@@ -113,7 +113,7 @@ class Builder extends PureClasss<Props>
     tabActions: List<TabAction>;
 
     nonexistentVariantIds: List<ID>;
-    
+
     saving?: boolean;
 
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
@@ -147,11 +147,11 @@ class Builder extends PureClasss<Props>
       updater: (builderState: BuilderState) =>
       {
         if (
-            builderState.query !== this.state.builderState.query
-            || builderState.pastQueries !== this.state.builderState.pastQueries
-            || builderState.nextQueries !== this.state.builderState.nextQueries
-            || builderState.isDirty !== this.state.builderState.isDirty
-          )
+          builderState.query !== this.state.builderState.query
+          || builderState.pastQueries !== this.state.builderState.pastQueries
+          || builderState.nextQueries !== this.state.builderState.nextQueries
+          || builderState.isDirty !== this.state.builderState.isDirty
+        )
         {
           this.setState({
             tabActions: this.getTabActions(builderState),
@@ -159,14 +159,14 @@ class Builder extends PureClasss<Props>
         }
       },
     });
-    
+
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
       storeKeyPath: ['variants'],
     });
 
     let colKeys: List<number>;
-    
+
     if (localStorage.getItem('colKeys'))
     {
       colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
@@ -253,7 +253,7 @@ class Builder extends PureClasss<Props>
         {
           // current opened variant is still open, move along.
           // TODO
-          return  true;
+          return true;
           // note: don't currently return true because that resets unsaved changes in open v
           //  but when we redo how the stores work, then that shouldn't happen.
         }
@@ -323,7 +323,7 @@ class Builder extends PureClasss<Props>
     }
     if (newConfig !== props.params.config
       && (props.params.config !== undefined || newConfig.length)
-      )
+    )
     {
       browserHistory.replace(`/builder/${newConfig}`);
     }
@@ -392,7 +392,7 @@ class Builder extends PureClasss<Props>
 
     const variantId = this.getSelectedId(props);
     const variant = this.state.variants &&
-    this.state.variants.get(+variantId);
+      this.state.variants.get(+variantId);
     if (variantId && !variant)
     {
       LibraryActions.variants.fetchVersion(variantId, () =>
@@ -425,16 +425,16 @@ class Builder extends PureClasss<Props>
         onClick: this.onSave,
         enabled: this.shouldSave(builderState),
       },
-  //   {
-  //     text: 'Duplicate',
-  //     icon: <DuplicateIcon />,
-  //     onClick: this.duplicateAlgorithm,
-  //   },
-  //   {
-  //     text: 'Open',
-  //     icon: <OpenIcon />,
-  //     onClick: this.loadAlgorithm,
-  //   },
+      //   {
+      //     text: 'Duplicate',
+      //     icon: <DuplicateIcon />,
+      //     onClick: this.duplicateAlgorithm,
+      //   },
+      //   {
+      //     text: 'Open',
+      //     icon: <OpenIcon />,
+      //     onClick: this.loadAlgorithm,
+      //   },
     ]);
   }
 
@@ -501,7 +501,8 @@ class Builder extends PureClasss<Props>
       if (
         !Util.haveRole(variant.groupId, 'builder', UserStore, RolesStore)
         && !Util.haveRole(variant.groupId, 'admin', UserStore, RolesStore)
-      ) {
+      )
+      {
         // not auth
         return false;
       }
@@ -514,27 +515,27 @@ class Builder extends PureClasss<Props>
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
-    
+
     this.setState({
       saving: true,
     });
-    
+
     //TODO remove if queries/variants model changes
-    LibraryActions.variants.change(variant);    
+    LibraryActions.variants.change(variant);
     this.onSaveSuccess(variant);
     Actions.save(); // register that we are saving
 
     let configArr = window.location.pathname.split('/')[2].split(',');
     let currentVariant;
     configArr = configArr.map(function(tab)
+    {
+      if (tab.substr(0, 1) === '!')
       {
-        if (tab.substr(0, 1) === '!')
-        {
-          currentVariant = tab.substr(1).split('@')[0];
-          return '!' + currentVariant;
-        }
-        return tab;
-      },
+        currentVariant = tab.substr(1).split('@')[0];
+        return '!' + currentVariant;
+      }
+      return tab;
+    },
     );
     for (let i = 0; i < configArr.length; i++)
     {
@@ -558,9 +559,9 @@ class Builder extends PureClasss<Props>
       onColSizeChange: this.handleColSizeChange,
       minColWidth: 316,
       columns:
-        _.range(0, this.state.colKeys.size).map((index) =>
-          this.getColumn(index),
-        ),
+      _.range(0, this.state.colKeys.size).map((index) =>
+        this.getColumn(index),
+      ),
     };
   }
 
@@ -674,7 +675,7 @@ class Builder extends PureClasss<Props>
         const closeIndex = index < 2 ? 2 : 1;
         this.handleCloseColumn(closeIndex);
       }
-        this.addManualColumn(index, selectedCardName);
+      this.addManualColumn(index, selectedCardName);
     }
   }
 
@@ -740,17 +741,17 @@ class Builder extends PureClasss<Props>
           <div className="builder-revert-time-message">
             Version from {lastEdited}
           </div>
-          <div className="builder-white-space"/>
+          <div className="builder-white-space" />
           {
             this.canEdit() &&
-              <div
-                className="button builder-revert-button"
-                onClick={this.revertVersion}
-                data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
-              >
-                Revert to this version
+            <div
+              className="button builder-revert-button"
+              onClick={this.revertVersion}
+              data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
+            >
+              Revert to this version
               </div>
-           }
+          }
         </div>
       );
     }
@@ -789,7 +790,7 @@ class Builder extends PureClasss<Props>
     browserHistory.push(this.state.nextLocation);
   }
 
-	render()
+  render()
   {
     const config = this.props.params.config;
     const variant = this.getVariant();
@@ -808,7 +809,7 @@ class Builder extends PureClasss<Props>
               button="Go to the Library"
               onClick={this.goToLibrary}
             />
-          :
+            :
             <div>
               <Tabs
                 actions={this.state.tabActions}
@@ -844,6 +845,6 @@ class Builder extends PureClasss<Props>
         />
       </div>
     );
-	}
+  }
 }
 export default withRouter(DragDropContext(HTML5Backend)(Builder));

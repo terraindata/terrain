@@ -50,16 +50,16 @@ const create = '';
 const change = '';
 
 const UserActionTypes =
-{
-  create,
-  change,
+  {
+    create,
+    change,
 
-  fetch: '',
-  setUsers: '',
-  updateCurrentUser: '',
-  
-  completeTutorial: '',
-};
+    fetch: '',
+    setUsers: '',
+    updateCurrentUser: '',
+
+    completeTutorial: '',
+  };
 
 Util.setValuesToKeys(UserActionTypes, '');
 

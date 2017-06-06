@@ -56,7 +56,7 @@ import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 import { DragSource } from 'react-dnd';
 
@@ -93,7 +93,7 @@ class CardsDeck extends PureClasss<Props>
   {
     const ordering = AllBackendsMap[this.props.language].cardsDeck;
     const cards = AllBackendsMap[this.props.language].blocks;
-    
+
     if (ordering === undefined)
     {
       throw new Error('Unable to find backend of type ' + this.props.language);
@@ -157,7 +157,7 @@ class _CardDeckCard extends PureClasss<CardProps>
 {
   render()
   {
-    const {card} = this.props;
+    const { card } = this.props;
     const data = card.static;
     const search = this.props.search.toLowerCase();
     let hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
@@ -189,37 +189,37 @@ export interface CardItem
 }
 
 const cardSource =
-{
-  canDrag: (props) => true,
-
-  beginDrag: (props: CardProps): CardItem =>
   {
-    setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
-    // TODO unselect cards?
+    canDrag: (props) => true,
 
-    const item: CardItem = {
-      type: props.card.type,
-      new: true,
-    };
+    beginDrag: (props: CardProps): CardItem =>
+    {
+      setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
+      // TODO unselect cards?
 
-    Actions.dragCard(item);
+      const item: CardItem = {
+        type: props.card.type,
+        new: true,
+      };
 
-    return item;
-  },
+      Actions.dragCard(item);
 
-  endDrag: () =>
-  {
-    $('body').removeClass('body-card-is-dragging');
-    Actions.dragCard(false);
-  },
-};
+      return item;
+    },
+
+    endDrag: () =>
+    {
+      $('body').removeClass('body-card-is-dragging');
+      Actions.dragCard(false);
+    },
+  };
 
 const dragCollect = (connect, monitor) =>
-({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
-  connectDragPreview: connect.dragPreview(),
-});
+  ({
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview(),
+  });
 
 const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(_CardDeckCard);
 

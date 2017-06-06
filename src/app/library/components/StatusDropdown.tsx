@@ -46,7 +46,7 @@ require('./StatusDropdown.less');
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-const {List} = Immutable;
+const { List } = Immutable;
 import * as classNames from 'classnames';
 import LibraryActions from '../data/LibraryActions';
 import LibraryTypes from '../LibraryTypes';
@@ -99,20 +99,20 @@ class StatusDropdown extends PureClasss<Props>
 
   canEdit(): boolean
   {
-    const {variant} = this.props;
+    const { variant } = this.props;
     return this.state.isSuperUser ||
       (this.state.isBuilder && variant.status !== Status.Live);
   }
 
   getOptions(): List<El>
   {
-    const {variant} = this.props;
+    const { variant } = this.props;
 
     if (!this.canEdit())
     {
       return LockedOptions[variant.status];
     }
-    
+
     if (this.state.isSuperUser)
     {
       return AdminOptions;
@@ -132,7 +132,7 @@ class StatusDropdown extends PureClasss<Props>
     {
       return AdminOptionsOrder;
     }
-    
+
     if (this.state.isBuilder)
     {
       return BuilderOptionsOrder;
@@ -148,14 +148,14 @@ class StatusDropdown extends PureClasss<Props>
       return 0;
     }
 
-    const {status} = this.props.variant;
+    const { status } = this.props.variant;
 
     return this.getOrder().indexOf(status);
   }
 
   render()
   {
-    const {variant} = this.props;
+    const { variant } = this.props;
 
     let tooltip = '';
     if (!this.canEdit())
@@ -204,11 +204,11 @@ function getOption(status: Status)
     >
       {
         status === Status.Default
-        ?
+          ?
           <StarIcon
             className="status-dropdown-option-star"
           />
-        :
+          :
           <div
             className="status-dropdown-option-marker"
             style={{
@@ -228,21 +228,21 @@ function getOption(status: Status)
 }
 
 const AdminOptionsOrder =
-[
-  Status.Default,
-  Status.Live,
-  Status.Approve,
-  Status.Build,
-  Status.Archive,
-];
+  [
+    Status.Default,
+    Status.Live,
+    Status.Approve,
+    Status.Build,
+    Status.Archive,
+  ];
 const AdminOptions = List(AdminOptionsOrder.map(getOption));
 
 const BuilderOptionsOrder =
-[
-  Status.Approve,
-  Status.Build,
-  Status.Archive,
-];
+  [
+    Status.Approve,
+    Status.Build,
+    Status.Archive,
+  ];
 const BuilderOptions = List(BuilderOptionsOrder.map(getOption));
 
 const LockedOptions = _.map(Status, (status) =>

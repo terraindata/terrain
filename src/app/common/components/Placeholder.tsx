@@ -48,10 +48,11 @@ import InfoArea from './InfoArea';
 
 class Placeholder extends PureClasss<any>
 {
-  render() {
+  render()
+  {
     return (
-       <InfoArea large="In progress." />
-     );
+      <InfoArea large="In progress." />
+    );
   }
 }
 export default Placeholder;

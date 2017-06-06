@@ -96,7 +96,7 @@ class CreateCardTool extends PureClasss<Props>
     if (this.props.index === null)
     {
       Actions.change(
-        this.props.keyPath, 
+        this.props.keyPath,
         BlockUtils.make(AllBackendsMap[this.props.language].blocks[type])
       );
     }
@@ -150,55 +150,55 @@ class CreateCardTool extends PureClasss<Props>
     {
       return null;
     }
-    
-    return (
-     <div className="create-card-selector" ref="selector">
-       <div className="create-card-selector-inner">
-         {
-           AllBackendsMap[this.props.language].cardsList.map((type: string) =>
-           {
-             if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
-             {
-               return null;
-             }
 
-             const card = BlockUtils.make(
-               AllBackendsMap[this.props.language].blocks[type]
-             );
-                 // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
-             return (
-               <a
-                 className="create-card-button"
-                 key={type}
-                 rel={type}
-                 onClick={this.createCard}
-                 style={{
-                   backgroundColor: card.static.colors[0],
-                 }}
-               >
-                 <div className="create-card-button-inner" rel={type}>
-                   {
-                     card.static.title
-                   }
-                 </div>
-               </a>
-             );
-           })
-         }
-         {
-           _.map(_.range(0, 10), (i) => <div className="create-card-button-fodder" key={i} />)
-         }
-       </div>
-       {
-         !this.props.cannotClose &&
-           <div
-             className="close create-card-close"
-             onClick={this.handleCloseClick}
-           >
-             <CloseIcon />
-           </div>
-       }
-     </div>
+    return (
+      <div className="create-card-selector" ref="selector">
+        <div className="create-card-selector-inner">
+          {
+            AllBackendsMap[this.props.language].cardsList.map((type: string) =>
+            {
+              if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
+              {
+                return null;
+              }
+
+              const card = BlockUtils.make(
+                AllBackendsMap[this.props.language].blocks[type]
+              );
+              // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
+              return (
+                <a
+                  className="create-card-button"
+                  key={type}
+                  rel={type}
+                  onClick={this.createCard}
+                  style={{
+                    backgroundColor: card.static.colors[0],
+                  }}
+                >
+                  <div className="create-card-button-inner" rel={type}>
+                    {
+                      card.static.title
+                    }
+                  </div>
+                </a>
+              );
+            })
+          }
+          {
+            _.map(_.range(0, 10), (i) => <div className="create-card-button-fodder" key={i} />)
+          }
+        </div>
+        {
+          !this.props.cannotClose &&
+          <div
+            className="close create-card-close"
+            onClick={this.handleCloseClick}
+          >
+            <CloseIcon />
+          </div>
+        }
+      </div>
     );
   }
 
@@ -245,16 +245,16 @@ class CreateCardTool extends PureClasss<Props>
       'create-card-opening': this.state.opening,
     });
     classes += ' ' + this.props.className;
-    
+
     let style: React.CSSProperties;
 
     if (this.props.dy)
     {
       style =
-      {
-        position: 'relative',
-        top: this.props.dy,
-      };
+        {
+          position: 'relative',
+          top: this.props.dy,
+        };
     }
 
     return (
@@ -275,8 +275,8 @@ class CreateCardTool extends PureClasss<Props>
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
         />
-     </div>
-   );
+      </div>
+    );
   }
 }
 export default CreateCardTool;

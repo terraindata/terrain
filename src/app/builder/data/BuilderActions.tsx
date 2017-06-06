@@ -52,96 +52,96 @@ import List = Immutable.List;
 import Map = Immutable.Map;
 import Query from '../../../../shared/items/types/Query';
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const BuilderActions =
-{
-  change:
+  {
+    change:
     (keyPath: KeyPath, value: any, notDirty = false) =>
       $(ActionTypes.change, { keyPath, value, notDirty }),
 
-  create:
+    create:
     (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
       $(ActionTypes.create, { keyPath, factoryType, index, data }),
 
-  move:
+    move:
     (keyPath: KeyPath, index: number, newIndex: number) =>
       $(ActionTypes.move, { keyPath, index, newIndex }),
 
-  nestedMove:
+    nestedMove:
     (itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number) =>
       $(ActionTypes.nestedMove, { itemKeyPath, itemIndex, newKeyPath, newIndex }),
 
-  remove:
+    remove:
     (keyPath: KeyPath, index: number) =>
       $(ActionTypes.remove, { keyPath, index }),
 
-  dragCard:
+    dragCard:
     (cardItem: CardItem) =>
       $(ActionTypes.dragCard, { cardItem }),
 
-  dragCardOver:
+    dragCardOver:
     (keyPath: KeyPath, index: number) =>
       $(ActionTypes.dragCardOver, { keyPath, index }),
 
-  dropCard:
+    dropCard:
     () =>
       $(ActionTypes.dropCard, {}),
 
-  changeTQL:
+    changeTQL:
     (tql: string) =>
       $(ActionTypes.changeTQL, { tql }),
 
-  hoverCard:
+    hoverCard:
     (cardId: ID) =>
       $(ActionTypes.hoverCard, { cardId }),
 
-  selectCard:
+    selectCard:
     (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
       $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
 
-  toggleDeck:
+    toggleDeck:
     (open: boolean) =>
       $(ActionTypes.toggleDeck, { open }),
 
-  // fetches the query from the server
-  fetchQuery:
+    // fetches the query from the server
+    fetchQuery:
     (variantId: ID, handleNoVariant: (variantId: ID) => void, db: BackendInstance) =>
       $(ActionTypes.fetchQuery, { variantId, handleNoVariant, db }),
 
-  // load query from server into state
-  queryLoaded:
+    // load query from server into state
+    queryLoaded:
     (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
       $(ActionTypes.queryLoaded, { query, xhr, db }),
 
-  save:
+    save:
     (failed?: boolean) =>
       $(ActionTypes.save, { failed }),
 
-  undo:
+    undo:
     () =>
-      $(ActionTypes.undo, { }),
+      $(ActionTypes.undo, {}),
 
-  redo:
+    redo:
     () =>
-      $(ActionTypes.redo, { }),
+      $(ActionTypes.redo, {}),
 
-  checkpoint:
+    checkpoint:
     () =>
-      $(ActionTypes.checkpoint, { }),
+      $(ActionTypes.checkpoint, {}),
 
-  changeResultsConfig:
+    changeResultsConfig:
     (resultsConfig) =>
       $(ActionTypes.changeResultsConfig, {
         resultsConfig,
       }),
 
-  results:
+    results:
     (resultsState) =>
       $(ActionTypes.results, {
         resultsState,
       }),
-};
+  };
 
 _.map(ActionTypes,
   (type: string) =>

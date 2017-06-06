@@ -52,7 +52,7 @@ import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
 import UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 import Modal from './Modal';
 const CommitLog = require('../../../commitlog.txt');
 
@@ -63,7 +63,8 @@ const EditIcon = require('./../../../images/icon_edit.svg');
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 
-export interface Props {
+export interface Props
+{
 }
 
 class AccountDropdown extends PureClasss<Props>
@@ -143,34 +144,34 @@ class AccountDropdown extends PureClasss<Props>
       <div className="account-dropdown-content">
         <div className="account-dropdown-row" onMouseDown={this.editProfile}>
           <div className="account-dropdown-icon account-dropdown-icon-red">
-            <EditIcon/>
+            <EditIcon />
           </div>
           <div className="account-dropdown-link">
-             Edit Profile
+            Edit Profile
           </div>
         </div>
         <div className="account-dropdown-row" onMouseDown={this.goTeamGoTeamGo}>
           <div className="account-dropdown-icon account-dropdown-icon-blue">
-            <HomeIcon/>
+            <HomeIcon />
           </div>
           <div className="account-dropdown-link">
-             My Team
+            My Team
           </div>
         </div>
         {
           this.state.user && this.state.user.isSuperUser &&
-            <div className="account-dropdown-row" onMouseDown={this._toggle('commitLogOpen')}>
-              <div className="account-dropdown-icon account-dropdown-icon-blue">
-                <InfoIcon />
-              </div>
-              <div className="account-dropdown-link">
-                 Commit Log
-              </div>
+          <div className="account-dropdown-row" onMouseDown={this._toggle('commitLogOpen')}>
+            <div className="account-dropdown-icon account-dropdown-icon-blue">
+              <InfoIcon />
             </div>
+            <div className="account-dropdown-link">
+              Commit Log
+              </div>
+          </div>
         }
         <div className="account-dropdown-row" onMouseDown={this.handleLogout}>
           <div className="account-dropdown-icon account-dropdown-icon-blue">
-            <LogoutIcon/>
+            <LogoutIcon />
           </div>
           Logout
         </div>
@@ -216,7 +217,7 @@ class AccountDropdown extends PureClasss<Props>
           pre={true}
         />
       </div>
-   );
+    );
   }
 }
 export default AccountDropdown;

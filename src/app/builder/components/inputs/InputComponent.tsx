@@ -46,7 +46,7 @@ require('./InputStyle.less');
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import * as React from 'react';
-const {List} = Immutable;
+const { List } = Immutable;
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
@@ -61,20 +61,20 @@ const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-import {Input, InputType} from '../../../../../shared/blocks/types/Input';
+import { Input, InputType } from '../../../../../shared/blocks/types/Input';
 
 const InputComponent = React.createClass<any, any>({
-	mixins: [PanelMixin],
+  mixins: [PanelMixin],
 
-	propTypes:
-	{
-		input: React.PropTypes.object.isRequired,
+  propTypes:
+  {
+    input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     canEdit: React.PropTypes.bool.isRequired,
     // since inputs still are regular classes, instead of PureClasss, we construct keyPaths for Actions on execution
     //  rather than caching. This is fine since inputs aren't nested, there would be no
     //  benefit to caching keyPaths anyways.
-	},
+  },
 
   getKeyPath(type?: string)
   {
@@ -91,14 +91,14 @@ const InputComponent = React.createClass<any, any>({
     return shallowCompare(this, nextProps, nextState);
   },
 
-	getDefaultProps()
-	{
-		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
-		};
-	},
+  getDefaultProps()
+  {
+    return {
+      drag_x: false,
+      drag_y: true,
+      reorderOnDrag: true,
+    };
+  },
 
   convertToDate()
   {
@@ -125,7 +125,8 @@ const InputComponent = React.createClass<any, any>({
   closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       Actions.remove(this.getKeyPath(), this.props.index);
     }, 250);
   },
@@ -202,17 +203,17 @@ const InputComponent = React.createClass<any, any>({
     Util.animateToAutoHeight(this.refs.input);
   },
 
-	render()
+  render()
   {
-		return (
-			<div className="input" ref="input">
+    return (
+      <div className="input" ref="input">
         {
           this.props.canEdit ?
             <CreateLine
               open={false}
               onClick={this.createInput}
             />
-          :
+            :
             <div className="input-spacing" />
         }
         <div className="input-inner">
@@ -234,14 +235,14 @@ const InputComponent = React.createClass<any, any>({
             </div>
           </div>
           <div className="input-bottom-row">
-          {
-            this.renderInputValue()
-          }
+            {
+              this.renderInputValue()
+            }
           </div>
         </div>
-			</div>
-		);
-	},
+      </div>
+    );
+  },
 });
 
 export default InputComponent;

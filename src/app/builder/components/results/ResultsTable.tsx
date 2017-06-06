@@ -46,14 +46,14 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
-import {MenuOption} from '../../../common/components/Menu';
+import { MenuOption } from '../../../common/components/Menu';
 import PureClasss from '../../../common/components/PureClasss';
-import {IColumn, Table} from '../../../common/components/Table';
+import { IColumn, Table } from '../../../common/components/Table';
 import ColorManager from '../../../util/ColorManager';
-import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
-import {getResultFields, getResultName, getResultValue} from './Result';
-import {getPrimaryKeyFor, MAX_RESULTS, Results} from './ResultsManager';
-import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import { getResultFields, getResultName, getResultValue } from './Result';
+import { getPrimaryKeyFor, MAX_RESULTS, Results } from './ResultsManager';
+import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 
 export interface Props
 {
@@ -96,7 +96,7 @@ export default class ResultsTable extends PureClasss<Props>
 
   getColumns(props: Props): List<IColumn>
   {
-    const {resultsConfig} = props;
+    const { resultsConfig } = props;
     let cols: IColumn[] = [];
 
     if (resultsConfig.enabled)
@@ -138,7 +138,7 @@ export default class ResultsTable extends PureClasss<Props>
             key: field,
             name: field,
             resizable: true,
-            width:120,
+            width: 120,
           }),
       );
     }

@@ -46,11 +46,11 @@ const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-import {CardItem} from '../components/cards/CardComponent';
+import { CardItem } from '../components/cards/CardComponent';
 const Redux = require('redux');
 import Util from '../../util/Util';
-import {_ResultsState, ResultsState} from '../components/results/ResultsManager';
-import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes';
+import { _ResultsState, ResultsState } from '../components/results/ResultsManager';
+import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { Card, Cards } from '../../../../shared/blocks/types/Card';
@@ -91,9 +91,10 @@ export class BuilderStateClass
 
   resultsState: ResultsState = _ResultsState();
 }
-export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}
+export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());
-const _BuilderState = (config?: any) => {
+const _BuilderState = (config?: any) =>
+{
   return new BuilderState_Record(config || {}) as any as BuilderState;
 };
 
@@ -148,13 +149,13 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
       //  needs to be after the card change has affected the state
       state = state
         .setIn(['query', 'tql'],
-          AllBackendsMap[state.query.language].queryToCode(state.query, {}),
-        )
+        AllBackendsMap[state.query.language].queryToCode(state.query, {}),
+      )
         .setIn(['query', 'cardsAndCodeInSync'], true);
     }
 
     return state;
   }
-, DefaultState);
+  , DefaultState);
 
 export default BuilderStore;

@@ -51,26 +51,28 @@ import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 const CheckMark = require('./../../../images/icon_checkMark.svg');
 
-export interface Props {
-	checked: boolean;
-	onChange: () => void;
+export interface Props
+{
+  checked: boolean;
+  onChange: () => void;
 }
 
 class CheckBox extends Classs<Props>
 {
-	render() {
-		return (
-			<div
-				className={classNames({
-					'checkbox': true,
-  					'checkbox-checked': this.props.checked,
-				})}
-				onClick={this.props.onChange}
-			>
-			{this.props.checked ? <CheckMark className ="check-mark-icon"/> : 'O'}
-			</div>
-		);
-	}
+  render()
+  {
+    return (
+      <div
+        className={classNames({
+          'checkbox': true,
+          'checkbox-checked': this.props.checked,
+        })}
+        onClick={this.props.onChange}
+      >
+        {this.props.checked ? <CheckMark className="check-mark-icon" /> : 'O'}
+      </div>
+    );
+  }
 }
 
 export default CheckBox;

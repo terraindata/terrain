@@ -52,12 +52,14 @@ THE SOFTWARE.
 
 // import React = __React;
 
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
+interface Array<T>
+{
+  find(predicate: (search: T) => boolean): T;
+  findIndex(predicate: (search: T) => boolean): number;
 }
 
-interface Action<T> {
+interface Action<T>
+{
   type: string;
   payload?: T;
 }
@@ -79,7 +81,7 @@ declare interface IStore<T>
 {
   getState: () => T;
   subscribe: (updater: (() => void)) => (() => void);
-  dispatch: (action: { type: string, payload: {[k: string]: any} }) => void;
+  dispatch: (action: { type: string, payload: { [k: string]: any } }) => void;
 }
 
 declare interface IMap<T>
