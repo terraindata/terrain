@@ -57,9 +57,8 @@ import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
-import BuilderTypes from '../BuilderTypes';
 import Ajax from './../../util/Ajax';
-type Query = BuilderTypes.Query;
+import Query from '../../../../shared/items/types/Query';
 
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -202,19 +201,21 @@ const BuilderColumn = React.createClass<any, any>(
       );
     }
 
-    const query: BuilderTypes.Query = this.props.query;
+    const query: Query = this.props.query;
     const {canEdit} = this.props;
     switch (this.state.column)
     {
       case COLUMNS.Builder:
         return <CardsColumn
+          queryType={query.language}
           cards={query.cards}
           deckOpen={query.deckOpen}
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
-          tqlCardsInSync={query.tqlCardsInSync}
-          parseTreeError={query.parseTreeError}
+          cardsAndCodeInSync={query.cardsAndCodeInSync}
+          parseError={query.parseError}
+          language={query.language}
         />;
 
       case COLUMNS.Inputs:

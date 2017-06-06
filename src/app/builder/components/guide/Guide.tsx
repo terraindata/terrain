@@ -42,155 +42,154 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-/***********************
-***
-*    PROTOTYPING
-***
-******/
+// /***********************
+// ***
+// *    PROTOTYPING
+// ***
+// ******/
 
-require('./Guide.less');
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
-import Actions from '../../data/BuilderActions';
-import Card from '../cards/Card';
-import PureClasss from './../../../common/components/PureClasss';
-const L = Immutable.List;
-const M = Immutable.Map;
+// require('./Guide.less');
+// import * as classNames from 'classnames';
+// import * as Immutable from 'immutable';
+// import * as $ from 'jquery';
+// import * as React from 'react';
+// import * as ReactDOM from 'react-dom';
+// import * as _ from 'underscore';
+// import Util from '../../../util/Util';
+// import Actions from '../../data/BuilderActions';
+// import Card from '../cards/Card';
+// import PureClasss from './../../../common/components/PureClasss';
+// const L = Immutable.List;
+// const M = Immutable.Map;
 
-export interface Props
-{
-}
+// export interface Props
+// {
+// }
 
-export enum EScreen
-{
-  FROM,
-  SELECT,
-  WHERE,
-  LIMIT,
-  LET,
-  VAR,
-  TRANSFORM,
-  SCORE,
+// export enum EScreen
+// {
+//   FROM,
+//   SELECT,
+//   WHERE,
+//   LIMIT,
+//   LET,
+//   VAR,
+//   TRANSFORM,
+//   SCORE,
 
-  ALL,
-}
+//   ALL,
+// }
 
-export interface State
-{
-  screen: EScreen;
-  query: IQuery;
-}
+// export interface State
+// {
+//   screen: EScreen;
+//   query: IQuery;
+// }
 
-export enum EExpressionType
-{
-  STRING,
-  NUMBER,
+// export enum EExpressionType
+// {
+//   STRING,
+//   NUMBER,
 
-  MAX,
-  MIN,
-  COUNT,
-  SUM,
-  EXISTS,
+//   MAX,
+//   MIN,
+//   COUNT,
+//   SUM,
+//   EXISTS,
 
-  QUERY,
-}
+//   QUERY,
+// }
 
-export interface IExpression
-{
-  type: EExpressionType;
-  value: any;
-}
+// export interface IExpression
+// {
+//   type: EExpressionType;
+//   value: any;
+// }
 
-export interface ICondition
-{
-  first: IExpression;
-  second: IExpression;
-  operator: BuilderTypes.Operator;
-}
+// export interface ICondition
+// {
+//   first: IExpression;
+//   second: IExpression;
+//   // operator: Operator;
+// }
 
-export interface IConditions
-{
-  conditions: Array<ICondition | IConditions>;
-  combinator: BuilderTypes.Combinator;
-}
+// export interface IConditions
+// {
+//   conditions: Array<ICondition | IConditions>;
+//   // combinator: Combinator;
+// }
 
-// DIFFERENT FROM BROWSERTYPES
-class QueryClass
-{
-  tables: Array<{
-    table: string;
-    alias: string;
-  }> = [];
+// // DIFFERENT FROM BROWSERTYPES
+// class QueryClass
+// {
+//   tables: Array<{
+//     table: string;
+//     alias: string;
+//   }> = [];
 
-  fields: string[] = [];
+//   fields: string[] = [];
 
-  where: IConditions = {
-    conditions: [],
-    combinator: BuilderTypes.Combinator.AND,
-  };
-}
-export interface IQuery extends QueryClass, IRecord<IQuery> {}
-const Query_Record = Immutable.Record(new QueryClass());
-export const _Query = (config?: any) => {
-  return new Query_Record(config || {}) as any as IQuery;
-};
+//   where: IConditions = {
+//     conditions: [],
+//     // combinator: Combinator.AND,
+//   };
+// }
+// export interface IQuery extends QueryClass, IRecord<IQuery> {}
+// const Query_Record = Immutable.Record(new QueryClass());
+// export const _Query = (config?: any) => {
+//   return new Query_Record(config || {}) as any as IQuery;
+// };
 
-class Guide extends PureClasss<Props>
-{
-  state: State = {
-    screen: EScreen.FROM,
-    query: _Query(),
-  };
+// class Guide extends PureClasss<Props>
+// {
+//   state: State = {
+//     screen: EScreen.FROM,
+//     query: _Query(),
+//   };
 
-  constructor(props: Props)
-  {
-    super(props);
-  }
+//   constructor(props: Props)
+//   {
+//     super(props);
+//   }
 
-  render()
-  {
-    const {screen, query} = this.state;
+//   render()
+//   {
+//     const {screen, query} = this.state;
 
-    return (
-      <div
-        className="guide"
-      >
-        <div className="guide-left">
-          <div className="guide-title">
-            Guide
-          </div>
-        </div>
-        <div className="guide-right">
-          <div className="guide-title">
-            Your Query
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-        // {
-        //   !topLevel ? null :
-        //     <CardDropArea
-        //       half={true}
-        //       index={0}
-        //       keyPath={this.state.keyPath}
-        //     />
-        // }
-        // {
-        //   !topLevel ? null :
-        //     <CardDropArea
-        //       half={true}
-        //       lower={true}
-        //       index={props.cards.size}
-        //       keyPath={this.state.keyPath}
-        //     />
-        // }
+//     return (
+//       <div
+//         className="guide"
+//       >
+//         <div className="guide-left">
+//           <div className="guide-title">
+//             Guide
+//           </div>
+//         </div>
+//         <div className="guide-right">
+//           <div className="guide-title">
+//             Your Query
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+// }
+//         // {
+//         //   !topLevel ? null :
+//         //     <CardDropArea
+//         //       half={true}
+//         //       index={0}
+//         //       keyPath={this.state.keyPath}
+//         //     />
+//         // }
+//         // {
+//         //   !topLevel ? null :
+//         //     <CardDropArea
+//         //       half={true}
+//         //       lower={true}
+//         //       index={props.cards.size}
+//         //       keyPath={this.state.keyPath}
+//         //     />
+//         // }
 
-export default Guide;
+// export default Guide;

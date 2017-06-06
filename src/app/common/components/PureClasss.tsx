@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as _ from 'underscore';
-import BuilderTypes from '../../builder/BuilderTypes';
 import Classs from './Classs';
 const shallowCompare = require('react-addons-shallow-compare');
 
@@ -85,12 +84,6 @@ class PureClasss<T> extends Classs<T>
       }
     }
   }
-
-  // TODO
-  // _myKeyPath(el: BuilderTypes.KeyPathClass)
-  // {
-  //   return this._ikeyPath(el.keyPath, el.id);
-  // }
 }
 
 export default PureClasss;

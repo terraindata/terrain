@@ -42,68 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// a specific instance of a database or backend
 
-import MidwayErrorItem from './MidwayErrorItem';
-
-export class MidwayError
+interface BackendInstance
 {
-  public static fromJSON(json: string | MidwayErrorItem[])
-  {
-    const midwayError = Object.create(MidwayError.prototype);
-    if (typeof json === 'string')
-    {
-      const jobject = JSON.parse(json);
-      midwayError.errors = jobject;
-    } else
-    {
-      midwayError.errors = json;
-    }
-    return midwayError;
-  }
-
-  public errors: MidwayErrorItem[];
-
-  public constructor(status: number, title: string, detail: string, source: object)
-  {
-    const o: MidwayErrorItem = { status, title, detail, source };
-    this.errors = [o];
-  }
-
-  public getMidwayErrors(): MidwayErrorItem[]
-  {
-    return this.errors;
-  }
-
-  // we may provide a iterator interface later
-  public getNthMidwayErrorItem(index): MidwayErrorItem
-  {
-    return this.errors[index];
-  }
-
-  // get the first error object's status
-  public getStatus(): number
-  {
-    return this.getNthMidwayErrorItem(0).status;
-  }
-
-  // get the first error object's title
-  public getTitle(): string
-  {
-    return this.getNthMidwayErrorItem(0).title;
-  }
-
-  // get the first error object's detail
-  public getDetail(): string
-  {
-    return this.getNthMidwayErrorItem(0).detail;
-  }
-
-  // get the first error object's source
-  public getSource(): object
-  {
-    return this.getNthMidwayErrorItem(0).source;
-  }
+  id: string | number;
+  name: string;
+  type: string;
+  source: 'm1' | 'm2';
 }
 
-export default MidwayError;
+export default BackendInstance;

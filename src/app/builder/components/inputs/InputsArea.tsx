@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import {Input} from '../../../../../shared/blocks/types/Input';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -49,16 +50,14 @@ import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
-import Input from '../inputs/Input';
+import InputComponent from '../inputs/InputComponent';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
-type IInput = BuilderTypes.IInput;
 
 export interface Props
 {
-  inputs: List<IInput>;
+  inputs: List<Input>;
   canEdit: boolean;
 }
 
@@ -95,7 +94,7 @@ class InputsArea extends PureClasss<Props>
       <div className="inputs-area">
         {
           this.props.inputs.map((input, index) =>
-            <Input
+            <InputComponent
               input={input}
               index={index}
               canEdit={this.props.canEdit}

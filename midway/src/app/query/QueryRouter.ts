@@ -47,14 +47,16 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
+import * as Util from '../Util';
 
 import { Readable } from 'stream';
+
+import QueryRequest from '../../../../shared/backends/types/QueryRequest';
+import QueryResponse from '../../../../shared/backends/types/QueryResponse';
+import { QueryHandler } from './QueryHandler';
+
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Util from '../Util';
-import { QueryHandler } from './QueryHandler';
-import QueryRequest from './QueryRequest';
-import QueryResponse from './QueryResponse';
 
 const QueryRouter = new KoaRouter();
 
@@ -109,6 +111,7 @@ QueryRouter.post(
     {
       const qh: QueryHandler = database.getQueryHandler();
       const result: QueryResponse = await qh.handleQuery(query) as QueryResponse;
+      result.setQueryRequest(query);
       ctx.body = result;
       ctx.status = 200;
     }

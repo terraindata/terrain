@@ -71,7 +71,7 @@ module.exports =
             // note: this first loader string gets updated in webpack.config.prod.js
             //  keep it first in this list
             {
-                test: /\.tsx$/,
+                test: /\.(ts|tsx)$/,
                 exclude: [/midway/, /node_modules/],
                 loader:
                     'babel-loader?presets[]=react&presets[]=latest!ts-loader?'

@@ -51,10 +51,11 @@ import * as ReduxActions from 'redux-actions';
 import SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
 import Ajax from './../../util/Ajax';
+import AjaxM1 from './../../util/AjaxM1';
 import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
@@ -72,8 +73,8 @@ export const SchemaStore: Store<SchemaState> =
             {
               SchemaActions.dbCount(Object.keys(dbs).length);
               _.map((dbs as any),
-                (db: SharedTypes.Database) =>
-                  (db.source === 'm1' ? Ajax.schema_m1 : Ajax.schema)(
+                (db: BackendInstance) =>
+                  (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
                     db['id'],
                     (colsData, error) =>
                     {

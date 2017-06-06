@@ -45,15 +45,19 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const {Map, List} = Immutable;
 import * as React from 'react';
+import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
-import TQLConverter from '../../../tql/TQLConverter';
-import { Ajax, QueryResponse } from '../../../util/Ajax';
+import AjaxM1 from '../../../util/AjaxM1';
+import {M1QueryResponse} from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
-import { BuilderTypes } from './../../BuilderTypes';
 import TransformCardChart from './TransformCardChart';
-const Dimensions = require('react-dimensions');
+import { Card, CardString } from '../../../../../shared/blocks/types/Card';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import Block from '../../../../../shared/blocks/types/Block';
+
+import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
 
 const NUM_BARS = 1000;
 
@@ -63,6 +67,7 @@ export interface Props
   data: any; // transform card
   onChange: (keyPath: KeyPath, value: any, isDirty?: boolean) => void;
   builderState: any;
+  language: string;
 
   canEdit?: boolean;
   spotlights?: any;
@@ -151,11 +156,11 @@ class TransformCard extends PureClasss<Props>
     ]);
   }
 
-  findTableForAlias(data: BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias: string): string
+  findTableForAlias(data: Block | List<Block>, alias: string): string
   {
     if (Immutable.List.isList(data))
     {
-      const list = data as List<BuilderTypes.IBlock>;
+      const list = data as List<Block>;
       for (let i = 0; i < list.size; i ++)
       {
         const table = this.findTableForAlias(list.get(i), alias);
@@ -194,8 +199,14 @@ class TransformCard extends PureClasss<Props>
   }
 
   // TODO move the bars computation to a higher level
-  computeBars(input: BuilderTypes.CardString)
+  computeBars(input: CardString)
   {
+    if (this.props.language !== 'mysql')
+    {
+      // TODO MOD adapt Transform card for elastic.
+      return;
+    }
+
     // TODO consider putting the query in context
     const {builderState} = this.props;
     const {cards} = builderState.query;
@@ -215,7 +226,7 @@ class TransformCard extends PureClasss<Props>
         if (table)
         {
           this.setState(
-            Ajax.query(
+            AjaxM1.queryM1(
               `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
               db,
               this.handleQueryResponse,
@@ -228,7 +239,7 @@ class TransformCard extends PureClasss<Props>
     }
     else if (input && input._isCard)
     {
-      const card = input as BuilderTypes.ICard;
+      const card = input as Card;
       if (card.type === 'score' && card['weights'].size)
       {
         // only case we know how to handle so far is a score card with a bunch of fields
@@ -275,8 +286,8 @@ class TransformCard extends PureClasss<Props>
         {
           // convert the score to TQL, do the query
           this.setState(
-            Ajax.query(
-              `SELECT ${TQLConverter._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+            AjaxM1.queryM1(
+              `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
               db,
               this.handleQueryResponse,
               this.handleQueryError,
@@ -302,10 +313,10 @@ class TransformCard extends PureClasss<Props>
   killQuery()
   {
     this && this.state && this.state.queryId &&
-      Ajax.killQuery(this.state.queryId);
+      AjaxM1.killQuery(this.state.queryId);
   }
 
-  handleQueryResponse(response: QueryResponse)
+  handleQueryResponse(response: M1QueryResponse)
   {
     this.setState({
       queryXhr: null,
@@ -425,9 +436,10 @@ class TransformCard extends PureClasss<Props>
           domain={this.state.domain}
           range={this.state.range}
           spotlights={spotlights && spotlights.toList().toJS()}
-          inputKey={BuilderTypes.transformAlias(this.props.data)}
+          inputKey={BlockUtils.transformAlias(this.props.data)}
           updatePoints={this.handleUpdatePoints}
           width={width}
+          language={this.props.language}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}

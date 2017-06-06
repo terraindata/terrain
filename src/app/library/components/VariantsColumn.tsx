@@ -65,6 +65,7 @@ import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 import StatusDropdown from './StatusDropdown';
 const {browserHistory} = require('react-router');
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
@@ -144,7 +145,7 @@ class VariantsColumn extends Classs<Props>
   {
     Actions.variants.change(
       this.props.variants.get(id)
-        .set('status', LibraryTypes.ItemStatus.Archive) as Variant,
+        .set('status', ItemStatus.Archive) as Variant,
     );
   }
 
@@ -257,7 +258,7 @@ class VariantsColumn extends Classs<Props>
     //   canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
     //     || roles.getIn([this.props.groupId, me.id, 'admin']);
     //   canDrag = canEdit &&
-    //     (variant.status !== LibraryTypes.ItemStatus.Live ||
+    //     (variant.status !== ItemStatus.Live ||
     //       roles.getIn([this.props.groupId, me.id, 'admin']));
     // }
 
@@ -330,14 +331,14 @@ class VariantsColumn extends Classs<Props>
   handlItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
-    const status = LibraryTypes.ItemStatus[statusString];
+    const status = ItemStatus[statusString];
     if (v.status !== status)
     {
       Actions.variants.change(v.set('status', status) as Variant);
     }
   }
 
-  hasStatus(id: ID, status: LibraryTypes.ItemStatus)
+  hasStatus(id: ID, status: ItemStatus)
   {
     return this.props.variants.getIn([id, 'status']) === status;
   }
@@ -356,7 +357,7 @@ class VariantsColumn extends Classs<Props>
 
     return (
       <LibraryItemCategory
-        status={archived ? LibraryTypes.ItemStatus.Archive : LibraryTypes.ItemStatus.Build}
+        status={archived ? ItemStatus.Archive : ItemStatus.Build}
         key={archived ? '1' : '0'}
         type="variant"
         onHover={this.handlItemStatusHover}

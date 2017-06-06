@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Input.less');
+require('./InputStyle.less');
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -54,7 +54,6 @@ import Menu from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
-import { BuilderTypes } from './../../BuilderTypes';
 const shallowCompare = require('react-addons-shallow-compare');
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
@@ -62,10 +61,9 @@ const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-type IInput = BuilderTypes.IInput;
-const InputType = BuilderTypes.InputType;
+import {Input, InputType} from '../../../../../shared/blocks/types/Input';
 
-const Input = React.createClass<any, any>({
+const InputComponent = React.createClass<any, any>({
 	mixins: [PanelMixin],
 
 	propTypes:
@@ -171,7 +169,7 @@ const Input = React.createClass<any, any>({
 
   renderInputValue()
   {
-    if (this.props.input.inputType === BuilderTypes.InputType.DATE)
+    if (this.props.input.inputType === InputType.DATE)
     {
       return (
         <div>
@@ -190,10 +188,11 @@ const Input = React.createClass<any, any>({
         value={this.props.input.value}
         className="input-text input-text-second"
         keyPath={this.getKeyPath('value')}
-        isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
+        isNumber={this.props.input.inputType === InputType.NUMBER}
         typeErrorMessage="This input is in number mode\nthis should be a number."
         placeholder="Sample value"
         autoDisabled={true}
+        language={null}
       />
     );
   },
@@ -225,6 +224,7 @@ const Input = React.createClass<any, any>({
               keyPath={this.getKeyPath('key')}
               placeholder="Input name"
               autoDisabled={true}
+              language={null}
             />
             <Menu
               options={this.getMenuOptions()}
@@ -244,4 +244,4 @@ const Input = React.createClass<any, any>({
 	},
 });
 
-export default Input;
+export default InputComponent;

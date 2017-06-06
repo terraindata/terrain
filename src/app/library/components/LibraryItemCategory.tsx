@@ -48,6 +48,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import Classs from './../../common/components/Classs';
 import LibraryTypes from '../LibraryTypes';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 
 export interface Props
 {
@@ -68,7 +69,7 @@ class LibraryItemCategory extends Classs<Props>
   constructor(props: Props)
   {
     super(props);
-    this.state.open = props.status !== LibraryTypes.ItemStatus.Archive;
+    this.state.open = props.status !== ItemStatus.Archive;
   }
 
   toggleOpen()

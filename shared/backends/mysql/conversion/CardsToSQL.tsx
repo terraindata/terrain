@@ -44,16 +44,19 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-type ICard = BuilderTypes.ICard;
-type IBlock = BuilderTypes.IBlock;
-type IInput = BuilderTypes.IInput;
+import CommonSQL from '../syntax/CommonSQL';
+
+import {Block} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
+import {Card} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
+import Query from '../../../items/types/Query';
+import MySQLBlocks from '../blocks/MySQLBlocks';
 
 const join = (j, index) => (index === 0 ? '' : j);
 const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
 const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
-
-import { BuilderTypes } from '../builder/BuilderTypes';
 
 export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.
@@ -63,31 +66,31 @@ export interface Options {
   replaceInputs?: boolean; // replaces occurences of inputs with their values
 }
 
-class TQLConverter
+class CardsToSQL
 {
-  static toTQL(query: BuilderTypes.Query, options: Options = {}): string
+  static toSQL(query: Query, options: Options = {}): string
   {
     let {cards, inputs} = query;
 
     let cardsTql = '';
     if (cards && cards.size)
     {
-      cards = this.applyOptions(cards, options);
-      cardsTql = removeBlanks(this._cards(cards, ';\n', options, true));
+      cards = CardsToSQL.applyOptions(cards, options);
+      cardsTql = removeBlanks(CardsToSQL._cards(cards, ';\n', options, true));
     }
 
     // TODO update inputs when back-end is ready
     // var inputsTql = "";
     if (inputs && inputs.size && options.replaceInputs)
     {
-      inputs.map((input: IInput) =>
+      inputs.map((input: Input) =>
         {
           let {value} = input;
-          if (input.inputType === BuilderTypes.InputType.TEXT)
+          if (input.inputType === InputType.TEXT)
           {
             value = `"${value}"`;
           }
-          if (input.inputType == BuilderTypes.InputType.DATE)
+          if (input.inputType == InputType.DATE)
           {
             value = `'${value}'`;
           }
@@ -104,25 +107,9 @@ class TQLConverter
 
     return cardsTql;
   }
-  public static toEQL(query: BuilderTypes.Query, options: Options = {}): string
-  {
-    let q: string = query.tql;
-
-    if (options.allFields === true)
-    {
-      const o = JSON.parse(query.tql);
-      if (o.body && o.body._source)
-      {
-        o.body._source  = [];
-      }
-      q = JSON.stringify(o);
-    }
-
-    return q;
-  }
 
 
-  private static _topFromCard(cards: List<ICard>, fn: (fromCard: ICard) => ICard): List<ICard>
+  private static _topFromCard(cards: List<Card>, fn: (fromCard: Card) => Card): List<Card>
   {
     // find top-level 'from' cards
     return cards.map((topCard) =>
@@ -139,20 +126,20 @@ class TQLConverter
         }
       }
       return topCard;
-    }) as List<ICard>;
+    }) as List<Card>;
   }
 
-  private static applyOptions(cards, options): List<ICard>
+  private static applyOptions(cards, options): List<Card>
   {
     if (options.allFields)
     {
-      cards = this._topFromCard(cards, (fromCard: ICard) =>
+      cards = CardsToSQL._topFromCard(cards, (fromCard: Card) =>
         fromCard.update('fields',
           (fields: List<any>) =>
           {
             fields = fields.filter((v) => v.field !== '*').toList();
             return fields.unshift(
-              BuilderTypes.make(BuilderTypes.Blocks.field, {
+              BlockUtils.make(MySQLBlocks.field, {
                 field: '*',
               }),
             );
@@ -161,12 +148,12 @@ class TQLConverter
       );
     }
 
-    cards = this._topFromCard(cards, (fromCard: ICard) =>
+    cards = CardsToSQL._topFromCard(cards, (fromCard: Card) =>
     {
       // add a take card if none are present
       if (options.limit && !fromCard['cards'].some((card) => card.type === 'take'))
       {
-        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.make(BuilderTypes.Blocks.take, {
+        return fromCard.set('cards', fromCard['cards'].push(BlockUtils.make(MySQLBlocks.take, {
           value: options.limit,
         })));
       }
@@ -178,7 +165,7 @@ class TQLConverter
         fromCard = fromCard.update('fields',
           (fields) =>
             fields.filter((v) => v.field !== '*').toList()
-              .unshift(BuilderTypes.make(BuilderTypes.Blocks.field, {
+              .unshift(BlockUtils.make(MySQLBlocks.field, {
                 field: 'COUNT(*)',
               })),
         );
@@ -189,18 +176,18 @@ class TQLConverter
         // TODO find score fields. Score fields!
 
         let transformInputs: Array<{input: string, alias: string}> = [];
-        BuilderTypes.forAllCards(fromCard, (card) =>
+        BlockUtils.forAllCards(fromCard, (card) =>
         {
           if (card.type === 'transform')
           {
             let input = card['input'];
             if (input._isCard)
             {
-              input = this._parse(input);
+              input = CardsToSQL._parse(input);
             }
             transformInputs.push({
               input,
-              alias: BuilderTypes.transformAlias(card),
+              alias: BlockUtils.transformAlias(card),
             }); // need to filter out any non-letters-or-numbers
           }
         });
@@ -216,7 +203,7 @@ class TQLConverter
             let {alias, value} = field;
             if (typeof value !== 'string')
             {
-              value = TQLConverter._parse(value);
+              value = CardsToSQL._parse(value);
             }
             // replace all instances in the transform inputs with the alias'd content
             transformInputs = transformInputs.map((transformInput) =>
@@ -240,7 +227,7 @@ class TQLConverter
         {
           fromCard = fromCard.update('fields',
             (fields) => fields.push(
-                BuilderTypes.make(BuilderTypes.Blocks.field, {
+                BlockUtils.make(MySQLBlocks.field, {
                   field: transformInput.input + ' as ' + transformInput.alias,
                 }),
               ),
@@ -254,15 +241,15 @@ class TQLConverter
     return cards;
   }
 
-  private static _cards(cards: List<ICard>, append?: string, options?: Options, isTop?: boolean): string
+  private static _cards(cards: List<Card>, append?: string, options?: Options, isTop?: boolean): string
   {
     const glue = append || '\n';
     return addTabs(cards.map(
-        (card, i) => this._parse(card, i, i === cards.size, isTop),
+        (card, i) => CardsToSQL._parse(card, i, i === cards.size, isTop),
       ).join(glue)) + (options && options['excludeSuffix'] ? '' : glue);
   }
 
-  static _parse(block: IBlock, index?: number, isLast?: boolean, isTop?: boolean): string
+  static _parse(block: Block, index?: number, isLast?: boolean, isTop?: boolean): string
   {
     if (!block)
     {
@@ -288,13 +275,13 @@ class TQLConverter
     while (repIndex !== -1)
     {
       const f = str.match('\\$[a-zA-Z]+')[0].substr(1);
-      str = str.replace('\$' + f, this._value(f, block));
+      str = str.replace('\$' + f, CardsToSQL._value(f, block));
       repIndex = str.indexOf('$');
     }
     return str;
   }
 
-  private static _value(field: string, block: IBlock)
+  private static _value(field: string, block: Block)
   {
     if (field === 'cards')
     {
@@ -305,7 +292,7 @@ class TQLConverter
         append = block.static.tqlGlue;
         options['excludeSuffix'] = true;
       }
-      return this._cards(block['cards'], append, options);
+      return CardsToSQL._cards(block['cards'], append, options);
     }
 
     if (Array.isArray(block[field]) || Immutable.List.isList(block[field]))
@@ -313,7 +300,7 @@ class TQLConverter
       const pieces =
         block[field].map(
           (v, index) =>
-            this._parse(v, index, index === block[field].size - 1),
+            CardsToSQL._parse(v, index, index === block[field].size - 1),
         );
 
       let glue = ', ';
@@ -332,13 +319,13 @@ class TQLConverter
 
     if (typeof block[field] === 'object')
     {
-      return this._parse(block[field]);
+      return CardsToSQL._parse(block[field]);
     }
 
     if (field.toUpperCase() === field)
     {
       // all caps, look up value from corresponding map
-      return BuilderTypes[field.charAt(0) + field.substr(1).toLowerCase() + 'TQL'][block[field.toLowerCase()]];
+      return CommonSQL[field.charAt(0) + field.substr(1).toLowerCase() + 'TQL'][block[field.toLowerCase()]];
     }
 
     return block[field];
@@ -346,4 +333,4 @@ class TQLConverter
 
 }
 
-export default TQLConverter;
+export default CardsToSQL;
