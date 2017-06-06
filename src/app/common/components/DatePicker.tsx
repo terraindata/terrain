@@ -58,9 +58,10 @@ const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
 const _hours = [];
-for (let h = 0; h < 24; h ++)
+for (let h = 0; h < 24; h++)
 {
-  for (let m = 0; m < 60; m += MINUTE_INTERVAL) {
+  for (let m = 0; m < 60; m += MINUTE_INTERVAL)
+  {
     let hour = (h - 1) % 12 + 1;
     if (h === 0) hour = 12;
     _hours.push(hour + ':' + (m < 10 ? '0' : '') + m + (h < 12 ? 'am' : 'pm'));
@@ -69,7 +70,8 @@ for (let h = 0; h < 24; h ++)
 
 const HOUR_OPTIONS = Immutable.List(_hours);
 
-export interface Props {
+export interface Props
+{
   date: string;
   onChange: (newDate: string) => void;
   canEdit: boolean;
@@ -135,12 +137,13 @@ class DatePicker extends PureClasss<Props>
       </div>);
   }
 
-  render() {
+  render()
+  {
     const date = this.getDate();
     const modifiers =
-    {
-      selected: (day) => DateUtils.isSameDay(day, date),
-    };
+      {
+        selected: (day) => DateUtils.isSameDay(day, date),
+      };
 
     return (
       <div className="date-picker">
@@ -149,9 +152,9 @@ class DatePicker extends PureClasss<Props>
           onDayClick={this.handleDayClick}
           initialMonth={date}
         />
-        { this.renderTimePicker() }
+        {this.renderTimePicker()}
       </div>
-     );
+    );
   }
 }
 export default DatePicker;

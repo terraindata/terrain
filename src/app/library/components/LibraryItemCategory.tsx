@@ -83,7 +83,7 @@ class LibraryItemCategory extends Classs<Props>
   {
     return this.props.connectDropTarget(
       <div className={`library-category library-category-${this.props.status} library-category-${this.state.open ? 'open' : 'closed'}`}>
-        { ! this.props.titleHidden &&
+        {!this.props.titleHidden &&
           <div className="library-category-title" onClick={this.toggleOpen}>
             <div className="library-category-title-symbol" />
             <div className="library-category-title-text">
@@ -94,7 +94,7 @@ class LibraryItemCategory extends Classs<Props>
           </div>
         }
         <div className="library-category-content">
-          { this.props['children'] }
+          {this.props['children']}
         </div>
       </div>,
     );
@@ -112,23 +112,23 @@ const canDrop = (props, monitor) =>
   return !props.dropDisabled;
 };
 const target =
-{
-  canDrop,
-
-  hover(props, monitor, component)
   {
-    if (canDrop(props, monitor))
+    canDrop,
+
+    hover(props, monitor, component)
     {
-      const item = monitor.getItem();
-      props.onHover(props.status, item.id);
-    }
-  },
-};
+      if (canDrop(props, monitor))
+      {
+        const item = monitor.getItem();
+        props.onHover(props.status, item.id);
+      }
+    },
+  };
 
 const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
+  ({
+    connectDropTarget: connect.dropTarget(),
+  });
 
 const LIC = DropTarget('BROWSER', target, dropCollect)(LibraryItemCategory) as any;
 

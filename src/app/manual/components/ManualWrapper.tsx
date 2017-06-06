@@ -61,19 +61,19 @@ export interface Props
 
 class ManualWrapper extends Classs<Props>
 {
-	constructor(props)
-	{
-		super(props);
-	}
+  constructor(props)
+  {
+    super(props);
+  }
 
-	render()
-	{
-		const selected = this.props.params['term'] || '';
-		return <Manual
-			selectedKey={selected}
-			manualTab={true}
-		/>;
-	}
+  render()
+  {
+    const selected = this.props.params['term'] || '';
+    return <Manual
+      selectedKey={selected}
+      manualTab={true}
+    />;
+  }
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast

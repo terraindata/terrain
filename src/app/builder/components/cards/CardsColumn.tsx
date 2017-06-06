@@ -51,17 +51,17 @@ import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import {scrollAction} from '../../data/BuilderScrollStore';
+import { scrollAction } from '../../data/BuilderScrollStore';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
-import {AllBackendsMap} from '../../../../../shared/backends/AllBackends';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props
@@ -115,12 +115,12 @@ class CardsColumn extends PureClasss<Props>
       this.handleScroll();
     }
   }
-  
+
   getPossibleCards()
   {
     return AllBackendsMap[this.props.language].topLevelCards;
   }
-  
+
   getFirstCard()
   {
     const type = AllBackendsMap[this.props.language].topLevelCards.get(0);
@@ -143,7 +143,7 @@ class CardsColumn extends PureClasss<Props>
   {
     return (
       <div className="cards-area-top-bar">
-        <div className = "cards-area-white-space" />
+        <div className="cards-area-white-space" />
         <Switch
           first="Standard"
           second="Learning"
@@ -157,7 +157,7 @@ class CardsColumn extends PureClasss<Props>
 
   toggleDeck()
   {
-    Actions.toggleDeck(! this.props.deckOpen);
+    Actions.toggleDeck(!this.props.deckOpen);
   }
 
   handleScroll()
@@ -189,9 +189,9 @@ class CardsColumn extends PureClasss<Props>
   innerHeight: number = -1;
   render()
   {
-    const {props} = this;
-    const {cards, canEdit} = props;
-    const {keyPath} = this.state;
+    const { props } = this;
+    const { cards, canEdit } = props;
+    const { keyPath } = this.state;
     const canHaveDeck = canEdit;
 
     return (
@@ -204,10 +204,10 @@ class CardsColumn extends PureClasss<Props>
       >
         {
           canHaveDeck &&
-            <CardsDeck
-              open={this.props.deckOpen}
-              language={this.props.language}
-            />
+          <CardsDeck
+            open={this.props.deckOpen}
+            language={this.props.language}
+          />
         }
         <div
           className={classNames({
@@ -247,23 +247,23 @@ class CardsColumn extends PureClasss<Props>
                   onClick={this.createCard}
                   inline={false}
                 />
-              : null
+                : null
             }
           </div>
         </div>
         {
           canHaveDeck &&
-            <div
-              className="cards-deck-knob"
-              onClick={this.toggleDeck}
-            >
-              <ExpandIcon
-                className="cards-deck-knob-icon"
-              />
-              <div className="cards-deck-knob-text">
-                  Card Deck
+          <div
+            className="cards-deck-knob"
+            onClick={this.toggleDeck}
+          >
+            <ExpandIcon
+              className="cards-deck-knob-icon"
+            />
+            <div className="cards-deck-knob-text">
+              Card Deck
               </div>
-            </div>
+          </div>
         }
 
         <div
@@ -277,13 +277,13 @@ class CardsColumn extends PureClasss<Props>
     );
   }
 }
-            // <CardDropArea
-            //   half={true}
-            //   index={0}
-            //   keyPath={keyPath}
-            //   height={12}
-            //   accepts={this.getPossibleCards()}
-            // />
+// <CardDropArea
+//   half={true}
+//   index={0}
+//   keyPath={keyPath}
+//   height={12}
+//   accepts={this.getPossibleCards()}
+// />
 
 // wasn't able to get this to work but will leave it around in case some
 //  bright eyed dev comes along and find the solution

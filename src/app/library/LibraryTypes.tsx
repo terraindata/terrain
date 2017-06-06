@@ -47,12 +47,12 @@ import * as _ from 'underscore';
 import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
-const {List, Map} = Immutable;
-import {BaseClass, New} from '../Classes';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 import BackendInstance from '../../../shared/backends/types/BackendInstance';
-import {Query, _Query, queryForSave} from '../../../shared/items/types/Query';
-import {ItemStatus, ItemType, ItemC, Item} from '../../../shared/items/types/Item';
-import {ResultsConfig, _ResultsConfig} from '../../../shared/results/types/ResultsConfig';
+import { Query, _Query, queryForSave } from '../../../shared/items/types/Query';
+import { ItemStatus, ItemType, ItemC, Item } from '../../../shared/items/types/Item';
+import { ResultsConfig, _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 
 // TODO MOD refactor
 
@@ -65,9 +65,9 @@ export module LibraryTypes
     algorithmId: number = -1;
     groupId: number = -1;
 
-    excludeFields= ['dbFields', 'excludeFields', 'algorithmId', 'groupId']; 
+    excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
     // TODO try super or prototype
-    
+
     lastEdited = '';
     lastUserId = -1;
     version = false;
@@ -77,9 +77,10 @@ export module LibraryTypes
     // TODO remove when variants can be saved without queries
     query: Query = null;
   }
-  export interface Variant extends VariantC, IRecord<Variant> {}
+  export interface Variant extends VariantC, IRecord<Variant> { }
   const Variant_Record = Immutable.Record(new VariantC());
-  export const _Variant = (config?: any) => {
+  export const _Variant = (config?: any) =>
+  {
     // NOTE: we do not want a default value for the config param because
     //  we want to know the difference between creating a new variant with
     //  no params vs. an old version with no modelVersion param
@@ -97,13 +98,13 @@ export module LibraryTypes
         language: 'mysql',
       };
     }
-    
-    if(config && config.modelVersion === 1)
+
+    if (config && config.modelVersion === 1)
     {
       // from 1 to 2
       // TODO if necessary
     }
-    
+
     config = config || {};
 
     // TODO change to standalone query Item
@@ -122,7 +123,7 @@ export module LibraryTypes
     return v
       .set('lastEdited', new Date())
       .set('lastUserId', +localStorage['id'])
-    ;
+      ;
   }
 
   export function variantForSave(v: Variant): Variant
@@ -134,49 +135,50 @@ export module LibraryTypes
   class AlgorithmC extends ItemC
   {
     type = ItemType.Algorithm;
-    
+
     groupId = -1;
-    
+
     lastEdited = '';
     lastUsername = '';
 
     variantsOrder = List([]);
     language = 'elastic';
 
-    excludeFields= ['dbFields', 'excludeFields', 'groupId']; 
+    excludeFields = ['dbFields', 'excludeFields', 'groupId'];
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
-  export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
-  export const _Algorithm = (config?: any) => {
-    if(config && (!config.modelVersion || config.modelVersion === 1))
+  export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
+  export const _Algorithm = (config?: any) =>
+  {
+    if (config && (!config.modelVersion || config.modelVersion === 1))
     {
       // from 0 and 1 to 2
       // TODO
     }
-    
+
     config = config || {};
     config.variantsOrder = List(config.variantsOrder || []);
     return new Algorithm_Record(config) as any as Algorithm;
   };
 
   export const groupColors =
-  [
-    '#00A7F7',
-    '#00BCD6',
-    '#009788',
-    '#48B14B',
-    '#8AC541',
-    '#CCDD1F',
-    '#FFEC18',
-    '#FFC200',
-    '#FF9900',
-    '#5F7D8C',
-  ];
+    [
+      '#00A7F7',
+      '#00BCD6',
+      '#009788',
+      '#48B14B',
+      '#8AC541',
+      '#CCDD1F',
+      '#FFEC18',
+      '#FFC200',
+      '#FF9900',
+      '#5F7D8C',
+    ];
 
   class GroupC extends ItemC
   {
     type = ItemType.Group;
-    
+
     lastEdited = '';
     lastUserId = '';
     userIds = List([]);
@@ -184,14 +186,15 @@ export module LibraryTypes
     defaultLanguage = 'elastic';
   }
   const Group_Record = Immutable.Record(new GroupC());
-  export interface Group extends GroupC, IRecord<Group> {}
-  export const _Group = (config: any = {}) => {
-    if(config && (!config.modelVersion || config.modelVersion === 1))
+  export interface Group extends GroupC, IRecord<Group> { }
+  export const _Group = (config: any = {}) =>
+  {
+    if (config && (!config.modelVersion || config.modelVersion === 1))
     {
       // from 0 and 1 to 2
       // TODO
     }
-    
+
     config = config || {};
     config.userIds = List(config.userIds || []);
     config.algorithmsOrder = List(config.algorithmsOrder || []);
@@ -235,17 +238,17 @@ export module LibraryTypes
         return '#000';
     }
   }
-  
-  
+
+
   export const typeToConstructor: {
     [key: string]: (...args) => Item,
   } =
-  {
-    [ItemType.Query]: _Query,
-    [ItemType.Variant]: _Variant,
-    [ItemType.Algorithm]: _Algorithm,
-    [ItemType.Group]: _Group,
-  };
+    {
+      [ItemType.Query]: _Query,
+      [ItemType.Variant]: _Variant,
+      [ItemType.Algorithm]: _Algorithm,
+      [ItemType.Group]: _Group,
+    };
 
 }
 

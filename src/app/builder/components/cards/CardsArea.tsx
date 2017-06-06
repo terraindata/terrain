@@ -50,12 +50,12 @@ import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import {BuilderState, BuilderStore} from '../../data/BuilderStore';
-import {CardComponent, CardItem} from '../cards/CardComponent';
+import { BuilderState, BuilderStore } from '../../data/BuilderStore';
+import { CardComponent, CardItem } from '../cards/CardComponent';
 import PureClasss from './../../../common/components/PureClasss';
 import CreateCardTool from './CreateCardTool';
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
-const {List} = Immutable;
+const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
@@ -76,11 +76,13 @@ export interface Props
   singleChild?: boolean;
 }
 
-interface KeyState {
+interface KeyState
+{
   keyPath: KeyPath;
 }
 
-interface State extends KeyState {
+interface State extends KeyState
+{
   learningMode: boolean;
   cardToolOpen: boolean;
   isDraggingCardOver: boolean;
@@ -142,9 +144,9 @@ class CardsArea extends PureClasss<Props>
     });
   }
 
-  copy() {}
+  copy() { }
 
-  clear() {}
+  clear() { }
 
   createFromCard()
   {
@@ -167,13 +169,13 @@ class CardsArea extends PureClasss<Props>
 
   render()
   {
-    const {props} = this;
-    const {cards, canEdit} = props;
+    const { props } = this;
+    const { cards, canEdit } = props;
     const renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
 
-    const {isDraggingCardOver, draggingCardItem, draggingOverIndex} = this.state;
-    const {keyPath} = this.props;
-    
+    const { isDraggingCardOver, draggingCardItem, draggingOverIndex } = this.state;
+    const { keyPath } = this.props;
+
     return (
       <div>
         <div
@@ -231,18 +233,18 @@ class CardsArea extends PureClasss<Props>
 
           {
             renderCardTool &&
-              <CreateCardTool
-                language={this.props.language}
-                canEdit={this.props.canEdit}
-                keyPath={this.props.keyPath}
-                index={props.cards.size}
-                open={this.state.cardToolOpen}
-                className="nested-create-card-tool-wrapper"
-                accepts={this.props.accepts}
-                onToggle={this._toggle('cardToolOpen')}
-                hidePlaceholder={this.props.singleChild || cards.size === 0}
-                cannotClose={cards.size === 0}
-              />
+            <CreateCardTool
+              language={this.props.language}
+              canEdit={this.props.canEdit}
+              keyPath={this.props.keyPath}
+              index={props.cards.size}
+              open={this.state.cardToolOpen}
+              className="nested-create-card-tool-wrapper"
+              accepts={this.props.accepts}
+              onToggle={this._toggle('cardToolOpen')}
+              hidePlaceholder={this.props.singleChild || cards.size === 0}
+              cannotClose={cards.size === 0}
+            />
           }
 
         </div>

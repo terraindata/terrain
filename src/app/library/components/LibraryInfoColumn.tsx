@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-const {List} = Immutable;
+const { List } = Immutable;
 import Classs from './../../common/components/Classs';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
@@ -151,7 +151,7 @@ class LibraryInfoColumn extends Classs<Props>
 
   public renderAlgorithm(isSuperUser, isBuilder)
   {
-    if (! this.props.algorithm || this.props.variant)
+    if (!this.props.algorithm || this.props.variant)
     {
       return null;
     }
@@ -160,7 +160,7 @@ class LibraryInfoColumn extends Classs<Props>
       <div>
         <div className="library-info-line">
           <div>
-          Default Database
+            Default Database
           </div>
           <Dropdown
             selectedIndex={this.state.dbs && this.state.dbs.findIndex(
@@ -178,7 +178,7 @@ class LibraryInfoColumn extends Classs<Props>
 
   public renderUser(user: User): JSX.Element
   {
-    const {roles} = this.state;
+    const { roles } = this.state;
     const groupRoles = roles && roles.get(this.props.group.id);
     if (!user || user.isDisabled)
     {
@@ -203,13 +203,13 @@ class LibraryInfoColumn extends Classs<Props>
     }
 
     return groupRoles.toArray().map((role: Role) =>
+    {
+      if (role.userId === me.id)
       {
-        if (role.userId === me.id)
-        {
-          return null; // current user is always rendered at top
-        }
-        return this.renderUser(users.get(role.userId));
-      });
+        return null; // current user is always rendered at top
+      }
+      return this.renderUser(users.get(role.userId));
+    });
   }
 
   public renderRemainingUsers()
@@ -222,13 +222,13 @@ class LibraryInfoColumn extends Classs<Props>
     }
 
     return users.toArray().map((user: User) =>
+    {
+      if (user.id === me.id || (groupRoles && groupRoles.get(user.id)))
       {
-        if (user.id === me.id || (groupRoles && groupRoles.get(user.id)))
-        {
-          return null; // current user and existing roles are rendered at top
-        }
-        return this.renderUser(user);
-      });
+        return null; // current user and existing roles are rendered at top
+      }
+      return this.renderUser(user);
+    });
   }
 
   public handleGroupDbChange(dbIndex: number)
@@ -267,9 +267,9 @@ class LibraryInfoColumn extends Classs<Props>
           />
         </div>
         <div className="library-info-users">
-          { this.renderUser(this.state.me) }
-          { this.renderGroupRoles() }
-          { this.renderRemainingUsers() }
+          {this.renderUser(this.state.me)}
+          {this.renderGroupRoles()}
+          {this.renderRemainingUsers()}
         </div>
       </div>
     );
@@ -320,7 +320,8 @@ class LibraryInfoColumn extends Classs<Props>
                 className="library-info-image"
               >
                 <style
-                  dangerouslySetInnerHTML={{ __html: '.library-info-image #Color { \
+                  dangerouslySetInnerHTML={{
+                    __html: '.library-info-image #Color { \
                     fill: ' + ColorManager.colorForKey(groupId) + ' !important; \
                   }'}}
                 />
@@ -348,7 +349,7 @@ class LibraryInfoColumn extends Classs<Props>
                 this.renderGroup(isSuperUser, isBuilder)
               }
             </div>
-          :
+            :
             <div className="library-info">
               <InfoArea
                 large="Select a Group"

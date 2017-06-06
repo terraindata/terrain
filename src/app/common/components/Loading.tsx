@@ -53,7 +53,8 @@ import Util from '../../util/Util';
 
 const Sprites = require('./../../../images/spritesheet_terrainLoading.png');
 
-export interface Props {
+export interface Props
+{
   loading: boolean;
   loaded: boolean;
   onLoadedEnd: () => void;
@@ -165,7 +166,7 @@ class Loading extends PureClasss<Props>
 
   render()
   {
-    const {width} = this.props;
+    const { width } = this.props;
 
     return (
       <div
@@ -188,7 +189,7 @@ class Loading extends PureClasss<Props>
         />
       </div>
     );
-   }
+  }
 }
 const fps = 35;
 
@@ -247,7 +248,7 @@ class ImgLooper
   // only called by the interval
   private nextFrame()
   {
-    const {loop, startFrame, endFrame, followThrough, onStageEnd} = this.stages[this.stage];
+    const { loop, startFrame, endFrame, followThrough, onStageEnd } = this.stages[this.stage];
 
     if (this.frame === endFrame)
     {

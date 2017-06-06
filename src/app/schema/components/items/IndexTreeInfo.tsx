@@ -50,7 +50,7 @@ const Radium = require('radium');
 
 export interface Props
 {
-	item: SchemaTypes.Index;
+  item: SchemaTypes.Index;
 }
 
 class State
@@ -60,35 +60,35 @@ class State
 @Radium
 export class IndexTreeInfo extends PureClasss<Props>
 {
-	state: State = new State();
+  state: State = new State();
 
   render()
   {
-  	const index = this.props.item;
+    const index = this.props.item;
 
     return (
       <div
-      	style={Styles.infoPieces}
+        style={Styles.infoPieces}
       >
-      	<div
-      		style={Styles.infoPiece}
-      	>
-      		<span
-      			style={Styles.infoPieceNumber as any}
-      		>
-      			{ index.indexType }
-      		</span>
-      	</div>
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {index.indexType}
+          </span>
+        </div>
 
-      	<div
-      		style={Styles.infoPiece}
-      	>
-      		<span
-      			style={Styles.infoPieceNumber as any}
-      		>
-      			{ index.columnIds.size }
-      		</span>
-      		 columns
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {index.columnIds.size}
+          </span>
+          columns
       	</div>
       </div>
     );
@@ -96,11 +96,11 @@ export class IndexTreeInfo extends PureClasss<Props>
 }
 
 export const indexChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-[
-  {
-    label: 'Columns',
-    type: 'column',
-  },
-];
+  [
+    {
+      label: 'Columns',
+      type: 'column',
+    },
+  ];
 
 export default IndexTreeInfo;

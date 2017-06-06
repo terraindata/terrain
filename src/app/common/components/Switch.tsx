@@ -64,7 +64,8 @@ class Switch extends Classs<Props>
     this.props.onChange((this.props.selected + 1) % 2);
   }
 
-  render() {
+  render()
+  {
     const classes = classNames({
       'switch': true,
       'switch-on-first': this.props.selected === 1,
@@ -77,10 +78,10 @@ class Switch extends Classs<Props>
       <div className={classes} onClick={this.handleSwitch}>
         <div className="switch-on" />
         <div className="switch-first">
-          { this.props.first }
+          {this.props.first}
         </div>
         <div className="switch-second">
-          { this.props.second }
+          {this.props.second}
         </div>
       </div>
     );

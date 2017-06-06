@@ -55,9 +55,10 @@ export class BuilderScrollStateClass
   columnScroll: number = 0;
   totalHeight: number = 0;
 }
-export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> {}
+export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> { }
 const BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
-const _BuilderScrollState = (config?: any) => {
+const _BuilderScrollState = (config?: any) =>
+{
   return new BuilderScrollState_Record(config || {}) as any as BuilderScrollState;
 };
 
@@ -78,26 +79,26 @@ interface BuilderScrollAction
 export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
   ReduxActions.handleActions({
     scroll:
-      (state: BuilderScrollState, action: BuilderScrollAction) =>
+    (state: BuilderScrollState, action: BuilderScrollAction) =>
+    {
+      const { columnTop, columnHeight, columnScroll, totalHeight } = action.payload;
+
+      if (
+        columnTop !== state.columnTop || columnHeight !== state.columnHeight
+        || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
+      )
       {
-        const {columnTop, columnHeight, columnScroll, totalHeight} = action.payload;
+        return state
+          .set('columnTop', columnTop)
+          .set('columnHeight', columnHeight)
+          .set('columnScroll', columnScroll)
+          .set('totalHeight', totalHeight);
+      }
 
-        if (
-          columnTop !== state.columnTop || columnHeight !== state.columnHeight
-          || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
-        )
-        {
-          return state
-            .set('columnTop', columnTop)
-            .set('columnHeight', columnHeight)
-            .set('columnScroll', columnScroll)
-            .set('totalHeight', totalHeight);
-        }
-
-        return state;
-      },
+      return state;
+    },
   }, DefaultState),
-DefaultState);
+  DefaultState);
 
 export function scrollAction(columnTop: number, columnHeight: number, columnScroll: number, totalHeight: number)
 {

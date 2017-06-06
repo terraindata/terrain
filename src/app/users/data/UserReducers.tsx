@@ -70,7 +70,7 @@ UserReducers[ActionTypes.fetch] =
           UserTypes._User(userObj)
         );
       });
-      action.payload.setUsers(users);      
+      action.payload.setUsers(users);
     });
     return state.set('loading', true);
   };
@@ -92,7 +92,7 @@ UserReducers[ActionTypes.updateCurrentUser] =
 
 UserReducers[ActionTypes.completeTutorial] =
   (
-    state: UserTypes.UserState, 
+    state: UserTypes.UserState,
     action: Action<{
       stepId: string,
       complete: boolean,
@@ -100,13 +100,13 @@ UserReducers[ActionTypes.completeTutorial] =
   ) =>
   {
     state = state.setIn(
-      ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId], 
+      ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId],
       action.payload.complete
     );
-    
+
     const user = state.users.get(state.currentUser.id);
-    Ajax.saveUser(user, () => {}, () => {});
-    
+    Ajax.saveUser(user, () => { }, () => { });
+
     state = state.set('currentUser', user); // update the version of the current user reference
     return state;
   };

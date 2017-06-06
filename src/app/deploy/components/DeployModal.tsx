@@ -57,7 +57,8 @@ import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 
-export interface Props {
+export interface Props
+{
 }
 
 class DeployModal extends PureClasss<Props>
@@ -79,12 +80,13 @@ class DeployModal extends PureClasss<Props>
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        const {changingStatus, changingStatusOf, changingStatusTo} = state;
+        const { changingStatus, changingStatusOf, changingStatusTo } = state;
         if (
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
           changingStatusTo !== this.state.changingStatusTo
-        ) {
+        )
+        {
           this.setState({
             changingStatus,
             changingStatusOf,
@@ -144,7 +146,7 @@ class DeployModal extends PureClasss<Props>
       return null;
     }
 
-    const {changingStatus, changingStatusOf, changingStatusTo} = this.state;
+    const { changingStatus, changingStatusOf, changingStatusTo } = this.state;
     const name = (changingStatusOf && changingStatusOf.name);
 
     let title = 'Deploy "' + name + '" to Live';
@@ -173,23 +175,23 @@ class DeployModal extends PureClasss<Props>
       >
         {
           changingStatusOf &&
-            <div
-              className={classNames({
-                'deploy-modal': true,
-              })}
-            >
-              {
-                this.renderTQLColumn(defaultVariant)
-              }
-              <DeployModalColumn
-                variant={changingStatusOf}
-                status={changingStatusTo}
-                onDeploy={this.handleDeploy}
-                defaultChecked={this.state.defaultChecked}
-                defaultVariant={defaultVariant}
-                onDefaultCheckedChange={this.handleDefaultCheckedChange}
-              />
-            </div>
+          <div
+            className={classNames({
+              'deploy-modal': true,
+            })}
+          >
+            {
+              this.renderTQLColumn(defaultVariant)
+            }
+            <DeployModalColumn
+              variant={changingStatusOf}
+              status={changingStatusTo}
+              onDeploy={this.handleDeploy}
+              defaultChecked={this.state.defaultChecked}
+              defaultVariant={defaultVariant}
+              onDefaultCheckedChange={this.handleDefaultCheckedChange}
+            />
+          </div>
         }
       </Modal>
     );

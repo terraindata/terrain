@@ -47,13 +47,13 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-const {List} = Immutable;
+const { List } = Immutable;
 import * as _ from 'underscore';
 import Query from '../../../../shared/items/types/Query';
-import {ResultsState} from '../../builder/components/results/ResultsManager';
+import { ResultsState } from '../../builder/components/results/ResultsManager';
 import { MenuOption } from '../../common/components/Menu';
 import LibraryTypes from '../../library/LibraryTypes';
-import {cardList} from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
+import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';
@@ -62,7 +62,8 @@ import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';
 
-export interface Props {
+export interface Props
+{
   variant?: LibraryTypes.Variant;
   query?: Query;
   canEdit?: boolean;
@@ -266,7 +267,8 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     const keywords = Object.keys(cardList);
     let cardName = '';
-    keywords.map(function(word) {
+    keywords.map(function(word)
+    {
       const words = word.split(' ');
       //For terms like select from, only need to match one of the words
       if (words.length > 1)
@@ -295,7 +297,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     const top = event.clientY - event.offsetY + 17;
     this.setState({
       syntaxHelpOpen: !this.state.syntaxHelpOpen,
-      syntaxHelpPos: {left, top},
+      syntaxHelpPos: { left, top },
       cardName,
       termDefinitionOpen: false,
     });
@@ -310,7 +312,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     {
       this.setState({
         termDefinitionOpen: true,
-        termDefinitionPos: {left, top},
+        termDefinitionPos: { left, top },
         cardName,
         syntaxHelpOpen: false,
       });
@@ -334,8 +336,8 @@ class BuilderTQLColumn extends PureClasss<Props>
   render()
   {
     const manualEntry = null;
-     // cardList[this.state.cardName] &&
-     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
+    // cardList[this.state.cardName] &&
+    //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
 
     return (
       <div
@@ -369,25 +371,25 @@ class BuilderTQLColumn extends PureClasss<Props>
           />
           {
             this.state.syntaxHelpOpen &&
-              <TQLPopup
-                 cardName={this.state.cardName}
-                 text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
-                 style={this.state.syntaxHelpPos}
-                 addColumn={this.props.addColumn}
-                 columnIndex={this.props.columnIndex}
-                 onClick={this.turnSyntaxPopupOff}
-              />
+            <TQLPopup
+              cardName={this.state.cardName}
+              text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
+              style={this.state.syntaxHelpPos}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+              onClick={this.turnSyntaxPopupOff}
+            />
           }
           {
             this.state.termDefinitionOpen &&
-              <TQLPopup
-                cardName={this.state.cardName}
-                text={manualEntry ? manualEntry.summary : 'No definition available'}
-                 style={this.state.termDefinitionPos}
-                 addColumn={this.props.addColumn}
-                 columnIndex={this.props.columnIndex}
-                 onClick={this.turnSyntaxPopupOff}
-              />
+            <TQLPopup
+              cardName={this.state.cardName}
+              text={manualEntry ? manualEntry.summary : 'No definition available'}
+              style={this.state.termDefinitionPos}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+              onClick={this.turnSyntaxPopupOff}
+            />
           }
 
           <TQLResultsBar

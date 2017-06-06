@@ -54,7 +54,7 @@ const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon')
 
 export interface Props
 {
-	message: string;
+  message: string;
   open: boolean;
   title?: string;
   error?: boolean;
@@ -87,91 +87,91 @@ class Modal extends PureClasss<Props>
       <div>
         <ReactModal
           contentLabel={''}
-        	isOpen={this.props.open}
-        	overlayClassName="modal-overlay"
-        	className={classNames({
+          isOpen={this.props.open}
+          overlayClassName="modal-overlay"
+          className={classNames({
             'modal-content': true,
             'modal-content-fill': this.props.fill,
           })}
         >
-          <div className ="modal-dialog">
-          	<div className={classNames({
+          <div className="modal-dialog">
+            <div className={classNames({
               'modal-title': true,
               'modal-title-error': this.props.error,
             })}>
+              {
+                this.props.error ?
+                  <div className="modal-info-icon">
+                    <InfoIcon />
+                  </div>
+                  :
+                  null
+              }
+              <div
+                className="modal-title-inner"
+              >
                 {
-                  this.props.error ?
-                    <div className="modal-info-icon">
-                      <InfoIcon />
-                    </div>
-                    :
-                    null
+                  this.props.title ? this.props.title : defaultTitle
                 }
-                <div
-                  className="modal-title-inner"
-                >
-                  {
-                    this.props.title ? this.props.title : defaultTitle
-                  }
-                </div>
-                {
-                  !this.props.confirm &&
-                    <CloseIcon
-                      className="modal-close-x"
-                      onClick={this.props.onClose}
-                    />
-                }
+              </div>
+              {
+                !this.props.confirm &&
+                <CloseIcon
+                  className="modal-close-x"
+                  onClick={this.props.onClose}
+                />
+              }
             </div>
             {
               this.props.message &&
-                React.cloneElement(
-                  msgTag,
-                  {
-                    className: classNames({
-                      'modal-message': true,
-                      'modal-message-error': this.props.error,
-                    }),
-                    children: this.props.message,
-                  },
-                )
+              React.cloneElement(
+                msgTag,
+                {
+                  className: classNames({
+                    'modal-message': true,
+                    'modal-message-error': this.props.error,
+                  }),
+                  children: this.props.message,
+                },
+              )
             }
             {
               this.props.children
             }
             {
               this.props.confirm &&
-             		<div className ="modal-buttons">
-                  {
-                    this.props.thirdButtonText &&
-                      <div
-                        className="button modal-third-button"
-                        onClick={this.props.onThirdButton}
-                      >
-                        {
-                          this.props.thirdButtonText
-                        }
-                      </div>
-                  }
-              		{
-             				this.props.confirm ?
-             					<div
-                         className="button modal-confirm-button"
-                         onClick={this.closeModalSuccess}
-                      >
-             						{
-                           this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
-                        }
-             					</div>
-             					:
-             					<div />
-             			}
+              <div className="modal-buttons">
+                {
+                  this.props.thirdButtonText &&
                   <div
-                    className="button modal-close-button"
-                    onClick={this.props.onClose}
+                    className="button modal-third-button"
+                    onClick={this.props.onThirdButton}
                   >
-                    Cancel
+                    {
+                      this.props.thirdButtonText
+                    }
                   </div>
-              	</div>
+                }
+                {
+                  this.props.confirm ?
+                    <div
+                      className="button modal-confirm-button"
+                      onClick={this.closeModalSuccess}
+                    >
+                      {
+                        this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
+                      }
+                    </div>
+                    :
+                    <div />
+                }
+                <div
+                  className="button modal-close-button"
+                  onClick={this.props.onClose}
+                >
+                  Cancel
+                  </div>
+              </div>
             }
           </div>
         </ReactModal>

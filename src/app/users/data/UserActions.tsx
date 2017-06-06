@@ -50,30 +50,30 @@ import Store from './UserStore';
 
 import Ajax from './../../util/Ajax';
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const Actions =
-{
-  change:
+  {
+    change:
     (user: UserTypes.User) =>
       $(ActionTypes.change, { user }),
 
-  fetch:
+    fetch:
     () =>
       $(ActionTypes.fetch, { setUsers: Actions.setUsers }),
 
-  setUsers:
+    setUsers:
     (users: UserTypes.UserMap) =>
       $(ActionTypes.setUsers, { users }),
 
-  updateCurrentUser:
+    updateCurrentUser:
     () =>
       $(ActionTypes.updateCurrentUser, {}),
-  
-  copmleteTutorial:
+
+    copmleteTutorial:
     (stepId: string, complete: boolean = true) =>
       $(ActionTypes.completeTutorial, { stepId, complete }),
-};
+  };
 
 import AuthStore from './../../auth/data/AuthStore';
 AuthStore.subscribe(Actions.updateCurrentUser);

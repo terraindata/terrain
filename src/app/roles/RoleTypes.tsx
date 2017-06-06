@@ -47,12 +47,12 @@ import * as Immutable from 'immutable';
 export module RoleTypes
 {
   const _Role = Immutable.Record(
-  {
-    groupId: '',
-    userId: '',
-    admin: false,
-    builder: false,
-  });
+    {
+      groupId: '',
+      userId: '',
+      admin: false,
+      builder: false,
+    });
   export class Role extends _Role
   {
     groupId: ID;

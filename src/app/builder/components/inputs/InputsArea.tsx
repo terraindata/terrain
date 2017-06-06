@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import {Input} from '../../../../../shared/blocks/types/Input';
+import { Input } from '../../../../../shared/blocks/types/Input';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -71,7 +71,7 @@ class InputsArea extends PureClasss<Props>
   renderNoInputs()
   {
     const large = ''; // "No inputs have been added, yet."
-    const button =  this.props.canEdit ? 'Add an Input' : null;
+    const button = this.props.canEdit ? 'Add an Input' : null;
     const onClick = this.createInput;
 
     return (
@@ -106,10 +106,10 @@ class InputsArea extends PureClasss<Props>
         <div className="standard-margin">
           {
             this.props.canEdit &&
-              <CreateLine
-                open={false}
-                onClick={this.createInput}
-              />
+            <CreateLine
+              open={false}
+              onClick={this.createInput}
+            />
           }
         </div>
       </div>

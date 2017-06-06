@@ -75,7 +75,7 @@ class Team extends Classs<Props>
     addingUser: boolean,
     showDisabledUsers: boolean,
     errorModalOpen: boolean,
-      errorModalMessage: string,
+    errorModalMessage: string,
   } = {
     users: null,
     loading: true,
@@ -142,42 +142,42 @@ class Team extends Classs<Props>
           <div className="team-item-info">
             {
               !!user.phone &&
-                <div className="team-item-info-row">
-                  <div className="team-item-info-label">
-                    Phone Number
+              <div className="team-item-info-row">
+                <div className="team-item-info-label">
+                  Phone Number
                   </div>
-                  <div className="team-item-info-value">
-                    {
-                      user.phone
-                    }
-                  </div>
+                <div className="team-item-info-value">
+                  {
+                    user.phone
+                  }
                 </div>
+              </div>
             }
             {
               !!user.email &&
-                <div className="team-item-info-row">
-                  <div className="team-item-info-label">
-                    Email
+              <div className="team-item-info-row">
+                <div className="team-item-info-label">
+                  Email
                   </div>
-                  <div className="team-item-info-value">
-                    {
-                      user.email
-                    }
-                  </div>
+                <div className="team-item-info-value">
+                  {
+                    user.email
+                  }
                 </div>
+              </div>
             }
             {
               !!user.skype &&
-                <div className="team-item-info-row">
-                  <div className="team-item-info-label">
-                    Skype
+              <div className="team-item-info-row">
+                <div className="team-item-info-label">
+                  Skype
                   </div>
-                  <div className="team-item-info-value">
-                    {
-                      user.skype
-                    }
-                  </div>
+                <div className="team-item-info-value">
+                  {
+                    user.skype
+                  }
                 </div>
+              </div>
             }
           </div>
         </div>
@@ -209,7 +209,7 @@ class Team extends Classs<Props>
 
     return (
       <div className="team-show-disabled" onClick={this.toggleShowDisabledUsers}>
-        { this.state.showDisabledUsers ? 'Hide Disabled Users' : 'Show Disabled Users' }
+        {this.state.showDisabledUsers ? 'Hide Disabled Users' : 'Show Disabled Users'}
       </div>
     );
   }
@@ -265,14 +265,16 @@ class Team extends Classs<Props>
       addingUser: false,
     });
 
-    Ajax.createUser(email, password, () => {
+    Ajax.createUser(email, password, () =>
+    {
       Actions.fetch();
-    }, (error) => {
-      this.setState({
-        errorModalMessage: 'Error creating user: ' + JSON.stringify(error),
+    }, (error) =>
+      {
+        this.setState({
+          errorModalMessage: 'Error creating user: ' + JSON.stringify(error),
+        });
+        this.toggleErrorModal();
       });
-      this.toggleErrorModal();
-    });
   }
 
   renderAddUser()
@@ -330,7 +332,7 @@ class Team extends Classs<Props>
 
   toggleErrorModal()
   {
-    this.setState ({
+    this.setState({
       errorModalOpen: !this.state.errorModalOpen,
     });
   }
@@ -341,25 +343,25 @@ class Team extends Classs<Props>
 
     return (
       <div>
-      <div className="team">
-        <div className="team-page-title">
-          Team Directory
+        <div className="team">
+          <div className="team-page-title">
+            Team Directory
         </div>
-        {
-          loading &&
+          {
+            loading &&
             <InfoArea large="Loading..." />
-        }
-        { users && users.toArray().map(this.renderUser) }
-        { this.renderAddUser() }
-        { this.renderShowDisabledUsers() }
-      </div>
-      <Modal
+          }
+          {users && users.toArray().map(this.renderUser)}
+          {this.renderAddUser()}
+          {this.renderShowDisabledUsers()}
+        </div>
+        <Modal
           message={this.state.errorModalMessage}
           onClose={this.toggleErrorModal}
           open={this.state.errorModalOpen}
           error={true}
         />
-        </div>
+      </div>
     );
   }
 }

@@ -46,10 +46,7 @@ require('./TQLResultsBar.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
-import {ResultsState} from '../../builder/components/results/ResultsManager';
-import Actions from '../../builder/data/BuilderActions';
-import {Ajax, QueryResponse} from '../../util/Ajax';
-import Util from '../../util/Util';
+import { ResultsState } from '../../builder/components/results/ResultsManager';
 import PureClasss from './../../common/components/PureClasss';
 export interface Props
 {
@@ -65,7 +62,7 @@ class TQLResultsBar extends PureClasss<Props>
 
   renderResults()
   {
-    const {resultsState} = this.props;
+    const { resultsState } = this.props;
 
     if (!resultsState.hasLoadedResults)
     {
@@ -95,7 +92,7 @@ class TQLResultsBar extends PureClasss<Props>
       );
     }
 
-    const {results} = resultsState;
+    const { results } = resultsState;
 
     if (!results)
     {
@@ -137,7 +134,7 @@ class TQLResultsBar extends PureClasss<Props>
     );
   }
 
-	render()
+  render()
   {
     return (
       <div
@@ -154,7 +151,7 @@ class TQLResultsBar extends PureClasss<Props>
         </div>
       </div>
     );
-	}
+  }
 }
 
 export default TQLResultsBar;

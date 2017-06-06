@@ -47,11 +47,11 @@ const Immutable = require('immutable');
 import Util from './../../util/Util';
 
 const RolesActionTypes =
-{
-  change: '',
-  fetch: '',
-  setRoles: '',
-};
+  {
+    change: '',
+    fetch: '',
+    setRoles: '',
+  };
 
 Util.setValuesToKeys(RolesActionTypes, '');
 

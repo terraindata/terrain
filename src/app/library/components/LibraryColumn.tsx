@@ -65,9 +65,9 @@ class LibraryColumn extends Classs<Props>
         {
           this.props.title ?
             <div className="library-column-title">
-              { this.props.title }
+              {this.props.title}
             </div>
-          : null
+            : null
         }
         <div className={classNames({
           'library-column-content': true,

@@ -52,7 +52,7 @@ const classNames = require('classnames');
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';
-import {cardWillWrap, onCardDrop} from './CardDropArea';
+import { cardWillWrap, onCardDrop } from './CardDropArea';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
@@ -86,14 +86,14 @@ class CardDragPreview extends PureClasss<CDPProps>
     justDropped: false,
     language: Store.getState().query.language,
   };
-  
+
   componentDidMount()
   {
     this._subscribe(Store,
-    {
-      stateKey: 'language',
-      storeKeyPath: ['query', 'language'],
-    })
+      {
+        stateKey: 'language',
+        storeKeyPath: ['query', 'language'],
+      })
   }
 
   timeout: any;
@@ -119,7 +119,7 @@ class CardDragPreview extends PureClasss<CDPProps>
   {
     const item = this.props.cardItem;
     let colors: string[], title: string, preview: string;
-    
+
     const Blocks = AllBackendsMap[this.state.language].blocks;
 
     if (!item)
@@ -129,7 +129,7 @@ class CardDragPreview extends PureClasss<CDPProps>
 
     if (item)
     {
-      const {type} = item;
+      const { type } = item;
       if (Blocks[type])
       {
         colors = Blocks[type].static.colors;
@@ -148,7 +148,7 @@ class CardDragPreview extends PureClasss<CDPProps>
       title = 'None';
     }
 
-    let {visible, cardItem} = this.props;
+    let { visible, cardItem } = this.props;
 
     if (visible && cardItem.props
       && cardItem.props.keyPath === this.props.keyPath)
@@ -160,7 +160,7 @@ class CardDragPreview extends PureClasss<CDPProps>
     }
 
     const willWrap = this.props.cardItem
-            && cardWillWrap(this.props, this.props.cardItem.type);
+      && cardWillWrap(this.props, this.props.cardItem.type);
 
     return this.props.connectDropTarget(
       <div
@@ -216,25 +216,25 @@ class CardDragPreview extends PureClasss<CDPProps>
 }
 
 const cardPreviewTarget =
-{
-  canDrop(targetProps: CDPProps, monitor)
   {
-    return true;
-  },
+    canDrop(targetProps: CDPProps, monitor)
+    {
+      return true;
+    },
 
-  drop: (targetProps: CDPProps, monitor, component) =>
-  {
-    onCardDrop(targetProps, monitor, component);
-  },
-};
+    drop: (targetProps: CDPProps, monitor, component) =>
+    {
+      onCardDrop(targetProps, monitor, component);
+    },
+  };
 
 const cardPreviewCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-  // isOver: monitor.isOver({ shallow: true }),
-  // canDrop: monitor.isOver({ shallow: true }) && monitor.canDrop(),
-  // item: monitor.getItem(),
-});
+  ({
+    connectDropTarget: connect.dropTarget(),
+    // isOver: monitor.isOver({ shallow: true }),
+    // canDrop: monitor.isOver({ shallow: true }) && monitor.canDrop(),
+    // item: monitor.getItem(),
+  });
 
 const CDP = DropTarget('CARD', cardPreviewTarget, cardPreviewCollect)(CardDragPreview) as any;
 

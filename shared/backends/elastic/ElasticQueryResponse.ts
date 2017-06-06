@@ -42,17 +42,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as React from 'react';
-import PureClasss from '../../common/components/PureClasss';
-import InfoArea from './InfoArea';
+// Copyright 2017 Terrain Data, Inc.
 
-class Placeholder extends PureClasss<any>
+export interface ElasticQueryHitSource
 {
-  render()
-  {
-    return (
-      <InfoArea large="In progress." />
-    );
-  }
+  [key: string]: any;
 }
-export default Placeholder;
+
+export interface ElasticQueryHit
+{
+  _index: string;
+  _type: string;
+  _id: string;
+  _score: number;
+  _source: ElasticQueryHitSource;
+  _sort?: boolean;
+}
+
+export interface ElasticQueryShards
+{
+  total: number;
+  successful: number;
+  failed: number;
+}
+
+export interface ElasticQueryHits {
+  total: number;
+  max_score: number;
+  hits: ElasticQueryHit[];
+}
+
+export interface ElasticQueryResult
+{
+  took: number;
+  timed_out: boolean;
+  hits: ElasticQueryHits;
+  _shards: ElasticQueryShards;
+
+}
+
+export default ElasticQueryResult;

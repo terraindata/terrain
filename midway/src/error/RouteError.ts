@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as winston from 'winston';
 
-import MidwayError from './MidwayError';
+import MidwayError from '../../../shared/error/MidwayError';
 
 class RouteError extends MidwayError
 {

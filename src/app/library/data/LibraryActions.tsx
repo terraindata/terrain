@@ -48,7 +48,7 @@ import LibraryTypes from './../LibraryTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
-import {_LibraryState, LibraryState, LibraryStore} from './LibraryStore';
+import { _LibraryState, LibraryState, LibraryStore } from './LibraryStore';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
@@ -57,13 +57,13 @@ import { ItemStatus } from '../../../../shared/items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const Actions =
-{
-  groups:
   {
-    create:
+    groups:
+    {
+      create:
       (
         group: LibraryTypes.Group = LibraryTypes._Group(),
         idCallBack?: (id: ID) => void
@@ -83,22 +83,22 @@ const Actions =
         );
       },
 
-    change:
+      change:
       (group: Group) =>
         $(ActionTypes.groups.change, { group }),
 
-    move:
+      move:
       (group, index: number) =>
         $(ActionTypes.groups.move, { group, index }),
 
-    // duplicate:
-    //   (group: Group, index: number) =>
-    //     $(ActionTypes.groups.duplicate, { group, index }),
-  },
+      // duplicate:
+      //   (group: Group, index: number) =>
+      //     $(ActionTypes.groups.duplicate, { group, index }),
+    },
 
-  algorithms:
-  {
-    create:
+    algorithms:
+    {
+      create:
       (
         groupId: ID,
         algorithm = LibraryTypes._Algorithm(),
@@ -108,7 +108,7 @@ const Actions =
         algorithm = algorithm
           .set('parent', groupId)
           .set('groupId', groupId);
-          
+
         Ajax.saveItem(
           algorithm,
           (response) =>
@@ -123,19 +123,19 @@ const Actions =
         );
       },
 
-    change:
+      change:
       (algorithm: Algorithm) =>
         $(ActionTypes.algorithms.change, { algorithm }),
 
-    move:
+      move:
       (algorithm: Algorithm, index: number, groupId: ID) =>
         $(ActionTypes.algorithms.move, { groupId, index, algorithm }),
 
-    duplicate:
+      duplicate:
       (algorithm: Algorithm, index: number, groupId?: ID) =>
       {
-        let {variantsOrder} = algorithm;
-        
+        let { variantsOrder } = algorithm;
+
         groupId = groupId || algorithm.groupId;
         algorithm = algorithm
           .set('parent', groupId)
@@ -143,7 +143,7 @@ const Actions =
           .set('id', -1)
           .set('name', Util.duplicateNameFor(algorithm.name))
           .set('variantsOrder', Immutable.List([]));
-          
+
         Actions.algorithms.create(
           algorithm.groupId,
           algorithm,
@@ -160,18 +160,18 @@ const Actions =
           }
         );
       }
-  },
+    },
 
-  variants:
-  {
-    create:
+    variants:
+    {
+      create:
       (groupId: ID, algorithmId: ID, variant = LibraryTypes._Variant()) =>
       {
         variant = variant
           .set('parent', algorithmId)
           .set('algorithmId', algorithmId)
           .set('groupId', groupId);
-          
+
         Ajax.saveItem(
           variant,
           (response) =>
@@ -185,20 +185,20 @@ const Actions =
         );
       },
 
-    change:
+      change:
       (variant: Variant) =>
         $(ActionTypes.variants.change, { variant }),
 
-    move:
+      move:
       (variant: Variant, index: number, groupId: ID, algorithmId: ID) =>
         $(ActionTypes.variants.move, { variant, index, groupId, algorithmId }),
 
-    duplicate:
+      duplicate:
       (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) =>
       {
         groupId = groupId || variant.groupId;
         algorithmId = algorithmId || variant.algorithmId;
-        
+
         let newVariant = variant
           .set('id', -1)
           .set('parent', algorithmId)
@@ -207,15 +207,15 @@ const Actions =
           .set('name', Util.duplicateNameFor(variant.name))
           .set('status', ItemStatus.Build);
         newVariant = LibraryTypes.touchVariant(newVariant);
-        
+
         Actions.variants.create(groupId, algorithmId, newVariant);
       },
 
-    status:
+      status:
       (variant: Variant, status: ItemStatus, confirmed?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed }),
 
-    fetchVersion:
+      fetchVersion:
       (variantId: string, onNoVersion: (variantId: string) => void) =>
       {
         // TODO
@@ -232,22 +232,22 @@ const Actions =
         // });
       },
 
-    loadVersion:
+      loadVersion:
       (variantId: string, variantVersion: LibraryTypes.Variant) =>
         $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
 
-  },
+    },
 
-  loadState:
+    loadState:
     (state: LibraryState) =>
       $(ActionTypes.loadState, { state }),
 
-  setDbs:
+    setDbs:
     (dbs: List<BackendInstance>, dbLoadFinished: boolean) =>
       $(ActionTypes.setDbs, { dbs, dbLoadFinished }),
 
-  // overwrites current state with state from server
-  fetch:
+    // overwrites current state with state from server
+    fetch:
     () =>
     {
       Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
@@ -261,6 +261,6 @@ const Actions =
         }));
       });
     },
-};
+  };
 
 export default Actions;

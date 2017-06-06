@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./ResultsConfigStyle.less');
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -55,8 +55,8 @@ import Util from '../../../util/Util';
 import Result from '../results/Result';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import {MAX_RESULTS, Results} from './ResultsManager';
-import {ResultsConfig, _ResultsConfig, Format, _Format} from '../../../../../shared/results/types/ResultsConfig';
+import { MAX_RESULTS, Results } from './ResultsManager';
+import { ResultsConfig, _ResultsConfig, Format, _Format } from '../../../../../shared/results/types/ResultsConfig';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
@@ -75,10 +75,10 @@ export interface Props
 export class ResultsConfigComponent extends PureClasss<Props>
 {
   state: {
-    lastHover: {index: number, field: string},
+    lastHover: { index: number, field: string },
     config: ResultsConfig;
   } = {
-    lastHover: {index: null, field: null},
+    lastHover: { index: null, field: null },
     config: null,
   };
 
@@ -103,12 +103,12 @@ export class ResultsConfigComponent extends PureClasss<Props>
     if (this.state.lastHover.field === field && index === undefined && type === 'field')
     {
       this.setState({
-        lastHover: {index: null, field: null},
+        lastHover: { index: null, field: null },
       });
       return;
     }
 
-    let {config} = this.state;
+    let { config } = this.state;
 
     // remove if already set
     if (config.name === field)
@@ -148,7 +148,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     if (index === undefined)
     {
       this.setState({
-        lastHover: {index: null, field: null},
+        lastHover: { index: null, field: null },
       });
     }
   }
@@ -167,7 +167,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
 
   fieldType(field)
   {
-    const {config} = this.state;
+    const { config } = this.state;
     if (!config) return null;
     if (config.name === field)
     {
@@ -189,7 +189,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     if (this.state.lastHover.index !== index || this.state.lastHover.field !== field)
     {
       this.setState({
-        lastHover: {index, field},
+        lastHover: { index, field },
       });
       this.handleDrop('field', field, index);
     }
@@ -220,17 +220,17 @@ export class ResultsConfigComponent extends PureClasss<Props>
     );
   }
 
-	render()
+  render()
   {
-    const {config} = this.state;
-    const {enabled, formats} = config;
+    const { config } = this.state;
+    const { enabled, formats } = config;
 
     return (
       <div className="results-config-wrapper">
         <div className={classNames({
-            'results-config': true,
-            'results-config-disabled': !enabled,
-          })}>
+          'results-config': true,
+          'results-config-disabled': !enabled,
+        })}>
           <div className="results-config-bar">
             <div className="results-config-title">
               Configure Results View
@@ -272,7 +272,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
-                  :
+                    :
                     <div className="results-config-placeholder">
                       Drag name field <em>(optional)</em>
                     </div>
@@ -297,7 +297,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
-                  :
+                    :
                     <div className="results-config-placeholder">
                       Drag score field <em>(optional)</em>
                     </div>
@@ -313,21 +313,21 @@ export class ResultsConfigComponent extends PureClasss<Props>
                 </div>
                 {
                   config && config.fields.map((field, index) =>
-                      <div className="results-config-field-wrapper" key={field}>
-                        <ResultsConfigResult
-                          field={field}
-                          is="field"
-                          index={index}
-                          onHover={this.handleFieldHover}
-                          draggingField={this.state.lastHover.field}
-                          onRemove={this.handleRemove}
-                          format={formats.get(field)}
-                          onFormatChange={this.handleFormatChange}
-                          primaryKeys={config.primaryKeys}
-                          onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                        />
-                      </div>,
-                    )
+                    <div className="results-config-field-wrapper" key={field}>
+                      <ResultsConfigResult
+                        field={field}
+                        is="field"
+                        index={index}
+                        onHover={this.handleFieldHover}
+                        draggingField={this.state.lastHover.field}
+                        onRemove={this.handleRemove}
+                        format={formats.get(field)}
+                        onFormatChange={this.handleFormatChange}
+                        primaryKeys={config.primaryKeys}
+                        onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                      />
+                    </div>,
+                  )
                 }
                 <div className="results-config-placeholder">
                   Drag more fields here
@@ -365,7 +365,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
         </div>
       </div>
     );
-	}
+  }
 }
 
 interface ResultsConfigResultProps
@@ -446,7 +446,7 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
 
   handlePrimaryKeyChange()
   {
-    let {primaryKeys} = this.props;
+    let { primaryKeys } = this.props;
     if (primaryKeys.contains(this.props.field))
     {
       primaryKeys = primaryKeys.remove(primaryKeys.indexOf(this.props.field));
@@ -460,14 +460,14 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
 
   render()
   {
-    const {format} = this.props;
+    const { format } = this.props;
     const image = format && format.type === 'image';
 
     return this.props.connectDropTarget(this.props.connectDragSource(
       <div className={classNames({
         'results-config-field': true,
         'results-config-field-dragging': this.props.isDragging ||
-          (this.props.draggingField && this.props.draggingField === this.props.field),
+        (this.props.draggingField && this.props.draggingField === this.props.field),
         'results-config-field-name': this.props.is === 'name',
         'results-config-field-score': this.props.is === 'score',
         'results-config-field-field': this.props.is === 'field',
@@ -488,7 +488,7 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
                 className="close"
                 onClick={this.handleRemove}
               />
-            : null
+              : null
           }
           <GearIcon
             className="results-config-field-gear"
@@ -514,11 +514,11 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
               htmlFor={'primaryKey-' + this.props.field}
               className="rcf-primary-key-label"
             >
-              { this.props.field} is a primary key
+              {this.props.field} is a primary key
             </label>
           </div>
           <div className="results-config-format-header">
-            Display the value of { this.props.field } as:
+            Display the value of {this.props.field} as:
           </div>
           <div className="results-config-format-btns">
             <div className="results-config-text-btn" onClick={this.changeToText}>
@@ -576,58 +576,58 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
 }
 // Defines a draggable result functionality
 const resultSource =
-{
-  beginDrag(props)
   {
-    return props;
-  },
-
-  endDrag(props, monitor, component)
-  {
-    if (!monitor.didDrop())
+    beginDrag(props)
     {
-      return;
-    }
+      return props;
+    },
 
-    const item = monitor.getItem();
-    const dropResult = monitor.getDropResult();
-  },
-};
+    endDrag(props, monitor, component)
+    {
+      if (!monitor.didDrop())
+      {
+        return;
+      }
+
+      const item = monitor.getItem();
+      const dropResult = monitor.getDropResult();
+    },
+  };
 
 // Defines props to inject into the component
 const dragCollect = (connect, monitor) =>
-({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
-  connectDragPreview: connect.dragPreview(),
-});
+  ({
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview(),
+  });
 
 const resultTarget =
-{
-  canDrop(props, monitor)
   {
-    return false;
-  },
-
-  hover(props, monitor, component)
-  {
-    if (!props.isAvailableField && props.onHover)
+    canDrop(props, monitor)
     {
-      props.onHover(props.index, monitor.getItem().field);
-    }
-  },
+      return false;
+    },
 
-  drop(props, monitor, component)
-  {
-  },
-};
+    hover(props, monitor, component)
+    {
+      if (!props.isAvailableField && props.onHover)
+      {
+        props.onHover(props.index, monitor.getItem().field);
+      }
+    },
+
+    drop(props, monitor, component)
+    {
+    },
+  };
 
 const resultDropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  canDrop: monitor.canDrop(),
-});
+  ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    canDrop: monitor.canDrop(),
+  });
 
 const ResultsConfigResult = DropTarget('RESULTCONFIG', resultTarget, resultDropCollect)(DragSource('RESULTCONFIG', resultSource, dragCollect)(ResultsConfigResultC));
 
@@ -646,37 +646,37 @@ class CRTargetC extends PureClasss<CRTargetProps>
   {
     return this.props.connectDropTarget(
       <div className={this.props.className + (this.props.isOver ? ' results-config-over' : '')}>
-        { this.props.children }
+        {this.props.children}
       </div>,
     );
   }
 }
 
 const crTarget =
-{
-  canDrop(props, monitor)
   {
-    return true;
-  },
+    canDrop(props, monitor)
+    {
+      return true;
+    },
 
-  hover(props, monitor, component)
-  {
-    const canDrop = monitor.canDrop();
-  },
+    hover(props, monitor, component)
+    {
+      const canDrop = monitor.canDrop();
+    },
 
-  drop(props, monitor, component)
-  {
-    const item = monitor.getItem();
-    props.onDrop(props.type, item.field);
-  },
-};
+    drop(props, monitor, component)
+    {
+      const item = monitor.getItem();
+      props.onDrop(props.type, item.field);
+    },
+  };
 
 const crDropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  canDrop: monitor.canDrop(),
-});
+  ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    canDrop: monitor.canDrop(),
+  });
 
 const CRTarget = DropTarget('RESULTCONFIG', crTarget, crDropCollect)(CRTargetC);
 

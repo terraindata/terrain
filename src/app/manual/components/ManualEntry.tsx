@@ -62,7 +62,7 @@ import './../../tql/components/monokai.less';
 
 const reactStringReplace = require('react-string-replace');
 
-import {cardList} from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
+import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {
@@ -148,24 +148,24 @@ class ManualEntry extends Classs<Props>
   {
     return (
       <div className="manual-entry-expanded-area">
-        <div className ="manual-entry-row">
-          <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.notation)}
-        </div>
-        <div className ="manual-entry-row">
-          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.syntax)}
-        </div>
-        <div className ="maunual-entry-indepth">
-           {this.renderInDepthDescription()}
+        <div className="manual-entry-row">
+          <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.notation)}
+        </div>
+        <div className="manual-entry-row">
+          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.syntax)}
+        </div>
+        <div className="maunual-entry-indepth">
+          {this.renderInDepthDescription()}
         </div>
       </div>
-        );
+    );
   }
 
   renderPhraseTypeEntryDetail()
   {
     return (
       <div className="manual-entry-expanded-area">
-        <div className ="maunual-entry-indepth">
+        <div className="maunual-entry-indepth">
           {this.renderPhraseTypeInDepth()}
         </div>
       </div>
@@ -177,14 +177,15 @@ class ManualEntry extends Classs<Props>
     return (
       <div>
         {
-        this.state.manualEntry.text.map((result, index) => {
-          return (
-            <div key ={index} className="manual-entry-row">
-              {this.highlightKeyWords(result)}
-              <br/>
-            </div>
-          );
-        })
+          this.state.manualEntry.text.map((result, index) =>
+          {
+            return (
+              <div key={index} className="manual-entry-row">
+                {this.highlightKeyWords(result)}
+                <br />
+              </div>
+            );
+          })
         }
       </div>
     );
@@ -192,34 +193,34 @@ class ManualEntry extends Classs<Props>
 
   renderEntry()
   {
-    return(
+    return (
       <div>
-      <div className ="manual-entry-row">
-        <div
-          onClick={this.expand}
-          className="manual-entry-expand"
-        >
-          <ArrowIcon className = {classNames ({
-            'manual-entry-arrow-icon': true,
-            'manual-entry-arrow-icon-open': this.state.expanded,
-            'manual-entry-arrow-icon-green': this.props.phraseType,
+        <div className="manual-entry-row">
+          <div
+            onClick={this.expand}
+            className="manual-entry-expand"
+          >
+            <ArrowIcon className={classNames({
+              'manual-entry-arrow-icon': true,
+              'manual-entry-arrow-icon-open': this.state.expanded,
+              'manual-entry-arrow-icon-green': this.props.phraseType,
             })}
-          />
-        </div>
-        <div className =
-          {classNames ({
-            'manual-entry-name': true,
-            'manual-entry-name-green': this.props.phraseType,
+            />
+          </div>
+          <div className=
+            {classNames({
+              'manual-entry-name': true,
+              'manual-entry-name-green': this.props.phraseType,
             })}
-          onClick={this.expand} >
-          {this.props.entryName}
+            onClick={this.expand} >
+            {this.props.entryName}
+          </div>
         </div>
-      </div>
 
-      <div className ="manual-entry-summary">
-        {this.highlightKeyWords(this.state.manualEntry.summary)}
+        <div className="manual-entry-summary">
+          {this.highlightKeyWords(this.state.manualEntry.summary)}
+        </div>
       </div>
-    </div>
     );
   }
 
@@ -295,49 +296,51 @@ class ManualEntry extends Classs<Props>
   renderInDepthDescription()
   {
     return (
-        <div>
+      <div>
         {
-          Object.keys(this.state.manualEntry.text).map((result, index) => {
+          Object.keys(this.state.manualEntry.text).map((result, index) =>
+          {
             if (typeof this.state.manualEntry.text[index] === 'string')
             {
               return (
-                <div key ={index}>
-                {
-                  this.highlightKeyWords(this.state.manualEntry.text[index])
-                }
-                <br/>
+                <div key={index}>
+                  {
+                    this.highlightKeyWords(this.state.manualEntry.text[index])
+                  }
+                  <br />
                 </div>
-                );
+              );
             }
-            else {
+            else
+            {
               return (
-                 <div
-                   key ={index}
-                    className={classNames({
-                      'manual-entry-demo-box': true,
-                      'manual-entry-in-depth': !this.props.manualTab,
-                    })}
-                 >
-                   {this.state.manualEntry.text[index].title ? <b className ="manual-entry-demo-title"> {this.state.manualEntry.text[index].title} </b> : null}
-                   {this.renderCardExample(index)}
-                   {this.renderCodeMirrorExample(index)}
+                <div
+                  key={index}
+                  className={classNames({
+                    'manual-entry-demo-box': true,
+                    'manual-entry-in-depth': !this.props.manualTab,
+                  })}
+                >
+                  {this.state.manualEntry.text[index].title ? <b className="manual-entry-demo-title"> {this.state.manualEntry.text[index].title} </b> : null}
+                  {this.renderCardExample(index)}
+                  {this.renderCodeMirrorExample(index)}
 
-                 </div>
+                </div>
               );
             }
           })
         }
-        </div>
+      </div>
     );
   }
 
   renderTqlCardEntry()
   {
     return (
-        <div>
-          {this.renderEntry()}
-          {this.state.expanded ? this.renderTqlCardEntryDetail() : null }
-        </div>
+      <div>
+        {this.renderEntry()}
+        {this.state.expanded ? this.renderTqlCardEntryDetail() : null}
+      </div>
     );
   }
 
@@ -346,7 +349,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div>
         {this.renderEntry()}
-         {this.state.expanded ? this.renderPhraseTypeEntryDetail() : null }
+        {this.state.expanded ? this.renderPhraseTypeEntryDetail() : null}
       </div>
     );
   }
@@ -354,9 +357,9 @@ class ManualEntry extends Classs<Props>
   render()
   {
     return (
-      <div className ="manual-entry">
+      <div className="manual-entry">
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
-        {this.props.bottomLine ? <hr className ="manual-entry-line"/> : null}
+        {this.props.bottomLine ? <hr className="manual-entry-line" /> : null}
       </div>
     );
   }

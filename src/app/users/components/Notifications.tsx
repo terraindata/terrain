@@ -156,19 +156,19 @@ class Notifications extends Classs<Props>
 
   changeUserField(field: string, value: string)
   {
-     let newUser = this.state.istate.currentUser;
-     newUser = newUser.set(field, value);
-     Actions.change(newUser as UserTypes.User);
+    let newUser = this.state.istate.currentUser;
+    newUser = newUser.set(field, value);
+    Actions.change(newUser as UserTypes.User);
 
-     this.setState({
-       saving: true,
-       savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
-     });
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+    });
   }
 
   onDesktopNotificationChange(val)
   {
-    const {value} = val;
+    const { value } = val;
     this.changeUserField('desktopNotificationType', value);
   }
 
@@ -191,13 +191,14 @@ class Notifications extends Classs<Props>
 
   onDesktopNotificationsSoundChange(val)
   {
-    const {value} = val;
+    const { value } = val;
     this.changeUserField('sound', value);
   }
 
   playSound()
   {
-    if (this.state.istate.currentUser) {
+    if (this.state.istate.currentUser)
+    {
       const soundName = this.state.istate.currentUser.sound;
       if (soundName !== 'none')
       {
@@ -211,33 +212,33 @@ class Notifications extends Classs<Props>
 
   renderDesktopNotificationsContent()
   {
-   let desktopNotification: any, sound: any;
-   
-   if (this.state.istate.currentUser)
-   {
+    let desktopNotification: any, sound: any;
+
+    if (this.state.istate.currentUser)
+    {
       desktopNotification = this.state.istate.currentUser.desktopNotificationType;
       sound = this.state.istate.currentUser.sound;
-   }
+    }
 
-   return (
-     <div className="notification-expansion">
-       <div className="notification-subtitle">
-         Send me desktop notifications for:
+    return (
+      <div className="notification-expansion">
+        <div className="notification-subtitle">
+          Send me desktop notifications for:
        </div>
-       <Select
-         clearable={false}
-         name="desktop-notification"
-         value={desktopNotification}
-         options={this.notificationTypes}
-         onChange={this.onDesktopNotificationChange}
-         className="notifications-select"
-         searchable={false}
-       />
-       <div className="notification-subtitle">
-         Desktop notifications use this sound:
+        <Select
+          clearable={false}
+          name="desktop-notification"
+          value={desktopNotification}
+          options={this.notificationTypes}
+          onChange={this.onDesktopNotificationChange}
+          className="notifications-select"
+          searchable={false}
+        />
+        <div className="notification-subtitle">
+          Desktop notifications use this sound:
        </div>
-       <div className="notification-row">
-         <Select
+        <div className="notification-row">
+          <Select
             name="desktop-notification-sound"
             value={sound}
             clearable={false}
@@ -245,21 +246,21 @@ class Notifications extends Classs<Props>
             onChange={this.onDesktopNotificationsSoundChange}
             className="notifications-select"
             searchable={false}
-         />
-         <div
-           className={sound === 'none' ? 'disabled' : 'preview-button'}
-           onClick={sound === 'none' ? null : this.playSound}
-         >
-          <div className="notification-sound-icon">
-            <SoundIcon/>
+          />
+          <div
+            className={sound === 'none' ? 'disabled' : 'preview-button'}
+            onClick={sound === 'none' ? null : this.playSound}
+          >
+            <div className="notification-sound-icon">
+              <SoundIcon />
+            </div>
+            <div className="notification-preview-button-text">
+              Preview
           </div>
-          <div className="notification-preview-button-text">
-            Preview
           </div>
         </div>
       </div>
-     </div>
-   );
+    );
   }
 
   changeEmailNotifications_15Min()
@@ -279,7 +280,7 @@ class Notifications extends Classs<Props>
 
   onEmailNotificationTypeChange(val)
   {
-    const {value} = val;
+    const { value } = val;
     this.changeUserField('emailNotificationType', value);
   }
 
@@ -292,11 +293,11 @@ class Notifications extends Classs<Props>
       emailNotification = this.state.istate.currentUser.emailNotificationType;
       emailTiming = this.state.istate.currentUser.emailNotificationTiming;
     }
-   
+
     return (
       <div className="notification-expansion">
         <div>Send me email notifications:</div>
-        <br/>
+        <br />
         <div className="expanded-section-indent">
           <RadioButtons
             selected={emailTiming}
@@ -304,17 +305,17 @@ class Notifications extends Classs<Props>
           />
         </div>
         <div className="notification-subtitle-small">
-         Send me email notifications for:
+          Send me email notifications for:
        </div>
-       <Select
-         clearable={false}
-         name="email-notification"
-         value={emailNotification}
-         options={this.notificationTypes}
-         onChange={this.onEmailNotificationTypeChange}
-         className="notifications-select"
-         searchable={false}
-       />
+        <Select
+          clearable={false}
+          name="email-notification"
+          value={emailNotification}
+          options={this.notificationTypes}
+          onChange={this.onEmailNotificationTypeChange}
+          className="notifications-select"
+          searchable={false}
+        />
         {this.renderEmail()}
       </div>
     );
@@ -330,44 +331,44 @@ class Notifications extends Classs<Props>
   renderEmailNewsContent()
   {
     let emailNewsOn: boolean;
-    
+
     if (this.state.istate.currentUser)
     {
       emailNewsOn = this.state.istate.currentUser.emailNews === 'on';
     }
-    
+
     return (
       <div className="notification-expansion">
         <div>You can choose which of these updates you'd like to receive:</div>
-        <br/>
+        <br />
         <span className="expanded-section-indent">
           <CheckBox
             checked={emailNewsOn}
             onChange={this.toggleEmailNews}
           />
-          Send me emails with Terrain news and tips <br/><br/>
+          Send me emails with Terrain news and tips <br /><br />
         </span>
         <div>If you opt out of the above, note that we we'll still send you important
-        adminstrative emails, such as password resets. <br/>
+        adminstrative emails, such as password resets. <br />
         </div>
         {
           this.renderEmail()
         }
       </div>
-      );
+    );
   }
 
   renderEmail()
   {
     if (this.state.istate.currentUser && this.state.istate.currentUser.email)
     {
-      return(
+      return (
         <div>
-        Your email is currently set to
+          Your email is currently set to
         <span className="notification-email-blue">
-        {this.state.istate.currentUser.email}
-        </span>
-        .
+            {this.state.istate.currentUser.email}
+          </span>
+          .
         </div>
       );
     }
@@ -377,13 +378,13 @@ class Notifications extends Classs<Props>
   renderDesktopDescription()
   {
     let desktopNotification: any;
-    
+
     if (this.state.istate.currentUser)
     {
       desktopNotification = this.state.istate.currentUser.desktopNotificationType;
     }
-    
-    return(
+
+    return (
       <div>
         Terrain can send push notifications to your desktop when someone
         updates an algorithm. You are currently recieving updates for
@@ -396,13 +397,13 @@ class Notifications extends Classs<Props>
   renderEmailDescription()
   {
     let emailTiming: string;
-    
+
     if (this.state.istate.currentUser)
     {
       emailTiming = this.state.istate.currentUser.emailNotificationTiming;
     }
-    
-    return(
+
+    return (
       <div>
         When you're busy or not online, Terrain can send you
         emails so you don't miss a beat. You are currently receiving emails
@@ -414,13 +415,13 @@ class Notifications extends Classs<Props>
   renderEmailNewsDescription()
   {
     let emailNewsOn: boolean;
-    
+
     if (this.state.istate.currentUser)
     {
       emailNewsOn = (this.state.istate.currentUser.emailNews) === 'on';
     }
-    
-    return(
+
+    return (
       <div>
         From time to time we'd like to send you emails with interesting
         news from the Terrain team. You are set up to
@@ -452,10 +453,10 @@ class Notifications extends Classs<Props>
           lastEntry={true}
         />
         <Modal
-            message={this.state.errorModalMessage}
-            onClose={this._toggle('errorModalOpen')}
-            open={this.state.errorModalOpen}
-            error={true}
+          message={this.state.errorModalMessage}
+          onClose={this._toggle('errorModalOpen')}
+          open={this.state.errorModalOpen}
+          error={true}
         />
       </div>
     );

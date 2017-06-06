@@ -60,7 +60,7 @@ import PureClasss from './../../../common/components/PureClasss';
 import ManualPopup from './../../../manual/components/ManualPopup';
 import { Display } from './../../../../../shared/blocks/displays/Display';
 import { Card } from '../../../../../shared/blocks/types/Card';
-import {BuilderScrollState, BuilderScrollStore} from './../../data/BuilderScrollStore';
+import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
@@ -73,7 +73,7 @@ import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 const CARD_OVERSCAN = 200;
-const CARD_HEIGHT_MAP: {[id: string]: number} = {};
+const CARD_HEIGHT_MAP: { [id: string]: number } = {};
 
 export interface Props
 {
@@ -129,22 +129,22 @@ class _CardComponent extends PureClasss<Props>
       closing: false,
       opening: false,
       menuOptions:
-        Immutable.List([
-          // {
-          //   text: 'Copy',
-          //   onClick: this.handleCopy,
-          // },
-          {
-            text: 'Duplicate',
-            onClick: this.handleDuplicate,
-          },
-          {
-            text: 'Delete',
-            onClick: this.handleDelete,
-          },
-        ]),
+      Immutable.List([
+        // {
+        //   text: 'Copy',
+        //   onClick: this.handleCopy,
+        // },
+        {
+          text: 'Duplicate',
+          onClick: this.handleDuplicate,
+        },
+        {
+          text: 'Delete',
+          onClick: this.handleDelete,
+        },
+      ]),
 
-     scrollState: BuilderScrollStore.getState(),
+      scrollState: BuilderScrollStore.getState(),
     };
 
   }
@@ -229,24 +229,24 @@ class _CardComponent extends PureClasss<Props>
 
     this.dragPreview = createDragPreview(
       this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')',
-    {
-      backgroundColor: this.props.card.static.colors[0],
-      borderColor: this.props.card.static.colors[0],
-      color: '#fff',
-      fontSize: 15,
-      fontWeight: 'bold',
-      paddingTop: 7,
-      paddingRight: 12,
-      paddingBottom: 9,
-      paddingLeft: 12,
-      borderRadius: 10,
-    });
+      {
+        backgroundColor: this.props.card.static.colors[0],
+        borderColor: this.props.card.static.colors[0],
+        color: '#fff',
+        fontSize: 15,
+        fontWeight: 'bold',
+        paddingTop: 7,
+        paddingRight: 12,
+        paddingBottom: 9,
+        paddingLeft: 12,
+        borderRadius: 10,
+      });
 
     this.props.connectDragPreview(this.dragPreview);
   }
 
-	toggleClose(event)
-	{
+  toggleClose(event)
+  {
     if (this.state.closing || this.state.opening)
     {
       return; // I just don't want to deal
@@ -296,7 +296,7 @@ class _CardComponent extends PureClasss<Props>
 
     event && event.preventDefault();
     event && event.stopPropagation();
-	}
+  }
 
   handleTitleClick(event)
   {
@@ -317,7 +317,7 @@ class _CardComponent extends PureClasss<Props>
     Util.animateToHeight(this.refs.cardInner, 0);
     setTimeout(() =>
       Actions.remove(this.props.keyPath, this.props.index)
-    , 250);
+      , 250);
   }
 
   handleCopy()
@@ -332,7 +332,8 @@ class _CardComponent extends PureClasss<Props>
       return;
     }
 
-    const removeId = (block) => {
+    const removeId = (block) =>
+    {
       if (Immutable.Iterable.isIterable(block))
       {
         if (block.get('id'))
@@ -372,8 +373,8 @@ class _CardComponent extends PureClasss<Props>
   getKeyPath()
   {
     return this.props.singleCard
-        ? this.props.keyPath
-        : this._ikeyPath(this.props.keyPath, this.props.index);
+      ? this.props.keyPath
+      : this._ikeyPath(this.props.keyPath, this.props.index);
   }
 
   handleCardToolClose()
@@ -396,19 +397,20 @@ class _CardComponent extends PureClasss<Props>
   cardEl: HTMLElement;
   renderTimeout: any;
 
-	render()
+  render()
   {
-    const {id} = this.props.card;
+    const { id } = this.props.card;
     this.cardEl = document.getElementById(this.props.card.id); // memoize?
     if (this.cardEl)
     {
-      const {columnTop, columnHeight, columnScroll} = this.state.scrollState;
+      const { columnTop, columnHeight, columnScroll } = this.state.scrollState;
       const visibleStart = columnScroll - CARD_OVERSCAN;
       const visibleEnd = columnScroll + columnHeight + CARD_OVERSCAN;
 
       let cardStart = 0;
       let el = this.cardEl;
-      do {
+      do
+      {
         cardStart += el.offsetTop;
         el = el.offsetParent as any;
       } while (el && el.id !== 'cards-column');
@@ -438,8 +440,9 @@ class _CardComponent extends PureClasss<Props>
     }
     else
     {
-      this.renderTimeout = setTimeout(() => {
-        this.setState({random: Math.random()});
+      this.renderTimeout = setTimeout(() =>
+      {
+        this.setState({ random: Math.random() });
       }, 15);
 
       return (
@@ -483,8 +486,8 @@ class _CardComponent extends PureClasss<Props>
       language={this.props.card.static.language}
     />;
 
-    const {card} = this.props;
-		const {title} = card.static;
+    const { card } = this.props;
+    const { title } = card.static;
     const { isDragging, connectDragSource } = this.props;
 
     // TODO
@@ -500,7 +503,7 @@ class _CardComponent extends PureClasss<Props>
         className={classNames({
           'card': true,
           'card-dragging': isDragging,
-          'card-closed' : this.props.card.closed,
+          'card-closed': this.props.card.closed,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
@@ -541,13 +544,13 @@ class _CardComponent extends PureClasss<Props>
                   background: card.static.colors[0],
                 }}
                 onClick={this.handleTitleClick}
-                >
+              >
                 {
                   this.state.hovering &&
-                    <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
+                  <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
                 }
                 <div className="card-title-inner">
-                  { title }
+                  {title}
                 </div>
 
                 {
@@ -556,13 +559,13 @@ class _CardComponent extends PureClasss<Props>
                       'card-preview': true,
                       'card-preview-hidden': this.state.opening,
                     })}>
-                      { BlockUtils.getPreview(card) }
+                      {BlockUtils.getPreview(card)}
                     </div>
                 }
                 {
                   this.props.canEdit &&
                   this.state.hovering &&
-                    <Menu options={this.state.menuOptions} />
+                  <Menu options={this.state.menuOptions} />
                 }
               </div>,
             )
@@ -570,13 +573,13 @@ class _CardComponent extends PureClasss<Props>
 
           {
             (!this.props.card.closed || this.state.opening) &&
-              <div className="card-body-wrapper" ref="cardBody">
-                <div className="card-body">
-                  {
-                    content
-                  }
-                </div>
+            <div className="card-body-wrapper" ref="cardBody">
+              <div className="card-body">
+                {
+                  content
+                }
               </div>
+            </div>
           }
         </div>
         <CDA
@@ -591,7 +594,7 @@ class _CardComponent extends PureClasss<Props>
         />
       </div>
     );
-	}
+  }
 }
 
 // Drag and Drop (the bass)
@@ -605,40 +608,40 @@ export interface CardItem
 }
 
 const cardSource =
-{
-  canDrag: (props) => props.canEdit,
-
-  beginDrag: (props: Props): CardItem =>
   {
-    // TODO
-    setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
-    const item: CardItem = {
-      props,
-      childIds: BlockUtils.getChildIds(props.card)
-        .remove(props.card.id),
-      type: props.card.type,
-    };
+    canDrag: (props) => props.canEdit,
 
-    Actions.dragCard(item);
+    beginDrag: (props: Props): CardItem =>
+    {
+      // TODO
+      setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
+      const item: CardItem = {
+        props,
+        childIds: BlockUtils.getChildIds(props.card)
+          .remove(props.card.id),
+        type: props.card.type,
+      };
 
-    return item;
-  },
-  // select card?
+      Actions.dragCard(item);
 
-  endDrag: () =>
-  {
-    $('body').removeClass('body-card-is-dragging');
+      return item;
+    },
+    // select card?
 
-    Actions.dragCard(false);
-  },
-};
+    endDrag: () =>
+    {
+      $('body').removeClass('body-card-is-dragging');
+
+      Actions.dragCard(false);
+    },
+  };
 
 const dragCollect = (connect, monitor) =>
-({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
-  connectDragPreview: connect.dragPreview(),
-});
+  ({
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview(),
+  });
 
 export const CardComponent = DragSource('CARD', cardSource, dragCollect)(_CardComponent);
 
