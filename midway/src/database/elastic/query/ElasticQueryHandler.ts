@@ -59,8 +59,6 @@ import QueryHandler from '../../../app/query/QueryHandler';
 import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
-
-
 /**
  * Implements the QueryHandler interface for ElasticSearch
  */

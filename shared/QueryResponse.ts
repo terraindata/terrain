@@ -53,7 +53,7 @@ export interface QueryResult {
 
 export default class QueryResponse
 {
-  public request: QueryRequest;
+  public request?: QueryRequest;
   public result: QueryResult;
   public errors: MidwayErrorItem[];
 
