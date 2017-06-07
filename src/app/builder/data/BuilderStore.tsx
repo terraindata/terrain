@@ -60,37 +60,37 @@ import Query from '../../../../shared/items/types/Query';
 
 export class BuilderStateClass
 {
-  variantId: ID = '';
-  query: Query = null;
+  public variantId: ID = '';
+  public query: Query = null;
 
   // for undo/redo
-  pastQueries: List<Query> = Immutable.List([]);
-  nextQueries: List<Query> = Immutable.List([]);
-  lastActionType: string = '';
-  lastActionKeyPath: KeyPath = null;
-  lastActionTime: number = 0;
+  public pastQueries: List<Query> = Immutable.List([]);
+  public nextQueries: List<Query> = Immutable.List([]);
+  public lastActionType: string = '';
+  public lastActionKeyPath: KeyPath = null;
+  public lastActionTime: number = 0;
 
-  loading: boolean = false;
-  loadingXhr: XMLHttpRequest = null;
-  loadingVariantId: ID = '';
+  public loading: boolean = false;
+  public loadingXhr: XMLHttpRequest = null;
+  public loadingVariantId: ID = '';
 
-  hoveringCardId: ID = '';
+  public hoveringCardId: ID = '';
 
-  selectedCardIds = Map<ID, boolean>({});
+  public selectedCardIds = Map<ID, boolean>({});
 
-  db: BackendInstance = {} as any;
+  public db: BackendInstance = {} as any;
 
   // TODO move
-  manual = Map<ID, Cards>({});
+  public manual = Map<ID, Cards>({});
   // Card examples used in the manual are stored here.
 
-  draggingCardItem: CardItem = false;
-  draggingOverKeyPath: KeyPath = Immutable.List([]);
-  draggingOverIndex: number = -1;
+  public draggingCardItem: CardItem = false;
+  public draggingOverKeyPath: KeyPath = Immutable.List([]);
+  public draggingOverIndex: number = -1;
 
-  isDirty: boolean = false;
+  public isDirty: boolean = false;
 
-  resultsState: ResultsState = _ResultsState();
+  public resultsState: ResultsState = _ResultsState();
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());

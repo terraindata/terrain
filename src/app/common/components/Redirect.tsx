@@ -55,12 +55,12 @@ export interface Props
 
 class Placeholder extends PureClasss<Props>
 {
-  componentWillMount()
+  public componentWillMount()
   {
     browserHistory.replace('/library');
   }
 
-  render()
+  public render()
   {
     return (
       <InfoArea large='Redirecting...' />

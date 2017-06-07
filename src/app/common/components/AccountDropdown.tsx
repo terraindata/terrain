@@ -70,14 +70,14 @@ export interface Props
 
 class AccountDropdown extends PureClasss<Props>
 {
-  state: {
+  public state: {
     open?: boolean,
     user?: UserTypes.User,
     commitLogOpen?: boolean,
   } = {
   };
 
-  unsubscribe = null;
+  public unsubscribe = null;
 
   constructor(props: Props)
   {
@@ -91,12 +91,12 @@ class AccountDropdown extends PureClasss<Props>
     );
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $('body').unbind('click', this.close);
   }
 
-  close(event)
+  public close(event)
   {
     this.setState({
       open: false,
@@ -105,7 +105,7 @@ class AccountDropdown extends PureClasss<Props>
     event.stopPropagation();
   }
 
-  open(event)
+  public open(event)
   {
     this.setState({
       open: true,
@@ -114,27 +114,27 @@ class AccountDropdown extends PureClasss<Props>
     event.stopPropagation();
   }
 
-  editProfile()
+  public editProfile()
   {
     this.go('/account/profile/edit');
   }
 
-  goTeamGoTeamGo()
+  public goTeamGoTeamGo()
   {
     this.go('/account/team');
   }
 
-  go(url: string)
+  public go(url: string)
   {
     browserHistory.push(url);
   }
 
-  handleLogout()
+  public handleLogout()
   {
     this.go('/logout');
   }
 
-  renderDropdown()
+  public renderDropdown()
   {
     if (!this.state.open)
     {
@@ -180,7 +180,7 @@ class AccountDropdown extends PureClasss<Props>
     );
   }
 
-  renderTopBar()
+  public renderTopBar()
   {
     return (
       <div className='account-dropdown-top-bar' onClick={this.open} ref='accountDropdownButton'>
@@ -194,7 +194,7 @@ class AccountDropdown extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     const classes = Util.objToClassname({
       'account-dropdown-wrapper': true,

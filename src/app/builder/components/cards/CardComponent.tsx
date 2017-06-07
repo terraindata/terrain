@@ -100,7 +100,7 @@ export interface Props
 
 class _CardComponent extends PureClasss<Props>
 {
-  state: {
+  public state: {
     selected: boolean;
     hovering: boolean;
     closing: boolean;
@@ -110,7 +110,7 @@ class _CardComponent extends PureClasss<Props>
     scrollState: BuilderScrollState;
   };
 
-  refs: {
+  public refs: {
     [k: string]: Ref;
     card: Ref;
     cardInner: Ref;
@@ -118,7 +118,7 @@ class _CardComponent extends PureClasss<Props>
   };
 
   // _debugUpdates = true;
-  _debugName = 'Card';
+  public _debugName = 'Card';
 
   constructor(props: Props)
   {
@@ -150,7 +150,7 @@ class _CardComponent extends PureClasss<Props>
 
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     // TODO
     // this._subscribe(Store, {
@@ -183,7 +183,7 @@ class _CardComponent extends PureClasss<Props>
     });
   }
 
-  getCardTerms(card: Card): List<string>
+  public getCardTerms(card: Card): List<string>
   {
     let terms: List<string> = Immutable.List([]);
 
@@ -200,7 +200,7 @@ class _CardComponent extends PureClasss<Props>
     return terms;
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.card.closed !== this.props.card.closed)
     {
@@ -220,8 +220,8 @@ class _CardComponent extends PureClasss<Props>
     }
   }
 
-  dragPreview: any;
-  componentDidMount()
+  public dragPreview: any;
+  public componentDidMount()
   {
     if (this.props.card.type === 'creating')
     {
@@ -246,7 +246,7 @@ class _CardComponent extends PureClasss<Props>
     this.props.connectDragPreview(this.dragPreview);
   }
 
-  toggleClose(event)
+  public toggleClose(event)
   {
     if (this.state.closing || this.state.opening)
     {
@@ -299,7 +299,7 @@ class _CardComponent extends PureClasss<Props>
     event && event.stopPropagation();
   }
 
-  handleTitleClick(event)
+  public handleTitleClick(event)
   {
     // TODO decide how selection mechanics work.
     //  consider limiting selection to neighbors.
@@ -313,7 +313,7 @@ class _CardComponent extends PureClasss<Props>
     // Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
   }
 
-  handleDelete()
+  public handleDelete()
   {
     Util.animateToHeight(this.refs.cardInner, 0);
     setTimeout(() =>
@@ -321,11 +321,11 @@ class _CardComponent extends PureClasss<Props>
       , 250);
   }
 
-  handleCopy()
+  public handleCopy()
   {
   }
 
-  handleDuplicate()
+  public handleDuplicate()
   {
     if (this.props.singleCard || this.props.singleChild)
     {
@@ -362,7 +362,7 @@ class _CardComponent extends PureClasss<Props>
 
   }
 
-  handleMouseMove(event)
+  public handleMouseMove(event)
   {
     event.stopPropagation();
     if (!this.state.hovering)
@@ -371,14 +371,14 @@ class _CardComponent extends PureClasss<Props>
     }
   }
 
-  getKeyPath()
+  public getKeyPath()
   {
     return this.props.singleCard
       ? this.props.keyPath
       : this._ikeyPath(this.props.keyPath, this.props.index);
   }
 
-  handleCardToolClose()
+  public handleCardToolClose()
   {
     if (this.props.index === null)
     {
@@ -390,15 +390,15 @@ class _CardComponent extends PureClasss<Props>
     }
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.renderTimeout && clearTimeout(this.renderTimeout);
   }
 
-  cardEl: HTMLElement;
-  renderTimeout: any;
+  public cardEl: HTMLElement;
+  public renderTimeout: any;
 
-  render()
+  public render()
   {
     const { id } = this.props.card;
     this.cardEl = document.getElementById(this.props.card.id); // memoize?

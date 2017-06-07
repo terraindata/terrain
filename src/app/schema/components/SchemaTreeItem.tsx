@@ -68,11 +68,11 @@ export interface Props
 
 class State
 {
-  open: boolean = false;
-  item: SchemaTypes.SchemaBaseClass = null;
-  childCount: number = -1;
-  isSelected = false;
-  isHighlighted = false;
+  public open: boolean = false;
+  public item: SchemaTypes.SchemaBaseClass = null;
+  public childCount: number = -1;
+  public isSelected = false;
+  public isHighlighted = false;
 }
 
 const typeToRendering: {
@@ -114,7 +114,7 @@ const typeToRendering: {
 @Radium
 class SchemaTreeItem extends PureClasss<Props>
 {
-  state: State = new State();
+  public state: State = new State();
 
   constructor(props: Props)
   {
@@ -159,7 +159,7 @@ class SchemaTreeItem extends PureClasss<Props>
     });
   }
 
-  renderItemInfo()
+  public renderItemInfo()
   {
     const { item } = this.state;
 
@@ -181,7 +181,7 @@ class SchemaTreeItem extends PureClasss<Props>
     return <div>No item type information</div>;
   }
 
-  renderItemChildren()
+  public renderItemChildren()
   {
     const { item } = this.state;
 
@@ -222,9 +222,9 @@ class SchemaTreeItem extends PureClasss<Props>
     );
   }
 
-  lastHeaderClickTime: number = 0;
+  public lastHeaderClickTime: number = 0;
 
-  handleHeaderClick()
+  public handleHeaderClick()
   {
     const time = (new Date()).getTime();
     if (time - this.lastHeaderClickTime > 1000)
@@ -260,8 +260,8 @@ class SchemaTreeItem extends PureClasss<Props>
     // }
   }
 
-  lastArrowClickTime: number = 0;
-  handleArrowClick(event)
+  public lastArrowClickTime: number = 0;
+  public handleArrowClick(event)
   {
     this.setState({
       open: !this.state.open,
@@ -271,7 +271,7 @@ class SchemaTreeItem extends PureClasss<Props>
     // used to stop triggering of double click handler
   }
 
-  handleHeaderDoubleClick(event)
+  public handleHeaderDoubleClick(event)
   {
     if ((new Date()).getTime() - this.lastArrowClickTime > 100)
     {
@@ -283,7 +283,7 @@ class SchemaTreeItem extends PureClasss<Props>
     }
   }
 
-  renderName()
+  public renderName()
   {
     const { item } = this.state;
 
@@ -348,7 +348,7 @@ class SchemaTreeItem extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     const { item, isSelected, isHighlighted } = this.state;
 

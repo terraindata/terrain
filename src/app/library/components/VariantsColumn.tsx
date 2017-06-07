@@ -82,7 +82,7 @@ export interface Props
 
 class VariantsColumn extends Classs<Props>
 {
-  state: {
+  public state: {
     rendered: boolean,
     lastMoved: any,
     me: UserTypes.User,
@@ -98,7 +98,7 @@ class VariantsColumn extends Classs<Props>
     draggingOverIndex: -1,
   };
 
-  componentWillMount()
+  public componentWillMount()
   {
     this._subscribe(UserStore, {
       stateKey: 'me',
@@ -114,7 +114,7 @@ class VariantsColumn extends Classs<Props>
     });
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (!this.state.rendered)
     {
@@ -124,7 +124,7 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.algorithmId !== this.props.algorithmId)
     {
@@ -134,7 +134,7 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  handleDuplicate(id: ID)
+  public handleDuplicate(id: ID)
   {
     Actions.variants.duplicate(
       this.props.variants.get(id),
@@ -142,7 +142,7 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleArchive(id: ID)
+  public handleArchive(id: ID)
   {
     Actions.variants.change(
       this.props.variants.get(id)
@@ -150,12 +150,12 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleCreate()
+  public handleCreate()
   {
     Actions.variants.create(this.props.groupId, this.props.algorithmId);
   }
 
-  handleNameChange(id: ID, name: string)
+  public handleNameChange(id: ID, name: string)
   {
     if (this.props.variants.get(id).name !== name)
     {
@@ -180,7 +180,7 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleHover(index: number, type: string, id: ID)
+  public handleHover(index: number, type: string, id: ID)
   {
     const itemIndex = this.props.variantsOrder.findIndex((v) => v === id);
     if (type === 'variant'
@@ -198,7 +198,7 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
+  public handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
     switch (targetType)
     {
@@ -241,12 +241,12 @@ class VariantsColumn extends Classs<Props>
     });
   }
 
-  handleDoubleClick(id: ID)
+  public handleDoubleClick(id: ID)
   {
     browserHistory.push(`/builder/?o=${id}`);
   }
 
-  renderVariant(id: ID, fadeIndex: number)
+  public renderVariant(id: ID, fadeIndex: number)
   {
     const variant = this.props.variants.get(id);
     const index = this.props.variantsOrder.indexOf(id);
@@ -330,7 +330,7 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handlItemStatusHover(statusString: string, id: ID)
+  public handlItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
     const status = ItemStatus[statusString];
@@ -340,12 +340,12 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  hasStatus(id: ID, status: ItemStatus)
+  public hasStatus(id: ID, status: ItemStatus)
   {
     return this.props.variants.getIn([id, 'status']) === status;
   }
 
-  renderVariants(archived?: boolean)
+  public renderVariants(archived?: boolean)
   {
     const { me, roles } = this.state;
     const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
@@ -388,7 +388,7 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <LibraryColumn

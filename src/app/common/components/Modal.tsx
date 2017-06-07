@@ -72,13 +72,13 @@ export interface Props
 
 class Modal extends PureClasss<Props>
 {
-  closeModalSuccess()
+  public closeModalSuccess()
   {
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
   }
 
-  render()
+  public render()
   {
     const defaultTitle = this.props.error ? 'Alert' : 'Please Confirm';
 

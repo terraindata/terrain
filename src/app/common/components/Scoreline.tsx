@@ -60,7 +60,7 @@ export interface Props
 
 class Scoreline extends Classs<Props>
 {
-  renderScore(score: { color: string, score: number, name?: string }, index: number)
+  public renderScore(score: { color: string, score: number, name?: string }, index: number)
   {
     if (score.score === 0 && this.props.hideZeroes)
     {
@@ -87,7 +87,7 @@ class Scoreline extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     let none: any;
     if (this.props.hideZeroes && this.props.scores.every((score) => score.score === 0))

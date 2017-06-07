@@ -61,14 +61,14 @@ export interface Props
 
 class SchemaPage extends PureClasss<Props>
 {
-  state: {
+  public state: {
     on: boolean;
     name?: string;
   } = {
     on: false,
   };
 
-  render()
+  public render()
   {
     return (
       <SchemaView

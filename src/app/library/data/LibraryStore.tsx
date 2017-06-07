@@ -65,25 +65,25 @@ import Ajax from './../../util/Ajax';
 
 class LibraryStateC
 {
-  loaded = false;
-  loading = true;
-  dbs: List<BackendInstance> = Immutable.List([]);
-  dbsLoaded: boolean = false;
+  public loaded = false;
+  public loading = true;
+  public dbs: List<BackendInstance> = Immutable.List([]);
+  public dbsLoaded: boolean = false;
 
-  groups: IMMap<ID, Group> = null;
-  algorithms: IMMap<ID, Algorithm> = null;
-  variants: IMMap<ID, Variant> = null;
+  public groups: IMMap<ID, Group> = null;
+  public algorithms: IMMap<ID, Algorithm> = null;
+  public variants: IMMap<ID, Variant> = null;
 
   // these are set these on initial load
-  prevGroups: IMMap<ID, Group> = null;
-  prevAlgorithms: IMMap<ID, Algorithm> = null;
-  prevVariants: IMMap<ID, Variant> = null;
+  public prevGroups: IMMap<ID, Group> = null;
+  public prevAlgorithms: IMMap<ID, Algorithm> = null;
+  public prevVariants: IMMap<ID, Variant> = null;
 
-  groupsOrder: List<ID> = Immutable.List([]);
+  public groupsOrder: List<ID> = Immutable.List([]);
 
-  changingStatus: boolean = false;
-  changingStatusOf: LibraryTypes.Variant = null;
-  changingStatusTo: ItemStatus = 'BUILD';
+  public changingStatus: boolean = false;
+  public changingStatusOf: LibraryTypes.Variant = null;
+  public changingStatusTo: ItemStatus = 'BUILD';
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }

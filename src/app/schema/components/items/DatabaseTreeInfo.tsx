@@ -61,9 +61,9 @@ class State
 @Radium
 export class DatabaseTreeInfo extends PureClasss<Props>
 {
-  state: State = new State();
+  public state: State = new State();
 
-  render()
+  public render()
   {
     const database = this.props.item;
 

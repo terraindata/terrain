@@ -70,7 +70,7 @@ class PasswordStrengthInput extends Classs<Props>
     };
   }
 
-  handleInput(event)
+  public handleInput(event)
   {
     event.preventDefault();
     const password = event.target.value;
@@ -114,7 +114,7 @@ class PasswordStrengthInput extends Classs<Props>
     });
   }
 
-  render()
+  public render()
   {
     return (
       <div>

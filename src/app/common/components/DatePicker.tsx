@@ -91,7 +91,7 @@ class DatePicker extends PureClasss<Props>
       'handleHourChange']);
   }
 
-  getDate(): Date
+  public getDate(): Date
   {
     let date = new Date(this.props.date);
     if (isNaN(date.getTime()))
@@ -104,7 +104,7 @@ class DatePicker extends PureClasss<Props>
     return date;
   }
 
-  handleDayClick(e, day: Date, modifiers)
+  public handleDayClick(e, day: Date, modifiers)
   {
     const date = this.getDate();
     date.setDate(day.getDate());
@@ -113,7 +113,7 @@ class DatePicker extends PureClasss<Props>
     this.props.onChange(Util.formatInputDate(date));
   }
 
-  handleHourChange(hourIndex)
+  public handleHourChange(hourIndex)
   {
     const date = this.getDate();
     date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
@@ -121,12 +121,12 @@ class DatePicker extends PureClasss<Props>
     this.props.onChange(Util.formatInputDate(date));
   }
 
-  dateToHourIndex(date)
+  public dateToHourIndex(date)
   {
     return date.getHours() * (60 / MINUTE_INTERVAL) + (date.getMinutes() / MINUTE_INTERVAL);
   }
 
-  renderTimePicker()
+  public renderTimePicker()
   {
     const date = this.getDate();
 
@@ -141,7 +141,7 @@ class DatePicker extends PureClasss<Props>
       </div>);
   }
 
-  render()
+  public render()
   {
     const date = this.getDate();
     const modifiers =

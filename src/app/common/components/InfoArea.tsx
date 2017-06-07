@@ -69,7 +69,7 @@ class InfoArea extends PureClasss<Props>
     Util.bind(this, 'renderThing');
   }
 
-  renderThing(thing: string, onClick?: boolean)
+  public renderThing(thing: string, onClick?: boolean)
   {
     if (!this.props[thing])
     {
@@ -83,7 +83,7 @@ class InfoArea extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div className={classNames({

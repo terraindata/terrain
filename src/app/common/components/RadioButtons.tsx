@@ -63,7 +63,7 @@ export interface Props
 class RadioButtons extends Classs<Props>
 {
 
-  renderOption(option)
+  public renderOption(option)
   {
     return (
       <div key={option.value} className='radio-button-option'>
@@ -81,7 +81,7 @@ class RadioButtons extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div>

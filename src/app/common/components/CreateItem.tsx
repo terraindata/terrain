@@ -56,7 +56,7 @@ export interface Props
 
 class CreateItem extends Classs<Props>
 {
-  render()
+  public render()
   {
     return (
       <div className='create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>

@@ -96,7 +96,7 @@ export interface Props
 
 class TQLEditor extends PureClasss<Props>
 {
-  render()
+  public render()
   {
     const options =
       {

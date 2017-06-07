@@ -65,13 +65,13 @@ export interface Props
 
 class TQLPopup extends Classs<Props>
 {
-  openManual()
+  public openManual()
   {
     this.props.onClick && this.props.onClick();
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render()
+  public render()
   {
     return (
       <div

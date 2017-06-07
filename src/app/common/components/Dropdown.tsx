@@ -79,8 +79,8 @@ class Dropdown extends PureClasss<Props>
       };
   }
 
-  _clickHandlers: { [index: number]: () => void } = {};
-  clickHandler(index)
+  public _clickHandlers: { [index: number]: () => void } = {};
+  public clickHandler(index)
   {
     if (!this._clickHandlers[index])
     {
@@ -103,7 +103,7 @@ class Dropdown extends PureClasss<Props>
     return this._clickHandlers[index];
   }
 
-  renderOption(option, index)
+  public renderOption(option, index)
   {
     return (
       <div
@@ -123,7 +123,7 @@ class Dropdown extends PureClasss<Props>
     );
   }
 
-  close()
+  public close()
   {
     this.setState({
       open: false,
@@ -131,7 +131,7 @@ class Dropdown extends PureClasss<Props>
     $(document).off('click', this.close);
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     if (!this.props.canEdit)
     {
@@ -152,7 +152,7 @@ class Dropdown extends PureClasss<Props>
     });
   }
 
-  getOptionName(option, index: number): string
+  public getOptionName(option, index: number): string
   {
     if (this.props.optionsDisplayName)
     {
@@ -161,7 +161,7 @@ class Dropdown extends PureClasss<Props>
     return option;
   }
 
-  render()
+  public render()
   {
     // Element with options, rendered at the top or bottom of the dropdown
 

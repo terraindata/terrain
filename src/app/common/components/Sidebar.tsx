@@ -71,7 +71,7 @@ export interface Props
 
 export class Sidebar extends PureClasss<Props>
 {
-  render()
+  public render()
   {
     return (
       <div

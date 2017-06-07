@@ -72,7 +72,7 @@ const MAX_BARS = 100;
 
 class TransformCardPeriscope extends PureClasss<Props>
 {
-  state: {
+  public state: {
     initialDomain: List<number>,
     chartState: IMMap<string, any>,
     initialVal: number,
@@ -84,7 +84,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     bars: null,
   };
 
-  refs: {
+  public refs: {
     [k: string]: Ref;
     chart: Ref;
   };
@@ -95,7 +95,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     this.state.bars = this.formatBars(props.barsData);
   }
 
-  formatBars(bars: Bars): Bars
+  public formatBars(bars: Bars): Bars
   {
     if (bars.size > MAX_BARS)
     {
@@ -124,7 +124,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     return bars;
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
     const chartState = this.getChartState();
@@ -135,7 +135,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     Periscope.create(el, chartState.toJS());
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.shouldComponentUpdate(nextProps, this.state))
     {
@@ -151,13 +151,13 @@ class TransformCardPeriscope extends PureClasss<Props>
     }
   }
 
-  update(overrideState?)
+  public update(overrideState?)
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.update(el, this.getChartState(overrideState).toJS());
   }
 
-  handleDomainChangeStart(initialVal)
+  public handleDomainChangeStart(initialVal)
   {
     this.setState({
       initialDomain: this.props.domain,
@@ -165,7 +165,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     });
   }
 
-  handleDomainChange(handleIndex, newVal)
+  public handleDomainChange(handleIndex, newVal)
   {
     let domain =
       this.state.initialDomain.set(handleIndex,
@@ -188,12 +188,12 @@ class TransformCardPeriscope extends PureClasss<Props>
     });
   }
 
-  handleDomainTextChange()
+  public handleDomainTextChange()
   {
     Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
   }
 
-  getChartState(overrideState = {}): IMMap<string, any>
+  public getChartState(overrideState = {}): IMMap<string, any>
   {
     const chartState = Map<string, any>({
       barsData: (overrideState['bars'] || this.state.bars).toJS(),
@@ -211,13 +211,13 @@ class TransformCardPeriscope extends PureClasss<Props>
     return chartState;
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.destroy(el);
   }
 
-  render()
+  public render()
   {
     return (
       <div className='transform-periscope-wrapper'>

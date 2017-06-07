@@ -67,7 +67,7 @@ class ManualInfo extends Classs<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     return (
       <div className={'manual-info-wrapper ' + this.props.className} >

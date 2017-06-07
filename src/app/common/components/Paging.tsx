@@ -81,12 +81,12 @@ class Paging extends PureClasss<Props>
     };
   }
 
-  pageFromEvent(event): number
+  public pageFromEvent(event): number
   {
     return parseInt(Util.rel(event.target), 10);
   }
 
-  changePage(page): void
+  public changePage(page): void
   {
     this.setState({
       open: false,
@@ -98,41 +98,41 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handlePageClick(event): void
+  public handlePageClick(event): void
   {
     this.changePage(this.pageFromEvent(event));
   }
 
-  handleAllPages(): void
+  public handleAllPages(): void
   {
     this.setState({
       open: !this.state.open,
     });
   }
 
-  goFirst(): void
+  public goFirst(): void
   {
     this.changePage(1);
   }
 
-  goPrevious(): void
+  public goPrevious(): void
   {
     this.changePage(this.props.page - 1);
   }
 
-  goNext(): void
+  public goNext(): void
   {
     this.changePage(this.props.page + 1);
   }
 
-  goLast(): void
+  public goLast(): void
   {
     this.changePage(this.props.pages);
   }
 
   // mouseovers
 
-  goHover(page): void
+  public goHover(page): void
   {
     if (this.props.onHover && this.props.onHover(page))
     {
@@ -143,17 +143,17 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handlePageMouseOver(event): void
+  public handlePageMouseOver(event): void
   {
     this.goHover(this.pageFromEvent(event));
   }
 
-  handleFirstHover(): void
+  public handleFirstHover(): void
   {
     this.goHover(1);
   }
 
-  handlePreviousHover(): void
+  public handlePreviousHover(): void
   {
     if (this.props.page !== 1)
     {
@@ -161,7 +161,7 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handleNextHover(): void
+  public handleNextHover(): void
   {
     if (this.props.page !== this.props.pages)
     {
@@ -169,12 +169,12 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handleLastHover(): void
+  public handleLastHover(): void
   {
     this.goHover(this.props.pages);
   }
 
-  handleMouseOut(event): void
+  public handleMouseOut(event): void
   {
     // this.clearHoverTimeout();
 
@@ -210,7 +210,7 @@ class Paging extends PureClasss<Props>
   //   this.clearHoverTimeout();
   // }
 
-  render()
+  public render()
   {
     return (
       <div className={Util.objToClassname(

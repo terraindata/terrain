@@ -84,12 +84,12 @@ export interface Props
 }
 
 class NotificationItem extends Classs<Props> {
-  _noAnimation = false;
-  _styles = null;
-  _notificationTimer = null;
-  _height = 0;
-  _isMounted = false;
-  _removeCount = 0;
+  public _noAnimation = false;
+  public _styles = null;
+  public _notificationTimer = null;
+  public _height = 0;
+  public _isMounted = false;
+  public _removeCount = 0;
 
   constructor(props)
   {
@@ -100,7 +100,7 @@ class NotificationItem extends Classs<Props> {
     };
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     const getStyles = this.props.getStyles;
     const level = this.props.notification.level;
@@ -119,7 +119,7 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  _getCssPropertyByPosition()
+  public _getCssPropertyByPosition()
   {
     const position = this.props.notification.position;
     let css = {};
@@ -161,7 +161,7 @@ class NotificationItem extends Classs<Props> {
     return css;
   }
 
-  _defaultAction(event)
+  public _defaultAction(event)
   {
     const notification = this.props.notification;
 
@@ -172,7 +172,8 @@ class NotificationItem extends Classs<Props> {
       notification.action.callback();
     }
   }
-  _hideNotification()
+
+  public _hideNotification()
   {
     if (this._notificationTimer)
     {
@@ -194,12 +195,12 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  _removeNotification()
+  public _removeNotification()
   {
     this.props.onRemove(this.props.notification.uid);
   }
 
-  _dismiss()
+  public _dismiss()
   {
     if (!this.props.notification.dismissible)
     {
@@ -209,7 +210,7 @@ class NotificationItem extends Classs<Props> {
     this._hideNotification();
   }
 
-  _showNotification()
+  public _showNotification()
   {
     const self = this;
     setTimeout(() =>
@@ -223,7 +224,7 @@ class NotificationItem extends Classs<Props> {
     }, 50);
   }
 
-  _onTransitionEnd()
+  public _onTransitionEnd()
   {
     if (this._removeCount > 0)
     {
@@ -236,7 +237,7 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     const self = this;
     const transitionEvent = whichTransitionEvent();
@@ -270,7 +271,7 @@ class NotificationItem extends Classs<Props> {
     this._showNotification();
   }
 
-  _handleMouseEnter()
+  public _handleMouseEnter()
   {
     const notification = this.props.notification;
     if (notification.autoDismiss)
@@ -279,7 +280,7 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  _handleMouseLeave()
+  public _handleMouseLeave()
   {
     const notification = this.props.notification;
     if (notification.autoDismiss)
@@ -288,7 +289,7 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     const element = ReactDOM.findDOMNode(this);
     const transitionEvent = whichTransitionEvent();
@@ -296,12 +297,12 @@ class NotificationItem extends Classs<Props> {
     this._isMounted = false;
   }
 
-  _allowHTML(string)
+  public _allowHTML(string)
   {
     return { __html: string };
   }
 
-  renderLogo()
+  public renderLogo()
   {
     return (
       <TerrainLogo
@@ -313,7 +314,7 @@ class NotificationItem extends Classs<Props> {
     );
   }
 
-  renderTitle()
+  public renderTitle()
   {
     const notification = this.props.notification;
     if (notification.title)
@@ -328,7 +329,7 @@ class NotificationItem extends Classs<Props> {
     return null;
   }
 
-  renderMessage()
+  public renderMessage()
   {
     const notification = this.props.notification;
     if (notification.message)
@@ -342,7 +343,7 @@ class NotificationItem extends Classs<Props> {
     return null;
   }
 
-  renderDismiss()
+  public renderDismiss()
   {
     if (this.props.notification.dismissible)
     {
@@ -358,7 +359,7 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  renderActionButton()
+  public renderActionButton()
   {
     const notification = this.props.notification;
     if (notification.action)
@@ -373,7 +374,7 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  render()
+  public render()
   {
     const notification = this.props.notification;
     let notificationClassName = 'notification notification-' + notification.level;

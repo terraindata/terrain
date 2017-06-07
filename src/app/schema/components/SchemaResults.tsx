@@ -73,7 +73,7 @@ export interface Props
 @Radium
 class SchemaResults extends PureClasss<Props>
 {
-  state: {
+  public state: {
     selectedId?: ID,
     selectedItem?: SchemaBaseClass,
 
@@ -160,7 +160,7 @@ class SchemaResults extends PureClasss<Props>
     });
   }
 
-  getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
+  public getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
   {
     if (resultsDb.type !== 'mysql')
     {
@@ -247,19 +247,19 @@ class SchemaResults extends PureClasss<Props>
     });
   }
 
-  showsResults(selectedItem: SchemaBaseClass): boolean
+  public showsResults(selectedItem: SchemaBaseClass): boolean
   {
     return selectedItem && selectedItem.type !== 'index';
   }
 
-  handleResultsStateChange(resultsState: ResultsState)
+  public handleResultsStateChange(resultsState: ResultsState)
   {
     this.setState({
       resultsState,
     });
   }
 
-  render()
+  public render()
   {
     return (
       <div

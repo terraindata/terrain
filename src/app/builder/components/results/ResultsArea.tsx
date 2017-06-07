@@ -96,7 +96,7 @@ interface State
 
 class ResultsArea extends PureClasss<Props>
 {
-  state: State = {
+  public state: State = {
     expanded: false,
     expandedResultIndex: null,
     showingConfig: false,
@@ -104,7 +104,7 @@ class ResultsArea extends PureClasss<Props>
     resultFormat: 'icon',
   };
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.query.cards !== this.props.query
       || nextProps.query.inputs !== this.props.query.inputs)
@@ -117,14 +117,14 @@ class ResultsArea extends PureClasss<Props>
     }
   }
 
-  handleCollapse()
+  public handleCollapse()
   {
     this.setState({
       expanded: false,
     });
   }
 
-  handleExpand(resultIndex: number)
+  public handleExpand(resultIndex: number)
   {
     this.setState({
       expanded: true,
@@ -132,7 +132,7 @@ class ResultsArea extends PureClasss<Props>
     });
   }
 
-  renderExpandedResult()
+  public renderExpandedResult()
   {
     const { expandedResultIndex } = this.state;
     const { results } = this.props.resultsState;
@@ -165,7 +165,7 @@ class ResultsArea extends PureClasss<Props>
     );
   }
 
-  handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
+  public handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
     const { resultsPages } = this.state;
 
@@ -182,7 +182,7 @@ class ResultsArea extends PureClasss<Props>
     }
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (this.state.onResultsLoaded)
     {
@@ -193,7 +193,7 @@ class ResultsArea extends PureClasss<Props>
     }
   }
 
-  isQueryEmpty(): boolean
+  public isQueryEmpty(): boolean
   {
     const { query } = this.props;
     return !query || (!query.tql && !query.cards.size);
@@ -204,9 +204,9 @@ class ResultsArea extends PureClasss<Props>
     return !this.props.db || !this.props.db.id;
   }
 
-  resultsFodderRange = _.range(0, 25);
+  public resultsFodderRange = _.range(0, 25);
 
-  renderResults()
+  public renderResults()
   {
     if (this.isDatabaseEmpty())
     {
@@ -316,7 +316,7 @@ class ResultsArea extends PureClasss<Props>
     );
   }
 
-  handleESresultExport()
+  public handleESresultExport()
   {
     this.props.onNavigationException();
 
@@ -375,14 +375,14 @@ column if you have set a custom results view.');
   column if you have set a custom results view.');
     }*/
 
-  toggleView()
+  public toggleView()
   {
     this.setState({
       resultFormat: this.state.resultFormat === 'icon' ? 'table' : 'icon',
     });
   }
 
-  renderTopbar()
+  public renderTopbar()
   {
     const { resultsState } = this.props;
     let text: any = '';
@@ -445,21 +445,21 @@ column if you have set a custom results view.');
     );
   }
 
-  showConfig()
+  public showConfig()
   {
     this.setState({
       showingConfig: true,
     });
   }
 
-  hideConfig()
+  public hideConfig()
   {
     this.setState({
       showingConfig: false,
     });
   }
 
-  renderConfig()
+  public renderConfig()
   {
     if (this.state.showingConfig)
     {
@@ -472,12 +472,12 @@ column if you have set a custom results view.');
     }
   }
 
-  handleConfigChange(config: ResultsConfig)
+  public handleConfigChange(config: ResultsConfig)
   {
     Actions.changeResultsConfig(config);
   }
 
-  render()
+  public render()
   {
     return (
       <div className={classNames({

@@ -93,7 +93,7 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 
 class TransformCard extends PureClasss<Props>
 {
-  state: {
+  public state: {
     domain: List<number>;
     range: List<number>;
     bars: Bars;
@@ -114,7 +114,7 @@ class TransformCard extends PureClasss<Props>
     };
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.computeBars(this.props.data.input);
     this._subscribe(SpotlightStore, {
@@ -124,7 +124,7 @@ class TransformCard extends PureClasss<Props>
     });
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.data.input !== this.props.data.input)
     {
@@ -145,7 +145,7 @@ class TransformCard extends PureClasss<Props>
     }
   }
 
-  trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
+  public trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
   {
     const low = maxDomain.get(0);
     const high = maxDomain.get(1);
@@ -157,7 +157,7 @@ class TransformCard extends PureClasss<Props>
     ]);
   }
 
-  findTableForAlias(data: Block | List<Block>, alias: string): string
+  public findTableForAlias(data: Block | List<Block>, alias: string): string
   {
     if (Immutable.List.isList(data))
     {
@@ -200,7 +200,7 @@ class TransformCard extends PureClasss<Props>
   }
 
   // TODO move the bars computation to a higher level
-  computeBars(input: CardString)
+  public computeBars(input: CardString)
   {
     if (this.props.language !== 'mysql')
     {
@@ -305,19 +305,19 @@ class TransformCard extends PureClasss<Props>
     });
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.state.queryXhr && this.state.queryXhr.abort();
     this.killQuery();
   }
 
-  killQuery()
+  public killQuery()
   {
     this && this.state && this.state.queryId &&
       AjaxM1.killQuery(this.state.queryId);
   }
 
-  handleQueryResponse(response: M1QueryResponse)
+  public handleQueryResponse(response: M1QueryResponse)
   {
     this.setState({
       queryXhr: null,
@@ -395,7 +395,7 @@ class TransformCard extends PureClasss<Props>
     }
   }
 
-  handleQueryError(error: any)
+  public handleQueryError(error: any)
   {
     this.setState({
       bars: List([]),
@@ -405,14 +405,14 @@ class TransformCard extends PureClasss<Props>
     });
   }
 
-  handleDomainChange(domain: List<number>)
+  public handleDomainChange(domain: List<number>)
   {
     this.setState({
       domain,
     });
   }
 
-  handleUpdatePoints(points, isConcrete?: boolean)
+  public handleUpdatePoints(points, isConcrete?: boolean)
   {
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
     // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
@@ -420,7 +420,7 @@ class TransformCard extends PureClasss<Props>
     //  in more than one state on the Undo stack.
   }
 
-  render()
+  public render()
   {
     const spotlights = this.state.spotlights;
     const { data } = this.props;

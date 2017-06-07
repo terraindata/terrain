@@ -67,31 +67,31 @@ export interface Props
 
 class Library extends Classs<Props>
 {
-  state: {
+  public state: {
     unchanged: boolean;
   } = {
     unchanged: false,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.check();
   }
 
-  unmounted = false;
-  componentWillUnmount()
+  public unmounted = false;
+  public componentWillUnmount()
   {
     // I know this is an anti-pattern, but I can't figure out a way around it
     //  ResultsArea sometimes calls onItemsLoaded after this component has been unmounted
     this.unmounted = true;
   }
 
-  handleScroll()
+  public handleScroll()
   {
     this.check();
   }
 
-  onItemsLoaded(unchanged?: boolean)
+  public onItemsLoaded(unchanged?: boolean)
   {
     if (!this.unmounted)
     {
@@ -102,7 +102,7 @@ class Library extends Classs<Props>
     }
   }
 
-  check(unchanged?: boolean)
+  public check(unchanged?: boolean)
   {
     if (unchanged === undefined)
     {
@@ -130,7 +130,7 @@ class Library extends Classs<Props>
     }
   }
 
-  render()
+  public render()
   {
     return (
       <div

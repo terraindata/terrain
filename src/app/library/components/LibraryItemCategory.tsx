@@ -63,7 +63,7 @@ export interface Props
 
 class LibraryItemCategory extends Classs<Props>
 {
-  state = {
+  public state = {
     open: true,
   };
 
@@ -73,14 +73,14 @@ class LibraryItemCategory extends Classs<Props>
     this.state.open = props.status !== ItemStatus.Archive;
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     this.setState({
       open: !this.state.open,
     });
   }
 
-  render()
+  public render()
   {
     return this.props.connectDropTarget(
       <div className={`library-category library-category-${this.props.status} library-category-${this.state.open ? 'open' : 'closed'}`}>

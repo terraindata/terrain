@@ -67,12 +67,12 @@ export const MAX_RESULTS = 200;
 class ResultClass extends BaseClass
 {
   // all available fields for display
-  fields: IMMap<string, string> = Map<string, string>({});
+  public fields: IMMap<string, string> = Map<string, string>({});
 
-  spotlight: any;
+  public spotlight: any;
 
-  rawFields: IMMap<string, string> = Map<string, string>({});
-  transformFields: IMMap<string, string> = Map<string, string>({});
+  public rawFields: IMMap<string, string> = Map<string, string>({});
+  public transformFields: IMMap<string, string> = Map<string, string>({});
 }
 export type Result = ResultClass & IRecord<ResultClass>;
 const _Result = (config: Object = {}) =>
@@ -82,29 +82,29 @@ export type Results = List<Result>;
 
 class ResultsStateC extends BaseClass
 {
-  results: Results = List([]);
-  fields: List<string> = List([]);
-  count: number = 0;
-  rawResult: string = '';
+  public results: Results = List([]);
+  public fields: List<string> = List([]);
+  public count: number = 0;
+  public rawResult: string = '';
 
-  primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
+  public primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
 
-  hasError: boolean = false;
-  errorMessage: string = '';
-  hasAllFieldsError: boolean = false;
-  allFieldsErrorMessage: string = '';
-  mainErrorMessage: string = '';
-  subErrorMessage: string = '';
-  errorLine: number = -1;
+  public hasError: boolean = false;
+  public errorMessage: string = '';
+  public hasAllFieldsError: boolean = false;
+  public allFieldsErrorMessage: string = '';
+  public mainErrorMessage: string = '';
+  public subErrorMessage: string = '';
+  public errorLine: number = -1;
 
-  valid: boolean = false; // are these results still valid for the given query?
+  public valid: boolean = false; // are these results still valid for the given query?
 
-  loading: boolean = false; // if we're still loading any fields, besides for the count
+  public loading: boolean = false; // if we're still loading any fields, besides for the count
 
-  hasLoadedResults: boolean = false;
-  hasLoadedAllFields: boolean = false;
-  hasLoadedCount: boolean = false;
-  hasLoadedTransform: boolean = false;
+  public hasLoadedResults: boolean = false;
+  public hasLoadedAllFields: boolean = false;
+  public hasLoadedCount: boolean = false;
+  public hasLoadedTransform: boolean = false;
 }
 export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
 export let _ResultsState = (config: Object = {}) =>
@@ -140,10 +140,10 @@ const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
 export class ResultsManager extends PureClasss<Props>
 {
-  state: State = {};
+  public state: State = {};
 
   // apply a function to all active queries
-  mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
+  public mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
   {
     stateQueries.map(
       (stateKey) =>
@@ -152,13 +152,13 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Util.addBeforeLeaveHandler(this.killQueries);
     this.queryResults(this.props.query, this.props.db);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.killQueries();
 
@@ -343,7 +343,7 @@ export class ResultsManager extends PureClasss<Props>
     // });
   }
 
-  killQueries()
+  public killQueries()
   {
     this.mapQueries(
       (query) =>
@@ -354,7 +354,7 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (
       nextProps.query
@@ -630,7 +630,7 @@ export class ResultsManager extends PureClasss<Props>
     this.updateM2ErrorState(errorItems, isAllFields);
   }
 
-  handleCountResponse(response: M1QueryResponse)
+  public handleCountResponse(response: M1QueryResponse)
   {
     this.setState({
       countQuery: null,
@@ -662,7 +662,7 @@ export class ResultsManager extends PureClasss<Props>
     // }
   }
 
-  handleCountError()
+  public handleCountError()
   {
     this.setState({
       countQuery: null,
@@ -674,7 +674,7 @@ export class ResultsManager extends PureClasss<Props>
     // );
   }
 
-  changeResults(changes: { [key: string]: any })
+  public changeResults(changes: { [key: string]: any })
   {
     let { resultsState } = this.props;
     _.map(changes,
@@ -685,7 +685,7 @@ export class ResultsManager extends PureClasss<Props>
     this.props.onResultsStateChange(resultsState);
   }
 
-  render()
+  public render()
   {
     return (
       <div />

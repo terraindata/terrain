@@ -73,12 +73,12 @@ class ManualPopup extends Classs<Props>
       };
   }
 
-  shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
-  close()
+  public close()
   {
     this.setState({
       open: false,
@@ -86,12 +86,12 @@ class ManualPopup extends Classs<Props>
     $(document).off('click', this.close);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $(document).off('click', this.close);
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     this.setState({
       open: !this.state.open,
@@ -103,12 +103,12 @@ class ManualPopup extends Classs<Props>
     }
   }
 
-  openManual()
+  public openManual()
   {
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render()
+  public render()
   {
 
     // const manualEntry = cardList[this.props.cardName]

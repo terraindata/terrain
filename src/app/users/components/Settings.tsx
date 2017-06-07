@@ -75,7 +75,7 @@ export interface Props
 
 class Settings extends Classs<Props>
 {
-  cancelSubscription = null;
+  public cancelSubscription = null;
 
   constructor(props)
   {
@@ -103,17 +103,17 @@ class Settings extends Classs<Props>
       }));
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Actions.fetch();
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.cancelSubscription && this.cancelSubscription();
   }
 
-  changeUserField(field: string, value: string)
+  public changeUserField(field: string, value: string)
   {
     let newUser = this.state.istate.currentUser;
     newUser = newUser.set(field, value);
@@ -125,28 +125,28 @@ class Settings extends Classs<Props>
     });
   }
 
-  handleCurrentPasswordChange(ev)
+  public handleCurrentPasswordChange(ev)
   {
     this.setState({
       currentPassword: ev.target.value,
     });
   }
 
-  handleNewPasswordChange(ev)
+  public handleNewPasswordChange(ev)
   {
     this.setState({
       newPassword: ev.target.value,
     });
   }
 
-  handleConfirmPasswordChange(ev)
+  public handleConfirmPasswordChange(ev)
   {
     this.setState({
       confirmPassword: ev.target.value,
     });
   }
 
-  createNewPassword()
+  public createNewPassword()
   {
     const userId: number = localStorage['id'];
     const currentPassword: string = this.state.currentPassword;
@@ -198,14 +198,14 @@ class Settings extends Classs<Props>
       });
   }
 
-  toggleShowPassword()
+  public toggleShowPassword()
   {
     this.setState({
       showPassword: !this.state.showPassword,
     });
   }
 
-  renderPasswordContent()
+  public renderPasswordContent()
   {
     return (
       <div className='settings-expand-field'>
@@ -257,7 +257,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  setupAuthentication()
+  public setupAuthentication()
   {
     this.setState({
       modalMessage: 'This button has not been implemented yet',
@@ -266,7 +266,7 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  renderAuthenticationDescription()
+  public renderAuthenticationDescription()
   {
     return (
       <div>
@@ -275,7 +275,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderAuthenticationContent()
+  public renderAuthenticationContent()
   {
     return (
       <div className='settings-expand-field'>
@@ -294,7 +294,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderEmailDescription()
+  public renderEmailDescription()
   {
     if (this.state.istate.currentUser && this.state.istate.currentUser.email)
     {
@@ -308,7 +308,7 @@ class Settings extends Classs<Props>
     return <div>Your email adddress has not been set yet.</div>;
   }
 
-  changeEmail()
+  public changeEmail()
   {
     this.changeUserField('email', this.state.newEmail);
 
@@ -317,7 +317,7 @@ class Settings extends Classs<Props>
     });
   }
 
-  onSave()
+  public onSave()
   {
     this.setState({
       saving: false,
@@ -325,7 +325,7 @@ class Settings extends Classs<Props>
     });
   }
 
-  onSaveError(response)
+  public onSaveError(response)
   {
     this.setState({
       modalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -334,14 +334,14 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  updateNewEmail(event)
+  public updateNewEmail(event)
   {
     this.setState({
       newEmail: event.target.value,
     });
   }
 
-  renderEmailContent()
+  public renderEmailContent()
   {
     return (
       <div className='settings-expand-field'>
@@ -364,7 +364,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderTimeZoneDescription()
+  public renderTimeZoneDescription()
   {
     let timeZone: number;
 
@@ -385,7 +385,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  getTimeZonesList()
+  public getTimeZonesList()
   {
     const timeZonesList = TimeZones.map((tz, i) =>
     {
@@ -397,7 +397,7 @@ class Settings extends Classs<Props>
     return timeZonesList;
   }
 
-  changeTimeZone(val)
+  public changeTimeZone(val)
   {
     this.changeUserField('timeZone', val.value);
     this.setState({
@@ -405,7 +405,7 @@ class Settings extends Classs<Props>
     });
   }
 
-  renderTimeZoneContent()
+  public renderTimeZoneContent()
   {
     const timeZonesList = this.getTimeZonesList();
     let timeZone: number;
@@ -433,7 +433,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderSignOutDescription()
+  public renderSignOutDescription()
   {
     return (
       <div className='settings-shifted-text'>
@@ -443,7 +443,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  signOut()
+  public signOut()
   {
     this.setState({
       modalMessage: 'This button has not been implemented.',
@@ -452,7 +452,7 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  renderSignOutButton()
+  public renderSignOutButton()
   {
     return (
       <div className='settings-yellow-button button' onClick={this.signOut}>
@@ -466,7 +466,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderDeactivateDescription()
+  public renderDeactivateDescription()
   {
     return (
       <div className='settings-shifted-text'>
@@ -480,7 +480,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  deactivate()
+  public deactivate()
   {
     this.setState({
       modalMessage: 'This button has not been implemented.',
@@ -489,7 +489,7 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  renderDeactivateButton()
+  public renderDeactivateButton()
   {
     return (
       <div className='settings-gray-button button' onClick={this.deactivate}>
@@ -498,7 +498,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  toggleModal()
+  public toggleModal()
   {
     this.setState({
       modalOpen: !this.state.modalOpen,
@@ -526,7 +526,7 @@ class Settings extends Classs<Props>
   //   buttonText={this.renderDeactivateButton()}
   //   lastEntry={true}
   //   />
-  render()
+  public render()
   {
     return (
       <div>

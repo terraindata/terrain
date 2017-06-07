@@ -75,7 +75,7 @@ export interface Props
 
 export class ResultsConfigComponent extends PureClasss<Props>
 {
-  state: {
+  public state: {
     lastHover: { index: number, field: string },
     config: ResultsConfig;
   } = {
@@ -89,7 +89,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     this.state.config = props.config;
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.config !== this.props.config)
     {
@@ -99,7 +99,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     }
   }
 
-  handleDrop(type: string, field: string, index?: number)
+  public handleDrop(type: string, field: string, index?: number)
   {
     if (this.state.lastHover.field === field && index === undefined && type === 'field')
     {
@@ -154,19 +154,19 @@ export class ResultsConfigComponent extends PureClasss<Props>
     }
   }
 
-  changeConfig(config: ResultsConfig)
+  public changeConfig(config: ResultsConfig)
   {
     this.setState({
       config,
     });
   }
 
-  handleEnabledToggle()
+  public handleEnabledToggle()
   {
     this.changeConfig(this.state.config.set('enabled', !this.state.config.enabled));
   }
 
-  fieldType(field)
+  public fieldType(field)
   {
     const { config } = this.state;
     if (!config)
@@ -188,7 +188,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     return null;
   }
 
-  handleFieldHover(index: number, field: string)
+  public handleFieldHover(index: number, field: string)
   {
     if (this.state.lastHover.index !== index || this.state.lastHover.field !== field)
     {
@@ -199,32 +199,32 @@ export class ResultsConfigComponent extends PureClasss<Props>
     }
   }
 
-  handleRemove(field: string)
+  public handleRemove(field: string)
   {
     this.handleDrop(null, field);
   }
 
-  handleFormatChange(field: string, format: Format)
+  public handleFormatChange(field: string, format: Format)
   {
     this.changeConfig(
       this.state.config.setIn(['formats', field], format),
     );
   }
 
-  handleClose()
+  public handleClose()
   {
     this.props.onConfigChange(this.state.config);
     this.props.onClose();
   }
 
-  handlePrimaryKeysChange(primaryKeys: List<string>)
+  public handlePrimaryKeysChange(primaryKeys: List<string>)
   {
     this.changeConfig(
       this.state.config.set('primaryKeys', primaryKeys),
     );
   }
 
-  render()
+  public render()
   {
     const { config } = this.state;
     const { enabled, formats } = config;
@@ -391,50 +391,50 @@ interface ResultsConfigResultProps
 }
 class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
 {
-  state: {
+  public state: {
     showFormat: boolean;
   } = {
     showFormat: false,
   };
 
-  handleRemove()
+  public handleRemove()
   {
     this.props.onRemove(this.props.field);
   }
 
-  toggleShowFormat()
+  public toggleShowFormat()
   {
     this.setState({
       showFormat: !this.state.showFormat,
     });
   }
 
-  changeToText()
+  public changeToText()
   {
     this.changeFormat('type', 'text');
   }
 
-  changeToImage()
+  public changeToImage()
   {
     this.changeFormat('type', 'image');
   }
 
-  toggleRaw(event)
+  public toggleRaw(event)
   {
     this.changeFormat('showRaw', event.target.checked);
   }
 
-  toggleField(event)
+  public toggleField(event)
   {
     this.changeFormat('showField', event.target.checked);
   }
 
-  handleTemplateChange(event)
+  public handleTemplateChange(event)
   {
     this.changeFormat('template', event.target.value);
   }
 
-  changeFormat(key: string, val: any)
+  public changeFormat(key: string, val: any)
   {
     const format = this.props.format || _Format({
       type: 'text',
@@ -448,7 +448,7 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
     );
   }
 
-  handlePrimaryKeyChange()
+  public handlePrimaryKeyChange()
   {
     let { primaryKeys } = this.props;
     if (primaryKeys.contains(this.props.field))
@@ -462,7 +462,7 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
     this.props.onPrimaryKeysChange(primaryKeys);
   }
 
-  render()
+  public render()
   {
     const { format } = this.props;
     const image = format && format.type === 'image';
@@ -646,7 +646,7 @@ interface CRTargetProps
 }
 class CRTargetC extends PureClasss<CRTargetProps>
 {
-  render()
+  public render()
   {
     return this.props.connectDropTarget(
       <div className={this.props.className + (this.props.isOver ? ' results-config-over' : '')}>

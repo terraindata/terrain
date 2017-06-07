@@ -70,7 +70,7 @@ const searchHeight = 42;
 @Radium
 class SchemaView extends PureClasss<Props>
 {
-  state: {
+  public state: {
     highlightedIndex: number;
     search: string;
 
@@ -97,7 +97,7 @@ class SchemaView extends PureClasss<Props>
     });
   }
 
-  handleSearchChange(event)
+  public handleSearchChange(event)
   {
     const search = event.target.value as string;
     this.setState({
@@ -107,7 +107,7 @@ class SchemaView extends PureClasss<Props>
     SchemaActions.highlightId(null, false);
   }
 
-  handleSearchKeyDown(event)
+  public handleSearchKeyDown(event)
   {
     const { highlightedIndex } = this.state;
     let offset: number = 0;
@@ -164,7 +164,7 @@ class SchemaView extends PureClasss<Props>
     }
   }
 
-  render()
+  public render()
   {
     const search = this.props.search || this.state.search;
     const { showSearch } = this.props;

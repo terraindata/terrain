@@ -89,7 +89,7 @@ class ResultComponent extends Classs<Props> {
   //   spotlightColor: "",
   // };
 
-  renderExpandedField(value, field)
+  public renderExpandedField(value, field)
   {
     return this.renderField(field, 0, null, {
       showField: true,
@@ -97,7 +97,7 @@ class ResultComponent extends Classs<Props> {
     });
   }
 
-  renderField(field, index?, fields?, overrideFormat?)
+  public renderField(field, index?, fields?, overrideFormat?)
   {
     if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
     {
@@ -132,7 +132,7 @@ class ResultComponent extends Classs<Props> {
     );
   }
 
-  spotlight()
+  public spotlight()
   {
     const id = this.props.primaryKey;
     const spotlightColor = ColorManager.altColorForKey(id);
@@ -148,7 +148,7 @@ class ResultComponent extends Classs<Props> {
     spotlightAction(id, spotlightData);
   }
 
-  unspotlight()
+  public unspotlight()
   {
     this.setState({
       isSpotlit: false,
@@ -156,7 +156,7 @@ class ResultComponent extends Classs<Props> {
     spotlightAction(this.props.primaryKey, null);
   }
 
-  renderSpotlight()
+  public renderSpotlight()
   {
     if (!this.props.result.spotlight)
     {
@@ -173,7 +173,7 @@ class ResultComponent extends Classs<Props> {
     );
   }
 
-  menuOptions =
+  public menuOptions =
   [
     List([
       {
@@ -190,12 +190,12 @@ class ResultComponent extends Classs<Props> {
     ]),
   ];
 
-  expand()
+  public expand()
   {
     this.props.onExpand(this.props.index);
   }
 
-  render()
+  public render()
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, result } = this.props;
 
