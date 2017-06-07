@@ -42,15 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonSQL from '../syntax/CommonSQL';
 
+import {Block, TQLStringFn} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
-import { Block } from '../../../blocks/types/Block';
-import { Card } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import {Card} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import MySQLBlocks from '../blocks/MySQLBlocks';
 
@@ -59,8 +58,7 @@ const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
 const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
-export interface Options
-{
+export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.
   limit?: number;
   count?: boolean;
@@ -72,7 +70,7 @@ class CardsToSQL
 {
   static toSQL(query: Query, options: Options = {}): string
   {
-    let { cards, inputs } = query;
+    let {cards, inputs} = query;
 
     let cardsTql = '';
     if (cards && cards.size)
@@ -86,29 +84,30 @@ class CardsToSQL
     if (inputs && inputs.size && options.replaceInputs)
     {
       inputs.map((input: Input) =>
-      {
-        let { value } = input;
-        if (input.inputType === InputType.TEXT)
         {
-          value = `"${value}"`;
-        }
-        if (input.inputType === InputType.DATE)
-        {
-          value = `'${value}'`;
-        }
+          let {value} = input;
+          if (input.inputType === InputType.TEXT)
+          {
+            value = `"${value}"`;
+          }
+          if (input.inputType == InputType.DATE)
+          {
+            value = `'${value}'`;
+          }
 
-        const key = '([^a-zA-Z_.]|^)' + 'input\\.' + input.key + '([^a-zA-Z_.]|$)';
+          const key = '([^a-zA-Z_.]|^)' + 'input\\.' + input.key + '([^a-zA-Z_.]|$)';
 
-        cardsTql = cardsTql.replace(
-          new RegExp(key, 'g'),
-          (...args) => args[1] + value + args[2],
-        );
-      },
+          cardsTql = cardsTql.replace(
+            new RegExp(key, 'g'),
+            (...args) => args[1] + value + args[2],
+          );
+        },
       );
     }
 
     return cardsTql;
   }
+
 
   private static _topFromCard(cards: List<Card>, fn: (fromCard: Card) => Card): List<Card>
   {
@@ -118,9 +117,9 @@ class CardsToSQL
       if (topCard.type === 'sfw')
       {
         if (topCard['cards'].some(
-          (card) =>
-            card.type === 'from',
-        ))
+            (card) =>
+              card.type === 'from',
+          ))
         {
           // we only want to apply these functions to Select cards that also have a From
           return fn(topCard);
@@ -176,7 +175,7 @@ class CardsToSQL
       {
         // TODO find score fields. Score fields!
 
-        let transformInputs: Array<{ input: string, alias: string }> = [];
+        let transformInputs: Array<{input: string, alias: string}> = [];
         BlockUtils.forAllCards(fromCard, (card) =>
         {
           if (card.type === 'transform')
@@ -198,29 +197,29 @@ class CardsToSQL
         // remember: you can't use an alias inside of an alias in SQL
         fromCard['fields'].map((fieldBlock) =>
         {
-          const { field } = fieldBlock;
+          const {field} = fieldBlock;
           if (field['_isCard'] && field['type'] === 'as')
           {
-            let { alias, value } = field;
+            let {alias, value} = field;
             if (typeof value !== 'string')
             {
               value = CardsToSQL._parse(value);
             }
             // replace all instances in the transform inputs with the alias'd content
             transformInputs = transformInputs.map((transformInput) =>
-              ({
-                // these two regexes are probably able to combine into one but I couldn't figure it out.
-                //  first one replaces any instances of the alias that aren't at the start of a line/string
-                //  second replaces instances at the start of the string
-                input: transformInput.input.replace(
-                  new RegExp('([^a-zA-Z0-9])' + alias + '($|[^a-zA-Z0-9])', 'g'),
-                  '$1(' + value + ')$2',
-                ).replace(
-                  new RegExp('^' + alias + '($|[^a-zA-Z0-9])', 'g'),
-                  '(' + value + ')$1',
-                ),
-                alias: transformInput.alias,
-              }));
+            ({
+              // these two regexes are probably able to combine into one but I couldn't figure it out.
+              //  first one replaces any instances of the alias that aren't at the start of a line/string
+              //  second replaces instances at the start of the string
+              input: transformInput.input.replace(
+                new RegExp('([^a-zA-Z0-9])' + alias + '($|[^a-zA-Z0-9])', 'g'),
+                '$1(' + value + ')$2',
+              ).replace(
+                new RegExp('^' + alias + '($|[^a-zA-Z0-9])', 'g'),
+                '(' + value + ')$1',
+              ),
+              alias: transformInput.alias,
+            }));
           }
         });
 
@@ -228,10 +227,10 @@ class CardsToSQL
         {
           fromCard = fromCard.update('fields',
             (fields) => fields.push(
-              BlockUtils.make(MySQLBlocks.field, {
-                field: transformInput.input + ' as ' + transformInput.alias,
-              }),
-            ),
+                BlockUtils.make(MySQLBlocks.field, {
+                  field: transformInput.input + ' as ' + transformInput.alias,
+                }),
+              ),
           );
         });
       }
@@ -246,8 +245,8 @@ class CardsToSQL
   {
     const glue = append || '\n';
     return addTabs(cards.map(
-      (card, i) => CardsToSQL._parse(card, i, i === cards.size, isTop),
-    ).join(glue)) + (options && options['excludeSuffix'] ? '' : glue);
+        (card, i) => CardsToSQL._parse(card, i, i === cards.size, isTop),
+      ).join(glue)) + (options && options['excludeSuffix'] ? '' : glue);
   }
 
   static _parse(block: Block, index?: number, isLast?: boolean, isTop?: boolean): string
@@ -260,14 +259,15 @@ class CardsToSQL
     {
       return;
     }
+    
     let str: string;
-    const strFn = ((isTop && block.static.topTql) || block.static.tql);
+    const strFn = ((isTop && block.static.topTql) || block.static.tql) as TQLStringFn;
 
     if (typeof strFn === 'string')
     {
       str = strFn;
     }
-    else if (typeof strFn === 'function')
+    else if (typeof strFn == 'function')
     {
       str = strFn(block);
     }

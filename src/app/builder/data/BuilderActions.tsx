@@ -57,9 +57,13 @@ const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const BuilderActions =
   {
-    change:
+    change: // reserved for cards only
     (keyPath: KeyPath, value: any, notDirty = false) =>
       $(ActionTypes.change, { keyPath, value, notDirty }),
+
+    changeQuery:
+    (query: Query) =>
+      $(ActionTypes.changeQuery, { query }),
 
     create:
     (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>

@@ -42,29 +42,77 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-const _ = require('underscore');
+import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
-import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import CommonElastic from '../syntax/CommonElastic';
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 
+import {Card, Cards, CardString} from '../../../blocks/types/Card';
+import {Block} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
-import { Block } from '../../../blocks/types/Block';
-import { Card, Cards, CardString } from '../../../blocks/types/Card';
 const { make } = BlockUtils;
 
 import Blocks from '../blocks/ElasticBlocks';
 
 export default function ElasticToCards(
   query: Query,
-  queryReady: (query: Query) => void,
+  queryReady: (query: Query) => void
 ): Query
 {
+	try
+	{
+		const obj = JSON.parse(query.tql);
+		const cards = parseObject(obj);
+		return query
+			.set('cards', cards)
+	    .set('cardsAndCodeInSync', true);
+	}
+	catch(e)
+	{
+	  return query
+	    .set('cardsAndCodeInSync', false);
+	}
+}
 
-  return query
-    .set('cardsAndCodeInSync', false);
+const parseObject = (obj: Object): Cards =>
+{
+	let arr: Card[] = _.map(obj,
+		(rawVal: any, key: string) =>
+		{
+			let valueType = CommonElastic.valueTypes.null;
+			let value = rawVal;
+			switch(typeof rawVal)
+			{
+				case 'string':
+					valueType = CommonElastic.valueTypes.text;
+					break;
+			  case 'number':
+			  	valueType = CommonElastic.valueTypes.number;
+			  	break;
+			  case 'boolean':
+			  	valueType = CommonElastic.valueTypes.bool;
+			  	break;
+			  case 'object':
+			  	if (value === null)
+			  	{
+			  		valueType = CommonElastic.valueTypes.null;
+			  	}
+			}
+			
+			return make(
+				Blocks.elasticKeyValue,
+				{
+					key,
+					value,
+					valueType,
+				}
+			);
+		}
+	);
+	
+	return Immutable.List(arr);
 }

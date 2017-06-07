@@ -57,6 +57,7 @@ export let BuilderActionTypes =
   {
     fetchQuery: '', // triggers server xhr
     queryLoaded: '', // when the call to the server returns
+    changeQuery: '',
 
     // these apply to the state's query
     create: '',

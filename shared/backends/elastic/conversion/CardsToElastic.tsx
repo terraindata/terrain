@@ -42,15 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonElastic from '../syntax/CommonElastic';
 
+import {Block, TQLRecursiveObjectFn} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
-import { Block } from '../../../blocks/types/Block';
-import { Card } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import {Card} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
@@ -59,8 +58,7 @@ const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
 const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
-export interface Options
-{
+export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.
   limit?: number;
   count?: boolean;
@@ -68,24 +66,53 @@ export interface Options
   replaceInputs?: boolean; // replaces occurences of inputs with their values
 }
 
+export interface ElasticObjectInterface
+{
+  index?: string;
+  type?: string;
+  body?: {
+    _source: object;
+  }
+  
+  [key: string]: any;
+}
+
 class CardsToElastic
 {
   static toElastic(query: Query, options: Options = {}): string
   {
-    let q: string = query.tql;
-
+    let elasticObj: ElasticObjectInterface = {};
+    
+    query.cards.map(
+      (card: Card) =>
+      {
+        const tqlFn = card.static.tql as TQLRecursiveObjectFn;
+        const tqlObj = tqlFn(card, CardsToElastic.blockToElastic, options);
+        _.extend(elasticObj, tqlObj);
+      }
+    );
+    
     if (options.allFields === true)
     {
-      const o = JSON.parse(query.tql);
-      if (o.body && o.body._source)
+      if (elasticObj.body && elasticObj.body._source)
       {
-        o.body._source = [];
+        elasticObj.body._source  = [];
       }
-      q = JSON.stringify(o);
     }
+    
+    return JSON.stringify(elasticObj, null, 2);
+    
+    // let q: string = query.tql;
 
-    return q;
+
+    // return q;
+  }
+  
+  static blockToElastic(block: Block, options: Options = {}): object
+  {
+    return { notYet: 'not yet done' };
   }
 }
+
 
 export default CardsToElastic;
