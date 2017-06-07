@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // A generic type of backend, e.g. mysql or elastic
 
 import * as Immutable from 'immutable';
