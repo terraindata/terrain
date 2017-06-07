@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 const color = require('color');
 const active = '#00A7F7';
 const lighterActive = color(active).lighten(0.25).string();

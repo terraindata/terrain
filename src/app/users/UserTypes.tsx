@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import { BaseClass, New } from '../Classes';
 import RoleTypes from './../roles/RoleTypes';

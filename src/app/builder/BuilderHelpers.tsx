@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import { Block } from '../../../shared/blocks/types/Block';
 import { Card } from '../../../shared/blocks/types/Card';
 import { Input } from '../../../shared/blocks/types/Input';
