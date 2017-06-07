@@ -42,13 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
 
 module CommonElastic
 {
-  export const valueTypes = ['text', 'number', 'object', 'array', 'bool', 'null'];
+  export const valueTypes = 
+  {
+    text: 'text',
+    number: 'number',
+    object: 'object',
+    array: 'array',
+    bool: 'bool',
+    null: 'null',
+  };
+  export const valueTypesList = _.map(valueTypes, (v) => v);
   export const valueTypesDisplayNames =
   {
     text: 'Text',

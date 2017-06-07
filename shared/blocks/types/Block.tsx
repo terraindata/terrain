@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 
-export type TQLRecursiveObjectFn = ((block: Block, tqlFn: TQLFn, tqlConfig: object) => string | object);
+export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object);
+export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object);
 export type TQLStringFn = string | ((block: Block) => string)
 export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
 

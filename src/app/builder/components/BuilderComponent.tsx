@@ -204,6 +204,12 @@ class BuilderComponent extends PureClasss<Props>
         />;
         break;
       case DisplayType.DROPDOWN:
+        let selectedIndex = value;
+        if (d.dropdownUsesRawValues)
+        {
+          selectedIndex = d.options.indexOf(value);
+        }
+
         content = (
           <div key={key} className="builder-component-wrapper">
             <Dropdown
@@ -211,7 +217,7 @@ class BuilderComponent extends PureClasss<Props>
               className={className}
               keyPath={keyPath}
               options={d.options}
-              selectedIndex={value}
+              selectedIndex={selectedIndex}
               centerAlign={d.centerDropdown}
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}

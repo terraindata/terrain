@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
@@ -63,8 +63,56 @@ export default function ElasticToCards(
   queryReady: (query: Query) => void
 ): Query
 {
-  
-  return query
-    .set('cardsAndCodeInSync', false);
+	try
+	{
+		const obj = JSON.parse(query.tql);
+		const cards = parseObject(obj);
+		return query
+			.set('cards', cards)
+	    .set('cardsAndCodeInSync', true);
+	}
+	catch(e)
+	{
+	  return query
+	    .set('cardsAndCodeInSync', false);
+	}
 }
 
+const parseObject = (obj: Object): Cards =>
+{
+	let arr: Card[] = _.map(obj,
+		(rawVal: any, key: string) =>
+		{
+			let valueType = CommonElastic.valueTypes.null;
+			let value = rawVal;
+			switch(typeof rawVal)
+			{
+				case 'string':
+					valueType = CommonElastic.valueTypes.text;
+					break;
+			  case 'number':
+			  	valueType = CommonElastic.valueTypes.number;
+			  	break;
+			  case 'boolean':
+			  	valueType = CommonElastic.valueTypes.bool;
+			  	break;
+			  case 'object':
+			  	if (value === null)
+			  	{
+			  		valueType = CommonElastic.valueTypes.null;
+			  	}
+			}
+			
+			return make(
+				Blocks.elasticKeyValue,
+				{
+					key,
+					value,
+					valueType,
+				}
+			);
+		}
+	);
+	
+	return Immutable.List(arr);
+}
