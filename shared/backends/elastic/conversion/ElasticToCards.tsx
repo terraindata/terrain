@@ -52,8 +52,8 @@ import Query from '../../../items/types/Query';
 import CommonElastic from '../syntax/CommonElastic';
 
 import BlockUtils from '../../../blocks/BlockUtils';
-import {Block} from '../../../blocks/types/Block';
-import {Card, Cards, CardString} from '../../../blocks/types/Card';
+import { Block } from '../../../blocks/types/Block';
+import { Card, Cards, CardString } from '../../../blocks/types/Card';
 const { make } = BlockUtils;
 
 import Blocks from '../blocks/ElasticBlocks';

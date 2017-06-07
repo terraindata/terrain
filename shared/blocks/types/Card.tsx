@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import BlockUtils from '../BlockUtils';
-import {Display} from '../displays/Display';
-import {allBlocksMetaFields, Block, TQLFn} from './Block';
+import { Display } from '../displays/Display';
+import { allBlocksMetaFields, Block, TQLFn } from './Block';
 
 export interface Card extends IRecord<Card>
 {
@@ -87,7 +87,7 @@ export interface Card extends IRecord<Card>
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
     getParentTerms?: (card: Card, schemaState) => List<string>;
-      // returns terms for its parent and its neighbors (but not its parent's neighbors)
+    // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
     preview: string | ((c: Card) => string);
     // The BlockUtils.getPreview function constructs

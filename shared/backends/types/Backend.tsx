@@ -51,52 +51,52 @@ import CardsToCodeOptions from './CardsToCodeOptions';
 
 export interface Backend
 {
-	type: string;
-	name: string;
+  type: string;
+  name: string;
 
-	// The Building Blocks of Terraformer
-	// Blocks are either a card or some inside part of a card.
-	// Note: each type should be unique among the whole scope of cards in all languages.
-	blocks:
-	{
-		[type: string]: BlockConfig,
-	};
-	creatingType: string; // type of the block that marks where a card is being created
+  // The Building Blocks of Terraformer
+  // Blocks are either a card or some inside part of a card.
+  // Note: each type should be unique among the whole scope of cards in all languages.
+  blocks:
+  {
+    [type: string]: BlockConfig,
+  };
+  creatingType: string; // type of the block that marks where a card is being created
 
-	// Cards that can go at the root level
-	topLevelCards: List<string>;
+  // Cards that can go at the root level
+  topLevelCards: List<string>;
 
-	// Ordering of the cards deck
-	cardsDeck: List<List<string>>;
-	cardsList: List<string>;
+  // Ordering of the cards deck
+  cardsDeck: List<List<string>>;
+  cardsList: List<string>;
 
-	queryToCode(
-		query: Query,
-		options: CardsToCodeOptions,
+  queryToCode(
+    query: Query,
+    options: CardsToCodeOptions,
   ): string;
 
-	codeToQuery(
-		query: Query,
-		queryReady: (query: Query) => void,
-	): Query;
+  codeToQuery(
+    query: Query,
+    queryReady: (query: Query) => void,
+  ): Query;
 
-	syntaxConfig: object;
+  syntaxConfig: object;
 
-	// schema?
+  // schema?
 
-	// function to get transform bars?
-	// autocomplete?
+  // function to get transform bars?
+  // autocomplete?
 }
 
 export const cardsDeckToList = (cardsDeck: List<List<string>>) =>
 {
-	return cardsDeck.reduce(
-		(memo: List<string>, miniList: List<string>) =>
-		{
-			return memo.concat(miniList);
-		},
-		Immutable.List<string>([]),
-	).toList();
+  return cardsDeck.reduce(
+    (memo: List<string>, miniList: List<string>) =>
+    {
+      return memo.concat(miniList);
+    },
+    Immutable.List<string>([]),
+  ).toList();
 };
 
 export default Backend;

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import {Backend, cardsDeckToList} from '../types/Backend';
+import { Backend, cardsDeckToList } from '../types/Backend';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import ElasticBlocks from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
@@ -53,27 +53,27 @@ const syntaxConfig = require('./syntax/ElasticSyntaxConfig.json');
 
 class ElasticBackend implements Backend
 {
-	type = 'elastic';
-	name = 'Elastic';
+  type = 'elastic';
+  name = 'Elastic';
 
-	blocks = ElasticBlocks;
-	creatingType = ElasticBlocks.elasticCreating.type;
-	topLevelCards = Immutable.List<string>([
-			ElasticBlocks.elasticKeyValue.type,
-	]);
+  blocks = ElasticBlocks;
+  creatingType = ElasticBlocks.elasticCreating.type;
+  topLevelCards = Immutable.List<string>([
+    ElasticBlocks.elasticKeyValue.type,
+  ]);
 
-	// Ordering of the cards deck
-	cardsDeck = ElasticCardsDeck;
-	cardsList = cardsDeckToList(ElasticCardsDeck);
+  // Ordering of the cards deck
+  cardsDeck = ElasticCardsDeck;
+  cardsList = cardsDeckToList(ElasticCardsDeck);
 
-	queryToCode = CardsToElastic.toElastic;
+  queryToCode = CardsToElastic.toElastic;
 
-	codeToQuery = ElasticToCards;
+  codeToQuery = ElasticToCards;
 
-	syntaxConfig = syntaxConfig;
+  syntaxConfig = syntaxConfig;
 
-	// function to get transform bars?
-	// autocomplete?
+  // function to get transform bars?
+  // autocomplete?
 }
 
 export default new ElasticBackend();

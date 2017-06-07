@@ -44,20 +44,20 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-const {List} = Immutable;
+const { List } = Immutable;
 
 namespace CommonElastic
 {
   export const valueTypes = ['text', 'number', 'object', 'array', 'bool', 'null'];
   export const valueTypesDisplayNames =
-  {
-    text: 'Text',
-    number: 'Number',
-    object: 'Map',
-    array: 'List',
-    bool: 'True / False',
-    null: 'Null',
-  };
+    {
+      text: 'Text',
+      number: 'Number',
+      object: 'Map',
+      array: 'List',
+      bool: 'True / False',
+      null: 'Null',
+    };
 
   export const acceptsValues = List(
     ['elasticValue', 'elasticObject', 'elasticArray'],
@@ -67,7 +67,8 @@ namespace CommonElastic
   export const Combinators: string[] = ['&', 'or'];
   export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
-	export enum Operator {
+  export enum Operator
+  {
     EQ,
     NE,
     GE,
@@ -91,7 +92,8 @@ namespace CommonElastic
     [Operator.LIKE]: 'LIKE',
   };
 
-  export enum Direction {
+  export enum Direction
+  {
     ASC,
     DESC,
   }
@@ -101,7 +103,8 @@ namespace CommonElastic
     [Direction.DESC]: 'DESC',
   };
 
-  export enum Combinator {
+  export enum Combinator
+  {
     AND,
     OR,
   }

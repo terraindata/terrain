@@ -50,7 +50,8 @@ namespace CommonSQL
   export const Combinators: string[] = ['&', 'or'];
   export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
-	export enum Operator {
+  export enum Operator
+  {
     EQ,
     NE,
     GE,
@@ -74,7 +75,8 @@ namespace CommonSQL
     [Operator.LIKE]: 'LIKE',
   };
 
-  export enum Direction {
+  export enum Direction
+  {
     ASC,
     DESC,
   }
@@ -84,7 +86,8 @@ namespace CommonSQL
     [Direction.DESC]: 'DESC',
   };
 
-  export enum Combinator {
+  export enum Combinator
+  {
     AND,
     OR,
   }

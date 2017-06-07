@@ -47,23 +47,23 @@ import MySQLBackend from './mysql/MySQLBackend';
 import Backend from './types/Backend';
 
 export const AllBackendsArray: Backend[] =
-[
-	ElasticBackend,
-	MySQLBackend,
-];
+  [
+    ElasticBackend,
+    MySQLBackend,
+  ];
 
 export const AllBackendsMap: { [type: string]: Backend } =
-{
-	elastic: ElasticBackend,
-	mysql: MySQLBackend,
-};
+  {
+    elastic: ElasticBackend,
+    mysql: MySQLBackend,
+  };
 
 AllBackendsArray.map(
-	(backend) =>
-	{
-		if (!AllBackendsMap[backend.type])
-		{
-			throw new Error('missing backend in map for backend ' + backend.type);
-		}
-	},
+  (backend) =>
+  {
+    if (!AllBackendsMap[backend.type])
+    {
+      throw new Error('missing backend in map for backend ' + backend.type);
+    }
+  },
 );

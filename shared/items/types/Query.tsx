@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import BlockUtils from '../../blocks/BlockUtils';
-import {Cards} from '../../blocks/types/Card';
-const {List} = Immutable;
+import { Cards } from '../../blocks/types/Card';
+const { List } = Immutable;
 import { AllBackendsMap } from '../../backends/AllBackends';
-import {_ResultsConfig, ResultsConfig} from '../../results/types/ResultsConfig';
+import { _ResultsConfig, ResultsConfig } from '../../results/types/ResultsConfig';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -83,14 +83,15 @@ class QueryC
   meta: IMMap<string, any> = Immutable.Map<string, any>({});
 
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
-  excludeFields= ['dbFields', 'excludeFields'];
+  excludeFields = ['dbFields', 'excludeFields'];
 
   modelVersion = 2; // 2 is for the first version of Node midway
 }
 const Query_Record = Immutable.Record(new QueryC());
-export interface Query extends QueryC, IRecord<Query> {}
+export interface Query extends QueryC, IRecord<Query> { }
 
-export const _Query = (config?: Object) => {
+export const _Query = (config?: Object) =>
+{
   config = config || {};
   const Blocks = AllBackendsMap[config['language'] || 'elastic'].blocks;
   config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);

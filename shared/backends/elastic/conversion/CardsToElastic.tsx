@@ -47,9 +47,9 @@ import * as _ from 'underscore';
 import CommonElastic from '../syntax/CommonElastic';
 
 import BlockUtils from '../../../blocks/BlockUtils';
-import {Block} from '../../../blocks/types/Block';
-import {Card} from '../../../blocks/types/Card';
-import {Input, InputType} from '../../../blocks/types/Input';
+import { Block } from '../../../blocks/types/Block';
+import { Card } from '../../../blocks/types/Card';
+import { Input, InputType } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
@@ -58,7 +58,8 @@ const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
 const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
-export interface Options {
+export interface Options
+{
   allFields?: boolean; // amend the final Select card to include all possible fields.
   limit?: number;
   count?: boolean;
@@ -77,7 +78,7 @@ class CardsToElastic
       const o = JSON.parse(query.tql);
       if (o.body && o.body._source)
       {
-        o.body._source  = [];
+        o.body._source = [];
       }
       q = JSON.stringify(o);
     }

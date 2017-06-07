@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const {Map, List} = Immutable;
+const { Map, List } = Immutable;
 
-import {Block, BlockConfig} from './types/Block';
-import {Card} from './types/Card';
+import { Block, BlockConfig } from './types/Block';
+import { Card } from './types/Card';
 // import { AllBackendsMap } from '../backends/AllBackends';
 
 namespace BlockUtils
@@ -72,7 +72,8 @@ namespace BlockUtils
   export function forAllCards(
     block: Block | List<Block>,
     fn: (card: Card, keyPath: KeyPath) => void,
-  ) {
+  )
+  {
     forAllBlocks(
       block,
       (block: Block, keyPath: KeyPath) =>
@@ -130,9 +131,9 @@ namespace BlockUtils
 
   // This creates a new instance of a card / block
   // Usage: BlockUtils.make(MySQLBlocks.sort)
-  export const make = (block: BlockConfig, extraConfig?: {[key: string]: any}) =>
+  export const make = (block: BlockConfig, extraConfig?: { [key: string]: any }) =>
   {
-    const {type} = block;
+    const { type } = block;
 
     block = _.extend({}, block); // shallow clone
 
@@ -244,14 +245,16 @@ namespace BlockUtils
         return card + '';
       }
 
-      try {
+      try
+      {
         return JSON.stringify(card);
-      } catch (e) {
+      } catch (e)
+      {
         return 'No preview';
       }
     }
 
-    const {preview} = card.static;
+    const { preview } = card.static;
     if (typeof preview === 'string')
     {
       return preview.replace(/\[[a-z\.]*\]/g, (str) =>
@@ -290,7 +293,7 @@ namespace BlockUtils
   export function initBlocks(Blocks)
   {
     _.map(
-      Blocks as ({[card: string]: any}),
+      Blocks as ({ [card: string]: any }),
       (v, i) =>
       {
         // Set the "type" field for all blocks equal to its key
