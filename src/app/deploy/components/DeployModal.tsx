@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./DeployModal.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -49,13 +50,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
 
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
 import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 export interface Props
 {
@@ -107,7 +108,7 @@ class DeployModal extends PureClasss<Props>
   handleDeploy()
   {
     LibraryActions.variants.status(
-      this.state.changingStatusOf, this.state.changingStatusTo, true
+      this.state.changingStatusOf, this.state.changingStatusTo, true,
     );
   }
 
@@ -119,8 +120,8 @@ class DeployModal extends PureClasss<Props>
     const tql = variant ? variant.query.tql : '';
 
     return (
-      <div className="deploy-modal-tql">
-        <div className="deploy-modal-tql-wrapper">
+      <div className='deploy-modal-tql'>
+        <div className='deploy-modal-tql-wrapper'>
           <TQLEditor
             canEdit={false}
             tql={tql}

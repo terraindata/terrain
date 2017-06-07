@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 const { List } = Immutable;
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Classs from './../../common/components/Classs';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
@@ -58,11 +59,10 @@ import UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import ColorManager from './../../util/ColorManager';
 import Util from './../../util/Util';
-import LibraryActions from './../data/LibraryActions';
 import Actions from './../data/LibraryActions';
+import LibraryActions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
 import LibraryTypes from './../LibraryTypes';
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
 import LibraryInfoUser from './LibraryInfoUser';
@@ -127,7 +127,7 @@ class LibraryInfoColumn extends Classs<Props>
     {
       LibraryActions.setDbs(
         List(dbs),
-        loadFinished
+        loadFinished,
       );
     });
   }
@@ -158,18 +158,18 @@ class LibraryInfoColumn extends Classs<Props>
 
     return (
       <div>
-        <div className="library-info-line">
+        <div className='library-info-line'>
           <div>
             Default Database
           </div>
           <Dropdown
             selectedIndex={this.state.dbs && this.state.dbs.findIndex(
-              db => db.id === this.props.algorithm.db.id
+              (db) => db.id === this.props.algorithm.db.id,
             )}
-            options={this.state.dbs.map(db => db.name + ' (' + db.type + ')').toList()}
+            options={this.state.dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
             onChange={this.handleAlgorithmDbChange}
             canEdit={isBuilder || isSuperUser}
-            className="bic-db-dropdown"
+            className='bic-db-dropdown'
           />
         </div>
       </div>
@@ -252,21 +252,21 @@ class LibraryInfoColumn extends Classs<Props>
 
     return (
       <div>
-        <div className="library-info-line">
+        <div className='library-info-line'>
           <div>
             Default Database
           </div>
           <Dropdown
             selectedIndex={this.state.dbs && this.state.dbs.findIndex(
-              db => db.id === this.props.group.db.id
+              (db) => db.id === this.props.group.db.id,
             )}
-            options={this.state.dbs.map(db => db.name).toList()}
+            options={this.state.dbs.map((db) => db.name).toList()}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isSuperUser}
-            className="bic-db-dropdown"
+            className='bic-db-dropdown'
           />
         </div>
-        <div className="library-info-users">
+        <div className='library-info-users'>
           {this.renderUser(this.state.me)}
           {this.renderGroupRoles()}
           {this.renderRemainingUsers()}
@@ -315,9 +315,9 @@ class LibraryInfoColumn extends Classs<Props>
       >
         {
           item ?
-            <div className="library-info">
+            <div className='library-info'>
               <div
-                className="library-info-image"
+                className='library-info-image'
               >
                 <style
                   dangerouslySetInnerHTML={{
@@ -329,12 +329,12 @@ class LibraryInfoColumn extends Classs<Props>
                   icon
                 }
               </div>
-              <div className="library-info-name">
+              <div className='library-info-name'>
                 {
                   item.name
                 }
               </div>
-              <div className="library-info-type">
+              <div className='library-info-type'>
                 {
                   item.type
                 }
@@ -350,9 +350,9 @@ class LibraryInfoColumn extends Classs<Props>
               }
             </div>
             :
-            <div className="library-info">
+            <div className='library-info'>
               <InfoArea
-                large="Select a Group"
+                large='Select a Group'
               />
             </div>
 

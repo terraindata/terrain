@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import RoleTypes from './../roles/RoleTypes';
 import { BaseClass, New } from '../Classes';
+import RoleTypes from './../roles/RoleTypes';
 
-export module UserTypes
+export namespace UserTypes
 {
   class UserC extends BaseClass
   {
@@ -64,7 +65,7 @@ export module UserTypes
     imgSrc = '';
     tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
 
-    //notifications fields
+    // notifications fields
     sound = 'chime';
     emailNotificationType = 'Activities of any kind';
     emailNotificationTiming = 'Once every 15 minutes';
@@ -89,7 +90,7 @@ export module UserTypes
     // groupRoles: Immutable.Map({}),
   }
   export type User = UserC & IRecord<UserC>;
-  export const _User = (config: { [key: string]: any } = {}) => 
+  export const _User = (config: { [key: string]: any } = {}) =>
   {
     config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
     return New<User>(new UserC(config), config);

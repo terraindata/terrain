@@ -42,7 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import {BaseClass, New} from '../../../src/app/Classes';
+// Copyright 2017 Terrain Data, Inc.
+import { BaseClass, New } from '../../../src/app/Classes';
 import BackendInstance from '../../backends/types/BackendInstance';
 
 export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
@@ -52,11 +53,11 @@ export const ItemType: {
   Algorithm: ItemType;
   Group: ItemType;
 } = {
-  Query: 'QUERY',
-  Variant: 'VARIANT',
-  Algorithm: 'ALGORITHM',
-  Group: 'GROUP',
-};
+    Query: 'QUERY',
+    Variant: 'VARIANT',
+    Algorithm: 'ALGORITHM',
+    Group: 'GROUP',
+  };
 
 export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT';
 export const ItemStatus: {
@@ -66,36 +67,34 @@ export const ItemStatus: {
   Live: ItemStatus;
   Default: ItemStatus;
 } =
-{
-  Archive: 'ARCHIVE',
-  Build: 'BUILD',
-  Approve: 'APPROVE',
-  Live: 'LIVE',
-  Default: 'DEFAULT',
-};
-
-
+  {
+    Archive: 'ARCHIVE',
+    Build: 'BUILD',
+    Approve: 'APPROVE',
+    Live: 'LIVE',
+    Default: 'DEFAULT',
+  };
 
 export class ItemC extends BaseClass
 {
   // TODO potentially consolidate with midway
   id: ID = -1;
   parent: number = 0;
-  
+
   name: string = '';
   status: ItemStatus = 'BUILD';
   type: ItemType;
-  
+
   db: BackendInstance = {} as any;
-  
+
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
-  excludeFields= ['dbFields', 'excludeFields'];
-  
+  excludeFields = ['dbFields', 'excludeFields'];
+
   modelVersion = 2; // 2 is for the first version of Node midway
 }
 export type Item = ItemC & IRecord<ItemC>;
 // remove?
-// export const _Item = (config?: {[key:string]: any}) => 
+// export const _Item = (config?: {[key:string]: any}) =>
 // {
 //   if(config && typeToConstructor[config.type])
 //   {

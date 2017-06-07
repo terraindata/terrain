@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./DatePicker.less');
 import * as React from 'react';
 // import * as moment from 'moment';
@@ -127,7 +128,7 @@ class DatePicker extends PureClasss<Props>
     const date = this.getDate();
 
     return (
-      <div className="date-time-time">
+      <div className='date-time-time'>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
@@ -146,7 +147,7 @@ class DatePicker extends PureClasss<Props>
       };
 
     return (
-      <div className="date-picker">
+      <div className='date-picker'>
         <ReactDayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}

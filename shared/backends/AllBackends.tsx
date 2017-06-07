@@ -42,30 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import Backend from './types/Backend';
-import MySQLBackend from './mysql/MySQLBackend';
+// Copyright 2017 Terrain Data, Inc.
 import ElasticBackend from './elastic/ElasticBackend';
+import MySQLBackend from './mysql/MySQLBackend';
+import Backend from './types/Backend';
 
-export const AllBackendsArray: Backend[] = 
-[
-	ElasticBackend,
-	MySQLBackend,
-];
+export const AllBackendsArray: Backend[] =
+  [
+    ElasticBackend,
+    MySQLBackend,
+  ];
 
 export const AllBackendsMap: { [type: string]: Backend } =
-{
-	elastic: ElasticBackend,
-	mysql: MySQLBackend,
-};
+  {
+    elastic: ElasticBackend,
+    mysql: MySQLBackend,
+  };
 
 AllBackendsArray.map(
-	backend =>
-	{
-		if(!AllBackendsMap[backend.type])
-		{
-			throw new Error('missing backend in map for backend ' + backend.type);
-		}
-	}
+  (backend) =>
+  {
+    if (!AllBackendsMap[backend.type])
+    {
+      throw new Error('missing backend in map for backend ' + backend.type);
+    }
+  },
 );
-
-

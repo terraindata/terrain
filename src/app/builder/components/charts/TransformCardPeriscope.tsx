@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./TransformCardPeriscope.less');
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
@@ -219,15 +220,15 @@ class TransformCardPeriscope extends PureClasss<Props>
   render()
   {
     return (
-      <div className="transform-periscope-wrapper">
-        <div ref="chart" />
+      <div className='transform-periscope-wrapper'>
+        <div ref='chart' />
 
-        <div className="tp-text-wrapper">
+        <div className='tp-text-wrapper'>
           <BuilderTextbox
             value={this.props.maxDomain.get(0)}
             keyPath={this._ikeyPath(this.props.keyPath, 'domain', 0)}
             isNumber={true}
-            className="tp-tb-left"
+            className='tp-tb-left'
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
@@ -237,7 +238,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             value={this.props.maxDomain.get(1)}
             keyPath={this._ikeyPath(this.props.keyPath, 'domain', 1)}
             isNumber={true}
-            className="tp-tb-right"
+            className='tp-tb-right'
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}

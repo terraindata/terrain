@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 import * as _ from 'underscore';
@@ -53,8 +54,8 @@ import AuthStore from './../../auth/data/AuthStore';
 import Util from './../../util/Util';
 
 import UserTypes from './../UserTypes';
-import UserReducers from './UserReducers';
 import ActionTypes from './UserActionTypes';
+import UserReducers from './UserReducers';
 
 const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
@@ -75,9 +76,9 @@ UserStore.subscribe(() =>
 
 window['test'] = () =>
 {
-  let users = UserStore.getState().users;
+  const users = UserStore.getState().users;
   console.log('users', users);
   Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-}
+};
 
 export default UserStore;

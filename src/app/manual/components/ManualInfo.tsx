@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./ManualInfo.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -70,7 +71,7 @@ class ManualInfo extends Classs<Props>
   {
     return (
       <div className={'manual-info-wrapper ' + this.props.className} >
-        <div className="manual-info-indicator"></div>
+        <div className='manual-info-indicator'></div>
         <div
           className={classNames({
             'manual-info-content': true,

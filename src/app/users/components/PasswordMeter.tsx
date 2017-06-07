@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./PasswordMeter.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -82,7 +83,7 @@ class PasswordMeter extends Classs<Props>
   render()
   {
     return (
-      <div className="password-meter">
+      <div className='password-meter'>
         {meterSectionValues.map(this.renderMeterSection)}
       </div>
     );

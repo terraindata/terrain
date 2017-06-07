@@ -50,7 +50,8 @@ var NotificationContainer = require('./NotificationContainer');
 var Constants = require('./constants');
 var Styles = require('./styles');
 
-var NotificationSystem = React.createClass({displayName: "NotificationSystem",
+var NotificationSystem = React.createClass({
+  displayName: "NotificationSystem",
 
   uid: 3400,
 
@@ -59,26 +60,31 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
 
     overrideWidth: null,
 
-    setOverrideStyle: function(style) {
+    setOverrideStyle: function(style)
+    {
       this.overrideStyle = style;
     },
 
-    wrapper: function() {
+    wrapper: function()
+    {
       if (!this.overrideStyle) return {};
       return merge({}, Styles.Wrapper, this.overrideStyle.Wrapper);
     },
 
-    container: function(position) {
+    container: function(position)
+    {
       var override = this.overrideStyle.Containers || {};
       if (!this.overrideStyle) return {};
 
       this.overrideWidth = Styles.Containers.DefaultStyle.width;
 
-      if (override.DefaultStyle && override.DefaultStyle.width) {
+      if (override.DefaultStyle && override.DefaultStyle.width)
+      {
         this.overrideWidth = override.DefaultStyle.width;
       }
 
-      if (override[position] && override[position].width) {
+      if (override[position] && override[position].width)
+      {
         this.overrideWidth = override[position].width;
       }
 
@@ -94,9 +100,11 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
       actionWrapper: 'ActionWrapper'
     },
 
-    byElement: function(element) {
+    byElement: function(element)
+    {
       var self = this;
-      return function(level) {
+      return function(level)
+      {
         var _element = self.elements[element];
         var override = self.overrideStyle[_element] || {};
         if (!self.overrideStyle) return {};
@@ -105,23 +113,28 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
     }
   },
 
-  _didNotificationRemoved: function(uid) {
+  _didNotificationRemoved: function(uid)
+  {
     var notification;
-    var notifications = this.state.notifications.filter(function(toCheck) {
-      if (toCheck.uid === uid) {
+    var notifications = this.state.notifications.filter(function(toCheck)
+    {
+      if (toCheck.uid === uid)
+      {
         notification = toCheck;
       }
       return toCheck.uid !== uid;
     });
 
-    if (notification && notification.onRemove) {
+    if (notification && notification.onRemove)
+    {
       notification.onRemove(notification);
     }
 
     this.setState({ notifications: notifications });
   },
 
-  getInitialState: function() {
+  getInitialState: function()
+  {
     return {
       notifications: []
     };
@@ -136,7 +149,8 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
     allowHTML: React.PropTypes.bool
   },
 
-  getDefaultProps: function() {
+  getDefaultProps: function()
+  {
     return {
       style: {},
       noAnimation: false,
@@ -144,24 +158,29 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
     };
   },
 
-  addNotification: function(notification) {
+  addNotification: function(notification)
+  {
     var _notification = merge({}, Constants.notification, notification);
     var notifications = JSON.parse(JSON.stringify(this.state.notifications));
     var i;
 
-    if (!_notification.level) {
+    if (!_notification.level)
+    {
       throw new Error('notification level is required.');
     }
 
-    if (Object.keys(Constants.levels).indexOf(_notification.level) === -1) {
+    if (Object.keys(Constants.levels).indexOf(_notification.level) === -1)
+    {
       throw new Error('\'' + _notification.level + '\' is not a valid level.');
     }
 
-    if (isNaN(_notification.autoDismiss)) {
+    if (isNaN(_notification.autoDismiss))
+    {
       throw new Error('\'autoDismiss\' must be a number.');
     }
 
-    if (Object.keys(Constants.positions).indexOf(_notification.position) === -1) {
+    if (Object.keys(Constants.positions).indexOf(_notification.position) === -1)
+    {
       throw new Error('\'' + _notification.position + '\' is not a valid position.');
     }
 
@@ -175,15 +194,18 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
     this.uid += 1;
 
     // do not add if the notification already exists based on supplied uid
-    for (i = 0; i < notifications.length; i++) {
-      if (notifications[i].uid === _notification.uid) {
+    for (i = 0; i < notifications.length; i++)
+    {
+      if (notifications[i].uid === _notification.uid)
+      {
         return false;
       }
     }
 
     notifications.push(_notification);
 
-    if (typeof _notification.onAdd === 'function') {
+    if (typeof _notification.onAdd === 'function')
+    {
       notification.onAdd(_notification);
     }
 
@@ -194,13 +216,18 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
     return _notification;
   },
 
-  removeNotification: function(notification) {
+  removeNotification: function(notification)
+  {
     var self = this;
-    Object.keys(this.refs).forEach(function(container) {
-      if (container.indexOf('container') > -1) {
-        Object.keys(self.refs[container].refs).forEach(function(_notification) {
+    Object.keys(this.refs).forEach(function(container)
+    {
+      if (container.indexOf('container') > -1)
+      {
+        Object.keys(self.refs[container].refs).forEach(function(_notification)
+        {
           var uid = notification.uid ? notification.uid : notification;
-          if (_notification === 'notification-' + uid) {
+          if (_notification === 'notification-' + uid)
+          {
             self.refs[container].refs[_notification]._hideNotification();
           }
         });
@@ -208,31 +235,38 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount: function()
+  {
     this._getStyles.setOverrideStyle(this.props.style);
   },
 
-  render: function() {
+  render: function()
+  {
     var self = this;
     var containers = null;
     var notifications = this.state.notifications;
-    if (notifications.length) {
-      containers = Object.keys(Constants.positions).map(function(position) {
-        var _notifications = notifications.filter(function(notification) {
+    if (notifications.length)
+    {
+      containers = Object.keys(Constants.positions).map(function(position)
+      {
+        var _notifications = notifications.filter(function(notification)
+        {
           return position === notification.position;
         });
 
-        if (_notifications.length) {
+        if (_notifications.length)
+        {
           return (
             React.createElement(NotificationContainer, {
-              ref:  'container-' + position, 
-              key:  position, 
-              position:  position, 
-              notifications:  _notifications, 
-              getStyles:  self._getStyles, 
-              onRemove:  self._didNotificationRemoved, 
-              noAnimation:  self.props.noAnimation, 
-              allowHTML:  self.props.allowHTML}
+              ref: 'container-' + position,
+              key: position,
+              position: position,
+              notifications: _notifications,
+              getStyles: self._getStyles,
+              onRemove: self._didNotificationRemoved,
+              noAnimation: self.props.noAnimation,
+              allowHTML: self.props.allowHTML
+            }
             )
           );
         }
@@ -241,8 +275,8 @@ var NotificationSystem = React.createClass({displayName: "NotificationSystem",
 
 
     return (
-      React.createElement("div", {className: "notifications-wrapper", style:  this._getStyles.wrapper() }, 
-         containers 
+      React.createElement("div", { className: "notifications-wrapper", style: this._getStyles.wrapper() },
+        containers
       )
 
     );

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./CheckBox.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -69,7 +70,7 @@ class CheckBox extends Classs<Props>
         })}
         onClick={this.props.onChange}
       >
-        {this.props.checked ? <CheckMark className="check-mark-icon" /> : 'O'}
+        {this.props.checked ? <CheckMark className='check-mark-icon' /> : 'O'}
       </div>
     );
   }

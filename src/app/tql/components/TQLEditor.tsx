@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./TQLEditor.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -121,8 +122,8 @@ class TQLEditor extends PureClasss<Props>
       options['value'] = this.props.tql || '';
       return (
         <CodeMirror
-          ref="cm2"
-          className="codemirror-text"
+          ref='cm2'
+          className='codemirror-text'
           options={options}
 
           isDiff={true}
@@ -133,8 +134,8 @@ class TQLEditor extends PureClasss<Props>
 
     return (
       <CodeMirror
-        ref="cm"
-        className="codemirror-text"
+        ref='cm'
+        className='codemirror-text'
         value={this.props.tql || ''}
         options={options}
 

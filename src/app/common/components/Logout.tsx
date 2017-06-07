@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
 import InfoArea from './InfoArea';
@@ -64,7 +65,7 @@ class Logout extends PureClasss<Props>
   render()
   {
     return (
-      <InfoArea large="Logging out..." />
+      <InfoArea large='Logging out...' />
     );
   }
 }

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./BuilderTQLColumn.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -49,11 +50,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 const { List } = Immutable;
 import * as _ from 'underscore';
+import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import Query from '../../../../shared/items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultsManager';
 import { MenuOption } from '../../common/components/Menu';
 import LibraryTypes from '../../library/LibraryTypes';
-import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';
@@ -270,7 +271,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     keywords.map(function(word)
     {
       const words = word.split(' ');
-      //For terms like select from, only need to match one of the words
+      // For terms like select from, only need to match one of the words
       if (words.length > 1)
       {
         for (let i = 0; i < words.length; i++)
@@ -353,7 +354,7 @@ class BuilderTQLColumn extends PureClasss<Props>
         />
 
         <div
-          className="tql-section"
+          className='tql-section'
         >
           <TQLEditor
             tql={this.state.tql}

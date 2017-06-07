@@ -42,14 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./ManualPopup.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import ManualEntry from '../../../../shared/blocks/types/ManualEntry';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import ManualEntry from '../../../../shared/blocks/types/ManualEntry';
 const InfoIcon = require('./../../../images/icon_info.svg');
 const OpenIcon = require('./../../../images/icon_open.svg');
 
@@ -124,24 +125,24 @@ class ManualPopup extends Classs<Props>
         })}
       >
         <div
-          className="manual-popup-icon-wrapper"
+          className='manual-popup-icon-wrapper'
           onClick={this.toggleOpen}
         >
-          <InfoIcon className="manual-popup-icon" />
+          <InfoIcon className='manual-popup-icon' />
         </div>
         {!this.state.open ? null :
           <div
-            className="manual-popup-content-wrapper"
+            className='manual-popup-content-wrapper'
             onClick={this.toggleOpen}
           >
             {content}
             <div
-              className="manual-popup-link"
+              className='manual-popup-link'
               onClick={this.openManual}
             >
               See full description in Manual
               <OpenIcon
-                className="manual-popup-open-icon"
+                className='manual-popup-open-icon'
                 onClick={this.openManual}
               />
             </div>

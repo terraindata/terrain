@@ -42,20 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
-import AjaxM1 from '../../../util/AjaxM1';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import Block from '../../../../../shared/blocks/types/Block';
+import { Card, CardString } from '../../../../../shared/blocks/types/Card';
 import { M1QueryResponse } from '../../../util/AjaxM1';
+import AjaxM1 from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
 import TransformCardChart from './TransformCardChart';
-import { Card, CardString } from '../../../../../shared/blocks/types/Card';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import Block from '../../../../../shared/blocks/types/Block';
 
 import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
 
@@ -427,7 +428,7 @@ class TransformCard extends PureClasss<Props>
 
     return (
       <div
-        className="transform-card-inner"
+        className='transform-card-inner'
       >
         <TransformCardChart
           canEdit={this.props.canEdit}

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // somebody please rescue this or kill this
 
 require('./LayoutManager.less');
@@ -760,7 +761,7 @@ const LayoutManager = React.createClass<any, any>({
   renderColumn(column, index)
   {
     const classToPass = colClass;
-    let style: React.CSSProperties
+    let style: React.CSSProperties;
 
     if (this.props.layout.compact)
     {
@@ -843,7 +844,7 @@ const LayoutManager = React.createClass<any, any>({
     {
       // TODO write test for this
       return (
-        <div className="error">
+        <div className='error'>
           Error: Must pass one and only one of [cells, rows, columns] to the same level of a LayoutManager. Passed <b>{layoutSum}</b>.
 					<pre>{JSON.stringify(this.props.layout)}</pre>
         </div>
@@ -862,7 +863,7 @@ const LayoutManager = React.createClass<any, any>({
     const lmClassString = lmClasses.join(' ');
 
     return (
-      <div className={lmClassString} ref="layoutManagerDiv">
+      <div className={lmClassString} ref='layoutManagerDiv'>
         {this.props.layout.columns && this.props.layout.columns.map(this.renderColumn)}
         {this.props.layout.rows && this.props.layout.rows.map(this.renderRow)}
         {this.props.layout.cells && this.props.layout.cells.map(this.renderCell)}

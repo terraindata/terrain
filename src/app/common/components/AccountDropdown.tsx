@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./AccountDropdown.less');
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -141,36 +142,36 @@ class AccountDropdown extends PureClasss<Props>
     }
 
     return (
-      <div className="account-dropdown-content">
-        <div className="account-dropdown-row" onMouseDown={this.editProfile}>
-          <div className="account-dropdown-icon account-dropdown-icon-red">
+      <div className='account-dropdown-content'>
+        <div className='account-dropdown-row' onMouseDown={this.editProfile}>
+          <div className='account-dropdown-icon account-dropdown-icon-red'>
             <EditIcon />
           </div>
-          <div className="account-dropdown-link">
+          <div className='account-dropdown-link'>
             Edit Profile
           </div>
         </div>
-        <div className="account-dropdown-row" onMouseDown={this.goTeamGoTeamGo}>
-          <div className="account-dropdown-icon account-dropdown-icon-blue">
+        <div className='account-dropdown-row' onMouseDown={this.goTeamGoTeamGo}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
             <HomeIcon />
           </div>
-          <div className="account-dropdown-link">
+          <div className='account-dropdown-link'>
             My Team
           </div>
         </div>
         {
           this.state.user && this.state.user.isSuperUser &&
-          <div className="account-dropdown-row" onMouseDown={this._toggle('commitLogOpen')}>
-            <div className="account-dropdown-icon account-dropdown-icon-blue">
+          <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
+            <div className='account-dropdown-icon account-dropdown-icon-blue'>
               <InfoIcon />
             </div>
-            <div className="account-dropdown-link">
+            <div className='account-dropdown-link'>
               Commit Log
               </div>
           </div>
         }
-        <div className="account-dropdown-row" onMouseDown={this.handleLogout}>
-          <div className="account-dropdown-icon account-dropdown-icon-blue">
+        <div className='account-dropdown-row' onMouseDown={this.handleLogout}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
             <LogoutIcon />
           </div>
           Logout
@@ -182,13 +183,13 @@ class AccountDropdown extends PureClasss<Props>
   renderTopBar()
   {
     return (
-      <div className="account-dropdown-top-bar" onClick={this.open} ref="accountDropdownButton">
+      <div className='account-dropdown-top-bar' onClick={this.open} ref='accountDropdownButton'>
         <UserThumbnail
           showName={true}
           userId={this.state.user && this.state.user.id}
           hideAdmin={true}
         />
-        <ArrowIcon className="account-arrow-icon" />
+        <ArrowIcon className='account-arrow-icon' />
       </div>
     );
   }

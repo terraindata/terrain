@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./CreateItem.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
@@ -58,7 +59,7 @@ class CreateItem extends Classs<Props>
   render()
   {
     return (
-      <div className="create-item" onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
+      <div className='create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
         <AddIcon />
       </div>
     );

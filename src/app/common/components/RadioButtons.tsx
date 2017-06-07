@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./RadioButtons.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -65,7 +66,7 @@ class RadioButtons extends Classs<Props>
   renderOption(option)
   {
     return (
-      <div key={option.value} className="radio-button-option">
+      <div key={option.value} className='radio-button-option'>
         <div
           onClick={option.onClick}
           className={classNames({

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
@@ -52,10 +53,10 @@ import Util from '../../util/Util';
 import { _ResultsState, ResultsState } from '../components/results/ResultsManager';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { Card, Cards } from '../../../../shared/blocks/types/Card';
 import Query from '../../../../shared/items/types/Query';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 export class BuilderStateClass
 {

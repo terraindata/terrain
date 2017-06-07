@@ -42,9 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -61,7 +63,6 @@ import LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
@@ -271,7 +272,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     const canDuplicate = canArchive;
     const canDrag = canArchive;
     const canEdit = canDrag; // ||
-    //(me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -321,10 +322,10 @@ class AlgorithmsColumn extends PureClasss<Props>
         color={ColorManager.colorForKey(this.props.groupId)}
         key={algorithm.id}
         to={`/library/${this.props.groupId}/${algorithm.id}`}
-        className="library-item-lighter"
+        className='library-item-lighter'
         id={id}
         onNameChange={this.handleNameChange}
-        type="algorithm"
+        type='algorithm'
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
@@ -335,17 +336,17 @@ class AlgorithmsColumn extends PureClasss<Props>
         canArchive={canArchive}
         canDuplicate={canDuplicate}
       >
-        <div className="flex-container">
+        <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />
-          <div className="flex-grow">
-            <div className="library-item-line">
+          <div className='flex-grow'>
+            <div className='library-item-line'>
               <Scoreline
                 scores={_.values(scores)}
                 hideZeroes={true}
               />
             </div>
             <div
-              className="library-item-line"
+              className='library-item-line'
             >
               {Util.formatDate(date)}
 
@@ -371,26 +372,26 @@ class AlgorithmsColumn extends PureClasss<Props>
     const { algorithms } = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const { me, roles } = this.state;
-    const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+    const canCreate = true; // me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
 
     return (
       <LibraryItemCategory
         status={status}
         key={status}
         onHover={this.handleCategoryHover}
-        type="algorithm"
+        type='algorithm'
         titleHidden={status === ItemStatus.Build}
       >
         {
           ids.map(this.renderAlgorithm)
         }
         {
-          ids.size === 0 && <div className="library-category-none">None</div>
+          ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
           status === ItemStatus.Build && canCreate &&
           <CreateItem
-            name="algorithm"
+            name='algorithm'
             onCreate={this.handleCreate}
           />
         }
@@ -403,7 +404,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     return (
       <LibraryColumn
         index={2}
-        title="Algorithms"
+        title='Algorithms'
       >
         {
           this.props.algorithmsOrder ?
@@ -421,7 +422,7 @@ class AlgorithmsColumn extends PureClasss<Props>
                 )
                 :
                 <InfoArea
-                  large="No algorithms created, yet."
+                  large='No algorithms created, yet.'
                   button={
                     Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
                       ? 'Create a algorithm' : null

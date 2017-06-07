@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./UserThumbnail.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -138,14 +139,14 @@ class UserThumbnail extends Classs<Props>
         data-html={true}
       >
         <div
-          className="user-thumbnail-image"
+          className='user-thumbnail-image'
           style={{
             backgroundImage: `url(${src})`,
           }}
         />
         {
           text &&
-          <div className="user-thumbnail-text">
+          <div className='user-thumbnail-text'>
             {
               text
             }

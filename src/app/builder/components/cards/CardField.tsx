@@ -42,14 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./CardField.less');
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Display, DisplayType, RowDisplay } from '../../../../../shared/blocks/displays/Display';
 import PureClasss from '../../../common/components/PureClasss';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
-import { Display, DisplayType, RowDisplay } from '../../../../../shared/blocks/displays/Display';
 import BuilderComponent from '../BuilderComponent';
 import { CardItem } from './CardComponent';
 import CardDropArea from './CardDropArea';
@@ -323,7 +324,7 @@ class CardField extends PureClasss<Props>
 
     return (
       <div
-        ref="all"
+        ref='all'
         className={classNames({
           'card-field-wrapper': true,
           'card-field-wrapper-moving': this.state.movedTo !== null,
@@ -352,12 +353,12 @@ class CardField extends PureClasss<Props>
             // ^ hides the left drag handle if single
             'card-field-editable': this.props.canEdit,
           })}
-          ref="cardField"
+          ref='cardField'
         >
           {
             !renderTools && this.props.canEdit && this.props.isFirstRow &&
             <div
-              className="card-field-top-add card-field-add"
+              className='card-field-top-add card-field-add'
               onClick={this.addFieldTop}
               data-tip={'Add another'}
             >
@@ -374,10 +375,10 @@ class CardField extends PureClasss<Props>
           }
           {
             renderTools && this.props.canEdit &&
-            <div className="card-field-tools-left">
-              <div className="card-field-tools-left-inner">
+            <div className='card-field-tools-left'>
+              <div className='card-field-tools-left-inner'>
                 <div
-                  className="card-field-handle"
+                  className='card-field-handle'
                   onMouseDown={this.handleHandleMousedown}
                 >
                   ⋮⋮
@@ -385,8 +386,8 @@ class CardField extends PureClasss<Props>
                 {
                   this.props.helpOn ?
                     <ManualInfo
-                      information="Can move fields around within the current card by dragging and dropping"
-                      className="card-field-manual-info"
+                      information='Can move fields around within the current card by dragging and dropping'
+                      className='card-field-manual-info'
                       leftSide={true}
                     />
                     : null
@@ -394,7 +395,7 @@ class CardField extends PureClasss<Props>
               </div>
             </div>
           }
-          <div className="card-field-inner" >
+          <div className='card-field-inner' >
             <BuilderComponent
               display={row.inner}
               keyPath={this.props.keyPath}
@@ -409,11 +410,11 @@ class CardField extends PureClasss<Props>
           </div>
           {
             renderTools && this.props.canEdit &&
-            <div className="card-field-tools-right">
-              <div className="card-field-tools-right-inner">
+            <div className='card-field-tools-right'>
+              <div className='card-field-tools-right-inner'>
                 <div>
                   <div
-                    className="card-field-add"
+                    className='card-field-add'
                     onClick={this.addField}
                     data-tip={'Add another'}
                   >
@@ -422,16 +423,16 @@ class CardField extends PureClasss<Props>
                   {
                     this.props.helpOn ?
                       <ManualInfo
-                        information="Can add field using the plus button or remove fields using the x button"
+                        information='Can add field using the plus button or remove fields using the x button'
                         rightSide={true}
-                        className="card-field-manual-info"
+                        className='card-field-manual-info'
                       />
                       : null
                   }
                   {
                     !this.props.isOnlyRow &&
                     <div
-                      className="card-field-remove"
+                      className='card-field-remove'
                       onClick={this.removeField}
                       data-tip={'Remove'}
                     >

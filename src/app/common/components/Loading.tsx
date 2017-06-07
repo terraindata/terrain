@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Loading.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -181,11 +182,11 @@ class Loading extends PureClasss<Props>
       >
         <img
           src={Sprites}
-          className="moutain-loading-img"
+          className='moutain-loading-img'
           style={{
             height: this.props.height,
           }}
-          ref="sprites"
+          ref='sprites'
         />
       </div>
     );

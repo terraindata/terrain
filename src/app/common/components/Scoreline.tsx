@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Scoreline.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
@@ -68,16 +69,16 @@ class Scoreline extends Classs<Props>
 
     return (
       <div
-        className="scoreline-score"
+        className='scoreline-score'
         key={index}
         data-tip={score.name}
       >
         <div
-          className="scoreline-score-icon"
+          className='scoreline-score-icon'
           style={{ backgroundColor: score.color }}
         />
         <div
-          className="scoreline-score-score"
+          className='scoreline-score-score'
           style={{ color: score.color }}
         >
           {score.score}
@@ -91,11 +92,11 @@ class Scoreline extends Classs<Props>
     let none: any;
     if (this.props.hideZeroes && this.props.scores.every((score) => score.score === 0))
     {
-      none = <div className="scoreline-none">None</div>;
+      none = <div className='scoreline-none'>None</div>;
     }
 
     return (
-      <div className="scoreline">
+      <div className='scoreline'>
         {
           this.props.scores.map(this.renderScore)
         }

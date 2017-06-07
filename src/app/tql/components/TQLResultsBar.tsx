@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./TQLResultsBar.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -73,17 +74,17 @@ class TQLResultsBar extends PureClasss<Props>
     {
       return (
         <div>
-          <span className="error-detail">
+          <span className='error-detail'>
             {
               this.props.open ? '\u25BC ' : '\u25B6 '
             }
           </span>
-          <span className="error-title">
+          <span className='error-title'>
             {
               resultsState.mainErrorMessage
             }
           </span>
-          <span className="error-message">
+          <span className='error-message'>
             {
               resultsState.subErrorMessage
             }
@@ -144,7 +145,7 @@ class TQLResultsBar extends PureClasss<Props>
         })}
         onClick={this.props.onToggle}
       >
-        <div className="tql-results-bar-inner">
+        <div className='tql-results-bar-inner'>
           {
             this.renderResults()
           }

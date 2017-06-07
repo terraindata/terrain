@@ -42,10 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 const _ = require('underscore');
 import Util from '../../util/Util';
-import LibraryTypes from './../LibraryTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
 import { _LibraryState, LibraryState, LibraryStore } from './LibraryStore';
@@ -66,7 +67,7 @@ const Actions =
       create:
       (
         group: LibraryTypes.Group = LibraryTypes._Group(),
-        idCallBack?: (id: ID) => void
+        idCallBack?: (id: ID) => void,
       ) =>
       {
         Ajax.saveItem(
@@ -74,12 +75,12 @@ const Actions =
           (response) =>
           {
             // on load
-            let id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.groups.create, {
               group: group.set('id', id),
             });
             idCallBack && idCallBack(id);
-          }
+          },
         );
       },
 
@@ -102,7 +103,7 @@ const Actions =
       (
         groupId: ID,
         algorithm = LibraryTypes._Algorithm(),
-        idCallback?: (id: ID) => void
+        idCallback?: (id: ID) => void,
       ) =>
       {
         algorithm = algorithm
@@ -114,12 +115,12 @@ const Actions =
           (response) =>
           {
             // on load
-            let id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.algorithms.create, {
               algorithm: algorithm.set('id', id),
             });
             idCallback && idCallback(id);
-          }
+          },
         );
       },
 
@@ -134,7 +135,7 @@ const Actions =
       duplicate:
       (algorithm: Algorithm, index: number, groupId?: ID) =>
       {
-        let { variantsOrder } = algorithm;
+        const { variantsOrder } = algorithm;
 
         groupId = groupId || algorithm.groupId;
         algorithm = algorithm
@@ -153,13 +154,13 @@ const Actions =
             variantsOrder.map(
               (variantId, index) =>
               {
-                let variant = variants.get(variantId);
+                const variant = variants.get(variantId);
                 setTimeout(() => Actions.variants.duplicate(variant, 0, groupId, algorithmId), index * 200);
-              }
+              },
             );
-          }
+          },
         );
-      }
+      },
     },
 
     variants:
@@ -177,11 +178,11 @@ const Actions =
           (response) =>
           {
             // on load
-            let id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.variants.create, {
               variant: variant.set('id', id),
             });
-          }
+          },
         );
       },
 
@@ -256,7 +257,7 @@ const Actions =
           groups,
           algorithms,
           variants,
-          groupsOrder: groupsOrder,
+          groupsOrder,
           loading: false,
         }));
       });

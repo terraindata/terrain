@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
 
 export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object);
@@ -75,7 +76,6 @@ export interface Block extends IRecord<Block>
 
   [field: string]: any;
 }
-
 
 export interface BlockConfig
 {
@@ -114,7 +114,6 @@ export const _block = (config: BlockConfig): Block =>
 
   return blockConfig;
 };
-
 
 
 export default Block;

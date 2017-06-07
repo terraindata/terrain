@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Team.less');
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -118,8 +119,8 @@ class Team extends Classs<Props>
     }
 
     return (
-      <Link to={`/users/${user.id}`} className="team-link" key={user.id}>
-        <div className="team-row">
+      <Link to={`/users/${user.id}`} className='team-link' key={user.id}>
+        <div className='team-row'>
           <div>
             <UserThumbnail
               large={true}
@@ -127,26 +128,26 @@ class Team extends Classs<Props>
               square={true}
             />
           </div>
-          <div className="team-item-names">
-            <div className="team-name">
+          <div className='team-item-names'>
+            <div className='team-name'>
               {
                 user.name
               }
             </div>
-            <div className="team-role">
+            <div className='team-role'>
               {
                 user.isDisabled ? <b>Disabled</b> : user.whatIDo
               }
             </div>
           </div>
-          <div className="team-item-info">
+          <div className='team-item-info'>
             {
               !!user.phone &&
-              <div className="team-item-info-row">
-                <div className="team-item-info-label">
+              <div className='team-item-info-row'>
+                <div className='team-item-info-label'>
                   Phone Number
                   </div>
-                <div className="team-item-info-value">
+                <div className='team-item-info-value'>
                   {
                     user.phone
                   }
@@ -155,11 +156,11 @@ class Team extends Classs<Props>
             }
             {
               !!user.email &&
-              <div className="team-item-info-row">
-                <div className="team-item-info-label">
+              <div className='team-item-info-row'>
+                <div className='team-item-info-label'>
                   Email
                   </div>
-                <div className="team-item-info-value">
+                <div className='team-item-info-value'>
                   {
                     user.email
                   }
@@ -168,11 +169,11 @@ class Team extends Classs<Props>
             }
             {
               !!user.skype &&
-              <div className="team-item-info-row">
-                <div className="team-item-info-label">
+              <div className='team-item-info-row'>
+                <div className='team-item-info-label'>
                   Skype
                   </div>
-                <div className="team-item-info-value">
+                <div className='team-item-info-value'>
                   {
                     user.skype
                   }
@@ -208,7 +209,7 @@ class Team extends Classs<Props>
     }
 
     return (
-      <div className="team-show-disabled" onClick={this.toggleShowDisabledUsers}>
+      <div className='team-show-disabled' onClick={this.toggleShowDisabledUsers}>
         {this.state.showDisabledUsers ? 'Hide Disabled Users' : 'Show Disabled Users'}
       </div>
     );
@@ -287,33 +288,33 @@ class Team extends Classs<Props>
       if (this.state.addingUser)
       {
         return (
-          <div className="create-user">
-            <div className="create-user-cancel" onClick={this.toggleAddingUser} data-tip="Cancel">
+          <div className='create-user'>
+            <div className='create-user-cancel' onClick={this.toggleAddingUser} data-tip='Cancel'>
               x
             </div>
             <h3>Create a new user</h3>
 
-            <div className="flex-container">
-              <div className="flex-grow">
+            <div className='flex-container'>
+              <div className='flex-grow'>
                 <b>Email</b>
                 <div>
-                  <input ref="newEmail" placeholder="Email" />
+                  <input ref='newEmail' placeholder='Email' />
                 </div>
               </div>
-              <div className="flex-grow">
+              <div className='flex-grow'>
                 <b>Temporary Password</b>
                 <div>
-                  <input ref="newPassword" placeholder="Password" type="password" />
+                  <input ref='newPassword' placeholder='Password' type='password' />
                 </div>
               </div>
-              <div className="flex-grow">
+              <div className='flex-grow'>
                 <b>Confirm Password</b>
                 <div>
-                  <input ref="confirmPassword" placeholder="Confirm password" type="password" />
+                  <input ref='confirmPassword' placeholder='Confirm password' type='password' />
                 </div>
               </div>
             </div>
-            <div className="button" onClick={this.createNewUser}>
+            <div className='button' onClick={this.createNewUser}>
               Create
             </div>
           </div>
@@ -322,7 +323,7 @@ class Team extends Classs<Props>
 
       return (
         <CreateItem
-          name="New User"
+          name='New User'
           onCreate={this.toggleAddingUser}
         />
       );
@@ -343,13 +344,13 @@ class Team extends Classs<Props>
 
     return (
       <div>
-        <div className="team">
-          <div className="team-page-title">
+        <div className='team'>
+          <div className='team-page-title'>
             Team Directory
         </div>
           {
             loading &&
-            <InfoArea large="Loading..." />
+            <InfoArea large='Loading...' />
           }
           {users && users.toArray().map(this.renderUser)}
           {this.renderAddUser()}

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Switch.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -76,11 +77,11 @@ class Switch extends Classs<Props>
 
     return (
       <div className={classes} onClick={this.handleSwitch}>
-        <div className="switch-on" />
-        <div className="switch-first">
+        <div className='switch-on' />
+        <div className='switch-first'>
           {this.props.first}
         </div>
-        <div className="switch-second">
+        <div className='switch-second'>
           {this.props.second}
         </div>
       </div>

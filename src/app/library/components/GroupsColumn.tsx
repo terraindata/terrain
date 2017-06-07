@@ -42,8 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 
 import * as React from 'react';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -58,7 +60,6 @@ import LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
@@ -166,7 +167,7 @@ class GroupsColumn extends Classs<Props>
         key={group.id}
         to={'/library/' + group.id}
         onNameChange={this.handleNameChange}
-        type="group"
+        type='group'
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
@@ -177,7 +178,7 @@ class GroupsColumn extends Classs<Props>
         canDuplicate={false}
         canCreate={canCreate}
       >
-        <div className="group-library-info-wrapper">
+        <div className='group-library-info-wrapper'>
           {
             groupRoles && me && (groupRoles.getIn([me.id, 'builder']) || groupRoles.getIn([me.id, 'admin'])) &&
             <UserThumbnail
@@ -231,19 +232,19 @@ class GroupsColumn extends Classs<Props>
         status={ItemStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
-        type="group"
+        type='group'
         titleHidden={status === ItemStatus.Build}
       >
         {
           ids.map(this.renderGroup)
         }
         {
-          ids.size === 0 && <div className="library-category-none">None</div>
+          ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
           status === ItemStatus.Build && canCreate &&
           <CreateItem
-            name="group"
+            name='group'
             onCreate={this.handleCreate}
           />
         }
@@ -256,7 +257,7 @@ class GroupsColumn extends Classs<Props>
     return (
       <LibraryColumn
         index={1}
-        title="Groups"
+        title='Groups'
       >
         {
           this.props.groups.size ?
@@ -268,8 +269,8 @@ class GroupsColumn extends Classs<Props>
             )
             :
             <InfoArea
-              large="No groups created, yet."
-              button="Create a group"
+              large='No groups created, yet.'
+              button='Create a group'
               onClick={this.handleCreate}
             />
         }

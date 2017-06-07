@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import BackendInstance from '../../../shared/backends/types/BackendInstance';
@@ -114,7 +115,7 @@ export const Ajax =
           return;
         }
 
-        if (xhr.status != 200)
+        if (xhr.status !== 200)
         {
           config && config.onError && config.onError({
             error: xhr.responseText,
@@ -188,7 +189,7 @@ export const Ajax =
         download?: boolean;
         downloadFilename?: string;
         useMidway?: boolean;
-      } = {}
+      } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const uniqueId = '' + Math.random();
@@ -239,7 +240,7 @@ export const Ajax =
       options: {
         csv?: boolean,
         csvName?: string,
-      } = {}
+      } = {},
     )
     {
       // kill queries running under the same id
@@ -318,7 +319,7 @@ export const Ajax =
         (e) =>
         {
           onError && onError(e, context);
-        }
+        },
       );
     },
 

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./VariantVersions.less');
 const classNames = require('classnames');
 import * as React from 'react';
@@ -164,7 +165,7 @@ class VariantVersions extends PureClasss<Props>
           this._fn(this.showVersion, version.id, i)
         }
       >
-        <div className="versions-table-element">
+        <div className='versions-table-element'>
           <UserThumbnail
             userId={version.userId}
             small={true}
@@ -173,7 +174,7 @@ class VariantVersions extends PureClasss<Props>
           />
         </div>
         <div
-          className="versions-table-element"
+          className='versions-table-element'
         >
           {
             Util.formatDate(version.createdAt)
@@ -186,20 +187,20 @@ class VariantVersions extends PureClasss<Props>
   render()
   {
     return (
-      <div className="versions-table-wrapper">
-        <div className="versions-table-title">
+      <div className='versions-table-wrapper'>
+        <div className='versions-table-title'>
           Version History
         </div>
-        <div className="versions-table-right-align">
+        <div className='versions-table-right-align'>
           Current Version
         </div>
         {
           this.state.versions === null ?
-            <div className="loading">
+            <div className='loading'>
               Loading...
             </div>
             :
-            <div className="versions-table">
+            <div className='versions-table'>
               {
                 this.state.versions.map(this.renderVersion)
               }

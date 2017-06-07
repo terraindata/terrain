@@ -42,18 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 
-import {Card, Cards, _card} from './types/Card';
-import {Block, TQLFn} from './types/Block';
-import {Display, getCardStringDisplay, valueDisplay, stringValueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from './displays/Display';
 import BlockUtils from './BlockUtils';
-const {List, Map} = Immutable;
+import { Display, getCardStringDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from './displays/Display';
+import { Block, TQLFn } from './types/Block';
+import { _card, Card, Cards } from './types/Card';
+const { List, Map } = Immutable;
 const L = () => List([]);
-const {make} = BlockUtils;
+const { make } = BlockUtils;
 
-export module CommonBlocks
+export namespace CommonBlocks
 {
   // a card that contains other cards
   export interface IWrapperCard extends Card
@@ -94,7 +95,8 @@ export module CommonBlocks
         getChildTerms: config.getChildTerms,
         getNeighborTerms: config.getNeighborTerms,
 
-        preview: (c: IWrapperCard) => {
+        preview: (c: IWrapperCard) =>
+        {
           // var prefix = config.title + ': ';
           // if(c.type === 'parentheses')
           // {
@@ -138,14 +140,14 @@ export module CommonBlocks
       isAggregate: true,
 
       display:
-        config.defaultValue === undefined
-          ? stringValueDisplay
-          : _.extend({},
-              stringValueDisplay,
-              {
-                defaultValue: config.defaultValue,
-              },
-            )
+      config.defaultValue === undefined
+        ? stringValueDisplay
+        : _.extend({},
+          stringValueDisplay,
+          {
+            defaultValue: config.defaultValue,
+          },
+        )
       ,
     },
   });
@@ -177,29 +179,29 @@ export module CommonBlocks
     },
   });
 
-  export const _valueCard = (config: { 
-    title: string, 
-    colors: string[], 
-    // manualEntry: IManualEntry, 
-    tql: string, 
+  export const _valueCard = (config: {
+    title: string,
+    colors: string[],
+    // manualEntry: IManualEntry,
+    tql: string,
     defaultValue: number,
     language: string,
   }) => (
-    _card({
-      value: config.defaultValue,
+      _card({
+        value: config.defaultValue,
 
-      static: {
-        language: config.language,
-        title: config.title,
-        colors: config.colors,
-        preview: '[value]',
-        display: valueDisplay,
-        // manualEntry: config.manualEntry,
-        tql: config.tql,
-      },
-    })
-  );
-  
+        static: {
+          language: config.language,
+          title: config.title,
+          colors: config.colors,
+          preview: '[value]',
+          display: valueDisplay,
+          // manualEntry: config.manualEntry,
+          tql: config.tql,
+        },
+      })
+    );
+
 }
 
 export default CommonBlocks;

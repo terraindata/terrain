@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as $ from 'jquery';
 // import * as moment from 'moment';
 const moment = require('moment');
@@ -157,7 +158,7 @@ const Util = {
 
   stringIsNumber(str: string): boolean
   {
-    return str && str !== " " && !Number.isNaN(+str);
+    return str && str !== ' ' && !Number.isNaN(+str);
   },
 
   canEdit(item: { type: string, id: ID }, UserStore, RolesStore)
@@ -439,7 +440,7 @@ const Util = {
     {
       field.focus();
       field.setSelectionRange(start, end);
-    } else if (typeof field.selectionStart != 'undefined')
+    } else if (typeof field.selectionStart !== 'undefined')
     {
       field.selectionStart = start;
       field.selectionEnd = end;
@@ -594,7 +595,7 @@ const Util = {
       return 11;
 
     else
-      return 0; //It is not IE
+      return 0; // It is not IE
   },
 };
 

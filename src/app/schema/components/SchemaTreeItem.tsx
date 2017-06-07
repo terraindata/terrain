@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
@@ -144,7 +145,7 @@ class SchemaTreeItem extends PureClasss<Props>
         }
 
         const isHighlighted = this.props.id === state.highlightedId
-          && !!this.props.inSearchResults == state.highlightedInSearchResults;
+          && !!this.props.inSearchResults === state.highlightedInSearchResults;
         const isSelected = this.props.id === state.selectedId;
 
         if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
@@ -193,7 +194,7 @@ class SchemaTreeItem extends PureClasss<Props>
     {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }
@@ -286,7 +287,7 @@ class SchemaTreeItem extends PureClasss<Props>
   {
     const { item } = this.state;
 
-    let nameText: string | El = <span className="loading-text" />;
+    let nameText: string | El = <span className='loading-text' />;
 
     if (item)
     {
@@ -359,12 +360,12 @@ class SchemaTreeItem extends PureClasss<Props>
       >
         <FadeInOut
           open={showing}
-          key="one"
+          key='one'
         >
           {
             showing &&
             <div
-              data-rel="schema-item"
+              data-rel='schema-item'
               data-id={this.props.id}
               data-search={this.props.inSearchResults}
             >
@@ -402,7 +403,7 @@ class SchemaTreeItem extends PureClasss<Props>
 
         <FadeInOut
           open={this.state.open}
-          key="two"
+          key='two'
         >
           {
             this.renderItemChildren()

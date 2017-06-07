@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Sidebar.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -80,7 +81,7 @@ export class Sidebar extends PureClasss<Props>
         })}
       >
         <div
-          className="sidebar-selected-square"
+          className='sidebar-selected-square'
           style={{
             top: (this.props.selectedIndex * linkHeight) + 'px',
           }}
@@ -97,11 +98,11 @@ export class Sidebar extends PureClasss<Props>
                   'sidebar-link-selected': index === this.props.selectedIndex,
                 })}
               >
-                <div className="sidebar-link-inner">
+                <div className='sidebar-link-inner'>
                   {
                     link.icon
                   }
-                  <div className="sidebar-link-text">
+                  <div className='sidebar-link-text'>
                     {
                       link.text
                     }
@@ -114,8 +115,8 @@ export class Sidebar extends PureClasss<Props>
         {
           this.props.expandable ?
             (
-              <div className="sidebar-expand" onClick={this.props.onExpand}>
-                <div className="dead-center">
+              <div className='sidebar-expand' onClick={this.props.onExpand}>
+                <div className='dead-center'>
                   <ExpandIcon />
                 </div>
               </div>

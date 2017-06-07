@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Library.less');
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
@@ -158,7 +159,7 @@ class Library extends PureClasss<any>
           }
         }
       }
-      else 
+      else
       {
         // !group
         browserHistory.replace('/library');
@@ -168,7 +169,7 @@ class Library extends PureClasss<any>
     localStorage.setItem('lastLibraryPath', this.props.location.pathname);
 
     return (
-      <div className="library">
+      <div className='library'>
         <GroupsColumn
           {...{
             groups,

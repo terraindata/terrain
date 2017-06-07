@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./CardsColumn.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -142,11 +143,11 @@ class CardsColumn extends PureClasss<Props>
   renderTopbar()
   {
     return (
-      <div className="cards-area-top-bar">
-        <div className="cards-area-white-space" />
+      <div className='cards-area-top-bar'>
+        <div className='cards-area-white-space' />
         <Switch
-          first="Standard"
-          second="Learning"
+          first='Standard'
+          second='Learning'
           onChange={this.toggleLearningMode}
           selected={this.state.learningMode ? 2 : 1}
           small={true}
@@ -215,10 +216,10 @@ class CardsColumn extends PureClasss<Props>
             'cards-column-cards-area-faded': !this.props.cardsAndCodeInSync,
           })}
           onScroll={this.handleScroll}
-          id="cards-column"
+          id='cards-column'
         >
           <div
-            id="cards-column-inner"
+            id='cards-column-inner'
           >
             <CardDropArea
               half={true}
@@ -254,20 +255,20 @@ class CardsColumn extends PureClasss<Props>
         {
           canHaveDeck &&
           <div
-            className="cards-deck-knob"
+            className='cards-deck-knob'
             onClick={this.toggleDeck}
           >
             <ExpandIcon
-              className="cards-deck-knob-icon"
+              className='cards-deck-knob-icon'
             />
-            <div className="cards-deck-knob-text">
+            <div className='cards-deck-knob-text'>
               Card Deck
               </div>
           </div>
         }
 
         <div
-          className="cards-column-tql-parse-error"
+          className='cards-column-tql-parse-error'
         >
           {
             'There is a parsing error with your TQL.' || 'All good!'

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as _ from 'underscore';
 // import * as moment from 'moment';
@@ -291,9 +292,9 @@ class VariantsColumn extends Classs<Props>
         color={ColorManager.colorForKey(this.props.groupId)}
         key={variant.id}
         to={`/library/${this.props.groupId}/${this.props.algorithmId}/${id}`}
-        className="library-item-lightest"
+        className='library-item-lightest'
         id={id}
-        type="variant"
+        type='variant'
         onNameChange={this.handleNameChange}
         rendered={this.state.rendered}
         onHover={this.handleHover}
@@ -305,19 +306,19 @@ class VariantsColumn extends Classs<Props>
         canCreate={canDrag}
         isStarred={variant.status === 'DEFAULT'}
       >
-        <div className="flex-container">
+        <div className='flex-container'>
           <UserThumbnail
             userId={variant.lastUserId}
             medium={true}
           />
 
-          <div className="flex-grow">
+          <div className='flex-grow'>
             <StatusDropdown
               variant={variant}
               noBorder={true}
             />
             <div
-              className="library-item-line"
+              className='library-item-line'
             >
               {
                 Util.formatDate(variant.lastEdited)
@@ -360,7 +361,7 @@ class VariantsColumn extends Classs<Props>
       <LibraryItemCategory
         status={archived ? ItemStatus.Archive : ItemStatus.Build}
         key={archived ? '1' : '0'}
-        type="variant"
+        type='variant'
         onHover={this.handlItemStatusHover}
         titleHidden={!archived}
       >
@@ -374,12 +375,12 @@ class VariantsColumn extends Classs<Props>
         {
           this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
             ? null
-            : <div className="library-category-none">None</div>
+            : <div className='library-category-none'>None</div>
         }
         {
           canCreate && !archived &&
           <CreateItem
-            name="variant"
+            name='variant'
             onCreate={this.handleCreate}
           />
         }
@@ -392,7 +393,7 @@ class VariantsColumn extends Classs<Props>
     return (
       <LibraryColumn
         index={3}
-        title="Variants"
+        title='Variants'
       >
         {
           this.props.variantsOrder ?
@@ -406,7 +407,7 @@ class VariantsColumn extends Classs<Props>
                 )
                 :
                 <InfoArea
-                  large="No variants created, yet."
+                  large='No variants created, yet.'
                   button={
                     Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore) ||
                       Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./ScoreBar.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -99,11 +100,11 @@ class ScoreBar extends PureClasss<{
     }
 
     return (
-      <div className="weight-graph">
-        <div className="weight-graph-inner">
-          <div className="weight-graph-bar" style={style} />
+      <div className='weight-graph'>
+        <div className='weight-graph-inner'>
+          <div className='weight-graph-bar' style={style} />
         </div>
-        <div className="weight-graph-line" />
+        <div className='weight-graph-line' />
       </div>
     );
   }

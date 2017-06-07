@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./CreateLine.less');
 import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
@@ -61,9 +62,9 @@ class CreateLine extends PureClasss<Props>
   render()
   {
     return (
-      <div className="create-line-row" onClick={this.props.onClick}>
-        <div className="create-line-line"></div>
-        <div className="create-line-plus">
+      <div className='create-line-row' onClick={this.props.onClick}>
+        <div className='create-line-line'></div>
+        <div className='create-line-plus'>
           {this.props.open ? <CloseIcon /> : <AddIcon />}
         </div>
       </div>

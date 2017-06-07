@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
@@ -128,7 +129,7 @@ class SchemaTreeList extends PureClasss<Props>
     {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }

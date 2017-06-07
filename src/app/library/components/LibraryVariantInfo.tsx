@@ -42,10 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./LibraryVariantInfo.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
 const { List } = Immutable;
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
 import UserThumbnail from './../../users/components/UserThumbnail';
@@ -54,7 +56,6 @@ import Actions from './../data/LibraryActions';
 import LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 
 type Variant = LibraryTypes.Variant;
 
@@ -83,7 +84,7 @@ class LibraryInfoColumn extends PureClasss<Props>
     Actions.variants.change(
       this.props.variant
         .set('language', language)
-        .setIn(['query', 'language'], language) // TODO change once we remove query from variant
+        .setIn(['query', 'language'], language), // TODO change once we remove query from variant
     );
   }
 
@@ -99,67 +100,67 @@ class LibraryInfoColumn extends PureClasss<Props>
 
     return (
       <div
-        className="library-info-variant"
+        className='library-info-variant'
       >
-        <div className="biv-table-wrapper">
+        <div className='biv-table-wrapper'>
           <div
-            className="biv-table"
+            className='biv-table'
           >
-            <div className="biv-row">
-              <div className="biv-cell-first">
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
                 Status
               </div>
-              <div className="biv-cell-second">
+              <div className='biv-cell-second'>
                 <StatusDropdown
                   variant={this.props.variant}
                 />
               </div>
             </div>
-            <div className="biv-row">
-              <div className="biv-cell-first">
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
                 Language
               </div>
-              <div className="biv-cell-second">
+              <div className='biv-cell-second'>
                 <Dropdown
                   selectedIndex={LANGUAGES.indexOf(this.props.variant.language)}
                   options={LANGUAGES}
                   onChange={this.handleLanguageChange}
                   canEdit={isBuilder || isSuperUser}
-                  className="bic-db-dropdown"
+                  className='bic-db-dropdown'
                 />
               </div>
             </div>
-            <div className="biv-row">
-              <div className="biv-cell-first">
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
                 Database
               </div>
-              <div className="biv-cell-second">
+              <div className='biv-cell-second'>
                 <Dropdown
                   selectedIndex={this.props.dbs && this.props.dbs.findIndex(
-                    db => db.id === this.props.variant.db.id
+                    (db) => db.id === this.props.variant.db.id,
                   )}
-                  options={this.props.dbs.map(db => db.name + ' (' + db.type + ')').toList()}
+                  options={this.props.dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
                   onChange={this.handleDbChange}
                   canEdit={isBuilder || isSuperUser}
-                  className="bic-db-dropdown"
+                  className='bic-db-dropdown'
                 />
               </div>
             </div>
-            <div className="biv-row">
-              <div className="biv-cell-first">
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
                 Updated At
               </div>
-              <div className="biv-cell-second">
+              <div className='biv-cell-second'>
                 {
                   Util.formatDate(variant.lastEdited)
                 }
               </div>
             </div>
-            <div className="biv-row">
-              <div className="biv-cell-first">
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
                 Updated By
               </div>
-              <div className="biv-cell-second">
+              <div className='biv-cell-second'>
                 <UserThumbnail
                   userId={variant.lastUserId}
                   smallest={true}

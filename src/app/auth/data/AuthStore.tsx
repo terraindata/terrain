@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 const _ = require('underscore');
 const Immutable = require('immutable');
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
-import ActionTypes from './AuthActionTypes';
 import AuthTypes from '../AuthTypes';
+import ActionTypes from './AuthActionTypes';
 
 import AuthReducers from './AuthReducers';
 

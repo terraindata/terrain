@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../util/Util';
@@ -49,7 +50,7 @@ const { List, Map } = Immutable;
 import { BaseClass, New } from '../Classes';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
-export module AuthTypes
+export namespace AuthTypes
 {
   // This type represents the state of the AuthStore
   class AuthStateC extends BaseClass
@@ -61,7 +62,7 @@ export module AuthTypes
   //  This first line exports a type that you will actually use in other files.
   //  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
   export type AuthState = AuthStateC & IRecord<AuthStateC>;
-  //  This second line exports a function to create a new instance of the AuthState Immutable backed class 
+  //  This second line exports a function to create a new instance of the AuthState Immutable backed class
   //  It's a replacement for a constructor.
   //  This is necessary because simply doing `new AuthStateC` will not create an Immutable version
   //   and you can't use `new` simply with Immutable Records.

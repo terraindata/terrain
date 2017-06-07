@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import { Card, CardString } from '../../../../shared/blocks/types/Card';
 
 import * as classNames from 'classnames';
@@ -95,7 +96,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
       <div className={classNames({
         'builder-tb-cards-area': true,
         [this.props.className]: !!this.props.className,
-      })} ref="tb">
+      })} ref='tb'>
         <CardComponent
           {...this.props}
           singleCard={true}

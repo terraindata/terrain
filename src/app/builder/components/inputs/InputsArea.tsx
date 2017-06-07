@@ -42,10 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import { Input } from '../../../../../shared/blocks/types/Input';
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Input } from '../../../../../shared/blocks/types/Input';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
 import PureClasss from '../../../common/components/PureClasss';
@@ -91,7 +92,7 @@ class InputsArea extends PureClasss<Props>
     }
 
     return (
-      <div className="inputs-area">
+      <div className='inputs-area'>
         {
           this.props.inputs.map((input, index) =>
             <InputComponent
@@ -103,7 +104,7 @@ class InputsArea extends PureClasss<Props>
           )
         }
 
-        <div className="standard-margin">
+        <div className='standard-margin'>
           {
             this.props.canEdit &&
             <CreateLine

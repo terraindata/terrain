@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Autocomplete.less');
 
 import * as classNames from 'classnames';
@@ -269,10 +270,10 @@ class Autocomplete extends PureClasss<Props>
     const options = this.props.options && this.props.options.filter(this.showOption);
     const inputClassName = 'ac-input ' + (this.props.className || '');
     return (
-      <div className="autocomplete">
+      <div className='autocomplete'>
         <input
-          ref="input"
-          type="text"
+          ref='input'
+          type='text'
           className={inputClassName}
           value={this.state.value}
           onChange={this.handleChange}
@@ -290,13 +291,13 @@ class Autocomplete extends PureClasss<Props>
               'ac-options': true,
               'ac-options-open': this.state.open,
             })}
-            ref="ac"
+            ref='ac'
           >
             {
               options.map(this.renderOption)
             }
             {
-              options.size ? null : null && <div className="ac-no-options">No matches</div>
+              options.size ? null : null && <div className='ac-no-options'>No matches</div>
             }
           </div>
         }

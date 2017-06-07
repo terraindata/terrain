@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./Settings.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -122,7 +123,7 @@ class PasswordStrengthInput extends Classs<Props>
           value={this.props.value}
           onChange={this.props.onChange}
           onInput={this.handleInput}
-          className="settings-input password-input"
+          className='settings-input password-input'
         />
         <PasswordMeter value={this.state.score} />
       </div>
