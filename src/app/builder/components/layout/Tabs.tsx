@@ -57,8 +57,8 @@ import BuilderStore from './../../../builder/data/BuilderStore';
 import Classs from './../../../common/components/Classs';
 import InfoArea from './../../../common/components/InfoArea';
 import PureClasss from './../../../common/components/PureClasss';
-import {LibraryState, LibraryStore} from './../../../library/data/LibraryStore';
-const {browserHistory} = require('react-router');
+import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
+const { browserHistory } = require('react-router');
 const ReactTooltip = require('react-tooltip');
 
 const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
@@ -106,7 +106,7 @@ const Tab = React.createClass<any, any>({
   },
 
   // Returns z-index so that tabs are layered in a nice fashion
-  zIndexStyle(): ({zIndex?: number})
+  zIndexStyle(): ({ zIndex?: number })
   {
     if (!this.props.selected)
     {
@@ -165,43 +165,43 @@ const Tab = React.createClass<any, any>({
       topStyle = '-8px';
     }
 
-    return this.renderPanel(
-      <div
-        className={classNames({
-          'tabs-tab': true,
-          'tabs-tab-selected': this.props.selected,
-          'tabs-tab-no-bg': this.props.fixed,
-        })}
-        key={this.props.id}
+    return this.renderPanel(
+      <div
+        className={classNames({
+          'tabs-tab': true,
+          'tabs-tab-selected': this.props.selected,
+          'tabs-tab-no-bg': this.props.fixed,
+        })}
+        key={this.props.id}
         onClick={this.handleClick}
-        style={this.zIndexStyle()}
+        style={this.zIndexStyle()}
       >
-          {
-            !this.props.fixed &&
-              <TabIcon
-                className='tab-icon tab-icon-left'
-              />
-          }
-          <div
-            className='tab-inner'
-            style={{top: topStyle}}
-          >
-            {
-              this.props.name
-            }
-            {
-              this.renderClose()
-            }
-          </div>
-          {
-            !this.props.fixed &&
-              <TabIcon
-                className='tab-icon tab-icon-right'
-              />
-          }
-      </div>,
-    );
-  },
+        {
+          !this.props.fixed &&
+          <TabIcon
+            className='tab-icon tab-icon-left'
+          />
+        }
+        <div
+          className='tab-inner'
+          style={{ top: topStyle }}
+        >
+          {
+            this.props.name
+          }
+          {
+            this.renderClose()
+          }
+        </div>
+        {
+          !this.props.fixed &&
+          <TabIcon
+            className='tab-icon tab-icon-right'
+          />
+        }
+      </div>,
+    );
+  },
 });
 
 export interface TabAction
@@ -255,7 +255,7 @@ export class Tabs extends PureClasss<TabsProps> {
 
   computeTabs(config)
   {
-    const {variants} = this.state;
+    const { variants } = this.state;
     const tabs = config && variants && config.split(',').map((vId) =>
     {
       const id = this.getId(vId);
@@ -318,11 +318,11 @@ export class Tabs extends PureClasss<TabsProps> {
             >
               {
                 action.icon &&
-                  <div className='tabs-action-piece'>
-                    {
-                      action.icon
-                    }
-                  </div>
+                <div className='tabs-action-piece'>
+                  {
+                    action.icon
+                  }
+                </div>
               }
               <div className='tabs-action-piece'>
                 {
@@ -368,42 +368,42 @@ export class Tabs extends PureClasss<TabsProps> {
 
   getCloseTo(id)
   {
-    const {tabs} = this.state;
+    const { tabs } = this.state;
     const tab = this.state.tabs.find((tab) => tab.id === id);
     const newConfig = (tab.selected && tabs.length > 1 ? '!' : '')
       + tabs.map((tab) =>
         tab.id === id ? null :
           (tab.selected ? '!' : '') + tab.id,
-    ).filter((s) => s)
-     .join(',');
+      ).filter((s) => s)
+        .join(',');
 
     localStorage.setItem('config', newConfig); // need to set for closing the last tab to work
     return '/builder/' + newConfig;
   }
 
-	render()
+  render()
   {
     const { tabs } = this.state;
 
     const tabsLayout =
-    {
-      compact: true,
-      columns: tabs ? tabs.map((tab, index) => (
       {
-        key: tab.id,
-        content:
-          <Tab
-            name={tab.name}
-            selected={tab.selected}
-            id={tab.id}
-            index={index}
-            onClick={this.handleClick}
-            onClose={this.handleClose}
-          />
-        ,
-      }))
-      : [],
-    };
+        compact: true,
+        columns: tabs ? tabs.map((tab, index) => (
+          {
+            key: tab.id,
+            content:
+            <Tab
+              name={tab.name}
+              selected={tab.selected}
+              id={tab.id}
+              index={index}
+              onClick={this.handleClick}
+              onClose={this.handleClose}
+            />
+            ,
+          }))
+          : [],
+      };
 
     return (
       <div className='tabs-container'>
@@ -419,7 +419,7 @@ export class Tabs extends PureClasss<TabsProps> {
           </div>
         </div>
       </div>
-     );
-	}
+    );
+  }
 }
 export default Tabs;

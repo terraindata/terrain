@@ -602,7 +602,7 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean )
+  private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean)
   {
     this.updateM2ErrorState(response.errors, isAllFields);
   }
