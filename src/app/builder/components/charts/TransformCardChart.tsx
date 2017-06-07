@@ -52,7 +52,8 @@ import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 
-interface ScorePoint {
+interface ScorePoint
+{
   id: string;
   score: number;
   value: number;

@@ -358,7 +358,7 @@ export const Ajax =
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
       variants: IMMap<number, LibraryTypes.Variant>,
       groupsOrder: IMList<number, any>) => void,
-      onError?: (ev: Event) => void )
+      onError?: (ev: Event) => void)
     {
       return Ajax.req(
         'get',
@@ -540,7 +540,7 @@ export const Ajax =
     },
 
     getQuery(variantId: ID,
-      onLoad: (query: Query, variant: LibraryTypes.Variant) => void )
+      onLoad: (query: Query, variant: LibraryTypes.Variant) => void)
     {
       if (!variantId)
       {
