@@ -282,14 +282,14 @@ class Manual extends Classs<Props>
     });
 
     let selectedKey = '';
-    this.allTqlCards.forEach(function(key, index)
+    this.allTqlCards.forEach((key, index) =>
     {
       if (value.toLowerCase() === key.toLowerCase())
       {
         selectedKey = key;
       }
     });
-    this.allPhraseTypes.forEach(function(key, index)
+    this.allPhraseTypes.forEach((key, index) =>
     {
       if (value.toLowerCase() === key.toLowerCase())
       {

@@ -528,7 +528,7 @@ class Builder extends PureClasss<Props>
 
     let configArr = window.location.pathname.split('/')[2].split(',');
     let currentVariant;
-    configArr = configArr.map(function(tab)
+    configArr = configArr.map((tab) =>
     {
       if (tab.substr(0, 1) === '!')
       {

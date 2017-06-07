@@ -73,7 +73,7 @@ const cleanupFrame = (frame) =>
   document.body.removeChild(frame);
 };
 
-test('LayoutManager renders columns', function(t)
+test('LayoutManager renders columns', (t) =>
 {
   const layout = {
     fullHeight: true,
@@ -133,7 +133,7 @@ test('LayoutManager renders columns', function(t)
   t.end();
 });
 
-test('LayoutManager renders rows', function(t)
+test('LayoutManager renders rows', (t) =>
 {
   const layout = {
     rows: [

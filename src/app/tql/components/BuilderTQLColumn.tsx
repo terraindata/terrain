@@ -268,7 +268,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     const keywords = Object.keys(cardList);
     let cardName = '';
-    keywords.map(function(word)
+    keywords.map((word) =>
     {
       const words = word.split(' ');
       // For terms like select from, only need to match one of the words

@@ -483,7 +483,7 @@ const Util = {
     const curHeight = el.height();
     const autoHeight = el.css('height', 'auto').height();
 
-    el.height(curHeight).animate({ height: autoHeight }, duration || 250, function()
+    el.height(curHeight).animate({ height: autoHeight }, duration || 250, () =>
     {
       el.css('height', 'auto');
       el.css('overflow-y', 'visible');

@@ -54,7 +54,7 @@ const merge = require('object-assign');
 const CloseIcon = require('./../../../../images/icon_close.svg');
 const TerrainLogo = require('./../../../../images/logo_terrainCircle.svg');
 /* From Modernizr */
-const whichTransitionEvent = function()
+const whichTransitionEvent = () =>
 {
   let t;
   const el = document.createElement('fakeelement');
@@ -212,7 +212,7 @@ class NotificationItem extends Classs<Props> {
   _showNotification()
   {
     const self = this;
-    setTimeout(function()
+    setTimeout(() =>
     {
       if (self._isMounted)
       {
@@ -261,7 +261,7 @@ class NotificationItem extends Classs<Props> {
 
     if (notification.autoDismiss)
     {
-      this._notificationTimer = new Helpers.Timer(function()
+      this._notificationTimer = new Helpers.Timer(() =>
       {
         self._hideNotification();
       }, notification.autoDismiss * 1000);

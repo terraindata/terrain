@@ -370,7 +370,7 @@ class LibraryItem extends Classs<Props>
 // DnD stuff
 
 let shifted = false;
-$(document).on('dragover dragend', function(e) { shifted = e.shiftKey; return true; });
+$(document).on('dragover dragend', (e) => { shifted = e.shiftKey; return true; });
 // http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
 
 const source =
