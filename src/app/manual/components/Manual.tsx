@@ -410,7 +410,7 @@ class Manual extends Classs<Props>
           'manual-left-column-section-heading': true,
           'manual-left-column-section-heading-blue': true,
           'manual-left-column-entry': true,
-          'manual-entry-left-selected': this.state.selectedKey == 'TQL Cards',
+          'manual-entry-left-selected': this.state.selectedKey === 'TQL Cards',
         })}>
           <ArrowIcon className={classNames({
             'manual-arrow-icon': true,
@@ -429,7 +429,7 @@ class Manual extends Classs<Props>
           'manual-left-column-section-heading': true,
           'manual-left-column-section-heading-green': true,
           'manual-left-column-entry': true,
-          'manual-entry-left-selected': this.state.selectedKey == 'Phrase Types',
+          'manual-entry-left-selected': this.state.selectedKey === 'Phrase Types',
         })}>
           <ArrowIcon className={classNames({
             'manual-arrow-icon': true,
@@ -478,7 +478,7 @@ class Manual extends Classs<Props>
         <div className={classNames({
           'manual-left-column-title': true,
           'manual-left-column-entry': true,
-          'manual-entry-left-selected': this.state.value == '' && !this.state.selectedKey,
+          'manual-entry-left-selected': this.state.value === '' && !this.state.selectedKey,
         })}>
           <ArrowIcon className={classNames({
             'manual-arrow-icon': true,

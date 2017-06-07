@@ -528,7 +528,7 @@ export class ResultsManager extends PureClasss<Props>
         let mainErrorMessage = errorMessage;
         let subErrorMessage: string = null;
 
-        if (line !== NaN && line !== null && line !== undefined)
+        if (isNaN(line) !== true && line !== null && line !== undefined)
         {
           mainErrorMessage = 'Error on line ' + line + ': ';
           subErrorMessage = errorMessage;

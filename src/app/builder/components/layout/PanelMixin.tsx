@@ -213,7 +213,7 @@ const Panel = {
   {
     if (this.props.onMouseDown)
     {
-      if (!this.props.mouseDownRef || event.target == this.refs[this.props.mouseDownRef])
+      if (!this.props.mouseDownRef || event.target === this.refs[this.props.mouseDownRef])
       {
         this.props.onMouseDown(this.props.index, event);
       }
@@ -221,7 +221,7 @@ const Panel = {
 
     if (this.props.handleRef)
     {
-      if (event.target != this.refs[this.props.handleRef])
+      if (event.target !== this.refs[this.props.handleRef])
       {
         // a handleRef is set, so only respond to mouse events on our handle
         return;

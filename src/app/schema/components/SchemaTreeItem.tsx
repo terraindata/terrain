@@ -145,7 +145,7 @@ class SchemaTreeItem extends PureClasss<Props>
         }
 
         const isHighlighted = this.props.id === state.highlightedId
-          && !!this.props.inSearchResults == state.highlightedInSearchResults;
+          && !!this.props.inSearchResults === state.highlightedInSearchResults;
         const isSelected = this.props.id === state.selectedId;
 
         if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)

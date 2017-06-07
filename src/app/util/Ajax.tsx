@@ -193,7 +193,7 @@ export const Ajax =
           Actions.logout();
         }
 
-        if (xhr.status != 200)
+        if (xhr.status !== 200)
         {
           config && config.onError && config.onError(xhr.responseText);
           return;

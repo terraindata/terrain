@@ -115,7 +115,7 @@ export const Ajax =
           return;
         }
 
-        if (xhr.status != 200)
+        if (xhr.status !== 200)
         {
           config && config.onError && config.onError({
             error: xhr.responseText,
