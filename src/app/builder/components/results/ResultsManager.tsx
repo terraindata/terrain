@@ -44,22 +44,22 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
+import { line } from 'd3-shape';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { BaseClass, New } from '../../../Classes';
-import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
-import { Ajax } from '../../../util/Ajax';
-import Util from '../../../util/Util';
-import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
-import PureClasss from './../../../common/components/PureClasss';
-import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
-import { line } from 'd3-shape';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import MidwayQueryResponse from '../../../../../shared/backends/types/MidwayQueryResponse';
 import MidwayError from '../../../../../shared/error/MidwayError';
+import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import Query from '../../../../../shared/items/types/Query';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { BaseClass, New } from '../../../Classes';
+import { Ajax } from '../../../util/Ajax';
+import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
+import Util from '../../../util/Util';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
+import PureClasss from './../../../common/components/PureClasss';
 
 export const MAX_RESULTS = 200;
 
@@ -415,8 +415,6 @@ export class ResultsManager extends PureClasss<Props>
     // }
   }
 
-
-
   private updateResults(resultsData: any[], isAllFields: boolean)
   {
     const { resultsState } = this.props;
@@ -604,7 +602,7 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
-  private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean, )
+  private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean)
   {
     this.updateM2ErrorState(response.errors, isAllFields);
   }

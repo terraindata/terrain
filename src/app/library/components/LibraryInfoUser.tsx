@@ -143,13 +143,13 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
       ]);
 
     return (
-      <div key={user.id} className="library-info-user">
+      <div key={user.id} className='library-info-user'>
         <UserThumbnail
           userId={user.id}
           showName={true}
           link={true}
         />
-        <div className="library-info-user-roles">
+        <div className='library-info-user-roles'>
           {
             roleText
           }

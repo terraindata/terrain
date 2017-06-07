@@ -193,7 +193,7 @@ class SchemaTreeItem extends PureClasss<Props>
     {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }
@@ -286,7 +286,7 @@ class SchemaTreeItem extends PureClasss<Props>
   {
     const { item } = this.state;
 
-    let nameText: string | El = <span className="loading-text" />;
+    let nameText: string | El = <span className='loading-text' />;
 
     if (item)
     {
@@ -359,12 +359,12 @@ class SchemaTreeItem extends PureClasss<Props>
       >
         <FadeInOut
           open={showing}
-          key="one"
+          key='one'
         >
           {
             showing &&
             <div
-              data-rel="schema-item"
+              data-rel='schema-item'
               data-id={this.props.id}
               data-search={this.props.inSearchResults}
             >
@@ -402,7 +402,7 @@ class SchemaTreeItem extends PureClasss<Props>
 
         <FadeInOut
           open={this.state.open}
-          key="two"
+          key='two'
         >
           {
             this.renderItemChildren()

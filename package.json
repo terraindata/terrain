@@ -19,10 +19,10 @@
     "lint": "yarn run lint-back",
     "lint-back": "./node_modules/.bin/tslint -c midway/tslint.json --fix --type-check --project midway/tsconfig.json",
     "lint-front": "echo !!! Not yet implemented, use yarn run style-front instead. !!!",
-    "style": "yarn run style-front; yarn run style-back;",
+    "style": "yarn run style-front && yarn run style-back;",
     "style-back": "find midway -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
     "style-front": "find src -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
-    "fix": "yarn run lint; yarn run style;"
+    "fix": "yarn run lint && yarn run style;"
   },
   "repository": {
     "type": "git",
@@ -186,10 +186,10 @@
     "svg-react-loader": "^0.3.7",
     "tape": "^4.4.0",
     "ts-jest": "^20.0.2",
-    "ts-loader": "^2.0.3",
+    "ts-loader": "^2.1.0",
     "ts-node": "^3.0.2",
     "tslint": "^5.3.2",
-    "typescript": "^2.3.2",
+    "typescript": "^2.3.4",
     "typescript-formatter": "^5.2.0",
     "url-loader": "^0.5.6",
     "webpack": "^2.6.1",

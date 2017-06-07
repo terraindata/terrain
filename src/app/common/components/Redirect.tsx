@@ -62,7 +62,7 @@ class Placeholder extends PureClasss<Props>
   render()
   {
     return (
-      <InfoArea large="Redirecting..." />
+      <InfoArea large='Redirecting...' />
     );
   }
 }

@@ -190,8 +190,8 @@ class SchemaView extends PureClasss<Props>
               }}
             >
               <input
-                type="text"
-                placeholder="Search schema"
+                type='text'
+                placeholder='Search schema'
                 value={search}
                 onChange={this.handleSearchChange}
                 onKeyDown={this.handleSearchKeyDown}
@@ -217,7 +217,7 @@ class SchemaView extends PureClasss<Props>
             </FadeInOut>
 
             <SchemaTreeList
-              itemType="database"
+              itemType='database'
               itemIds={this.state.databases && this.state.databases.keySeq().toList()}
               label={'Databases'}
               topLevel={true}

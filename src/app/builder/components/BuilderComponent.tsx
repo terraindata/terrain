@@ -47,17 +47,17 @@ require('./BuilderComponent.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
 import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
+import SchemaStore from '../../schema/data/SchemaStore';
 import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
-import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
-import SchemaStore from '../../schema/data/SchemaStore';
 
 export interface Props
 {
@@ -143,7 +143,7 @@ class BuilderComponent extends PureClasss<Props>
     {
       // special type that is unrealted to the data
       return <div
-        className="builder-label"
+        className='builder-label'
         key={keySeed + '-label'}
       >
         {d.label}
@@ -205,7 +205,7 @@ class BuilderComponent extends PureClasss<Props>
         break;
       case DisplayType.DROPDOWN:
         content = (
-          <div key={key} className="builder-component-wrapper">
+          <div key={key} className='builder-component-wrapper'>
             <Dropdown
               canEdit={this.props.canEdit}
               className={className}
@@ -219,7 +219,7 @@ class BuilderComponent extends PureClasss<Props>
             {this.props.helpOn && d.help ?
               <ManualInfo
                 information={d.help as string}
-                className="builder-component-help-right"
+                className='builder-component-help-right'
               />
               : null
             }
@@ -242,7 +242,7 @@ class BuilderComponent extends PureClasss<Props>
               />
             }
             <div
-              className="card-flex"
+              className='card-flex'
             >
               <BuilderComponent
                 display={d.flex}
@@ -258,7 +258,7 @@ class BuilderComponent extends PureClasss<Props>
             </div>
             {!d.below ? null :
               <div
-                className="card-flex-below"
+                className='card-flex-below'
               >
                 <BuilderComponent
                   display={d.below}
@@ -315,7 +315,7 @@ class BuilderComponent extends PureClasss<Props>
         content = (
           <div
             key={key}
-            className="builder-component-wrapper builder-component-wrapper-wide"
+            className='builder-component-wrapper builder-component-wrapper-wide'
           >
             {
               React.cloneElement(
@@ -353,7 +353,7 @@ class BuilderComponent extends PureClasss<Props>
                   :
                   <ManualInfo
                     information={d.help as string}
-                    className="builder-component-help-right"
+                    className='builder-component-help-right'
                   />
               )
               : null
@@ -374,7 +374,7 @@ class BuilderComponent extends PureClasss<Props>
       content = (
         <div
           key={key}
-          className="builder-component-wrapper builder-component-wrapper-wide"
+          className='builder-component-wrapper builder-component-wrapper-wide'
         >
           <BuilderTextbox
             canEdit={this.props.canEdit}
@@ -400,7 +400,7 @@ class BuilderComponent extends PureClasss<Props>
             this.props.helpOn && d.help ?
               <ManualInfo
                 information={d.help as string}
-                className="builder-component-help-right"
+                className='builder-component-help-right'
               />
               : null
           }
@@ -428,7 +428,7 @@ class BuilderComponent extends PureClasss<Props>
     {
       return (
         <div
-          className="builder-comp-list"
+          className='builder-comp-list'
         >
           {
             display.map((d, i) => this.renderDisplay(

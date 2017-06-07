@@ -288,8 +288,8 @@ class LibraryItem extends Classs<Props>
       >
         <Link
           to={this.props.to}
-          className="library-item-link"
-          activeClassName="library-item-active"
+          className='library-item-link'
+          activeClassName='library-item-active'
           onDoubleClick={this.handleDoubleClick}
         >
           <div
@@ -318,32 +318,32 @@ class LibraryItem extends Classs<Props>
                   })}
                 >
                   <div
-                    className="library-item-icon"
+                    className='library-item-icon'
                   >
                     {
                       this.props.icon
                     }
                   </div>
                   <div
-                    className="library-item-name"
+                    className='library-item-name'
                   >
                     {
                       this.props.name.length ? this.props.name : <em>Untitled</em>
                     }
                   </div>
                   <input
-                    className="library-item-name-input"
+                    className='library-item-name-input'
                     defaultValue={this.props.name}
                     placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
                     onBlur={this.hideTextfield}
                     onFocus={this.handleFocus}
                     onKeyDown={this.handleKeyDown}
-                    ref="input"
+                    ref='input'
                   />
                   {
                     this.props.isStarred &&
                     <div
-                      className="library-item-star"
+                      className='library-item-star'
                     >
                       <StarIcon />
                     </div>
@@ -352,7 +352,7 @@ class LibraryItem extends Classs<Props>
                     options={menuOptions}
                   />
                 </div>
-                <div className="library-item-content">
+                <div className='library-item-content'>
                   {
                     this.props['children']
                   }

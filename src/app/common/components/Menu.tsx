@@ -82,7 +82,7 @@ export class Menu extends PureClasss<Props>
   {
     if (option.spacer)
     {
-      return <div className="menu-option menu-option-spacer" key={index} />;
+      return <div className='menu-option menu-option-spacer' key={index} />;
     }
 
     let onClick: any = _.noop;
@@ -105,7 +105,7 @@ export class Menu extends PureClasss<Props>
         onClick={onClick}
       >
         <div
-          className="menu-option-icon"
+          className='menu-option-icon'
           style={{
             fill: option.iconColor || 'black',
           }}>
@@ -180,15 +180,15 @@ export class Menu extends PureClasss<Props>
         style={this.props.style ? this.props.style : null}
       >
         <div
-          className="menu-icon-wrapper"
+          className='menu-icon-wrapper'
           onClick={this.toggleOpen}
         >
-          <MoreIcon className="menu-icon" />
+          <MoreIcon className='menu-icon' />
         </div>
         {
           this.state.open &&
           <div
-            className="menu-options-wrapper"
+            className='menu-options-wrapper'
             style={style}
             onClick={this.toggleOpen}
           >

@@ -48,11 +48,11 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
@@ -100,27 +100,27 @@ class CardsDeck extends PureClasss<Props>
     }
     return (
       <div
-        className="cards-deck"
+        className='cards-deck'
       >
         <div
-          className="cards-deck-search-wrapper"
+          className='cards-deck-search-wrapper'
         >
           <input
-            type="text"
-            ref="search"
-            className="cards-deck-search"
-            placeholder="Filter Cards"
+            type='text'
+            ref='search'
+            className='cards-deck-search'
+            placeholder='Filter Cards'
             value={this.state.search}
             onChange={this.handleSearchChange}
           />
         </div>
         <div
-          className="cards-deck-inner"
+          className='cards-deck-inner'
         >
           {
             ordering.map((group: List<string>, index) =>
               <div
-                className="cards-deck-group"
+                className='cards-deck-group'
                 key={index}
               >
                 {
@@ -160,7 +160,7 @@ class _CardDeckCard extends PureClasss<CardProps>
     const { card } = this.props;
     const data = card.static;
     const search = this.props.search.toLowerCase();
-    let hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
+    const hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
 
     return this.props.connectDragSource(
       <div

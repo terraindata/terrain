@@ -306,7 +306,7 @@ class App extends PureClasss<Props>
             noProps: true,
             content:
             <div
-              className="app-inner"
+              className='app-inner'
             >
               {
                 this.props.children
@@ -338,22 +338,22 @@ class App extends PureClasss<Props>
 
     return (
       <div
-        className="app"
+        className='app'
         onMouseMove={this.handleMouseMove}
       >
         {
           this.state.loggedInAndLoaded &&
           <div
-            className="app-top-bar"
+            className='app-top-bar'
           >
             <TerrainIcon
-              className="app-top-bar-icon"
+              className='app-top-bar-icon'
             />
             <AccountDropdown />
           </div>
         }
         <div
-          className="app-wrapper"
+          className='app-wrapper'
         >
           {
             this.renderApp()
@@ -363,9 +363,9 @@ class App extends PureClasss<Props>
         <DeployModal />
 
         <ReactTooltip
-          place="bottom"
-          effect="solid"
-          class="tooltip"
+          place='bottom'
+          effect='solid'
+          class='tooltip'
           hideOnClick={true}
         />
 
@@ -379,53 +379,53 @@ class App extends PureClasss<Props>
 
 const router = (
   <Router history={browserHistory}>
-    <Route path="/" component={App}>rsv E`
+    <Route path='/' component={App}>rsv E`
       <IndexRoute component={Redirect} />
 
-      <Route path="/builder" component={Builder} />
-      <Route path="/builder/:config" component={Builder} />
-      <Route path="/builder/:config/:splitConfig" component={Builder} />
+      <Route path='/builder' component={Builder} />
+      <Route path='/builder/:config' component={Builder} />
+      <Route path='/builder/:config/:splitConfig' component={Builder} />
 
-      <Route path="/library">
+      <Route path='/library'>
         <IndexRoute component={Library} />
-        <Route path=":groupId" component={Library}>
+        <Route path=':groupId' component={Library}>
           <IndexRoute component={Library} />
-          <Route path=":algorithmId" component={Library}>
+          <Route path=':algorithmId' component={Library}>
             <IndexRoute component={Library} />
-            <Route path=":variantId" component={Library}>
+            <Route path=':variantId' component={Library}>
               <IndexRoute component={Library} />
             </Route>
           </Route>
         </Route>
       </Route>
 
-      <Route path="/account" component={Account}>
+      <Route path='/account' component={Account}>
         <IndexRoute component={Profile} />
-        <Route path="/account/profile" component={Profile} />
-        <Route path="/account/profile/edit" component={EditProfile} />
-        <Route path="/account/settings" component={Settings} />
-        <Route path="/account/notifications" component={Notifications} />
-        <Route path="/account/team" component={Team} />
+        <Route path='/account/profile' component={Profile} />
+        <Route path='/account/profile/edit' component={EditProfile} />
+        <Route path='/account/settings' component={Settings} />
+        <Route path='/account/notifications' component={Notifications} />
+        <Route path='/account/team' component={Team} />
       </Route>
 
-      <Route path="/manual" component={ManualWrapper} />
-      <Route path="/manual/:term" component={ManualWrapper} />
+      <Route path='/manual' component={ManualWrapper} />
+      <Route path='/manual/:term' component={ManualWrapper} />
 
-      <Route path="/users/:userId" component={Profile} />
+      <Route path='/users/:userId' component={Profile} />
 
-      <Route path="/reporting" component={Placeholder} />
+      <Route path='/reporting' component={Placeholder} />
 
-      <Route path="/logout" component={Logout} />
+      <Route path='/logout' component={Logout} />
 
-      <Route path="/x" component={X} />
-      <Route path="/x/:x" component={X} />
+      <Route path='/x' component={X} />
+      <Route path='/x/:x' component={X} />
 
-      <Route path="/browser" component={Redirect} />
-      <Route path="/browser/:a" component={Redirect} />
-      <Route path="/browser/:a/:b" component={Redirect} />
-      <Route path="/browser/:a/:b/:c" component={Redirect} />
+      <Route path='/browser' component={Redirect} />
+      <Route path='/browser/:a' component={Redirect} />
+      <Route path='/browser/:a/:b' component={Redirect} />
+      <Route path='/browser/:a/:b/:c' component={Redirect} />
 
-      <Route path="/schema" component={SchemaPage} />
+      <Route path='/schema' component={SchemaPage} />
     </Route>
   </Router>
 );

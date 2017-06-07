@@ -43,37 +43,37 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
+import { Backend, cardsDeckToList } from '../types/Backend';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import {Backend, cardsDeckToList} from '../types/Backend';
+import ElasticBlocks from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';
 import ElasticToCards from './conversion/ElasticToCards';
-import ElasticBlocks from './blocks/ElasticBlocks';
 const syntaxConfig = require('./syntax/ElasticSyntaxConfig.json');
 
 class ElasticBackend implements Backend
 {
-	type = 'elastic';
-	name = 'Elastic';
-	
-	blocks = ElasticBlocks;
-	creatingType = ElasticBlocks.elasticCreating.type;
-	topLevelCards = Immutable.List<string>([
-			ElasticBlocks.elasticKeyValue.type,
-	]);
-	
-	// Ordering of the cards deck
-	cardsDeck = ElasticCardsDeck;
-	cardsList = cardsDeckToList(ElasticCardsDeck);
-	
-	queryToCode = CardsToElastic.toElastic;
-	
-	codeToQuery = ElasticToCards;
-	
-	syntaxConfig = syntaxConfig;
-	
-	// function to get transform bars?
-	// autocomplete?
+  type = 'elastic';
+  name = 'Elastic';
+
+  blocks = ElasticBlocks;
+  creatingType = ElasticBlocks.elasticCreating.type;
+  topLevelCards = Immutable.List<string>([
+    ElasticBlocks.elasticKeyValue.type,
+  ]);
+
+  // Ordering of the cards deck
+  cardsDeck = ElasticCardsDeck;
+  cardsList = cardsDeckToList(ElasticCardsDeck);
+
+  queryToCode = CardsToElastic.toElastic;
+
+  codeToQuery = ElasticToCards;
+
+  syntaxConfig = syntaxConfig;
+
+  // function to get transform bars?
+  // autocomplete?
 }
 
 export default new ElasticBackend();

@@ -46,9 +46,9 @@ require('./LibraryItemCategory.less');
 
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
-import Classs from './../../common/components/Classs';
-import LibraryTypes from '../LibraryTypes';
 import { ItemStatus } from '../../../../shared/items/types/Item';
+import LibraryTypes from '../LibraryTypes';
+import Classs from './../../common/components/Classs';
 
 export interface Props
 {
@@ -84,16 +84,16 @@ class LibraryItemCategory extends Classs<Props>
     return this.props.connectDropTarget(
       <div className={`library-category library-category-${this.props.status} library-category-${this.state.open ? 'open' : 'closed'}`}>
         {!this.props.titleHidden &&
-          <div className="library-category-title" onClick={this.toggleOpen}>
-            <div className="library-category-title-symbol" />
-            <div className="library-category-title-text">
+          <div className='library-category-title' onClick={this.toggleOpen}>
+            <div className='library-category-title-symbol' />
+            <div className='library-category-title-text'>
               {
                 this.props.status
               }
             </div>
           </div>
         }
-        <div className="library-category-content">
+        <div className='library-category-content'>
           {this.props['children']}
         </div>
       </div>,

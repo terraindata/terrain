@@ -42,30 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
+import * as _ from 'underscore';
+const { List, Map } = Immutable;
 const L = () => List([]);
-import {_block, Block, TQLFn} from '../../../blocks/types/Block';
-import {_card, Card, CardString} from '../../../blocks/types/Card';
-import {Input, InputType} from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
-import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
+import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { _block, Block, TQLFn } from '../../../blocks/types/Block';
+import { _card, Card, CardString } from '../../../blocks/types/Card';
+import { Input, InputType } from '../../../blocks/types/Input';
+import CommonElastic from '../syntax/CommonElastic';
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 export const elasticKeyValue = _card({
   key: '',
   value: '',
   valueType: CommonElastic.valueTypes[0],
-  
+
   static: {
     language: 'elastic',
     tql: '{ "$key": "$value" }',
     title: 'Key / Value',
     colors: ['#789', '#abc'],
     preview: '[key]: [value]',
-    
+
     display:
     {
       displayType: DisplayType.FLEX,
@@ -99,15 +99,15 @@ export const elasticKeyValue = _card({
         key: 'value',
         accepts: CommonElastic.acceptsValues,
       },
-    }
-  }
+    },
+  },
 });
-  
+
 export const elasticValue = _card({
   key: '',
   value: '',
   valueType: CommonElastic.valueTypes[0],
-  
+
   static: {
     language: 'elastic',
     tql: '"$value"',
@@ -119,9 +119,9 @@ export const elasticValue = _card({
       displayType: DisplayType.TEXT,
       key: 'value',
     },
-  }
+  },
 });
-  
+
 export const elasticObject = _wrapperCard({
   language: 'elastic',
   tql: '{ $cards }',

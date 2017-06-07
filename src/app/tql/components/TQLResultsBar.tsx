@@ -73,17 +73,17 @@ class TQLResultsBar extends PureClasss<Props>
     {
       return (
         <div>
-          <span className="error-detail">
+          <span className='error-detail'>
             {
               this.props.open ? '\u25BC ' : '\u25B6 '
             }
           </span>
-          <span className="error-title">
+          <span className='error-title'>
             {
               resultsState.mainErrorMessage
             }
           </span>
-          <span className="error-message">
+          <span className='error-message'>
             {
               resultsState.subErrorMessage
             }
@@ -144,7 +144,7 @@ class TQLResultsBar extends PureClasss<Props>
         })}
         onClick={this.props.onToggle}
       >
-        <div className="tql-results-bar-inner">
+        <div className='tql-results-bar-inner'>
           {
             this.renderResults()
           }

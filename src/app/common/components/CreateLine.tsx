@@ -61,9 +61,9 @@ class CreateLine extends PureClasss<Props>
   render()
   {
     return (
-      <div className="create-line-row" onClick={this.props.onClick}>
-        <div className="create-line-line"></div>
-        <div className="create-line-plus">
+      <div className='create-line-row' onClick={this.props.onClick}>
+        <div className='create-line-line'></div>
+        <div className='create-line-plus'>
           {this.props.open ? <CloseIcon /> : <AddIcon />}
         </div>
       </div>

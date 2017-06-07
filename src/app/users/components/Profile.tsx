@@ -141,11 +141,11 @@ class Profile extends Classs<Props>
   renderInfoItem(key: string)
   {
     return (
-      <div className="profile-info-item" key={key}>
-        <div className="profile-info-item-name">
+      <div className='profile-info-item' key={key}>
+        <div className='profile-info-item-name'>
           {key.replace(/([A-Z])/g, (v) => ' ' + v)}
         </div>
-        <div className="profile-info-item-value">
+        <div className='profile-info-item-value'>
           {this.state.user[key]}
         </div>
       </div>
@@ -197,7 +197,7 @@ immediately be logged out of any existing sessions. \
     }
 
     return (
-      <div className="profile-admin-tools">
+      <div className='profile-admin-tools'>
         <div
           className={classNames({
             'profile-admin-button': true,
@@ -224,12 +224,12 @@ immediately be logged out of any existing sessions. \
   {
     if (this.state.loading)
     {
-      return <InfoArea large="Loading..." />;
+      return <InfoArea large='Loading...' />;
     }
 
     if (!this.state.user)
     {
-      return <InfoArea large="No such user found." />;
+      return <InfoArea large='No such user found.' />;
     }
 
     return (
@@ -238,15 +238,15 @@ immediately be logged out of any existing sessions. \
         'profile-wrapper': this.state.routeIsDirect,
       })}>
         <div
-          className="profile-pic"
+          className='profile-pic'
         >
           <img
-            className="profile-pic-image"
+            className='profile-pic-image'
             src={UserTypes.profileUrlFor(this.state.user)}
-            ref="profilePicImg"
+            ref='profilePicImg'
           />
         </div>
-        <div className="profile-name">
+        <div className='profile-name'>
           {
             this.state.user.name
           }
@@ -256,20 +256,20 @@ immediately be logged out of any existing sessions. \
         </div>
         {
           this.state.isLoggedInUser ?
-            <div className="profile-edit-row">
-              <Link to="/account/profile/edit" className="button">
+            <div className='profile-edit-row'>
+              <Link to='/account/profile/edit' className='button'>
                 Edit
               </Link>
             </div>
             : null
         }
-        <div className="profile-info">
+        <div className='profile-info'>
           {
             this.infoKeys.map(this.renderInfoItem)
           }
         </div>
         {this.renderAdminTools()}
-        <Link to="/account/team" className="profile-team-button">
+        <Link to='/account/team' className='profile-team-button'>
           Team Directory
         </Link>
       </div>

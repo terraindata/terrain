@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import CommonSQL from '../../backends/mysql/syntax/CommonSQL';
-const {Combinators, Operators} = CommonSQL;
+const { Combinators, Operators } = CommonSQL;
 
 // import SchemaTypes from '../schema/SchemaTypes';
 // const ManualConfig = require('./../manual/ManualConfig.json');
@@ -72,7 +72,7 @@ export interface RowDisplay
   hideToolsWhenNotString?: boolean;
   noDataPadding?: boolean; // don't add extra padding to first row when data
 }
-const {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
+const { TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT } = DisplayType;
 
 export interface Display
 {
@@ -127,7 +127,7 @@ export interface Display
   provideParentData?: boolean;
   // if true, it passes the parent data down
   // this will cause unnecessary re-rendering, so avoid if possible
-  
+
   // the transform card currently requires the full builder state
   //  let's change that in the future by having the histogram bars be
   //  computed at a higher level
@@ -137,12 +137,12 @@ export interface Display
 // Section: Re-useable displays
 
 export const valueDisplay: Display =
-{
-  displayType: NUM,
-  // help: ManualConfig.help['value'],
-  key: 'value',
-  placeholder: 'value',
-};
+  {
+    displayType: NUM,
+    // help: ManualConfig.help['value'],
+    key: 'value',
+    placeholder: 'value',
+  };
 
 export const stringValueDisplay: Display =
   {
@@ -153,104 +153,104 @@ export const stringValueDisplay: Display =
 
 export const getCardStringDisplay =
   (config: { accepts?: List<string>, defaultValue?: string } = {}): Display[] =>
-[
-  {
-    displayType: CARDSFORTEXT,
-    key: 'value',
-    className: 'nested-cards-content',
-    accepts: config.accepts,
-  },
-  {
-    displayType: CARDTEXT,
-    key: 'value',
-    defaultValue: config.defaultValue,
-    accepts: config.accepts,
-  },
-];
+    [
+      {
+        displayType: CARDSFORTEXT,
+        key: 'value',
+        className: 'nested-cards-content',
+        accepts: config.accepts,
+      },
+      {
+        displayType: CARDTEXT,
+        key: 'value',
+        defaultValue: config.defaultValue,
+        accepts: config.accepts,
+      },
+    ];
 
 export const firstSecondDisplay = (middle: Display, accepts: List<string>): Display =>
-({
-  displayType: FLEX,
-  key: null,
+  ({
+    displayType: FLEX,
+    key: null,
 
-  above:
-  {
-    displayType: CARDSFORTEXT,
-    key: 'first',
-    className: 'card-double-first',
-    accepts,
-  },
-
-  below:
-  {
-    displayType: CARDSFORTEXT,
-    key: 'second',
-    accepts,
-  },
-
-  flex:
-  [
+    above:
     {
-      displayType: CARDTEXT,
+      displayType: CARDSFORTEXT,
       key: 'first',
-      top: true,
-      showWhenCards: true,
-      // help: ManualConfig.help['first'],
+      className: 'card-double-first',
       accepts,
     },
 
-    middle,
-
+    below:
     {
-      displayType: CARDTEXT,
+      displayType: CARDSFORTEXT,
       key: 'second',
-      showWhenCards: true,
-      // help: ManualConfig.help['second'],
       accepts,
     },
-  ],
-});
+
+    flex:
+    [
+      {
+        displayType: CARDTEXT,
+        key: 'first',
+        top: true,
+        showWhenCards: true,
+        // help: ManualConfig.help['first'],
+        accepts,
+      },
+
+      middle,
+
+      {
+        displayType: CARDTEXT,
+        key: 'second',
+        showWhenCards: true,
+        // help: ManualConfig.help['second'],
+        accepts,
+      },
+    ],
+  });
 
 export const wrapperDisplay: Display =
-{
-  displayType: CARDS,
-  key: 'cards',
-  className: 'nested-cards-content',
-};
+  {
+    displayType: CARDS,
+    key: 'cards',
+    className: 'nested-cards-content',
+  };
 
 export const wrapperSingleChildDisplay: Display =
-{
-  displayType: CARDS,
-  key: 'cards',
-  className: 'nested-cards-content',
-  singleChild: true,
-};
+  {
+    displayType: CARDS,
+    key: 'cards',
+    className: 'nested-cards-content',
+    singleChild: true,
+  };
 
 export const letVarDisplay =
-{
-  displayType: FLEX,
-  key: null,
-  flex:
-  [
-    {
-      displayType: TEXT,
-      // help: ManualConfig.help['let-var-field'],
-      key: 'field',
-    },
-    {
-      displayType: LABEL,
-      label: '=',
-      key: null,
-    },
-    {
-      displayType: CARDTEXT,
-      // help: ManualConfig.help['expression'],
-      key: 'expression',
-    },
-  ],
-  below:
   {
-    key: 'expression',
-    displayType: CARDSFORTEXT,
-  },
-};
+    displayType: FLEX,
+    key: null,
+    flex:
+    [
+      {
+        displayType: TEXT,
+        // help: ManualConfig.help['let-var-field'],
+        key: 'field',
+      },
+      {
+        displayType: LABEL,
+        label: '=',
+        key: null,
+      },
+      {
+        displayType: CARDTEXT,
+        // help: ManualConfig.help['expression'],
+        key: 'expression',
+      },
+    ],
+    below:
+    {
+      key: 'expression',
+      displayType: CARDSFORTEXT,
+    },
+  };

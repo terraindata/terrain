@@ -43,35 +43,35 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
+import { Backend, cardsDeckToList } from '../types/Backend';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import {Backend, cardsDeckToList} from '../types/Backend';
+import MySQLBlocks from './blocks/MySQLBlocks';
 import MySQLCardsDeck from './blocks/MySQLCardsDeck';
 import CardsToSQL from './conversion/CardsToSQL';
 import SQLToCards from './conversion/SQLToCards';
-import MySQLBlocks from './blocks/MySQLBlocks';
 const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
 
 class MySQLBackend implements Backend
 {
-	type = 'mysql';
-	name = 'MySQL';
-	
-	blocks = MySQLBlocks;
-	creatingType = MySQLBlocks.creating.type;
-	topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
-	
-	// Ordering of the cards deck
-	cardsDeck = MySQLCardsDeck;
-	cardsList = cardsDeckToList(MySQLCardsDeck);
-	
-	queryToCode = CardsToSQL.toSQL;
-	
-	codeToQuery = SQLToCards;
-	
-	syntaxConfig = syntaxConfig;
-	
-	// function to get transform bars?
-	// autocomplete?
+  type = 'mysql';
+  name = 'MySQL';
+
+  blocks = MySQLBlocks;
+  creatingType = MySQLBlocks.creating.type;
+  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
+
+  // Ordering of the cards deck
+  cardsDeck = MySQLCardsDeck;
+  cardsList = cardsDeckToList(MySQLCardsDeck);
+
+  queryToCode = CardsToSQL.toSQL;
+
+  codeToQuery = SQLToCards;
+
+  syntaxConfig = syntaxConfig;
+
+  // function to get transform bars?
+  // autocomplete?
 }
 
 export default new MySQLBackend();

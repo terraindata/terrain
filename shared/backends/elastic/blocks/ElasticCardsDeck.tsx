@@ -47,15 +47,15 @@ import Blocks from './ElasticBlocks';
 
 export const ElasticCardsDeck =
   Immutable.fromJS(
-  [
     [
-      // JSON
-      Blocks.elasticKeyValue.type,
-      Blocks.elasticValue.type,
-      Blocks.elasticObject.type,
-      Blocks.elasticArray.type,
+      [
+        // JSON
+        Blocks.elasticKeyValue.type,
+        Blocks.elasticValue.type,
+        Blocks.elasticObject.type,
+        Blocks.elasticArray.type,
+      ],
     ],
-  ]
   );
-  
+
 export default ElasticCardsDeck;

@@ -113,7 +113,7 @@ class Dropdown extends PureClasss<Props>
         key={index}
         onClick={this.clickHandler(index)}
       >
-        <div className="dropdown-option-inner">
+        <div className='dropdown-option-inner'>
           {
             this.getOptionName(option, index)
           }
@@ -168,7 +168,7 @@ class Dropdown extends PureClasss<Props>
     if (this.state.open)
     {
       optionsEl =
-        <div className="dropdown-options-wrapper">
+        <div className='dropdown-options-wrapper'>
           {
             this.props.options ?
               this.props.options.map(this.renderOption)
@@ -195,8 +195,8 @@ class Dropdown extends PureClasss<Props>
           && optionsEl
         }
         <div
-          className="dropdown-value"
-          ref="value"
+          className='dropdown-value'
+          ref='value'
         >
           {
             // map through all of the options so that the dropdown takes the width of the longest one

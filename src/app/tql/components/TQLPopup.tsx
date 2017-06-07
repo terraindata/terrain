@@ -74,17 +74,17 @@ class TQLPopup extends Classs<Props>
   {
     return (
       <div
-        className="tql-editor-popup"
+        className='tql-editor-popup'
         style={this.props.style}
       >
         {this.props.text}
         <div
-          className="manual-popup-link"
+          className='manual-popup-link'
           onClick={this.openManual}
         >
           See full description in Manual
           <OpenIcon
-            className="manual-popup-open-icon"
+            className='manual-popup-open-icon'
             onClick={this.openManual}
           />
         </div>

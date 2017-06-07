@@ -128,7 +128,7 @@ class SchemaTreeList extends PureClasss<Props>
     {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }

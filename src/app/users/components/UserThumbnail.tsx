@@ -138,14 +138,14 @@ class UserThumbnail extends Classs<Props>
         data-html={true}
       >
         <div
-          className="user-thumbnail-image"
+          className='user-thumbnail-image'
           style={{
             backgroundImage: `url(${src})`,
           }}
         />
         {
           text &&
-          <div className="user-thumbnail-text">
+          <div className='user-thumbnail-text'>
             {
               text
             }

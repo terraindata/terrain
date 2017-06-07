@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 
 export class Format
 {
@@ -56,7 +56,8 @@ export class Format
   setIn: (f: string[], v: any) => Format;
 }
 const Format_Record = Immutable.Record(new Format());
-export const _Format = (config?: any) => {
+export const _Format = (config?: any) =>
+{
   return new Format_Record(config || {}) as any as Format;
 };
 
@@ -74,7 +75,8 @@ export class ResultsConfig
   toJS: () => any;
 }
 const ResultsConfig_Record = Immutable.Record(new ResultsConfig());
-export const _ResultsConfig = (config?: any) => {
+export const _ResultsConfig = (config?: any) =>
+{
   let conf = new ResultsConfig_Record(config || {}) as any as ResultsConfig;
 
   conf = conf.set('formats', Map<string, Format>(conf.formats));

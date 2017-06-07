@@ -716,7 +716,7 @@ const TransformChart = {
   _deletePoints(el, onDelete)
   {
     d3.select('.point-edit-menu').remove();
-    const selectedIds = d3.select(el).selectAll('.point-selected')[0].map(function(point: any)    
+    const selectedIds = d3.select(el).selectAll('.point-selected')[0].map(function(point: any)
     {
       return point.getAttribute('_id');
     });

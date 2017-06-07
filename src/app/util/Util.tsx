@@ -157,7 +157,7 @@ const Util = {
 
   stringIsNumber(str: string): boolean
   {
-    return str && str !== " " && !Number.isNaN(+str);
+    return str && str !== ' ' && !Number.isNaN(+str);
   },
 
   canEdit(item: { type: string, id: ID }, UserStore, RolesStore)

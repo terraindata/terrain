@@ -52,23 +52,23 @@ import { DragSource } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 const { createDragPreview } = require('react-dnd-text-dragpreview');
+import { Card } from '../../../../../shared/blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import LayoutManager from '../layout/LayoutManager';
+import { Display } from './../../../../../shared/blocks/displays/Display';
 import PureClasss from './../../../common/components/PureClasss';
 import ManualPopup from './../../../manual/components/ManualPopup';
-import { Display } from './../../../../../shared/blocks/displays/Display';
-import { Card } from '../../../../../shared/blocks/types/Card';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
-import SchemaStore from '../../../schema/data/SchemaStore';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -354,7 +354,7 @@ class _CardComponent extends PureClasss<Props>
 
     const card = BlockUtils.recordFromJS(
       BlockUtils.cardsForServer(removeId(this.props.card)).toJS(),
-      AllBackendsMap[this.props.card.static.language].blocks
+      AllBackendsMap[this.props.card.static.language].blocks,
     );
 
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
@@ -428,7 +428,7 @@ class _CardComponent extends PureClasss<Props>
         {
           return (
             <div
-              className="card card-placeholder"
+              className='card card-placeholder'
               id={id}
               style={{
                 height: cardHeight,
@@ -447,7 +447,7 @@ class _CardComponent extends PureClasss<Props>
 
       return (
         <div
-          className="card card-placeholder"
+          className='card card-placeholder'
           id={id}
           style={{
             minHeight: CARD_HEIGHT_MAP[id] || 50,
@@ -511,7 +511,7 @@ class _CardComponent extends PureClasss<Props>
           'card-opening': this.state.opening,
           [card.type + '-card']: true,
         })}
-        ref="card"
+        ref='card'
         id={id}
         onMouseMove={this.handleMouseMove}
       >
@@ -530,7 +530,7 @@ class _CardComponent extends PureClasss<Props>
             background: card.static.colors[1],
             borderColor: card.static.colors[0],
           }}
-          ref="cardInner"
+          ref='cardInner'
         >
           {
             connectDragSource(
@@ -547,9 +547,9 @@ class _CardComponent extends PureClasss<Props>
               >
                 {
                   this.state.hovering &&
-                  <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
+                  <ArrowIcon className='card-arrow-icon' onClick={this.toggleClose} />
                 }
-                <div className="card-title-inner">
+                <div className='card-title-inner'>
                   {title}
                 </div>
 
@@ -573,8 +573,8 @@ class _CardComponent extends PureClasss<Props>
 
           {
             (!this.props.card.closed || this.state.opening) &&
-            <div className="card-body-wrapper" ref="cardBody">
-              <div className="card-body">
+            <div className='card-body-wrapper' ref='cardBody'>
+              <div className='card-body'>
                 {
                   content
                 }

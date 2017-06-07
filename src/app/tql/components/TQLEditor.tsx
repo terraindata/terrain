@@ -121,8 +121,8 @@ class TQLEditor extends PureClasss<Props>
       options['value'] = this.props.tql || '';
       return (
         <CodeMirror
-          ref="cm2"
-          className="codemirror-text"
+          ref='cm2'
+          className='codemirror-text'
           options={options}
 
           isDiff={true}
@@ -133,8 +133,8 @@ class TQLEditor extends PureClasss<Props>
 
     return (
       <CodeMirror
-        ref="cm"
-        className="codemirror-text"
+        ref='cm'
+        className='codemirror-text'
         value={this.props.tql || ''}
         options={options}
 

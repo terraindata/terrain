@@ -207,50 +207,50 @@ class Settings extends Classs<Props>
   renderPasswordContent()
   {
     return (
-      <div className="settings-expand-field">
-        <div className="settings-field-title">
+      <div className='settings-expand-field'>
+        <div className='settings-field-title'>
           Current Password
         </div>
         <input
           type={this.state.showPassword ? 'text' : 'password'}
           onChange={this.handleCurrentPasswordChange}
-          className="settings-input password-input"
+          className='settings-input password-input'
           value={this.state.currentPassword}
         />
-        <div className="settings-field-title">
+        <div className='settings-field-title'>
           New Password
         </div>
-        <div className="settings-row">
-          <div className="settings-password-container">
+        <div className='settings-row'>
+          <div className='settings-password-container'>
             <PasswordStrengthInput
               onChange={this.handleNewPasswordChange}
               value={this.state.newPassword}
               type={this.state.showPassword ? 'text' : 'password'}
             />
           </div>
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
-        <div className="settings-field-title">
+        <div className='settings-field-title'>
           Confirm Password
         </div>
-        <div className="settings-row">
+        <div className='settings-row'>
           <input
             type={this.state.showPassword ? 'text' : 'password'}
             value={this.state.confirmPassword}
             onChange={this.handleConfirmPasswordChange}
-            className="settings-input password-input"
+            className='settings-input password-input'
           />
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
-        <div className="settings-row settings-bottom-margin">
+        <div className='settings-row settings-bottom-margin'>
           <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword} />
-          <div className="settings-field-info settings-left-shift" onClick={this.toggleShowPassword}>Show password</div>
+          <div className='settings-field-info settings-left-shift' onClick={this.toggleShowPassword}>Show password</div>
         </div>
-        <div className="settings-row">
-          <div className="button settings-save-button" onClick={this.createNewPassword} >
+        <div className='settings-row'>
+          <div className='button settings-save-button' onClick={this.createNewPassword} >
             Save
           </div>
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
       </div>
     );
@@ -277,15 +277,15 @@ class Settings extends Classs<Props>
   renderAuthenticationContent()
   {
     return (
-      <div className="settings-expand-field">
-        <div className="settings-authentication-field">
+      <div className='settings-expand-field'>
+        <div className='settings-authentication-field'>
           Protect your Terrain account with an extra layer of security by
        requiring access to your phone. Once configured you'll be required
        to enter <b>both your password and an authentication code from your
        mobile phone</b> in order to sign into your Terrain account.
        </div>
-        <div className="settings-row">
-          <div className="button settings-gray-button" onClick={this.setupAuthentication}>
+        <div className='settings-row'>
+          <div className='button settings-gray-button' onClick={this.setupAuthentication}>
             Setup Two-Factor Authentication
         </div>
         </div>
@@ -343,20 +343,20 @@ class Settings extends Classs<Props>
   renderEmailContent()
   {
     return (
-      <div className="settings-expand-field">
-        <div className="settings-field-title">
+      <div className='settings-expand-field'>
+        <div className='settings-field-title'>
           New Email Address
         </div>
-        <div className="settings-row">
+        <div className='settings-row'>
           <input
-            type="text"
+            type='text'
             value={this.state.newEmail}
             onChange={this.updateNewEmail}
-            className="settings-input password-input"
+            className='settings-input password-input'
           />
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
-        <div className="button settings-save-button" onClick={this.changeEmail}>
+        <div className='button settings-save-button' onClick={this.changeEmail}>
           Update Email
          </div>
       </div>
@@ -419,13 +419,13 @@ class Settings extends Classs<Props>
     }
 
     return (
-      <div className="settings-row">
+      <div className='settings-row'>
         <Select
           clearable={false}
           value={timeZone}
           options={timeZonesList}
           onChange={this.changeTimeZone}
-          className="settings-timezone-dropdown"
+          className='settings-timezone-dropdown'
           searchable={false}
         />
       </div>
@@ -435,7 +435,7 @@ class Settings extends Classs<Props>
   renderSignOutDescription()
   {
     return (
-      <div className="settings-shifted-text">
+      <div className='settings-shifted-text'>
         Lost your computer? Left yourself logged in on a public computer? Need a way to sign out
         everywhere except your current library? This is for you.
       </div>
@@ -454,9 +454,9 @@ class Settings extends Classs<Props>
   renderSignOutButton()
   {
     return (
-      <div className="settings-yellow-button button" onClick={this.signOut}>
-        <div className="settings-logout-button">
-          <div className="settings-logout-icon">
+      <div className='settings-yellow-button button' onClick={this.signOut}>
+        <div className='settings-logout-button'>
+          <div className='settings-logout-icon'>
             <LogoutIcon />
           </div>
           Sign out all other sessions
@@ -468,11 +468,11 @@ class Settings extends Classs<Props>
   renderDeactivateDescription()
   {
     return (
-      <div className="settings-shifted-text">
+      <div className='settings-shifted-text'>
         If you no longer need your <b>Terrain</b> account you can deactivate it here.
         <br />
-        <span className="settings-font-small">
-          <b>Note:</b> Don't deactivate your account if you just want to change your <span className="settings-blue-font">email
+        <span className='settings-font-small'>
+          <b>Note:</b> Don't deactivate your account if you just want to change your <span className='settings-blue-font'>email
           address </span>.
         </span>
       </div>
@@ -491,7 +491,7 @@ class Settings extends Classs<Props>
   renderDeactivateButton()
   {
     return (
-      <div className="settings-gray-button button" onClick={this.deactivate}>
+      <div className='settings-gray-button button' onClick={this.deactivate}>
         Deactivate your account
       </div>
     );
@@ -529,18 +529,18 @@ class Settings extends Classs<Props>
   {
     return (
       <div>
-        <div className="settings-page-title">Update your settings</div>
+        <div className='settings-page-title'>Update your settings</div>
         <AccountEntry
-          title="Password"
+          title='Password'
           content={this.renderPasswordContent()}
         />
         <AccountEntry
-          title="Email"
+          title='Email'
           description={this.renderEmailDescription()}
           content={this.renderEmailContent()}
         />
         <AccountEntry
-          title="Time Zone"
+          title='Time Zone'
           description={this.renderTimeZoneDescription()}
           content={this.renderTimeZoneContent()}
         />

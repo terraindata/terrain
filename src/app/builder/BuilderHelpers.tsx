@@ -47,10 +47,10 @@ import { Card } from '../../../shared/blocks/types/Card';
 import { Input } from '../../../shared/blocks/types/Input';
 
 import * as Immutable from 'immutable';
-import { BuilderState, BuilderStore } from './data/BuilderStore';
 import SchemaStore from '../schema/data/SchemaStore';
+import { BuilderState, BuilderStore } from './data/BuilderStore';
 
-export module BuilderHelpers
+export namespace BuilderHelpers
 {
   export function getTermsForKeyPath(keyPath: KeyPath): List<string>
   {

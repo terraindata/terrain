@@ -119,7 +119,7 @@ class InAppNotification extends Classs<Props>
   {
     return (
       <div>
-        <NotificationSystem allowHTML={true} style={styles} ref="notificationSystem" />
+        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem' />
       </div>
     );
   }

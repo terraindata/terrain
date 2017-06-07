@@ -44,13 +44,14 @@ THE SOFTWARE.
 
 import * as React from 'react';
 
-module CommonSQL
+namespace CommonSQL
 {
   export const Directions: string[] = ['ascending', 'descending'];
   export const Combinators: string[] = ['&', 'or'];
-  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
-	export enum Operator {
+  export enum Operator
+  {
     EQ,
     NE,
     GE,
@@ -74,7 +75,8 @@ module CommonSQL
     [Operator.LIKE]: 'LIKE',
   };
 
-  export enum Direction {
+  export enum Direction
+  {
     ASC,
     DESC,
   }
@@ -84,7 +86,8 @@ module CommonSQL
     [Direction.DESC]: 'DESC',
   };
 
-  export enum Combinator {
+  export enum Combinator
+  {
     AND,
     OR,
   }

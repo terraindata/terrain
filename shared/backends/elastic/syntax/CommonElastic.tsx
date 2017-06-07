@@ -42,34 +42,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as React from 'react';
 import * as Immutable from 'immutable';
-const {List} = Immutable;
+import * as React from 'react';
+const { List } = Immutable;
 
-module CommonElastic
+namespace CommonElastic
 {
   export const valueTypes = ['text', 'number', 'object', 'array', 'bool', 'null'];
   export const valueTypesDisplayNames =
-  {
-    text: 'Text',
-    number: 'Number',
-    object: 'Map',
-    array: 'List',
-    bool: 'True / False',
-    null: 'Null',
-  };
-  
-  
+    {
+      text: 'Text',
+      number: 'Number',
+      object: 'Map',
+      array: 'List',
+      bool: 'True / False',
+      null: 'Null',
+    };
+
   export const acceptsValues = List(
-    ['elasticValue', 'elasticObject', 'elasticArray']
+    ['elasticValue', 'elasticObject', 'elasticArray'],
   );
-  
-  
+
   export const Directions: string[] = ['ascending', 'descending'];
   export const Combinators: string[] = ['&', 'or'];
-  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
-	export enum Operator {
+  export enum Operator
+  {
     EQ,
     NE,
     GE,
@@ -93,7 +92,8 @@ module CommonElastic
     [Operator.LIKE]: 'LIKE',
   };
 
-  export enum Direction {
+  export enum Direction
+  {
     ASC,
     DESC,
   }
@@ -103,7 +103,8 @@ module CommonElastic
     [Direction.DESC]: 'DESC',
   };
 
-  export enum Combinator {
+  export enum Combinator
+  {
     AND,
     OR,
   }

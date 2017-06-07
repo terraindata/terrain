@@ -95,7 +95,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
       <div className={classNames({
         'builder-tb-cards-area': true,
         [this.props.className]: !!this.props.className,
-      })} ref="tb">
+      })} ref='tb'>
         <CardComponent
           {...this.props}
           singleCard={true}

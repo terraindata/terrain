@@ -99,11 +99,11 @@ class ScoreBar extends PureClasss<{
     }
 
     return (
-      <div className="weight-graph">
-        <div className="weight-graph-inner">
-          <div className="weight-graph-bar" style={style} />
+      <div className='weight-graph'>
+        <div className='weight-graph-inner'>
+          <div className='weight-graph-bar' style={style} />
         </div>
-        <div className="weight-graph-line" />
+        <div className='weight-graph-line' />
       </div>
     );
   }

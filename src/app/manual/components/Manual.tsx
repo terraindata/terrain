@@ -146,10 +146,10 @@ class Manual extends Classs<Props>
     const height = 22 * this.allTqlCards.length;
     const style = this.state.expandTqlCards ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
     return (
-      <div className="manual-sidebar-section" style={style}>
+      <div className='manual-sidebar-section' style={style}>
         {
           this.allTqlCards.map((result, index) =>
-            <div key={index} className="manual-left-column-row">
+            <div key={index} className='manual-left-column-row'>
               <div
                 className={classNames({
                   'manual-left-column-entry': true,
@@ -173,10 +173,10 @@ class Manual extends Classs<Props>
     const height = 22 * Object.keys(ManualConfig.phraseTypes).length;
     const style = this.state.expandPhraseTypes ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
     return (
-      <div className="manual-sidebar-section" style={style}>
+      <div className='manual-sidebar-section' style={style}>
         {
           this.allPhraseTypes.map((result, index) =>
-            <div key={index} className="manual-left-column-row">
+            <div key={index} className='manual-left-column-row'>
               <div
                 className={classNames({
                   'manual-left-column-entry': true,
@@ -321,18 +321,18 @@ class Manual extends Classs<Props>
   {
     const closeOpacity = this.state.value.length ? 1 : 0;
     return (
-      <div className="manual-topbar builder-manual-topbar">
-        <div className="manual-search-bar">
-          <SearchIcon className="manual-search-icon" />
+      <div className='manual-topbar builder-manual-topbar'>
+        <div className='manual-search-bar'>
+          <SearchIcon className='manual-search-icon' />
           <Autocomplete
-            className="manual-search-input"
+            className='manual-search-input'
             value={this.state.value as string}
             onChange={this.search}
-            placeholder="Search"
+            placeholder='Search'
             options={this.autocompleteOptions}
           />
           <CloseIcon
-            className="manual-close-icon"
+            className='manual-close-icon'
             style={{
               opacity: closeOpacity,
             }}
@@ -404,7 +404,7 @@ class Manual extends Classs<Props>
     const style = this.state.expandSidebar ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
 
     return (
-      <div className="manual-sidebar" style={style}>
+      <div className='manual-sidebar' style={style}>
         <div className={classNames({
           'manual-left-column-section-heading': true,
           'manual-left-column-section-heading-blue': true,
@@ -451,22 +451,22 @@ class Manual extends Classs<Props>
   {
     const closeOpacity = this.state.value.length ? 1 : 0;
     return (
-      <div className="manual-content-area">
+      <div className='manual-content-area'>
         <div className={classNames({
           'manual-search-bar': true,
           'manual-tab-search-bar': this.props.manualTab,
           'manual-sidebar-search': true,
         })}>
-          <SearchIcon className="manual-search-icon" />
+          <SearchIcon className='manual-search-icon' />
           <Autocomplete
-            className="manual-search-input"
+            className='manual-search-input'
             value={this.state.value as string}
             onChange={this.search}
-            placeholder="Search"
+            placeholder='Search'
             options={this.autocompleteOptions}
           />
           <CloseIcon
-            className="manual-close-icon"
+            className='manual-close-icon'
             style={{
               opacity: closeOpacity,
             }}
@@ -495,10 +495,10 @@ class Manual extends Classs<Props>
   render()
   {
     return (
-      <div className="manual-area">
+      <div className='manual-area'>
         {this.props.manualTab ? null : this.renderManualTopbar()}        {
           this.props.manualTab ?
-            <div className="manual-left-column">
+            <div className='manual-left-column'>
               {this.renderLeftColumn()}
             </div>
             :

@@ -46,19 +46,19 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Redux = require('redux');
 
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import AuthStore from './../../auth/data/AuthStore';
 import RoleStore from './../../roles/data/RolesStore';
 import UserStore from './../../users/data/UserStore';
 import LibraryTypes from './../LibraryTypes';
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Actions from './LibraryActions';
 import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import BuilderActions from '../../builder/data/BuilderActions';
 import Util from './../../util/Util';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 import Ajax from './../../util/Ajax';
 

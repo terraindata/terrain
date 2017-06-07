@@ -135,7 +135,7 @@ class Library extends Classs<Props>
       <div
         className={this.props.className}
         onScroll={this.handleScroll}
-        ref="is"
+        ref='is'
       >
         {this.props.children}
       </div>

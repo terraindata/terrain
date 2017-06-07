@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import SchemaTypes from '../SchemaTypes';
 const { Map, List } = Immutable;
 
@@ -54,7 +54,7 @@ type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
 
-export module SchemaParser
+export namespace SchemaParser
 {
   export function parseMySQLDb(
     db: object,

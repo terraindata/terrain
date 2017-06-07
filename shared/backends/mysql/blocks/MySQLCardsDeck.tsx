@@ -47,49 +47,49 @@ import Blocks from './MySQLBlocks';
 
 export const MySQLCardsDeck =
   Immutable.fromJS(
-  [
     [
-      Blocks.sfw.type,
-      Blocks.from.type,
+      [
+        Blocks.sfw.type,
+        Blocks.from.type,
+      ],
+      [
+        Blocks.as.type,
+        Blocks.count.type,
+        Blocks.avg.type,
+        Blocks.min.type,
+        Blocks.max.type,
+        Blocks.sum.type,
+        Blocks.distinct.type,
+      ],
+      [
+        Blocks.where.type,
+        Blocks.groupBy.type,
+        Blocks.having.type,
+        Blocks.sort.type,
+        Blocks.take.type,
+        Blocks.skip.type,
+      ],
+      [
+        Blocks.comparison.type,
+        Blocks.and.type,
+        Blocks.or.type,
+        Blocks.exists.type,
+        Blocks.not.type,
+      ],
+      [
+        Blocks.transform.type,
+        Blocks.score.type,
+      ],
+      [
+        Blocks.add.type,
+        Blocks.subtract.type,
+        Blocks.multiply.type,
+        Blocks.divide.type,
+      ],
+      [
+        Blocks.tql.type,
+      ],
     ],
-    [
-      Blocks.as.type,
-      Blocks.count.type,
-      Blocks.avg.type,
-      Blocks.min.type,
-      Blocks.max.type,
-      Blocks.sum.type,
-      Blocks.distinct.type,
-    ],
-    [
-      Blocks.where.type,
-      Blocks.groupBy.type,
-      Blocks.having.type,
-      Blocks.sort.type,
-      Blocks.take.type,
-      Blocks.skip.type,
-    ],
-    [
-      Blocks.comparison.type,
-      Blocks.and.type,
-      Blocks.or.type,
-      Blocks.exists.type,
-      Blocks.not.type,
-    ],
-    [
-      Blocks.transform.type,
-      Blocks.score.type,
-    ],
-    [
-      Blocks.add.type,
-      Blocks.subtract.type,
-      Blocks.multiply.type,
-      Blocks.divide.type,
-    ],
-    [
-      Blocks.tql.type,
-    ],
-  ]
   );
-  
+
 export default MySQLCardsDeck;

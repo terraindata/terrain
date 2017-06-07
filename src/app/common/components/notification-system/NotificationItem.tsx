@@ -315,7 +315,7 @@ class NotificationItem extends Classs<Props> {
     if (notification.title)
     {
       return (
-        <h4 className="notification-title" style={this._styles.title}>
+        <h4 className='notification-title' style={this._styles.title}>
           {notification.title}
         </h4>
       );
@@ -330,7 +330,7 @@ class NotificationItem extends Classs<Props> {
     if (notification.message)
     {
       return (
-        <div className="notification-message" style={this._styles.messageWrapper}>
+        <div className='notification-message' style={this._styles.messageWrapper}>
           {notification.message}
         </div>
       );
@@ -343,7 +343,7 @@ class NotificationItem extends Classs<Props> {
     if (this.props.notification.dismissible)
     {
       return (
-        <span className="notification-dismiss close" style={this._styles.dismiss}>
+        <span className='notification-dismiss close' style={this._styles.dismiss}>
           <CloseIcon style={{
             position: 'relative',
             width: '8px',
@@ -360,8 +360,8 @@ class NotificationItem extends Classs<Props> {
     if (notification.action)
     {
       return (
-        <div className="notification-action-wrapper" style={this._styles.actionWrapper}>
-          <div className="notification-action-button" onClick={this._defaultAction} style={this._styles.action}>
+        <div className='notification-action-wrapper' style={this._styles.actionWrapper}>
+          <div className='notification-action-button' onClick={this._defaultAction} style={this._styles.action}>
             {notification.action.label}
           </div>
         </div>
@@ -420,7 +420,7 @@ class NotificationItem extends Classs<Props> {
         onMouseEnter={this._handleMouseEnter}
         onMouseLeave={this._handleMouseLeave}
         style={notificationStyle}
-        ref="item"
+        ref='item'
       >
         {this.renderDismiss()}
         <div

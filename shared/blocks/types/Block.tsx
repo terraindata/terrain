@@ -71,7 +71,6 @@ export interface Block extends IRecord<Block>
   [field: string]: any;
 }
 
-
 export interface BlockConfig
 {
   static: {
@@ -111,6 +110,5 @@ export const _block = (config: BlockConfig): Block =>
 };
 
 export type TQLFn = string | ((block: Block) => string);
-
 
 export default Block;

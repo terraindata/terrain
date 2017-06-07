@@ -45,6 +45,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { MenuOption } from '../../../common/components/Menu';
 import PureClasss from '../../../common/components/PureClasss';
@@ -53,7 +54,6 @@ import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultFields, getResultName, getResultValue } from './Result';
 import { getPrimaryKeyFor, MAX_RESULTS, Results } from './ResultsManager';
-import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 
 export interface Props
 {
@@ -266,7 +266,7 @@ export default class ResultsTable extends PureClasss<Props>
   {
     if (!this.props.results)
     {
-      return <InfoArea large="Loading..." />;
+      return <InfoArea large='Loading...' />;
     }
 
     // let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);

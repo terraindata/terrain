@@ -66,7 +66,8 @@ export interface ElasticQueryShards
   failed: number;
 }
 
-export interface ElasticQueryHits {
+export interface ElasticQueryHits
+{
   total: number;
   max_score: number;
   hits: ElasticQueryHit[];

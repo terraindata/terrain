@@ -51,7 +51,7 @@ class Placeholder extends PureClasss<any>
   render()
   {
     return (
-      <InfoArea large="In progress." />
+      <InfoArea large='In progress.' />
     );
   }
 }

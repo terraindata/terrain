@@ -47,51 +47,50 @@ import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import CommonSQL from '../syntax/CommonSQL';
-import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 
-import {Card, Cards, CardString} from '../../../blocks/types/Card';
-import {Block} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
+import { Block } from '../../../blocks/types/Block';
+import { Card, Cards, CardString } from '../../../blocks/types/Card';
 const { make } = BlockUtils;
 
 import Blocks from '../blocks/MySQLBlocks';
 
 export default function SQLToCards(
   query: Query,
-  queryReady: (query: Query) => void
+  queryReady: (query: Query) => void,
 ): Query
 {
   const prevReq = query.getIn(['meta', 'parseTreeReq']);
   prevReq && typeof prevReq.abort === 'function' && prevReq.abort();
-  
+
   const req = AjaxM1.parseTree(
     query.tql,
-    query.db.id + "",
+    query.db.id + '',
     parseTreeLoaded,
     parseTreeError,
     { // context
       query,
       queryReady,
-    }
+    },
   ).xhr;
-  
+
   return query
     .set('cardsAndCodeInSync', false)
     .setIn(['meta', 'parseTreeReq'], req);
 }
 
-
 const parseTreeLoaded = (response, context) =>
 {
   let query: Query = context.query;
   const queryReady: (query: Query) => void = context.queryReady;
-  
-  const {error, result} = response;
-  
+
+  const { error, result } = response;
+
   query = query.setIn(['meta', 'parseTreeReq'], null);
-  
+
   if (error)
   {
     query = query
@@ -107,14 +106,14 @@ const parseTreeLoaded = (response, context) =>
 
   // alert the state that the query needs to change
   queryReady(query);
-}
+};
 
 const parseTreeError = (error, context) =>
 {
   // TODO MOD confirm what format the error comes back as
   let query: Query = context.query;
   const queryReady: (query: Query) => void = context.queryReady;
-  
+
   query = query.setIn(['meta', 'parseTreeReq'], null);
   query = query
     .set('parseError', (error && error.errorMessage) || error)
@@ -122,25 +121,24 @@ const parseTreeError = (error, context) =>
 
   // alert the state that the query needs to change
   queryReady(query);
-}
-
+};
 
 const TQLToCards =
-{
-  convert(statement: Statement, currentCards?: Cards): Cards
   {
-    const statements = statement.statements.map(parseNodeAsCard);
-
-    const cards: Cards = List(statements);
-
-    if (currentCards)
+    convert(statement: Statement, currentCards?: Cards): Cards
     {
-      return reconcileCards(currentCards, cards);
-    }
+      const statements = statement.statements.map(parseNodeAsCard);
 
-    return cards;
-  },
-};
+      const cards: Cards = List(statements);
+
+      if (currentCards)
+      {
+        return reconcileCards(currentCards, cards);
+      }
+
+      return cards;
+    },
+  };
 
 function parseNode(node: Node | string): CardString
 {
@@ -218,12 +216,12 @@ const generalProcessors: {
     node: Node,
   ) => CardString,
 } = {
-  'FROM':
+    'FROM':
     (node) =>
     {
       const tables = _.compact(
         flattenCommas(node.child)
-        .map(
+          .map(
           (tableNode) =>
           {
             if (!tableNode)
@@ -262,7 +260,7 @@ const generalProcessors: {
       });
     },
 
-  'SELECT':
+    'SELECT':
     (node) =>
     {
       const sfw = parseNode(node.left_child) as Card;
@@ -279,13 +277,13 @@ const generalProcessors: {
       return sfw.set('fields', Immutable.List(fieldBlocks));
     },
 
-  '.':
+    '.':
     (node) =>
     {
       return node.left_child + '.' + node.right_child;
     },
 
-  'CALL':
+    'CALL':
     (node) =>
     {
       let type = node.left_child as string;
@@ -347,8 +345,8 @@ const generalProcessors: {
       return make(Blocks.tql, { clause: 'call' });
     },
 
-  'call':
-      (node) =>
+    'call':
+    (node) =>
     {
       let type = node.left_child as string;
       if (typeof type === 'string')
@@ -404,30 +402,30 @@ const generalProcessors: {
       return make(Blocks.tql, { clause: 'call' });
     },
 
-  'DISTINCT':
+    'DISTINCT':
     (node) =>
       make(Blocks.distinct, {
         value: parseNode(node.child),
       }),
 
-  'EXPR':
+    'EXPR':
     (node) =>
       parseNode(node.child),
 
-  'AS':
+    'AS':
     (node) =>
       make(Blocks.as, {
         value: parseNode(node.left_child),
         alias: node.right_child,
       }),
 
-  'AND':
+    'AND':
     andOrProcessor('AND'),
 
-  'OR':
+    'OR':
     andOrProcessor('OR'),
 
-  'EXISTS':
+    'EXISTS':
     (node) =>
       make(
         Blocks.exists,
@@ -438,7 +436,7 @@ const generalProcessors: {
         },
       ),
 
-  'NOT':
+    'NOT':
     (node) =>
       make(
         Blocks.not,
@@ -449,16 +447,16 @@ const generalProcessors: {
         },
       ),
 
-  // TODO migrate to card when available
-  'IS NOT NULL':
+    // TODO migrate to card when available
+    'IS NOT NULL':
     (node) =>
       node.child + ' IS NOT NULL',
 
-  '+':
+    '+':
     (node) =>
       parseMathNode(node, '+', Blocks.add),
 
-  '-':
+    '-':
     (node) =>
     {
       // could be negative, or could be subract
@@ -472,29 +470,29 @@ const generalProcessors: {
         }
 
         return make(Blocks.subtract,
-        {
-          fields: List([
-            make(Blocks.field, {
-              field: '0',
-            }),
-            make(Blocks.field, {
-              field: contents,
-            }),
-          ]),
-        });
+          {
+            fields: List([
+              make(Blocks.field, {
+                field: '0',
+              }),
+              make(Blocks.field, {
+                field: contents,
+              }),
+            ]),
+          });
       }
       return parseMathNode(node, '-', Blocks.subtract);
     },
 
-  '*':
+    '*':
     (node) =>
       parseMathNode(node, '*', Blocks.multiply),
 
-  '/':
+    '/':
     (node) =>
       parseMathNode(node, '/', Blocks.divide),
 
-};
+  };
 
 function parseMathNode(node: Node, op: string, mathCardBlock): Card
 {
@@ -502,9 +500,9 @@ function parseMathNode(node: Node, op: string, mathCardBlock): Card
   const fields = nodes.map(parseNode).map(
     (fieldValue) =>
       make(Blocks.field,
-      {
-        field: fieldValue,
-      }),
+        {
+          field: fieldValue,
+        }),
   );
 
   return make(
@@ -544,19 +542,19 @@ const sfwProcessors: {
   ) => CardString,
 } = {
 
-  TAKE:
+    TAKE:
     (rightNodes) =>
       make(Blocks.take, {
         value: rightNodes[0],
       }),
 
-  SKIP:
+    SKIP:
     (rightNodes) =>
       make(Blocks.skip, {
         value: rightNodes[0],
       }),
 
-  SORT:
+    SORT:
     (sortNodes) =>
       make(Blocks.sort, {
         sorts: List(
@@ -579,7 +577,7 @@ const sfwProcessors: {
         ),
       }),
 
-  GROUP:
+    GROUP:
     (fieldNodes) =>
       make(Blocks.groupBy, {
         fields: List(
@@ -592,7 +590,7 @@ const sfwProcessors: {
         ),
       }),
 
-  FILTER:
+    FILTER:
     (childNodes) =>
       make(
         Blocks.where,
@@ -604,7 +602,7 @@ const sfwProcessors: {
         },
       ),
 
-  HAVING:
+    HAVING:
     (childNodes) =>
       make(
         Blocks.having,
@@ -614,7 +612,7 @@ const sfwProcessors: {
           ]),
         },
       ),
-};
+  };
 
 // takes a tree of a certain op (e.g. commas, and/or)
 //  and turns it into an array of Node
@@ -662,10 +660,10 @@ function reconcileCards(currentCards: Cards, newCards: Cards): Cards
       let tempIndex = currentCardIndex;
       while (
         tempIndex < currentCards.size &&
-          currentCards.get(tempIndex).type !== card.type
+        currentCards.get(tempIndex).type !== card.type
       )
       {
-        tempIndex ++;
+        tempIndex++;
       }
 
       if (tempIndex !== currentCards.size)

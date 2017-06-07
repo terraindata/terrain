@@ -305,7 +305,7 @@ const Panel = {
         className={panelClass}
         style={style}
         onMouseDown={this.down}
-        ref="panel"
+        ref='panel'
         onTouchStart={this.down}>
         {content}
       </div>

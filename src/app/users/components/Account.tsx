@@ -105,17 +105,17 @@ class Account extends Classs<Props>
     //   Notifications
     // </Link>
     return (
-      <div className="account">
-        <div className="account-wrapper">
-          <div className="account-title">
+      <div className='account'>
+        <div className='account-wrapper'>
+          <div className='account-title'>
             <HomeIcon />
             {
               title
             }
           </div>
-          <div className="account-links">
+          <div className='account-links'>
             <div
-              className="selected-link-marker"
+              className='selected-link-marker'
               style={{
                 left: selected,
               }}
@@ -146,7 +146,7 @@ class Account extends Classs<Props>
               Team
             </Link>
           </div>
-          <div className="account-inner">
+          <div className='account-inner'>
             {
               this.props.children
             }
