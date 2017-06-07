@@ -538,7 +538,10 @@ const TransformChart = {
         const offset = d['offset'];
         const radius = SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING;
         let straightHeight = offset - radius * 2 - 2;
-        if (straightHeight < 0) straightHeight = 0;
+        if (straightHeight < 0)
+        {
+          straightHeight = 0;
+        }
         const pinR = 5;
 
         let str = 'Mx y l -p -15 ' +

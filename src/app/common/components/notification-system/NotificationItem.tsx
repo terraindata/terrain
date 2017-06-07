@@ -225,7 +225,10 @@ class NotificationItem extends Classs<Props> {
 
   _onTransitionEnd()
   {
-    if (this._removeCount > 0) return;
+    if (this._removeCount > 0)
+    {
+      return;
+    }
     if (this.state.removed)
     {
       this._removeCount++;

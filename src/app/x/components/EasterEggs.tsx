@@ -92,7 +92,10 @@ class EasterEggs extends PureClasss<Props>
   dropSnow()
   {
     let { buckets, snow, w, h } = this.state;
-    if (!buckets || !snow) return;
+    if (!buckets || !snow)
+    {
+      return;
+    }
 
     // new snow
     const c = Util.randInt(4);

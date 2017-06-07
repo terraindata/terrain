@@ -127,7 +127,10 @@ class ManualEntry extends Classs<Props>
 
   highlightKeyWords(text)
   {
-    if (!text) return;
+    if (!text)
+    {
+      return;
+    }
     let keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
     // Remove ( ) card
     const index = keywords.indexOf('( )');

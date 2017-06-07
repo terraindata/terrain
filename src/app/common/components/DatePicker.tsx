@@ -64,7 +64,10 @@ for (let h = 0; h < 24; h++)
   for (let m = 0; m < 60; m += MINUTE_INTERVAL)
   {
     let hour = (h - 1) % 12 + 1;
-    if (h === 0) hour = 12;
+    if (h === 0)
+    {
+      hour = 12;
+    }
     _hours.push(hour + ':' + (m < 10 ? '0' : '') + m + (h < 12 ? 'am' : 'pm'));
   }
 }

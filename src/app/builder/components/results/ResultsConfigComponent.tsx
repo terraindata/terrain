@@ -169,7 +169,10 @@ export class ResultsConfigComponent extends PureClasss<Props>
   fieldType(field)
   {
     const { config } = this.state;
-    if (!config) return null;
+    if (!config)
+    {
+      return null;
+    }
     if (config.name === field)
     {
       return 'name';
