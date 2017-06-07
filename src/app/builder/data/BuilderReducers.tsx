@@ -128,7 +128,10 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       {
         if (action.payload.query.tql)
         {
-          // TODO MOD convert
+          query = AllBackendsMap[query.language].codeToQuery(
+            query,
+            Actions.changeQuery
+          );
         }
         else
         {
@@ -164,6 +167,17 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         action.payload.keyPath,
         action.payload.value,
       ),
+
+    [ActionTypes.changeQuery]:
+    (
+      state: BuilderState,
+      action: {
+        payload?: {
+          query: Query,
+        },
+      },
+    ) =>
+      state.set('query', action.payload.query),
 
     [ActionTypes.create]:
     (
@@ -316,8 +330,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       query = query.set('tql', action.payload.tql);
       query = AllBackendsMap[query.language].codeToQuery(
         query,
-        (newQuery) =>
-          Actions.change(Immutable.List(['query']), newQuery)
+        Actions.changeQuery
       );
 
       return state.set('query', query);

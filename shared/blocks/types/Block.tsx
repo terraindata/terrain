@@ -44,6 +44,10 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 
+export type TQLRecursiveObjectFn = ((block: Block, tqlFn: TQLFn, tqlConfig: object) => string | object);
+export type TQLStringFn = string | ((block: Block) => string)
+export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
+
 // A Block is a card or a distinct piece / group of card pieces
 export interface Block extends IRecord<Block>
 {
@@ -110,7 +114,6 @@ export const _block = (config: BlockConfig): Block =>
   return blockConfig;
 };
 
-export type TQLFn = string | ((block: Block) => string);
 
 
 export default Block;
