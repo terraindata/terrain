@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonSQL from '../syntax/CommonSQL';
@@ -91,7 +92,7 @@ class CardsToSQL
         {
           value = `"${value}"`;
         }
-        if (input.inputType == InputType.DATE)
+        if (input.inputType === InputType.DATE)
         {
           value = `'${value}'`;
         }
@@ -266,7 +267,7 @@ class CardsToSQL
     {
       str = strFn;
     }
-    else if (typeof strFn == 'function')
+    else if (typeof strFn === 'function')
     {
       str = strFn(block);
     }

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 /*
 How to use Notifications:
 In App.tsx:
@@ -81,7 +82,7 @@ export interface Props
 const notificationManager = {
   system: null,
 
-  addNotification: function(title: string, message: string, level: string, timeOut?: number)
+  addNotification(title: string, message: string, level: string, timeOut?: number)
   {
     if (this.system)
     {

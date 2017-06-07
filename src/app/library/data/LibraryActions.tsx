@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 const _ = require('underscore');
 import Util from '../../util/Util';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
@@ -74,7 +75,7 @@ const Actions =
           (response) =>
           {
             // on load
-            const id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.groups.create, {
               group: group.set('id', id),
             });
@@ -114,7 +115,7 @@ const Actions =
           (response) =>
           {
             // on load
-            const id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.algorithms.create, {
               algorithm: algorithm.set('id', id),
             });
@@ -177,7 +178,7 @@ const Actions =
           (response) =>
           {
             // on load
-            const id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.variants.create, {
               variant: variant.set('id', id),
             });

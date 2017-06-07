@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./LibraryItem.less');
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -267,11 +268,11 @@ class LibraryItem extends Classs<Props>
     if (this.props.draggingOverIndex !== -1)
     {
       // could be shifted
-      if (this.props.index > this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      if (this.props.index > this.props.draggingItemIndex && this.props.index === this.props.draggingOverIndex)
       {
         shiftedUp = true;
       }
-      if (this.props.index < this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      if (this.props.index < this.props.draggingItemIndex && this.props.index === this.props.draggingOverIndex)
       {
         shiftedDown = true;
       }

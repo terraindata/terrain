@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // Libraries
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -520,7 +521,7 @@ class Builder extends PureClasss<Props>
       saving: true,
     });
 
-    //TODO remove if queries/variants model changes
+    // TODO remove if queries/variants model changes
     LibraryActions.variants.change(variant);
     this.onSaveSuccess(variant);
     Actions.save(); // register that we are saving

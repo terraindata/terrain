@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./CardStyle.less');
 
 import * as classNames from 'classnames';
@@ -343,7 +344,7 @@ class _CardComponent extends PureClasss<Props>
         let b = block.map(removeId);
         if (!b)
         {
-          //records don't have a map fn
+          // records don't have a map fn
           b = block.toMap().map(removeId);
         }
         return b;

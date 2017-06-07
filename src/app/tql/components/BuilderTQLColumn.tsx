@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./BuilderTQLColumn.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -270,7 +271,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     keywords.map(function(word)
     {
       const words = word.split(' ');
-      //For terms like select from, only need to match one of the words
+      // For terms like select from, only need to match one of the words
       if (words.length > 1)
       {
         for (let i = 0; i < words.length; i++)

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
 require('./BuilderColumn.less');
 import * as classNames from 'classnames';
@@ -279,7 +280,7 @@ const BuilderColumn = React.createClass<any, any>(
       localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
     },
 
-    getMenuOptions(): List<MenuOption> //TODO
+    getMenuOptions(): List<MenuOption> // TODO
     {
       const options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map((index) => ({
         text: COLUMNS[index],

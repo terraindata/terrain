@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./ManualEntry.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -128,10 +129,10 @@ class ManualEntry extends Classs<Props>
   {
     if (!text) return;
     let keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
-    //Remove ( ) card
+    // Remove ( ) card
     const index = keywords.indexOf('( )');
     keywords.splice(index, 1);
-    //Separate multi-word keywords like 'Take Limit' into sep. keywords
+    // Separate multi-word keywords like 'Take Limit' into sep. keywords
     keywords = keywords.join(' ').split(' ');
 
     text = this.findKeywords(text, keywords, 'manual-entry-keyword');

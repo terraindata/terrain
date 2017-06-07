@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./panel.less');
 import * as React from 'react';
 const _ = require('underscore');
@@ -212,7 +213,7 @@ const Panel = {
   {
     if (this.props.onMouseDown)
     {
-      if (!this.props.mouseDownRef || event.target == this.refs[this.props.mouseDownRef])
+      if (!this.props.mouseDownRef || event.target === this.refs[this.props.mouseDownRef])
       {
         this.props.onMouseDown(this.props.index, event);
       }
@@ -220,7 +221,7 @@ const Panel = {
 
     if (this.props.handleRef)
     {
-      if (event.target != this.refs[this.props.handleRef])
+      if (event.target !== this.refs[this.props.handleRef])
       {
         // a handleRef is set, so only respond to mouse events on our handle
         return;
