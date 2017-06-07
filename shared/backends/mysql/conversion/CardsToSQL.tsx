@@ -92,7 +92,7 @@ class CardsToSQL
         {
           value = `"${value}"`;
         }
-        if (input.inputType == InputType.DATE)
+        if (input.inputType === InputType.DATE)
         {
           value = `'${value}'`;
         }
@@ -267,7 +267,7 @@ class CardsToSQL
     {
       str = strFn;
     }
-    else if (typeof strFn == 'function')
+    else if (typeof strFn === 'function')
     {
       str = strFn(block);
     }
