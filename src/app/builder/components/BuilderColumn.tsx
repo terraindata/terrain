@@ -279,7 +279,7 @@ const BuilderColumn = React.createClass<any, any>(
       localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
     },
 
-    getMenuOptions(): List<MenuOption> //TODO
+    getMenuOptions(): List<MenuOption> // TODO
     {
       const options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map((index) => ({
         text: COLUMNS[index],

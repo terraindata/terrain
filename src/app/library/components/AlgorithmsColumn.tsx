@@ -271,7 +271,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     const canDuplicate = canArchive;
     const canDrag = canArchive;
     const canEdit = canDrag; // ||
-    //(me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -371,7 +371,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     const { algorithms } = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const { me, roles } = this.state;
-    const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+    const canCreate = true; // me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
 
     return (
       <LibraryItemCategory

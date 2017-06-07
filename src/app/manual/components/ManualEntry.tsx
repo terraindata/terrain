@@ -128,10 +128,10 @@ class ManualEntry extends Classs<Props>
   {
     if (!text) return;
     let keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
-    //Remove ( ) card
+    // Remove ( ) card
     const index = keywords.indexOf('( )');
     keywords.splice(index, 1);
-    //Separate multi-word keywords like 'Take Limit' into sep. keywords
+    // Separate multi-word keywords like 'Take Limit' into sep. keywords
     keywords = keywords.join(' ').split(' ');
 
     text = this.findKeywords(text, keywords, 'manual-entry-keyword');

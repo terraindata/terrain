@@ -270,7 +270,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     keywords.map(function(word)
     {
       const words = word.split(' ');
-      //For terms like select from, only need to match one of the words
+      // For terms like select from, only need to match one of the words
       if (words.length > 1)
       {
         for (let i = 0; i < words.length; i++)

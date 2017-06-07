@@ -64,7 +64,7 @@ export namespace UserTypes
     imgSrc = '';
     tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
 
-    //notifications fields
+    // notifications fields
     sound = 'chime';
     emailNotificationType = 'Activities of any kind';
     emailNotificationTiming = 'Once every 15 minutes';

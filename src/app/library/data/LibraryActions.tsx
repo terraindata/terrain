@@ -74,7 +74,7 @@ const Actions =
           (response) =>
           {
             // on load
-            const id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.groups.create, {
               group: group.set('id', id),
             });
@@ -114,7 +114,7 @@ const Actions =
           (response) =>
           {
             // on load
-            const id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.algorithms.create, {
               algorithm: algorithm.set('id', id),
             });
@@ -177,7 +177,7 @@ const Actions =
           (response) =>
           {
             // on load
-            const id = response.id; //??
+            const id = response.id; // ??
             $(ActionTypes.variants.create, {
               variant: variant.set('id', id),
             });

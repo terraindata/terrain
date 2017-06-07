@@ -77,7 +77,7 @@ export interface Props
 {
   notification: any;
   getStyles: any;
-  onRemove: any; //type is function?
+  onRemove: any; // type is function?
   allowHTML: boolean;
   noAnimation: boolean;
 }

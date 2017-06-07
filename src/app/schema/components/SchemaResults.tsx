@@ -131,7 +131,7 @@ class SchemaResults extends PureClasss<Props>
                 table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
                 break;
               case 'index':
-                //TODO
+                // TODO
                 break;
             }
 

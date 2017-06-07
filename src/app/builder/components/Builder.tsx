@@ -520,7 +520,7 @@ class Builder extends PureClasss<Props>
       saving: true,
     });
 
-    //TODO remove if queries/variants model changes
+    // TODO remove if queries/variants model changes
     LibraryActions.variants.change(variant);
     this.onSaveSuccess(variant);
     Actions.save(); // register that we are saving

@@ -167,12 +167,12 @@ const TransformChart = {
     const drawCrossHairs = this._drawCrossHairs;
     if (state.canEdit)
     {
-      //Keep track of what element is in focus (for key events)
+      // Keep track of what element is in focus (for key events)
       let currentObject = this;
       d3.select(el).select('.transform-card').on('mouseover', function() { currentObject = this; });
       d3.select(el).select('.transform-card').on('mouseout', function() { currentObject = null; });
 
-      //Draw Point + menu on double click
+      // Draw Point + menu on double click
       d3.select(el).select('.inner-svg').on('dblclick', function()
       {
         const isvg = d3.select(el).select('.inner-svg');
@@ -183,7 +183,7 @@ const TransformChart = {
         return false;
       });
 
-      //Draw crosshairs when shift/ctrl is pressed
+      // Draw crosshairs when shift/ctrl is pressed
       d3.select(el).select('.inner-svg').on('mousemove', function()
       {
         if (d3.event['ctrlKey'] || d3.event['shiftKey'])
@@ -195,26 +195,26 @@ const TransformChart = {
 
       d3.select('body').on('keyup', function()
       {
-        //CTRL: 17, SHIFT: 16, ALT: 18, WIN/CMD: 91
+        // CTRL: 17, SHIFT: 16, ALT: 18, WIN/CMD: 91
         if (currentObject && (d3.event['keyCode'] === 17 || d3.event['keyCode'] === 16))
         {
           d3.select(el).selectAll('.crosshairs').remove();
         }
       });
 
-      //Stop normal right click functioning from happening
+      // Stop normal right click functioning from happening
       d3.select(el).select('.inner-svg').on('contextmenu', function()
       {
         d3.event['preventDefault']();
       });
 
-      //Delete selected points on del/backspace key press
+      // Delete selected points on del/backspace key press
       const deletePoints = this._deletePoints;
       d3.select('body').on('keydown', function()
       {
         if (
           currentObject &&
-          (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
+          (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
           && !$('input').is(':focus')
         )
         {
@@ -840,7 +840,7 @@ const TransformChart = {
       .attr('x2', containerWidth)
       .attr('y2', pos_y);
 
-    //When mouse leaves transform area, remove, the crosshairs
+    // When mouse leaves transform area, remove, the crosshairs
     d3.select(el).select('.inner-svg').on('mouseleave', function()
     {
       crosshairs.on('mousemove', null);
@@ -945,7 +945,7 @@ const TransformChart = {
     const value = scales.realX.invert(cx);
     const score = scales.realPointY.invert(cy);
 
-    //Get the max and min X values for the point
+    // Get the max and min X values for the point
     const pointValues = d3.select(el).selectAll('.point')[0].map(function(p: any)
     {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
@@ -970,7 +970,7 @@ const TransformChart = {
       .attr('class', 'point-edit-menu')
       .on('keydown', function()
       {
-        if (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
+        if (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
         {
           d3.event['stopPropagation']();
         }

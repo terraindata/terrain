@@ -343,7 +343,7 @@ class _CardComponent extends PureClasss<Props>
         let b = block.map(removeId);
         if (!b)
         {
-          //records don't have a map fn
+          // records don't have a map fn
           b = block.toMap().map(removeId);
         }
         return b;

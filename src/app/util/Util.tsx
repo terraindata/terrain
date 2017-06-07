@@ -594,7 +594,7 @@ const Util = {
       return 11;
 
     else
-      return 0; //It is not IE
+      return 0; // It is not IE
   },
 };
 
