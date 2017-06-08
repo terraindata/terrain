@@ -59,7 +59,9 @@ class ElasticBackend implements Backend
 
   blocks = ElasticBlocks;
   creatingType = ElasticBlocks.elasticCreating.type;
+  
   topLevelCards = Immutable.List<string>([
+    ElasticBlocks.elasticRootCard.type,
     ElasticBlocks.elasticKeyValueWrap.type,
     ElasticBlocks.elasticKeyValueToggle.type,
   ]);
