@@ -224,6 +224,7 @@ export const elasticKeyValueWrap = _card({
       return prefix + 'Nothing';
     },
     
+    accepts: CommonElastic.acceptsValues,
     display:
     [
       {
