@@ -48,7 +48,7 @@ import Ajax from './../../util/Ajax';
 import RoleTypes from './../RoleTypes';
 import Actions from './RolesActions';
 import ActionTypes from './RolesActionTypes';
-const Immutable = require('immutable');
+import * as Immutable from 'immutable';
 
 const RolesReducer = {};
 

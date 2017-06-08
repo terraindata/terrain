@@ -48,7 +48,7 @@ import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeItem from './SchemaTreeItem';
-const Radium = require('radium');
+import Radium = require('radium');
 import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
