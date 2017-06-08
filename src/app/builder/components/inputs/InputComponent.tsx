@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
-import './InputStyle.less';
-const _ = require('underscore');
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
+import './InputStyle.less';
 const { List } = Immutable;
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';

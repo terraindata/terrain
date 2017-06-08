@@ -52,7 +52,7 @@ const Dimensions = require('react-dimensions');
 import * as React from 'react';
 const shallowCompare = require('react-addons-shallow-compare');
 const $ = require('jquery');
-const _ = require('underscore');
+import * as _ from 'underscore';
 
 // Coordinate these classNames with layout_manager.css/less
 const lmClass = 'layout-manager';

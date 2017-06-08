@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-const _ = require('underscore');
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import { CardItem } from '../components/cards/CardComponent';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './BuilderActionTypes';
