@@ -94,7 +94,7 @@ export interface BlockConfig
 
 export const allBlocksMetaFields = ['id'];
 
-const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn', 'map', 'static'];
+const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn', 'map'];
 export const verifyBlockConfigKeys = (config: object) =>
 {
   RESERVED_WORDS.map(
