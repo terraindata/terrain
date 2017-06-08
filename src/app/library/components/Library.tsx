@@ -75,9 +75,9 @@ export interface Props
 
 class Library extends PureClasss<any>
 {
-  cancelSubscription = null;
+  public cancelSubscription = null;
 
-  state: {
+  public state: {
     libraryState: LibraryState;
   } = {
     libraryState: null,
@@ -90,7 +90,7 @@ class Library extends PureClasss<any>
     this.state.libraryState = Store.getState();
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     if (!this.props.params.groupId)
     {
@@ -103,7 +103,7 @@ class Library extends PureClasss<any>
     }
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(Store, {
       stateKey: 'libraryState',
@@ -114,7 +114,7 @@ class Library extends PureClasss<any>
     UserActions.fetch();
   }
 
-  render()
+  public render()
   {
     const { libraryState } = this.state;
 

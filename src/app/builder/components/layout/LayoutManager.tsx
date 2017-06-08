@@ -395,7 +395,9 @@ const LayoutManager = React.createClass<any, any>({
     {
       heightAmplifier = 1;
       if (coords.dy > 0)
+      {
         heightAmplifier = -1;
+      }
     }
 
     // dragged left/right
@@ -403,7 +405,9 @@ const LayoutManager = React.createClass<any, any>({
     {
       widthAmplifier = 1;
       if (coords.dx > 0)
+      {
         widthAmplifier = -1;
+      }
     }
 
     if (this.props.layout.cells)
@@ -461,7 +465,9 @@ const LayoutManager = React.createClass<any, any>({
     const shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
 
     if (shiftedIndices.length === 0)
+    {
       return;
+    }
 
     let fn = Math.max;
 
@@ -790,7 +796,9 @@ const LayoutManager = React.createClass<any, any>({
     // todo consider moving this to somehwere not in a loop
     let height = this.props.layout.cellHeight;
     if (typeof height !== 'string')
+    {
       height += 'px'; // necessary?
+    }
 
     const style = {
       height,

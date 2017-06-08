@@ -80,7 +80,7 @@ const SHOW_MORE_INCREMENT = 50;
 @Radium
 class SchemaSearchResults extends PureClasss<Props>
 {
-  state: {
+  public state: {
     // since search results are rendered as a list, we want
     //  to store them in a list, instead of the Map stored in the SchemaState
     items: IMMap<string, List<SchemaBaseClass>>,
@@ -121,7 +121,7 @@ class SchemaSearchResults extends PureClasss<Props>
     });
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.search !== this.props.search)
     {
@@ -131,7 +131,7 @@ class SchemaSearchResults extends PureClasss<Props>
     }
   }
 
-  renderSection(stateKey: string, type: string, label: string)
+  public renderSection(stateKey: string, type: string, label: string)
   {
     let index = 0;
     const max = this.state.showingCount.get(stateKey);
@@ -206,7 +206,7 @@ class SchemaSearchResults extends PureClasss<Props>
     );
   }
 
-  handleShowMore(stateKey: string)
+  public handleShowMore(stateKey: string)
   {
     let { showingCount } = this.state;
     showingCount = showingCount.set(stateKey, showingCount.get(stateKey) + SHOW_MORE_INCREMENT);
@@ -215,7 +215,7 @@ class SchemaSearchResults extends PureClasss<Props>
     });
   }
 
-  render()
+  public render()
   {
     const { search } = this.props;
 

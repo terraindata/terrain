@@ -57,7 +57,7 @@ export interface Props
 
 class LibraryColumn extends Classs<Props>
 {
-  render()
+  public render()
   {
     return (
       <div

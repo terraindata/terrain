@@ -60,7 +60,7 @@ export interface Props
 
 class CheckBox extends Classs<Props>
 {
-  render()
+  public render()
   {
     return (
       <div

@@ -59,9 +59,9 @@ export interface Props
 
 class TQLResultsBar extends PureClasss<Props>
 {
-  resultsFodderRange = _.range(0, 25);
+  public resultsFodderRange = _.range(0, 25);
 
-  renderResults()
+  public renderResults()
   {
     const { resultsState } = this.props;
 
@@ -135,7 +135,7 @@ class TQLResultsBar extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div

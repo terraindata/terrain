@@ -72,12 +72,12 @@ const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends PureClasss<Props>
 {
-  handleDbChange(dbIndex: number)
+  public handleDbChange(dbIndex: number)
   {
     Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)));
   }
 
-  handleLanguageChange(langIndex: number)
+  public handleLanguageChange(langIndex: number)
   {
     const language = LANGUAGES.get(langIndex);
     console.log(this.props.variant.query);
@@ -88,7 +88,7 @@ class LibraryInfoColumn extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     if (!this.props.variant)
     {

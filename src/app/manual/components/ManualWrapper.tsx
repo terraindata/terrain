@@ -67,7 +67,7 @@ class ManualWrapper extends Classs<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     const selected = this.props.params['term'] || '';
     return <Manual

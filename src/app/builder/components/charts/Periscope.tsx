@@ -195,7 +195,7 @@ const Periscope = {
     const initialClasses = handle.attr('class');
     handle.attr('class', initialClasses + ' handle-active');
 
-    const move = function(event)
+    const move = (event) =>
     {
       onMove(handle.attr('_id'), scale.invert(d3.mouse(t)[0]));
     };

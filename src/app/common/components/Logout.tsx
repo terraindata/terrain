@@ -56,13 +56,13 @@ export interface Props
 
 class Logout extends PureClasss<Props>
 {
-  componentWillMount()
+  public componentWillMount()
   {
     AuthActions.logout();
     browserHistory.replace('/');
   }
 
-  render()
+  public render()
   {
     return (
       <InfoArea large='Logging out...' />

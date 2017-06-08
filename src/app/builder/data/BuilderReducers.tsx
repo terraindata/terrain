@@ -44,16 +44,16 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import Query from '../../../../shared/items/types/Query';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import { BuilderState } from './BuilderStore';
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import Query from '../../../../shared/items/types/Query';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
   {
@@ -130,7 +130,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         {
           query = AllBackendsMap[query.language].codeToQuery(
             query,
-            Actions.changeQuery
+            Actions.changeQuery,
           );
         }
         else
@@ -197,7 +197,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         {
           const item = action.payload.data ? action.payload.data :
             BlockUtils.make(
-              AllBackendsMap[state.query.language].blocks[action.payload.factoryType]
+              AllBackendsMap[state.query.language].blocks[action.payload.factoryType],
             );
 
           if (action.payload.index === null)
@@ -330,7 +330,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       query = query.set('tql', action.payload.tql);
       query = AllBackendsMap[query.language].codeToQuery(
         query,
-        Actions.changeQuery
+        Actions.changeQuery,
       );
 
       return state.set('query', query);

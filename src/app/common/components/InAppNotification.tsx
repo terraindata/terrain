@@ -108,7 +108,7 @@ class InAppNotification extends Classs<Props>
     };
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     notificationManager.system = this.refs['notificationSystem'];
     this.setState({
@@ -116,7 +116,7 @@ class InAppNotification extends Classs<Props>
     });
   }
 
-  render()
+  public render()
   {
     return (
       <div>

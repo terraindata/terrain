@@ -80,20 +80,20 @@ export interface Props
 
 class BuilderComponent extends PureClasss<Props>
 {
-  addRow(keyPath: KeyPath, index: number, display: Display)
+  public addRow(keyPath: KeyPath, index: number, display: Display)
   {
     BuilderActions.create(keyPath, index + 1, display.factoryType);
   }
-  removeRow(keyPath: KeyPath, index: number)
+  public removeRow(keyPath: KeyPath, index: number)
   {
     BuilderActions.remove(keyPath, index);
   }
-  moveRow(keyPath: KeyPath, index: number, newIndex: number)
+  public moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
     BuilderActions.move(keyPath, index, newIndex);
   }
 
-  renderDisplay(
+  public renderDisplay(
     displayArg: Display | Display[],
     parentKeyPath: KeyPath,
     data: IMMap<any, any>,
@@ -418,7 +418,7 @@ class BuilderComponent extends PureClasss<Props>
     return content;
   }
 
-  render()
+  public render()
   {
     let { data, display } = this.props;
     if (!display)

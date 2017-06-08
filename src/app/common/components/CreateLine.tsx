@@ -59,7 +59,7 @@ export interface Props
 
 class CreateLine extends PureClasss<Props>
 {
-  render()
+  public render()
   {
     return (
       <div className='create-line-row' onClick={this.props.onClick}>

@@ -69,13 +69,13 @@ export interface Props
 
 class CardsDeck extends PureClasss<Props>
 {
-  state: {
+  public state: {
     search: string;
   } = {
     search: '',
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.props.open && nextProps.open)
     {
@@ -83,14 +83,14 @@ class CardsDeck extends PureClasss<Props>
     }
   }
 
-  handleSearchChange(evt)
+  public handleSearchChange(evt)
   {
     this.setState({
       search: evt.target.value,
     });
   }
 
-  render()
+  public render()
   {
     const ordering = AllBackendsMap[this.props.language].cardsDeck;
     const cards = AllBackendsMap[this.props.language].blocks;
@@ -156,7 +156,7 @@ interface CardProps
 
 class _CardDeckCard extends PureClasss<CardProps>
 {
-  render()
+  public render()
   {
     const { card } = this.props;
     const data = card.static;

@@ -65,10 +65,10 @@ export interface Props
 
 class Profile extends Classs<Props>
 {
-  userUnsubscribe = null;
-  authUnsubscribe = null;
+  public userUnsubscribe = null;
+  public authUnsubscribe = null;
 
-  state: {
+  public state: {
     user: UserTypes.User,
     loading: boolean,
     saving: boolean,
@@ -86,7 +86,7 @@ class Profile extends Classs<Props>
     errorModalMessage: '',
   };
 
-  infoKeys = [
+  public infoKeys = [
     {
       key: 'name',
       label: 'Your Name',
@@ -119,7 +119,7 @@ class Profile extends Classs<Props>
       AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
-  updateUser(props: Props)
+  public updateUser(props: Props)
   {
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
@@ -129,20 +129,20 @@ class Profile extends Classs<Props>
     });
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Actions.fetch();
     this.updateUser(this.props);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
     this.state.savingReq && this.state.savingReq.abort();
   }
 
-  handleSave()
+  public handleSave()
   {
     let newUser = this.state.user;
     this.infoKeys.map((infoKey) =>
@@ -158,7 +158,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  onSave()
+  public onSave()
   {
     this.setState({
       saving: false,
@@ -167,7 +167,7 @@ class Profile extends Classs<Props>
     browserHistory.push('/account/profile');
   }
 
-  onSaveError(response)
+  public onSaveError(response)
   {
     this.setState({
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -180,7 +180,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  renderInfoItem(infoKey: { key: string, label: string, subText: string })
+  public renderInfoItem(infoKey: { key: string, label: string, subText: string })
   {
     return (
       <div className='profile-info-item-edit' key={infoKey.key}>
@@ -201,19 +201,19 @@ class Profile extends Classs<Props>
     );
   }
 
-  handleProfilePicClick(event)
+  public handleProfilePicClick(event)
   {
     this.setState({
       showDropDown: !this.state.showDropDown,
     });
   }
 
-  handleUploadImage(event)
+  public handleUploadImage(event)
   {
     this.refs['imageInput']['click']();
   }
 
-  removeProfilePicture()
+  public removeProfilePicture()
   {
     const user = this.state.user.set('imgSrc', null) as UserTypes.User;
     this.setState({
@@ -222,7 +222,7 @@ class Profile extends Classs<Props>
     this.refs['profilePicImg']['src'] = UserTypes.profileUrlFor(user);
   }
 
-  handleProfilePicChange(event)
+  public handleProfilePicChange(event)
   {
     const reader = new FileReader();
 
@@ -251,7 +251,7 @@ class Profile extends Classs<Props>
     }
   }
 
-  hidePictureMenu()
+  public hidePictureMenu()
   {
     if (this.state.showDropDown)
     {
@@ -261,7 +261,7 @@ class Profile extends Classs<Props>
     }
   }
 
-  renderProfilePicture()
+  public renderProfilePicture()
   {
     return (
       <div
@@ -306,14 +306,14 @@ class Profile extends Classs<Props>
     );
   }
 
-  toggleErrorModal()
+  public toggleErrorModal()
   {
     this.setState({
       errorModalOpen: !this.state.errorModalOpen,
     });
   }
 
-  render()
+  public render()
   {
     if (this.state.loading)
     {

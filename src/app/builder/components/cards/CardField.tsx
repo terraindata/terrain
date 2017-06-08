@@ -113,30 +113,30 @@ const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
 class CardField extends PureClasss<Props>
 {
-  state: IMoveState = DefaultMoveState;
+  public state: IMoveState = DefaultMoveState;
 
-  ss(state: IMoveState)
+  public ss(state: IMoveState)
   {
     this.setState(state as any);
   }
 
-  removeField(event)
+  public removeField(event)
   {
     Util.animateToHeight(this.refs['all'], 0, () =>
       this.props.onRemove(this.props.index));
   }
 
-  addField(event)
+  public addField(event)
   {
     this.props.onAdd(this.props.index + 1);
   }
 
-  addFieldTop(event)
+  public addFieldTop(event)
   {
     this.props.onAdd(0);
   }
 
-  handleHandleMousedown(event: MEvent)
+  public handleHandleMousedown(event: MEvent)
   {
     $('body').on('mousemove', this.handleMouseMove);
     $('body').on('mouseup', this.handleMouseUp);
@@ -174,7 +174,7 @@ class CardField extends PureClasss<Props>
     });
   }
 
-  shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
+  public shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
   {
     const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
 
@@ -239,7 +239,7 @@ class CardField extends PureClasss<Props>
     };
   }
 
-  handleMouseMove(evt)
+  public handleMouseMove(evt)
   {
     this.setState({
       dY: this.shiftSiblings(evt, false).dY,
@@ -248,7 +248,7 @@ class CardField extends PureClasss<Props>
     evt.stopPropagation();
   }
 
-  move()
+  public move()
   {
     if (this.props.index !== this.state.movedTo)
     {
@@ -265,7 +265,7 @@ class CardField extends PureClasss<Props>
     $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.index !== this.props.index)
     {
@@ -280,7 +280,7 @@ class CardField extends PureClasss<Props>
     }
   }
 
-  handleMouseUp(evt)
+  public handleMouseUp(evt)
   {
     $('body').off('mousemove', this.handleMouseMove);
     $('body').off('mouseup', this.handleMouseUp);
@@ -295,12 +295,12 @@ class CardField extends PureClasss<Props>
     });
   }
 
-  beforeTopAddDrop(item: CardItem, targetProps)
+  public beforeTopAddDrop(item: CardItem, targetProps)
   {
     this.props.onAdd(0);
   }
 
-  render()
+  public render()
   {
     let style = null;
     if (this.state.movedTo !== null)

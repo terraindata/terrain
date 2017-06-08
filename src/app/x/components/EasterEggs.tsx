@@ -59,7 +59,7 @@ export interface Props
 
 class EasterEggs extends PureClasss<Props>
 {
-  state: {
+  public state: {
     christmas: boolean;
     snow: Immutable.List<{ x: number, y: number, moving: boolean }>;
     buckets: Immutable.List<number>;
@@ -73,7 +73,7 @@ class EasterEggs extends PureClasss<Props>
     h: 0,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     // setTimeout(this.startChristmas, 200);
     const keys = [];
@@ -89,10 +89,13 @@ class EasterEggs extends PureClasss<Props>
     });
   }
 
-  dropSnow()
+  public dropSnow()
   {
     let { buckets, snow, w, h } = this.state;
-    if (!buckets || !snow) return;
+    if (!buckets || !snow)
+    {
+      return;
+    }
 
     // new snow
     const c = Util.randInt(4);
@@ -135,7 +138,7 @@ class EasterEggs extends PureClasss<Props>
     });
   }
 
-  startChristmas()
+  public startChristmas()
   {
     const w = $('body').width();
     const h = $('body').height();
@@ -152,7 +155,7 @@ class EasterEggs extends PureClasss<Props>
     setInterval(this.dropSnow, 100);
   }
 
-  render()
+  public render()
   {
     if (this.state.christmas)
     {

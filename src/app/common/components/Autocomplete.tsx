@@ -70,13 +70,15 @@ export interface Props
 
 class Autocomplete extends PureClasss<Props>
 {
-  value: string;
+  public value: string;
 
-  state: {
+  public state: {
     value: string;
     open: boolean;
     selectedIndex: number;
   };
+
+  public blurValue: string = '';
 
   constructor(props: Props)
   {
@@ -90,7 +92,7 @@ class Autocomplete extends PureClasss<Props>
       };
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     this.value = nextProps.value;
     this.setState({
@@ -98,7 +100,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  handleChange(event)
+  public handleChange(event)
   {
     let { target } = event;
     while (target && target.value === undefined)
@@ -114,7 +116,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  handleFocus(event: React.FocusEvent<any>)
+  public handleFocus(event: React.FocusEvent<any>)
   {
     this.setState({
       open: true,
@@ -124,8 +126,7 @@ class Autocomplete extends PureClasss<Props>
     this.props.onFocus && this.props.onFocus(event);
   }
 
-  blurValue: string = '';
-  handleBlur(event: React.FocusEvent<any>)
+  public handleBlur(event: React.FocusEvent<any>)
   {
     this.setState({
       open: false,
@@ -135,7 +136,7 @@ class Autocomplete extends PureClasss<Props>
     this.blurValue = '';
   }
 
-  handleSelect(value)
+  public handleSelect(value)
   {
     this.props.onChange(value);
     this.setState({
@@ -145,7 +146,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  selectIndex(index: number)
+  public selectIndex(index: number)
   {
     // scroll option into view if necessary
     const ac = ReactDOM.findDOMNode(this.refs['ac']);
@@ -172,7 +173,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  handleKeydown(event)
+  public handleKeydown(event)
   {
     if (!this.props.options)
     {
@@ -218,7 +219,7 @@ class Autocomplete extends PureClasss<Props>
     }
   }
 
-  showOption(option: string): boolean
+  public showOption(option: string): boolean
   {
     if (!option)
     {
@@ -238,7 +239,7 @@ class Autocomplete extends PureClasss<Props>
       || haystack.indexOf('.' + needle) !== -1;
   }
 
-  renderOption(option: string, index: number)
+  public renderOption(option: string, index: number)
   {
     const first = option, second = '', third = '';
     if (this.state.value && this.state.value.length)
@@ -265,7 +266,7 @@ class Autocomplete extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     const options = this.props.options && this.props.options.filter(this.showOption);
     const inputClassName = 'ac-input ' + (this.props.className || '');

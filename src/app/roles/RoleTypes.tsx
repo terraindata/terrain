@@ -56,10 +56,10 @@ export namespace RoleTypes
     });
   export class Role extends _Role
   {
-    groupId: ID;
-    userId: string;
-    admin: boolean;
-    builder: boolean;
+    public groupId: ID;
+    public userId: string;
+    public admin: boolean;
+    public builder: boolean;
   }
   // { { userId: Role }
   export type GroupRoleMap = Immutable.Map<ID, Role>;

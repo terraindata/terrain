@@ -78,9 +78,9 @@ interface CDPProps
 
 class CardDragPreview extends PureClasss<CDPProps>
 {
-  noCardColors: string[] = ['#aaa', '#aaa'];
+  public noCardColors: string[] = ['#aaa', '#aaa'];
 
-  state: {
+  public state: {
     justDropped: boolean;
     language: string;
   } = {
@@ -88,7 +88,9 @@ class CardDragPreview extends PureClasss<CDPProps>
     language: Store.getState().query.language,
   };
 
-  componentDidMount()
+  public timeout: any;
+
+  public componentDidMount()
   {
     this._subscribe(Store,
       {
@@ -97,9 +99,7 @@ class CardDragPreview extends PureClasss<CDPProps>
       });
   }
 
-  timeout: any;
-
-  componentWillReceiveProps(nextProps: CDPProps)
+  public componentWillReceiveProps(nextProps: CDPProps)
   {
     if (this.props.cardItem && !nextProps.cardItem)
     {
@@ -111,12 +111,12 @@ class CardDragPreview extends PureClasss<CDPProps>
     }
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.timeout && clearTimeout(this.timeout);
   }
 
-  render()
+  public render()
   {
     const item = this.props.cardItem;
     let colors: string[], title: string, preview: string;

@@ -91,7 +91,7 @@ const MAX_INIT_WIDTH = 300;
 
 class _Table extends PureClasss<Props>
 {
-  state: {
+  public state: {
   } = {
   };
 
@@ -100,7 +100,7 @@ class _Table extends PureClasss<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     console.log(this.props.containerHeight);
     return (

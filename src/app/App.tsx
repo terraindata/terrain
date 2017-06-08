@@ -156,7 +156,7 @@ interface Props
 }
 class App extends PureClasss<Props>
 {
-  state = {
+  public state = {
     selectedPage: 3,
     loggedIn: false,
     sidebarExpanded: false,
@@ -243,7 +243,7 @@ class App extends PureClasss<Props>
     }
   }
 
-  fetchData()
+  public fetchData()
   {
     UserActions.fetch();
     LibraryActions.fetch();
@@ -251,28 +251,28 @@ class App extends PureClasss<Props>
     // RolesActions.fetch();
   }
 
-  toggleSidebar()
+  public toggleSidebar()
   {
     this.setState({
       sidebarExpanded: !this.state.sidebarExpanded,
     });
   }
 
-  handleLoginLoadComplete()
+  public handleLoginLoadComplete()
   {
     this.setState({
       loggedInAndLoaded: true,
     });
   }
 
-  isAppStateLoaded(): boolean
+  public isAppStateLoaded(): boolean
   {
     return this.state.libraryLoaded
       && this.state.usersLoaded;
     // && this.state.rolesLoaded
   }
 
-  renderApp()
+  public renderApp()
   {
     if (!this.state.loggedInAndLoaded)
     {
@@ -321,12 +321,12 @@ class App extends PureClasss<Props>
     return <LayoutManager layout={layout} />;
   }
 
-  handleMouseMove(e: MEvent)
+  public handleMouseMove(e: MEvent)
   {
     BuilderActions.hoverCard(null);
   }
 
-  render()
+  public render()
   {
     if (this.state.noLocalStorage)
     {

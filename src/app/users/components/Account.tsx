@@ -62,7 +62,7 @@ export interface Props
 
 class Account extends Classs<Props>
 {
-  render()
+  public render()
   {
 
     let title = 'Account';

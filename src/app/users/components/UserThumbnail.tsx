@@ -71,7 +71,7 @@ export interface Props
 
 class UserThumbnail extends Classs<Props>
 {
-  state: {
+  public state: {
     user?: User,
   } = {
   };
@@ -81,12 +81,12 @@ class UserThumbnail extends Classs<Props>
     super(props);
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.subscribeUser();
   }
 
-  subscribeUser(nextProps?: Props)
+  public subscribeUser(nextProps?: Props)
   {
     this._unsubscribe();
     this._subscribe(UserStore, {
@@ -96,12 +96,12 @@ class UserThumbnail extends Classs<Props>
     });
   }
 
-  getStoreKeyPath(props?: Props)
+  public getStoreKeyPath(props?: Props)
   {
     return ['users', (props || this.props).userId];
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.userId !== this.props.userId)
     {
@@ -109,12 +109,12 @@ class UserThumbnail extends Classs<Props>
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps, nextState)
   {
     return nextState.user !== this.state.user;
   }
 
-  render()
+  public render()
   {
     const { user } = this.state;
     const name: string = user ? user.name : 'Loading...';

@@ -75,10 +75,10 @@ export interface Props
 
 class Manual extends Classs<Props>
 {
-  allTqlCards = Object.keys(cardList).sort();
+  public allTqlCards = Object.keys(cardList).sort();
 
-  allPhraseTypes = Object.keys(ManualConfig.phraseTypes).sort();
-  autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
+  public allPhraseTypes = Object.keys(ManualConfig.phraseTypes).sort();
+  public autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
 
   constructor(props: Props)
   {
@@ -119,7 +119,7 @@ class Manual extends Classs<Props>
     };
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if ((this.state.selectedKey.toLowerCase() !== nextProps.selectedKey.toLowerCase()) && !this.props.manualTab)
     {
@@ -137,12 +137,12 @@ class Manual extends Classs<Props>
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
-  renderTqlCardsList()
+  public renderTqlCardsList()
   {
     const height = 22 * this.allTqlCards.length;
     const style = this.state.expandTqlCards ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
@@ -169,7 +169,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  renderPhraseTypesList()
+  public renderPhraseTypesList()
   {
     const height = 22 * Object.keys(ManualConfig.phraseTypes).length;
     const style = this.state.expandPhraseTypes ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
@@ -195,7 +195,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  openTerm(e)
+  public openTerm(e)
   {
     const cardName = e.target.textContent.trim().replace(/[^A-Za-z ]/g, '');
     this.setState({
@@ -204,7 +204,7 @@ class Manual extends Classs<Props>
     this.search(cardName);
   }
 
-  renderManualEntries()
+  public renderManualEntries()
   {
     if (this.state.visibleTqlCards.length === 0 && this.state.visiblePhraseTypes.length === 0)
     {
@@ -258,7 +258,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  search(value)
+  public search(value)
   {
     if (value === 'TQL Cards')
     {
@@ -282,14 +282,14 @@ class Manual extends Classs<Props>
     });
 
     let selectedKey = '';
-    this.allTqlCards.forEach(function(key, index)
+    this.allTqlCards.forEach((key, index) =>
     {
       if (value.toLowerCase() === key.toLowerCase())
       {
         selectedKey = key;
       }
     });
-    this.allPhraseTypes.forEach(function(key, index)
+    this.allPhraseTypes.forEach((key, index) =>
     {
       if (value.toLowerCase() === key.toLowerCase())
       {
@@ -313,12 +313,12 @@ class Manual extends Classs<Props>
     });
   }
 
-  clearInput()
+  public clearInput()
   {
     this.search('');
   }
 
-  renderManualTopbar()
+  public renderManualTopbar()
   {
     const closeOpacity = this.state.value.length ? 1 : 0;
     return (
@@ -344,7 +344,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  showTqlCards()
+  public showTqlCards()
   {
     this.setState({
       visibleTqlCards: this.allTqlCards,
@@ -357,7 +357,7 @@ class Manual extends Classs<Props>
     browserHistory.push('/manual/TQL%20Cards');
   }
 
-  showPhraseTypes()
+  public showPhraseTypes()
   {
     this.setState({
       visiblePhraseTypes: this.allPhraseTypes,
@@ -370,28 +370,28 @@ class Manual extends Classs<Props>
     browserHistory.push('/manual/Phrase%20Types');
   }
 
-  toggleTqlCardList()
+  public toggleTqlCardList()
   {
     this.setState({
       expandTqlCards: !this.state.expandTqlCards,
     });
   }
 
-  togglePhraseTypeList()
+  public togglePhraseTypeList()
   {
     this.setState({
       expandPhraseTypes: !this.state.expandPhraseTypes,
     });
   }
 
-  toggleSidebar()
+  public toggleSidebar()
   {
     this.setState({
       expandSidebar: !this.state.expandSidebar,
     });
   }
 
-  showAllTerms()
+  public showAllTerms()
   {
     this.setState({
       expandSidebar: this.state.selectedKey === '' ? !this.state.expandSidebar : true,
@@ -399,7 +399,7 @@ class Manual extends Classs<Props>
     this.search('');
   }
 
-  renderLeftColumnMenu()
+  public renderLeftColumnMenu()
   {
     const height = 22 * (this.allPhraseTypes.length + this.allTqlCards.length) + 2 * 26;
     const style = this.state.expandSidebar ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
@@ -448,7 +448,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  renderLeftColumn()
+  public renderLeftColumn()
   {
     const closeOpacity = this.state.value.length ? 1 : 0;
     return (
@@ -493,7 +493,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div className='manual-area'>

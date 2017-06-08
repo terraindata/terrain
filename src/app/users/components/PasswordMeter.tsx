@@ -60,7 +60,7 @@ export interface Props
 
 class PasswordMeter extends Classs<Props>
 {
-  renderMeterSection(value)
+  public renderMeterSection(value)
   {
     return (
       <div
@@ -80,7 +80,7 @@ class PasswordMeter extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div className='password-meter'>

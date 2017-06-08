@@ -66,7 +66,7 @@ export interface Props
 
 export default class ResultsTable extends PureClasss<Props>
 {
-  state: {
+  public state: {
     random: number;
     spotlightState: SpotlightState;
     columns: List<IColumn>;
@@ -76,14 +76,14 @@ export default class ResultsTable extends PureClasss<Props>
     columns: this.getColumns(this.props),
   };
 
-  menuOptions: List<MenuOption> = Immutable.List([
+  public menuOptions: List<MenuOption> = Immutable.List([
     {
       text: 'Spotlight',
       onClick: this.spotlight,
     },
   ]);
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.results !== this.props.results || nextProps.resultsConfig !== this.props.resultsConfig)
     {
@@ -95,7 +95,7 @@ export default class ResultsTable extends PureClasss<Props>
     }
   }
 
-  getColumns(props: Props): List<IColumn>
+  public getColumns(props: Props): List<IColumn>
   {
     const { resultsConfig } = props;
     let cols: IColumn[] = [];
@@ -170,7 +170,7 @@ export default class ResultsTable extends PureClasss<Props>
     return Immutable.List(cols);
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(SpotlightStore, {
       isMounted: true,
@@ -202,7 +202,7 @@ export default class ResultsTable extends PureClasss<Props>
   //   return config.fields.get(fieldIndex);
   // }
 
-  getRow(i: number): Object
+  public getRow(i: number): Object
   {
     // TODO
     return this.props.results.get(i).fields.toJS();
@@ -242,12 +242,12 @@ export default class ResultsTable extends PureClasss<Props>
   //   return this.state.resultsConfig.name !== "";
   // }
 
-  handleCellClick(r: number, c: number)
+  public handleCellClick(r: number, c: number)
   {
     this.props.onExpand(r);
   }
 
-  spotlight(menuIndex: number, rc: string)
+  public spotlight(menuIndex: number, rc: string)
   {
     // TODO
     const row = rc.split('-')[0];
@@ -263,7 +263,7 @@ export default class ResultsTable extends PureClasss<Props>
     spotlightAction(id, spotlightData);
   }
 
-  render()
+  public render()
   {
     if (!this.props.results)
     {

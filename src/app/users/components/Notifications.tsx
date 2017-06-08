@@ -70,9 +70,9 @@ export interface Props
 
 class Notifications extends Classs<Props>
 {
-  cancelSubscription = null;
+  public cancelSubscription = null;
 
-  emailNotificationOptions = [
+  public emailNotificationOptions = [
     {
       value: 'Once every 15 minutes',
       onClick: this.changeEmailNotifications_15Min,
@@ -87,7 +87,7 @@ class Notifications extends Classs<Props>
     },
   ];
 
-  notificationTypes = [
+  public notificationTypes = [
     {
       value: 'Activities of any kind',
       label: 'Activities of any kind',
@@ -102,7 +102,7 @@ class Notifications extends Classs<Props>
     },
   ];
 
-  desktopNotificationSounds = [
+  public desktopNotificationSounds = [
     {
       value: 'chime',
       label: 'chime',
@@ -121,7 +121,7 @@ class Notifications extends Classs<Props>
     },
   ];
 
-  sounds = {
+  public sounds = {
     chime: 'http://lukeknepper.com/upload/chime.wav',
     doorbell: 'http://lukeknepper.com/upload/doorbell_x.wav',
     whistle: 'http://lukeknepper.com/upload/slide_whistle_up.wav',
@@ -145,17 +145,17 @@ class Notifications extends Classs<Props>
       }));
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Actions.fetch();
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.cancelSubscription && this.cancelSubscription();
   }
 
-  changeUserField(field: string, value: string)
+  public changeUserField(field: string, value: string)
   {
     let newUser = this.state.istate.currentUser;
     newUser = newUser.set(field, value);
@@ -167,13 +167,13 @@ class Notifications extends Classs<Props>
     });
   }
 
-  onDesktopNotificationChange(val)
+  public onDesktopNotificationChange(val)
   {
     const { value } = val;
     this.changeUserField('desktopNotificationType', value);
   }
 
-  onSave()
+  public onSave()
   {
     this.setState({
       saving: false,
@@ -181,7 +181,7 @@ class Notifications extends Classs<Props>
     });
   }
 
-  onSaveError(response)
+  public onSaveError(response)
   {
     this.setState({
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -190,13 +190,13 @@ class Notifications extends Classs<Props>
 
   }
 
-  onDesktopNotificationsSoundChange(val)
+  public onDesktopNotificationsSoundChange(val)
   {
     const { value } = val;
     this.changeUserField('sound', value);
   }
 
-  playSound()
+  public playSound()
   {
     if (this.state.istate.currentUser)
     {
@@ -211,7 +211,7 @@ class Notifications extends Classs<Props>
     }
   }
 
-  renderDesktopNotificationsContent()
+  public renderDesktopNotificationsContent()
   {
     let desktopNotification: any, sound: any;
 
@@ -264,28 +264,28 @@ class Notifications extends Classs<Props>
     );
   }
 
-  changeEmailNotifications_15Min()
+  public changeEmailNotifications_15Min()
   {
     this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[0].value);
   }
 
-  changeEmailNotifications_Hour()
+  public changeEmailNotifications_Hour()
   {
     this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[1].value);
   }
 
-  changeEmailNotifications_Never()
+  public changeEmailNotifications_Never()
   {
     this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[2].value);
   }
 
-  onEmailNotificationTypeChange(val)
+  public onEmailNotificationTypeChange(val)
   {
     const { value } = val;
     this.changeUserField('emailNotificationType', value);
   }
 
-  renderEmailNotificationsContent()
+  public renderEmailNotificationsContent()
   {
     let emailNotification: any, emailTiming: any;
 
@@ -322,14 +322,14 @@ class Notifications extends Classs<Props>
     );
   }
 
-  toggleEmailNews()
+  public toggleEmailNews()
   {
     const emailNewsSetting = (this.state.istate.currentUser.emailNews) === 'on';
     const newEmailNewsSetting = emailNewsSetting ? 'off' : 'on';
     this.changeUserField('emailNews', newEmailNewsSetting);
   }
 
-  renderEmailNewsContent()
+  public renderEmailNewsContent()
   {
     let emailNewsOn: boolean;
 
@@ -359,7 +359,7 @@ class Notifications extends Classs<Props>
     );
   }
 
-  renderEmail()
+  public renderEmail()
   {
     if (this.state.istate.currentUser && this.state.istate.currentUser.email)
     {
@@ -376,7 +376,7 @@ class Notifications extends Classs<Props>
     return <div>Your email adddress has not been set yet.</div>;
   }
 
-  renderDesktopDescription()
+  public renderDesktopDescription()
   {
     let desktopNotification: any;
 
@@ -395,7 +395,7 @@ class Notifications extends Classs<Props>
 
   }
 
-  renderEmailDescription()
+  public renderEmailDescription()
   {
     let emailTiming: string;
 
@@ -413,7 +413,7 @@ class Notifications extends Classs<Props>
     );
   }
 
-  renderEmailNewsDescription()
+  public renderEmailNewsDescription()
   {
     let emailNewsOn: boolean;
 
@@ -432,7 +432,7 @@ class Notifications extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div>

@@ -64,7 +64,7 @@ export interface Props
 
 class DeployModal extends PureClasss<Props>
 {
-  state: {
+  public state: {
     changingStatus: boolean;
     changingStatusOf: LibraryTypes.Variant;
     changingStatusTo: ItemStatus;
@@ -76,7 +76,7 @@ class DeployModal extends PureClasss<Props>
     defaultChecked: false,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(LibraryStore, {
       updater: (state) =>
@@ -100,19 +100,19 @@ class DeployModal extends PureClasss<Props>
     });
   }
 
-  handleClose()
+  public handleClose()
   {
     LibraryActions.variants.status(null, null);
   }
 
-  handleDeploy()
+  public handleDeploy()
   {
     LibraryActions.variants.status(
       this.state.changingStatusOf, this.state.changingStatusTo, true,
     );
   }
 
-  renderTQLColumn(defaultVariant: LibraryTypes.Variant)
+  public renderTQLColumn(defaultVariant: LibraryTypes.Variant)
   {
     const variant = this.state.changingStatusOf;
     const defaultTql =
@@ -133,14 +133,14 @@ class DeployModal extends PureClasss<Props>
     );
   }
 
-  handleDefaultCheckedChange(defaultChecked: boolean)
+  public handleDefaultCheckedChange(defaultChecked: boolean)
   {
     this.setState({
       defaultChecked,
     });
   }
 
-  render()
+  public render()
   {
     if (!this.state.changingStatus)
     {

@@ -60,12 +60,12 @@ export interface Props
 
 class Switch extends Classs<Props>
 {
-  handleSwitch()
+  public handleSwitch()
   {
     this.props.onChange((this.props.selected + 1) % 2);
   }
 
-  render()
+  public render()
   {
     const classes = classNames({
       'switch': true,

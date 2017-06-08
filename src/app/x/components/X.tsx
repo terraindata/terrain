@@ -74,7 +74,7 @@ class X extends Classs<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     const { x } = this.props.params;
 

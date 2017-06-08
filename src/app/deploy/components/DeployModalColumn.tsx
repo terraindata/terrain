@@ -93,13 +93,13 @@ export interface Props
 
 class DeployModalColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     confirmChecked: boolean;
   } = {
     confirmChecked: false,
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.variant !== this.props.variant || nextProps.status !== this.props.status)
     {
@@ -109,7 +109,7 @@ class DeployModalColumn extends PureClasss<Props>
     }
   }
 
-  handleDefaultCheckedChange(c)
+  public handleDefaultCheckedChange(c)
   {
     this.props.onDefaultCheckedChange(!this.props.defaultChecked);
     this.setState({
@@ -117,19 +117,19 @@ class DeployModalColumn extends PureClasss<Props>
     });
   }
 
-  handleConfirmCheckedChange(c)
+  public handleConfirmCheckedChange(c)
   {
     this.setState({
       confirmChecked: !this.state.confirmChecked,
     });
   }
 
-  handleDeploy()
+  public handleDeploy()
   {
     this.props.onDeploy();
   }
 
-  render()
+  public render()
   {
     const { variant, status } = this.props;
     const state = LibraryStore.getState();

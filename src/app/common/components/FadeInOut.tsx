@@ -55,7 +55,7 @@ export interface Props
 
 class FadeInOut extends PureClasss<Props>
 {
-  render()
+  public render()
   {
     return (
       <VelocityComponent

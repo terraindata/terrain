@@ -65,7 +65,7 @@ class ScoreBar extends PureClasss<{
   keyPath: KeyPath;
 }>
 {
-  render()
+  public render()
   {
     const weights = this.props.parentData.weights;
     const weight = this.props.data;
