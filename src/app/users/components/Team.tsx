@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Team.less');
 import * as React from 'react';
 import { Link } from 'react-router';
 import CreateItem from '../../common/components/CreateItem';
@@ -55,6 +54,7 @@ import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
+import './Team.less';
 import UserThumbnail from './UserThumbnail';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
@@ -68,9 +68,9 @@ export interface Props
 
 class Team extends Classs<Props>
 {
-  unsub = null;
+  public unsub = null;
 
-  state: {
+  public state: {
     loading: boolean,
     users: UserMap,
     addingUser: boolean,
@@ -91,19 +91,19 @@ class Team extends Classs<Props>
     super(props);
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Actions.fetch();
     this.updateState();
     this.unsub = Store.subscribe(this.updateState);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.unsub && this.unsub();
   }
 
-  updateState()
+  public updateState()
   {
     this.setState({
       users: Store.getState().get('users'),
@@ -111,7 +111,7 @@ class Team extends Classs<Props>
     });
   }
 
-  renderUser(user: User)
+  public renderUser(user: User)
   {
     if (user.isDisabled && !this.state.showDisabledUsers)
     {
@@ -186,21 +186,21 @@ class Team extends Classs<Props>
     );
   }
 
-  toggleAddingUser()
+  public toggleAddingUser()
   {
     this.setState({
       addingUser: !this.state.addingUser,
     });
   }
 
-  toggleShowDisabledUsers()
+  public toggleShowDisabledUsers()
   {
     this.setState({
       showDisabledUsers: !this.state.showDisabledUsers,
     });
   }
 
-  renderShowDisabledUsers()
+  public renderShowDisabledUsers()
   {
     if (!this.state.users.some((user) => user.isDisabled))
     {
@@ -215,7 +215,7 @@ class Team extends Classs<Props>
     );
   }
 
-  createNewUser()
+  public createNewUser()
   {
     const email: string = this.refs['newEmail']['value'];
     const password: string = this.refs['newPassword']['value'];
@@ -278,7 +278,7 @@ class Team extends Classs<Props>
       });
   }
 
-  renderAddUser()
+  public renderAddUser()
   {
     const userId = AuthStore.getState().id;
     const user = Store.getState().getIn(['users', userId]) as User;
@@ -331,14 +331,14 @@ class Team extends Classs<Props>
     return null;
   }
 
-  toggleErrorModal()
+  public toggleErrorModal()
   {
     this.setState({
       errorModalOpen: !this.state.errorModalOpen,
     });
   }
 
-  render()
+  public render()
   {
     const { users, loading } = this.state;
 

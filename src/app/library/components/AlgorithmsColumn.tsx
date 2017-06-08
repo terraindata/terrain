@@ -79,7 +79,7 @@ export interface Props
 
 class AlgorithmsColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     rendered: boolean,
     me: UserTypes.User,
     roles: RoleTypes.RoleMap,
@@ -95,7 +95,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     draggingOverIndex: -1,
   };
 
-  componentWillMount()
+  public componentWillMount()
   {
     this._subscribe(UserStore, {
       stateKey: 'me',
@@ -108,14 +108,14 @@ class AlgorithmsColumn extends PureClasss<Props>
     });
   }
 
-  componetDidMount()
+  public componetDidMount()
   {
     this.setState({
       rendered: true,
     });
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (!this.state.rendered)
     {
@@ -125,7 +125,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.groupId !== this.props.groupId)
     {
@@ -135,7 +135,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
   }
 
-  handleDuplicate(id: ID)
+  public handleDuplicate(id: ID)
   {
     Actions.algorithms.duplicate(
       this.props.algorithms.get(id),
@@ -143,7 +143,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  handleArchive(id: ID)
+  public handleArchive(id: ID)
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
@@ -151,12 +151,12 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  handleCreate()
+  public handleCreate()
   {
     Actions.algorithms.create(this.props.groupId);
   }
 
-  handleNameChange(id: ID, name: string)
+  public handleNameChange(id: ID, name: string)
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
@@ -164,7 +164,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  handleHover(index: number, type: string, id: ID)
+  public handleHover(index: number, type: string, id: ID)
   {
     const itemIndex = this.props.algorithmsOrder.indexOf(id);
     if (type === 'algorithm'
@@ -178,7 +178,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
+  public handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
     switch (targetType)
     {
@@ -218,7 +218,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     });
   }
 
-  renderAlgorithm(id: ID, fadeIndex: number)
+  public renderAlgorithm(id: ID, fadeIndex: number)
   {
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
@@ -357,7 +357,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  handleCategoryHover(statusString: string, id: ID)
+  public handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
     const status = ItemStatus[statusString];
@@ -367,7 +367,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
   }
 
-  renderCategory(status: ItemStatus)
+  public renderCategory(status: ItemStatus)
   {
     const { algorithms } = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
@@ -399,7 +399,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <LibraryColumn

@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Profile.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -54,6 +53,7 @@ import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import UserStore from './../data/UserStore';
 import UserTypes from './../UserTypes';
+import './Profile.less';
 
 export interface Props
 {
@@ -64,10 +64,10 @@ export interface Props
 
 class Profile extends Classs<Props>
 {
-  userUnsubscribe = null;
-  authUnsubscribe = null;
+  public userUnsubscribe = null;
+  public authUnsubscribe = null;
 
-  state: {
+  public state: {
     user: UserTypes.User,
     me: UserTypes.User,
     loading: boolean,
@@ -81,7 +81,7 @@ class Profile extends Classs<Props>
     routeIsDirect: false,
   };
 
-  infoKeys = [
+  public infoKeys = [
     'userId',
     'whatIDo',
     'phone',
@@ -98,7 +98,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  updateUser(props: Props)
+  public updateUser(props: Props)
   {
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
@@ -122,7 +122,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     Actions.fetch();
     this.updateUser(this.props);
@@ -133,13 +133,13 @@ class Profile extends Classs<Props>
       AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
   }
 
-  renderInfoItem(key: string)
+  public renderInfoItem(key: string)
   {
     return (
       <div className='profile-info-item' key={key}>
@@ -153,7 +153,7 @@ class Profile extends Classs<Props>
     );
   }
 
-  toggleAdmin()
+  public toggleAdmin()
   {
     if (window.confirm(
       this.state.user.isSuperUser ?
@@ -172,7 +172,7 @@ are still a system administrator yourself.)'))
     }
   }
 
-  toggleDisabled()
+  public toggleDisabled()
   {
     if (window.confirm(this.state.user.isDisabled ?
       'Are you sure you want to re-enable this user? They will be able to log in to Terraformer again.'
@@ -189,7 +189,7 @@ immediately be logged out of any existing sessions. \
     }
   }
 
-  renderAdminTools()
+  public renderAdminTools()
   {
     const { me, user } = this.state;
     if (!me || !me.isSuperUser || me.id === user.id)
@@ -221,7 +221,7 @@ immediately be logged out of any existing sessions. \
     );
   }
 
-  render()
+  public render()
   {
     if (this.state.loading)
     {

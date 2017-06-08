@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./TQLResultsBar.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { ResultsState } from '../../builder/components/results/ResultsManager';
 import PureClasss from './../../common/components/PureClasss';
+import './TQLResultsBar.less';
 export interface Props
 {
   resultsState: ResultsState;
@@ -59,9 +59,9 @@ export interface Props
 
 class TQLResultsBar extends PureClasss<Props>
 {
-  resultsFodderRange = _.range(0, 25);
+  public resultsFodderRange = _.range(0, 25);
 
-  renderResults()
+  public renderResults()
   {
     const { resultsState } = this.props;
 
@@ -135,7 +135,7 @@ class TQLResultsBar extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div

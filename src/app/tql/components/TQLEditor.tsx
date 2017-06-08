@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./TQLEditor.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import './TQLEditor.less';
 const { List } = Immutable;
 import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
@@ -80,6 +80,12 @@ export interface Props
   tql: string;
   canEdit: boolean;
 
+  theme?: string;
+  highlightedLine?: number;
+
+  isDiff?: boolean;
+  diffTql?: string;
+
   onChange?(tql: string);
   onFocusChange?(focused: boolean);
 
@@ -87,16 +93,11 @@ export interface Props
   defineTerm?(value, event);
   turnSyntaxPopupOff?();
   hideTermDefinition?();
-  theme?: string;
-  highlightedLine?: number;
-
-  isDiff?: boolean;
-  diffTql?: string;
 }
 
 class TQLEditor extends PureClasss<Props>
 {
-  render()
+  public render()
   {
     const options =
       {

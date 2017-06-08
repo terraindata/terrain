@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./AccountEntry.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './AccountEntry.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 export interface Props
@@ -72,14 +72,14 @@ class AccountEntry extends Classs<Props>
       };
   }
 
-  expand()
+  public expand()
   {
     this.setState({
       expanded: !this.state.expanded,
     });
   }
 
-  renderContent()
+  public renderContent()
   {
     if (this.state.expanded)
     {
@@ -87,7 +87,7 @@ class AccountEntry extends Classs<Props>
     }
   }
 
-  renderDescription()
+  public renderDescription()
   {
     if (this.props.description)
     {
@@ -95,7 +95,7 @@ class AccountEntry extends Classs<Props>
     }
   }
 
-  renderDefaultButton()
+  public renderDefaultButton()
   {
     return (
       <div className='account-entry-expand-button button' onClick={this.expand}>
@@ -104,7 +104,7 @@ class AccountEntry extends Classs<Props>
     );
   }
 
-  renderButton()
+  public renderButton()
   {
     if (this.props.buttonText)
     {
@@ -117,7 +117,7 @@ class AccountEntry extends Classs<Props>
     return this.renderDefaultButton();
   }
 
-  renderLine()
+  public renderLine()
   {
     if (!this.props.lastEntry)
     {
@@ -126,7 +126,7 @@ class AccountEntry extends Classs<Props>
     return <hr className='account-entry-line settings-line-hidden' />;
   }
 
-  render()
+  public render()
   {
     return (
       <div className='account-entry'>

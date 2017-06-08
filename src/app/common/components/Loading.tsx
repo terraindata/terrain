@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Loading.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import './Loading.less';
 
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
@@ -70,7 +70,7 @@ export interface Props
 
 class Loading extends PureClasss<Props>
 {
-  state = {
+  public state = {
     stage: 0,
   };
 
@@ -80,7 +80,7 @@ class Loading extends PureClasss<Props>
   // 2: loading, loop
   // 3: loaded, phase out (freeze after the end)
 
-  stageParams: IStage[] = [
+  public stageParams: IStage[] = [
     {
       loop: false,
       startFrame: 0,
@@ -106,19 +106,19 @@ class Loading extends PureClasss<Props>
     },
   ];
 
-  imgLooper: ImgLooper;
+  public imgLooper: ImgLooper;
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.imgLooper = new ImgLooper(ReactDOM.findDOMNode(this.refs['sprites']) as any, this.props.width, this.stageParams);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.imgLooper && this.imgLooper.dispose();
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     let stage = -1;
     if (!this.props.loading && nextProps.loading)
@@ -140,7 +140,7 @@ class Loading extends PureClasss<Props>
     }
   }
 
-  setStage(stage: number)
+  public setStage(stage: number)
   {
     this.imgLooper.setStage(stage);
     this.setState({
@@ -148,7 +148,7 @@ class Loading extends PureClasss<Props>
     });
   }
 
-  handleFirstEnd()
+  public handleFirstEnd()
   {
     if (this.props.loaded)
     {
@@ -160,12 +160,12 @@ class Loading extends PureClasss<Props>
     }
   }
 
-  handleEnd()
+  public handleEnd()
   {
     this.props.onLoadedEnd();
   }
 
-  render()
+  public render()
   {
     const { width } = this.props;
 
@@ -205,13 +205,13 @@ interface IStage
 
 class ImgLooper
 {
-  el: HTMLElement;
-  stages: IStage[];
-  stage: number;
-  frame: number;
-  width: number;
+  public el: HTMLElement;
+  public stages: IStage[];
+  public stage: number;
+  public frame: number;
+  public width: number;
 
-  interval: any;
+  public interval: any;
 
   constructor(_el: HTMLElement, _width: number, _stages: IStage[], _stage = 0)
   {
@@ -225,7 +225,7 @@ class ImgLooper
 
   }
 
-  setStage(_stage: number, showFrame: boolean = false)
+  public setStage(_stage: number, showFrame: boolean = false)
   {
     const stageParams = this.stages[_stage];
     if (this.stage === -1 || showFrame || stageParams.endFrame < this.frame)
@@ -241,7 +241,7 @@ class ImgLooper
     }
   }
 
-  dispose()
+  public dispose()
   {
     this.clearInterval();
   }

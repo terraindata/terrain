@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./StatusDropdown.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import './StatusDropdown.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
 import { ItemStatus as Status } from '../../../../shared/items/types/Item';
@@ -68,12 +68,12 @@ export interface Props
 
 class StatusDropdown extends PureClasss<Props>
 {
-  state = {
+  public state = {
     isSuperUser: false,
     isBuilder: false,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(RolesStore, {
       updater: () =>
@@ -92,20 +92,20 @@ class StatusDropdown extends PureClasss<Props>
     });
   }
 
-  handleChange(index: number)
+  public handleChange(index: number)
   {
     const status = this.getOrder()[index];
     LibraryActions.variants.status(this.props.variant, status as Status, false);
   }
 
-  canEdit(): boolean
+  public canEdit(): boolean
   {
     const { variant } = this.props;
     return this.state.isSuperUser ||
       (this.state.isBuilder && variant.status !== Status.Live);
   }
 
-  getOptions(): List<El>
+  public getOptions(): List<El>
   {
     const { variant } = this.props;
 
@@ -127,7 +127,7 @@ class StatusDropdown extends PureClasss<Props>
     return AdminOptions;
   }
 
-  getOrder(): Array<Status | string>
+  public getOrder(): Array<Status | string>
   {
     if (this.state.isSuperUser)
     {
@@ -142,7 +142,7 @@ class StatusDropdown extends PureClasss<Props>
     return [];
   }
 
-  getSelectedIndex(): number
+  public getSelectedIndex(): number
   {
     if (!this.canEdit())
     {
@@ -154,7 +154,7 @@ class StatusDropdown extends PureClasss<Props>
     return this.getOrder().indexOf(status);
   }
 
-  render()
+  public render()
   {
     const { variant } = this.props;
 

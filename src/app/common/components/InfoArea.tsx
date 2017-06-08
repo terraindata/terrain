@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./InfoArea.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
+import './InfoArea.less';
 
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -69,7 +69,7 @@ class InfoArea extends PureClasss<Props>
     Util.bind(this, 'renderThing');
   }
 
-  renderThing(thing: string, onClick?: boolean)
+  public renderThing(thing: string, onClick?: boolean)
   {
     if (!this.props[thing])
     {
@@ -83,7 +83,7 @@ class InfoArea extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div className={classNames({

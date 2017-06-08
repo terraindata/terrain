@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./VariantVersions.less');
+import './VariantVersions.less';
 const classNames = require('classnames');
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
@@ -55,9 +55,9 @@ import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 // import * as moment from 'moment';
 const moment = require('moment');
+import { browserHistory } from 'react-router';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
-const { browserHistory } = require('react-router');
 
 type Variant = LibraryTypes.Variant;
 type User = UserTypes.User;
@@ -70,7 +70,7 @@ export interface Props
 
 class VariantVersions extends PureClasss<Props>
 {
-  state: {
+  public state: {
     users: UserMap,
     versions: any,
     roles: RoleTypes.RoleMap,
@@ -79,6 +79,8 @@ class VariantVersions extends PureClasss<Props>
     versions: null,
     roles: null,
   };
+
+  public xhr: XMLHttpRequest = null;
 
   constructor(props: Props)
   {
@@ -95,8 +97,7 @@ class VariantVersions extends PureClasss<Props>
       });
   }
 
-  xhr: XMLHttpRequest = null;
-  fetchVariants(props)
+  public fetchVariants(props)
   {
     // TODO
     // this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
@@ -111,23 +112,23 @@ class VariantVersions extends PureClasss<Props>
     // });
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     this.fetchVariants(this.props);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.xhr && this.xhr.abort();
     this.xhr = null;
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     this.fetchVariants(nextProps);
   }
 
-  showVersion(versionID, i)
+  public showVersion(versionID, i)
   {
     let url = '/builder/?o=' + this.props.variant.id;
     if (i !== 0)
@@ -137,7 +138,7 @@ class VariantVersions extends PureClasss<Props>
     browserHistory.push(url);
   }
 
-  renderVersion(version, i)
+  public renderVersion(version, i)
   {
     const { roles } = this.state;
     const groupId = this.props.variant.groupId;
@@ -184,7 +185,7 @@ class VariantVersions extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div className='versions-table-wrapper'>

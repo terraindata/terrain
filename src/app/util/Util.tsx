@@ -483,7 +483,7 @@ const Util = {
     const curHeight = el.height();
     const autoHeight = el.css('height', 'auto').height();
 
-    el.height(curHeight).animate({ height: autoHeight }, duration || 250, function()
+    el.height(curHeight).animate({ height: autoHeight }, duration || 250, () =>
     {
       el.css('height', 'auto');
       el.css('overflow-y', 'visible');
@@ -588,14 +588,19 @@ const Util = {
 
     // If IE, return version number.
     if (Idx > 0)
+    {
       return parseInt(sAgent.substring(Idx + 5, sAgent.indexOf('.', Idx)));
+    }
 
     // If IE 11 then look for Updated user agent string.
     else if (!!navigator.userAgent.match(/Trident\/7\./))
+    {
       return 11;
-
+    }
     else
+    {
       return 0; // It is not IE
+    }
   },
 };
 

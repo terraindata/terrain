@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Modal.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
+import './Modal.less';
 
 const ReactModal = require('react-modal');
 const InfoIcon = require('./../../../images/icon_info.svg');
@@ -72,13 +72,13 @@ export interface Props
 
 class Modal extends PureClasss<Props>
 {
-  closeModalSuccess()
+  public closeModalSuccess()
   {
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
   }
 
-  render()
+  public render()
   {
     const defaultTitle = this.props.error ? 'Alert' : 'Please Confirm';
 

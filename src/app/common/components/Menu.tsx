@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Menu.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 const optionHeight = 30; // coordinate with Menu.less
@@ -73,13 +73,13 @@ export interface Props
 
 export class Menu extends PureClasss<Props>
 {
-  state: {
+  public state: {
     open: boolean;
   } = {
     open: false,
   };
 
-  renderOption(option, index)
+  public renderOption(option, index)
   {
     if (option.spacer)
     {
@@ -125,7 +125,7 @@ export class Menu extends PureClasss<Props>
     );
   }
 
-  close()
+  public close()
   {
     this.setState({
       open: false,
@@ -133,12 +133,12 @@ export class Menu extends PureClasss<Props>
     $(document).off('click', this.close);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $(document).off('click', this.close);
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     this.setState({
       open: !this.state.open,
@@ -150,7 +150,7 @@ export class Menu extends PureClasss<Props>
     }
   }
 
-  render()
+  public render()
   {
     const { options } = this.props;
     if (!options || !options.size)

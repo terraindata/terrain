@@ -73,7 +73,7 @@ export interface Props
 
 class GroupsColumn extends Classs<Props>
 {
-  state: {
+  public state: {
     rendered: boolean,
     lastMoved: any,
     me: UserTypes.User,
@@ -85,7 +85,7 @@ class GroupsColumn extends Classs<Props>
     roles: null,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.setState({
       rendered: true,
@@ -107,13 +107,13 @@ class GroupsColumn extends Classs<Props>
   //     this.props.groupsOrder.findIndex(iid => iid === id));
   // }
 
-  handleArchive(id: ID)
+  public handleArchive(id: ID)
   {
     Actions.groups.change(this.props.groups.find((g) => g.id === id)
       .set('status', ItemStatus.Archive) as Group);
   }
 
-  handleNameChange(id: ID, name: string)
+  public handleNameChange(id: ID, name: string)
   {
     Actions.groups.change(
       this.props.groups.get(id)
@@ -121,12 +121,12 @@ class GroupsColumn extends Classs<Props>
     );
   }
 
-  handleCreate()
+  public handleCreate()
   {
     Actions.groups.create();
   }
 
-  handleHover(index: number, type: string, id: ID)
+  public handleHover(index: number, type: string, id: ID)
   {
     const itemIndex = this.props.groupsOrder.findIndex((v) => v === id);
     if (type === 'group' && itemIndex !== index
@@ -140,12 +140,12 @@ class GroupsColumn extends Classs<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
+  public handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
   {
 
   }
 
-  renderGroup(id: ID, index: number)
+  public renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
     const { me, roles } = this.state;
@@ -212,7 +212,7 @@ class GroupsColumn extends Classs<Props>
     );
   }
 
-  handleCategoryHover(statusString: string, id: ID)
+  public handleCategoryHover(statusString: string, id: ID)
   {
     const g = this.props.groups.get(id);
     const status = ItemStatus[statusString];
@@ -222,7 +222,7 @@ class GroupsColumn extends Classs<Props>
     }
   }
 
-  renderCategory(status: ItemStatus)
+  public renderCategory(status: ItemStatus)
   {
     const ids = this.props.groupsOrder.filter((id) => this.props.groups.get(id).status === status);
     const canCreate = this.state.me && this.state.me.isSuperUser;
@@ -252,7 +252,7 @@ class GroupsColumn extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <LibraryColumn

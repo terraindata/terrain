@@ -52,7 +52,7 @@ import { BaseClass, New } from '../../Classes';
 
 class SpotlightStateC extends BaseClass
 {
-  spotlights: IMMap<string, any> = Map({});
+  public spotlights: IMMap<string, any> = Map({});
 }
 export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
 export const _SpotlightState = (config?: { [key: string]: any }) =>

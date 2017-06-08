@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./ManualPopup.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -51,6 +50,7 @@ import * as _ from 'underscore';
 import ManualEntry from '../../../../shared/blocks/types/ManualEntry';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './ManualPopup.less';
 const InfoIcon = require('./../../../images/icon_info.svg');
 const OpenIcon = require('./../../../images/icon_open.svg');
 
@@ -73,12 +73,12 @@ class ManualPopup extends Classs<Props>
       };
   }
 
-  shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
-  close()
+  public close()
   {
     this.setState({
       open: false,
@@ -86,12 +86,12 @@ class ManualPopup extends Classs<Props>
     $(document).off('click', this.close);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $(document).off('click', this.close);
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     this.setState({
       open: !this.state.open,
@@ -103,12 +103,12 @@ class ManualPopup extends Classs<Props>
     }
   }
 
-  openManual()
+  public openManual()
   {
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render()
+  public render()
   {
 
     // const manualEntry = cardList[this.props.cardName]

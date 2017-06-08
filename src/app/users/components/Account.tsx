@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Account.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -51,6 +50,7 @@ import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
+import './Account.less';
 
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
@@ -62,7 +62,7 @@ export interface Props
 
 class Account extends Classs<Props>
 {
-  render()
+  public render()
   {
 
     let title = 'Account';

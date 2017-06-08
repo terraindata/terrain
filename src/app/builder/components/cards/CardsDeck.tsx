@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CardsDeck.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -54,6 +53,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
+import './CardsDeck.less';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
@@ -69,13 +69,13 @@ export interface Props
 
 class CardsDeck extends PureClasss<Props>
 {
-  state: {
+  public state: {
     search: string;
   } = {
     search: '',
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.props.open && nextProps.open)
     {
@@ -83,14 +83,14 @@ class CardsDeck extends PureClasss<Props>
     }
   }
 
-  handleSearchChange(evt)
+  public handleSearchChange(evt)
   {
     this.setState({
       search: evt.target.value,
     });
   }
 
-  render()
+  public render()
   {
     const ordering = AllBackendsMap[this.props.language].cardsDeck;
     const cards = AllBackendsMap[this.props.language].blocks;
@@ -156,7 +156,7 @@ interface CardProps
 
 class _CardDeckCard extends PureClasss<CardProps>
 {
-  render()
+  public render()
   {
     const { card } = this.props;
     const data = card.static;

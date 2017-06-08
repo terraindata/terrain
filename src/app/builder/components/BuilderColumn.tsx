@@ -43,12 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'underscore';
-require('./BuilderColumn.less');
+
+// tslint:disable:no-invalid-this
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
+import './BuilderColumn.less';
 const { List } = Immutable;
 import InfoArea from '../../common/components/InfoArea';
 import Menu from '../../common/components/Menu';

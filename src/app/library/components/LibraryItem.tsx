@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./LibraryItem.less');
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
+import './LibraryItem.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -105,14 +105,14 @@ export interface Props
 
 class LibraryItem extends Classs<Props>
 {
-  state = {
+  public state = {
     nameEditing: false,
     focusField: false,
     mounted: false,
     timeout: null,
   };
 
-  menuOptions =
+  public menuOptions =
   {
     none: List([]),
     duplicate:
@@ -156,7 +156,7 @@ class LibraryItem extends Classs<Props>
     ]),
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.setState({
       timeout:
@@ -174,7 +174,7 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     if (this.state.timeout)
     {
@@ -182,17 +182,17 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  handleDuplicate()
+  public handleDuplicate()
   {
     this.props.onDuplicate(this.props.id);
   }
 
-  handleArchive()
+  public handleArchive()
   {
     this.props.onArchive(this.props.id);
   }
 
-  handleKeyDown(event)
+  public handleKeyDown(event)
   {
     if (event.keyCode === 13)
     {
@@ -200,7 +200,7 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  showTextfield()
+  public showTextfield()
   {
     if (!this.props.canEdit)
     {
@@ -213,7 +213,7 @@ class LibraryItem extends Classs<Props>
     });
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (this.state.focusField)
     {
@@ -224,7 +224,7 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  hideTextfield(event)
+  public hideTextfield(event)
   {
     this.props.onNameChange(this.props.id, event.target.value);
     this.setState({
@@ -232,7 +232,7 @@ class LibraryItem extends Classs<Props>
     });
   }
 
-  handleDoubleClick(event)
+  public handleDoubleClick(event)
   {
     event.preventDefault();
     event.stopPropagation();
@@ -243,12 +243,12 @@ class LibraryItem extends Classs<Props>
     this.props.onDoubleClick && this.props.onDoubleClick(this.props.id);
   }
 
-  handleFocus(event)
+  public handleFocus(event)
   {
     event.target.select();
   }
 
-  render()
+  public render()
   {
     const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
@@ -370,7 +370,7 @@ class LibraryItem extends Classs<Props>
 // DnD stuff
 
 let shifted = false;
-$(document).on('dragover dragend', function(e) { shifted = e.shiftKey; return true; });
+$(document).on('dragover dragend', (e) => { shifted = e.shiftKey; return true; });
 // http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
 
 const source =

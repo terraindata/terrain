@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-require('./Dropdown.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -52,6 +51,7 @@ import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import './Dropdown.less';
 
 export interface Props
 {
@@ -68,6 +68,8 @@ export interface Props
 
 class Dropdown extends PureClasss<Props>
 {
+  public _clickHandlers: { [index: number]: () => void } = {};
+
   constructor(props: Props)
   {
     super(props);
@@ -79,8 +81,7 @@ class Dropdown extends PureClasss<Props>
       };
   }
 
-  _clickHandlers: { [index: number]: () => void } = {};
-  clickHandler(index)
+  public clickHandler(index)
   {
     if (!this._clickHandlers[index])
     {
@@ -103,7 +104,7 @@ class Dropdown extends PureClasss<Props>
     return this._clickHandlers[index];
   }
 
-  renderOption(option, index)
+  public renderOption(option, index)
   {
     return (
       <div
@@ -123,7 +124,7 @@ class Dropdown extends PureClasss<Props>
     );
   }
 
-  close()
+  public close()
   {
     this.setState({
       open: false,
@@ -131,7 +132,7 @@ class Dropdown extends PureClasss<Props>
     $(document).off('click', this.close);
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     if (!this.props.canEdit)
     {
@@ -152,7 +153,7 @@ class Dropdown extends PureClasss<Props>
     });
   }
 
-  getOptionName(option, index: number): string
+  public getOptionName(option, index: number): string
   {
     if (this.props.optionsDisplayName)
     {
@@ -161,7 +162,7 @@ class Dropdown extends PureClasss<Props>
     return option;
   }
 
-  render()
+  public render()
   {
     // Element with options, rendered at the top or bottom of the dropdown
 

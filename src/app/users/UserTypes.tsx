@@ -52,28 +52,28 @@ export namespace UserTypes
   class UserC extends BaseClass
   {
     // db-level fields
-    isSuperUser = false;
-    isDisabled = false;
-    email = '';
+    public isSuperUser = false;
+    public isDisabled = false;
+    public email = '';
 
     // metadata fields
-    name = '';
-    whatIDo = '';
-    skype = '';
-    timeZone = 158;
-    phone = '';
-    imgSrc = '';
-    tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
+    public name = '';
+    public whatIDo = '';
+    public skype = '';
+    public timeZone = 158;
+    public phone = '';
+    public imgSrc = '';
+    public tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
 
     // notifications fields
-    sound = 'chime';
-    emailNotificationType = 'Activities of any kind';
-    emailNotificationTiming = 'Once every 15 minutes';
-    desktopNotificationType = 'Activities of any kind';
-    emailNews = 'on';
+    public sound = 'chime';
+    public emailNotificationType = 'Activities of any kind';
+    public emailNotificationTiming = 'Once every 15 minutes';
+    public desktopNotificationType = 'Activities of any kind';
+    public emailNews = 'on';
 
     // DB level fields
-    dbFields = [
+    public dbFields = [
       'id',
       'email',
       'isDisabled',
@@ -85,7 +85,7 @@ export namespace UserTypes
     ];
 
     // "static" fields to exclude
-    excludeFields = ['dbFields', 'excludeFields'];
+    public excludeFields = ['dbFields', 'excludeFields'];
 
     // groupRoles: Immutable.Map({}),
   }
@@ -100,10 +100,10 @@ export namespace UserTypes
 
   class UserStateC extends BaseClass
   {
-    loading = false;
-    loaded = false;
-    users = Immutable.Map<ID, User>({});
-    currentUser: UserTypes.User = null;
+    public loading = false;
+    public loaded = false;
+    public users = Immutable.Map<ID, User>({});
+    public currentUser: UserTypes.User = null;
   }
   export type UserState = UserStateC & IRecord<UserStateC>;
   export const _UserState = (config?: { [key: string]: any }) =>

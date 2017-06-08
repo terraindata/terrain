@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./BuilderTextbox.less');
+import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -111,6 +111,14 @@ export interface Props
 
 class BuilderTextbox extends PureClasss<Props>
 {
+  public state: {
+    wrongType: boolean;
+    isSwitching: boolean;
+    value: CardString;
+    backupString: CardString;
+    options: List<string>;
+  };
+
   constructor(props: Props)
   {
     super(props);
@@ -128,21 +136,13 @@ class BuilderTextbox extends PureClasss<Props>
     };
   }
 
-  state: {
-    wrongType: boolean;
-    isSwitching: boolean;
-    value: CardString;
-    backupString: CardString;
-    options: List<string>;
-  };
-
-  getCreatingType(): string
+  public getCreatingType(): string
   {
     return AllBackendsMap[this.props.language].creatingType;
   }
 
   // TODO
-  componentWillReceiveProps(newProps)
+  public componentWillReceiveProps(newProps)
   {
     const value: any = newProps.value;
 
@@ -177,7 +177,7 @@ class BuilderTextbox extends PureClasss<Props>
   }
 
   // throttled event handler
-  executeChange(value)
+  public executeChange(value)
   {
     // if(this.props.isNumber)
     // {
@@ -188,17 +188,17 @@ class BuilderTextbox extends PureClasss<Props>
     this.props.onChange && this.props.onChange(value);
   }
 
-  handleCardDrop(item)
+  public handleCardDrop(item)
   {
     this.props.onChange && this.props.onChange(item);
   }
 
-  handleTextareaChange(event)
+  public handleTextareaChange(event)
   {
     this.executeChange(event.target.value);
   }
 
-  handleAutocompleteChange(value)
+  public handleAutocompleteChange(value)
   {
     this.executeChange(value);
     if (this.props.isNumber)
@@ -209,13 +209,13 @@ class BuilderTextbox extends PureClasss<Props>
     }
   }
 
-  isText()
+  public isText()
   {
     // TODO better approach?
     return typeof this.props.value === 'string' || typeof this.props.value === 'number' || !this.props.value;
   }
 
-  handleSwitch()
+  public handleSwitch()
   {
     const value = this.isText() ? BlockUtils.make(
       AllBackendsMap[this.props.language].blocks[this.getCreatingType()],
@@ -228,18 +228,18 @@ class BuilderTextbox extends PureClasss<Props>
 
   }
 
-  handleFocus(event: React.FocusEvent<any>)
+  public handleFocus(event: React.FocusEvent<any>)
   {
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
   }
 
-  handleBlur(event: React.FocusEvent<any>, value: string)
+  public handleBlur(event: React.FocusEvent<any>, value: string)
   {
     this.props.onBlur && this.props.onBlur(this, value, event);
   }
 
-  handleCardToolClose()
+  public handleCardToolClose()
   {
     this.executeChange('');
     this.setState({
@@ -247,7 +247,7 @@ class BuilderTextbox extends PureClasss<Props>
     });
   }
 
-  renderSwitch()
+  public renderSwitch()
   {
     if (!this.props.canEdit)
     {
@@ -270,12 +270,12 @@ class BuilderTextbox extends PureClasss<Props>
     );
   }
 
-  toggleClosed()
+  public toggleClosed()
   {
     Actions.change(this.props.keyPath.push('closed'), !this.props.value['closed']);
   }
 
-  computeOptions()
+  public computeOptions()
   {
     if (this.props.autoTerms || this.props.autoDisabled)
     {
@@ -292,7 +292,7 @@ class BuilderTextbox extends PureClasss<Props>
     }
   }
 
-  render()
+  public render()
   {
     if (this.isText())
     {

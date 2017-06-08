@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CreateCardTool.less');
 import * as React from 'react';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
@@ -53,6 +52,7 @@ import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
+import './CreateCardTool.less';
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -78,7 +78,7 @@ export interface Props
 
 class CreateCardTool extends PureClasss<Props>
 {
-  state: {
+  public state: {
     closed: boolean;
     opening: boolean;
   } = {
@@ -86,7 +86,7 @@ class CreateCardTool extends PureClasss<Props>
     opening: false,
   };
 
-  createCard(event)
+  public createCard(event)
   {
     if (this.props.open && this.props.onMinimize)
     {
@@ -109,7 +109,7 @@ class CreateCardTool extends PureClasss<Props>
     this.props.onToggle && this.props.onToggle();
   }
 
-  componentWillReceiveProps(newProps)
+  public componentWillReceiveProps(newProps)
   {
     if (newProps.open !== this.props.open)
     {
@@ -137,7 +137,7 @@ class CreateCardTool extends PureClasss<Props>
     }
   }
 
-  componentDidUpdate(prevProps, prevState)
+  public componentDidUpdate(prevProps, prevState)
   {
     if (!prevState.opening && this.state.opening)
     {
@@ -145,7 +145,7 @@ class CreateCardTool extends PureClasss<Props>
     }
   }
 
-  renderCardSelector()
+  public renderCardSelector()
   {
     if (this.state.closed)
     {
@@ -203,7 +203,7 @@ class CreateCardTool extends PureClasss<Props>
     );
   }
 
-  handleCloseClick()
+  public handleCloseClick()
   {
     if (this.props.onClose)
     {
@@ -215,7 +215,7 @@ class CreateCardTool extends PureClasss<Props>
     }
   }
 
-  renderPlaceholder()
+  public renderPlaceholder()
   {
     if (this.props.hidePlaceholder || this.props.open)
     {
@@ -232,7 +232,7 @@ class CreateCardTool extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     if (!this.props.canEdit)
     {

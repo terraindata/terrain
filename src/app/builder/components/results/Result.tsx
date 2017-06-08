@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Result.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import './Result.less';
 const { List } = Immutable;
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Menu from '../../../common/components/Menu';
@@ -89,7 +89,24 @@ class ResultComponent extends Classs<Props> {
   //   spotlightColor: "",
   // };
 
-  renderExpandedField(value, field)
+  public menuOptions =
+  [
+    List([
+      {
+        text: 'Spotlight',
+        onClick: this.spotlight,
+      },
+    ]),
+
+    List([
+      {
+        text: 'Un-Spotlight',
+        onClick: this.unspotlight,
+      },
+    ]),
+  ];
+
+  public renderExpandedField(value, field)
   {
     return this.renderField(field, 0, null, {
       showField: true,
@@ -97,7 +114,7 @@ class ResultComponent extends Classs<Props> {
     });
   }
 
-  renderField(field, index?, fields?, overrideFormat?)
+  public renderField(field, index?, fields?, overrideFormat?)
   {
     if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
     {
@@ -132,7 +149,7 @@ class ResultComponent extends Classs<Props> {
     );
   }
 
-  spotlight()
+  public spotlight()
   {
     const id = this.props.primaryKey;
     const spotlightColor = ColorManager.altColorForKey(id);
@@ -148,7 +165,7 @@ class ResultComponent extends Classs<Props> {
     spotlightAction(id, spotlightData);
   }
 
-  unspotlight()
+  public unspotlight()
   {
     this.setState({
       isSpotlit: false,
@@ -156,7 +173,7 @@ class ResultComponent extends Classs<Props> {
     spotlightAction(this.props.primaryKey, null);
   }
 
-  renderSpotlight()
+  public renderSpotlight()
   {
     if (!this.props.result.spotlight)
     {
@@ -173,29 +190,12 @@ class ResultComponent extends Classs<Props> {
     );
   }
 
-  menuOptions =
-  [
-    List([
-      {
-        text: 'Spotlight',
-        onClick: this.spotlight,
-      },
-    ]),
-
-    List([
-      {
-        text: 'Un-Spotlight',
-        onClick: this.unspotlight,
-      },
-    ]),
-  ];
-
-  expand()
+  public expand()
   {
     this.props.onExpand(this.props.index);
   }
 
-  render()
+  public render()
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, result } = this.props;
 

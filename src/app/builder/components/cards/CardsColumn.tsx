@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CardsColumn.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -57,6 +56,7 @@ import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
+import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
@@ -83,7 +83,7 @@ export interface Props
 
 class CardsColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     keyPath: KeyPath;
     learningMode: boolean;
   } = {
@@ -91,17 +91,19 @@ class CardsColumn extends PureClasss<Props>
     learningMode: false,
   };
 
-  componentDidMount()
+  public innerHeight: number = -1;
+
+  public componentDidMount()
   {
     this.handleScroll();
   }
 
-  computeKeyPath(props: Props): KeyPath
+  public computeKeyPath(props: Props): KeyPath
   {
     return List(this._keyPath('query', 'cards'));
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.queryId !== this.props.queryId)
     {
@@ -117,30 +119,30 @@ class CardsColumn extends PureClasss<Props>
     }
   }
 
-  getPossibleCards()
+  public getPossibleCards()
   {
     return AllBackendsMap[this.props.language].topLevelCards;
   }
 
-  getFirstCard()
+  public getFirstCard()
   {
     const type = AllBackendsMap[this.props.language].topLevelCards.get(0);
     return AllBackendsMap[this.props.language].blocks[type];
   }
 
-  createCard()
+  public createCard()
   {
     Actions.create(this.state.keyPath, 0, this.getFirstCard().type);
   }
 
-  toggleLearningMode()
+  public toggleLearningMode()
   {
     this.setState({
       learningMode: !this.state.learningMode,
     });
   }
 
-  renderTopbar()
+  public renderTopbar()
   {
     return (
       <div className='cards-area-top-bar'>
@@ -156,12 +158,12 @@ class CardsColumn extends PureClasss<Props>
     );
   }
 
-  toggleDeck()
+  public toggleDeck()
   {
     Actions.toggleDeck(!this.props.deckOpen);
   }
 
-  handleScroll()
+  public handleScroll()
   {
     // TODO improve make faster
     const el = $('#cards-column');
@@ -170,7 +172,7 @@ class CardsColumn extends PureClasss<Props>
     scrollAction(start, el.height(), el.scrollTop(), totalHeight);
   }
 
-  componentWillUpdate()
+  public componentWillUpdate()
   {
     const inner = document.getElementById('cards-column-inner');
     if (inner)
@@ -187,8 +189,7 @@ class CardsColumn extends PureClasss<Props>
     }
   }
 
-  innerHeight: number = -1;
-  render()
+  public render()
   {
     const { props } = this;
     const { cards, canEdit } = props;

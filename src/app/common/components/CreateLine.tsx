@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CreateLine.less');
 import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
+import './CreateLine.less';
 
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -59,7 +59,7 @@ export interface Props
 
 class CreateLine extends PureClasss<Props>
 {
-  render()
+  public render()
   {
     return (
       <div className='create-line-row' onClick={this.props.onClick}>

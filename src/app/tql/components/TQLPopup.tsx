@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./TQLPopup.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './TQLPopup.less';
 
 const OpenIcon = require('./../../../images/icon_open.svg');
 
@@ -65,13 +65,13 @@ export interface Props
 
 class TQLPopup extends Classs<Props>
 {
-  openManual()
+  public openManual()
   {
     this.props.onClick && this.props.onClick();
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render()
+  public render()
   {
     return (
       <div

@@ -51,7 +51,7 @@ import Util from './util/Util';
 
 export class BaseClass
 {
-  id: string | number = -1;
+  public id: string | number = -1;
 
   constructor(config: { id?: ID, [field: string]: any } = {})
   {

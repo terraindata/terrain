@@ -64,12 +64,12 @@ export interface Props
 
 class InputsArea extends PureClasss<Props>
 {
-  createInput()
+  public createInput()
   {
     Actions.create(Immutable.List(['query', 'inputs']), -1, 'input');
   }
 
-  renderNoInputs()
+  public renderNoInputs()
   {
     const large = ''; // "No inputs have been added, yet."
     const button = this.props.canEdit ? 'Add an Input' : null;
@@ -84,7 +84,7 @@ class InputsArea extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     if (this.props.inputs.size === 0)
     {

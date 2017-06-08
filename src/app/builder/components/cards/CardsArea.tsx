@@ -93,7 +93,7 @@ interface State extends KeyState
 
 class CardsArea extends PureClasss<Props>
 {
-  state: State = {
+  public state: State = {
     keyPath: null,
     learningMode: this.props.helpOn,
     cardToolOpen: true,
@@ -138,37 +138,37 @@ class CardsArea extends PureClasss<Props>
     });
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     this.setState({
       cardToolOpen: nextProps.cards.size === 0,
     });
   }
 
-  copy() { }
+  public copy() { }
 
-  clear() { }
+  public clear() { }
 
-  createFromCard()
+  public createFromCard()
   {
     Actions.create(this.props.keyPath, 0, 'sfw');
   }
 
-  toggleView()
+  public toggleView()
   {
     this.setState({
       learningMode: !this.state.learningMode,
     });
   }
 
-  toggleCardTool()
+  public toggleCardTool()
   {
     this.setState({
       cardToolOpen: !this.state.cardToolOpen,
     });
   }
 
-  render()
+  public render()
   {
     const { props } = this;
     const { cards, canEdit } = props;

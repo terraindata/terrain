@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./LibraryColumn.less');
+import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -57,7 +57,7 @@ export interface Props
 
 class LibraryColumn extends Classs<Props>
 {
-  render()
+  public render()
   {
     return (
       <div

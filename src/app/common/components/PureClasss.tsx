@@ -50,11 +50,11 @@ const shallowCompare = require('react-addons-shallow-compare');
 
 class PureClasss<T> extends Classs<T>
 {
-  props: T;
-  _debugUpdates = false;
-  _debugName = 'Not set';
+  public props: T;
+  public _debugUpdates = false;
+  public _debugName = 'Not set';
 
-  shouldComponentUpdate(nextProps: T, nextState: any)
+  public shouldComponentUpdate(nextProps: T, nextState: any)
   {
     const shouldUpdate = shallowCompare(this, nextProps, nextState);
 
@@ -67,7 +67,7 @@ class PureClasss<T> extends Classs<T>
     return shouldUpdate;
   }
 
-  _compareSets(first: any, second: any, setName: string)
+  public _compareSets(first: any, second: any, setName: string)
   {
     const firstKeys = _.keys(first);
     for (const key of firstKeys)

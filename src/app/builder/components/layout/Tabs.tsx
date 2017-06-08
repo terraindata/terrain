@@ -43,12 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Tabs.less');
+
+// tslint:disable:no-invalid-this
+
+import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
 import LibraryActions from '../../../library/data/LibraryActions';
 import Util from '../../../util/Util';
@@ -59,7 +63,6 @@ import Classs from './../../../common/components/Classs';
 import InfoArea from './../../../common/components/InfoArea';
 import PureClasss from './../../../common/components/PureClasss';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
-const { browserHistory } = require('react-router');
 const ReactTooltip = require('react-tooltip');
 
 const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
@@ -209,8 +212,8 @@ export interface TabAction
 {
   text: string;
   icon: any;
-  onClick();
   enabled?: boolean;
+  onClick();
 }
 
 interface TabsProps
@@ -221,13 +224,13 @@ interface TabsProps
 }
 
 export class Tabs extends PureClasss<TabsProps> {
-  state = {
+  public state = {
     variants: LibraryStore.getState().variants,
     tabs: null,
   };
-  cancel = null;
+  public cancel = null;
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
@@ -241,12 +244,12 @@ export class Tabs extends PureClasss<TabsProps> {
     this.computeTabs(this.props.config);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.cancel && this.cancel();
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.config !== this.props.config)
     {
@@ -254,7 +257,7 @@ export class Tabs extends PureClasss<TabsProps> {
     }
   }
 
-  computeTabs(config)
+  public computeTabs(config)
   {
     const { variants } = this.state;
     const tabs = config && variants && config.split(',').map((vId) =>
@@ -291,7 +294,7 @@ export class Tabs extends PureClasss<TabsProps> {
   //   return !_.isEqual(nextState.tabs, this.state.tabs);
   // }
 
-  moveTabs(index: number, destination: number)
+  public moveTabs(index: number, destination: number)
   {
     const newTabs = JSON.parse(JSON.stringify(this.state.tabs));
     const tab = newTabs.splice(index, 1)[0];
@@ -303,7 +306,7 @@ export class Tabs extends PureClasss<TabsProps> {
     );
   }
 
-  renderActions()
+  public renderActions()
   {
     return (
       <div className='tabs-actions'>
@@ -336,7 +339,7 @@ export class Tabs extends PureClasss<TabsProps> {
     );
   }
 
-  getId(idStr: string): string
+  public getId(idStr: string): string
   {
     if (idStr.substr(0, 1) === '!')
     {
@@ -345,29 +348,29 @@ export class Tabs extends PureClasss<TabsProps> {
     return idStr;
   }
 
-  isSelected(idStr: string): boolean
+  public isSelected(idStr: string): boolean
   {
     return idStr.substr(0, 1) === '!';
   }
 
-  handleClick(id: ID)
+  public handleClick(id: ID)
   {
     browserHistory.push(this.getTo(id));
   }
 
-  handleClose(id: ID)
+  public handleClose(id: ID)
   {
     browserHistory.push(this.getCloseTo(id));
   }
 
-  getTo(id)
+  public getTo(id)
   {
     return '/builder/' + this.state.tabs.map(
       (tab) => (tab.id === id ? '!' : '') + tab.id,
     ).join(',');
   }
 
-  getCloseTo(id)
+  public getCloseTo(id)
   {
     const { tabs } = this.state;
     const tab = this.state.tabs.find((tab) => tab.id === id);
@@ -382,7 +385,7 @@ export class Tabs extends PureClasss<TabsProps> {
     return '/builder/' + newConfig;
   }
 
-  render()
+  public render()
   {
     const { tabs } = this.state;
 

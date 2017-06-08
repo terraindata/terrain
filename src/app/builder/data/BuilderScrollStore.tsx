@@ -43,18 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
+import * as _ from 'underscore';
 const Redux = require('redux');
 
 export class BuilderScrollStateClass
 {
-  columnTop: number = 0;
-  columnHeight: number = 0;
-  columnScroll: number = 0;
-  totalHeight: number = 0;
+  public columnTop: number = 0;
+  public columnHeight: number = 0;
+  public columnScroll: number = 0;
+  public totalHeight: number = 0;
 }
 export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> { }
 const BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
