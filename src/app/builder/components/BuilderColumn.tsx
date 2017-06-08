@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 import * as _ from 'underscore';
 require('./BuilderColumn.less');
 import * as classNames from 'classnames';

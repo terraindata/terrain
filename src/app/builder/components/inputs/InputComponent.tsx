@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 require('./InputStyle.less');
 const _ = require('underscore');
 import * as Immutable from 'immutable';

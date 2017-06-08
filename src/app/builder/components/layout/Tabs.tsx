@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 require('./Tabs.less');
 // import * as moment from 'moment';
 const moment = require('moment');

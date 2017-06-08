@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 require('./TransformChart.less');
 
 // consider upgrading to v4 which has types

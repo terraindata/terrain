@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 require('./panel.less');
 import * as React from 'react';
 const _ = require('underscore');

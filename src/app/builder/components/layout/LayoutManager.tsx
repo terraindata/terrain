@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // somebody please rescue this or kill this
 
+// tslint:disable:no-invalid-this
+
 require('./LayoutManager.less');
 const Dimensions = require('react-dimensions');
 import * as React from 'react';
