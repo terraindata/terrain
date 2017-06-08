@@ -103,7 +103,7 @@ const LayoutManager = React.createClass<any, any>({
     // this.onPanelDrag = _.throttle(this.onPanelDrag, 500);
   },
 
-  getAdjustments(adjustments, containerWidth: number)
+  getAdjustments(adjustments: Adjustment[], containerWidth: number)
   {
     if (adjustments)
     {
@@ -120,7 +120,7 @@ const LayoutManager = React.createClass<any, any>({
         const colWidth = containerWidth / numColumns;
         let adjustmentsChanged = false;
         const newAdjustments = JSON.parse(JSON.stringify(adjustments));
-        _.map(newAdjustments, (adjustment, index) =>
+        _.map(newAdjustments, (adjustment: Adjustment, index: number) =>
         {
           const column = columns[index];
           if (column)
@@ -134,7 +134,7 @@ const LayoutManager = React.createClass<any, any>({
 
               // get magnitude of all adjustments
               const totalAdjustment = _.reduce(newAdjustments,
-                (sum, adjustment) =>
+                (sum: number, adjustment: Adjustment) =>
                 {
                   return sum + Math.max(adjustment.x, 0);
                 }
@@ -143,7 +143,7 @@ const LayoutManager = React.createClass<any, any>({
               if (difference >= totalAdjustment)
               {
                 // not enough space in the window, reset all
-                _.map(newAdjustments, (adjustment) => adjustment.x = 0);
+                _.map(newAdjustments, (adjustment: Adjustment) => adjustment.x = 0);
               }
               else
               {
@@ -151,7 +151,7 @@ const LayoutManager = React.createClass<any, any>({
                 // ratio by which to reduce adjustments
                 const ratio = (totalAdjustment - difference) / totalAdjustment;
                 _.map(newAdjustments,
-                  (adjustment) => adjustment.x > 0 && (adjustment.x *= ratio),
+                  (adjustment: Adjustment) => adjustment.x > 0 && (adjustment.x *= ratio),
                 );
               }
             }
