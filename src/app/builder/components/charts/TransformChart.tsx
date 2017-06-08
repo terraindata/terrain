@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
-require('./TransformChart.less');
+import './TransformChart.less';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');

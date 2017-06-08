@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./BuilderTQLColumn.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import './BuilderTQLColumn.less';
 const { List } = Immutable;
 import * as _ from 'underscore';
 import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';

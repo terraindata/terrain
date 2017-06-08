@@ -48,7 +48,7 @@ THE SOFTWARE.
 require('babel-polyfill');
 
 // Style
-require('./App.less');
+import './App.less';
 
 // Libraries
 import * as $ from 'jquery';

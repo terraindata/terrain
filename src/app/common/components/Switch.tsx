@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Switch.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
+import './Switch.less';
 
 export interface Props
 {

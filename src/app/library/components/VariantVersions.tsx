@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./VariantVersions.less');
+import './VariantVersions.less';
 const classNames = require('classnames');
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';

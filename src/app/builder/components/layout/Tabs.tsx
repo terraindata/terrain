@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
-require('./Tabs.less');
+import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as classNames from 'classnames';

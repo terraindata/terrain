@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Autocomplete.less');
+import './Autocomplete.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';

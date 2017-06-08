@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./AccountDropdown.less');
 import * as $ from 'jquery';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -53,6 +52,7 @@ import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
 import UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
+import './AccountDropdown.less';
 const { browserHistory } = require('react-router');
 import Modal from './Modal';
 const CommitLog = require('../../../commitlog.txt');

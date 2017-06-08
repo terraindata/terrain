@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Profile.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -54,6 +53,7 @@ import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import UserStore from './../data/UserStore';
 import UserTypes from './../UserTypes';
+import './Profile.less';
 
 export interface Props
 {

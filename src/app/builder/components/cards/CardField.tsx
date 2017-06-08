@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CardField.less');
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -54,6 +53,7 @@ import Util from '../../../util/Util';
 import BuilderComponent from '../BuilderComponent';
 import { CardItem } from './CardComponent';
 import CardDropArea from './CardDropArea';
+import './CardField.less';
 const classNames = require('classnames');
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');

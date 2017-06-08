@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
-require('./panel.less');
 import * as React from 'react';
+import './panel.less';
 const _ = require('underscore');
 const shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from 'react-dom';

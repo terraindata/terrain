@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CardsDeck.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -54,6 +53,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
+import './CardsDeck.less';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 

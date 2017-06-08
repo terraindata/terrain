@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./DatePicker.less');
 import * as React from 'react';
+import './DatePicker.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';

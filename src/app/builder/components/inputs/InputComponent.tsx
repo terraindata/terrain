@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
-require('./InputStyle.less');
+import './InputStyle.less';
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import * as React from 'react';

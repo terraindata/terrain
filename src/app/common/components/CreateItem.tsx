@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CreateItem.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
+import './CreateItem.less';
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props

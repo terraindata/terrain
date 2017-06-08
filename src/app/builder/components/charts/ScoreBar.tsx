@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./ScoreBar.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import PureClasss from './../../../common/components/PureClasss';
+import './ScoreBar.less';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =

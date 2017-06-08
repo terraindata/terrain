@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./ResultsArea.less');
 import * as Immutable from 'immutable';
+import './ResultsArea.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';

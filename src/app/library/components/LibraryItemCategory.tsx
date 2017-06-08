@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./LibraryItemCategory.less');
+import './LibraryItemCategory.less';
 
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';

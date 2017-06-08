@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Paging.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
+import './Paging.less';
 
 const HOVER_TIMEOUT_TIME = 1000;
 

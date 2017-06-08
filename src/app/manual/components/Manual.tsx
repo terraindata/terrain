@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Manual.less');
+import './Manual.less';
 const _ = require('underscore');
 import * as classNames from 'classnames';
 import * as React from 'react';

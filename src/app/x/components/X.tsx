@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./X.less');
 import * as React from 'react';
 import { Link } from 'react-router';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs';
+import './X.less';
 
 const xes =
   {

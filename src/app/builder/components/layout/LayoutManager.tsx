@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
-require('./LayoutManager.less');
+import './LayoutManager.less';
 const Dimensions = require('react-dimensions');
 import * as React from 'react';
 const shallowCompare = require('react-addons-shallow-compare');
