@@ -42,14 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ManualPopup.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import ManualEntry from '../../../../shared/blocks/types/ManualEntry';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import ManualEntry from '../../../../shared/blocks/types/ManualEntry';
+import './ManualPopup.less';
 const InfoIcon = require('./../../../images/icon_info.svg');
 const OpenIcon = require('./../../../images/icon_open.svg');
 
@@ -72,12 +73,12 @@ class ManualPopup extends Classs<Props>
       };
   }
 
-  shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
-  close()
+  public close()
   {
     this.setState({
       open: false,
@@ -85,12 +86,12 @@ class ManualPopup extends Classs<Props>
     $(document).off('click', this.close);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $(document).off('click', this.close);
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     this.setState({
       open: !this.state.open,
@@ -102,12 +103,12 @@ class ManualPopup extends Classs<Props>
     }
   }
 
-  openManual()
+  public openManual()
   {
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render()
+  public render()
   {
 
     // const manualEntry = cardList[this.props.cardName]
@@ -124,24 +125,24 @@ class ManualPopup extends Classs<Props>
         })}
       >
         <div
-          className="manual-popup-icon-wrapper"
+          className='manual-popup-icon-wrapper'
           onClick={this.toggleOpen}
         >
-          <InfoIcon className="manual-popup-icon" />
+          <InfoIcon className='manual-popup-icon' />
         </div>
         {!this.state.open ? null :
           <div
-            className="manual-popup-content-wrapper"
+            className='manual-popup-content-wrapper'
             onClick={this.toggleOpen}
           >
             {content}
             <div
-              className="manual-popup-link"
+              className='manual-popup-link'
               onClick={this.openManual}
             >
               See full description in Manual
               <OpenIcon
-                className="manual-popup-open-icon"
+                className='manual-popup-open-icon'
                 onClick={this.openManual}
               />
             </div>

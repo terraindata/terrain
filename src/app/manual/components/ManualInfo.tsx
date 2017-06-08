@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ManualInfo.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './ManualInfo.less';
 
 export interface Props
 {
@@ -66,11 +67,11 @@ class ManualInfo extends Classs<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     return (
       <div className={'manual-info-wrapper ' + this.props.className} >
-        <div className="manual-info-indicator"></div>
+        <div className='manual-info-indicator'></div>
         <div
           className={classNames({
             'manual-info-content': true,

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Settings.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { Link } from 'react-router';
 import UserTypes from '../UserTypes';
@@ -56,6 +56,7 @@ import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
+import './Settings.less';
 type User = UserTypes.User;
 import Modal from './../../common/components/Modal';
 import PasswordStrengthInput from './PasswordStrengthInput';
@@ -74,7 +75,7 @@ export interface Props
 
 class Settings extends Classs<Props>
 {
-  cancelSubscription = null;
+  public cancelSubscription = null;
 
   constructor(props)
   {
@@ -102,17 +103,17 @@ class Settings extends Classs<Props>
       }));
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Actions.fetch();
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.cancelSubscription && this.cancelSubscription();
   }
 
-  changeUserField(field: string, value: string)
+  public changeUserField(field: string, value: string)
   {
     let newUser = this.state.istate.currentUser;
     newUser = newUser.set(field, value);
@@ -124,28 +125,28 @@ class Settings extends Classs<Props>
     });
   }
 
-  handleCurrentPasswordChange(ev)
+  public handleCurrentPasswordChange(ev)
   {
     this.setState({
       currentPassword: ev.target.value,
     });
   }
 
-  handleNewPasswordChange(ev)
+  public handleNewPasswordChange(ev)
   {
     this.setState({
       newPassword: ev.target.value,
     });
   }
 
-  handleConfirmPasswordChange(ev)
+  public handleConfirmPasswordChange(ev)
   {
     this.setState({
       confirmPassword: ev.target.value,
     });
   }
 
-  createNewPassword()
+  public createNewPassword()
   {
     const userId: number = localStorage['id'];
     const currentPassword: string = this.state.currentPassword;
@@ -197,66 +198,66 @@ class Settings extends Classs<Props>
       });
   }
 
-  toggleShowPassword()
+  public toggleShowPassword()
   {
     this.setState({
       showPassword: !this.state.showPassword,
     });
   }
 
-  renderPasswordContent()
+  public renderPasswordContent()
   {
     return (
-      <div className="settings-expand-field">
-        <div className="settings-field-title">
+      <div className='settings-expand-field'>
+        <div className='settings-field-title'>
           Current Password
         </div>
         <input
           type={this.state.showPassword ? 'text' : 'password'}
           onChange={this.handleCurrentPasswordChange}
-          className="settings-input password-input"
+          className='settings-input password-input'
           value={this.state.currentPassword}
         />
-        <div className="settings-field-title">
+        <div className='settings-field-title'>
           New Password
         </div>
-        <div className="settings-row">
-          <div className="settings-password-container">
+        <div className='settings-row'>
+          <div className='settings-password-container'>
             <PasswordStrengthInput
               onChange={this.handleNewPasswordChange}
               value={this.state.newPassword}
               type={this.state.showPassword ? 'text' : 'password'}
             />
           </div>
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
-        <div className="settings-field-title">
+        <div className='settings-field-title'>
           Confirm Password
         </div>
-        <div className="settings-row">
+        <div className='settings-row'>
           <input
             type={this.state.showPassword ? 'text' : 'password'}
             value={this.state.confirmPassword}
             onChange={this.handleConfirmPasswordChange}
-            className="settings-input password-input"
+            className='settings-input password-input'
           />
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
-        <div className="settings-row settings-bottom-margin">
+        <div className='settings-row settings-bottom-margin'>
           <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword} />
-          <div className="settings-field-info settings-left-shift" onClick={this.toggleShowPassword}>Show password</div>
+          <div className='settings-field-info settings-left-shift' onClick={this.toggleShowPassword}>Show password</div>
         </div>
-        <div className="settings-row">
-          <div className="button settings-save-button" onClick={this.createNewPassword} >
+        <div className='settings-row'>
+          <div className='button settings-save-button' onClick={this.createNewPassword} >
             Save
           </div>
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
       </div>
     );
   }
 
-  setupAuthentication()
+  public setupAuthentication()
   {
     this.setState({
       modalMessage: 'This button has not been implemented yet',
@@ -265,7 +266,7 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  renderAuthenticationDescription()
+  public renderAuthenticationDescription()
   {
     return (
       <div>
@@ -274,18 +275,18 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderAuthenticationContent()
+  public renderAuthenticationContent()
   {
     return (
-      <div className="settings-expand-field">
-        <div className="settings-authentication-field">
+      <div className='settings-expand-field'>
+        <div className='settings-authentication-field'>
           Protect your Terrain account with an extra layer of security by
        requiring access to your phone. Once configured you'll be required
        to enter <b>both your password and an authentication code from your
        mobile phone</b> in order to sign into your Terrain account.
        </div>
-        <div className="settings-row">
-          <div className="button settings-gray-button" onClick={this.setupAuthentication}>
+        <div className='settings-row'>
+          <div className='button settings-gray-button' onClick={this.setupAuthentication}>
             Setup Two-Factor Authentication
         </div>
         </div>
@@ -293,7 +294,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderEmailDescription()
+  public renderEmailDescription()
   {
     if (this.state.istate.currentUser && this.state.istate.currentUser.email)
     {
@@ -307,7 +308,7 @@ class Settings extends Classs<Props>
     return <div>Your email adddress has not been set yet.</div>;
   }
 
-  changeEmail()
+  public changeEmail()
   {
     this.changeUserField('email', this.state.newEmail);
 
@@ -316,7 +317,7 @@ class Settings extends Classs<Props>
     });
   }
 
-  onSave()
+  public onSave()
   {
     this.setState({
       saving: false,
@@ -324,7 +325,7 @@ class Settings extends Classs<Props>
     });
   }
 
-  onSaveError(response)
+  public onSaveError(response)
   {
     this.setState({
       modalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -333,37 +334,37 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  updateNewEmail(event)
+  public updateNewEmail(event)
   {
     this.setState({
       newEmail: event.target.value,
     });
   }
 
-  renderEmailContent()
+  public renderEmailContent()
   {
     return (
-      <div className="settings-expand-field">
-        <div className="settings-field-title">
+      <div className='settings-expand-field'>
+        <div className='settings-field-title'>
           New Email Address
         </div>
-        <div className="settings-row">
+        <div className='settings-row'>
           <input
-            type="text"
+            type='text'
             value={this.state.newEmail}
             onChange={this.updateNewEmail}
-            className="settings-input password-input"
+            className='settings-input password-input'
           />
-          <div className="settings-white-space" />
+          <div className='settings-white-space' />
         </div>
-        <div className="button settings-save-button" onClick={this.changeEmail}>
+        <div className='button settings-save-button' onClick={this.changeEmail}>
           Update Email
          </div>
       </div>
     );
   }
 
-  renderTimeZoneDescription()
+  public renderTimeZoneDescription()
   {
     let timeZone: number;
 
@@ -384,7 +385,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  getTimeZonesList()
+  public getTimeZonesList()
   {
     const timeZonesList = TimeZones.map((tz, i) =>
     {
@@ -396,7 +397,7 @@ class Settings extends Classs<Props>
     return timeZonesList;
   }
 
-  changeTimeZone(val)
+  public changeTimeZone(val)
   {
     this.changeUserField('timeZone', val.value);
     this.setState({
@@ -404,7 +405,7 @@ class Settings extends Classs<Props>
     });
   }
 
-  renderTimeZoneContent()
+  public renderTimeZoneContent()
   {
     const timeZonesList = this.getTimeZonesList();
     let timeZone: number;
@@ -419,30 +420,30 @@ class Settings extends Classs<Props>
     }
 
     return (
-      <div className="settings-row">
+      <div className='settings-row'>
         <Select
           clearable={false}
           value={timeZone}
           options={timeZonesList}
           onChange={this.changeTimeZone}
-          className="settings-timezone-dropdown"
+          className='settings-timezone-dropdown'
           searchable={false}
         />
       </div>
     );
   }
 
-  renderSignOutDescription()
+  public renderSignOutDescription()
   {
     return (
-      <div className="settings-shifted-text">
+      <div className='settings-shifted-text'>
         Lost your computer? Left yourself logged in on a public computer? Need a way to sign out
         everywhere except your current library? This is for you.
       </div>
     );
   }
 
-  signOut()
+  public signOut()
   {
     this.setState({
       modalMessage: 'This button has not been implemented.',
@@ -451,12 +452,12 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  renderSignOutButton()
+  public renderSignOutButton()
   {
     return (
-      <div className="settings-yellow-button button" onClick={this.signOut}>
-        <div className="settings-logout-button">
-          <div className="settings-logout-icon">
+      <div className='settings-yellow-button button' onClick={this.signOut}>
+        <div className='settings-logout-button'>
+          <div className='settings-logout-icon'>
             <LogoutIcon />
           </div>
           Sign out all other sessions
@@ -465,21 +466,21 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderDeactivateDescription()
+  public renderDeactivateDescription()
   {
     return (
-      <div className="settings-shifted-text">
+      <div className='settings-shifted-text'>
         If you no longer need your <b>Terrain</b> account you can deactivate it here.
         <br />
-        <span className="settings-font-small">
-          <b>Note:</b> Don't deactivate your account if you just want to change your <span className="settings-blue-font">email
+        <span className='settings-font-small'>
+          <b>Note:</b> Don't deactivate your account if you just want to change your <span className='settings-blue-font'>email
           address </span>.
         </span>
       </div>
     );
   }
 
-  deactivate()
+  public deactivate()
   {
     this.setState({
       modalMessage: 'This button has not been implemented.',
@@ -488,16 +489,16 @@ class Settings extends Classs<Props>
     this.toggleModal();
   }
 
-  renderDeactivateButton()
+  public renderDeactivateButton()
   {
     return (
-      <div className="settings-gray-button button" onClick={this.deactivate}>
+      <div className='settings-gray-button button' onClick={this.deactivate}>
         Deactivate your account
       </div>
     );
   }
 
-  toggleModal()
+  public toggleModal()
   {
     this.setState({
       modalOpen: !this.state.modalOpen,
@@ -525,22 +526,22 @@ class Settings extends Classs<Props>
   //   buttonText={this.renderDeactivateButton()}
   //   lastEntry={true}
   //   />
-  render()
+  public render()
   {
     return (
       <div>
-        <div className="settings-page-title">Update your settings</div>
+        <div className='settings-page-title'>Update your settings</div>
         <AccountEntry
-          title="Password"
+          title='Password'
           content={this.renderPasswordContent()}
         />
         <AccountEntry
-          title="Email"
+          title='Email'
           description={this.renderEmailDescription()}
           content={this.renderEmailContent()}
         />
         <AccountEntry
-          title="Time Zone"
+          title='Time Zone'
           description={this.renderTimeZoneDescription()}
           content={this.renderTimeZoneContent()}
         />

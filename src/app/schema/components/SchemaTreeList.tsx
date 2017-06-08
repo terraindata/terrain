@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
@@ -63,8 +64,8 @@ export interface Props
 
 class State
 {
-  renderCount: number = 30;
-  intervalId: number = -1;
+  public renderCount: number = 30;
+  public intervalId: number = -1;
 }
 
 const NORMAL_STYLE = {
@@ -84,9 +85,9 @@ const SEARCH_STYLE = {
 @Radium
 class SchemaTreeList extends PureClasss<Props>
 {
-  state = new State();
+  public state = new State();
 
-  componentDidMount()
+  public componentDidMount()
   {
     if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount)
     {
@@ -96,7 +97,7 @@ class SchemaTreeList extends PureClasss<Props>
     }
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
     {
@@ -106,7 +107,7 @@ class SchemaTreeList extends PureClasss<Props>
     }
   }
 
-  increaseRenderCount()
+  public increaseRenderCount()
   {
     const renderCount = this.state.renderCount + 10;
     this.setState({
@@ -122,13 +123,13 @@ class SchemaTreeList extends PureClasss<Props>
     }
   }
 
-  render()
+  public render()
   {
     if (!this.props.itemIds)
     {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }

@@ -42,17 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CardField.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Display, DisplayType, RowDisplay } from '../../../../../shared/blocks/displays/Display';
 import PureClasss from '../../../common/components/PureClasss';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
-import { Display, DisplayType, RowDisplay } from '../../../../../shared/blocks/displays/Display';
 import BuilderComponent from '../BuilderComponent';
 import { CardItem } from './CardComponent';
 import CardDropArea from './CardDropArea';
+import './CardField.less';
 const classNames = require('classnames');
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -112,30 +113,30 @@ const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
 class CardField extends PureClasss<Props>
 {
-  state: IMoveState = DefaultMoveState;
+  public state: IMoveState = DefaultMoveState;
 
-  ss(state: IMoveState)
+  public ss(state: IMoveState)
   {
     this.setState(state as any);
   }
 
-  removeField(event)
+  public removeField(event)
   {
     Util.animateToHeight(this.refs['all'], 0, () =>
       this.props.onRemove(this.props.index));
   }
 
-  addField(event)
+  public addField(event)
   {
     this.props.onAdd(this.props.index + 1);
   }
 
-  addFieldTop(event)
+  public addFieldTop(event)
   {
     this.props.onAdd(0);
   }
 
-  handleHandleMousedown(event: MEvent)
+  public handleHandleMousedown(event: MEvent)
   {
     $('body').on('mousemove', this.handleMouseMove);
     $('body').on('mouseup', this.handleMouseUp);
@@ -173,7 +174,7 @@ class CardField extends PureClasss<Props>
     });
   }
 
-  shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
+  public shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
   {
     const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
 
@@ -238,7 +239,7 @@ class CardField extends PureClasss<Props>
     };
   }
 
-  handleMouseMove(evt)
+  public handleMouseMove(evt)
   {
     this.setState({
       dY: this.shiftSiblings(evt, false).dY,
@@ -247,7 +248,7 @@ class CardField extends PureClasss<Props>
     evt.stopPropagation();
   }
 
-  move()
+  public move()
   {
     if (this.props.index !== this.state.movedTo)
     {
@@ -264,7 +265,7 @@ class CardField extends PureClasss<Props>
     $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.index !== this.props.index)
     {
@@ -279,7 +280,7 @@ class CardField extends PureClasss<Props>
     }
   }
 
-  handleMouseUp(evt)
+  public handleMouseUp(evt)
   {
     $('body').off('mousemove', this.handleMouseMove);
     $('body').off('mouseup', this.handleMouseUp);
@@ -294,12 +295,12 @@ class CardField extends PureClasss<Props>
     });
   }
 
-  beforeTopAddDrop(item: CardItem, targetProps)
+  public beforeTopAddDrop(item: CardItem, targetProps)
   {
     this.props.onAdd(0);
   }
 
-  render()
+  public render()
   {
     let style = null;
     if (this.state.movedTo !== null)
@@ -323,7 +324,7 @@ class CardField extends PureClasss<Props>
 
     return (
       <div
-        ref="all"
+        ref='all'
         className={classNames({
           'card-field-wrapper': true,
           'card-field-wrapper-moving': this.state.movedTo !== null,
@@ -352,12 +353,12 @@ class CardField extends PureClasss<Props>
             // ^ hides the left drag handle if single
             'card-field-editable': this.props.canEdit,
           })}
-          ref="cardField"
+          ref='cardField'
         >
           {
             !renderTools && this.props.canEdit && this.props.isFirstRow &&
             <div
-              className="card-field-top-add card-field-add"
+              className='card-field-top-add card-field-add'
               onClick={this.addFieldTop}
               data-tip={'Add another'}
             >
@@ -374,10 +375,10 @@ class CardField extends PureClasss<Props>
           }
           {
             renderTools && this.props.canEdit &&
-            <div className="card-field-tools-left">
-              <div className="card-field-tools-left-inner">
+            <div className='card-field-tools-left'>
+              <div className='card-field-tools-left-inner'>
                 <div
-                  className="card-field-handle"
+                  className='card-field-handle'
                   onMouseDown={this.handleHandleMousedown}
                 >
                   ⋮⋮
@@ -385,8 +386,8 @@ class CardField extends PureClasss<Props>
                 {
                   this.props.helpOn ?
                     <ManualInfo
-                      information="Can move fields around within the current card by dragging and dropping"
-                      className="card-field-manual-info"
+                      information='Can move fields around within the current card by dragging and dropping'
+                      className='card-field-manual-info'
                       leftSide={true}
                     />
                     : null
@@ -394,7 +395,7 @@ class CardField extends PureClasss<Props>
               </div>
             </div>
           }
-          <div className="card-field-inner" >
+          <div className='card-field-inner' >
             <BuilderComponent
               display={row.inner}
               keyPath={this.props.keyPath}
@@ -409,11 +410,11 @@ class CardField extends PureClasss<Props>
           </div>
           {
             renderTools && this.props.canEdit &&
-            <div className="card-field-tools-right">
-              <div className="card-field-tools-right-inner">
+            <div className='card-field-tools-right'>
+              <div className='card-field-tools-right-inner'>
                 <div>
                   <div
-                    className="card-field-add"
+                    className='card-field-add'
                     onClick={this.addField}
                     data-tip={'Add another'}
                   >
@@ -422,16 +423,16 @@ class CardField extends PureClasss<Props>
                   {
                     this.props.helpOn ?
                       <ManualInfo
-                        information="Can add field using the plus button or remove fields using the x button"
+                        information='Can add field using the plus button or remove fields using the x button'
                         rightSide={true}
-                        className="card-field-manual-info"
+                        className='card-field-manual-info'
                       />
                       : null
                   }
                   {
                     !this.props.isOnlyRow &&
                     <div
-                      className="card-field-remove"
+                      className='card-field-remove'
                       onClick={this.removeField}
                       data-tip={'Remove'}
                     >

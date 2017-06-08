@@ -42,10 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./LibraryItem.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
+import './LibraryItem.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -104,14 +105,14 @@ export interface Props
 
 class LibraryItem extends Classs<Props>
 {
-  state = {
+  public state = {
     nameEditing: false,
     focusField: false,
     mounted: false,
     timeout: null,
   };
 
-  menuOptions =
+  public menuOptions =
   {
     none: List([]),
     duplicate:
@@ -155,7 +156,7 @@ class LibraryItem extends Classs<Props>
     ]),
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.setState({
       timeout:
@@ -173,7 +174,7 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     if (this.state.timeout)
     {
@@ -181,17 +182,17 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  handleDuplicate()
+  public handleDuplicate()
   {
     this.props.onDuplicate(this.props.id);
   }
 
-  handleArchive()
+  public handleArchive()
   {
     this.props.onArchive(this.props.id);
   }
 
-  handleKeyDown(event)
+  public handleKeyDown(event)
   {
     if (event.keyCode === 13)
     {
@@ -199,7 +200,7 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  showTextfield()
+  public showTextfield()
   {
     if (!this.props.canEdit)
     {
@@ -212,7 +213,7 @@ class LibraryItem extends Classs<Props>
     });
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (this.state.focusField)
     {
@@ -223,7 +224,7 @@ class LibraryItem extends Classs<Props>
     }
   }
 
-  hideTextfield(event)
+  public hideTextfield(event)
   {
     this.props.onNameChange(this.props.id, event.target.value);
     this.setState({
@@ -231,7 +232,7 @@ class LibraryItem extends Classs<Props>
     });
   }
 
-  handleDoubleClick(event)
+  public handleDoubleClick(event)
   {
     event.preventDefault();
     event.stopPropagation();
@@ -242,12 +243,12 @@ class LibraryItem extends Classs<Props>
     this.props.onDoubleClick && this.props.onDoubleClick(this.props.id);
   }
 
-  handleFocus(event)
+  public handleFocus(event)
   {
     event.target.select();
   }
 
-  render()
+  public render()
   {
     const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
@@ -267,11 +268,11 @@ class LibraryItem extends Classs<Props>
     if (this.props.draggingOverIndex !== -1)
     {
       // could be shifted
-      if (this.props.index > this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      if (this.props.index > this.props.draggingItemIndex && this.props.index === this.props.draggingOverIndex)
       {
         shiftedUp = true;
       }
-      if (this.props.index < this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      if (this.props.index < this.props.draggingItemIndex && this.props.index === this.props.draggingOverIndex)
       {
         shiftedDown = true;
       }
@@ -288,8 +289,8 @@ class LibraryItem extends Classs<Props>
       >
         <Link
           to={this.props.to}
-          className="library-item-link"
-          activeClassName="library-item-active"
+          className='library-item-link'
+          activeClassName='library-item-active'
           onDoubleClick={this.handleDoubleClick}
         >
           <div
@@ -318,32 +319,32 @@ class LibraryItem extends Classs<Props>
                   })}
                 >
                   <div
-                    className="library-item-icon"
+                    className='library-item-icon'
                   >
                     {
                       this.props.icon
                     }
                   </div>
                   <div
-                    className="library-item-name"
+                    className='library-item-name'
                   >
                     {
                       this.props.name.length ? this.props.name : <em>Untitled</em>
                     }
                   </div>
                   <input
-                    className="library-item-name-input"
+                    className='library-item-name-input'
                     defaultValue={this.props.name}
                     placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
                     onBlur={this.hideTextfield}
                     onFocus={this.handleFocus}
                     onKeyDown={this.handleKeyDown}
-                    ref="input"
+                    ref='input'
                   />
                   {
                     this.props.isStarred &&
                     <div
-                      className="library-item-star"
+                      className='library-item-star'
                     >
                       <StarIcon />
                     </div>
@@ -352,7 +353,7 @@ class LibraryItem extends Classs<Props>
                     options={menuOptions}
                   />
                 </div>
-                <div className="library-item-content">
+                <div className='library-item-content'>
                   {
                     this.props['children']
                   }
@@ -369,7 +370,7 @@ class LibraryItem extends Classs<Props>
 // DnD stuff
 
 let shifted = false;
-$(document).on('dragover dragend', function(e) { shifted = e.shiftKey; return true; });
+$(document).on('dragover dragend', (e) => { shifted = e.shiftKey; return true; });
 // http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
 
 const source =

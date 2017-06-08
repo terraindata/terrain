@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { Link } from 'react-router';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs';
+import './X.less';
 
 const xes =
   {
@@ -73,7 +74,7 @@ class X extends Classs<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     const { x } = this.props.params;
 
@@ -84,14 +85,14 @@ class X extends Classs<Props>
     }
 
     return (
-      <div className="x-area">
-        <div className="x-title">
+      <div className='x-area'>
+        <div className='x-title'>
           Experiments
         </div>
         {
           _.keys(xes).map((indX) =>
             <Link to={`/x/${indX}`} key={indX}>
-              <div className="x-x">
+              <div className='x-x'>
                 {xes[indX].name}
               </div>
             </Link>,

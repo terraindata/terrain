@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Modal.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
+import './Modal.less';
 
 const ReactModal = require('react-modal');
 const InfoIcon = require('./../../../images/icon_info.svg');
@@ -71,13 +72,13 @@ export interface Props
 
 class Modal extends PureClasss<Props>
 {
-  closeModalSuccess()
+  public closeModalSuccess()
   {
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
   }
 
-  render()
+  public render()
   {
     const defaultTitle = this.props.error ? 'Alert' : 'Please Confirm';
 
@@ -88,27 +89,27 @@ class Modal extends PureClasss<Props>
         <ReactModal
           contentLabel={''}
           isOpen={this.props.open}
-          overlayClassName="modal-overlay"
+          overlayClassName='modal-overlay'
           className={classNames({
             'modal-content': true,
             'modal-content-fill': this.props.fill,
           })}
         >
-          <div className="modal-dialog">
+          <div className='modal-dialog'>
             <div className={classNames({
               'modal-title': true,
               'modal-title-error': this.props.error,
             })}>
               {
                 this.props.error ?
-                  <div className="modal-info-icon">
+                  <div className='modal-info-icon'>
                     <InfoIcon />
                   </div>
                   :
                   null
               }
               <div
-                className="modal-title-inner"
+                className='modal-title-inner'
               >
                 {
                   this.props.title ? this.props.title : defaultTitle
@@ -117,7 +118,7 @@ class Modal extends PureClasss<Props>
               {
                 !this.props.confirm &&
                 <CloseIcon
-                  className="modal-close-x"
+                  className='modal-close-x'
                   onClick={this.props.onClose}
                 />
               }
@@ -140,11 +141,11 @@ class Modal extends PureClasss<Props>
             }
             {
               this.props.confirm &&
-              <div className="modal-buttons">
+              <div className='modal-buttons'>
                 {
                   this.props.thirdButtonText &&
                   <div
-                    className="button modal-third-button"
+                    className='button modal-third-button'
                     onClick={this.props.onThirdButton}
                   >
                     {
@@ -155,7 +156,7 @@ class Modal extends PureClasss<Props>
                 {
                   this.props.confirm ?
                     <div
-                      className="button modal-confirm-button"
+                      className='button modal-confirm-button'
                       onClick={this.closeModalSuccess}
                     >
                       {
@@ -166,7 +167,7 @@ class Modal extends PureClasss<Props>
                     <div />
                 }
                 <div
-                  className="button modal-close-button"
+                  className='button modal-close-button'
                   onClick={this.props.onClose}
                 >
                   Cancel

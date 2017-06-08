@@ -42,8 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Notifications.less');
-require('./Select.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { Link } from 'react-router';
 import UserTypes from '../UserTypes';
@@ -56,6 +55,8 @@ import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
+import './Notifications.less';
+import './Select.less';
 
 const Select = require('react-select');
 const SoundIcon = require('./../../../images/icon_audio.svg');
@@ -69,9 +70,9 @@ export interface Props
 
 class Notifications extends Classs<Props>
 {
-  cancelSubscription = null;
+  public cancelSubscription = null;
 
-  emailNotificationOptions = [
+  public emailNotificationOptions = [
     {
       value: 'Once every 15 minutes',
       onClick: this.changeEmailNotifications_15Min,
@@ -86,7 +87,7 @@ class Notifications extends Classs<Props>
     },
   ];
 
-  notificationTypes = [
+  public notificationTypes = [
     {
       value: 'Activities of any kind',
       label: 'Activities of any kind',
@@ -101,7 +102,7 @@ class Notifications extends Classs<Props>
     },
   ];
 
-  desktopNotificationSounds = [
+  public desktopNotificationSounds = [
     {
       value: 'chime',
       label: 'chime',
@@ -120,7 +121,7 @@ class Notifications extends Classs<Props>
     },
   ];
 
-  sounds = {
+  public sounds = {
     chime: 'http://lukeknepper.com/upload/chime.wav',
     doorbell: 'http://lukeknepper.com/upload/doorbell_x.wav',
     whistle: 'http://lukeknepper.com/upload/slide_whistle_up.wav',
@@ -144,17 +145,17 @@ class Notifications extends Classs<Props>
       }));
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Actions.fetch();
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.cancelSubscription && this.cancelSubscription();
   }
 
-  changeUserField(field: string, value: string)
+  public changeUserField(field: string, value: string)
   {
     let newUser = this.state.istate.currentUser;
     newUser = newUser.set(field, value);
@@ -166,13 +167,13 @@ class Notifications extends Classs<Props>
     });
   }
 
-  onDesktopNotificationChange(val)
+  public onDesktopNotificationChange(val)
   {
     const { value } = val;
     this.changeUserField('desktopNotificationType', value);
   }
 
-  onSave()
+  public onSave()
   {
     this.setState({
       saving: false,
@@ -180,7 +181,7 @@ class Notifications extends Classs<Props>
     });
   }
 
-  onSaveError(response)
+  public onSaveError(response)
   {
     this.setState({
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -189,13 +190,13 @@ class Notifications extends Classs<Props>
 
   }
 
-  onDesktopNotificationsSoundChange(val)
+  public onDesktopNotificationsSoundChange(val)
   {
     const { value } = val;
     this.changeUserField('sound', value);
   }
 
-  playSound()
+  public playSound()
   {
     if (this.state.istate.currentUser)
     {
@@ -210,7 +211,7 @@ class Notifications extends Classs<Props>
     }
   }
 
-  renderDesktopNotificationsContent()
+  public renderDesktopNotificationsContent()
   {
     let desktopNotification: any, sound: any;
 
@@ -221,40 +222,40 @@ class Notifications extends Classs<Props>
     }
 
     return (
-      <div className="notification-expansion">
-        <div className="notification-subtitle">
+      <div className='notification-expansion'>
+        <div className='notification-subtitle'>
           Send me desktop notifications for:
        </div>
         <Select
           clearable={false}
-          name="desktop-notification"
+          name='desktop-notification'
           value={desktopNotification}
           options={this.notificationTypes}
           onChange={this.onDesktopNotificationChange}
-          className="notifications-select"
+          className='notifications-select'
           searchable={false}
         />
-        <div className="notification-subtitle">
+        <div className='notification-subtitle'>
           Desktop notifications use this sound:
        </div>
-        <div className="notification-row">
+        <div className='notification-row'>
           <Select
-            name="desktop-notification-sound"
+            name='desktop-notification-sound'
             value={sound}
             clearable={false}
             options={this.desktopNotificationSounds}
             onChange={this.onDesktopNotificationsSoundChange}
-            className="notifications-select"
+            className='notifications-select'
             searchable={false}
           />
           <div
             className={sound === 'none' ? 'disabled' : 'preview-button'}
             onClick={sound === 'none' ? null : this.playSound}
           >
-            <div className="notification-sound-icon">
+            <div className='notification-sound-icon'>
               <SoundIcon />
             </div>
-            <div className="notification-preview-button-text">
+            <div className='notification-preview-button-text'>
               Preview
           </div>
           </div>
@@ -263,28 +264,28 @@ class Notifications extends Classs<Props>
     );
   }
 
-  changeEmailNotifications_15Min()
+  public changeEmailNotifications_15Min()
   {
     this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[0].value);
   }
 
-  changeEmailNotifications_Hour()
+  public changeEmailNotifications_Hour()
   {
     this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[1].value);
   }
 
-  changeEmailNotifications_Never()
+  public changeEmailNotifications_Never()
   {
     this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[2].value);
   }
 
-  onEmailNotificationTypeChange(val)
+  public onEmailNotificationTypeChange(val)
   {
     const { value } = val;
     this.changeUserField('emailNotificationType', value);
   }
 
-  renderEmailNotificationsContent()
+  public renderEmailNotificationsContent()
   {
     let emailNotification: any, emailTiming: any;
 
@@ -295,25 +296,25 @@ class Notifications extends Classs<Props>
     }
 
     return (
-      <div className="notification-expansion">
+      <div className='notification-expansion'>
         <div>Send me email notifications:</div>
         <br />
-        <div className="expanded-section-indent">
+        <div className='expanded-section-indent'>
           <RadioButtons
             selected={emailTiming}
             options={this.emailNotificationOptions}
           />
         </div>
-        <div className="notification-subtitle-small">
+        <div className='notification-subtitle-small'>
           Send me email notifications for:
        </div>
         <Select
           clearable={false}
-          name="email-notification"
+          name='email-notification'
           value={emailNotification}
           options={this.notificationTypes}
           onChange={this.onEmailNotificationTypeChange}
-          className="notifications-select"
+          className='notifications-select'
           searchable={false}
         />
         {this.renderEmail()}
@@ -321,14 +322,14 @@ class Notifications extends Classs<Props>
     );
   }
 
-  toggleEmailNews()
+  public toggleEmailNews()
   {
     const emailNewsSetting = (this.state.istate.currentUser.emailNews) === 'on';
     const newEmailNewsSetting = emailNewsSetting ? 'off' : 'on';
     this.changeUserField('emailNews', newEmailNewsSetting);
   }
 
-  renderEmailNewsContent()
+  public renderEmailNewsContent()
   {
     let emailNewsOn: boolean;
 
@@ -338,10 +339,10 @@ class Notifications extends Classs<Props>
     }
 
     return (
-      <div className="notification-expansion">
+      <div className='notification-expansion'>
         <div>You can choose which of these updates you'd like to receive:</div>
         <br />
-        <span className="expanded-section-indent">
+        <span className='expanded-section-indent'>
           <CheckBox
             checked={emailNewsOn}
             onChange={this.toggleEmailNews}
@@ -358,14 +359,14 @@ class Notifications extends Classs<Props>
     );
   }
 
-  renderEmail()
+  public renderEmail()
   {
     if (this.state.istate.currentUser && this.state.istate.currentUser.email)
     {
       return (
         <div>
           Your email is currently set to
-        <span className="notification-email-blue">
+        <span className='notification-email-blue'>
             {this.state.istate.currentUser.email}
           </span>
           .
@@ -375,7 +376,7 @@ class Notifications extends Classs<Props>
     return <div>Your email adddress has not been set yet.</div>;
   }
 
-  renderDesktopDescription()
+  public renderDesktopDescription()
   {
     let desktopNotification: any;
 
@@ -394,7 +395,7 @@ class Notifications extends Classs<Props>
 
   }
 
-  renderEmailDescription()
+  public renderEmailDescription()
   {
     let emailTiming: string;
 
@@ -412,7 +413,7 @@ class Notifications extends Classs<Props>
     );
   }
 
-  renderEmailNewsDescription()
+  public renderEmailNewsDescription()
   {
     let emailNewsOn: boolean;
 
@@ -431,23 +432,23 @@ class Notifications extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div>
-        <div className="notifications-page-title">Update your notifications</div>
+        <div className='notifications-page-title'>Update your notifications</div>
         <AccountEntry
-          title="Desktop Notifications"
+          title='Desktop Notifications'
           description={this.renderDesktopDescription()}
           content={this.renderDesktopNotificationsContent()}
         />
         <AccountEntry
-          title="Email Notifications"
+          title='Email Notifications'
           description={this.renderEmailDescription()}
           content={this.renderEmailNotificationsContent()}
         />
         <AccountEntry
-          title="Email News & Updates"
+          title='Email News & Updates'
           description={this.renderEmailNewsDescription()}
           content={this.renderEmailNewsContent()}
           lastEntry={true}

@@ -42,40 +42,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
-import { BaseClass, New } from '../Classes';
 import BackendInstance from '../../../shared/backends/types/BackendInstance';
-import { Query, _Query, queryForSave } from '../../../shared/items/types/Query';
-import { ItemStatus, ItemType, ItemC, Item } from '../../../shared/items/types/Item';
-import { ResultsConfig, _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
+import { _Query, Query, queryForSave } from '../../../shared/items/types/Query';
+import { _ResultsConfig, ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { BaseClass, New } from '../Classes';
 
 // TODO MOD refactor
 
-export module LibraryTypes
+export namespace LibraryTypes
 {
   class VariantC extends ItemC
   {
-    type = ItemType.Variant;
+    public type = ItemType.Variant;
 
-    algorithmId: number = -1;
-    groupId: number = -1;
+    public algorithmId: number = -1;
+    public groupId: number = -1;
 
-    excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
+    public excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
     // TODO try super or prototype
 
-    lastEdited = '';
-    lastUserId = -1;
-    version = false;
-    language = 'elastic';
+    public lastEdited = '';
+    public lastUserId = -1;
+    public version = false;
+    public language = 'elastic';
 
     // don't use this!
     // TODO remove when variants can be saved without queries
-    query: Query = null;
+    public query: Query = null;
   }
   export interface Variant extends VariantC, IRecord<Variant> { }
   const Variant_Record = Immutable.Record(new VariantC());
@@ -131,20 +132,19 @@ export module LibraryTypes
     return v.set('query', queryForSave(v.query));
   }
 
-
   class AlgorithmC extends ItemC
   {
-    type = ItemType.Algorithm;
+    public type = ItemType.Algorithm;
 
-    groupId = -1;
+    public groupId = -1;
 
-    lastEdited = '';
-    lastUsername = '';
+    public lastEdited = '';
+    public lastUsername = '';
 
-    variantsOrder = List([]);
-    language = 'elastic';
+    public variantsOrder = List([]);
+    public language = 'elastic';
 
-    excludeFields = ['dbFields', 'excludeFields', 'groupId'];
+    public excludeFields = ['dbFields', 'excludeFields', 'groupId'];
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
@@ -177,13 +177,13 @@ export module LibraryTypes
 
   class GroupC extends ItemC
   {
-    type = ItemType.Group;
+    public type = ItemType.Group;
 
-    lastEdited = '';
-    lastUserId = '';
-    userIds = List([]);
-    algorithmsOrder = List([]);
-    defaultLanguage = 'elastic';
+    public lastEdited = '';
+    public lastUserId = '';
+    public userIds = List([]);
+    public algorithmsOrder = List([]);
+    public defaultLanguage = 'elastic';
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> { }
@@ -238,7 +238,6 @@ export module LibraryTypes
         return '#000';
     }
   }
-
 
   export const typeToConstructor: {
     [key: string]: (...args) => Item,

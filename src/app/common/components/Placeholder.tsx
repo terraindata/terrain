@@ -42,16 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
 import InfoArea from './InfoArea';
 
 class Placeholder extends PureClasss<any>
 {
-  render()
+  public render()
   {
     return (
-      <InfoArea large="In progress." />
+      <InfoArea large='In progress.' />
     );
   }
 }

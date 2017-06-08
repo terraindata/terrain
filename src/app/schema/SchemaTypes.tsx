@@ -51,7 +51,7 @@ import Util from '../util/Util';
 
 type stringList = string[] | List<string>;
 
-export module SchemaTypes
+export namespace SchemaTypes
 {
 
   export class SchemaBaseClass extends BaseClass
@@ -120,12 +120,12 @@ export module SchemaTypes
 
   class TableC extends SchemaBaseClass
   {
-    type = 'table';
-    name = '';
-    databaseId: string = '';
+    public type = 'table';
+    public name = '';
+    public databaseId: string = '';
 
-    columnIds: List<string> = List([]);
-    indexIds: List<string> = List([]);
+    public columnIds: List<string> = List([]);
+    public indexIds: List<string> = List([]);
   }
   export type Table = TableC & IRecord<TableC>;
   export const _Table = (config: {

@@ -42,7 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./TransformChart.less');
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
+import './TransformChart.less';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
@@ -167,12 +171,12 @@ const TransformChart = {
     const drawCrossHairs = this._drawCrossHairs;
     if (state.canEdit)
     {
-      //Keep track of what element is in focus (for key events)
+      // Keep track of what element is in focus (for key events)
       let currentObject = this;
       d3.select(el).select('.transform-card').on('mouseover', function() { currentObject = this; });
-      d3.select(el).select('.transform-card').on('mouseout', function() { currentObject = null; });
+      d3.select(el).select('.transform-card').on('mouseout', () => { currentObject = null; });
 
-      //Draw Point + menu on double click
+      // Draw Point + menu on double click
       d3.select(el).select('.inner-svg').on('dblclick', function()
       {
         const isvg = d3.select(el).select('.inner-svg');
@@ -183,7 +187,7 @@ const TransformChart = {
         return false;
       });
 
-      //Draw crosshairs when shift/ctrl is pressed
+      // Draw crosshairs when shift/ctrl is pressed
       d3.select(el).select('.inner-svg').on('mousemove', function()
       {
         if (d3.event['ctrlKey'] || d3.event['shiftKey'])
@@ -193,28 +197,28 @@ const TransformChart = {
         return false;
       });
 
-      d3.select('body').on('keyup', function()
+      d3.select('body').on('keyup', () =>
       {
-        //CTRL: 17, SHIFT: 16, ALT: 18, WIN/CMD: 91
+        // CTRL: 17, SHIFT: 16, ALT: 18, WIN/CMD: 91
         if (currentObject && (d3.event['keyCode'] === 17 || d3.event['keyCode'] === 16))
         {
           d3.select(el).selectAll('.crosshairs').remove();
         }
       });
 
-      //Stop normal right click functioning from happening
-      d3.select(el).select('.inner-svg').on('contextmenu', function()
+      // Stop normal right click functioning from happening
+      d3.select(el).select('.inner-svg').on('contextmenu', () =>
       {
         d3.event['preventDefault']();
       });
 
-      //Delete selected points on del/backspace key press
+      // Delete selected points on del/backspace key press
       const deletePoints = this._deletePoints;
-      d3.select('body').on('keydown', function()
+      d3.select('body').on('keydown', () =>
       {
         if (
           currentObject &&
-          (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
+          (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
           && !$('input').is(':focus')
         )
         {
@@ -537,7 +541,10 @@ const TransformChart = {
         const offset = d['offset'];
         const radius = SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING;
         let straightHeight = offset - radius * 2 - 2;
-        if (straightHeight < 0) straightHeight = 0;
+        if (straightHeight < 0)
+        {
+          straightHeight = 0;
+        }
         const pinR = 5;
 
         let str = 'Mx y l -p -15 ' +
@@ -630,7 +637,7 @@ const TransformChart = {
     const t = this;
     const del = d3.select(el);
 
-    const move = function(event)
+    const move = (event) =>
     {
       onMove(x, scales.realPointY.invert(d3.mouse(t)[1]));
     };
@@ -716,11 +723,11 @@ const TransformChart = {
   _deletePoints(el, onDelete)
   {
     d3.select('.point-edit-menu').remove();
-    const selectedIds = d3.select(el).selectAll('.point-selected')[0].map(function(point: any)    
+    const selectedIds = d3.select(el).selectAll('.point-selected')[0].map((point: any) =>
     {
       return point.getAttribute('_id');
     });
-    selectedIds.map(function(id)
+    selectedIds.map((id) =>
     {
       onDelete(id);
     });
@@ -754,7 +761,7 @@ const TransformChart = {
       newY = Util.valueMinMax(newY, 0, 1);
       const newX = scales.realX.invert(d3.mouse(t)[0]);
       const cx = scales.realX.invert(parseFloat(point.attr('cx')));
-      const pointValues = d3.select(el).selectAll('.point')[0].map(function(point: any)
+      const pointValues = d3.select(el).selectAll('.point')[0].map((point: any) =>
       {
         return scales.realX.invert(parseFloat(point.getAttribute('cx')));
       });
@@ -840,8 +847,8 @@ const TransformChart = {
       .attr('x2', containerWidth)
       .attr('y2', pos_y);
 
-    //When mouse leaves transform area, remove, the crosshairs
-    d3.select(el).select('.inner-svg').on('mouseleave', function()
+    // When mouse leaves transform area, remove, the crosshairs
+    d3.select(el).select('.inner-svg').on('mouseleave', () =>
     {
       crosshairs.on('mousemove', null);
       crosshairs.attr('visibility', 'hidden');
@@ -901,7 +908,7 @@ const TransformChart = {
     const inputX = d3.select('#xVal');
     const inputY = d3.select('#yVal');
 
-    const pointValues = d3.select(el).selectAll('.point')[0].map(function(p: any)
+    const pointValues = d3.select(el).selectAll('.point')[0].map((p: any) =>
     {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     });
@@ -945,8 +952,8 @@ const TransformChart = {
     const value = scales.realX.invert(cx);
     const score = scales.realPointY.invert(cy);
 
-    //Get the max and min X values for the point
-    const pointValues = d3.select(el).selectAll('.point')[0].map(function(p: any)
+    // Get the max and min X values for the point
+    const pointValues = d3.select(el).selectAll('.point')[0].map((p: any) =>
     {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     }).sort((a, b) => a - b);
@@ -968,14 +975,14 @@ const TransformChart = {
       .attr('width', w)
       .attr('height', h)
       .attr('class', 'point-edit-menu')
-      .on('keydown', function()
+      .on('keydown', () =>
       {
-        if (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
+        if (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
         {
           d3.event['stopPropagation']();
         }
       })
-      .on('dblclick', function()
+      .on('dblclick', () =>
       {
         d3.event['preventDefault']();
         d3.event['stopPropagation']();
@@ -1005,7 +1012,7 @@ const TransformChart = {
       {
         this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
       })
-      .on('keydown', function()
+      .on('keydown', () =>
       {
         const xNode: any = d3.select(el).select('#xVal').node();
         const val = String(xNode.value).match(/\d/g);
@@ -1028,7 +1035,7 @@ const TransformChart = {
       .attr('value', f(score))
       .attr('raw_value', score)
       .attr('id', 'yVal')
-      .on('change', function(value)
+      .on('change', (value) =>
       {
         this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
       })
@@ -1036,7 +1043,7 @@ const TransformChart = {
       {
         this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
       })
-      .on('keydown', function()
+      .on('keydown', () =>
       {
         const yNode: any = d3.select(el).select('#yVal').node();
         const val = String(yNode.value).match(/\d/g);
@@ -1150,12 +1157,12 @@ const TransformChart = {
     return false;
   }.bind(this),
 
-  _mouseoutFactory: (el) => function(point)
+  _mouseoutFactory: (el) => (point) =>
   {
     d3.select(el).select('.transform-tooltip').remove();
   },
 
-  _doubleclickFactory: (el) => function(point)
+  _doubleclickFactory: (el) => (point) =>
   {
     d3.event['stopPropagation']();
   },

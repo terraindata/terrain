@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { List, Map } = Immutable;
@@ -54,11 +55,11 @@ import BackendInstance from './../../../../shared/backends/types/BackendInstance
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import { _Query, Query } from '../../../../shared/items/types/Query';
 import { _ResultsState, ResultsManager, ResultsState } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import InfoArea from '../../common/components/InfoArea';
-import { Query, _Query } from '../../../../shared/items/types/Query';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
 
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
@@ -72,7 +73,7 @@ export interface Props
 @Radium
 class SchemaResults extends PureClasss<Props>
 {
-  state: {
+  public state: {
     selectedId?: ID,
     selectedItem?: SchemaBaseClass,
 
@@ -131,7 +132,7 @@ class SchemaResults extends PureClasss<Props>
                 table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
                 break;
               case 'index':
-                //TODO
+                // TODO
                 break;
             }
 
@@ -159,7 +160,7 @@ class SchemaResults extends PureClasss<Props>
     });
   }
 
-  getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
+  public getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
   {
     if (resultsDb.type !== 'mysql')
     {
@@ -246,19 +247,19 @@ class SchemaResults extends PureClasss<Props>
     });
   }
 
-  showsResults(selectedItem: SchemaBaseClass): boolean
+  public showsResults(selectedItem: SchemaBaseClass): boolean
   {
     return selectedItem && selectedItem.type !== 'index';
   }
 
-  handleResultsStateChange(resultsState: ResultsState)
+  public handleResultsStateChange(resultsState: ResultsState)
   {
     this.setState({
       resultsState,
     });
   }
 
-  render()
+  public render()
   {
     return (
       <div
@@ -273,7 +274,7 @@ class SchemaResults extends PureClasss<Props>
             (
               this.state.resultsErrorMessage ?
                 <InfoArea
-                  large="Error retrieving results"
+                  large='Error retrieving results'
                   small={this.state.resultsErrorMessage}
                 />
                 :
@@ -285,7 +286,7 @@ class SchemaResults extends PureClasss<Props>
             )
             :
             <InfoArea
-              large="Select an item to see its contents here."
+              large='Select an item to see its contents here.'
             />
         }
 

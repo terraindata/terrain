@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import Util from '../../util/Util';
 
@@ -62,6 +63,28 @@ interface Store
 
 class Classs<T> extends React.Component<T, any>
 {
+  public _unmounted = false;
+
+  public subscriptions: Array<() => void> = [];
+
+  public _keyPaths: { [key: string]: Array<string | number> } = {};
+  public _ikeyPaths: {
+    [key: string]:
+    {
+      seed: Immutable.List<string | number>,
+      keyPath: Immutable.List<string | number>,
+    },
+  } = {};
+
+  public _fns: {
+    [name: string]: Array<{
+      args: any[],
+      fn: () => void,
+    }>,
+  } = {};
+
+  public _togMap: { [stateKey: string]: () => void } = {};
+
   constructor(props: T)
   {
     super(props);
@@ -89,15 +112,13 @@ class Classs<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
-  _unmounted = false;
-
-  _unsubscribe()
+  public _unsubscribe()
   {
     this.subscriptions.map((cancelSubscription) => cancelSubscription());
   }
 
   // subscribes to a Redux store
-  _subscribe(
+  public _subscribe(
     store: Store,
     config: Config,
   )
@@ -127,9 +148,8 @@ class Classs<T> extends React.Component<T, any>
       };
     }
   }
-  subscriptions: Array<() => void> = [];
 
-  _update(store: Store, config: Config)
+  public _update(store: Store, config: Config)
   {
     if (this._unmounted)
     {
@@ -186,8 +206,7 @@ class Classs<T> extends React.Component<T, any>
   //  this function accepts arguments from which to
   //  construct an array keyPath, and memoizes that array
   //  so as to allow for pure rendering
-  _keyPaths: { [key: string]: Array<string | number> } = {};
-  _keyPath(...keys: Array<string | number>)
+  public _keyPath(...keys: Array<string | number>)
   {
     const key = keys.join('.');
     if (this._keyPaths[key] === undefined)
@@ -197,14 +216,7 @@ class Classs<T> extends React.Component<T, any>
     return this._keyPaths[key];
   }
 
-  _ikeyPaths: {
-    [key: string]:
-    {
-      seed: Immutable.List<string | number>,
-      keyPath: Immutable.List<string | number>,
-    },
-  } = {};
-  _ikeyPath(seed: Immutable.List<string | number>, ...keys: Array<string | number | Array<string | number>>)
+  public _ikeyPath(seed: Immutable.List<string | number>, ...keys: Array<string | number | Array<string | number>>)
   {
     if (Array.isArray(keys[0]))
     {
@@ -223,13 +235,7 @@ class Classs<T> extends React.Component<T, any>
     return this._ikeyPaths[str].keyPath;
   }
 
-  _fns: {
-    [name: string]: Array<{
-      args: any[],
-      fn: () => void,
-    }>,
-  } = {};
-  _fn(instanceFn: (...args: any[]) => any, ...args: any[]): (...args: any[]) => any
+  public _fn(instanceFn: (...args: any[]) => any, ...args: any[]): (...args: any[]) => any
   {
     const fnName = instanceFn['name'];
     const fns = this._fns[fnName];
@@ -256,7 +262,7 @@ class Classs<T> extends React.Component<T, any>
     return fn;
   }
 
-  __getFn(instanceFn: (...args: any[]) => any, args: any[]): (...args: any[]) => any
+  public __getFn(instanceFn: (...args: any[]) => any, args: any[]): (...args: any[]) => any
   {
     switch (args.length)
     {
@@ -275,8 +281,7 @@ class Classs<T> extends React.Component<T, any>
     }
   }
 
-  _togMap: { [stateKey: string]: () => void } = {};
-  _toggle(stateKey: string): (() => void)
+  public _toggle(stateKey: string): (() => void)
   {
     return this._togMap[stateKey] || (
       this._togMap[stateKey] = () =>

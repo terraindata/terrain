@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import { LibraryState } from './LibraryStore';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const Immutable = require('immutable');
 
@@ -103,7 +104,7 @@ LibraryReducers[ActionTypes.algorithms.create] =
   {
     return addAlgorithm(
       state,
-      action.payload.algorithm
+      action.payload.algorithm,
     );
   };
 
@@ -147,7 +148,7 @@ LibraryReducers[ActionTypes.variants.create] =
   }>) =>
     addVariant(
       state,
-      action.payload.variant
+      action.payload.variant,
     );
 
 LibraryReducers[ActionTypes.variants.change] =
@@ -160,7 +161,7 @@ LibraryReducers[ActionTypes.variants.change] =
 LibraryReducers[ActionTypes.variants.status] =
   (state, action) =>
   {
-    let { variant, status, confirmed } = action.payload;
+    const { variant, status, confirmed } = action.payload;
 
     if (variant === null)
     {
@@ -193,7 +194,7 @@ LibraryReducers[ActionTypes.variants.status] =
                 return v.set('status', 'LIVE');
               }
               return v;
-            }
+            },
           ),
       );
     }
@@ -214,7 +215,7 @@ LibraryReducers[ActionTypes.variants.move] =
         .set('groupId', action.payload.groupId)
         .set('algorithmId', action.payload.algorithmId)
         .set('parent', action.payload.algorithmId),
-      action.payload.index
+      action.payload.index,
     );
 
 LibraryReducers[ActionTypes.loadState] =

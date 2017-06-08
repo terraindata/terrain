@@ -42,9 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./panel.less');
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 import * as React from 'react';
-const _ = require('underscore');
+import * as _ from 'underscore';
+import './panel.less';
 const shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util';
@@ -95,9 +99,13 @@ const Panel = {
     if (arguments.length)
     {
       if (arguments[0] === 'x')
+      {
         return this.props.drag_x || this.props.drag_xy;
+      }
       if (arguments[0] === 'y')
+      {
         return this.props.drag_y || this.props.drag_xy;
+      }
     }
     return this.props.drag_x || this.props.drag_y || this.props.drag_xy;
   },
@@ -212,7 +220,7 @@ const Panel = {
   {
     if (this.props.onMouseDown)
     {
-      if (!this.props.mouseDownRef || event.target == this.refs[this.props.mouseDownRef])
+      if (!this.props.mouseDownRef || event.target === this.refs[this.props.mouseDownRef])
       {
         this.props.onMouseDown(this.props.index, event);
       }
@@ -220,7 +228,7 @@ const Panel = {
 
     if (this.props.handleRef)
     {
-      if (event.target != this.refs[this.props.handleRef])
+      if (event.target !== this.refs[this.props.handleRef])
       {
         // a handleRef is set, so only respond to mouse events on our handle
         return;
@@ -305,7 +313,7 @@ const Panel = {
         className={panelClass}
         style={style}
         onMouseDown={this.down}
-        ref="panel"
+        ref='panel'
         onTouchStart={this.down}>
         {content}
       </div>

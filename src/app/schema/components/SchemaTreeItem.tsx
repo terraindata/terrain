@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
@@ -67,11 +68,11 @@ export interface Props
 
 class State
 {
-  open: boolean = false;
-  item: SchemaTypes.SchemaBaseClass = null;
-  childCount: number = -1;
-  isSelected = false;
-  isHighlighted = false;
+  public open: boolean = false;
+  public item: SchemaTypes.SchemaBaseClass = null;
+  public childCount: number = -1;
+  public isSelected = false;
+  public isHighlighted = false;
 }
 
 const typeToRendering: {
@@ -113,7 +114,10 @@ const typeToRendering: {
 @Radium
 class SchemaTreeItem extends PureClasss<Props>
 {
-  state: State = new State();
+  public state: State = new State();
+
+  public lastHeaderClickTime: number = 0;
+  public lastArrowClickTime: number = 0;
 
   constructor(props: Props)
   {
@@ -144,7 +148,7 @@ class SchemaTreeItem extends PureClasss<Props>
         }
 
         const isHighlighted = this.props.id === state.highlightedId
-          && !!this.props.inSearchResults == state.highlightedInSearchResults;
+          && !!this.props.inSearchResults === state.highlightedInSearchResults;
         const isSelected = this.props.id === state.selectedId;
 
         if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
@@ -158,7 +162,7 @@ class SchemaTreeItem extends PureClasss<Props>
     });
   }
 
-  renderItemInfo()
+  public renderItemInfo()
   {
     const { item } = this.state;
 
@@ -180,7 +184,7 @@ class SchemaTreeItem extends PureClasss<Props>
     return <div>No item type information</div>;
   }
 
-  renderItemChildren()
+  public renderItemChildren()
   {
     const { item } = this.state;
 
@@ -193,7 +197,7 @@ class SchemaTreeItem extends PureClasss<Props>
     {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }
@@ -221,9 +225,7 @@ class SchemaTreeItem extends PureClasss<Props>
     );
   }
 
-  lastHeaderClickTime: number = 0;
-
-  handleHeaderClick()
+  public handleHeaderClick()
   {
     const time = (new Date()).getTime();
     if (time - this.lastHeaderClickTime > 1000)
@@ -259,8 +261,7 @@ class SchemaTreeItem extends PureClasss<Props>
     // }
   }
 
-  lastArrowClickTime: number = 0;
-  handleArrowClick(event)
+  public handleArrowClick(event)
   {
     this.setState({
       open: !this.state.open,
@@ -270,7 +271,7 @@ class SchemaTreeItem extends PureClasss<Props>
     // used to stop triggering of double click handler
   }
 
-  handleHeaderDoubleClick(event)
+  public handleHeaderDoubleClick(event)
   {
     if ((new Date()).getTime() - this.lastArrowClickTime > 100)
     {
@@ -282,11 +283,11 @@ class SchemaTreeItem extends PureClasss<Props>
     }
   }
 
-  renderName()
+  public renderName()
   {
     const { item } = this.state;
 
-    let nameText: string | El = <span className="loading-text" />;
+    let nameText: string | El = <span className='loading-text' />;
 
     if (item)
     {
@@ -347,7 +348,7 @@ class SchemaTreeItem extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     const { item, isSelected, isHighlighted } = this.state;
 
@@ -359,12 +360,12 @@ class SchemaTreeItem extends PureClasss<Props>
       >
         <FadeInOut
           open={showing}
-          key="one"
+          key='one'
         >
           {
             showing &&
             <div
-              data-rel="schema-item"
+              data-rel='schema-item'
               data-id={this.props.id}
               data-search={this.props.inSearchResults}
             >
@@ -402,7 +403,7 @@ class SchemaTreeItem extends PureClasss<Props>
 
         <FadeInOut
           open={this.state.open}
-          key="two"
+          key='two'
         >
           {
             this.renderItemChildren()

@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./TQLResultsBar.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { ResultsState } from '../../builder/components/results/ResultsManager';
 import PureClasss from './../../common/components/PureClasss';
+import './TQLResultsBar.less';
 export interface Props
 {
   resultsState: ResultsState;
@@ -58,9 +59,9 @@ export interface Props
 
 class TQLResultsBar extends PureClasss<Props>
 {
-  resultsFodderRange = _.range(0, 25);
+  public resultsFodderRange = _.range(0, 25);
 
-  renderResults()
+  public renderResults()
   {
     const { resultsState } = this.props;
 
@@ -73,17 +74,17 @@ class TQLResultsBar extends PureClasss<Props>
     {
       return (
         <div>
-          <span className="error-detail">
+          <span className='error-detail'>
             {
               this.props.open ? '\u25BC ' : '\u25B6 '
             }
           </span>
-          <span className="error-title">
+          <span className='error-title'>
             {
               resultsState.mainErrorMessage
             }
           </span>
-          <span className="error-message">
+          <span className='error-message'>
             {
               resultsState.subErrorMessage
             }
@@ -134,7 +135,7 @@ class TQLResultsBar extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div
@@ -144,7 +145,7 @@ class TQLResultsBar extends PureClasss<Props>
         })}
         onClick={this.props.onToggle}
       >
-        <div className="tql-results-bar-inner">
+        <div className='tql-results-bar-inner'>
           {
             this.renderResults()
           }

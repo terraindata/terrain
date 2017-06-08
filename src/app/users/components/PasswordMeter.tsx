@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./PasswordMeter.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './PasswordMeter.less';
 
 const meterSectionValues = [0, 1, 2, 3, 4, 5];
 
@@ -59,7 +60,7 @@ export interface Props
 
 class PasswordMeter extends Classs<Props>
 {
-  renderMeterSection(value)
+  public renderMeterSection(value)
   {
     return (
       <div
@@ -79,10 +80,10 @@ class PasswordMeter extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
-      <div className="password-meter">
+      <div className='password-meter'>
         {meterSectionValues.map(this.renderMeterSection)}
       </div>
     );

@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CheckBox.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './CheckBox.less';
 const CheckMark = require('./../../../images/icon_checkMark.svg');
 
 export interface Props
@@ -59,7 +60,7 @@ export interface Props
 
 class CheckBox extends Classs<Props>
 {
-  render()
+  public render()
   {
     return (
       <div
@@ -69,7 +70,7 @@ class CheckBox extends Classs<Props>
         })}
         onClick={this.props.onChange}
       >
-        {this.props.checked ? <CheckMark className="check-mark-icon" /> : 'O'}
+        {this.props.checked ? <CheckMark className='check-mark-icon' /> : 'O'}
       </div>
     );
   }

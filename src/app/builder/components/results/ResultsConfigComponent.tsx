@@ -42,13 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ResultsConfigStyle.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as _ from 'underscore';
+import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
@@ -56,7 +58,6 @@ import Result from '../results/Result';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import { MAX_RESULTS, Results } from './ResultsManager';
-import { ResultsConfig, _ResultsConfig, Format, _Format } from '../../../../../shared/results/types/ResultsConfig';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
@@ -74,7 +75,7 @@ export interface Props
 
 export class ResultsConfigComponent extends PureClasss<Props>
 {
-  state: {
+  public state: {
     lastHover: { index: number, field: string },
     config: ResultsConfig;
   } = {
@@ -88,7 +89,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     this.state.config = props.config;
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.config !== this.props.config)
     {
@@ -98,7 +99,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     }
   }
 
-  handleDrop(type: string, field: string, index?: number)
+  public handleDrop(type: string, field: string, index?: number)
   {
     if (this.state.lastHover.field === field && index === undefined && type === 'field')
     {
@@ -153,22 +154,25 @@ export class ResultsConfigComponent extends PureClasss<Props>
     }
   }
 
-  changeConfig(config: ResultsConfig)
+  public changeConfig(config: ResultsConfig)
   {
     this.setState({
       config,
     });
   }
 
-  handleEnabledToggle()
+  public handleEnabledToggle()
   {
     this.changeConfig(this.state.config.set('enabled', !this.state.config.enabled));
   }
 
-  fieldType(field)
+  public fieldType(field)
   {
     const { config } = this.state;
-    if (!config) return null;
+    if (!config)
+    {
+      return null;
+    }
     if (config.name === field)
     {
       return 'name';
@@ -184,7 +188,7 @@ export class ResultsConfigComponent extends PureClasss<Props>
     return null;
   }
 
-  handleFieldHover(index: number, field: string)
+  public handleFieldHover(index: number, field: string)
   {
     if (this.state.lastHover.index !== index || this.state.lastHover.field !== field)
     {
@@ -195,77 +199,77 @@ export class ResultsConfigComponent extends PureClasss<Props>
     }
   }
 
-  handleRemove(field: string)
+  public handleRemove(field: string)
   {
     this.handleDrop(null, field);
   }
 
-  handleFormatChange(field: string, format: Format)
+  public handleFormatChange(field: string, format: Format)
   {
     this.changeConfig(
       this.state.config.setIn(['formats', field], format),
     );
   }
 
-  handleClose()
+  public handleClose()
   {
     this.props.onConfigChange(this.state.config);
     this.props.onClose();
   }
 
-  handlePrimaryKeysChange(primaryKeys: List<string>)
+  public handlePrimaryKeysChange(primaryKeys: List<string>)
   {
     this.changeConfig(
       this.state.config.set('primaryKeys', primaryKeys),
     );
   }
 
-  render()
+  public render()
   {
     const { config } = this.state;
     const { enabled, formats } = config;
 
     return (
-      <div className="results-config-wrapper">
+      <div className='results-config-wrapper'>
         <div className={classNames({
           'results-config': true,
           'results-config-disabled': !enabled,
         })}>
-          <div className="results-config-bar">
-            <div className="results-config-title">
+          <div className='results-config-bar'>
+            <div className='results-config-title'>
               Configure Results View
             </div>
-            <div className="results-config-switch">
+            <div className='results-config-switch'>
               <Switch
-                first="Enabled"
-                second="Disabled"
+                first='Enabled'
+                second='Disabled'
                 onChange={this.handleEnabledToggle}
                 selected={enabled ? 1 : 2}
               />
             </div>
-            <div className="results-config-button" onClick={this.handleClose}>
+            <div className='results-config-button' onClick={this.handleClose}>
               Done
             </div>
           </div>
-          <div className="results-config-config-wrapper">
-            <div className="results-config-instructions">
+          <div className='results-config-config-wrapper'>
+            <div className='results-config-instructions'>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
-            <div className="results-config-config">
+            <div className='results-config-config'>
               <CRTarget
-                className="results-config-name"
-                type="name"
+                className='results-config-name'
+                type='name'
                 onDrop={this.handleDrop}
               >
-                <div className="results-config-area-title">
+                <div className='results-config-area-title'>
                   Name
                 </div>
                 {
                   config && config.name ?
                     <ResultsConfigResult
                       field={config.name}
-                      is="score"
+                      is='score'
                       onRemove={this.handleRemove}
                       format={formats.get(config.name)}
                       onFormatChange={this.handleFormatChange}
@@ -273,24 +277,24 @@ export class ResultsConfigComponent extends PureClasss<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className="results-config-placeholder">
+                    <div className='results-config-placeholder'>
                       Drag name field <em>(optional)</em>
                     </div>
                 }
               </CRTarget>
               <CRTarget
-                className="results-config-score"
-                type="score"
+                className='results-config-score'
+                type='score'
                 onDrop={this.handleDrop}
               >
-                <div className="results-config-area-title">
+                <div className='results-config-area-title'>
                   Score
                 </div>
                 {
                   config && config.score ?
                     <ResultsConfigResult
                       field={config.score}
-                      is="score"
+                      is='score'
                       onRemove={this.handleRemove}
                       format={formats.get(config.score)}
                       onFormatChange={this.handleFormatChange}
@@ -298,25 +302,25 @@ export class ResultsConfigComponent extends PureClasss<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className="results-config-placeholder">
+                    <div className='results-config-placeholder'>
                       Drag score field <em>(optional)</em>
                     </div>
                 }
               </CRTarget>
               <CRTarget
-                className="results-config-fields"
-                type="field"
+                className='results-config-fields'
+                type='field'
                 onDrop={this.handleDrop}
               >
-                <div className="results-config-area-title">
+                <div className='results-config-area-title'>
                   Fields
                 </div>
                 {
                   config && config.fields.map((field, index) =>
-                    <div className="results-config-field-wrapper" key={field}>
+                    <div className='results-config-field-wrapper' key={field}>
                       <ResultsConfigResult
                         field={field}
-                        is="field"
+                        is='field'
                         index={index}
                         onHover={this.handleFieldHover}
                         draggingField={this.state.lastHover.field}
@@ -329,14 +333,14 @@ export class ResultsConfigComponent extends PureClasss<Props>
                     </div>,
                   )
                 }
-                <div className="results-config-placeholder">
+                <div className='results-config-placeholder'>
                   Drag more fields here
                 </div>
               </CRTarget>
             </div>
           </div>
           <CRTarget
-            className="results-config-available-fields"
+            className='results-config-available-fields'
             type={null}
             onDrop={this.handleDrop}
           >
@@ -356,8 +360,8 @@ export class ResultsConfigComponent extends PureClasss<Props>
               )
             }
           </CRTarget>
-          <div className="results-config-disabled-veil">
-            <div className="results-config-disabled-veil-inner">
+          <div className='results-config-disabled-veil'>
+            <div className='results-config-disabled-veil-inner'>
               <b>Custom results view is off.</b>
               Results will display the information returned from the query.
             </div>
@@ -387,50 +391,50 @@ interface ResultsConfigResultProps
 }
 class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
 {
-  state: {
+  public state: {
     showFormat: boolean;
   } = {
     showFormat: false,
   };
 
-  handleRemove()
+  public handleRemove()
   {
     this.props.onRemove(this.props.field);
   }
 
-  toggleShowFormat()
+  public toggleShowFormat()
   {
     this.setState({
       showFormat: !this.state.showFormat,
     });
   }
 
-  changeToText()
+  public changeToText()
   {
     this.changeFormat('type', 'text');
   }
 
-  changeToImage()
+  public changeToImage()
   {
     this.changeFormat('type', 'image');
   }
 
-  toggleRaw(event)
+  public toggleRaw(event)
   {
     this.changeFormat('showRaw', event.target.checked);
   }
 
-  toggleField(event)
+  public toggleField(event)
   {
     this.changeFormat('showField', event.target.checked);
   }
 
-  handleTemplateChange(event)
+  public handleTemplateChange(event)
   {
     this.changeFormat('template', event.target.value);
   }
 
-  changeFormat(key: string, val: any)
+  public changeFormat(key: string, val: any)
   {
     const format = this.props.format || _Format({
       type: 'text',
@@ -444,7 +448,7 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
     );
   }
 
-  handlePrimaryKeyChange()
+  public handlePrimaryKeyChange()
   {
     let { primaryKeys } = this.props;
     if (primaryKeys.contains(this.props.field))
@@ -458,7 +462,7 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
     this.props.onPrimaryKeysChange(primaryKeys);
   }
 
-  render()
+  public render()
   {
     const { format } = this.props;
     const image = format && format.type === 'image';
@@ -473,11 +477,11 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
         'results-config-field-field': this.props.is === 'field',
         'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
       })}>
-        <div className="results-config-field-body">
-          <span className="results-config-handle">
+        <div className='results-config-field-body'>
+          <span className='results-config-handle'>
             <HandleIcon />
           </span>
-          <span className="results-config-text">
+          <span className='results-config-text'>
             {
               this.props.field
             }
@@ -485,13 +489,13 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
           {
             this.props.is !== null ?
               <CloseIcon
-                className="close"
+                className='close'
                 onClick={this.handleRemove}
               />
               : null
           }
           <GearIcon
-            className="results-config-field-gear"
+            className='results-config-field-gear'
             onClick={this.toggleShowFormat}
           />
         </div>
@@ -502,40 +506,40 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
           'results-config-field-format-text': !image,
           'results-config-field-format-image': image,
         })}>
-          <div className="results-config-format-header">
+          <div className='results-config-format-header'>
             <input
-              type="checkbox"
+              type='checkbox'
               checked={this.props.primaryKeys.contains(this.props.field)}
               onChange={this.handlePrimaryKeyChange}
               id={'primaryKey-' + this.props.field}
-              className="rcf-primary-key-input"
+              className='rcf-primary-key-input'
             />
             <label
               htmlFor={'primaryKey-' + this.props.field}
-              className="rcf-primary-key-label"
+              className='rcf-primary-key-label'
             >
               {this.props.field} is a primary key
             </label>
           </div>
-          <div className="results-config-format-header">
+          <div className='results-config-format-header'>
             Display the value of {this.props.field} as:
           </div>
-          <div className="results-config-format-btns">
-            <div className="results-config-text-btn" onClick={this.changeToText}>
+          <div className='results-config-format-btns'>
+            <div className='results-config-text-btn' onClick={this.changeToText}>
               <TextIcon /> Text
             </div>
-            <div className="results-config-image-btn" onClick={this.changeToImage}>
+            <div className='results-config-image-btn' onClick={this.changeToImage}>
               <ImageIcon /> Image
             </div>
           </div>
 
-          <div className="results-config-image">
+          <div className='results-config-image'>
             <div>
               <b>Image URL Template</b>
             </div>
             <div>
               <input
-                type="text"
+                type='text'
                 value={format ? format.template : ''}
                 onChange={this.handleTemplateChange}
                 placeholder={'http://web.com/img/[value].png'}
@@ -544,9 +548,9 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
             <div>
               <em>"[value]" inserts the value of {this.props.field}</em>
             </div>
-            <div className="results-config-field-value">
+            <div className='results-config-field-value'>
               <input
-                type="checkbox"
+                type='checkbox'
                 id={'check-f-' + this.props.field}
                 checked={format && format.showField}
                 onChange={this.toggleField}
@@ -556,9 +560,9 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
                 Show field name label
               </label>
             </div>
-            <div className="results-config-raw-value">
+            <div className='results-config-raw-value'>
               <input
-                type="checkbox"
+                type='checkbox'
                 id={'check-' + this.props.field}
                 checked={!!format && format.showRaw}
                 onChange={this.toggleRaw}
@@ -642,7 +646,7 @@ interface CRTargetProps
 }
 class CRTargetC extends PureClasss<CRTargetProps>
 {
-  render()
+  public render()
   {
     return this.props.connectDropTarget(
       <div className={this.props.className + (this.props.isOver ? ' results-config-over' : '')}>

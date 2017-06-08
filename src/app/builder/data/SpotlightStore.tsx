@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
@@ -51,7 +52,7 @@ import { BaseClass, New } from '../../Classes';
 
 class SpotlightStateC extends BaseClass
 {
-  spotlights: IMMap<string, any> = Map({});
+  public spotlights: IMMap<string, any> = Map({});
 }
 export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
 export const _SpotlightState = (config?: { [key: string]: any }) =>

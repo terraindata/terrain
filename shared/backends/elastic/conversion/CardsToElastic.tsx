@@ -46,7 +46,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonElastic from '../syntax/CommonElastic';
 
-import {Block} from '../../../blocks/types/Block';
+import {Block, TQLRecursiveObjectFn} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
 import {Card} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
@@ -66,24 +66,53 @@ export interface Options {
   replaceInputs?: boolean; // replaces occurences of inputs with their values
 }
 
+export interface ElasticObjectInterface
+{
+  index?: string;
+  type?: string;
+  body?: {
+    _source: object;
+  }
+  
+  [key: string]: any;
+}
+
 class CardsToElastic
 {
   static toElastic(query: Query, options: Options = {}): string
   {
-    let q: string = query.tql;
-
+    let elasticObj: ElasticObjectInterface = {};
+    
+    query.cards.map(
+      (card: Card) =>
+      {
+        const tqlFn = card.static.tql as TQLRecursiveObjectFn;
+        const tqlObj = tqlFn(card, CardsToElastic.blockToElastic, options);
+        _.extend(elasticObj, tqlObj);
+      }
+    );
+    
     if (options.allFields === true)
     {
-      const o = JSON.parse(query.tql);
-      if (o.body && o.body._source)
+      if (elasticObj.body && elasticObj.body._source)
       {
-        o.body._source  = [];
+        elasticObj.body._source  = [];
       }
-      q = JSON.stringify(o);
     }
+    
+    return JSON.stringify(elasticObj, null, 2);
+    
+    // let q: string = query.tql;
 
-    return q;
+
+    // return q;
+  }
+  
+  static blockToElastic(block: Block, options: Options = {}): object
+  {
+    return { notYet: 'not yet done' };
   }
 }
+
 
 export default CardsToElastic;

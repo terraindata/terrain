@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
@@ -92,13 +93,13 @@ export interface Props
 
 class DeployModalColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     confirmChecked: boolean;
   } = {
     confirmChecked: false,
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.variant !== this.props.variant || nextProps.status !== this.props.status)
     {
@@ -108,7 +109,7 @@ class DeployModalColumn extends PureClasss<Props>
     }
   }
 
-  handleDefaultCheckedChange(c)
+  public handleDefaultCheckedChange(c)
   {
     this.props.onDefaultCheckedChange(!this.props.defaultChecked);
     this.setState({
@@ -116,19 +117,19 @@ class DeployModalColumn extends PureClasss<Props>
     });
   }
 
-  handleConfirmCheckedChange(c)
+  public handleConfirmCheckedChange(c)
   {
     this.setState({
       confirmChecked: !this.state.confirmChecked,
     });
   }
 
-  handleDeploy()
+  public handleDeploy()
   {
     this.props.onDeploy();
   }
 
-  render()
+  public render()
   {
     const { variant, status } = this.props;
     const state = LibraryStore.getState();
@@ -149,74 +150,74 @@ class DeployModalColumn extends PureClasss<Props>
 
     return (
       <div
-        className="deploy-modal-deploy-column"
+        className='deploy-modal-deploy-column'
       >
-        <div className="deploy-modal-message">
+        <div className='deploy-modal-message'>
           {
             text.main
           }
         </div>
-        <div className="deploy-modal-info">
-          <div className="deploy-modal-info-row">
+        <div className='deploy-modal-info'>
+          <div className='deploy-modal-info-row'>
             <GroupIcon
-              className="deploy-modal-info-icon"
+              className='deploy-modal-info-icon'
             />
-            <div className="deploy-modal-info-name">
+            <div className='deploy-modal-info-name'>
               {
                 group.name
               }
             </div>
           </div>
-          <div className="deploy-modal-info-row">
+          <div className='deploy-modal-info-row'>
             <AlgorithmIcon
-              className="deploy-modal-info-icon"
+              className='deploy-modal-info-icon'
             />
-            <div className="deploy-modal-info-name">
+            <div className='deploy-modal-info-name'>
               {
                 algorithm.name
               }
             </div>
           </div>
-          <div className="deploy-modal-info-row">
+          <div className='deploy-modal-info-row'>
             <VariantIcon
-              className="deploy-modal-info-icon"
+              className='deploy-modal-info-icon'
             />
-            <div className="deploy-modal-info-name">
+            <div className='deploy-modal-info-name'>
               {
                 variant.name
               }
             </div>
           </div>
-          <div className="deploy-modal-info-row-lower">
-            <span className="deploy-modal-info-bold">
+          <div className='deploy-modal-info-row-lower'>
+            <span className='deploy-modal-info-bold'>
               <UserThumbnail
                 userId={variant.lastUserId}
                 showName={true}
               />
             </span>
           </div>
-          <div className="deploy-modal-info-row-lower">
-            <span className="deploy-modal-info-bold">
+          <div className='deploy-modal-info-row-lower'>
+            <span className='deploy-modal-info-bold'>
               {
                 Util.formatDate(variant.lastEdited)
               }
             </span>
           </div>
-          <div className="deploy-modal-info-row-lower deploy-modal-info-status-row">
+          <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
             <span>
               Current status:
             </span>
-            <span className="deploy-modal-info-bold">
+            <span className='deploy-modal-info-bold'>
               {
                 ItemStatus[variant.status]
               }
             </span>
           </div>
-          <div className="deploy-modal-info-row-lower">
+          <div className='deploy-modal-info-row-lower'>
             <span>
               Changing to status:
             </span>
-            <span className="deploy-modal-info-bold">
+            <span className='deploy-modal-info-bold'>
               {
                 ItemStatus[status]
               }
@@ -234,13 +235,13 @@ class DeployModalColumn extends PureClasss<Props>
               })}
             >
               <input
-                type="checkbox"
+                type='checkbox'
                 checked={this.props.defaultChecked}
                 onChange={this.handleDefaultCheckedChange}
-                id="deploy-modal-default-check"
+                id='deploy-modal-default-check'
               />
               <label
-                htmlFor="deploy-modal-default-check"
+                htmlFor='deploy-modal-default-check'
               >
                 Make default for algorithm <b>{algorithm.name}</b>
               </label>
@@ -248,7 +249,7 @@ class DeployModalColumn extends PureClasss<Props>
             {
               this.props.defaultChecked &&
               <div
-                className="info"
+                className='info'
               >
                 <b>{variant.name}</b> will be served for any requests to algorithm <b>{algorithm.name}.</b> &nbsp;
                     {
@@ -274,13 +275,13 @@ class DeployModalColumn extends PureClasss<Props>
           })}
         >
           <input
-            type="checkbox"
+            type='checkbox'
             checked={this.state.confirmChecked}
             onChange={this.handleConfirmCheckedChange}
-            id="deploy-modal-confirm-check"
+            id='deploy-modal-confirm-check'
           />
           <label
-            htmlFor="deploy-modal-confirm-check"
+            htmlFor='deploy-modal-confirm-check'
           >
             {
               text.confirm

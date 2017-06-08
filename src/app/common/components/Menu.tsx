@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Menu.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 const optionHeight = 30; // coordinate with Menu.less
@@ -72,17 +73,17 @@ export interface Props
 
 export class Menu extends PureClasss<Props>
 {
-  state: {
+  public state: {
     open: boolean;
   } = {
     open: false,
   };
 
-  renderOption(option, index)
+  public renderOption(option, index)
   {
     if (option.spacer)
     {
-      return <div className="menu-option menu-option-spacer" key={index} />;
+      return <div className='menu-option menu-option-spacer' key={index} />;
     }
 
     let onClick: any = _.noop;
@@ -105,7 +106,7 @@ export class Menu extends PureClasss<Props>
         onClick={onClick}
       >
         <div
-          className="menu-option-icon"
+          className='menu-option-icon'
           style={{
             fill: option.iconColor || 'black',
           }}>
@@ -124,7 +125,7 @@ export class Menu extends PureClasss<Props>
     );
   }
 
-  close()
+  public close()
   {
     this.setState({
       open: false,
@@ -132,12 +133,12 @@ export class Menu extends PureClasss<Props>
     $(document).off('click', this.close);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $(document).off('click', this.close);
   }
 
-  toggleOpen()
+  public toggleOpen()
   {
     this.setState({
       open: !this.state.open,
@@ -149,7 +150,7 @@ export class Menu extends PureClasss<Props>
     }
   }
 
-  render()
+  public render()
   {
     const { options } = this.props;
     if (!options || !options.size)
@@ -180,15 +181,15 @@ export class Menu extends PureClasss<Props>
         style={this.props.style ? this.props.style : null}
       >
         <div
-          className="menu-icon-wrapper"
+          className='menu-icon-wrapper'
           onClick={this.toggleOpen}
         >
-          <MoreIcon className="menu-icon" />
+          <MoreIcon className='menu-icon' />
         </div>
         {
           this.state.open &&
           <div
-            className="menu-options-wrapper"
+            className='menu-options-wrapper'
             style={style}
             onClick={this.toggleOpen}
           >

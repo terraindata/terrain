@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
@@ -60,9 +61,9 @@ class State
 @Radium
 export class IndexTreeInfo extends PureClasss<Props>
 {
-  state: State = new State();
+  public state: State = new State();
 
-  render()
+  public render()
   {
     const index = this.props.item;
 

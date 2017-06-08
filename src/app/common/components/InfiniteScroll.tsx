@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs';
@@ -66,31 +67,32 @@ export interface Props
 
 class Library extends Classs<Props>
 {
-  state: {
+  public state: {
     unchanged: boolean;
   } = {
     unchanged: false,
   };
 
-  componentDidMount()
+  public unmounted = false;
+
+  public componentDidMount()
   {
     this.check();
   }
 
-  unmounted = false;
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     // I know this is an anti-pattern, but I can't figure out a way around it
     //  ResultsArea sometimes calls onItemsLoaded after this component has been unmounted
     this.unmounted = true;
   }
 
-  handleScroll()
+  public handleScroll()
   {
     this.check();
   }
 
-  onItemsLoaded(unchanged?: boolean)
+  public onItemsLoaded(unchanged?: boolean)
   {
     if (!this.unmounted)
     {
@@ -101,7 +103,7 @@ class Library extends Classs<Props>
     }
   }
 
-  check(unchanged?: boolean)
+  public check(unchanged?: boolean)
   {
     if (unchanged === undefined)
     {
@@ -129,13 +131,13 @@ class Library extends Classs<Props>
     }
   }
 
-  render()
+  public render()
   {
     return (
       <div
         className={this.props.className}
         onScroll={this.handleScroll}
-        ref="is"
+        ref='is'
       >
         {this.props.children}
       </div>

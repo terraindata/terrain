@@ -42,7 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
+import * as _ from 'underscore';
 import ActionTypes from './AuthActionTypes';
 import Store from './AuthStore';
 

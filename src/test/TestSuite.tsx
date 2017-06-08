@@ -42,5 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 require('./unit/ActionsTest.tsx');
 require('./unit/LayoutManagerTest.tsx');

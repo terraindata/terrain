@@ -42,10 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ScoreBar.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import PureClasss from './../../../common/components/PureClasss';
+import './ScoreBar.less';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -64,7 +65,7 @@ class ScoreBar extends PureClasss<{
   keyPath: KeyPath;
 }>
 {
-  render()
+  public render()
   {
     const weights = this.props.parentData.weights;
     const weight = this.props.data;
@@ -99,11 +100,11 @@ class ScoreBar extends PureClasss<{
     }
 
     return (
-      <div className="weight-graph">
-        <div className="weight-graph-inner">
-          <div className="weight-graph-bar" style={style} />
+      <div className='weight-graph'>
+        <div className='weight-graph-inner'>
+          <div className='weight-graph-bar' style={style} />
         </div>
-        <div className="weight-graph-line" />
+        <div className='weight-graph-line' />
       </div>
     );
   }

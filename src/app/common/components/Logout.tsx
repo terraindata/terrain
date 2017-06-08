@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
+import { browserHistory } from 'react-router';
+import AuthActions from '../../auth/data/AuthActions';
 import PureClasss from '../../common/components/PureClasss';
 import InfoArea from './InfoArea';
-const { browserHistory } = require('react-router');
-import AuthActions from '../../auth/data/AuthActions';
 
 export interface Props
 {
@@ -55,16 +56,16 @@ export interface Props
 
 class Logout extends PureClasss<Props>
 {
-  componentWillMount()
+  public componentWillMount()
   {
     AuthActions.logout();
     browserHistory.replace('/');
   }
 
-  render()
+  public render()
   {
     return (
-      <InfoArea large="Logging out..." />
+      <InfoArea large='Logging out...' />
     );
   }
 }

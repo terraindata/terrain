@@ -42,17 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountDropdown.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as $ from 'jquery';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
 import Actions from '../../builder/data/BuilderActions';
 import PureClasss from '../../common/components/PureClasss';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
 import UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
-const { browserHistory } = require('react-router');
+import './AccountDropdown.less';
 import Modal from './Modal';
 const CommitLog = require('../../../commitlog.txt');
 
@@ -69,14 +70,14 @@ export interface Props
 
 class AccountDropdown extends PureClasss<Props>
 {
-  state: {
+  public state: {
     open?: boolean,
     user?: UserTypes.User,
     commitLogOpen?: boolean,
   } = {
   };
 
-  unsubscribe = null;
+  public unsubscribe = null;
 
   constructor(props: Props)
   {
@@ -90,12 +91,12 @@ class AccountDropdown extends PureClasss<Props>
     );
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $('body').unbind('click', this.close);
   }
 
-  close(event)
+  public close(event)
   {
     this.setState({
       open: false,
@@ -104,7 +105,7 @@ class AccountDropdown extends PureClasss<Props>
     event.stopPropagation();
   }
 
-  open(event)
+  public open(event)
   {
     this.setState({
       open: true,
@@ -113,27 +114,27 @@ class AccountDropdown extends PureClasss<Props>
     event.stopPropagation();
   }
 
-  editProfile()
+  public editProfile()
   {
     this.go('/account/profile/edit');
   }
 
-  goTeamGoTeamGo()
+  public goTeamGoTeamGo()
   {
     this.go('/account/team');
   }
 
-  go(url: string)
+  public go(url: string)
   {
     browserHistory.push(url);
   }
 
-  handleLogout()
+  public handleLogout()
   {
     this.go('/logout');
   }
 
-  renderDropdown()
+  public renderDropdown()
   {
     if (!this.state.open)
     {
@@ -141,36 +142,36 @@ class AccountDropdown extends PureClasss<Props>
     }
 
     return (
-      <div className="account-dropdown-content">
-        <div className="account-dropdown-row" onMouseDown={this.editProfile}>
-          <div className="account-dropdown-icon account-dropdown-icon-red">
+      <div className='account-dropdown-content'>
+        <div className='account-dropdown-row' onMouseDown={this.editProfile}>
+          <div className='account-dropdown-icon account-dropdown-icon-red'>
             <EditIcon />
           </div>
-          <div className="account-dropdown-link">
+          <div className='account-dropdown-link'>
             Edit Profile
           </div>
         </div>
-        <div className="account-dropdown-row" onMouseDown={this.goTeamGoTeamGo}>
-          <div className="account-dropdown-icon account-dropdown-icon-blue">
+        <div className='account-dropdown-row' onMouseDown={this.goTeamGoTeamGo}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
             <HomeIcon />
           </div>
-          <div className="account-dropdown-link">
+          <div className='account-dropdown-link'>
             My Team
           </div>
         </div>
         {
           this.state.user && this.state.user.isSuperUser &&
-          <div className="account-dropdown-row" onMouseDown={this._toggle('commitLogOpen')}>
-            <div className="account-dropdown-icon account-dropdown-icon-blue">
+          <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
+            <div className='account-dropdown-icon account-dropdown-icon-blue'>
               <InfoIcon />
             </div>
-            <div className="account-dropdown-link">
+            <div className='account-dropdown-link'>
               Commit Log
               </div>
           </div>
         }
-        <div className="account-dropdown-row" onMouseDown={this.handleLogout}>
-          <div className="account-dropdown-icon account-dropdown-icon-blue">
+        <div className='account-dropdown-row' onMouseDown={this.handleLogout}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
             <LogoutIcon />
           </div>
           Logout
@@ -179,21 +180,21 @@ class AccountDropdown extends PureClasss<Props>
     );
   }
 
-  renderTopBar()
+  public renderTopBar()
   {
     return (
-      <div className="account-dropdown-top-bar" onClick={this.open} ref="accountDropdownButton">
+      <div className='account-dropdown-top-bar' onClick={this.open} ref='accountDropdownButton'>
         <UserThumbnail
           showName={true}
           userId={this.state.user && this.state.user.id}
           hideAdmin={true}
         />
-        <ArrowIcon className="account-arrow-icon" />
+        <ArrowIcon className='account-arrow-icon' />
       </div>
     );
   }
 
-  render()
+  public render()
   {
     const classes = Util.objToClassname({
       'account-dropdown-wrapper': true,

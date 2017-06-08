@@ -42,10 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./InputStyle.less');
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
+import './InputStyle.less';
 const { List } = Immutable;
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
@@ -187,11 +191,11 @@ const InputComponent = React.createClass<any, any>({
       <BuilderTextbox
         canEdit={true}
         value={this.props.input.value}
-        className="input-text input-text-second"
+        className='input-text input-text-second'
         keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === InputType.NUMBER}
-        typeErrorMessage="This input is in number mode\nthis should be a number."
-        placeholder="Sample value"
+        typeErrorMessage='This input is in number mode\nthis should be a number.'
+        placeholder='Sample value'
         autoDisabled={true}
         language={null}
       />
@@ -206,7 +210,7 @@ const InputComponent = React.createClass<any, any>({
   render()
   {
     return (
-      <div className="input" ref="input">
+      <div className='input' ref='input'>
         {
           this.props.canEdit ?
             <CreateLine
@@ -214,27 +218,27 @@ const InputComponent = React.createClass<any, any>({
               onClick={this.createInput}
             />
             :
-            <div className="input-spacing" />
+            <div className='input-spacing' />
         }
-        <div className="input-inner">
-          <div className="input-top-row">
+        <div className='input-inner'>
+          <div className='input-top-row'>
             <BuilderTextbox
               canEdit={this.props.canEdit}
               value={this.props.input.key}
-              className="input-text input-text-first input-borderless"
+              className='input-text input-text-first input-borderless'
               keyPath={this.getKeyPath('key')}
-              placeholder="Input name"
+              placeholder='Input name'
               autoDisabled={true}
               language={null}
             />
             <Menu
               options={this.getMenuOptions()}
             />
-            <div className="input-close" onClick={this.closeInput}>
+            <div className='input-close' onClick={this.closeInput}>
               <CloseIcon />
             </div>
           </div>
-          <div className="input-bottom-row">
+          <div className='input-bottom-row'>
             {
               this.renderInputValue()
             }

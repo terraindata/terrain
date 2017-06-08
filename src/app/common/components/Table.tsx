@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import * as _ from 'underscore';
 const ReactDataGrid = require('react-data-grid');
 
-require('./Table.less');
+import './Table.less';
 
 import * as classNames from 'classnames';
 import { Menu, MenuOption } from '../../common/components/Menu';
@@ -90,7 +91,7 @@ const MAX_INIT_WIDTH = 300;
 
 class _Table extends PureClasss<Props>
 {
-  state: {
+  public state: {
   } = {
   };
 
@@ -99,7 +100,7 @@ class _Table extends PureClasss<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     console.log(this.props.containerHeight);
     return (

@@ -42,7 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BuilderTextbox.less');
+// Copyright 2017 Terrain Data, Inc.
+import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -50,7 +51,11 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
 import { Display } from '../../../../shared/blocks/displays/Display';
+import { Block } from '../../../../shared/blocks/types/Block';
+import { Card, CardString } from '../../../../shared/blocks/types/Card';
 import BuilderHelpers from '../../builder/BuilderHelpers';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
@@ -60,10 +65,6 @@ import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
-import { Block } from '../../../../shared/blocks/types/Block';
-import { CardString, Card } from '../../../../shared/blocks/types/Card';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
@@ -110,6 +111,14 @@ export interface Props
 
 class BuilderTextbox extends PureClasss<Props>
 {
+  public state: {
+    wrongType: boolean;
+    isSwitching: boolean;
+    value: CardString;
+    backupString: CardString;
+    options: List<string>;
+  };
+
   constructor(props: Props)
   {
     super(props);
@@ -127,21 +136,13 @@ class BuilderTextbox extends PureClasss<Props>
     };
   }
 
-  state: {
-    wrongType: boolean;
-    isSwitching: boolean;
-    value: CardString;
-    backupString: CardString;
-    options: List<string>;
-  };
-
-  getCreatingType(): string
+  public getCreatingType(): string
   {
     return AllBackendsMap[this.props.language].creatingType;
   }
 
   // TODO
-  componentWillReceiveProps(newProps)
+  public componentWillReceiveProps(newProps)
   {
     const value: any = newProps.value;
 
@@ -176,7 +177,7 @@ class BuilderTextbox extends PureClasss<Props>
   }
 
   // throttled event handler
-  executeChange(value)
+  public executeChange(value)
   {
     // if(this.props.isNumber)
     // {
@@ -187,17 +188,17 @@ class BuilderTextbox extends PureClasss<Props>
     this.props.onChange && this.props.onChange(value);
   }
 
-  handleCardDrop(item)
+  public handleCardDrop(item)
   {
     this.props.onChange && this.props.onChange(item);
   }
 
-  handleTextareaChange(event)
+  public handleTextareaChange(event)
   {
     this.executeChange(event.target.value);
   }
 
-  handleAutocompleteChange(value)
+  public handleAutocompleteChange(value)
   {
     this.executeChange(value);
     if (this.props.isNumber)
@@ -208,16 +209,16 @@ class BuilderTextbox extends PureClasss<Props>
     }
   }
 
-  isText()
+  public isText()
   {
     // TODO better approach?
     return typeof this.props.value === 'string' || typeof this.props.value === 'number' || !this.props.value;
   }
 
-  handleSwitch()
+  public handleSwitch()
   {
     const value = this.isText() ? BlockUtils.make(
-      AllBackendsMap[this.props.language].blocks[this.getCreatingType()]
+      AllBackendsMap[this.props.language].blocks[this.getCreatingType()],
     ) : '';
     this.setState({
       value,
@@ -227,18 +228,18 @@ class BuilderTextbox extends PureClasss<Props>
 
   }
 
-  handleFocus(event: React.FocusEvent<any>)
+  public handleFocus(event: React.FocusEvent<any>)
   {
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
   }
 
-  handleBlur(event: React.FocusEvent<any>, value: string)
+  public handleBlur(event: React.FocusEvent<any>, value: string)
   {
     this.props.onBlur && this.props.onBlur(this, value, event);
   }
 
-  handleCardToolClose()
+  public handleCardToolClose()
   {
     this.executeChange('');
     this.setState({
@@ -246,7 +247,7 @@ class BuilderTextbox extends PureClasss<Props>
     });
   }
 
-  renderSwitch()
+  public renderSwitch()
   {
     if (!this.props.canEdit)
     {
@@ -269,12 +270,12 @@ class BuilderTextbox extends PureClasss<Props>
     );
   }
 
-  toggleClosed()
+  public toggleClosed()
   {
     Actions.change(this.props.keyPath.push('closed'), !this.props.value['closed']);
   }
 
-  computeOptions()
+  public computeOptions()
   {
     if (this.props.autoTerms || this.props.autoDisabled)
     {
@@ -291,7 +292,7 @@ class BuilderTextbox extends PureClasss<Props>
     }
   }
 
-  render()
+  public render()
   {
     if (this.isText())
     {
@@ -320,7 +321,7 @@ class BuilderTextbox extends PureClasss<Props>
           {
             this.props.textarea ?
               <textarea
-                ref="input"
+                ref='input'
                 disabled={!this.props.canEdit}
                 defaultValue={this.props.value as string}
                 onChange={this.handleTextareaChange}
@@ -330,7 +331,7 @@ class BuilderTextbox extends PureClasss<Props>
               />
               :
               <Autocomplete
-                ref="input"
+                ref='input'
                 disabled={!this.props.canEdit}
                 value={this.props.value as string}
                 options={options}
@@ -398,27 +399,27 @@ class BuilderTextbox extends PureClasss<Props>
         'builder-tb-cards': true,
         'builder-tb-cards-top': this.props.top,
         'builder-tb-cards-closed': card.closed,
-      })} ref="cards">
-        <div className="builder-tb-cards-input">
-          <div className="builder-tb-cards-input-value" style={chipStyle}>
+      })} ref='cards'>
+        <div className='builder-tb-cards-input'>
+          <div className='builder-tb-cards-input-value' style={chipStyle}>
             <div
-              className="builder-tb-cards-toggle"
+              className='builder-tb-cards-toggle'
               onClick={this.toggleClosed}
             >
               <ArrowIcon />
             </div>
-            <div className="builder-tb-cards-input-value-text">
+            <div className='builder-tb-cards-input-value-text'>
               {title}
             </div>
             {!preview ? null :
-              <div className="card-preview">
+              <div className='card-preview'>
                 {preview}
               </div>
             }
             {this.renderSwitch()}
           </div>
-          <div className="builder-tb-cards-arrow" style={arrowLineStyle}>
-            <div className="builder-tb-cards-arrow-inner" style={arrowHeadStyle} />
+          <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
+            <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
           </div>
         </div>
       </div>

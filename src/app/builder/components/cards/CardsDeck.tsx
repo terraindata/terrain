@@ -42,17 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CardsDeck.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import './CardsDeck.less';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
@@ -68,13 +69,13 @@ export interface Props
 
 class CardsDeck extends PureClasss<Props>
 {
-  state: {
+  public state: {
     search: string;
   } = {
     search: '',
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.props.open && nextProps.open)
     {
@@ -82,14 +83,14 @@ class CardsDeck extends PureClasss<Props>
     }
   }
 
-  handleSearchChange(evt)
+  public handleSearchChange(evt)
   {
     this.setState({
       search: evt.target.value,
     });
   }
 
-  render()
+  public render()
   {
     const ordering = AllBackendsMap[this.props.language].cardsDeck;
     const cards = AllBackendsMap[this.props.language].blocks;
@@ -100,27 +101,27 @@ class CardsDeck extends PureClasss<Props>
     }
     return (
       <div
-        className="cards-deck"
+        className='cards-deck'
       >
         <div
-          className="cards-deck-search-wrapper"
+          className='cards-deck-search-wrapper'
         >
           <input
-            type="text"
-            ref="search"
-            className="cards-deck-search"
-            placeholder="Filter Cards"
+            type='text'
+            ref='search'
+            className='cards-deck-search'
+            placeholder='Filter Cards'
             value={this.state.search}
             onChange={this.handleSearchChange}
           />
         </div>
         <div
-          className="cards-deck-inner"
+          className='cards-deck-inner'
         >
           {
             ordering.map((group: List<string>, index) =>
               <div
-                className="cards-deck-group"
+                className='cards-deck-group'
                 key={index}
               >
                 {
@@ -155,12 +156,12 @@ interface CardProps
 
 class _CardDeckCard extends PureClasss<CardProps>
 {
-  render()
+  public render()
   {
     const { card } = this.props;
     const data = card.static;
     const search = this.props.search.toLowerCase();
-    let hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
+    const hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
 
     return this.props.connectDragSource(
       <div

@@ -42,12 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Result.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import './Result.less';
 const { List } = Immutable;
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
@@ -55,7 +57,6 @@ import Actions from '../../data/BuilderActions';
 import { spotlightAction } from '../../data/SpotlightStore';
 import Classs from './../../../common/components/Classs';
 import { MAX_RESULTS, Result } from './ResultsManager';
-import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -88,7 +89,24 @@ class ResultComponent extends Classs<Props> {
   //   spotlightColor: "",
   // };
 
-  renderExpandedField(value, field)
+  public menuOptions =
+  [
+    List([
+      {
+        text: 'Spotlight',
+        onClick: this.spotlight,
+      },
+    ]),
+
+    List([
+      {
+        text: 'Un-Spotlight',
+        onClick: this.unspotlight,
+      },
+    ]),
+  ];
+
+  public renderExpandedField(value, field)
   {
     return this.renderField(field, 0, null, {
       showField: true,
@@ -96,7 +114,7 @@ class ResultComponent extends Classs<Props> {
     });
   }
 
-  renderField(field, index?, fields?, overrideFormat?)
+  public renderField(field, index?, fields?, overrideFormat?)
   {
     if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
     {
@@ -107,10 +125,10 @@ class ResultComponent extends Classs<Props> {
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
-      <div className="result-field" key={field}>
+      <div className='result-field' key={field}>
         {
           showField &&
-          <div className="result-field-name">
+          <div className='result-field-name'>
             {
               field
             }
@@ -131,7 +149,7 @@ class ResultComponent extends Classs<Props> {
     );
   }
 
-  spotlight()
+  public spotlight()
   {
     const id = this.props.primaryKey;
     const spotlightColor = ColorManager.altColorForKey(id);
@@ -147,7 +165,7 @@ class ResultComponent extends Classs<Props> {
     spotlightAction(id, spotlightData);
   }
 
-  unspotlight()
+  public unspotlight()
   {
     this.setState({
       isSpotlit: false,
@@ -155,7 +173,7 @@ class ResultComponent extends Classs<Props> {
     spotlightAction(this.props.primaryKey, null);
   }
 
-  renderSpotlight()
+  public renderSpotlight()
   {
     if (!this.props.result.spotlight)
     {
@@ -164,7 +182,7 @@ class ResultComponent extends Classs<Props> {
 
     return (
       <div
-        className="result-spotlight"
+        className='result-spotlight'
         style={{
           background: this.state.spotlightColor,
         }}
@@ -172,29 +190,12 @@ class ResultComponent extends Classs<Props> {
     );
   }
 
-  menuOptions =
-  [
-    List([
-      {
-        text: 'Spotlight',
-        onClick: this.spotlight,
-      },
-    ]),
-
-    List([
-      {
-        text: 'Un-Spotlight',
-        onClick: this.unspotlight,
-      },
-    ]),
-  ];
-
-  expand()
+  public expand()
   {
     this.props.onExpand(this.props.index);
   }
 
-  render()
+  public render()
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, result } = this.props;
 
@@ -210,7 +211,7 @@ class ResultComponent extends Classs<Props> {
     if (resultsConfig && resultsConfig.score && resultsConfig.enabled)
     {
       scoreArea = (
-        <div className="result-score">
+        <div className='result-score'>
           {
             this.renderField(resultsConfig.score)
           }
@@ -227,7 +228,7 @@ class ResultComponent extends Classs<Props> {
     if (!configHasFields && fields.length > 4 && !this.props.expanded)
     {
       bottomContent = (
-        <div className="result-bottom" onClick={this.expand}>
+        <div className='result-bottom' onClick={this.expand}>
           {fields.length - MAX_DEFAULT_FIELDS} more field{fields.length - 4 === 1 ? '' : 's'}
         </div>
       );
@@ -237,8 +238,8 @@ class ResultComponent extends Classs<Props> {
     if (this.props.expanded)
     {
       expandedContent = (
-        <div className="result-expanded-fields">
-          <div className="result-expanded-fields-title">
+        <div className='result-expanded-fields'>
+          <div className='result-expanded-fields-title'>
             All Fields
           </div>
           {
@@ -256,13 +257,13 @@ class ResultComponent extends Classs<Props> {
         className={classes}
         onDoubleClick={this.expand}
       >
-        <div className="result-inner">
-          <div className="result-name">
-            <div className="result-name-inner">
+        <div className='result-inner'>
+          <div className='result-name'>
+            <div className='result-name-inner'>
               {
                 this.renderSpotlight()
               }
-              <div className="result-pin-icon">
+              <div className='result-pin-icon'>
                 <PinIcon />
               </div>
               {
@@ -281,7 +282,7 @@ class ResultComponent extends Classs<Props> {
             scoreArea
           }
 
-          <div className="result-fields-wrapper">
+          <div className='result-fields-wrapper'>
             {
               _.map(fields, this.renderField)
             }
@@ -378,10 +379,10 @@ export function ResultFormatValue(field: string, value: string | number, config:
         const url = format.template.replace(/\[value\]/g, value as string);
         return (
           <div
-            className="result-field-value-image-wrapper"
+            className='result-field-value-image-wrapper'
           >
             <div
-              className="result-field-value-image"
+              className='result-field-value-image'
               style={{
                 backgroundImage: `url(${url})`,
                 // give the div the background image, to make use of the "cover" CSS positioning,
@@ -390,7 +391,7 @@ export function ResultFormatValue(field: string, value: string | number, config:
             >
               <img src={url} />
             </div>
-            <div className="result-field-value">
+            <div className='result-field-value'>
               {
                 showRaw ? value : null
               }

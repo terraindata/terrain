@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Paging.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
+import './Paging.less';
 
 const HOVER_TIMEOUT_TIME = 1000;
 
@@ -80,12 +81,12 @@ class Paging extends PureClasss<Props>
     };
   }
 
-  pageFromEvent(event): number
+  public pageFromEvent(event): number
   {
     return parseInt(Util.rel(event.target), 10);
   }
 
-  changePage(page): void
+  public changePage(page): void
   {
     this.setState({
       open: false,
@@ -97,41 +98,41 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handlePageClick(event): void
+  public handlePageClick(event): void
   {
     this.changePage(this.pageFromEvent(event));
   }
 
-  handleAllPages(): void
+  public handleAllPages(): void
   {
     this.setState({
       open: !this.state.open,
     });
   }
 
-  goFirst(): void
+  public goFirst(): void
   {
     this.changePage(1);
   }
 
-  goPrevious(): void
+  public goPrevious(): void
   {
     this.changePage(this.props.page - 1);
   }
 
-  goNext(): void
+  public goNext(): void
   {
     this.changePage(this.props.page + 1);
   }
 
-  goLast(): void
+  public goLast(): void
   {
     this.changePage(this.props.pages);
   }
 
   // mouseovers
 
-  goHover(page): void
+  public goHover(page): void
   {
     if (this.props.onHover && this.props.onHover(page))
     {
@@ -142,17 +143,17 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handlePageMouseOver(event): void
+  public handlePageMouseOver(event): void
   {
     this.goHover(this.pageFromEvent(event));
   }
 
-  handleFirstHover(): void
+  public handleFirstHover(): void
   {
     this.goHover(1);
   }
 
-  handlePreviousHover(): void
+  public handlePreviousHover(): void
   {
     if (this.props.page !== 1)
     {
@@ -160,7 +161,7 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handleNextHover(): void
+  public handleNextHover(): void
   {
     if (this.props.page !== this.props.pages)
     {
@@ -168,12 +169,12 @@ class Paging extends PureClasss<Props>
     }
   }
 
-  handleLastHover(): void
+  public handleLastHover(): void
   {
     this.goHover(this.props.pages);
   }
 
-  handleMouseOut(event): void
+  public handleMouseOut(event): void
   {
     // this.clearHoverTimeout();
 
@@ -209,7 +210,7 @@ class Paging extends PureClasss<Props>
   //   this.clearHoverTimeout();
   // }
 
-  render()
+  public render()
   {
     return (
       <div className={Util.objToClassname(
@@ -218,7 +219,7 @@ class Paging extends PureClasss<Props>
           'paging-open': this.state.open,
         })}>
         <div
-          className="paging-first"
+          className='paging-first'
           onClick={this.goFirst}
           onMouseOver={this.handleFirstHover}
           onMouseOut={this.handleMouseOut}
@@ -226,14 +227,14 @@ class Paging extends PureClasss<Props>
           &lt;&lt;
         </div>
         <div
-          className="paging-previous"
+          className='paging-previous'
           onClick={this.goPrevious}
           onMouseOver={this.handlePreviousHover}
           onMouseOut={this.handleMouseOut}
         >
           &lt;
         </div>
-        <div className="paging-pages">
+        <div className='paging-pages'>
           {
             _.range(1, this.props.pages + 1).map((page) =>
             {
@@ -262,11 +263,11 @@ class Paging extends PureClasss<Props>
             })
           }
         </div>
-        <div className="paging-all-pages" onClick={this.handleAllPages}>
+        <div className='paging-all-pages' onClick={this.handleAllPages}>
           {this.state.open ? '-' : '...'}
         </div>
         <div
-          className="paging-next"
+          className='paging-next'
           onClick={this.goNext}
           onMouseOver={this.handleNextHover}
           onMouseOut={this.handleMouseOut}
@@ -274,7 +275,7 @@ class Paging extends PureClasss<Props>
           &gt;
         </div>
         <div
-          className="paging-last"
+          className='paging-last'
           onClick={this.goLast}
           onMouseOver={this.handleLastHover}
           onMouseOut={this.handleMouseOut}

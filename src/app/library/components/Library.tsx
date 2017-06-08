@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Library.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea';
@@ -55,10 +55,11 @@ import Store from './../data/LibraryStore';
 import LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import GroupsColumn from './GroupsColumn';
+import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
 const HTML5Backend = require('react-dnd-html5-backend');
-const { browserHistory } = require('react-router');
+import { browserHistory } from 'react-router';
 
 export interface Props
 {
@@ -74,9 +75,9 @@ export interface Props
 
 class Library extends PureClasss<any>
 {
-  cancelSubscription = null;
+  public cancelSubscription = null;
 
-  state: {
+  public state: {
     libraryState: LibraryState;
   } = {
     libraryState: null,
@@ -89,7 +90,7 @@ class Library extends PureClasss<any>
     this.state.libraryState = Store.getState();
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     if (!this.props.params.groupId)
     {
@@ -102,7 +103,7 @@ class Library extends PureClasss<any>
     }
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(Store, {
       stateKey: 'libraryState',
@@ -113,7 +114,7 @@ class Library extends PureClasss<any>
     UserActions.fetch();
   }
 
-  render()
+  public render()
   {
     const { libraryState } = this.state;
 
@@ -158,7 +159,7 @@ class Library extends PureClasss<any>
           }
         }
       }
-      else 
+      else
       {
         // !group
         browserHistory.replace('/library');
@@ -168,7 +169,7 @@ class Library extends PureClasss<any>
     localStorage.setItem('lastLibraryPath', this.props.location.pathname);
 
     return (
-      <div className="library">
+      <div className='library'>
         <GroupsColumn
           {...{
             groups,

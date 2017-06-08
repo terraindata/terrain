@@ -42,19 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 import * as Immutable from 'immutable';
-require('./CardDragPreview.less');
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss';
+import './CardDragPreview.less';
 const classNames = require('classnames');
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';
 import { cardWillWrap, onCardDrop } from './CardDropArea';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 interface CDPProps
 {
@@ -77,9 +78,9 @@ interface CDPProps
 
 class CardDragPreview extends PureClasss<CDPProps>
 {
-  noCardColors: string[] = ['#aaa', '#aaa'];
+  public noCardColors: string[] = ['#aaa', '#aaa'];
 
-  state: {
+  public state: {
     justDropped: boolean;
     language: string;
   } = {
@@ -87,18 +88,18 @@ class CardDragPreview extends PureClasss<CDPProps>
     language: Store.getState().query.language,
   };
 
-  componentDidMount()
+  public timeout: any;
+
+  public componentDidMount()
   {
     this._subscribe(Store,
       {
         stateKey: 'language',
         storeKeyPath: ['query', 'language'],
-      })
+      });
   }
 
-  timeout: any;
-
-  componentWillReceiveProps(nextProps: CDPProps)
+  public componentWillReceiveProps(nextProps: CDPProps)
   {
     if (this.props.cardItem && !nextProps.cardItem)
     {
@@ -110,12 +111,12 @@ class CardDragPreview extends PureClasss<CDPProps>
     }
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.timeout && clearTimeout(this.timeout);
   }
 
-  render()
+  public render()
   {
     const item = this.props.cardItem;
     let colors: string[], title: string, preview: string;
@@ -179,18 +180,18 @@ class CardDragPreview extends PureClasss<CDPProps>
         }}
       >
         <div
-          className="card-title card-title-closed"
+          className='card-title card-title-closed'
           style={{
             background: colors[0],
           }}
         >
-          <div className="card-title-inner">
+          <div className='card-title-inner'>
             {
               title
             }
           </div>
           <div
-            className="card-preview"
+            className='card-preview'
           >
             {
               preview
@@ -198,13 +199,13 @@ class CardDragPreview extends PureClasss<CDPProps>
           </div>
         </div>
         <div
-          className="card-drag-preview-wrap-handle"
+          className='card-drag-preview-wrap-handle'
           style={{
             borderColor: colors[0],
           }}
         >
           <div
-            className="card-drag-preview-wrap-handle-inner"
+            className='card-drag-preview-wrap-handle-inner'
             style={{
               background: colors[0],
             }}

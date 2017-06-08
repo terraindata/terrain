@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 /// <reference path="../../typings/tsd.d.ts" />
 
 import * as test from 'tape';
@@ -72,24 +73,24 @@ const cleanupFrame = (frame) =>
   document.body.removeChild(frame);
 };
 
-test('LayoutManager renders columns', function(t)
+test('LayoutManager renders columns', (t) =>
 {
   const layout = {
     fullHeight: true,
     columns: [
       {
-        content: <div className="test-col" style={{ height: '100%' }}>1</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>1</div>,
         width: 20,
       },
       {
-        content: <div className="test-col" style={{ height: '100%' }}>2</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>2</div>,
       },
       {
-        content: <div className="test-col" style={{ height: '100%' }}>3</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>3</div>,
         colSpan: 2,
       },
       {
-        content: <div className="test-col" style={{ height: '100%' }}>4</div>,
+        content: <div className='test-col' style={{ height: '100%' }}>4</div>,
       },
     ],
   };
@@ -132,19 +133,19 @@ test('LayoutManager renders columns', function(t)
   t.end();
 });
 
-test('LayoutManager renders rows', function(t)
+test('LayoutManager renders rows', (t) =>
 {
   const layout = {
     rows: [
       {
-        content: <div className="test-row" style={{ height: '20px' }}>1</div>,
+        content: <div className='test-row' style={{ height: '20px' }}>1</div>,
       },
       {
-        content: <div className="test-row" style={{ height: '40px' }}>2</div>,
+        content: <div className='test-row' style={{ height: '40px' }}>2</div>,
         rowSpan: 2,
       },
       {
-        content: <div className="test-row" style={{ height: '20px' }}>3</div>,
+        content: <div className='test-row' style={{ height: '20px' }}>3</div>,
       },
     ],
   };

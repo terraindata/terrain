@@ -42,14 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // somebody please rescue this or kill this
 
-require('./LayoutManager.less');
+// tslint:disable:no-invalid-this
+
+import './LayoutManager.less';
 const Dimensions = require('react-dimensions');
 import * as React from 'react';
 const shallowCompare = require('react-addons-shallow-compare');
 const $ = require('jquery');
-const _ = require('underscore');
+import * as _ from 'underscore';
 
 // Coordinate these classNames with layout_manager.css/less
 const lmClass = 'layout-manager';
@@ -100,7 +103,7 @@ const LayoutManager = React.createClass<any, any>({
     // this.onPanelDrag = _.throttle(this.onPanelDrag, 500);
   },
 
-  getAdjustments(adjustments, containerWidth: number)
+  getAdjustments(adjustments: Adjustment[], containerWidth: number)
   {
     if (adjustments)
     {
@@ -117,7 +120,7 @@ const LayoutManager = React.createClass<any, any>({
         const colWidth = containerWidth / numColumns;
         let adjustmentsChanged = false;
         const newAdjustments = JSON.parse(JSON.stringify(adjustments));
-        _.map(newAdjustments, (adjustment, index) =>
+        _.map(newAdjustments, (adjustment: Adjustment, index: number) =>
         {
           const column = columns[index];
           if (column)
@@ -131,7 +134,7 @@ const LayoutManager = React.createClass<any, any>({
 
               // get magnitude of all adjustments
               const totalAdjustment = _.reduce(newAdjustments,
-                (sum, adjustment) =>
+                (sum: number, adjustment: Adjustment) =>
                 {
                   return sum + Math.max(adjustment.x, 0);
                 }
@@ -140,7 +143,7 @@ const LayoutManager = React.createClass<any, any>({
               if (difference >= totalAdjustment)
               {
                 // not enough space in the window, reset all
-                _.map(newAdjustments, (adjustment) => adjustment.x = 0);
+                _.map(newAdjustments, (adjustment: Adjustment) => adjustment.x = 0);
               }
               else
               {
@@ -148,7 +151,7 @@ const LayoutManager = React.createClass<any, any>({
                 // ratio by which to reduce adjustments
                 const ratio = (totalAdjustment - difference) / totalAdjustment;
                 _.map(newAdjustments,
-                  (adjustment) => adjustment.x > 0 && (adjustment.x *= ratio),
+                  (adjustment: Adjustment) => adjustment.x > 0 && (adjustment.x *= ratio),
                 );
               }
             }
@@ -394,7 +397,9 @@ const LayoutManager = React.createClass<any, any>({
     {
       heightAmplifier = 1;
       if (coords.dy > 0)
+      {
         heightAmplifier = -1;
+      }
     }
 
     // dragged left/right
@@ -402,7 +407,9 @@ const LayoutManager = React.createClass<any, any>({
     {
       widthAmplifier = 1;
       if (coords.dx > 0)
+      {
         widthAmplifier = -1;
+      }
     }
 
     if (this.props.layout.cells)
@@ -460,7 +467,9 @@ const LayoutManager = React.createClass<any, any>({
     const shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
 
     if (shiftedIndices.length === 0)
+    {
       return;
+    }
 
     let fn = Math.max;
 
@@ -760,7 +769,7 @@ const LayoutManager = React.createClass<any, any>({
   renderColumn(column, index)
   {
     const classToPass = colClass;
-    let style: React.CSSProperties
+    let style: React.CSSProperties;
 
     if (this.props.layout.compact)
     {
@@ -789,7 +798,9 @@ const LayoutManager = React.createClass<any, any>({
     // todo consider moving this to somehwere not in a loop
     let height = this.props.layout.cellHeight;
     if (typeof height !== 'string')
+    {
       height += 'px'; // necessary?
+    }
 
     const style = {
       height,
@@ -843,7 +854,7 @@ const LayoutManager = React.createClass<any, any>({
     {
       // TODO write test for this
       return (
-        <div className="error">
+        <div className='error'>
           Error: Must pass one and only one of [cells, rows, columns] to the same level of a LayoutManager. Passed <b>{layoutSum}</b>.
 					<pre>{JSON.stringify(this.props.layout)}</pre>
         </div>
@@ -862,7 +873,7 @@ const LayoutManager = React.createClass<any, any>({
     const lmClassString = lmClasses.join(' ');
 
     return (
-      <div className={lmClassString} ref="layoutManagerDiv">
+      <div className={lmClassString} ref='layoutManagerDiv'>
         {this.props.layout.columns && this.props.layout.columns.map(this.renderColumn)}
         {this.props.layout.rows && this.props.layout.rows.map(this.renderRow)}
         {this.props.layout.cells && this.props.layout.cells.map(this.renderCell)}

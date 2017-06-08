@@ -46,7 +46,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonSQL from '../syntax/CommonSQL';
 
-import {Block} from '../../../blocks/types/Block';
+import {Block, TQLStringFn} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
 import {Card} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
@@ -259,8 +259,9 @@ class CardsToSQL
     {
       return;
     }
+    
     let str: string;
-    const strFn = ((isTop && block.static.topTql) || block.static.tql);
+    const strFn = ((isTop && block.static.topTql) || block.static.tql) as TQLStringFn;
 
     if (typeof strFn === 'string')
     {

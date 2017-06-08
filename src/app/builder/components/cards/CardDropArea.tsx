@@ -42,17 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 import * as Immutable from 'immutable';
-require('./CardDropArea.less');
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss';
+import './CardDropArea.less';
 const classNames = require('classnames');
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 export const cardWillWrap = (targetProps: Props, cardType: string) =>
 {
@@ -159,7 +160,7 @@ export interface Props
 
 class CardDropArea extends PureClasss<Props>
 {
-  state: {
+  public state: {
     draggingCardItem: CardItem;
     language: string;
   } = {
@@ -182,7 +183,7 @@ class CardDropArea extends PureClasss<Props>
     });
   }
 
-  selfDragging()
+  public selfDragging()
   {
     const item = this.state.draggingCardItem;
 
@@ -191,7 +192,7 @@ class CardDropArea extends PureClasss<Props>
       && item.props.index === this.props.index;
   }
 
-  renderCardPreview()
+  public renderCardPreview()
   {
     if (this.selfDragging() || !this.props.renderPreview)
     {
@@ -208,7 +209,7 @@ class CardDropArea extends PureClasss<Props>
     );
   }
 
-  renderCouldDrop()
+  public renderCouldDrop()
   {
 
     let color = 'rgba(0,0,0,0)';
@@ -219,7 +220,7 @@ class CardDropArea extends PureClasss<Props>
 
     return (
       <div
-        className="card-drop-area-could-drop-marker"
+        className='card-drop-area-could-drop-marker'
         style={{
           background: color,
           borderColor: color,
@@ -228,7 +229,7 @@ class CardDropArea extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     if (!this.state.draggingCardItem)
     {
@@ -266,7 +267,7 @@ class CardDropArea extends PureClasss<Props>
         style={style}
       >
         <div
-          className="card-drop-area-inner"
+          className='card-drop-area-inner'
           style={{
             zIndex: 99999999 + this.props.keyPath.size,
           }}
@@ -336,7 +337,7 @@ const cardCouldWrap = (targetProps: Props, item: CardItem) =>
       if (
         targetKeyPath.splice(itemChildKeyPath.size, targetKeyPath.size - itemChildKeyPath.size)
           .equals(itemChildKeyPath)
-      )      
+      )
       {
         // can't drop in yoself
         return false;

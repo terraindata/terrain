@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { DragDropContext } from 'react-dnd';
-const { browserHistory } = require('react-router');
+import { browserHistory } from 'react-router';
 
 import SchemaView from './SchemaView';
 
@@ -60,14 +61,14 @@ export interface Props
 
 class SchemaPage extends PureClasss<Props>
 {
-  state: {
+  public state: {
     on: boolean;
     name?: string;
   } = {
     on: false,
   };
 
-  render()
+  public render()
   {
     return (
       <SchemaView

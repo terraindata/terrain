@@ -42,7 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
+import * as _ from 'underscore';
 const Immutable = require('immutable');
 
 // Defining our object like this gives us compile-time TypeScript support for ActionTypes
@@ -56,6 +57,7 @@ export let BuilderActionTypes =
   {
     fetchQuery: '', // triggers server xhr
     queryLoaded: '', // when the call to the server returns
+    changeQuery: '',
 
     // these apply to the state's query
     create: '',

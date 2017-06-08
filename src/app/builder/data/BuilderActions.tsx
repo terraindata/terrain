@@ -42,8 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import { CardItem } from '../components/cards/CardComponent';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './BuilderActionTypes';
@@ -56,9 +57,13 @@ const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const BuilderActions =
   {
-    change:
+    change: // reserved for cards only
     (keyPath: KeyPath, value: any, notDirty = false) =>
       $(ActionTypes.change, { keyPath, value, notDirty }),
+
+    changeQuery:
+    (query: Query) =>
+      $(ActionTypes.changeQuery, { query }),
 
     create:
     (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>

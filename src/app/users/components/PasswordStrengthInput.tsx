@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Settings.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -50,6 +50,7 @@ import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 import PasswordMeter from './PasswordMeter';
+import './Settings.less';
 const zxcvbn = require('zxcvbn');
 
 export interface Props
@@ -69,7 +70,7 @@ class PasswordStrengthInput extends Classs<Props>
     };
   }
 
-  handleInput(event)
+  public handleInput(event)
   {
     event.preventDefault();
     const password = event.target.value;
@@ -113,7 +114,7 @@ class PasswordStrengthInput extends Classs<Props>
     });
   }
 
-  render()
+  public render()
   {
     return (
       <div>
@@ -122,7 +123,7 @@ class PasswordStrengthInput extends Classs<Props>
           value={this.props.value}
           onChange={this.props.onChange}
           onInput={this.handleInput}
-          className="settings-input password-input"
+          className='settings-input password-input'
         />
         <PasswordMeter value={this.state.score} />
       </div>

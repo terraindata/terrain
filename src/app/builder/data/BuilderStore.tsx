@@ -42,54 +42,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
+import * as _ from 'underscore';
 import { CardItem } from '../components/cards/CardComponent';
 const Redux = require('redux');
 import Util from '../../util/Util';
 import { _ResultsState, ResultsState } from '../components/results/ResultsManager';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { Card, Cards } from '../../../../shared/blocks/types/Card';
 import Query from '../../../../shared/items/types/Query';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 export class BuilderStateClass
 {
-  variantId: ID = '';
-  query: Query = null;
+  public variantId: ID = '';
+  public query: Query = null;
 
   // for undo/redo
-  pastQueries: List<Query> = Immutable.List([]);
-  nextQueries: List<Query> = Immutable.List([]);
-  lastActionType: string = '';
-  lastActionKeyPath: KeyPath = null;
-  lastActionTime: number = 0;
+  public pastQueries: List<Query> = Immutable.List([]);
+  public nextQueries: List<Query> = Immutable.List([]);
+  public lastActionType: string = '';
+  public lastActionKeyPath: KeyPath = null;
+  public lastActionTime: number = 0;
 
-  loading: boolean = false;
-  loadingXhr: XMLHttpRequest = null;
-  loadingVariantId: ID = '';
+  public loading: boolean = false;
+  public loadingXhr: XMLHttpRequest = null;
+  public loadingVariantId: ID = '';
 
-  hoveringCardId: ID = '';
+  public hoveringCardId: ID = '';
 
-  selectedCardIds = Map<ID, boolean>({});
+  public selectedCardIds = Map<ID, boolean>({});
 
-  db: BackendInstance = {} as any;
+  public db: BackendInstance = {} as any;
 
   // TODO move
-  manual = Map<ID, Cards>({});
+  public manual = Map<ID, Cards>({});
   // Card examples used in the manual are stored here.
 
-  draggingCardItem: CardItem = false;
-  draggingOverKeyPath: KeyPath = Immutable.List([]);
-  draggingOverIndex: number = -1;
+  public draggingCardItem: CardItem = false;
+  public draggingOverKeyPath: KeyPath = Immutable.List([]);
+  public draggingOverIndex: number = -1;
 
-  isDirty: boolean = false;
+  public isDirty: boolean = false;
 
-  resultsState: ResultsState = _ResultsState();
+  public resultsState: ResultsState = _ResultsState();
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());

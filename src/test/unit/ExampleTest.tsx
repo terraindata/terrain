@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 /// <reference path="../../typings/tsd.d.ts" />
 
 import * as test from 'tape';
@@ -57,7 +58,7 @@ const CardField = React.createClass({
   },
 });
 
-test('Is a test', function(t)
+test('Is a test', (t) =>
 {
   const AppElement = TestUtils.renderIntoDocument(<CardField />);
   const divs = TestUtils.scryRenderedDOMComponentsWithTag(AppElement, 'div');
@@ -67,7 +68,7 @@ test('Is a test', function(t)
   t.end();
 });
 
-test('Uses types', function(t)
+test('Uses types', (t) =>
 {
   const a: number = 1.0;
   t.equal(a, 1.0);

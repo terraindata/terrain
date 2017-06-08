@@ -42,8 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./DatePicker.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
+import './DatePicker.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
@@ -63,7 +64,10 @@ for (let h = 0; h < 24; h++)
   for (let m = 0; m < 60; m += MINUTE_INTERVAL)
   {
     let hour = (h - 1) % 12 + 1;
-    if (h === 0) hour = 12;
+    if (h === 0)
+    {
+      hour = 12;
+    }
     _hours.push(hour + ':' + (m < 10 ? '0' : '') + m + (h < 12 ? 'am' : 'pm'));
   }
 }
@@ -87,7 +91,7 @@ class DatePicker extends PureClasss<Props>
       'handleHourChange']);
   }
 
-  getDate(): Date
+  public getDate(): Date
   {
     let date = new Date(this.props.date);
     if (isNaN(date.getTime()))
@@ -100,7 +104,7 @@ class DatePicker extends PureClasss<Props>
     return date;
   }
 
-  handleDayClick(e, day: Date, modifiers)
+  public handleDayClick(e, day: Date, modifiers)
   {
     const date = this.getDate();
     date.setDate(day.getDate());
@@ -109,7 +113,7 @@ class DatePicker extends PureClasss<Props>
     this.props.onChange(Util.formatInputDate(date));
   }
 
-  handleHourChange(hourIndex)
+  public handleHourChange(hourIndex)
   {
     const date = this.getDate();
     date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
@@ -117,17 +121,17 @@ class DatePicker extends PureClasss<Props>
     this.props.onChange(Util.formatInputDate(date));
   }
 
-  dateToHourIndex(date)
+  public dateToHourIndex(date)
   {
     return date.getHours() * (60 / MINUTE_INTERVAL) + (date.getMinutes() / MINUTE_INTERVAL);
   }
 
-  renderTimePicker()
+  public renderTimePicker()
   {
     const date = this.getDate();
 
     return (
-      <div className="date-time-time">
+      <div className='date-time-time'>
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
@@ -137,7 +141,7 @@ class DatePicker extends PureClasss<Props>
       </div>);
   }
 
-  render()
+  public render()
   {
     const date = this.getDate();
     const modifiers =
@@ -146,7 +150,7 @@ class DatePicker extends PureClasss<Props>
       };
 
     return (
-      <div className="date-picker">
+      <div className='date-picker'>
         <ReactDayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}

@@ -42,20 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./StatusDropdown.less');
-import * as _ from 'underscore';
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
+import './StatusDropdown.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
+import { ItemStatus as Status } from '../../../../shared/items/types/Item';
+import RolesStore from '../../roles/data/RolesStore';
+import UserStore from '../../users/data/UserStore';
+import Util from '../../util/Util';
 import LibraryActions from '../data/LibraryActions';
 import LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
-import RolesStore from '../../roles/data/RolesStore';
-import UserStore from '../../users/data/UserStore';
-import Util from '../../util/Util';
-import { ItemStatus as Status } from '../../../../shared/items/types/Item';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -67,12 +68,12 @@ export interface Props
 
 class StatusDropdown extends PureClasss<Props>
 {
-  state = {
+  public state = {
     isSuperUser: false,
     isBuilder: false,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(RolesStore, {
       updater: () =>
@@ -91,20 +92,20 @@ class StatusDropdown extends PureClasss<Props>
     });
   }
 
-  handleChange(index: number)
+  public handleChange(index: number)
   {
-    let status = this.getOrder()[index];
+    const status = this.getOrder()[index];
     LibraryActions.variants.status(this.props.variant, status as Status, false);
   }
 
-  canEdit(): boolean
+  public canEdit(): boolean
   {
     const { variant } = this.props;
     return this.state.isSuperUser ||
       (this.state.isBuilder && variant.status !== Status.Live);
   }
 
-  getOptions(): List<El>
+  public getOptions(): List<El>
   {
     const { variant } = this.props;
 
@@ -126,7 +127,7 @@ class StatusDropdown extends PureClasss<Props>
     return AdminOptions;
   }
 
-  getOrder(): Array<Status | string>
+  public getOrder(): Array<Status | string>
   {
     if (this.state.isSuperUser)
     {
@@ -141,7 +142,7 @@ class StatusDropdown extends PureClasss<Props>
     return [];
   }
 
-  getSelectedIndex(): number
+  public getSelectedIndex(): number
   {
     if (!this.canEdit())
     {
@@ -153,7 +154,7 @@ class StatusDropdown extends PureClasss<Props>
     return this.getOrder().indexOf(status);
   }
 
-  render()
+  public render()
   {
     const { variant } = this.props;
 
@@ -171,7 +172,7 @@ class StatusDropdown extends PureClasss<Props>
     }
 
     return (
-      <div className="status-dropdown-wrapper">
+      <div className='status-dropdown-wrapper'>
         <div
           className={classNames({
             'status-dropdown': true,
@@ -197,7 +198,7 @@ function getOption(status: Status)
 {
   return (
     <div
-      className="status-dropdown-option"
+      className='status-dropdown-option'
       style={{
         color: LibraryTypes.colorForStatus(status),
       }}
@@ -206,18 +207,18 @@ function getOption(status: Status)
         status === Status.Default
           ?
           <StarIcon
-            className="status-dropdown-option-star"
+            className='status-dropdown-option-star'
           />
           :
           <div
-            className="status-dropdown-option-marker"
+            className='status-dropdown-option-marker'
             style={{
               background: LibraryTypes.colorForStatus(status),
             }}
           />
       }
       <div
-        className="status-dropdown-option-text"
+        className='status-dropdown-option-text'
       >
         {
           LibraryTypes.nameForStatus(status as Status)

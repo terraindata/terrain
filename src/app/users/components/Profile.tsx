@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Profile.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -53,6 +53,7 @@ import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import UserStore from './../data/UserStore';
 import UserTypes from './../UserTypes';
+import './Profile.less';
 
 export interface Props
 {
@@ -63,10 +64,10 @@ export interface Props
 
 class Profile extends Classs<Props>
 {
-  userUnsubscribe = null;
-  authUnsubscribe = null;
+  public userUnsubscribe = null;
+  public authUnsubscribe = null;
 
-  state: {
+  public state: {
     user: UserTypes.User,
     me: UserTypes.User,
     loading: boolean,
@@ -80,7 +81,7 @@ class Profile extends Classs<Props>
     routeIsDirect: false,
   };
 
-  infoKeys = [
+  public infoKeys = [
     'userId',
     'whatIDo',
     'phone',
@@ -97,7 +98,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  updateUser(props: Props)
+  public updateUser(props: Props)
   {
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
@@ -121,7 +122,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     Actions.fetch();
     this.updateUser(this.props);
@@ -132,27 +133,27 @@ class Profile extends Classs<Props>
       AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
   }
 
-  renderInfoItem(key: string)
+  public renderInfoItem(key: string)
   {
     return (
-      <div className="profile-info-item" key={key}>
-        <div className="profile-info-item-name">
+      <div className='profile-info-item' key={key}>
+        <div className='profile-info-item-name'>
           {key.replace(/([A-Z])/g, (v) => ' ' + v)}
         </div>
-        <div className="profile-info-item-value">
+        <div className='profile-info-item-value'>
           {this.state.user[key]}
         </div>
       </div>
     );
   }
 
-  toggleAdmin()
+  public toggleAdmin()
   {
     if (window.confirm(
       this.state.user.isSuperUser ?
@@ -171,7 +172,7 @@ are still a system administrator yourself.)'))
     }
   }
 
-  toggleDisabled()
+  public toggleDisabled()
   {
     if (window.confirm(this.state.user.isDisabled ?
       'Are you sure you want to re-enable this user? They will be able to log in to Terraformer again.'
@@ -188,7 +189,7 @@ immediately be logged out of any existing sessions. \
     }
   }
 
-  renderAdminTools()
+  public renderAdminTools()
   {
     const { me, user } = this.state;
     if (!me || !me.isSuperUser || me.id === user.id)
@@ -197,7 +198,7 @@ immediately be logged out of any existing sessions. \
     }
 
     return (
-      <div className="profile-admin-tools">
+      <div className='profile-admin-tools'>
         <div
           className={classNames({
             'profile-admin-button': true,
@@ -220,16 +221,16 @@ immediately be logged out of any existing sessions. \
     );
   }
 
-  render()
+  public render()
   {
     if (this.state.loading)
     {
-      return <InfoArea large="Loading..." />;
+      return <InfoArea large='Loading...' />;
     }
 
     if (!this.state.user)
     {
-      return <InfoArea large="No such user found." />;
+      return <InfoArea large='No such user found.' />;
     }
 
     return (
@@ -238,15 +239,15 @@ immediately be logged out of any existing sessions. \
         'profile-wrapper': this.state.routeIsDirect,
       })}>
         <div
-          className="profile-pic"
+          className='profile-pic'
         >
           <img
-            className="profile-pic-image"
+            className='profile-pic-image'
             src={UserTypes.profileUrlFor(this.state.user)}
-            ref="profilePicImg"
+            ref='profilePicImg'
           />
         </div>
-        <div className="profile-name">
+        <div className='profile-name'>
           {
             this.state.user.name
           }
@@ -256,20 +257,20 @@ immediately be logged out of any existing sessions. \
         </div>
         {
           this.state.isLoggedInUser ?
-            <div className="profile-edit-row">
-              <Link to="/account/profile/edit" className="button">
+            <div className='profile-edit-row'>
+              <Link to='/account/profile/edit' className='button'>
                 Edit
               </Link>
             </div>
             : null
         }
-        <div className="profile-info">
+        <div className='profile-info'>
           {
             this.infoKeys.map(this.renderInfoItem)
           }
         </div>
         {this.renderAdminTools()}
-        <Link to="/account/team" className="profile-team-button">
+        <Link to='/account/team' className='profile-team-button'>
           Team Directory
         </Link>
       </div>

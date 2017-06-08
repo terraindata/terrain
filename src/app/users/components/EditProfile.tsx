@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { Link } from 'react-router';
 import AuthStore from './../../auth/data/AuthStore';
@@ -54,7 +55,7 @@ import UserStore from './../data/UserStore';
 import UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8_gray.svg');
-const { browserHistory } = require('react-router');
+import { browserHistory } from 'react-router';
 
 export interface Props
 {
@@ -64,10 +65,10 @@ export interface Props
 
 class Profile extends Classs<Props>
 {
-  userUnsubscribe = null;
-  authUnsubscribe = null;
+  public userUnsubscribe = null;
+  public authUnsubscribe = null;
 
-  state: {
+  public state: {
     user: UserTypes.User,
     loading: boolean,
     saving: boolean,
@@ -85,7 +86,7 @@ class Profile extends Classs<Props>
     errorModalMessage: '',
   };
 
-  infoKeys = [
+  public infoKeys = [
     {
       key: 'name',
       label: 'Your Name',
@@ -118,7 +119,7 @@ class Profile extends Classs<Props>
       AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
-  updateUser(props: Props)
+  public updateUser(props: Props)
   {
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
@@ -128,20 +129,20 @@ class Profile extends Classs<Props>
     });
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Actions.fetch();
     this.updateUser(this.props);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
     this.state.savingReq && this.state.savingReq.abort();
   }
 
-  handleSave()
+  public handleSave()
   {
     let newUser = this.state.user;
     this.infoKeys.map((infoKey) =>
@@ -157,7 +158,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  onSave()
+  public onSave()
   {
     this.setState({
       saving: false,
@@ -166,7 +167,7 @@ class Profile extends Classs<Props>
     browserHistory.push('/account/profile');
   }
 
-  onSaveError(response)
+  public onSaveError(response)
   {
     this.setState({
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -179,40 +180,40 @@ class Profile extends Classs<Props>
     });
   }
 
-  renderInfoItem(infoKey: { key: string, label: string, subText: string })
+  public renderInfoItem(infoKey: { key: string, label: string, subText: string })
   {
     return (
-      <div className="profile-info-item-edit" key={infoKey.key}>
-        <div className="profile-info-item-name">
+      <div className='profile-info-item-edit' key={infoKey.key}>
+        <div className='profile-info-item-name'>
           {infoKey.label}
         </div>
-        <div className="profile-info-item-value">
+        <div className='profile-info-item-value'>
           <input
-            type="text"
+            type='text'
             defaultValue={this.state.user[infoKey.key]}
             ref={infoKey.key}
           />
         </div>
-        <div className="profile-info-item-subtext">
+        <div className='profile-info-item-subtext'>
           {infoKey.subText}
         </div>
       </div>
     );
   }
 
-  handleProfilePicClick(event)
+  public handleProfilePicClick(event)
   {
     this.setState({
       showDropDown: !this.state.showDropDown,
     });
   }
 
-  handleUploadImage(event)
+  public handleUploadImage(event)
   {
     this.refs['imageInput']['click']();
   }
 
-  removeProfilePicture()
+  public removeProfilePicture()
   {
     const user = this.state.user.set('imgSrc', null) as UserTypes.User;
     this.setState({
@@ -221,7 +222,7 @@ class Profile extends Classs<Props>
     this.refs['profilePicImg']['src'] = UserTypes.profileUrlFor(user);
   }
 
-  handleProfilePicChange(event)
+  public handleProfilePicChange(event)
   {
     const reader = new FileReader();
 
@@ -250,7 +251,7 @@ class Profile extends Classs<Props>
     }
   }
 
-  hidePictureMenu()
+  public hidePictureMenu()
   {
     if (this.state.showDropDown)
     {
@@ -260,88 +261,88 @@ class Profile extends Classs<Props>
     }
   }
 
-  renderProfilePicture()
+  public renderProfilePicture()
   {
     return (
       <div
-        className="edit-profile-pic"
+        className='edit-profile-pic'
         onClick={this.handleProfilePicClick}
       >
         <div className={this.state.showDropDown ? 'dropdown' : 'dropdown-hidden'}>
           <div
             onClick={this.handleUploadImage}
-            className="menu-item"
+            className='menu-item'
           >
             Upload an image
           </div>
           <div
             onClick={this.removeProfilePicture}
-            className="menu-item"
+            className='menu-item'
           >
             Remove photo
           </div>
         </div>
         <img
-          className="profile-pic-image"
+          className='profile-pic-image'
           src={UserTypes.profileUrlFor(this.state.user)}
-          ref="profilePicImg"
+          ref='profilePicImg'
         />
-        <div className="profile-pic-overlay">
-          <div className="profile-pic-overlay-message">
-            <div className="camera-icon">
+        <div className='profile-pic-overlay'>
+          <div className='profile-pic-overlay-message'>
+            <div className='camera-icon'>
               <CameraIcon />
             </div>
             Change your profile picture
           </div>
         </div>
         <input
-          ref="imageInput"
-          type="file"
-          className="profile-pic-upload"
+          ref='imageInput'
+          type='file'
+          className='profile-pic-upload'
           onChange={this.handleProfilePicChange}
-          id="profile-image-input"
+          id='profile-image-input'
         />
       </div>
     );
   }
 
-  toggleErrorModal()
+  public toggleErrorModal()
   {
     this.setState({
       errorModalOpen: !this.state.errorModalOpen,
     });
   }
 
-  render()
+  public render()
   {
     if (this.state.loading)
     {
-      return <InfoArea large="Loading..." />;
+      return <InfoArea large='Loading...' />;
     }
 
     if (!this.state.user)
     {
-      return <InfoArea large="No such user found." />;
+      return <InfoArea large='No such user found.' />;
     }
 
     return (
-      <div className="profile profile-edit" onClick={this.hidePictureMenu}>
-        <div className="profile-save-row">
-          <div className="edit-profile-title">
+      <div className='profile profile-edit' onClick={this.hidePictureMenu}>
+        <div className='profile-save-row'>
+          <div className='edit-profile-title'>
             Edit your profile
           </div>
-          <div className="edit-profile-close-icon" onClick={this.handleSave}>
+          <div className='edit-profile-close-icon' onClick={this.handleSave}>
             <CloseIcon />
           </div>
         </div>
-        <div className="profile-edit-container">
-          <div className="profile-info">
+        <div className='profile-edit-container'>
+          <div className='profile-info'>
             {
               this.infoKeys.map(this.renderInfoItem)
             }
           </div>
-          <div className="profile-pic-column">
-            <div className="profile-pic-name"> Profile Picture </div>
+          <div className='profile-pic-column'>
+            <div className='profile-pic-name'> Profile Picture </div>
             {this.renderProfilePicture()}
           </div>
         </div>

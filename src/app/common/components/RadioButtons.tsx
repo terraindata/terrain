@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./RadioButtons.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './RadioButtons.less';
 
 export interface Props
 {
@@ -62,10 +63,10 @@ export interface Props
 class RadioButtons extends Classs<Props>
 {
 
-  renderOption(option)
+  public renderOption(option)
   {
     return (
-      <div key={option.value} className="radio-button-option">
+      <div key={option.value} className='radio-button-option'>
         <div
           onClick={option.onClick}
           className={classNames({
@@ -80,7 +81,7 @@ class RadioButtons extends Classs<Props>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <div>

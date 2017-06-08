@@ -42,18 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BuilderTQLColumn.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import './BuilderTQLColumn.less';
 const { List } = Immutable;
 import * as _ from 'underscore';
+import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import Query from '../../../../shared/items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultsManager';
 import { MenuOption } from '../../common/components/Menu';
 import LibraryTypes from '../../library/LibraryTypes';
-import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';
@@ -76,7 +77,7 @@ export interface Props
 
 class BuilderTQLColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     tql: string;
     theme: string;
     focused: boolean;
@@ -108,7 +109,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     // this.sendTqlAction = _.debounce(this.sendTqlAction, 1000);
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.state.focused && nextProps.query.tql !== this.state.tql)
     {
@@ -121,7 +122,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  updateTql(tql: string, noAction?: boolean)
+  public updateTql(tql: string, noAction?: boolean)
   {
     if (tql === this.state.tql)
     {
@@ -152,12 +153,12 @@ class BuilderTQLColumn extends PureClasss<Props>
   //   }
   // }
 
-  sendTqlAction()
+  public sendTqlAction()
   {
     BuilderActions.changeTQL(this.state.tql);
   }
 
-  changeThemeDefault()
+  public changeThemeDefault()
   {
     localStorage.setItem('theme', 'default');
     this.setState({
@@ -166,7 +167,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  changeThemeNeo()
+  public changeThemeNeo()
   {
     localStorage.setItem('theme', 'neo');
     this.setState({
@@ -175,7 +176,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  changeThemeCobalt()
+  public changeThemeCobalt()
   {
     localStorage.setItem('theme', 'cobalt');
     this.setState({
@@ -184,7 +185,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  changeThemeMonokai()
+  public changeThemeMonokai()
   {
     localStorage.setItem('theme', 'monokai');
     this.setState({
@@ -193,7 +194,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  getThemeIndex()
+  public getThemeIndex()
   {
     switch (this.state.theme)
     {
@@ -208,7 +209,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  getMenuOptions(): List<MenuOption>
+  public getMenuOptions(): List<MenuOption>
   {
     const options: List<MenuOption> =
       List([
@@ -245,7 +246,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     return options;
   }
 
-  highlightError(lineNumber: number)
+  public highlightError(lineNumber: number)
   {
     if (lineNumber !== null)
     {
@@ -255,7 +256,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  turnSyntaxPopupOff()
+  public turnSyntaxPopupOff()
   {
     this.setState({
       syntaxHelpOpen: false,
@@ -263,14 +264,14 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  findKeyword(line: string)
+  public findKeyword(line: string)
   {
     const keywords = Object.keys(cardList);
     let cardName = '';
-    keywords.map(function(word)
+    keywords.map((word) =>
     {
       const words = word.split(' ');
-      //For terms like select from, only need to match one of the words
+      // For terms like select from, only need to match one of the words
       if (words.length > 1)
       {
         for (let i = 0; i < words.length; i++)
@@ -289,7 +290,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     return cardName;
   }
 
-  toggleSyntaxPopup(event, line)
+  public toggleSyntaxPopup(event, line)
   {
     const cardName = this.findKeyword(line);
 
@@ -303,7 +304,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  defineTerm(value, event)
+  public defineTerm(value, event)
   {
     const cardName = this.findKeyword(value);
     const left = event.clientX;
@@ -319,21 +320,21 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  hideTermDefinition()
+  public hideTermDefinition()
   {
     this.setState({
       termDefinitionOpen: false,
     });
   }
 
-  handleFocusChange(focused)
+  public handleFocusChange(focused)
   {
     this.setState({
       focused,
     });
   }
 
-  render()
+  public render()
   {
     const manualEntry = null;
     // cardList[this.state.cardName] &&
@@ -353,7 +354,7 @@ class BuilderTQLColumn extends PureClasss<Props>
         />
 
         <div
-          className="tql-section"
+          className='tql-section'
         >
           <TQLEditor
             tql={this.state.tql}

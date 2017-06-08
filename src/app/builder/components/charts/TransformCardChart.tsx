@@ -42,22 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
-type ScorePoint = {
+interface ScorePoint
+{
   id: string;
   score: number;
   value: number;
   set: (f: string, v: any) => ScorePoint;
-};
+}
 type ScorePoints = List<ScorePoint>;
 
 import TransformChart from './TransformChart';
@@ -81,7 +83,7 @@ export interface Props
 
 class TransformCardChart extends PureClasss<Props>
 {
-  state: {
+  public state: {
     selectedPointIds: IMMap<string, boolean>;
     lastSelectedPointId?: string;
     initialScore?: number;
@@ -97,13 +99,13 @@ class TransformCardChart extends PureClasss<Props>
     movedSeed: -1,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     const el = ReactDOM.findDOMNode(this);
     TransformChart.create(el, this.getChartState());
   }
 
-  onSelect(pointId: string, selectRange: boolean): void
+  public onSelect(pointId: string, selectRange: boolean): void
   {
     const { points } = this.props;
     let { selectedPointIds } = this.state;
@@ -145,7 +147,7 @@ class TransformCardChart extends PureClasss<Props>
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
   }
 
-  updatePoints(points: ScorePoints, isConcrete?: boolean)
+  public updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
     points = points.map(
       (scorePoint) =>
@@ -156,7 +158,7 @@ class TransformCardChart extends PureClasss<Props>
     this.props.updatePoints(points, isConcrete);
   }
 
-  onPointMoveStart(initialScore, initialValue)
+  public onPointMoveStart(initialScore, initialValue)
   {
     this.setState({
       initialScore,
@@ -166,12 +168,12 @@ class TransformCardChart extends PureClasss<Props>
     });
   }
 
-  sortNumber(a, b)
+  public sortNumber(a, b)
   {
     return a - b;
   }
 
-  onPointMove(pointId, newScore, newValue, pointValues, cx, altKey)
+  public onPointMove(pointId, newScore, newValue, pointValues, cx, altKey)
   {
     const scoreDiff = this.state.initialScore - newScore;
     const valueDiff = this.state.initialValue - newValue;
@@ -214,11 +216,11 @@ class TransformCardChart extends PureClasss<Props>
     this.updatePoints(points.toList(), isConcrete);
   }
 
-  onPointRelease()
+  public onPointRelease()
   {
   }
 
-  onLineClick(x, y)
+  public onLineClick(x, y)
   {
     this.setState({
       lineMoving: true,
@@ -227,7 +229,7 @@ class TransformCardChart extends PureClasss<Props>
     });
   }
 
-  onLineMove(x, y)
+  public onLineMove(x, y)
   {
     const scoreDiff = y - this.state.initialLineY;
 
@@ -236,14 +238,14 @@ class TransformCardChart extends PureClasss<Props>
     ).toList());
   }
 
-  onDelete(pointId)
+  public onDelete(pointId)
   {
     this.updatePoints(this.props.points.filterNot(
       (point) => point.id === pointId || this.state.selectedPointIds.get(point.id),
     ).toList(), true);
   }
 
-  onCreate(value, score)
+  public onCreate(value, score)
   {
     const { points } = this.props;
     let index = 0;
@@ -258,19 +260,19 @@ class TransformCardChart extends PureClasss<Props>
           AllBackendsMap[this.props.language].blocks.scorePoint, {
             value,
             score,
-          }
+          },
         ),
       ).toList(),
-      true
+      true,
     );
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());
   }
 
-  getChartState(overrideState?: any)
+  public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
 
@@ -306,13 +308,13 @@ class TransformCardChart extends PureClasss<Props>
     return chartState;
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
   }
 
-  render()
+  public render()
   {
     return (
       <div />
