@@ -56,7 +56,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
-const { browserHistory } = require('react-router');
+import { browserHistory } from 'react-router';
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
 window['PerfStart'] = Perf.start;

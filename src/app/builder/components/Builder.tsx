@@ -52,8 +52,8 @@ import { DragDropContext } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 const HTML5Backend = require('react-dnd-html5-backend');
-const { browserHistory } = require('react-router');
-const { withRouter } = require('react-router');
+import { browserHistory } from 'react-router';
+import { withRouter } from 'react-router';
 
 // Data
 import { ItemStatus } from '../../../../shared/items/types/Item';

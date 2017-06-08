@@ -55,9 +55,9 @@ import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 // import * as moment from 'moment';
 const moment = require('moment');
+import { browserHistory } from 'react-router';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
-const { browserHistory } = require('react-router');
 
 type Variant = LibraryTypes.Variant;
 type User = UserTypes.User;

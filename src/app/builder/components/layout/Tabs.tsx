@@ -52,6 +52,7 @@ const moment = require('moment');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
 import LibraryActions from '../../../library/data/LibraryActions';
 import Util from '../../../util/Util';
@@ -62,7 +63,6 @@ import Classs from './../../../common/components/Classs';
 import InfoArea from './../../../common/components/InfoArea';
 import PureClasss from './../../../common/components/PureClasss';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
-const { browserHistory } = require('react-router');
 const ReactTooltip = require('react-tooltip');
 
 const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');

@@ -48,10 +48,10 @@ const _ = require('underscore');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
 import Autocomplete from './../../common/components/Autocomplete';
 import Classs from './../../common/components/Classs';
 import ManualEntry from './ManualEntry';
-const { browserHistory } = require('react-router');
 
 import * as Immutable from 'immutable';
 const { List } = Immutable;

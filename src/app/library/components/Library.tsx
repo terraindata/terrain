@@ -59,7 +59,7 @@ import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
 const HTML5Backend = require('react-dnd-html5-backend');
-const { browserHistory } = require('react-router');
+import { browserHistory } from 'react-router';
 
 export interface Props
 {
