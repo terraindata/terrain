@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./ManualPopup.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -51,6 +50,7 @@ import * as _ from 'underscore';
 import ManualEntry from '../../../../shared/blocks/types/ManualEntry';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './ManualPopup.less';
 const InfoIcon = require('./../../../images/icon_info.svg');
 const OpenIcon = require('./../../../images/icon_open.svg');
 

@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Library.less');
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea';
@@ -56,10 +55,11 @@ import Store from './../data/LibraryStore';
 import LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import GroupsColumn from './GroupsColumn';
+import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
 const HTML5Backend = require('react-dnd-html5-backend');
-const { browserHistory } = require('react-router');
+import { browserHistory } from 'react-router';
 
 export interface Props
 {

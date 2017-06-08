@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Loading.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import './Loading.less';
 
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';

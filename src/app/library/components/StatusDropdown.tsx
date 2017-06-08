@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./StatusDropdown.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import './StatusDropdown.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
 import { ItemStatus as Status } from '../../../../shared/items/types/Item';

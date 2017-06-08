@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./DeployModal.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
+import './DeployModal.less';
 
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import Modal from '../../common/components/Modal';

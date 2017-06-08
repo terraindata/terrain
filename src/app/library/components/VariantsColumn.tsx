@@ -48,6 +48,8 @@ import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
+import { browserHistory } from 'react-router';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -65,8 +67,6 @@ import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 import StatusDropdown from './StatusDropdown';
-const { browserHistory } = require('react-router');
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 

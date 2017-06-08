@@ -43,7 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Periscope.less');
+
+// tslint:disable:no-invalid-this
+
+import './Periscope.less';
 
 // consider upgrading d3 to v4, which has available types
 // import * as d3 from 'd3';

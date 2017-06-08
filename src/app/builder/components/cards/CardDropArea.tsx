@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 import * as Immutable from 'immutable';
-require('./CardDropArea.less');
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss';
+import './CardDropArea.less';
 const classNames = require('classnames');
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import Actions from '../../data/BuilderActions';

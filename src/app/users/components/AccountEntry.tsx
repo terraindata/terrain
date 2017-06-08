@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./AccountEntry.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './AccountEntry.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 export interface Props

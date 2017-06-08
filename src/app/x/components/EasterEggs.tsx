@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./EasterEggs.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -52,6 +51,7 @@ import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import './EasterEggs.less';
 const r = 3;
 export interface Props
 {

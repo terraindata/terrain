@@ -43,10 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./InputStyle.less');
-const _ = require('underscore');
+
+// tslint:disable:no-invalid-this
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
+import './InputStyle.less';
 const { List } = Immutable;
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';

@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Settings.less');
 import * as React from 'react';
 import { Link } from 'react-router';
 import UserTypes from '../UserTypes';
@@ -57,6 +56,7 @@ import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
+import './Settings.less';
 type User = UserTypes.User;
 import Modal from './../../common/components/Modal';
 import PasswordStrengthInput from './PasswordStrengthInput';

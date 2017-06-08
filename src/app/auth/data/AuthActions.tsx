@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-const _ = require('underscore');
+import * as _ from 'underscore';
 import ActionTypes from './AuthActionTypes';
 import Store from './AuthStore';
 

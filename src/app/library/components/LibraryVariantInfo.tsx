@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./LibraryVariantInfo.less');
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import './LibraryVariantInfo.less';
 const { List } = Immutable;
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';

@@ -43,8 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Notifications.less');
-require('./Select.less');
 import * as React from 'react';
 import { Link } from 'react-router';
 import UserTypes from '../UserTypes';
@@ -57,6 +55,8 @@ import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
+import './Notifications.less';
+import './Select.less';
 
 const Select = require('react-select');
 const SoundIcon = require('./../../../images/icon_audio.svg');

@@ -43,15 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Manual.less');
-const _ = require('underscore');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
+import * as _ from 'underscore';
 import Autocomplete from './../../common/components/Autocomplete';
 import Classs from './../../common/components/Classs';
+import './Manual.less';
 import ManualEntry from './ManualEntry';
-const { browserHistory } = require('react-router');
 
 import * as Immutable from 'immutable';
 const { List } = Immutable;

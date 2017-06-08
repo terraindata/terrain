@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./TQLResultsBar.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { ResultsState } from '../../builder/components/results/ResultsManager';
 import PureClasss from './../../common/components/PureClasss';
+import './TQLResultsBar.less';
 export interface Props
 {
   resultsState: ResultsState;

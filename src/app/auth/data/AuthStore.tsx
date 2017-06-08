@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-const _ = require('underscore');
+import * as _ from 'underscore';
 const Immutable = require('immutable');
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';

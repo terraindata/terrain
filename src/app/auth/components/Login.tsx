@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Login.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -54,6 +53,7 @@ import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
+import './Login.less';
 
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 

@@ -48,7 +48,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 const ReactDataGrid = require('react-data-grid');
 
-require('./Table.less');
+import './Table.less';
 
 import * as classNames from 'classnames';
 import { Menu, MenuOption } from '../../common/components/Menu';

@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Team.less');
 import * as React from 'react';
 import { Link } from 'react-router';
 import CreateItem from '../../common/components/CreateItem';
@@ -55,6 +54,7 @@ import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
+import './Team.less';
 import UserThumbnail from './UserThumbnail';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;

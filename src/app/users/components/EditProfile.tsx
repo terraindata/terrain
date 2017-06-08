@@ -55,7 +55,7 @@ import UserStore from './../data/UserStore';
 import UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8_gray.svg');
-const { browserHistory } = require('react-router');
+import { browserHistory } from 'react-router';
 
 export interface Props
 {

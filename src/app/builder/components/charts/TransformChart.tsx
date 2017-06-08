@@ -43,7 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./TransformChart.less');
+
+// tslint:disable:no-invalid-this
+
+import './TransformChart.less';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');

@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./CardsColumn.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -57,6 +56,7 @@ import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
+import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';

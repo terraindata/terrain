@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-require('./Menu.less');
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 const optionHeight = 30; // coordinate with Menu.less
