@@ -94,9 +94,25 @@ export interface BlockConfig
 
 export const allBlocksMetaFields = ['id'];
 
+const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn', 'map', 'static'];
+export const verifyBlockConfigKeys = (config: object) =>
+{
+  RESERVED_WORDS.map(
+    word => 
+    {
+      if (config[word])
+      {
+        throw new Error("Creating card: " + word + " is a reserved word. " + JSON.stringify(config));
+      }
+    }
+  );
+}
+
 // helper function to populate common fields for an Block
 export const _block = (config: BlockConfig): Block =>
 {
+  verifyBlockConfigKeys(config);
+  
   const blockConfig: Block = _.extend({
     id: '',
     type: '',
