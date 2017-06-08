@@ -91,6 +91,8 @@ class CardsColumn extends PureClasss<Props>
     learningMode: false,
   };
 
+  public innerHeight: number = -1;
+
   public componentDidMount()
   {
     this.handleScroll();
@@ -187,7 +189,6 @@ class CardsColumn extends PureClasss<Props>
     }
   }
 
-  public innerHeight: number = -1;
   public render()
   {
     const { props } = this;

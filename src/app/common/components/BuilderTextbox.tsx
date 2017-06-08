@@ -111,6 +111,14 @@ export interface Props
 
 class BuilderTextbox extends PureClasss<Props>
 {
+  public state: {
+    wrongType: boolean;
+    isSwitching: boolean;
+    value: CardString;
+    backupString: CardString;
+    options: List<string>;
+  };
+
   constructor(props: Props)
   {
     super(props);
@@ -127,14 +135,6 @@ class BuilderTextbox extends PureClasss<Props>
       options: Immutable.List([]),
     };
   }
-
-  public state: {
-    wrongType: boolean;
-    isSwitching: boolean;
-    value: CardString;
-    backupString: CardString;
-    options: List<string>;
-  };
 
   public getCreatingType(): string
   {

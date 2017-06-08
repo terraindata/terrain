@@ -139,6 +139,8 @@ class Builder extends PureClasss<Props>
 
   public initialColSizes: any;
 
+  public confirmedLeave: boolean = false;
+
   constructor(props: Props)
   {
     super(props);
@@ -771,7 +773,6 @@ class Builder extends PureClasss<Props>
     });
   }
 
-  public confirmedLeave: boolean = false;
   public handleModalDontSave()
   {
     this.confirmedLeave = true;

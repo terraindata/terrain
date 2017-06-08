@@ -45,6 +45,53 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 class ColorManager
 {
+  // Public
+
+  public static colorForKey(_key: ID, _secondaryKey?: string): string
+  {
+    const key = _key + '';
+    const secondaryKey = _secondaryKey + '';
+    return this.COLORS[this.indexForKey(key, secondaryKey)];
+  }
+
+  public static altColorForKey(_key: ID, _secondaryKey?: string): string
+  {
+    const key = _key + '';
+    const secondaryKey = _secondaryKey + '';
+    return this.ALT_COLORS[this.indexForKey(key, secondaryKey)];
+  }
+
+  public static darkerColorForKey(_key: ID, _secondaryKey?: string): string
+  {
+    const key = _key + '';
+    const secondaryKey = _secondaryKey + '';
+    return this.DARKER_COLORS[this.indexForKey(key)];
+  }
+
+  public static readColorForKey(_key: ID)
+  {
+    const key = _key + '';
+    const index = this.readIndexForKey(key);
+    if (index === null)
+    {
+      return null;
+    }
+
+    return this.COLORS[index];
+  }
+
+  public static readDarkerColorForKey(_key: ID)
+  {
+    const key = _key + '';
+    const index = this.readIndexForKey(key);
+    if (index === null)
+    {
+      return null;
+    }
+
+    return this.COLORS[index];
+  }
+
   private static COLORS =
   [
     '#00A7F7',
@@ -147,54 +194,6 @@ class ColorManager
 
     return this.keyToIndex[key];
   }
-
-  // Public
-
-  public static colorForKey(_key: ID, _secondaryKey?: string): string
-  {
-    const key = _key + '';
-    const secondaryKey = _secondaryKey + '';
-    return this.COLORS[this.indexForKey(key, secondaryKey)];
-  }
-
-  public static altColorForKey(_key: ID, _secondaryKey?: string): string
-  {
-    const key = _key + '';
-    const secondaryKey = _secondaryKey + '';
-    return this.ALT_COLORS[this.indexForKey(key, secondaryKey)];
-  }
-
-  public static darkerColorForKey(_key: ID, _secondaryKey?: string): string
-  {
-    const key = _key + '';
-    const secondaryKey = _secondaryKey + '';
-    return this.DARKER_COLORS[this.indexForKey(key)];
-  }
-
-  public static readColorForKey(_key: ID)
-  {
-    const key = _key + '';
-    const index = this.readIndexForKey(key);
-    if (index === null)
-    {
-      return null;
-    }
-
-    return this.COLORS[index];
-  }
-
-  public static readDarkerColorForKey(_key: ID)
-  {
-    const key = _key + '';
-    const index = this.readIndexForKey(key);
-    if (index === null)
-    {
-      return null;
-    }
-
-    return this.COLORS[index];
-  }
-
 }
 
 export default ColorManager;

@@ -88,6 +88,8 @@ class CardDragPreview extends PureClasss<CDPProps>
     language: Store.getState().query.language,
   };
 
+  public timeout: any;
+
   public componentDidMount()
   {
     this._subscribe(Store,
@@ -96,8 +98,6 @@ class CardDragPreview extends PureClasss<CDPProps>
         storeKeyPath: ['query', 'language'],
       });
   }
-
-  public timeout: any;
 
   public componentWillReceiveProps(nextProps: CDPProps)
   {

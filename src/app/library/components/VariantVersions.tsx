@@ -80,6 +80,8 @@ class VariantVersions extends PureClasss<Props>
     roles: null,
   };
 
+  public xhr: XMLHttpRequest = null;
+
   constructor(props: Props)
   {
     super(props);
@@ -95,7 +97,6 @@ class VariantVersions extends PureClasss<Props>
       });
   }
 
-  public xhr: XMLHttpRequest = null;
   public fetchVariants(props)
   {
     // TODO

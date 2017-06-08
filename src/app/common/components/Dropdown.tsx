@@ -68,6 +68,8 @@ export interface Props
 
 class Dropdown extends PureClasss<Props>
 {
+  public _clickHandlers: { [index: number]: () => void } = {};
+
   constructor(props: Props)
   {
     super(props);
@@ -79,7 +81,6 @@ class Dropdown extends PureClasss<Props>
       };
   }
 
-  public _clickHandlers: { [index: number]: () => void } = {};
   public clickHandler(index)
   {
     if (!this._clickHandlers[index])

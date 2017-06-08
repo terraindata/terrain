@@ -80,6 +80,12 @@ export interface Props
   tql: string;
   canEdit: boolean;
 
+  theme?: string;
+  highlightedLine?: number;
+
+  isDiff?: boolean;
+  diffTql?: string;
+
   onChange?(tql: string);
   onFocusChange?(focused: boolean);
 
@@ -87,11 +93,6 @@ export interface Props
   defineTerm?(value, event);
   turnSyntaxPopupOff?();
   hideTermDefinition?();
-  theme?: string;
-  highlightedLine?: number;
-
-  isDiff?: boolean;
-  diffTql?: string;
 }
 
 class TQLEditor extends PureClasss<Props>

@@ -63,6 +63,28 @@ interface Store
 
 class Classs<T> extends React.Component<T, any>
 {
+  public _unmounted = false;
+
+  public subscriptions: Array<() => void> = [];
+
+  public _keyPaths: { [key: string]: Array<string | number> } = {};
+  public _ikeyPaths: {
+    [key: string]:
+    {
+      seed: Immutable.List<string | number>,
+      keyPath: Immutable.List<string | number>,
+    },
+  } = {};
+
+  public _fns: {
+    [name: string]: Array<{
+      args: any[],
+      fn: () => void,
+    }>,
+  } = {};
+
+  public _togMap: { [stateKey: string]: () => void } = {};
+
   constructor(props: T)
   {
     super(props);
@@ -89,8 +111,6 @@ class Classs<T> extends React.Component<T, any>
 
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
-
-  public _unmounted = false;
 
   public _unsubscribe()
   {
@@ -128,7 +148,6 @@ class Classs<T> extends React.Component<T, any>
       };
     }
   }
-  public subscriptions: Array<() => void> = [];
 
   public _update(store: Store, config: Config)
   {
@@ -187,7 +206,6 @@ class Classs<T> extends React.Component<T, any>
   //  this function accepts arguments from which to
   //  construct an array keyPath, and memoizes that array
   //  so as to allow for pure rendering
-  public _keyPaths: { [key: string]: Array<string | number> } = {};
   public _keyPath(...keys: Array<string | number>)
   {
     const key = keys.join('.');
@@ -198,13 +216,6 @@ class Classs<T> extends React.Component<T, any>
     return this._keyPaths[key];
   }
 
-  public _ikeyPaths: {
-    [key: string]:
-    {
-      seed: Immutable.List<string | number>,
-      keyPath: Immutable.List<string | number>,
-    },
-  } = {};
   public _ikeyPath(seed: Immutable.List<string | number>, ...keys: Array<string | number | Array<string | number>>)
   {
     if (Array.isArray(keys[0]))
@@ -224,12 +235,6 @@ class Classs<T> extends React.Component<T, any>
     return this._ikeyPaths[str].keyPath;
   }
 
-  public _fns: {
-    [name: string]: Array<{
-      args: any[],
-      fn: () => void,
-    }>,
-  } = {};
   public _fn(instanceFn: (...args: any[]) => any, ...args: any[]): (...args: any[]) => any
   {
     const fnName = instanceFn['name'];
@@ -276,7 +281,6 @@ class Classs<T> extends React.Component<T, any>
     }
   }
 
-  public _togMap: { [stateKey: string]: () => void } = {};
   public _toggle(stateKey: string): (() => void)
   {
     return this._togMap[stateKey] || (

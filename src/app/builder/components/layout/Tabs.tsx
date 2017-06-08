@@ -209,8 +209,8 @@ export interface TabAction
 {
   text: string;
   icon: any;
-  onClick();
   enabled?: boolean;
+  onClick();
 }
 
 interface TabsProps

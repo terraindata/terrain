@@ -120,6 +120,11 @@ class _CardComponent extends PureClasss<Props>
   // _debugUpdates = true;
   public _debugName = 'Card';
 
+  public dragPreview: any;
+
+  public cardEl: HTMLElement;
+  public renderTimeout: any;
+
   constructor(props: Props)
   {
     super(props);
@@ -220,7 +225,6 @@ class _CardComponent extends PureClasss<Props>
     }
   }
 
-  public dragPreview: any;
   public componentDidMount()
   {
     if (this.props.card.type === 'creating')
@@ -394,9 +398,6 @@ class _CardComponent extends PureClasss<Props>
   {
     this.renderTimeout && clearTimeout(this.renderTimeout);
   }
-
-  public cardEl: HTMLElement;
-  public renderTimeout: any;
 
   public render()
   {

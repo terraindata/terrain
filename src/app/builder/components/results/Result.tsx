@@ -89,6 +89,23 @@ class ResultComponent extends Classs<Props> {
   //   spotlightColor: "",
   // };
 
+  public menuOptions =
+  [
+    List([
+      {
+        text: 'Spotlight',
+        onClick: this.spotlight,
+      },
+    ]),
+
+    List([
+      {
+        text: 'Un-Spotlight',
+        onClick: this.unspotlight,
+      },
+    ]),
+  ];
+
   public renderExpandedField(value, field)
   {
     return this.renderField(field, 0, null, {
@@ -172,23 +189,6 @@ class ResultComponent extends Classs<Props> {
       />
     );
   }
-
-  public menuOptions =
-  [
-    List([
-      {
-        text: 'Spotlight',
-        onClick: this.spotlight,
-      },
-    ]),
-
-    List([
-      {
-        text: 'Un-Spotlight',
-        onClick: this.unspotlight,
-      },
-    ]),
-  ];
 
   public expand()
   {

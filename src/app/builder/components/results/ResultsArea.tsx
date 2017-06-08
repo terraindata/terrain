@@ -104,6 +104,8 @@ class ResultsArea extends PureClasss<Props>
     resultFormat: 'icon',
   };
 
+  public resultsFodderRange = _.range(0, 25);
+
   public componentWillReceiveProps(nextProps)
   {
     if (nextProps.query.cards !== this.props.query
@@ -198,13 +200,6 @@ class ResultsArea extends PureClasss<Props>
     const { query } = this.props;
     return !query || (!query.tql && !query.cards.size);
   }
-
-  private isDatabaseEmpty(): boolean
-  {
-    return !this.props.db || !this.props.db.id;
-  }
-
-  public resultsFodderRange = _.range(0, 25);
 
   public renderResults()
   {
@@ -491,6 +486,11 @@ column if you have set a custom results view.');
         {this.renderConfig()}
       </div>
     );
+  }
+
+  private isDatabaseEmpty(): boolean
+  {
+    return !this.props.db || !this.props.db.id;
   }
 }
 

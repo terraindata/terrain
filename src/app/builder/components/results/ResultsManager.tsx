@@ -170,6 +170,173 @@ export class ResultsManager extends PureClasss<Props>
     );
   }
 
+  public queryResults(query: Query, db: BackendInstance)
+  {
+    if (!query || !db)
+    {
+      return;
+    }
+
+    if (db.source === 'm1')
+    {
+      this.queryM1Results(query, db);
+    } else if (db.source === 'm2')
+    {
+      this.queryM2Results(query, db);
+    } else
+    {
+      console.log('Unknown Database ' + query);
+    }
+    // temporarily disable count
+    // this.setState({
+    //   countXhr:
+    //     Ajax.query(
+    //       TQLConverter.toTQL(query, {
+    //         count: true,
+    //         replaceInputs: true,
+    //       }),
+    //       db,
+    //       this.handleCountResponse,
+    //       this.handleCountError
+    //     ),
+    // });
+  }
+
+  public killQueries()
+  {
+    this.mapQueries(
+      (query) =>
+      {
+        AjaxM1.killQuery(query.queryId);
+        query.xhr.abort();
+      },
+    );
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (
+      nextProps.query
+      && nextProps.query.tql
+      && (!this.props.query ||
+        (
+          this.props.query.tql !== nextProps.query.tql ||
+          this.props.query.cards !== nextProps.query.cards ||
+          this.props.query.inputs !== nextProps.query.inputs
+        )
+      )
+    )
+    {
+      this.queryResults(nextProps.query, nextProps.db);
+
+      if (!this.props.query || nextProps.query.id !== this.props.query.id)
+      {
+        this.changeResults({
+          results: List([]),
+        });
+      }
+    }
+
+    // if(nextProps.resultsState.results !== this.props.resultsState.results)
+    // {
+    //   // update spotlights
+    //   let nextState = nextProps.resultsState;
+    //   let {resultsConfig} = nextProps.query;
+
+    //   SpotlightStore.getState().spotlights.map(
+    //     (spotlight, id) =>
+    //     {
+    //       let resultIndex = nextState.results && nextState.results.findIndex(
+    //         r => getPrimaryKeyFor(r, resultsConfig) === id
+    //       );
+    //       if(resultIndex !== -1)
+    //       {
+    //         spotlightAction(id, _.extend({
+    //             color: spotlight.color,
+    //             name: spotlight.name,
+    //           },
+    //           nextState.results.get(resultIndex).toJS()
+    //         ));
+    //         // TODO something more like this
+    //         // spotlightAction(id,
+    //         //   {
+    //         //     color: spotlight.color,
+    //         //     name: spotlight.name,
+    //         //     result: nextState.results.get(resultIndex),
+    //         //   }
+    //         // );
+    //       }
+    //       else
+    //       {
+    //         spotlightAction(id, null);
+    //       }
+    //     }
+    //   );
+    // }
+  }
+
+  public handleCountResponse(response: M1QueryResponse)
+  {
+    this.setState({
+      countQuery: null,
+    });
+
+    // let results = response.results;
+    // if(results)
+    // {
+    //   if(results.length === 1)
+    //   {
+    //     this.setState({
+    //       resultsCount: results[0]['COUNT(*)']
+    //     });
+    //   }
+    //   else if(results.length > 1)
+    //   {
+    //     this.setState({
+    //       resultsCount: results.length,
+    //     })
+    //   }
+    //   else
+    //   {
+    //     this.handleCountError();
+    //   }
+    // }
+    // else
+    // {
+    //   this.handleCountError();
+    // }
+  }
+
+  public handleCountError()
+  {
+    this.setState({
+      countQuery: null,
+    });
+    // probably not needed
+    // this.props.onResultsStateChange(
+    //   this.props.resultsState
+    //     .set('resultsLongCount', 0)
+    // );
+  }
+
+  public changeResults(changes: { [key: string]: any })
+  {
+    let { resultsState } = this.props;
+    _.map(changes,
+      (value: any, key: string) =>
+        resultsState = resultsState.set(key, value),
+    );
+
+    this.props.onResultsStateChange(resultsState);
+  }
+
+  public render()
+  {
+    return (
+      <div />
+    );
+  }
+
   private queryM1Results(query: Query, db: BackendInstance)
   {
     const tql = AllBackendsMap[query.language].queryToCode(
@@ -309,111 +476,6 @@ export class ResultsManager extends PureClasss<Props>
         hasLoadedTransform: false,
       });
     }
-  }
-
-  public queryResults(query: Query, db: BackendInstance)
-  {
-    if (!query || !db)
-    {
-      return;
-    }
-
-    if (db.source === 'm1')
-    {
-      this.queryM1Results(query, db);
-    } else if (db.source === 'm2')
-    {
-      this.queryM2Results(query, db);
-    } else
-    {
-      console.log('Unknown Database ' + query);
-    }
-    // temporarily disable count
-    // this.setState({
-    //   countXhr:
-    //     Ajax.query(
-    //       TQLConverter.toTQL(query, {
-    //         count: true,
-    //         replaceInputs: true,
-    //       }),
-    //       db,
-    //       this.handleCountResponse,
-    //       this.handleCountError
-    //     ),
-    // });
-  }
-
-  public killQueries()
-  {
-    this.mapQueries(
-      (query) =>
-      {
-        AjaxM1.killQuery(query.queryId);
-        query.xhr.abort();
-      },
-    );
-  }
-
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    if (
-      nextProps.query
-      && nextProps.query.tql
-      && (!this.props.query ||
-        (
-          this.props.query.tql !== nextProps.query.tql ||
-          this.props.query.cards !== nextProps.query.cards ||
-          this.props.query.inputs !== nextProps.query.inputs
-        )
-      )
-    )
-    {
-      this.queryResults(nextProps.query, nextProps.db);
-
-      if (!this.props.query || nextProps.query.id !== this.props.query.id)
-      {
-        this.changeResults({
-          results: List([]),
-        });
-      }
-    }
-
-    // if(nextProps.resultsState.results !== this.props.resultsState.results)
-    // {
-    //   // update spotlights
-    //   let nextState = nextProps.resultsState;
-    //   let {resultsConfig} = nextProps.query;
-
-    //   SpotlightStore.getState().spotlights.map(
-    //     (spotlight, id) =>
-    //     {
-    //       let resultIndex = nextState.results && nextState.results.findIndex(
-    //         r => getPrimaryKeyFor(r, resultsConfig) === id
-    //       );
-    //       if(resultIndex !== -1)
-    //       {
-    //         spotlightAction(id, _.extend({
-    //             color: spotlight.color,
-    //             name: spotlight.name,
-    //           },
-    //           nextState.results.get(resultIndex).toJS()
-    //         ));
-    //         // TODO something more like this
-    //         // spotlightAction(id,
-    //         //   {
-    //         //     color: spotlight.color,
-    //         //     name: spotlight.name,
-    //         //     result: nextState.results.get(resultIndex),
-    //         //   }
-    //         // );
-    //       }
-    //       else
-    //       {
-    //         spotlightAction(id, null);
-    //       }
-    //     }
-    //   );
-    // }
   }
 
   private updateResults(resultsData: any[], isAllFields: boolean)
@@ -628,68 +690,6 @@ export class ResultsManager extends PureClasss<Props>
       errorItems = response.errors;
     }
     this.updateM2ErrorState(errorItems, isAllFields);
-  }
-
-  public handleCountResponse(response: M1QueryResponse)
-  {
-    this.setState({
-      countQuery: null,
-    });
-
-    // let results = response.results;
-    // if(results)
-    // {
-    //   if(results.length === 1)
-    //   {
-    //     this.setState({
-    //       resultsCount: results[0]['COUNT(*)']
-    //     });
-    //   }
-    //   else if(results.length > 1)
-    //   {
-    //     this.setState({
-    //       resultsCount: results.length,
-    //     })
-    //   }
-    //   else
-    //   {
-    //     this.handleCountError();
-    //   }
-    // }
-    // else
-    // {
-    //   this.handleCountError();
-    // }
-  }
-
-  public handleCountError()
-  {
-    this.setState({
-      countQuery: null,
-    });
-    // probably not needed
-    // this.props.onResultsStateChange(
-    //   this.props.resultsState
-    //     .set('resultsLongCount', 0)
-    // );
-  }
-
-  public changeResults(changes: { [key: string]: any })
-  {
-    let { resultsState } = this.props;
-    _.map(changes,
-      (value: any, key: string) =>
-        resultsState = resultsState.set(key, value),
-    );
-
-    this.props.onResultsStateChange(resultsState);
-  }
-
-  public render()
-  {
-    return (
-      <div />
-    );
   }
 }
 

@@ -116,6 +116,9 @@ class SchemaTreeItem extends PureClasss<Props>
 {
   public state: State = new State();
 
+  public lastHeaderClickTime: number = 0;
+  public lastArrowClickTime: number = 0;
+
   constructor(props: Props)
   {
     super(props);
@@ -222,8 +225,6 @@ class SchemaTreeItem extends PureClasss<Props>
     );
   }
 
-  public lastHeaderClickTime: number = 0;
-
   public handleHeaderClick()
   {
     const time = (new Date()).getTime();
@@ -260,7 +261,6 @@ class SchemaTreeItem extends PureClasss<Props>
     // }
   }
 
-  public lastArrowClickTime: number = 0;
   public handleArrowClick(event)
   {
     this.setState({

@@ -78,6 +78,8 @@ class Autocomplete extends PureClasss<Props>
     selectedIndex: number;
   };
 
+  public blurValue: string = '';
+
   constructor(props: Props)
   {
     super(props);
@@ -124,7 +126,6 @@ class Autocomplete extends PureClasss<Props>
     this.props.onFocus && this.props.onFocus(event);
   }
 
-  public blurValue: string = '';
   public handleBlur(event: React.FocusEvent<any>)
   {
     this.setState({

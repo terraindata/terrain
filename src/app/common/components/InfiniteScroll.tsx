@@ -73,12 +73,13 @@ class Library extends Classs<Props>
     unchanged: false,
   };
 
+  public unmounted = false;
+
   public componentDidMount()
   {
     this.check();
   }
 
-  public unmounted = false;
   public componentWillUnmount()
   {
     // I know this is an anti-pattern, but I can't figure out a way around it
