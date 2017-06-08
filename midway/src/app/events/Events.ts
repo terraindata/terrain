@@ -131,10 +131,11 @@ export class Events
     for (let tp = 0; tp < timePeriods; ++tp)
     {
       const newTime: number = checkTime - tp * timeInterval * 60;
-      const privateKey: string = this.getUniqueId(event.ip as string, newTime);
+      const privateKey: string = this.getUniqueId(event.ip as string, event.eventId, newTime);
       const decodedMsg: string = this.decrypt(message, privateKey);
       if (this.isJSON(decodedMsg) && emptyPayloadHash === hashObj(JSON.parse(decodedMsg)))
       {
+
         await this.storeEvent(event);
         return true;
       }
@@ -150,21 +151,27 @@ export class Events
     return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
   }
 
-  public encodeMessage(eventReq: EventRequestConfig): EventRequestConfig
+  public async encodeMessage(eventReq: EventRequestConfig): Promise<EventRequestConfig>
   {
-    eventReq.payload = payloadSkeleton[eventReq.eventId];
-    const privateKey: string = this.getUniqueId(eventReq.ip);
-    eventReq.message = this.encrypt(JSON.stringify(eventReq.payload), privateKey);
-    delete eventReq['ip'];
-    return eventReq;
+    return new Promise<EventRequestConfig>(async (resolve, reject) =>
+    {
+      eventReq.payload = payloadSkeleton[eventReq.eventId];
+      const privateKey: string = this.getUniqueId(eventReq.ip, eventReq.eventId);
+      eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
+      delete eventReq['ip'];
+      resolve(eventReq);
+    });
   }
 
-  public encrypt(msg: string, privateKey: string): string
+  public encrypt(msg: string, privateKey: string): Promise<string>
   {
-    const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
-    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
+      const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+      const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+      resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+    });
   }
 
   public isJSON(str: string): boolean
@@ -198,13 +205,49 @@ export class Events
       {});
   }
 
-  public getUniqueId(IPSource: string, currTime?: number): string
+  public getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): string
   {
-    if (currTime === undefined)
+    currTime = currTime | this.getClosestTime();
+    if (uniqueId === undefined)
     {
-      currTime = this.getClosestTime();
+      uniqueId = "";
     }
-    return sha1(currTime.toString() + IPSource + timeSalt).substring(0, 16);
+    return sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16);
+  }
+
+  public async JSONHandler(IPSource: string, req: object[]): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (req === undefined || (Object.keys(req).length === 0 && req.constructor === Object) || req.length === 0)
+      {
+        resolve();
+        return;
+      }
+
+      const JSONArr: object[] = req;
+      const encodedEventArr: EventRequestConfig[] = [];
+      for (const jsonObj of JSONArr)
+      {
+        if (jsonObj['eventId'] === undefined || !(jsonObj['eventId'] in payloadSkeleton))
+        {
+          continue;
+        }
+        const eventRequest: EventRequestConfig =
+          {
+            eventId: jsonObj['eventId'],
+            variantId: jsonObj['variantId'],
+            ip: IPSource,
+          };
+        encodedEventArr.push(await this.encodeMessage(eventRequest));
+      }
+      if (encodedEventArr.length === 0)
+      {
+        resolve();
+        return;
+      }
+      resolve(JSON.stringify(encodedEventArr));
+    });
   }
 
   public async storeEvent(event: EventConfig): Promise<any>

@@ -64,12 +64,7 @@ const Router = new KoaRouter();
  */
 Router.get('/', async (ctx, next) =>
 {
-  const eventRequest: EventRequestConfig =
-    {
-      eventId: ctx.request.query['eventId'],
-      ip: ctx.request.ip,
-    };
-  ctx.body = JSON.stringify(events.encodeMessage(eventRequest));
+  ctx.body = JSON.stringify(await events.JSONHandler(ctx.request.ip, ctx.request.body));
 });
 
 /*
