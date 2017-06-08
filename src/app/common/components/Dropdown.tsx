@@ -89,7 +89,7 @@ class Dropdown extends PureClasss<Props>
         const pr = this.props;
         if (pr.keyPath)
         {
-          Actions.change(pr.keyPath, pr.values ? pr.values[index] : index);
+          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : index);
         }
         if (pr.onChange)
         {

@@ -71,7 +71,7 @@ module CommonElastic
   
   
   export const acceptsValues = List(
-    ['elasticValue', 'elasticObject', 'elasticArray']
+    ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull']
   );
   
   

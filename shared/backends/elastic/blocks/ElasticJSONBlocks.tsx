@@ -47,6 +47,7 @@ import * as Immutable from 'immutable';
 const {List, Map} = Immutable;
 const L = () => List([]);
 import {_block, Block, TQLTranslationFn} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
 import {_card, Card, CardString} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
 import CommonElastic from '../syntax/CommonElastic';
@@ -54,12 +55,13 @@ import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDi
 import CommonBlocks from '../../../blocks/CommonBlocks';
 const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
 
-export const elasticKeyValue = _card({
+export const elasticKeyValueToggle = _card({
   key: '',
   value: '',
   valueType: CommonElastic.valueTypesList[0],
   
-  static: {
+  static:
+  {
     language: 'elastic',
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
@@ -82,11 +84,11 @@ export const elasticKeyValue = _card({
           break;
         case CommonElastic.valueTypes.array:
           // TODO ELASTIC
-          value = tqlTranslationFn(value, tqlConfig);
+          value = tqlTranslationFn(rawValue, tqlConfig);
           break;
         case CommonElastic.valueTypes.object:
           // TODO ELASTIC
-          value = tqlTranslationFn(value, tqlConfig);
+          value = tqlTranslationFn(rawValue, tqlConfig);
           break;
       }
       
@@ -94,7 +96,7 @@ export const elasticKeyValue = _card({
         [block['key']]: value,
       };
     },
-    title: 'Key / Value',
+    title: 'Property T',
     colors: ['#789', '#abc'],
     preview: '[key]: [value]',
     
@@ -157,16 +159,137 @@ export const elasticValue = _card({
   
 export const elasticObject = _wrapperCard({
   language: 'elastic',
-  tql: '{ $cards }',
+  tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+  {
+    let obj: object = {};
+    
+    block['cards'].map(
+      card => 
+        _.extend(obj, tqlTranslationFn(card, tqlConfig))
+    );
+    
+    return obj;
+  },
   title: 'Object',
   colors: ['#123', '#456'],
-  accepts: List(['elasticKeyValue']),
+  accepts: List(['elasticKeyValueWrap', 'elasticKeyValueToggle']),
 });
 
 export const elasticArray = _wrapperCard({
-  language: 'elastic',
-  tql: '[ $cards ]',
   title: 'Array',
+  language: 'elastic',
+  tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+  {
+    let arr: any[] = [];
+    
+    block['cards'].map(
+      card => 
+        arr.push(tqlTranslationFn(card, tqlConfig))
+    );
+    
+    return arr;
+  },
   colors: ['#123', '#456'],
-  accepts: List(['elasticValue']),
+  accepts: CommonElastic.acceptsValues,
 });
+
+
+// section: each value type has its own card
+
+
+export const elasticKeyValueWrap = _card({
+  key: '',
+  cards: L(),
+  
+  static:
+  {
+    language: 'elastic',
+    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+    {
+      return {
+        [block['key']]: tqlTranslationFn(block['cards'].get(0), tqlConfig),
+      };
+    },
+    title: 'Property W',
+    colors: ['#789', '#abc'],
+    preview: (c: Card) =>
+    {
+      const prefix = c['key'] + ': ';
+      
+      if (c['cards'].size)
+      {
+        const card = c['cards'].get(0);
+        return prefix + BlockUtils.getPreview(card);
+      }
+      return prefix + 'Nothing';
+    },
+    
+    display:
+    [
+      {
+        displayType: DisplayType.TEXT,
+        key: 'key',
+        autoDisabled: true,
+      },
+      
+      {
+        displayType: DisplayType.CARDS,
+        key: 'cards',
+        // className: 'nested-cards-content',
+        singleChild: true,
+        accepts: CommonElastic.acceptsValues,
+      },
+    ]
+  }
+});
+ 
+
+export const elasticText = _valueCard({
+  language: 'elastic',
+  title: 'Text',
+  colors: ['#798', '#acb'],
+  defaultValue: '',
+  tql: (block: Block) => block['value'],
+  string: true,
+});
+
+export const elasticNumber = _valueCard({
+  language: 'elastic',
+  title: 'Number',
+  colors: ['#798', '#acb'],
+  defaultValue: 0,
+  tql: (block: Block) => + block['value'] as any,
+  string: true,
+});
+
+export const elasticBool = _card({
+  value: 1,
+  
+  static:
+  {
+    language: 'elastic',
+    title: 'True / False',
+    preview: (card: Card) => card['value'] ? 'True' : 'False',
+    tql: (block: Block) => !! block['value'] as any,
+    colors: ['#798', '#acb'],
+    display:
+    {
+      displayType: DisplayType.DROPDOWN,
+      options: Immutable.List(['false', 'true']),
+      key: 'value',
+    }
+  }
+});
+
+export const elasticNull = _card({
+  static:
+  {
+    language: 'elastic',
+    title: 'Null',
+    preview: 'Null',
+    tql: () => null,
+    colors: ['#798', '#acb'],
+    display: [],
+  }
+});
+
