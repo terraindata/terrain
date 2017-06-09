@@ -44,11 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserError from './ESParserError';
-import ESParserPropertyInfo from './ESPropertyInfo';
-import ESParserToken from './ESParserToken';
-import ESValueInfo from './ESValueInfo';
+import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
+import ESParserError from './ESParserError';
+import ESParserToken from './ESParserToken';
+import ESParserPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
 
 /**
  * An instrumented interpreter that takes the output of ESJSONParser and
@@ -56,7 +57,8 @@ import ESJSONParser from './ESJSONParser';
  */
 export default class ESInterpreter
 {
-  private parser: ESJSONParser; // source parser
+  public parser: ESJSONParser; // source parser
+  public config: EQLConfig; // query language description
 
   /**
    * Runs the interpreter on the given query string. Read needed data by calling the
@@ -74,27 +76,10 @@ export default class ESInterpreter
       this.parser = query;
     }
 
-    this.interpretRoot(this.parser.get);
+    this.config.getClause('root').mark(this, this.parser.getValueInfo());
   }
 
-  /**
-   * @returns {any} the delegate parser, from which the results can be retrieved
-   */
-  public getParser(): ESJSONParser
-  {
-    return this.parser;
-  }
-
-  private interpretRoot(info: ESValueInfo): void
-  {
-    if (typeof info.value !== 'object')
-    {
-      this.accumulateError(info, 'Queries must be objects');
-      return;
-    }
-  }
-
-  private accumulateError(info: ESValueInfo, message: string): void
+  public accumulateError(info: ESValueInfo, message: string): void
   {
     this.parser.accumulateError(new ESParserError(info.tokens[0], message));
   }

@@ -43,59 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
 
-export interface Props
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
+
+/**
+ * A clause which can only take on a restricted set of values.
+ */
+export default class ESEnumClause extends ESClause
 {
-  onFocus();
-  onFocusLost();
-  index: number; // currently selected
-  length: number; // number possible to select
-  onIndexChange(index: number);
-  onSelect(index: number);
-}
+  public values: any[];
+  public valuesMap: any;
 
-const STYLE: {
-  [key: string]: any,
-} = {
-    opacity: 0,
-    height: 0,
-    width: 0,
-    position: 'absolute', // vodka
-  };
-
-class KeyboardFocus extends PureClasss<Props>
-{
-  handleKeyDown(e)
+  public constructor(id: string, settings: any)
   {
-    switch (e.keyCode)
+    super(id, settings);
+    this.values = settings.values as any[];
+    for (let i = 0; i < this.values.length; ++i)
     {
-      case 38:
-        // up
-        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
-        break;
-      case 40:
-        // down
-        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
-        break;
-      case 13:
-        this.props.onSelect(this.props.index);
+      const value = this.values[i];
+      this.valuesMap[value] = true;
     }
   }
 
-  render()
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    return (
-      <select
-        style={STYLE}
-        onFocus={this.props.onFocus}
-        onBlur={this.props.onFocusLost}
-        onKeyDown={this.handleKeyDown}
-      >
-      </select>
-    );
+    if (this.valuesMap[valueInfo.value] !== true)
+    {
+      if (this.values.length > 10)
+      {
+        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
+      }
+      else
+      {
+        interpreter.accumulateError(valueInfo,
+          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
+      }
+    }
+    valueInfo.clause = this;
   }
 }
-export default KeyboardFocus;

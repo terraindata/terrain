@@ -43,59 +43,72 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
 
-export interface Props
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
+
+/**
+ * A clause with a well-defined structure.
+ */
+export default class ESStructureClause extends ESClause
 {
-  onFocus();
-  onFocusLost();
-  index: number; // currently selected
-  length: number; // number possible to select
-  onIndexChange(index: number);
-  onSelect(index: number);
-}
+  public structure: { [name: string]: string | null };
 
-const STYLE: {
-  [key: string]: any,
-} = {
-    opacity: 0,
-    height: 0,
-    width: 0,
-    position: 'absolute', // vodka
-  };
-
-class KeyboardFocus extends PureClasss<Props>
-{
-  handleKeyDown(e)
+  public constructor(id: string, settings: any)
   {
-    switch (e.keyCode)
+    super(id, settings);
+    this.structure = this.type as { [key: string]: string | null };
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+
+    const value = valueInfo.value;
+    if (typeof (value) !== 'object')
     {
-      case 38:
-        // up
-        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
-        break;
-      case 40:
-        // down
-        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
-        break;
-      case 13:
-        this.props.onSelect(this.props.index);
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
+      return;
     }
-  }
 
-  render()
-  {
-    return (
-      <select
-        style={STYLE}
-        onFocus={this.props.onFocus}
-        onBlur={this.props.onFocusLost}
-        onKeyDown={this.handleKeyDown}
-      >
-      </select>
-    );
+    if (Array.isArray(value))
+    {
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
+      return;
+    }
+
+    const children: any = valueInfo.children;
+
+    // mark properties
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        if (!this.structure.hasOwnProperty(name))
+        {
+          interpreter.accumulateError(viTuple.name, 'Unknown property.');
+          return;
+        }
+
+        const propertyType: string =
+          (this.structure[name] === null) ? name : this.structure[name] as string;
+
+        if (viTuple.value !== null)
+        {
+          interpreter.config.getClause(propertyType).mark(interpreter, viTuple.value);
+        }
+      });
+
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 }
-export default KeyboardFocus;

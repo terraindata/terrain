@@ -43,59 +43,50 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
 
-export interface Props
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
+
+/**
+ * A clause which is one of several possible types
+ */
+export default class ESVariantClause extends ESClause
 {
-  onFocus();
-  onFocusLost();
-  index: number; // currently selected
-  length: number; // number possible to select
-  onIndexChange(index: number);
-  onSelect(index: number);
-}
+  public types: string[];
 
-const STYLE: {
-  [key: string]: any,
-} = {
-    opacity: 0,
-    height: 0,
-    width: 0,
-    position: 'absolute', // vodka
-  };
-
-class KeyboardFocus extends PureClasss<Props>
-{
-  handleKeyDown(e)
+  public constructor(id: string, settings: any)
   {
-    switch (e.keyCode)
+    super(id, settings);
+    this.types = this.type as string[];
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    for (let i = 0; i < this.types.length; ++i)
     {
-      case 38:
-        // up
-        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
-        break;
-      case 40:
-        // down
-        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
-        break;
-      case 13:
-        this.props.onSelect(this.props.index);
-    }
-  }
+      const delegateID: string = this.types[i];
+      const delegateClause: ESClause = interpreter.config.getClause(delegateID);
 
-  render()
-  {
-    return (
-      <select
-        style={STYLE}
-        onFocus={this.props.onFocus}
-        onBlur={this.props.onFocusLost}
-        onKeyDown={this.handleKeyDown}
-      >
-      </select>
-    );
+      const errorCount: number = interpreter.parser.getErrors().length;
+      delegateClause.mark(interpreter, valueInfo);
+
+      if (errorCount === interpreter.parser.getErrors().length)
+      {
+        // no errors: this interpretation worked.
+        valueInfo.delegateClause = delegateClause;
+        valueInfo.clause = this;
+        return;
+      }
+
+      // remove generated errors
+      interpreter.parser.getErrors().splice(errorCount);
+    }
+
+    valueInfo.clause = this;
+    interpreter.accumulateError(
+      valueInfo,
+      'Did not find any of the expected types for this clause: ' +
+      JSON.stringify(this.types, null, 2) + '.');
   }
 }
-export default KeyboardFocus;

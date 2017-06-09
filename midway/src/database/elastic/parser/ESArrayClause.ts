@@ -43,59 +43,43 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
 
-export interface Props
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
+
+/**
+ * A clause that corresponds to an array of uniform type.
+ */
+export default class ESArrayClause extends ESClause
 {
-  onFocus();
-  onFocusLost();
-  index: number; // currently selected
-  length: number; // number possible to select
-  onIndexChange(index: number);
-  onSelect(index: number);
-}
+  public elementID: string;
 
-const STYLE: {
-  [key: string]: any,
-} = {
-    opacity: 0,
-    height: 0,
-    width: 0,
-    position: 'absolute', // vodka
-  };
-
-class KeyboardFocus extends PureClasss<Props>
-{
-  handleKeyDown(e)
+  public constructor(id: string, settings: any, elementID: string)
   {
-    switch (e.keyCode)
+    super(id, settings);
+    this.elementID = elementID;
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+
+    const value: any = valueInfo.value;
+    if (!Array.isArray(value))
     {
-      case 38:
-        // up
-        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
-        break;
-      case 40:
-        // down
-        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
-        break;
-      case 13:
-        this.props.onSelect(this.props.index);
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
+      return;
     }
-  }
 
-  render()
-  {
-    return (
-      <select
-        style={STYLE}
-        onFocus={this.props.onFocus}
-        onBlur={this.props.onFocusLost}
-        onKeyDown={this.handleKeyDown}
-      >
-      </select>
-    );
+    // mark children
+    const childClause: ESClause = interpreter.config.getClause(this.elementID);
+    const children: ESValueInfo[] = valueInfo.children as ESValueInfo[];
+    children.forEach(
+      (element: ESValueInfo): void =>
+      {
+        childClause.mark(interpreter, element);
+      });
   }
 }
-export default KeyboardFocus;

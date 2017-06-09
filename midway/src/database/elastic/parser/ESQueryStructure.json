@@ -1,7 +1,29 @@
 {
+  "null" : {
+    "desc" : "A null value.",
+    "url" : "http://www.json.org/",
+    "type" : "null"
+  },
   "boolean" : {
-    "type" : "enum",
-    "values" : [true, false]
+    "desc" : "A boolean, either true or false.",
+    "url" : "http://www.json.org/",
+    "type" : "boolean"
+  },
+  "number" : {
+    "desc" : "A number. Numbers must begin with either '-', or a digit. For decimals type the leading zero (0.1234). For scientific notation use e or E to indicate the order of magnitude (1.23e10).",
+    "url" : "http://www.json.org/",
+    "type" : "number"
+  },
+  "string" : {
+    "desc" : "A string. Strings are enclosed in double quotes (\"example string\"). Quotes and other special symbols can be encoded by escaping them. See json.org for more information.",
+    "url" : "http://www.json.org/",
+    "type" : "string"
+  },
+  "base" : {
+    "name": "value",
+    "desc" : "A null, boolean, number, or string value.",
+    "url" : "http://www.json.org/",
+    "type" : "base"
   },
   "root" : {
     "name" : "root clause",
@@ -163,13 +185,13 @@
   },
   "term_value" : {
     "required" : ["value"],
-    "type" : ["term_object", "any"]
+    "type" : ["term_object", "base"]
   },
   "term_settings" : {
     "required" : ["value"],
     "type" : {
-      "value" : "any",
-      "boost" : "number"
+      "value" : "base",
+      "boost" : null
     }
   },
   "terms" : {
@@ -211,10 +233,10 @@
   },
   "range_value" : {
     "type" : {
-      "gt" : "value",
-      "gte" : "value",
-      "lt" : "value",
-      "lte" : "value",
+      "gt" : "base",
+      "gte" : "base",
+      "lt" : "base",
+      "lte" : "base",
       "boost" : null
     }
   },
@@ -244,7 +266,7 @@
     "type" : "match_value{}"
   },
   "match_value" : {
-    "type" : ["match_settings", "any"]
+    "type" : ["match_settings", "base"]
   },
   "match_settings" : {
     "required" : ["query"],

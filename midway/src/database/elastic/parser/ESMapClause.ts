@@ -43,59 +43,55 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
 
-export interface Props
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
+
+/**
+ * A clause that corresponds to an object of uniform type values.
+ */
+export default class ESMapClause extends ESClause
 {
-  onFocus();
-  onFocusLost();
-  index: number; // currently selected
-  length: number; // number possible to select
-  onIndexChange(index: number);
-  onSelect(index: number);
-}
+  public valueID: string;
 
-const STYLE: {
-  [key: string]: any,
-} = {
-    opacity: 0,
-    height: 0,
-    width: 0,
-    position: 'absolute', // vodka
-  };
-
-class KeyboardFocus extends PureClasss<Props>
-{
-  handleKeyDown(e)
+  public constructor(id: string, settings: any, valueID: string)
   {
-    switch (e.keyCode)
+    super(id, settings);
+    this.valueID = valueID;
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+
+    const value: any = valueInfo.value;
+    if (typeof (value) !== 'object')
     {
-      case 38:
-        // up
-        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
-        break;
-      case 40:
-        // down
-        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
-        break;
-      case 13:
-        this.props.onSelect(this.props.index);
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
+      return;
     }
-  }
 
-  render()
-  {
-    return (
-      <select
-        style={STYLE}
-        onFocus={this.props.onFocus}
-        onBlur={this.props.onFocusLost}
-        onKeyDown={this.handleKeyDown}
-      >
-      </select>
-    );
+    if (Array.isArray(value))
+    {
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be a map, but found an array instead.');
+      return;
+    }
+
+    // mark children
+    const childClause: ESClause = interpreter.config.getClause(this.valueID);
+    const children: any = valueInfo.children;
+    children.keys().forEach(
+      (name: string): void =>
+      {
+        const propertyInfo: ESPropertyInfo = children[name];
+        if (propertyInfo.value !== null)
+        {
+          childClause.mark(interpreter, propertyInfo.value);
+        }
+      });
   }
 }
-export default KeyboardFocus;

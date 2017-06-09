@@ -59,7 +59,7 @@ export default class ESParserToken
 
   public valueInfo: ESValueInfo | null; // value info that this token belongs to
 
-  private attachedErrors: ESParserError[] | null; // attached errors, or null if none
+  public errors: ESParserError[] | null;
 
   public constructor(charNumber: number,
     row: number,
@@ -71,27 +71,23 @@ export default class ESParserToken
     this.col = col;
     this.length = length;
     this.valueInfo = null;
-    this.attachedErrors = null;
+    this.errors = null;
   }
 
   public attachError(error: ESParserError): void
   {
-    if (this.attachedErrors === null)
+    if (this.valueInfo !== null)
     {
-      this.attachedErrors = [];
+      this.valueInfo.attachError(error);
     }
 
-    this.attachedErrors.push(error);
-  }
-
-  public get errors(): ESParserError[]
-  {
-    if (this.attachedErrors === null)
+    if (this.errors === null)
     {
-      return [];
+      this.errors = [error];
     }
-
-    return this.attachedErrors;
+    else
+    {
+      this.errors.push(error);
+    }
   }
-
 }

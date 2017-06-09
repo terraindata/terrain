@@ -44,17 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
 /**
  */
-export default class ESClause
+abstract class ESClause
 {
   public id: string;
   public name: string;
   public desc: string;
   public url: string;
-  public type: string | object | string[];
+  public type: string | { [key: string]: string | null } | string[];
   public required: string[];
-  public values: any[];
   public template: any;
 
   /**
@@ -83,14 +84,11 @@ export default class ESClause
     this.setPropertyFromSettings(settings, 'template', () => null);
   }
 
-  public mark(): void
-  {
-    ;
-  }
+  public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
 
   private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
   {
-    if (settings.hasOwnProperty(name))
+    if (settings[name] !== undefined)
     {
       this[name] = settings[name];
     }
@@ -100,3 +98,5 @@ export default class ESClause
     }
   }
 }
+
+export default ESClause;
