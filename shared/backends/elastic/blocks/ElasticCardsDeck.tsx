@@ -77,6 +77,10 @@ export const ElasticCardsDeck =
         Blocks.elasticKeyValueToggle.type,
         Blocks.elasticValue.type,
       ],
+
+      [
+        Blocks.elasticMagicCard.type,
+      ],
     ],
   );
 

@@ -62,12 +62,14 @@ const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = Commo
 const { make } = BlockUtils;
 
 import { elasticArray, elasticObject, elasticValue, elasticBool, elasticNull, elasticNumber, elasticText, elasticKeyValueToggle, elasticKeyValueWrap } from './ElasticJSONBlocks';
+import elasticMagicCard from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
 
 export const ElasticBlocks =
   {
+    elasticMagicCard,
+
     // JSON 
-    
     elasticObject,
     elasticArray,
     

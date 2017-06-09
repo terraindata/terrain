@@ -61,6 +61,7 @@ class ElasticBackend implements Backend
   creatingType = ElasticBlocks.elasticCreating.type;
   
   topLevelCards = Immutable.List<string>([
+    ElasticBlocks.elasticMagicCard.type,
     ElasticBlocks.elasticRootCard.type,
     ElasticBlocks.elasticKeyValueWrap.type,
     ElasticBlocks.elasticKeyValueToggle.type,
