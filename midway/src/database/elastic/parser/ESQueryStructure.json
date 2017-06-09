@@ -1,8 +1,21 @@
 {
+  "boolean" : {
+    "type" : "enum",
+    "values" : [true, false]
+  },
   "root" : {
     "name" : "root clause",
     "desc" : "The outermost clause object that contains an entire search query.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html",
+    "template" : {
+      "index" : "",
+      "type" : "",
+      "from" : 0,
+      "size" : 1000,
+      "body" : {
+        "query" : {}
+      }
+    },
     "type" : {
       "index" : null,
       "type" : null,
@@ -146,9 +159,13 @@
     "name" : "term clause",
     "desc" : "Matches documents that contain an exact match for the given term.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html",
-    "type" : null
+    "type" : "term_value{}"
   },
   "term_value" : {
+    "required" : ["value"],
+    "type" : ["term_object", "any"]
+  },
+  "term_settings" : {
     "required" : ["value"],
     "type" : {
       "value" : "any",
@@ -159,7 +176,10 @@
     "name" : "terms clause",
     "desc" : "Matches documents that contain an exact match for any of the given terms. Can also be populated by a terms lookup clause.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html",
-    "type" : null
+    "type" : "terms_value{}"
+  },
+  "terms_value" : {
+    "type" : ["any[]", "terms_lookup"]
   },
   "terms_lookup" : {
     "required" : ["value"],
@@ -187,10 +207,9 @@
     "name" : "range clause",
     "desc" : "Matches documents that have a value within the specified range.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html",
-    "type" : null
+    "type" : "range_value{}"
   },
   "range_value" : {
-    "name" : "range value",
     "type" : {
       "gt" : "value",
       "gte" : "value",
@@ -222,16 +241,28 @@
     "name" : "match clause",
     "desc" : "Does an analyzed (full-text) match on the given term.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html",
-    "type" : null
+    "type" : "match_value{}"
   },
   "match_value" : {
-    "name" : "match value",
+    "type" : ["match_settings", "any"]
+  },
+  "match_settings" : {
     "required" : ["query"],
     "type" : {
       "query" : "string",
-      "operator" : ["and", "or"],
-      "zero_terms_query" : ["none", "all"],
-      "cutoff_frequency": "number"
+      "operator" : "match_operator",
+      "zero_terms_query" : null,
+      "cutoff_frequency" : "number"
     }
+  },
+  "match_operator" : {
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero"
+    "type" : "enum",
+    "values" : ["and", "or"]
+  },
+  "zero_terms_query" : {
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero"
+    "type" : "enum",
+    "values" : ["none", "all"]
   }
 }
