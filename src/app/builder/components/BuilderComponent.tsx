@@ -208,6 +208,7 @@ class BuilderComponent extends PureClasss<Props>
         let selectedIndex = value;
         if (d.dropdownUsesRawValues)
         {
+          console.log(d.options, value);
           selectedIndex = d.options.indexOf(value);
         }
 

@@ -44,11 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
+import * as classNames from 'classnames';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { Card } from '../../../../../shared/blocks/types/Card';
 import PureClasss from '../../../common/components/PureClasss';
+import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
@@ -81,19 +83,26 @@ class CreateCardTool extends PureClasss<Props>
   public state: {
     closed: boolean;
     opening: boolean;
+    focusedIndex: number;
   } = {
     closed: !this.props.open,
     opening: false,
+    focusedIndex: -1,
   };
+  
+  handleCardClick(event)
+  {
+    const type = Util.rel(event.target);
+    this.createCard(type);
+  }
 
-  public createCard(event)
+  public createCard(type)
   {
     if (this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
     }
 
-    const type = Util.rel(event.target);
     if (this.props.index === null)
     {
       Actions.change(
@@ -153,10 +162,16 @@ class CreateCardTool extends PureClasss<Props>
     }
 
     return (
-      <div className='create-card-selector' ref='selector'>
+      <div
+        className={classNames({
+          'create-card-selector': true,
+          'create-card-selector-focused': this.state.focusedIndex !== -1,
+        })}
+        ref='selector'
+      >
         <div className='create-card-selector-inner'>
           {
-            AllBackendsMap[this.props.language].cardsList.map((type: string) =>
+            AllBackendsMap[this.props.language].cardsList.map((type: string, index: number) =>
             {
               if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
               {
@@ -169,10 +184,13 @@ class CreateCardTool extends PureClasss<Props>
               // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
               return (
                 <a
-                  className='create-card-button'
+                  className={classNames({
+                    'create-card-button': true,
+                    'create-card-button-focused': this.state.focusedIndex === index
+                  })}
                   key={type}
                   rel={type}
-                  onClick={this.createCard}
+                  onClick={this.handleCardClick}
                   style={{
                     backgroundColor: card.static.colors[0],
                   }}
@@ -231,7 +249,34 @@ class CreateCardTool extends PureClasss<Props>
       </div>
     );
   }
-
+  
+  handleFocus()
+  {
+    this.setState({
+      focusedIndex: 0,
+    });
+  }
+  
+  handleFocusLost()
+  {
+    this.setState({
+      focusedIndex: -1,
+    });
+  }
+  
+  handleFocusedIndexChange(focusedIndex: number)
+  {
+    this.setState({
+      focusedIndex,
+    });
+  }
+  
+  handleKeyboardSelect(index: number)
+  {
+    const type = this.props.accepts.get(index);
+    this.createCard(type);
+  }
+  
   public render()
   {
     if (!this.props.canEdit)
@@ -275,6 +320,14 @@ class CreateCardTool extends PureClasss<Props>
           accepts={this.props.accepts}
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
+        />
+        <KeyboardFocus
+          onFocus={this.handleFocus}
+          onFocusLost={this.handleFocusLost}
+          index={this.state.focusedIndex}
+          onIndexChange={this.handleFocusedIndexChange}
+          length={this.props.accepts && this.props.accepts.size}
+          onSelect={this.handleKeyboardSelect}
         />
       </div>
     );

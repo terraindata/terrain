@@ -42,42 +42,87 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
+const {List, Map} = Immutable;
+const L = () => List([]);
+import {_block, Block, TQLTranslationFn} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
+import {_card, Card, CardString} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
+import CommonElastic from '../syntax/CommonElastic';
+import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
+import CommonBlocks from '../../../blocks/CommonBlocks';
+const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
+const accepts = Immutable.List(['elasticKeyValueWrap']);
+
+export const elasticRootCard = _card({
+  index: '',
+  from: 0,
+  rootType: '',
+  rootSize: 100,
+  
+  body: '',
+  sort: '',
+  
+  cards: L(),
+  
+  static:
+  {
+    title: 'Root',
+    colors: ['#456', '#789'],
+    preview: '[index], [rootType]',
+    language: 'elastic',
+    
+    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+    {
+      return {
+        index: rootBlock['index'],
+        type: rootBlock['rootType'],
+        from: rootBlock['from'],
+        size: rootBlock['rootSize'],
+      };
+    },
+    
+    accepts,    
+    
+    display:
     [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+      {
+        displayType: DisplayType.TEXT,
+        key: 'index',
+        getAutoTerms: (schemaState) =>
+        {
+          return Immutable.List(['movies', 'baseball', 'zazzle']);
+        }
+        // autoDisabled: true,
+      },
+      {
+        displayType: DisplayType.TEXT,
+        key: 'rootType',
+        autoDisabled: true,
+      },
+      {
+        displayType: DisplayType.NUM,
+        key: 'from',
+        autoDisabled: true,
+      },
+      {
+        displayType: DisplayType.NUM,
+        key: 'rootSize',
+        autoDisabled: true,
+      },
       
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
-      
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
-      
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
-      
-      [
-        // JSON
-        Blocks.elasticKeyValueToggle.type,
-        Blocks.elasticValue.type,
-      ],
-    ],
-  );
+      {
+        displayType: DisplayType.CARDS,
+        key: 'cards',
+        accepts,
+      },
+    ]
+  },
+});
 
-export default ElasticCardsDeck;
+console.log(elasticRootCard);
+
+export default elasticRootCard;

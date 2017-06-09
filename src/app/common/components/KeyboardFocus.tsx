@@ -43,41 +43,59 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
+import * as React from 'react';
+import * as _ from 'underscore';
+import PureClasss from '../../common/components/PureClasss';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
-      
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
-      
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
-      
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
-      
-      [
-        // JSON
-        Blocks.elasticKeyValueToggle.type,
-        Blocks.elasticValue.type,
-      ],
-    ],
-  );
+export interface Props
+{
+  onFocus();
+  onFocusLost();
+  index: number; // currently selected
+  length: number; // number possible to select
+  onIndexChange(index: number);
+  onSelect(index: number);
+}
 
-export default ElasticCardsDeck;
+const STYLE: {
+  [key: string]: any,
+} = {
+  opacity: 0,
+  height: 0,
+  width: 0,
+  position: 'absolute', // vodka
+};
+
+class KeyboardFocus extends PureClasss<Props>
+{
+  handleKeyDown(e)
+  {
+    switch (e.keyCode)
+    {
+      case 38:
+        // up
+        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
+        break;
+      case 40:
+        // down
+        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
+        break;
+      case 13:
+        this.props.onSelect(this.props.index);
+    }
+  }
+
+  render()
+  {
+    return (
+      <select
+        style={STYLE}
+        onFocus={this.props.onFocus}
+        onBlur={this.props.onFocusLost}
+        onKeyDown={this.handleKeyDown}
+      >
+      </select>
+    );
+  }
+}
+export default KeyboardFocus;

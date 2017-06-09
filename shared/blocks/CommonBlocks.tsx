@@ -124,7 +124,7 @@ export namespace CommonBlocks
     colors: string[];
     title: string;
     // manualEntry: IManualEntry;
-    tql: string;
+    tql: TQLFn;
     defaultValue?: string;
     language: string;
   }) => _card({
@@ -156,7 +156,7 @@ export namespace CommonBlocks
     colors: string[],
     title: string,
     // manualEntry: IManualEntry,
-    tql: string,
+    tql: TQLFn,
     accepts: List<string>,
     init?: () => any,
     language: string,
@@ -183,9 +183,10 @@ export namespace CommonBlocks
     title: string,
     colors: string[],
     // manualEntry: IManualEntry,
-    tql: string,
-    defaultValue: number,
+    tql: TQLFn,
+    defaultValue: number | string,
     language: string,
+    string?: boolean,
   }) => (
       _card({
         value: config.defaultValue,
@@ -195,7 +196,7 @@ export namespace CommonBlocks
           title: config.title,
           colors: config.colors,
           preview: '[value]',
-          display: valueDisplay,
+          display: config.string ? stringValueDisplay : valueDisplay,
           // manualEntry: config.manualEntry,
           tql: config.tql,
         },

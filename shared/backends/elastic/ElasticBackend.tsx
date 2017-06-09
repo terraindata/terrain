@@ -59,8 +59,11 @@ class ElasticBackend implements Backend
 
   blocks = ElasticBlocks;
   creatingType = ElasticBlocks.elasticCreating.type;
+  
   topLevelCards = Immutable.List<string>([
-    ElasticBlocks.elasticKeyValue.type,
+    ElasticBlocks.elasticRootCard.type,
+    ElasticBlocks.elasticKeyValueWrap.type,
+    ElasticBlocks.elasticKeyValueToggle.type,
   ]);
 
   // Ordering of the cards deck
