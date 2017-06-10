@@ -80,7 +80,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   public state: {
     tql: string;
     theme: string;
-    tqlUpdateMode: string;
+    runMode: string;
     focused: boolean;
     highlightedLine: number;
     theme_index: number;
@@ -93,7 +93,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   } = {
     tql: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
-    tqlUpdateMode: 'auto',
+    runMode: 'auto',
     focused: false,
     highlightedLine: null,
     theme_index: 0,
@@ -126,7 +126,7 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   public updateTql(tql: string, noAction: boolean = false, manualRequest: boolean = false)
   {
-    if (this.state.tqlUpdateMode === 'auto')
+    if (this.state.runMode === 'auto')
     {
       // auto mode
       if (tql === this.state.tql)
@@ -230,17 +230,17 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  public changeTqlUpdateModeToAuto()
+  public changeRunModeToAuto()
   {
     this.setState({
-      tqlUpdateMode: 'auto',
+      runMode: 'auto',
     });
   }
 
-  public changeTqlUpdateModeToManual()
+  public changeRunModeToManual()
   {
     this.setState({
-      tqlUpdateMode: 'manual',
+      runMode: 'manual',
     });
   }
 
@@ -270,13 +270,13 @@ class BuilderTQLColumn extends PureClasss<Props>
         },
         {
           text: 'Auto',
-          onClick: this.changeTqlUpdateModeToAuto,
-          disabled: this.state.tqlUpdateMode === 'auto',
+          onClick: this.changeRunModeToAuto,
+          disabled: this.state.runMode === 'auto',
         },
         {
           text: 'Manual',
-          onClick: this.changeTqlUpdateModeToManual,
-          disabled: this.state.tqlUpdateMode === 'manual',
+          onClick: this.changeRunModeToManual,
+          disabled: this.state.runMode === 'manual',
         },
         // {
         //   spacer: true,
