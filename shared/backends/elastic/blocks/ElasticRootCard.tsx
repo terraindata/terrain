@@ -123,6 +123,4 @@ export const elasticRootCard = _card({
   },
 });
 
-console.log(elasticRootCard);
-
 export default elasticRootCard;
