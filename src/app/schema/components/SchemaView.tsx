@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-const Radium = require('radium');
+import Radium = require('radium');
 import * as $ from 'jquery';
 import * as React from 'react';
 import FadeInOut from '../../common/components/FadeInOut';
