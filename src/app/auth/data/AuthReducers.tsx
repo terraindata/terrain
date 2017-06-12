@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
 import ActionTypes from './AuthActionTypes';
-const Immutable = require('immutable');
+import * as Immutable from 'immutable';
 import AuthTypes from '../AuthTypes';
 
 const AuthReducer = {};

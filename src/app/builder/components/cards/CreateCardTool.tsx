@@ -326,7 +326,7 @@ class CreateCardTool extends PureClasss<Props>
           onFocusLost={this.handleFocusLost}
           index={this.state.focusedIndex}
           onIndexChange={this.handleFocusedIndexChange}
-          length={this.props.accepts.size}
+          length={this.props.accepts && this.props.accepts.size}
           onSelect={this.handleKeyboardSelect}
         />
       </div>

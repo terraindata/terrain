@@ -110,6 +110,9 @@ var CodeMirror = React.createClass({
     {
       this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
       this.codeMirror.on('change', this.codemirrorValueChanged);
+      this.codeMirror.addKeyMap({
+        'Ctrl-Enter': this.codemirrorIssueQuery,
+      });
       this.codeMirror.on('focus', this.focusChanged.bind(this, true));
       this.codeMirror.on('blur', this.focusChanged.bind(this, false));
       this.codeMirror.on('contextmenu', this.handleRightClick);
@@ -417,6 +420,13 @@ var CodeMirror = React.createClass({
     if (this.props.onChange && change.origin != 'setValue')
     {
       this.props.onChange(doc.getValue());
+    }
+  },
+  codemirrorIssueQuery: function codemirrorIssueQuery(cm)
+  {
+    if (this.props.onChange)
+    {
+      this.props.onChange(cm.getDoc().getValue(), false, true);
     }
   },
   render: function render()

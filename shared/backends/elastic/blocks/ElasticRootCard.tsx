@@ -55,6 +55,8 @@ import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDi
 import CommonBlocks from '../../../blocks/CommonBlocks';
 const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
 
+const accepts = Immutable.List(['elasticKeyValueWrap']);
+
 export const elasticRootCard = _card({
   index: '',
   from: 0,
@@ -82,6 +84,8 @@ export const elasticRootCard = _card({
         size: rootBlock['rootSize'],
       };
     },
+    
+    accepts,    
     
     display:
     [
@@ -113,12 +117,10 @@ export const elasticRootCard = _card({
       {
         displayType: DisplayType.CARDS,
         key: 'cards',
-        accepts: Immutable.List(['elasticKeyValueWrap']),
+        accepts,
       },
     ]
   },
 });
-
-console.log(elasticRootCard);
 
 export default elasticRootCard;

@@ -51,7 +51,7 @@ import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
 import { databaseChildrenConfig, DatabaseTreeInfo } from './items/DatabaseTreeInfo';
 import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
 import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
-const Radium = require('radium');
+import Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 import FadeInOut from '../../common/components/FadeInOut';
