@@ -53,40 +53,37 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESVariantClause extends ESClause
 {
-  public types: string[];
+  public subtypes: { [jsonType: string]: string };
 
   public constructor(id: string, settings: any)
   {
     super(id, settings);
-    this.types = this.type as string[];
+    this.subtypes = settings.subtypes as { [jsonType: string]: string };
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    for (let i = 0; i < this.types.length; ++i)
+    valueInfo.clause = this; // only sticks if subclause isn't detected
+
+    const value: any = valueInfo.value;
+    let valueType: string = typeof (value);
+    if (Array.isArray(value))
     {
-      const delegateID: string = this.types[i];
-      const delegateClause: ESClause = interpreter.config.getClause(delegateID);
-
-      const errorCount: number = interpreter.parser.getErrors().length;
-      delegateClause.mark(interpreter, valueInfo);
-
-      if (errorCount === interpreter.parser.getErrors().length)
-      {
-        // no errors: this interpretation worked.
-        valueInfo.delegateClause = delegateClause;
-        valueInfo.clause = this;
-        return;
-      }
-
-      // remove generated errors
-      interpreter.parser.getErrors().splice(errorCount);
+      valueType = 'array';
     }
 
-    valueInfo.clause = this;
-    interpreter.accumulateError(
-      valueInfo,
-      'Did not find any of the expected types for this clause: ' +
-      JSON.stringify(this.types, null, 2) + '.');
+    const subtype: string | undefined = this.subtypes[valueType];
+    if (subtype === undefined)
+    {
+      interpreter.accumulateError(valueInfo,
+        'Unknown clause type. Expected one of these types: ' +
+        JSON.stringify(Object.keys(this.subtypes), null, 2) +
+        ', but found a ' +
+        valueType +
+        ' instead.');
+      return;
+    }
+
+    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
   }
 }

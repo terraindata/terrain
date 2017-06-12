@@ -20,10 +20,15 @@
     "type" : "string"
   },
   "base" : {
-    "name": "value",
+    "name" : "value",
     "desc" : "A null, boolean, number, or string value.",
     "url" : "http://www.json.org/",
     "type" : "base"
+  },
+  "field" : {
+    "name" : "field",
+    "desc" : "The name of a document field.",
+    "type" : "string"
   },
   "root" : {
     "name" : "root clause",
@@ -97,12 +102,13 @@
     "name" : "source clause",
     "desc" : "Controls which source fields are returned by this query",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-source-filtering.html",
-    "type" : [
-      "boolean",
-      "string",
-      "string[]",
-      "includeExclude"
-    ]
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "includeExclude",
+      "boolean" : "boolean",
+      "string" : "string",
+      "array" : "string[]"
+    }
   },
   "includeExclude" : {
     "name" : "include and exclude lists",
@@ -169,23 +175,38 @@
     "name" : "should clause",
     "desc" : "Results should match this query. The better a result matches, the higher its __score will be. Also see minimum_should_match.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html",
-    "type" : ["query", "query[]"]
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "query",
+      "array" : "query[]"
+    }
   },
   "minumum_should_match" : {
     "name" : "minimum should match",
     "desc" : "Controls how many or what percentage of should clauses are required to match.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html"
-    "type" : ["string", "number"]
+    "type" : "variant",
+    "subtypes" : {
+      "number" : "number",
+      "string" : "string"
+    }
   },
   "term" : {
     "name" : "term clause",
     "desc" : "Matches documents that contain an exact match for the given term.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html",
-    "type" : "term_value{}"
+    "type" : "{field:term_value}"
   },
   "term_value" : {
     "required" : ["value"],
-    "type" : ["term_object", "base"]
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "term_object",
+      "null" : "base",
+      "boolean" : "base",
+      "number" : "base",
+      "string" : "base"
+    }
   },
   "term_settings" : {
     "required" : ["value"],
@@ -198,10 +219,14 @@
     "name" : "terms clause",
     "desc" : "Matches documents that contain an exact match for any of the given terms. Can also be populated by a terms lookup clause.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html",
-    "type" : "terms_value{}"
+    "type" : "{field:terms_value}"
   },
   "terms_value" : {
-    "type" : ["any[]", "terms_lookup"]
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "terms_lookup",
+      "array" : "any[]"
+    }
   },
   "terms_lookup" : {
     "required" : ["value"],
@@ -229,7 +254,7 @@
     "name" : "range clause",
     "desc" : "Matches documents that have a value within the specified range.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html",
-    "type" : "range_value{}"
+    "type" : "{field:range_value}"
   },
   "range_value" : {
     "type" : {
@@ -263,10 +288,17 @@
     "name" : "match clause",
     "desc" : "Does an analyzed (full-text) match on the given term.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html",
-    "type" : "match_value{}"
+    "type" : "{field:match_value}"
   },
   "match_value" : {
-    "type" : ["match_settings", "base"]
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "match_settings",
+      "null" : "base",
+      "boolean" : "base",
+      "number" : "base",
+      "string" : "base"
+    }
   },
   "match_settings" : {
     "required" : ["query"],

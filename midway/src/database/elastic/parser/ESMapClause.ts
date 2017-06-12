@@ -54,12 +54,22 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESMapClause extends ESClause
 {
+  public nameID: string;
   public valueID: string;
 
-  public constructor(id: string, settings: any, valueID: string)
+  public constructor(id: string, settings: any, type: string)
   {
     super(id, settings);
-    this.valueID = valueID;
+    if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
+      type.indexOf(' ') !== -1)
+    {
+      throw new Error('Unsupported map type "' + type + '".');
+    }
+
+    type = type.substring(1, id.length - 1); // trim off { and }
+    const components: string[] = type.split(':');
+    this.nameID = components[0];
+    this.valueID = components[1];
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void

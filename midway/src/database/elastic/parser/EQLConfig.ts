@@ -73,6 +73,13 @@ export default class EQLConfig
         const settings: any = clauseConfiguration[id];
         const type: string = settings.type as string;
 
+        if (type.match(/^(?:[a-zA-Z0-9_]+(:?[])?|{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+})$/gim) === null)
+        {
+          throw new Error('Type names must be composed only of letters, numbers, and underscores. Type "' +
+            type +
+            ' is an invalid type name.');
+        }
+
         let clause: ESClause;
         if (Array.isArray(type))
         {
@@ -115,10 +122,10 @@ export default class EQLConfig
             // array
             clause = new ESArrayClause(id, settings, type.substring(0, id.length - 2));
           }
-          else if (type.indexOf('{}', id.length - 2) !== -1)
+          else if (type.indexOf('}', id.length - 1) !== -1)
           {
             // map
-            clause = new ESMapClause(id, settings, type.substring(0, id.length - 2));
+            clause = new ESMapClause(id, settings, type);
           }
           else
           {
