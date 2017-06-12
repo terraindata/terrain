@@ -135,7 +135,7 @@ export function responseToRecordConfig(response: object): object
     }
     catch (e) 
     { 
-      console.log('JSON Parse Error converting item: ', e, response);
+      console.log('JSON Parse Error converting item: ', e, response['meta']);
     }
   }
 
