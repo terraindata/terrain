@@ -50,7 +50,7 @@ import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import { LibraryState } from './LibraryStore';
 
-const Immutable = require('immutable');
+import * as Immutable from 'immutable';
 
 const LibraryReducers = {};
 
