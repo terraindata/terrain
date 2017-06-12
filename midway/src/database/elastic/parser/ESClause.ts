@@ -46,17 +46,28 @@ THE SOFTWARE.
 
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
+
 /**
+ * Represents an Elastic Search query clause
  */
 abstract class ESClause
 {
-  public id: string;
-  public name: string;
-  public desc: string;
-  public url: string;
-  public type: string | { [key: string]: string | null } | string[];
-  public required: string[];
-  public template: any;
+  public id: string; // type name
+  public name: string; // human type name
+  public desc: string; // clause description
+  public url: string; // clause documentation url
+
+  /**
+   * Type information for this clause. It should be one of these:
+   * + A parent type name that this clause inherits from (ex: boost inherits from number)
+   * + An object containing all allowed properties and their types.
+   *   (a null property value means the type is the same as the name of the property)
+   */
+  public type: string | { [key: string]: string | null };
+
+  public required: string[]; // list of required properties
+
+  public template: null | { [key: string]: any }; // template for this clause type
 
   /**
    * + null types mean custom or disabled type validation
