@@ -83,7 +83,6 @@ function testParse(testString: string,
   winston.info('testing \'' + testString + '\'');
   const interpreter: ESInterpreter = new ESInterpreter(testString, config);
   const parser: ESParser = interpreter.parser;
-  const value = parser.getValue();
 
   const objects = new WeakMap();
   let count = 0;

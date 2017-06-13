@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
@@ -55,10 +56,15 @@ export default class ESVariantClause extends ESClause
 {
   public subtypes: { [jsonType: string]: string };
 
-  public constructor(id: string, settings: any)
+  public constructor(settings: any, config: EQLConfig)
   {
-    super(id, settings);
+    super(settings);
     this.subtypes = settings.subtypes as { [jsonType: string]: string };
+    Object.keys(this.subtypes).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.subtypes[key]);
+      });
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void

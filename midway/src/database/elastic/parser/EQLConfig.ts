@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as winston from 'winston';
 import { makePromiseCallback } from '../../../app/Util';
+import ESAnyClause from './ESAnyClause';
 import ESArrayClause from './ESArrayClause';
 import ESBaseClause from './ESBaseClause';
 import ESBooleanClause from './ESBooleanClause';
@@ -83,77 +84,48 @@ export default class EQLConfig
 
   private static defaultConfig: EQLConfig;
 
+  private undefinedTypes: { [name: string]: boolean };
   private clauses: { [name: string]: ESClause };
 
   public constructor(clauseConfiguration: any)
   {
+    this.undefinedTypes = {};
     this.clauses = {};
 
     winston.info(JSON.stringify(clauseConfiguration));
     Object.keys(clauseConfiguration).forEach(
       (id: string): void =>
       {
+        winston.info('defining "' + id + '"');
+
         const settings: any = clauseConfiguration[id];
+        this.declareType(id, settings);
+        if (this.clauses[id] !== undefined)
+        {
+          return;
+        }
+
         const type: any = settings.type;
-
-        if (id.match(/^(?:[a-zA-Z0-9_]+(:?[])?|{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+})$/gim) === null)
-        {
-          throw new Error('Type names must be composed only of letters, numbers, and underscores. Type "' +
-            String(type) +
-            ' is an invalid type name.');
-        }
-
         let clause: ESClause;
-        if (Array.isArray(type))
-        {
-          // list of possible types
-          clause = new ESVariantClause(id, settings);
-        }
-        else if (typeof (type) === 'object')
+        if (typeof (type) === 'object')
         {
           // structured object id
-          clause = new ESStructureClause(id, settings);
+          clause = new ESStructureClause(settings, this);
         }
         else if (typeof (type) === 'string')
         {
-          if (type === 'null')
+          switch (type)
           {
-            clause = new ESNullClause(type, settings);
-          }
-          else if (type === 'boolean')
-          {
-            clause = new ESBooleanClause(type, settings);
-          }
-          else if (type === 'number')
-          {
-            clause = new ESNumberClause(type, settings);
-          }
-          else if (type === 'string')
-          {
-            clause = new ESStringClause(type, settings);
-          }
-          else if (type === 'base')
-          {
-            clause = new ESBaseClause(type, settings);
-          }
-          else if (type === 'enum')
-          {
-            clause = new ESEnumClause(id, settings);
-          }
-          else if (type.indexOf('[]', id.length - 2) !== -1)
-          {
-            // array
-            clause = new ESArrayClause(id, settings, type.substring(0, id.length - 2));
-          }
-          else if (type.indexOf('}', id.length - 1) !== -1)
-          {
-            // map
-            clause = new ESMapClause(id, settings, type);
-          }
-          else
-          {
-            // reference id
-            clause = new ESReferenceClause(id, settings);
+            case 'enum':
+              clause = new ESEnumClause(settings, this);
+              break;
+            case 'variant':
+              clause = new ESVariantClause(settings, this);
+              break;
+            default:
+              // reference clause
+              clause = new ESReferenceClause(settings, this);
+              break;
           }
         }
         else
@@ -161,29 +133,96 @@ export default class EQLConfig
           throw new Error('Unknown clause type "' + String(type) + '".');
         }
 
+        winston.info('registering clause "' + id + '"');
         this.clauses[id] = clause;
-      });
+        delete this.undefinedTypes[id];
+      },
+    );
 
     // TODO: validate id references and other settings
   }
 
-  public tryGetClause(id: string): ESClause | null
+  public declareType(id: string, settings: any = {}): void
   {
-    if (this.clauses.hasOwnProperty(id))
+    if (this.clauses[id] !== undefined)
     {
-      return this.clauses[id];
+      return; // already declared
     }
-    else
+
+    winston.info('declare "' + id + '"');
+    settings.id = id;
+    let clause: ESClause | null = null;
+    switch (id)
     {
-      return null;
+      case 'null':
+        clause = new ESNullClause(settings);
+        break;
+      case 'boolean':
+        clause = new ESBooleanClause(settings);
+        break;
+      case 'number':
+        clause = new ESNumberClause(settings);
+        break;
+      case 'string':
+        clause = new ESStringClause(settings);
+        break;
+      case 'base':
+        clause = new ESBaseClause(settings);
+        break;
+      case 'any':
+        clause = new ESAnyClause(settings);
+        break;
+
+      default:
+        this.validateTypename(id);
+
+        if (id.endsWith('[]'))
+        {
+          // array
+          clause = new ESArrayClause(settings, id.substring(0, id.length - 2));
+        }
+        else if (id.startsWith('{'))
+        {
+          // map
+          if (id.charAt(0) !== '{' || id.charAt(id.length - 1) !== '}' ||
+            id.indexOf(' ') !== -1)
+          {
+            throw new Error('Unsupported map id "' + id + '".');
+          }
+
+          const components: string[] = id.substring(1, id.length - 1).split(':');
+          clause = new ESMapClause(settings, components[0], components[1], this);
+        }
+        else
+        {
+          // undefined reference id
+          this.undefinedTypes[id] = true;
+        }
+        break;
+    }
+
+    if (clause !== null)
+    {
+      this.clauses[id] = clause;
+    }
+  }
+
+  public validateTypename(type: string): void
+  {
+    if (type.match(/^(?:[a-zA-Z0-9_]+(:?\[])?|{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+})$/gim) === null)
+    {
+      throw new Error('Type names must be composed only of letters, numbers, and underscores. Type "' +
+        String(type) +
+        '" is an invalid type name.');
     }
   }
 
   public getClause(id: string): ESClause
   {
-    if (this.clauses.hasOwnProperty(id))
+    const clause: ESClause = this.clauses[id];
+    if (clause !== undefined)
     {
-      return this.clauses[id];
+      return clause;
     }
     else
     {

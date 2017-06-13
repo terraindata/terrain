@@ -81,8 +81,8 @@ export default class ESInterpreter
     this.config.getClause('root').mark(this, this.parser.getValueInfo());
   }
 
-  public accumulateError(info: ESValueInfo, message: string): void
+  public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
-    this.parser.accumulateError(new ESParserError(info.tokens[0], message));
+    this.parser.accumulateError(new ESParserError(info.tokens[0], message, isWarning));
   }
 }

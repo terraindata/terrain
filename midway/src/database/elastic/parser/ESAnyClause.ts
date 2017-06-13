@@ -44,46 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which can only take on a restricted set of values.
+ * A clause which can be any valid JSON value
  */
-export default class ESEnumClause extends ESClause
+export default class ESAnyClause extends ESClause
 {
-  public values: any[];
-  public valueMap: any;
-
-  public constructor(settings: any, config: EQLConfig)
+  public constructor(settings: any)
   {
     super(settings);
-    this.values = settings.values as any[];
-    this.valueMap = new Map();
-    for (let i = 0; i < this.values.length; ++i)
-    {
-      const value = this.values[i];
-      this.valueMap.set(value, i);
-      config.declareType(value);
-    }
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    if (this.valueMap.get(valueInfo.value) === undefined)
-    {
-      if (this.values.length > 10)
-      {
-        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
-      }
-      else
-      {
-        interpreter.accumulateError(valueInfo,
-          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
-      }
-    }
     valueInfo.clause = this;
   }
 }

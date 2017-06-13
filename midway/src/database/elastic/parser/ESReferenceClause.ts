@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
@@ -63,10 +64,11 @@ export default class ESReferenceClause extends ESClause
 {
   public delegateType: string;
 
-  public constructor(id: string, settings: any)
+  public constructor(settings: any, config: EQLConfig)
   {
-    super(id, settings);
+    super(settings);
     this.delegateType = this.type as string;
+    config.declareType(this.delegateType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void

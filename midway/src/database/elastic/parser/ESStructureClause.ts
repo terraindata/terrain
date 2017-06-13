@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -54,12 +55,24 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESStructureClause extends ESClause
 {
-  public structure: { [name: string]: string | null };
+  public structure: { [name: string]: string };
 
-  public constructor(id: string, settings: any)
+  public constructor(settings: any, config: EQLConfig)
   {
-    super(id, settings);
-    this.structure = this.type as { [key: string]: string | null };
+    super(settings);
+
+    Object.keys(this.type).forEach(
+      (key: string): void =>
+      {
+        if (this.type[key] === null)
+        {
+          this.type[key] = key;
+        }
+
+        config.declareType(this.type[key]);
+      });
+
+    this.structure = this.type as { [key: string]: string };
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
@@ -89,16 +102,13 @@ export default class ESStructureClause extends ESClause
 
         if (!this.structure.hasOwnProperty(name))
         {
-          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.');
+          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
           return;
         }
 
-        const propertyType: string =
-          (this.structure[name] === null) ? name : this.structure[name] as string;
-
         if (viTuple.propertyValue !== null)
         {
-          interpreter.config.getClause(propertyType).mark(interpreter, viTuple.propertyValue);
+          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
         }
       });
 

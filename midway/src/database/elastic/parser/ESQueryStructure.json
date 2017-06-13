@@ -1,4 +1,9 @@
 {
+  "any" : {
+    "desc" : "Any valid JSON value.",
+    "url" : "http://www.json.org/",
+    "type" : "any"
+  },
   "null" : {
     "desc" : "A null value.",
     "url" : "http://www.json.org/",
@@ -30,6 +35,65 @@
     "desc" : "The name of a document field.",
     "type" : "string"
   },
+  "field_type" : {
+    "type" : "enum",
+    "values" : [
+      "string",
+      "number",
+      "integer",
+      "date",
+      "boolean",
+      "text",
+      "keyword",
+      "long",
+      "short",
+      "byte",
+      "double",
+      "float",
+      "half_float",
+      "scaled_float",
+      "binary",
+      "integer_range",
+      "float_range",
+      "long_range",
+      "double_range",
+      "date_range",
+      "object",
+      "nested",
+      "geo_point",
+      "geo_shape",
+      "ip",
+      "completion",
+      "token_count",
+      "murmur3",
+      "attachment",
+      "percolator"
+    ]
+  },
+  "distance_unit" : {
+    "type" : "enum",
+    "values" : [
+      "mi",
+      "yd",
+      "ft",
+      "in",
+      "km",
+      "m",
+      "cm",
+      "mm",
+      "nmi",
+      "miles",
+      "yards",
+      "feet",
+      "inch",
+      "kilometers",
+      "meters",
+      "centimeters",
+      "millimeters",
+      "nauticalmiles",
+      "NM"
+    ]
+  },
   "root" : {
     "name" : "root clause",
     "desc" : "The outermost clause object that contains an entire search query.",
@@ -50,11 +114,10 @@
       "size" : null,
       "body" : null
     },
-    "autocomplete":
-      [
-        "index",
-        "type"
-      ]
+    "autocomplete" : [
+      "index",
+      "type"
+    ]
   },
   "index" : {
     "desc" : "Selects which index to search.",
@@ -81,9 +144,10 @@
     "type" : {
       "from" : null,
       "size" : null,
+      "sort" : "sort_clause",
+      "track_scores" : null,
       "_name" : "string",
       "query" : null,
-      "sort" : null,
       "_source" : "_source",
       "stored_fields" : "string[]",
       "script_fields" : "object",
@@ -102,6 +166,155 @@
       "aggregations" : "array",
       "aggs" : "array"
     }
+  },
+  "sort_clause" : {
+    "desc" : "Controls the order in which results are returned. Results will be sorted by the first condition, and ties are broken by the second, and so on.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html",
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "sort",
+      "array" : "sort[]",
+      "string": "field"
+    }
+  },
+  "sort" : {
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html",
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "{field:sort_control}",
+      "string" : "field"
+    }
+  },
+  "sort_control" : {
+    "desc" : "Either \"asc\" or \"desc\", or a sort settings clause, {\"order\" : \"asc\"}",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html",
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "sort_settings",
+      "string" : "field"
+    }
+  },
+  "sort_settings" : {
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html",
+    "type" : {
+      "order" : "sort_order",
+      "mode" : "sort_mode",
+      "missing" : "sort_missing",
+      "nested_path" : "sort_nested_path",
+      "nested_filter" : "sort_nested_filter",
+      "unmapped_type" : "sort_unmapped_type",
+      "unit" : "distance_unit",
+      "distance_type" : null,
+      "pin.location" : "geo_points",
+      "type" : "sort_field_type",
+      "script" : null
+    }
+  },
+  "sort_mode" : {
+    "desc" : "When sorting by an array or multi-valued field, controls how that field is used to sort results.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_sort_mode_option",
+    "type" : "enum",
+    "values" : [
+      "min", "max", "sum", "avg", "median"
+    ]
+  },
+  "sort_order" : {
+    "desc" : "The order to sort this field by: ascending or descending.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_sort_order",
+    "type" : "enum",
+    "values" : ["asc", "desc"]
+  },
+  "sort_nested_path" : {
+    "name" : "nested path",
+    "desc" : "The name of the nested object to sort by.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#nested-sorting",
+    "type" : "field"
+  },
+  "sort_nested_filter" : {
+    "name" : "nested sort filter",
+    "desc" : "A query that filters the nested objects before using them to sort by.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#nested-sorting",
+    "type" : "query"
+  },
+  "sort_missing" : {
+    "name" : "missing value clause",
+    "desc" : "Sets how documents missing this sort field will be treated. The special values of _last and _first can be used to sort these documents after or before other results, or substitute value can be specified.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_missing_values",
+    "template" : "_last",
+    "type" : "base"
+  },
+  "sort_unmapped_type" : {
+    "name" : "unmapped type",
+    "desc" : "If no mapping is defined for this field, unmapped_type can be used to set what type the field is interpreted as.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_ignoring_unmapped_fields",
+    "type" : "field_type"
+  },
+  "sort_field_type" : {
+    "desc" : "The type to interpret the result of the sort script as.",
+    "type" : "field_type"
+  },
+  "track_scores" : {
+    "desc" : "When set to true, the Elastic _score field will be computed even when it isn't used to sort the results.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_multiple_reference_points",
+    "type" : "boolean",
+    "template" : true
+  },
+  "geo_points" : {
+    "desc" : "Either a single geo point, or a list of several.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_multiple_reference_points",
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "geo_point",
+      "array" : "geo_point[]"
+    }
+  },
+  "geo_point" : {
+    "desc" : "Indicates a point location. Should be one of these: a lat-lon object, {\"lat\":40, \"lon\":-70}; a lat lon string, \"40,-70\"; a geohash, \"drm3btev3e86\"; or a lat lon array, [40, -70].",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_lat_lon_as_properties",
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "latlon_object",
+      "array" : "number[]",
+      "string" : "string"
+    }
+  },
+  "latlon_object" : {
+    "type" : {"lat" : "number", "lon" : "number"}
+  },
+  "distance_type" : {
+    "desc" : "Chooses the distance formula to use. arc is the default, plane is faster but less accurate.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#geo-sorting",
+    "type" : "enum",
+    "values" : ["arc", "plane"],
+    "template" : "arc"
+  },
+  "script" : {
+    "type" : {
+      "lang" : "script_language",
+      "params" : "script_params",
+      "inline" : "script_inline",
+      "stored" : "script_name"
+    }
+  },
+  "script_inline" : {
+    "desc" : "The code for this inline script",
+    "type" : "string"
+  },
+  "script_params" : {
+    "desc" : "Parameters to pass to the script.",
+    "type" : "{string:any}"
+  },
+  "script_language" : {
+    "desc" : "The scripting language to use.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html#_general_purpose_languages",
+    "type" : "enum",
+    "template" : "painless",
+    "values" : ["painless", "groovy", "expression", "mustache", "javascript", "python"]
+  },
+  "script_name" : {
+    "desc" : "The name of the stored script to call.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html#modules-scripting-stored-scripts",
+    "type" : "string"
   },
   "_source" : {
     "name" : "source clause",
@@ -166,19 +379,7 @@
   },
   "must" : {
     "name" : "must clause",
-    "desc" : "All results must match this subquery. The better a result matches, the higher its __score will be.",
-    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html",
-    "type" : "query"
-  },
-  "must_not" : {
-    "name" : "must not clause",
-    "desc" : "All results must not match this query. Filters out documents that match this subquery.",
-    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html",
-    "type" : "query"
-  },
-  "should" : {
-    "name" : "should clause",
-    "desc" : "Results should match this query. The better a result matches, the higher its __score will be. Also see minimum_should_match.",
+    "desc" : "All results must match this subquery. The better a result matches, the higher its __score will be. The must clause may be a single query object, or an array of query objects.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html",
     "type" : "variant",
     "subtypes" : {
@@ -186,7 +387,33 @@
       "array" : "query[]"
     }
   },
-  "minumum_should_match" : {
+  "must_not" : {
+    "name" : "must not clause",
+    "desc" : "All results must not match this query. Filters out documents that match this subquery. The must not clause may be a single query object, or an array of query objects.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html",
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "query",
+      "array" : "query[]"
+    }
+  },
+  "filter" : {
+    "name" : "filter context clause",
+    "desc" : "Query conditions in a filter clause aren't used when computing a document's elastic __score.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html#_scoring_with_literal_bool_filter_literal",
+    "type" : "query"
+  },
+  "should" : {
+    "name" : "should clause",
+    "desc" : "Results should match this query. The better a result matches, the higher its __score will be. Also see minimum_should_match. The should clause may be a single query object, or an array of query objects.",
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html",
+    "type" : "variant",
+    "subtypes" : {
+      "object" : "query",
+      "array" : "query[]"
+    }
+  },
+  "minimum_should_match" : {
     "name" : "minimum should match",
     "desc" : "Controls how many or what percentage of should clauses are required to match.",
     "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html",

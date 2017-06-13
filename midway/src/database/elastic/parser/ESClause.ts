@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as winston from 'winston';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
@@ -83,10 +84,11 @@ abstract class ESClause
    * @param id the id to refer to this clause by
    * @param settings the settings object to initialize it from
    */
-  public constructor(id: string, settings: any)
+  public constructor(settings: any)
   {
-    this.id = id;
-    this.setPropertyFromSettings(settings, 'name', () => id.replace('_', ' '));
+    winston.info('setting: ' + JSON.stringify(settings));
+    this.id = settings.id;
+    this.setPropertyFromSettings(settings, 'name', () => this.id.replace('_', ' '));
     this.setPropertyFromSettings(settings, 'desc', () => '');
     this.setPropertyFromSettings(settings, 'url', () => '');
     this.setPropertyFromSettings(settings, 'type', () => 'value');

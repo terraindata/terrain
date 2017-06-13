@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -57,19 +58,13 @@ export default class ESMapClause extends ESClause
   public nameID: string;
   public valueID: string;
 
-  public constructor(id: string, settings: any, type: string)
+  public constructor(settings: any, nameID: string, valueID: string, config: EQLConfig)
   {
-    super(id, settings);
-    if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
-      type.indexOf(' ') !== -1)
-    {
-      throw new Error('Unsupported map type "' + type + '".');
-    }
-
-    type = type.substring(1, id.length - 1); // trim off { and }
-    const components: string[] = type.split(':');
-    this.nameID = components[0];
-    this.valueID = components[1];
+    super(settings);
+    this.nameID = nameID;
+    this.valueID = valueID;
+    config.declareType(nameID);
+    config.declareType(valueID);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
@@ -91,16 +86,19 @@ export default class ESMapClause extends ESClause
       return;
     }
 
-    // mark children
+    // mark properties
     const childClause: ESClause = interpreter.config.getClause(this.valueID);
     const children: any = valueInfo.children;
-    children.keys().forEach(
+    Object.keys(children).forEach(
       (name: string): void =>
       {
-        const propertyInfo: ESPropertyInfo = children[name];
-        if (propertyInfo.propertyValue !== null)
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        interpreter.config.getClause(this.nameID).mark(interpreter, viTuple.propertyName);
+
+        if (viTuple.propertyValue !== null)
         {
-          childClause.mark(interpreter, propertyInfo.propertyValue);
+          childClause.mark(interpreter, viTuple.propertyValue);
         }
       });
   }
