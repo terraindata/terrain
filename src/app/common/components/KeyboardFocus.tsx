@@ -60,11 +60,11 @@ export interface Props
 const STYLE: {
   [key: string]: any,
 } = {
-  opacity: 0,
-  height: 0,
-  width: 0,
-  position: 'absolute', // vodka
-};
+    opacity: 0,
+    height: 0,
+    width: 0,
+    position: 'absolute', // vodka
+  };
 
 class KeyboardFocus extends PureClasss<Props>
 {

@@ -62,16 +62,6 @@ Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
   winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
 });
 
-Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
-{
-  ctx.body =
-    {
-      accessToken: ctx.state.user.accessToken,
-      id: ctx.state.user.userId,
-    };
-  winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
-});
-
 Router.post('/logout', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('Logging out user ' + String(ctx.state.user.email));

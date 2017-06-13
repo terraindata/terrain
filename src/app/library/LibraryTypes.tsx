@@ -107,8 +107,10 @@ export namespace LibraryTypes
     }
 
     config = config || {};
+    config.language = config.language || 'elastic';
 
-    // TODO change to standalone query Item
+    config.query = config.query || {};
+    config.query.language = config.language;
     config.query = _Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
