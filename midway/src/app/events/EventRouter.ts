@@ -62,7 +62,7 @@ const Router = new KoaRouter();
  * Get an event tracker.
  *
  */
-Router.get('/', async (ctx, next) =>
+Router.post('/', async (ctx, next) =>
 {
   ctx.body = JSON.stringify(await events.JSONHandler(ctx.request.ip, ctx.request.body));
 });
@@ -71,7 +71,7 @@ Router.get('/', async (ctx, next) =>
  * Handle client response for event tracker
  *
  */
-Router.post('/', async (ctx, next) =>
+Router.post('/update/', async (ctx, next) =>
 {
   const event: EventConfig =
     {

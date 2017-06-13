@@ -79,6 +79,18 @@ const payloadSkeleton: object =
       drink: '',
       ingredients: '',
     },
+    oldpro:
+    {
+      drink: '',
+      ingredients: '',
+      habanero_wings: '',
+    },
+    maclarens:
+    {
+      drink: '',
+      ingredients: '',
+      bartender: '',
+    },
   };
 
 export interface EventConfig
@@ -199,7 +211,19 @@ export class Events
   {
     return Object.keys(payload).reduce((res, item) =>
     {
-      res[item] = '';
+      switch (typeof (res[item]))
+      {
+        case "boolean":
+          res[item] = false;
+          break;
+
+        case "number":
+          res[item] = 0;
+          break;
+
+        default:
+          res[item] = '';
+      }
       return res;
     },
       {});
