@@ -48,6 +48,7 @@ import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 const {List, Map} = Immutable;
 const L = () => List([]);
+import BlockUtils from '../../../blocks/BlockUtils';
 import {_block, Block, TQLTranslationFn} from '../../../blocks/types/Block';
 import {_card, Card, CardString} from '../../../blocks/types/Card';
 import {Input, InputType} from '../../../blocks/types/Input';
@@ -56,86 +57,139 @@ import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDi
 import CommonBlocks from '../../../blocks/CommonBlocks';
 const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
 
-export const elasticMagicCard = _card({
+const { make } = BlockUtils;
+
+export const elasticMagicValue = _block({
   key: '',
   value: '',
   valueType: CommonElastic.valueTypesList[0],
-  
   static: {
     language: 'elastic',
+    removeOnCardRemove: true,
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
       let rawValue = block['value'];
       let value: any;
 
-      switch (block['valueType'])
+      if (rawValue._isBlock)
       {
-        case CommonElastic.valueTypes.number:
-          value = +rawValue;
-          break;
-        case CommonElastic.valueTypes.text:
-          value = "" + rawValue;
-          break;
-        case CommonElastic.valueTypes.null:
-          value = null;
-          break;
-        case CommonElastic.valueTypes.bool:
-          value = !rawValue || rawValue === 'false' ? false : true;
-          break;
-        case CommonElastic.valueTypes.array:
-          // TODO ELASTIC
-          value = tqlTranslationFn(rawValue, tqlConfig);
-          break;
-        case CommonElastic.valueTypes.object:
-          // TODO ELASTIC
-          value = tqlTranslationFn(rawValue, tqlConfig);
-          break;
-        default:
-          try
-          {
-            value = JSON.parse(rawValue);
-          }
-          catch (e)
-          {
-            value = rawValue;
-          }
+        value = tqlTranslationFn(rawValue, tqlConfig);
+      }
+      else
+      {
+        switch (block['valueType'])
+        {
+          case CommonElastic.valueTypes.number:
+            value = +rawValue;
+            break;
+          case CommonElastic.valueTypes.text:
+            value = "" + rawValue;
+            break;
+          case CommonElastic.valueTypes.null:
+            value = null;
+            break;
+          case CommonElastic.valueTypes.bool:
+            value = !rawValue || rawValue === 'false' ? false : true;
+            break;
+          case CommonElastic.valueTypes.array:
+            // TODO ELASTIC
+            value = tqlTranslationFn(rawValue, tqlConfig);
+            break;
+          case CommonElastic.valueTypes.object:
+            // TODO ELASTIC
+            value = tqlTranslationFn(rawValue, tqlConfig);
+            break;
+          default:
+            try
+            {
+              value = JSON.parse(rawValue);
+            }
+            catch (e)
+            {
+              value = rawValue;
+            }
+        }
       }
 
       return {
         [block['key']]: value,
       };
+    }
+  },
+});
+
+//           },
+//           // {
+//           //   displayType: DisplayType.DROPDOWN,
+//           //   key: 'valueType',
+//           //   options: Immutable.List(CommonElastic.valueTypesList),
+//           //   centerDropdown: true,
+//           //   dropdownUsesRawValues: true,
+//           // },
+
+const accepts = List(['elasticMagicCard']);
+
+export const elasticMagicCard = _card(
+{
+  values: List([]),
+  method: '',
+
+  static: {
+    language: 'elastic',
+    title: 'Object',
+    colors: ['#3a91a6', '#a1eafb'],
+    preview: '[values.length] Values',
+    accepts,
+    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+    {
+      let elasticObj: object = {};
+
+      block['values'].map(
+        (card: Card) =>
+        {
+          _.extend(elasticObj, tqlTranslationFn(card, tqlConfig));
+        }
+      );
+
+      return elasticObj;
     },
-    title: 'Magic',
-    colors: ['#921', '#801'],
-    preview: '[key]: [value]',
-    
+    init: () => ({
+      values: List([
+        make(elasticMagicValue),
+      ]),
+    }),
     display:
     {
-      displayType: DisplayType.FLEX,
-      key: null,
-
-      flex:
-      [
+      displayType: DisplayType.ROWS,
+      key: 'values',
+      english: 'elasticMagicValue',
+      factoryType: 'elasticMagicValue',
+      provideParentData: true,
+      row:
+      {
+        noDataPadding: true,
+        inner:
+        [
+          {
+            displayType: DisplayType.TEXT,
+            key: 'key',
+          },
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'value',
+            showWhenCards: true,
+            autoDisabled: true,
+            accepts,
+          },
+        ],
+        below:
         {
-          displayType: DisplayType.TEXT,
-          key: 'key',
-          autoDisabled: true,
-        },
-        {
-          displayType: DisplayType.DROPDOWN,
-          key: 'valueType',
-          options: Immutable.List(CommonElastic.valueTypesList),
-          centerDropdown: true,
-          dropdownUsesRawValues: true,
-        },
-        {
-          displayType: DisplayType.TEXT,
+          displayType: DisplayType.CARDSFORTEXT,
           key: 'value',
-          autoDisabled: true,
         },
-      ],
-    }
-  }
+      },
+    },
+  },
 });
 
 export default elasticMagicCard;
