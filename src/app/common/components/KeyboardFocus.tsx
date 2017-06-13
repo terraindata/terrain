@@ -72,12 +72,12 @@ class KeyboardFocus extends PureClasss<Props>
   {
     switch (e.keyCode)
     {
-      case 38:
-        // up
-        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
-        break;
       case 40:
         // down
+        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
+        break;
+      case 38:
+        // up
         this.props.onIndexChange(Math.max(this.props.index - 1, 0));
         break;
       case 13:
@@ -87,6 +87,7 @@ class KeyboardFocus extends PureClasss<Props>
 
   render()
   {
+    console.log(this.props.index);
     return (
       <select
         style={STYLE}
