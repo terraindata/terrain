@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
-const Immutable = require('immutable');
+import * as Immutable from 'immutable';
 
 // Defining our object like this gives us compile-time TypeScript support for ActionTypes
 //  and prevents us from defining duplicate action types.

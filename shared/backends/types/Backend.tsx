@@ -64,7 +64,8 @@ export interface Backend
   };
   creatingType: string; // type of the block that marks where a card is being created
 
-  // Cards that can go at the root level
+  rootCard: BlockConfig;
+  // Cards that can go at the top/root level
   topLevelCards: List<string>;
 
   // Ordering of the cards deck

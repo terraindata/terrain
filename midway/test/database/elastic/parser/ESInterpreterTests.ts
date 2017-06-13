@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as winston from 'winston';
-import EQLConfig from '../../../../src/database/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../src/database/elastic/parser/ESInterpreter';
-import ESParser from '../../../../src/database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../src/database/elastic/parser/ESParserError';
+import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
+import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
 import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
 function getExpectedFile(): string
@@ -82,7 +82,7 @@ function testParse(testString: string,
 {
   winston.info('testing \'' + testString + '\'');
   const interpreter: ESInterpreter = new ESInterpreter(testString, config);
-  const parser: ESParser = interpreter.parser;
+  const parser: ESJSONParser = interpreter.parser;
 
   const objects = new WeakMap();
   let count = 0;

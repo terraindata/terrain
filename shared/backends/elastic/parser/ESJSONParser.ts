@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';

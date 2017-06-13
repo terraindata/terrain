@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
@@ -86,7 +85,7 @@ abstract class ESClause
    */
   public constructor(settings: any)
   {
-    winston.info('setting: ' + JSON.stringify(settings));
+    // winston.info('setting: ' + JSON.stringify(settings));
     this.id = settings.id;
     this.setPropertyFromSettings(settings, 'name', () => this.id.replace('_', ' '));
     this.setPropertyFromSettings(settings, 'desc', () => '');

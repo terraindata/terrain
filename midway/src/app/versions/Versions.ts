@@ -104,7 +104,7 @@ export class Versions
 
   public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
   {
-    let result: Promise<VersionConfig[]>;
+    let result: Promise<object[]>;
     if (objectId !== undefined && objectType !== undefined)
     {
       result = App.DB.select(this.versionTable, [], { objectType, objectId });
@@ -117,7 +117,7 @@ export class Versions
     {
       result = App.DB.select(this.versionTable, [], {});
     }
-    return result;
+    return result as Promise<VersionConfig[]>;
   }
 }
 

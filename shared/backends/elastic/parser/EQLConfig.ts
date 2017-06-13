@@ -45,8 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import * as winston from 'winston';
-import { makePromiseCallback } from '../../../app/Util';
+import {makePromiseCallback} from '../../../../midway/src/tasty/Utils';
 import ESAnyClause from './ESAnyClause';
 import ESArrayClause from './ESArrayClause';
 import ESBaseClause from './ESBaseClause';
@@ -92,11 +91,11 @@ export default class EQLConfig
     this.undefinedTypes = {};
     this.clauses = {};
 
-    winston.info(JSON.stringify(clauseConfiguration));
+    // winston.info(JSON.stringify(clauseConfiguration));
     Object.keys(clauseConfiguration).forEach(
       (id: string): void =>
       {
-        winston.info('defining "' + id + '"');
+        // winston.info('defining "' + id + '"');
 
         const settings: any = clauseConfiguration[id];
         this.declareType(id, settings);
@@ -133,7 +132,7 @@ export default class EQLConfig
           throw new Error('Unknown clause type "' + String(type) + '".');
         }
 
-        winston.info('registering clause "' + id + '"');
+        // winston.info('registering clause "' + id + '"');
         this.clauses[id] = clause;
         delete this.undefinedTypes[id];
       },
@@ -149,7 +148,7 @@ export default class EQLConfig
       return; // already declared
     }
 
-    winston.info('declare "' + id + '"');
+    // winston.info('declare "' + id + '"');
     settings.id = id;
     let clause: ESClause | null = null;
     switch (id)
