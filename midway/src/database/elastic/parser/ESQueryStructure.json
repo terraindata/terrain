@@ -49,7 +49,12 @@
       "from" : null,
       "size" : null,
       "body" : null
-    }
+    },
+    "autocomplete":
+      [
+        "index",
+        "type"
+      ]
   },
   "index" : {
     "desc" : "Selects which index to search.",
@@ -144,7 +149,7 @@
   "constant_score" : {
     "name" : "constant score query",
     "desc" : "A query clause that is not used to compute result scores.",
-    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html"
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html",
     "type" : "query"
   },
   "bool" : {
@@ -184,7 +189,7 @@
   "minumum_should_match" : {
     "name" : "minimum should match",
     "desc" : "Controls how many or what percentage of should clauses are required to match.",
-    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html"
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html",
     "type" : "variant",
     "subtypes" : {
       "number" : "number",
@@ -267,7 +272,7 @@
   },
   "boost" : {
     "desc" : "Boosts the score of matches by the given amount. Boosts are not exactly multiplicative.",
-    "url" : "https://www.elastic.co/guide/en/elasticsearch/guide/current/_boosting_query_clauses.html"
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/guide/current/_boosting_query_clauses.html",
     "type" : "number"
   },
   "match_all" : {
@@ -310,12 +315,12 @@
     }
   },
   "match_operator" : {
-    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero"
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero",
     "type" : "enum",
     "values" : ["and", "or"]
   },
   "zero_terms_query" : {
-    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero"
+    "url" : "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero",
     "type" : "enum",
     "values" : ["none", "all"]
   }

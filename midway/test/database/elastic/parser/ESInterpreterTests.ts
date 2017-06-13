@@ -44,71 +44,81 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
+import * as fs from 'fs';
+import * as winston from 'winston';
+import EQLConfig from '../../../../src/database/elastic/parser/EQLConfig';
+import ESInterpreter from '../../../../src/database/elastic/parser/ESInterpreter';
+import ESParser from '../../../../src/database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../src/database/elastic/parser/ESParserError';
+import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
-/**
- * A clause with a well-defined structure.
- */
-export default class ESStructureClause extends ESClause
+function getExpectedFile(): string
 {
-  public structure: { [name: string]: string | null };
-
-  public constructor(id: string, settings: any)
-  {
-    super(id, settings);
-    this.structure = this.type as { [key: string]: string | null };
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-
-    const value = valueInfo.value;
-    if (typeof (value) !== 'object')
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
-      return;
-    }
-
-    const children: any = valueInfo.children;
-
-    // mark properties
-    Object.keys(children).forEach(
-      (name: string): void =>
-      {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        if (!this.structure.hasOwnProperty(name))
-        {
-          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.');
-          return;
-        }
-
-        const propertyType: string =
-          (this.structure[name] === null) ? name : this.structure[name] as string;
-
-        if (viTuple.propertyValue !== null)
-        {
-          interpreter.config.getClause(propertyType).mark(interpreter, viTuple.propertyValue);
-        }
-      });
-
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] !== undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
-  }
+  return __filename.split('.')[0] + '.expected';
 }
+
+let expected;
+let config: EQLConfig;
+
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+
+  const expectedString: any = await new Promise((resolve, reject) =>
+  {
+    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+  });
+
+  expected = JSON.parse(expectedString);
+  config = await EQLConfig.getDefault();
+
+  done();
+});
+
+function testParse(testString: string,
+  expectedValue: any,
+  expectedErrors: ESParserError[] = [])
+{
+  winston.info('testing \'' + testString + '\'');
+  const interpreter: ESInterpreter = new ESInterpreter(testString, config);
+  const parser: ESParser = interpreter.parser;
+  const value = parser.getValue();
+
+  const objects = new WeakMap();
+  let count = 0;
+  winston.info(JSON.stringify(parser.getValueInfo(),
+    (key, val) =>
+    {
+      if (val != null && typeof val === 'object')
+      {
+        const id = objects.get(val);
+        if (id === undefined)
+        {
+          objects.set(val, count++);
+        }
+        else
+        {
+          return 'ref ' + String(id);
+        }
+      }
+
+      return val;
+    }, 2));
+
+  // winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
+  // expect(value).toEqual(expectedValue);
+  expect(parser.getErrors()).toEqual(expectedErrors);
+}
+
+test('parse valid json objects', () =>
+{
+  Object.getOwnPropertyNames(expected).forEach(
+    (testName: string) =>
+    {
+      const testValue: any = expected[testName];
+
+      // test parsing the value using a few spacing options
+      testParse(JSON.stringify(testValue), testValue);
+    });
+});

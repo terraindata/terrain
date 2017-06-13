@@ -88,7 +88,7 @@ export default class ESValueInfo
    */
   public delegateClause: ESClause | null;
 
-  public constructor(value: any = null, tokens: ESParserToken[] = [])
+  public constructor(value?: any, tokens: ESParserToken[] = [])
   {
     this.value = value;
     this.tokens = tokens;

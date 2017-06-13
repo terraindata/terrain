@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
+import * as winston from 'winston';
+import { makePromiseCallback } from '../../../app/Util';
 import ESArrayClause from './ESArrayClause';
 import ESBaseClause from './ESBaseClause';
 import ESBooleanClause from './ESBooleanClause';
@@ -62,21 +65,41 @@ import ESVariantClause from './ESVariantClause';
  */
 export default class EQLConfig
 {
+
+  public static async getDefault(): Promise<EQLConfig>
+  {
+    if (EQLConfig.defaultConfig === undefined)
+    {
+      const configString: any = await new Promise((resolve, reject) =>
+      {
+        fs.readFile(__dirname + '/ESQueryStructure.json', makePromiseCallback(resolve, reject));
+      });
+
+      EQLConfig.defaultConfig = new EQLConfig(JSON.parse(configString));
+    }
+
+    return EQLConfig.defaultConfig;
+  }
+
+  private static defaultConfig: EQLConfig;
+
   private clauses: { [name: string]: ESClause };
 
   public constructor(clauseConfiguration: any)
   {
     this.clauses = {};
+
+    winston.info(JSON.stringify(clauseConfiguration));
     Object.keys(clauseConfiguration).forEach(
       (id: string): void =>
       {
         const settings: any = clauseConfiguration[id];
-        const type: string = settings.type as string;
+        const type: any = settings.type;
 
-        if (type.match(/^(?:[a-zA-Z0-9_]+(:?[])?|{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+})$/gim) === null)
+        if (id.match(/^(?:[a-zA-Z0-9_]+(:?[])?|{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+})$/gim) === null)
         {
           throw new Error('Type names must be composed only of letters, numbers, and underscores. Type "' +
-            type +
+            String(type) +
             ' is an invalid type name.');
         }
 
@@ -167,4 +190,5 @@ export default class EQLConfig
       throw new Error('Unknown clause id "' + id + '"');
     }
   }
+
 }

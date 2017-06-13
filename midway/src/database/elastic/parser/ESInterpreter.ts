@@ -66,8 +66,10 @@ export default class ESInterpreter
    * to run the interpreter on it's result.
    * @param query the query string or parser to interpret
    */
-  public constructor(query: string | ESJSONParser)
+  public constructor(query: string | ESJSONParser, config: EQLConfig)
   {
+    this.config = config;
+
     if (typeof query === 'string')
     {
       this.parser = new ESJSONParser(query);

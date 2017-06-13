@@ -56,6 +56,7 @@ export default class ESParserToken
   public row: number; // row in which this token begins (rows start at 0)
   public col: number; // column in which this token begins (cols start at 0)
   public length: number; // token length in chars
+  public substring: string; // token substring
 
   public valueInfo: ESValueInfo | null; // value info that this token belongs to
 
@@ -64,12 +65,14 @@ export default class ESParserToken
   public constructor(charNumber: number,
     row: number,
     col: number,
-    length: number)
+    length: number,
+    substring: string)
   {
     this.charNumber = charNumber;
     this.row = row;
     this.col = col;
     this.length = length;
+    this.substring = substring;
     this.valueInfo = null;
     this.errors = null;
   }

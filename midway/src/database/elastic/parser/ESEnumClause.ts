@@ -54,22 +54,23 @@ import ESValueInfo from './ESValueInfo';
 export default class ESEnumClause extends ESClause
 {
   public values: any[];
-  public valuesMap: any;
+  public valueMap: any;
 
   public constructor(id: string, settings: any)
   {
     super(id, settings);
     this.values = settings.values as any[];
+    this.valueMap = new Map();
     for (let i = 0; i < this.values.length; ++i)
     {
       const value = this.values[i];
-      this.valuesMap[value] = true;
+      this.valueMap.set(value, i);
     }
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    if (this.valuesMap[valueInfo.value] !== true)
+    if (this.valueMap.get(valueInfo.value) === undefined)
     {
       if (this.values.length > 10)
       {

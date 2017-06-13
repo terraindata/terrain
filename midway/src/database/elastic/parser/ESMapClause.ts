@@ -98,9 +98,9 @@ export default class ESMapClause extends ESClause
       (name: string): void =>
       {
         const propertyInfo: ESPropertyInfo = children[name];
-        if (propertyInfo.value !== null)
+        if (propertyInfo.propertyValue !== null)
         {
-          childClause.mark(interpreter, propertyInfo.value);
+          childClause.mark(interpreter, propertyInfo.propertyValue);
         }
       });
   }
