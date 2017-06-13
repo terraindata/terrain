@@ -569,7 +569,7 @@ export class ResultsManager extends PureClasss<Props>
     this.updateResults(resultsData, isAllFields);
   }
 
-  private handleM1Error(response: M1QueryResponse, isAllFields?: boolean)
+  private handleM1Error(response: any, isAllFields?: boolean)
   {
     let { errorMessage } = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
