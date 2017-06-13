@@ -89,7 +89,7 @@ class CreateCardTool extends PureClasss<Props>
     opening: false,
     focusedIndex: -1,
   };
-  
+
   handleCardClick(event)
   {
     const type = Util.rel(event.target);
@@ -249,34 +249,34 @@ class CreateCardTool extends PureClasss<Props>
       </div>
     );
   }
-  
+
   handleFocus()
   {
     this.setState({
       focusedIndex: 0,
     });
   }
-  
+
   handleFocusLost()
   {
     this.setState({
       focusedIndex: -1,
     });
   }
-  
+
   handleFocusedIndexChange(focusedIndex: number)
   {
     this.setState({
       focusedIndex,
     });
   }
-  
+
   handleKeyboardSelect(index: number)
   {
     const type = this.props.accepts.get(index);
     this.createCard(type);
   }
-  
+
   public render()
   {
     if (!this.props.canEdit)
