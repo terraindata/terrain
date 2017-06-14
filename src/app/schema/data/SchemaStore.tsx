@@ -105,13 +105,13 @@ export const SchemaStore: Store<SchemaState> =
                         {
                           if (db['type'] === 'mysql')
                           {
+                            console.log('going to parse: ');
+                            console.log(db);
+                            console.log(schemaData);
                             // SchemaParser.parseMySQLDb(db, colsData, SchemaActions.setDatabase);
                           }
                           else if (db['type'] === 'elastic')
                           {
-                            console.log('going to parse: ');
-                            console.log(db);
-                            console.log(schemaData);
                             SchemaParser.parseElasticDb(db, schemaData, SchemaActions.setServer);
                           }
                         }

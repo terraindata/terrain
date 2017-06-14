@@ -201,7 +201,7 @@ export module SchemaParser
             );
           }
 
-          _.each(tableFields, (fieldProperties, fieldName, fieldList) => {
+          _.each((tableFields as any), (fieldProperties, fieldName, fieldList) => {
             const column = SchemaTypes._Column({
               name: (fieldName as any) as string,
               serverId,
