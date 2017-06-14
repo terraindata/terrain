@@ -226,14 +226,18 @@ export default class ESJSONParser
           this.readObject(valueInfo);
           break;
 
+        // object end
         case '}':
-        case ']':
           break;
-
+          
         // array
         case '[':
           this.advance();
           this.readArray(valueInfo);
+          break;
+
+        // array end
+        case ']':
           break;
 
         // true
