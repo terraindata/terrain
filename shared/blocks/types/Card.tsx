@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import BlockUtils from '../BlockUtils';
 import { Display } from '../displays/Display';
-import { allBlocksMetaFields, Block, TQLFn } from './Block';
+import { allBlocksMetaFields, Block, TQLFn, verifyBlockConfigKeys } from './Block';
 
 export interface Card extends IRecord<Card>
 {
@@ -141,6 +141,8 @@ export const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
 {
+  verifyBlockConfigKeys(config);
+  
   config = _.extend(config, {
     id: '',
     _isCard: true,

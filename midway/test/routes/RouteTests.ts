@@ -138,7 +138,7 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/login request returned an error: ' + String(error));
       });
   });
 
@@ -164,7 +164,7 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/login request returned an error: ' + String(error));
       });
 
     await request(server)
@@ -415,7 +415,7 @@ describe('Item route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/login request returned an error: ' + String(error));
       });
 
     await request(server)

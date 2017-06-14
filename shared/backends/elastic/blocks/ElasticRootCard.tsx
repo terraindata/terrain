@@ -42,30 +42,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
+const {List, Map} = Immutable;
+const L = () => List([]);
+import {_block, Block, TQLTranslationFn} from '../../../blocks/types/Block';
+import BlockUtils from '../../../blocks/BlockUtils';
+import {_card, Card, CardString} from '../../../blocks/types/Card';
+import {Input, InputType} from '../../../blocks/types/Input';
+import CommonElastic from '../syntax/CommonElastic';
+import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
+import CommonBlocks from '../../../blocks/CommonBlocks';
+const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+const accepts = Immutable.List(['elasticKeyValueWrap']);
 
-import { users } from '../users/UserRouter';
-
-const Router = new KoaRouter();
-
-Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
-{
-  ctx.body =
+export const elasticRootCard = _card({
+  index: '',
+  from: 0,
+  rootType: '',
+  rootSize: 100,
+  
+  body: '',
+  sort: '',
+  
+  cards: L(),
+  
+  static:
+  {
+    title: 'Root',
+    colors: ['#456', '#789'],
+    preview: '[index], [rootType]',
+    language: 'elastic',
+    
+    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      accessToken: ctx.state.user.accessToken,
-      id: ctx.state.user.id,
-    };
-  winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
+      return {
+        index: rootBlock['index'],
+        type: rootBlock['rootType'],
+        from: rootBlock['from'],
+        size: rootBlock['rootSize'],
+      };
+    },
+    
+    accepts,    
+    
+    display:
+    [
+      {
+        displayType: DisplayType.TEXT,
+        key: 'index',
+        getAutoTerms: (schemaState) =>
+        {
+          return Immutable.List(['movies', 'baseball', 'zazzle']);
+        }
+        // autoDisabled: true,
+      },
+      {
+        displayType: DisplayType.TEXT,
+        key: 'rootType',
+        autoDisabled: true,
+      },
+      {
+        displayType: DisplayType.NUM,
+        key: 'from',
+        autoDisabled: true,
+      },
+      {
+        displayType: DisplayType.NUM,
+        key: 'rootSize',
+        autoDisabled: true,
+      },
+      
+      {
+        displayType: DisplayType.CARDS,
+        key: 'cards',
+        accepts,
+      },
+    ]
+  },
 });
 
-Router.post('/logout', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Logging out user ' + String(ctx.state.user.email));
-  ctx.body = await users.logout(ctx.request.body.id, ctx.request.body.accessToken);
-});
-
-export default Router;
+export default elasticRootCard;

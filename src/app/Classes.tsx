@@ -129,13 +129,14 @@ export function responseToRecordConfig(response: object): object
   {
     try
     {
-      // somewhere along the line, \ get added to the text and not removed correctly
-      // TODO update if the backend escaping is fixed
-      const meta = JSON.parse(response['meta'].replace(/\\([^\\])/g, (a, b) => b).replace(/\\\\/g, '\\') || '{}');
+      const meta = JSON.parse(response['meta'] || '{}');
       response = _.extend(meta, response);
       delete response['meta'];
     }
-    catch (e) { }
+    catch (e) 
+    {
+      console.log('JSON Parse Error converting item: ', e, response['meta']);
+    }
   }
 
   return response;

@@ -110,7 +110,7 @@ class CardsDeck extends PureClasss<Props>
             type='text'
             ref='search'
             className='cards-deck-search'
-            placeholder='Filter Cards'
+            placeholder='Search Cards'
             value={this.state.search}
             onChange={this.handleSearchChange}
           />

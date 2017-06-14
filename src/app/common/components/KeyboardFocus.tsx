@@ -43,29 +43,60 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as React from 'react';
+import * as _ from 'underscore';
+import PureClasss from '../../common/components/PureClasss';
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-
-import { users } from '../users/UserRouter';
-
-const Router = new KoaRouter();
-
-Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
+export interface Props
 {
-  ctx.body =
+  onFocus();
+  onFocusLost();
+  index: number; // currently selected
+  length: number; // number possible to select
+  onIndexChange(index: number);
+  onSelect(index: number);
+}
+
+const STYLE: {
+  [key: string]: any,
+} = {
+    opacity: 0,
+    height: 0,
+    width: 0,
+    position: 'absolute', // vodka
+  };
+
+class KeyboardFocus extends PureClasss<Props>
+{
+  handleKeyDown(e)
+  {
+    switch (e.keyCode)
     {
-      accessToken: ctx.state.user.accessToken,
-      id: ctx.state.user.id,
-    };
-  winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
-});
+      case 40:
+        // down
+        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
+        break;
+      case 38:
+        // up
+        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
+        break;
+      case 13:
+        this.props.onSelect(this.props.index);
+    }
+  }
 
-Router.post('/logout', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Logging out user ' + String(ctx.state.user.email));
-  ctx.body = await users.logout(ctx.request.body.id, ctx.request.body.accessToken);
-});
-
-export default Router;
+  render()
+  {
+    console.log(this.props.index);
+    return (
+      <select
+        style={STYLE}
+        onFocus={this.props.onFocus}
+        onBlur={this.props.onFocusLost}
+        onKeyDown={this.handleKeyDown}
+      >
+      </select>
+    );
+  }
+}
+export default KeyboardFocus;

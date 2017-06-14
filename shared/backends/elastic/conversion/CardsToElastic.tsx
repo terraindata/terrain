@@ -86,9 +86,7 @@ class CardsToElastic
     query.cards.map(
       (card: Card) =>
       {
-        const tqlFn = card.static.tql as TQLRecursiveObjectFn;
-        const tqlObj = tqlFn(card, CardsToElastic.blockToElastic, options);
-        _.extend(elasticObj, tqlObj);
+        _.extend(elasticObj, CardsToElastic.blockToElastic(card, options));
       }
     );
     
@@ -108,8 +106,13 @@ class CardsToElastic
     // return q;
   }
   
-  static blockToElastic(block: Block, options: Options = {}): object
+  static blockToElastic(block: Block, options: Options = {}): string | object
   {
+    if (block && block.static.tql)
+    {
+      const tql = block.static.tql as TQLRecursiveObjectFn;
+      return tql(block, CardsToElastic.blockToElastic, options);
+    }
     return { notYet: 'not yet done' };
   }
 }

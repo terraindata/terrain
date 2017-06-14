@@ -66,7 +66,7 @@ export default function ElasticToCards(
 	try
 	{
 		const obj = JSON.parse(query.tql);
-		const cards = parseObject(obj);
+		const cards = parseObjectWrap(obj);
 		return query
 			.set('cards', cards)
 	    .set('cardsAndCodeInSync', true);
@@ -78,17 +78,93 @@ export default function ElasticToCards(
 	}
 }
 
-const parseObject = (obj: Object): Cards =>
+const parseObjectWrap = (obj: Object): Cards =>
+{
+	let arr: Card[] = _.map(obj,
+		(value: any, key: string) =>
+		{
+			return make(
+				Blocks.elasticKeyValueWrap,
+				{
+					key,
+					cards: Immutable.List([
+						parseValueSingleCard(value)
+					]),
+				}
+			);
+		}
+	);
+	
+	return Immutable.List(arr);
+};
+
+const parseArrayWrap = (arr: any[]): Cards =>
+{
+	return Immutable.List(arr.map(parseValueSingleCard));
+};
+
+const parseValueSingleCard = (value: any): Card =>
+{
+	switch(typeof value)
+	{
+		case 'string':
+			return make(Blocks.elasticText, {
+				value,
+			});
+	  case 'number':
+	  	return make(Blocks.elasticNumber, {
+	  		value,
+	  	});
+	  case 'boolean':
+	  	return make(Blocks.elasticBool, {
+	  		value: value ? 1 : 0,
+	  	});
+	  case 'object':
+	  	if (value === null)
+	  	{
+	  		return make(Blocks.elasticNull);
+	  	}
+	  	else if (Array.isArray(value))
+	  	{
+	  		return make(
+	  			Blocks.elasticArray,
+	  			{
+	  				cards: parseArrayWrap(value),
+	  			}
+	  		);
+	  	}
+	  	else
+	  	{
+	  		// value is an object
+	  		return make(
+	  			Blocks.elasticObject,
+	  			{
+	  				cards: parseObjectWrap(value),
+	  			}
+	  		);
+	  	}
+	}
+	
+	throw new Error("Elastic Parsing: Unsupported value: " + value);
+}
+
+
+
+const parseObjectToggle = (obj: Object): Cards =>
 {
 	let arr: Card[] = _.map(obj,
 		(rawVal: any, key: string) =>
 		{
+			// For the Toggle cards, use the valueType
 			let valueType = CommonElastic.valueTypes.null;
+			
 			let value = rawVal;
+			
 			switch(typeof rawVal)
 			{
 				case 'string':
 					valueType = CommonElastic.valueTypes.text;
+					
 					break;
 			  case 'number':
 			  	valueType = CommonElastic.valueTypes.number;
@@ -101,10 +177,15 @@ const parseObject = (obj: Object): Cards =>
 			  	{
 			  		valueType = CommonElastic.valueTypes.null;
 			  	}
+			  	else if (Array.isArray(value))
+			  	{
+			  		// not yet done
+			  	}
+			  	// not yet done
 			}
 			
 			return make(
-				Blocks.elasticKeyValue,
+				Blocks.elasticKeyValueToggle,
 				{
 					key,
 					value,
@@ -116,3 +197,4 @@ const parseObject = (obj: Object): Cards =>
 	
 	return Immutable.List(arr);
 }
+

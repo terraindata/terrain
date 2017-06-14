@@ -80,6 +80,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   public state: {
     tql: string;
     theme: string;
+    runMode: string;
     focused: boolean;
     highlightedLine: number;
     theme_index: number;
@@ -92,6 +93,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   } = {
     tql: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
+    runMode: 'auto',
     focused: false,
     highlightedLine: null,
     theme_index: 0,
@@ -122,24 +124,43 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  public updateTql(tql: string, noAction?: boolean)
+  public updateTql(tql: string, noAction: boolean = false, manualRequest: boolean = false)
   {
-    if (tql === this.state.tql)
+    if (this.state.runMode === 'auto')
     {
-      return;
-    }
+      // auto mode
+      if (tql === this.state.tql)
+      {
+        return;
+      }
 
-    // this.checkForFolding(tql);
-    this.setState({
-      tql,
-      highlightedLine: null,
-      syntaxHelpOpen: false,
-      termDefinitionOpen: false,
-    });
+      // this.checkForFolding(tql);
+      this.setState({
+        tql,
+        highlightedLine: null,
+        syntaxHelpOpen: false,
+        termDefinitionOpen: false,
+      });
 
-    if (!noAction && tql !== this.props.query.tql)
+      if (!noAction && tql !== this.props.query.tql)
+      {
+        this.sendTqlAction();
+      }
+    } else
     {
-      this.sendTqlAction();
+      if (tql !== this.state.tql)
+      {
+        this.setState({
+          tql,
+          highlightedLine: null,
+          syntaxHelpOpen: false,
+          termDefinitionOpen: false,
+        });
+      }
+      if (manualRequest === true && noAction === false)
+      {
+        this.sendTqlAction();
+      }
     }
   }
 
@@ -209,6 +230,20 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
+  public changeRunModeToAuto()
+  {
+    this.setState({
+      runMode: 'auto',
+    });
+  }
+
+  public changeRunModeToManual()
+  {
+    this.setState({
+      runMode: 'manual',
+    });
+  }
+
   public getMenuOptions(): List<MenuOption>
   {
     const options: List<MenuOption> =
@@ -232,6 +267,16 @@ class BuilderTQLColumn extends PureClasss<Props>
           text: 'Monokai',
           onClick: this.changeThemeMonokai,
           disabled: this.getThemeIndex() === 3,
+        },
+        {
+          text: 'Auto',
+          onClick: this.changeRunModeToAuto,
+          disabled: this.state.runMode === 'auto',
+        },
+        {
+          text: 'Manual',
+          onClick: this.changeRunModeToManual,
+          disabled: this.state.runMode === 'manual',
         },
         // {
         //   spacer: true,

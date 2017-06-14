@@ -50,11 +50,32 @@ export const ElasticCardsDeck =
   Immutable.fromJS(
     [
       [
-        // JSON
-        Blocks.elasticKeyValue.type,
-        Blocks.elasticValue.type,
+        Blocks.elasticRootCard.type,
+      ],
+      
+      [
+        // JSON key wraps
+        Blocks.elasticKeyValueWrap.type,
+      ],
+      
+      [
+        // JSON wrapper cards
         Blocks.elasticObject.type,
         Blocks.elasticArray.type,
+      ],
+      
+      [
+        // JSON individual value cards
+        Blocks.elasticBool.type,
+        Blocks.elasticNumber.type,
+        Blocks.elasticText.type,
+        Blocks.elasticNull.type,
+      ],
+      
+      [
+        // JSON
+        Blocks.elasticKeyValueToggle.type,
+        Blocks.elasticValue.type,
       ],
     ],
   );

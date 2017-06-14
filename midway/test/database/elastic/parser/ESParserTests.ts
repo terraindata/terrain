@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as winston from 'winston';
-import ESParser from '../../../../src/database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../src/database/elastic/parser/ESParserError';
+import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
 import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
 function getExpectedFile(): string
