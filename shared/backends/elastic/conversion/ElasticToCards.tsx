@@ -42,159 +42,156 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
+import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import CommonElastic from '../syntax/CommonElastic';
-import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 
-import {Card, Cards, CardString} from '../../../blocks/types/Card';
-import {Block} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
+import { Block } from '../../../blocks/types/Block';
+import { Card, Cards, CardString } from '../../../blocks/types/Card';
 const { make } = BlockUtils;
 
 import Blocks from '../blocks/ElasticBlocks';
 
 export default function ElasticToCards(
   query: Query,
-  queryReady: (query: Query) => void
+  queryReady: (query: Query) => void,
 ): Query
 {
-	try
-	{
-		const obj = JSON.parse(query.tql);
-		const cards = parseObjectWrap(obj);
-		return query
-			.set('cards', cards)
-	    .set('cardsAndCodeInSync', true);
-	}
-	catch(e)
-	{
-	  return query
-	    .set('cardsAndCodeInSync', false);
-	}
+  try
+  {
+    const obj = JSON.parse(query.tql);
+    const cards = parseObjectWrap(obj);
+    return query
+      .set('cards', cards)
+      .set('cardsAndCodeInSync', true);
+  }
+  catch (e)
+  {
+    return query
+      .set('cardsAndCodeInSync', false);
+  }
 }
 
 const parseObjectWrap = (obj: Object): Cards =>
 {
-	let arr: Card[] = _.map(obj,
-		(value: any, key: string) =>
-		{
-			return make(
-				Blocks.elasticKeyValueWrap,
-				{
-					key,
-					cards: Immutable.List([
-						parseValueSingleCard(value)
-					]),
-				}
-			);
-		}
-	);
-	
-	return Immutable.List(arr);
+  const arr: Card[] = _.map(obj,
+    (value: any, key: string) =>
+    {
+      return make(
+        Blocks.elasticKeyValueWrap,
+        {
+          key,
+          cards: Immutable.List([
+            parseValueSingleCard(value),
+          ]),
+        },
+      );
+    },
+  );
+
+  return Immutable.List(arr);
 };
 
 const parseArrayWrap = (arr: any[]): Cards =>
 {
-	return Immutable.List(arr.map(parseValueSingleCard));
+  return Immutable.List(arr.map(parseValueSingleCard));
 };
 
 const parseValueSingleCard = (value: any): Card =>
 {
-	switch(typeof value)
-	{
-		case 'string':
-			return make(Blocks.elasticText, {
-				value,
-			});
-	  case 'number':
-	  	return make(Blocks.elasticNumber, {
-	  		value,
-	  	});
-	  case 'boolean':
-	  	return make(Blocks.elasticBool, {
-	  		value: value ? 1 : 0,
-	  	});
-	  case 'object':
-	  	if (value === null)
-	  	{
-	  		return make(Blocks.elasticNull);
-	  	}
-	  	else if (Array.isArray(value))
-	  	{
-	  		return make(
-	  			Blocks.elasticArray,
-	  			{
-	  				cards: parseArrayWrap(value),
-	  			}
-	  		);
-	  	}
-	  	else
-	  	{
-	  		// value is an object
-	  		return make(
-	  			Blocks.elasticObject,
-	  			{
-	  				cards: parseObjectWrap(value),
-	  			}
-	  		);
-	  	}
-	}
-	
-	throw new Error("Elastic Parsing: Unsupported value: " + value);
-}
+  switch (typeof value)
+  {
+    case 'string':
+      return make(Blocks.elasticText, {
+        value,
+      });
+    case 'number':
+      return make(Blocks.elasticNumber, {
+        value,
+      });
+    case 'boolean':
+      return make(Blocks.elasticBool, {
+        value: value ? 1 : 0,
+      });
+    case 'object':
+      if (value === null)
+      {
+        return make(Blocks.elasticNull);
+      }
+      else if (Array.isArray(value))
+      {
+        return make(
+          Blocks.elasticArray,
+          {
+            cards: parseArrayWrap(value),
+          },
+        );
+      }
+      else
+      {
+        // value is an object
+        return make(
+          Blocks.elasticObject,
+          {
+            cards: parseObjectWrap(value),
+          },
+        );
+      }
+  }
 
-
+  throw new Error('Elastic Parsing: Unsupported value: ' + value);
+};
 
 const parseObjectToggle = (obj: Object): Cards =>
 {
-	let arr: Card[] = _.map(obj,
-		(rawVal: any, key: string) =>
-		{
-			// For the Toggle cards, use the valueType
-			let valueType = CommonElastic.valueTypes.null;
-			
-			let value = rawVal;
-			
-			switch(typeof rawVal)
-			{
-				case 'string':
-					valueType = CommonElastic.valueTypes.text;
-					
-					break;
-			  case 'number':
-			  	valueType = CommonElastic.valueTypes.number;
-			  	break;
-			  case 'boolean':
-			  	valueType = CommonElastic.valueTypes.bool;
-			  	break;
-			  case 'object':
-			  	if (value === null)
-			  	{
-			  		valueType = CommonElastic.valueTypes.null;
-			  	}
-			  	else if (Array.isArray(value))
-			  	{
-			  		// not yet done
-			  	}
-			  	// not yet done
-			}
-			
-			return make(
-				Blocks.elasticKeyValueToggle,
-				{
-					key,
-					value,
-					valueType,
-				}
-			);
-		}
-	);
-	
-	return Immutable.List(arr);
-}
+  const arr: Card[] = _.map(obj,
+    (rawVal: any, key: string) =>
+    {
+      // For the Toggle cards, use the valueType
+      let valueType = CommonElastic.valueTypes.null;
 
+      const value = rawVal;
+
+      switch (typeof rawVal)
+      {
+        case 'string':
+          valueType = CommonElastic.valueTypes.text;
+
+          break;
+        case 'number':
+          valueType = CommonElastic.valueTypes.number;
+          break;
+        case 'boolean':
+          valueType = CommonElastic.valueTypes.bool;
+          break;
+        case 'object':
+          if (value === null)
+          {
+            valueType = CommonElastic.valueTypes.null;
+          }
+          else if (Array.isArray(value))
+          {
+            // not yet done
+          }
+        // not yet done
+      }
+
+      return make(
+        Blocks.elasticKeyValueToggle,
+        {
+          key,
+          value,
+          valueType,
+        },
+      );
+    },
+  );
+
+  return Immutable.List(arr);
+};
