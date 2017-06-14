@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import {makePromiseCallback} from '../../../../midway/src/tasty/Utils';
+import EQLSpec from './EQLSpec';
 import ESAnyClause from './ESAnyClause';
 import ESArrayClause from './ESArrayClause';
 import ESBaseClause from './ESBaseClause';
@@ -66,27 +65,10 @@ import ESVariantClause from './ESVariantClause';
 export default class EQLConfig
 {
 
-  public static async getDefault(): Promise<EQLConfig>
-  {
-    if (EQLConfig.defaultConfig === undefined)
-    {
-      const configString: any = await new Promise((resolve, reject) =>
-      {
-        fs.readFile(__dirname + '/ESQueryStructure.json', makePromiseCallback(resolve, reject));
-      });
-
-      EQLConfig.defaultConfig = new EQLConfig(JSON.parse(configString));
-    }
-
-    return EQLConfig.defaultConfig;
-  }
-
-  private static defaultConfig: EQLConfig;
-
   private undefinedTypes: { [name: string]: boolean };
   private clauses: { [name: string]: ESClause };
 
-  public constructor(clauseConfiguration: any)
+  public constructor(clauseConfiguration: any = EQLSpec)
   {
     this.undefinedTypes = {};
     this.clauses = {};

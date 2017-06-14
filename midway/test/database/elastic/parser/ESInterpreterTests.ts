@@ -71,7 +71,7 @@ beforeAll(async (done) =>
   });
 
   expected = JSON.parse(expectedString);
-  config = await EQLConfig.getDefault();
+  config = new EQLConfig();
 
   done();
 });

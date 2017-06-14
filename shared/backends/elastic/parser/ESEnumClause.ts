@@ -66,7 +66,6 @@ export default class ESEnumClause extends ESClause
     {
       const value = this.values[i];
       this.valueMap.set(value, i);
-      config.declareType(value);
     }
   }
 

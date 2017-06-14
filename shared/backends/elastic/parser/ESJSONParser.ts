@@ -68,7 +68,7 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESJSONParser
 {
-  private queryString: string; // string being parsed
+  private queryString: string; // stringgit being parsed
 
   private charNumber: number; // current parser/tokenizer position in the queryString
 
@@ -106,6 +106,12 @@ export default class ESJSONParser
     if (this.valueInfo !== null)
     {
       this.value = this.valueInfo.value;
+    }
+
+    // check ending
+    if (this.peek() !== '')
+    {
+      this.accumulateErrorOnCurrentToken('Unexpected token at the end of the query string');
     }
   }
 
@@ -306,9 +312,9 @@ export default class ESJSONParser
     arrayInfo.value = array;
     arrayInfo.children = [];
 
-    for (let elementInfo: ESValueInfo | null = this.readValue();
-      elementInfo !== null;
-      elementInfo = this.readValue())
+    for ( let elementInfo: ESValueInfo | null = this.readValue();
+          elementInfo !== null;
+          elementInfo = this.readValue() )
     {
       array.push(elementInfo.value);
       arrayInfo.children.push(elementInfo);
@@ -342,9 +348,9 @@ export default class ESJSONParser
     objInfo.value = obj;
     objInfo.children = {};
 
-    for (let nameInfo: ESValueInfo | null = this.readValue();
-      nameInfo !== null;
-      nameInfo = this.readValue())
+    for ( let nameInfo: ESValueInfo | null = this.readValue();
+          nameInfo !== null;
+          nameInfo = this.readValue() )
     {
       let propertyName: any = nameInfo.value;
 
@@ -439,7 +445,7 @@ export default class ESJSONParser
 
   private readBooleanOrNull(exp: RegExp): boolean
   {
-    const match: string | null = this.match(exp);
+    const match: any = this.match(exp);
     if (match !== null)
     {
       return true;
