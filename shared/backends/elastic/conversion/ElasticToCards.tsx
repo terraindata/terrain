@@ -66,7 +66,7 @@ export default function ElasticToCards(
 	try
 	{
 		const obj = JSON.parse(query.tql);
-		const cards = parseObjectWrap(obj);
+		const cards = parseMagicObject(obj);
 		return query
 			.set('cards', cards)
 	    .set('cardsAndCodeInSync', true);
@@ -162,10 +162,9 @@ const parseObjectToggle = (obj: Object): Cards =>
 			
 			switch(typeof rawVal)
 			{
-				case 'string':
-					valueType = CommonElastic.valueTypes.text;
-					
-					break;
+			  case 'string':
+				valueType = CommonElastic.valueTypes.text;
+				break;
 			  case 'number':
 			  	valueType = CommonElastic.valueTypes.number;
 			  	break;
@@ -198,3 +197,19 @@ const parseObjectToggle = (obj: Object): Cards =>
 	return Immutable.List(arr);
 }
 
+const parseMagicObject = (obj: Object): Cards =>
+{
+	let valueCards: Card[] = _.map(obj,
+		(rawVal: any, key: string) =>
+		{
+			return make(
+				Blocks.elasticMagicValue,
+				{
+					key,
+				});
+		}
+	);
+
+	let arr: Card[] = [ make(Blocks.elasticMagicCard, { values: valueCards }) ];
+	return Immutable.List(arr);
+}
