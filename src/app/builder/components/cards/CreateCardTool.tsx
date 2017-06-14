@@ -161,6 +161,8 @@ class CreateCardTool extends PureClasss<Props>
       return null;
     }
 
+    let curIndex = -1; // tracks the index of the cards we are actually showing
+
     return (
       <div
         className={classNames({
@@ -178,6 +180,8 @@ class CreateCardTool extends PureClasss<Props>
                 return null;
               }
 
+              curIndex++;
+
               const card = BlockUtils.make(
                 AllBackendsMap[this.props.language].blocks[type],
               );
@@ -186,7 +190,7 @@ class CreateCardTool extends PureClasss<Props>
                 <a
                   className={classNames({
                     'create-card-button': true,
-                    'create-card-button-focused': this.state.focusedIndex === index
+                    'create-card-button-focused': this.state.focusedIndex === curIndex
                   })}
                   key={type}
                   rel={type}
