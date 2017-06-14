@@ -90,7 +90,7 @@ export class IndexTreeInfo extends PureClasss<Props>
             {index.columnIds.size}
           </span>
           columns
-      	</div>
+        </div>
       </div>
     );
   }

@@ -98,11 +98,11 @@ export const _Query = (config?: Object) =>
   config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
-  
+
   if (config['cards'].size === 0)
   {
     config['cards'] = Immutable.List([
-      BlockUtils.make(AllBackendsMap[config['language']].rootCard)
+      BlockUtils.make(AllBackendsMap[config['language']].rootCard),
     ]);
   }
 

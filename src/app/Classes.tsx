@@ -133,7 +133,7 @@ export function responseToRecordConfig(response: object): object
       response = _.extend(meta, response);
       delete response['meta'];
     }
-    catch (e) 
+    catch (e)
     {
       console.log('JSON Parse Error converting item: ', e, response['meta']);
     }

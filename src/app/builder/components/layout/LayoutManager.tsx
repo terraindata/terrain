@@ -856,7 +856,7 @@ const LayoutManager = React.createClass<any, any>({
       return (
         <div className='error'>
           Error: Must pass one and only one of [cells, rows, columns] to the same level of a LayoutManager. Passed <b>{layoutSum}</b>.
-					<pre>{JSON.stringify(this.props.layout)}</pre>
+          <pre>{JSON.stringify(this.props.layout)}</pre>
         </div>
       );
     }

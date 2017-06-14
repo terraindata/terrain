@@ -46,10 +46,10 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonElastic from '../syntax/CommonElastic';
 
-import {Block, TQLRecursiveObjectFn} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
-import {Card} from '../../../blocks/types/Card';
-import {Input, InputType} from '../../../blocks/types/Input';
+import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
+import { Card } from '../../../blocks/types/Card';
+import { Input, InputType } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
@@ -58,7 +58,8 @@ const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
 const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
-export interface Options {
+export interface Options
+{
   allFields?: boolean; // amend the final Select card to include all possible fields.
   limit?: number;
   count?: boolean;
@@ -72,8 +73,8 @@ export interface ElasticObjectInterface
   type?: string;
   body?: {
     _source: object;
-  }
-  
+  };
+
   [key: string]: any;
 }
 
@@ -81,31 +82,30 @@ class CardsToElastic
 {
   static toElastic(query: Query, options: Options = {}): string
   {
-    let elasticObj: ElasticObjectInterface = {};
-    
+    const elasticObj: ElasticObjectInterface = {};
+
     query.cards.map(
       (card: Card) =>
       {
         _.extend(elasticObj, CardsToElastic.blockToElastic(card, options));
-      }
+      },
     );
-    
+
     if (options.allFields === true)
     {
       if (elasticObj.body && elasticObj.body._source)
       {
-        elasticObj.body._source  = [];
+        elasticObj.body._source = [];
       }
     }
-    
-    return JSON.stringify(elasticObj, null, 2);
-    
-    // let q: string = query.tql;
 
+    return JSON.stringify(elasticObj, null, 2);
+
+    // let q: string = query.tql;
 
     // return q;
   }
-  
+
   static blockToElastic(block: Block, options: Options = {}): string | object
   {
     if (block && block.static.tql)
@@ -116,6 +116,5 @@ class CardsToElastic
     return { notYet: 'not yet done' };
   }
 }
-
 
 export default CardsToElastic;

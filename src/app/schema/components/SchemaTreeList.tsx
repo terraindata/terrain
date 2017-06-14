@@ -165,7 +165,7 @@ class SchemaTreeList extends PureClasss<Props>
                 style={SchemaTreeStyles.none}
               >
                 None
-            			</div>
+                  </div>
             }
           </FadeInOut>
         }

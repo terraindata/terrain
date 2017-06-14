@@ -61,45 +61,44 @@ const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = Commo
 
 const { make } = BlockUtils;
 
-import { elasticArray, elasticObject, elasticValue, elasticBool, elasticNull, elasticNumber, elasticText, elasticKeyValueToggle, elasticKeyValueWrap } from './ElasticJSONBlocks';
+import { elasticArray, elasticBool, elasticKeyValueToggle, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
 import elasticRootCard from './ElasticRootCard';
 
 export const ElasticBlocks =
   {
-    // JSON 
-    
+    // JSON
+
     elasticObject,
     elasticArray,
-    
+
     // JSON Value blocks
     elasticBool,
     elasticNumber,
     elasticText,
     elasticNull,
-    
+
     elasticRootCard,
 
     elasticCreating: _card( // a placeholder for when a card is being created
-    {
-      static:
       {
-        language: 'elastic',
-        tql: '',
-        title: 'New Card',
-        colors: ['#777', '#777'],
-        preview: '',
-        display: null,
-        // manualEntry: null,
-      },
-    }),
-    
+        static:
+        {
+          language: 'elastic',
+          tql: '',
+          title: 'New Card',
+          colors: ['#777', '#777'],
+          preview: '',
+          display: null,
+          // manualEntry: null,
+        },
+      }),
+
     elasticKeyValueWrap,
-    
-    
+
     // JSON toggle the type blocks
     elasticKeyValueToggle,
     elasticValue,
-    
+
   };
 
 BlockUtils.initBlocks(ElasticBlocks);
