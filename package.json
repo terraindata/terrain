@@ -18,10 +18,8 @@
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony -- ./midway/src/Midway.ts",
     "lint": "yarn run lint-back",
     "lint-back": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
-    "lint-front": "echo !!! Not yet implemented, use yarn run style-front instead. !!!",
-    "style": "yarn run style-front && yarn run style-back;",
-    "style-back": "find midway -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
-    "style-front": "find src -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
+    "lint-front": "echo !!! Not yet implemented, use yarn run style instead. !!!",
+    "style": "find midway src shared -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
     "fix": "yarn run lint && yarn run style;"
   },
   "repository": {
