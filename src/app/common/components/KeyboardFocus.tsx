@@ -97,6 +97,7 @@ class KeyboardFocus extends PureClasss<Props>
 
   render()
   {
+    console.log(this.props.index);
     return (
       <select
         style={STYLE}

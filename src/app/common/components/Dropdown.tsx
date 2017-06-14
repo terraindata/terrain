@@ -251,7 +251,6 @@ class Dropdown extends PureClasss<Props>
           !this.state.up && this.state.open
           && optionsEl
         }
-
         <KeyboardFocus
           onFocus={this.handleFocus}
           onFocusLost={this.handleFocusLost}
