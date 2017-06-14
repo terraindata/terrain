@@ -42,57 +42,68 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import SchemaTypes from '../SchemaTypes';
 
+let servers = Immutable.Map({});
 let databases = Immutable.Map({});
 let tables = Immutable.Map({});
 let columns = Immutable.Map({});
 
-['movieDB', 'baseballDB'].map(
-	(name) =>
-	{
-		let db = SchemaTypes._Database({ name });
+['Example Database Server'].map(
+  (serverName) => {
+    let server = SchemaTypes._Server({name: serverName});
 
-		['movies', 'actors', 'reviews', 'characters', 'users'].map(
-			(tableName) =>
-			{
-				let table = SchemaTypes._Table({ name: tableName, databaseId: db.id });
-				db = db.set('tableIds', db.tableIds.push(table.id));
+    ['movieDB', 'baseballDB'].map(
+      (dbName) => {
+        let db = SchemaTypes._Database({name: dbName, serverId: server.id});
+        server = server.set('databaseIds', server.databaseIds.push(db.id));
 
-				['first', 'second', 'third', 'fourth', 'fifth'].map(
-					(colName) =>
-					{
-						const column = SchemaTypes._Column({
-							name: colName,
-							tableId: table.id,
-							databaseId: db.id,
-							datatype: 'VARCHAR',
-							isNullable: true,
-							defaultValue: '',
-							isPrimaryKey: false,
-						});
+        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
+          (tableName) => {
+            let table = SchemaTypes._Table({name: tableName, serverId: server.id, databaseId: db.id});
+            db = db.set('tableIds', db.tableIds.push(table.id));
 
-						columns = columns.set(column.id, column);
+            ['first', 'second', 'third', 'fourth', 'fifth'].map(
+              (colName) => {
+                const column = SchemaTypes._Column({
+                  name: colName,
+                  tableId: table.id,
+                  databaseId: db.id,
+                  serverId: server.id,
+                  datatype: 'VARCHAR',
+                  isNullable: true,
+                  defaultValue: '',
+                  isPrimaryKey: false,
+                });
 
-						table = table.set('columnIds', table.columnIds.push(column.id));
-					},
-				);
+                columns = columns.set(column.id, column);
 
-				tables = tables.set(table.id, table);
-			},
-		);
+                table = table.set('columnIds', table.columnIds.push(column.id));
+              },
+            );
 
-		databases = databases.set(db.id, db);
-	},
+            tables = tables.set(table.id, table);
+          },
+        );
+
+        databases = databases.set(db.id, db);
+      },
+    );
+
+    servers = servers.set(server.id, server);
+  },
 );
 
 const ExampleSchemaData =
-	SchemaTypes._SchemaState()
-		.set('databases', databases)
-		.set('columns', columns)
-		.set('tables', tables)
-		.set('loading', false)
-		.set('loaded', true);
+  SchemaTypes._SchemaState()
+    .set('servers', servers)
+    .set('databases', databases)
+    .set('columns', columns)
+    .set('tables', tables)
+    .set('loading', false)
+    .set('loaded', true);
 
 export default ExampleSchemaData;

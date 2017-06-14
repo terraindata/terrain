@@ -69,8 +69,22 @@ export const SchemaStore: Store<SchemaState> =
         (state: SchemaState) =>
         {
           Ajax.getDbs(
-            (m1Dbs: object, m2Dbs: object) =>
+            (dbs: object) =>
             {
+              let m1Dbs: SharedTypes.Database[] = [];
+              let m2Dbs: SharedTypes.Database[] = [];
+              _.map((dbs as any),
+                (db: SharedTypes.Database) => {
+                  if (db.source === 'm1')
+                  {
+                    m1Dbs.push(db);
+                  }
+                  else
+                  {
+                    m2Dbs.push(db);
+                  }
+                },
+              );
               console.log('m1Dbs:');
               console.log(m1Dbs);
               // Group all m1Dbs under a server e.g. "Other Databases"
@@ -78,8 +92,8 @@ export const SchemaStore: Store<SchemaState> =
               console.log(m2Dbs);
               // The m2Dbs are servers, so need to do parsing differently
               return;
-              SchemaActions.serverCount(Object.keys(dbs).length);
-              _.map((dbs as any),
+              /*SchemaActions.serverCount(Object.keys(m2Dbs).length);
+              _.map((m2Dbs as any),
                 (db: SharedTypes.Database) =>
                   (db.source === 'm1' ? Ajax.schema_m1 : Ajax.schema)(
                     db['id'],
@@ -101,7 +115,7 @@ export const SchemaStore: Store<SchemaState> =
                     {
                       // TODO consider handling individual DB errors
                     }),
-              );
+              );*/
             },
             (dbError) =>
             {
@@ -135,12 +149,12 @@ export const SchemaStore: Store<SchemaState> =
 
           return state
             .setIn(['servers', server.id], server)
-            .set('databases', state.databases.merge(databases)
+            .set('databases', state.databases.merge(databases))
             .set('tables', state.tables.merge(tables))
             .set('columns', state.columns.merge(columns))
-            .set('indexes', state.indexes.merge(indexes))
-            .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-            .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+            .set('indexes', state.indexes.merge(indexes));
+            // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+            // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
         },
 
       [SchemaActionTypes.selectId]:
@@ -166,8 +180,8 @@ export const SchemaActions =
       () =>
         $(SchemaActionTypes.fetch, {} ),
 
-    dbCount:
-      (dbCount: number) =>
+    serverCount:
+      (serverCount: number) =>
         $(SchemaActionTypes.serverCount, { serverCount }),
 
     error:

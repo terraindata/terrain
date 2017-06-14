@@ -74,7 +74,7 @@ class SchemaView extends PureClasss<Props> {
     search: string;
 
     // from Store
-    databases?: SchemaTypes.DatabaseMap;
+    servers?: SchemaTypes.ServerMap;
     highlightedId?: ID;
   } = {
     highlightedIndex: -1,
@@ -85,8 +85,8 @@ class SchemaView extends PureClasss<Props> {
     super(props);
 
     this._subscribe(SchemaStore, {
-      stateKey: 'databases',
-      storeKeyPath: ['databases'],
+      stateKey: 'servers',
+      storeKeyPath: ['servers'],
     });
 
     this._subscribe(SchemaStore, {
@@ -212,14 +212,6 @@ class SchemaView extends PureClasss<Props> {
               </div>
             </FadeInOut>
 
-            <!-- <SchemaTreeList
-              itemType="database"
-              itemIds={this.state.databases && this.state.databases.keySeq().toList()}
-              label={'Databases'}
-              topLevel={true}
-              search={search}
-            /> -->
-
             <SchemaTreeList
               itemType="server"
               itemIds={this.state.servers && this.state.servers.keySeq().toList()}
@@ -240,9 +232,7 @@ class SchemaView extends PureClasss<Props> {
             this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
           ]}
         >
-          <SchemaResults
-            servers={this.state.servers}
-          />
+
         </div>
       </div>
     );

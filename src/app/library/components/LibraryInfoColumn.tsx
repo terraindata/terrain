@@ -127,7 +127,7 @@ class LibraryInfoColumn extends Classs<Props>
     {
       LibraryActions.setDbs(
         List(dbs),
-        loadFinished
+        loadFinished,
       );
     });
   }

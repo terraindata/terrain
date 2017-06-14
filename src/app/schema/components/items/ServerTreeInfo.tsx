@@ -79,7 +79,7 @@ export class ServerTreeInfo extends PureClasss<Props>
             style={Styles.infoPieceNumber as any}
           >
             { server.databaseIds.size }
-          </span> tables
+          </span> databases
         </div>
       </div>
     );

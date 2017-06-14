@@ -59,9 +59,9 @@ export module SchemaParser
   export function parseMySQLDb(
     db: object,
     colsData: object,
-    setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void,
+    setDbAction: (payload: SchemaTypes.SetServerActionPayload) => void,
   ) {
-    let database = SchemaTypes._Database({
+    /*let database = SchemaTypes._Database({
       name: db['name'],
     });
     const databaseId = database.id;
@@ -149,15 +149,15 @@ export module SchemaParser
       indexes,
       tableNames,
       columnNames: columnNamesByTable,
-    });
+    });*/
   }
 
   export function parseElasticDb(
     db: object,
     colsData: object,
-    setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void,
+    setDbAction: (payload: SchemaTypes.SetServerActionPayload) => void,
   ) {
-    let database = SchemaTypes._Database({
+    /*let database = SchemaTypes._Database({
       name: db['name'],
     });
     const databaseId = database.id;
@@ -227,7 +227,7 @@ export module SchemaParser
       indexes,
       tableNames,
       columnNames: columnNamesByTable,
-    });
+    });*/
   }
 }
 

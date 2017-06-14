@@ -60,12 +60,14 @@ export module SchemaTypes {
   }
 
   class SchemaStateC {
+    public servers: ServerMap = Map<string, Server>({});
     public databases: DatabaseMap = Map<string, Database>({});
     public tables: TableMap = Map<string, Table>({});
     public columns: ColumnMap = Map<string, Column>({});
     public indexes: IndexMap = Map<string, Index>({});
 
-    public dbCount: number = -1;
+    public serverCount: number = -1;
+    // public dbCount: number = -1;
     public loading: boolean = false;
     public loaded: boolean = false;
     public schemaError: boolean = false;
@@ -217,7 +219,7 @@ export module SchemaTypes {
     indexType: string,
     id?: string,
   }) => {
-    config.id = indexId(config.serverId, onfig.databaseId, config.tableId, config.tableId);
+    config.id = indexId(config.serverId, config.databaseId, config.tableId, config.tableId);
     return New<Index>(new IndexC(config), config, 'string');
   };
   export type IndexMap = IMMap<string, Index>;
@@ -251,9 +253,8 @@ export module SchemaTypes {
 
   export type TableNamesByDb = IMMap<string, List<string>>;
   export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
-  export interface SetDbActionPayload {
+  export interface SetServerActionPayload {
     server: Server;
-    database: Database;
     databases: IMMap<string, Database>;
     tables: IMMap<string, Table>;
     columns: IMMap<string, Column>;

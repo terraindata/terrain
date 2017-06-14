@@ -834,7 +834,7 @@ export const Ajax =
       });
     },
 
-    getDbs(onLoad: (m1Dbs: SharedTypes.Database[], m2Dbs: SharedTypes.Database[],
+    getDbs(onLoad: (dbs: SharedTypes.Database[],
                     loadFinished: boolean) => void, onError?: (ev: Event) => void)
     {
       let m1Dbs: SharedTypes.Database[] = null;
@@ -856,7 +856,7 @@ export const Ajax =
         {
           dbs = dbs.concat(m2Dbs);
         }
-        onLoad(m1Dbs, m2Dbs, !!(m1Dbs && m2Dbs));
+        onLoad(dbs, !!(m1Dbs && m2Dbs));
       };
 
       Ajax._postMidway1(
