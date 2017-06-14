@@ -47,7 +47,7 @@ import * as _ from 'underscore';
 
 export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object);
 export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object);
-export type TQLStringFn = string | ((block: Block) => string)
+export type TQLStringFn = string | ((block: Block) => string);
 export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
 
 // A Block is a card or a distinct piece / group of card pieces
@@ -98,21 +98,21 @@ const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn'
 export const verifyBlockConfigKeys = (config: object) =>
 {
   RESERVED_WORDS.map(
-    word => 
+    (word) =>
     {
       if (config[word])
       {
-        throw new Error("Creating card: " + word + " is a reserved word. " + JSON.stringify(config));
+        throw new Error('Creating card: ' + word + ' is a reserved word. ' + JSON.stringify(config));
       }
-    }
+    },
   );
-}
+};
 
 // helper function to populate common fields for an Block
 export const _block = (config: BlockConfig): Block =>
 {
   verifyBlockConfigKeys(config);
-  
+
   const blockConfig: Block = _.extend({
     id: '',
     type: '',
@@ -130,6 +130,5 @@ export const _block = (config: BlockConfig): Block =>
 
   return blockConfig;
 };
-
 
 export default Block;

@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 
 // Defining our object like this gives us compile-time TypeScript support for ActionTypes
 //  and prevents us from defining duplicate action types.

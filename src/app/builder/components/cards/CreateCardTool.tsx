@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
 import * as classNames from 'classnames';
+import * as React from 'react';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { Card } from '../../../../../shared/blocks/types/Card';
-import PureClasss from '../../../common/components/PureClasss';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
+import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
@@ -190,7 +190,7 @@ class CreateCardTool extends PureClasss<Props>
                 <a
                   className={classNames({
                     'create-card-button': true,
-                    'create-card-button-focused': this.state.focusedIndex === curIndex
+                    'create-card-button-focused': this.state.focusedIndex === curIndex,
                   })}
                   key={type}
                   rel={type}

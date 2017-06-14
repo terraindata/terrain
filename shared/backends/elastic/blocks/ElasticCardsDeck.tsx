@@ -52,18 +52,18 @@ export const ElasticCardsDeck =
       [
         Blocks.elasticRootCard.type,
       ],
-      
+
       [
         // JSON key wraps
         Blocks.elasticKeyValueWrap.type,
       ],
-      
+
       [
         // JSON wrapper cards
         Blocks.elasticObject.type,
         Blocks.elasticArray.type,
       ],
-      
+
       [
         // JSON individual value cards
         Blocks.elasticBool.type,
@@ -71,7 +71,7 @@ export const ElasticCardsDeck =
         Blocks.elasticText.type,
         Blocks.elasticNull.type,
       ],
-      
+
       [
         // JSON
         Blocks.elasticKeyValueToggle.type,
