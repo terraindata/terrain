@@ -81,8 +81,10 @@ const payloadSkeleton: object =
     },
     oldpro:
     {
+      beerCounter: 0,
       drink: '',
       ingredients: '',
+      isAlcoholic: false,
       habanero_wings: '',
     },
     maclarens:
@@ -135,6 +137,10 @@ export class Events
     );
   }
 
+  /*
+   * Decode message from /events/update route
+   *
+   */
   public async decodeMessage(event: EventConfig): Promise<boolean>
   {
     const checkTime = this.getClosestTime();
@@ -155,6 +161,10 @@ export class Events
     return false;
   }
 
+  /*
+   * Decrypt a message with the private key using AES128
+   *
+   */
   public decrypt(msg: string, privateKey: string): string
   {
     const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
@@ -163,6 +173,10 @@ export class Events
     return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
   }
 
+  /*
+   * Prep an empty payload with the encoded message
+   *
+   */
   public async encodeMessage(eventReq: EventRequestConfig): Promise<EventRequestConfig>
   {
     return new Promise<EventRequestConfig>(async (resolve, reject) =>
@@ -175,6 +189,10 @@ export class Events
     });
   }
 
+  /*
+   * Encrypt a message with the private key using AES128
+   *
+   */
   public encrypt(msg: string, privateKey: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
@@ -186,6 +204,10 @@ export class Events
     });
   }
 
+  /*
+   * Validate that the string is valid JSON
+   *
+   */
   public isJSON(str: string): boolean
   {
     let res: any = false;
@@ -200,6 +222,10 @@ export class Events
     return res;
   }
 
+  /*
+   * Return the number of seconds since epoch time rounded to nearest timeInterval
+   *
+   */
   public getClosestTime(): number
   {
     let currSeconds: any = new Date();
@@ -207,11 +233,15 @@ export class Events
     return currSeconds - (currSeconds % (timeInterval * 60));
   }
 
+  /*
+   * Create an object with the same keys but empty values
+   *
+   */
   public getEmptyObject(payload: object): object
   {
     return Object.keys(payload).reduce((res, item) =>
     {
-      switch (typeof (res[item]))
+      switch (typeof (payload[item]))
       {
         case "boolean":
           res[item] = false;
@@ -229,6 +259,10 @@ export class Events
       {});
   }
 
+  /*
+   * Generate a random string that will be used as a private key for encryption/decryption
+   *
+   */
   public getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): string
   {
     currTime = currTime | this.getClosestTime();
@@ -239,6 +273,10 @@ export class Events
     return sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16);
   }
 
+  /*
+   * Parse incoming event request event
+   *
+   */
   public async JSONHandler(IPSource: string, req: object[]): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
@@ -274,6 +312,10 @@ export class Events
     });
   }
 
+  /*
+   * Store the validated event in the datastore
+   *
+   */
   public async storeEvent(event: EventConfig): Promise<any>
   {
     event.payload = JSON.stringify(event.payload);

@@ -64,7 +64,14 @@ const Router = new KoaRouter();
  */
 Router.post('/', async (ctx, next) =>
 {
-  ctx.body = JSON.stringify(await events.JSONHandler(ctx.request.ip, ctx.request.body));
+  try
+  {
+    ctx.body = JSON.stringify(await events.JSONHandler(ctx.request.ip, ctx.request.body));
+  }
+  catch (e)
+  {
+    ctx.body = '';
+  }
 });
 
 /*
@@ -73,23 +80,33 @@ Router.post('/', async (ctx, next) =>
  */
 Router.post('/update/', async (ctx, next) =>
 {
-  const event: EventConfig =
-    {
-      eventId: ctx.request.body['eventId'],
-      ip: ctx.request.ip,
-      message: ctx.request.body['message'],
-      payload: ctx.request.body['payload'],
-      type: ctx.request.body['type'],
-    };
-
-  if (await events.decodeMessage(event))
+  try
   {
-    ctx.body = 'Success';
+    const event: EventConfig =
+      {
+        eventId: ctx.request.body['eventId'],
+        ip: ctx.request.ip,
+        message: ctx.request.body['message'],
+        payload: ctx.request.body['payload'],
+        type: ctx.request.body['type'],
+      };
+    // TODO in production, use this instead
+    // await events.decodeMessage(event);
+    // ctx.body = '';
+    if (await events.decodeMessage(event))
+    {
+      ctx.body = 'Success'; // for dev/testing purposes only
+    }
+    else
+    {
+      ctx.body = '';
+    }
   }
-  else
+  catch (e)
   {
     ctx.body = '';
   }
+
 });
 
 export default Router;
