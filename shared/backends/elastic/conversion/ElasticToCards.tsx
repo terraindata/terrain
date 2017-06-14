@@ -197,19 +197,34 @@ const parseObjectToggle = (obj: Object): Cards =>
 	return Immutable.List(arr);
 }
 
+const parseMagicValue = (key: any, value: any): Card =>
+{
+	if (typeof value === 'object')
+	{
+	  return make(Blocks.elasticMagicValue, { key });
+	}
+	else
+	{
+	  return make(Blocks.elasticMagicValue, { key, value });
+	}
+}
+
 const parseMagicObject = (obj: Object): Cards =>
 {
-	let valueCards: Card[] = _.map(obj,
-		(rawVal: any, key: string) =>
+	let arr: Card[] = _.map(obj,
+		(value: any, key: string) =>
 		{
 			return make(
-				Blocks.elasticMagicValue,
+				Blocks.elasticMagicCard,
 				{
 					key,
-				});
+					values: Immutable.List([
+						parseMagicValue(key, value)
+					]),
+				}
+			);
 		}
 	);
-
-	let arr: Card[] = [ make(Blocks.elasticMagicCard, { values: valueCards }) ];
+	
 	return Immutable.List(arr);
-}
+};
