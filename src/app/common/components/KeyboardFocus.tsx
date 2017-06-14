@@ -55,6 +55,7 @@ export interface Props
   length: number; // number possible to select
   onIndexChange(index: number);
   onSelect(index: number);
+  focusOverride?: boolean;
 }
 
 const STYLE: {
@@ -85,15 +86,24 @@ class KeyboardFocus extends PureClasss<Props>
     }
   }
 
+  componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.focusOverride && !this.props.focusOverride)
+    {
+      this.refs["select"].focus();
+      this.props.onFocus();
+    }
+  }
+
   render()
   {
-    console.log(this.props.index);
     return (
       <select
         style={STYLE}
         onFocus={this.props.onFocus}
         onBlur={this.props.onFocusLost}
         onKeyDown={this.handleKeyDown}
+        ref="select"
       >
       </select>
     );
