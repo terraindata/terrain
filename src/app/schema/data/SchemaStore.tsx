@@ -91,23 +91,33 @@ export const SchemaStore: Store<SchemaState> =
               console.log('m2Dbs:');
               console.log(m2Dbs);
               // The m2Dbs are servers, so need to do parsing differently
-              return;
-              /*SchemaActions.serverCount(Object.keys(m2Dbs).length);
-              _.map((m2Dbs as any),
+              // return;
+              SchemaActions.serverCount(Object.keys(m2Dbs).length);
+              _.map((dbs as any),
                 (db: SharedTypes.Database) =>
                   (db.source === 'm1' ? Ajax.schema_m1 : Ajax.schema)(
                     db['id'],
-                    (colsData, error) =>
+                    (schemaData, error) =>
                     {
                       if (!error)
                       {
-                        if (db['type'] === 'mysql')
+                        if (db.source === 'm2')
                         {
-                          SchemaParser.parseMySQLDb(db, colsData, SchemaActions.setDatabase);
+                          if (db['type'] === 'mysql')
+                          {
+                            // SchemaParser.parseMySQLDb(db, colsData, SchemaActions.setDatabase);
+                          }
+                          else if (db['type'] === 'elastic')
+                          {
+                            console.log('going to parse: ');
+                            console.log(db);
+                            console.log(schemaData);
+                            SchemaParser.parseElasticDb(db, schemaData, SchemaActions.setServer);
+                          }
                         }
-                        else if (db['type'] === 'elastic')
+                        else
                         {
-                          SchemaParser.parseElasticDb(db, colsData, SchemaActions.setDatabase);
+                          // TODO process DBs from m1
                         }
                       }
                     },
@@ -115,7 +125,7 @@ export const SchemaStore: Store<SchemaState> =
                     {
                       // TODO consider handling individual DB errors
                     }),
-              );*/
+              );
             },
             (dbError) =>
             {
@@ -188,7 +198,7 @@ export const SchemaActions =
       (error: string) =>
         $(SchemaActionTypes.error, { error }),
 
-    setDatabase:
+    setServer:
       (
         payload: SchemaTypes.SetServerActionPayload,
       ) =>

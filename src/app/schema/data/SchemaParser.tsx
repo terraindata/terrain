@@ -153,81 +153,94 @@ export module SchemaParser
   }
 
   export function parseElasticDb(
-    db: object,
-    colsData: object,
-    setDbAction: (payload: SchemaTypes.SetServerActionPayload) => void,
+    elasticServer: object,
+    schemaData: object,
+    setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,
   ) {
-    /*let database = SchemaTypes._Database({
-      name: db['name'],
+    let server = SchemaTypes._Server({
+      name: elasticServer['name'],
     });
-    const databaseId = database.id;
+    const serverId = server.id;
 
-    let tables: IMMap<string, Table> = Map<string, Table>({});
-    let columns: IMMap<string, Column> = Map<string, Column>({});
-    const indexes: IMMap<string, Index> = Map<string, Index>({});
+    let databases: IMMap<string, Database> = Map<string, Database>({});
 
-    let tableNames = List<string>([]);
-    let columnIds = List<string>([]);
-    let columnNamesByTable = Map<string, List<string>>([]);
+    _.each((schemaData as any), (databaseValue, databaseKey, databaseList) => {
+      let database = SchemaTypes._Database({
+        name: databaseKey.toString(),
+        serverId: serverId as string,
+      });
+      const databaseId = database.id;
+      server = server.set('databaseIds', server.databaseIds.push(databaseId));
 
-    _.each((colsData as any),
-      (tableFields, tableName, tableList) =>
-      {
-        const tableId = SchemaTypes.tableId(db['name'], (tableName as any) as string);
-        let table = tables.get(tableId);
+      let tables: IMMap<string, Table> = Map<string, Table>({});
+      let columns: IMMap<string, Column> = Map<string, Column>({});
+      const indexes: IMMap<string, Index> = Map<string, Index>({});
 
-        if (!table)
-        {
-          table = SchemaTypes._Table({
-            name: (tableName as any) as string,
-            databaseId,
-          });
-          tables = tables.set(tableId, table);
-          tableNames = tableNames.push(table.name);
-          database = database.set(
-            'tableIds', database.tableIds.push(tableId),
-          );
-          database = database.set(
-            'databaseType', 'elastic',
-          );
-        }
+      let tableNames = List<string>([]);
+      let columnIds = List<string>([]);
+      let columnNamesByTable = Map<string, List<string>>([]);
 
-        _.each(tableFields['data'], (fieldProperties, fieldName, fieldList) =>
-        {
-          const column = SchemaTypes._Column({
-            name: (fieldName as any) as string,
-            databaseId,
-            tableId,
-            datatype: fieldProperties['type'],
-          });
+      _.each((databaseValue as any),
+        (tableFields, tableName, tableList) => {
+          const tableId = SchemaTypes.tableId(server['name'], database['name'], (tableName as any) as string);
+          let table = tables.get(tableId);
 
-          columns = columns.set(column.id, column);
-
-          if (!columnNamesByTable.get(table.id))
-          {
-            columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+          if (!table) {
+            table = SchemaTypes._Table({
+              name: (tableName as any) as string,
+              databaseId,
+              serverId,
+            });
+            tables = tables.set(tableId, table);
+            tableNames = tableNames.push(table.name);
+            database = database.set(
+              'tableIds', database.tableIds.push(tableId),
+            );
+            database = database.set(
+              'databaseType', 'elastic',
+            );
           }
-          columnNamesByTable = columnNamesByTable.update(table.id,
-            (list) => list.push(column.name),
-          );
 
-          columnIds = columnIds.push(column.id);
+          _.each(tableFields, (fieldProperties, fieldName, fieldList) => {
+            const column = SchemaTypes._Column({
+              name: (fieldName as any) as string,
+              serverId,
+              databaseId,
+              tableId,
+              datatype: fieldProperties['type'],
+            });
+
+            columns = columns.set(column.id, column);
+
+            if (!columnNamesByTable.get(table.id)) {
+              columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+            }
+            columnNamesByTable = columnNamesByTable.update(table.id,
+              (list) => list.push(column.name),
+            );
+
+            columnIds = columnIds.push(column.id);
+          });
+
+          tables = tables.setIn(
+            [tableId, 'columnIds'],
+            columnIds,
+          );
         });
 
-        tables = tables.setIn(
-          [tableId, 'columnIds'],
-          columnIds,
-        );
+      databases = databases.set(databaseId, database);
+
+      setServerAction({
+        server,
+        databases,
+        tables,
+        columns,
+        indexes,
+        tableNames,
+        columnNames: columnNamesByTable,
       });
 
-    setDbAction({
-      database,
-      tables,
-      columns,
-      indexes,
-      tableNames,
-      columnNames: columnNamesByTable,
-    });*/
+    });
   }
 }
 
