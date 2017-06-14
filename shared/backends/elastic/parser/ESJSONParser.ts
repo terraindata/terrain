@@ -229,7 +229,7 @@ export default class ESJSONParser
         // object end
         case '}':
           break;
-          
+
         // array
         case '[':
           this.advance();
