@@ -44,17 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 const { List, Map } = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
+import CommonBlocks from '../../../blocks/CommonBlocks';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 import CommonElastic from '../syntax/CommonElastic';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
-import CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 const { make } = BlockUtils;
@@ -68,7 +68,7 @@ export const elasticMagicValue = _block({
     removeOnCardRemove: true,
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      let rawValue = block['value'];
+      const rawValue = block['value'];
       let value: any;
 
       if (rawValue._isBlock)
@@ -83,7 +83,7 @@ export const elasticMagicValue = _block({
             value = +rawValue;
             break;
           case CommonElastic.valueTypes.text:
-            value = "" + rawValue;
+            value = '' + rawValue;
             break;
           case CommonElastic.valueTypes.null:
             value = null;
@@ -114,7 +114,7 @@ export const elasticMagicValue = _block({
       return {
         [block['key']]: value,
       };
-    }
+    },
   },
 });
 
@@ -142,13 +142,13 @@ export const elasticMagicCard = _card(
       accepts,
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        let elasticObj: object = {};
+        const elasticObj: object = {};
 
         block['values'].map(
           (card: Card) =>
           {
             _.extend(elasticObj, tqlTranslationFn(card, tqlConfig));
-          }
+          },
         );
 
         return elasticObj;

@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import List = Immutable.List;
@@ -55,7 +57,6 @@ import BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
 const { make } = BlockUtils;
-
 import Blocks from '../blocks/ElasticBlocks';
 
 export default function ElasticToCards(
@@ -66,7 +67,7 @@ export default function ElasticToCards(
   try
   {
     const obj = JSON.parse(query.tql);
-    const cards = parseObjectWrap(obj);
+    const cards = parseMagicObject('', obj);
     return query
       .set('cards', cards)
       .set('cardsAndCodeInSync', true);
@@ -78,7 +79,7 @@ export default function ElasticToCards(
   }
 }
 
-const parseObjectWrap = (obj: Object): Cards =>
+const parseObjectWrap = (obj: object): Cards =>
 {
   const arr: Card[] = _.map(obj,
     (value: any, key: string) =>
@@ -143,12 +144,12 @@ const parseValueSingleCard = (value: any): Card =>
           },
         );
       }
+      default:
+        throw new Error('Elastic Parsing: Unsupported value: ' + value);
   }
-
-  throw new Error('Elastic Parsing: Unsupported value: ' + value);
 };
 
-const parseObjectToggle = (obj: Object): Cards =>
+const parseObjectToggle = (obj: object): Cards =>
 {
   const arr: Card[] = _.map(obj,
     (rawVal: any, key: string) =>
@@ -162,7 +163,6 @@ const parseObjectToggle = (obj: Object): Cards =>
       {
         case 'string':
           valueType = CommonElastic.valueTypes.text;
-
           break;
         case 'number':
           valueType = CommonElastic.valueTypes.number;
@@ -180,6 +180,9 @@ const parseObjectToggle = (obj: Object): Cards =>
             // not yet done
           }
         // not yet done
+          break;
+        default:
+          throw new Error('Elastic Parsing: Unsupported value: ' + value);
       }
 
       return make(
@@ -195,3 +198,35 @@ const parseObjectToggle = (obj: Object): Cards =>
 
   return Immutable.List(arr);
 };
+
+const parseMagicObject = (rootKey: string, obj: object): Cards =>
+{
+  const values: Card[] = _.map(obj,
+    (value: any, key: string) =>
+    {
+      if (typeof value === 'object')
+      {
+        const cards: Cards = parseMagicObject(key, value);
+        return cards.first();
+      }
+      else
+      {
+        return make(Blocks.elasticMagicValue, {
+          key,
+          value,
+        });
+      }
+    },
+  );
+
+  const magicCard = make(
+    Blocks.elasticMagicCard,
+    {
+      rootKey,
+      values,
+    },
+  );
+
+  return Immutable.List([ magicCard ]);
+};
+
