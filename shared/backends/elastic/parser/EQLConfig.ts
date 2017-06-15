@@ -118,7 +118,7 @@ export default class EQLConfig
       throw new Error('Unknown clause "' + 'name:' + String(name) + ',' + 'def:' + String(def) + ' ".');
     }
 
-// winston.info('registering clause "' + id + '"');
+    // winston.info('registering clause "' + id + '"');
     this.clauses[name] = clause;
     delete this.undefinedTypes[name];
   }
