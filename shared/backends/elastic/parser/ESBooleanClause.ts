@@ -42,22 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.id
 
-import ESParserToken from './ESParserToken';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause which is a boolean
  */
-export default class ESPropertyInfo
+export default class ESBooleanClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
-
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+    const value: any = valueInfo.value;
+    if (typeof (value) !== 'boolean')
+    {
+      interpreter.accumulateError(valueInfo, 'This value should be a boolean.');
+    }
   }
 }

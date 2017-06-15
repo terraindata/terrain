@@ -44,20 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause which can only take on a restricted set of values.
  */
-export default class ESPropertyInfo
+export default class ESEnumClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
+  public values: any[];
+  public valueMap: any;
 
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+    this.valueMap = new Map();
+    for (let i = 0; i < this.values.length; ++i)
+    {
+      const value = this.values[i];
+      this.valueMap.set(value, i);
+    }
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    if (this.valueMap.get(valueInfo.value) === undefined)
+    {
+      if (this.values.length > 10)
+      {
+        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
+      }
+      else
+      {
+        interpreter.accumulateError(valueInfo,
+          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
+      }
+    }
+    valueInfo.clause = this;
   }
 }

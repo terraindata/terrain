@@ -44,20 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause which can be any valid JSON value
  */
-export default class ESPropertyInfo
+export default class ESAnyClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
-
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
   }
 }
