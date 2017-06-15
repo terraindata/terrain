@@ -42,47 +42,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-//Temporary testing file to be run using node
-import ESConverter from './ESConverter';
-let nextObject =
+/*
+ *  Data container with immutable members
+ */
+class ElementInfo
+{
+  constructor(
+    public readonly index: number, //Index is element's position underneath its parent (so 0 if it's root level)
+    public readonly container: any[] | object = undefined, //parent of element: undefined for values under root
+    public readonly keys: string[] = undefined, //undefined for values inside arrays or under root
+  ){}
+
+  public containerSize() : number
   {
-    "index" : "movies",
-    "type" : "data",
-    "size" : 10,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must_not" : [
-            {
-              "match" : {
-                "title" : "Toy Story (1995)"
-              }
-            },
-          ],
-          "must": [
-            {
-              "range" : {
-                "releasedate" : {
-                  "gte" : "2007-03-24"
-                }
-              }
-            },
-          ],
-        }
-      }
+    if(this.container === undefined)
+    {
+      return 1;
+    }
+    else if(this.container instanceof Array)
+    {
+      return this.container.length;
+    }
+    else 
+    {
+      return this.keys.length;
     }
   }
-;
-//console.log(JSON.stringify(nextObject, null, 2));
-//console.log(ESConverter.formatES(nextObject));
-//test to see if formatES results in string that is semantically identical to original JSON object
-console.log("testing ESConverter");
-let bounced : string = JSON.stringify(JSON.parse(ESConverter.formatES(nextObject)));
-if(JSON.stringify(nextObject) === bounced)
-{
-  console.log("test passed");
+
+  public isLastElement() : boolean
+  {
+    return this.index + 1 === this.containerSize();
+  }
+
+  public isFirstElement() : boolean
+  {
+    return this.index === 0;
+  }
+
+  public isOnlyElement() : boolean
+  {
+    return this.containerSize() === 1;
+  }
 }
-else
-{
-  console.log("test failed");
-}
+export default ElementInfo;

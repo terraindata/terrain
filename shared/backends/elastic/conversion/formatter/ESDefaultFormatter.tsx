@@ -42,119 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-class ElementInfo
+import ObjectFormatter from './ObjectFormatter';
+import ElementInfo from './ElementInfo';
+/**
+ *  Default formatter implementation
+ */
+class ESDefaultFormatter extends ObjectFormatter
 {
-  /*
-   *  Data container with immutable members
-   *  Index is element's position underneath its parent (so 0 if it's root level)
-   */
-  constructor(
-    public readonly index: number,
-    public readonly container: any[] | object = undefined, //parent of element: undefined for values under root
-    public readonly keys: string[] = undefined, //undefined for values inside arrays or under root
-  ){}
-  public containerSize() : number
-  {
-    if(this.container === undefined)
-    {
-      return 1;
-    }
-    else if(this.container instanceof Array)
-    {
-      return this.container.length;
-    }
-    else 
-    {
-      return this.keys.length;
-    }
-  }
-  public isLastElement() : boolean
-  {
-    return this.index + 1 === this.containerSize();
-  }
-  public isFirstElement() : boolean
-  {
-    return this.index === 0;
-  }
-  public isOnlyElement() : boolean
-  {
-    return this.containerSize() === 1;
-  }
-}
-abstract class ObjectFormatter
-{
-  abstract getResultText(): string;
-  //vvvv handlers called while traversing the object
-  abstract onValue(val: any, element?: ElementInfo): void;
-  abstract onKey(key: string, element?: ElementInfo): void;
-  abstract onOpenObject(obj?: object, element?: ElementInfo): void;
-  abstract onCloseObject(obj?: object, element?: ElementInfo): void;
-  abstract onOpenArray(arr?: any[], element?: ElementInfo): void;
-  abstract onCloseArray(arr?: any[], element?: ElementInfo): void;
-  protected onEnd(): void {};
-  protected onError(err: Error, element?: ElementInfo): void {console.error(err);};
-  protected sortKeys(keys: string[], element?: ElementInfo): string[] {return keys;}; //traverse keys in order of returned array
-  //^^^^
-  constructor(){}
-  public parseObject(obj: any)
-  {
-    try
-    {
-      this.traverseObject(obj, new ElementInfo(0));
-      this.onEnd();
-    }
-    catch(e)
-    {
-      this.onError(e);
-    }
-  }
-  protected traverseObject(obj: any, element: ElementInfo): void
-  {
-    switch(typeof obj)
-    {
-      case 'string':
-      case 'number':
-      case 'boolean':
-      case 'undefined':
-        this.onValue(obj, element);
-        break;
-      case 'object':
-        if(obj instanceof Array)
-        {
-          this.onOpenArray(obj, element);
-          for(let i = 0; i < obj.length; i++)
-          {
-            this.traverseObject(obj[i], new ElementInfo(i, obj));
-          }
-          this.onCloseArray(obj, element);
-        }
-        else if(obj === null)
-        {
-          this.onValue(null, element);
-        }
-        else
-        {
-          let keys = this.sortKeys(Object.keys(obj), element);
-          this.onOpenObject(obj, element);
-          for(let i = 0; i < keys.length; i++)
-          {
-            let innerElement : ElementInfo = new ElementInfo(i, obj, keys);
-            this.onKey(keys[i], innerElement);
-            this.traverseObject(obj[keys[i]], innerElement);
-          }
-          this.onCloseObject(obj, element);
-        }
-        break;
-      default:
-        throw new Error('Error while traversing object: "' + (typeof obj) + '" is not a valid type');
-    }
-  }
-}
-class ESFormatter extends ObjectFormatter
-{
-  /*
-   *  Default formatter implementation.
-   */
   protected static readonly defaultRules = 
   {
     'delimiter' : ',',
@@ -175,15 +69,18 @@ class ESFormatter extends ObjectFormatter
     'openSingularArrayToks' : ['', ''],
     'closeSingularArrayToks' : ['', '']
   };
+
   protected depth: number = 0;
   protected output: string = '';
   protected rules: object;
   protected token: string = '';
-  constructor(formattingRules : object = ESFormatter.defaultRules)
+  
+  constructor(formattingRules : object = ESDefaultFormatter.defaultRules)
   {
     super();
     this.rules = formattingRules;
   }
+
   protected addText(value: any, key: string): void
   {
     //Sandwiches the value between the tokens defined by key. Merges tokens. Strips double newlines and applies indents.
@@ -191,15 +88,19 @@ class ESFormatter extends ObjectFormatter
     this.output += this.token + value.toString();
     this.token = this.rules[key][1];
   }
+
   protected lintToken(tok: string): string
   {
     return tok.replace('\n\n', '\n');
   }
+
   protected indentToken(text: string): string
   {
     return text.replace(new RegExp('\n', 'mg'), '\n' + this.rules['spacingTok'].repeat(this.depth));
   }
-  //vvv overrides vvv
+
+  //parent class method implementations
+
   onValue(value: any, element: ElementInfo): void
   {
     if(typeof(value) == 'string')
@@ -210,17 +111,20 @@ class ESFormatter extends ObjectFormatter
     let delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
     this.addText(value + delimiter, toks);
   }
+
   onKey(key: string, element: ElementInfo): void
   {
     let toks : string = element.isOnlyElement() ? 'singularKeyToks' : 'keyToks';
     this.addText(JSON.stringify(key) + this.rules['key'], toks);
   }
+
   onOpenObject(obj?: object, element?: ElementInfo): void
   {
     let toks : string = Object.keys(obj).length === 1 ? 'openSingularObjectToks' : 'openObjectToks';
     this.addText(this.rules['object'][0], toks);
     this.depth += 1;
   }
+
   onCloseObject(obj?: object, element?: ElementInfo): void
   {
     this.depth -= 1;
@@ -228,12 +132,14 @@ class ESFormatter extends ObjectFormatter
     let delimiter : string = element.isLastElement() ? '' : this.rules['delimiter'];
     this.addText(this.rules['object'][1] + delimiter, toks);
   }
+
   onOpenArray(arr?: any[], element?: ElementInfo): void
   {
     let toks : string = arr.length === 1 ? 'openSingularArrayToks' : 'openArrayToks';
     this.addText(this.rules['array'][0], toks);
     this.depth += 1;
   }
+
   onCloseArray(arr?: any[], element?: ElementInfo): void
   {
     this.depth -= 1;
@@ -241,18 +147,10 @@ class ESFormatter extends ObjectFormatter
     let delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
     this.addText(this.rules['array'][1] + delimiter, toks);
   }
+
   getResultText(): string
   {
     return this.output;
   }
 }
-class ESConverter
-{
-  public static formatES(query: object | string, previousCode?: string): string
-  {
-    let formatter = new ESFormatter();
-    formatter.parseObject(query);
-    return formatter.getResultText();
-  }
-}
-export default ESConverter;
+export default ESDefaultFormatter;
