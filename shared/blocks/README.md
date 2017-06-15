@@ -22,7 +22,7 @@ special Immutable properties that help React perform optimizations.
 
 ### Block Instance Properties
 
-  * id: Each block is assigned a random type on creation
+  * id: Each block is assigned a random id on creation
   * type: Each kind of block has a unique type. This is set by the `initBlocks` method.
   * block-specific properties: When you define a block, you define what
     specific instance properties that block could have. For example,
