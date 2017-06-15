@@ -164,15 +164,30 @@ export default class EQLConfig
         }
         else if (type.startsWith('{'))
         {
-          // map
-          if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
-            type.indexOf(' ') !== -1)
+          // map {"ktype":"vtype"}
+          let mapTypes;
+          try
           {
-            throw new Error('Unsupported map id "' + type + '".');
+            mapTypes = JSON.parse(type);
+          } catch (e)
+          {
+            throw new Error('The map type "' + type + '" is not a JSON object');
           }
 
-          const components: string[] = type.substring(1, type.length - 1).split(':');
-          clause = new ESMapClause(settings, components[0], components[1], this);
+          if (Object.keys(mapTypes).length !== 1)
+          {
+            throw new Error('The map type "' + type + '" has more than one field');
+          }
+
+          const ktype = Object.keys(mapTypes)[0];
+          const vtype = mapTypes[ktype];
+
+          if (typeof vtype !== 'string')
+          {
+            throw new Error('The value type of the map type "' + type + '" is not a string');
+          }
+
+          clause = new ESMapClause(settings, ktype, vtype, this);
         }
         else
         {
@@ -190,7 +205,7 @@ export default class EQLConfig
 
   public validateTypename(type: string): void
   {
-    if (type.match(/^(?:[a-zA-Z0-9_]+(:?\[])?|{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+})$/gim) === null)
+    if (type.match(/^(?:[a-zA-Z0-9_"]+(:?\[])?|{[a-zA-Z0-9_"]+:[a-zA-Z0-9_"]+})$/gim) === null)
     {
       throw new Error('Type names must be composed only of letters, numbers, and underscores. Type "' +
         String(type) +

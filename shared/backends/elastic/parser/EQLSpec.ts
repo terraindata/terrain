@@ -235,7 +235,7 @@ const EQLSpec: any =
       url:      'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html',
       def:     'variant',
       subtypes: {
-        object: '{field:sort_control}',
+        object: '{"field":"sort_control"}',
         string: 'field',
       },
     },
@@ -356,7 +356,7 @@ const EQLSpec: any =
     },
     script_params:             {
       desc: 'Parameters to pass to the script.',
-      def: '{string:any}',
+      def: '{"string":"any"}',
     },
     script_language:           {
       desc:     'The scripting language to use.',
@@ -495,7 +495,7 @@ const EQLSpec: any =
     term_query:                {
       desc: 'Matches documents that contain an exact match for the given term.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html',
-      def: '{field:term_value}',
+      def: '{"field":"term_value"}',
     },
     term_value:                {
       required: ['value'],
@@ -518,7 +518,7 @@ const EQLSpec: any =
     terms_query:               {
       desc: 'Matches documents that contain an exact match for any of the given terms. Can also be populated by a terms lookup clause.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html',
-      def: '{field:terms_value}',
+      def: '{"field":"terms_value"}',
     },
     terms_value:               {
       def:     'variant',
@@ -552,7 +552,7 @@ const EQLSpec: any =
     range_query:               {
       desc: 'Matches documents that have a value within the specified range.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html',
-      def: '{field:range_value}',
+      def: '{"field":"range_value"}',
     },
     range_value:               {
       def: {
@@ -575,7 +575,7 @@ const EQLSpec: any =
     prefix_query:              {
       desc: 'Matches documents that contain terms with the given prefix.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html',
-      def: '{field:prefix_query_value}',
+      def: '{"field":"prefix_query_value"}',
     },
     prefix_query_value:        {
       def:     'variant',
@@ -691,7 +691,7 @@ const EQLSpec: any =
       name: 'match clause',
       desc: 'Does an analyzed (full-text) match on the given term.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html',
-      def: '{field:match_value}',
+      def: '{"field":"match_value"}',
     },
     match_value:               {
       def:     'variant',
@@ -885,7 +885,7 @@ const EQLSpec: any =
       name: 'match phrase query',
       desc: 'Makes a phrase query using analyzed text. Matches documents containing the words (tokens) in the phrase text.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html',
-      def: '{field:match_phrase_value}',
+      def: '{"field":"match_phrase_value"}',
     },
     match_phrase_value:        {
       def:     'variant',
@@ -898,7 +898,7 @@ const EQLSpec: any =
       name: 'match phrase prefix query',
       desc: 'Makes a query using analyzed text which matches on all terms and any term starting with the prefix of the last term in the phrase text.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html',
-      def: '{field:match_phrase_prefix_value}',
+      def: '{"field":"match_phrase_prefix_value"}',
     },
     match_phrase_prefix_value: {
       def:     'variant',
