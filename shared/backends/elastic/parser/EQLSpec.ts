@@ -598,6 +598,7 @@ const EQLSpec: any =
     wildcard_query:            {
       desc: 'Matches documents using a wildcard expression.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html',
+      type: {},
     },
     wildcard_query_value:      {
       type:     'variant',
@@ -620,6 +621,7 @@ const EQLSpec: any =
     regexp_query:              {
       desc: 'Matches documents using a regular expression.',
       url:  'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html',
+      type: {},
     },
     regexp_query_value:        {
       type:     'variant',
