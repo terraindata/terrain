@@ -92,7 +92,7 @@ export class Events
 
   constructor()
   {
-    const elasticConfig: ElasticConfig = DBUtil.DSNToConfig('elastic', '127.0.0.1:9200') as ElasticConfig;
+    const elasticConfig: ElasticConfig = DBUtil.DSNToConfig('elastic', 'http://127.0.0.1:9200') as ElasticConfig;
     this.elasticController = new ElasticController(elasticConfig, 0, 'Events');
     this.eventTable = new Tasty.Table(
       'data',

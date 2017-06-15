@@ -100,7 +100,7 @@ const optionList = [
   {
     name: 'analyticsdb',
     type: String,
-    defaultValue: '127.0.0.1:9200',
+    defaultValue: 'http://127.0.0.1:9200',
     description: 'Analytics datastore connection parameters',
   },
 ];
