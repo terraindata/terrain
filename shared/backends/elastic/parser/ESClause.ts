@@ -52,18 +52,18 @@ import ESValueInfo from './ESValueInfo';
  */
 abstract class ESClause
 {
-  public id: string; // type name
+  public type: string; // type name
   public name: string; // human type name
   public desc: string; // clause description
   public url: string; // clause documentation url
 
   /**
-   * Type information for this clause. It should be one of these:
+   * Type definition for this clause. It should be one of these:
    * + A parent type name that this clause inherits from (ex: boost inherits from number)
    * + An object containing all allowed properties and their types.
    *   (a null property value means the type is the same as the name of the property)
    */
-  public type: string | { [key: string]: string | null };
+  public def: string | { [key: string]: string | null };
 
   public required: string[]; // list of required properties
 
@@ -79,20 +79,20 @@ abstract class ESClause
    * + typename with {} after it means object of type
    * + type "enum" uses "values" member to list enumerated values
    * + array type means any of these types
-   * + object type means structured type definition
-   * + string type references another type
+   * + object type means structured def definition
+   * + string type references another def
    *
-   * @param id the id to refer to this clause by
+   * @param type the name to refer to this clause (type)
    * @param settings the settings object to initialize it from
    */
   public constructor(settings: any)
   {
     // winston.info('setting: ' + JSON.stringify(settings));
-    this.id = settings.id;
-    this.setPropertyFromSettings(settings, 'name', () => this.id.replace('_', ' '));
+    this.type = settings.type;
+    this.setPropertyFromSettings(settings, 'name', () => this.type.replace('_', ' '));
     this.setPropertyFromSettings(settings, 'desc', () => '');
     this.setPropertyFromSettings(settings, 'url', () => '');
-    this.setPropertyFromSettings(settings, 'type', () => 'value');
+    this.setPropertyFromSettings(settings, 'def', () => 'value');
     this.setPropertyFromSettings(settings, 'required', () => []);
     this.setPropertyFromSettings(settings, 'values', () => []);
     this.setPropertyFromSettings(settings, 'template', () => null);
