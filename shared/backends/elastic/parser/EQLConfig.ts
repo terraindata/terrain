@@ -75,65 +75,65 @@ export default class EQLConfig
 
     // winston.info(JSON.stringify(clauseConfiguration));
     Object.keys(clauseConfiguration).forEach(
-      (typename: string): void =>
-      {
-        // winston.info('defining "' + id + '"');
-
-        const settings: any = clauseConfiguration[typename];
-        this.declareType(typename, settings);
-        if (this.clauses[typename] !== undefined)
-        {
-          return;
-        }
-
-        const def: any = settings.def;
-        let clause: ESClause;
-        if (typeof (def) === 'object')
-        {
-          // structured object id
-          clause = new ESStructureClause(settings, this);
-        }
-        else if (typeof (def) === 'string')
-        {
-          switch (def)
-          {
-            case 'enum':
-              clause = new ESEnumClause(settings);
-              break;
-            case 'variant':
-              clause = new ESVariantClause(settings, this);
-              break;
-            default:
-              // reference clause
-              clause = new ESReferenceClause(settings, this);
-              break;
-          }
-        }
-        else
-        {
-          throw new Error('Unknown clause "' + 'type:' + String(typename)  + ','  + 'def:' + String(def) + ' ".');
-        }
-
-        // winston.info('registering clause "' + id + '"');
-        this.clauses[typename] = clause;
-        delete this.undefinedTypes[typename];
-      },
-    );
+      (key: string): void => this.defineType(key, clauseConfiguration[key]));
 
     // TODO: validate id references and other settings
   }
 
-  public declareType(type: string, settings: any = {}): void
+  public defineType(name: string, settings: any): void
   {
-    if (this.clauses[type] !== undefined)
+    // winston.info('defining "' + id + '"');
+
+    this.declareType(name, settings);
+    if (this.clauses[name] !== undefined)
+    {
+      return;
+    }
+
+    const def: any = settings.def;
+    let clause: ESClause;
+    if (typeof (def) === 'object')
+    {
+      // structured object id
+      clause = new ESStructureClause(settings, this);
+    }
+    else if (typeof (def) === 'string')
+    {
+      switch (def)
+      {
+        case 'enum':
+          clause = new ESEnumClause(settings);
+          break;
+        case 'variant':
+          clause = new ESVariantClause(settings, this);
+          break;
+        default:
+          // reference clause
+          clause = new ESReferenceClause(settings, this);
+          break;
+      }
+    }
+    else
+    {
+      throw new Error('Unknown clause "' + 'name:' + String(name) + ',' + 'def:' + String(def) + ' ".');
+    }
+
+// winston.info('registering clause "' + id + '"');
+    this.clauses[name] = clause;
+    delete this.undefinedTypes[name];
+  }
+
+  public declareType(name: string, settings: any = {}): void
+  {
+    if (this.clauses[name] !== undefined)
     {
       return; // already declared
     }
 
     // winston.info('declare "' + id + '"');
-    settings.type = type;
+    settings.name = name;
     let clause: ESClause | null = null;
-    switch (type)
+    switch (name)
     {
       case 'null':
         clause = new ESNullClause(settings);
@@ -155,61 +155,46 @@ export default class EQLConfig
         break;
 
       default:
-        this.validateTypename(type);
+        this.validateTypename(name);
 
-        if (type.endsWith('[]'))
+        if (name.endsWith('[]'))
         {
           // array
-          clause = new ESArrayClause(settings, type.substring(0, type.length - 2));
+          clause = new ESArrayClause(settings, name.substring(0, name.length - 2));
         }
-        else if (type.startsWith('{'))
+        else if (name.startsWith('{'))
         {
-          // map {"ktype":"vtype"}
-          let mapTypes;
-          try
+          // map
+          if (name.charAt(0) !== '{' || name.charAt(name.length - 1) !== '}' ||
+            name.indexOf(' ') !== -1)
           {
-            mapTypes = JSON.parse(type);
-          } catch (e)
-          {
-            throw new Error('The map type "' + type + '" is not a JSON object');
+            throw new Error('Unsupported map name "' + name + '".');
           }
 
-          if (Object.keys(mapTypes).length !== 1)
-          {
-            throw new Error('The map type "' + type + '" has more than one field');
-          }
-
-          const ktype = Object.keys(mapTypes)[0];
-          const vtype = mapTypes[ktype];
-
-          if (typeof vtype !== 'string')
-          {
-            throw new Error('The value type of the map type "' + type + '" is not a string');
-          }
-
-          clause = new ESMapClause(settings, ktype, vtype, this);
+          const components: string[] = name.substring(1, name.length - 1).split(':');
+          clause = new ESMapClause(settings, components[0], components[1], this);
         }
         else
         {
           // undefined reference id
-          this.undefinedTypes[type] = true;
+          this.undefinedTypes[name] = true;
         }
         break;
     }
 
     if (clause !== null)
     {
-      this.clauses[type] = clause;
+      this.clauses[name] = clause;
     }
   }
 
-  public validateTypename(type: string): void
+  public validateTypename(name: string): void
   {
-    if (type.match(/^(?:[a-zA-Z0-9_"]+(:?\[])?|{[a-zA-Z0-9_"]+:[a-zA-Z0-9_"]+})$/gim) === null)
+    if (name.match(/^(?:[a-zA-Z0-9_]+(:?\[])?|{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+})$/gim) === null)
     {
-      throw new Error('Type names must be composed only of letters, numbers, and underscores. Type "' +
-        String(type) +
-        '" is an invalid type name.');
+      throw new Error('name names must be composed only of letters, numbers, and underscores. name "' +
+        String(name) +
+        '" is an invalid name name.');
     }
   }
 
