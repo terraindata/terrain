@@ -243,11 +243,11 @@ export class Events
     {
       switch (typeof (payload[item]))
       {
-        case "boolean":
+        case 'boolean':
           res[item] = false;
           break;
 
-        case "number":
+        case 'number':
           res[item] = 0;
           break;
 
@@ -265,10 +265,10 @@ export class Events
    */
   public getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): string
   {
-    currTime = currTime | this.getClosestTime();
+    currTime = currTime !== undefined ? currTime : this.getClosestTime();
     if (uniqueId === undefined)
     {
-      uniqueId = "";
+      uniqueId = '';
     }
     return sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16);
   }
