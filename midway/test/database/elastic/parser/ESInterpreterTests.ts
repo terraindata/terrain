@@ -71,7 +71,13 @@ beforeAll(async (done) =>
   });
 
   expected = JSON.parse(expectedString);
-  config = new EQLConfig();
+  try
+  {
+    config = new EQLConfig();
+  } catch (e)
+  {
+    fail(e);
+  }
 
   done();
 });

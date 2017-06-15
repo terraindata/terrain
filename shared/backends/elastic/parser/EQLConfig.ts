@@ -75,27 +75,27 @@ export default class EQLConfig
 
     // winston.info(JSON.stringify(clauseConfiguration));
     Object.keys(clauseConfiguration).forEach(
-      (id: string): void =>
+      (typename: string): void =>
       {
         // winston.info('defining "' + id + '"');
 
-        const settings: any = clauseConfiguration[id];
-        this.declareType(id, settings);
-        if (this.clauses[id] !== undefined)
+        const settings: any = clauseConfiguration[typename];
+        this.declareType(typename, settings);
+        if (this.clauses[typename] !== undefined)
         {
           return;
         }
 
-        const type: any = settings.type;
+        const def: any = settings.type;
         let clause: ESClause;
-        if (typeof (type) === 'object')
+        if (typeof (def) === 'object')
         {
           // structured object id
           clause = new ESStructureClause(settings, this);
         }
-        else if (typeof (type) === 'string')
+        else if (typeof (def) === 'string')
         {
-          switch (type)
+          switch (def)
           {
             case 'enum':
               clause = new ESEnumClause(settings);
@@ -111,12 +111,12 @@ export default class EQLConfig
         }
         else
         {
-          throw new Error('Unknown clause type "' + String(type) + '".');
+          throw new Error('Unknown clause "' + "type:" + String(typename)  + ", " + "def:" + String(def) + ' ".');
         }
 
         // winston.info('registering clause "' + id + '"');
-        this.clauses[id] = clause;
-        delete this.undefinedTypes[id];
+        this.clauses[typename] = clause;
+        delete this.undefinedTypes[typename];
       },
     );
 
