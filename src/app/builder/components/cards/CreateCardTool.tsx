@@ -42,16 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CreateCardTool.less');
+// Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { Card } from '../../../../../shared/blocks/types/Card';
+import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
-import { Card } from '../../../../../shared/blocks/types/Card';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import './CreateCardTool.less';
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -77,27 +80,34 @@ export interface Props
 
 class CreateCardTool extends PureClasss<Props>
 {
-  state: {
+  public state: {
     closed: boolean;
     opening: boolean;
+    focusedIndex: number;
   } = {
     closed: !this.props.open,
     opening: false,
+    focusedIndex: -1,
   };
 
-  createCard(event)
+  handleCardClick(event)
+  {
+    const type = Util.rel(event.target);
+    this.createCard(type);
+  }
+
+  public createCard(type)
   {
     if (this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
     }
 
-    const type = Util.rel(event.target);
     if (this.props.index === null)
     {
       Actions.change(
-        this.props.keyPath, 
-        BlockUtils.make(AllBackendsMap[this.props.language].blocks[type])
+        this.props.keyPath,
+        BlockUtils.make(AllBackendsMap[this.props.language].blocks[type]),
       );
     }
     else
@@ -108,7 +118,7 @@ class CreateCardTool extends PureClasss<Props>
     this.props.onToggle && this.props.onToggle();
   }
 
-  componentWillReceiveProps(newProps)
+  public componentWillReceiveProps(newProps)
   {
     if (newProps.open !== this.props.open)
     {
@@ -136,7 +146,7 @@ class CreateCardTool extends PureClasss<Props>
     }
   }
 
-  componentDidUpdate(prevProps, prevState)
+  public componentDidUpdate(prevProps, prevState)
   {
     if (!prevState.opening && this.state.opening)
     {
@@ -144,65 +154,78 @@ class CreateCardTool extends PureClasss<Props>
     }
   }
 
-  renderCardSelector()
+  public renderCardSelector()
   {
     if (this.state.closed)
     {
       return null;
     }
-    
-    return (
-     <div className="create-card-selector" ref="selector">
-       <div className="create-card-selector-inner">
-         {
-           AllBackendsMap[this.props.language].cardsList.map((type: string) =>
-           {
-             if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
-             {
-               return null;
-             }
 
-             const card = BlockUtils.make(
-               AllBackendsMap[this.props.language].blocks[type]
-             );
-                 // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
-             return (
-               <a
-                 className="create-card-button"
-                 key={type}
-                 rel={type}
-                 onClick={this.createCard}
-                 style={{
-                   backgroundColor: card.static.colors[0],
-                 }}
-               >
-                 <div className="create-card-button-inner" rel={type}>
-                   {
-                     card.static.title
-                   }
-                 </div>
-               </a>
-             );
-           })
-         }
-         {
-           _.map(_.range(0, 10), (i) => <div className="create-card-button-fodder" key={i} />)
-         }
-       </div>
-       {
-         !this.props.cannotClose &&
-           <div
-             className="close create-card-close"
-             onClick={this.handleCloseClick}
-           >
-             <CloseIcon />
-           </div>
-       }
-     </div>
+    let curIndex = -1; // tracks the index of the cards we are actually showing
+
+    return (
+      <div
+        className={classNames({
+          'create-card-selector': true,
+          'create-card-selector-focused': this.state.focusedIndex !== -1,
+        })}
+        ref='selector'
+      >
+        <div className='create-card-selector-inner'>
+          {
+            AllBackendsMap[this.props.language].cardsList.map((type: string, index: number) =>
+            {
+              if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
+              {
+                return null;
+              }
+
+              curIndex++;
+
+              const card = BlockUtils.make(
+                AllBackendsMap[this.props.language].blocks[type],
+              );
+              // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
+              return (
+                <a
+                  className={classNames({
+                    'create-card-button': true,
+                    'create-card-button-focused': this.state.focusedIndex === curIndex,
+                  })}
+                  key={type}
+                  rel={type}
+                  onClick={this.handleCardClick}
+                  style={{
+                    backgroundColor: card.static.colors[0],
+                  }}
+                >
+                  <div className='create-card-button-inner' rel={type}>
+                    {
+                      card.static.title
+                    }
+                  </div>
+                </a>
+              );
+            })
+          }
+          {
+            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
+          }
+        </div>
+        {
+          !this.props.cannotClose &&
+          <div
+            className='close create-card-close'
+            onClick={this.handleCloseClick}
+          >
+            <CloseIcon />
+          </div>
+        }
+      </div>
     );
   }
 
-  handleCloseClick()
+  public handleCloseClick()
   {
     if (this.props.onClose)
     {
@@ -214,7 +237,7 @@ class CreateCardTool extends PureClasss<Props>
     }
   }
 
-  renderPlaceholder()
+  public renderPlaceholder()
   {
     if (this.props.hidePlaceholder || this.props.open)
     {
@@ -224,14 +247,41 @@ class CreateCardTool extends PureClasss<Props>
     return (
       <div
         onClick={this.props.onToggle}
-        className="create-card-placeholder"
+        className='create-card-placeholder'
       >
         <AddIcon />
       </div>
     );
   }
 
-  render()
+  handleFocus()
+  {
+    this.setState({
+      focusedIndex: 0,
+    });
+  }
+
+  handleFocusLost()
+  {
+    this.setState({
+      focusedIndex: -1,
+    });
+  }
+
+  handleFocusedIndexChange(focusedIndex: number)
+  {
+    this.setState({
+      focusedIndex,
+    });
+  }
+
+  handleKeyboardSelect(index: number)
+  {
+    const type = this.props.accepts.get(index);
+    this.createCard(type);
+  }
+
+  public render()
   {
     if (!this.props.canEdit)
     {
@@ -245,16 +295,16 @@ class CreateCardTool extends PureClasss<Props>
       'create-card-opening': this.state.opening,
     });
     classes += ' ' + this.props.className;
-    
+
     let style: React.CSSProperties;
 
     if (this.props.dy)
     {
       style =
-      {
-        position: 'relative',
-        top: this.props.dy,
-      };
+        {
+          position: 'relative',
+          top: this.props.dy,
+        };
     }
 
     return (
@@ -275,8 +325,16 @@ class CreateCardTool extends PureClasss<Props>
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
         />
-     </div>
-   );
+        <KeyboardFocus
+          onFocus={this.handleFocus}
+          onFocusLost={this.handleFocusLost}
+          index={this.state.focusedIndex}
+          onIndexChange={this.handleFocusedIndexChange}
+          length={this.props.accepts && this.props.accepts.size}
+          onSelect={this.handleKeyboardSelect}
+        />
+      </div>
+    );
   }
 }
 export default CreateCardTool;

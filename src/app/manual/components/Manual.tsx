@@ -42,18 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Manual.less');
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
+import * as _ from 'underscore';
 import Autocomplete from './../../common/components/Autocomplete';
 import Classs from './../../common/components/Classs';
+import './Manual.less';
 import ManualEntry from './ManualEntry';
-const {browserHistory} = require('react-router');
 
 import * as Immutable from 'immutable';
-const {List} = Immutable;
+const { List } = Immutable;
 
 const CloseIcon = require('./../../../images/icon_close.svg');
 const SearchIcon = require('./../../../images/icon_search.svg');
@@ -61,7 +62,7 @@ const HomeIcon = require('./../../../images/icon_home.svg');
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 
-import {cardList} from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
+import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {
@@ -74,23 +75,23 @@ export interface Props
 
 class Manual extends Classs<Props>
 {
-  allTqlCards = Object.keys(cardList).sort();
+  public allTqlCards = Object.keys(cardList).sort();
 
-  allPhraseTypes = Object.keys(ManualConfig.phraseTypes).sort();
-  autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
+  public allPhraseTypes = Object.keys(ManualConfig.phraseTypes).sort();
+  public autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
 
   constructor(props: Props)
   {
     super(props);
     let value = this.props.selectedKey || '';
     let tqlCards = this.allTqlCards.filter((key) =>
-      {
-         return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
-      });
+    {
+      return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+    });
 
     let phraseTypes = this.allPhraseTypes.filter((key) =>
     {
-       return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+      return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
     });
 
     if (this.props.selectedKey === 'TQL Cards')
@@ -118,38 +119,38 @@ class Manual extends Classs<Props>
     };
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if ((this.state.selectedKey.toLowerCase() !== nextProps.selectedKey.toLowerCase()) && !this.props.manualTab)
     {
-        this.setState({
-          selectedKey: nextProps.selectedKey,
-        });
-        this.search(nextProps.selectedKey);
+      this.setState({
+        selectedKey: nextProps.selectedKey,
+      });
+      this.search(nextProps.selectedKey);
     }
     else if (this.props.selectedKey.toLowerCase() !== nextProps.selectedKey.toLowerCase())
     {
-        this.setState({
-          selectedKey: nextProps.selectedKey,
-        });
-        this.search(nextProps.selectedKey);
+      this.setState({
+        selectedKey: nextProps.selectedKey,
+      });
+      this.search(nextProps.selectedKey);
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
-  renderTqlCardsList()
+  public renderTqlCardsList()
   {
-   const height = 22 * this.allTqlCards.length;
-   const style = this.state.expandTqlCards ? {maxHeight: height + 'px'} : {maxHeight: '0px'};
+    const height = 22 * this.allTqlCards.length;
+    const style = this.state.expandTqlCards ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
     return (
-      <div className="manual-sidebar-section" style={style}>
+      <div className='manual-sidebar-section' style={style}>
         {
           this.allTqlCards.map((result, index) =>
-            <div key ={index} className="manual-left-column-row">
+            <div key={index} className='manual-left-column-row'>
               <div
                 className={classNames({
                   'manual-left-column-entry': true,
@@ -168,15 +169,15 @@ class Manual extends Classs<Props>
     );
   }
 
-  renderPhraseTypesList()
+  public renderPhraseTypesList()
   {
     const height = 22 * Object.keys(ManualConfig.phraseTypes).length;
-    const style = this.state.expandPhraseTypes ? {maxHeight: height + 'px'} : {maxHeight: '0px'};
+    const style = this.state.expandPhraseTypes ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
     return (
-      <div className="manual-sidebar-section" style={style}>
+      <div className='manual-sidebar-section' style={style}>
         {
           this.allPhraseTypes.map((result, index) =>
-            <div key ={index} className="manual-left-column-row">
+            <div key={index} className='manual-left-column-row'>
               <div
                 className={classNames({
                   'manual-left-column-entry': true,
@@ -194,23 +195,23 @@ class Manual extends Classs<Props>
     );
   }
 
-  openTerm(e)
+  public openTerm(e)
   {
     const cardName = e.target.textContent.trim().replace(/[^A-Za-z ]/g, '');
-    this.setState ({
+    this.setState({
       value: cardName,
     });
     this.search(cardName);
   }
 
-  renderManualEntries()
+  public renderManualEntries()
   {
     if (this.state.visibleTqlCards.length === 0 && this.state.visiblePhraseTypes.length === 0)
     {
       return (
         <div className={classNames({
-            'manual-content-area': true,
-            'manual-content-area-builder-tab': !this.props.manualTab,
+          'manual-content-area': true,
+          'manual-content-area-builder-tab': !this.props.manualTab,
         })}>
           No results found.
         </div>
@@ -218,13 +219,13 @@ class Manual extends Classs<Props>
     }
     return (
       <div className={classNames({
-            'manual-content-area': true,
-            'manual-content-area-builder-tab': !this.props.manualTab,
-        })}
+        'manual-content-area': true,
+        'manual-content-area-builder-tab': !this.props.manualTab,
+      })}
       >
         {
           this.state.visibleTqlCards.sort().map((result, index) =>
-            <div key ={index}>
+            <div key={index}>
               <ManualEntry
                 entryName={result}
                 canEdit={false}
@@ -248,7 +249,7 @@ class Manual extends Classs<Props>
                 phraseType={true}
                 expanded={this.state.expanded}
                 manualTab={this.props.manualTab}
-                bottomLine={index !== this.state.visiblePhraseTypes.length - 1 }
+                bottomLine={index !== this.state.visiblePhraseTypes.length - 1}
               />
             </div>,
           )
@@ -257,7 +258,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  search(value)
+  public search(value)
   {
     if (value === 'TQL Cards')
     {
@@ -270,26 +271,30 @@ class Manual extends Classs<Props>
       return;
     }
 
-    const visibleTqlCards = this.allTqlCards.filter((key) => {
+    const visibleTqlCards = this.allTqlCards.filter((key) =>
+    {
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
     }).sort();
 
-    const visiblePhraseTypes = this.allPhraseTypes.filter((key) => {
+    const visiblePhraseTypes = this.allPhraseTypes.filter((key) =>
+    {
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
     });
 
     let selectedKey = '';
-    this.allTqlCards.forEach(function(key, index) {
-        if (value.toLowerCase() === key.toLowerCase())
-        {
-          selectedKey = key;
-        }
+    this.allTqlCards.forEach((key, index) =>
+    {
+      if (value.toLowerCase() === key.toLowerCase())
+      {
+        selectedKey = key;
+      }
     });
-    this.allPhraseTypes.forEach(function(key, index) {
-        if (value.toLowerCase() === key.toLowerCase())
-        {
-          selectedKey = key;
-        }
+    this.allPhraseTypes.forEach((key, index) =>
+    {
+      if (value.toLowerCase() === key.toLowerCase())
+      {
+        selectedKey = key;
+      }
     });
 
     if (this.props.manualTab)
@@ -308,38 +313,38 @@ class Manual extends Classs<Props>
     });
   }
 
-  clearInput()
+  public clearInput()
   {
     this.search('');
   }
 
-  renderManualTopbar()
+  public renderManualTopbar()
   {
     const closeOpacity = this.state.value.length ? 1 : 0;
     return (
-       <div className = "manual-topbar builder-manual-topbar">
-          <div className= "manual-search-bar">
-              <SearchIcon className ="manual-search-icon"/>
-              <Autocomplete
-                className="manual-search-input"
-                value={this.state.value as string}
-                onChange={this.search}
-                placeholder="Search"
-                options={this.autocompleteOptions}
-              />
-              <CloseIcon
-               className="manual-close-icon"
-               style={{
-                 opacity: closeOpacity,
-               }}
-               onClick={this.clearInput}
-              />
-            </div>
+      <div className='manual-topbar builder-manual-topbar'>
+        <div className='manual-search-bar'>
+          <SearchIcon className='manual-search-icon' />
+          <Autocomplete
+            className='manual-search-input'
+            value={this.state.value as string}
+            onChange={this.search}
+            placeholder='Search'
+            options={this.autocompleteOptions}
+          />
+          <CloseIcon
+            className='manual-close-icon'
+            style={{
+              opacity: closeOpacity,
+            }}
+            onClick={this.clearInput}
+          />
         </div>
+      </div>
     );
   }
 
-  showTqlCards()
+  public showTqlCards()
   {
     this.setState({
       visibleTqlCards: this.allTqlCards,
@@ -352,7 +357,7 @@ class Manual extends Classs<Props>
     browserHistory.push('/manual/TQL%20Cards');
   }
 
-  showPhraseTypes()
+  public showPhraseTypes()
   {
     this.setState({
       visiblePhraseTypes: this.allPhraseTypes,
@@ -365,28 +370,28 @@ class Manual extends Classs<Props>
     browserHistory.push('/manual/Phrase%20Types');
   }
 
-  toggleTqlCardList()
+  public toggleTqlCardList()
   {
     this.setState({
       expandTqlCards: !this.state.expandTqlCards,
     });
   }
 
-  togglePhraseTypeList()
+  public togglePhraseTypeList()
   {
     this.setState({
       expandPhraseTypes: !this.state.expandPhraseTypes,
     });
   }
 
-  toggleSidebar()
+  public toggleSidebar()
   {
     this.setState({
       expandSidebar: !this.state.expandSidebar,
     });
   }
 
-  showAllTerms()
+  public showAllTerms()
   {
     this.setState({
       expandSidebar: this.state.selectedKey === '' ? !this.state.expandSidebar : true,
@@ -394,20 +399,20 @@ class Manual extends Classs<Props>
     this.search('');
   }
 
-  renderLeftColumnMenu()
+  public renderLeftColumnMenu()
   {
     const height = 22 * (this.allPhraseTypes.length + this.allTqlCards.length) + 2 * 26;
-    const style = this.state.expandSidebar ? {maxHeight: height + 'px'} : {maxHeight: '0px'};
+    const style = this.state.expandSidebar ? { maxHeight: height + 'px' } : { maxHeight: '0px' };
 
-     return (
-      <div className="manual-sidebar" style={style}>
+    return (
+      <div className='manual-sidebar' style={style}>
         <div className={classNames({
           'manual-left-column-section-heading': true,
           'manual-left-column-section-heading-blue': true,
           'manual-left-column-entry': true,
-          'manual-entry-left-selected': this.state.selectedKey == 'TQL Cards',
+          'manual-entry-left-selected': this.state.selectedKey === 'TQL Cards',
         })}>
-          <ArrowIcon className = {classNames ({
+          <ArrowIcon className={classNames({
             'manual-arrow-icon': true,
             'manual-arrow-icon-open': this.state.expandTqlCards,
           })}
@@ -415,27 +420,27 @@ class Manual extends Classs<Props>
           />
           <span
             onClick={this.showTqlCards}
-            style={{paddingRight: '70px'}}
+            style={{ paddingRight: '70px' }}
           >
-          TQL Cards</span>
+            TQL Cards</span>
         </div>
         {this.renderTqlCardsList()}
         <div className={classNames({
           'manual-left-column-section-heading': true,
           'manual-left-column-section-heading-green': true,
           'manual-left-column-entry': true,
-          'manual-entry-left-selected': this.state.selectedKey == 'Phrase Types',
+          'manual-entry-left-selected': this.state.selectedKey === 'Phrase Types',
         })}>
-          <ArrowIcon className = {classNames ({
+          <ArrowIcon className={classNames({
             'manual-arrow-icon': true,
             'manual-arrow-icon-open': this.state.expandPhraseTypes,
             'manual-arrow-icon-green': true,
-            })}
+          })}
             onClick={this.togglePhraseTypeList}
           />
           <span
             onClick={this.showPhraseTypes}
-            style={{paddingRight: '52px'}}
+            style={{ paddingRight: '52px' }}
           >Phrase Types</span>
         </div>
         {this.renderPhraseTypesList()}
@@ -443,65 +448,65 @@ class Manual extends Classs<Props>
     );
   }
 
-  renderLeftColumn()
+  public renderLeftColumn()
   {
     const closeOpacity = this.state.value.length ? 1 : 0;
     return (
-      <div className = "manual-content-area">
-       <div  className= {classNames({
-           'manual-search-bar': true,
-           'manual-tab-search-bar': this.props.manualTab,
-           'manual-sidebar-search': true,
-          })}>
-            <SearchIcon className ="manual-search-icon"/>
-            <Autocomplete
-                className="manual-search-input"
-                value={this.state.value as string}
-                onChange={this.search}
-                placeholder="Search"
-                options={this.autocompleteOptions}
-            />
-            <CloseIcon
-               className="manual-close-icon"
-               style={{
-                 opacity: closeOpacity,
-               }}
-               onClick={this.clearInput}
-            />
-      </div>
+      <div className='manual-content-area'>
+        <div className={classNames({
+          'manual-search-bar': true,
+          'manual-tab-search-bar': this.props.manualTab,
+          'manual-sidebar-search': true,
+        })}>
+          <SearchIcon className='manual-search-icon' />
+          <Autocomplete
+            className='manual-search-input'
+            value={this.state.value as string}
+            onChange={this.search}
+            placeholder='Search'
+            options={this.autocompleteOptions}
+          />
+          <CloseIcon
+            className='manual-close-icon'
+            style={{
+              opacity: closeOpacity,
+            }}
+            onClick={this.clearInput}
+          />
+        </div>
 
-      <div className={classNames({
-        'manual-left-column-title': true,
-        'manual-left-column-entry': true,
-        'manual-entry-left-selected': this.state.value == '' && !this.state.selectedKey,
-      })}>
-        <ArrowIcon className = {classNames ({
-          'manual-arrow-icon': true,
-          'manual-arrow-icon-open': this.state.expandSidebar,
-        })}
-          onClick={this.toggleSidebar}
-        />
-         <span onClick={this.showAllTerms} > Manual </span>
-       </div>
-       {this.renderLeftColumnMenu()}
+        <div className={classNames({
+          'manual-left-column-title': true,
+          'manual-left-column-entry': true,
+          'manual-entry-left-selected': this.state.value === '' && !this.state.selectedKey,
+        })}>
+          <ArrowIcon className={classNames({
+            'manual-arrow-icon': true,
+            'manual-arrow-icon-open': this.state.expandSidebar,
+          })}
+            onClick={this.toggleSidebar}
+          />
+          <span onClick={this.showAllTerms} > Manual </span>
+        </div>
+        {this.renderLeftColumnMenu()}
       </div>
     );
   }
 
-  render()
+  public render()
   {
     return (
-      <div className ="manual-area">
-          {this.props.manualTab ? null : this.renderManualTopbar()}        {
+      <div className='manual-area'>
+        {this.props.manualTab ? null : this.renderManualTopbar()}        {
           this.props.manualTab ?
-          <div className="manual-left-column">
-           {this.renderLeftColumn()}
-          </div>
-          :
-          null
+            <div className='manual-left-column'>
+              {this.renderLeftColumn()}
+            </div>
+            :
+            null
         }
         <div className={classNames({
-            'manual-right-column': this.props.manualTab,
+          'manual-right-column': this.props.manualTab,
         })}>
           {this.renderManualEntries()}
         </div>

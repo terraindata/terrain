@@ -42,38 +42,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
 import Store from './UserStore';
 
 import Ajax from './../../util/Ajax';
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const Actions =
-{
-  change:
+  {
+    change:
     (user: UserTypes.User) =>
       $(ActionTypes.change, { user }),
 
-  fetch:
+    fetch:
     () =>
       $(ActionTypes.fetch, { setUsers: Actions.setUsers }),
 
-  setUsers:
+    setUsers:
     (users: UserTypes.UserMap) =>
       $(ActionTypes.setUsers, { users }),
 
-  updateCurrentUser:
+    updateCurrentUser:
     () =>
       $(ActionTypes.updateCurrentUser, {}),
-  
-  copmleteTutorial:
+
+    copmleteTutorial:
     (stepId: string, complete: boolean = true) =>
       $(ActionTypes.completeTutorial, { stepId, complete }),
-};
+  };
 
 import AuthStore from './../../auth/data/AuthStore';
 AuthStore.subscribe(Actions.updateCurrentUser);

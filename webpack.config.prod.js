@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Production build configuration for webpack.
 
-var webpack = require('webpack');
-var conf = require('./webpack.config');
+var webpack = require("webpack");
+var conf = require("./webpack.config");
 
 // Disable source map.
 delete conf.devtool;
@@ -53,23 +53,23 @@ delete conf.devtool;
 conf.plugins = [
   new webpack.DefinePlugin({
     // Signal to React not to include detailed checks.
-    'process.env': {
-      'NODE_ENV': "'production'"
+    "process.env": {
+      "NODE_ENV": "'production'",
     },
-    
+
     DEV: "false",
-    
+
     // The server simultaneously serves the client and the client's requests.
     MIDWAY_HOST: "'//" + process.env.MIDWAY_HOST + ":40080'",
     TDB_HOST: "'//" + process.env.TDB_HOST + ":7344'"
   }),
 
-  // Minify code.
+,  // Minify code.
   new webpack.optimize.UglifyJsPlugin()
 ];
 
-// enable babel plugins on tsx loader
-if(conf.module.rules[0].loader !== 'babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
+// ,enable babel plugins on tsx loader
+if(conf .module.rules[0].loader !== 'babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
 {
   throw new Error('Expected first loader to be babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}} but found '
     + conf.module.rules[0].loader);

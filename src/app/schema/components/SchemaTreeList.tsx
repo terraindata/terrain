@@ -42,29 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeItem from './SchemaTreeItem';
-const Radium = require('radium');
+import Radium = require('radium');
 import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
 
 export interface Props
 {
-	itemIds: List<ID>;
-	itemType: string;
-	label?: string;
+  itemIds: List<ID>;
+  itemType: string;
+  label?: string;
   topLevel?: boolean;
   search: string;
 }
 
 class State
 {
-  renderCount: number = 30;
-  intervalId: number = -1;
+  public renderCount: number = 30;
+  public intervalId: number = -1;
 }
 
 const NORMAL_STYLE = {
@@ -84,9 +85,9 @@ const SEARCH_STYLE = {
 @Radium
 class SchemaTreeList extends PureClasss<Props>
 {
-  state = new State();
+  public state = new State();
 
-  componentDidMount()
+  public componentDidMount()
   {
     if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount)
     {
@@ -96,7 +97,7 @@ class SchemaTreeList extends PureClasss<Props>
     }
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
     {
@@ -106,7 +107,7 @@ class SchemaTreeList extends PureClasss<Props>
     }
   }
 
-  increaseRenderCount()
+  public increaseRenderCount()
   {
     const renderCount = this.state.renderCount + 10;
     this.setState({
@@ -122,65 +123,65 @@ class SchemaTreeList extends PureClasss<Props>
     }
   }
 
-  render()
+  public render()
   {
-  	if (!this.props.itemIds)
-  	{
-  		return (
-  			<div
-          className="loading-text"
+    if (!this.props.itemIds)
+    {
+      return (
+        <div
+          className='loading-text'
         />
-  		);
-  	}
+      );
+    }
 
-    const {itemIds, itemType, search, label, topLevel} = this.props;
+    const { itemIds, itemType, search, label, topLevel } = this.props;
 
     return (
       <div
-      	style={[
+        style={[
           NORMAL_STYLE,
           this.props.search && SEARCH_STYLE,
           this.props.topLevel && TOP_LEVEL_STYLE,
         ]}
       >
-      	{
-      		label &&
-            <FadeInOut
-              open={!this.props.search}
+        {
+          label &&
+          <FadeInOut
+            open={!this.props.search}
+          >
+            <div
+              style={
+                SchemaTreeStyles.label as any
+              }
             >
-  		      	<div
-  		      		style={
-  		      			SchemaTreeStyles.label as any
-  		      		}
-  		      	>
-  		      		{
-  		      			label
-  		      		}
-  		      	</div>
+              {
+                label
+              }
+            </div>
 
-            	{
-            		!itemIds.size &&
-            			<div
-            				style={SchemaTreeStyles.none}
-            			>
-            				None
-            			</div>
-            	}
-            </FadeInOut>
+            {
+              !itemIds.size &&
+              <div
+                style={SchemaTreeStyles.none}
+              >
+                None
+                  </div>
+            }
+          </FadeInOut>
         }
 
-      	{
-      		itemIds.map(
-      			(id, index) =>
+        {
+          itemIds.map(
+            (id, index) =>
               index < this.state.renderCount &&
-        				<SchemaTreeItem
-        					id={id}
-        					type={itemType}
-        					key={id}
-                  search={search}
-        				/>,
-      		)
-      	}
+              <SchemaTreeItem
+                id={id}
+                type={itemType}
+                key={id}
+                search={search}
+              />,
+          )
+        }
       </div>
     );
   }

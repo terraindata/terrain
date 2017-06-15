@@ -42,20 +42,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import Blocks from './ElasticBlocks';
 
 export const ElasticCardsDeck =
   Immutable.fromJS(
-  [
     [
-      // JSON
-      Blocks.elasticKeyValue.type,
-      Blocks.elasticValue.type,
-      Blocks.elasticObject.type,
-      Blocks.elasticArray.type,
+      [
+        Blocks.elasticRootCard.type,
+      ],
+
+      [
+        // JSON key wraps
+        Blocks.elasticKeyValueWrap.type,
+      ],
+
+      [
+        // JSON wrapper cards
+        Blocks.elasticObject.type,
+        Blocks.elasticArray.type,
+      ],
+
+      [
+        // JSON individual value cards
+        Blocks.elasticBool.type,
+        Blocks.elasticNumber.type,
+        Blocks.elasticText.type,
+        Blocks.elasticNull.type,
+      ],
+
+      [
+        // JSON
+        Blocks.elasticKeyValueToggle.type,
+        Blocks.elasticValue.type,
+      ],
     ],
-  ]
   );
-  
+
 export default ElasticCardsDeck;

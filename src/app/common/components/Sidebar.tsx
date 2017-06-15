@@ -42,23 +42,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Sidebar.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
+import './Sidebar.less';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
 
-export interface ILink {
+export interface ILink
+{
   icon: any;
   text: string;
   route: string;
 }
 
-export interface Props {
+export interface Props
+{
   links: ILink[];
   selectedIndex: number;
   expandable?: boolean;
@@ -68,60 +71,60 @@ export interface Props {
 
 export class Sidebar extends PureClasss<Props>
 {
-	render()
+  public render()
   {
-		return (
+    return (
       <div
         className={classNames({
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
       >
-      <div
-        className="sidebar-selected-square"
-        style={{
-          top: (this.props.selectedIndex * linkHeight) + 'px',
-        }}
-      />
-      {
-        this.props.links.map((link, index) =>
-          <Link
-            to={link.route}
-            key={index}
-          >
-            <div
-              className={Util.objToClassname({
-                'sidebar-link': true,
-                'sidebar-link-selected': index === this.props.selectedIndex,
-                })}
+        <div
+          className='sidebar-selected-square'
+          style={{
+            top: (this.props.selectedIndex * linkHeight) + 'px',
+          }}
+        />
+        {
+          this.props.links.map((link, index) =>
+            <Link
+              to={link.route}
+              key={index}
             >
-              <div className="sidebar-link-inner">
-                {
-                  link.icon
-                }
-                <div className="sidebar-link-text">
+              <div
+                className={Util.objToClassname({
+                  'sidebar-link': true,
+                  'sidebar-link-selected': index === this.props.selectedIndex,
+                })}
+              >
+                <div className='sidebar-link-inner'>
                   {
-                    link.text
+                    link.icon
                   }
+                  <div className='sidebar-link-text'>
+                    {
+                      link.text
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
-          </Link>,
+            </Link>,
           )
-      }
-      {
-        this.props.expandable ?
-          (
-            <div className="sidebar-expand" onClick={this.props.onExpand}>
-              <div className="dead-center">
-                <ExpandIcon />
+        }
+        {
+          this.props.expandable ?
+            (
+              <div className='sidebar-expand' onClick={this.props.onExpand}>
+                <div className='dead-center'>
+                  <ExpandIcon />
+                </div>
               </div>
-            </div>
-          )
-          : null
-      }
-	  </div>
-		);
-	}
+            )
+            : null
+        }
+      </div>
+    );
+  }
 }
 export default Sidebar;

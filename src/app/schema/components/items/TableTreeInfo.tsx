@@ -42,15 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
+import Radium = require('radium');
 
 export interface Props
 {
-	item: SchemaTypes.Table;
+  item: SchemaTypes.Table;
 }
 
 class State
@@ -60,23 +61,23 @@ class State
 @Radium
 export class TableTreeInfo extends PureClasss<Props>
 {
-	state: State = new State();
+  public state: State = new State();
 
-  render()
+  public render()
   {
-  	const table = this.props.item;
+    const table = this.props.item;
 
     return (
       <div
-      	style={Styles.infoPieces as any}
+        style={Styles.infoPieces as any}
       >
-      	<div
+        <div
           style={Styles.infoPiece as any}
         >
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { table.columnIds.size }
+            {table.columnIds.size}
           </span> columns
         </div>
 
@@ -97,15 +98,15 @@ export class TableTreeInfo extends PureClasss<Props>
 }
 
 export const tableChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-[
-  {
-    label: 'Columns',
-    type: 'column',
-  },
-  {
-    label: 'Indexes',
-    type: 'index',
-  },
-];
+  [
+    {
+      label: 'Columns',
+      type: 'column',
+    },
+    {
+      label: 'Indexes',
+      type: 'index',
+    },
+  ];
 
 export default TableTreeInfo;

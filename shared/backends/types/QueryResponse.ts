@@ -47,7 +47,8 @@ THE SOFTWARE.
 import MidwayErrorItem from '../../error/MidwayErrorItem';
 import QueryRequest from './QueryRequest';
 
-export interface QueryResult {
+export interface QueryResult
+{
   [key: string]: any;
 }
 

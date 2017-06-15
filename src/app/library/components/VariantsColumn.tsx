@@ -42,11 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
+import { browserHistory } from 'react-router';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -54,7 +57,7 @@ import UserStore from '../../users/data/UserStore';
 import UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import {notificationManager} from './../../common/components/InAppNotification';
+import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
@@ -64,8 +67,6 @@ import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 import StatusDropdown from './StatusDropdown';
-const {browserHistory} = require('react-router');
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
@@ -81,7 +82,7 @@ export interface Props
 
 class VariantsColumn extends Classs<Props>
 {
-  state: {
+  public state: {
     rendered: boolean,
     lastMoved: any,
     me: UserTypes.User,
@@ -97,7 +98,7 @@ class VariantsColumn extends Classs<Props>
     draggingOverIndex: -1,
   };
 
-  componentWillMount()
+  public componentWillMount()
   {
     this._subscribe(UserStore, {
       stateKey: 'me',
@@ -113,7 +114,7 @@ class VariantsColumn extends Classs<Props>
     });
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (!this.state.rendered)
     {
@@ -123,7 +124,7 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.algorithmId !== this.props.algorithmId)
     {
@@ -133,7 +134,7 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  handleDuplicate(id: ID)
+  public handleDuplicate(id: ID)
   {
     Actions.variants.duplicate(
       this.props.variants.get(id),
@@ -141,7 +142,7 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleArchive(id: ID)
+  public handleArchive(id: ID)
   {
     Actions.variants.change(
       this.props.variants.get(id)
@@ -149,12 +150,12 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleCreate()
+  public handleCreate()
   {
     Actions.variants.create(this.props.groupId, this.props.algorithmId);
   }
 
-  handleNameChange(id: ID, name: string)
+  public handleNameChange(id: ID, name: string)
   {
     if (this.props.variants.get(id).name !== name)
     {
@@ -164,7 +165,7 @@ class VariantsColumn extends Classs<Props>
       {
         message = 'To "' + name + '"';
       }
-      
+
       notificationManager.addNotification(
         'Renamed',
         message,
@@ -179,7 +180,7 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handleHover(index: number, type: string, id: ID)
+  public handleHover(index: number, type: string, id: ID)
   {
     const itemIndex = this.props.variantsOrder.findIndex((v) => v === id);
     if (type === 'variant'
@@ -197,9 +198,10 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
+  public handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
-    switch (targetType) {
+    switch (targetType)
+    {
       case 'group':
         // move this one to the new group
         // and create a new group
@@ -207,7 +209,7 @@ class VariantsColumn extends Classs<Props>
         break;
       case 'algorithm':
         const algorithmName = targetItem.name || 'Untitled';
-        const vrntName = this.props.variants.get(id).name  || 'Untitled';
+        const vrntName = this.props.variants.get(id).name || 'Untitled';
         notificationManager.addNotification(
           'Moved',
           '"' + vrntName + '" was moved to algorithm "' + algorithmName + '"',
@@ -239,20 +241,20 @@ class VariantsColumn extends Classs<Props>
     });
   }
 
-  handleDoubleClick(id: ID)
+  public handleDoubleClick(id: ID)
   {
     browserHistory.push(`/builder/?o=${id}`);
   }
 
-  renderVariant(id: ID, fadeIndex: number)
+  public renderVariant(id: ID, fadeIndex: number)
   {
     const variant = this.props.variants.get(id);
     const index = this.props.variantsOrder.indexOf(id);
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     let canEdit: boolean, canDrag: boolean;
     canEdit = true;
     canDrag = true;
-    
+
     // if (me && roles)
     // {
     //   canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
@@ -290,9 +292,9 @@ class VariantsColumn extends Classs<Props>
         color={ColorManager.colorForKey(this.props.groupId)}
         key={variant.id}
         to={`/library/${this.props.groupId}/${this.props.algorithmId}/${id}`}
-        className="library-item-lightest"
+        className='library-item-lightest'
         id={id}
-        type="variant"
+        type='variant'
         onNameChange={this.handleNameChange}
         rendered={this.state.rendered}
         onHover={this.handleHover}
@@ -304,19 +306,19 @@ class VariantsColumn extends Classs<Props>
         canCreate={canDrag}
         isStarred={variant.status === 'DEFAULT'}
       >
-        <div className="flex-container">
+        <div className='flex-container'>
           <UserThumbnail
             userId={variant.lastUserId}
             medium={true}
           />
 
-          <div className="flex-grow">
+          <div className='flex-grow'>
             <StatusDropdown
               variant={variant}
               noBorder={true}
             />
             <div
-              className="library-item-line"
+              className='library-item-line'
             >
               {
                 Util.formatDate(variant.lastEdited)
@@ -328,7 +330,7 @@ class VariantsColumn extends Classs<Props>
     );
   }
 
-  handlItemStatusHover(statusString: string, id: ID)
+  public handlItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
     const status = ItemStatus[statusString];
@@ -338,14 +340,14 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  hasStatus(id: ID, status: ItemStatus)
+  public hasStatus(id: ID, status: ItemStatus)
   {
     return this.props.variants.getIn([id, 'status']) === status;
   }
 
-  renderVariants(archived?: boolean)
+  public renderVariants(archived?: boolean)
   {
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
     const canCreate = true; // canMakeLive;
     // TODO maybe on the new middle tier, builders can create variants
@@ -359,62 +361,62 @@ class VariantsColumn extends Classs<Props>
       <LibraryItemCategory
         status={archived ? ItemStatus.Archive : ItemStatus.Build}
         key={archived ? '1' : '0'}
-        type="variant"
+        type='variant'
         onHover={this.handlItemStatusHover}
         titleHidden={!archived}
       >
         {
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
-              (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
-              && this.renderVariant(id, fadeIndex ++),
+            (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
+            && this.renderVariant(id, fadeIndex++),
           )
         }
         {
           this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
-          ? null
-          : <div className="library-category-none">None</div>
+            ? null
+            : <div className='library-category-none'>None</div>
         }
         {
           canCreate && !archived &&
-            <CreateItem
-              name="variant"
-              onCreate={this.handleCreate}
-            />
+          <CreateItem
+            name='variant'
+            onCreate={this.handleCreate}
+          />
         }
       </LibraryItemCategory>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <LibraryColumn
         index={3}
-        title="Variants"
+        title='Variants'
       >
         {
           this.props.variantsOrder ?
             (
               this.props.variantsOrder.size ?
-              (
-                <div>
-                  { this.renderVariants() }
-                  { this.renderVariants(true) }
-                </div>
-              )
-              :
-              <InfoArea
-                large="No variants created, yet."
-                button={
-                  Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore) ||
-                  Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
-                    ? 'Create a variant' : null
-                }
-                onClick={this.handleCreate}
-              />
+                (
+                  <div>
+                    {this.renderVariants()}
+                    {this.renderVariants(true)}
+                  </div>
+                )
+                :
+                <InfoArea
+                  large='No variants created, yet.'
+                  button={
+                    Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore) ||
+                      Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                      ? 'Create a variant' : null
+                  }
+                  onClick={this.handleCreate}
+                />
             )
-          : null
+            : null
         }
       </LibraryColumn>
     );

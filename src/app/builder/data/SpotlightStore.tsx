@@ -42,19 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
 import * as _ from 'underscore';
 const Redux = require('redux');
-import {BaseClass, New} from '../../Classes';
+import { BaseClass, New } from '../../Classes';
 
 class SpotlightStateC extends BaseClass
 {
-  spotlights: IMMap<string, any> = Map({});
+  public spotlights: IMMap<string, any> = Map({});
 }
 export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
-export const _SpotlightState = (config?: {[key: string]: any}) =>
+export const _SpotlightState = (config?: { [key: string]: any }) =>
   New<SpotlightState>(new SpotlightStateC(config), config);
 
 const DefaultState = _SpotlightState();
@@ -83,24 +84,24 @@ interface SpotlightAction
 export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
   ReduxActions.handleActions({
     spotlight:
-      (state: SpotlightState, action: SpotlightAction) =>
+    (state: SpotlightState, action: SpotlightAction) =>
+    {
+      const { result, id } = action.payload;
+      if (!result)
       {
-        const {result, id} = action.payload;
-        if (!result)
-        {
-          return state.removeIn(['spotlights', id]);
-        }
+        return state.removeIn(['spotlights', id]);
+      }
 
-        return state.setIn(['spotlights', id], _.extend({ id }, result));
-      },
+      return state.setIn(['spotlights', id], _.extend({ id }, result));
+    },
 
     clearSpotlights:
-      (state: SpotlightState) =>
-      {
-        return state.set('spotlights', Map({}));
-      },
+    (state: SpotlightState) =>
+    {
+      return state.set('spotlights', Map({}));
+    },
   }, DefaultState),
-DefaultState);
+  DefaultState);
 
 export function spotlightAction(id: string, result: any)
 {

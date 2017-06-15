@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Account.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -50,6 +50,7 @@ import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
+import './Account.less';
 
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
@@ -61,7 +62,7 @@ export interface Props
 
 class Account extends Classs<Props>
 {
-  render()
+  public render()
   {
 
     let title = 'Account';
@@ -95,27 +96,27 @@ class Account extends Classs<Props>
         break;
     }
 
-      // add this back in when ready
-            // <Link
-            //   to={'/account/notifications'}
-            //   className={classNames({
-            //     'account-link': true,
-            //     'active': notificationsActive,
-            //   })}  >
-            //   Notifications
-            // </Link>
+    // add this back in when ready
+    // <Link
+    //   to={'/account/notifications'}
+    //   className={classNames({
+    //     'account-link': true,
+    //     'active': notificationsActive,
+    //   })}  >
+    //   Notifications
+    // </Link>
     return (
-      <div className="account">
-        <div className="account-wrapper">
-          <div className="account-title">
+      <div className='account'>
+        <div className='account-wrapper'>
+          <div className='account-title'>
             <HomeIcon />
             {
               title
             }
           </div>
-          <div className="account-links">
+          <div className='account-links'>
             <div
-              className="selected-link-marker"
+              className='selected-link-marker'
               style={{
                 left: selected,
               }}
@@ -146,7 +147,7 @@ class Account extends Classs<Props>
               Team
             </Link>
           </div>
-          <div className="account-inner">
+          <div className='account-inner'>
             {
               this.props.children
             }

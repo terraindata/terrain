@@ -54,54 +54,54 @@ require('./merge.js');
 const Dimensions = require('react-dimensions');
 
 var CodeMirror = React.createClass({
-	displayName: 'CodeMirror',
+  displayName: 'CodeMirror',
 
-	propTypes:
+  propTypes:
   {
-		onChange: React.PropTypes.func,
-		onFocusChange: React.PropTypes.func,
-		options: React.PropTypes.object,
-		path: React.PropTypes.string,
-		value: React.PropTypes.string,
-		className: React.PropTypes.any,
-		codeMirrorInstance: React.PropTypes.object,
-		toggleSyntaxPopup: React.PropTypes.func,
-		defineTerm: React.PropTypes.func,
-		turnSyntaxPopupOff: React.PropTypes.func,
-		hideTermDefinition: React.PropTypes.func,
+    onChange: React.PropTypes.func,
+    onFocusChange: React.PropTypes.func,
+    options: React.PropTypes.object,
+    path: React.PropTypes.string,
+    value: React.PropTypes.string,
+    className: React.PropTypes.any,
+    codeMirrorInstance: React.PropTypes.object,
+    toggleSyntaxPopup: React.PropTypes.func,
+    defineTerm: React.PropTypes.func,
+    turnSyntaxPopupOff: React.PropTypes.func,
+    hideTermDefinition: React.PropTypes.func,
     highlightedLine: React.PropTypes.number,
 
     isDiff: React.PropTypes.bool,
     diff: React.PropTypes.string,
 
     containerHeight: React.PropTypes.number,
-	},
-	foldClass: {
-		open: "CodeMirror-foldgutter-open",
-		folded: "CodeMirror-foldgutter-folded",
-	},
+  },
+  foldClass: {
+    open: "CodeMirror-foldgutter-open",
+    folded: "CodeMirror-foldgutter-folded",
+  },
 
-	getCodeMirrorInstance()
-	{
-		return this.props.codeMirrorInstance || (
+  getCodeMirrorInstance()
+  {
+    return this.props.codeMirrorInstance || (
       this.props.isDiff ? CM.MergeView : require('codemirror')
     );
-	},
+  },
 
-	getInitialState()
-	{
-		return {
-			isFocused: false,
-		};
-	},
+  getInitialState()
+  {
+    return {
+      isFocused: false,
+    };
+  },
 
-	componentDidMount()
-	{
-		var textareaNode = this.refs.textarea;
-		var codeMirrorInstance = this.getCodeMirrorInstance();
+  componentDidMount()
+  {
+    var textareaNode = this.refs.textarea;
+    var codeMirrorInstance = this.getCodeMirrorInstance();
 
     // different treatement used in CodeMirror for diffs vs. regular editor
-    if(this.props.isDiff)
+    if (this.props.isDiff)
     {
       this.codeMirror = CM.MergeView(this.refs['div'], this.props.options, this.props.containerHeight + 'px');
       // this.codeMirror.wrap.style.height = this.props.containerHeight + 'px';
@@ -109,234 +109,240 @@ var CodeMirror = React.createClass({
     else
     {
       this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
-  		this.codeMirror.on('change', this.codemirrorValueChanged);
-  		this.codeMirror.on('focus', this.focusChanged.bind(this, true));
-  		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
-  		this.codeMirror.on('contextmenu', this.handleRightClick);
-  		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
-  		this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
-  		this.codeMirror.setSize("100%", "100%");
+      this.codeMirror.on('change', this.codemirrorValueChanged);
+      this.codeMirror.addKeyMap({
+        'Ctrl-Enter': this.codemirrorIssueQuery,
+      });
+      this.codeMirror.on('focus', this.focusChanged.bind(this, true));
+      this.codeMirror.on('blur', this.focusChanged.bind(this, false));
+      this.codeMirror.on('contextmenu', this.handleRightClick);
+      this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
+      this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
+      this.codeMirror.setSize("100%", "100%");
     }
-	},
+  },
 
-	turnSyntaxPopupOff()
-	{
-		this.props.turnSyntaxPopupOff && this.props.turnSyntaxPopupOff();
-	},
+  turnSyntaxPopupOff()
+  {
+    this.props.turnSyntaxPopupOff && this.props.turnSyntaxPopupOff();
+  },
 
-	componentWillUnmount()
-	{
-		if(this.codeMirror && this.codeMirror.toTextArea)
-		{
-			this.codeMirror.toTextArea();
-		}
+  componentWillUnmount()
+  {
+    if (this.codeMirror && this.codeMirror.toTextArea)
+    {
+      this.codeMirror.toTextArea();
+    }
     this.codeMirror && this.codeMirror.wrap && this.codeMirror.wrap.remove();
-	},
+  },
 
-	handleRightClick(self, event)
-	{
-		event.preventDefault();
-		this.codeMirror.on('mousedown', this.props.hideTermDefinition);
-		if(this.props.defineTerm)
-		{
-			this.props.defineTerm(this.codeMirror.getSelection(), event);
-		}
-	},
+  handleRightClick(self, event)
+  {
+    event.preventDefault();
+    this.codeMirror.on('mousedown', this.props.hideTermDefinition);
+    if (this.props.defineTerm)
+    {
+      this.props.defineTerm(this.codeMirror.getSelection(), event);
+    }
+  },
 
-	updateHighlightedLine: function updateHighlightedLine(lineToHighlight)
-	{
-		if(lineToHighlight !== null)
-		{
-			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
-		}
-		//Add info gutter widget
-		var widget = document.createElement("span");
-		var text = document.createElement("div");
-		var content = document.createTextNode("?");
-		widget.appendChild(text);
-		text.appendChild(content);
-		widget.className = 'CodeMirror-error-marker';
-		text.className = 'CodeMirror-error-text';
-		var self = this;
-		var codeMirrorInstance = this.getCodeMirrorInstance();
-		var line = this.codeMirror.getLine(lineToHighlight);
-		codeMirrorInstance.on(widget, "mousedown", function(e) {
-      		self.props.toggleSyntaxPopup(e, line);
-   		});
-		this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
-	},
-	undoHighlightedLine: function undoHighlightedLine(line)
-	{
-		if(line !== null)
-		{
-			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
-			this.codeMirror.clearGutter('CodeMirror-lint-markers');
-		}
-	},
-	addOpenBrace: function addOpenBrace(i, ch, arr)
-	{
-		//Increment the counters for all unmatched braces
-		for(var entry = 0; entry < arr.length; entry++)
-			{
-			if(!arr[entry].closingPos)
-			{
-				arr[entry].counter += 1;
-			}
-		}
-		//Note: ch is + 1 because the opening ( should not be included in the collapsable range
-		//Add a new entry for the open brace found at line i, position ch
-		var pos = {
-			openingPos: this.getCodeMirrorInstance().Pos(i, ch+1),
-			closingPos: null,
-			counter: 1
-		};
-		arr.push(pos);
-		return arr;
-	},
-	addCloseBrace: function addCloseBrace(i, ch, arr)
-	{
-		//Decrement the counters for all unmatched braces
-		//The counter at 0 is the one that the added closing brace belongs with
-		for(var entry = 0; entry < arr.length; entry++)
-		{
-			if(!arr[entry].closingPos)
-			{
-				arr[entry].counter -= 1;
-				if(arr[entry].counter === 0)
-				{
-					arr[entry].closingPos = this.getCodeMirrorInstance().Pos(i, ch);
-				}
-			}
-		}
-		return arr;
-	},
-	findCodeToFold: function findCodeToFold()
-	{
-		var paranthesesPositions = [];
-		var bracketPositions 	 = [];
-		//Find positions of sets of () and {}
-		for(var i = 0; i < this.codeMirror.lineCount(); i++)
-		{
-			var line = this.codeMirror.getLine(i);
-			for(var ch = 0; ch < line.length; ch++)
-			{
-				if(line[ch] === '(')
-				{
-					paranthesesPositions = this.addOpenBrace(i, ch, paranthesesPositions);
-				}
-				else if(line[ch] === ')')
-				{
-					paranthesesPositions = this.addCloseBrace(i, ch, paranthesesPositions);
-				}
-				else if(line[ch] === '{')
-				{
-					bracketPositions = this.addOpenBrace(i, ch, bracketPositions);
-				}
-				else if(line[ch] === '}')
-				{
-					bracketPositions = this.addCloseBrace(i, ch, bracketPositions);
-				}
-			}
-		}
-		var codeFoldingPositions = bracketPositions.concat(paranthesesPositions);
-		this.addGutterWidgets(codeFoldingPositions);
-	},
-	addGutterWidgets: function addGutterWidgets(codeFoldingPositions)
-	{
-		var self = this;
-		var codeMirrorInstance = this.getCodeMirrorInstance();
-		this.codeMirror.clearGutter('CodeMirror-foldgutter');
+  updateHighlightedLine: function updateHighlightedLine(lineToHighlight)
+  {
+    if (lineToHighlight !== null)
+    {
+      this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
+    }
+    //Add info gutter widget
+    var widget = document.createElement("span");
+    var text = document.createElement("div");
+    var content = document.createTextNode("?");
+    widget.appendChild(text);
+    text.appendChild(content);
+    widget.className = 'CodeMirror-error-marker';
+    text.className = 'CodeMirror-error-text';
+    var self = this;
+    var codeMirrorInstance = this.getCodeMirrorInstance();
+    var line = this.codeMirror.getLine(lineToHighlight);
+    codeMirrorInstance.on(widget, "mousedown", function(e)
+    {
+      self.props.toggleSyntaxPopup(e, line);
+    });
+    this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
+  },
+  undoHighlightedLine: function undoHighlightedLine(line)
+  {
+    if (line !== null)
+    {
+      this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
+      this.codeMirror.clearGutter('CodeMirror-lint-markers');
+    }
+  },
+  addOpenBrace: function addOpenBrace(i, ch, arr)
+  {
+    //Increment the counters for all unmatched braces
+    for (var entry = 0; entry < arr.length; entry++)
+    {
+      if (!arr[entry].closingPos)
+      {
+        arr[entry].counter += 1;
+      }
+    }
+    //Note: ch is + 1 because the opening ( should not be included in the collapsable range
+    //Add a new entry for the open brace found at line i, position ch
+    var pos = {
+      openingPos: this.getCodeMirrorInstance().Pos(i, ch + 1),
+      closingPos: null,
+      counter: 1
+    };
+    arr.push(pos);
+    return arr;
+  },
+  addCloseBrace: function addCloseBrace(i, ch, arr)
+  {
+    //Decrement the counters for all unmatched braces
+    //The counter at 0 is the one that the added closing brace belongs with
+    for (var entry = 0; entry < arr.length; entry++)
+    {
+      if (!arr[entry].closingPos)
+      {
+        arr[entry].counter -= 1;
+        if (arr[entry].counter === 0)
+        {
+          arr[entry].closingPos = this.getCodeMirrorInstance().Pos(i, ch);
+        }
+      }
+    }
+    return arr;
+  },
+  findCodeToFold: function findCodeToFold()
+  {
+    var paranthesesPositions = [];
+    var bracketPositions = [];
+    //Find positions of sets of () and {}
+    for (var i = 0; i < this.codeMirror.lineCount(); i++)
+    {
+      var line = this.codeMirror.getLine(i);
+      for (var ch = 0; ch < line.length; ch++)
+      {
+        if (line[ch] === '(')
+        {
+          paranthesesPositions = this.addOpenBrace(i, ch, paranthesesPositions);
+        }
+        else if (line[ch] === ')')
+        {
+          paranthesesPositions = this.addCloseBrace(i, ch, paranthesesPositions);
+        }
+        else if (line[ch] === '{')
+        {
+          bracketPositions = this.addOpenBrace(i, ch, bracketPositions);
+        }
+        else if (line[ch] === '}')
+        {
+          bracketPositions = this.addCloseBrace(i, ch, bracketPositions);
+        }
+      }
+    }
+    var codeFoldingPositions = bracketPositions.concat(paranthesesPositions);
+    this.addGutterWidgets(codeFoldingPositions);
+  },
+  addGutterWidgets: function addGutterWidgets(codeFoldingPositions)
+  {
+    var self = this;
+    var codeMirrorInstance = this.getCodeMirrorInstance();
+    this.codeMirror.clearGutter('CodeMirror-foldgutter');
 
-		for(var i = 0; i < codeFoldingPositions.length; i++)
-		{
-			let openingPos = codeFoldingPositions[i].openingPos;
-			let closingPos = codeFoldingPositions[i].closingPos;
-			if(openingPos && closingPos)
-			{
-				let range = this.codeMirror.markText(openingPos, closingPos, {
-      				__isFold: true
-    			});
-				let gutterWidget = this.makeGutterWidget(openingPos, closingPos);
+    for (var i = 0; i < codeFoldingPositions.length; i++)
+    {
+      let openingPos = codeFoldingPositions[i].openingPos;
+      let closingPos = codeFoldingPositions[i].closingPos;
+      if (openingPos && closingPos)
+      {
+        let range = this.codeMirror.markText(openingPos, closingPos, {
+          __isFold: true
+        });
+        let gutterWidget = this.makeGutterWidget(openingPos, closingPos);
 
-				codeMirrorInstance.on(gutterWidget, "mousedown", function(e) {
-					codeMirrorInstance.e_preventDefault(e);
-					//if it's folded, unfold (by removing the mark __isFold)
-		      		if(gutterWidget.className === self.foldClass.folded)
-		      		{
-		      			var marks = self.codeMirror.findMarksAt(openingPos);
-		      			for(var i = 0; i < marks.length; i++)
-		      			{
-		      				if(marks[i].__isFold)
-		      				{
-		      					marks[i].clear();
-		      				}
-		      			}
-		      			gutterWidget.className = self.foldClass.open;
-		      		}
-		      		//if the section is open, collapse it
-		      		else
-		      		{
-		      			gutterWidget.className = self.foldClass.folded;
-		      			self.collapseCode(openingPos, closingPos, gutterWidget);
-		      		}
-		   		});
+        codeMirrorInstance.on(gutterWidget, "mousedown", function(e)
+        {
+          codeMirrorInstance.e_preventDefault(e);
+          //if it's folded, unfold (by removing the mark __isFold)
+          if (gutterWidget.className === self.foldClass.folded)
+          {
+            var marks = self.codeMirror.findMarksAt(openingPos);
+            for (var i = 0; i < marks.length; i++)
+            {
+              if (marks[i].__isFold)
+              {
+                marks[i].clear();
+              }
+            }
+            gutterWidget.className = self.foldClass.open;
+          }
+          //if the section is open, collapse it
+          else
+          {
+            gutterWidget.className = self.foldClass.folded;
+            self.collapseCode(openingPos, closingPos, gutterWidget);
+          }
+        });
 
-		   		this.codeMirror.setGutterMarker(openingPos.line, "CodeMirror-foldgutter", gutterWidget);
-   			}
-   		}
-	},
-	//Collapses code and replaces the code with a widget that can re-open the code segment
-	collapseCode: function collapseCode(openingPos, closingPos, gutterWidget)
-	{
-		var codeMirrorInstance = this.getCodeMirrorInstance();
-		var widget = this.makeWidget('...');
-		var self = this;
-		//Onclick functions to unfold the code
-		codeMirrorInstance.on(widget, "mousedown", function(e) {
-      		myRange.clear();
-      		gutterWidget.className = self.foldClass.open;
-     		codeMirrorInstance.e_preventDefault(e);
-   		});
-   		//Actually fold code
-    	var myRange = this.codeMirror.markText(openingPos, closingPos, {
-      		replacedWith: widget,
-      		__isFold: true
-    	});
-	},
-	//Makes the codemirror widget
-	makeWidget: function makeWidget(text)
-	{
-		var widget = document.createElement("span");
-		var content = document.createTextNode(text);
-		widget.appendChild(content);
-		widget.className = "CodeMirror-foldmarker";
-		return widget;
-  	},
-  	//Create a gutter widget
-  	//Check the current gutter widget to decide which widget to make
-  	makeGutterWidget: function makeGutterWidget(openingPos, closingPos)
-  	{
-  		var classname = this.foldClass.open;
-  		var marks = this.codeMirror.findMarks(openingPos, closingPos);
-  		if(marks)
-  		{
-  			for (var i = 0; i < marks.length; i++)
-  			{
-  				if (marks[i].replacedWith)
-  				{
-  					classname = this.foldClass.folded;
-  				}
-  			}
-  		}
-  		var widget = document.createElement("span");
-  		widget.className = classname;
-  		return widget;
-  	},
-	 
+        this.codeMirror.setGutterMarker(openingPos.line, "CodeMirror-foldgutter", gutterWidget);
+      }
+    }
+  },
+  //Collapses code and replaces the code with a widget that can re-open the code segment
+  collapseCode: function collapseCode(openingPos, closingPos, gutterWidget)
+  {
+    var codeMirrorInstance = this.getCodeMirrorInstance();
+    var widget = this.makeWidget('...');
+    var self = this;
+    //Onclick functions to unfold the code
+    codeMirrorInstance.on(widget, "mousedown", function(e)
+    {
+      myRange.clear();
+      gutterWidget.className = self.foldClass.open;
+      codeMirrorInstance.e_preventDefault(e);
+    });
+    //Actually fold code
+    var myRange = this.codeMirror.markText(openingPos, closingPos, {
+      replacedWith: widget,
+      __isFold: true
+    });
+  },
+  //Makes the codemirror widget
+  makeWidget: function makeWidget(text)
+  {
+    var widget = document.createElement("span");
+    var content = document.createTextNode(text);
+    widget.appendChild(content);
+    widget.className = "CodeMirror-foldmarker";
+    return widget;
+  },
+  //Create a gutter widget
+  //Check the current gutter widget to decide which widget to make
+  makeGutterWidget: function makeGutterWidget(openingPos, closingPos)
+  {
+    var classname = this.foldClass.open;
+    var marks = this.codeMirror.findMarks(openingPos, closingPos);
+    if (marks)
+    {
+      for (var i = 0; i < marks.length; i++)
+      {
+        if (marks[i].replacedWith)
+        {
+          classname = this.foldClass.folded;
+        }
+      }
+    }
+    var widget = document.createElement("span");
+    widget.className = classname;
+    return widget;
+  },
+
 
   componentDidUpdate()
   {
-    if(this.state.shouldMount)
+    if (this.state.shouldMount)
     {
       this.setState({
         shouldMount: false,
@@ -345,9 +351,9 @@ var CodeMirror = React.createClass({
     }
   },
 
-	componentWillReceiveProps: function componentWillReceiveProps(nextProps)
-	{
-    if(this.props.isDiff !== nextProps.isDiff)
+  componentWillReceiveProps: function componentWillReceiveProps(nextProps)
+  {
+    if (this.props.isDiff !== nextProps.isDiff)
     {
       this.componentWillUnmount();
       this.setState({
@@ -356,71 +362,78 @@ var CodeMirror = React.createClass({
       return;
     }
 
-    if(nextProps.containerHeight !== this.props.containerHeight)
+    if (nextProps.containerHeight !== this.props.containerHeight)
     {
       this.codeMirror && this.codeMirror.wrap && (this.codeMirror.wrap.style.height = nextProps.containerHeight + 'px');
     }
 
-		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value)
-		{
-			this.codeMirror.setValue(nextProps.value);
-		}
-		if (typeof nextProps.options === 'object' && this.codeMirror && this.codeMirror.setOption)
-		{
-			for (var optionName in nextProps.options)
-			{
-				if (nextProps.options.hasOwnProperty(optionName))
-				{
-					this.codeMirror.setOption(optionName, nextProps.options[optionName]);
-				}
-			}
-		}
-
-    if(nextProps.highlightedLine !== this.props.highlightedLine)
+    if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value)
     {
-      if(typeof this.props.highlightedLine === 'number')
+      this.codeMirror.setValue(nextProps.value);
+    }
+    if (typeof nextProps.options === 'object' && this.codeMirror && this.codeMirror.setOption)
+    {
+      for (var optionName in nextProps.options)
+      {
+        if (nextProps.options.hasOwnProperty(optionName))
+        {
+          this.codeMirror.setOption(optionName, nextProps.options[optionName]);
+        }
+      }
+    }
+
+    if (nextProps.highlightedLine !== this.props.highlightedLine)
+    {
+      if (typeof this.props.highlightedLine === 'number')
       {
         this.undoHighlightedLine(this.props.highlightedLine);
       }
-      if(typeof nextProps.highlightedLine === 'number')
+      if (typeof nextProps.highlightedLine === 'number')
       {
         this.updateHighlightedLine(nextProps.highlightedLine);
       }
     }
-	},
-	getCodeMirror: function getCodeMirror()
-	{
-		return this.codeMirror;
-	},
-	focus: function focus()
-	 {
-	 if (this.codeMirror)
-		{
-			this.codeMirror.focus();
-		}
-	},
-	focusChanged: function focusChanged(focused)
-	{
-		if(window.location.pathname.indexOf('builder') >= 0)
-		{
-			this.setState({
-				isFocused: focused
-			});
-			this.props.onFocusChange && this.props.onFocusChange(focused);
-		}
-	},
-	codemirrorValueChanged: function codemirrorValueChanged(doc, change)
-	{
-		if (this.props.onChange && change.origin != 'setValue')
-		{
-			this.props.onChange(doc.getValue());
-		}
-	},
-	render: function render()
-	{
-		var editorClassName = className('ReactCodeMirror', this.state.isFocused ? 'ReactCodeMirror--focused' : null, this.props.className);
+  },
+  getCodeMirror: function getCodeMirror()
+  {
+    return this.codeMirror;
+  },
+  focus: function focus()
+  {
+    if (this.codeMirror)
+    {
+      this.codeMirror.focus();
+    }
+  },
+  focusChanged: function focusChanged(focused)
+  {
+    if (window.location.pathname.indexOf('builder') >= 0)
+    {
+      this.setState({
+        isFocused: focused
+      });
+      this.props.onFocusChange && this.props.onFocusChange(focused);
+    }
+  },
+  codemirrorValueChanged: function codemirrorValueChanged(doc, change)
+  {
+    if (this.props.onChange && change.origin != 'setValue')
+    {
+      this.props.onChange(doc.getValue());
+    }
+  },
+  codemirrorIssueQuery: function codemirrorIssueQuery(cm)
+  {
+    if (this.props.onChange)
+    {
+      this.props.onChange(cm.getDoc().getValue(), false, true);
+    }
+  },
+  render: function render()
+  {
+    var editorClassName = className('ReactCodeMirror', this.state.isFocused ? 'ReactCodeMirror--focused' : null, this.props.className);
 
-    if(this.props.isDiff)
+    if (this.props.isDiff)
     {
       return React.createElement(
         'div',
@@ -430,14 +443,14 @@ var CodeMirror = React.createClass({
         });
     }
 
-		return React.createElement(
-			'div',
-			{
+    return React.createElement(
+      'div',
+      {
         className: editorClassName,
       },
-			React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write TQL here", defaultValue: this.props.value, autoComplete: 'off' })
-		);
-	}
+      React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write TQL here", defaultValue: this.props.value, autoComplete: 'off' })
+    );
+  }
 });
 
 module.exports = Dimensions()(CodeMirror);

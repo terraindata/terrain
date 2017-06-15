@@ -42,27 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./DeployModal.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
+import './DeployModal.less';
 
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
 import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
-export interface Props {
+export interface Props
+{
 }
 
 class DeployModal extends PureClasss<Props>
 {
-  state: {
+  public state: {
     changingStatus: boolean;
     changingStatusOf: LibraryTypes.Variant;
     changingStatusTo: ItemStatus;
@@ -74,17 +76,18 @@ class DeployModal extends PureClasss<Props>
     defaultChecked: false,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        const {changingStatus, changingStatusOf, changingStatusTo} = state;
+        const { changingStatus, changingStatusOf, changingStatusTo } = state;
         if (
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
           changingStatusTo !== this.state.changingStatusTo
-        ) {
+        )
+        {
           this.setState({
             changingStatus,
             changingStatusOf,
@@ -97,19 +100,19 @@ class DeployModal extends PureClasss<Props>
     });
   }
 
-  handleClose()
+  public handleClose()
   {
     LibraryActions.variants.status(null, null);
   }
 
-  handleDeploy()
+  public handleDeploy()
   {
     LibraryActions.variants.status(
-      this.state.changingStatusOf, this.state.changingStatusTo, true
+      this.state.changingStatusOf, this.state.changingStatusTo, true,
     );
   }
 
-  renderTQLColumn(defaultVariant: LibraryTypes.Variant)
+  public renderTQLColumn(defaultVariant: LibraryTypes.Variant)
   {
     const variant = this.state.changingStatusOf;
     const defaultTql =
@@ -117,8 +120,8 @@ class DeployModal extends PureClasss<Props>
     const tql = variant ? variant.query.tql : '';
 
     return (
-      <div className="deploy-modal-tql">
-        <div className="deploy-modal-tql-wrapper">
+      <div className='deploy-modal-tql'>
+        <div className='deploy-modal-tql-wrapper'>
           <TQLEditor
             canEdit={false}
             tql={tql}
@@ -130,21 +133,21 @@ class DeployModal extends PureClasss<Props>
     );
   }
 
-  handleDefaultCheckedChange(defaultChecked: boolean)
+  public handleDefaultCheckedChange(defaultChecked: boolean)
   {
     this.setState({
       defaultChecked,
     });
   }
 
-  render()
+  public render()
   {
     if (!this.state.changingStatus)
     {
       return null;
     }
 
-    const {changingStatus, changingStatusOf, changingStatusTo} = this.state;
+    const { changingStatus, changingStatusOf, changingStatusTo } = this.state;
     const name = (changingStatusOf && changingStatusOf.name);
 
     let title = 'Deploy "' + name + '" to Live';
@@ -173,23 +176,23 @@ class DeployModal extends PureClasss<Props>
       >
         {
           changingStatusOf &&
-            <div
-              className={classNames({
-                'deploy-modal': true,
-              })}
-            >
-              {
-                this.renderTQLColumn(defaultVariant)
-              }
-              <DeployModalColumn
-                variant={changingStatusOf}
-                status={changingStatusTo}
-                onDeploy={this.handleDeploy}
-                defaultChecked={this.state.defaultChecked}
-                defaultVariant={defaultVariant}
-                onDefaultCheckedChange={this.handleDefaultCheckedChange}
-              />
-            </div>
+          <div
+            className={classNames({
+              'deploy-modal': true,
+            })}
+          >
+            {
+              this.renderTQLColumn(defaultVariant)
+            }
+            <DeployModalColumn
+              variant={changingStatusOf}
+              status={changingStatusTo}
+              onDeploy={this.handleDeploy}
+              defaultChecked={this.state.defaultChecked}
+              defaultVariant={defaultVariant}
+              onDefaultCheckedChange={this.handleDefaultCheckedChange}
+            />
+          </div>
         }
       </Modal>
     );

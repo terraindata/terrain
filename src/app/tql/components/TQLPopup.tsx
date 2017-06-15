@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./TQLPopup.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './TQLPopup.less';
 
 const OpenIcon = require('./../../../images/icon_open.svg');
 
@@ -64,27 +65,27 @@ export interface Props
 
 class TQLPopup extends Classs<Props>
 {
-  openManual()
+  public openManual()
   {
     this.props.onClick && this.props.onClick();
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render()
+  public render()
   {
     return (
       <div
-        className="tql-editor-popup"
+        className='tql-editor-popup'
         style={this.props.style}
       >
         {this.props.text}
         <div
-          className="manual-popup-link"
+          className='manual-popup-link'
           onClick={this.openManual}
         >
-            See full description in Manual
+          See full description in Manual
           <OpenIcon
-            className="manual-popup-open-icon"
+            className='manual-popup-open-icon'
             onClick={this.openManual}
           />
         </div>

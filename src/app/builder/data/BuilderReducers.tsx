@@ -44,312 +44,326 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import Query from '../../../../shared/items/types/Query';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
-import {BuilderState} from './BuilderStore';
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import Query from '../../../../shared/items/types/Query';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
+import { BuilderState } from './BuilderStore';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
-{
-
-[ActionTypes.fetchQuery]:
-  (
-    state: BuilderState,
-    action: {
-      payload?: {
-        variantId: ID,
-        handleNoVariant: (id: ID) => void,
-        db: BackendInstance,
-      },
-    },
-  ) =>
   {
-    const {variantId, handleNoVariant} = action.payload;
 
-    if (state.loadingXhr)
+    [ActionTypes.fetchQuery]:
+    (
+      state: BuilderState,
+      action: {
+        payload?: {
+          variantId: ID,
+          handleNoVariant: (id: ID) => void,
+          db: BackendInstance,
+        },
+      },
+    ) =>
     {
-      if (variantId === state.loadingVariantId)
+      const { variantId, handleNoVariant } = action.payload;
+
+      if (state.loadingXhr)
       {
-        // still loading the same variant
+        if (variantId === state.loadingVariantId)
+        {
+          // still loading the same variant
+          return state;
+        }
+
+        // abort the previous request
+        state.loadingXhr.abort();
+      }
+
+      const xhr: XMLHttpRequest = Ajax.getQuery(
+        variantId,
+        (query: Query) =>
+        {
+          if (query)
+          {
+            Actions.queryLoaded(query, xhr, action.payload.db);
+          }
+          else
+          {
+            handleNoVariant &&
+              handleNoVariant(variantId);
+          }
+        },
+      );
+
+      return state
+        .set('loading', true)
+        .set('loadingXhr', xhr)
+        .set('loadingVariantId', variantId)
+        ;
+    },
+
+    [ActionTypes.queryLoaded]:
+    (
+      state: BuilderState,
+      action: Action<{
+        query: Query,
+        xhr: XMLHttpRequest,
+        db: BackendInstance,
+      }>,
+    ) =>
+    {
+      let { query } = action.payload;
+      if (state.loadingXhr !== action.payload.xhr)
+      {
+        // wrong XHR
         return state;
       }
 
-      // abort the previous request
-      state.loadingXhr.abort();
-    }
-
-    const xhr: XMLHttpRequest = Ajax.getQuery(
-      variantId,
-      (query: Query) =>
+      if (!action.payload.query.cardsAndCodeInSync)
       {
-        if (query)
+        if (action.payload.query.tql)
         {
-          Actions.queryLoaded(query, xhr, action.payload.db);
+          query = AllBackendsMap[query.language].codeToQuery(
+            query,
+            Actions.changeQuery,
+          );
         }
         else
         {
-          handleNoVariant &&
-            handleNoVariant(variantId);
+          // blank
+          query = query
+            .set('cardsAndCodeInSync', true);
         }
+      }
+
+      return state
+        .set('query', query)
+        .set('loading', false)
+        .set('loadingXhr', null)
+        .set('loadingVariantId', '')
+        .set('isDirty', false)
+        .set('pastQueries', Immutable.List([]))
+        .set('nextQueries', Immutable.List([]))
+        .set('db', action.payload.db)
+        ;
+    },
+
+    [ActionTypes.change]:
+    (
+      state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          value: any,
+        },
       },
-    );
+    ) =>
+      state.setIn(
+        action.payload.keyPath,
+        action.payload.value,
+      ),
 
-    return state
-      .set('loading', true)
-      .set('loadingXhr', xhr)
-      .set('loadingVariantId', variantId)
-    ;
-  },
+    [ActionTypes.changeQuery]:
+    (
+      state: BuilderState,
+      action: {
+        payload?: {
+          query: Query,
+        },
+      },
+    ) =>
+      state.set('query', action.payload.query),
 
-[ActionTypes.queryLoaded]:
-  (
-    state: BuilderState,
-    action: Action<{
-      query: Query,
-      xhr: XMLHttpRequest,
-      db: BackendInstance,
-    }>,
-  ) =>
-  {
-    let {query} = action.payload;
-    if (state.loadingXhr !== action.payload.xhr)
+    [ActionTypes.create]:
+    (
+      state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          index: number,
+          factoryType: string,
+          data: any,
+        },
+      },
+    ) =>
+      state.updateIn(
+        action.payload.keyPath,
+        (arr) =>
+        {
+          const item = action.payload.data ? action.payload.data :
+            BlockUtils.make(
+              AllBackendsMap[state.query.language].blocks[action.payload.factoryType],
+            );
+
+          if (action.payload.index === null)
+          {
+            return item; // creating at that spot
+          }
+
+          return arr.splice
+            (
+            action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
+            0,
+            item,
+          );
+        },
+      )
+    ,
+
+    [ActionTypes.move]:
+    (
+      state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          index: number,
+          newIndex; number
+        },
+      },
+    ) =>
+      state.updateIn(
+        action.payload.keyPath,
+        (arr) =>
+        {
+          const { index, newIndex } = action.payload;
+          const el = arr.get(index);
+          arr = arr.splice(index, 1);
+          arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
+          return arr;
+        },
+      ),
+
+    // first check original keypath
+    [ActionTypes.nestedMove]: // a deep move
+    (state: BuilderState, action: {
+      payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number },
+    }) =>
     {
-      // wrong XHR
-      return state;
-    }
+      const { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
 
-    if (!action.payload.query.cardsAndCodeInSync)
-    {
-      if (action.payload.query.tql)
+      if (itemKeyPath.equals(newKeyPath))
       {
-        // TODO MOD convert
+        if (itemIndex === newIndex)
+        {
+          return state;
+        }
+
+        // moving within same list
+        return state.updateIn(itemKeyPath, (arr) =>
+        {
+          const item = arr.get(itemIndex);
+          let indexOffset = 0;
+          if (itemIndex < newIndex)
+          {
+            // dragging down
+            indexOffset = -1;
+          }
+          return arr.splice(itemIndex, 1).splice(newIndex + indexOffset, 0, item);
+        });
+      }
+
+      const itemReferenceKeyPath = itemIndex === null ? itemKeyPath : itemKeyPath.push(itemIndex);
+      const item = state.getIn(itemReferenceKeyPath);
+      const tempId = '' + Math.random(); // mark with a temporary ID so we know where to delete
+      state = state.setIn(itemReferenceKeyPath.push('id'), tempId);
+
+      state = state.updateIn(newKeyPath, (obj) =>
+      {
+        if (Immutable.List.isList(obj))
+        {
+          return obj.splice(newIndex, 0, item);
+        }
+        return item;
+      });
+
+      if (state.getIn(itemReferenceKeyPath.push('id')) === tempId)
+      {
+        // location remained same, optimized delete
+        state = state.deleteIn(itemReferenceKeyPath);
       }
       else
       {
-        // blank
-        query = query
-          .set('cardsAndCodeInSync', true);
-      }
-    }
-
-    return state
-      .set('query', query)
-      .set('loading', false)
-      .set('loadingXhr', null)
-      .set('loadingVariantId', '')
-      .set('isDirty', false)
-      .set('pastQueries', Immutable.List([]))
-      .set('nextQueries', Immutable.List([]))
-      .set('db', action.payload.db)
-    ;
-  },
-
-[ActionTypes.change]:
-  (
-    state: BuilderState,
-    action: {
-      payload?: {
-        keyPath: KeyPath,
-        value: any,
-      },
-    },
-  ) =>
-    state.setIn(
-      action.payload.keyPath,
-      action.payload.value,
-    ),
-
-[ActionTypes.create]:
-  (
-    state: BuilderState,
-    action: {
-      payload?: {
-        keyPath: KeyPath,
-        index: number,
-        factoryType: string,
-        data: any,
-      },
-    },
-  ) =>
-    state.updateIn(
-      action.payload.keyPath,
-      (arr) =>
-      {
-        const item = action.payload.data ? action.payload.data :
-            BlockUtils.make(
-              AllBackendsMap[state.query.language].blocks[action.payload.factoryType]
-            );
-
-        if (action.payload.index === null)
-        {
-          return item; // creating at that spot
-        }
-
-        return arr.splice
-        (
-          action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
-          0,
-          item,
-        );
-      },
-    )
-  ,
-
-[ActionTypes.move]:
-  (
-    state: BuilderState,
-    action: {
-      payload?: {
-        keyPath: KeyPath,
-        index: number,
-        newIndex; number
-      },
-    },
-  ) =>
-    state.updateIn(
-      action.payload.keyPath,
-      (arr) =>
-      {
-        const {index, newIndex} = action.payload;
-        const el = arr.get(index);
-        arr = arr.splice(index, 1);
-        arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
-        return arr;
-      },
-    ),
-
-     // first check original keypath
-[ActionTypes.nestedMove]: // a deep move
-  (state: BuilderState, action: {
-    payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number },
-  }) =>
-  {
-    const { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
-
-    if (itemKeyPath.equals(newKeyPath))
-    {
-      if (itemIndex === newIndex)
-      {
-        return state;
+        // search and destroy
+        // NOTE: if in the future the same card is open in multiple places, this will break
+        state = state.deleteIn(Util.keyPathForId(state, tempId) as Array<string | number>);
+        // Consider an optimized search if performance becomes an issue.
       }
 
-      // moving within same list
-      return state.updateIn(itemKeyPath, (arr) =>
-      {
-        const item = arr.get(itemIndex);
-        let indexOffset = 0;
-        if (itemIndex < newIndex)
-        {
-          // dragging down
-          indexOffset = -1;
-        }
-        return arr.splice(itemIndex, 1).splice(newIndex + indexOffset, 0, item);
-      });
-    }
+      state = trimParent(state, itemKeyPath);
 
-    const itemReferenceKeyPath = itemIndex === null ? itemKeyPath : itemKeyPath.push(itemIndex);
-    const item = state.getIn(itemReferenceKeyPath);
-    const tempId = '' + Math.random(); // mark with a temporary ID so we know where to delete
-    state = state.setIn(itemReferenceKeyPath.push('id'), tempId);
+      return state;
+    },
 
-    state = state.updateIn(newKeyPath, (obj) => {
-      if (Immutable.List.isList(obj))
+    [ActionTypes.remove]:
+    (state: BuilderState, action: {
+      payload?: { keyPath: KeyPath, index: number },
+    }) =>
+    {
+      let { keyPath, index } = action.payload;
+      if (index !== null)
       {
-        return obj.splice(newIndex, 0, item);
+        keyPath = keyPath.push(index);
       }
-      return item;
-    });
 
-    if (state.getIn(itemReferenceKeyPath.push('id')) === tempId)
+      state = state.removeIn(keyPath);
+      state = trimParent(state, keyPath);
+
+      return state;
+    },
+
+    // change handwritten tql
+    [ActionTypes.changeTQL]:
+    (
+      state: BuilderState,
+      action: Action<{
+        tql: string,
+      }>,
+    ) =>
     {
-      // location remained same, optimized delete
-      state = state.deleteIn(itemReferenceKeyPath);
-    }
-    else
-    {
-      // search and destroy
-      // NOTE: if in the future the same card is open in multiple places, this will break
-      state = state.deleteIn(Util.keyPathForId(state, tempId) as Array<string | number>);
-      // Consider an optimized search if performance becomes an issue.
-    }
+      // TODO MOD convert
+      let { query } = state;
+      query = query.set('tql', action.payload.tql);
+      query = AllBackendsMap[query.language].codeToQuery(
+        query,
+        Actions.changeQuery,
+      );
 
-    state = trimParent(state, itemKeyPath);
+      return state.set('query', query);
+    },
 
-    return state;
-  },
-
-[ActionTypes.remove]:
-  (state: BuilderState, action: {
-    payload?: { keyPath: KeyPath, index: number },
-  }) =>
-  {
-    let {keyPath, index} = action.payload;
-    if (index !== null)
-    {
-      keyPath = keyPath.push(index);
-    }
-
-    state = state.removeIn(keyPath);
-    state = trimParent(state, keyPath);
-
-    return state;
-  },
-
-// change handwritten tql
-[ActionTypes.changeTQL]:
-  (
-    state: BuilderState,
-    action: Action<{
-      tql: string,
-    }>,
-  ) =>
-  {
-    // TODO MOD convert
-    let {query} = state;
-    query = query.set('tql', action.payload.tql);
-    query = AllBackendsMap[query.language].codeToQuery(
-      query,
-      (newQuery) =>
-        Actions.change(Immutable.List(['query']), newQuery)
-    );
-    
-    return state.set('query', query);
-  },
-
-[ActionTypes.hoverCard]:
-  (state: BuilderState, action: Action<{
-    cardId: ID,
-  }>) =>
-    state.set('hoveringCardId', action.payload.cardId),
+    [ActionTypes.hoverCard]:
+    (state: BuilderState, action: Action<{
+      cardId: ID,
+    }>) =>
+      state.set('hoveringCardId', action.payload.cardId),
     // if hovered over same card, will return original state object
 
-[ActionTypes.selectCard]:
-  (state: BuilderState, action: Action<{
-    cardId: ID,
-    shiftKey: boolean,
-    ctrlKey: boolean,
-  }>) =>
-  {
-    const {cardId, shiftKey, ctrlKey} = action.payload;
-    if (!shiftKey && !ctrlKey)
+    [ActionTypes.selectCard]:
+    (state: BuilderState, action: Action<{
+      cardId: ID,
+      shiftKey: boolean,
+      ctrlKey: boolean,
+    }>) =>
     {
-      state = state.set('selectedCardIds', Immutable.Map({}));
-    }
-    if (ctrlKey)
-    {
-      return state.setIn(['selectedCardIds', cardId],
-        !state.getIn(['selectedCardIds', cardId]));
-    }
-    return state.setIn(['selectedCardIds', cardId], true);
-  },
+      const { cardId, shiftKey, ctrlKey } = action.payload;
+      if (!shiftKey && !ctrlKey)
+      {
+        state = state.set('selectedCardIds', Immutable.Map({}));
+      }
+      if (ctrlKey)
+      {
+        return state.setIn(['selectedCardIds', cardId],
+          !state.getIn(['selectedCardIds', cardId]));
+      }
+      return state.setIn(['selectedCardIds', cardId], true);
+    },
 
-  [ActionTypes.dragCard]:
+    [ActionTypes.dragCard]:
     (
       state: BuilderState,
       action: Action<{
@@ -358,28 +372,28 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     ) =>
       state.set('draggingCardItem', action.payload.cardItem),
 
-  [ActionTypes.dragCardOver]:
+    [ActionTypes.dragCardOver]:
     (state: BuilderState, action: {
       payload?: { keyPath: KeyPath, index: number },
     }) =>
     {
-      const {keyPath, index} = action.payload;
+      const { keyPath, index } = action.payload;
       return state
         .set('draggingOverKeyPath', keyPath)
         .set('draggingOverIndex', index);
     },
 
-  [ActionTypes.dropCard]:
+    [ActionTypes.dropCard]:
     (state) => state
       .set('draggingOverKeyPath', null)
       .set('draggingOverIndex', null)
       .set('draggingCardItem', null),
 
-  [ActionTypes.toggleDeck]:
+    [ActionTypes.toggleDeck]:
     (state: BuilderState, action) => state
       .setIn(['query', 'deckOpen'], action.payload.open),
 
-  [ActionTypes.changeResultsConfig]:
+    [ActionTypes.changeResultsConfig]:
     (
       state: BuilderState,
       action: Action<{
@@ -388,11 +402,11 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     ) =>
       state
         .update('query',
-          (query) =>
-            query.set('resultsConfig', action.payload.resultsConfig),
-        ),
+        (query) =>
+          query.set('resultsConfig', action.payload.resultsConfig),
+      ),
 
-  [ActionTypes.save]:
+    [ActionTypes.save]:
     (
       state: BuilderState,
       action: Action<{
@@ -402,7 +416,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       state
         .set('isDirty', action.payload && action.payload.failed),
 
-  [ActionTypes.undo]:
+    [ActionTypes.undo]:
     (
       state: BuilderState,
       action: Action<{}>,
@@ -421,7 +435,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-  [ActionTypes.redo]:
+    [ActionTypes.redo]:
     (
       state: BuilderState,
       action: Action<{}>,
@@ -440,16 +454,16 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-  [ActionTypes.checkpoint]:
+    [ActionTypes.checkpoint]:
     (state: BuilderState, action: Action<{}>) => state,
 
-  [ActionTypes.results]:
+    [ActionTypes.results]:
     (
       state: BuilderState,
       action: Action<{ resultsState }>,
     ) =>
       state.set('resultsState', action.payload.resultsState),
-};
+  };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
 {
@@ -457,9 +471,9 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   const parentListKeyPath = parentKeyPath.splice(parentKeyPath.size - 1, 1).toList();
   const st = state.getIn(parentKeyPath.push('static'));
 
-  if ( st && st.removeOnCardRemove
-      && state.getIn(parentListKeyPath).size > 1 // only remove if there are multiple items
-    )
+  if (st && st.removeOnCardRemove
+    && state.getIn(parentListKeyPath).size > 1 // only remove if there are multiple items
+  )
   {
     return state.removeIn(parentKeyPath);
   }

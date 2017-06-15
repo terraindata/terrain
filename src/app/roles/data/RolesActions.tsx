@@ -42,26 +42,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import RoleTypes from './../RoleTypes';
 import ActionTypes from './RolesActionTypes';
 import Store from './RolesStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const RolesActions =
-{
-  fetch:
+  {
+    fetch:
     () =>
-      $(ActionTypes.fetch, { }),
+      $(ActionTypes.fetch, {}),
 
-  setRoles:
+    setRoles:
     (roles: RoleTypes.RoleMap) =>
       $(ActionTypes.setRoles, { roles }),
 
-  change:
+    change:
     (role: RoleTypes.Role) =>
       $(ActionTypes.change, { role }),
-};
+  };
 
 export default RolesActions;

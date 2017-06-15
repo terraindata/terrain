@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 /// <reference path="../../typings/tsd.d.ts" />
 
 import * as test from 'tape';
@@ -49,20 +50,26 @@ import * as _ from 'underscore';
 import Actions from '../../app/builder/data/BuilderActions';
 import ActionTypes from '../../app/builder/data/BuilderActionTypes';
 
-const onlyContainsType = (obj, type: string) => {
-  return _.every(obj, (val) => {
+const onlyContainsType = (obj, type: string) =>
+{
+  return _.every(obj, (val) =>
+  {
     return typeof val === type || (typeof val === 'object' && onlyContainsType(val, type));
   });
 };
 
-test('ActionTypes', (t) => {
+test('ActionTypes', (t) =>
+{
   t.ok(onlyContainsType(ActionTypes, 'string'), 'ActionTypes only contains strings');
   t.end();
 });
 
-test('Actions', (t) => {
-  const containSameKeys = (first, second) => {
-    return _.every(first, (val, key) => {
+test('Actions', (t) =>
+{
+  const containSameKeys = (first, second) =>
+  {
+    return _.every(first, (val, key) =>
+    {
       if (typeof first[key] === 'object' && typeof second[key] === 'object')
       {
         return containSameKeys(first[key], second[key]);

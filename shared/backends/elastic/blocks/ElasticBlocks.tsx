@@ -42,51 +42,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
+import * as _ from 'underscore';
+const { List, Map } = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
-import {_block, Block, TQLFn} from '../../../blocks/types/Block';
-import {_card, Card, CardString} from '../../../blocks/types/Card';
-import {Input, InputType} from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
-import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
 import CommonBlocks from '../../../blocks/CommonBlocks';
+import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { _block, Block, TQLFn } from '../../../blocks/types/Block';
+import { _card, Card, CardString } from '../../../blocks/types/Card';
+import { Input, InputType } from '../../../blocks/types/Input';
+import CommonElastic from '../syntax/CommonElastic';
 
 import Util from '../../../../src/app/util/Util';
 
-const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
-const {make} = BlockUtils;
+const { make } = BlockUtils;
 
-import {elasticKeyValue, elasticValue, elasticObject, elasticArray} from './ElasticJSONBlocks';
+import { elasticArray, elasticBool, elasticKeyValueToggle, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
+import elasticRootCard from './ElasticRootCard';
 
 export const ElasticBlocks =
-{
-  // JSON blocks
-  elasticKeyValue,
-  elasticValue,
-  elasticObject,
-  elasticArray,
-
-  elasticCreating: _card( // a placeholder for when a card is being created
   {
-    static:
-    {
-      language: 'elastic',
-      tql: '',
-      title: 'New Card',
-      colors: ['#777', '#777'],
-      preview: '',
-      display: null,
-      // manualEntry: null,
-    },
-  }),
-};
+    // JSON
+
+    elasticObject,
+    elasticArray,
+
+    // JSON Value blocks
+    elasticBool,
+    elasticNumber,
+    elasticText,
+    elasticNull,
+
+    elasticRootCard,
+
+    elasticCreating: _card( // a placeholder for when a card is being created
+      {
+        static:
+        {
+          language: 'elastic',
+          tql: '',
+          title: 'New Card',
+          colors: ['#777', '#777'],
+          preview: '',
+          display: null,
+          // manualEntry: null,
+        },
+      }),
+
+    elasticKeyValueWrap,
+
+    // JSON toggle the type blocks
+    elasticKeyValueToggle,
+    elasticValue,
+
+  };
 
 BlockUtils.initBlocks(ElasticBlocks);
-
 
 // TODO remove
 const cards = {};
@@ -98,6 +113,5 @@ for (const key in ElasticBlocks)
   }
 }
 export const cardList = cards;
-
 
 export default ElasticBlocks;

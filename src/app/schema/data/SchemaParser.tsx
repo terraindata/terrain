@@ -44,31 +44,32 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import SchemaTypes from '../SchemaTypes';
-const {Map, List} = Immutable;
+const { Map, List } = Immutable;
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
 
-export module SchemaParser
+export namespace SchemaParser
 {
   export function parseMySQLDb(
     db: object,
     colsData: object,
     setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void,
-  ) {
+  )
+  {
     let database = SchemaTypes._Database({
       name: db['name'],
     });
     const databaseId = database.id;
 
     let tables: IMMap<string, Table> = Map<string, Table>({});
-    let columns: IMMap<string, Column> =  Map<string, Column>({});
-    const indexes: IMMap<string, Index> =  Map<string, Index>({});
+    let columns: IMMap<string, Column> = Map<string, Column>({});
+    const indexes: IMMap<string, Index> = Map<string, Index>({});
 
     let tableNames = List<string>([]);
     let columnNamesByTable = Map<string, List<string>>([]);
@@ -156,7 +157,8 @@ export module SchemaParser
     db: object,
     colsData: object,
     setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void,
-  ) {
+  )
+  {
     let database = SchemaTypes._Database({
       name: db['name'],
     });

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import SchemaTypes from '../SchemaTypes';
 
@@ -50,49 +51,49 @@ let tables = Immutable.Map({});
 let columns = Immutable.Map({});
 
 ['movieDB', 'baseballDB'].map(
-	(name) =>
-	{
-		let db = SchemaTypes._Database({ name });
+  (name) =>
+  {
+    let db = SchemaTypes._Database({ name });
 
-		['movies', 'actors', 'reviews', 'characters', 'users'].map(
-			(tableName) =>
-			{
-				let table = SchemaTypes._Table({ name: tableName, databaseId: db.id });
-				db = db.set('tableIds', db.tableIds.push(table.id));
+    ['movies', 'actors', 'reviews', 'characters', 'users'].map(
+      (tableName) =>
+      {
+        let table = SchemaTypes._Table({ name: tableName, databaseId: db.id });
+        db = db.set('tableIds', db.tableIds.push(table.id));
 
-				['first', 'second', 'third', 'fourth', 'fifth'].map(
-					(colName) =>
-					{
-						const column = SchemaTypes._Column({
-							name: colName,
-							tableId: table.id,
-							databaseId: db.id,
-							datatype: 'VARCHAR',
-							isNullable: true,
-							defaultValue: '',
-							isPrimaryKey: false,
-						});
+        ['first', 'second', 'third', 'fourth', 'fifth'].map(
+          (colName) =>
+          {
+            const column = SchemaTypes._Column({
+              name: colName,
+              tableId: table.id,
+              databaseId: db.id,
+              datatype: 'VARCHAR',
+              isNullable: true,
+              defaultValue: '',
+              isPrimaryKey: false,
+            });
 
-						columns = columns.set(column.id, column);
+            columns = columns.set(column.id, column);
 
-						table = table.set('columnIds', table.columnIds.push(column.id));
-					},
-				);
+            table = table.set('columnIds', table.columnIds.push(column.id));
+          },
+        );
 
-				tables = tables.set(table.id, table);
-			},
-		);
+        tables = tables.set(table.id, table);
+      },
+    );
 
-		databases = databases.set(db.id, db);
-	},
+    databases = databases.set(db.id, db);
+  },
 );
 
 const ExampleSchemaData =
-	SchemaTypes._SchemaState()
-		.set('databases', databases)
-		.set('columns', columns)
-		.set('tables', tables)
-		.set('loading', false)
-		.set('loaded', true);
+  SchemaTypes._SchemaState()
+    .set('databases', databases)
+    .set('columns', columns)
+    .set('tables', tables)
+    .set('loading', false)
+    .set('loaded', true);
 
 export default ExampleSchemaData;

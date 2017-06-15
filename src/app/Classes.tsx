@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // TODO MOD maybe move?
 
 import * as Immutable from 'immutable';
@@ -50,9 +51,9 @@ import Util from './util/Util';
 
 export class BaseClass
 {
-  id: string | number = -1;
-  
-  constructor(config: {id?: ID, [field: string]: any} = {})
+  public id: string | number = -1;
+
+  constructor(config: { id?: ID, [field: string]: any } = {})
   {
     // nada
   }
@@ -65,12 +66,12 @@ export class BaseClass
 // export const _TestClass = (config?: {[key:string]: any}) =>
 //   New<TestClass>(new TestClassC(config), config);
 
-const records: {[class_name: string]: Immutable.Record.Class} = {};
+const records: { [class_name: string]: Immutable.Record.Class } = {};
 
 export function New<T>(
-  instance, 
-  config: {[field: string]: any} = {},
-  extendId?: boolean | 'string' // if true, generate an ID on instantiation
+  instance,
+  config: { [field: string]: any } = {},
+  extendId?: boolean | 'string', // if true, generate an ID on instantiation
 ): T & IRecord<T>
 {
   const class_name = instance.__proto__.constructor.name;
@@ -78,8 +79,8 @@ export function New<T>(
   {
     records[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
   }
-  
-  if(extendId)
+
+  if (extendId)
   {
     config = Util.extendId(config, extendId === 'string');
   }
@@ -96,8 +97,8 @@ export function recordForSave(record: IRecord<any>)
 {
   const recordData = record.toJS();
   const meta = _.extend({}, recordData);
-  
-  if(record['excludeFields'])
+
+  if (record['excludeFields'])
   {
     record['excludeFields'].map((field) =>
     {
@@ -105,20 +106,20 @@ export function recordForSave(record: IRecord<any>)
       delete meta[field];
     });
   }
-  
-  if(record['dbFields'])
+
+  if (record['dbFields'])
   {
     record['dbFields'].map(
-      (field) => delete meta[field]
+      (field) => delete meta[field],
     );
-    
+
     _.map(meta,
-      (v, key) => delete recordData[key]
+      (v, key) => delete recordData[key],
     );
-    
+
     recordData['meta'] = JSON.stringify(meta);
   }
-  
+
   return recordData;
 }
 
@@ -128,14 +129,15 @@ export function responseToRecordConfig(response: object): object
   {
     try
     {
-      // somewhere along the line, \ get added to the text and not removed correctly
-      // TODO update if the backend escaping is fixed
-      let meta = JSON.parse(response['meta'].replace(/\\([^\\])/g, (a,b) => b).replace(/\\\\/g, "\\") || '{}');
+      const meta = JSON.parse(response['meta'] || '{}');
       response = _.extend(meta, response);
       delete response['meta'];
     }
-    catch (e) {  }
+    catch (e)
+    {
+      console.log('JSON Parse Error converting item: ', e, response['meta']);
+    }
   }
-  
+
   return response;
 }

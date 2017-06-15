@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ManualPopup.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -51,6 +51,7 @@ import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 import Manual from './Manual';
+import './ManualPopup.less';
 const HTML5Backend = require('react-dnd-html5-backend');
 
 export interface Props
@@ -61,19 +62,19 @@ export interface Props
 
 class ManualWrapper extends Classs<Props>
 {
-	constructor(props)
-	{
-		super(props);
-	}
+  constructor(props)
+  {
+    super(props);
+  }
 
-	render()
-	{
-		const selected = this.props.params['term'] || '';
-		return <Manual
-			selectedKey={selected}
-			manualTab={true}
-		/>;
-	}
+  public render()
+  {
+    const selected = this.props.params['term'] || '';
+    return <Manual
+      selectedKey={selected}
+      manualTab={true}
+    />;
+  }
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast

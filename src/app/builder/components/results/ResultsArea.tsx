@@ -42,31 +42,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ResultsArea.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-const {Map, List} = Immutable;
+import './ResultsArea.less';
+const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import Query from '../../../../../shared/items/types/Query';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import Result from '../results/Result';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
+import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import InfiniteScroll from './../../../common/components/InfiniteScroll';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import {getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass} from './ResultsManager';
-import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
-import Query from '../../../../../shared/items/types/Query';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
+import { getPrimaryKeyFor, MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -95,7 +96,7 @@ interface State
 
 class ResultsArea extends PureClasss<Props>
 {
-  state: State = {
+  public state: State = {
     expanded: false,
     expandedResultIndex: null,
     showingConfig: false,
@@ -103,7 +104,9 @@ class ResultsArea extends PureClasss<Props>
     resultFormat: 'icon',
   };
 
-  componentWillReceiveProps(nextProps)
+  public resultsFodderRange = _.range(0, 25);
+
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.query.cards !== this.props.query
       || nextProps.query.inputs !== this.props.query.inputs)
@@ -116,14 +119,14 @@ class ResultsArea extends PureClasss<Props>
     }
   }
 
-  handleCollapse()
+  public handleCollapse()
   {
     this.setState({
       expanded: false,
     });
   }
 
-  handleExpand(resultIndex: number)
+  public handleExpand(resultIndex: number)
   {
     this.setState({
       expanded: true,
@@ -131,11 +134,11 @@ class ResultsArea extends PureClasss<Props>
     });
   }
 
-  renderExpandedResult()
+  public renderExpandedResult()
   {
-    const {expandedResultIndex} = this.state;
-    const {results} = this.props.resultsState;
-    const {resultsConfig} = this.props.query;
+    const { expandedResultIndex } = this.state;
+    const { results } = this.props.resultsState;
+    const { resultsConfig } = this.props.query;
 
     let result: ResultClass;
 
@@ -151,7 +154,7 @@ class ResultsArea extends PureClasss<Props>
 
     return (
       <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
-        <div className="result-expanded-bg" onClick={this.handleCollapse}></div>
+        <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result
           result={result}
           resultsConfig={resultsConfig}
@@ -164,9 +167,9 @@ class ResultsArea extends PureClasss<Props>
     );
   }
 
-  handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
+  public handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
-    const {resultsPages} = this.state;
+    const { resultsPages } = this.state;
 
     if (resultsPages * RESULTS_PAGE_SIZE < MAX_RESULTS)
     {
@@ -181,7 +184,7 @@ class ResultsArea extends PureClasss<Props>
     }
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (this.state.onResultsLoaded)
     {
@@ -192,20 +195,13 @@ class ResultsArea extends PureClasss<Props>
     }
   }
 
-  isQueryEmpty(): boolean
+  public isQueryEmpty(): boolean
   {
-    const {query} = this.props;
+    const { query } = this.props;
     return !query || (!query.tql && !query.cards.size);
   }
 
-  private isDatabaseEmpty(): boolean
-  {
-    return !this.props.db || !this.props.db.id;
-  }
-
-  resultsFodderRange = _.range(0, 25);
-
-  renderResults()
+  public renderResults()
   {
     if (this.isDatabaseEmpty())
     {
@@ -219,12 +215,12 @@ class ResultsArea extends PureClasss<Props>
       />;
     }
 
-    const {resultsState} = this.props;
+    const { resultsState } = this.props;
 
     if (resultsState.hasError)
     {
       return <InfoArea
-        large="There was an error with your query."
+        large='There was an error with your query.'
         small={resultsState.errorMessage}
       />;
     }
@@ -234,7 +230,7 @@ class ResultsArea extends PureClasss<Props>
       if (resultsState.rawResult)
       {
         return (
-          <div className="result-text">
+          <div className='result-text'>
             {
               resultsState.rawResult
             }
@@ -245,29 +241,29 @@ class ResultsArea extends PureClasss<Props>
       if (resultsState.loading)
       {
         return <InfoArea
-          large="Querying results..."
+          large='Querying results...'
         />;
       }
 
       return <InfoArea
-        large="Compose a query to view results here."
+        large='Compose a query to view results here.'
       />;
     }
 
-    const {results} = resultsState;
+    const { results } = resultsState;
 
     if (!results.size)
     {
       return <InfoArea
-        large="There are no results for your query."
-        small="The query was successful, but there were no matches."
+        large='There are no results for your query.'
+        small='The query was successful, but there were no matches.'
       />;
     }
 
     if (this.state.resultFormat === 'table')
     {
       return (
-        <div className="results-table-wrapper">
+        <div className='results-table-wrapper'>
           <ResultsTable
             results={results}
             resultsConfig={this.props.query.resultsConfig}
@@ -278,11 +274,11 @@ class ResultsArea extends PureClasss<Props>
       );
     }
 
-    const {resultsConfig} = this.props.query;
+    const { resultsConfig } = this.props.query;
 
     return (
       <InfiniteScroll
-        className="results-area-results"
+        className='results-area-results'
         onRequestMoreItems={this.handleRequestMoreResults}
       >
         {
@@ -308,26 +304,26 @@ class ResultsArea extends PureClasss<Props>
         {
           this.resultsFodderRange.map(
             (i) =>
-              <div className="results-area-fodder" key={i} />,
+              <div className='results-area-fodder' key={i} />,
           )
         }
       </InfiniteScroll>
     );
   }
 
-  handleESresultExport()
+  public handleESresultExport()
   {
     this.props.onNavigationException();
 
-    const {xhr, queryId} = Ajax.query(
-        this.props.query.tql,
+    const { xhr, queryId } = Ajax.query(
+      this.props.query.tql,
       this.props.db,
       _.noop,
       _.noop,
       false,
       {
         streaming: true,
-        streamingTo: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.json'
+        streamingTo: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.json',
       },
     );
 
@@ -342,52 +338,52 @@ Note: this exports the results of your query, which may be different from the re
 column if you have set a custom results view.');
   }
 
-/*  handleExport()
-  {
-    this.props.onNavigationException();
+  /*  handleExport()
+    {
+      this.props.onNavigationException();
 
-    const {xhr, queryId} = Ajax.query(
-      .toTQL(
-        this.props.query,
+      const {xhr, queryId} = Ajax.query(
+        .toTQL(
+          this.props.query,
+          {
+            replaceInputs: true,
+          },
+        ),
+        this.props.db,
+        _.noop,
+        _.noop,
+        false,
         {
-          replaceInputs: true,
+          csv: true,
+          csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
         },
-      ),
-      this.props.db,
-      _.noop,
-      _.noop,
-      false,
-      {
-        csv: true,
-        csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
-      },
-    );
+      );
 
-    // TODO kill this on unmount
-    this.setState({
-      csvXhr: xhr,
-      csvQueryId: queryId,
-    });
+      // TODO kill this on unmount
+      this.setState({
+        csvXhr: xhr,
+        csvQueryId: queryId,
+      });
 
-    alert('Your data are being prepared for export, and will automatically download when ready.\n\
-Note: this exports the results of your query, which may be different from the results in the Results \
-column if you have set a custom results view.');
-  }*/
+      alert('Your data are being prepared for export, and will automatically download when ready.\n\
+  Note: this exports the results of your query, which may be different from the results in the Results \
+  column if you have set a custom results view.');
+    }*/
 
-  toggleView()
+  public toggleView()
   {
     this.setState({
       resultFormat: this.state.resultFormat === 'icon' ? 'table' : 'icon',
     });
   }
 
-  renderTopbar()
+  public renderTopbar()
   {
-    const {resultsState} = this.props;
+    const { resultsState } = this.props;
     let text: any = '';
     if (resultsState.loading)
     {
-      text = <span className="loading-text" />;
+      text = <span className='loading-text' />;
     }
     else if (this.isDatabaseEmpty())
     {
@@ -403,7 +399,7 @@ column if you have set a custom results view.');
     }
     else if (resultsState.results)
     {
-      const {count} = resultsState;
+      const { count } = resultsState;
       text = `${count || 'No'}${count === MAX_RESULTS ? '+' : ''} result${count === 1 ? '' : 's'}`;
     }
     else
@@ -412,30 +408,30 @@ column if you have set a custom results view.');
     }
 
     return (
-      <div className="results-top">
-        <div className="results-top-summary">
+      <div className='results-top'>
+        <div className='results-top-summary'>
           {
             text
           }
         </div>
 
         <div
-          className="results-top-config"
+          className='results-top-config'
           onClick={this.handleESresultExport}
         >
           Export
         </div>
 
         <div
-          className="results-top-config"
+          className='results-top-config'
           onClick={this.showConfig}
         >
           Customize view
         </div>
 
         <Switch
-          first="Icons"
-          second="Table"
+          first='Icons'
+          second='Table'
           onChange={this.toggleView}
           selected={this.state.resultFormat === 'icon' ? 1 : 2}
           small={true}
@@ -444,21 +440,21 @@ column if you have set a custom results view.');
     );
   }
 
-  showConfig()
+  public showConfig()
   {
     this.setState({
       showingConfig: true,
     });
   }
 
-  hideConfig()
+  public hideConfig()
   {
     this.setState({
       showingConfig: false,
     });
   }
 
-  renderConfig()
+  public renderConfig()
   {
     if (this.state.showingConfig)
     {
@@ -471,12 +467,12 @@ column if you have set a custom results view.');
     }
   }
 
-  handleConfigChange(config: ResultsConfig)
+  public handleConfigChange(config: ResultsConfig)
   {
     Actions.changeResultsConfig(config);
   }
 
-	render()
+  public render()
   {
     return (
       <div className={classNames({
@@ -484,13 +480,18 @@ column if you have set a custom results view.');
         'results-area-config-open': this.state.showingConfig,
         'results-area-table': this.state.resultFormat === 'table',
       })}>
-        { this.renderTopbar() }
-        { this.renderResults() }
-        { this.renderExpandedResult() }
-        { this.renderConfig() }
+        {this.renderTopbar()}
+        {this.renderResults()}
+        {this.renderExpandedResult()}
+        {this.renderConfig()}
       </div>
     );
-	}
+  }
+
+  private isDatabaseEmpty(): boolean
+  {
+    return !this.props.db || !this.props.db.id;
+  }
 }
 
 export default ResultsArea;

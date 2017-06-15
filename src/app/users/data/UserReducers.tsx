@@ -42,14 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import AuthStore from './../../auth/data/AuthStore';
 import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import UserTypes from './../UserTypes';
 import Actions from './UserActions';
 import ActionTypes from './UserActionTypes';
-import AuthStore from './../../auth/data/AuthStore';
-import * as Immutable from 'immutable';
 
 const UserReducers = {};
 
@@ -67,10 +68,10 @@ UserReducers[ActionTypes.fetch] =
       {
         users = users.set(
           +userId,
-          UserTypes._User(userObj)
+          UserTypes._User(userObj),
         );
       });
-      action.payload.setUsers(users);      
+      action.payload.setUsers(users);
     });
     return state.set('loading', true);
   };
@@ -82,7 +83,7 @@ UserReducers[ActionTypes.setUsers] =
       .set('currentUser', action.payload.users.get(AuthStore.getState().id))
       .set('loading', false)
       .set('loaded', true);
-  }
+  };
 
 // This currentUser reference is hacky, and we should change it.
 UserReducers[ActionTypes.updateCurrentUser] =
@@ -92,21 +93,21 @@ UserReducers[ActionTypes.updateCurrentUser] =
 
 UserReducers[ActionTypes.completeTutorial] =
   (
-    state: UserTypes.UserState, 
+    state: UserTypes.UserState,
     action: Action<{
       stepId: string,
       complete: boolean,
-    }>
+    }>,
   ) =>
   {
     state = state.setIn(
-      ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId], 
-      action.payload.complete
+      ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId],
+      action.payload.complete,
     );
-    
+
     const user = state.users.get(state.currentUser.id);
-    Ajax.saveUser(user, () => {}, () => {});
-    
+    Ajax.saveUser(user, () => { }, () => { });
+
     state = state.set('currentUser', user); // update the version of the current user reference
     return state;
   };

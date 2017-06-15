@@ -45,25 +45,25 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // Note: If anyone would like to take the time to clean up this file, be my guest.
 
+import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
 
+import { Item, ItemType } from '../../../shared/items/types/Item';
 import Query from '../../../shared/items/types/Query';
+import LibraryStore from '../library/data/LibraryStore';
+import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import LibraryTypes from './../library/LibraryTypes';
-import BackendInstance from './../../../shared/backends/types/BackendInstance';
-import {Item, ItemType} from '../../../shared/items/types/Item';
-import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
 
-import {recordForSave, responseToRecordConfig} from '../Classes';
-import {QueryRequest} from '../../../shared/backends/types/QueryRequest';
-import {MidwayError} from '../../../shared/error/MidwayError';
-import {routerShape} from 'react-router';
+import { routerShape } from 'react-router';
+import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
+import { MidwayError } from '../../../shared/error/MidwayError';
+import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
 
 export const Ajax =
@@ -90,7 +90,7 @@ export const Ajax =
       {
         const authState = AuthStore.getState();
         data = {
-          id:          authState.id,
+          id: authState.id,
           accessToken: authState.accessToken,
           body,
         };
@@ -102,7 +102,7 @@ export const Ajax =
         JSON.stringify(data),
         (response) =>
         {
-          var responseData: object = null;
+          let responseData: object = null;
           try
           {
             responseData = JSON.parse(response);
@@ -131,19 +131,19 @@ export const Ajax =
     },
 
     _reqGeneric(method: string,
-                url: string,
-                data: string,
-                onLoad: (response: any) => void,
-                config: {
-                  onError?: (response: any) => void,
-                  host?: string,
-                  crossDomain?: boolean;
-                  noToken?: boolean;
-                  download?: boolean;
-                  downloadFilename?: string;
-                  json?: boolean;
-                  urlArgs?: object;
-                } = {})
+      url: string,
+      data: string,
+      onLoad: (response: any) => void,
+      config: {
+        onError?: (response: any) => void,
+        host?: string,
+        crossDomain?: boolean;
+        noToken?: boolean;
+        download?: boolean;
+        downloadFilename?: string;
+        json?: boolean;
+        urlArgs?: object;
+      } = {})
     {
       const host = config.host || MIDWAY_HOST;
       let fullUrl = host + url;
@@ -193,7 +193,7 @@ export const Ajax =
           Actions.logout();
         }
 
-        if (xhr.status != 200)
+        if (xhr.status !== 200)
         {
           config && config.onError && config.onError(xhr.responseText);
           return;
@@ -216,7 +216,7 @@ export const Ajax =
           }
         }
         catch (e)
-        {}
+        { }
       }
       else if (config.urlArgs)
       {
@@ -318,8 +318,8 @@ export const Ajax =
         'post',
         `users/${id}`,
         {
-          oldPassword: oldPassword,
-          password:    newPassword,
+          oldPassword,
+          password: newPassword,
         },
         onSave,
         {
@@ -334,7 +334,7 @@ export const Ajax =
         `users/${user.id}`,
         {
           isSuperUser: user.isSuperUser ? 1 : 0,
-          isDisabled:  user.isDisabled ? 1 : 0,
+          isDisabled: user.isDisabled ? 1 : 0,
         },
         _.noop,
       );
@@ -358,7 +358,7 @@ export const Ajax =
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
       variants: IMMap<number, LibraryTypes.Variant>,
       groupsOrder: IMList<number, any>) => void,
-      onError?: (ev: Event) => void,)
+      onError?: (ev: Event) => void)
     {
       return Ajax.req(
         'get',
@@ -368,12 +368,12 @@ export const Ajax =
         {
           const mapping =
             {
-              VARIANT:   Immutable.Map<number, LibraryTypes.Variant>({}) as any,
+              VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
               ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}),
-              GROUP:     Immutable.Map<number, LibraryTypes.Group>({}),
-              QUERY:     Immutable.Map<number, Query>({}),
+              GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
+              QUERY: Immutable.Map<number, Query>({}),
             };
-          let groupsOrder = [];
+          const groupsOrder = [];
 
           items.map(
             (itemObj) =>
@@ -390,15 +390,15 @@ export const Ajax =
           );
 
           mapping.ALGORITHM = mapping.ALGORITHM.map(
-            alg => alg.set('groupId', alg.parent),
+            (alg) => alg.set('groupId', alg.parent),
           ).toMap();
 
           mapping.VARIANT = mapping.VARIANT.map(
-            v =>
+            (v) =>
             {
               v = v.set('algorithmId', v.parent);
               const alg = mapping.ALGORITHM.get(v.algorithmId);
-              if(alg)
+              if (alg)
               {
                 v = v.set('groupId', alg.groupId);
               }
@@ -540,7 +540,7 @@ export const Ajax =
     },
 
     getQuery(variantId: ID,
-      onLoad: (query: Query, variant: LibraryTypes.Variant) => void,)
+      onLoad: (query: Query, variant: LibraryTypes.Variant) => void)
     {
       if (!variantId)
       {
@@ -628,16 +628,18 @@ export const Ajax =
           onError,
           download: options.streaming,
           downloadFilename: options.streamingTo,
-         },
+        },
       );
 
-      return {queryId, xhr};
+      return { queryId, xhr };
     },
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1
-      return Ajax.req('get', 'database/' + dbId + '/schema', {}, (response: any) => {
-        try {
+      return Ajax.req('get', 'database/' + dbId + '/schema', {}, (response: any) =>
+      {
+        try
+        {
           const cols: object = JSON.parse(response);
           onLoad(cols);
         }
@@ -654,34 +656,34 @@ export const Ajax =
       let m2Dbs: BackendInstance[] = null;
       const checkForLoaded = () =>
       {
-        if(!m1Dbs || !m2Dbs)
+        if (!m1Dbs || !m2Dbs)
         {
           return;
         }
 
         let dbs: BackendInstance[] = [];
-        if(m1Dbs)
+        if (m1Dbs)
         {
           dbs = m1Dbs;
         }
-        if(m2Dbs)
+        if (m2Dbs)
         {
           dbs = dbs.concat(m2Dbs);
         }
         onLoad(dbs, !!(m1Dbs && m2Dbs));
-      }
+      };
 
       AjaxM1.getDbs_m1(
         (dbNames: string[]) =>
         {
           m1Dbs = dbNames.map(
             (dbName: string) =>
-            ({
-              id: dbName,
-              name: dbName,
-              type: 'mysql',
-              source: 'm1' as ('m1' | 'm2'),
-            })
+              ({
+                id: dbName,
+                name: dbName,
+                type: 'mysql',
+                source: 'm1' as ('m1' | 'm2'),
+              }),
           );
           checkForLoaded();
         },
@@ -689,16 +691,16 @@ export const Ajax =
         {
           m1Dbs = [];
           checkForLoaded();
-        }
+        },
       );
 
       Ajax.req(
         'get',
         'database',
-        { },
+        {},
         (dbs: [BackendInstance]) =>
         {
-          m2Dbs = dbs.map(db =>
+          m2Dbs = dbs.map((db) =>
           {
             db['source'] = 'm2';
             return db;
@@ -708,11 +710,11 @@ export const Ajax =
         {
           onError: (e) =>
           {
-            onError && onError(e)
+            onError && onError(e);
             m2Dbs = [] as any;
             checkForLoaded();
-          }
-        }
+          },
+        },
       );
     },
     login(email: string,

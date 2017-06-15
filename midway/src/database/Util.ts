@@ -65,8 +65,27 @@ export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConf
   }
   else if (type === 'mysql')
   {
+    let host: string = 'localhost';
+    let port: number = 3306;
+
+    const hp = dsn.split(':');
+    if (hp.length === 1)
+    {
+      host = dsn;
+    }
+    else if (hp.length === 2)
+    {
+      host = hp[0];
+      port = parseInt(hp[1], 10);
+    }
+    else
+    {
+      throw new Error('Error interpreting DSN parameter for MySQL.');
+    }
+
     return {
-      host: dsn,
+      host,
+      port,
     } as MySQLConfig;
   }
   else if (type === 'elasticsearch' || type === 'elastic')

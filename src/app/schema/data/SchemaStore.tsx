@@ -46,16 +46,16 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import Redux = require('redux');
-import {Store} from 'redux';
+import { Store } from 'redux';
 import * as ReduxActions from 'redux-actions';
 import SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
 import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
@@ -66,124 +66,125 @@ export const SchemaStore: Store<SchemaState> =
   Redux.createStore(ReduxActions.handleActions<SchemaState, any>(
     {
       [SchemaActionTypes.fetch]:
-        (state: SchemaState) =>
-        {
-          Ajax.getDbs(
-            (dbs: object) =>
-            {
-              SchemaActions.dbCount(Object.keys(dbs).length);
-              _.map((dbs as any),
-                (db: BackendInstance) =>
-                  (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
-                    db['id'],
-                    (colsData, error) =>
+      (state: SchemaState) =>
+      {
+        Ajax.getDbs(
+          (dbs: object) =>
+          {
+            SchemaActions.dbCount(Object.keys(dbs).length);
+            _.map((dbs as any),
+              (db: BackendInstance) =>
+                (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
+                  db['id'],
+                  (colsData, error) =>
+                  {
+                    if (!error)
                     {
-                      if (!error)
+                      if (db['type'] === 'mysql')
                       {
-                        if (db['type'] === 'mysql')
-                        {
-                          SchemaParser.parseMySQLDb(db, colsData, SchemaActions.setDatabase);
-                        }
-                        else if (db['type'] === 'elastic')
-                        {
-                          SchemaParser.parseElasticDb(db, colsData, SchemaActions.setDatabase);
-                        }
+                        SchemaParser.parseMySQLDb(db, colsData, SchemaActions.setDatabase);
                       }
-                    },
-                    (error) =>
-                    {
-                      // TODO consider handling individual DB errors
-                    }),
-              );
-            },
-            (dbError) =>
-            {
-              SchemaActions.error(JSON.stringify(dbError));
-            },
-          );
+                      else if (db['type'] === 'elastic')
+                      {
+                        SchemaParser.parseElasticDb(db, colsData, SchemaActions.setDatabase);
+                      }
+                    }
+                  },
+                  (error) =>
+                  {
+                    // TODO consider handling individual DB errors
+                  }),
+            );
+          },
+          (dbError) =>
+          {
+            SchemaActions.error(JSON.stringify(dbError));
+          },
+        );
 
-          return state
-            .set('loading', true);
-        },
+        return state
+          .set('loading', true);
+      },
 
       [SchemaActionTypes.dbCount]:
-        (
-          state: SchemaState,
-          action: Action<{
-            dbCount: number,
-          }>,
-        ) =>
-          state.set('dbCount', action.payload.dbCount),
+      (
+        state: SchemaState,
+        action: Action<{
+          dbCount: number,
+        }>,
+      ) =>
+        state.set('dbCount', action.payload.dbCount),
 
       [SchemaActionTypes.setDatabase]:
-        (
-          state: SchemaState,
-          action: Action<SchemaTypes.SetDbActionPayload>,
-        ) => {
-          const {database, tables, columns, indexes, tableNames, columnNames} = action.payload;
-          if (state.databases.size === state.dbCount - 1)
-          {
-            state = state.set('loading', false).set('loaded', true);
-          }
+      (
+        state: SchemaState,
+        action: Action<SchemaTypes.SetDbActionPayload>,
+      ) =>
+      {
+        const { database, tables, columns, indexes, tableNames, columnNames } = action.payload;
+        if (state.databases.size === state.dbCount - 1)
+        {
+          state = state.set('loading', false).set('loaded', true);
+        }
 
-          return state
-            .setIn(['databases', database.id], database)
-            .set('tables', state.tables.merge(tables))
-            .set('columns', state.columns.merge(columns))
-            .set('indexes', state.indexes.merge(indexes))
-            .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-            .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
-        },
+        return state
+          .setIn(['databases', database.id], database)
+          .set('tables', state.tables.merge(tables))
+          .set('columns', state.columns.merge(columns))
+          .set('indexes', state.indexes.merge(indexes))
+          .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+          .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+      },
 
       [SchemaActionTypes.selectId]:
-        (state: SchemaState, action: Action<{ id: ID }>) =>
-          state.set('selectedId', action.payload.id),
+      (state: SchemaState, action: Action<{ id: ID }>) =>
+        state.set('selectedId', action.payload.id),
 
       [SchemaActionTypes.highlightId]:
-        (state: SchemaState, action: Action<{
-          id: ID,
-          inSearchResults: boolean,
-        }>) =>
-          state.set('highlightedId', action.payload.id)
-            .set('highlightedInSearchResults', action.payload.inSearchResults),
+      (state: SchemaState, action: Action<{
+        id: ID,
+        inSearchResults: boolean,
+      }>) =>
+        state.set('highlightedId', action.payload.id)
+          .set('highlightedInSearchResults', action.payload.inSearchResults),
     },
     DEV ? ExampleSchemaData : SchemaTypes._SchemaState(),
   ), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
 
-const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload});
+const $ = (type: string, payload: any) => SchemaStore.dispatch({ type, payload });
 
 export const SchemaActions =
   {
     fetch:
-      () =>
-        $(SchemaActionTypes.fetch, {} ),
+    () =>
+      $(SchemaActionTypes.fetch, {}),
 
     dbCount:
-      (dbCount: number) =>
-        $(SchemaActionTypes.dbCount, { dbCount }),
+    (dbCount: number) =>
+      $(SchemaActionTypes.dbCount, { dbCount }),
 
     error:
-      (error: string) =>
-        $(SchemaActionTypes.error, { error }),
+    (error: string) =>
+      $(SchemaActionTypes.error, { error }),
 
     setDatabase:
-      (
-        payload: SchemaTypes.SetDbActionPayload,
-      ) =>
-        $(SchemaActionTypes.setDatabase, payload),
+    (
+      payload: SchemaTypes.SetDbActionPayload,
+    ) =>
+      $(SchemaActionTypes.setDatabase, payload),
 
     highlightId:
-      (id: ID, inSearchResults: boolean) =>
-        $(SchemaActionTypes.highlightId, {
-          id,
-          inSearchResults,
-        }),
+    (id: ID, inSearchResults: boolean) =>
+      $(SchemaActionTypes.highlightId, {
+        id,
+        inSearchResults,
+      }),
 
     selectId:
-      (id: ID) =>
-        $(SchemaActionTypes.selectId, {
-          id,
-        }),
+    (id: ID) =>
+      $(SchemaActionTypes.selectId, {
+        id,
+      }),
 
   };
 

@@ -42,112 +42,113 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 const color = require('color');
 const active = '#00A7F7';
 const lighterActive = color(active).lighten(0.25).string();
 
 export const Styles =
-{
-	margin: 6,
+  {
+    margin: 6,
 
-	colors:
-	{
-		text:
-		{
-			light: '#aaa',
-			white: '#fff',
-			black: 'rgba(0,0,0,0.8)',
+    colors:
+    {
+      text:
+      {
+        light: '#aaa',
+        white: '#fff',
+        black: 'rgba(0,0,0,0.8)',
 
-			loading: '#aaa',
-		},
+        loading: '#aaa',
+      },
 
-		active,
+      active,
 
-		transBlack: 'rgba(0,0,0,0.75)',
-	},
+      transBlack: 'rgba(0,0,0,0.75)',
+    },
 
-	link:
-	{
-		'color': active,
-		'cursor': 'pointer',
+    link:
+    {
+      'color': active,
+      'cursor': 'pointer',
 
-		':hover':
-		{
-			color: lighterActive,
-		},
-	},
+      ':hover':
+      {
+        color: lighterActive,
+      },
+    },
 
-	font:
-	{
-		title: {
-		  fontWeight: 1000,
-		  fontSize: '16px',
-		},
-		semiBoldBig: {
-		  fontWeight: 600,
-		  fontSize: '14px',
-		},
-		big: {
-		  fontWeight: 400,
-		  fontSize: '14px',
-		},
-		boldNormal: {
-		  fontWeight: 1000,
-		  fontSize: '12px',
-		},
-		semiBoldNormal: {
-		  fontWeight: 500,
-		  fontSize: '12px',
-		},
-		normal: {
-		  fontWeight: 400,
-		  fontSize: '12px',
-		},
-		smallBold: {
-		  fontWeight: 1000,
-		  fontSize: '10px',
-		},
-		small: {
-		  fontWeight: 400,
-		  fontSize: '10px',
-		},
-		smallest: {
-		  fontWeight: 400,
-		  fontSize: '9px',
-		},
-	},
+    font:
+    {
+      title: {
+        fontWeight: 1000,
+        fontSize: '16px',
+      },
+      semiBoldBig: {
+        fontWeight: 600,
+        fontSize: '14px',
+      },
+      big: {
+        fontWeight: 400,
+        fontSize: '14px',
+      },
+      boldNormal: {
+        fontWeight: 1000,
+        fontSize: '12px',
+      },
+      semiBoldNormal: {
+        fontWeight: 500,
+        fontSize: '12px',
+      },
+      normal: {
+        fontWeight: 400,
+        fontSize: '12px',
+      },
+      smallBold: {
+        fontWeight: 1000,
+        fontSize: '10px',
+      },
+      small: {
+        fontWeight: 400,
+        fontSize: '10px',
+      },
+      smallest: {
+        fontWeight: 400,
+        fontSize: '9px',
+      },
+    },
 
-	rotate90neg:
-	{
-	  MozTransform: 'rotate(-90deg)',
-	  WebkitTransform: 'rotate(-90deg)',
-	  OTransform: 'rotate(-90deg)',
-	  msTransform: 'rotate(-90deg)',
-	  transform: 'rotate(-90deg)',
-	},
+    rotate90neg:
+    {
+      MozTransform: 'rotate(-90deg)',
+      WebkitTransform: 'rotate(-90deg)',
+      OTransform: 'rotate(-90deg)',
+      msTransform: 'rotate(-90deg)',
+      transform: 'rotate(-90deg)',
+    },
 
-	rotate90:
-	{
-	  MozTransform: 'rotate(90deg)',
-	  WebkitTransform: 'rotate(90deg)',
-	  OTransform: 'rotate(90deg)',
-	  msTransform: 'rotate(90deg)',
-	  transform: 'rotate(90deg)',
-	},
+    rotate90:
+    {
+      MozTransform: 'rotate(90deg)',
+      WebkitTransform: 'rotate(90deg)',
+      OTransform: 'rotate(90deg)',
+      msTransform: 'rotate(90deg)',
+      transform: 'rotate(90deg)',
+    },
 
-	rotate180: {
-	  MozTransform: 'rotate(180deg)',
-	  WebkitTransform: 'rotate(180deg)',
-	  OTransform: 'rotate(180deg)',
-	  msTransform: 'rotate(180deg)',
-	  transform: 'rotate(180deg)',
-	},
+    rotate180: {
+      MozTransform: 'rotate(180deg)',
+      WebkitTransform: 'rotate(180deg)',
+      OTransform: 'rotate(180deg)',
+      msTransform: 'rotate(180deg)',
+      transform: 'rotate(180deg)',
+    },
 
-	transition:
-	{
-	  WebkitTransition: 'all 0.15s',
-	  transition: 'all 0.15s',
-	},
-};
+    transition:
+    {
+      WebkitTransition: 'all 0.15s',
+      transition: 'all 0.15s',
+    },
+  };
 
 export default Styles;

@@ -42,15 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
+import Radium = require('radium');
 
 export interface Props
 {
-	item: SchemaTypes.Database;
+  item: SchemaTypes.Database;
 }
 
 class State
@@ -60,36 +61,36 @@ class State
 @Radium
 export class DatabaseTreeInfo extends PureClasss<Props>
 {
-	state: State = new State();
+  public state: State = new State();
 
-  render()
+  public render()
   {
-  	const database = this.props.item;
+    const database = this.props.item;
 
     return (
       <div
-      	style={Styles.infoPieces}
+        style={Styles.infoPieces}
       >
-      	<div
-      		style={Styles.infoPiece}
-      	>
-      		<span
-      			style={Styles.infoPieceNumber as any}
-      		>
-      			{ database.tableIds.size }
-      		</span> tables
-      	</div>
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {database.tableIds.size}
+          </span> tables
+        </div>
       </div>
     );
   }
 }
 
 export const databaseChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-[
-  {
-    label: 'Tables',
-    type: 'table',
-  },
-];
+  [
+    {
+      label: 'Tables',
+      type: 'table',
+    },
+  ];
 
 export default DatabaseTreeInfo;

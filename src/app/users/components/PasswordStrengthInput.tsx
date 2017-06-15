@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Settings.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -50,77 +50,85 @@ import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 import PasswordMeter from './PasswordMeter';
+import './Settings.less';
 const zxcvbn = require('zxcvbn');
 
-export interface Props {
-	onChange: (ev: any) => void;
-	value: string;
-	type: string;
+export interface Props
+{
+  onChange: (ev: any) => void;
+  value: string;
+  type: string;
 }
 
 class PasswordStrengthInput extends Classs<Props>
 {
-	constructor(Props) {
-		super(Props);
-		this.state = {
-			score: -1,
-		};
-	}
+  constructor(Props)
+  {
+    super(Props);
+    this.state = {
+      score: -1,
+    };
+  }
 
-	handleInput(event) {
-		event.preventDefault();
-		const password = event.target.value;
-		if (password.length === 0)
-		{
-			this.setState({
-				score: -1,
-			});
-			return;
-		}
-		const result = zxcvbn(password);
-		const crack_time = result.crack_times_seconds.online_no_throttling_10_per_second;
-		let score;
-		if (crack_time <= Math.pow(10, 2))
-		{
-			score = 0;
-		}
-		else if (crack_time <= Math.pow(10, 4)) {
-			score = 1;
-		}
-		else if (crack_time <= Math.pow(10, 6)) {
-			score = 2;
-		}
-		else if (crack_time <= Math.pow(10, 8)) {
-			score = 3;
-		}
-		else if (crack_time <= Math.pow(10, 10)) {
-			score = 4;
-		}
-		else
-		{
-			score = 5;
-		}
+  public handleInput(event)
+  {
+    event.preventDefault();
+    const password = event.target.value;
+    if (password.length === 0)
+    {
+      this.setState({
+        score: -1,
+      });
+      return;
+    }
+    const result = zxcvbn(password);
+    const crack_time = result.crack_times_seconds.online_no_throttling_10_per_second;
+    let score;
+    if (crack_time <= Math.pow(10, 2))
+    {
+      score = 0;
+    }
+    else if (crack_time <= Math.pow(10, 4))
+    {
+      score = 1;
+    }
+    else if (crack_time <= Math.pow(10, 6))
+    {
+      score = 2;
+    }
+    else if (crack_time <= Math.pow(10, 8))
+    {
+      score = 3;
+    }
+    else if (crack_time <= Math.pow(10, 10))
+    {
+      score = 4;
+    }
+    else
+    {
+      score = 5;
+    }
 
-		this.setState({
-			score,
-		});
-	}
+    this.setState({
+      score,
+    });
+  }
 
-	render()
-	{
-		return(
-			<div>
-				<input
-					type={this.props.type}
-					value={this.props.value}
-					onChange={this.props.onChange}
-					onInput={this.handleInput}
-					className="settings-input password-input"
-				/>
-				<PasswordMeter value={this.state.score}/>
-			</div>
-		);
-	}
+  public render()
+  {
+    return (
+      <div>
+        <input
+          type={this.props.type}
+          value={this.props.value}
+          onChange={this.props.onChange}
+          onInput={this.handleInput}
+          className='settings-input password-input'
+        />
+        <PasswordMeter value={this.state.score} />
+      </div>
+    );
+  }
 }
 
 export default PasswordStrengthInput;

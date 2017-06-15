@@ -42,20 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-const {Map, List} = Immutable;
+const { Map, List } = Immutable;
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import Block from '../../../../../shared/blocks/types/Block';
+import { Card, CardString } from '../../../../../shared/blocks/types/Card';
+import { M1QueryResponse } from '../../../util/AjaxM1';
 import AjaxM1 from '../../../util/AjaxM1';
-import {M1QueryResponse} from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
 import TransformCardChart from './TransformCardChart';
-import { Card, CardString } from '../../../../../shared/blocks/types/Card';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import Block from '../../../../../shared/blocks/types/Block';
 
 import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
 
@@ -92,7 +93,7 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 
 class TransformCard extends PureClasss<Props>
 {
-  state: {
+  public state: {
     domain: List<number>;
     range: List<number>;
     bars: Bars;
@@ -113,7 +114,7 @@ class TransformCard extends PureClasss<Props>
     };
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.computeBars(this.props.data.input);
     this._subscribe(SpotlightStore, {
@@ -123,7 +124,7 @@ class TransformCard extends PureClasss<Props>
     });
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.data.input !== this.props.data.input)
     {
@@ -144,7 +145,7 @@ class TransformCard extends PureClasss<Props>
     }
   }
 
-  trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
+  public trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
   {
     const low = maxDomain.get(0);
     const high = maxDomain.get(1);
@@ -156,12 +157,12 @@ class TransformCard extends PureClasss<Props>
     ]);
   }
 
-  findTableForAlias(data: Block | List<Block>, alias: string): string
+  public findTableForAlias(data: Block | List<Block>, alias: string): string
   {
     if (Immutable.List.isList(data))
     {
       const list = data as List<Block>;
-      for (let i = 0; i < list.size; i ++)
+      for (let i = 0; i < list.size; i++)
       {
         const table = this.findTableForAlias(list.get(i), alias);
         if (table)
@@ -199,7 +200,7 @@ class TransformCard extends PureClasss<Props>
   }
 
   // TODO move the bars computation to a higher level
-  computeBars(input: CardString)
+  public computeBars(input: CardString)
   {
     if (this.props.language !== 'mysql')
     {
@@ -208,9 +209,9 @@ class TransformCard extends PureClasss<Props>
     }
 
     // TODO consider putting the query in context
-    const {builderState} = this.props;
-    const {cards} = builderState.query;
-    const {db} = builderState;
+    const { builderState } = this.props;
+    const { cards } = builderState.query;
+    const { db } = builderState;
 
     if (typeof input === 'string')
     {
@@ -304,19 +305,19 @@ class TransformCard extends PureClasss<Props>
     });
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.state.queryXhr && this.state.queryXhr.abort();
     this.killQuery();
   }
 
-  killQuery()
+  public killQuery()
   {
     this && this.state && this.state.queryId &&
       AjaxM1.killQuery(this.state.queryId);
   }
 
-  handleQueryResponse(response: M1QueryResponse)
+  public handleQueryResponse(response: M1QueryResponse)
   {
     this.setState({
       queryXhr: null,
@@ -348,7 +349,7 @@ class TransformCard extends PureClasss<Props>
       }
 
       const bars: Bar[] = [];
-      for (let j = 0; j < NUM_BARS; j ++)
+      for (let j = 0; j < NUM_BARS; j++)
       {
         bars.push({
           id: '' + j,
@@ -375,7 +376,7 @@ class TransformCard extends PureClasss<Props>
           return;
         }
 
-        bars[i].count ++;
+        bars[i].count++;
         bars[i].percentage += 1 / results.length;
       });
 
@@ -394,7 +395,7 @@ class TransformCard extends PureClasss<Props>
     }
   }
 
-  handleQueryError(error: any)
+  public handleQueryError(error: any)
   {
     this.setState({
       bars: List([]),
@@ -404,14 +405,14 @@ class TransformCard extends PureClasss<Props>
     });
   }
 
-  handleDomainChange(domain: List<number>)
+  public handleDomainChange(domain: List<number>)
   {
     this.setState({
       domain,
     });
   }
 
-  handleUpdatePoints(points, isConcrete?: boolean)
+  public handleUpdatePoints(points, isConcrete?: boolean)
   {
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
     // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
@@ -419,15 +420,15 @@ class TransformCard extends PureClasss<Props>
     //  in more than one state on the Undo stack.
   }
 
-  render()
+  public render()
   {
     const spotlights = this.state.spotlights;
-    const {data} = this.props;
+    const { data } = this.props;
     const width = this.props.containerWidth ? this.props.containerWidth + 110 : 300;
 
     return (
       <div
-        className="transform-card-inner"
+        className='transform-card-inner'
       >
         <TransformCardChart
           canEdit={this.props.canEdit}

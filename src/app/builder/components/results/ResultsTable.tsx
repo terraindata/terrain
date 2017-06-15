@@ -42,18 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
-import {MenuOption} from '../../../common/components/Menu';
+import { MenuOption } from '../../../common/components/Menu';
 import PureClasss from '../../../common/components/PureClasss';
-import {IColumn, Table} from '../../../common/components/Table';
+import { IColumn, Table } from '../../../common/components/Table';
 import ColorManager from '../../../util/ColorManager';
-import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
-import {getResultFields, getResultName, getResultValue} from './Result';
-import {getPrimaryKeyFor, MAX_RESULTS, Results} from './ResultsManager';
-import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import { getResultFields, getResultName, getResultValue } from './Result';
+import { getPrimaryKeyFor, MAX_RESULTS, Results } from './ResultsManager';
 
 export interface Props
 {
@@ -65,7 +66,7 @@ export interface Props
 
 export default class ResultsTable extends PureClasss<Props>
 {
-  state: {
+  public state: {
     random: number;
     spotlightState: SpotlightState;
     columns: List<IColumn>;
@@ -75,14 +76,14 @@ export default class ResultsTable extends PureClasss<Props>
     columns: this.getColumns(this.props),
   };
 
-  menuOptions: List<MenuOption> = Immutable.List([
+  public menuOptions: List<MenuOption> = Immutable.List([
     {
       text: 'Spotlight',
       onClick: this.spotlight,
     },
   ]);
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.results !== this.props.results || nextProps.resultsConfig !== this.props.resultsConfig)
     {
@@ -94,9 +95,9 @@ export default class ResultsTable extends PureClasss<Props>
     }
   }
 
-  getColumns(props: Props): List<IColumn>
+  public getColumns(props: Props): List<IColumn>
   {
-    const {resultsConfig} = props;
+    const { resultsConfig } = props;
     let cols: IColumn[] = [];
 
     if (resultsConfig.enabled)
@@ -138,7 +139,7 @@ export default class ResultsTable extends PureClasss<Props>
             key: field,
             name: field,
             resizable: true,
-            width:120,
+            width: 120,
           }),
       );
     }
@@ -169,7 +170,7 @@ export default class ResultsTable extends PureClasss<Props>
     return Immutable.List(cols);
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this._subscribe(SpotlightStore, {
       isMounted: true,
@@ -201,7 +202,7 @@ export default class ResultsTable extends PureClasss<Props>
   //   return config.fields.get(fieldIndex);
   // }
 
-  getRow(i: number): Object
+  public getRow(i: number): Object
   {
     // TODO
     return this.props.results.get(i).fields.toJS();
@@ -241,12 +242,12 @@ export default class ResultsTable extends PureClasss<Props>
   //   return this.state.resultsConfig.name !== "";
   // }
 
-  handleCellClick(r: number, c: number)
+  public handleCellClick(r: number, c: number)
   {
     this.props.onExpand(r);
   }
 
-  spotlight(menuIndex: number, rc: string)
+  public spotlight(menuIndex: number, rc: string)
   {
     // TODO
     const row = rc.split('-')[0];
@@ -262,11 +263,11 @@ export default class ResultsTable extends PureClasss<Props>
     spotlightAction(id, spotlightData);
   }
 
-  render()
+  public render()
   {
     if (!this.props.results)
     {
-      return <InfoArea large="Loading..." />;
+      return <InfoArea large='Loading...' />;
     }
 
     // let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);

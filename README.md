@@ -115,7 +115,8 @@ To setup a node project using typescript for debugging inside webstorm:
   * Set any other args or options you like
   * Now you can run the script inside Webstorm!
   * To debug an npm script add `$NODE_DEBUG_OPTION` to the command line: http://pavelpolyakov.com/2016/05/01/webstorm-npm-tasks-debug/
-  * To run & debug jest tests with teh integrated jest runner, add a run/debug configuration of type `jest` in the root source directory
+  * To run & debug jest tests with the integrated jest runner, add a run/debug configuration of type `jest` in the root source directory
+  * To debug frontline in webstorm, follow the steps here: https://blog.jetbrains.com/webstorm/2017/01/debugging-react-apps/
 
 
 ## Major Dependencies

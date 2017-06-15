@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ElasticQueryResult from '../elastic/ElasticQueryResponse';
 import MidwayErrorItem from '../../error/MidwayErrorItem';
+import ElasticQueryResult from '../elastic/ElasticQueryResponse';
 import QueryRequest from './QueryRequest';
-import QueryResponse, {QueryResult} from './QueryResponse';
+import QueryResponse, { QueryResult } from './QueryResponse';
 
 export default class MidwayQueryResponse extends QueryResponse
 {
@@ -78,7 +78,7 @@ export default class MidwayQueryResponse extends QueryResponse
       return source;
     });
     ret = results;
-    return  ret;
+    return ret;
   }
 
   public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)

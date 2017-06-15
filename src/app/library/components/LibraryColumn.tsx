@@ -42,7 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./LibraryColumn.less');
+// Copyright 2017 Terrain Data, Inc.
+import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -56,7 +57,7 @@ export interface Props
 
 class LibraryColumn extends Classs<Props>
 {
-  render()
+  public render()
   {
     return (
       <div
@@ -64,10 +65,10 @@ class LibraryColumn extends Classs<Props>
       >
         {
           this.props.title ?
-            <div className="library-column-title">
-              { this.props.title }
+            <div className='library-column-title'>
+              {this.props.title}
             </div>
-          : null
+            : null
         }
         <div className={classNames({
           'library-column-content': true,
@@ -77,7 +78,7 @@ class LibraryColumn extends Classs<Props>
             this.props['children']
           }
         </div>
-        <div className="library-column-border" />
+        <div className='library-column-border' />
       </div>
     );
   }

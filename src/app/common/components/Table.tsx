@@ -42,15 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import * as _ from 'underscore';
 const ReactDataGrid = require('react-data-grid');
 
-require('./Table.less');
+import './Table.less';
 
 import * as classNames from 'classnames';
-import {Menu, MenuOption} from '../../common/components/Menu';
+import { Menu, MenuOption } from '../../common/components/Menu';
 import Util from '../../util/Util';
 import PureClasss from './PureClasss';
 const Dimensions = require('react-dimensions');
@@ -90,7 +91,7 @@ const MAX_INIT_WIDTH = 300;
 
 class _Table extends PureClasss<Props>
 {
-  state: {
+  public state: {
   } = {
   };
 
@@ -99,7 +100,7 @@ class _Table extends PureClasss<Props>
     super(props);
   }
 
-  render()
+  public render()
   {
     console.log(this.props.containerHeight);
     return (
@@ -120,7 +121,8 @@ export const Table = Dimensions({
   },
 })(_Table);
 
-function hexToRgb(hex) {
+function hexToRgb(hex)
+{
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
     r: parseInt(result[1], 16),
@@ -133,7 +135,8 @@ function hexToRgb(hex) {
  * Ported from sass implementation in C
  * https://github.com/sass/libsass/blob/0e6b4a2850092356aa3ece07c6b249f0221caced/functions.cpp#L209
  */
-function mixColors(color1, color2, amount) {
+function mixColors(color1, color2, amount)
+{
   const weight1 = amount;
   const weight2 = 1 - amount;
 

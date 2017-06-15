@@ -42,36 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-const {Map, List} = Immutable;
+const { Map, List } = Immutable;
+import { line } from 'd3-shape';
 import * as React from 'react';
 import * as _ from 'underscore';
-import {BaseClass, New} from '../../../Classes';
-import AjaxM1, {M1QueryResponse} from '../../../util/AjaxM1';
-import {Ajax} from '../../../util/Ajax';
-import Util from '../../../util/Util';
-import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
-import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
-import PureClasss from './../../../common/components/PureClasss';
-import {MidwayErrorItem} from '../../../../../shared/error/MidwayErrorItem';
-import {line} from 'd3-shape';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import MidwayQueryResponse from '../../../../../shared/backends/types/MidwayQueryResponse';
 import MidwayError from '../../../../../shared/error/MidwayError';
+import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import Query from '../../../../../shared/items/types/Query';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import {ResultsConfig, _ResultsConfig} from '../../../../../shared/results/types/ResultsConfig';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { BaseClass, New } from '../../../Classes';
+import { Ajax } from '../../../util/Ajax';
+import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
+import Util from '../../../util/Util';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
+import PureClasss from './../../../common/components/PureClasss';
 
 export const MAX_RESULTS = 200;
 
 class ResultClass extends BaseClass
 {
   // all available fields for display
-  fields: IMMap<string, string> = Map<string, string>({});
+  public fields: IMMap<string, string> = Map<string, string>({});
 
-  spotlight: any;
+  public spotlight: any;
 
-  rawFields: IMMap<string, string> = Map<string, string>({});
-  transformFields: IMMap<string, string> = Map<string, string>({});
+  public rawFields: IMMap<string, string> = Map<string, string>({});
+  public transformFields: IMMap<string, string> = Map<string, string>({});
 }
 export type Result = ResultClass & IRecord<ResultClass>;
 const _Result = (config: Object = {}) =>
@@ -81,29 +82,29 @@ export type Results = List<Result>;
 
 class ResultsStateC extends BaseClass
 {
-  results: Results = List([]);
-  fields: List<string> = List([]);
-  count: number = 0;
-  rawResult: string = '';
+  public results: Results = List([]);
+  public fields: List<string> = List([]);
+  public count: number = 0;
+  public rawResult: string = '';
 
-  primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
+  public primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
 
-  hasError: boolean = false;
-  errorMessage: string = '';
-  hasAllFieldsError: boolean = false;
-  allFieldsErrorMessage: string = '';
-  mainErrorMessage: string = '';
-  subErrorMessage: string = '';
-  errorLine: number = -1;
+  public hasError: boolean = false;
+  public errorMessage: string = '';
+  public hasAllFieldsError: boolean = false;
+  public allFieldsErrorMessage: string = '';
+  public mainErrorMessage: string = '';
+  public subErrorMessage: string = '';
+  public errorLine: number = -1;
 
-  valid: boolean = false; // are these results still valid for the given query?
+  public valid: boolean = false; // are these results still valid for the given query?
 
-  loading: boolean = false; // if we're still loading any fields, besides for the count
+  public loading: boolean = false; // if we're still loading any fields, besides for the count
 
-  hasLoadedResults: boolean = false;
-  hasLoadedAllFields: boolean = false;
-  hasLoadedCount: boolean = false;
-  hasLoadedTransform: boolean = false;
+  public hasLoadedResults: boolean = false;
+  public hasLoadedAllFields: boolean = false;
+  public hasLoadedCount: boolean = false;
+  public hasLoadedTransform: boolean = false;
 }
 export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
 export let _ResultsState = (config: Object = {}) =>
@@ -139,25 +140,25 @@ const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
 export class ResultsManager extends PureClasss<Props>
 {
-  state: State = {};
+  public state: State = {};
 
   // apply a function to all active queries
-  mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
+  public mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
   {
     stateQueries.map(
       (stateKey) =>
         this && this.state && this.state[stateKey] &&
-          fn(this.state[stateKey], stateKey),
+        fn(this.state[stateKey], stateKey),
     );
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     Util.addBeforeLeaveHandler(this.killQueries);
     this.queryResults(this.props.query, this.props.db);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.killQueries();
 
@@ -166,6 +167,173 @@ export class ResultsManager extends PureClasss<Props>
         this.setState({
           [stateKey]: null,
         }),
+    );
+  }
+
+  public queryResults(query: Query, db: BackendInstance)
+  {
+    if (!query || !db)
+    {
+      return;
+    }
+
+    if (db.source === 'm1')
+    {
+      this.queryM1Results(query, db);
+    } else if (db.source === 'm2')
+    {
+      this.queryM2Results(query, db);
+    } else
+    {
+      console.log('Unknown Database ' + query);
+    }
+    // temporarily disable count
+    // this.setState({
+    //   countXhr:
+    //     Ajax.query(
+    //       TQLConverter.toTQL(query, {
+    //         count: true,
+    //         replaceInputs: true,
+    //       }),
+    //       db,
+    //       this.handleCountResponse,
+    //       this.handleCountError
+    //     ),
+    // });
+  }
+
+  public killQueries()
+  {
+    this.mapQueries(
+      (query) =>
+      {
+        AjaxM1.killQuery(query.queryId);
+        query.xhr.abort();
+      },
+    );
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (
+      nextProps.query
+      && nextProps.query.tql
+      && (!this.props.query ||
+        (
+          this.props.query.tql !== nextProps.query.tql ||
+          this.props.query.cards !== nextProps.query.cards ||
+          this.props.query.inputs !== nextProps.query.inputs
+        )
+      )
+    )
+    {
+      this.queryResults(nextProps.query, nextProps.db);
+
+      if (!this.props.query || nextProps.query.id !== this.props.query.id)
+      {
+        this.changeResults({
+          results: List([]),
+        });
+      }
+    }
+
+    // if(nextProps.resultsState.results !== this.props.resultsState.results)
+    // {
+    //   // update spotlights
+    //   let nextState = nextProps.resultsState;
+    //   let {resultsConfig} = nextProps.query;
+
+    //   SpotlightStore.getState().spotlights.map(
+    //     (spotlight, id) =>
+    //     {
+    //       let resultIndex = nextState.results && nextState.results.findIndex(
+    //         r => getPrimaryKeyFor(r, resultsConfig) === id
+    //       );
+    //       if(resultIndex !== -1)
+    //       {
+    //         spotlightAction(id, _.extend({
+    //             color: spotlight.color,
+    //             name: spotlight.name,
+    //           },
+    //           nextState.results.get(resultIndex).toJS()
+    //         ));
+    //         // TODO something more like this
+    //         // spotlightAction(id,
+    //         //   {
+    //         //     color: spotlight.color,
+    //         //     name: spotlight.name,
+    //         //     result: nextState.results.get(resultIndex),
+    //         //   }
+    //         // );
+    //       }
+    //       else
+    //       {
+    //         spotlightAction(id, null);
+    //       }
+    //     }
+    //   );
+    // }
+  }
+
+  public handleCountResponse(response: M1QueryResponse)
+  {
+    this.setState({
+      countQuery: null,
+    });
+
+    // let results = response.results;
+    // if(results)
+    // {
+    //   if(results.length === 1)
+    //   {
+    //     this.setState({
+    //       resultsCount: results[0]['COUNT(*)']
+    //     });
+    //   }
+    //   else if(results.length > 1)
+    //   {
+    //     this.setState({
+    //       resultsCount: results.length,
+    //     })
+    //   }
+    //   else
+    //   {
+    //     this.handleCountError();
+    //   }
+    // }
+    // else
+    // {
+    //   this.handleCountError();
+    // }
+  }
+
+  public handleCountError()
+  {
+    this.setState({
+      countQuery: null,
+    });
+    // probably not needed
+    // this.props.onResultsStateChange(
+    //   this.props.resultsState
+    //     .set('resultsLongCount', 0)
+    // );
+  }
+
+  public changeResults(changes: { [key: string]: any })
+  {
+    let { resultsState } = this.props;
+    _.map(changes,
+      (value: any, key: string) =>
+        resultsState = resultsState.set(key, value),
+    );
+
+    this.props.onResultsStateChange(resultsState);
+  }
+
+  public render()
+  {
+    return (
+      <div />
     );
   }
 
@@ -274,7 +442,7 @@ export class ResultsManager extends PureClasss<Props>
       {
         allfieldEql = AllBackendsMap[query.language].queryToCode(
           query,
-          {allFields: true},
+          { allFields: true },
         );
       }
       catch (err)
@@ -310,116 +478,9 @@ export class ResultsManager extends PureClasss<Props>
     }
   }
 
-  public queryResults(query: Query, db: BackendInstance)
-  {
-    if (!query || !db)
-    {
-      return;
-    }
-
-    if (db.source === 'm1')
-    {
-      this.queryM1Results(query, db);
-    } else if (db.source === 'm2')
-    {
-      this.queryM2Results(query, db);
-    } else
-    {
-      console.log('Unknown Database ' + query);
-    }
-      // temporarily disable count
-          // this.setState({
-          //   countXhr:
-          //     Ajax.query(
-          //       TQLConverter.toTQL(query, {
-          //         count: true,
-          //         replaceInputs: true,
-          //       }),
-          //       db,
-          //       this.handleCountResponse,
-          //       this.handleCountError
-          //     ),
-    // });
-  }
-
-  killQueries()
-  {
-    this.mapQueries(
-      (query) =>
-      {
-        AjaxM1.killQuery(query.queryId);
-        query.xhr.abort();
-      },
-    );
-  }
-
-  componentWillReceiveProps(nextProps: Props)
-  {
-    if (
-      nextProps.query
-      && nextProps.query.tql
-      && (!this.props.query ||
-        (
-          this.props.query.tql !== nextProps.query.tql ||
-          this.props.query.cards !== nextProps.query.cards ||
-          this.props.query.inputs !== nextProps.query.inputs
-        )
-      )
-    )
-    {
-      this.queryResults(nextProps.query, nextProps.db);
-
-      if (!this.props.query || nextProps.query.id !== this.props.query.id)
-      {
-        this.changeResults({
-          results: List([]),
-        });
-      }
-    }
-
-    // if(nextProps.resultsState.results !== this.props.resultsState.results)
-    // {
-    //   // update spotlights
-    //   let nextState = nextProps.resultsState;
-    //   let {resultsConfig} = nextProps.query;
-
-    //   SpotlightStore.getState().spotlights.map(
-    //     (spotlight, id) =>
-    //     {
-    //       let resultIndex = nextState.results && nextState.results.findIndex(
-    //         r => getPrimaryKeyFor(r, resultsConfig) === id
-    //       );
-    //       if(resultIndex !== -1)
-    //       {
-    //         spotlightAction(id, _.extend({
-    //             color: spotlight.color,
-    //             name: spotlight.name,
-    //           },
-    //           nextState.results.get(resultIndex).toJS()
-    //         ));
-    //         // TODO something more like this
-    //         // spotlightAction(id,
-    //         //   {
-    //         //     color: spotlight.color,
-    //         //     name: spotlight.name,
-    //         //     result: nextState.results.get(resultIndex),
-    //         //   }
-    //         // );
-    //       }
-    //       else
-    //       {
-    //         spotlightAction(id, null);
-    //       }
-    //     }
-    //   );
-    // }
-  }
-
-
-
   private updateResults(resultsData: any[], isAllFields: boolean)
   {
-    const {resultsState} = this.props;
+    const { resultsState } = this.props;
 
     const resultsCount = resultsData.length;
     if (resultsData.length > MAX_RESULTS)
@@ -508,11 +569,11 @@ export class ResultsManager extends PureClasss<Props>
     this.updateResults(resultsData, isAllFields);
   }
 
-  private handleM1Error(response: M1QueryResponse, isAllFields?: boolean)
+  private handleM1Error(response: any, isAllFields?: boolean)
   {
-    let {errorMessage} = response || { errorMessage: '' };
+    let { errorMessage } = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
-    let {resultsState} = this.props;
+    let { resultsState } = this.props;
 
     if (typeof errorMessage === 'string')
     {
@@ -529,7 +590,7 @@ export class ResultsManager extends PureClasss<Props>
         let mainErrorMessage = errorMessage;
         let subErrorMessage: string = null;
 
-        if (line !== NaN && line !== null && line !== undefined)
+        if (isNaN(line) !== true && line !== null && line !== undefined)
         {
           mainErrorMessage = 'Error on line ' + line + ': ';
           subErrorMessage = errorMessage;
@@ -549,21 +610,21 @@ export class ResultsManager extends PureClasss<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-          isAllFields ? 'hasAllFieldsError' : 'hasError',
-          true,
-        )
+        isAllFields ? 'hasAllFieldsError' : 'hasError',
+        true,
+      )
         .set(
-          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-          errorMessage,
-        )
+        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+        errorMessage,
+      )
         .set(
-          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-          true,
-        )
+        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+        true,
+      )
         .set(
-          'loading',
-          false,
-        ),
+        'loading',
+        false,
+      ),
     );
   }
 
@@ -571,7 +632,7 @@ export class ResultsManager extends PureClasss<Props>
   {
     // TODO: handle myltiple errors.
     const err = errors[0];
-    let {resultsState} = this.props;
+    let { resultsState } = this.props;
     if (!isAllFields)
     {
       resultsState = resultsState
@@ -586,25 +647,25 @@ export class ResultsManager extends PureClasss<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-          isAllFields ? 'hasAllFieldsError' : 'hasError',
-          true,
-        )
+        isAllFields ? 'hasAllFieldsError' : 'hasError',
+        true,
+      )
         .set(
-          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-          err.title,
-        )
+        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+        err.title,
+      )
         .set(
-          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-          true,
-        )
+        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+        true,
+      )
         .set(
-          'loading',
-          false,
-        ),
+        'loading',
+        false,
+      ),
     );
   }
 
-  private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean, )
+  private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean)
   {
     this.updateM2ErrorState(response.errors, isAllFields);
   }
@@ -630,68 +691,6 @@ export class ResultsManager extends PureClasss<Props>
     }
     this.updateM2ErrorState(errorItems, isAllFields);
   }
-
-  handleCountResponse(response: M1QueryResponse)
-  {
-    this.setState({
-      countQuery: null,
-    });
-
-    // let results = response.results;
-    // if(results)
-    // {
-    //   if(results.length === 1)
-    //   {
-    //     this.setState({
-    //       resultsCount: results[0]['COUNT(*)']
-    //     });
-    //   }
-    //   else if(results.length > 1)
-    //   {
-    //     this.setState({
-    //       resultsCount: results.length,
-    //     })
-    //   }
-    //   else
-    //   {
-    //     this.handleCountError();
-    //   }
-    // }
-    // else
-    // {
-    //   this.handleCountError();
-    // }
-  }
-
-  handleCountError()
-  {
-    this.setState({
-      countQuery: null,
-    });
-    // probably not needed
-    // this.props.onResultsStateChange(
-    //   this.props.resultsState
-    //     .set('resultsLongCount', 0)
-    // );
-  }
-
-  changeResults(changes: { [key: string]: any })
-  {
-    let {resultsState} = this.props;
-    _.map(changes,
-      (value: any, key: string) =>
-        resultsState = resultsState.set(key, value),
-    );
-
-    this.props.onResultsStateChange(resultsState);
-  }
-
-	render()
-  {
-    return (
-      <div />
-    );
-	}
 }
 
 export function getPrimaryKeyFor(result: any, config: ResultsConfig): string

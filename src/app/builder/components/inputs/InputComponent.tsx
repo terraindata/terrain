@@ -42,11 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./InputStyle.less');
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-invalid-this
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
-const {List} = Immutable;
+import * as _ from 'underscore';
+import './InputStyle.less';
+const { List } = Immutable;
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
@@ -61,20 +65,20 @@ const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-import {Input, InputType} from '../../../../../shared/blocks/types/Input';
+import { Input, InputType } from '../../../../../shared/blocks/types/Input';
 
 const InputComponent = React.createClass<any, any>({
-	mixins: [PanelMixin],
+  mixins: [PanelMixin],
 
-	propTypes:
-	{
-		input: React.PropTypes.object.isRequired,
+  propTypes:
+  {
+    input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     canEdit: React.PropTypes.bool.isRequired,
     // since inputs still are regular classes, instead of PureClasss, we construct keyPaths for Actions on execution
     //  rather than caching. This is fine since inputs aren't nested, there would be no
     //  benefit to caching keyPaths anyways.
-	},
+  },
 
   getKeyPath(type?: string)
   {
@@ -91,14 +95,14 @@ const InputComponent = React.createClass<any, any>({
     return shallowCompare(this, nextProps, nextState);
   },
 
-	getDefaultProps()
-	{
-		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
-		};
-	},
+  getDefaultProps()
+  {
+    return {
+      drag_x: false,
+      drag_y: true,
+      reorderOnDrag: true,
+    };
+  },
 
   convertToDate()
   {
@@ -125,7 +129,8 @@ const InputComponent = React.createClass<any, any>({
   closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       Actions.remove(this.getKeyPath(), this.props.index);
     }, 250);
   },
@@ -186,11 +191,11 @@ const InputComponent = React.createClass<any, any>({
       <BuilderTextbox
         canEdit={true}
         value={this.props.input.value}
-        className="input-text input-text-second"
+        className='input-text input-text-second'
         keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === InputType.NUMBER}
-        typeErrorMessage="This input is in number mode\nthis should be a number."
-        placeholder="Sample value"
+        typeErrorMessage='This input is in number mode\nthis should be a number.'
+        placeholder='Sample value'
         autoDisabled={true}
         language={null}
       />
@@ -202,46 +207,46 @@ const InputComponent = React.createClass<any, any>({
     Util.animateToAutoHeight(this.refs.input);
   },
 
-	render()
+  render()
   {
-		return (
-			<div className="input" ref="input">
+    return (
+      <div className='input' ref='input'>
         {
           this.props.canEdit ?
             <CreateLine
               open={false}
               onClick={this.createInput}
             />
-          :
-            <div className="input-spacing" />
+            :
+            <div className='input-spacing' />
         }
-        <div className="input-inner">
-          <div className="input-top-row">
+        <div className='input-inner'>
+          <div className='input-top-row'>
             <BuilderTextbox
               canEdit={this.props.canEdit}
               value={this.props.input.key}
-              className="input-text input-text-first input-borderless"
+              className='input-text input-text-first input-borderless'
               keyPath={this.getKeyPath('key')}
-              placeholder="Input name"
+              placeholder='Input name'
               autoDisabled={true}
               language={null}
             />
             <Menu
               options={this.getMenuOptions()}
             />
-            <div className="input-close" onClick={this.closeInput}>
+            <div className='input-close' onClick={this.closeInput}>
               <CloseIcon />
             </div>
           </div>
-          <div className="input-bottom-row">
-          {
-            this.renderInputValue()
-          }
+          <div className='input-bottom-row'>
+            {
+              this.renderInputValue()
+            }
           </div>
         </div>
-			</div>
-		);
-	},
+      </div>
+    );
+  },
 });
 
 export default InputComponent;

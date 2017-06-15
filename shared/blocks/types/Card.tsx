@@ -42,10 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
-import {Block, TQLFn, allBlocksMetaFields} from './Block';
-import {Display} from '../displays/Display';
 import BlockUtils from '../BlockUtils';
+import { Display } from '../displays/Display';
+import { allBlocksMetaFields, Block, TQLFn, verifyBlockConfigKeys } from './Block';
 
 export interface Card extends IRecord<Card>
 {
@@ -87,7 +88,7 @@ export interface Card extends IRecord<Card>
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
     getParentTerms?: (card: Card, schemaState) => List<string>;
-      // returns terms for its parent and its neighbors (but not its parent's neighbors)
+    // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
     preview: string | ((c: Card) => string);
     // The BlockUtils.getPreview function constructs
@@ -95,7 +96,7 @@ export interface Card extends IRecord<Card>
     // It replaces anything within [] with the value for that key.
     // If an array of objects, you can specify: [arrayKey.objectKey]
     // and it will map through and join the values with ", ";
-    
+
     // TODO bring back manualEntry
     // manualEntry: IManualEntry;
 
@@ -140,6 +141,8 @@ export const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
 {
+  verifyBlockConfigKeys(config);
+
   config = _.extend(config, {
     id: '',
     _isCard: true,
@@ -158,7 +161,6 @@ export const _card = (config: CardConfig) =>
 
   return config;
 };
-
 
 export type Cards = List<Card>;
 export type CardString = string | Card;

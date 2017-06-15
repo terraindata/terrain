@@ -42,15 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
+import Radium = require('radium');
 
 export interface Props
 {
-	item: SchemaTypes.Column;
+  item: SchemaTypes.Column;
 }
 
 class State
@@ -60,36 +61,36 @@ class State
 @Radium
 export class ColumnTreeInfo extends PureClasss<Props>
 {
-	state: State = new State();
+  public state: State = new State();
 
-  render()
+  public render()
   {
-  	const column = this.props.item;
+    const column = this.props.item;
 
     return (
       <div
-      	style={Styles.infoPieces as any}
+        style={Styles.infoPieces as any}
       >
         {
           column.isPrimaryKey &&
-            <div
-              style={Styles.infoPiece as any}
+          <div
+            style={Styles.infoPiece as any}
+          >
+            <span
+              style={Styles.infoPieceNumber as any}
             >
-              <span
-                style={Styles.infoPieceNumber as any}
-              >
-                Primary key
+              Primary key
               </span>
-            </div>
+          </div>
         }
 
-      	<div
+        <div
           style={Styles.infoPiece as any}
         >
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { column.datatype }
+            {column.datatype}
           </span>
         </div>
 
@@ -100,7 +101,7 @@ export class ColumnTreeInfo extends PureClasss<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { column.defaultValue }
+            {column.defaultValue}
           </span>
           "
         </div>
@@ -111,7 +112,7 @@ export class ColumnTreeInfo extends PureClasss<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { column.isNullable ? 'nullable' : 'not nullable' }
+            {column.isNullable ? 'nullable' : 'not nullable'}
           </span>
         </div>
 
@@ -121,11 +122,11 @@ export class ColumnTreeInfo extends PureClasss<Props>
 }
 
 export const columnChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-[
-  {
-    label: 'Indexes',
-    type: 'index',
-  },
-];
+  [
+    {
+      label: 'Indexes',
+      type: 'index',
+    },
+  ];
 
 export default ColumnTreeInfo;

@@ -45,21 +45,24 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
-import {BaseClass, New} from '../Classes';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 import Util from '../util/Util';
 
 type stringList = string[] | List<string>;
 
-export module SchemaTypes {
+export namespace SchemaTypes
+{
 
-  export class SchemaBaseClass extends BaseClass {
+  export class SchemaBaseClass extends BaseClass
+  {
     public id: string;
     public type: string = '';
     public name: string = '';
   }
 
-  class SchemaStateC {
+  class SchemaStateC
+  {
     public databases: DatabaseMap = Map<string, Database>({});
     public tables: TableMap = Map<string, Table>({});
     public columns: ColumnMap = Map<string, Column>({});
@@ -83,11 +86,13 @@ export module SchemaTypes {
   export const _SchemaState = (config?: { [key: string]: any }) =>
     New<SchemaState>(new SchemaStateC(), config);
 
-  export function databaseId(databaseName: string) {
+  export function databaseId(databaseName: string)
+  {
     return databaseName;
   }
 
-  class DatabaseC extends SchemaBaseClass {
+  class DatabaseC extends SchemaBaseClass
+  {
     public type = 'database';
     public name = '';
     public databaseType = 'mysql';
@@ -99,7 +104,8 @@ export module SchemaTypes {
     (config: {
       name: string,
       id?: string,
-    }) => {
+    }) =>
+    {
       config.id = databaseId(config.name);
       return New<Database>(
         new DatabaseC(config),
@@ -107,34 +113,39 @@ export module SchemaTypes {
     };
   export type DatabaseMap = IMMap<string, Database>;
 
-  export function tableId(databaseName: string, tableName: string): string {
+  export function tableId(databaseName: string, tableName: string): string
+  {
     return databaseName + '.' + tableName;
   }
 
-  class TableC extends SchemaBaseClass {
-    type = 'table';
-    name = '';
-    databaseId: string = '';
+  class TableC extends SchemaBaseClass
+  {
+    public type = 'table';
+    public name = '';
+    public databaseId: string = '';
 
-    columnIds: List<string> = List([]);
-    indexIds: List<string> = List([]);
+    public columnIds: List<string> = List([]);
+    public indexIds: List<string> = List([]);
   }
   export type Table = TableC & IRecord<TableC>;
   export const _Table = (config: {
     name: string,
     databaseId: string,
     id?: string,
-  }) => {
+  }) =>
+  {
     config.id = tableId(config.databaseId, config.name);
     return New<Table>(new TableC(config), config, 'string');
   };
   export type TableMap = IMMap<string, Table>;
 
-  export function columnId(tableId: string, columnName: string) {
+  export function columnId(tableId: string, columnName: string)
+  {
     return tableId + '.c.' + columnName;
   }
 
-  class ColumnC extends SchemaBaseClass {
+  class ColumnC extends SchemaBaseClass
+  {
     public type = 'column';
     public name = '';
     public databaseId: string = '';
@@ -158,17 +169,20 @@ export module SchemaTypes {
     isPrimaryKey?: boolean,
 
     id?: string,
-  }) => {
+  }) =>
+  {
     config.id = columnId(config.tableId, config.name);
     return New<Column>(new ColumnC(config), config, 'string');
   };
   export type ColumnMap = IMMap<string, Column>;
 
-  export function indexId(databaseName: string, tableName: string, indexName: string) {
+  export function indexId(databaseName: string, tableName: string, indexName: string)
+  {
     return databaseName + '.' + tableName + '.i.' + indexName;
   }
 
-  class IndexC extends SchemaBaseClass {
+  class IndexC extends SchemaBaseClass
+  {
     public type = 'index';
     public name = '';
     public databaseId: string = '';
@@ -185,7 +199,8 @@ export module SchemaTypes {
 
     indexType: string,
     id?: string,
-  }) => {
+  }) =>
+  {
     config.id = indexId(config.databaseId, config.tableId, config.tableId);
     return New<Index>(new IndexC(config), config, 'string');
   };
@@ -199,7 +214,8 @@ export module SchemaTypes {
       index: 'indexes',
     };
 
-  export function searchIncludes(item: SchemaBaseClass, search: string): boolean {
+  export function searchIncludes(item: SchemaBaseClass, search: string): boolean
+  {
     return !search ||
       (
         item && typeof item.name === 'string' &&
@@ -209,17 +225,18 @@ export module SchemaTypes {
       );
   }
 
-// used to define how to render tree item children in tree list
+  // used to define how to render tree item children in tree list
   export type ISchemaTreeChildrenConfig = [
     {
       label?: string;
       type: string;
     }
-    ];
+  ];
 
   export type TableNamesByDb = IMMap<string, List<string>>;
   export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
-  export interface SetDbActionPayload {
+  export interface SetDbActionPayload
+  {
     database: Database;
     tables: IMMap<string, Table>;
     columns: IMMap<string, Column>;
