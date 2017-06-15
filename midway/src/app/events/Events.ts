@@ -53,47 +53,15 @@ import sha1 = require('sha1');
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
-import ElasticDB from '../../database/elastic/tasty/ElasticDB';
+import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../Util';
 
-// CREATE TABLE events (id integer PRIMARY KEY, date date NOT NULL, eventId text NOT NULL, ip text NOT NULL, \
-// payload text NOT NULL, type text NOT NULL);
-
-let elasticController: ElasticController;
-let elasticDB: ElasticDB;
-const elasticConfig: ElasticConfig = {
-  hosts: ['http://localhost:9200'],
-};
-elasticController = new ElasticController(elasticConfig, 0, 'Events');
-elasticDB = elasticController.getTasty().getDB() as ElasticDB;
-
 const timeInterval: number = 5; // minutes before refreshing
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
-const timeSalt: string = srs({ length: 256 });
-const payloadSkeleton: object =
-  {
-    nola:
-    {
-      drink: '',
-      ingredients: '',
-    },
-    oldpro:
-    {
-      beerCounter: 0,
-      drink: '',
-      ingredients: '',
-      isAlcoholic: false,
-      habanero_wings: '',
-    },
-    maclarens:
-    {
-      drink: '',
-      ingredients: '',
-      bartender: '',
-    },
-  };
+const timeSalt: string = srs({ length: 256 }); // time salt
+const payloadSkeleton: object = {}; // payload object where key is the eventId and the value is the empty payload
 
 export interface EventConfig
 {
@@ -120,9 +88,12 @@ export interface EventRequestConfig
 export class Events
 {
   private eventTable: Tasty.Table;
+  private elasticController: ElasticController;
 
   constructor()
   {
+    const elasticConfig: ElasticConfig = DBUtil.DSNToConfig('elastic', '127.0.0.1:9200') as ElasticConfig;
+    this.elasticController = new ElasticController(elasticConfig, 0, 'Events');
     this.eventTable = new Tasty.Table(
       'data',
       ['eventId'],
@@ -320,7 +291,7 @@ export class Events
   {
     event.payload = JSON.stringify(event.payload);
     const events: object[] = [event as object];
-    return await elasticController.getTasty().upsert(this.eventTable, events);
+    return await this.elasticController.getTasty().upsert(this.eventTable, events);
   }
 }
 
