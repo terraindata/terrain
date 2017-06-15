@@ -64,11 +64,6 @@ export default class ESStructureClause extends ESClause
     Object.keys(this.def).forEach(
       (key: string): void =>
       {
-        if (this.def[key] === null)
-        {
-          this.def[key] = key;
-        }
-
         config.declareType(this.def[key]);
       });
 
