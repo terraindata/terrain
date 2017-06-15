@@ -111,7 +111,7 @@ export default class EQLConfig
         }
         else
         {
-          throw new Error('Unknown clause "' + "type:" + String(typename)  + ", " + "def:" + String(def) + ' ".');
+          throw new Error('Unknown clause "' + 'type:' + String(typename)  + ','  + 'def:' + String(def) + ' ".');
         }
 
         // winston.info('registering clause "' + id + '"');
