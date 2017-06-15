@@ -1,3 +1,57 @@
+commit 9f9815fd081bbcd55b2b288a2a2bdc94ee3d37a6
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed Jun 14 17:56:33 2017 -0700
+
+    Results loading message tweak
+
+commit dc47941bb1f6f88cde0f925fcde1c3a0953f3f69
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed Jun 14 12:49:21 2017 -0700
+
+    Finally fix group by loading bug
+
+commit 6d7b83fb56e0973b21641bfe2c4d52caceef7b49
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu May 18 13:49:19 2017 -0700
+
+    quick fix for results table, more needed
+
+commit 46b7200b52fec8690e4f7bc175cdc1de6ffa78bc
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed May 17 12:06:49 2017 -0700
+
+    Fix bugs: tql to cards with CALL, Revert, Results loading
+
+commit 07d7741fce98bfb76d5eb73c8f9d5d3e2470c1e3
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed May 10 19:18:07 2017 -0700
+
+    Fixing db fetching bug (needs testing)
+
+commit 46e512c1013f69a950a2af98213d0199efccc2a7
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu May 4 13:46:29 2017 -0700
+
+    remove sample schema
+
+commit a2c1ebb48f36a64b4f213bc5ece72a6ed067d948
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu May 4 10:29:50 2017 -0700
+
+    Final touches on spotlight fix
+
+commit c6776e24dfcd66dd8f8248420d894b09ce22d4ba
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed May 3 17:55:15 2017 -0700
+
+    fixing spotlights
+
+commit 63deaeb6cc2ee3442ba375043510ec777842ff73
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Tue Mar 28 17:21:14 2017 -0700
+
+    Quick update to Score defaults
+
 commit 015113a53adc12d3f1ed181d7fffeb5007bd7b06
 Author: Luke Knepper <luke@terraindb.com>
 Date:   Tue Mar 28 15:07:43 2017 -0700
@@ -11,7 +65,7 @@ Date:   Tue Mar 28 14:51:06 2017 -0700
     Re-add tql error line support
 
 commit a17874bc099f6cc79338ff536e3e85cd999c321c
-Merge: 52d0a22 4b9007c
+Merge: 52d0a22f 4b9007cc
 Author: Luke Knepper <luke@terraindb.com>
 Date:   Tue Mar 28 12:21:54 2017 -0700
 
@@ -44,57 +98,3 @@ Date:   Fri Mar 24 11:59:51 2017 -0700
 commit b839fdb2bbde1bb7a4a240588cf53a305ac7f619
 Author: Luke Knepper <luke@terraindb.com>
 Date:   Wed Mar 22 20:32:14 2017 -0700
-
-    More progress on schema and builder interaction
-
-commit 52d0a22f042f32605a3fb2d0a6410d037c1ca423
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Wed Mar 22 14:32:34 2017 -0700
-
-    README additions for major dependencies
-
-commit 2e76e59e0d6de88ed6ad03a23f44d8c0d8ae16d0
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Wed Mar 22 11:08:22 2017 -0700
-
-    README additions for editors
-
-commit e47d7e5351260c0ddedde231e00706e90fe8d8c9
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Wed Mar 22 10:40:57 2017 -0700
-
-    Progress on adapting Builder to new schema store
-
-commit 9eebf88f3e155a156446977e92382e93a497e3e4
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Mon Mar 20 14:53:00 2017 -0700
-
-    README changes for new syntax
-
-commit ebfd12126b7c8f24a6e483135f23901c4f9f0018
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Fri Mar 17 18:47:40 2017 -0700
-
-    Progress on diagnosing schema bugs and updating builder to new schema
-
-commit 3368ea47d3230d4ac0d530e0d8f44c741608c70e
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Wed Mar 15 12:16:11 2017 -0700
-
-    A new table library, much better than the old one
-
-commit 6163ad8b7ae2203f711a9c00b222db65cf541500
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Tue Mar 14 10:20:51 2017 -0700
-
-    Schema results table, basic version
-
-commit aa12bfbcca9e8eca63bb38b49549f43f63f2595a
-Merge: 933f0d4 39d3382
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Mon Mar 13 09:37:19 2017 -0700
-
-    Merge branch 'master' into schema
-
-commit 933f0d4b06107aed7a54261b11adde831469868c
-Author: Luke Knepper <luke@terraindb.com>
