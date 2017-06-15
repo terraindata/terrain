@@ -50,7 +50,7 @@ import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause with a type that references another type.
+ * A clause with a type that references another def.
  * This is used to specify clause types with special names or descriptions,
  * but which are composed wholly of another type.
  *
@@ -67,7 +67,7 @@ export default class ESReferenceClause extends ESClause
   public constructor(settings: any, config: EQLConfig)
   {
     super(settings);
-    this.delegateType = this.type as string;
+    this.delegateType = this.def as string;
     config.declareType(this.delegateType);
   }
 

@@ -7,7 +7,7 @@ and often a Card may have sub-blocks inside of it, which aren't necessarily visi
 
   * Cards: The main type of block. A user can create a Card using the Card deck
   or using the in-Builder suggestions
-  
+
   * Sub-Blocks: Sometimes a complicated Card may need to have smaller blocks
   contained within it. For example, the Transform card contains a list of ScorePoints
   (points that mark an x/y position on the Transform graph). A ScorePoint is a
@@ -22,7 +22,7 @@ special Immutable properties that help React perform optimizations.
 
 ### Block Instance Properties
 
-  * id: Each block is assigned a random id on creation
+  * id: Each block is assigned a random type on creation
   * type: Each kind of block has a unique type. This is set by the `initBlocks` method.
   * block-specific properties: When you define a block, you define what
     specific instance properties that block could have. For example,

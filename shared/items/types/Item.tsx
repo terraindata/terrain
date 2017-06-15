@@ -100,5 +100,5 @@ export type Item = ItemC & IRecord<ItemC>;
 //   {
 //     return typeToConstructor[config.type](config);
 //   }
-//   throw new Error('Unrecognized item type: ' + (config && config.type));
+//   throw new Error('Unrecognized item type: ' + (config && config.def));
 // }

@@ -61,18 +61,18 @@ export default class ESStructureClause extends ESClause
   {
     super(settings);
 
-    Object.keys(this.type).forEach(
+    Object.keys(this.def).forEach(
       (key: string): void =>
       {
-        if (this.type[key] === null)
+        if (this.def[key] === null)
         {
-          this.type[key] = key;
+          this.def[key] = key;
         }
 
-        config.declareType(this.type[key]);
+        config.declareType(this.def[key]);
       });
 
-    this.structure = this.type as { [key: string]: string };
+    this.structure = this.def as { [key: string]: string };
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void

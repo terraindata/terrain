@@ -444,7 +444,7 @@ var ReactTooltip = function(_Component)
         placeholder: tooltipText,
         multilineCount: multilineCount,
         place: e.currentTarget.getAttribute('data-place') ? e.currentTarget.getAttribute('data-place') : this.props.place ? this.props.place : 'top',
-        type: e.currentTarget.getAttribute('data-type') ? e.currentTarget.getAttribute('data-type') : this.props.type ? this.props.type : 'dark',
+        type: e.currentTarget.getAttribute('data-type') ? e.currentTarget.getAttribute('data-def') : this.props.type ? this.props.type : 'dark',
         effect: e.currentTarget.getAttribute('data-effect') ? e.currentTarget.getAttribute('data-effect') : this.props.effect ? this.props.effect : 'float',
         offset: e.currentTarget.getAttribute('data-offset') ? e.currentTarget.getAttribute('data-offset') : this.props.offset ? this.props.offset : {},
         html: e.currentTarget.getAttribute('data-html') ? e.currentTarget.getAttribute('data-html') : this.props.html ? this.props.html : false,

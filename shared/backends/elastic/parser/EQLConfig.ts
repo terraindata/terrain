@@ -86,7 +86,7 @@ export default class EQLConfig
           return;
         }
 
-        const def: any = settings.type;
+        const def: any = settings.def;
         let clause: ESClause;
         if (typeof (def) === 'object')
         {
@@ -123,17 +123,17 @@ export default class EQLConfig
     // TODO: validate id references and other settings
   }
 
-  public declareType(id: string, settings: any = {}): void
+  public declareType(type: string, settings: any = {}): void
   {
-    if (this.clauses[id] !== undefined)
+    if (this.clauses[type] !== undefined)
     {
       return; // already declared
     }
 
     // winston.info('declare "' + id + '"');
-    settings.id = id;
+    settings.type = type;
     let clause: ESClause | null = null;
-    switch (id)
+    switch (type)
     {
       case 'null':
         clause = new ESNullClause(settings);
@@ -155,36 +155,36 @@ export default class EQLConfig
         break;
 
       default:
-        this.validateTypename(id);
+        this.validateTypename(type);
 
-        if (id.endsWith('[]'))
+        if (type.endsWith('[]'))
         {
           // array
-          clause = new ESArrayClause(settings, id.substring(0, id.length - 2));
+          clause = new ESArrayClause(settings, type.substring(0, type.length - 2));
         }
-        else if (id.startsWith('{'))
+        else if (type.startsWith('{'))
         {
           // map
-          if (id.charAt(0) !== '{' || id.charAt(id.length - 1) !== '}' ||
-            id.indexOf(' ') !== -1)
+          if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
+            type.indexOf(' ') !== -1)
           {
-            throw new Error('Unsupported map id "' + id + '".');
+            throw new Error('Unsupported map id "' + type + '".');
           }
 
-          const components: string[] = id.substring(1, id.length - 1).split(':');
+          const components: string[] = type.substring(1, type.length - 1).split(':');
           clause = new ESMapClause(settings, components[0], components[1], this);
         }
         else
         {
           // undefined reference id
-          this.undefinedTypes[id] = true;
+          this.undefinedTypes[type] = true;
         }
         break;
     }
 
     if (clause !== null)
     {
-      this.clauses[id] = clause;
+      this.clauses[type] = clause;
     }
   }
 
