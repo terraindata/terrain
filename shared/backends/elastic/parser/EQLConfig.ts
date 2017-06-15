@@ -98,7 +98,7 @@ export default class EQLConfig
           switch (type)
           {
             case 'enum':
-              clause = new ESEnumClause(settings, this);
+              clause = new ESEnumClause(settings);
               break;
             case 'variant':
               clause = new ESVariantClause(settings, this);

@@ -57,10 +57,9 @@ export default class ESEnumClause extends ESClause
   public values: any[];
   public valueMap: any;
 
-  public constructor(settings: any, config: EQLConfig)
+  public constructor(settings: any)
   {
     super(settings);
-    this.values = settings.values as any[];
     this.valueMap = new Map();
     for (let i = 0; i < this.values.length; ++i)
     {

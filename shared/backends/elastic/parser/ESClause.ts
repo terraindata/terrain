@@ -67,6 +67,8 @@ abstract class ESClause
 
   public required: string[]; // list of required properties
 
+  public values: any[]; // list of commonly used values (a soft enum or autocomplete list)
+
   public template: null | { [key: string]: any }; // template for this clause type
 
   /**
