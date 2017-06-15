@@ -44,20 +44,36 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause with a type that references another def.
+ * This is used to specify clause types with special names or descriptions,
+ * but which are composed wholly of another type.
+ *
+ * For example, a bool clause contains "must", "must_not", and "should" properties,
+ * each of which has a unique function, but all of these properties contain a "query" clause.
+ *
+ * Another example is a setting property such as "boost", which must contain a
+ * "number" as its value.
  */
-export default class ESPropertyInfo
+export default class ESReferenceClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
+  public delegateType: string;
 
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any, config: EQLConfig)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+    this.delegateType = this.def as string;
+    config.declareType(this.delegateType);
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
+    valueInfo.clause = this;
   }
 }

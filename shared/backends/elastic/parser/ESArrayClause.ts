@@ -44,20 +44,42 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause that corresponds to an array of uniform type.
  */
-export default class ESPropertyInfo
+export default class ESArrayClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
+  public elementID: string;
 
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any, elementID: string)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+    this.elementID = elementID;
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+
+    const value: any = valueInfo.value;
+    if (!Array.isArray(value))
+    {
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
+      return;
+    }
+
+    // mark children
+    const childClause: ESClause = interpreter.config.getClause(this.elementID);
+    const children: ESValueInfo[] = valueInfo.children as ESValueInfo[];
+    children.forEach(
+      (element: ESValueInfo): void =>
+      {
+        childClause.mark(interpreter, element);
+      });
   }
 }

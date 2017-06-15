@@ -44,20 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause with a well-defined structure.
  */
-export default class ESPropertyInfo
+export default class ESStructureClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
+  public structure: { [name: string]: string };
 
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any, config: EQLConfig)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+
+    Object.keys(this.def).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.def[key]);
+      });
+
+    this.structure = this.def as { [key: string]: string };
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+
+    const value = valueInfo.value;
+    if (typeof (value) !== 'object')
+    {
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
+      return;
+    }
+
+    if (Array.isArray(value))
+    {
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
+      return;
+    }
+
+    const children: any = valueInfo.children;
+
+    // mark properties
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        if (!this.structure.hasOwnProperty(name))
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
+          return;
+        }
+
+        if (viTuple.propertyValue !== null)
+        {
+          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
+        }
+      });
+
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 }

@@ -44,20 +44,62 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause that corresponds to an object of uniform type values.
  */
-export default class ESPropertyInfo
+export default class ESMapClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
+  public nameID: string;
+  public valueID: string;
 
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any, nameID: string, valueID: string, config: EQLConfig)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+    this.nameID = nameID;
+    this.valueID = valueID;
+    config.declareType(nameID);
+    config.declareType(valueID);
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+
+    const value: any = valueInfo.value;
+    if (typeof (value) !== 'object')
+    {
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
+      return;
+    }
+
+    if (Array.isArray(value))
+    {
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be a map, but found an array instead.');
+      return;
+    }
+
+    // mark properties
+    const childClause: ESClause = interpreter.config.getClause(this.valueID);
+    const children: any = valueInfo.children;
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        interpreter.config.getClause(this.nameID).mark(interpreter, viTuple.propertyName);
+
+        if (viTuple.propertyValue !== null)
+        {
+          childClause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
   }
 }

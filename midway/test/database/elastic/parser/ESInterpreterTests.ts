@@ -44,20 +44,86 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
-import ESValueInfo from './ESValueInfo';
+import * as fs from 'fs';
+import * as winston from 'winston';
+import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
+import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
+import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
-/**
- * Represents information about a property that was parsed by ESJSONParser
- */
-export default class ESPropertyInfo
+function getExpectedFile(): string
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
-
-  public constructor(propertyName: ESValueInfo)
-  {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
-  }
+  return __filename.split('.')[0] + '.expected';
 }
+
+let expected;
+let config: EQLConfig;
+
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+
+  const expectedString: any = await new Promise((resolve, reject) =>
+  {
+    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+  });
+
+  expected = JSON.parse(expectedString);
+  try
+  {
+    config = new EQLConfig();
+  } catch (e)
+  {
+    fail(e);
+  }
+
+  done();
+});
+
+function testParse(testString: string,
+  expectedValue: any,
+  expectedErrors: ESParserError[] = [])
+{
+  winston.info('testing \'' + testString + '\'');
+  const interpreter: ESInterpreter = new ESInterpreter(testString, config);
+  const parser: ESJSONParser = interpreter.parser;
+
+  const objects = new WeakMap();
+  let count = 0;
+  winston.info(JSON.stringify(parser.getValueInfo(),
+    (key, val) =>
+    {
+      if (val != null && typeof val === 'object')
+      {
+        const id = objects.get(val);
+        if (id === undefined)
+        {
+          objects.set(val, count++);
+        }
+        else
+        {
+          return 'ref ' + String(id);
+        }
+      }
+
+      return val;
+    }, 2));
+
+  // winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
+  // expect(value).toEqual(expectedValue);
+  expect(parser.getErrors()).toEqual(expectedErrors);
+}
+
+test('parse valid json objects', () =>
+{
+  Object.getOwnPropertyNames(expected).forEach(
+    (testName: string) =>
+    {
+      const testValue: any = expected[testName];
+
+      // test parsing the value using a few spacing options
+      testParse(JSON.stringify(testValue), testValue);
+    });
+});

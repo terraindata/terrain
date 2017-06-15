@@ -44,20 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
-import ESParserValueInfo from './ESParserValueInfo';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause which is a null
  */
-export default class ESParserPropertyInfo
+export default class ESNullClause extends ESClause
 {
-  public name: ESParserValueInfo; // the value info for the property name
-  public value: ESParserValueInfo | null; // the value info for the property value
-
-  public constructor(name: ESParserValueInfo)
+  public constructor(settings: any)
   {
-    this.name = name;
-    this.value = null;
+    super(settings);
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+    const value: any = valueInfo.value;
+    if (value !== null)
+    {
+      interpreter.accumulateError(valueInfo, 'This value should be null.');
+    }
   }
 }
