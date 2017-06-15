@@ -46,16 +46,16 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
-import {_block, Block, TQLTranslationFn} from '../../../blocks/types/Block';
-import {_card, Card, CardString} from '../../../blocks/types/Card';
-import {Input, InputType} from '../../../blocks/types/Input';
+import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
+import { _card, Card, CardString } from '../../../blocks/types/Card';
+import { Input, InputType } from '../../../blocks/types/Input';
 import CommonElastic from '../syntax/CommonElastic';
-import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
+import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 const { make } = BlockUtils;
 
@@ -130,66 +130,66 @@ export const elasticMagicValue = _block({
 const accepts = List(['elasticMagicCard']);
 
 export const elasticMagicCard = _card(
-{
-  values: List([]),
-  method: '',
+  {
+    values: List([]),
+    method: '',
 
-  static: {
-    language: 'elastic',
-    title: 'Object',
-    colors: ['#3a91a6', '#a1eafb'],
-    preview: '[values.length] Values',
-    accepts,
-    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      let elasticObj: object = {};
-
-      block['values'].map(
-        (card: Card) =>
-        {
-          _.extend(elasticObj, tqlTranslationFn(card, tqlConfig));
-        }
-      );
-
-      return elasticObj;
-    },
-    init: () => ({
-      values: List([
-        make(elasticMagicValue),
-      ]),
-    }),
-    display:
-    {
-      displayType: DisplayType.ROWS,
-      key: 'values',
-      english: 'elasticMagicValue',
-      factoryType: 'elasticMagicValue',
-      provideParentData: true,
-      row:
+    static: {
+      language: 'elastic',
+      title: 'Object',
+      colors: ['#3a91a6', '#a1eafb'],
+      preview: '[values.length] Values',
+      accepts,
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        noDataPadding: true,
-        inner:
-        [
+        let elasticObj: object = {};
+
+        block['values'].map(
+          (card: Card) =>
           {
-            displayType: DisplayType.TEXT,
-            key: 'key',
-          },
-          {
-            displayType: DisplayType.CARDTEXT,
-            key: 'value',
-            showWhenCards: true,
-            autoDisabled: true,
-            accepts,
-          },
-        ],
-        below:
+            _.extend(elasticObj, tqlTranslationFn(card, tqlConfig));
+          }
+        );
+
+        return elasticObj;
+      },
+      init: () => ({
+        values: List([
+          make(elasticMagicValue),
+        ]),
+      }),
+      display:
+      {
+        displayType: DisplayType.ROWS,
+        key: 'values',
+        english: 'elasticMagicValue',
+        factoryType: 'elasticMagicValue',
+        provideParentData: true,
+        row:
         {
-          displayType: DisplayType.CARDSFORTEXT,
-          key: 'value',
+          noDataPadding: true,
+          inner:
+          [
+            {
+              displayType: DisplayType.TEXT,
+              key: 'key',
+            },
+            {
+              displayType: DisplayType.CARDTEXT,
+              key: 'value',
+              showWhenCards: true,
+              autoDisabled: true,
+              accepts,
+            },
+          ],
+          below:
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'value',
+          },
         },
       },
     },
-  },
-});
+  });
 
 export default elasticMagicCard;
