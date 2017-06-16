@@ -52,8 +52,8 @@ const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, paylo
 const FileImportActions =
   {
     loadState:
-      (state: FileImportState) =>
-        $(ActionTypes.loadState, { state }),
+    (state: FileImportState) =>
+      $(ActionTypes.loadState, { state }),
   };
 
 export default FileImportActions;

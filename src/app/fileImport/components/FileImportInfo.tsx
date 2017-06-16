@@ -45,72 +45,77 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import { DragDropContext } from 'react-dnd';
-import InfoArea from './../../common/components/InfoArea';
+const { List } = Immutable;
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
+import UserThumbnail from './../../users/components/UserThumbnail';
+import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
-import Store from './../data/FileImportStore';
 import FileImportTypes from './../FileImportTypes';
-import './FileImport.less';
-const HTML5Backend = require('react-dnd-html5-backend');
-import { browserHistory } from 'react-router';
-import FileImportInfo from './FileImportInfo';
+
+// type Source = FileImportTypes.Source;
 
 export interface Props
 {
-  params?: any;
-  location?: any;
-  router?: any;
-  route?: any;
-  // params?: any;
-  // location?: {
-  //   pathname: string;
-  // };
+  canEdit: boolean;
+  sourceIndex: number;
+  targetIndex: number;
+  onSourceChange(index: number);
+  onTargetChange(index: number);
 }
 
-class FileImport extends PureClasss<any>
-{
-  public state: {
-    on: boolean;
-    name?: string;
-    sourceIndex: number;
-    targetIndex: number;
-  } = {
-    on: false,
-    sourceIndex: -1,
-    targetIndex: -1,
-  };
+const SOURCES = Immutable.List(['JSON', 'CSV', 'SQL']);
+const TARGETS = Immutable.List(['movies', 'new']);
 
-  constructor(props)
-  {
-    super(props);
-  }
+class FileImportInfoColumn extends PureClasss<Props>
+{
   public handleSourceChange(sourceIndex: number)
   {
-    this.setState({
-      sourceIndex,
-    })
+    const source = SOURCES.get(sourceIndex);
+    console.log(source);
+    console.log("index ", sourceIndex);
+    this.props.onSourceChange(sourceIndex);
   }
   public handleTargetChange(targetIndex: number)
   {
-    this.setState({
-      targetIndex,
-    })
+    const target = TARGETS.get(targetIndex);
+    console.log(target);
+    console.log("index ", targetIndex);
+    this.props.onTargetChange(targetIndex);
   }
 
   public render()
   {
+    // if (!this.props.source)
+    // {
+    //   return null;
+    // }
+    const { canEdit } = this.props;
+    // const { source } = this.props;
+
     return (
       <div>
-        <h2>File Import Page</h2>
         <div>
-          <FileImportInfo
-            canEdit={true}
-            sourceIndex={this.state.sourceIndex}
-            onSourceChange={this.handleSourceChange}
-            targetIndex={this.state.targetIndex}
-            onTargetChange={this.handleTargetChange}
+          <h3>Source</h3>
+        </div>
+        <div>
+          <Dropdown
+            selectedIndex={this.props.sourceIndex}
+            options={SOURCES}
+            onChange={this.handleSourceChange}
+            canEdit={canEdit}
+          />
+        </div>
+        <div>
+          <h3>Target</h3>
+        </div>
+        <div>
+          <Dropdown
+            selectedIndex={this.props.targetIndex}
+            options={TARGETS}
+            onChange={this.handleTargetChange}
+            canEdit={canEdit}
           />
         </div>
       </div>
@@ -118,7 +123,4 @@ class FileImport extends PureClasss<any>
   }
 }
 
-// ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ExportFileImport = DragDropContext(HTML5Backend)(FileImport) as any;
-
-export default ExportFileImport;
+export default FileImportInfoColumn;

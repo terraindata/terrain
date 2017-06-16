@@ -48,6 +48,7 @@ import * as _ from 'underscore';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
 import { BaseClass, New } from '../Classes';
+import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
 export namespace FileImportTypes
@@ -66,6 +67,54 @@ export namespace FileImportTypes
   //   and you can't use `new` simply with Immutable Records.
   export const _FileImportState = (config?: { [key: string]: any }) =>
     New<FileImportState>(new FileImportStateC(config), config);
+  /*
+  class SourceC extends ItemC
+  {
+    public type = ItemType.Source;
+    public source = 'CSV';
+  }
+  export interface Variant extends SourceC, IRecord<Source> { }
+  const Source_Record = Immutable.Record(new SourceC());
+  export const _Variant = (config?: any) =>
+  {
+    // NOTE: we do not want a default value for the config param because
+    //  we want to know the difference between creating a new variant with
+    //  no params vs. an old version with no modelVersion param
+    if (config && !config.modelVersion)
+    {
+      // from modelVersion 0 to 1
+      config.modelVersion = 1;
+      config.query = {
+        cards: config.cards,
+        inputs: config.inputs,
+        resultsConfig: config.resultsConfig,
+        tql: config.tql,
+        deckOpen: config.deckOpen,
+        variantId: config.id,
+        language: 'mysql',
+      };
+    }
+
+    if (config && config.modelVersion === 1)
+    {
+      // from 1 to 2
+      // TODO if necessary
+    }
+
+    config = config || {};
+    config.language = config.language || 'elastic';
+
+    config.query = config.query || {};
+    config.query.language = config.language;
+    config.query = _Query(config.query);
+
+    let v = new Variant_Record(config) as any as Variant;
+    if (!config || !config.lastUserId || !config.lastEdited)
+    {
+      v = touchVariant(v);
+    }
+    return v;
+  };*/
 }
 
 export default FileImportTypes;
