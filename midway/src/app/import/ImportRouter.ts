@@ -46,72 +46,55 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as send from 'koa-send';
 import * as winston from 'winston';
 
-import AuthRouter from './auth/AuthRouter';
-import DatabaseRouter from './database/DatabaseRouter';
-import ImportRouter from './import/ImportRouter';
-import ItemRouter from './items/ItemRouter';
-import QueryRouter from './query/QueryRouter';
-import SchemaRouter from './schema/SchemaRouter';
-import StatusRouter from './status/StatusRouter';
-import UserRouter from './users/UserRouter';
-import * as Util from './Util';
-import VersionRouter from './versions/VersionRouter';
+// import DatabaseController from '../../database/DatabaseController';
+// import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import ElasticConfig from '../../database/elastic/ElasticConfig';
+import ElasticController from '../../database/elastic/ElasticController';
+import * as DBUtil from '../../database/Util';
+import * as Tasty from '../../tasty/Tasty';
+import * as Util from '../Util';
+import { ImportConfig } from './Import';
 
-const AppRouter = new KoaRouter();
+const Router = new KoaRouter();
+// export const items: Items = new Items();
 
-AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
-AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
-AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
-AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
-AppRouter.use('/database', DatabaseRouter.routes(), DatabaseRouter.allowedMethods());
-AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
-AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
-AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
-AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
-// Add future routes here.
-
-// Prefix all routes with /midway
-//  This is so that we can allow the front-end to use all other routes.
-//  Any route not prefixed with /midway will just serve the front-end.
-
-AppRouter.get('/', async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  if (ctx.state.user !== undefined && ctx.state.user[0] !== undefined)
+  winston.info('importing to database');
+  const imprt: ImportConfig = ctx.request.body.body;
+  Util.verifyParameters(imprt, ['dbtype', 'contents', 'dsn', 'table']);
+  if (imprt.dbtype !== 'elastic')
   {
-    ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
+    throw new Error('File import currently is only supported for Elastic databases.');
   }
-  else
-  {
-    ctx.body = 'not authenticated';
-  }
+  Util.verifyParameters(imprt, ['db']);
+
+  const items: object[] = JSON.parse(imprt.contents);
+  // let columns: string[];
+  // const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
+  // if (database !== undefined)
+  // {
+  //     // find schema to find primary key ; somewhat redundant with SchemaRouter.ts
+  //     const schema: Tasty.Schema = await database.getTasty().schema();
+  //     columns = schema.fieldNames(imprt.db, imprt.table);
+  // } else {
+  //     columns = Object.keys(items[0]);    // for now assume all items have all keys
+  // }
+  const columns: string[] = Object.keys(items[0]);
+
+  const insertTable: Tasty.Table = new Tasty.Table(
+    imprt.table,
+    ['_id'],        // TODO: find schema to find primary key
+    columns,
+    imprt.db,      // TODO: only if this exists
+  );
+
+  const elasticConfig: ElasticConfig = DBUtil.DSNToConfig(imprt.dbtype, imprt.dsn) as ElasticConfig;
+  const elasticController: ElasticController = new ElasticController(elasticConfig, 0, 'Import');
+
+  await elasticController.getTasty().upsert(insertTable, items);
 });
 
-AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body = 'authenticated as ' + (ctx.state.user[0].email as string);
-});
-
-const MidwayRouter = new KoaRouter();
-MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-MidwayRouter.get('/', async (ctx, next) =>
-{
-  await send(ctx, '/src/app/index.html');
-});
-
-MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
-{
-  if (process.env.NODE_ENV === 'production')
-  {
-    await send(ctx, '/src/assets/bundle.js');
-  }
-  else
-  {
-    ctx.body = await Util.getRequest('http://localhost:8080/assets/bundle.js');
-  }
-});
-
-export default MidwayRouter;
+export default Router;
