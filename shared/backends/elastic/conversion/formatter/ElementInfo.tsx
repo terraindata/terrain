@@ -42,44 +42,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 /*
  *  Data container with immutable members
  */
 class ElementInfo
 {
   constructor(
-    public readonly index: number, //Index is element's position underneath its parent (so 0 if it's root level)
-    public readonly container: any[] | object = undefined, //parent of element: undefined for values under root
-    public readonly keys: string[] = undefined, //undefined for values inside arrays or under root
-  ){}
+    public readonly index: number, // index is element's position underneath its parent (so 0 if it's root level)
+    public readonly container?: any[] | object, // parent of element: undefined for values under root
+    public readonly keys?: string[], // undefined for values inside arrays or under root
+  ) { }
 
-  public containerSize() : number
+  public containerSize(): number
   {
-    if(this.container === undefined)
+    if (this.container === undefined)
     {
       return 1;
     }
-    else if(this.container instanceof Array)
+    else if (this.container instanceof Array)
     {
       return this.container.length;
     }
-    else 
+    else
     {
       return this.keys.length;
     }
   }
 
-  public isLastElement() : boolean
+  public isLastElement(): boolean
   {
     return this.index + 1 === this.containerSize();
   }
 
-  public isFirstElement() : boolean
+  public isFirstElement(): boolean
   {
     return this.index === 0;
   }
 
-  public isOnlyElement() : boolean
+  public isOnlyElement(): boolean
   {
     return this.containerSize() === 1;
   }

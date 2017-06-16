@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import ElementInfo from './ElementInfo';
 /**
  * Abstract class for classes that want to format query strings
@@ -54,73 +56,18 @@ import ElementInfo from './ElementInfo';
 abstract class ObjectFormatter
 {
   /**
-   * @returns {string} the formatted query string
-   */
-  public abstract getResultText(): string;
-  
-  /** 
-   * All event handlers except for onEnd and onError are provided an ElementInfo when called. 
-   * Each ElementInfo gives information about the relationship between the handled element and its container
-   */
-
-  /**
-   * Called on terminal values
-   */
-  protected abstract onValue(val: any, element?: ElementInfo): void;
-  
-  /**
-   * Called on key names - keys are delivered in order that sortKeys returns
-   */
-  protected abstract onKey(key: string, element?: ElementInfo): void;
-  
-  /**
-   * Called when object is encountered
-   */
-  protected abstract onOpenObject(obj?: object, element?: ElementInfo): void;
-  
-  /**
-   * Called after traversing through object
-   */
-  protected abstract onCloseObject(obj?: object, element?: ElementInfo): void;
-  
-  /**
-   * Called when array is encountered
-   */
-  protected abstract onOpenArray(arr?: any[], element?: ElementInfo): void;
-  
-  /**
-   * Called after traversing through array
-   */
-  protected abstract onCloseArray(arr?: any[], element?: ElementInfo): void;
-  
-  /**
-   * Called after traversing through root element
-   */
-  protected onEnd(): void {};
-  
-  /**
-   * Called when errors are encountered. No information other than the error itself is given
-   */
-  protected onError(err: Error): void {console.error(err);};
-  
-  /**
-   * Called when an object is encountered. The returned array will be the order in which
-   * the traversal algorithm goes through the obejct. By default, returns the keys as found.
-   */
-  protected sortKeys(keys: string[], element?: ElementInfo): string[] {return keys;}; //traverse keys in order of returned array
-
-  /**
-   * It might make sense to pass in query object here and parse it on construction, 
+   * It might make sense to pass in query object here and parse it on construction,
    * but this could prevent child classes from doing construction-time setup since
    * inherited class constructors must call super() immediately.
    */
-  constructor(){}
+  // tslint:disable-next-line:no-empty
+  constructor() { }
 
   /**
    * @param obj the query object
    * @returns If parsing was successful
    */
-  public parseObject(obj: any) : boolean
+  public parseObject(obj: any): boolean
   {
     try
     {
@@ -128,16 +75,77 @@ abstract class ObjectFormatter
       this.onEnd();
       return true;
     }
-    catch(e)
+    catch (e)
     {
       this.onError(e);
       return false;
     }
   }
 
+  /**
+   * @returns {string} the formatted query string
+   */
+  public abstract getResultText(): string;
+
+  /**
+   * All event handlers except for onEnd and onError are provided an ElementInfo when called.
+   * Each ElementInfo gives information about the relationship between the handled element and its container
+   */
+
+  /**
+   * Called on terminal values
+   */
+  protected abstract onValue(val: any, element?: ElementInfo): void;
+
+  /**
+   * Called on key names - keys are delivered in order that sortKeys returns
+   */
+  protected abstract onKey(key: string, element?: ElementInfo): void;
+
+  /**
+   * Called when object is encountered
+   */
+  protected abstract onOpenObject(obj?: object, element?: ElementInfo): void;
+
+  /**
+   * Called after traversing through object
+   */
+  protected abstract onCloseObject(obj?: object, element?: ElementInfo): void;
+
+  /**
+   * Called when array is encountered
+   */
+  protected abstract onOpenArray(arr?: any[], element?: ElementInfo): void;
+
+  /**
+   * Called after traversing through array
+   */
+  protected abstract onCloseArray(arr?: any[], element?: ElementInfo): void;
+
+  /**
+   * Called after traversing through root element
+   */
+  // tslint:disable-next-line:no-empty
+  protected onEnd(): void { }
+
+  /**
+   * Called when errors are encountered. No information other than the error itself is given
+   */
+  // tslint:disable-next-line
+  protected onError(err: Error): void { console.error(err); }
+
+  /**
+   * Called when an object is encountered. The returned array will be the order in which
+   * the traversal algorithm goes through the obejct. By default, returns the keys as found.
+   */
+  protected sortKeys(keys: string[], element?: ElementInfo): string[] { return keys; } // traverse keys in order of returned array
+
+  /**
+   * This does not need to be overriden
+   */
   protected traverseObject(obj: any, element: ElementInfo): void
   {
-    switch(typeof obj)
+    switch (typeof obj)
     {
       case 'string':
       case 'number':
@@ -145,26 +153,26 @@ abstract class ObjectFormatter
         this.onValue(obj, element);
         break;
       case 'object':
-        if(Array.isArray(obj))
+        if (Array.isArray(obj))
         {
           this.onOpenArray(obj, element);
-          for(let i = 0; i < obj.length; i++)
+          for (let i = 0; i < obj.length; i++)
           {
             this.traverseObject(obj[i], new ElementInfo(i, obj));
           }
           this.onCloseArray(obj, element);
         }
-        else if(obj === null)
+        else if (obj === null)
         {
           this.onValue(null, element);
         }
         else
         {
-          let keys = this.sortKeys(Object.keys(obj), element);
+          const keys = this.sortKeys(Object.keys(obj), element);
           this.onOpenObject(obj, element);
-          for(let i = 0; i < keys.length; i++)
+          for (let i = 0; i < keys.length; i++)
           {
-            let innerElement : ElementInfo = new ElementInfo(i, obj, keys);
+            const innerElement: ElementInfo = new ElementInfo(i, obj, keys);
             this.onKey(keys[i], innerElement);
             this.traverseObject(obj[keys[i]], innerElement);
           }

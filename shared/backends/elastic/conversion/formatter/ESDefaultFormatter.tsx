@@ -42,48 +42,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import ObjectFormatter from './ObjectFormatter';
+// Copyright 2017 Terrain Data, Inc.
+
 import ElementInfo from './ElementInfo';
+import ObjectFormatter from './ObjectFormatter';
+
 /**
  *  Default formatter implementation
  */
 class ESDefaultFormatter extends ObjectFormatter
 {
-  protected static readonly defaultRules = 
+  protected static readonly defaultRules =
   {
-    'delimiter' : ',',
-    'object' : ['{', '}'],
-    'array' : ['[', ']'],
-    'key' : ':',
-    'spacingTok' : '  ', //tokens are cosmetic
-    'valueToks' : ['', '\n'],
-    'singularValueToks' : ['', ''],
-    'keyToks' : ['\n', ' '],
-    'singularKeyToks' : ['', ' '],
-    'openObjectToks' : ['\n', '\n'],
-    'closeObjectToks' : ['\n', '\n'],
-    'openArrayToks' : ['\n', '\n'],
-    'closeArrayToks' : ['\n', '\n'],
-    'openSingularObjectToks' : ['', ''],
-    'closeSingularObjectToks' : ['', ''],
-    'openSingularArrayToks' : ['', ''],
-    'closeSingularArrayToks' : ['', '']
+    delimiter: ',',
+    object: ['{', '}'],
+    array: ['[', ']'],
+    key: ':',
+    spacingTok: '  ', // tokens are cosmetic
+    valueToks: ['', '\n'],
+    singularValueToks: ['', ''],
+    keyToks: ['\n', ' '],
+    singularKeyToks: ['', ' '],
+    openObjectToks: ['\n', '\n'],
+    closeObjectToks: ['\n', '\n'],
+    openArrayToks: ['\n', '\n'],
+    closeArrayToks: ['\n', '\n'],
+    openSingularObjectToks: ['', ''],
+    closeSingularObjectToks: ['', ''],
+    openSingularArrayToks: ['', ''],
+    closeSingularArrayToks: ['', ''],
   };
 
   protected depth: number = 0;
   protected output: string = '';
   protected rules: object;
   protected token: string = '';
-  
-  constructor(formattingRules : object = ESDefaultFormatter.defaultRules)
+
+  constructor(formattingRules: object = ESDefaultFormatter.defaultRules)
   {
     super();
     this.rules = formattingRules;
   }
 
+  public getResultText(): string
+  {
+    return this.output;
+  }
+
   protected addText(value: any, key: string): void
   {
-    //Sandwiches the value between the tokens defined by key. Merges tokens. Strips double newlines and applies indents.
+    // Sandwiches the value between the tokens defined by key. Merges tokens. Strips double newlines and applies indents.
     this.token = this.indentToken(this.lintToken(this.token + this.rules[key][0]));
     this.output += this.token + value.toString();
     this.token = this.rules[key][1];
@@ -99,58 +107,54 @@ class ESDefaultFormatter extends ObjectFormatter
     return text.replace(new RegExp('\n', 'mg'), '\n' + this.rules['spacingTok'].repeat(this.depth));
   }
 
-  //parent class method implementations
+  // parent class method implementations
 
-  onValue(value: any, element: ElementInfo): void
+  protected onValue(value: any, element: ElementInfo): void
   {
-    if(typeof(value) == 'string')
+    if (typeof (value) === 'string')
     {
       value = JSON.stringify(value);
     }
-    let toks : string = element.isOnlyElement() ? 'singularValueToks' : 'valueToks';
-    let delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
+    const toks: string = element.isOnlyElement() ? 'singularValueToks' : 'valueToks';
+    const delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
     this.addText(value + delimiter, toks);
   }
 
-  onKey(key: string, element: ElementInfo): void
+  protected onKey(key: string, element: ElementInfo): void
   {
-    let toks : string = element.isOnlyElement() ? 'singularKeyToks' : 'keyToks';
+    const toks: string = element.isOnlyElement() ? 'singularKeyToks' : 'keyToks';
     this.addText(JSON.stringify(key) + this.rules['key'], toks);
   }
 
-  onOpenObject(obj?: object, element?: ElementInfo): void
+  protected onOpenObject(obj?: object, element?: ElementInfo): void
   {
-    let toks : string = Object.keys(obj).length === 1 ? 'openSingularObjectToks' : 'openObjectToks';
+    const toks: string = Object.keys(obj).length === 1 ? 'openSingularObjectToks' : 'openObjectToks';
     this.addText(this.rules['object'][0], toks);
     this.depth += 1;
   }
 
-  onCloseObject(obj?: object, element?: ElementInfo): void
+  protected onCloseObject(obj?: object, element?: ElementInfo): void
   {
     this.depth -= 1;
-    let toks : string = Object.keys(obj).length === 1 ? 'closeSingularObjectToks' : 'closeObjectToks';
-    let delimiter : string = element.isLastElement() ? '' : this.rules['delimiter'];
+    const toks: string = Object.keys(obj).length === 1 ? 'closeSingularObjectToks' : 'closeObjectToks';
+    const delimiter: string = element.isLastElement() ? '' : this.rules['delimiter'];
     this.addText(this.rules['object'][1] + delimiter, toks);
   }
 
-  onOpenArray(arr?: any[], element?: ElementInfo): void
+  protected onOpenArray(arr?: any[], element?: ElementInfo): void
   {
-    let toks : string = arr.length === 1 ? 'openSingularArrayToks' : 'openArrayToks';
+    const toks: string = arr.length === 1 ? 'openSingularArrayToks' : 'openArrayToks';
     this.addText(this.rules['array'][0], toks);
     this.depth += 1;
   }
 
-  onCloseArray(arr?: any[], element?: ElementInfo): void
+  protected onCloseArray(arr?: any[], element?: ElementInfo): void
   {
     this.depth -= 1;
-    let toks : string = arr.length === 1 ? 'closeSingularArrayToks' : 'closeArrayToks';
-    let delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
+    const toks: string = arr.length === 1 ? 'closeSingularArrayToks' : 'closeArrayToks';
+    const delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
     this.addText(this.rules['array'][1] + delimiter, toks);
   }
 
-  getResultText(): string
-  {
-    return this.output;
-  }
 }
 export default ESDefaultFormatter;

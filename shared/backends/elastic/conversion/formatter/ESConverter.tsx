@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import ESDefaultFormatter from './ESDefaultFormatter';
 /**
  * WIP
@@ -50,7 +52,7 @@ class ESConverter
 {
   public static formatES(query: object | string, previousCode?: string): string
   {
-    let formatter = new ESDefaultFormatter();
+    const formatter = new ESDefaultFormatter();
     formatter.parseObject(query);
     return formatter.getResultText();
   }
