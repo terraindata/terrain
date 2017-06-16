@@ -43,55 +43,63 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
-import ActionTypes from './RolesActionTypes';
 
-const RolesReducer = {};
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
 
-RolesReducer[ActionTypes.fetch] =
-  (state, action) =>
+/**
+ * A clause that corresponds to an object of uniform type values.
+ */
+export default class ESMapClause extends ESClause
+{
+  public nameID: string;
+  public valueID: string;
+
+  public constructor(settings: any, nameID: string, valueID: string, config: EQLConfig)
   {
-    // Ajax.getRoles((rolesData: any[]) =>
-    // {
-    //   let roles = Immutable.Map({});
-    //   rolesData.map((role) =>
-    //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
-    //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
-    //     }
-    //     role.admin = !! role.admin;
-    //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-    //   });
+    super(settings);
+    this.nameID = nameID;
+    this.valueID = valueID;
+    config.declareType(nameID);
+    config.declareType(valueID);
+  }
 
-    //   Actions.setRoles(roles);
-    // });
-    return state.set('loading', true);
-  };
-
-RolesReducer[ActionTypes.setRoles] =
-  (state, action) =>
-    action.payload.roles
-      .set('loading', false)
-      .set('loaded', true);
-
-RolesReducer[ActionTypes.change] =
-  (state, action) =>
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    const role: RoleTypes.Role = action.payload.role;
+    valueInfo.clause = this;
 
-    // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
+    const value: any = valueInfo.value;
+    if (typeof (value) !== 'object')
     {
-      state = state.set(role.groupId, Immutable.Map({}));
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
+      return;
     }
-    return state.setIn([role.groupId, role.userId], role);
-  };
 
-export default RolesReducer;
+    if (Array.isArray(value))
+    {
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be a map, but found an array instead.');
+      return;
+    }
+
+    // mark properties
+    const childClause: ESClause = interpreter.config.getClause(this.valueID);
+    const children: any = valueInfo.children;
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        interpreter.config.getClause(this.nameID).mark(interpreter, viTuple.propertyName);
+
+        if (viTuple.propertyValue !== null)
+        {
+          childClause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
+  }
+}

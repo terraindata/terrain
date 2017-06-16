@@ -42,44 +42,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
 import * as Immutable from 'immutable';
-const {List} = Immutable;
+import * as React from 'react';
+import * as _ from 'underscore';
+const { List } = Immutable;
 
-module CommonElastic
+namespace CommonElastic
 {
-  export const valueTypes = 
-  {
-    text: 'text',
-    number: 'number',
-    object: 'object',
-    array: 'array',
-    bool: 'bool',
-    null: 'null',
-  };
+  export const valueTypes =
+    {
+      text: 'text',
+      number: 'number',
+      object: 'object',
+      array: 'array',
+      bool: 'bool',
+      null: 'null',
+    };
   export const valueTypesList = _.map(valueTypes, (v) => v);
   export const valueTypesDisplayNames =
-  {
-    text: 'Text',
-    number: 'Number',
-    object: 'Map',
-    array: 'List',
-    bool: 'True / False',
-    null: 'Null',
-  };
-  
-  
+    {
+      text: 'Text',
+      number: 'Number',
+      object: 'Map',
+      array: 'List',
+      bool: 'True / False',
+      null: 'Null',
+    };
+
   export const acceptsValues = List(
-    ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull']
+    ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull'],
   );
-  
-  
+
   export const Directions: string[] = ['ascending', 'descending'];
   export const Combinators: string[] = ['&', 'or'];
-  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
+  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
-	export enum Operator {
+  export enum Operator
+  {
     EQ,
     NE,
     GE,
@@ -103,7 +102,8 @@ module CommonElastic
     [Operator.LIKE]: 'LIKE',
   };
 
-  export enum Direction {
+  export enum Direction
+  {
     ASC,
     DESC,
   }
@@ -113,7 +113,8 @@ module CommonElastic
     [Direction.DESC]: 'DESC',
   };
 
-  export enum Combinator {
+  export enum Combinator
+  {
     AND,
     OR,
   }

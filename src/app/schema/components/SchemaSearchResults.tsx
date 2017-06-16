@@ -199,7 +199,7 @@ class SchemaSearchResults extends PureClasss<Props>
               key={'show-more-' + stateKey}
             >
               Show More
-						</div>
+            </div>
           </FadeInOut>
         </div>
       </FadeInOut>
@@ -237,7 +237,7 @@ class SchemaSearchResults extends PureClasss<Props>
             style={SchemaTreeStyles.schemaHeading}
           >
             All Results
-		      	</div>
+            </div>
 
           {
             this.renderSection('databases', 'database', 'Databases')

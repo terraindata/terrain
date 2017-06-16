@@ -214,7 +214,7 @@ class SchemaView extends PureClasss<Props>
                 style={Styles.schemaHeading}
               >
                 Visible Results
-			      	</div>
+              </div>
             </FadeInOut>
 
             <SchemaTreeList

@@ -42,18 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
+import * as _ from 'underscore';
+const { List, Map } = Immutable;
 const L = () => List([]);
-import {_block, Block, TQLTranslationFn} from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
-import {_card, Card, CardString} from '../../../blocks/types/Card';
-import {Input, InputType} from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
-import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from '../../../blocks/displays/Display';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-const {_wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard} = CommonBlocks;
+import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
+import { _card, Card, CardString } from '../../../blocks/types/Card';
+import { Input, InputType } from '../../../blocks/types/Input';
+import CommonElastic from '../syntax/CommonElastic';
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 const accepts = Immutable.List(['elasticKeyValueWrap']);
 
@@ -62,19 +62,19 @@ export const elasticRootCard = _card({
   from: 0,
   rootType: '',
   rootSize: 100,
-  
+
   body: '',
   sort: '',
-  
+
   cards: L(),
-  
+
   static:
   {
     title: 'Root',
     colors: ['#456', '#789'],
     preview: '[index], [rootType]',
     language: 'elastic',
-    
+
     tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
       return {
@@ -84,9 +84,9 @@ export const elasticRootCard = _card({
         size: rootBlock['rootSize'],
       };
     },
-    
-    accepts,    
-    
+
+    accepts,
+
     display:
     [
       {
@@ -95,7 +95,7 @@ export const elasticRootCard = _card({
         getAutoTerms: (schemaState) =>
         {
           return Immutable.List(['movies', 'baseball', 'zazzle']);
-        }
+        },
         // autoDisabled: true,
       },
       {
@@ -113,13 +113,13 @@ export const elasticRootCard = _card({
         key: 'rootSize',
         autoDisabled: true,
       },
-      
+
       {
         displayType: DisplayType.CARDS,
         key: 'cards',
         accepts,
       },
-    ]
+    ],
   },
 });
 

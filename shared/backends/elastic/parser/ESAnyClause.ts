@@ -43,55 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
-import ActionTypes from './RolesActionTypes';
 
-const RolesReducer = {};
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
 
-RolesReducer[ActionTypes.fetch] =
-  (state, action) =>
+/**
+ * A clause which can be any valid JSON value
+ */
+export default class ESAnyClause extends ESClause
+{
+  public constructor(settings: any)
   {
-    // Ajax.getRoles((rolesData: any[]) =>
-    // {
-    //   let roles = Immutable.Map({});
-    //   rolesData.map((role) =>
-    //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
-    //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
-    //     }
-    //     role.admin = !! role.admin;
-    //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-    //   });
+    super(settings);
+  }
 
-    //   Actions.setRoles(roles);
-    // });
-    return state.set('loading', true);
-  };
-
-RolesReducer[ActionTypes.setRoles] =
-  (state, action) =>
-    action.payload.roles
-      .set('loading', false)
-      .set('loaded', true);
-
-RolesReducer[ActionTypes.change] =
-  (state, action) =>
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    const role: RoleTypes.Role = action.payload.role;
-
-    // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
-    {
-      state = state.set(role.groupId, Immutable.Map({}));
-    }
-    return state.setIn([role.groupId, role.userId], role);
-  };
-
-export default RolesReducer;
+    valueInfo.clause = this;
+  }
+}
