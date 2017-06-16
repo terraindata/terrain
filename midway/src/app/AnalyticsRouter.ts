@@ -44,82 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Config } from './Config';
-import cmdLineArgs = require('command-line-args');
-import cmdLineUsage = require('command-line-usage');
+// Part of events PoC
 
-// process command-line arguments
-const optionList = [
-  {
-    alias: 'c',
-    defaultValue: 'midway.json',
-    name: 'config',
-    type: String,
-    typeLabel: 'file',
-    description: 'Configuration file to use.',
-  },
-  {
-    alias: 'p',
-    defaultValue: 3000,
-    name: 'port',
-    type: Number,
-    typeLabel: 'number',
-    description: 'Port to listen on.',
-  },
-  {
-    alias: 'd',
-    defaultValue: 'sqlite',
-    name: 'db',
-    type: String,
-    typeLabel: 'type',
-    description: 'System database backend to use.',
-  },
-  {
-    alias: 'n',
-    defaultValue: 'midway.db',
-    name: 'dsn',
-    type: String,
-    description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
-  },
-  {
-    name: 'debug',
-    type: Boolean,
-    description: 'Turn on debug mode.',
-  },
-  {
-    name: 'help',
-    type: Boolean,
-    description: 'Show help and usage information.',
-  },
-  {
-    alias: 'v',
-    name: 'verbose',
-    type: Boolean,
-    description: 'Print verbose information.',
-  },
-  {
-    name: 'analyticsdb',
-    type: String,
-    defaultValue: 'http://127.0.0.1:9200',
-    description: 'Analytics datastore connection parameters',
-  },
-];
+import * as KoaRouter from 'koa-router';
 
-const sections = [
-  {
-    header: 'Midway 2.0',
-    content: 'Refreshingly good.',
-  },
-  {
-    header: 'Options',
-    optionList,
-  },
-];
+import EventRouter from './events/EventRouter';
 
-export let CmdLineArgs: Config = cmdLineArgs(optionList,
-  {
-    partial: true,
-  });
+import * as Util from './Util';
 
-export const CmdLineUsage = cmdLineUsage(sections);
-export default CmdLineArgs;
+const AnalyticsRouter = new KoaRouter();
+AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
+
+export default AnalyticsRouter;

@@ -62,6 +62,7 @@ export interface Config
   help?: boolean;
   verbose?: boolean;
   databases?: object[];
+  analyticsdb?: string;
 }
 
 export function loadConfigFromFile(config: Config): Config
