@@ -97,7 +97,7 @@ function runBounceChecks(tests: bounceTest[])
 
 let deepArr = [];
 let curr = deepArr;
-for(let i = 0; i < 100; i++)
+for(let i = 0; i < 64; i++)
 {
   curr.push(i);
   curr.push([]);
