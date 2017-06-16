@@ -47,7 +47,10 @@ THE SOFTWARE.
 // Temporary testing file to be run using node from command line, until I get unit testing working
 import * as deepEqual from 'deep-equal';
 import ESConverter from './ESConverter';
-/* tslint:disable */
+
+/* tslint:disable:no-console */
+/* tslint:disable:object-literal-key-quotes */
+
 class BounceTest
 {
   constructor(
@@ -70,37 +73,37 @@ function runBounceChecks(tests: BounceTest[])
       if (bounceCheck(tests[i].testObj))
       {
         nPassed += 1;
-        console.log("PASS: " + tests[i].testName);
+        console.log('PASS: ' + tests[i].testName);
       }
       else
       {
-        console.log("FAIL: " + tests[i].testName);
-        console.log("Expected object: ");
+        console.log('FAIL: ' + tests[i].testName);
+        console.log('Expected object: ');
         console.log(tests[i].testObj);
-        console.log("Reparsed as: ");
+        console.log('Reparsed as: ');
         console.log(JSON.parse(ESConverter.formatES(tests[i].testObj)));
       }
     }
     catch (e)
     {
-      console.log("FAIL: " + tests[i].testName);
-      console.log("uncaught exception or error: ");
+      console.log('FAIL: ' + tests[i].testName);
+      console.log('uncaught exception or error: ');
       console.log(e);
     }
   }
   if (nPassed === tests.length)
   {
-    console.log(String(nPassed) + "/" + String(tests.length) + " tests passed");
-    console.log("All Tests Passed");
+    console.log(String(nPassed) + '/' + String(tests.length) + ' tests passed');
+    console.log('All Tests Passed');
   }
-  else 
+  else
   {
-    console.log(String(nPassed) + "/" + String(tests.length) + " tests passed");
-    console.log("Tests Failed");
+    console.log(String(nPassed) + '/' + String(tests.length) + ' tests passed');
+    console.log('Tests Failed');
   }
 }
 
-let deepArr = [];
+const deepArr = [];
 let curr = deepArr;
 for (let i = 0; i < 64; i++)
 {
@@ -109,94 +112,95 @@ for (let i = 0; i < 64; i++)
   curr = curr[1];
 }
 runBounceChecks([
-  new BounceTest("generic",
+  new BounceTest('generic',
     {
-      "index": "movies",
-      "type": "data",
-      "size": 10,
-      "body": {
-        "query": {
-          "bool": {
-            "must_not": [
+      'index': 'movies',
+      'type': 'data',
+      'size': 10,
+      'body': {
+        'query': {
+          'bool': {
+            'must_not': [
               {
-                "match": {
-                  "title": "Toy Story (1995)"
-                }
+                'match': {
+                  'title': 'Toy Story (1995)',
+                },
               },
             ],
-            "must": [
+            'must': [
               {
-                "range": {
-                  "releasedate": {
-                    "gte": "2007-03-24"
-                  }
-                }
+                'range': {
+                  'releasedate': {
+                    'gte': '2007-03-24',
+                  },
+                },
               },
             ],
-          }
-        }
-      }
+          },
+        },
+      },
     }),
-  new BounceTest("some topologies",
+  new BounceTest('some topologies',
     {
-      "1":
+      '1':
       [
-        { "1": [1, 2] },
-        [{ "1": 1 }, [1, 2]]
+        { '1': [1, 2] },
+        [{ '1': 1 }, [1, 2]],
       ],
-      "2":
+      '2':
       {
-        "1": [[1, 2], [1, 2]],
-        "2": [{ "1": "1", "2": "2" }, { "1": "1", "2": "2" }]
-      }
+        '1': [[1, 2], [1, 2]],
+        '2': [{ '1': '1', '2': '2' }, { '1': '1', '2': '2' }],
+      },
     }),
-  new BounceTest("uncommon data types",
+  new BounceTest('uncommon data types',
     {
-      "foo": null,
-      "baz": [null],
-      "oof": true,
-      "rab": "",
+      'foo': null,
+      'baz': [null],
+      'oof': true,
+      'rab': '',
     }),
-  new BounceTest("newlines",
+  new BounceTest('newlines',
     {
-      "normal": "string",
-      "\nHel\rlo": "Good\n\nBye",
-      "How\n": "A\rre\r\nYou?",
+      'normal': 'string',
+      '\nHel\rlo': 'Good\n\nBye',
+      'How\n': 'A\rre\r\nYou?',
     }),
-  new BounceTest("unusual characters and escapes",
+  new BounceTest('unusual characters and escapes',
     {
-      "\\": "hi\\\\",
-      "\0": ["'\"hey\"'"],
-      "": "\twell"
+      '\\': 'hi\\\\',
+      '\0': ['\"hey\"'],
+      '': '\twell',
     }),
-  new BounceTest("unicode values",
-    ["\u0000", "\u0001", "\u0008", "\u0030"]
+  new BounceTest('unicode values',
+    ['\u0000', '\u0001', '\u0008', '\u0030'],
   ),
-  new BounceTest("scientific notation",
+  new BounceTest('scientific notation',
     {
-      "foo": 1e6,
-      "bar": "1e6"
+      'foo': 1e6,
+      'bar': '1e6',
     }),
-  new BounceTest("root value string",
-    "string"
+  new BounceTest('root value string',
+    'string',
   ),
-  new BounceTest("root value number",
-    1
+  new BounceTest('root value number',
+    1,
   ),
-  new BounceTest("root value boolean",
-    false
+  new BounceTest('root value boolean',
+    false,
   ),
-  new BounceTest("root value null",
-    null
+  new BounceTest('root value null',
+    null,
   ),
-  new BounceTest("root value empty string",
-    ""
+  new BounceTest('root value empty string',
+    '',
   ),
-  new BounceTest("root value unicode",
-    "\u0030"
+  new BounceTest('root value unicode',
+    '\u0030',
   ),
-  new BounceTest("deep nested array",
-    deepArr
-  )
+  new BounceTest('deep nested array',
+    deepArr,
+  ),
 ]);
-/* tslint:enable */
+/* tslint:enable:no-console */
+/* tslint:enable:object-literal-key-quotes */
