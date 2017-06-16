@@ -79,7 +79,7 @@ export class DatabaseTreeInfo extends PureClasss<Props>
           >
             {database.tableIds.size}
           </span> tables
-      	</div>
+        </div>
       </div>
     );
   }

@@ -43,55 +43,87 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
-import ActionTypes from './RolesActionTypes';
 
-const RolesReducer = {};
+import * as fs from 'fs';
+import * as winston from 'winston';
+import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
+import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
+import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
-RolesReducer[ActionTypes.fetch] =
-  (state, action) =>
+function getExpectedFile(): string
+{
+  return __filename.split('.')[0] + '.expected';
+}
+
+let expected;
+let config: EQLConfig;
+
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+
+  const expectedString: any = await new Promise((resolve, reject) =>
   {
-    // Ajax.getRoles((rolesData: any[]) =>
-    // {
-    //   let roles = Immutable.Map({});
-    //   rolesData.map((role) =>
-    //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
-    //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
-    //     }
-    //     role.admin = !! role.admin;
-    //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-    //   });
+    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+  });
 
-    //   Actions.setRoles(roles);
-    // });
-    return state.set('loading', true);
-  };
-
-RolesReducer[ActionTypes.setRoles] =
-  (state, action) =>
-    action.payload.roles
-      .set('loading', false)
-      .set('loaded', true);
-
-RolesReducer[ActionTypes.change] =
-  (state, action) =>
+  expected = JSON.parse(expectedString);
+  try
   {
-    const role: RoleTypes.Role = action.payload.role;
+    config = new EQLConfig();
+  } catch (e)
+  {
+    fail(e);
+  }
 
-    // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
+  done();
+});
+
+function testParse(testString: string,
+  expectedValue: any,
+  expectedErrors: ESParserError[] = [])
+{
+  winston.info('testing \'' + testString + '\'');
+  const interpreter: ESInterpreter = new ESInterpreter(testString, config);
+  const parser: ESJSONParser = interpreter.parser;
+
+  const objects = new WeakMap();
+  let count = 0;
+  winston.info(JSON.stringify(parser.getValueInfo(),
+    (key, val) =>
     {
-      state = state.set(role.groupId, Immutable.Map({}));
-    }
-    return state.setIn([role.groupId, role.userId], role);
-  };
+      if (val != null && typeof val === 'object')
+      {
+        const id = objects.get(val);
+        if (id === undefined)
+        {
+          objects.set(val, count++);
+        }
+        else
+        {
+          return 'ref ' + String(id);
+        }
+      }
 
-export default RolesReducer;
+      return val;
+    }, 2));
+
+  // winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
+  // expect(value).toEqual(expectedValue);
+  expect(parser.getErrors()).toEqual(expectedErrors);
+}
+
+test('parse valid json objects', () =>
+{
+  Object.getOwnPropertyNames(expected).forEach(
+    (testName: string) =>
+    {
+      const testValue: any = expected[testName];
+
+      // test parsing the value using a few spacing options
+      testParse(JSON.stringify(testValue), testValue);
+    });
+});

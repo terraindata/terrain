@@ -43,55 +43,77 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
-import ActionTypes from './RolesActionTypes';
 
-const RolesReducer = {};
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
 
-RolesReducer[ActionTypes.fetch] =
-  (state, action) =>
+/**
+ * A clause with a well-defined structure.
+ */
+export default class ESStructureClause extends ESClause
+{
+  public structure: { [name: string]: string };
+
+  public constructor(settings: any, config: EQLConfig)
   {
-    // Ajax.getRoles((rolesData: any[]) =>
-    // {
-    //   let roles = Immutable.Map({});
-    //   rolesData.map((role) =>
-    //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
-    //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
-    //     }
-    //     role.admin = !! role.admin;
-    //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-    //   });
+    super(settings);
 
-    //   Actions.setRoles(roles);
-    // });
-    return state.set('loading', true);
-  };
+    Object.keys(this.def).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.def[key]);
+      });
 
-RolesReducer[ActionTypes.setRoles] =
-  (state, action) =>
-    action.payload.roles
-      .set('loading', false)
-      .set('loaded', true);
+    this.structure = this.def as { [key: string]: string };
+  }
 
-RolesReducer[ActionTypes.change] =
-  (state, action) =>
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    const role: RoleTypes.Role = action.payload.role;
+    valueInfo.clause = this;
 
-    // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
+    const value = valueInfo.value;
+    if (typeof (value) !== 'object')
     {
-      state = state.set(role.groupId, Immutable.Map({}));
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
+      return;
     }
-    return state.setIn([role.groupId, role.userId], role);
-  };
 
-export default RolesReducer;
+    if (Array.isArray(value))
+    {
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
+      return;
+    }
+
+    const children: any = valueInfo.children;
+
+    // mark properties
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        if (!this.structure.hasOwnProperty(name))
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
+          return;
+        }
+
+        if (viTuple.propertyValue !== null)
+        {
+          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
+        }
+      });
+
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
+  }
+}

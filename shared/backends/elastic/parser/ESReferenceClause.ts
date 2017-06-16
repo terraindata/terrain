@@ -43,55 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
-import ActionTypes from './RolesActionTypes';
 
-const RolesReducer = {};
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
 
-RolesReducer[ActionTypes.fetch] =
-  (state, action) =>
+/**
+ * A clause with a type that references another def.
+ * This is used to specify clause types with special names or descriptions,
+ * but which are composed wholly of another type.
+ *
+ * For example, a bool clause contains "must", "must_not", and "should" properties,
+ * each of which has a unique function, but all of these properties contain a "query" clause.
+ *
+ * Another example is a setting property such as "boost", which must contain a
+ * "number" as its value.
+ */
+export default class ESReferenceClause extends ESClause
+{
+  public delegateType: string;
+
+  public constructor(settings: any, config: EQLConfig)
   {
-    // Ajax.getRoles((rolesData: any[]) =>
-    // {
-    //   let roles = Immutable.Map({});
-    //   rolesData.map((role) =>
-    //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
-    //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
-    //     }
-    //     role.admin = !! role.admin;
-    //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-    //   });
+    super(settings);
+    this.delegateType = this.def as string;
+    config.declareType(this.delegateType);
+  }
 
-    //   Actions.setRoles(roles);
-    // });
-    return state.set('loading', true);
-  };
-
-RolesReducer[ActionTypes.setRoles] =
-  (state, action) =>
-    action.payload.roles
-      .set('loading', false)
-      .set('loaded', true);
-
-RolesReducer[ActionTypes.change] =
-  (state, action) =>
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    const role: RoleTypes.Role = action.payload.role;
-
-    // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
-    {
-      state = state.set(role.groupId, Immutable.Map({}));
-    }
-    return state.setIn([role.groupId, role.userId], role);
-  };
-
-export default RolesReducer;
+    interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
+    valueInfo.clause = this;
+  }
+}

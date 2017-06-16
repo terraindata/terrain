@@ -134,7 +134,7 @@ const TQLToCards =
 
       if (currentCards)
       {
-        return reconcileCards(currentCards, cards);
+        return BlockUtils.reconcileCards(currentCards, cards);
       }
 
       return cards;
@@ -649,73 +649,4 @@ interface Node
   left_child?: Node | string;
   right_child?: Node | string;
   child?: Node;
-}
-
-function reconcileCards(currentCards: Cards, newCards: Cards): Cards
-{
-  let currentCardIndex = 0;
-  return newCards.map(
-    (card, index) =>
-    {
-      // search for a card of the same type
-      let tempIndex = currentCardIndex;
-      while (
-        tempIndex < currentCards.size &&
-        currentCards.get(tempIndex).type !== card.type
-      )
-      {
-        tempIndex++;
-      }
-
-      if (tempIndex !== currentCards.size)
-      {
-        // found a matching card, assign the id and meta fields, and update currentCardIndex
-        const currentCard = currentCards.get(tempIndex) as Card;
-        currentCardIndex = tempIndex + 1;
-        return reconcileBlock(currentCard, card) as Card;
-
-      }
-      // else, no matching card found, move on
-      return card;
-    },
-  ).toList();
-}
-
-function reconcileBlock(currentBlock: Block, newBlock: Block): Block
-{
-  if (!currentBlock || currentBlock.type !== newBlock.type)
-  {
-    return newBlock;
-  }
-
-  let block = newBlock;
-
-  block.static.metaFields && block.static.metaFields.map(
-    (metaField) =>
-      block = block.set(metaField, currentBlock[metaField]),
-  );
-
-  if (block['cards'])
-  {
-    block = block.set('cards',
-      reconcileCards(currentBlock['cards'], block['cards']),
-    );
-  }
-
-  BlockUtils.forAllBlocks(
-    block,
-    (childBlock, keyPath) =>
-    {
-      const currentChildBlock = currentBlock.getIn(keyPath);
-      if (keyPath.size && currentChildBlock)
-      {
-        block = block.setIn(keyPath, reconcileBlock(currentChildBlock, childBlock));
-      }
-    },
-    List([]),
-    true,
-    true,
-  );
-
-  return block;
 }

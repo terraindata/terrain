@@ -43,55 +43,46 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
-import ActionTypes from './RolesActionTypes';
 
-const RolesReducer = {};
+import EQLConfig from './EQLConfig';
+import ESJSONParser from './ESJSONParser';
+import ESParserError from './ESParserError';
+import ESParserToken from './ESParserToken';
+import ESParserPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
 
-RolesReducer[ActionTypes.fetch] =
-  (state, action) =>
+/**
+ * An instrumented interpreter that takes the output of ESJSONParser and
+ * decorates the results with ES-specific information.
+ */
+export default class ESInterpreter
+{
+  public parser: ESJSONParser; // source parser
+  public config: EQLConfig; // query language description
+
+  /**
+   * Runs the interpreter on the given query string. Read needed data by calling the
+   * public member functions below. You can also pass in an existing ESJSONParser
+   * to run the interpreter on it's result.
+   * @param query the query string or parser to interpret
+   */
+  public constructor(query: string | ESJSONParser, config: EQLConfig)
   {
-    // Ajax.getRoles((rolesData: any[]) =>
-    // {
-    //   let roles = Immutable.Map({});
-    //   rolesData.map((role) =>
-    //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
-    //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
-    //     }
-    //     role.admin = !! role.admin;
-    //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-    //   });
+    this.config = config;
 
-    //   Actions.setRoles(roles);
-    // });
-    return state.set('loading', true);
-  };
-
-RolesReducer[ActionTypes.setRoles] =
-  (state, action) =>
-    action.payload.roles
-      .set('loading', false)
-      .set('loaded', true);
-
-RolesReducer[ActionTypes.change] =
-  (state, action) =>
-  {
-    const role: RoleTypes.Role = action.payload.role;
-
-    // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
+    if (typeof query === 'string')
     {
-      state = state.set(role.groupId, Immutable.Map({}));
+      this.parser = new ESJSONParser(query);
+    } else
+    {
+      this.parser = query;
     }
-    return state.setIn([role.groupId, role.userId], role);
-  };
 
-export default RolesReducer;
+    this.config.getClause('root').mark(this, this.parser.getValueInfo());
+  }
+
+  public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
+  {
+    this.parser.accumulateError(new ESParserError(info.tokens[0], message, isWarning));
+  }
+}

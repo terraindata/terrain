@@ -142,7 +142,7 @@ export const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
 export const _card = (config: CardConfig) =>
 {
   verifyBlockConfigKeys(config);
-  
+
   config = _.extend(config, {
     id: '',
     _isCard: true,

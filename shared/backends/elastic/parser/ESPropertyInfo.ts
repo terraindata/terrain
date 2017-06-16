@@ -52,12 +52,12 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESPropertyInfo
 {
-  public name: ESValueInfo; // the value info for the property name
-  public value: ESValueInfo | null; // the value info for the property value
+  public propertyName: ESValueInfo; // the value info for the property name
+  public propertyValue: ESValueInfo | null; // the value info for the property value
 
-  public constructor(name: ESValueInfo)
+  public constructor(propertyName: ESValueInfo)
   {
-    this.name = name;
-    this.value = null;
+    this.propertyName = propertyName;
+    this.propertyValue = null;
   }
 }

@@ -43,55 +43,47 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
-import ActionTypes from './RolesActionTypes';
 
-const RolesReducer = {};
+/*
+ *  Data container with immutable members
+ */
+class ElementInfo
+{
+  constructor(
+    public readonly index: number, // index is element's position underneath its parent (so 0 if it's root level)
+    public readonly container?: any[] | object, // parent of element: undefined for values under root
+    public readonly keys?: string[], // undefined for values inside arrays or under root
+  ) { }
 
-RolesReducer[ActionTypes.fetch] =
-  (state, action) =>
+  public containerSize(): number
   {
-    // Ajax.getRoles((rolesData: any[]) =>
-    // {
-    //   let roles = Immutable.Map({});
-    //   rolesData.map((role) =>
-    //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
-    //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
-    //     }
-    //     role.admin = !! role.admin;
-    //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
-    //   });
-
-    //   Actions.setRoles(roles);
-    // });
-    return state.set('loading', true);
-  };
-
-RolesReducer[ActionTypes.setRoles] =
-  (state, action) =>
-    action.payload.roles
-      .set('loading', false)
-      .set('loaded', true);
-
-RolesReducer[ActionTypes.change] =
-  (state, action) =>
-  {
-    const role: RoleTypes.Role = action.payload.role;
-
-    // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
+    if (this.container === undefined)
     {
-      state = state.set(role.groupId, Immutable.Map({}));
+      return 1;
     }
-    return state.setIn([role.groupId, role.userId], role);
-  };
+    else if (this.container instanceof Array)
+    {
+      return this.container.length;
+    }
+    else
+    {
+      return this.keys.length;
+    }
+  }
 
-export default RolesReducer;
+  public isLastElement(): boolean
+  {
+    return this.index + 1 === this.containerSize();
+  }
+
+  public isFirstElement(): boolean
+  {
+    return this.index === 0;
+  }
+
+  public isOnlyElement(): boolean
+  {
+    return this.containerSize() === 1;
+  }
+}
+export default ElementInfo;
