@@ -51,9 +51,17 @@ const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, paylo
 
 const FileImportActions =
   {
-    loadState:
-    (state: FileImportState) =>
-      $(ActionTypes.loadState, { state }),
+    changeTarget:
+    (targetIndex: number) =>
+      $(ActionTypes.changeTarget, { targetIndex }),
+
+    saveFile:
+    (file: File) =>
+      $(ActionTypes.saveFile, { file }),
+
+    uploadFile:
+    (file: File) =>
+      $(ActionTypes.uploadFile, { file }),
   };
 
 export default FileImportActions;

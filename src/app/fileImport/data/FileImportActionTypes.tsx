@@ -49,7 +49,9 @@ import Util from './../../util/Util';
 
 const FileImportActionTypes =
   {
-    loadState: '',
+    changeTarget: '',
+    saveFile: '',
+    uploadFile: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

@@ -242,10 +242,6 @@ class App extends PureClasss<Props>
       storeKeyPath: ['loaded'],
     });
 
-    this._subscribe(FileImportStore, {
-      stateKey: 'fileImportLoaded',
-      storeKeyPath: ['loaded'],
-    });
 
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];

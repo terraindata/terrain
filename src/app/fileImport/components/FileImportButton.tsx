@@ -45,65 +45,36 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import { DragDropContext } from 'react-dnd';
-import PureClasss from './../../common/components/PureClasss';;
-import FileImportStore from './../data/FileImportStore';
-import FileImportInfo from './FileImportInfo';
-import { FileImportState } from './../data/FileImportStore';
+const { List } = Immutable;
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import Dropdown from './../../common/components/Dropdown';
+import PureClasss from './../../common/components/PureClasss';
+import UserThumbnail from './../../users/components/UserThumbnail';
+import Util from './../../util/Util';
+import Actions from './../data/FileImportActions';
 import FileImportTypes from './../FileImportTypes';
-import './FileImport.less';
-const HTML5Backend = require('react-dnd-html5-backend');
-import { browserHistory } from 'react-router';
+import { FileImportState } from './../data/FileImportStore';
 
 export interface Props
 {
-  params?: any;
-  location?: any;
-  router?: any;
-  route?: any;
+  canImport: boolean;
 }
 
-const TARGETS = Immutable.List(['movies', 'new']);
-
-class FileImport extends PureClasss<any>
+class FileImportButton extends PureClasss<Props>
 {
-  public state: {
-    fileImportState: FileImportState;
-  } = {
-    fileImportState: FileImportStore.getState(),
-  };
-
-  constructor(props)
+  public handleImportClick()
   {
-    super(props);
 
-    this._subscribe(FileImportStore, {
-      stateKey: 'fileImportState',
-    });
   }
 
   public render()
   {
-    const { fileImportState } = this.state;
-    const { targetIndex, file } = fileImportState;
-
     return (
-      <div>
-        <h2>File Import Page</h2>
-        <div>
-          <FileImportInfo
-            canSelectTarget={true}
-            targetIndex={targetIndex}
-            targets={TARGETS}
-            canImport={true}
-          />
-        </div>
+      <div onClick={this.handleImportClick}>
+        <h2>Import</h2>
       </div>
     );
   }
 }
 
-// ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ExportFileImport = DragDropContext(HTML5Backend)(FileImport) as any;
-
-export default ExportFileImport;
+export default FileImportButton;

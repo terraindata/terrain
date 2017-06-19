@@ -46,12 +46,27 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../../util/Util';
+import ActionTypes from './FileImportActionTypes';
 
-const FileImportActionTypes =
-  {
-    loadState: '',
+const FileImportReducers = {}
+
+FileImportReducers[ActionTypes.changeTarget] =
+  (state, action) => {
+    return state.set('targetIndex', action.payload.targetIndex);
   };
 
-Util.setValuesToKeys(FileImportActionTypes, '');
+FileImportReducers[ActionTypes.saveFile] =
+  (state, action) => {
+    console.log(action.payload.file);
+    console.log(state);
+    console.log(state.set('file', action.payload.file));
+    return state.set('file', action.payload.file);
+  };
 
-export default FileImportActionTypes;
+FileImportReducers[ActionTypes.uploadFile] =
+  (state, action) => {
+    // Ajax call
+
+  };
+
+export default FileImportReducers;

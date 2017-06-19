@@ -633,6 +633,47 @@ export const Ajax =
 
       return { queryId, xhr };
     },
+
+    /* FileImport
+    upload(file: File,
+          onLoad: (response: MidwayQueryResponse) => void,
+          onError?: (ev: string | MidwayError) => void,
+          sqlQuery?: boolean, // unused
+          options: {
+            streaming?: boolean,
+            streamingTo?: string,
+          } = {},
+    ): { xhr: XMLHttpRequest, queryId: string }
+    {
+      const queryId = '' + Math.random();
+      const payload: any = {
+        dsn: 'http://127.0.0.1:9200',
+        db: 'search',       // index
+        table: 'movies',    // type
+        contents: file,
+        dbtype: 'elastic',
+      };
+
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
+      const xhr = Ajax.req(
+        'post',
+        'import/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+          download: options.streaming,
+          downloadFilename: options.streamingTo,
+        },
+      );
+
+      return { queryId, xhr };
+    },*/
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

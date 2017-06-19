@@ -53,59 +53,54 @@ import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
 import FileImportTypes from './../FileImportTypes';
-
-// type Source = FileImportTypes.Source;
+import { FileImportState } from './../data/FileImportStore';
 
 export interface Props
 {
-  canEdit: boolean;
-  sourceIndex: number;
+  canSelectTarget: boolean;
   targetIndex: number;
-  onSourceChange(index: number);
-  onTargetChange(index: number);
+  targets: List<string>;
+  canImport: boolean;
 }
 
-const SOURCES = Immutable.List(['JSON', 'CSV', 'SQL']);
-const TARGETS = Immutable.List(['movies', 'new']);
-
-class FileImportInfoColumn extends PureClasss<Props>
+class FileImportInfo extends PureClasss<Props>
 {
-  public handleSourceChange(sourceIndex: number)
-  {
-    const source = SOURCES.get(sourceIndex);
-    console.log(source);
-    console.log("index ", sourceIndex);
-    this.props.onSourceChange(sourceIndex);
-  }
   public handleTargetChange(targetIndex: number)
   {
-    const target = TARGETS.get(targetIndex);
-    console.log(target);
-    console.log("index ", targetIndex);
-    this.props.onTargetChange(targetIndex);
+    Actions.changeTarget(targetIndex);
+  }
+
+  public handleSaveFile(file)
+  {
+    console.log(file);
+    console.log(file.target);
+    console.log(file.target.files[0]);
+    console.log(file.target.files[0].type);
+    console.log(file.target.files[0].name);
+
+    Actions.saveFile(file.target.files[0]);
+  }
+
+  public handleUploadFile()
+  {
+    if (this.props.canImport)
+    {
+      Actions.uploadFile();
+    }
+    else
+    {
+      alert("Please select a file to upload and a target database");
+    }
   }
 
   public render()
   {
-    // if (!this.props.source)
-    // {
-    //   return null;
-    // }
-    const { canEdit } = this.props;
-    // const { source } = this.props;
+    const { canSelectTarget } = this.props;
 
     return (
       <div>
         <div>
-          <h3>Source</h3>
-        </div>
-        <div>
-          <Dropdown
-            selectedIndex={this.props.sourceIndex}
-            options={SOURCES}
-            onChange={this.handleSourceChange}
-            canEdit={canEdit}
-          />
+          <input ref="file" type="file" onChange={this.handleSaveFile}/>
         </div>
         <div>
           <h3>Target</h3>
@@ -113,14 +108,17 @@ class FileImportInfoColumn extends PureClasss<Props>
         <div>
           <Dropdown
             selectedIndex={this.props.targetIndex}
-            options={TARGETS}
+            options={this.props.targets}
             onChange={this.handleTargetChange}
-            canEdit={canEdit}
+            canEdit={canSelectTarget}
           />
+        </div>
+        <div>
+          <h3 onClick={this.handleUploadFile}>Import</h3>
         </div>
       </div>
     );
   }
 }
 
-export default FileImportInfoColumn;
+export default FileImportInfo;
