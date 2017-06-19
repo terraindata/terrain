@@ -64,8 +64,9 @@ import InfoArea from './../../../common/components/InfoArea';
 import PureClasss from './../../../common/components/PureClasss';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
 const ReactTooltip = require('react-tooltip');
+import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
 
-const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
+// const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
 const Tab = React.createClass<any, any>({
@@ -81,24 +82,6 @@ const Tab = React.createClass<any, any>({
     onClose: React.PropTypes.func.isRequired,
   },
 
-  handleResize(e)
-  {
-    this.setState({
-      zoom: (window.outerWidth - 8) / window.innerWidth,
-    });
-  },
-
-  componentDidMount()
-  {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  },
-
-  componentWillUnmount()
-  {
-    window.removeEventListener('resize', this.handleResize);
-  },
-
   getDefaultProps(): any
   {
     return {
@@ -110,16 +93,14 @@ const Tab = React.createClass<any, any>({
   },
 
   // Returns z-index so that tabs are layered in a nice fashion
-  zIndexStyle(): ({ zIndex?: number })
+  zIndexStyle(): number
   {
     if (!this.props.selected)
     {
-      return {
-        zIndex: this.props.index,
-      };
+      return this.props.index;
     }
 
-    return {};
+    return undefined;
   },
 
   handleClick()
@@ -155,20 +136,7 @@ const Tab = React.createClass<any, any>({
 
   render()
   {
-    let topStyle = '-17px';
-    if (this.state.zoom < 0.8)
-    {
-      topStyle = '-15px';
-    }
-    if (this.state.zoom < 0.7)
-    {
-      topStyle = '-13px';
-    }
-    if (this.state.zoom < 0.6)
-    {
-      topStyle = '-8px';
-    }
-
+    console.log(this.props.selected);
     return this.renderPanel(
       <div
         className={classNames({
@@ -178,17 +146,15 @@ const Tab = React.createClass<any, any>({
         })}
         key={this.props.id}
         onClick={this.handleClick}
-        style={this.zIndexStyle()}
+        style={{
+          background: this.props.selected ? Colors().builder.tabs.tabTopRibbon : Colors().builder.tabs.tabTopRibbonInactive,
+          color: this.props.selected ? Colors().text.baseLight : Colors().text.secondaryLight,
+          zIndex: this.zIndexStyle(),
+        }}
       >
-        {
-          !this.props.fixed &&
-          <TabIcon
-            className='tab-icon tab-icon-left'
-          />
-        }
         <div
           className='tab-inner'
-          style={{ top: topStyle }}
+          style={backgroundColor(this.props.selected ? Colors().builder.tabs.tabActive :  Colors().builder.tabs.tabInactive)}
         >
           {
             this.props.name
@@ -197,12 +163,6 @@ const Tab = React.createClass<any, any>({
             this.renderClose()
           }
         </div>
-        {
-          !this.props.fixed &&
-          <TabIcon
-            className='tab-icon tab-icon-right'
-          />
-        }
       </div>,
     );
   },
@@ -410,9 +370,17 @@ export class Tabs extends PureClasss<TabsProps> {
       };
 
     return (
-      <div className='tabs-container'>
-        <div className='tabs-row-wrapper'>
-          <div className='tabs-row'>
+      <div
+        className='tabs-container'
+      >
+        <div
+          className='tabs-row-wrapper'
+          style={backgroundColor(Colors().builder.tabs.background)}
+        >
+          <div 
+            className='tabs-row'
+            style={backgroundColor(Colors().builder.tabs.background)}
+          >
             <div className='tabs-inner-wrapper'>
               <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
             </div>

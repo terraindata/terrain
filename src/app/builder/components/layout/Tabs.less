@@ -5,7 +5,7 @@
 @tab-selected-bg-color: @fresh-moss;
 @tab-border-color: @tab-bg-color;
 @tab-selected-border-color: @tab-selected-bg-color;
-@tab-hover-color: lighten(@tab-bg-color, 5%);
+@tab-hover-color: rgba(255,255,255,0.1);
 
 @font-color: @fresh-moss;
 @selected-font-color: #798072;
@@ -94,16 +94,16 @@
     .small-text;
     line-height: 0px;
     
+    padding-top: 5px; // ribbon width
+    
     display: inline-block;
     position: relative;
     height: 35px;
-    padding: 8px 0px;
     box-sizing: border-box;
     cursor: pointer;
     color: @font-color;
-    margin-top: 1px;
+    background: @tab-bg-color;
     
-    margin-right: -25px;
     position: relative;
     z-index: 1;
         
@@ -128,19 +128,12 @@
     }
     
     .tab-inner {
+      padding: 8px;
       z-index: 17;
       display: inline-block;
-      background: @tab-bg-color;
       .transition;
       height: 31px;
       position: relative;
-      //top: -17px;      
-      padding-top: 7px;
-      padding-bottom: 5px;
-      margin-left: -2px;
-      margin-right: -2px;
-      //margin-top: 11px !important;
-      border-top: 1px solid @tab-border-color;
       
       .tabs-close {
         margin-left: 10px;
@@ -194,11 +187,9 @@
   .tabs-tab-selected {
     z-index: 9999;
     color: @selected-font-color;
+    background: @tab-selected-bg-color;
     
     .tab-inner {
-      background: @tab-selected-bg-color;
-      border-color: @tab-selected-border-color;
-      
       .tabs-close svg {
         fill: @selected-font-color !important;
         &:hover {
