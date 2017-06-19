@@ -154,7 +154,7 @@ const Tab = React.createClass<any, any>({
       >
         <div
           className='tab-inner'
-          style={backgroundColor(this.props.selected ? Colors().builder.tabs.tabActive :  Colors().builder.tabs.tabInactive)}
+          style={backgroundColor(this.props.selected ? Colors().builder.tabs.tabActive : Colors().builder.tabs.tabInactive)}
         >
           {
             this.props.name
@@ -377,7 +377,7 @@ export class Tabs extends PureClasss<TabsProps> {
           className='tabs-row-wrapper'
           style={backgroundColor(Colors().builder.tabs.background)}
         >
-          <div 
+          <div
             className='tabs-row'
             style={backgroundColor(Colors().builder.tabs.background)}
           >

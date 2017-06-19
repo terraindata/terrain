@@ -800,7 +800,7 @@ class Builder extends PureClasss<Props>
     const query = this.getQuery();
 
     return (
-      <div 
+      <div
         className={classNames({
           'builder': true,
           'builder-no-column-animation': this.state.noColumnAnimation,
