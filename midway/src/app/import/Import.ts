@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import csv = require('csvtojson');
+
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
@@ -60,7 +62,7 @@ export interface ImportConfig
   table: string; // for elastic, type name
   contents: string;   // should parse directly into a JSON object
   dbtype: string;  // e.g., 'elastic'
-  // dbid?: number;
+  filetype: string;   // either 'json' or 'csv'
 }
 
 export class Import
@@ -69,19 +71,13 @@ export class Import
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
-      const items: object[] = JSON.parse(imprt.contents);
-      // let columns: string[];
-      // const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
-      // if (database !== undefined)
-      // {
-      //     // find schema to find primary key ; somewhat redundant with SchemaRouter.ts
-      //     const schema: Tasty.Schema = await database.getTasty().schema();
-      //     columns = schema.fieldNames(imprt.db, imprt.table);
-      // } else {
-      //     columns = Object.keys(items[0]);    // for now assume all items have all keys
-      // }
+      const items: object[] = await this.parseData(imprt);
       const columns: string[] = Object.keys(items[0]);
 
+      if (imprt.db === '' || imprt.table === '')
+      {
+        return reject('Index name and document type cannot be empty strings.');
+      }
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
         ['_id'],        // TODO: find schema to find primary key
@@ -93,6 +89,26 @@ export class Import
       const elasticController: ElasticController = new ElasticController(elasticConfig, 0, 'Import');
 
       resolve(await elasticController.getTasty().upsert(insertTable, items) as ImportConfig);
+    });
+  }
+
+  private async parseData(imprt: ImportConfig): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      if (imprt.filetype === 'json')
+      {
+        resolve(JSON.parse(imprt.contents));
+      } else if (imprt.filetype === 'csv')
+      {
+        csv({flatKeys: true, checkColumn: true}).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
+        {
+          resolve(jsonArrObj);
+        });
+      } else
+      {
+        return reject('Invalid file-type provided.');
+      }
     });
   }
 }
