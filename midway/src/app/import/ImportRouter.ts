@@ -50,51 +50,24 @@ import * as winston from 'winston';
 
 // import DatabaseController from '../../database/DatabaseController';
 // import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import ElasticConfig from '../../database/elastic/ElasticConfig';
-import ElasticController from '../../database/elastic/ElasticController';
-import * as DBUtil from '../../database/Util';
-import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
-import { ImportConfig } from './Import';
+import { Import, ImportConfig } from './Import';
 
 const Router = new KoaRouter();
-// export const items: Items = new Items();
+export const imprt: Import = new Import();
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('importing to database');
-  const imprt: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprt, ['dbtype', 'contents', 'dsn', 'table']);
-  if (imprt.dbtype !== 'elastic')
+  const imprtConf: ImportConfig = ctx.request.body.body;
+  Util.verifyParameters(imprtConf, ['dbtype', 'contents', 'dsn', 'table']);
+  if (imprtConf.dbtype !== 'elastic')
   {
     throw new Error('File import currently is only supported for Elastic databases.');
   }
-  Util.verifyParameters(imprt, ['db']);
+  Util.verifyParameters(imprtConf, ['db']);
 
-  const items: object[] = JSON.parse(imprt.contents);
-  // let columns: string[];
-  // const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
-  // if (database !== undefined)
-  // {
-  //     // find schema to find primary key ; somewhat redundant with SchemaRouter.ts
-  //     const schema: Tasty.Schema = await database.getTasty().schema();
-  //     columns = schema.fieldNames(imprt.db, imprt.table);
-  // } else {
-  //     columns = Object.keys(items[0]);    // for now assume all items have all keys
-  // }
-  const columns: string[] = Object.keys(items[0]);
-
-  const insertTable: Tasty.Table = new Tasty.Table(
-    imprt.table,
-    ['_id'],        // TODO: find schema to find primary key
-    columns,
-    imprt.db,      // TODO: only if this exists
-  );
-
-  const elasticConfig: ElasticConfig = DBUtil.DSNToConfig(imprt.dbtype, imprt.dsn) as ElasticConfig;
-  const elasticController: ElasticController = new ElasticController(elasticConfig, 0, 'Import');
-
-  await elasticController.getTasty().upsert(insertTable, items);
+  ctx.body = await imprt.insert(imprtConf);
 });
 
 export default Router;
