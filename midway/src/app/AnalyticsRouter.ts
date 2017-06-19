@@ -44,20 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
-import ESValueInfo from './ESValueInfo';
+// Part of events PoC
 
-/**
- * Represents information about a property that was parsed by ESJSONParser
- */
-export default class ESPropertyInfo
-{
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
+import * as KoaRouter from 'koa-router';
 
-  public constructor(propertyName: ESValueInfo)
-  {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
-  }
-}
+import EventRouter from './events/EventRouter';
+
+import * as Util from './Util';
+
+const AnalyticsRouter = new KoaRouter();
+AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
+
+export default AnalyticsRouter;

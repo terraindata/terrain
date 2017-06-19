@@ -44,20 +44,69 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
-import ESValueInfo from './ESValueInfo';
+// Part of events PoC
 
-/**
- * Represents information about a property that was parsed by ESJSONParser
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+
+import * as Util from '../Util';
+import { EventConfig, EventRequestConfig, Events } from './Events';
+// export * from './Events';
+
+export const events: Events = new Events();
+
+const Router = new KoaRouter();
+
+/*
+ * Get an event tracker.
+ *
  */
-export default class ESPropertyInfo
+Router.post('/', async (ctx, next) =>
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
-
-  public constructor(propertyName: ESValueInfo)
+  try
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    ctx.body = JSON.stringify(await events.JSONHandler(ctx.request.ip, ctx.request.body));
   }
-}
+  catch (e)
+  {
+    ctx.body = '';
+  }
+});
+
+/*
+ * Handle client response for event tracker
+ *
+ */
+Router.post('/update/', async (ctx, next) =>
+{
+  try
+  {
+    const event: EventConfig =
+      {
+        eventId: ctx.request.body['eventId'],
+        ip: ctx.request.ip,
+        message: ctx.request.body['message'],
+        payload: ctx.request.body['payload'],
+        type: ctx.request.body['type'],
+      };
+    // TODO in production, use this instead
+    // await events.decodeMessage(event);
+    // ctx.body = '';
+    if (await events.decodeMessage(event))
+    {
+      ctx.body = 'Success'; // for dev/testing purposes only
+    }
+    else
+    {
+      ctx.body = '';
+    }
+  }
+  catch (e)
+  {
+    ctx.body = '';
+  }
+
+});
+
+export default Router;

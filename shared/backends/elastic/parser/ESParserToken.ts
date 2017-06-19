@@ -56,42 +56,41 @@ export default class ESParserToken
   public row: number; // row in which this token begins (rows start at 0)
   public col: number; // column in which this token begins (cols start at 0)
   public length: number; // token length in chars
+  public substring: string; // token substring
 
   public valueInfo: ESValueInfo | null; // value info that this token belongs to
 
-  private attachedErrors: ESParserError[] | null; // attached errors, or null if none
+  public errors: ESParserError[] | null;
 
   public constructor(charNumber: number,
     row: number,
     col: number,
-    length: number)
+    length: number,
+    substring: string)
   {
     this.charNumber = charNumber;
     this.row = row;
     this.col = col;
     this.length = length;
+    this.substring = substring;
     this.valueInfo = null;
-    this.attachedErrors = null;
+    this.errors = null;
   }
 
   public attachError(error: ESParserError): void
   {
-    if (this.attachedErrors === null)
+    if (this.valueInfo !== null)
     {
-      this.attachedErrors = [];
+      this.valueInfo.attachError(error);
     }
 
-    this.attachedErrors.push(error);
-  }
-
-  public get errors(): ESParserError[]
-  {
-    if (this.attachedErrors === null)
+    if (this.errors === null)
     {
-      return [];
+      this.errors = [error];
     }
-
-    return this.attachedErrors;
+    else
+    {
+      this.errors.push(error);
+    }
   }
-
 }

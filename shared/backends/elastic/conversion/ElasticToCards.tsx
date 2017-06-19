@@ -67,7 +67,8 @@ export default function ElasticToCards(
   try
   {
     const obj = JSON.parse(query.tql);
-    const cards = parseMagicObject(obj);
+    let cards = parseMagicObject(obj);
+    cards = BlockUtils.reconcileCards(query.cards, cards);
     return query
       .set('cards', cards)
       .set('cardsAndCodeInSync', true);
