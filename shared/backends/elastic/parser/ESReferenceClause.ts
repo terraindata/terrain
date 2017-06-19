@@ -80,17 +80,4 @@ export default class ESReferenceClause extends ESClause
     interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
     valueInfo.clause = this;
   }
-
-  // public convert(config: EQLConfig, referencedClauses: any): string
-  // {
-  //   let result: string = 'export default class ' + this.type +
-  //     ' extends ' + this.delegateType + '\n';
-  //   referencedClauses[this.delegateType] = true;
-  //
-  //   result += 'public constructor(){\n';
-  //   result += this.makeSuperCall();
-  //   result += '}\n';
-  //   result += '}';
-  //   return result;
-  // }
 }
