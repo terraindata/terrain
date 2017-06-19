@@ -72,13 +72,18 @@ class FileImportInfo extends PureClasss<Props>
 
   public handleSaveFile(file)
   {
-    console.log(file);
-    console.log(file.target);
-    console.log(file.target.files[0]);
-    console.log(file.target.files[0].type);
-    console.log(file.target.files[0].name);
+    // console.log(file);
+    // console.log(file.target);
+    // console.log(file.target.files[0]);
+    // console.log(file.target.files[0].type);
+    // console.log(file.target.files[0].name);
 
-    Actions.saveFile(file.target.files[0]);
+    const fr = new FileReader();
+    fr.readAsText(file.target.files[0]);
+    fr.onloadend = () => {
+      // const obj = JSON.parse(saveFile);
+      Actions.saveFile(fr.result);
+    }
   }
 
   public handleUploadFile()
@@ -100,7 +105,7 @@ class FileImportInfo extends PureClasss<Props>
     return (
       <div>
         <div>
-          <input ref="file" type="file" onChange={this.handleSaveFile}/>
+          <input ref="file" type="file" onChange={this.handleSaveFile} />
         </div>
         <div>
           <h3>Target</h3>

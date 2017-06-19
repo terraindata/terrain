@@ -634,8 +634,8 @@ export const Ajax =
       return { queryId, xhr };
     },
 
-    /* FileImport
-    upload(file: File,
+    /* FileImport */
+    upload(file: string,
           onLoad: (response: MidwayQueryResponse) => void,
           onError?: (ev: string | MidwayError) => void,
           sqlQuery?: boolean, // unused
@@ -648,8 +648,8 @@ export const Ajax =
       const queryId = '' + Math.random();
       const payload: any = {
         dsn: 'http://127.0.0.1:9200',
-        db: 'search',       // index
-        table: 'movies',    // type
+        db: '',       // index
+        table: '',    // type
         contents: file,
         dbtype: 'elastic',
       };
@@ -672,7 +672,7 @@ export const Ajax =
       );
 
       return { queryId, xhr };
-    },*/
+    },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {

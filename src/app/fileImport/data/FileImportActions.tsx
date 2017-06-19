@@ -56,12 +56,12 @@ const FileImportActions =
       $(ActionTypes.changeTarget, { targetIndex }),
 
     saveFile:
-    (file: File) =>
+    (file: string) =>
       $(ActionTypes.saveFile, { file }),
 
     uploadFile:
-    (file: File) =>
-      $(ActionTypes.uploadFile, { file }),
+    () =>
+      $(ActionTypes.uploadFile, {}),
   };
 
 export default FileImportActions;

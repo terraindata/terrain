@@ -47,16 +47,20 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
+import Ajax from './../../util/Ajax';
+const moment = require('moment');
 
 const FileImportReducers = {}
 
 FileImportReducers[ActionTypes.changeTarget] =
-  (state, action) => {
+  (state, action) =>
+  {
     return state.set('targetIndex', action.payload.targetIndex);
   };
 
 FileImportReducers[ActionTypes.saveFile] =
-  (state, action) => {
+  (state, action) =>
+  {
     console.log(action.payload.file);
     console.log(state);
     console.log(state.set('file', action.payload.file));
@@ -64,8 +68,18 @@ FileImportReducers[ActionTypes.saveFile] =
   };
 
 FileImportReducers[ActionTypes.uploadFile] =
-  (state, action) => {
-    // Ajax call
+  (state, action) =>
+  {
+    const { xhr, queryId } = Ajax.upload(
+      state.file,
+      _.noop,
+      _.noop,
+      false,
+      {
+        streaming: true,
+        streamingTo: state.fileName + ' on ' + moment().format('MM/DD/YY') + '.json',
+      },
+    );
 
   };
 
