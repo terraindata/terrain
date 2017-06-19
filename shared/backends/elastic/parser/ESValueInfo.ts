@@ -44,15 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClause from './ESClause';
+import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
+import ESPropertyInfo from './ESPropertyInfo';
 
 /**
  * Represents information about a value that was parsed by ESJSONParser
  */
 export default class ESValueInfo
 {
-  public value: any; // the parsed value
-  public tokens: ESParserToken[]; // the tokens belonging to the value, in order of appearance
+  /**
+   * The parsed value
+   */
+  public value: any;
+
+  /**
+   * The tokens belonging to the value, in order of appearance
+   */
+  public tokens: ESParserToken[];
 
   /**
    * If value is a terminal node, children is null
@@ -60,12 +70,43 @@ export default class ESValueInfo
    * If value is an object, children is a corresponding object mapping keys
    *  to {name:ESValueInfo, value:ESValueInfo} tuples.
    */
-  public children: any;
+  public children: null | ESValueInfo[] | { [name: string]: ESPropertyInfo };
 
-  public constructor(value: any = null, tokens: ESParserToken[] = [])
+  /**
+   * If errors were detected associated with this value, they will be in this list
+   * in the order in which they were detected.
+   */
+  public errors: ESParserError[] | null;
+
+  /**
+   * When interpreted, this is set to the detected ESClause for this value
+   */
+  public clause: ESClause | null;
+
+  /**
+   * In the case of a variant clause, this is set to the delegate clause used
+   */
+  public delegateClause: ESClause | null;
+
+  public constructor(value?: any, tokens: ESParserToken[] = [])
   {
     this.value = value;
     this.tokens = tokens;
     this.children = null;
+    this.errors = null;
+    this.clause = null;
+    this.delegateClause = null;
+  }
+
+  public attachError(error: ESParserError): void
+  {
+    if (this.errors === null)
+    {
+      this.errors = [error];
+    }
+    else
+    {
+      this.errors.push(error);
+    }
   }
 }

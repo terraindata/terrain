@@ -97,6 +97,12 @@ const optionList = [
     type: Boolean,
     description: 'Print verbose information.',
   },
+  {
+    name: 'analyticsdb',
+    type: String,
+    defaultValue: 'http://127.0.0.1:9200',
+    description: 'Analytics datastore connection parameters',
+  },
 ];
 
 const sections = [
