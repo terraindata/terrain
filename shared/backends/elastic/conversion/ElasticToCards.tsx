@@ -178,7 +178,7 @@ const parseObjectToggle = (obj: object): Cards =>
           }
           else if (Array.isArray(value))
           {
-            // not yet done
+            valueType = CommonElastic.valueTypes.array;
           }
           // not yet done
           break;
@@ -205,7 +205,7 @@ const parseMagicObject = (obj: object): Cards =>
   const values: Card[] = _.map(obj,
     (value: any, key: string) =>
     {
-      if (typeof value === 'object')
+      if (typeof value === 'object' && !Array.isArray(value))
       {
         const cards: Cards = parseMagicObject(value);
         return make(Blocks.elasticMagicValue, {
