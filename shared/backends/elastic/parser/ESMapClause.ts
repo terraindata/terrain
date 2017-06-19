@@ -55,16 +55,20 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESMapClause extends ESClause
 {
-  public nameID: string;
-  public valueID: string;
+  public nameType: string;
+  public valueType: string;
 
-  public constructor(settings: any, nameID: string, valueID: string, config: EQLConfig)
+  public constructor(type: string, nameType: string, valueType: string, settings: any)
   {
-    super(settings);
-    this.nameID = nameID;
-    this.valueID = valueID;
-    config.declareType(nameID);
-    config.declareType(valueID);
+    super(type, settings);
+    this.nameType = nameType;
+    this.valueType = valueType;
+  }
+
+  public init(config: EQLConfig): void
+  {
+    config.declareType(this.nameType);
+    config.declareType(this.valueType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
@@ -87,14 +91,14 @@ export default class ESMapClause extends ESClause
     }
 
     // mark properties
-    const childClause: ESClause = interpreter.config.getClause(this.valueID);
+    const childClause: ESClause = interpreter.config.getClause(this.valueType);
     const children: any = valueInfo.children;
     Object.keys(children).forEach(
       (name: string): void =>
       {
         const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
 
-        interpreter.config.getClause(this.nameID).mark(interpreter, viTuple.propertyName);
+        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
 
         if (viTuple.propertyValue !== null)
         {

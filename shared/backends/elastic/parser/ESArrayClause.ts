@@ -55,9 +55,9 @@ export default class ESArrayClause extends ESClause
 {
   public elementID: string;
 
-  public constructor(settings: any, elementID: string)
+  public constructor(type: string, elementID: string, settings: any)
   {
-    super(settings);
+    super(type, settings);
     this.elementID = elementID;
   }
 

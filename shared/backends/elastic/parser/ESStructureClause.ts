@@ -56,18 +56,17 @@ import ESValueInfo from './ESValueInfo';
 export default class ESStructureClause extends ESClause
 {
   public structure: { [name: string]: string };
+  public required: any[];
 
-  public constructor(settings: any, config: EQLConfig, structure?: { [name: string]: string })
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(settings);
-
-    if (structure === undefined)
-    {
-      structure = this.def as { [key: string]: string };
-    }
-
+    super(type, settings);
     this.structure = structure;
+    this.required = required;
+  }
 
+  public init(config: EQLConfig): void
+  {
     Object.keys(this.structure).forEach(
       (key: string): void =>
       {

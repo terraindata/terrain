@@ -86,32 +86,24 @@ abstract class ESClause
    * @param type the name to refer to this clause (type)
    * @param settings the settings object to initialize it from
    */
-  public constructor(settings: any)
+  public constructor(type: string, settings: any)
   {
-    // winston.info('setting: ' + JSON.stringify(settings));
+    this.type = type;
     this.settings = settings;
 
-    this.type = settings.type;
     this.setPropertyFromSettings(settings, 'name', () => this.type.replace('_', ' '));
     this.setPropertyFromSettings(settings, 'desc', () => '');
     this.setPropertyFromSettings(settings, 'url', () => '');
     this.setPropertyFromSettings(settings, 'def', () => 'value');
-    this.setPropertyFromSettings(settings, 'required', () => []);
-    // this.setPropertyFromSettings(settings, 'values', () => []);
     this.setPropertyFromSettings(settings, 'template', () => null);
   }
 
-  public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
+  public init(config: EQLConfig): void
+  {
+    // default is to do nothing
+  }
 
-  // public abstract convert(config: EQLConfig, referencedClauses: any): string;
-  //
-  // protected makeSuperCall() : string
-  // {
-  //   let result :string = 'super(';
-  //   result += JSON.stringify(this.settings, null, 2);
-  //   result +=');'
-  //   return result;
-  // }
+  public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
 
   private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
   {

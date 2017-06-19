@@ -45,85 +45,33 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import EQLSpec from './EQLSpec';
-import ESAnyClause from './ESAnyClause';
 import ESArrayClause from './ESArrayClause';
-import ESBaseClause from './ESBaseClause';
-import ESBooleanClause from './ESBooleanClause';
 import ESClause from './ESClause';
-import ESEnumClause from './ESEnumClause';
 import ESMapClause from './ESMapClause';
-import ESNullClause from './ESNullClause';
-import ESNumberClause from './ESNumberClause';
-import ESReferenceClause from './ESReferenceClause';
-import ESStringClause from './ESStringClause';
-import ESStructureClause from './ESStructureClause';
-import ESVariantClause from './ESVariantClause';
-
-import * as fs from 'fs';
 
 /**
  *
  */
 export default class EQLConfig
 {
-
-  private undefinedTypes: { [name: string]: boolean };
   private clauses: { [name: string]: ESClause };
 
-  public constructor(clauseConfiguration: any = EQLSpec)
+  public constructor(clauseConfiguration: ESClause[] = EQLSpec)
   {
-    this.undefinedTypes = {};
     this.clauses = {};
 
-    // winston.info(JSON.stringify(clauseConfiguration));
-    clauseConfiguration = JSON.parse(JSON.stringify(clauseConfiguration));
-    Object.keys(clauseConfiguration).forEach(
-      (key: string): void => this.defineType(key, clauseConfiguration[key]));
-
-    // TODO: validate id references and other settings
-  }
-
-  public defineType(type: string, settings: any): void
-  {
-    // winston.info('defining "' + id + '"');
-
-    this.declareType(type, settings);
-    if (this.clauses[type] !== undefined)
-    {
-      return;
-    }
-
-    const def: any = settings.def;
-    let clause: ESClause;
-    if (typeof (def) === 'object')
-    {
-      // structured object id
-      clause = new ESStructureClause(settings, this);
-    }
-    else if (typeof (def) === 'string')
-    {
-      switch (def)
+    clauseConfiguration.forEach(
+      (clause: ESClause): void =>
       {
-        case 'enum':
-          clause = new ESEnumClause(settings);
-          break;
-        case 'variant':
-          clause = new ESVariantClause(settings, this);
-          break;
-        default:
-          // reference clause
-          clause = new ESReferenceClause(settings, this);
-          break;
-      }
-    }
-    else
-    {
-      throw new Error('Unknown clause "' + 'typename:' + String(type) + ',' + 'def:' + String(def) + ' ".');
-    }
+        this.validateTypename(clause.type);
+        this.clauses[clause.type] = clause;
+      });
 
-    // winston.info('registering clause "' + id + '"');
-    this.clauses[type] = clause;
-    delete this.undefinedTypes[type];
+    clauseConfiguration.forEach(
+      (clause: ESClause): void =>
+      {
+        clause.init(this);
+      });
   }
 
   public declareType(type: string, settings: any = {}): void
@@ -136,53 +84,30 @@ export default class EQLConfig
     // winston.info('declare "' + id + '"');
     settings.type = type;
     let clause: ESClause | null = null;
-    switch (type)
+
+    this.validateTypename(type);
+
+    if (type.endsWith('[]'))
     {
-      case 'null':
-        clause = new ESNullClause(settings);
-        break;
-      case 'boolean':
-        clause = new ESBooleanClause(settings);
-        break;
-      case 'number':
-        clause = new ESNumberClause(settings);
-        break;
-      case 'string':
-        clause = new ESStringClause(settings);
-        break;
-      case 'base':
-        clause = new ESBaseClause(settings);
-        break;
-      case 'any':
-        clause = new ESAnyClause(settings);
-        break;
+      // array
+      clause = new ESArrayClause(type, type.substring(0, type.length - 2), settings);
+    }
+    else if (type.startsWith('{'))
+    {
+      // map
+      if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
+        type.indexOf(' ') !== -1)
+      {
+        throw new Error('Unsupported map type "' + type + '".');
+      }
 
-      default:
-        this.validateTypename(type);
-
-        if (type.endsWith('[]'))
-        {
-          // array
-          clause = new ESArrayClause(settings, type.substring(0, type.length - 2));
-        }
-        else if (type.startsWith('{'))
-        {
-          // map
-          if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
-            type.indexOf(' ') !== -1)
-          {
-            throw new Error('Unsupported map type "' + type + '".');
-          }
-
-          const components: string[] = type.substring(1, type.length - 1).split(':');
-          clause = new ESMapClause(settings, components[0], components[1], this);
-        }
-        else
-        {
-          // undefined reference id
-          this.undefinedTypes[type] = true;
-        }
-        break;
+      const components: string[] = type.substring(1, type.length - 1).split(':');
+      clause = new ESMapClause(type, components[0], components[1], settings);
+    }
+    else
+    {
+      // undefined reference id
+      throw new Error('Unknown clause type: "' + type + '"');
     }
 
     if (clause !== null)
@@ -213,44 +138,4 @@ export default class EQLConfig
       throw new Error('Unknown clause id "' + id + '"');
     }
   }
-
-  // public async convert(path: string): string
-  // {
-  //   let result: string = `// Copyright 2017 Terrain Data, Inc.
-  //
-  //   namespace EQLSpec {`;
-  //
-  //   Object.keys(this.clauses).forEach(
-  //     (type: string): void =>
-  //     {
-  //       const clause: ESClause = this.clauses[type] as ESClause;
-  //       let referencedClauses = {};
-  //       let body = clause.convert(this, referencedClauses);
-  //       let text = '// Copyright 2017 Terrain Data, Inc.\n\n';
-  //       Object.keys(referencedClauses).forEach(
-  //         (key) =>
-  //         {
-  //           text += 'import ' + key + ' from \'./' + key + '\';\n';
-  //         });
-  //       text += '\n';
-  //       // text += 'export default class ' + clause + ' {\n';
-  //       text += body;
-  //       // text += '}\n';
-  //       text += '\n';
-  //
-  //       const filename = path + clause + '.ts';
-  //       fs.writeFile(filename, text, (err) =>
-  //       {
-  //         if (err)
-  //         {
-  //           console.log('error writing file: ' + err);
-  //         }
-  //       });
-  //     });
-  //
-  //   result += '\n}';
-  //
-  //   return result;
-  // }
-
 }
