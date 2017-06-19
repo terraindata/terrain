@@ -64,16 +64,41 @@ export default class ESReferenceClause extends ESClause
 {
   public delegateType: string;
 
-  public constructor(settings: any, config: EQLConfig)
+  public constructor(settings: any, config: EQLConfig, delegateType?: string)
   {
     super(settings);
-    this.delegateType = this.def as string;
+
+    if (delegateType === undefined)
+    {
+      delegateType = settings.def as string;
+    }
+
+    this.delegateType = delegateType;
+
     config.declareType(this.delegateType);
   }
+
+  // public declareTypes(config: EQLConfig) : void
+  // {
+  //   config.declareType(this.delegateType);
+  // }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
     valueInfo.clause = this;
   }
+
+  // public convert(config: EQLConfig, referencedClauses: any): string
+  // {
+  //   let result: string = 'export default class ' + this.type +
+  //     ' extends ' + this.delegateType + '\n';
+  //   referencedClauses[this.delegateType] = true;
+  //
+  //   result += 'public constructor(){\n';
+  //   result += this.makeSuperCall();
+  //   result += '}\n';
+  //   result += '}';
+  //   return result;
+  // }
 }

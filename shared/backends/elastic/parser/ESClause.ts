@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from './EQLConfig';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
@@ -67,9 +68,9 @@ abstract class ESClause
 
   public required: string[]; // list of required properties
 
-  public values: any[]; // list of commonly used values (a soft enum or autocomplete list)
-
   public template: null | { [key: string]: any }; // template for this clause type
+
+  protected settings;
 
   /**
    * + null types mean custom or disabled type validation
@@ -88,17 +89,29 @@ abstract class ESClause
   public constructor(settings: any)
   {
     // winston.info('setting: ' + JSON.stringify(settings));
+    this.settings = settings;
+
     this.type = settings.type;
     this.setPropertyFromSettings(settings, 'name', () => this.type.replace('_', ' '));
     this.setPropertyFromSettings(settings, 'desc', () => '');
     this.setPropertyFromSettings(settings, 'url', () => '');
     this.setPropertyFromSettings(settings, 'def', () => 'value');
     this.setPropertyFromSettings(settings, 'required', () => []);
-    this.setPropertyFromSettings(settings, 'values', () => []);
+    // this.setPropertyFromSettings(settings, 'values', () => []);
     this.setPropertyFromSettings(settings, 'template', () => null);
   }
 
   public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
+
+  // public abstract convert(config: EQLConfig, referencedClauses: any): string;
+  //
+  // protected makeSuperCall() : string
+  // {
+  //   let result :string = 'super(';
+  //   result += JSON.stringify(this.settings, null, 2);
+  //   result +=');'
+  //   return result;
+  // }
 
   private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
   {

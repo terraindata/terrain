@@ -57,11 +57,19 @@ export default class ESEnumClause extends ESClause
   public values: any[];
   public valueMap: any;
 
-  public constructor(settings: any)
+  public constructor(settings: any, values?: any[])
   {
     super(settings);
+
+    if (values === undefined)
+    {
+      values = settings.values as any[];
+    }
+
+    this.values = values;
+
     this.valueMap = new Map();
-    for (let i = 0; i < this.values.length; ++i)
+    for ( let i = 0; i < this.values.length; ++i )
     {
       const value = this.values[i];
       this.valueMap.set(value, i);

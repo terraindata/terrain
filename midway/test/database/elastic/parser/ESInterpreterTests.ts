@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as winston from 'winston';
 import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
+import EQLConverter from '../../../../../shared/backends/elastic/parser/EQLConverter';
 import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
 import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
@@ -73,6 +74,7 @@ beforeAll(async (done) =>
   expected = JSON.parse(expectedString);
   try
   {
+    new EQLConverter();
     config = new EQLConfig();
   } catch (e)
   {

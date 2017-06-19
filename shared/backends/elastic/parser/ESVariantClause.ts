@@ -56,10 +56,17 @@ export default class ESVariantClause extends ESClause
 {
   public subtypes: { [jsonType: string]: string };
 
-  public constructor(settings: any, config: EQLConfig)
+  public constructor(settings: any, config: EQLConfig, subtypes?: { [jsonType: string]: string })
   {
     super(settings);
-    this.subtypes = settings.subtypes as { [jsonType: string]: string };
+
+    if (subtypes === undefined)
+    {
+      subtypes = settings.subtypes as { [jsonType: string]: string };
+    }
+
+    this.subtypes = subtypes;
+
     Object.keys(this.subtypes).forEach(
       (key: string): void =>
       {

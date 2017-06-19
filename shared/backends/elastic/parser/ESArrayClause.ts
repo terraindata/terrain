@@ -82,4 +82,5 @@ export default class ESArrayClause extends ESClause
         childClause.mark(interpreter, element);
       });
   }
+
 }

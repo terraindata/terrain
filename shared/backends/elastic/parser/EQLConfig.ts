@@ -59,6 +59,8 @@ import ESStringClause from './ESStringClause';
 import ESStructureClause from './ESStructureClause';
 import ESVariantClause from './ESVariantClause';
 
+import * as fs from 'fs';
+
 /**
  *
  */
@@ -74,18 +76,19 @@ export default class EQLConfig
     this.clauses = {};
 
     // winston.info(JSON.stringify(clauseConfiguration));
+    clauseConfiguration = JSON.parse(JSON.stringify(clauseConfiguration));
     Object.keys(clauseConfiguration).forEach(
       (key: string): void => this.defineType(key, clauseConfiguration[key]));
 
     // TODO: validate id references and other settings
   }
 
-  public defineType(name: string, settings: any): void
+  public defineType(type: string, settings: any): void
   {
     // winston.info('defining "' + id + '"');
 
-    this.declareType(name, settings);
-    if (this.clauses[name] !== undefined)
+    this.declareType(type, settings);
+    if (this.clauses[type] !== undefined)
     {
       return;
     }
@@ -115,25 +118,25 @@ export default class EQLConfig
     }
     else
     {
-      throw new Error('Unknown clause "' + 'name:' + String(name) + ',' + 'def:' + String(def) + ' ".');
+      throw new Error('Unknown clause "' + 'typename:' + String(type) + ',' + 'def:' + String(def) + ' ".');
     }
 
     // winston.info('registering clause "' + id + '"');
-    this.clauses[name] = clause;
-    delete this.undefinedTypes[name];
+    this.clauses[type] = clause;
+    delete this.undefinedTypes[type];
   }
 
-  public declareType(name: string, settings: any = {}): void
+  public declareType(type: string, settings: any = {}): void
   {
-    if (this.clauses[name] !== undefined)
+    if (this.clauses[type] !== undefined)
     {
       return; // already declared
     }
 
     // winston.info('declare "' + id + '"');
-    settings.name = name;
+    settings.type = type;
     let clause: ESClause | null = null;
-    switch (name)
+    switch (type)
     {
       case 'null':
         clause = new ESNullClause(settings);
@@ -155,36 +158,36 @@ export default class EQLConfig
         break;
 
       default:
-        this.validateTypename(name);
+        this.validateTypename(type);
 
-        if (name.endsWith('[]'))
+        if (type.endsWith('[]'))
         {
           // array
-          clause = new ESArrayClause(settings, name.substring(0, name.length - 2));
+          clause = new ESArrayClause(settings, type.substring(0, type.length - 2));
         }
-        else if (name.startsWith('{'))
+        else if (type.startsWith('{'))
         {
           // map
-          if (name.charAt(0) !== '{' || name.charAt(name.length - 1) !== '}' ||
-            name.indexOf(' ') !== -1)
+          if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
+            type.indexOf(' ') !== -1)
           {
-            throw new Error('Unsupported map name "' + name + '".');
+            throw new Error('Unsupported map type "' + type + '".');
           }
 
-          const components: string[] = name.substring(1, name.length - 1).split(':');
+          const components: string[] = type.substring(1, type.length - 1).split(':');
           clause = new ESMapClause(settings, components[0], components[1], this);
         }
         else
         {
           // undefined reference id
-          this.undefinedTypes[name] = true;
+          this.undefinedTypes[type] = true;
         }
         break;
     }
 
     if (clause !== null)
     {
-      this.clauses[name] = clause;
+      this.clauses[type] = clause;
     }
   }
 
@@ -210,5 +213,44 @@ export default class EQLConfig
       throw new Error('Unknown clause id "' + id + '"');
     }
   }
+
+  // public async convert(path: string): string
+  // {
+  //   let result: string = `// Copyright 2017 Terrain Data, Inc.
+  //
+  //   namespace EQLSpec {`;
+  //
+  //   Object.keys(this.clauses).forEach(
+  //     (type: string): void =>
+  //     {
+  //       const clause: ESClause = this.clauses[type] as ESClause;
+  //       let referencedClauses = {};
+  //       let body = clause.convert(this, referencedClauses);
+  //       let text = '// Copyright 2017 Terrain Data, Inc.\n\n';
+  //       Object.keys(referencedClauses).forEach(
+  //         (key) =>
+  //         {
+  //           text += 'import ' + key + ' from \'./' + key + '\';\n';
+  //         });
+  //       text += '\n';
+  //       // text += 'export default class ' + clause + ' {\n';
+  //       text += body;
+  //       // text += '}\n';
+  //       text += '\n';
+  //
+  //       const filename = path + clause + '.ts';
+  //       fs.writeFile(filename, text, (err) =>
+  //       {
+  //         if (err)
+  //         {
+  //           console.log('error writing file: ' + err);
+  //         }
+  //       });
+  //     });
+  //
+  //   result += '\n}';
+  //
+  //   return result;
+  // }
 
 }
