@@ -189,6 +189,7 @@ class Dropdown extends PureClasss<Props>
   handleKeyboardSelect(index: number)
   {
     this.clickHandler(index)();
+    this.close();
   }
 
   public render()

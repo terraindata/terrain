@@ -93,6 +93,11 @@ class KeyboardFocus extends PureClasss<Props>
       this.refs["select"].focus();
       this.props.onFocus();
     }
+    else if (this.props.focusOverride && !nextProps.focusOverride)
+    {
+      this.refs["select"].blur();
+      this.props.onFocusLost();
+    }
   }
 
   render()
