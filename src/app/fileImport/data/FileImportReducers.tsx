@@ -75,12 +75,8 @@ FileImportReducers[ActionTypes.uploadFile] =
       _.noop,
       _.noop,
       false,
-      {
-        streaming: true,
-        streamingTo: state.fileName + ' on ' + moment().format('MM/DD/YY') + '.json',
-      },
     );
-
+    return state;
   };
 
 export default FileImportReducers;

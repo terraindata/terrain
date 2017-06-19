@@ -639,21 +639,16 @@ export const Ajax =
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string | MidwayError) => void,
       sqlQuery?: boolean, // unused
-      options: {
-        streaming?: boolean,
-        streamingTo?: string,
-      } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const queryId = '' + Math.random();
-      const payload: any = {
+      const payload: object = {
         dsn: 'http://127.0.0.1:9200',
-        db: '',       // index
-        table: '',    // type
+        db: 'testdb',       // index
+        table: 'testtable',    // type
         contents: file,
         dbtype: 'elastic',
       };
-
       const onLoadHandler = (resp) =>
       {
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
@@ -666,8 +661,6 @@ export const Ajax =
         onLoadHandler,
         {
           onError,
-          download: options.streaming,
-          downloadFilename: options.streamingTo,
         },
       );
 
