@@ -46,7 +46,40 @@ THE SOFTWARE.
 
 /* tslint:disable: max-line-length no-reserved-keys object-literal-key-quotes*/
 
-const EQLSpec: any =
+export type BaseType = 'any' | 'null' | 'boolean' | 'number' | 'string' | 'base' 
+  | 'field' | 'query' | 'field_type' | 'enum' | 'variant' | 'term_value' | 'term_values'
+  | 'painless';
+
+export type DefType = string | BaseType | {[key: string]: string}; 
+
+// type definition for a clause                                                                                                                             in thisasdljfksadkjlas dfsadfsadf 
+export interface EQLSpecClause
+{
+  // value/type definition, can be a
+  // - string of a base type
+  // - string like "base[]" for an array of base types
+  // - string like "{base1:base2}" for an object with key/value types base1/base2
+  // - object of specific keys and value types
+  def: DefType;
+  
+  name?: string;
+  
+  // human readable description
+  desc?: string;
+  
+  // url for more info
+  url?: string;
+  // list of possible values for enum
+  values?: string[];
+  
+  // list of ways to generate the autocomplete - WIP
+  autocomplete?: string[];
+  
+  // default value
+  template?: any;
+}
+
+export const EQLSpec: any =
   {
     any: {
       desc: 'Any valid JSON value.',
