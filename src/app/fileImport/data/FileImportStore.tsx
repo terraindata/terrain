@@ -60,7 +60,7 @@ class FileImportStateC
 {
   public targetIndex: number = -1;
   public file: string = "";
-  public fileName: string= "test";
+  public fileName: string = "test";
 }
 const FileImportState_Record = Immutable.Record(new FileImportStateC());
 export interface FileImportState extends FileImportStateC, IRecord<FileImportState> { }

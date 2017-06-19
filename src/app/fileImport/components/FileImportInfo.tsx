@@ -80,7 +80,8 @@ class FileImportInfo extends PureClasss<Props>
 
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
-    fr.onloadend = () => {
+    fr.onloadend = () =>
+    {
       // const obj = JSON.parse(saveFile);
       Actions.saveFile(fr.result);
     }

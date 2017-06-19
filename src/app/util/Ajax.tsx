@@ -636,13 +636,13 @@ export const Ajax =
 
     /* FileImport */
     upload(file: string,
-          onLoad: (response: MidwayQueryResponse) => void,
-          onError?: (ev: string | MidwayError) => void,
-          sqlQuery?: boolean, // unused
-          options: {
-            streaming?: boolean,
-            streamingTo?: string,
-          } = {},
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: string | MidwayError) => void,
+      sqlQuery?: boolean, // unused
+      options: {
+        streaming?: boolean,
+        streamingTo?: string,
+      } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const queryId = '' + Math.random();
