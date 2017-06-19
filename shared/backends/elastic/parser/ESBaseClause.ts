@@ -44,20 +44,32 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a property that was parsed by ESJSONParser
+ * A clause which is a terminal (base) value: null, boolean, number, or string
  */
-export default class ESPropertyInfo
+export default class ESBaseClause extends ESClause
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
-
-  public constructor(propertyName: ESValueInfo)
+  public constructor(settings: any)
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    super(settings);
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+    const value: any = valueInfo.value;
+    if (typeof (value) === 'object')
+    {
+      const foundType: string = Array.isArray(value) ? 'array' : 'object';
+      interpreter.accumulateError(
+        valueInfo,
+        'Found an ' +
+        foundType +
+        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+    }
   }
 }

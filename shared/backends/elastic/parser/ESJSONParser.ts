@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
-import ESParserPropertyInfo from './ESPropertyInfo';
+import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
 /**
@@ -68,7 +68,7 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESJSONParser
 {
-  private queryString: string; // string being parsed
+  private queryString: string; // stringgit being parsed
 
   private charNumber: number; // current parser/tokenizer position in the queryString
 
@@ -77,10 +77,9 @@ export default class ESJSONParser
   private lastRowNumber: number; // row number of last newline
 
   private value: any; // parsed value
-  private valueInfo: ESValueInfo | null; // parsed root value info
+  private valueInfo: ESValueInfo | null; // parsed root value info (or null on failure)
 
   private tokens: ESParserToken[]; // accumulated tokens, in order
-  private valueStack: ESValueInfo[]; // stack of current value info's
   private valueInfos: ESValueInfo[]; // accumulated value info's, in order
   private errors: ESParserError[]; // accumulated errors, in order
 
@@ -100,11 +99,20 @@ export default class ESJSONParser
     this.valueInfo = null;
 
     this.tokens = [];
-    this.valueStack = [];
     this.valueInfos = [];
     this.errors = [];
 
-    this.value = this.readValue();
+    this.valueInfo = this.readValue();
+    if (this.valueInfo !== null)
+    {
+      this.value = this.valueInfo.value;
+    }
+
+    // check ending
+    if (this.peek() !== '')
+    {
+      this.accumulateErrorOnCurrentToken('Unexpected token at the end of the query string');
+    }
   }
 
   /**
@@ -181,17 +189,10 @@ export default class ESJSONParser
     this.charNumber += numChars;
   }
 
-  private readValue(): any
+  private readValue(): ESValueInfo | null
   {
     const valueInfo: ESValueInfo = this.beginValueInfo();
-    if (this.valueInfo === null)
-    {
-      // set root value info
-      this.valueInfo = valueInfo;
-    }
-
     const token: ESParserToken = this.accumulateToken();
-    let value: any;
 
     try
     {
@@ -199,7 +200,7 @@ export default class ESJSONParser
       {
         // string
         case '"':
-          value = this.readString();
+          valueInfo.value = this.readString();
           this.setToken();
           break;
 
@@ -215,68 +216,70 @@ export default class ESJSONParser
         case '8':
         case '9':
         case '-':
-          value = this.readNumber();
+          valueInfo.value = this.readNumber();
           this.setToken();
           break;
 
         // object
         case '{':
           this.advance();
-          value = this.readObject();
+          this.readObject(valueInfo);
           break;
 
+        // object end
         case '}':
-        case ']':
           break;
 
         // array
         case '[':
           this.advance();
-          value = this.readArray();
+          this.readArray(valueInfo);
+          break;
+
+        // array end
+        case ']':
           break;
 
         // true
         case 't':
-          value = this.readTrueValue();
+          valueInfo.value = this.readTrueValue();
           this.setToken();
           break;
 
         // false
         case 'f':
-          value = this.readFalseValue();
+          valueInfo.value = this.readFalseValue();
           this.setToken();
           break;
 
         // null
         case 'n':
-          value = this.readNullValue();
+          valueInfo.value = this.readNullValue();
           this.setToken();
           break;
 
         default:
           this.accumulateErrorOnCurrentToken('Unknown token found when expecting a value');
           this.advance();
-          value = null;
           break;
       }
     }
     finally
     {
-      if (value !== undefined)
-      {
-        // always end the value, even if it broke
-        this.endValueInfo(value);
-      }
-      else
+      if (valueInfo.value === undefined)
       {
         // if no value was read, erase the token information accumulated
-        this.valueStack.pop();
         this.valueInfos.pop();
         this.tokens.pop();
       }
     }
 
-    return value;
+    if (valueInfo.value === undefined)
+    {
+      return null;
+    }
+
+    return valueInfo;
   }
 
   private readString(): string
@@ -307,19 +310,18 @@ export default class ESJSONParser
     return 0;
   }
 
-  private readArray(): any[]
+  private readArray(arrayInfo: ESValueInfo): void
   {
     const array: any[] = [];
-    const arrayInfo: ESValueInfo = this.getCurrentValueInfo();
+    arrayInfo.value = array;
     arrayInfo.children = [];
 
-    for (let element = this.readValue();
-      element !== undefined;
-      element = this.readValue())
+    for (let elementInfo: ESValueInfo | null = this.readValue();
+      elementInfo !== null;
+      elementInfo = this.readValue())
     {
-      array.push(element);
-
-      arrayInfo.children.push(this.getCurrentValueInfo());
+      array.push(elementInfo.value);
+      arrayInfo.children.push(elementInfo);
 
       // read next delimiter
       const propertyDelimiter: string = this.peek();
@@ -335,27 +337,27 @@ export default class ESJSONParser
     // at the end of the list, make sure that the terminating char is ']'
     if (this.peek() === ']')
     {
-      this.accumulateToken();
+      this.accumulateToken(arrayInfo);
       this.advance();
     }
     else
     {
       this.accumulateErrorOnCurrentToken('Missing or misplaced array closing bracket, "]"');
     }
-
-    return array;
   }
 
-  private readObject(): object
+  private readObject(objInfo: ESValueInfo): void
   {
     const obj: object = {};
-    const objInfo: ESValueInfo = this.getCurrentValueInfo();
+    objInfo.value = obj;
     objInfo.children = {};
 
-    for (let propertyName = this.readValue();
-      propertyName !== undefined;
-      propertyName = this.readValue())
+    for (let nameInfo: ESValueInfo | null = this.readValue();
+      nameInfo !== null;
+      nameInfo = this.readValue())
     {
+      let propertyName: any = nameInfo.value;
+
       if (typeof propertyName !== 'string')
       {
         this.accumulateErrorOnCurrentToken(
@@ -368,8 +370,7 @@ export default class ESJSONParser
         this.accumulateErrorOnCurrentToken('Duplicate property names are not allowed');
       }
 
-      const propertyInfo: ESParserPropertyInfo =
-        new ESParserPropertyInfo(this.getCurrentValueInfo());
+      const propertyInfo: ESPropertyInfo = new ESPropertyInfo(nameInfo);
       objInfo.children[propertyName] = propertyInfo;
 
       // read delimiter between property name and value
@@ -389,21 +390,21 @@ export default class ESJSONParser
         break;
       }
 
-      this.accumulateToken();
+      this.accumulateToken(nameInfo);
       this.advance(); // skip ':'
 
       // read property value
-      const propertyValue = this.readValue();
-      propertyInfo.value = this.getCurrentValueInfo();
+      const propertyValueInfo: ESValueInfo | null = this.readValue();
 
       // check for errors in the property value
-      if (propertyValue === undefined)
+      if (propertyValueInfo === null)
       {
         this.accumulateErrorOnCurrentToken('Object property\'s value is missing');
         break;
       }
 
-      obj[propertyName] = propertyValue; // set object property
+      propertyInfo.propertyValue = propertyValueInfo;
+      obj[propertyName] = propertyValueInfo.value; // set object property
 
       // read next delimiter
       const propertyDelimiter: string = this.peek();
@@ -412,22 +413,20 @@ export default class ESJSONParser
         break;
       }
 
-      this.accumulateToken();
+      this.accumulateToken(nameInfo);
       this.advance(); // skip over ','
     }
 
     // at the end of the object, make sure that the terminating char is '}'
     if (this.peek() === '}')
     {
-      this.accumulateToken();
+      this.accumulateToken(objInfo);
       this.advance();
     }
     else
     {
       this.accumulateErrorOnCurrentToken('Missing or misplaced object closing brace, "}"');
     }
-
-    return obj;
   }
 
   private readTrueValue(): boolean
@@ -450,7 +449,7 @@ export default class ESJSONParser
 
   private readBooleanOrNull(exp: RegExp): boolean
   {
-    const match: string | null = this.match(exp);
+    const match: any = this.match(exp);
     if (match !== null)
     {
       return true;
@@ -487,14 +486,22 @@ export default class ESJSONParser
     return match;
   }
 
-  private accumulateToken(): ESParserToken
+  private accumulateToken(valueInfo?: ESValueInfo): ESParserToken
   {
     const element: ESParserToken =
-      new ESParserToken(this.charNumber, this.getRow(), this.getCol(), 1);
+      new ESParserToken(this.charNumber,
+        this.getRow(),
+        this.getCol(),
+        1,
+        this.queryString.substring(this.charNumber, this.charNumber + 1));
     this.tokens.push(element);
 
-    // link up the current ValueInfo and the Token
-    const valueInfo: ESValueInfo = this.getCurrentValueInfo();
+    // link up the ValueInfo and the Token
+    if (valueInfo === undefined)
+    {
+      valueInfo = this.getCurrentValueInfo();
+    }
+
     element.valueInfo = valueInfo;
     valueInfo.tokens.push(element);
     return element;
@@ -509,25 +516,19 @@ export default class ESJSONParser
   {
     const element: ESParserToken = this.getCurrentToken();
     element.length = this.charNumber - element.charNumber;
+    element.substring = this.queryString.substring(element.charNumber, element.charNumber + element.length);
   }
 
   private beginValueInfo(): ESValueInfo
   {
-    const element: ESValueInfo = new ESValueInfo(null, []);
+    const element: ESValueInfo = new ESValueInfo();
     this.valueInfos.push(element);
-    this.valueStack.push(element);
     return element;
   }
 
   private getCurrentValueInfo(): ESValueInfo
   {
-    return this.valueStack[this.valueStack.length - 1];
-  }
-
-  private endValueInfo(value: any): void
-  {
-    const element = this.valueStack.pop() as ESValueInfo;
-    element.value = value;
+    return this.valueInfos[this.valueInfos.length - 1];
   }
 
   private accumulateErrorOnCurrentToken(message: string): void

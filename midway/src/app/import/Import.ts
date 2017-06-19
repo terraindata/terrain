@@ -44,20 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
-import ESValueInfo from './ESValueInfo';
+import ElasticConfig from '../../database/elastic/ElasticConfig';
+import ElasticController from '../../database/elastic/ElasticController';
+import * as DBUtil from '../../database/Util';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import { UserConfig } from '../users/Users';
+import * as Util from '../Util';
+import { versions } from '../versions/VersionRouter';
 
-/**
- * Represents information about a property that was parsed by ESJSONParser
- */
-export default class ESPropertyInfo
+export interface ImportConfig
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
+  dsn: string;   // 'http://127.0.0.1:9200'
+  db?: string;   // for elastic, index name
+  table: string; // for elastic, type name
+  contents: string;   // should parse directly into a JSON object
+  dbtype: string;  // e.g., 'elastic'
+  // dbid?: number;
+}
 
-  public constructor(propertyName: ESValueInfo)
+export class Import
+{
+  public async insert(imprt: ImportConfig): Promise<ImportConfig>
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    return new Promise<ImportConfig>(async (resolve, reject) =>
+    {
+      const items: object[] = JSON.parse(imprt.contents);
+      // let columns: string[];
+      // const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
+      // if (database !== undefined)
+      // {
+      //     // find schema to find primary key ; somewhat redundant with SchemaRouter.ts
+      //     const schema: Tasty.Schema = await database.getTasty().schema();
+      //     columns = schema.fieldNames(imprt.db, imprt.table);
+      // } else {
+      //     columns = Object.keys(items[0]);    // for now assume all items have all keys
+      // }
+      const columns: string[] = Object.keys(items[0]);
+
+      const insertTable: Tasty.Table = new Tasty.Table(
+        imprt.table,
+        ['_id'],        // TODO: find schema to find primary key
+        columns,
+        imprt.db,
+      );
+
+      const elasticConfig: ElasticConfig = DBUtil.DSNToConfig(imprt.dbtype, imprt.dsn) as ElasticConfig;
+      const elasticController: ElasticController = new ElasticController(elasticConfig, 0, 'Import');
+
+      resolve(await elasticController.getTasty().upsert(insertTable, items) as ImportConfig);
+    });
   }
 }
+
+export default Import;

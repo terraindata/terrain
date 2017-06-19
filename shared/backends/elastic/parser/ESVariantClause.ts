@@ -44,28 +44,52 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
+import EQLConfig from './EQLConfig';
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
 
 /**
- * Represents information about a value that was parsed by ESJSONParser
+ * A clause which is one of several possible types
  */
-export default class ESParserValueInfo
+export default class ESVariantClause extends ESClause
 {
-  public value: any; // the parsed value
-  public tokens: ESParserToken[]; // the tokens belonging to the value, in order of appearance
+  public subtypes: { [jsonType: string]: string };
 
-  /**
-   * If value is a terminal node, children is null
-   * If value is an array, children is a corresponding ESParserValueInfo[]
-   * If value is an object, children is a corresponding object mapping keys
-   *  to {name:ESParserValueInfo, value:ESParserValueInfo} tuples.
-   */
-  public children: any;
-
-  public constructor(value: any = null, tokens: ESParserToken[] = [])
+  public constructor(settings: any, config: EQLConfig)
   {
-    this.value = value;
-    this.tokens = tokens;
-    this.children = null;
+    super(settings);
+    this.subtypes = settings.subtypes as { [jsonType: string]: string };
+    Object.keys(this.subtypes).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.subtypes[key]);
+      });
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this; // only sticks if subclause isn't detected
+
+    const value: any = valueInfo.value;
+    let valueType: string = typeof (value);
+    if (Array.isArray(value))
+    {
+      valueType = 'array';
+    }
+
+    const subtype: string | undefined = this.subtypes[valueType];
+    if (subtype === undefined)
+    {
+      interpreter.accumulateError(valueInfo,
+        'Unknown clause type. Expected one of these types: ' +
+        JSON.stringify(Object.keys(this.subtypes), null, 2) +
+        ', but found a ' +
+        valueType +
+        ' instead.');
+      return;
+    }
+
+    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
   }
 }

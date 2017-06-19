@@ -68,6 +68,7 @@ import MidwayRouter from './Router';
 import * as Schema from './Schema';
 import Users from './users/Users';
 
+export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 
 class App
@@ -107,6 +108,7 @@ class App
 
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
+    CFG = this.config;
 
     this.app = new Koa();
     this.app.proxy = true;

@@ -44,20 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserToken from './ESParserToken';
-import ESValueInfo from './ESValueInfo';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-/**
- * Represents information about a property that was parsed by ESJSONParser
- */
-export default class ESPropertyInfo
+// import DatabaseController from '../../database/DatabaseController';
+// import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Util from '../Util';
+import { Import, ImportConfig } from './Import';
+
+const Router = new KoaRouter();
+export const imprt: Import = new Import();
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  public propertyName: ESValueInfo; // the value info for the property name
-  public propertyValue: ESValueInfo | null; // the value info for the property value
-
-  public constructor(propertyName: ESValueInfo)
+  winston.info('importing to database');
+  const imprtConf: ImportConfig = ctx.request.body.body;
+  Util.verifyParameters(imprtConf, ['dbtype', 'contents', 'dsn', 'table']);
+  if (imprtConf.dbtype !== 'elastic')
   {
-    this.propertyName = propertyName;
-    this.propertyValue = null;
+    throw new Error('File import currently is only supported for Elastic databases.');
   }
-}
+  Util.verifyParameters(imprtConf, ['db']);
+
+  ctx.body = await imprt.insert(imprtConf);
+});
+
+export default Router;
