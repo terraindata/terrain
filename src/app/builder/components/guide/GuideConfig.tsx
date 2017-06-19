@@ -42,66 +42,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as Immutable from 'immutable';
-import {EExpressionType, EScreen} from './Guide';
+// Copyright 2017 Terrain Data, Inc.
+// import * as Immutable from 'immutable';
+// import {EExpressionType, EScreen} from './Guide';
 
-export enum EScreenType
-{
-  // given a list of items, choose the applicable one(s)
-  LIST,
+// export enum EScreenType
+// {
+//   // given a list of items, choose the applicable one(s)
+//   LIST,
 
-  // add items to a set of items
-  ADD,
-}
+//   // add items to a set of items
+//   ADD,
+// }
 
-interface IScreenConfig
-{
-  title: string;
-  prompt: string;
-  next: EScreen;
-  back: EScreen;
-  type: EScreenType;
+// interface IScreenConfig
+// {
+//   title: string;
+//   prompt: string;
+//   next: EScreen;
+//   back: EScreen;
+//   type: EScreenType;
 
-  listOptions?: List<string>; // for lists
-  listMulti?: boolean; // multiple options can be chosen
-}
+//   listOptions?: List<string>; // for lists
+//   listMulti?: boolean; // multiple options can be chosen
+// }
 
-const GuideConfig: {
-  screens: {[screen: number]: IScreenConfig},
-} = {
-  screens:
-  {
-    [EScreen.FROM]:
-    {
-      title: 'Tables',
-      prompt: 'Which tables do you need for your query?',
-      next: EScreen.WHERE,
-      back: null,
-      type: EScreenType.LIST,
-      listOptions: Immutable.List(['sitters', 'bookings', 'reviews', 'bookmarks', 'reports']),
-      listMulti: true,
-    },
+// const GuideConfig: {
+//   screens: {[screen: number]: IScreenConfig},
+// } = {
+//   screens:
+//   {
+//     [EScreen.FROM]:
+//     {
+//       title: 'Tables',
+//       prompt: 'Which tables do you need for your query?',
+//       next: EScreen.WHERE,
+//       back: null,
+//       type: EScreenType.LIST,
+//       listOptions: Immutable.List(['sitters', 'bookings', 'reviews', 'bookmarks', 'reports']),
+//       listMulti: true,
+//     },
 
-    [EScreen.WHERE]:
-    {
-      title: 'Where',
-      prompt: 'Would you like to filter a specific set of results?',
-      next: EScreen.SELECT,
-      back: EScreen.FROM,
-      type: EScreenType.ADD,
-    },
+//     [EScreen.WHERE]:
+//     {
+//       title: 'Where',
+//       prompt: 'Would you like to filter a specific set of results?',
+//       next: EScreen.SELECT,
+//       back: EScreen.FROM,
+//       type: EScreenType.ADD,
+//     },
 
-    [EScreen.SELECT]:
-    {
-      title: 'Select',
-      prompt: 'Which fields do you need?',
-      next: EScreen.ALL,
-      back: EScreen.WHERE,
-      type: EScreenType.LIST,
-      listOptions: Immutable.List(['uid', 'name', 'maxKids']),
-      listMulti: true,
-    },
-  },
-};
+//     [EScreen.SELECT]:
+//     {
+//       title: 'Select',
+//       prompt: 'Which fields do you need?',
+//       next: EScreen.ALL,
+//       back: EScreen.WHERE,
+//       type: EScreenType.LIST,
+//       listOptions: Immutable.List(['uid', 'name', 'maxKids']),
+//       listMulti: true,
+//     },
+//   },
+// };
 
-export default GuideConfig;
+// export default GuideConfig;

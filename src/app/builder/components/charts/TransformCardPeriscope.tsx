@@ -42,9 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./TransformCardPeriscope.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-const {Map, List} = Immutable;
+import './TransformCardPeriscope.less';
+const { Map, List } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
@@ -52,9 +53,8 @@ import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import { BuilderTypes } from './../../BuilderTypes';
 import Periscope from './Periscope';
-import {Bar, Bars} from './TransformCard';
+import { Bar, Bars } from './TransformCard';
 
 export interface Props
 {
@@ -72,7 +72,7 @@ const MAX_BARS = 100;
 
 class TransformCardPeriscope extends PureClasss<Props>
 {
-  state: {
+  public state: {
     initialDomain: List<number>,
     chartState: IMMap<string, any>,
     initialVal: number,
@@ -84,7 +84,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     bars: null,
   };
 
-  refs: {
+  public refs: {
     [k: string]: Ref;
     chart: Ref;
   };
@@ -95,7 +95,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     this.state.bars = this.formatBars(props.barsData);
   }
 
-  formatBars(bars: Bars): Bars
+  public formatBars(bars: Bars): Bars
   {
     if (bars.size > MAX_BARS)
     {
@@ -124,7 +124,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     return bars;
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
     const chartState = this.getChartState();
@@ -135,7 +135,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     Periscope.create(el, chartState.toJS());
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.shouldComponentUpdate(nextProps, this.state))
     {
@@ -151,13 +151,13 @@ class TransformCardPeriscope extends PureClasss<Props>
     }
   }
 
-  update(overrideState?)
+  public update(overrideState?)
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.update(el, this.getChartState(overrideState).toJS());
   }
 
-  handleDomainChangeStart(initialVal)
+  public handleDomainChangeStart(initialVal)
   {
     this.setState({
       initialDomain: this.props.domain,
@@ -165,35 +165,35 @@ class TransformCardPeriscope extends PureClasss<Props>
     });
   }
 
-  handleDomainChange(handleIndex, newVal)
+  public handleDomainChange(handleIndex, newVal)
   {
     let domain =
       this.state.initialDomain.set(handleIndex,
         this.state.initialDomain.get(handleIndex) + newVal - this.state.initialVal,
       );
 
-    const {maxDomain} = this.props;
+    const { maxDomain } = this.props;
     const buffer = (maxDomain.get(1) - maxDomain.get(0)) * 0.01;
     domain = domain.set(0,
-        Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer),
-      );
+      Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer),
+    );
     domain = domain.set(1,
       Util.valueMinMax(domain.get(1),
         this.state.initialDomain.get(0) + buffer,
         maxDomain.get(1)),
-      );
+    );
     this.props.onDomainChange(domain);
     this.update({
       domain,
     });
   }
 
-  handleDomainTextChange()
+  public handleDomainTextChange()
   {
     Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
   }
 
-  getChartState(overrideState = {}): IMMap<string, any>
+  public getChartState(overrideState = {}): IMMap<string, any>
   {
     const chartState = Map<string, any>({
       barsData: (overrideState['bars'] || this.state.bars).toJS(),
@@ -211,36 +211,38 @@ class TransformCardPeriscope extends PureClasss<Props>
     return chartState;
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.destroy(el);
   }
 
-  render()
+  public render()
   {
     return (
-      <div className="transform-periscope-wrapper">
-        <div ref="chart" />
+      <div className='transform-periscope-wrapper'>
+        <div ref='chart' />
 
-        <div className="tp-text-wrapper">
+        <div className='tp-text-wrapper'>
           <BuilderTextbox
             value={this.props.maxDomain.get(0)}
             keyPath={this._ikeyPath(this.props.keyPath, 'domain', 0)}
             isNumber={true}
-            className="tp-tb-left"
+            className='tp-tb-left'
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
+            language={null}
           />
           <BuilderTextbox
             value={this.props.maxDomain.get(1)}
             keyPath={this._ikeyPath(this.props.keyPath, 'domain', 1)}
             isNumber={true}
-            className="tp-tb-right"
+            className='tp-tb-right'
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
+            language={null}
           />
         </div>
 

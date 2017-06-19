@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
 const HTML5Backend = require('react-dnd-html5-backend');

@@ -42,40 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CardsDeck.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-type ICard = BuilderTypes.ICard;
-type ICards = BuilderTypes.ICards;
+import './CardsDeck.less';
 
-const {CardsDeckOrdering} = BuilderTypes;
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
-const {List, Map} = Immutable;
+const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 import { DragSource } from 'react-dnd';
 
 export interface Props
 {
   open: boolean;
+  language: string;
 }
 
 class CardsDeck extends PureClasss<Props>
 {
-  state: {
+  public state: {
     search: string;
   } = {
     search: '',
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.props.open && nextProps.open)
     {
@@ -83,46 +83,54 @@ class CardsDeck extends PureClasss<Props>
     }
   }
 
-  handleSearchChange(evt)
+  public handleSearchChange(evt)
   {
     this.setState({
       search: evt.target.value,
     });
   }
 
-  render()
+  public render()
   {
+    const ordering = AllBackendsMap[this.props.language].cardsDeck;
+    const cards = AllBackendsMap[this.props.language].blocks;
+
+    if (ordering === undefined)
+    {
+      throw new Error('Unable to find backend of type ' + this.props.language);
+    }
     return (
       <div
-        className="cards-deck"
+        className='cards-deck'
       >
         <div
-          className="cards-deck-search-wrapper"
+          className='cards-deck-search-wrapper'
         >
           <input
-            type="text"
-            ref="search"
-            className="cards-deck-search"
-            placeholder="Filter Cards"
+            type='text'
+            ref='search'
+            className='cards-deck-search'
+            placeholder='Search Cards'
             value={this.state.search}
             onChange={this.handleSearchChange}
           />
         </div>
         <div
-          className="cards-deck-inner"
+          className='cards-deck-inner'
         >
           {
-            CardsDeckOrdering.map((group: ICard[], index) =>
+            ordering.map((group: List<string>, index) =>
               <div
-                className="cards-deck-group"
+                className='cards-deck-group'
                 key={index}
               >
                 {
-                  group.map((card: ICard) =>
+                  group.map((cardType: string) =>
                     <CardDeckCard
-                      card={card}
+                      card={cards[cardType]}
                       search={this.state.search}
-                      key={card.type}
+                      key={cardType}
+                      type={cardType}
                     />,
                   )
                 }
@@ -137,7 +145,7 @@ class CardsDeck extends PureClasss<Props>
 
 interface CardProps
 {
-  card: ICard;
+  card: Card;
   search: string;
   key: string;
 
@@ -148,12 +156,12 @@ interface CardProps
 
 class _CardDeckCard extends PureClasss<CardProps>
 {
-  render()
+  public render()
   {
-    const {card} = this.props;
+    const { card } = this.props;
     const data = card.static;
     const search = this.props.search.toLowerCase();
-    let hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
+    const hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
 
     return this.props.connectDragSource(
       <div
@@ -182,37 +190,37 @@ export interface CardItem
 }
 
 const cardSource =
-{
-  canDrag: (props) => true,
-
-  beginDrag: (props: CardProps): CardItem =>
   {
-    setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
-    // TODO unselect cards?
+    canDrag: (props) => true,
 
-    const item: CardItem = {
-      type: props.card.type,
-      new: true,
-    };
+    beginDrag: (props: CardProps): CardItem =>
+    {
+      setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
+      // TODO unselect cards?
 
-    Actions.dragCard(item);
+      const item: CardItem = {
+        type: props.card.type,
+        new: true,
+      };
 
-    return item;
-  },
+      Actions.dragCard(item);
 
-  endDrag: () =>
-  {
-    $('body').removeClass('body-card-is-dragging');
-    Actions.dragCard(false);
-  },
-};
+      return item;
+    },
+
+    endDrag: () =>
+    {
+      $('body').removeClass('body-card-is-dragging');
+      Actions.dragCard(false);
+    },
+  };
 
 const dragCollect = (connect, monitor) =>
-({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
-  connectDragPreview: connect.dragPreview(),
-});
+  ({
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview(),
+  });
 
 const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(_CardDeckCard);
 

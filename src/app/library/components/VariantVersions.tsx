@@ -42,7 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./VariantVersions.less');
+// Copyright 2017 Terrain Data, Inc.
+import './VariantVersions.less';
 const classNames = require('classnames');
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
@@ -54,9 +55,9 @@ import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 // import * as moment from 'moment';
 const moment = require('moment');
+import { browserHistory } from 'react-router';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
-const {browserHistory} = require('react-router');
 
 type Variant = LibraryTypes.Variant;
 type User = UserTypes.User;
@@ -69,7 +70,7 @@ export interface Props
 
 class VariantVersions extends PureClasss<Props>
 {
-  state: {
+  public state: {
     users: UserMap,
     versions: any,
     roles: RoleTypes.RoleMap,
@@ -79,23 +80,24 @@ class VariantVersions extends PureClasss<Props>
     roles: null,
   };
 
+  public xhr: XMLHttpRequest = null;
+
   constructor(props: Props)
   {
     super(props);
 
     this._subscribe(UserStore,
-    {
-      stateKey: 'users',
-      storeKeyPath: ['users'],
-    });
+      {
+        stateKey: 'users',
+        storeKeyPath: ['users'],
+      });
     this._subscribe(RolesStore,
-    {
-      stateKey: 'roles',
-    });
+      {
+        stateKey: 'roles',
+      });
   }
 
-  xhr: XMLHttpRequest = null;
-  fetchVariants(props)
+  public fetchVariants(props)
   {
     this.xhr = Ajax.getVersions(props.variant.id, (versions) =>
     {
@@ -109,23 +111,23 @@ class VariantVersions extends PureClasss<Props>
     });
   }
 
-  componentWillMount()
+  public componentWillMount()
   {
     this.fetchVariants(this.props);
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     this.xhr && this.xhr.abort();
     this.xhr = null;
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     this.fetchVariants(nextProps);
   }
 
-  showVersion(versionID, i)
+  public showVersion(versionID, i)
   {
     let url = '/builder/?o=' + this.props.variant.id;
     if (i !== 0)
@@ -135,9 +137,9 @@ class VariantVersions extends PureClasss<Props>
     browserHistory.push(url);
   }
 
-  renderVersion(version, i)
+  public renderVersion(version, i)
   {
-    const {roles} = this.state;
+    const { roles } = this.state;
     const groupId = this.props.variant.groupId;
     let role = 'Viewer';
     if (roles && roles.getIn([groupId, version.userId]))
@@ -163,7 +165,7 @@ class VariantVersions extends PureClasss<Props>
           this._fn(this.showVersion, version.id, i)
         }
       >
-        <div className="versions-table-element">
+        <div className='versions-table-element'>
           <UserThumbnail
             userId={version.userId}
             small={true}
@@ -172,7 +174,7 @@ class VariantVersions extends PureClasss<Props>
           />
         </div>
         <div
-          className="versions-table-element"
+          className='versions-table-element'
         >
           {
             Util.formatDate(version.createdAt)
@@ -182,23 +184,23 @@ class VariantVersions extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
-    return(
-      <div className="versions-table-wrapper">
-        <div className="versions-table-title">
+    return (
+      <div className='versions-table-wrapper'>
+        <div className='versions-table-title'>
           Version History
         </div>
-        <div className="versions-table-right-align">
+        <div className='versions-table-right-align'>
           Current Version
         </div>
         {
           this.state.versions === null ?
-            <div className="loading">
+            <div className='loading'>
               Loading...
             </div>
-          :
-            <div className="versions-table">
+            :
+            <div className='versions-table'>
               {
                 this.state.versions.map(this.renderVersion)
               }

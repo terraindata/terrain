@@ -42,22 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
+import * as _ from 'underscore';
 const Redux = require('redux');
 
 export class BuilderScrollStateClass
 {
-  columnTop: number = 0;
-  columnHeight: number = 0;
-  columnScroll: number = 0;
-  totalHeight: number = 0;
+  public columnTop: number = 0;
+  public columnHeight: number = 0;
+  public columnScroll: number = 0;
+  public totalHeight: number = 0;
 }
-export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> {}
+export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> { }
 const BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
-const _BuilderScrollState = (config?: any) => {
+const _BuilderScrollState = (config?: any) =>
+{
   return new BuilderScrollState_Record(config || {}) as any as BuilderScrollState;
 };
 
@@ -78,26 +80,26 @@ interface BuilderScrollAction
 export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
   ReduxActions.handleActions({
     scroll:
-      (state: BuilderScrollState, action: BuilderScrollAction) =>
+    (state: BuilderScrollState, action: BuilderScrollAction) =>
+    {
+      const { columnTop, columnHeight, columnScroll, totalHeight } = action.payload;
+
+      if (
+        columnTop !== state.columnTop || columnHeight !== state.columnHeight
+        || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
+      )
       {
-        const {columnTop, columnHeight, columnScroll, totalHeight} = action.payload;
+        return state
+          .set('columnTop', columnTop)
+          .set('columnHeight', columnHeight)
+          .set('columnScroll', columnScroll)
+          .set('totalHeight', totalHeight);
+      }
 
-        if (
-          columnTop !== state.columnTop || columnHeight !== state.columnHeight
-          || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
-        )
-        {
-          return state
-            .set('columnTop', columnTop)
-            .set('columnHeight', columnHeight)
-            .set('columnScroll', columnScroll)
-            .set('totalHeight', totalHeight);
-        }
-
-        return state;
-      },
+      return state;
+    },
   }, DefaultState),
-DefaultState);
+  DefaultState);
 
 export function scrollAction(columnTop: number, columnHeight: number, columnScroll: number, totalHeight: number)
 {

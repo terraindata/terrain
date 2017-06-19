@@ -45,15 +45,17 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-const {List, Map} = Immutable;
-import {BaseClass, New} from '../Classes';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 import Util from '../util/Util';
 
 type stringList = string[] | List<string>;
 
-export module SchemaTypes {
+export namespace SchemaTypes
+{
 
-  export class SchemaBaseClass extends BaseClass {
+  export class SchemaBaseClass extends BaseClass
+  {
     public id: string;
     public type: string = '';
     public name: string = '';
@@ -138,7 +140,8 @@ export module SchemaTypes {
     return serverName + '/' + databaseName + '.' + tableName;
   }
 
-  class TableC extends SchemaBaseClass {
+  class TableC extends SchemaBaseClass
+  {
     public type = 'table';
     public name = '';
     public serverId: string = '';
@@ -159,11 +162,13 @@ export module SchemaTypes {
   };
   export type TableMap = IMMap<string, Table>;
 
-  export function columnId(tableId: string, columnName: string) {
+  export function columnId(tableId: string, columnName: string)
+  {
     return tableId + '.c.' + columnName;
   }
 
-  class ColumnC extends SchemaBaseClass {
+  class ColumnC extends SchemaBaseClass
+  {
     public type = 'column';
     public name = '';
     public serverId: string = '';
@@ -189,7 +194,8 @@ export module SchemaTypes {
     isPrimaryKey?: boolean,
 
     id?: string,
-  }) => {
+  }) =>
+  {
     config.id = columnId(config.tableId, config.name);
     return New<Column>(new ColumnC(config), config, 'string');
   };
@@ -199,7 +205,8 @@ export module SchemaTypes {
     return serverId + '/' + databaseName + '.' + tableName + '.i.' + indexName;
   }
 
-  class IndexC extends SchemaBaseClass {
+  class IndexC extends SchemaBaseClass
+  {
     public type = 'index';
     public name = '';
     public serverId: string = '';
@@ -233,7 +240,8 @@ export module SchemaTypes {
       index: 'indexes',
     };
 
-  export function searchIncludes(item: SchemaBaseClass, search: string): boolean {
+  export function searchIncludes(item: SchemaBaseClass, search: string): boolean
+  {
     return !search ||
       (
         item && typeof item.name === 'string' &&
@@ -243,13 +251,13 @@ export module SchemaTypes {
       );
   }
 
-// used to define how to render tree item children in tree list
+  // used to define how to render tree item children in tree list
   export type ISchemaTreeChildrenConfig = [
     {
       label?: string;
       type: string;
     }
-    ];
+  ];
 
   export type TableNamesByDb = IMMap<string, List<string>>;
   export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;

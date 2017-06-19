@@ -43,49 +43,56 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const {List, Map} = Immutable;
-const Radium = require('radium');
+const { List, Map } = Immutable;
+import Radium = require('radium');
 import * as React from 'react';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
-import SharedTypes from './../../../../shared/SharedTypes';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
-import BuilderTypes from '../../builder/BuilderTypes';
-import {_ResultsState, ResultsManager, ResultsState} from '../../builder/components/results/ResultsManager';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import { _Query, Query } from '../../../../shared/items/types/Query';
+import { _ResultsState, ResultsManager, ResultsState } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import InfoArea from '../../common/components/InfoArea';
 
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
+
 const NUM_ROWS = 200;
 
-export interface Props {
+export interface Props
+{
   databases: SchemaTypes.DatabaseMap;
 }
 
 @Radium
-class SchemaResults extends PureClasss<Props> {
+class SchemaResults extends PureClasss<Props>
+{
   public state: {
     selectedId?: ID,
     selectedItem?: SchemaBaseClass,
 
     resultsState?: ResultsState;
-    resultsQuery?: BuilderTypes.Query;
-    resultsDb?: SharedTypes.Database;
+    resultsQuery?: Query;
+    resultsDb?: BackendInstance;
+    resultsErrorMessage?: string;
   } = {
     resultsState: _ResultsState(),
   };
 
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
 
     this._subscribe(SchemaStore, {
-      updater: (storeState: SchemaTypes.SchemaState) => {
-        const {selectedId} = storeState;
+      updater: (storeState: SchemaTypes.SchemaState) =>
+      {
+        const { selectedId } = storeState;
         // TODO change if store changes
         const selectedItem =
           storeState.getIn(['databases', selectedId]) ||
@@ -93,13 +100,15 @@ class SchemaResults extends PureClasss<Props> {
           storeState.getIn(['columns', selectedId]) ||
           storeState.getIn(['indexes', selectedId]);
 
-        if (selectedItem !== this.state.selectedItem) {
+        if (selectedItem !== this.state.selectedItem)
+        {
           this.setState({
             selectedId,
             selectedItem,
           });
 
-          if (this.showsResults(selectedItem)) {
+          if (this.showsResults(selectedItem))
+          {
             const resultsDb =
               selectedItem.type === 'database' ? selectedItem.name :
                 this.props.databases
@@ -107,7 +116,8 @@ class SchemaResults extends PureClasss<Props> {
             console.log('schema resultsDb', resultsDb);
             let field: string, table: string, where: string;
 
-            switch (selectedItem.type) {
+            switch (selectedItem.type)
+            {
               case 'database':
                 field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
                 table = 'INFORMATION_SCHEMA.TABLES';
@@ -126,15 +136,23 @@ class SchemaResults extends PureClasss<Props> {
                 break;
             }
 
-            const resultsQuery = this.getQuery(field, table, where);
+            const resultsQuery = this.getQuery(resultsDb, field, table, where);
+            let resultsErrorMessage = null;
+
+            if (!resultsQuery)
+            {
+              resultsErrorMessage = 'Unsupported DB type: ' + resultsDb.type;
+            }
 
             this.setState({
               resultsQuery,
               resultsDb,
               resultsState: _ResultsState(),
+              resultsErrorMessage,
             });
           }
-          else {
+          else
+          {
             this.handleResultsStateChange(_ResultsState());
           }
         }
@@ -142,8 +160,13 @@ class SchemaResults extends PureClasss<Props> {
     });
   }
 
-  public getQuery(field: string, table: string, where: string = '1'): BuilderTypes.Query {
-    const tql = 'SELECT ' + field + ' FROM ' + table + ' ' + where + ' LIMIT ' + NUM_ROWS + ';';
+  public getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
+  {
+    if (resultsDb.type !== 'mysql')
+    {
+      // TODO MOD
+      return null;
+    }
 
     const inputs = [
       {
@@ -160,22 +183,22 @@ class SchemaResults extends PureClasss<Props> {
       },
     ].map(
       (inputConfig) =>
-        BuilderTypes.make(
-          BuilderTypes.Blocks.input,
+        BlockUtils.make(
+          AllBackendsMap.mysql.blocks.input,
           inputConfig,
         ),
     );
 
-    return BuilderTypes._Query({
+    return _Query({
       inputs: List(inputs),
 
       cards: List([
-        BuilderTypes.make(
-          BuilderTypes.Blocks.sfw,
+        BlockUtils.make(
+          AllBackendsMap.mysql.blocks.sfw,
           {
             fields: List([
-              BuilderTypes.make(
-                BuilderTypes.Blocks.field,
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.field,
                 {
                   field: 'input.field',
                 },
@@ -183,12 +206,12 @@ class SchemaResults extends PureClasss<Props> {
             ]),
 
             cards: List([
-              BuilderTypes.make(
-                BuilderTypes.Blocks.from,
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.from,
                 {
                   tables: List([
-                    BuilderTypes.make(
-                      BuilderTypes.Blocks.table,
+                    BlockUtils.make(
+                      AllBackendsMap.mysql.blocks.table,
                       {
                         table: 'input.table',
                       },
@@ -197,12 +220,12 @@ class SchemaResults extends PureClasss<Props> {
                 },
               ),
 
-              BuilderTypes.make(
-                BuilderTypes.Blocks.where,
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.where,
                 {
                   cards: List([
-                    BuilderTypes.make(
-                      BuilderTypes.Blocks.tql,
+                    BlockUtils.make(
+                      AllBackendsMap.mysql.blocks.tql,
                       {
                         clause: where,
                       },
@@ -211,8 +234,8 @@ class SchemaResults extends PureClasss<Props> {
                 },
               ),
 
-              BuilderTypes.make(
-                BuilderTypes.Blocks.take,
+              BlockUtils.make(
+                AllBackendsMap.mysql.blocks.take,
                 {
                   value: 'input.numRows',
                 },
@@ -224,17 +247,20 @@ class SchemaResults extends PureClasss<Props> {
     });
   }
 
-  public showsResults(selectedItem: SchemaBaseClass): boolean {
+  public showsResults(selectedItem: SchemaBaseClass): boolean
+  {
     return selectedItem && selectedItem.type !== 'index';
   }
 
-  public handleResultsStateChange(resultsState: ResultsState) {
+  public handleResultsStateChange(resultsState: ResultsState)
+  {
     this.setState({
       resultsState,
     });
   }
 
-  public render() {
+  public render()
+  {
     return (
       <div
         style={{
@@ -245,14 +271,22 @@ class SchemaResults extends PureClasss<Props> {
       >
         {
           this.showsResults(this.state.selectedItem) ?
-            <ResultsTable
-              results={this.state.resultsState.results}
-              onExpand={_.noop}
-              resultsLoading={this.state.resultsState.loading}
-            />
+            (
+              this.state.resultsErrorMessage ?
+                <InfoArea
+                  large='Error retrieving results'
+                  small={this.state.resultsErrorMessage}
+                />
+                :
+                <ResultsTable
+                  results={this.state.resultsState.results}
+                  onExpand={_.noop}
+                  resultsLoading={this.state.resultsState.loading}
+                />
+            )
             :
             <InfoArea
-              large="Select an item to see its contents here."
+              large='Select an item to see its contents here.'
             />
         }
 

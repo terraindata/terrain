@@ -42,37 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Input } from '../../../../../shared/blocks/types/Input';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
-import Input from '../inputs/Input';
+import InputComponent from '../inputs/InputComponent';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
-type IInput = BuilderTypes.IInput;
 
 export interface Props
 {
-  inputs: List<IInput>;
+  inputs: List<Input>;
   canEdit: boolean;
 }
 
 class InputsArea extends PureClasss<Props>
 {
-  createInput()
+  public createInput()
   {
     Actions.create(Immutable.List(['query', 'inputs']), -1, 'input');
   }
 
-  renderNoInputs()
+  public renderNoInputs()
   {
     const large = ''; // "No inputs have been added, yet."
-    const button =  this.props.canEdit ? 'Add an Input' : null;
+    const button = this.props.canEdit ? 'Add an Input' : null;
     const onClick = this.createInput;
 
     return (
@@ -84,7 +84,7 @@ class InputsArea extends PureClasss<Props>
     );
   }
 
-  render()
+  public render()
   {
     if (this.props.inputs.size === 0)
     {
@@ -92,10 +92,10 @@ class InputsArea extends PureClasss<Props>
     }
 
     return (
-      <div className="inputs-area">
+      <div className='inputs-area'>
         {
           this.props.inputs.map((input, index) =>
-            <Input
+            <InputComponent
               input={input}
               index={index}
               canEdit={this.props.canEdit}
@@ -104,13 +104,13 @@ class InputsArea extends PureClasss<Props>
           )
         }
 
-        <div className="standard-margin">
+        <div className='standard-margin'>
           {
             this.props.canEdit &&
-              <CreateLine
-                open={false}
-                onClick={this.createInput}
-              />
+            <CreateLine
+              open={false}
+              onClick={this.createInput}
+            />
           }
         </div>
       </div>

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./UserThumbnail.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -50,6 +50,7 @@ import Classs from './../../common/components/Classs';
 import ColorManager from './../../util/ColorManager';
 import UserStore from './../data/UserStore';
 import UserTypes from './../UserTypes';
+import './UserThumbnail.less';
 
 type User = UserTypes.User;
 
@@ -70,7 +71,7 @@ export interface Props
 
 class UserThumbnail extends Classs<Props>
 {
-  state: {
+  public state: {
     user?: User,
   } = {
   };
@@ -80,12 +81,12 @@ class UserThumbnail extends Classs<Props>
     super(props);
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.subscribeUser();
   }
 
-  subscribeUser(nextProps?: Props)
+  public subscribeUser(nextProps?: Props)
   {
     this._unsubscribe();
     this._subscribe(UserStore, {
@@ -95,12 +96,12 @@ class UserThumbnail extends Classs<Props>
     });
   }
 
-  getStoreKeyPath(props?: Props)
+  public getStoreKeyPath(props?: Props)
   {
     return ['users', (props || this.props).userId];
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.userId !== this.props.userId)
     {
@@ -108,12 +109,12 @@ class UserThumbnail extends Classs<Props>
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps, nextState)
   {
     return nextState.user !== this.state.user;
   }
 
-  render()
+  public render()
   {
     const { user } = this.state;
     const name: string = user ? user.name : 'Loading...';
@@ -138,18 +139,18 @@ class UserThumbnail extends Classs<Props>
         data-html={true}
       >
         <div
-          className="user-thumbnail-image"
+          className='user-thumbnail-image'
           style={{
             backgroundImage: `url(${src})`,
           }}
         />
         {
           text &&
-            <div className="user-thumbnail-text">
-              {
-                text
-              }
-            </div>
+          <div className='user-thumbnail-text'>
+            {
+              text
+            }
+          </div>
         }
       </div>
     );
@@ -158,7 +159,7 @@ class UserThumbnail extends Classs<Props>
     {
       return (
         <Link to={`/users/${user.id}`}>
-          { thumbnail }
+          {thumbnail}
         </Link>
       );
     }

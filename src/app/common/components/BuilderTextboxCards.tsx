@@ -42,18 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+import { Card, CardString } from '../../../../shared/blocks/types/Card';
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { Display } from '../../builder/BuilderDisplays';
-import { BuilderTypes } from '../../builder/BuilderTypes';
-import Card from '../../builder/components/cards/Card';
+import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
+import CardComponent from '../../builder/components/cards/CardComponent';
 import Util from '../../util/Util';
 
 export interface Props
 {
-  value: BuilderTypes.CardString;
+  value: CardString;
   keyPath: KeyPath;
   canEdit: boolean;
   className: string;
@@ -61,26 +63,29 @@ export interface Props
   addColumn?: (number, string?) => void;
   columnIndex: number;
   display: Display;
+  language: string;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>
 {
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
   }
 
-  isText()
+  public isText()
   {
     return typeof this.props.value !== 'object';
   }
 
-  isCreating()
+  public isCreating()
   {
     return false; // TODO
     // return this.props.value && this.props.value['type'] === 'creating';
   }
 
-  render() {
+  public render()
+  {
     if (this.isText() || this.isCreating() || this.props.value['closed'])
     {
       return null;
@@ -91,11 +96,11 @@ class BuilderTextboxCards extends React.Component<Props, any>
       <div className={classNames({
         'builder-tb-cards-area': true,
         [this.props.className]: !!this.props.className,
-      })} ref="tb">
-        <Card
+      })} ref='tb'>
+        <CardComponent
           {...this.props}
           singleCard={true}
-          card={this.props.value as BuilderTypes.ICard}
+          card={this.props.value as Card}
           index={null}
           display={this.props.display}
         />

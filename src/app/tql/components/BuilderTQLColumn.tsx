@@ -42,18 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BuilderTQLColumn.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-const {List} = Immutable;
+import './BuilderTQLColumn.less';
+const { List } = Immutable;
 import * as _ from 'underscore';
-import BuilderTypes from '../../builder/BuilderTypes';
-import {ResultsState} from '../../builder/components/results/ResultsManager';
+import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
+import Query from '../../../../shared/items/types/Query';
+import { ResultsState } from '../../builder/components/results/ResultsManager';
 import { MenuOption } from '../../common/components/Menu';
 import LibraryTypes from '../../library/LibraryTypes';
-import TQLConverter from '../TQLConverter';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';
@@ -62,9 +63,10 @@ import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';
 
-export interface Props {
+export interface Props
+{
   variant?: LibraryTypes.Variant;
-  query?: BuilderTypes.Query;
+  query?: Query;
   canEdit?: boolean;
   resultsState: ResultsState;
 
@@ -75,9 +77,10 @@ export interface Props {
 
 class BuilderTQLColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     tql: string;
     theme: string;
+    runMode: string;
     focused: boolean;
     highlightedLine: number;
     theme_index: number;
@@ -90,6 +93,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   } = {
     tql: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
+    runMode: 'auto',
     focused: false,
     highlightedLine: null,
     theme_index: 0,
@@ -107,7 +111,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     // this.sendTqlAction = _.debounce(this.sendTqlAction, 1000);
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.state.focused && nextProps.query.tql !== this.state.tql)
     {
@@ -120,24 +124,43 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  updateTql(tql: string, noAction?: boolean)
+  public updateTql(tql: string, noAction: boolean = false, manualRequest: boolean = false)
   {
-    if (tql === this.state.tql)
+    if (this.state.runMode === 'auto')
     {
-      return;
-    }
+      // auto mode
+      if (tql === this.state.tql)
+      {
+        return;
+      }
 
-    // this.checkForFolding(tql);
-    this.setState({
-      tql,
-      highlightedLine: null,
-      syntaxHelpOpen: false,
-      termDefinitionOpen: false,
-    });
+      // this.checkForFolding(tql);
+      this.setState({
+        tql,
+        highlightedLine: null,
+        syntaxHelpOpen: false,
+        termDefinitionOpen: false,
+      });
 
-    if (!noAction && tql !== this.props.query.tql)
+      if (!noAction && tql !== this.props.query.tql)
+      {
+        this.sendTqlAction();
+      }
+    } else
     {
-      this.sendTqlAction();
+      if (tql !== this.state.tql)
+      {
+        this.setState({
+          tql,
+          highlightedLine: null,
+          syntaxHelpOpen: false,
+          termDefinitionOpen: false,
+        });
+      }
+      if (manualRequest === true && noAction === false)
+      {
+        this.sendTqlAction();
+      }
     }
   }
 
@@ -151,12 +174,12 @@ class BuilderTQLColumn extends PureClasss<Props>
   //   }
   // }
 
-  sendTqlAction()
+  public sendTqlAction()
   {
     BuilderActions.changeTQL(this.state.tql);
   }
 
-  changeThemeDefault()
+  public changeThemeDefault()
   {
     localStorage.setItem('theme', 'default');
     this.setState({
@@ -165,7 +188,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  changeThemeNeo()
+  public changeThemeNeo()
   {
     localStorage.setItem('theme', 'neo');
     this.setState({
@@ -174,7 +197,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  changeThemeCobalt()
+  public changeThemeCobalt()
   {
     localStorage.setItem('theme', 'cobalt');
     this.setState({
@@ -183,7 +206,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  changeThemeMonokai()
+  public changeThemeMonokai()
   {
     localStorage.setItem('theme', 'monokai');
     this.setState({
@@ -192,7 +215,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  getThemeIndex()
+  public getThemeIndex()
   {
     switch (this.state.theme)
     {
@@ -207,7 +230,21 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  getMenuOptions(): List<MenuOption>
+  public changeRunModeToAuto()
+  {
+    this.setState({
+      runMode: 'auto',
+    });
+  }
+
+  public changeRunModeToManual()
+  {
+    this.setState({
+      runMode: 'manual',
+    });
+  }
+
+  public getMenuOptions(): List<MenuOption>
   {
     const options: List<MenuOption> =
       List([
@@ -231,6 +268,16 @@ class BuilderTQLColumn extends PureClasss<Props>
           onClick: this.changeThemeMonokai,
           disabled: this.getThemeIndex() === 3,
         },
+        {
+          text: 'Auto',
+          onClick: this.changeRunModeToAuto,
+          disabled: this.state.runMode === 'auto',
+        },
+        {
+          text: 'Manual',
+          onClick: this.changeRunModeToManual,
+          disabled: this.state.runMode === 'manual',
+        },
         // {
         //   spacer: true,
         //   text: null,
@@ -244,7 +291,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     return options;
   }
 
-  highlightError(lineNumber: number)
+  public highlightError(lineNumber: number)
   {
     if (lineNumber !== null)
     {
@@ -254,7 +301,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  turnSyntaxPopupOff()
+  public turnSyntaxPopupOff()
   {
     this.setState({
       syntaxHelpOpen: false,
@@ -262,13 +309,14 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  findKeyword(line: string)
+  public findKeyword(line: string)
   {
-    const keywords = Object.keys(BuilderTypes.cardList);
+    const keywords = Object.keys(cardList);
     let cardName = '';
-    keywords.map(function(word) {
+    keywords.map((word) =>
+    {
       const words = word.split(' ');
-      //For terms like select from, only need to match one of the words
+      // For terms like select from, only need to match one of the words
       if (words.length > 1)
       {
         for (let i = 0; i < words.length; i++)
@@ -287,7 +335,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     return cardName;
   }
 
-  toggleSyntaxPopup(event, line)
+  public toggleSyntaxPopup(event, line)
   {
     const cardName = this.findKeyword(line);
 
@@ -295,13 +343,13 @@ class BuilderTQLColumn extends PureClasss<Props>
     const top = event.clientY - event.offsetY + 17;
     this.setState({
       syntaxHelpOpen: !this.state.syntaxHelpOpen,
-      syntaxHelpPos: {left, top},
+      syntaxHelpPos: { left, top },
       cardName,
       termDefinitionOpen: false,
     });
   }
 
-  defineTerm(value, event)
+  public defineTerm(value, event)
   {
     const cardName = this.findKeyword(value);
     const left = event.clientX;
@@ -310,31 +358,32 @@ class BuilderTQLColumn extends PureClasss<Props>
     {
       this.setState({
         termDefinitionOpen: true,
-        termDefinitionPos: {left, top},
+        termDefinitionPos: { left, top },
         cardName,
         syntaxHelpOpen: false,
       });
     }
   }
 
-  hideTermDefinition()
+  public hideTermDefinition()
   {
     this.setState({
       termDefinitionOpen: false,
     });
   }
 
-  handleFocusChange(focused)
+  public handleFocusChange(focused)
   {
     this.setState({
       focused,
     });
   }
 
-  render()
+  public render()
   {
-    const manualEntry = BuilderTypes.cardList[this.state.cardName] &&
-        BuilderTypes.Blocks[BuilderTypes.cardList[this.state.cardName]].static.manualEntry;
+    const manualEntry = null;
+    // cardList[this.state.cardName] &&
+    //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
 
     return (
       <div
@@ -350,7 +399,7 @@ class BuilderTQLColumn extends PureClasss<Props>
         />
 
         <div
-          className="tql-section"
+          className='tql-section'
         >
           <TQLEditor
             tql={this.state.tql}
@@ -368,25 +417,25 @@ class BuilderTQLColumn extends PureClasss<Props>
           />
           {
             this.state.syntaxHelpOpen &&
-              <TQLPopup
-                 cardName={this.state.cardName}
-                 text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
-                 style={this.state.syntaxHelpPos}
-                 addColumn={this.props.addColumn}
-                 columnIndex={this.props.columnIndex}
-                 onClick={this.turnSyntaxPopupOff}
-              />
+            <TQLPopup
+              cardName={this.state.cardName}
+              text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
+              style={this.state.syntaxHelpPos}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+              onClick={this.turnSyntaxPopupOff}
+            />
           }
           {
             this.state.termDefinitionOpen &&
-              <TQLPopup
-                cardName={this.state.cardName}
-                text={manualEntry ? manualEntry.summary : 'No definition available'}
-                 style={this.state.termDefinitionPos}
-                 addColumn={this.props.addColumn}
-                 columnIndex={this.props.columnIndex}
-                 onClick={this.turnSyntaxPopupOff}
-              />
+            <TQLPopup
+              cardName={this.state.cardName}
+              text={manualEntry ? manualEntry.summary : 'No definition available'}
+              style={this.state.termDefinitionPos}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+              onClick={this.turnSyntaxPopupOff}
+            />
           }
 
           <TQLResultsBar

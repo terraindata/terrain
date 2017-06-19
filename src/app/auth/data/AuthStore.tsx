@@ -42,17 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
-const Immutable = require('immutable');
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
-import ActionTypes from './AuthActionTypes';
 import AuthTypes from '../AuthTypes';
+import ActionTypes from './AuthActionTypes';
 
 import AuthReducers from './AuthReducers';
 
 const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({},
   AuthReducers,
-{}), AuthTypes._AuthState()), AuthTypes._AuthState());
+  {}), AuthTypes._AuthState()), AuthTypes._AuthState());
 
 export default AuthStore;

@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Radium = require('radium');
@@ -57,7 +56,8 @@ import SchemaTreeItem from './SchemaTreeItem';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 
-export interface Props {
+export interface Props
+{
   search: string;
 }
 
@@ -68,7 +68,8 @@ let INIT_PREV_ITEMS: IMMap<string, IMMap<string, SchemaBaseClass>> =
   Immutable.Map<string, IMMap<string, SchemaBaseClass>>({});
 
 _.map(SchemaTypes.typeToStoreKey as any,
-  (storeKey: string, type) => {
+  (storeKey: string, type) =>
+  {
     INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
     INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
     INIT_PREV_ITEMS = INIT_PREV_ITEMS.set(storeKey, Immutable.Map<any, any>({}));
@@ -77,7 +78,8 @@ _.map(SchemaTypes.typeToStoreKey as any,
 const SHOW_MORE_INCREMENT = 50;
 
 @Radium
-class SchemaSearchResults extends PureClasss<Props> {
+class SchemaSearchResults extends PureClasss<Props>
+{
   public state: {
     // since search results are rendered as a list, we want
     //  to store them in a list, instead of the Map stored in the SchemaState
@@ -92,15 +94,19 @@ class SchemaSearchResults extends PureClasss<Props> {
     prevItems: INIT_PREV_ITEMS,
   };
 
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
 
     this._subscribe(SchemaStore, {
-      updater: (storeState: SchemaTypes.SchemaState) => {
-        let {items, prevItems} = this.state;
-        items.map((v, storeKey) => {
+      updater: (storeState: SchemaTypes.SchemaState) =>
+      {
+        let { items, prevItems } = this.state;
+        items.map((v, storeKey) =>
+        {
           const storeValue = storeState.get(storeKey);
-          if (prevItems.get(storeKey) !== storeValue) {
+          if (prevItems.get(storeKey) !== storeValue)
+          {
             // reference changed
             items = items.set(storeKey, storeValue.valueSeq().toList());
             prevItems = prevItems.set(storeKey, storeValue);
@@ -115,29 +121,36 @@ class SchemaSearchResults extends PureClasss<Props> {
     });
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.search !== this.props.search) {
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.search !== this.props.search)
+    {
       this.setState({
         showingCount: INIT_SHOWING_COUNT,
       });
     }
   }
 
-  public renderSection(stateKey: string, type: string, label: string) {
+  public renderSection(stateKey: string, type: string, label: string)
+  {
     let index = 0;
     const max = this.state.showingCount.get(stateKey);
     const items = this.state.items.get(stateKey);
     const renderItems: SchemaBaseClass[] = [];
     let couldShowMore = false; // are there additional entries to show?
 
-    while (renderItems.length <= max && index < items.size && !couldShowMore) {
+    while (renderItems.length <= max && index < items.size && !couldShowMore)
+    {
       const item = items.get(index);
 
-      if (SchemaTypes.searchIncludes(item, this.props.search)) {
-        if (renderItems.length < max) {
+      if (SchemaTypes.searchIncludes(item, this.props.search))
+      {
+        if (renderItems.length < max)
+        {
           renderItems.push(item);
         }
-        else {
+        else
+        {
           couldShowMore = true;
         }
       }
@@ -193,16 +206,18 @@ class SchemaSearchResults extends PureClasss<Props> {
     );
   }
 
-  public handleShowMore(stateKey: string) {
-    let {showingCount} = this.state;
+  public handleShowMore(stateKey: string)
+  {
+    let { showingCount } = this.state;
     showingCount = showingCount.set(stateKey, showingCount.get(stateKey) + SHOW_MORE_INCREMENT);
     this.setState({
       showingCount,
     });
   }
 
-  public render() {
-    const {search} = this.props;
+  public render()
+  {
+    const { search } = this.props;
 
     return (
       <div

@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as React from 'react';
 import SchemaStore from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
@@ -54,7 +53,8 @@ import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
 
-export interface Props {
+export interface Props
+{
   itemIds: List<ID>;
   itemType: string;
   label?: string;
@@ -62,7 +62,8 @@ export interface Props {
   search: string;
 }
 
-class State {
+class State
+{
   public renderCount: number = 30;
   public intervalId: number = -1;
 }
@@ -82,51 +83,58 @@ const SEARCH_STYLE = {
 };
 
 @Radium
-class SchemaTreeList extends PureClasss<Props> {
+class SchemaTreeList extends PureClasss<Props>
+{
   public state = new State();
 
-  public componentDidMount() {
-    if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount) {
+  public componentDidMount()
+  {
+    if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount)
+    {
       this.setState({
         intervalId: setInterval(this.increaseRenderCount, 50),
       });
     }
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.itemIds && nextProps.itemIds.size > this.state.renderCount && this.state.intervalId === -1) {
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
+    {
       this.setState({
         intervalId: setInterval(this.increaseRenderCount),
       });
     }
   }
 
-  public increaseRenderCount() {
+  public increaseRenderCount()
+  {
     const renderCount = this.state.renderCount + 10;
-
-    let {intervalId} = this.state;
-
-    if (this.props.itemIds.size < renderCount) {
-      clearInterval(this.state.intervalId);
-      intervalId = -1;
-    }
-
     this.setState({
       renderCount,
-      intervalId,
     });
+
+    if (this.props.itemIds.size < renderCount)
+    {
+      clearInterval(this.state.intervalId);
+      this.setState({
+        intervalId: -1,
+      });
+    }
   }
 
-  public render() {
-    if (!this.props.itemIds) {
+  public render()
+  {
+    if (!this.props.itemIds)
+    {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }
 
-    const {itemIds, itemType, search, label, topLevel} = this.props;
+    const { itemIds, itemType, search, label, topLevel } = this.props;
 
     return (
       <div
@@ -157,7 +165,7 @@ class SchemaTreeList extends PureClasss<Props> {
                 style={SchemaTreeStyles.none}
               >
                 None
-              </div>
+                  </div>
             }
           </FadeInOut>
         }
@@ -165,13 +173,13 @@ class SchemaTreeList extends PureClasss<Props> {
         {
           itemIds.map(
             (id, index) =>
-            index < this.state.renderCount &&
-            <SchemaTreeItem
-              id={id}
-              type={itemType}
-              key={id}
-              search={search}
-            />,
+              index < this.state.renderCount &&
+              <SchemaTreeItem
+                id={id}
+                type={itemType}
+                key={id}
+                search={search}
+              />,
           )
         }
       </div>

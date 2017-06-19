@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 /// <reference path="../typings/tsd.d.ts" />
 
 require('babel-polyfill');
 
 // Style
-require('./App.less');
+import './App.less';
 
 // Libraries
 import * as $ from 'jquery';
@@ -55,7 +56,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
-const {browserHistory} = require('react-router');
+import { browserHistory } from 'react-router';
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
 window['PerfStart'] = Perf.start;
@@ -99,7 +100,7 @@ import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
-import {SchemaActions, SchemaStore} from './schema/data/SchemaStore';
+import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
 
@@ -110,41 +111,41 @@ const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
-const ManualIcon = require ('./../images/icon_info.svg');
+const ManualIcon = require('./../images/icon_info.svg');
 
 const links =
-[
-  // {
-  //   icon: <HomeIcon />,
-  //   text: 'Account',
-  //   route: '/account',
-  // },
-  // {
-  //   icon: <ReportingIcon />,
-  //   text: 'Reporting',
-  //   route: '/reporting',
-  // },
-  {
-    icon: <LibraryIcon />,
-    text: 'Library',
-    route: '/library',
-  },
-  {
-    icon: <BuilderIcon />,
-    text: 'Builder',
-    route: '/builder',
-  },
-  {
-    icon: <ReportingIcon />,
-    text: 'Schema',
-    route: '/schema',
-  },
-  // {
-  //   icon: <ManualIcon />,
-  //   text: 'Manual',
-  //   route: '/manual',
-  // }
-];
+  [
+    // {
+    //   icon: <HomeIcon />,
+    //   text: 'Account',
+    //   route: '/account',
+    // },
+    // {
+    //   icon: <ReportingIcon />,
+    //   text: 'Reporting',
+    //   route: '/reporting',
+    // },
+    {
+      icon: <LibraryIcon />,
+      text: 'Library',
+      route: '/library',
+    },
+    {
+      icon: <BuilderIcon />,
+      text: 'Builder',
+      route: '/builder',
+    },
+    {
+      icon: <ReportingIcon />,
+      text: 'Schema',
+      route: '/schema',
+    },
+    // {
+    //   icon: <ManualIcon />,
+    //   text: 'Manual',
+    //   route: '/manual',
+    // }
+  ];
 
 interface Props
 {
@@ -155,7 +156,7 @@ interface Props
 }
 class App extends PureClasss<Props>
 {
-  state = {
+  public state = {
     selectedPage: 3,
     loggedIn: false,
     sidebarExpanded: false,
@@ -163,7 +164,7 @@ class App extends PureClasss<Props>
 
     libraryLoaded: false,
     schemaLoaded: false,
-    
+
     usersLoaded: false,
 
     noLocalStorage: false,
@@ -178,7 +179,8 @@ class App extends PureClasss<Props>
       () => console.log('Midway 2 is not running.'),
     );
 
-    try {
+    try
+    {
       // check to see if we can use localStorage
       localStorage['test'] = 'test';
     } catch (e)
@@ -194,7 +196,8 @@ class App extends PureClasss<Props>
 
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
-      updater: (state) => {
+      updater: (state) =>
+      {
         const token = AuthStore.getState().accessToken;
         const loggedIn = !!token;
         const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
@@ -240,7 +243,7 @@ class App extends PureClasss<Props>
     }
   }
 
-  fetchData()
+  public fetchData()
   {
     UserActions.fetch();
     LibraryActions.fetch();
@@ -248,28 +251,28 @@ class App extends PureClasss<Props>
     // RolesActions.fetch();
   }
 
-  toggleSidebar()
+  public toggleSidebar()
   {
     this.setState({
       sidebarExpanded: !this.state.sidebarExpanded,
     });
   }
 
-  handleLoginLoadComplete()
+  public handleLoginLoadComplete()
   {
     this.setState({
       loggedInAndLoaded: true,
     });
   }
 
-  isAppStateLoaded(): boolean
+  public isAppStateLoaded(): boolean
   {
     return this.state.libraryLoaded
       && this.state.usersLoaded;
-      // && this.state.rolesLoaded
+    // && this.state.rolesLoaded
   }
 
-  renderApp()
+  public renderApp()
   {
     if (!this.state.loggedInAndLoaded)
     {
@@ -283,7 +286,7 @@ class App extends PureClasss<Props>
     }
 
     const sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
-    const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0 );
+    const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
 
     const layout =
       {
@@ -303,13 +306,13 @@ class App extends PureClasss<Props>
           {
             noProps: true,
             content:
-              <div
-                className="app-inner"
-              >
-                {
-                  this.props.children
-                }
-              </div>
+            <div
+              className='app-inner'
+            >
+              {
+                this.props.children
+              }
+            </div>
             ,
           },
         ],
@@ -318,12 +321,12 @@ class App extends PureClasss<Props>
     return <LayoutManager layout={layout} />;
   }
 
-  handleMouseMove(e: MEvent)
+  public handleMouseMove(e: MEvent)
   {
     BuilderActions.hoverCard(null);
   }
 
-  render()
+  public render()
   {
     if (this.state.noLocalStorage)
     {
@@ -336,22 +339,22 @@ class App extends PureClasss<Props>
 
     return (
       <div
-        className="app"
+        className='app'
         onMouseMove={this.handleMouseMove}
       >
         {
           this.state.loggedInAndLoaded &&
-            <div
-              className="app-top-bar"
-            >
-              <TerrainIcon
-                className="app-top-bar-icon"
-              />
-               <AccountDropdown />
-            </div>
+          <div
+            className='app-top-bar'
+          >
+            <TerrainIcon
+              className='app-top-bar-icon'
+            />
+            <AccountDropdown />
+          </div>
         }
         <div
-          className="app-wrapper"
+          className='app-wrapper'
         >
           {
             this.renderApp()
@@ -361,9 +364,9 @@ class App extends PureClasss<Props>
         <DeployModal />
 
         <ReactTooltip
-          place="bottom"
-          effect="solid"
-          class="tooltip"
+          place='bottom'
+          effect='solid'
+          class='tooltip'
           hideOnClick={true}
         />
 
@@ -377,53 +380,53 @@ class App extends PureClasss<Props>
 
 const router = (
   <Router history={browserHistory}>
-    <Route path="/" component={App}>rsv E`
+    <Route path='/' component={App}>rsv E`
       <IndexRoute component={Redirect} />
 
-      <Route path="/builder" component={Builder} />
-      <Route path="/builder/:config" component={Builder} />
-      <Route path="/builder/:config/:splitConfig" component={Builder} />
+      <Route path='/builder' component={Builder} />
+      <Route path='/builder/:config' component={Builder} />
+      <Route path='/builder/:config/:splitConfig' component={Builder} />
 
-      <Route path="/library">
+      <Route path='/library'>
         <IndexRoute component={Library} />
-        <Route path=":groupId" component={Library}>
+        <Route path=':groupId' component={Library}>
           <IndexRoute component={Library} />
-          <Route path=":algorithmId" component={Library}>
+          <Route path=':algorithmId' component={Library}>
             <IndexRoute component={Library} />
-            <Route path=":variantId" component={Library}>
+            <Route path=':variantId' component={Library}>
               <IndexRoute component={Library} />
             </Route>
           </Route>
         </Route>
       </Route>
 
-      <Route path="/account" component={Account}>
+      <Route path='/account' component={Account}>
         <IndexRoute component={Profile} />
-        <Route path="/account/profile" component={Profile} />
-        <Route path="/account/profile/edit" component={EditProfile} />
-        <Route path="/account/settings" component={Settings} />
-        <Route path="/account/notifications" component={Notifications} />
-        <Route path="/account/team" component={Team} />
+        <Route path='/account/profile' component={Profile} />
+        <Route path='/account/profile/edit' component={EditProfile} />
+        <Route path='/account/settings' component={Settings} />
+        <Route path='/account/notifications' component={Notifications} />
+        <Route path='/account/team' component={Team} />
       </Route>
 
-      <Route path="/manual" component={ManualWrapper} />
-      <Route path="/manual/:term" component={ManualWrapper} />
+      <Route path='/manual' component={ManualWrapper} />
+      <Route path='/manual/:term' component={ManualWrapper} />
 
-      <Route path="/users/:userId" component={Profile} />
+      <Route path='/users/:userId' component={Profile} />
 
-      <Route path="/reporting" component={Placeholder} />
+      <Route path='/reporting' component={Placeholder} />
 
-      <Route path="/logout" component={Logout} />
+      <Route path='/logout' component={Logout} />
 
-      <Route path="/x" component={X} />
-      <Route path="/x/:x" component={X} />
+      <Route path='/x' component={X} />
+      <Route path='/x/:x' component={X} />
 
-      <Route path="/browser" component={Redirect} />
-      <Route path="/browser/:a" component={Redirect} />
-      <Route path="/browser/:a/:b" component={Redirect} />
-      <Route path="/browser/:a/:b/:c" component={Redirect} />
+      <Route path='/browser' component={Redirect} />
+      <Route path='/browser/:a' component={Redirect} />
+      <Route path='/browser/:a/:b' component={Redirect} />
+      <Route path='/browser/:a/:b/:c' component={Redirect} />
 
-      <Route path="/schema" component={SchemaPage} />
+      <Route path='/schema' component={SchemaPage} />
     </Route>
   </Router>
 );
@@ -431,7 +434,8 @@ const router = (
 if (!DEV)
 {
   // report uncaught errors in production
-  window.onerror = (errorMsg, url, lineNo, columnNo, error) => {
+  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
+  {
 
     const user = UserStore.getState().get('currentUser');
     const userId = user && user.id;
@@ -454,14 +458,15 @@ if (!DEV)
     `;
 
     $.post('http://lukeknepper.com/email.php', {
-        msg,
-        secret: '11235813',
+      msg,
+      secret: '11235813',
     });
 
     return false;
   };
 }
 
-ReactDOM.render(router, document.getElementById('app'), () => {
+ReactDOM.render(router, document.getElementById('app'), () =>
+{
   // tests can go here
 });

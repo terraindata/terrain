@@ -42,9 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -77,7 +79,7 @@ export interface Props
 
 class AlgorithmsColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     rendered: boolean,
     me: UserTypes.User,
     roles: RoleTypes.RoleMap,
@@ -93,7 +95,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     draggingOverIndex: -1,
   };
 
-  componentWillMount()
+  public componentWillMount()
   {
     this._subscribe(UserStore, {
       stateKey: 'me',
@@ -106,14 +108,14 @@ class AlgorithmsColumn extends PureClasss<Props>
     });
   }
 
-  componetDidMount()
+  public componetDidMount()
   {
     this.setState({
       rendered: true,
     });
   }
 
-  componentDidUpdate()
+  public componentDidUpdate()
   {
     if (!this.state.rendered)
     {
@@ -123,7 +125,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     if (nextProps.groupId !== this.props.groupId)
     {
@@ -133,7 +135,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
   }
 
-  handleDuplicate(id: ID)
+  public handleDuplicate(id: ID)
   {
     Actions.algorithms.duplicate(
       this.props.algorithms.get(id),
@@ -141,20 +143,20 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  handleArchive(id: ID)
+  public handleArchive(id: ID)
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
-        .set('status', LibraryTypes.ItemStatus.Archive) as Algorithm,
-      );
+        .set('status', ItemStatus.Archive) as Algorithm,
+    );
   }
 
-  handleCreate()
+  public handleCreate()
   {
     Actions.algorithms.create(this.props.groupId);
   }
 
-  handleNameChange(id: ID, name: string)
+  public handleNameChange(id: ID, name: string)
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
@@ -162,7 +164,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  handleHover(index: number, type: string, id: ID)
+  public handleHover(index: number, type: string, id: ID)
   {
     const itemIndex = this.props.algorithmsOrder.indexOf(id);
     if (type === 'algorithm'
@@ -176,9 +178,10 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
+  public handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
-    switch (targetType) {
+    switch (targetType)
+    {
       case 'group':
         if (shiftKey)
         {
@@ -215,39 +218,39 @@ class AlgorithmsColumn extends PureClasss<Props>
     });
   }
 
-  renderAlgorithm(id: ID, fadeIndex: number)
+  public renderAlgorithm(id: ID, fadeIndex: number)
   {
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
     const scores = {
-      [LibraryTypes.ItemStatus.Archive]:
+      [ItemStatus.Archive]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Archive),
+        color: LibraryTypes.colorForStatus(ItemStatus.Archive),
         name: 'Variants in Archived Status',
       },
-      [LibraryTypes.ItemStatus.Build]:
+      [ItemStatus.Build]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Build),
+        color: LibraryTypes.colorForStatus(ItemStatus.Build),
         name: 'Variants in Build Status',
       },
-      [LibraryTypes.ItemStatus.Approve]:
+      [ItemStatus.Approve]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Approve),
+        color: LibraryTypes.colorForStatus(ItemStatus.Approve),
         name: 'Variants in Approve Status',
       },
-      [LibraryTypes.ItemStatus.Live]:
+      [ItemStatus.Live]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Live),
+        color: LibraryTypes.colorForStatus(ItemStatus.Live),
         name: 'Variants in Live Status',
       },
-      [LibraryTypes.ItemStatus.Default]:
+      [ItemStatus.Default]:
       {
         score: 0,
-        color: LibraryTypes.colorForStatus(LibraryTypes.ItemStatus.Default),
+        color: LibraryTypes.colorForStatus(ItemStatus.Default),
         name: 'Variants in Default Status',
       },
     };
@@ -256,20 +259,20 @@ class AlgorithmsColumn extends PureClasss<Props>
       (v: Variant) =>
         v.algorithmId === id,
     );
-    
+
     variants.map(
       (v: Variant) =>
-        scores[v.status].score ++,
+        scores[v.status].score++,
     );
 
     // scores.splice(0, 1); // remove Archived count
 
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     const canArchive = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     const canDuplicate = canArchive;
     const canDrag = canArchive;
     const canEdit = canDrag; // ||
-      //(me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -287,7 +290,8 @@ class AlgorithmsColumn extends PureClasss<Props>
 
     let date = 'There are no variants';
     let userId: string | number = 'There are no variants';
-    if (lastTouched) {
+    if (lastTouched)
+    {
       date = lastTouched.lastEdited;
       userId = lastTouched.lastUserId;
     }
@@ -318,10 +322,10 @@ class AlgorithmsColumn extends PureClasss<Props>
         color={ColorManager.colorForKey(this.props.groupId)}
         key={algorithm.id}
         to={`/library/${this.props.groupId}/${algorithm.id}`}
-        className="library-item-lighter"
+        className='library-item-lighter'
         id={id}
         onNameChange={this.handleNameChange}
-        type="algorithm"
+        type='algorithm'
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
@@ -332,19 +336,19 @@ class AlgorithmsColumn extends PureClasss<Props>
         canArchive={canArchive}
         canDuplicate={canDuplicate}
       >
-        <div className="flex-container">
-          <UserThumbnail userId={userId} medium={true} extra={role}/>
-          <div className="flex-grow">
-            <div className="library-item-line">
+        <div className='flex-container'>
+          <UserThumbnail userId={userId} medium={true} extra={role} />
+          <div className='flex-grow'>
+            <div className='library-item-line'>
               <Scoreline
                 scores={_.values(scores)}
                 hideZeroes={true}
               />
             </div>
             <div
-              className="library-item-line"
+              className='library-item-line'
             >
-              { Util.formatDate(date) }
+              {Util.formatDate(date)}
 
             </div>
           </div>
@@ -353,80 +357,80 @@ class AlgorithmsColumn extends PureClasss<Props>
     );
   }
 
-  handleCategoryHover(statusString: string, id: ID)
+  public handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
-    const status = LibraryTypes.ItemStatus[statusString];
+    const status = ItemStatus[statusString];
     if (a.status !== status)
     {
       Actions.algorithms.change(a.set('status', status) as Algorithm);
     }
   }
 
-  renderCategory(status: LibraryTypes.ItemStatus)
+  public renderCategory(status: ItemStatus)
   {
-    const {algorithms} = this.props;
+    const { algorithms } = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
-    const {me, roles} = this.state;
-    const canCreate = true; //me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
-    
+    const { me, roles } = this.state;
+    const canCreate = true; // me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+
     return (
       <LibraryItemCategory
         status={status}
         key={status}
         onHover={this.handleCategoryHover}
-        type="algorithm"
-        titleHidden={status === LibraryTypes.ItemStatus.Build}
+        type='algorithm'
+        titleHidden={status === ItemStatus.Build}
       >
         {
           ids.map(this.renderAlgorithm)
         }
         {
-          ids.size === 0 && <div className="library-category-none">None</div>
+          ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
-          status === LibraryTypes.ItemStatus.Build && canCreate &&
-            <CreateItem
-              name="algorithm"
-              onCreate={this.handleCreate}
-            />
+          status === ItemStatus.Build && canCreate &&
+          <CreateItem
+            name='algorithm'
+            onCreate={this.handleCreate}
+          />
         }
       </LibraryItemCategory>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <LibraryColumn
         index={2}
-        title="Algorithms"
+        title='Algorithms'
       >
         {
           this.props.algorithmsOrder ?
             (
               this.props.algorithmsOrder.size ?
-              (
-                <div>
-                  {
-                    this.renderCategory('BUILD')
+                (
+                  <div>
+                    {
+                      this.renderCategory('BUILD')
+                    }
+                    {
+                      this.renderCategory('ARCHIVE')
+                    }
+                  </div>
+                )
+                :
+                <InfoArea
+                  large='No algorithms created, yet.'
+                  button={
+                    Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                      ? 'Create a algorithm' : null
                   }
-                  {
-                    this.renderCategory('ARCHIVE')
-                  }
-                </div>
-              )
-              :
-              <InfoArea
-                large="No algorithms created, yet."
-                button={
-                  Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
-                    ? 'Create a algorithm' : null
-                  }
-                onClick={this.handleCreate}
-              />
+                  onClick={this.handleCreate}
+                />
             )
-          : null
+            : null
         }
       </LibraryColumn>
     );

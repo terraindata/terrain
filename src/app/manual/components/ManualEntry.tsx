@@ -42,19 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ManualEntry.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './ManualEntry.less';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 import * as Immutable from 'immutable';
-import TQLConverter from '../../tql/TQLConverter';
-import BuilderTypes from './../../builder/BuilderTypes';
-import Card from './../../builder/components/cards/Card';
+import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import Card from './../../builder/components/cards/CardComponent';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');
 require('./../../tql/components/tql.js');
@@ -62,6 +62,8 @@ import './../../tql/components/codemirror.less';
 import './../../tql/components/monokai.less';
 
 const reactStringReplace = require('react-string-replace');
+
+import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {
@@ -78,7 +80,7 @@ export interface Props
 class ManualEntry extends Classs<Props>
 {
 
-  allTqlCards = BuilderTypes.cardList;
+  public allTqlCards = cardList;
 
   constructor(props: Props)
   {
@@ -86,28 +88,28 @@ class ManualEntry extends Classs<Props>
     this.state =
       {
         expanded: this.props.expanded,
-        manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[this.props.entryName] :
-          BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry,
+        // manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[this.props.entryName] :
+        //   Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry,
       };
   }
 
-  componentWillReceiveProps(newProps)
+  public componentWillReceiveProps(newProps)
   {
     this.setState({
       expanded: newProps.expanded,
-      manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[newProps.entryName] :
-        BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry,
+      // manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[newProps.entryName] :
+      //   Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry,
     });
   }
 
-  expand()
+  public expand()
   {
     this.setState({
       expanded: !this.state.expanded,
     });
   }
 
-  findKeywords(text, words, className)
+  public findKeywords(text, words, className)
   {
     const matchForm = new RegExp('(' + words.join('[^A-Za-z]|') + '[^A-Za-z])', 'gi');
 
@@ -123,14 +125,17 @@ class ManualEntry extends Classs<Props>
     return text;
   }
 
-  highlightKeyWords(text)
+  public highlightKeyWords(text)
   {
-    if (!text) return;
+    if (!text)
+    {
+      return;
+    }
     let keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
-    //Remove ( ) card
+    // Remove ( ) card
     const index = keywords.indexOf('( )');
     keywords.splice(index, 1);
-    //Separate multi-word keywords like 'Take Limit' into sep. keywords
+    // Separate multi-word keywords like 'Take Limit' into sep. keywords
     keywords = keywords.join(' ').split(' ');
 
     text = this.findKeywords(text, keywords, 'manual-entry-keyword');
@@ -143,92 +148,93 @@ class ManualEntry extends Classs<Props>
     );
   }
 
-  renderTqlCardEntryDetail()
+  public renderTqlCardEntryDetail()
   {
     return (
-      <div className="manual-entry-expanded-area">
-        <div className ="manual-entry-row">
-          <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.notation)}
-        </div>
-        <div className ="manual-entry-row">
-          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.syntax)}
-        </div>
-        <div className ="maunual-entry-indepth">
-           {this.renderInDepthDescription()}
+      <div className='manual-entry-expanded-area'>
+        <div className='manual-entry-row'>
+          <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.notation)}
+        </div>
+        <div className='manual-entry-row'>
+          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.syntax)}
+        </div>
+        <div className='maunual-entry-indepth'>
+          {this.renderInDepthDescription()}
         </div>
       </div>
-        );
+    );
   }
 
-  renderPhraseTypeEntryDetail()
+  public renderPhraseTypeEntryDetail()
   {
     return (
-      <div className="manual-entry-expanded-area">
-        <div className ="maunual-entry-indepth">
+      <div className='manual-entry-expanded-area'>
+        <div className='maunual-entry-indepth'>
           {this.renderPhraseTypeInDepth()}
         </div>
       </div>
     );
   }
 
-  renderPhraseTypeInDepth()
+  public renderPhraseTypeInDepth()
   {
     return (
       <div>
         {
-        this.state.manualEntry.text.map((result, index) => {
-          return (
-            <div key ={index} className="manual-entry-row">
-              {this.highlightKeyWords(result)}
-              <br/>
-            </div>
-          );
-        })
+          this.state.manualEntry.text.map((result, index) =>
+          {
+            return (
+              <div key={index} className='manual-entry-row'>
+                {this.highlightKeyWords(result)}
+                <br />
+              </div>
+            );
+          })
         }
       </div>
     );
   }
 
-  renderEntry()
+  public renderEntry()
   {
-    return(
+    return (
       <div>
-      <div className ="manual-entry-row">
-        <div
-          onClick={this.expand}
-          className="manual-entry-expand"
-        >
-          <ArrowIcon className = {classNames ({
-            'manual-entry-arrow-icon': true,
-            'manual-entry-arrow-icon-open': this.state.expanded,
-            'manual-entry-arrow-icon-green': this.props.phraseType,
+        <div className='manual-entry-row'>
+          <div
+            onClick={this.expand}
+            className='manual-entry-expand'
+          >
+            <ArrowIcon className={classNames({
+              'manual-entry-arrow-icon': true,
+              'manual-entry-arrow-icon-open': this.state.expanded,
+              'manual-entry-arrow-icon-green': this.props.phraseType,
             })}
-          />
-        </div>
-        <div className =
-          {classNames ({
-            'manual-entry-name': true,
-            'manual-entry-name-green': this.props.phraseType,
+            />
+          </div>
+          <div className=
+            {classNames({
+              'manual-entry-name': true,
+              'manual-entry-name-green': this.props.phraseType,
             })}
-          onClick={this.expand} >
-          {this.props.entryName}
+            onClick={this.expand} >
+            {this.props.entryName}
+          </div>
         </div>
-      </div>
 
-      <div className ="manual-entry-summary">
-        {this.highlightKeyWords(this.state.manualEntry.summary)}
+        <div className='manual-entry-summary'>
+          {this.highlightKeyWords(this.state.manualEntry.summary)}
+        </div>
       </div>
-    </div>
     );
   }
 
-  renderCardExample(index)
+  public renderCardExample(index)
   {
     return <div>Temporarily disabled</div>;
-    // if(BuilderTypes.Blocks[this.state.manualEntry.text[index].type])
+    // if(Blocks[this.state.manualEntry.text[index].type])
     // {
-    //   var card = BuilderTypes.make(
-    //     BuilderTypes.Blocks[this.state.manualEntry.text[index].type],
+    //   var card = BlockUtils.make(
+    //     Blocks[this.state.manualEntry.text[index].type],
     //     this.state.manualEntry.text[index]
     //   );
     //   return (
@@ -248,7 +254,7 @@ class ManualEntry extends Classs<Props>
     // }
   }
 
-  renderCodeMirrorExample(index)
+  public renderCodeMirrorExample(index)
   {
     return <div>Temporarily disabled</div>;
     // var options = {
@@ -258,7 +264,7 @@ class ManualEntry extends Classs<Props>
     //   foldGutter: true,
     //   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     // }
-    // var cards = Immutable.List([BuilderTypes.recordFromJS(this.state.manualEntry.text[index])]);
+    // var cards = Immutable.List([BlockUtils.recordFromJS(this.state.manualEntry.text[index])]);
     // var query: any = {
     //   id: 'a',
     //   cards: cards,
@@ -274,7 +280,7 @@ class ManualEntry extends Classs<Props>
     //   isDefault: false,
     // };
 
-    // var value = TQLConverter.toTQL(query);
+    // var value = .toTQL(query);
 
     // var numLines = value.split('\n').length;
     // var padding = numLines === 1 ? 2 : 8;
@@ -291,71 +297,73 @@ class ManualEntry extends Classs<Props>
     // );
   }
 
-  renderInDepthDescription()
+  public renderInDepthDescription()
   {
     return (
-        <div>
+      <div>
         {
-          Object.keys(this.state.manualEntry.text).map((result, index) => {
+          Object.keys(this.state.manualEntry.text).map((result, index) =>
+          {
             if (typeof this.state.manualEntry.text[index] === 'string')
             {
               return (
-                <div key ={index}>
-                {
-                  this.highlightKeyWords(this.state.manualEntry.text[index])
-                }
-                <br/>
+                <div key={index}>
+                  {
+                    this.highlightKeyWords(this.state.manualEntry.text[index])
+                  }
+                  <br />
                 </div>
-                );
+              );
             }
-            else {
+            else
+            {
               return (
-                 <div
-                   key ={index}
-                    className={classNames({
-                      'manual-entry-demo-box': true,
-                      'manual-entry-in-depth': !this.props.manualTab,
-                    })}
-                 >
-                   {this.state.manualEntry.text[index].title ? <b className ="manual-entry-demo-title"> {this.state.manualEntry.text[index].title} </b> : null}
-                   {this.renderCardExample(index)}
-                   {this.renderCodeMirrorExample(index)}
+                <div
+                  key={index}
+                  className={classNames({
+                    'manual-entry-demo-box': true,
+                    'manual-entry-in-depth': !this.props.manualTab,
+                  })}
+                >
+                  {this.state.manualEntry.text[index].title ? <b className='manual-entry-demo-title'> {this.state.manualEntry.text[index].title} </b> : null}
+                  {this.renderCardExample(index)}
+                  {this.renderCodeMirrorExample(index)}
 
-                 </div>
+                </div>
               );
             }
           })
         }
-        </div>
-    );
-  }
-
-  renderTqlCardEntry()
-  {
-    return (
-        <div>
-          {this.renderEntry()}
-          {this.state.expanded ? this.renderTqlCardEntryDetail() : null }
-        </div>
-    );
-  }
-
-  renderPhraseTypeEntry()
-  {
-    return (
-      <div>
-        {this.renderEntry()}
-         {this.state.expanded ? this.renderPhraseTypeEntryDetail() : null }
       </div>
     );
   }
 
-  render()
+  public renderTqlCardEntry()
   {
     return (
-      <div className ="manual-entry">
+      <div>
+        {this.renderEntry()}
+        {this.state.expanded ? this.renderTqlCardEntryDetail() : null}
+      </div>
+    );
+  }
+
+  public renderPhraseTypeEntry()
+  {
+    return (
+      <div>
+        {this.renderEntry()}
+        {this.state.expanded ? this.renderPhraseTypeEntryDetail() : null}
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div className='manual-entry'>
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
-        {this.props.bottomLine ? <hr className ="manual-entry-line"/> : null}
+        {this.props.bottomLine ? <hr className='manual-entry-line' /> : null}
       </div>
     );
   }

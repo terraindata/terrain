@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountEntry.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import './AccountEntry.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 export interface Props
@@ -71,14 +72,14 @@ class AccountEntry extends Classs<Props>
       };
   }
 
-  expand()
+  public expand()
   {
     this.setState({
       expanded: !this.state.expanded,
     });
   }
 
-  renderContent()
+  public renderContent()
   {
     if (this.state.expanded)
     {
@@ -86,24 +87,24 @@ class AccountEntry extends Classs<Props>
     }
   }
 
-  renderDescription()
+  public renderDescription()
   {
     if (this.props.description)
-     {
-      return <div className="account-entry-description">{this.props.description}</div>;
+    {
+      return <div className='account-entry-description'>{this.props.description}</div>;
     }
   }
 
-  renderDefaultButton()
+  public renderDefaultButton()
   {
     return (
-        <div className="account-entry-expand-button button" onClick={this.expand}>
-            {this.state.expanded ? 'Collapse' : 'Expand'}
-        </div>
-      );
+      <div className='account-entry-expand-button button' onClick={this.expand}>
+        {this.state.expanded ? 'Collapse' : 'Expand'}
+      </div>
+    );
   }
 
-  renderButton()
+  public renderButton()
   {
     if (this.props.buttonText)
     {
@@ -116,31 +117,32 @@ class AccountEntry extends Classs<Props>
     return this.renderDefaultButton();
   }
 
-  renderLine()
+  public renderLine()
   {
     if (!this.props.lastEntry)
     {
-      return (<hr className ="account-entry-line"/>);
+      return (<hr className='account-entry-line' />);
     }
-    return <hr className ="account-entry-line settings-line-hidden"/>;
+    return <hr className='account-entry-line settings-line-hidden' />;
   }
 
-  render() {
+  public render()
+  {
     return (
-      <div className="account-entry">
-      <div className="account-entry-top-bar">
-        <div className="account-entry-title">
-          {this.props.title}
+      <div className='account-entry'>
+        <div className='account-entry-top-bar'>
+          <div className='account-entry-title'>
+            {this.props.title}
+          </div>
+          <div className='account-entry-white-space' />
+          {this.renderButton()}
         </div>
-        <div className="account-entry-white-space" />
-        {this.renderButton()}
+        {this.renderDescription()}
+        <div className='account-entry-expanded-info'>
+          {this.renderContent()}
+        </div>
+        {this.renderLine()}
       </div>
-      {this.renderDescription()}
-      <div className="account-entry-expanded-info">
-        {this.renderContent()}
-      </div>
-      {this.renderLine()}
-    </div>
     );
   }
 }

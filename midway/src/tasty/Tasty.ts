@@ -88,6 +88,11 @@ export class Tasty
     this.db = database;
   }
 
+  public getController(): DatabaseController
+  {
+    return this.controller;
+  }
+
   public getDB(): TastyDB
   {
     return this.db;

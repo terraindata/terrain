@@ -42,13 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import UserThumbnail from '../../users/components/UserThumbnail';
-import Util from  '../../util/Util';
+import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 
-import BuilderTypes from '../../builder/BuilderTypes';
 import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
 
@@ -56,35 +57,34 @@ const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
-const {ItemStatus} = LibraryTypes;
-
 const TEXT =
+  {
+    live:
+    {
+      main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, and it will be accessible for production queries.',
+      confirm: 'I approve of deploying this TQL to Live for this variant.',
+      button: 'Deploy to Live',
+    },
+
+    default:
+    {
+      main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, it will be indexed, and it will be accessible for production queries.',
+      confirm: 'I approve of deploying this TQL to Live for this variant, and making it the Default for this algorithm.',
+      button: 'Deploy to Live and Make Default',
+    },
+
+    notLive:
+    {
+      main: 'You are removing the following variant from Live. Its TQL will be removed from production servers, and it will not be accessible for production queries.',
+      confirm: 'I approve of removing this TQL from Live for this variant.',
+      button: 'Remove from Live',
+    },
+  };
+
+export interface Props
 {
-  live:
-  {
-    main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, and it will be accessible for production queries.',
-    confirm: 'I approve of deploying this TQL to Live for this variant.',
-    button: 'Deploy to Live',
-  },
-
-  default:
-  {
-    main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, it will be indexed, and it will be accessible for production queries.',
-    confirm: 'I approve of deploying this TQL to Live for this variant, and making it the Default for this algorithm.',
-    button: 'Deploy to Live and Make Default',
-  },
-
-  notLive:
-  {
-    main: 'You are removing the following variant from Live. Its TQL will be removed from production servers, and it will not be accessible for production queries.',
-    confirm: 'I approve of removing this TQL from Live for this variant.',
-    button: 'Remove from Live',
-  },
-};
-
-export interface Props {
   variant: LibraryTypes.Variant;
-  status: LibraryTypes.ItemStatus;
+  status: ItemStatus;
   defaultChecked: boolean;
   defaultVariant: LibraryTypes.Variant;
   onDefaultCheckedChange(defaultChecked: boolean);
@@ -93,13 +93,13 @@ export interface Props {
 
 class DeployModalColumn extends PureClasss<Props>
 {
-  state: {
+  public state: {
     confirmChecked: boolean;
   } = {
     confirmChecked: false,
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.variant !== this.props.variant || nextProps.status !== this.props.status)
     {
@@ -109,7 +109,7 @@ class DeployModalColumn extends PureClasss<Props>
     }
   }
 
-  handleDefaultCheckedChange(c)
+  public handleDefaultCheckedChange(c)
   {
     this.props.onDefaultCheckedChange(!this.props.defaultChecked);
     this.setState({
@@ -117,21 +117,21 @@ class DeployModalColumn extends PureClasss<Props>
     });
   }
 
-  handleConfirmCheckedChange(c)
+  public handleConfirmCheckedChange(c)
   {
     this.setState({
       confirmChecked: !this.state.confirmChecked,
     });
   }
 
-  handleDeploy()
+  public handleDeploy()
   {
     this.props.onDeploy();
   }
 
-  render()
+  public render()
   {
-    const {variant, status} = this.props;
+    const { variant, status } = this.props;
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
@@ -150,74 +150,74 @@ class DeployModalColumn extends PureClasss<Props>
 
     return (
       <div
-        className="deploy-modal-deploy-column"
+        className='deploy-modal-deploy-column'
       >
-        <div className="deploy-modal-message">
+        <div className='deploy-modal-message'>
           {
             text.main
           }
         </div>
-        <div className="deploy-modal-info">
-          <div className="deploy-modal-info-row">
+        <div className='deploy-modal-info'>
+          <div className='deploy-modal-info-row'>
             <GroupIcon
-              className="deploy-modal-info-icon"
+              className='deploy-modal-info-icon'
             />
-            <div className="deploy-modal-info-name">
+            <div className='deploy-modal-info-name'>
               {
                 group.name
               }
             </div>
           </div>
-          <div className="deploy-modal-info-row">
+          <div className='deploy-modal-info-row'>
             <AlgorithmIcon
-              className="deploy-modal-info-icon"
+              className='deploy-modal-info-icon'
             />
-            <div className="deploy-modal-info-name">
+            <div className='deploy-modal-info-name'>
               {
                 algorithm.name
               }
             </div>
           </div>
-          <div className="deploy-modal-info-row">
+          <div className='deploy-modal-info-row'>
             <VariantIcon
-              className="deploy-modal-info-icon"
+              className='deploy-modal-info-icon'
             />
-            <div className="deploy-modal-info-name">
+            <div className='deploy-modal-info-name'>
               {
                 variant.name
               }
             </div>
           </div>
-          <div className="deploy-modal-info-row-lower">
-            <span className="deploy-modal-info-bold">
+          <div className='deploy-modal-info-row-lower'>
+            <span className='deploy-modal-info-bold'>
               <UserThumbnail
                 userId={variant.lastUserId}
                 showName={true}
               />
             </span>
           </div>
-          <div className="deploy-modal-info-row-lower">
-            <span className="deploy-modal-info-bold">
+          <div className='deploy-modal-info-row-lower'>
+            <span className='deploy-modal-info-bold'>
               {
                 Util.formatDate(variant.lastEdited)
               }
             </span>
           </div>
-          <div className="deploy-modal-info-row-lower deploy-modal-info-status-row">
+          <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
             <span>
               Current status:
             </span>
-            <span className="deploy-modal-info-bold">
+            <span className='deploy-modal-info-bold'>
               {
                 ItemStatus[variant.status]
               }
             </span>
           </div>
-          <div className="deploy-modal-info-row-lower">
+          <div className='deploy-modal-info-row-lower'>
             <span>
               Changing to status:
             </span>
-            <span className="deploy-modal-info-bold">
+            <span className='deploy-modal-info-bold'>
               {
                 ItemStatus[status]
               }
@@ -227,46 +227,46 @@ class DeployModalColumn extends PureClasss<Props>
         {
           false && /* temp disable */
           status === ItemStatus.Live &&
-            <div>
-              <div
-                className={classNames({
-                  'deploy-modal-check-wrapper': true,
-                  'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
-                })}
+          <div>
+            <div
+              className={classNames({
+                'deploy-modal-check-wrapper': true,
+                'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
+              })}
+            >
+              <input
+                type='checkbox'
+                checked={this.props.defaultChecked}
+                onChange={this.handleDefaultCheckedChange}
+                id='deploy-modal-default-check'
+              />
+              <label
+                htmlFor='deploy-modal-default-check'
               >
-                <input
-                  type="checkbox"
-                  checked={this.props.defaultChecked}
-                  onChange={this.handleDefaultCheckedChange}
-                  id="deploy-modal-default-check"
-                />
-                <label
-                  htmlFor="deploy-modal-default-check"
-                >
-                  Make default for algorithm <b>{algorithm.name}</b>
-                </label>
-              </div>
-              {
-                this.props.defaultChecked &&
-                  <div
-                    className="info"
-                  >
-                    <b>{variant.name}</b> will be served for any requests to algorithm <b>{algorithm.name}.</b> &nbsp;
+                Make default for algorithm <b>{algorithm.name}</b>
+              </label>
+            </div>
+            {
+              this.props.defaultChecked &&
+              <div
+                className='info'
+              >
+                <b>{variant.name}</b> will be served for any requests to algorithm <b>{algorithm.name}.</b> &nbsp;
                     {
-                      this.props.defaultVariant
-                      ?
-                        <span>
-                          This will replace the current default variant <b>{this.props.defaultVariant.name}</b>,
+                  this.props.defaultVariant
+                    ?
+                    <span>
+                      This will replace the current default variant <b>{this.props.defaultVariant.name}</b>,
                           which will remain Live.
                         </span>
-                      :
-                        <span>
-                          There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
+                    :
+                    <span>
+                      There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
                         </span>
-                    }
-                  </div>
-              }
-            </div>
+                }
+              </div>
+            }
+          </div>
         }
         <div
           className={classNames({
@@ -275,13 +275,13 @@ class DeployModalColumn extends PureClasss<Props>
           })}
         >
           <input
-            type="checkbox"
+            type='checkbox'
             checked={this.state.confirmChecked}
             onChange={this.handleConfirmCheckedChange}
-            id="deploy-modal-confirm-check"
+            id='deploy-modal-confirm-check'
           />
           <label
-            htmlFor="deploy-modal-confirm-check"
+            htmlFor='deploy-modal-confirm-check'
           >
             {
               text.confirm

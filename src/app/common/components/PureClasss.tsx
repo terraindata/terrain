@@ -42,19 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as _ from 'underscore';
-import BuilderTypes from '../../builder/BuilderTypes';
 import Classs from './Classs';
 const shallowCompare = require('react-addons-shallow-compare');
 
 class PureClasss<T> extends Classs<T>
 {
-  props: T;
-  _debugUpdates = false;
-  _debugName = 'Not set';
+  public props: T;
+  public _debugUpdates = false;
+  public _debugName = 'Not set';
 
-  shouldComponentUpdate(nextProps: T, nextState: any)
+  public shouldComponentUpdate(nextProps: T, nextState: any)
   {
     const shouldUpdate = shallowCompare(this, nextProps, nextState);
 
@@ -67,7 +67,7 @@ class PureClasss<T> extends Classs<T>
     return shouldUpdate;
   }
 
-  _compareSets(first: any, second: any, setName: string)
+  public _compareSets(first: any, second: any, setName: string)
   {
     const firstKeys = _.keys(first);
     for (const key of firstKeys)
@@ -85,12 +85,6 @@ class PureClasss<T> extends Classs<T>
       }
     }
   }
-
-  // TODO
-  // _myKeyPath(el: BuilderTypes.KeyPathClass)
-  // {
-  //   return this._ikeyPath(el.keyPath, el.id);
-  // }
 }
 
 export default PureClasss;

@@ -42,14 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
-import {LibraryState} from './LibraryStore';
-const {ItemStatus} = LibraryTypes;
+import { LibraryState } from './LibraryStore';
 
-const Immutable = require('immutable');
+import * as Immutable from 'immutable';
 
 const LibraryReducers = {};
 
@@ -57,7 +58,7 @@ const removeItem = (state: LibraryState, id: ID, parentKeyPath: Array<string | I
   state.removeIn([type + 's', id])
     .updateIn(parentKeyPath.concat([type + 'sOrder']), (order) =>
       order.filter((value) => value !== id),
-    );
+  );
 
 const removeVariant = (state: LibraryState, variant) =>
   removeItem(state, variant.id, ['algorithms', variant.algorithmId], 'variant');
@@ -66,10 +67,11 @@ const removeAlgorithm = (state: LibraryState, algorithm) =>
 const removeGroup = (state: LibraryState, group) =>
   removeItem(state, group.id, [], 'group');
 
-const addItem = (state: LibraryState, item, parentKeyPath: Array<string | ID>, type: string, index?: number) => {
+const addItem = (state: LibraryState, item, parentKeyPath: Array<string | ID>, type: string, index?: number) =>
+{
   state = state.setIn([type + 's', item.id], item)
     .updateIn(parentKeyPath.concat([type + 'sOrder']),
-      (order) => order.splice(index === undefined ? order.size : index, 0, item.id));
+    (order) => order.splice(index === undefined ? order.size : index, 0, item.id));
   return state;
 };
 
@@ -102,7 +104,7 @@ LibraryReducers[ActionTypes.algorithms.create] =
   {
     return addAlgorithm(
       state,
-      action.payload.algorithm
+      action.payload.algorithm,
     );
   };
 
@@ -116,7 +118,7 @@ LibraryReducers[ActionTypes.algorithms.change] =
 LibraryReducers[ActionTypes.algorithms.move] =
   (state, action) =>
   {
-    const {algorithm, groupId} = action.payload;
+    const { algorithm, groupId } = action.payload;
     if (groupId !== algorithm.groupId)
     {
       state = state.update('variants',
@@ -134,9 +136,9 @@ LibraryReducers[ActionTypes.algorithms.move] =
     }
 
     return addAlgorithm(
-        removeAlgorithm(state, algorithm),
-        algorithm.set('groupId', groupId).set('parent', groupId),
-        action.payload.index,
+      removeAlgorithm(state, algorithm),
+      algorithm.set('groupId', groupId).set('parent', groupId),
+      action.payload.index,
     );
   };
 
@@ -146,7 +148,7 @@ LibraryReducers[ActionTypes.variants.create] =
   }>) =>
     addVariant(
       state,
-      action.payload.variant
+      action.payload.variant,
     );
 
 LibraryReducers[ActionTypes.variants.change] =
@@ -159,7 +161,7 @@ LibraryReducers[ActionTypes.variants.change] =
 LibraryReducers[ActionTypes.variants.status] =
   (state, action) =>
   {
-    let {variant, status, confirmed} = action.payload;
+    const { variant, status, confirmed } = action.payload;
 
     if (variant === null)
     {
@@ -187,21 +189,21 @@ LibraryReducers[ActionTypes.variants.status] =
           variants.map(
             (v: LibraryTypes.Variant) =>
             {
-              if(v.algorithmId === variant.algorithmId && v.status === 'DEFAULT')
+              if (v.algorithmId === variant.algorithmId && v.status === 'DEFAULT')
               {
                 return v.set('status', 'LIVE');
               }
               return v;
-            }
+            },
           ),
-        );
+      );
     }
 
     return state
       .updateIn(
-        ['variants', variant.id],
-        (v) => v.set('status', status),
-      )
+      ['variants', variant.id],
+      (v) => v.set('status', status),
+    )
       .set('changingStatus', false);
   };
 
@@ -213,7 +215,7 @@ LibraryReducers[ActionTypes.variants.move] =
         .set('groupId', action.payload.groupId)
         .set('algorithmId', action.payload.algorithmId)
         .set('parent', action.payload.algorithmId),
-      action.payload.index
+      action.payload.index,
     );
 
 LibraryReducers[ActionTypes.loadState] =
@@ -224,7 +226,7 @@ LibraryReducers[ActionTypes.loadState] =
       .set('prevGroups', action.payload.state.groups)
       .set('prevAlgorithms', action.payload.state.algorithms)
       .set('prevVariants', action.payload.state.variants)
-      ;
+  ;
 
 LibraryReducers[ActionTypes.setDbs] =
   (state, action) =>

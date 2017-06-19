@@ -42,15 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
-const Immutable = require('immutable');
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import Util from './../../util/Util';
 
 const AuthActionTypes =
-{
-  login: '',
-  logout: '',
-};
+  {
+    login: '',
+    logout: '',
+  };
 
 Util.setValuesToKeys(AuthActionTypes, '');
 

@@ -42,20 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
+// Copyright 2017 Terrain Data, Inc.
+import * as _ from 'underscore';
 import ActionTypes from './AuthActionTypes';
 import Store from './AuthStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
 const AuthActions =
-{
-  login:
+  {
+    login:
     (accessToken: string, id: number) =>
       $(ActionTypes.login, { accessToken, id }),
-  logout:
+    logout:
     () =>
       $(ActionTypes.logout, null),
-};
+  };
 
 export default AuthActions;

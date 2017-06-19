@@ -84,7 +84,6 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * `yarn`
 * `yarn global add webpack-dev-server`
 * `yarn start` - starts the Midway server, now running at localhost:3000
-  * You may need to copy a valid sqlite db file into nodeway.db: `cp midway/test/scripts/nodewaytest.db nodeway.db`
 * `yarn run start-front` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
 * Alternatively, `yarn run start-front-m1` will run the front-end pointed at Midway 1 (in Go)
@@ -116,7 +115,8 @@ To setup a node project using typescript for debugging inside webstorm:
   * Set any other args or options you like
   * Now you can run the script inside Webstorm!
   * To debug an npm script add `$NODE_DEBUG_OPTION` to the command line: http://pavelpolyakov.com/2016/05/01/webstorm-npm-tasks-debug/
-  * To run & debug jest tests with teh integrated jest runner, add a run/debug configuration of type `jest` in the root source directory
+  * To run & debug jest tests with the integrated jest runner, add a run/debug configuration of type `jest` in the root source directory
+  * To debug frontline in webstorm, follow the steps here: https://blog.jetbrains.com/webstorm/2017/01/debugging-react-apps/
 
 
 ## Major Dependencies
@@ -398,6 +398,7 @@ console.log(catchphrase); // ERROR: cannot find name catchphrase
 
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
 - Do not call any methods that fetch data from the server and then update a redux store (e.g. `Actions.fetch()`) from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method). You can put these in `componentDidMount`
+- `key` is a reserved name in props, so you can't use it as a prop in your component.
 
 #### ES6 gotchas
 

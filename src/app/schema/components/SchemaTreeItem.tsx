@@ -43,9 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as React from 'react';
-import {SchemaActions, SchemaStore} from '../data/SchemaStore';
+import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import {columnChildrenConfig, ColumnTreeInfo} from './items/ColumnTreeInfo';
@@ -59,7 +58,8 @@ const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 import FadeInOut from '../../common/components/FadeInOut';
 import SchemaTreeList from './SchemaTreeList';
 
-export interface Props {
+export interface Props
+{
   id: ID;
   type: string;
   search: string;
@@ -67,7 +67,8 @@ export interface Props {
   inSearchResults?: boolean;
 }
 
-class State {
+class State
+{
   public open: boolean = false;
   public item: SchemaTypes.SchemaBaseClass = null;
   public childCount: number = -1;
@@ -82,54 +83,65 @@ const typeToRendering: {
     canSelect: boolean,
   },
 } = {
-  server: {
+  server:
+  {
     component: ServerTreeInfo,
     childConfig: serverChildrenConfig,
     canSelect: false,
   },
-  database: {
-    component: DatabaseTreeInfo,
-    childConfig: databaseChildrenConfig,
-    canSelect: false,
-  },
+  database:
+    {
+      component: DatabaseTreeInfo,
+      childConfig: databaseChildrenConfig,
+      canSelect: false,
+    },
 
-  table: {
-    component: TableTreeInfo,
-    childConfig: tableChildrenConfig,
-    canSelect: true,
-  },
+    table:
+    {
+      component: TableTreeInfo,
+      childConfig: tableChildrenConfig,
+      canSelect: true,
+    },
 
-  column: {
-    component: ColumnTreeInfo,
-    childConfig: columnChildrenConfig,
-    canSelect: true,
-  },
+    column:
+    {
+      component: ColumnTreeInfo,
+      childConfig: columnChildrenConfig,
+      canSelect: true,
+    },
 
-  index: {
-    component: IndexTreeInfo,
-    childConfig: indexChildrenConfig,
-    canSelect: true,
-  },
-};
+    index:
+    {
+      component: IndexTreeInfo,
+      childConfig: indexChildrenConfig,
+      canSelect: true,
+    },
+  };
 
 @Radium
-class SchemaTreeItem extends PureClasss<Props> {
+class SchemaTreeItem extends PureClasss<Props>
+{
   public state: State = new State();
+
   public lastHeaderClickTime: number = 0;
   public lastArrowClickTime: number = 0;
 
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
 
     this._subscribe(SchemaStore, {
       stateKey: 'item',
-      storeKeyPath: [SchemaTypes.typeToStoreKey[this.props.type], this.props.id],
+      storeKeyPath:
+      [SchemaTypes.typeToStoreKey[this.props.type], this.props.id],
 
-      updater: (state: SchemaTypes.SchemaState) => {
+      updater: (state: SchemaTypes.SchemaState) =>
+      {
         if (this.state.childCount === -1) // assumes that schema data does not change
         {
           const item = state.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
-          if (item) {
+          if (item)
+          {
             let childCount = 0;
             typeToRendering[item['type']].childConfig.map(
               (section) =>
@@ -143,10 +155,11 @@ class SchemaTreeItem extends PureClasss<Props> {
         }
 
         const isHighlighted = this.props.id === state.highlightedId
-          && !!this.props.inSearchResults == state.highlightedInSearchResults;
+          && !!this.props.inSearchResults === state.highlightedInSearchResults;
         const isSelected = this.props.id === state.selectedId;
 
-        if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected) {
+        if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
+        {
           this.setState({
             isHighlighted,
             isSelected,
@@ -156,14 +169,17 @@ class SchemaTreeItem extends PureClasss<Props> {
     });
   }
 
-  public renderItemInfo() {
-    const {item} = this.state;
+  public renderItemInfo()
+  {
+    const { item } = this.state;
 
-    if (!item) {
+    if (!item)
+    {
       return null;
     }
 
-    if (typeToRendering[item.type]) {
+    if (typeToRendering[item.type])
+    {
       const Comp = typeToRendering[item.type].component;
       return (
         <Comp
@@ -175,17 +191,20 @@ class SchemaTreeItem extends PureClasss<Props> {
     return <div>No item type information</div>;
   }
 
-  public renderItemChildren() {
-    const {item} = this.state;
+  public renderItemChildren()
+  {
+    const { item } = this.state;
 
-    if (!this.state.open) {
+    if (!this.state.open)
+    {
       return null;
     }
 
-    if (!item) {
+    if (!item)
+    {
       return (
         <div
-          className="loading-text"
+          className='loading-text'
         />
       );
     }
@@ -213,19 +232,23 @@ class SchemaTreeItem extends PureClasss<Props> {
     );
   }
 
-  public handleHeaderClick() {
+  public handleHeaderClick()
+  {
     const time = (new Date()).getTime();
-    if (time - this.lastHeaderClickTime > 1000) {
+    if (time - this.lastHeaderClickTime > 1000)
+    {
       this.lastHeaderClickTime = time;
-      const {item, isSelected} = this.state;
-      if (!isSelected) {
+      const { item, isSelected } = this.state;
+      if (!isSelected)
+      {
         this.setState({
           isSelected: true,
           // open: !this.state.open, // need to decide whether or not to keep this in
         });
         SchemaActions.selectId(this.props.id);
       }
-      else {
+      else
+      {
         this.setState({
           isSelected: false,
         });
@@ -245,7 +268,8 @@ class SchemaTreeItem extends PureClasss<Props> {
     // }
   }
 
-  public handleArrowClick(event) {
+  public handleArrowClick(event)
+  {
     this.setState({
       open: !this.state.open,
     });
@@ -254,8 +278,10 @@ class SchemaTreeItem extends PureClasss<Props> {
     // used to stop triggering of double click handler
   }
 
-  public handleHeaderDoubleClick(event) {
-    if ((new Date()).getTime() - this.lastArrowClickTime > 100) {
+  public handleHeaderDoubleClick(event)
+  {
+    if ((new Date()).getTime() - this.lastArrowClickTime > 100)
+    {
       // ^ need to double check this wasn't trigged for the arrow
       this.setState({
         open: !this.state.open,
@@ -264,15 +290,18 @@ class SchemaTreeItem extends PureClasss<Props> {
     }
   }
 
-  public renderName() {
-    const {item} = this.state;
+  public renderName()
+  {
+    const { item } = this.state;
 
-    let nameText: string | El = <span className="loading-text"/>;
+    let nameText: string | El = <span className='loading-text' />;
 
-    if (item) {
-      if (this.props.search) {
+    if (item)
+    {
+      if (this.props.search)
+      {
         // show search details
-        const {name} = item;
+        const { name } = item;
         const searchStartIndex = item.name.indexOf(this.props.search);
         const searchEndIndex = searchStartIndex + this.props.search.length;
         nameText = (
@@ -282,7 +311,8 @@ class SchemaTreeItem extends PureClasss<Props> {
                 (type) => {
                   const id = item[type + 'Id'];
 
-                  if (id) {
+                  if (id)
+                  {
                     const parentItem = SchemaStore.getState().getIn([type + 's', id]);
                     return parentItem && parentItem.name + ' > ';
                   }
@@ -306,7 +336,8 @@ class SchemaTreeItem extends PureClasss<Props> {
           </div>
         );
       }
-      else {
+      else
+      {
         // show plain name
         nameText = item.name;
       }
@@ -323,8 +354,9 @@ class SchemaTreeItem extends PureClasss<Props> {
     );
   }
 
-  public render() {
-    const {item, isSelected, isHighlighted} = this.state;
+  public render()
+  {
+    const { item, isSelected, isHighlighted } = this.state;
 
     const showing = SchemaTypes.searchIncludes(item, this.props.search);
 
@@ -334,12 +366,12 @@ class SchemaTreeItem extends PureClasss<Props> {
       >
         <FadeInOut
           open={showing}
-          key="one"
+          key='one'
         >
           {
             showing &&
             <div
-              data-rel="schema-item"
+              data-rel='schema-item'
               data-id={this.props.id}
               data-search={this.props.inSearchResults}
             >
@@ -377,7 +409,7 @@ class SchemaTreeItem extends PureClasss<Props> {
 
         <FadeInOut
           open={this.state.open}
-          key="two"
+          key='two'
         >
           {
             this.renderItemChildren()

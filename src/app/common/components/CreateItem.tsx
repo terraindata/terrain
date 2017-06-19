@@ -42,9 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CreateItem.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
+import './CreateItem.less';
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props
@@ -55,10 +56,10 @@ export interface Props
 
 class CreateItem extends Classs<Props>
 {
-  render()
+  public render()
   {
     return (
-      <div className="create-item" onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
+      <div className='create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
         <AddIcon />
       </div>
     );

@@ -42,8 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
-const Immutable = require('immutable');
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import Util from './../../util/Util';
 
 const create = '';
@@ -52,36 +53,36 @@ const move = '';
 const duplicate = '';
 
 export let LibraryActionTypes =
-{
-  groups:
   {
-    create, change, move,
-    // duplicate,
-  },
+    groups:
+    {
+      create, change, move,
+      // duplicate,
+    },
 
-  algorithms:
-  {
-    create, change, move,
-  },
+    algorithms:
+    {
+      create, change, move,
+    },
 
-  variants:
-  {
-    create, change, move,
-    status: '',
-    fetchVersion: '',
-    loadVersion: '',
-  },
+    variants:
+    {
+      create, change, move,
+      status: '',
+      fetchVersion: '',
+      loadVersion: '',
+    },
 
-  loadState: '',
-  setDbs: '',
-};
+    loadState: '',
+    setDbs: '',
+  };
 
 Util.setValuesToKeys(LibraryActionTypes, '');
 
 export const CleanLibraryActionTypes = // not dirty
-[
-  LibraryActionTypes.loadState,
-  LibraryActionTypes.setDbs,
-];
+  [
+    LibraryActionTypes.loadState,
+    LibraryActionTypes.setDbs,
+  ];
 
 export default LibraryActionTypes;

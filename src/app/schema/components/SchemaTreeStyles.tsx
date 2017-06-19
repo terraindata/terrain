@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as _ from 'underscore';
 import Styles from '../../Styles';
 const color = require('color');
@@ -76,7 +75,9 @@ const SchemaTreeStyles =
 
     label: Styles.font.semiBoldNormal,
 
-    none: {},
+    none: {
+
+    },
 
     treeItem: [
       Styles.transition,
@@ -110,17 +111,19 @@ const SchemaTreeStyles =
         background: headerHighlightedColor,
       },
     },
-      Styles.transition,
+    Styles.transition,
     ],
 
-    treeItemHeaderSelected: {
+    treeItemHeaderSelected:
+    {
       'background': headerSelectedColor,
       ':hover': {
         background: headerSelectedColor,
       },
     },
 
-    treeItemHeaderHighlighted: {
+    treeItemHeaderHighlighted:
+    {
       background: headerHighlightedColor,
     },
 
@@ -149,7 +152,9 @@ const SchemaTreeStyles =
       search: Styles.transition,
     },
 
-    childSection: {},
+    childSection: {
+
+    },
 
     // SchemaTreeInfo
     infoPieces: {

@@ -42,7 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Autocomplete.less');
+// Copyright 2017 Terrain Data, Inc.
+import './Autocomplete.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -69,27 +70,29 @@ export interface Props
 
 class Autocomplete extends PureClasss<Props>
 {
-  value: string;
+  public value: string;
 
-  state: {
+  public state: {
     value: string;
     open: boolean;
     selectedIndex: number;
   };
+
+  public blurValue: string = '';
 
   constructor(props: Props)
   {
     super(props);
     this.value = props.value;
     this.state =
-    {
-      value: props.value,
-      open: false,
-      selectedIndex: -1,
-    };
+      {
+        value: props.value,
+        open: false,
+        selectedIndex: -1,
+      };
   }
 
-  componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps)
   {
     this.value = nextProps.value;
     this.setState({
@@ -97,15 +100,15 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  handleChange(event)
+  public handleChange(event)
   {
-    let {target} = event;
+    let { target } = event;
     while (target && target.value === undefined)
     {
       target = target.parentNode;
     }
 
-    const {value} = target;
+    const { value } = target;
     this.value = value;
     this.props.onChange(value);
     this.setState({
@@ -113,7 +116,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  handleFocus(event: React.FocusEvent<any>)
+  public handleFocus(event: React.FocusEvent<any>)
   {
     this.setState({
       open: true,
@@ -123,8 +126,7 @@ class Autocomplete extends PureClasss<Props>
     this.props.onFocus && this.props.onFocus(event);
   }
 
-  blurValue: string = '';
-  handleBlur(event: React.FocusEvent<any>)
+  public handleBlur(event: React.FocusEvent<any>)
   {
     this.setState({
       open: false,
@@ -134,7 +136,7 @@ class Autocomplete extends PureClasss<Props>
     this.blurValue = '';
   }
 
-  handleSelect(value)
+  public handleSelect(value)
   {
     this.props.onChange(value);
     this.setState({
@@ -144,7 +146,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  selectIndex(index: number)
+  public selectIndex(index: number)
   {
     // scroll option into view if necessary
     const ac = ReactDOM.findDOMNode(this.refs['ac']);
@@ -152,7 +154,7 @@ class Autocomplete extends PureClasss<Props>
     if (ac && opt)
     {
       const acMin = ac.scrollTop;
-      const acMax = ac.scrollTop +  ac.clientHeight;
+      const acMax = ac.scrollTop + ac.clientHeight;
       const oMin = opt['offsetTop'];
       const oMax = opt['offsetTop'] + opt.clientHeight;
 
@@ -171,7 +173,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
 
-  handleKeydown(event)
+  public handleKeydown(event)
   {
     if (!this.props.options)
     {
@@ -210,14 +212,14 @@ class Autocomplete extends PureClasss<Props>
         this.refs['input']['blur']();
         break;
       default:
-        // nada
-        // this.setState({
-        //   selectedIndex: 0,
-        // })
+      // nada
+      // this.setState({
+      //   selectedIndex: 0,
+      // })
     }
   }
 
-  showOption(option: string): boolean
+  public showOption(option: string): boolean
   {
     if (!option)
     {
@@ -237,7 +239,7 @@ class Autocomplete extends PureClasss<Props>
       || haystack.indexOf('.' + needle) !== -1;
   }
 
-  renderOption(option: string, index: number)
+  public renderOption(option: string, index: number)
   {
     const first = option, second = '', third = '';
     if (this.state.value && this.state.value.length)
@@ -259,20 +261,20 @@ class Autocomplete extends PureClasss<Props>
         key={option}
         ref={'opt' + index}
       >
-        { first }<b>{ second }</b>{ third }
+        {first}<b>{second}</b>{third}
       </div>
     );
   }
 
-  render()
+  public render()
   {
     const options = this.props.options && this.props.options.filter(this.showOption);
     const inputClassName = 'ac-input ' + (this.props.className || '');
     return (
-      <div className="autocomplete">
+      <div className='autocomplete'>
         <input
-          ref="input"
-          type="text"
+          ref='input'
+          type='text'
           className={inputClassName}
           value={this.state.value}
           onChange={this.handleChange}
@@ -284,28 +286,28 @@ class Autocomplete extends PureClasss<Props>
           data-tip={this.props.help}
           data-html={true}
         />
-        { !options || !this.state.open ? null :
+        {!options || !this.state.open ? null :
           <div
             className={classNames({
               'ac-options': true,
               'ac-options-open': this.state.open,
             })}
-            ref="ac"
+            ref='ac'
           >
             {
               options.map(this.renderOption)
             }
             {
-              options.size ? null : null && <div className="ac-no-options">No matches</div>
+              options.size ? null : null && <div className='ac-no-options'>No matches</div>
             }
           </div>
         }
       </div>
     );
   }
-            // {
-            //   !options.size ? null :
-            //     this.renderOption("", -1)
-            // }
+  // {
+  //   !options.size ? null :
+  //     this.renderOption("", -1)
+  // }
 }
 export default Autocomplete;

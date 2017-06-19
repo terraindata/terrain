@@ -42,37 +42,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import { BaseClass, New } from '../Classes';
 import RoleTypes from './../roles/RoleTypes';
-import {BaseClass, New} from '../Classes';
 
-export module UserTypes
+export namespace UserTypes
 {
   class UserC extends BaseClass
   {
     // db-level fields
-    isSuperUser = false;
-    isDisabled = false;
-    email = '';
+    public isSuperUser = false;
+    public isDisabled = false;
+    public email = '';
 
     // metadata fields
-    name = '';
-    whatIDo = '';
-    skype = '';
-    timeZone = 158;
-    phone = '';
-    imgSrc = '';
-    tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
+    public name = '';
+    public whatIDo = '';
+    public skype = '';
+    public timeZone = 158;
+    public phone = '';
+    public imgSrc = '';
+    public tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
 
-    //notifications fields
-    sound = 'chime';
-    emailNotificationType = 'Activities of any kind';
-    emailNotificationTiming = 'Once every 15 minutes';
-    desktopNotificationType = 'Activities of any kind';
-    emailNews = 'on';
+    // notifications fields
+    public sound = 'chime';
+    public emailNotificationType = 'Activities of any kind';
+    public emailNotificationTiming = 'Once every 15 minutes';
+    public desktopNotificationType = 'Activities of any kind';
+    public emailNews = 'on';
 
     // DB level fields
-    dbFields = [
+    public dbFields = [
       'id',
       'email',
       'isDisabled',
@@ -84,12 +85,12 @@ export module UserTypes
     ];
 
     // "static" fields to exclude
-    excludeFields = ['dbFields', 'excludeFields'];
+    public excludeFields = ['dbFields', 'excludeFields'];
 
     // groupRoles: Immutable.Map({}),
   }
   export type User = UserC & IRecord<UserC>;
-  export const _User = (config: {[key:string]: any} = {}) => 
+  export const _User = (config: { [key: string]: any } = {}) =>
   {
     config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
     return New<User>(new UserC(config), config);
@@ -99,13 +100,13 @@ export module UserTypes
 
   class UserStateC extends BaseClass
   {
-    loading = false;
-    loaded = false;
-    users = Immutable.Map<ID, User>({});
-    currentUser: UserTypes.User = null;
+    public loading = false;
+    public loaded = false;
+    public users = Immutable.Map<ID, User>({});
+    public currentUser: UserTypes.User = null;
   }
   export type UserState = UserStateC & IRecord<UserStateC>;
-  export const _UserState = (config?: {[key:string]: any}) => 
+  export const _UserState = (config?: { [key: string]: any }) =>
     New<UserState>(new UserStateC(config), config);
 
   export function profileUrlFor(user: User): string
@@ -114,7 +115,7 @@ export module UserTypes
     {
       return user.imgSrc;
     }
-    
+
     let index: number = 0;
     if (user)
     {
@@ -127,8 +128,8 @@ export module UserTypes
         index = (user.id % numProfileImages);
       }
     }
-    
-    return  NODEWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
+
+    return MIDWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
   }
 }
 

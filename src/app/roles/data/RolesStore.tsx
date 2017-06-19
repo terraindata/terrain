@@ -42,8 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
-const Immutable = require('immutable');
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
 import ActionTypes from './RolesActionTypes';
@@ -52,6 +53,6 @@ import RolesReducers from './RolesReducers';
 
 const RolesStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   RolesReducers,
-{}), Immutable.Map({})), Immutable.Map({}));
+  {}), Immutable.Map({})), Immutable.Map({}));
 
 export default RolesStore;

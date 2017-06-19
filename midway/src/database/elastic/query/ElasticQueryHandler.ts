@@ -48,18 +48,17 @@ THE SOFTWARE.
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
 import clarinet = require('clarinet');
-import ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
+import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
+import QueryRequest from '../../../../../shared/backends/types/QueryRequest';
+import QueryResponse from '../../../../../shared/backends/types/QueryResponse';
+import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryHandler from '../../../app/query/QueryHandler';
-import QueryRequest from '../../../app/query/QueryRequest';
-import QueryResponse from '../../../app/query/QueryResponse';
-import MidwayErrorItem from '../../../error/MidwayErrorItem';
 import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
-
 /**
  * Implements the QueryHandler interface for ElasticSearch
  */
@@ -118,7 +117,7 @@ export default class ElasticQueryHandler extends QueryHandler
           errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
         }
 
-        return new QueryResponse(null, errors);
+        return new QueryResponse({}, errors);
       }
     }
 
@@ -152,7 +151,7 @@ export default class ElasticQueryHandler extends QueryHandler
         {
           const res: QueryResponse =
             new QueryResponse(
-              null,
+              {},
               QueryError.fromElasticQueryError(error).getMidwayErrors());
           resolve(res);
         }

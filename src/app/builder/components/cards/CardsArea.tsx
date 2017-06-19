@@ -42,31 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
-import BuilderTypes from '../../BuilderTypes';
 import Actions from '../../data/BuilderActions';
-import {BuilderState, BuilderStore} from '../../data/BuilderStore';
-import {Card, CardItem} from '../cards/Card';
+import { BuilderState, BuilderStore } from '../../data/BuilderStore';
+import { CardComponent, CardItem } from '../cards/CardComponent';
 import PureClasss from './../../../common/components/PureClasss';
 import CreateCardTool from './CreateCardTool';
-type ICard = BuilderTypes.ICard;
-type ICards = BuilderTypes.ICards;
-const {List} = Immutable;
+const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
-import CardDropArea from './CardDropArea';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props
 {
-  cards: ICards;
+  cards: Cards;
   canEdit: boolean;
   keyPath: KeyPath;
+  language: string;
 
   addColumn?: (number, string?) => void;
   columnIndex?: number;
@@ -78,11 +77,13 @@ export interface Props
   singleChild?: boolean;
 }
 
-interface KeyState {
+interface KeyState
+{
   keyPath: KeyPath;
 }
 
-interface State extends KeyState {
+interface State extends KeyState
+{
   learningMode: boolean;
   cardToolOpen: boolean;
   isDraggingCardOver: boolean;
@@ -92,7 +93,7 @@ interface State extends KeyState {
 
 class CardsArea extends PureClasss<Props>
 {
-  state: State = {
+  public state: State = {
     keyPath: null,
     learningMode: this.props.helpOn,
     cardToolOpen: true,
@@ -137,44 +138,44 @@ class CardsArea extends PureClasss<Props>
     });
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     this.setState({
       cardToolOpen: nextProps.cards.size === 0,
     });
   }
 
-  copy() {}
+  public copy() { }
 
-  clear() {}
+  public clear() { }
 
-  createFromCard()
+  public createFromCard()
   {
     Actions.create(this.props.keyPath, 0, 'sfw');
   }
 
-  toggleView()
+  public toggleView()
   {
     this.setState({
       learningMode: !this.state.learningMode,
     });
   }
 
-  toggleCardTool()
+  public toggleCardTool()
   {
     this.setState({
       cardToolOpen: !this.state.cardToolOpen,
     });
   }
 
-  render()
+  public render()
   {
-    const {props} = this;
-    const {cards, canEdit} = props;
+    const { props } = this;
+    const { cards, canEdit } = props;
     const renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
 
-    const {isDraggingCardOver, draggingCardItem, draggingOverIndex} = this.state;
-    const {keyPath} = this.props;
+    const { isDraggingCardOver, draggingCardItem, draggingOverIndex } = this.state;
+    const { keyPath } = this.props;
 
     return (
       <div>
@@ -185,7 +186,7 @@ class CardsArea extends PureClasss<Props>
           })}
         >
           {
-            cards.map((card: ICard, index: number) =>
+            cards.map((card: Card, index: number) =>
               <div
                 key={card.id}
               >
@@ -198,9 +199,11 @@ class CardsArea extends PureClasss<Props>
                   accepts={this.props.accepts}
                   singleChild={this.props.singleChild}
                   wrapType={card.type}
+                  language={this.props.language}
                 />
-                <Card
+                <CardComponent
                   card={card}
+                  language={this.props.language}
                   index={index}
                   singleCard={false}
                   canEdit={this.props.canEdit}
@@ -226,21 +229,23 @@ class CardsArea extends PureClasss<Props>
             singleChild={this.props.singleChild}
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
+            language={this.props.language}
           />
 
           {
             renderCardTool &&
-              <CreateCardTool
-                canEdit={this.props.canEdit}
-                keyPath={this.props.keyPath}
-                index={props.cards.size}
-                open={this.state.cardToolOpen}
-                className="nested-create-card-tool-wrapper"
-                accepts={this.props.accepts}
-                onToggle={this._toggle('cardToolOpen')}
-                hidePlaceholder={this.props.singleChild || cards.size === 0}
-                cannotClose={cards.size === 0}
-              />
+            <CreateCardTool
+              language={this.props.language}
+              canEdit={this.props.canEdit}
+              keyPath={this.props.keyPath}
+              index={props.cards.size}
+              open={this.state.cardToolOpen}
+              className='nested-create-card-tool-wrapper'
+              accepts={this.props.accepts}
+              onToggle={this._toggle('cardToolOpen')}
+              hidePlaceholder={this.props.singleChild || cards.size === 0}
+              cannotClose={cards.size === 0}
+            />
           }
 
         </div>

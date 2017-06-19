@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import Util from './../../util/Util';
 
 export let SchemaActionTypes =

@@ -42,38 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ScoreBar.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import BuilderTypes from '../../BuilderTypes';
 import PureClasss from './../../../common/components/PureClasss';
+import './ScoreBar.less';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
-{
-  POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#88C33E'],
-  NEGATIVE: ['#F8B14A', '#FF735B', '#DD333C', '#A50808'],
-};
+  {
+    POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#88C33E'],
+    NEGATIVE: ['#F8B14A', '#FF735B', '#DD333C', '#A50808'],
+  };
 
 class ScoreBar extends PureClasss<{
   parentData: {
-    weights: Array<{weight: number}>;
+    weights: Array<{ weight: number }>;
   };
   data: {
     weight: number;
   }
   keyPath: KeyPath;
-  // weights: List<BuilderTypes.IWeight>,
-  // index: number,
 }>
 {
-  render()
+  public render()
   {
     const weights = this.props.parentData.weights;
     const weight = this.props.data;
 
     let max = 0;
-    weights.map((w) => {
+    weights.map((w) =>
+    {
       if (Math.abs(w.weight) > max)
       {
         max = Math.abs(w.weight);
@@ -101,11 +100,11 @@ class ScoreBar extends PureClasss<{
     }
 
     return (
-      <div className="weight-graph">
-        <div className="weight-graph-inner">
-          <div className="weight-graph-bar" style={style} />
+      <div className='weight-graph'>
+        <div className='weight-graph-inner'>
+          <div className='weight-graph-bar' style={style} />
         </div>
-        <div className="weight-graph-line" />
+        <div className='weight-graph-line' />
       </div>
     );
   }

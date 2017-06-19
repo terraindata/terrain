@@ -45,21 +45,29 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
+import * as sqlite3 from 'sqlite3';
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import { readFile } from '../Utils';
 
 let server;
 
-beforeAll((done) =>
+beforeAll(async (done) =>
 {
-  fs.writeFileSync('./nodewaytest.db', fs.readFileSync('./midway/test/scripts/nodewaytest.db'));
+  const testDBName = 'midwaytest.db';
+  if (fs.existsSync(testDBName))
+  {
+    fs.unlinkSync(testDBName);
+  }
+
+  const db = new sqlite3.Database(testDBName);
   const options =
     {
       debug: true,
       db: 'sqlite',
-      dsn: 'nodewaytest.db',
-      port: 3001,
+      dsn: testDBName,
+      port: 43001,
       databases: [
         {
           name: 'My ElasticSearch Instance',
@@ -70,7 +78,20 @@ beforeAll((done) =>
     };
 
   const app = new App(options);
-  server = app.listen();
+  server = await app.start();
+
+  const sql = await readFile('./midway/test/scripts/test.sql');
+  const results = await new Promise((resolve, reject) =>
+  {
+    return db.exec(sql.toString(), (error: Error) =>
+    {
+      if (error !== null && error !== undefined)
+      {
+        reject(error);
+      }
+      resolve();
+    });
+  });
 
   request(server)
     .post('/midway/v1/users/')
@@ -90,6 +111,11 @@ beforeAll((done) =>
     {
       done();
     });
+});
+
+afterAll(() =>
+{
+  fs.unlinkSync('midwaytest.db');
 });
 
 describe('User and auth route tests', () =>
@@ -112,7 +138,7 @@ describe('User and auth route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/login request returned an error: ' + String(error));
       });
   });
 
@@ -130,13 +156,15 @@ describe('User and auth route tests', () =>
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const resp = JSON.parse(response.text);
-        id = resp.id;
-        accessToken = resp.accessToken;
+        const respData = JSON.parse(response.text);
+        expect(typeof respData['id']).toBe('number');
+        expect(typeof respData['accessToken']).toBe('string');
+        id = respData.id;
+        accessToken = respData.accessToken;
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/login request returned an error: ' + String(error));
       });
 
     await request(server)
@@ -148,8 +176,11 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(JSON.parse(response.text))
-          .toMatchObject([{ accessToken: '', email: 'test@terraindata.com', id }]);
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({ accessToken: '', email: 'test@terraindata.com', id });
       })
       .catch((error) =>
       {
@@ -165,8 +196,7 @@ describe('User and auth route tests', () =>
       .expect(401)
       .then((response) =>
       {
-        expect(response.text)
-          .toBe('Unauthorized');
+        expect(response.text).toBe('Unauthorized');
       })
       .catch((error) =>
       {
@@ -188,10 +218,18 @@ describe('Version route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          .toBe(
-          // tslint:disable-next-line:max-line-length
-          '[{"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"id":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            createdAt: '2017-05-31 00:22:04',
+            createdByUserId: 1,
+            id: 1,
+            object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"GROUP"}',
+            objectId: 2,
+            objectType: 'items',
+          });
       })
       .catch((error) =>
       {
@@ -213,10 +251,34 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          // tslint:disable-next-line:max-line-length
-          .toEqual(
-          '[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"},{"id":2,"meta":"#realmusician","name":"Bob Dylan","parent":0,"status":"Hearts beatin","type":"GROUP"},{"id":3,"meta":"Are we an item?","name":"Justin Bieber","parent":0,"status":"Baby","type":"VARIANT"}]');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData)
+          .toMatchObject([
+            {
+              id: 1,
+              meta: 'I won a Nobel prize! But Im more proud of my music',
+              name: 'Al Gore',
+              parent: 0,
+              status: 'Still Alive',
+              type: 'ALGORITHM',
+            },
+            {
+              id: 2,
+              meta: '#realmusician',
+              parent: 0,
+              type: 'GROUP',
+            },
+            {
+              id: 3,
+              meta: 'Are we an item?',
+              name: 'Justin Bieber',
+              parent: 0,
+              status: 'Baby',
+              type: 'VARIANT',
+            },
+          ]);
       })
       .catch((error) =>
       {
@@ -239,7 +301,10 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(JSON.parse(response.text)[0])
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
           .toMatchObject({
             id: 4,
             name: 'Test Item',
@@ -263,10 +328,17 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text)
-          // tslint:disable-next-line:max-line-length
-          .toEqual(
-          '[{"id":1,"meta":"I won a Nobel prize! But Im more proud of my music","name":"Al Gore","parent":0,"status":"Still Alive","type":"ALGORITHM"}]');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0]).toMatchObject({
+          id: 1,
+          meta: 'I won a Nobel prize! But Im more proud of my music',
+          name: 'Al Gore',
+          parent: 0,
+          status: 'Still Alive',
+          type: 'ALGORITHM',
+        });
       })
       .catch((error) =>
       {
@@ -287,8 +359,10 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(JSON.parse(response.text)[0])
-          .toMatchObject(insertOjbect);
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0]).toMatchObject(insertOjbect);
       })
       .catch((error) =>
       {
@@ -333,13 +407,15 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const resp = JSON.parse(response.text);
-        id = resp.id;
-        accessToken = resp.accessToken;
+        const respData = JSON.parse(response.text);
+        expect(typeof respData['id']).toBe('number');
+        expect(typeof respData['accessToken']).toBe('string');
+        id = respData.id;
+        accessToken = respData.accessToken;
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/api_login request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/login request returned an error: ' + String(error));
       });
 
     await request(server)
@@ -456,7 +532,7 @@ describe('Query route tests', () =>
         winston.info(response.text);
         expect(JSON.parse(response.text)).toMatchObject(
           {
-            result: null,
+            result: {},
             errors: [
               {
                 status: 404,

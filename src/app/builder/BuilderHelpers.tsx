@@ -42,12 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as Immutable from 'immutable';
-import BuilderTypes from './BuilderTypes';
-import {BuilderState, BuilderStore} from './data/BuilderStore';
-import SchemaStore from '../schema/data/SchemaStore';
+// Copyright 2017 Terrain Data, Inc.
+import { Block } from '../../../shared/blocks/types/Block';
+import { Card } from '../../../shared/blocks/types/Card';
+import { Input } from '../../../shared/blocks/types/Input';
 
-export module BuilderHelpers
+import * as Immutable from 'immutable';
+import SchemaStore from '../schema/data/SchemaStore';
+import { BuilderState, BuilderStore } from './data/BuilderStore';
+
+export namespace BuilderHelpers
 {
   export function getTermsForKeyPath(keyPath: KeyPath): List<string>
   {
@@ -60,7 +64,7 @@ export module BuilderHelpers
     if (inputs && inputs.size)
     {
       const inputTerms = inputs.map(
-        (input: BuilderTypes.IInput) => 'input.' + input.key,
+        (input: Input) => 'input.' + input.key,
       ).toList();
       if (terms)
       {
@@ -85,7 +89,7 @@ export module BuilderHelpers
 
     if (block._isCard)
     {
-      const card = block as BuilderTypes.ICard;
+      const card = block as Card;
 
       if (card.static.getChildTerms)
       {
@@ -100,7 +104,7 @@ export module BuilderHelpers
       if (card['cards'])
       {
         card['cards'].map(
-          (childCard: BuilderTypes.ICard) =>
+          (childCard: Card) =>
           {
             if (childCard.static.getParentTerms)
             {

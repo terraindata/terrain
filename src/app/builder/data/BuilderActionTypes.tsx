@@ -42,8 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
-const Immutable = require('immutable');
+// Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 
 // Defining our object like this gives us compile-time TypeScript support for ActionTypes
 //  and prevents us from defining duplicate action types.
@@ -53,40 +54,39 @@ const Immutable = require('immutable');
 // So you end up with ActionTypes.cards.move === 'cards.move'
 
 export let BuilderActionTypes =
-{
-  fetchQuery: '', // triggers server xhr
-  queryLoaded: '', // when the call to the server returns
+  {
+    fetchQuery: '', // triggers server xhr
+    queryLoaded: '', // when the call to the server returns
+    changeQuery: '',
 
-  // these apply to the state's query
-  create: '',
-  change: '',
-  move: '', // within the same parent
-  nestedMove: '', // can occur between different parts of the tree
-  remove: '',
-  dragCard: '',
-  dragCardOver: '',
-  dropCard: '',
+    // these apply to the state's query
+    create: '',
+    change: '',
+    move: '', // within the same parent
+    nestedMove: '', // can occur between different parts of the tree
+    remove: '',
+    dragCard: '',
+    dragCardOver: '',
+    dropCard: '',
 
-  hoverCard: '',
+    hoverCard: '',
 
-  selectCard: '',
+    selectCard: '',
 
-  // Change the hand-writen TQL
-  changeTQL: '',
-  parseTreeLoaded: '',
-  parseTreeError: '',
+    // Change the hand-writen TQL
+    changeTQL: '',
 
-  toggleDeck: '',
+    toggleDeck: '',
 
-  changeResultsConfig: '',
-  results: '',
+    changeResultsConfig: '',
+    results: '',
 
-  save: '', // just tells the store that something was saved
+    save: '', // just tells the store that something was saved
 
-  undo: '',
-  redo: '',
-  checkpoint: '', // inserts an undo checkpoint
-};
+    undo: '',
+    redo: '',
+    checkpoint: '', // inserts an undo checkpoint
+  };
 
 // I tried using this type to correclty classify this function,
 //  but because of how object literals work in TypeScript,

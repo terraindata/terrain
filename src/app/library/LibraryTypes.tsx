@@ -42,100 +42,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import {IResultsConfig} from '../builder/components/results/ResultsConfig';
-import BuilderTypes from './../builder/BuilderTypes';
 import RoleTypes from './../roles/RoleTypes';
 import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
-const {List, Map} = Immutable;
-import {BaseClass, New} from '../Classes';
-import SharedTypes from '../../../shared/SharedTypes';
+const { List, Map } = Immutable;
+import BackendInstance from '../../../shared/backends/types/BackendInstance';
+import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
+import { _Query, Query, queryForSave } from '../../../shared/items/types/Query';
+import { _ResultsConfig, ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { BaseClass, New } from '../Classes';
 
-export module LibraryTypes
+// TODO MOD refactor
+
+export namespace LibraryTypes
 {
-  export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
-  export const ItemType: {
-    Query: ItemType;
-    Variant: ItemType;
-    Algorithm: ItemType;
-    Group: ItemType;
-  } = {
-    Query: 'QUERY',
-    Variant: 'VARIANT',
-    Algorithm: 'ALGORITHM',
-    Group: 'GROUP',
-  };
-  
-  export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT';
-  export const ItemStatus: {
-    Archive: ItemStatus;
-    Build: ItemStatus;
-    Approve: ItemStatus;
-    Live: ItemStatus;
-    Default: ItemStatus;
-  } =
-  {
-    Archive: 'ARCHIVE',
-    Build: 'BUILD',
-    Approve: 'APPROVE',
-    Live: 'LIVE',
-    Default: 'DEFAULT',
-  };
-  
-
-  
-  class ItemC extends BaseClass
-  {
-    // TODO potentially consolidate with midway
-    id: ID = -1;
-    parent: number = 0;
-    
-    name: string = '';
-    status: ItemStatus = 'BUILD';
-    type: ItemType;
-    
-    db: SharedTypes.Database = {} as any;
-    
-    dbFields = ['id', 'parent', 'name', 'status', 'type'];
-    excludeFields= ['dbFields', 'excludeFields'];
-    
-    modelVersion = 2; // 2 is for the first version of Node midway
-  }
-  export type Item = ItemC & IRecord<ItemC>;
-  export const _Item = (config?: {[key:string]: any}) => 
-  {
-    if(config && typeToConstructor[config.type])
-    {
-      return typeToConstructor[config.type](config);
-    }
-    throw new Error('Unrecognized item type: ' + (config && config.type));
-  }
-  
-
   class VariantC extends ItemC
   {
-    type = ItemType.Variant;
+    public type = ItemType.Variant;
 
-    algorithmId: number = -1;
-    groupId: number = -1;
+    public algorithmId: number = -1;
+    public groupId: number = -1;
 
-    excludeFields= ['dbFields', 'excludeFields', 'algorithmId', 'groupId']; 
+    public excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
     // TODO try super or prototype
-    
-    lastEdited = '';
-    lastUserId = -1;
-    version = false;
-    language = 'elastic';
+
+    public lastEdited = '';
+    public lastUserId = -1;
+    public version = false;
+    public language = 'elastic';
 
     // don't use this!
     // TODO remove when variants can be saved without queries
-    query: BuilderTypes.Query = null;
+    public query: Query = null;
   }
-  export interface Variant extends VariantC, IRecord<Variant> {}
+  export interface Variant extends VariantC, IRecord<Variant> { }
   const Variant_Record = Immutable.Record(new VariantC());
-  export const _Variant = (config?: any) => {
+  export const _Variant = (config?: any) =>
+  {
     // NOTE: we do not want a default value for the config param because
     //  we want to know the difference between creating a new variant with
     //  no params vs. an old version with no modelVersion param
@@ -150,19 +96,22 @@ export module LibraryTypes
         tql: config.tql,
         deckOpen: config.deckOpen,
         variantId: config.id,
+        language: 'mysql',
       };
     }
-    
-    if(config && config.modelVersion === 1)
+
+    if (config && config.modelVersion === 1)
     {
       // from 1 to 2
       // TODO if necessary
     }
-    
-    config = config || {};
 
-    // TODO change to standalone query Item
-    config.query = BuilderTypes._Query(config.query);
+    config = config || {};
+    config.language = config.language || 'elastic';
+
+    config.query = config.query || {};
+    config.query.language = config.language;
+    config.query = _Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
     if (!config || !config.lastUserId || !config.lastEdited)
@@ -177,76 +126,77 @@ export module LibraryTypes
     return v
       .set('lastEdited', new Date())
       .set('lastUserId', +localStorage['id'])
-    ;
+      ;
   }
 
   export function variantForSave(v: Variant): Variant
   {
-    return v.set('query', BuilderTypes.queryForSave(v.query));
+    return v.set('query', queryForSave(v.query));
   }
-
 
   class AlgorithmC extends ItemC
   {
-    type = ItemType.Algorithm;
-    
-    groupId = -1;
-    
-    lastEdited = '';
-    lastUsername = '';
+    public type = ItemType.Algorithm;
 
-    variantsOrder = List([]);
-    language = 'elastic';
+    public groupId = -1;
 
-    excludeFields= ['dbFields', 'excludeFields', 'groupId']; 
+    public lastEdited = '';
+    public lastUsername = '';
+
+    public variantsOrder = List([]);
+    public language = 'elastic';
+
+    public excludeFields = ['dbFields', 'excludeFields', 'groupId'];
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
-  export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
-  export const _Algorithm = (config?: any) => {
-    if(config && (!config.modelVersion || config.modelVersion === 1))
+  export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
+  export const _Algorithm = (config?: any) =>
+  {
+    if (config && (!config.modelVersion || config.modelVersion === 1))
     {
       // from 0 and 1 to 2
       // TODO
     }
-    
+
     config = config || {};
     config.variantsOrder = List(config.variantsOrder || []);
     return new Algorithm_Record(config) as any as Algorithm;
   };
 
   export const groupColors =
-  [
-    '#00A7F7',
-    '#00BCD6',
-    '#009788',
-    '#48B14B',
-    '#8AC541',
-    '#CCDD1F',
-    '#FFEC18',
-    '#FFC200',
-    '#FF9900',
-    '#5F7D8C',
-  ];
+    [
+      '#00A7F7',
+      '#00BCD6',
+      '#009788',
+      '#48B14B',
+      '#8AC541',
+      '#CCDD1F',
+      '#FFEC18',
+      '#FFC200',
+      '#FF9900',
+      '#5F7D8C',
+    ];
 
   class GroupC extends ItemC
   {
-    type = ItemType.Group;
-    
-    lastEdited = '';
-    lastUserId = '';
-    userIds = List([]);
-    algorithmsOrder = List([]);
-    defaultLanguage = 'elastic';
+    public type = ItemType.Group;
+
+    public lastEdited = '';
+    public lastUserId = '';
+    public userIds = List([]);
+    public algorithmsOrder = List([]);
+    public defaultLanguage = 'elastic';
   }
   const Group_Record = Immutable.Record(new GroupC());
-  export interface Group extends GroupC, IRecord<Group> {}
-  export const _Group = (config: any = {}) => {
-    if(config && (!config.modelVersion || config.modelVersion === 1))
+  export interface Group extends GroupC, IRecord<Group> { }
+  export const _Group = (config: any = {}) =>
+  {
+    if (config && (!config.modelVersion || config.modelVersion === 1))
     {
       // from 0 and 1 to 2
       // TODO
     }
-    
+
     config = config || {};
     config.userIds = List(config.userIds || []);
     config.algorithmsOrder = List(config.algorithmsOrder || []);
@@ -290,16 +240,17 @@ export module LibraryTypes
         return '#000';
     }
   }
-  
+
   export const typeToConstructor: {
     [key: string]: (...args) => Item,
   } =
-  {
-    [ItemType.Query]: BuilderTypes._Query,
-    [ItemType.Variant]: _Variant,
-    [ItemType.Algorithm]: _Algorithm,
-    [ItemType.Group]: _Group,
-  };
+    {
+      [ItemType.Query]: _Query,
+      [ItemType.Variant]: _Variant,
+      [ItemType.Algorithm]: _Algorithm,
+      [ItemType.Group]: _Group,
+    };
+
 }
 
 export default LibraryTypes;

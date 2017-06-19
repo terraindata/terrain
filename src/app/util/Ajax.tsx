@@ -42,33 +42,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+// Note: If anyone would like to take the time to clean up this file, be my guest.
+
+import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
 
+import { Item, ItemType } from '../../../shared/items/types/Item';
+import Query from '../../../shared/items/types/Query';
+import LibraryStore from '../library/data/LibraryStore';
+import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
-import BuilderTypes from './../builder/BuilderTypes';
 import LibraryTypes from './../library/LibraryTypes';
-import SharedTypes from './../../../shared/SharedTypes';
-import LibraryStore from '../library/data/LibraryStore';
 import UserTypes from './../users/UserTypes';
-import Util from './../util/Util';
-import {recordForSave, responseToRecordConfig} from '../Classes';
 
-/**
- * Note: This is the old query response type.
- * For the new QueryResponse definition, see /midway/src/app/query/QueryResponse.ts
- */
-export interface QueryResponse
-{
-  results?: any[];
-  errorMessage?: string;
-}
+import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
+
+import { routerShape } from 'react-router';
+import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
+import { MidwayError } from '../../../shared/error/MidwayError';
+import { recordForSave, responseToRecordConfig } from '../Classes';
+import AjaxM1 from './AjaxM1';
 
 export const Ajax =
   {
-    _reqMidway2(method: 'post' | 'get',
+    req(method: 'post' | 'get',
       url: string,
       body: object,
       onLoad: (response: object) => void,
@@ -90,25 +90,27 @@ export const Ajax =
       {
         const authState = AuthStore.getState();
         data = {
-          id:          authState.id,
+          id: authState.id,
           accessToken: authState.accessToken,
           body,
         };
       }
 
-      return Ajax._req(
+      return Ajax._reqGeneric(
         method,
         '/midway/v1/' + url,
         JSON.stringify(data),
         (response) =>
         {
-          var responseData: object = null;
+          let responseData: object = null;
           try
           {
             responseData = JSON.parse(response);
           }
           catch (e)
           {
+            // parsing error, we create a new QueryResponse so that callers wont need to worry about the format
+            // anymore.
             config.onError && config.onError(e);
           }
 
@@ -119,7 +121,8 @@ export const Ajax =
           }
         },
         _.extend({
-          host: NODEWAY_HOST,
+          onError: config.onError,
+          host: MIDWAY_HOST,
           noToken: true,
           json: true,
           crossDomain: false,
@@ -127,31 +130,7 @@ export const Ajax =
       );
     },
 
-    midwayStatus(success: () => void,
-      failure: () => void)
-    {
-      return Ajax._reqMidway2(
-        'get',
-        'status',
-        {},
-        (resp: { status: string }) =>
-        {
-          if (resp && resp.status === 'ok')
-          {
-            success();
-          }
-          else
-          {
-            failure();
-          }
-        },
-        {
-          onError: failure,
-        },
-      );
-    },
-
-    _req(method: string,
+    _reqGeneric(method: string,
       url: string,
       data: string,
       onLoad: (response: any) => void,
@@ -200,21 +179,23 @@ export const Ajax =
       }
 
       const xhr = new XMLHttpRequest();
-      xhr.onerror = config && config.onError;
+      xhr.onerror = (err: any) =>
+      {
+        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+        config && config.onError && config.onError(routeError);
+      };
+
       xhr.onload = (ev: Event) =>
       {
-        // TODO re-enable
-        // if (xhr.status === 401)
-        // {
-        //   // Actions.logout();
-        //   return;
-        // }
-
-        if (xhr.status != 200)
+        if (xhr.status === 401)
         {
-          config && config.onError && config.onError({
-            error: xhr.responseText,
-          });
+          // TODO re-enable
+          Actions.logout();
+        }
+
+        if (xhr.status !== 200)
+        {
+          config && config.onError && config.onError(xhr.responseText);
           return;
         }
 
@@ -235,7 +216,7 @@ export const Ajax =
           }
         }
         catch (e)
-        {}
+        { }
       }
       else if (config.urlArgs)
       {
@@ -266,54 +247,33 @@ export const Ajax =
       return xhr;
     },
 
-    _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
+    midwayStatus(success: () => void,
+      failure: () => void)
     {
-      return Ajax._req('POST', url, data, onLoad, {onError});
-    },
-
-    _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
-    {
-      return Ajax._req('GET', url, data, onLoad, {onError});
-    },
-
-    _postMidway1(
-      url: string,
-      reqFields: { [f: string]: any },
-      onLoad: (resp: string) => void,
-      onError?: (ev: Event) => void,
-      options: {
-        download?: boolean;
-        downloadFilename?: string;
-        useMidway?: boolean;
-      } = {}
-    ): { xhr: XMLHttpRequest, queryId: string }
-    {
-      const uniqueId = '' + Math.random();
-      return {
-        xhr: Ajax._req('POST', url, JSON.stringify(_.extend(
+      return Ajax.req(
+        'get',
+        'status',
+        {},
+        (resp: { status: string }) =>
+        {
+          if (resp && resp.status === 'ok')
           {
-            timestamp: (new Date()).toISOString(),
-            uniqueId,
-          }, reqFields)),
-
-          onLoad,
-
+            success();
+          }
+          else
           {
-            // noToken: true,
-            onError,
-            // host: options.useMidway ? undefined : TDB_HOST,
-            // crossDomain: ! options.useMidway,
-            download:         options.download,
-            downloadFilename: options.downloadFilename,
-          },
-        ),
-        queryId: uniqueId,
-      };
+            failure();
+          }
+        },
+        {
+          onError: failure,
+        },
+      );
     },
 
     getUsers(onLoad: (users: { [id: string]: any }) => void)
     {
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'get',
         'users/',
         {},
@@ -337,7 +297,7 @@ export const Ajax =
     {
       const userData = recordForSave(user);
 
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'post',
         `users/${user.id}`,
         userData,
@@ -354,12 +314,12 @@ export const Ajax =
       onSave: (response: any) => void,
       onError: (response: any) => void)
     {
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'post',
         `users/${id}`,
         {
-          oldPassword: oldPassword,
-          password:    newPassword,
+          oldPassword,
+          password: newPassword,
         },
         onSave,
         {
@@ -369,12 +329,12 @@ export const Ajax =
 
     adminSaveUser(user: UserTypes.User)
     {
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'post',
         `users/${user.id}`,
         {
           isSuperUser: user.isSuperUser ? 1 : 0,
-          isDisabled:  user.isDisabled ? 1 : 0,
+          isDisabled: user.isDisabled ? 1 : 0,
         },
         _.noop,
       );
@@ -382,7 +342,7 @@ export const Ajax =
 
     createUser(email: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
     {
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'post',
         `users`,
         {
@@ -398,9 +358,9 @@ export const Ajax =
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
       variants: IMMap<number, LibraryTypes.Variant>,
       groupsOrder: IMList<number, any>) => void,
-      onError?: (ev: Event) => void,)
+      onError?: (ev: Event) => void)
     {
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'get',
         'items/',
         {},
@@ -408,21 +368,21 @@ export const Ajax =
         {
           const mapping =
             {
-              VARIANT:   Immutable.Map<number, LibraryTypes.Variant>({}) as any,
+              VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
               ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}),
-              GROUP:     Immutable.Map<number, LibraryTypes.Group>({}),
-              QUERY:     Immutable.Map<number, BuilderTypes.Query>({}),
+              GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
+              QUERY: Immutable.Map<number, Query>({}),
             };
-          let groupsOrder = [];
+          const groupsOrder = [];
 
           items.map(
             (itemObj) =>
             {
-              const item = LibraryTypes._Item(
+              const item = LibraryTypes.typeToConstructor[itemObj['type']](
                 responseToRecordConfig(itemObj),
               );
               mapping[item.type] = mapping[item.type].set(item.id, item);
-              if (item.type === LibraryTypes.ItemType.Group)
+              if (item.type === ItemType.Group)
               {
                 groupsOrder.push(item.id);
               }
@@ -430,15 +390,15 @@ export const Ajax =
           );
 
           mapping.ALGORITHM = mapping.ALGORITHM.map(
-            alg => alg.set('groupId', alg.parent),
+            (alg) => alg.set('groupId', alg.parent),
           ).toMap();
 
           mapping.VARIANT = mapping.VARIANT.map(
-            v =>
+            (v) =>
             {
               v = v.set('algorithmId', v.parent);
               const alg = mapping.ALGORITHM.get(v.algorithmId);
-              if(alg)
+              if (alg)
               {
                 v = v.set('groupId', alg.groupId);
               }
@@ -462,12 +422,12 @@ export const Ajax =
       );
     },
 
-    getItem(type: LibraryTypes.ItemType,
+    getItem(type: ItemType,
       id: ID,
-      onLoad: (item: LibraryTypes.Item) => void,
+      onLoad: (item: Item) => void,
       onError?: (ev: Event) => void)
     {
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'get',
         `items/${id}`,
         {},
@@ -475,7 +435,7 @@ export const Ajax =
         {
           if (response && response[0])
           {
-            const item = LibraryTypes._Item(responseToRecordConfig(response[0]));
+            const item = LibraryTypes.typeToConstructor[response[0]['type']](responseToRecordConfig(response[0]));
             onLoad(item);
           }
           else
@@ -494,7 +454,7 @@ export const Ajax =
       return Ajax.getItem(
         'VARIANT',
         variantId,
-        (variantItem: LibraryTypes.Item) =>
+        (variantItem: Item) =>
         {
           onLoad(variantItem as LibraryTypes.Variant);
         },
@@ -515,7 +475,7 @@ export const Ajax =
 
     getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
-      return Ajax._reqMidway2('get', 'versions/items/' + id, {}, (response: any) => {
+      return Ajax.req('get', 'versions/items/' + id, {}, (response: any) => {
         try {
           onLoad(response);
         }
@@ -581,7 +541,7 @@ export const Ajax =
     },
 
     getQuery(variantId: ID,
-      onLoad: (query: BuilderTypes.Query, variant: LibraryTypes.Variant) => void,)
+      onLoad: (query: Query, variant: LibraryTypes.Variant) => void)
     {
       if (!variantId)
       {
@@ -602,10 +562,10 @@ export const Ajax =
       );
     },
 
-    saveItem(item: LibraryTypes.Item,
+    saveItem(item: Item,
       onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
     {
-      if (item.type === LibraryTypes.ItemType.Variant)
+      if (item.type === ItemType.Variant)
       {
         item = LibraryTypes.variantForSave(item as LibraryTypes.Variant);
       }
@@ -619,7 +579,7 @@ export const Ajax =
       }
       onLoad = onLoad || _.noop;
 
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'post',
         route,
         itemData,
@@ -632,74 +592,13 @@ export const Ajax =
         },
       );
     },
-
     /**
-     * Old query interface. Queries M1.
-     */
-    query_m1(
-      tql: string,
-      db: string | number,
-      onLoad: (response: QueryResponse) => void,
-      onError?: (ev: Event) => void,
-      sqlQuery?: boolean,
-      options: {
-        csv?: boolean,
-        csvName?: string,
-      } = {}
-    )
-    {
-      // kill queries running under the same id
-      // Ajax.killQueries(); // TODO add id
-
-      let dest = '/query';
-      if (options.csv)
-      {
-        dest = '/query_csv';
-      }
-      else if (sqlQuery)
-      {
-        dest = '/sql_query';
-      }
-
-      return Ajax._postMidway1(dest, {
-          query_string: encode_utf8(tql),
-          db,
-          format:       options.csv ? 'csv' : undefined,
-        },
-
-        (resp) =>
-        {
-          let respData = null;
-          try
-          {
-            resp = resp.replace(/\t/g, ' ').replace(/\n/g, ' ');
-            respData = JSON.parse(resp);
-          } catch (e)
-          {
-            onError && onError(resp as any);
-            return;
-          }
-          onLoad(respData);
-        },
-
-        onError,
-
-        {
-          download:         options.csv,
-          downloadFilename: options.csvName || 'Results.csv',
-          useMidway:        options.csv,
-        },
-      );
-    },
-
-    /**
-     * Intermediate query interface. Queries M2.
-     * Transforms result into old format.
+     * Query M2
      */
     query(body: string,
-      db: SharedTypes.Database,
-      onLoad: (response: QueryResponse) => void,
-      onError?: (ev: Event) => void,
+      db: BackendInstance,
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: string | MidwayError) => void,
       sqlQuery?: boolean, // unused
       options: {
         streaming?: boolean,
@@ -707,64 +606,21 @@ export const Ajax =
       } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      // TODO make this hack not so bad
-      const dbs = LibraryStore.getState().dbs;
-      if (db && db.source === 'm1')
-      {
-        return Ajax.query_m1(body, db.id, onLoad, onError, sqlQuery, options as any);
-      }
-
-      // TODO: For MySQL and other string queries, we should skip this step and send it as a string
-      try
-      {
-        body = JSON.parse(body);
-      }
-      catch (e)
-      {
-        // on parse failure, absorb error and send query as a string
-      }
       const queryId = '' + Math.random();
-      const payload = {
+      const payload: QueryRequest = {
         type: 'search', // can be other things in the future
-        database: db.id, // should be passed by caller
+        database: db.id as number, // should be passed by caller
         streaming: options.streaming,
+        databasetype: 'elastic',
         body,
       };
 
       const onLoadHandler = (resp) =>
       {
-        let result: QueryResponse = {results: []};
-        try
-        {
-          const hits = resp.result.hits.hits;
-          const results = hits.map((hit) =>
-          {
-            let source = hit._source;
-            source._index = hit._index;
-            source._type = hit._type;
-            source._id = hit._id;
-            source._score = hit._score;
-            source._sort = hit._sort;
-            return source;
-          });
-
-          result = {results};
-        }
-        catch (e)
-        {
-          // absorb
-        }
-
-        // This could be improved
-        if (resp.errors.length > 0)
-        {
-          result.errorMessage = resp.errors[0].title;
-        }
-
-        onLoad(result);
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
       };
-
-      const xhr = Ajax._reqMidway2(
+      const xhr = Ajax.req(
         'post',
         'query/',
         payload,
@@ -773,58 +629,19 @@ export const Ajax =
           onError,
           download: options.streaming,
           downloadFilename: options.streamingTo,
-         },
+        },
       );
 
-      return {queryId, xhr};
+      return { queryId, xhr };
     },
-
-    parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
-    {
-      return Ajax._postMidway1('/get_tql_tree', {
-          query_string: encode_utf8(tql),
-          db,
-        },
-
-        (resp) =>
-        {
-          let respData = null;
-          try
-          {
-            resp = resp.replace(/\t/g, ''); // tabs cause the JSON parser to error out
-            respData = JSON.parse(resp);
-          } catch (e)
-          {
-            onError && onError(resp as any);
-            return;
-          }
-
-          if (respData.errorMessage)
-          {
-            onError && onError(respData);
-            return;
-          }
-
-          onLoad(respData);
-        },
-
-        onError,
-      );
-    },
-
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
-      return Ajax._reqMidway2('get', 'database/' + dbId + '/schema', {}, (response: any) => {
-        try {
-          let cols: object = {};
-          if (typeof response === 'object')
-          {
-            cols = response;
-          }
-          else
-          {
-            cols = JSON.parse(response);
-          }
+      // TODO see if needs to query m1
+      return Ajax.req('get', 'database/' + dbId + '/schema', {}, (response: any) =>
+      {
+        try
+        {
+          const cols: object = JSON.parse(response);
           onLoad(cols);
         }
         catch (e)
@@ -834,12 +651,10 @@ export const Ajax =
       });
     },
 
-    getDbs(onLoad: (dbs: SharedTypes.Database[],
-                    loadFinished: boolean) => void, onError?: (ev: Event) => void)
+    getDbs(onLoad: (dbs: BackendInstance[], loadFinished: boolean) => void, onError?: (ev: Event) => void)
     {
-      let m1Dbs: SharedTypes.Database[] = null;
-      let m2Dbs: SharedTypes.Database[] = null;
-
+      let m1Dbs: BackendInstance[] = null;
+      let m2Dbs: BackendInstance[] = null;
       const checkForLoaded = () =>
       {
         if (!m1Dbs || !m2Dbs)
@@ -847,7 +662,7 @@ export const Ajax =
           return;
         }
 
-        let dbs: SharedTypes.Database[] = [];
+        let dbs: BackendInstance[] = [];
         if (m1Dbs)
         {
           dbs = m1Dbs;
@@ -859,44 +674,32 @@ export const Ajax =
         onLoad(dbs, !!(m1Dbs && m2Dbs));
       };
 
-      Ajax._postMidway1(
-        '/get_databases',
+      AjaxM1.getDbs_m1(
+        (dbNames: string[]) =>
         {
-          db: 'information_schema',
-        },
-        (resp) =>
-        {
-          let data;
-          try
-          {
-            data = JSON.parse(resp);
-          }
-          catch (e)
-          {}
-
-          m1Dbs = [] as any;
-          if (data)
-          {
-            m1Dbs = data.results.map(
-              (r: {schema_name: string}) =>
+          m1Dbs = dbNames.map(
+            (dbName: string) =>
               ({
-                id: r.schema_name,
-                name: r.schema_name,
+                id: dbName,
+                name: dbName,
                 type: 'mysql',
-                source: 'm1',
+                source: 'm1' as ('m1' | 'm2'),
               }),
-            );
-          }
-
+          );
+          checkForLoaded();
+        },
+        () =>
+        {
+          m1Dbs = [];
           checkForLoaded();
         },
       );
 
-      Ajax._reqMidway2(
+      Ajax.req(
         'get',
         'database',
-        { },
-        (dbs: [SharedTypes.Database]) =>
+        {},
+        (dbs: [BackendInstance]) =>
         {
           m2Dbs = dbs.map((db) =>
           {
@@ -915,87 +718,6 @@ export const Ajax =
         },
       );
     },
-
-    schema_m1(db: string | number, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
-    {
-      return Ajax._postMidway1('/get_schema', {
-          db,
-        },
-        (resp: string) =>
-        {
-          const cols: any = null;
-          try
-          {
-            const cols = JSON.parse(resp).results;
-            // var tables: {[name:string]: {name: string; columns: any[];}} = {};
-
-            // cols.map(
-            // (
-            //   col: { TABLE_NAME: string; COLUMN_NAME: string; }
-            // ) =>
-            // {
-            //   let column = _.extend(col, { name: col.COLUMN_NAME });
-            //   let table = col.TABLE_NAME;
-
-            //   if(!tables[table])
-            //   {
-            //     console.log('add table', table);
-            //     tables[table] = {
-            //       name: table,
-            //       columns: [],
-            //     };
-            //   }
-
-            //   tables[table].columns.push(column);
-            // });
-
-            // onLoad(_.toArray(tables) as any);
-            onLoad(cols);
-          }
-          catch (e)
-          {
-            onError && onError(resp as any);
-          }
-
-          if (cols)
-          {
-            onLoad(cols as any);
-          }
-        },
-        onError,
-      );
-    },
-
-    getDbs_m1(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
-    {
-      Ajax._postMidway1('/get_databases', {
-        db: 'information_schema',
-      }, (resp) =>
-      {
-        try
-        {
-          const list = JSON.parse(resp);
-          onLoad(list.results.map((obj) => obj.schema_name));
-        }
-        catch (e)
-        {
-          onError && onError(e as any);
-        }
-      }, onError);
-    },
-
-    killQuery(id: string)
-    {
-      return Ajax._postMidway1('/kill_query_by_id', {
-          query_id: id,
-        },
-
-        (resp) =>
-        {
-        },
-      );
-    },
-
     login(email: string,
       password: string,
       onLoad: (data: {
@@ -1004,7 +726,7 @@ export const Ajax =
       }) => void,
       onError: (error) => void): XMLHttpRequest
     {
-      return Ajax._reqMidway2(
+      return Ajax.req(
         'post',
         'auth/login',
         {
@@ -1021,7 +743,7 @@ export const Ajax =
 
     checkLogin(accessToken: string, id: number, onSuccess: () => void, onError: () => void)
     {
-      Ajax._reqMidway2(
+      Ajax.req(
         'post',
         'status/loggedIn',
         {
@@ -1042,25 +764,6 @@ export const Ajax =
         onError,
       );
     },
-
-    _config()
-    {
-      // change_conf_dict_mysql[btoa("host")] = btoa(encode_utf8("10.1.0.25"));
-      // change_conf_dict_mysql[btoa("user")] = btoa(encode_utf8("dev"));
-      // change_conf_dict_mysql[btoa("password")] = btoa(encode_utf8("terrain_webscalesql42"));
-      // change_conf_dict_mysql[btoa("db")] = btoa(encode_utf8("BookDB"));
-      // change_conf_dict[btoa("mysqlconfig")] = change_conf_dict_mysql;
-    },
   };
-
-function encode_utf8(s)
-{
-  return unescape(encodeURIComponent(s));
-}
-
-function decode_utf8(s)
-{
-  return decodeURIComponent(escape(s));
-}
 
 export default Ajax;

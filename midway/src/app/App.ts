@@ -58,14 +58,17 @@ import srs = require('secure-random-string');
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
+import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import './Logging';
 import Middleware from './Middleware';
 import MidwayRouter from './Router';
+import * as Schema from './Schema';
 import Users from './users/Users';
 
+export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 
 class App
@@ -105,11 +108,7 @@ class App
 
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
-
-    // tslint:disable-next-line:no-floating-promises
-    (async () => { await Config.handleConfig(config); })();
-
-    Users.initializeDefaultUser();
+    CFG = this.config;
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -127,13 +126,19 @@ class App
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter.routes());
+    this.app.use(AnalyticsRouter.routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
   }
 
-  public listen(port: number | undefined = this.config.port): http.Server
+  public async start(): Promise<http.Server>
   {
-    winston.info('Listening on port ' + String(port));
-    return this.app.listen(port);
+    // tslint:disable-next-line:no-floating-promises
+    await Schema.createAppSchema(this.config.db as string, this.DB);
+    await Config.handleConfig(this.config);
+    await Users.initializeDefaultUser();
+
+    winston.info('Listening on port ' + String(this.config.port));
+    return this.app.listen(this.config.port);
   }
 
   public getConfig(): Config.Config

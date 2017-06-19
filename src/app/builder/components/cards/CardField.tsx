@@ -42,17 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CardField.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Display, DisplayType, RowDisplay } from '../../../../../shared/blocks/displays/Display';
 import PureClasss from '../../../common/components/PureClasss';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
-import {Display, RowDisplay} from '../../BuilderDisplays';
 import BuilderComponent from '../BuilderComponent';
-import { CardItem } from './Card';
+import { CardItem } from './CardComponent';
 import CardDropArea from './CardDropArea';
+import './CardField.less';
 const classNames = require('classnames');
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -64,6 +65,8 @@ const STANDARD_MARGIN = 6;
 export interface Props
 {
   index: number;
+  language: string;
+
   onAdd: (index: number) => void;
   onRemove: (index: number) => void;
   onMove: (index: number, newIndex: number) => void;
@@ -101,39 +104,39 @@ interface IMoveState
 }
 
 const DefaultMoveState: IMoveState =
-{
-  moving: false,
-  movedTo: null,
-};
+  {
+    moving: false,
+    movedTo: null,
+  };
 
-  const shallowCompare = require('react-addons-shallow-compare');
+const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
 class CardField extends PureClasss<Props>
 {
-  state: IMoveState = DefaultMoveState;
+  public state: IMoveState = DefaultMoveState;
 
-  ss(state: IMoveState)
+  public ss(state: IMoveState)
   {
     this.setState(state as any);
   }
 
-	removeField(event)
-	{
+  public removeField(event)
+  {
     Util.animateToHeight(this.refs['all'], 0, () =>
-		  this.props.onRemove(this.props.index));
-	}
+      this.props.onRemove(this.props.index));
+  }
 
-  addField(event)
+  public addField(event)
   {
     this.props.onAdd(this.props.index + 1);
   }
 
-  addFieldTop(event)
+  public addFieldTop(event)
   {
     this.props.onAdd(0);
   }
 
-  handleHandleMousedown(event: MEvent)
+  public handleHandleMousedown(event: MEvent)
   {
     $('body').on('mousemove', this.handleMouseMove);
     $('body').on('mouseup', this.handleMouseUp);
@@ -171,12 +174,12 @@ class CardField extends PureClasss<Props>
     });
   }
 
-  shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
+  public shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
   {
     const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
 
     let index: number;
-    
+
     // TODO search from the bottom up if dragging downwards
     if (dY < 0)
     {
@@ -185,7 +188,7 @@ class CardField extends PureClasss<Props>
       (
         index = 0;
         this.state.midpoints[index] < this.state.originalElTop + dY;
-        index ++
+        index++
       );
     }
     else
@@ -194,7 +197,7 @@ class CardField extends PureClasss<Props>
       (
         index = this.state.midpoints.length - 1;
         this.state.midpoints[index] > this.state.originalElBottom + dY;
-        index --
+        index--
       );
     }
 
@@ -230,13 +233,13 @@ class CardField extends PureClasss<Props>
       $(el).addClass('card-field-wrapper-moving');
     });
 
-    return { 
+    return {
       dY,
       index,
     };
   }
 
-  handleMouseMove(evt)
+  public handleMouseMove(evt)
   {
     this.setState({
       dY: this.shiftSiblings(evt, false).dY,
@@ -245,7 +248,7 @@ class CardField extends PureClasss<Props>
     evt.stopPropagation();
   }
 
-  move()
+  public move()
   {
     if (this.props.index !== this.state.movedTo)
     {
@@ -262,7 +265,7 @@ class CardField extends PureClasss<Props>
     $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
   }
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.index !== this.props.index)
     {
@@ -277,13 +280,13 @@ class CardField extends PureClasss<Props>
     }
   }
 
-  handleMouseUp(evt)
+  public handleMouseUp(evt)
   {
     $('body').off('mousemove', this.handleMouseMove);
     $('body').off('mouseup', this.handleMouseUp);
     $('body').off('mouseleave', this.handleMouseUp);
 
-    const {index} = this.shiftSiblings(evt, true);
+    const { index } = this.shiftSiblings(evt, true);
 
     setTimeout(this.move, 150);
 
@@ -292,12 +295,12 @@ class CardField extends PureClasss<Props>
     });
   }
 
-  beforeTopAddDrop(item: CardItem, targetProps)
+  public beforeTopAddDrop(item: CardItem, targetProps)
   {
     this.props.onAdd(0);
   }
 
-	render()
+  public render()
   {
     let style = null;
     if (this.state.movedTo !== null)
@@ -314,14 +317,14 @@ class CardField extends PureClasss<Props>
       };
     }
 
-    const {row} = this.props;
+    const { row } = this.props;
 
     const isData = typeof this.props.data[this.props.row.inner['key']] !== 'string';
-    const renderTools = ! row.hideToolsWhenNotString || ! isData;
+    const renderTools = !row.hideToolsWhenNotString || !isData;
 
     return (
       <div
-        ref="all"
+        ref='all'
         className={classNames({
           'card-field-wrapper': true,
           'card-field-wrapper-moving': this.state.movedTo !== null,
@@ -329,17 +332,18 @@ class CardField extends PureClasss<Props>
         })}
         style={style}
       >
-        { ! row.above ? null :
-            <BuilderComponent
-              display={this.props.row.above}
-              keyPath={this.props.keyPath}
-              data={this.props.data}
-              canEdit={this.props.canEdit}
-              parentData={this.props.parentData}
-              helpOn={this.props.helpOn}
-              addColumn={this.props.addColumn}
-              columnIndex={this.props.columnIndex}
-            />
+        {!row.above ? null :
+          <BuilderComponent
+            display={this.props.row.above}
+            keyPath={this.props.keyPath}
+            data={this.props.data}
+            canEdit={this.props.canEdit}
+            parentData={this.props.parentData}
+            helpOn={this.props.helpOn}
+            addColumn={this.props.addColumn}
+            columnIndex={this.props.columnIndex}
+            language={this.props.language}
+          />
         }
         <div
           className={classNames({
@@ -349,50 +353,51 @@ class CardField extends PureClasss<Props>
             // ^ hides the left drag handle if single
             'card-field-editable': this.props.canEdit,
           })}
-          ref="cardField"
+          ref='cardField'
         >
           {
             !renderTools && this.props.canEdit && this.props.isFirstRow &&
-              <div
-                className="card-field-top-add card-field-add"
-                onClick={this.addFieldTop}
-                data-tip={'Add another'}
-              >
-                <AddIcon />
-                <CardDropArea
-                  index={null}
-                  keyPath={this._ikeyPath(this.props.keyPath, (row.inner as Display).key)}
-                  beforeDrop={this.beforeTopAddDrop}
-                  renderPreview={true}
-                  accepts={(this.props.row.inner as Display).accepts}
-                />
-              </div>
+            <div
+              className='card-field-top-add card-field-add'
+              onClick={this.addFieldTop}
+              data-tip={'Add another'}
+            >
+              <AddIcon />
+              <CardDropArea
+                index={null}
+                keyPath={this._ikeyPath(this.props.keyPath, (row.inner as Display).key)}
+                beforeDrop={this.beforeTopAddDrop}
+                renderPreview={true}
+                accepts={(this.props.row.inner as Display).accepts}
+                language={this.props.language}
+              />
+            </div>
           }
           {
             renderTools && this.props.canEdit &&
-      				<div className="card-field-tools-left">
-                <div className="card-field-tools-left-inner">
-                  <div
-                    className="card-field-handle"
-                    onMouseDown={this.handleHandleMousedown}
-                  >
-                    ⋮⋮
+            <div className='card-field-tools-left'>
+              <div className='card-field-tools-left-inner'>
+                <div
+                  className='card-field-handle'
+                  onMouseDown={this.handleHandleMousedown}
+                >
+                  ⋮⋮
                   </div>
-                  {
-                      this.props.helpOn ?
-                      <ManualInfo
-                        information="Can move fields around within the current card by dragging and dropping"
-                        className="card-field-manual-info"
-                        leftSide={true}
-                      />
-                      : null
-                    }
-                </div>
+                {
+                  this.props.helpOn ?
+                    <ManualInfo
+                      information='Can move fields around within the current card by dragging and dropping'
+                      className='card-field-manual-info'
+                      leftSide={true}
+                    />
+                    : null
+                }
               </div>
+            </div>
           }
-  				<div className="card-field-inner" >
+          <div className='card-field-inner' >
             <BuilderComponent
-    					display={row.inner}
+              display={row.inner}
               keyPath={this.props.keyPath}
               data={this.props.data}
               canEdit={this.props.canEdit}
@@ -400,67 +405,69 @@ class CardField extends PureClasss<Props>
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
+              language={this.props.language}
             />
-  				</div>
+          </div>
           {
             renderTools && this.props.canEdit &&
-      				<div className="card-field-tools-right">
-                <div className="card-field-tools-right-inner">
-                  <div>
-                    <div
-                      className="card-field-add"
-                      onClick={this.addField}
-                      data-tip={'Add another'}
-                    >
-                      <AddIcon />
-                    </div>
-                    {
-                      this.props.helpOn ?
+            <div className='card-field-tools-right'>
+              <div className='card-field-tools-right-inner'>
+                <div>
+                  <div
+                    className='card-field-add'
+                    onClick={this.addField}
+                    data-tip={'Add another'}
+                  >
+                    <AddIcon />
+                  </div>
+                  {
+                    this.props.helpOn ?
                       <ManualInfo
-                        information="Can add field using the plus button or remove fields using the x button"
+                        information='Can add field using the plus button or remove fields using the x button'
                         rightSide={true}
-                        className="card-field-manual-info"
+                        className='card-field-manual-info'
                       />
                       : null
-                    }
-                    {
-                      !this.props.isOnlyRow &&
-                        <div
-                          className="card-field-remove"
-                          onClick={this.removeField}
-                          data-tip={'Remove'}
-                        >
-                          <RemoveIcon />
-                        </div>
-                    }
-                  </div>
+                  }
+                  {
+                    !this.props.isOnlyRow &&
+                    <div
+                      className='card-field-remove'
+                      onClick={this.removeField}
+                      data-tip={'Remove'}
+                    >
+                      <RemoveIcon />
+                    </div>
+                  }
                 </div>
               </div>
-           }
-  			</div>
-        { ! row.below ? null :
-            <div
-              className={classNames({
-                'card-field-below': true,
-                'card-field-below-first': this.props.isFirstRow,
-                'card-field-below-data': isData && !this.props.row.noDataPadding,
-              })}
-            >
-              <BuilderComponent
-                display={this.props.row.below}
-                keyPath={this.props.keyPath}
-                data={this.props.data}
-                canEdit={this.props.canEdit}
-                parentData={this.props.parentData}
-                helpOn={this.props.helpOn}
-                addColumn={this.props.addColumn}
-                columnIndex={this.props.columnIndex}
-              />
             </div>
+          }
+        </div>
+        {!row.below ? null :
+          <div
+            className={classNames({
+              'card-field-below': true,
+              'card-field-below-first': this.props.isFirstRow,
+              'card-field-below-data': isData && !this.props.row.noDataPadding,
+            })}
+          >
+            <BuilderComponent
+              display={this.props.row.below}
+              keyPath={this.props.keyPath}
+              data={this.props.data}
+              canEdit={this.props.canEdit}
+              parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+              language={this.props.language}
+            />
+          </div>
         }
       </div>
-	  );
-	}
+    );
+  }
 }
 
 export default CardField;

@@ -42,15 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
+import Radium = require('radium');
 
 export interface Props
 {
-	item: SchemaTypes.Index;
+  item: SchemaTypes.Index;
 }
 
 class State
@@ -60,47 +61,47 @@ class State
 @Radium
 export class IndexTreeInfo extends PureClasss<Props>
 {
-	state: State = new State();
+  public state: State = new State();
 
-  render()
+  public render()
   {
-  	const index = this.props.item;
+    const index = this.props.item;
 
     return (
       <div
-      	style={Styles.infoPieces}
+        style={Styles.infoPieces}
       >
-      	<div
-      		style={Styles.infoPiece}
-      	>
-      		<span
-      			style={Styles.infoPieceNumber as any}
-      		>
-      			{ index.indexType }
-      		</span>
-      	</div>
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {index.indexType}
+          </span>
+        </div>
 
-      	<div
-      		style={Styles.infoPiece}
-      	>
-      		<span
-      			style={Styles.infoPieceNumber as any}
-      		>
-      			{ index.columnIds.size }
-      		</span>
-      		 columns
-      	</div>
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {index.columnIds.size}
+          </span>
+          columns
+        </div>
       </div>
     );
   }
 }
 
 export const indexChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-[
-  {
-    label: 'Columns',
-    type: 'column',
-  },
-];
+  [
+    {
+      label: 'Columns',
+      type: 'column',
+    },
+  ];
 
 export default IndexTreeInfo;

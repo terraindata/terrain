@@ -49,7 +49,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import FadeInOut from '../../common/components/FadeInOut';
 import Util from '../../util/Util';
-import {SchemaActions, SchemaStore} from '../data/SchemaStore';
+import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaResults from './SchemaResults';
@@ -57,7 +57,8 @@ import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';
 
-export interface Props {
+export interface Props
+{
   fullPage: boolean;
   showSearch: boolean;
   search?: string;
@@ -68,7 +69,8 @@ const verticalDivide = 75;
 const searchHeight = 42;
 
 @Radium
-class SchemaView extends PureClasss<Props> {
+class SchemaView extends PureClasss<Props>
+{
   public state: {
     highlightedIndex: number;
     search: string;
@@ -81,7 +83,8 @@ class SchemaView extends PureClasss<Props> {
     search: '',
   };
 
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
 
     this._subscribe(SchemaStore, {
@@ -95,7 +98,8 @@ class SchemaView extends PureClasss<Props> {
     });
   }
 
-  public handleSearchChange(event) {
+  public handleSearchChange(event)
+  {
     const search = event.target.value as string;
     this.setState({
       search,
@@ -104,11 +108,13 @@ class SchemaView extends PureClasss<Props> {
     SchemaActions.highlightId(null, false);
   }
 
-  public handleSearchKeyDown(event) {
-    const {highlightedIndex} = this.state;
+  public handleSearchKeyDown(event)
+  {
+    const { highlightedIndex } = this.state;
     let offset: number = 0;
 
-    switch (event.keyCode) {
+    switch (event.keyCode)
+    {
       case 38:
         // up
         offset = -1;
@@ -133,7 +139,8 @@ class SchemaView extends PureClasss<Props> {
       case 9:
         // enter or tab
 
-        if (this.state.highlightedId) {
+        if (this.state.highlightedId)
+        {
           SchemaActions.selectId(this.state.highlightedId);
         }
 
@@ -160,9 +167,10 @@ class SchemaView extends PureClasss<Props> {
     }
   }
 
-  public render() {
+  public render()
+  {
     const search = this.props.search || this.state.search;
-    const {showSearch} = this.props;
+    const { showSearch } = this.props;
 
     return (
       <div
@@ -186,8 +194,8 @@ class SchemaView extends PureClasss<Props> {
               }}
             >
               <input
-                type="text"
-                placeholder="Search schema"
+                type='text'
+                placeholder='Search schema'
                 value={search}
                 onChange={this.handleSearchChange}
                 onKeyDown={this.handleSearchKeyDown}
@@ -213,7 +221,7 @@ class SchemaView extends PureClasss<Props> {
             </FadeInOut>
 
             <SchemaTreeList
-              itemType="server"
+              itemType='server'
               itemIds={this.state.servers && this.state.servers.keySeq().toList()}
               label={'Servers'}
               topLevel={true}
@@ -232,7 +240,6 @@ class SchemaView extends PureClasss<Props> {
             this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
           ]}
         >
-
         </div>
       </div>
     );

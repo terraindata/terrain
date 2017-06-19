@@ -52,7 +52,7 @@ import cmdLineUsage = require('command-line-usage');
 const optionList = [
   {
     alias: 'c',
-    defaultValue: 'nodeway.json',
+    defaultValue: 'midway.json',
     name: 'config',
     type: String,
     typeLabel: 'file',
@@ -76,7 +76,7 @@ const optionList = [
   },
   {
     alias: 'n',
-    defaultValue: 'nodeway.db',
+    defaultValue: 'midway.db',
     name: 'dsn',
     type: String,
     description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
@@ -97,11 +97,17 @@ const optionList = [
     type: Boolean,
     description: 'Print verbose information.',
   },
+  {
+    name: 'analyticsdb',
+    type: String,
+    defaultValue: 'http://127.0.0.1:9200',
+    description: 'Analytics datastore connection parameters',
+  },
 ];
 
 const sections = [
   {
-    header: 'Nodeway',
+    header: 'Midway 2.0',
     content: 'Refreshingly good.',
   },
   {

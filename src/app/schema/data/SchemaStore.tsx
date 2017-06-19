@@ -46,15 +46,16 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import Redux = require('redux');
-import {Store} from 'redux';
+import { Store } from 'redux';
 import * as ReduxActions from 'redux-actions';
 import SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Ajax from './../../util/Ajax';
+import AjaxM1 from './../../util/AjaxM1';
 import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
-import SharedTypes from './../../../../shared/SharedTypes';
 
 type Server = SchemaTypes.Server;
 type Database = SchemaTypes.Database;
@@ -71,10 +72,10 @@ export const SchemaStore: Store<SchemaState> =
           Ajax.getDbs(
             (dbs: object) =>
             {
-              let m1Dbs: SharedTypes.Database[] = [];
-              let m2Dbs: SharedTypes.Database[] = [];
+              let m1Dbs: BackendInstance[] = [];
+              let m2Dbs: BackendInstance[] = [];
               _.map((dbs as any),
-                (db: SharedTypes.Database) => {
+                (db: BackendInstance) => {
                   if (db.source === 'm1')
                   {
                     m1Dbs.push(db);
@@ -94,8 +95,8 @@ export const SchemaStore: Store<SchemaState> =
               // return;
               SchemaActions.serverCount(Object.keys(m2Dbs).length);
               _.map((dbs as any),
-                (db: SharedTypes.Database) =>
-                  (db.source === 'm1' ? Ajax.schema_m1 : Ajax.schema)(
+                (db: BackendInstance) =>
+                  (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
                     db['id'],
                     (schemaData, error) =>
                     {

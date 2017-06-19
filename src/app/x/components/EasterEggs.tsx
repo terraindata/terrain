@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./EasterEggs.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -51,13 +51,15 @@ import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import './EasterEggs.less';
 const r = 3;
-export interface Props {
+export interface Props
+{
 }
 
 class EasterEggs extends PureClasss<Props>
 {
-  state: {
+  public state: {
     christmas: boolean;
     snow: Immutable.List<{ x: number, y: number, moving: boolean }>;
     buckets: Immutable.List<number>;
@@ -71,7 +73,7 @@ class EasterEggs extends PureClasss<Props>
     h: 0,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     // setTimeout(this.startChristmas, 200);
     const keys = [];
@@ -87,10 +89,13 @@ class EasterEggs extends PureClasss<Props>
     });
   }
 
-  dropSnow()
+  public dropSnow()
   {
-    let {buckets, snow, w, h} = this.state;
-    if (!buckets || !snow) return;
+    let { buckets, snow, w, h } = this.state;
+    if (!buckets || !snow)
+    {
+      return;
+    }
 
     // new snow
     const c = Util.randInt(4);
@@ -109,7 +114,7 @@ class EasterEggs extends PureClasss<Props>
         return s;
       }
 
-      let {x, y} = s;
+      let { x, y } = s;
       if (buckets.get(x) >= y)
       {
         buckets = buckets.set(x, buckets.get(x) + 1);
@@ -118,7 +123,7 @@ class EasterEggs extends PureClasss<Props>
         };
       }
 
-      y --;
+      y--;
       const newx = Util.valueMinMax(x + Util.randInt(3) - 1, 0, Math.floor(w / r));
       if (buckets.get(newx) < y)
       {
@@ -133,7 +138,7 @@ class EasterEggs extends PureClasss<Props>
     });
   }
 
-  startChristmas()
+  public startChristmas()
   {
     const w = $('body').width();
     const h = $('body').height();
@@ -150,16 +155,16 @@ class EasterEggs extends PureClasss<Props>
     setInterval(this.dropSnow, 100);
   }
 
-  render()
+  public render()
   {
     if (this.state.christmas)
     {
       return (
-        <div className="snow-egg">
+        <div className='snow-egg'>
           {
             this.state.snow && this.state.snow.map((s) =>
               <div
-                className="snow"
+                className='snow'
                 style={{
                   width: r,
                   height: r,
@@ -169,7 +174,7 @@ class EasterEggs extends PureClasss<Props>
               />,
             )
           }
-          <iframe className="youtube-player" type="text/html" src="http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1">&lt;br /&gt;</iframe>
+          <iframe className='youtube-player' type='text/html' src='http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1'>&lt;br /&gt;</iframe>
         </div>
       );
     }

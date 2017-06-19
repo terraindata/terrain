@@ -42,8 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
 
 import * as React from 'react';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import RoleTypes from '../../roles/RoleTypes';
@@ -71,7 +73,7 @@ export interface Props
 
 class GroupsColumn extends Classs<Props>
 {
-  state: {
+  public state: {
     rendered: boolean,
     lastMoved: any,
     me: UserTypes.User,
@@ -83,7 +85,7 @@ class GroupsColumn extends Classs<Props>
     roles: null,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     this.setState({
       rendered: true,
@@ -105,13 +107,13 @@ class GroupsColumn extends Classs<Props>
   //     this.props.groupsOrder.findIndex(iid => iid === id));
   // }
 
-  handleArchive(id: ID)
+  public handleArchive(id: ID)
   {
     Actions.groups.change(this.props.groups.find((g) => g.id === id)
-      .set('status', LibraryTypes.ItemStatus.Archive) as Group);
+      .set('status', ItemStatus.Archive) as Group);
   }
 
-  handleNameChange(id: ID, name: string)
+  public handleNameChange(id: ID, name: string)
   {
     Actions.groups.change(
       this.props.groups.get(id)
@@ -119,12 +121,12 @@ class GroupsColumn extends Classs<Props>
     );
   }
 
-  handleCreate()
+  public handleCreate()
   {
     Actions.groups.create();
   }
 
-  handleHover(index: number, type: string, id: ID)
+  public handleHover(index: number, type: string, id: ID)
   {
     const itemIndex = this.props.groupsOrder.findIndex((v) => v === id);
     if (type === 'group' && itemIndex !== index
@@ -138,21 +140,21 @@ class GroupsColumn extends Classs<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
+  public handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
   {
 
   }
 
-  renderGroup(id: ID, index: number)
+  public renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
-    const {me, roles} = this.state;
+    const { me, roles } = this.state;
     const groupRoles = roles && roles.get(id);
     const canCreate = (me && groupRoles && groupRoles.getIn([me.id, 'admin']));
     const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
 
-        // onDuplicate={this.handleDuplicate}
+    // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
         index={index}
@@ -165,7 +167,7 @@ class GroupsColumn extends Classs<Props>
         key={group.id}
         to={'/library/' + group.id}
         onNameChange={this.handleNameChange}
-        type="group"
+        type='group'
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
@@ -176,22 +178,22 @@ class GroupsColumn extends Classs<Props>
         canDuplicate={false}
         canCreate={canCreate}
       >
-        <div className="group-library-info-wrapper">
+        <div className='group-library-info-wrapper'>
           {
             groupRoles && me && (groupRoles.getIn([me.id, 'builder']) || groupRoles.getIn([me.id, 'admin'])) &&
-              <UserThumbnail
-                userId={me.id}
-                medium={true}
-                extra={
-                  groupRoles.getIn([me.id, 'admin']) ? 'Admin' :
-                    (groupRoles.getIn([me.id, 'builder']) ? 'Builder' : 'Viewer')
-                }
-              />
+            <UserThumbnail
+              userId={me.id}
+              medium={true}
+              extra={
+                groupRoles.getIn([me.id, 'admin']) ? 'Admin' :
+                  (groupRoles.getIn([me.id, 'builder']) ? 'Builder' : 'Viewer')
+              }
+            />
           }
           {
             groupRoles && groupRoles.toArray()
-            .filter((role) => role.builder || role.admin)
-            .map(
+              .filter((role) => role.builder || role.admin)
+              .map(
               (role, index) =>
                 index > 8 || (me && role.userId === me.id) ? null :
                   <UserThumbnail
@@ -210,65 +212,65 @@ class GroupsColumn extends Classs<Props>
     );
   }
 
-  handleCategoryHover(statusString: string, id: ID)
+  public handleCategoryHover(statusString: string, id: ID)
   {
     const g = this.props.groups.get(id);
-    const status = LibraryTypes.ItemStatus[statusString];
+    const status = ItemStatus[statusString];
     if (g.status !== status)
     {
       Actions.groups.change(g.set('status', status) as Group);
     }
   }
 
-  renderCategory(status: LibraryTypes.ItemStatus)
+  public renderCategory(status: ItemStatus)
   {
     const ids = this.props.groupsOrder.filter((id) => this.props.groups.get(id).status === status);
     const canCreate = this.state.me && this.state.me.isSuperUser;
 
     return (
       <LibraryItemCategory
-        status={LibraryTypes.ItemStatus[status]}
+        status={ItemStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
-        type="group"
-        titleHidden={status === LibraryTypes.ItemStatus.Build}
+        type='group'
+        titleHidden={status === ItemStatus.Build}
       >
         {
           ids.map(this.renderGroup)
         }
         {
-          ids.size === 0 && <div className="library-category-none">None</div>
+          ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
-          status === LibraryTypes.ItemStatus.Build && canCreate &&
-            <CreateItem
-              name="group"
-              onCreate={this.handleCreate}
-            />
+          status === ItemStatus.Build && canCreate &&
+          <CreateItem
+            name='group'
+            onCreate={this.handleCreate}
+          />
         }
       </LibraryItemCategory>
     );
   }
 
-  render()
+  public render()
   {
     return (
       <LibraryColumn
         index={1}
-        title="Groups"
+        title='Groups'
       >
         {
           this.props.groups.size ?
             (
               <div>
-                { this.renderCategory(LibraryTypes.ItemStatus.Build) }
-                { this.renderCategory(LibraryTypes.ItemStatus.Archive) }
+                {this.renderCategory(ItemStatus.Build)}
+                {this.renderCategory(ItemStatus.Archive)}
               </div>
             )
             :
             <InfoArea
-              large="No groups created, yet."
-              button="Create a group"
+              large='No groups created, yet.'
+              button='Create a group'
               onClick={this.handleCreate}
             />
         }

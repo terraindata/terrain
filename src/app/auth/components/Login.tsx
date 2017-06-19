@@ -42,21 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Login.less');
+// Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import PureClasss from '../../common/components/PureClasss';
+import Ajax from '../../util/Ajax';
 import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
-import Ajax from '../../util/Ajax';
+import './Login.less';
 
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 
-export interface Props {
+export interface Props
+{
   appStateLoaded: boolean;
   loggedIn: boolean;
   onLoadComplete: () => void;
@@ -64,7 +66,7 @@ export interface Props {
 
 class Login extends PureClasss<Props>
 {
-  state = {
+  public state = {
     shifted: false,
     email: '',
     password: '',
@@ -77,7 +79,7 @@ class Login extends PureClasss<Props>
     xhr: null,
   };
 
-  componentDidMount()
+  public componentDidMount()
   {
     $('body').on('keydown', this.handleBodyKeyDown);
 
@@ -95,12 +97,12 @@ class Login extends PureClasss<Props>
     );
   }
 
-  componentWillUnmount()
+  public componentWillUnmount()
   {
     $('body').off('keydown', this.handleBodyKeyDown);
   }
 
-  handleBodyKeyDown(event)
+  public handleBodyKeyDown(event)
   {
     // delay it, because for some reason, the page does
     //  not pick up on auto-filled values in the password
@@ -108,7 +110,7 @@ class Login extends PureClasss<Props>
     setTimeout(() => this.handleKeyDown(event), 100);
   }
 
-  handleKeyDown(event)
+  public handleKeyDown(event)
   {
     if (event.keyCode === 13)
     {
@@ -116,9 +118,9 @@ class Login extends PureClasss<Props>
     }
   }
 
-  handleEmailChange(ev: any)
+  public handleEmailChange(ev: any)
   {
-    const {value} = ev.target;
+    const { value } = ev.target;
     this.setState({
       email: value,
     });
@@ -131,9 +133,9 @@ class Login extends PureClasss<Props>
     }
   }
 
-  handlePasswordChange(ev: any)
+  public handlePasswordChange(ev: any)
   {
-    const {value} = ev.target;
+    const { value } = ev.target;
     this.setState({
       password: value,
     });
@@ -146,14 +148,14 @@ class Login extends PureClasss<Props>
     }
   }
 
-  handleFocus()
+  public handleFocus()
   {
     this.setState({
       shifted: true,
     });
   }
 
-  handleBlur()
+  public handleBlur()
   {
     if (!this.state.email && !this.state.password)
     {
@@ -163,12 +165,12 @@ class Login extends PureClasss<Props>
     }
   }
 
-  handleAnimationEnded()
+  public handleAnimationEnded()
   {
     this.props.onLoadComplete();
   }
 
-  handleLogin()
+  public handleLogin()
   {
     if (this.state.loggingIn)
     {
@@ -177,48 +179,50 @@ class Login extends PureClasss<Props>
     }
 
     this.state.xhr && this.state.xhr.abort();
-    
+
     this.setState({
       loggingIn: true,
       xhr: Ajax.login(
         this.state.email,
         this.state.password,
-        
-        (userData: { accessToken: string, id: number }) => {
+
+        (userData: { accessToken: string, id: number }) =>
+        {
           Actions.login(userData.accessToken, userData.id);
         },
-        
-        (ev: Event) => {
+
+        (ev: Event) =>
+        {
           this.setState({
             errorModalMessage: 'Error logging in:' + JSON.stringify(ev),
             loggingIn: false,
             xhr: null,
           });
           this.toggleErrorModal();
-        }
+        },
       ),
     });
   }
 
-  handleForgotPassword()
+  public handleForgotPassword()
   {
     alert("Sorry, resetting your password hasn't been implemented yet.");
   }
 
-  registerNewUser()
+  public registerNewUser()
   {
     alert('Signing up for Terraformer has not been implemented yet');
   }
 
-  toggleErrorModal()
+  public toggleErrorModal()
   {
-    this.setState ({
+    this.setState({
       loginErrorModalOpen: !this.state.loginErrorModalOpen,
     });
   }
 
-          // <TerrainIcon className='login-logo'/>
-  render()
+  // <TerrainIcon className='login-logo'/>
+  public render()
   {
     // show loading if you are logging in, or if you are already logged in
     //  but the app state is still loading
@@ -232,9 +236,9 @@ class Login extends PureClasss<Props>
           'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.props.loggedIn,
         })}
       >
-        <div className="login-logo-container">
-        {
-          this.state.showingLogo &&
+        <div className='login-logo-container'>
+          {
+            this.state.showingLogo &&
             <Loading
               width={150}
               height={150}
@@ -242,51 +246,51 @@ class Login extends PureClasss<Props>
               loaded={this.props.loggedIn && this.props.appStateLoaded}
               onLoadedEnd={this.handleAnimationEnded}
             />
-        }
+          }
         </div>
         <div
-          className="login-container"
-          ref="container"
+          className='login-container'
+          ref='container'
         >
-          <div className="login-info">
-            <div className="login-row">
+          <div className='login-info'>
+            <div className='login-row'>
               <input
-                id="login-email"
-                type="text"
+                id='login-email'
+                type='text'
                 onChange={this.handleEmailChange}
-                className="login-input-field"
-                placeholder=""
+                className='login-input-field'
+                placeholder=''
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
               <label
-                htmlFor="login-email"
-                className="login-label"
+                htmlFor='login-email'
+                className='login-label'
               >
                 Email
               </label>
             </div>
-            <div className="login-row">
+            <div className='login-row'>
               <input
-                className="login-input-field"
-                type="password"
-                id="login-password"
-                placeholder=""
+                className='login-input-field'
+                type='password'
+                id='login-password'
+                placeholder=''
                 onKeyDown={this.handleKeyDown}
                 onChange={this.handlePasswordChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
               <label
-                className="login-label"
-                htmlFor="login-password"
+                className='login-label'
+                htmlFor='login-password'
               >
                 Password
               </label>
             </div>
           </div>
-          <div className="login-submit-button-wrapper" >
-            <div className="login-submit-button button" onClick={this.handleLogin}>
+          <div className='login-submit-button-wrapper' >
+            <div className='login-submit-button button' onClick={this.handleLogin}>
               Login
             </div>
           </div>
@@ -299,24 +303,24 @@ class Login extends PureClasss<Props>
         </div>
       </div>
     );
-   }
+  }
 }
 // <div className='login-bottom-toolbar'>
-        //   <div
-        //     className='login-forgot-password'
-        //     onClick={this.handleForgotPassword}
-        //   >
-        //     Forgot Password?
-        //   </div>
-        //   <div className='login-no-account'>
-        //     Don't have an account yet? &nbsp;
-        //       <span
-        //         className='login-green'
-        //         onClick={this.registerNewUser}
-        //       >
-        //          Sign Up
-        //       </span>
-        //   </div>
-        // </div>
+//   <div
+//     className='login-forgot-password'
+//     onClick={this.handleForgotPassword}
+//   >
+//     Forgot Password?
+//   </div>
+//   <div className='login-no-account'>
+//     Don't have an account yet? &nbsp;
+//       <span
+//         className='login-green'
+//         onClick={this.registerNewUser}
+//       >
+//          Sign Up
+//       </span>
+//   </div>
+// </div>
 
 export default Login;
