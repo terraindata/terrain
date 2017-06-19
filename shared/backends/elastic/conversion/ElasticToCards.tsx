@@ -67,7 +67,7 @@ export default function ElasticToCards(
   try
   {
     const obj = JSON.parse(query.tql);
-    const cards = parseMagicObject('', obj);
+    const cards = parseMagicObject(obj);
     return query
       .set('cards', cards)
       .set('cardsAndCodeInSync', true);
@@ -144,8 +144,8 @@ const parseValueSingleCard = (value: any): Card =>
           },
         );
       }
-      default:
-        throw new Error('Elastic Parsing: Unsupported value: ' + value);
+    default:
+      throw new Error('Elastic Parsing: Unsupported value: ' + value);
   }
 };
 
@@ -179,7 +179,7 @@ const parseObjectToggle = (obj: object): Cards =>
           {
             // not yet done
           }
-        // not yet done
+          // not yet done
           break;
         default:
           throw new Error('Elastic Parsing: Unsupported value: ' + value);
@@ -199,15 +199,18 @@ const parseObjectToggle = (obj: object): Cards =>
   return Immutable.List(arr);
 };
 
-const parseMagicObject = (rootKey: string, obj: object): Cards =>
+const parseMagicObject = (obj: object): Cards =>
 {
   const values: Card[] = _.map(obj,
     (value: any, key: string) =>
     {
       if (typeof value === 'object')
       {
-        const cards: Cards = parseMagicObject(key, value);
-        return cards.first();
+        const cards: Cards = parseMagicObject(value);
+        return make(Blocks.elasticMagicValue, {
+          key,
+          value: cards.first(),
+        });
       }
       else
       {
@@ -222,11 +225,10 @@ const parseMagicObject = (rootKey: string, obj: object): Cards =>
   const magicCard = make(
     Blocks.elasticMagicCard,
     {
-      rootKey,
-      values,
+      values: Immutable.List(values),
     },
   );
 
-  return Immutable.List([ magicCard ]);
+  return Immutable.List([magicCard]);
 };
 

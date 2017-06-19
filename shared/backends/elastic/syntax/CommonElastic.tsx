@@ -51,6 +51,7 @@ namespace CommonElastic
 {
   export const valueTypes =
     {
+      auto: 'auto',
       text: 'text',
       number: 'number',
       object: 'object',
@@ -61,6 +62,7 @@ namespace CommonElastic
   export const valueTypesList = _.map(valueTypes, (v) => v);
   export const valueTypesDisplayNames =
     {
+      auto: 'Auto',
       text: 'Text',
       number: 'Number',
       object: 'Map',
