@@ -62,18 +62,17 @@ class ESDefaultFormatter extends ObjectFormatter
     valueToks: ['', '\n'],
     singularValueToks: ['', ''],
     keyToks: ['\n', ' '],
-    singularKeyToks: ['', ' '],
+    singularKeyToks: ['\n', ' '],
     openObjectToks: ['\n', '\n'],
     closeObjectToks: ['\n', '\n'],
     openArrayToks: ['\n', '\n'],
     closeArrayToks: ['\n', '\n'],
-    openSingularObjectToks: ['', ''],
-    closeSingularObjectToks: ['', ''],
-    openSingularArrayToks: ['', ''],
-    closeSingularArrayToks: ['', ''],
+    openSingularObjectToks: ['\n', '\n'],
+    closeSingularObjectToks: ['\n', '\n'],
+    openSingularArrayToks: ['\n', '\n'],
+    closeSingularArrayToks: ['\n', '\n'],
   };
 
-  protected depth: number = 0;
   protected output: string = '';
   protected rules: object;
   protected token: string = '';
@@ -89,10 +88,10 @@ class ESDefaultFormatter extends ObjectFormatter
     return this.output;
   }
 
-  protected addText(value: any, key: string): void
+  protected addText(value: any, key: string, depth: number): void
   {
     // Sandwiches the value between the tokens defined by key. Merges tokens. Strips double newlines and applies indents.
-    this.token = this.indentToken(this.lintToken(this.token + this.rules[key][0]));
+    this.token = this.indentToken(this.lintToken(this.token + this.rules[key][0]), depth);
     this.output += this.token + value.toString();
     this.token = this.rules[key][1];
   }
@@ -102,9 +101,9 @@ class ESDefaultFormatter extends ObjectFormatter
     return tok.replace('\n\n', '\n');
   }
 
-  protected indentToken(text: string): string
+  protected indentToken(text: string, depth: number): string
   {
-    return text.replace(new RegExp('\n', 'mg'), '\n' + this.rules['spacingTok'].repeat(this.depth));
+    return text.replace(new RegExp('\n', 'mg'), '\n' + this.rules['spacingTok'].repeat(depth));
   }
 
   // parent class method implementations
@@ -117,43 +116,39 @@ class ESDefaultFormatter extends ObjectFormatter
     }
     const toks: string = element.isOnlyElement() ? 'singularValueToks' : 'valueToks';
     const delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
-    this.addText(value + delimiter, toks);
+    this.addText(value + delimiter, toks, element.depth);
   }
 
   protected onKey(key: string, element: ElementInfo): void
   {
     const toks: string = element.isOnlyElement() ? 'singularKeyToks' : 'keyToks';
-    this.addText(JSON.stringify(key) + this.rules['key'], toks);
+    this.addText(JSON.stringify(key) + this.rules['key'], toks, element.depth);
   }
 
   protected onOpenObject(obj?: object, element?: ElementInfo): void
   {
     const toks: string = Object.keys(obj).length === 1 ? 'openSingularObjectToks' : 'openObjectToks';
-    this.addText(this.rules['object'][0], toks);
-    this.depth += 1;
+    this.addText(this.rules['object'][0], toks, element.depth);
   }
 
   protected onCloseObject(obj?: object, element?: ElementInfo): void
   {
-    this.depth -= 1;
     const toks: string = Object.keys(obj).length === 1 ? 'closeSingularObjectToks' : 'closeObjectToks';
     const delimiter: string = element.isLastElement() ? '' : this.rules['delimiter'];
-    this.addText(this.rules['object'][1] + delimiter, toks);
+    this.addText(this.rules['object'][1] + delimiter, toks, element.depth);
   }
 
   protected onOpenArray(arr?: any[], element?: ElementInfo): void
   {
     const toks: string = arr.length === 1 ? 'openSingularArrayToks' : 'openArrayToks';
-    this.addText(this.rules['array'][0], toks);
-    this.depth += 1;
+    this.addText(this.rules['array'][0], toks, element.depth);
   }
 
   protected onCloseArray(arr?: any[], element?: ElementInfo): void
   {
-    this.depth -= 1;
     const toks: string = arr.length === 1 ? 'closeSingularArrayToks' : 'closeArrayToks';
     const delimiter = element.isLastElement() ? '' : this.rules['delimiter'];
-    this.addText(this.rules['array'][1] + delimiter, toks);
+    this.addText(this.rules['array'][1] + delimiter, toks, element.depth);
   }
 
 }

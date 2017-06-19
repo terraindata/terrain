@@ -43,7 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import ESJSONParser from '../../parser/ESJSONParser';
+import ESParserToken from '../../parser/ESParserToken';
+import ESParserValueInfo from '../../parser/ESValueInfo';
 import ElementInfo from './ElementInfo';
 /**
  * Abstract class for classes that want to format query strings
@@ -64,14 +66,15 @@ abstract class ObjectFormatter
   constructor() { }
 
   /**
-   * @param obj the query object
+   * @param query the query object
+   * @param previousQuery the previous query object (optional)
    * @returns If parsing was successful
    */
-  public parseObject(obj: any): boolean
+  public parseObject(query: ESJSONParser): boolean
   {
     try
     {
-      this.traverseObject(obj, new ElementInfo(0));
+      this.traverseObject(query.getValue(), new ElementInfo(0, 0));
       this.onEnd();
       return true;
     }
@@ -81,7 +84,6 @@ abstract class ObjectFormatter
       return false;
     }
   }
-
   /**
    * @returns {string} the formatted query string
    */
@@ -141,7 +143,7 @@ abstract class ObjectFormatter
   protected sortKeys(keys: string[], element?: ElementInfo): string[] { return keys; } // traverse keys in order of returned array
 
   /**
-   * This does not need to be overriden
+   * Recurses through an object and calls the appropriate handlers.
    */
   protected traverseObject(obj: any, element: ElementInfo): void
   {
@@ -158,7 +160,7 @@ abstract class ObjectFormatter
           this.onOpenArray(obj, element);
           for (let i = 0; i < obj.length; i++)
           {
-            this.traverseObject(obj[i], new ElementInfo(i, obj));
+            this.traverseObject(obj[i], new ElementInfo(i, element.depth + 1, obj));
           }
           this.onCloseArray(obj, element);
         }
@@ -172,7 +174,7 @@ abstract class ObjectFormatter
           this.onOpenObject(obj, element);
           for (let i = 0; i < keys.length; i++)
           {
-            const innerElement: ElementInfo = new ElementInfo(i, obj, keys);
+            const innerElement: ElementInfo = new ElementInfo(i, element.depth + 1, obj, keys);
             this.onKey(keys[i], innerElement);
             this.traverseObject(obj[keys[i]], innerElement);
           }

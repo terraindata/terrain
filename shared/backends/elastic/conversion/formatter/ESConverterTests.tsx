@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // Temporary testing file to be run using node from command line, until I get unit testing working
 import * as deepEqual from 'deep-equal';
+import ESJSONParser from '../../parser/ESJSONParser';
 import ESConverter from './ESConverter';
 
 /* tslint:disable:no-console */
@@ -53,15 +54,18 @@ import ESConverter from './ESConverter';
 
 class BounceTest
 {
-  constructor(
-    public testName: string,
-    public testObj: any,
-  ) { }
+  public testName: string;
+  public testObj: ESJSONParser;
+  constructor(testName: string, testObj: any)
+  {
+    this.testName = testName;
+    this.testObj = new ESJSONParser(JSON.stringify(testObj));
+  }
 }
-function bounceCheck(obj: any): boolean
+function bounceCheck(obj: ESJSONParser): boolean
 {
   const bounced: any = JSON.parse(ESConverter.formatES(obj));
-  return deepEqual(bounced, obj);
+  return deepEqual(bounced, obj.getValue());
 }
 function runBounceChecks(tests: BounceTest[])
 {
@@ -111,6 +115,7 @@ for (let i = 0; i < 64; i++)
   curr.push([]);
   curr = curr[1];
 }
+
 runBounceChecks([
   new BounceTest('generic',
     {
@@ -202,5 +207,39 @@ runBounceChecks([
     deepArr,
   ),
 ]);
+/*
+console.log(ESConverter.formatES(new ESJSONParser(JSON.stringify(
+    {
+      'index': 'movies',
+      'type': 'data',
+      'size': 10,
+      'body': {
+        'query': {
+          'bool': {
+            'must_not': [
+              {
+                'match': {
+                  'title': 'Toy Story (1995)',
+                },
+              },
+            ],
+            'must': [
+              {
+                'range': {
+                  'releasedate': {
+                    'gte': '2007-03-24',
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    }))));
+*/
+// const parser = new ESJSONParser('{"foo":[1, 2, {"bar": "xD"}]}');
+// console.log(parser);
+// console.log(parser.getValue());
+
 /* tslint:enable:no-console */
 /* tslint:enable:object-literal-key-quotes */

@@ -43,14 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import ESJSONParser from '../../parser/ESJSONParser';
 import ESDefaultFormatter from './ESDefaultFormatter';
+
 /**
- * WIP
+ * WIP - currently nothing happens with previousQuery
  */
 class ESConverter
 {
-  public static formatES(query: object | string, previousCode?: string): string
+  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
   {
     const formatter = new ESDefaultFormatter();
     formatter.parseObject(query);

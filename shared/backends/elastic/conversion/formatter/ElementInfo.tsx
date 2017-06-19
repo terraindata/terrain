@@ -51,6 +51,7 @@ class ElementInfo
 {
   constructor(
     public readonly index: number, // index is element's position underneath its parent (so 0 if it's root level)
+    public readonly depth: number,
     public readonly container?: any[] | object, // parent of element: undefined for values under root
     public readonly keys?: string[], // undefined for values inside arrays or under root
   ) { }
