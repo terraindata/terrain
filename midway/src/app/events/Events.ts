@@ -72,16 +72,18 @@ export interface EventConfig
   message: string;
   payload: any;
   type: string;
+  url?: string;
 }
 
 export interface EventRequestConfig
 {
+  date?: number;
+  eventId: string;
   id?: number;
   ip: string;
-  date?: number;
   message?: string;
   payload?: object;
-  eventId: string;
+  url?: string;
   variantId?: string;
 }
 
@@ -221,6 +223,16 @@ export class Events
         case 'number':
           res[item] = 0;
           break;
+        case 'object':
+          if (payload[item] instanceof Date)
+          {
+            res[item] = new Date(0);
+          }
+          else
+          {
+            res[item] = this.getEmptyObject(payload[item]);
+          }
+          break;
 
         default:
           res[item] = '';
@@ -271,6 +283,7 @@ export class Events
             eventId: jsonObj['eventId'],
             variantId: jsonObj['variantId'],
             ip: IPSource,
+            url: jsonObj['url'] !== undefined ? jsonObj['url'] : '',
           };
         encodedEventArr.push(await this.encodeMessage(eventRequest));
       }
