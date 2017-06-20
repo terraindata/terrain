@@ -50,10 +50,6 @@ import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import { UserConfig } from '../users/Users';
-import * as Util from '../Util';
-import { versions } from '../versions/VersionRouter';
 
 export interface ImportConfig
 {
