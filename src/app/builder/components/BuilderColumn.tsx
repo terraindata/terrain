@@ -86,7 +86,7 @@ enum COLUMNS
 {
   Builder,
   Results,
-  TQL,
+  Editor,
   Inputs,
   Schema,
 }
@@ -240,7 +240,7 @@ const BuilderColumn = React.createClass<any, any>(
             resultsState={this.props.resultsState}
           />;
 
-        case COLUMNS.TQL:
+        case COLUMNS.Editor:
           return <BuilderTQLColumn
             canEdit={canEdit}
             addColumn={this.props.onAddManualColumn}
@@ -374,8 +374,9 @@ const BuilderColumn = React.createClass<any, any>(
               'builder-column-content-scroll':
               this.state.column === COLUMNS.Builder ||
               this.state.column === COLUMNS.Inputs,
-            })
-            }>
+            })}
+            style={backgroundColor(Colors().builder.builderColumn.background)}
+          >
             {
               this.renderContent(canEdit)
             }

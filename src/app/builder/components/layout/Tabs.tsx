@@ -136,7 +136,6 @@ const Tab = React.createClass<any, any>({
 
   render()
   {
-    console.log(this.props.selected);
     return this.renderPanel(
       <div
         className={classNames({
@@ -147,7 +146,7 @@ const Tab = React.createClass<any, any>({
         key={this.props.id}
         onClick={this.handleClick}
         style={{
-          background: this.props.selected ? Colors().builder.tabs.tabTopRibbon : Colors().builder.tabs.tabTopRibbonInactive,
+          backgroundColor: this.props.selected ? Colors().builder.tabs.tabTopRibbon : Colors().builder.tabs.tabTopRibbonInactive,
           color: this.props.selected ? Colors().text.baseLight : Colors().text.secondaryLight,
           zIndex: this.zIndexStyle(),
         }}

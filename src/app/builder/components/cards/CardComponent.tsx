@@ -70,8 +70,9 @@ import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
-
+import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
+const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
@@ -516,6 +517,7 @@ class _CardComponent extends PureClasss<Props>
         ref='card'
         id={id}
         onMouseMove={this.handleMouseMove}
+        style={backgroundColor(Colors().builder.cards.cardBase)}
       >
         <CDA
           half={true}
@@ -548,11 +550,19 @@ class _CardComponent extends PureClasss<Props>
                 onClick={this.handleTitleClick}
               >
                 {
+                  this.props.canEdit &&
+                  <HandleIcon
+                    className='card-handle-icon'
+                  />
+                }
+                {
                   this.state.hovering &&
                   <ArrowIcon className='card-arrow-icon' onClick={this.toggleClose} />
                 }
                 <div className='card-title-inner'>
-                  {title}
+                  {
+                    title
+                  }
                 </div>
 
                 {
@@ -567,7 +577,9 @@ class _CardComponent extends PureClasss<Props>
                 {
                   this.props.canEdit &&
                   this.state.hovering &&
-                  <Menu options={this.state.menuOptions} />
+                  <Menu
+                    options={this.state.menuOptions}
+                  />
                 }
               </div>,
             )

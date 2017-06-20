@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+const color = require('color');
+
 interface Theme
 {
 
@@ -54,6 +56,9 @@ interface Theme
     secondaryDark: string,
     baseLight: string,
     secondaryLight: string,
+    
+    link: string, // TODO
+    linkHover: string,
   },
 
   // main title bar
@@ -130,6 +135,8 @@ interface Theme
 
     // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
     cards: {
+      cardBase: string,
+      
       card01: string,
       card02: string,
       card03: string,
@@ -171,9 +178,12 @@ const DARK: Theme =
     // text
     text: {
       baseDark: '#000000',
-      secondaryDark: 'rgba(0,0,0,50)',
+      secondaryDark: 'rgba(0,0,0,0.50)',
       baseLight: '#FFFFFF',
-      secondaryLight: 'rgba(255,255,255,80)',
+      secondaryLight: 'rgba(255,255,255,0.80)',
+      
+      link: color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+      linkHover: color('#4C7C9C').lighten(0.5).saturate(0.15).string()
     },
 
     // main title bar
@@ -215,7 +225,7 @@ const DARK: Theme =
         btnBase: '#696666',
         btnRoll: '#6E6B6B',
         btnSelected: '#828080',
-        btnRadioBase: 'rgba(0,0,0,50)',
+        btnRadioBase: 'rgba(0,0,0,0.50)',
         btnRadioSelected: '#80CCFF',
       },
 
@@ -235,7 +245,7 @@ const DARK: Theme =
         tabActive: '#272727',
         tabTopRibbon: '#4C7C9C',
         tabInactive: 'rgba(39,39,39,50)',
-        tabTopRibbonInactive: 'rgba(76, 124, 156, 50)',
+        tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
       },
 
       // title bar
@@ -250,6 +260,8 @@ const DARK: Theme =
 
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
+        cardBase: '#424242', // TODO
+        
         card01: '#559DCE',
         card02: '#397DD0',
         card03: '#D14F42',
@@ -296,17 +308,22 @@ const dynamicMap: any = {
   DARK: {}
 };
 
-export function backgroundColor(color: string)
+export function backgroundColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'backgroundColor');
+  return getStyle(color, 'backgroundColor', hoverColor);
 }
 
-export function fontColor(color: string)
+export function fontColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'color');
+  return getStyle(color, 'color', hoverColor);
 }
 
-export function getStyle(color: string, style: string)
+export function link()
+{
+  return fontColor(Colors().text.link, Colors().text.linkHover);
+}
+
+export function getStyle(color: string, style: string, hoverColor?: string)
 {
   if (!dynamicMap[curTheme])
   {
@@ -318,10 +335,20 @@ export function getStyle(color: string, style: string)
   }
   if (!dynamicMap[curTheme][color][style])
   {
-    dynamicMap[curTheme][color][style] = {
+    dynamicMap[curTheme][color][style] = {};
+  }
+  if (!dynamicMap[curTheme][color][style][hoverColor])
+  {
+    dynamicMap[curTheme][color][style][hoverColor] = {
       [style]: color,
     };
+    if(hoverColor)
+    {
+      dynamicMap[curTheme][color][style][hoverColor][':hover'] = {
+        [style]: hoverColor,
+      };
+    }
   }
 
-  return dynamicMap[curTheme][color][style];
+  return dynamicMap[curTheme][color][style][hoverColor];
 }

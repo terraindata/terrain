@@ -53,6 +53,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
+import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
 import './CardsDeck.less';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
@@ -102,6 +103,7 @@ class CardsDeck extends PureClasss<Props>
     return (
       <div
         className='cards-deck'
+        style={backgroundColor(Colors().builder.deck.background)}
       >
         <div
           className='cards-deck-search-wrapper'
