@@ -61,6 +61,7 @@ import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
+import { Menu, MenuOption } from '../../common/components/Menu';
 import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
@@ -102,6 +103,7 @@ export interface Props
   isNumber?: boolean;
   typeErrorMessage?: string;
 
+  options?: List<string | El>;
   showWhenCards?: boolean;
   display?: Display;
 
@@ -116,7 +118,9 @@ class BuilderTextbox extends PureClasss<Props>
     isSwitching: boolean;
     value: CardString;
     backupString: CardString;
+    open: boolean;
     options: List<string>;
+    dropdownWidth: number;
   };
 
   constructor(props: Props)
@@ -132,7 +136,9 @@ class BuilderTextbox extends PureClasss<Props>
       isSwitching: false,
       value,
       backupString: value,
+      open: false,
       options: Immutable.List([]),
+      dropdownWidth: 30,
     };
   }
 
@@ -270,6 +276,101 @@ class BuilderTextbox extends PureClasss<Props>
     );
   }
 
+  public close()
+  {
+    this.setState({
+      open: false,
+    });
+    $(document).off('click', this.close);
+  }
+
+  public componentWillUnmount()
+  {
+    $(document).off('click', this.close);
+  }
+
+  public handleDropdown()
+  {
+    this.setState({
+      open: !this.state.open,
+    });
+
+    if (!this.state.open)
+    {
+      $(document).on('click', this.close);
+    }
+  }
+
+  public renderOption(option, index)
+  {
+    const onClick = (event) =>
+      {
+        event.preventDefault();
+        event.stopPropagation();
+        return this.props.id;
+      };
+
+    return (
+      <div
+        className={'menu-option'}
+        key={index}
+        onClick={onClick}
+        style={ { width: this.state.dropdownWidth } }
+      >
+        <div
+          className={'menu-text-padding-no-icon'}
+        >
+          {
+            option
+          }
+        </div>
+      </div>
+    );
+  }
+
+  public renderDropdown()
+  {
+    if (!this.props.canEdit)
+    {
+      return null;
+    }
+
+    this.state.dropdownWidth = 10 * this.props.options.reduce((max, o) =>
+      (typeof o === 'string') && (o.length > max) ? o.length : max, 1);
+
+    return (
+      <div
+        className={classNames({
+          'builder-tb-dropdown': !!this.props.options,
+        })}
+        onClick={this.handleDropdown}
+      >
+      {
+        <ArrowIcon />
+      }
+      {
+        this.state.open &&
+          <div
+            className={classNames({
+              'menu-wrapper': false,
+              'menu-wrapper-small': true,
+              'menu-open': this.state.open,
+            })}
+          >
+            <div
+              className='menu-options-wrapper'
+              onClick={this.handleDropdown}
+            >
+              {
+                this.props.options.map(this.renderOption)
+              }
+            </div>
+          </div>
+      }
+      </div>
+    );
+  }
+
   public toggleClosed()
   {
     Actions.change(this.props.keyPath.push('closed'), !this.props.value['closed']);
@@ -343,6 +444,7 @@ class BuilderTextbox extends PureClasss<Props>
                 onBlur={this.handleBlur}
               />
           }
+          {this.props.options && this.renderDropdown()}
           {this.props.acceptsCards && this.renderSwitch()}
           {this.props.acceptsCards &&
             <CardDropArea
