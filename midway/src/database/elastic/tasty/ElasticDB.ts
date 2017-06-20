@@ -165,10 +165,13 @@ export class ElasticDB implements TastyDB
     for (let i = 0; i < upserted.length; i++)
     {
       results[i] = elements[i];
-      if ((primaryKeys.length === 1) &&
-        (elements[i][primaryKeys[0]] === undefined))
+      if (upserted[i]['_id'] !== undefined)
       {
-        results[i][primaryKeys[0]] = upserted[i]['_id'];
+        if ((primaryKeys.length === 1) &&
+          (elements[i][primaryKeys[0]] === undefined))
+        {
+          results[i][primaryKeys[0]] = upserted[i]['_id'];
+        }
       }
     }
 
@@ -222,7 +225,8 @@ export class ElasticDB implements TastyDB
   {
     if (elements.length > 2)
     {
-      return this.bulkUpsert(table, elements);
+      this.bulkUpsert(table, elements);
+      return elements;
     }
 
     const promises: Array<Promise<any>> = [];
