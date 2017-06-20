@@ -95,6 +95,7 @@ test('parse valid json objects', () =>
       testParse(JSON.stringify(testValue), testValue);
       testParse(JSON.stringify(testValue, null, 1), testValue);
       testParse(JSON.stringify(testValue, null, 2), testValue);
+      testParse(JSON.stringify(testValue, null, 3), testValue);
       testParse(JSON.stringify(testValue, null, 4), testValue);
     });
 });

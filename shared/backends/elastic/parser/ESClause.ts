@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from './EQLConfig';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
@@ -67,9 +68,9 @@ abstract class ESClause
 
   public required: string[]; // list of required properties
 
-  public values: any[]; // list of commonly used values (a soft enum or autocomplete list)
-
   public template: null | { [key: string]: any }; // template for this clause type
+
+  protected settings;
 
   /**
    * + null types mean custom or disabled type validation
@@ -85,17 +86,21 @@ abstract class ESClause
    * @param type the name to refer to this clause (type)
    * @param settings the settings object to initialize it from
    */
-  public constructor(settings: any)
+  public constructor(type: string, settings: any)
   {
-    // winston.info('setting: ' + JSON.stringify(settings));
-    this.type = settings.type;
+    this.type = type;
+    this.settings = settings;
+
     this.setPropertyFromSettings(settings, 'name', () => this.type.replace('_', ' '));
     this.setPropertyFromSettings(settings, 'desc', () => '');
     this.setPropertyFromSettings(settings, 'url', () => '');
     this.setPropertyFromSettings(settings, 'def', () => 'value');
-    this.setPropertyFromSettings(settings, 'required', () => []);
-    this.setPropertyFromSettings(settings, 'values', () => []);
     this.setPropertyFromSettings(settings, 'template', () => null);
+  }
+
+  public init(config: EQLConfig): void
+  {
+    // default is to do nothing
   }
 
   public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;

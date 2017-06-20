@@ -49,9 +49,9 @@ import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a string
+ * A clause which is a number
  */
-export default class ESStringClause extends ESClause
+export default class ESObjectClause extends ESClause
 {
   public constructor(type: string, settings: any)
   {
@@ -62,9 +62,9 @@ export default class ESStringClause extends ESClause
   {
     valueInfo.clause = this;
     const value: any = valueInfo.value;
-    if (typeof (value) !== 'string')
+    if (typeof (value) !== 'object' && !Array.isArray(value))
     {
-      interpreter.accumulateError(valueInfo, 'This value should be a string.');
+      interpreter.accumulateError(valueInfo, 'This value should be an object.');
     }
   }
 }
