@@ -44,11 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESInterpreter from './ESInterpreter';
-import ESJSONType from './ESJSONType';
-import ESValueInfo from './ESValueInfo';
-
 /**
  * Represents an Elastic Search input parameter for a search template:
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html
