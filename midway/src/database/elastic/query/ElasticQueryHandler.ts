@@ -62,6 +62,7 @@ import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
+
 /**
  * Implements the QueryHandler interface for ElasticSearch
  */
