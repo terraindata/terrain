@@ -91,7 +91,7 @@ export default class ESStructureClause extends ESClause
       return;
     }
 
-    const children: any = valueInfo.children;
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
 
     // mark properties
     Object.keys(children).forEach(

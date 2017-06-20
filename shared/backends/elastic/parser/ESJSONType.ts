@@ -44,58 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as winston from 'winston';
-import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
-
-function getExpectedFile(): string
+enum ESJSONType
 {
-  return __filename.split('.')[0] + '.expected';
+  'invalid',
+  'null',
+  'boolean',
+  'number',
+  'string',
+  'array',
+  'object',
 }
 
-let expected;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const contents: any = await new Promise((resolve, reject) =>
-  {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(contents);
-  done();
-});
-
-function testParse(testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing \'' + testString + '\'');
-  const parser: ESParser = new ESParser(testString);
-  const value = parser.getValue();
-
-  // winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
-  expect(value).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
-    {
-      const testValue: any = expected[testName];
-
-      // test parsing the value using a few spacing options
-      testParse(JSON.stringify(testValue), testValue);
-      testParse(JSON.stringify(testValue, null, 1), testValue);
-      testParse(JSON.stringify(testValue, null, 2), testValue);
-      testParse(JSON.stringify(testValue, null, 3), testValue);
-      testParse(JSON.stringify(testValue, null, 4), testValue);
-    });
-});
+export default ESJSONType;

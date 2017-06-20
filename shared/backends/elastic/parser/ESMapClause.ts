@@ -92,7 +92,7 @@ export default class ESMapClause extends ESClause
 
     // mark properties
     const childClause: ESClause = interpreter.config.getClause(this.valueType);
-    const children: any = valueInfo.children;
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
     Object.keys(children).forEach(
       (name: string): void =>
       {

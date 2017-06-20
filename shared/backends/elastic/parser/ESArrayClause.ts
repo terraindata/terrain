@@ -75,7 +75,7 @@ export default class ESArrayClause extends ESClause
 
     // mark children
     const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    const children: ESValueInfo[] = valueInfo.children as ESValueInfo[];
+    const children: ESValueInfo[] = valueInfo.arrayChildren;
     children.forEach(
       (element: ESValueInfo): void =>
       {
