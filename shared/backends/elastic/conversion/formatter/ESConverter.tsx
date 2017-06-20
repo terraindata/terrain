@@ -43,28 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESJSONParser from '../../parser/ESJSONParser';
+import ESDefaultFormatter from './ESDefaultFormatter';
 
 /**
- * A clause which is a string
+ * WIP - currently nothing happens with previousQuery
  */
-export default class ESStringClause extends ESClause
+class ESConverter
 {
-  public constructor(type: string, settings: any)
+  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
   {
-    super(type, settings);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'string')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a string.');
-    }
+    const formatter = new ESDefaultFormatter();
+    formatter.parseObject(query);
+    return formatter.getResultText();
   }
 }
+export default ESConverter;

@@ -53,9 +53,9 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESNullClause extends ESClause
 {
-  public constructor(settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(settings);
+    super(type, settings);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void

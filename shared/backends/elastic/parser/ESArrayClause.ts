@@ -55,9 +55,9 @@ export default class ESArrayClause extends ESClause
 {
   public elementID: string;
 
-  public constructor(settings: any, elementID: string)
+  public constructor(type: string, elementID: string, settings: any)
   {
-    super(settings);
+    super(type, settings);
     this.elementID = elementID;
   }
 
@@ -75,11 +75,12 @@ export default class ESArrayClause extends ESClause
 
     // mark children
     const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    const children: ESValueInfo[] = valueInfo.children as ESValueInfo[];
+    const children: ESValueInfo[] = valueInfo.arrayChildren;
     children.forEach(
       (element: ESValueInfo): void =>
       {
         childClause.mark(interpreter, element);
       });
   }
+
 }

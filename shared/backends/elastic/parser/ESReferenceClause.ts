@@ -64,10 +64,14 @@ export default class ESReferenceClause extends ESClause
 {
   public delegateType: string;
 
-  public constructor(settings: any, config: EQLConfig)
+  public constructor(type: string, delegateType: string, settings: any)
   {
-    super(settings);
-    this.delegateType = this.def as string;
+    super(type, settings);
+    this.delegateType = delegateType;
+  }
+
+  public init(config: EQLConfig): void
+  {
     config.declareType(this.delegateType);
   }
 

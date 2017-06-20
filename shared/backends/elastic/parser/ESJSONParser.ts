@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -200,6 +201,7 @@ export default class ESJSONParser
       {
         // string
         case '"':
+          valueInfo.jsonType = ESJSONType.string;
           valueInfo.value = this.readString();
           this.setToken();
           break;
@@ -216,12 +218,14 @@ export default class ESJSONParser
         case '8':
         case '9':
         case '-':
+          valueInfo.jsonType = ESJSONType.number;
           valueInfo.value = this.readNumber();
           this.setToken();
           break;
 
         // object
         case '{':
+          valueInfo.jsonType = ESJSONType.object;
           this.advance();
           this.readObject(valueInfo);
           break;
@@ -232,6 +236,7 @@ export default class ESJSONParser
 
         // array
         case '[':
+          valueInfo.jsonType = ESJSONType.array;
           this.advance();
           this.readArray(valueInfo);
           break;
@@ -242,18 +247,21 @@ export default class ESJSONParser
 
         // true
         case 't':
+          valueInfo.jsonType = ESJSONType.boolean;
           valueInfo.value = this.readTrueValue();
           this.setToken();
           break;
 
         // false
         case 'f':
+          valueInfo.jsonType = ESJSONType.boolean;
           valueInfo.value = this.readFalseValue();
           this.setToken();
           break;
 
         // null
         case 'n':
+          valueInfo.jsonType = ESJSONType.null;
           valueInfo.value = this.readNullValue();
           this.setToken();
           break;
@@ -314,14 +322,14 @@ export default class ESJSONParser
   {
     const array: any[] = [];
     arrayInfo.value = array;
-    arrayInfo.children = [];
+    arrayInfo.arrayChildren = [];
 
     for (let elementInfo: ESValueInfo | null = this.readValue();
       elementInfo !== null;
       elementInfo = this.readValue())
     {
       array.push(elementInfo.value);
-      arrayInfo.children.push(elementInfo);
+      arrayInfo.arrayChildren.push(elementInfo);
 
       // read next delimiter
       const propertyDelimiter: string = this.peek();
@@ -350,7 +358,7 @@ export default class ESJSONParser
   {
     const obj: object = {};
     objInfo.value = obj;
-    objInfo.children = {};
+    objInfo.objectChildren = {};
 
     for (let nameInfo: ESValueInfo | null = this.readValue();
       nameInfo !== null;
@@ -371,7 +379,7 @@ export default class ESJSONParser
       }
 
       const propertyInfo: ESPropertyInfo = new ESPropertyInfo(nameInfo);
-      objInfo.children[propertyName] = propertyInfo;
+      objInfo.objectChildren[propertyName] = propertyInfo;
 
       // read delimiter between property name and value
       const kvpDelimiter: string = this.peek();

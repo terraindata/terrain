@@ -44,27 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-
-/**
- * A clause which is a string
+/*
+ *  Data container with immutable members
  */
-export default class ESStringClause extends ESClause
+class ElementInfo
 {
-  public constructor(type: string, settings: any)
-  {
-    super(type, settings);
-  }
+  constructor(
+    public readonly index: number, // index is element's position underneath its parent (so 0 if it's root level)
+    public readonly depth: number,
+    public readonly container?: any[] | object, // parent of element: undefined for values under root
+    public readonly keys?: string[], // undefined for values inside arrays or under root
+  ) { }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  public containerSize(): number
   {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'string')
+    if (this.container === undefined)
     {
-      interpreter.accumulateError(valueInfo, 'This value should be a string.');
+      return 1;
+    }
+    else if (this.container instanceof Array)
+    {
+      return this.container.length;
+    }
+    else
+    {
+      return this.keys.length;
     }
   }
+
+  public isLastElement(): boolean
+  {
+    return this.index + 1 === this.containerSize();
+  }
+
+  public isFirstElement(): boolean
+  {
+    return this.index === 0;
+  }
+
+  public isOnlyElement(): boolean
+  {
+    return this.containerSize() === 1;
+  }
 }
+export default ElementInfo;
