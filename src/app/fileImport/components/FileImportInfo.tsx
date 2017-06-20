@@ -55,18 +55,24 @@ import Actions from './../data/FileImportActions';
 import FileImportTypes from './../FileImportTypes';
 import { FileImportState } from './../data/FileImportStore';
 import Autocomplete from './../../common/components/Autocomplete';
+import BuilderTextbox from './../../common/components/BuilderTextbox';
+import SchemaTypes from './../../schema/SchemaTypes'
 
 export interface Props
 {
   canSelectCluster: boolean;
   clusterIndex: number;
   clusters: List<string>;
-  canSelectTarget: boolean;
-  targetIndex: number;
-  targets: List<string>;
+
+  canSelectDb: boolean;
+  dbs: List<string>;
+  dbText: string;
+
+  canSelectTable: boolean;
+  tables: List<string>;
+  tableText: string;
+
   canImport: boolean;
-  text: string;
-  textarea?: boolean;
 }
 
 class FileImportInfo extends PureClasss<Props>
@@ -75,19 +81,29 @@ class FileImportInfo extends PureClasss<Props>
   {
     Actions.changeCluster(clusterIndex);
   }
-  public handleTargetChange(targetIndex: number)
+
+  public handleAutocompleteDbChange(event)
   {
-    Actions.changeTarget(targetIndex);
+    Actions.changeDbText(event);
+  }
+
+  public handleAutocompleteTableChange(event)
+  {
+    Actions.changeTableText(event);
   }
 
   public handleChooseFile(file)
   {
+    const filetype = file.target.files[0].name.split('.').pop();
+    console.log("filetype: ", filetype);
+
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
       // const obj = JSON.parse(saveFile);
-      Actions.chooseFile(fr.result);
+      console.log("contents: ", fr.result);
+      Actions.chooseFile(fr.result, filetype);
     }
   }
 
@@ -99,18 +115,13 @@ class FileImportInfo extends PureClasss<Props>
     }
     else
     {
-      alert("Please select a file to upload and a target database");
+      alert("Please select a file to upload, and a target database/table");
     }
-  }
-
-  public handleTextareaChange(event)
-  {
-    Actions.changeText(event.target.value);
   }
 
   public render()
   {
-    const { canSelectCluster, canSelectTarget } = this.props;
+    const { canSelectCluster, canSelectDb, canSelectTable } = this.props;
 
     return (
       <div>
@@ -132,40 +143,29 @@ class FileImportInfo extends PureClasss<Props>
           <h3>Database</h3>
         </div>
         <div>
-          <Dropdown
-            selectedIndex={this.props.targetIndex}
-            options={this.props.targets}
-            onChange={this.handleTargetChange}
-            canEdit={canSelectTarget}
+          <Autocomplete
+            value={this.props.dbText}
+            options={this.props.dbs}
+            onChange={this.handleAutocompleteDbChange}
+            placeholder={'database'}
+            disabled={!canSelectDb}
           />
         </div>
         <div>
           <h3>Table</h3>
         </div>
         <div>
-        {
-          this.props.textarea ?
-          <textarea
-            ref='input'
-            disabled={!this.props.canSelectTarget}
-            defaultValue={this.props.text}
-            onChange={this.handleTextareaChange}
-            placeholder={'table'}
-          />
-          :
           <Autocomplete
-            ref="input"
-            disabled={!canSelectTarget}
-            value={this.props.text}
-            options={this.props.targets}
-            onChange={this.handleTextareaChange}
+            value={this.props.tableText}
+            options={this.props.tables}
+            onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
+            disabled={!canSelectTable}
           />
-        }
         </div>
-        <div>
-          <h3 onClick={this.handleUploadFile}>Import</h3>
-        </div>
+        <button onClick={this.handleUploadFile}>
+          Import
+        </button>
       </div>
     );
   }

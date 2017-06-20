@@ -55,17 +55,17 @@ const FileImportActions =
     (clusterIndex: number) =>
       $(ActionTypes.changeCluster, { clusterIndex }),
 
-    changeTarget:
-    (targetIndex: number) =>
-      $(ActionTypes.changeTarget, { targetIndex }),
+    changeDbText:
+    (dbText: string) =>
+      $(ActionTypes.changeDbText, { dbText }),
 
-    changeText:
-    (text: string) =>
-      $(ActionTypes.changeText, { text }),
+    changeTableText:
+    (tableText: string) =>
+      $(ActionTypes.changeTableText, { tableText }),
 
     chooseFile:
-    (file: string) =>
-      $(ActionTypes.chooseFile, { file }),
+    (file: string, filetype: string) =>
+      $(ActionTypes.chooseFile, { file, filetype }),
 
     uploadFile:
     () =>

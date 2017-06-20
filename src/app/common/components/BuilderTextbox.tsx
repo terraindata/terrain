@@ -142,39 +142,39 @@ class BuilderTextbox extends PureClasss<Props>
   }
 
   // TODO
-  public componentWillReceiveProps(newProps)
-  {
-    const value: any = newProps.value;
-
-    // If you want two-way backups, use this line
-    // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
-    if (
-      (this.props.value && this.props.value['type'] === this.getCreatingType() && value === '')
-    )
-    {
-      if (this.state.backupString)
-      {
-        // was creating, now switched back
-        this.executeChange(this.state.backupString);
-      }
-      this.setState({
-        value: this.state.backupString,
-      });
-      return;
-    }
-
-    this.setState({
-      wrongType: newProps.isNumber ? isNaN(value) : false,
-    });
-    if (this.refs['input'])
-    {
-      if (this.refs['input'] !== document.activeElement)
-      {
-        // if not focused, then update the value
-        this.refs['input']['value'] = newProps.value;
-      }
-    }
-  }
+  // public componentWillReceiveProps(newProps)
+  // {
+  //   const value: any = newProps.value;
+  //
+  //   // If you want two-way backups, use this line
+  //   // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
+  //   if (
+  //     (this.props.value && this.props.value['type'] === this.getCreatingType() && value === '')
+  //   )
+  //   {
+  //     if (this.state.backupString)
+  //     {
+  //       // was creating, now switched back
+  //       this.executeChange(this.state.backupString);
+  //     }
+  //     this.setState({
+  //       value: this.state.backupString,
+  //     });
+  //     return;
+  //   }
+  //
+  //   this.setState({
+  //     wrongType: newProps.isNumber ? isNaN(value) : false,
+  //   });
+  //   if (this.refs['input'])
+  //   {
+  //     if (this.refs['input'] !== document.activeElement)
+  //     {
+  //       // if not focused, then update the value
+  //       this.refs['input']['value'] = newProps.value;
+  //     }
+  //   }
+  // }
 
   // throttled event handler
   public executeChange(value)
@@ -185,7 +185,7 @@ class BuilderTextbox extends PureClasss<Props>
     // }
 
     Actions.change(this.props.keyPath, value);
-    this.props.onChange && this.props.onChange(value);
+    //this.props.onChange && this.props.onChange(value);
   }
 
   public handleCardDrop(item)
@@ -201,12 +201,12 @@ class BuilderTextbox extends PureClasss<Props>
   public handleAutocompleteChange(value)
   {
     this.executeChange(value);
-    if (this.props.isNumber)
-    {
-      this.setState({
-        wrongType: isNaN(value),
-      });
-    }
+    // if (this.props.isNumber)
+    // {
+    //   this.setState({
+    //     wrongType: isNaN(value),
+    //   });
+    // }
   }
 
   public isText()
@@ -277,19 +277,19 @@ class BuilderTextbox extends PureClasss<Props>
 
   public computeOptions()
   {
-    if (this.props.autoTerms || this.props.autoDisabled)
-    {
-      return;
-    }
-
-    const options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
-
-    if (!options.equals(this.state.options))
-    {
-      this.setState({
-        options,
-      });
-    }
+    // if (this.props.autoTerms || this.props.autoDisabled)
+    // {
+    //   return;
+    // }
+    //
+    // const options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+    //
+    // if (!options.equals(this.state.options))
+    // {
+    //   this.setState({
+    //     options,
+    //   });
+    // }
   }
 
   public render()
@@ -319,40 +319,12 @@ class BuilderTextbox extends PureClasss<Props>
           })}
         >
           {
-            this.props.textarea ?
-              <textarea
-                ref='input'
-                disabled={!this.props.canEdit}
-                defaultValue={this.props.value as string}
-                onChange={this.handleTextareaChange}
-                className={this.props.className}
-                placeholder={placeholder}
-                rel={this.props.rel}
-              />
-              :
               <Autocomplete
-                ref='input'
-                disabled={!this.props.canEdit}
                 value={this.props.value as string}
                 options={options}
                 onChange={this.handleAutocompleteChange}
-                placeholder={placeholder}
-                help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
-                className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
-                onFocus={this.handleFocus}
-                onBlur={this.handleBlur}
+                placeholder={'hai'}
               />
-          }
-          {this.props.acceptsCards && this.renderSwitch()}
-          {this.props.acceptsCards &&
-            <CardDropArea
-              keyPath={this.props.keyPath}
-              index={null}
-              accepts={this.props.display && this.props.display.accepts}
-              renderPreview={true}
-              afterDrop={this.handleCardDrop}
-              language={this.props.language}
-            />
           }
         </div>
       );

@@ -58,25 +58,22 @@ FileImportReducers[ActionTypes.changeCluster] =
     return state.set('clusterIndex', action.payload.clusterIndex);
   };
 
-FileImportReducers[ActionTypes.changeTarget] =
+FileImportReducers[ActionTypes.changeDbText] =
   (state, action) =>
   {
-    return state.set('targetIndex', action.payload.targetIndex);
+    return state.set('dbText', action.payload.dbText);
   };
 
-FileImportReducers[ActionTypes.changeText] =
+FileImportReducers[ActionTypes.changeTableText] =
   (state, action) =>
   {
-    return state.set('text', action.payload.text);
+    return state.set('tableText', action.payload.tableText);
   };
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
   {
-    console.log(action.payload.file);
-    console.log(state);
-    console.log(state.set('file', action.payload.file));
-    return state.set('file', action.payload.file);
+    return state.set('file', action.payload.file).set('filetype', action.payload.filetype);
   };
 
 FileImportReducers[ActionTypes.uploadFile] =
@@ -84,6 +81,9 @@ FileImportReducers[ActionTypes.uploadFile] =
   {
     const { xhr, queryId } = Ajax.upload(
       state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
       _.noop,
       _.noop,
       false,
