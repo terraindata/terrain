@@ -48,8 +48,6 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-// import DatabaseController from '../../database/DatabaseController';
-// import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
 import { Import, ImportConfig } from './Import';
 

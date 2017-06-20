@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csv = require('csvtojson');
+import * as csv from 'csvtojson';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
@@ -57,11 +57,11 @@ import { versions } from '../versions/VersionRouter';
 
 export interface ImportConfig
 {
-  dsn: string;   // 'http://127.0.0.1:9200'
-  db?: string;   // for elastic, index name
-  table: string; // for elastic, type name
+  dsn: string;        // e.g.,'http://127.0.0.1:9200'
+  db?: string;        // for elastic, index name
+  table: string;      // for elastic, type name
   contents: string;   // should parse directly into a JSON object
-  dbtype: string;  // e.g., 'elastic'
+  dbtype: string;     // e.g., 'elastic'
   filetype: string;   // either 'json' or 'csv'
 }
 
@@ -71,8 +71,20 @@ export class Import
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
-      const items: object[] = await this.parseData(imprt);
+      let items: object[];
+      try
+      {
+        items = await this._parseData(imprt);
+      } catch (e)
+      {
+        return reject('Could not parse data: ' + String(e));
+      }
+      if (items.length === 0)
+      {
+        return reject('No data provided in file to upload.');
+      }
       const columns: string[] = Object.keys(items[0]);
+      // TODO: handle cases where JSON parsing works but the above line breaks
 
       if (imprt.db === '' || imprt.table === '')
       {
@@ -80,7 +92,7 @@ export class Import
       }
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
-        ['_id'],        // TODO: find schema to find primary key
+        ['_id'],
         columns,
         imprt.db,
       );
@@ -92,18 +104,27 @@ export class Import
     });
   }
 
-  private async parseData(imprt: ImportConfig): Promise<object[]>
+  private async _parseData(imprt: ImportConfig): Promise<object[]>
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
       if (imprt.filetype === 'json')
       {
-        resolve(JSON.parse(imprt.contents));
+        try
+        {
+          resolve(JSON.parse(imprt.contents));
+        } catch (e)
+        {
+          return reject('JSON format incorrect: ' + String(e));
+        }
       } else if (imprt.filetype === 'csv')
       {
-        csv({flatKeys: true, checkColumn: true}).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
+        csv({ flatKeys: true, checkColumn: true }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
           resolve(jsonArrObj);
+        }).on('error', (e) =>
+        {
+          return reject('CSV format incorrect: ' + String(e));
         });
       } else
       {
