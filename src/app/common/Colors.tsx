@@ -56,7 +56,7 @@ interface Theme
     secondaryDark: string,
     baseLight: string,
     secondaryLight: string,
-    
+
     link: string, // TODO
     linkHover: string,
   },
@@ -136,7 +136,7 @@ interface Theme
     // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
     cards: {
       cardBase: string,
-      
+
       card01: string,
       card02: string,
       card03: string,
@@ -181,7 +181,7 @@ const DARK: Theme =
       secondaryDark: 'rgba(0,0,0,0.50)',
       baseLight: '#FFFFFF',
       secondaryLight: 'rgba(255,255,255,0.80)',
-      
+
       link: color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
       linkHover: color('#4C7C9C').lighten(0.5).saturate(0.15).string()
     },
@@ -261,7 +261,7 @@ const DARK: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
         cardBase: '#424242', // TODO
-        
+
         card01: '#559DCE',
         card02: '#397DD0',
         card03: '#D14F42',
@@ -342,7 +342,7 @@ export function getStyle(color: string, style: string, hoverColor?: string)
     dynamicMap[curTheme][color][style][hoverColor] = {
       [style]: color,
     };
-    if(hoverColor)
+    if (hoverColor)
     {
       dynamicMap[curTheme][color][style][hoverColor][':hover'] = {
         [style]: hoverColor,

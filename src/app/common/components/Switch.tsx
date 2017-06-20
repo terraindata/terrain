@@ -78,7 +78,7 @@ class Switch extends Classs<Props>
 
     return (
       <div className={classes} onClick={this.handleSwitch}>
-        <div 
+        <div
           className='switch-on'
           style={backgroundColor(Colors().text.link, Colors().text.linkHover)}
         />
