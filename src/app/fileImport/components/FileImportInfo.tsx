@@ -54,36 +54,63 @@ import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
 import FileImportTypes from './../FileImportTypes';
 import { FileImportState } from './../data/FileImportStore';
+import Autocomplete from './../../common/components/Autocomplete';
+import BuilderTextbox from './../../common/components/BuilderTextbox';
+import SchemaTypes from './../../schema/SchemaTypes'
 
 export interface Props
 {
-  canSelectTarget: boolean;
-  targetIndex: number;
-  targets: List<string>;
+  canSelectCluster: boolean;
+  clusterIndex: number;
+  clusters: List<string>;
+
+  canSelectDb: boolean;
+  dbs: List<string>;
+  dbText: string;
+
+  canSelectTable: boolean;
+  tables: List<string>;
+  tableText: string;
+
   canImport: boolean;
+  validFiletypes: List<string>;
 }
 
 class FileImportInfo extends PureClasss<Props>
 {
-  public handleTargetChange(targetIndex: number)
+  public handleClusterChange(clusterIndex: number)
   {
-    Actions.changeTarget(targetIndex);
+    Actions.changeCluster(clusterIndex);
   }
 
-  public handleSaveFile(file)
+  public handleAutocompleteDbChange(event)
   {
-    // console.log(file);
-    // console.log(file.target);
-    // console.log(file.target.files[0]);
-    // console.log(file.target.files[0].type);
-    // console.log(file.target.files[0].name);
+    Actions.changeDbText(event);
+  }
+
+  public handleAutocompleteTableChange(event)
+  {
+    Actions.changeTableText(event);
+  }
+
+  public handleChooseFile(file)
+  {
+    const filetype = file.target.files[0].name.split('.').pop();
+    console.log("filetype: ", filetype);
+    if (this.props.validFiletypes.get(filetype) === undefined)
+    {
+      alert("Invalid filetype, please select another file");
+      this.refs['file']['value'] = null;
+      return;
+    }
 
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
       // const obj = JSON.parse(saveFile);
-      Actions.saveFile(fr.result);
+      console.log("contents: ", fr.result);
+      Actions.chooseFile(fr.result, filetype);
     }
   }
 
@@ -95,33 +122,57 @@ class FileImportInfo extends PureClasss<Props>
     }
     else
     {
-      alert("Please select a file to upload and a target database");
+      alert("Please select a file to upload, and a target database/table");
     }
   }
 
   public render()
   {
-    const { canSelectTarget } = this.props;
+    const { canSelectCluster, canSelectDb, canSelectTable } = this.props;
 
     return (
       <div>
         <div>
-          <input ref="file" type="file" onChange={this.handleSaveFile} />
+          <input ref="file" type="file" onChange={this.handleChooseFile} />
         </div>
         <div>
-          <h3>Target</h3>
+          <h3>Cluster</h3>
         </div>
         <div>
           <Dropdown
-            selectedIndex={this.props.targetIndex}
-            options={this.props.targets}
-            onChange={this.handleTargetChange}
-            canEdit={canSelectTarget}
+            selectedIndex={this.props.clusterIndex}
+            options={this.props.clusters}
+            onChange={this.handleClusterChange}
+            canEdit={canSelectCluster}
           />
         </div>
         <div>
-          <h3 onClick={this.handleUploadFile}>Import</h3>
+          <h3>Database</h3>
         </div>
+        <div>
+          <Autocomplete
+            value={this.props.dbText}
+            options={this.props.dbs}
+            onChange={this.handleAutocompleteDbChange}
+            placeholder={'database'}
+            disabled={!canSelectDb}
+          />
+        </div>
+        <div>
+          <h3>Table</h3>
+        </div>
+        <div>
+          <Autocomplete
+            value={this.props.tableText}
+            options={this.props.tables}
+            onChange={this.handleAutocompleteTableChange}
+            placeholder={'table'}
+            disabled={!canSelectTable}
+          />
+        </div>
+        <button onClick={this.handleUploadFile}>
+          Import
+        </button>
       </div>
     );
   }

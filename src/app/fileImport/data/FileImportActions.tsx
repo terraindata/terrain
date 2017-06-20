@@ -51,13 +51,21 @@ const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, paylo
 
 const FileImportActions =
   {
-    changeTarget:
-    (targetIndex: number) =>
-      $(ActionTypes.changeTarget, { targetIndex }),
+    changeCluster:
+    (clusterIndex: number) =>
+      $(ActionTypes.changeCluster, { clusterIndex }),
 
-    saveFile:
-    (file: string) =>
-      $(ActionTypes.saveFile, { file }),
+    changeDbText:
+    (dbText: string) =>
+      $(ActionTypes.changeDbText, { dbText }),
+
+    changeTableText:
+    (tableText: string) =>
+      $(ActionTypes.changeTableText, { tableText }),
+
+    chooseFile:
+    (file: string, filetype: string) =>
+      $(ActionTypes.chooseFile, { file, filetype }),
 
     uploadFile:
     () =>

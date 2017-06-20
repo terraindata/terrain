@@ -49,8 +49,10 @@ import Util from './../../util/Util';
 
 const FileImportActionTypes =
   {
-    changeTarget: '',
-    saveFile: '',
+    changeCluster: '',
+    changeDbText: '',
+    changeTableText: '',
+    chooseFile: '',
     uploadFile: '',
   };
 

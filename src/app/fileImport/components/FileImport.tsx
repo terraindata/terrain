@@ -54,6 +54,10 @@ import FileImportTypes from './../FileImportTypes';
 import './FileImport.less';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
+import SchemaStore from './../../schema/data/SchemaStore';
+import SchemaTypes from './../../schema/SchemaTypes';
+//import List = Immutable.List;
+const { List } = Immutable;
 
 export interface Props
 {
@@ -63,12 +67,16 @@ export interface Props
   route?: any;
 }
 
-const TARGETS = Immutable.List(['movies', 'new']);
+const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
+const DBS = Immutable.List(['movies', 'new']);
+const FILETYPES = Immutable.List(['json', 'csv']);
 
 class FileImport extends PureClasss<any>
 {
   public state: {
     fileImportState: FileImportState;
+    databases?: SchemaTypes.DatabaseMap;
+    tables?: SchemaTypes.TableMap;
   } = {
     fileImportState: FileImportStore.getState(),
   };
@@ -80,22 +88,54 @@ class FileImport extends PureClasss<any>
     this._subscribe(FileImportStore, {
       stateKey: 'fileImportState',
     });
+
+    this._subscribe(SchemaStore, {
+      stateKey: 'databases',
+      storeKeyPath: ['databases'],
+    });
+
+    this._subscribe(SchemaStore, {
+      stateKey: 'tables',
+      storeKeyPath: ['tables'],
+    });
+  }
+
+  private MapToList(map: IMMap<string, any>)
+  {
+    if (map === undefined)
+    {
+      return List();
+    }
+
+    const list = [];
+    map.forEach((value, key) =>
+    {
+      list.push(key);
+    })
+    return List(list);
   }
 
   public render()
   {
     const { fileImportState } = this.state;
-    const { targetIndex, file } = fileImportState;
+    const { clusterIndex, dbText, tableText } = fileImportState;
 
     return (
       <div>
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
-            canSelectTarget={true}
-            targetIndex={targetIndex}
-            targets={TARGETS}
+            canSelectCluster={true}
+            clusterIndex={clusterIndex}
+            clusters={CLUSTERS}
+            canSelectDb={true}
+            dbs={this.MapToList(this.state.databases)}
+            dbText={dbText}
+            canSelectTable={true}
+            tables={this.MapToList(this.state.tables)}
+            tableText={tableText}
             canImport={true}
+            validFiletypes={FILETYPES}
           />
         </div>
       </div>

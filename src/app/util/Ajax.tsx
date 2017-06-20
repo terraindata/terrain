@@ -636,6 +636,9 @@ export const Ajax =
 
     /* FileImport */
     upload(file: string,
+      filetype: string,
+      db: string,
+      table: string,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string | MidwayError) => void,
       sqlQuery?: boolean, // unused
@@ -644,11 +647,13 @@ export const Ajax =
       const queryId = '' + Math.random();
       const payload: object = {
         dsn: 'http://127.0.0.1:9200',
-        db: 'testdb',       // index
-        table: 'testtable',    // type
+        db: db,
+        table: table,
         contents: file,
         dbtype: 'elastic',
+        filetype: filetype,
       };
+      console.log("payload: ", payload);
       const onLoadHandler = (resp) =>
       {
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
