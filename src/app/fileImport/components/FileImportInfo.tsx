@@ -67,13 +67,16 @@ export interface Props
   canSelectDb: boolean;
   dbs: List<string>;
   dbText: string;
+  dbSelected: boolean;
 
   canSelectTable: boolean;
   tables: List<string>;
   tableText: string;
+  tableSelected: boolean;
 
   canImport: boolean;
   validFiletypes: List<string>;
+  fileChosen: boolean;
 }
 
 class FileImportInfo extends PureClasss<Props>
@@ -95,9 +98,15 @@ class FileImportInfo extends PureClasss<Props>
 
   public handleChooseFile(file)
   {
+    if (!file.target.files[0])
+    {
+      Actions.unchooseFile();
+      return;
+    }
+
     const filetype = file.target.files[0].name.split('.').pop();
-    console.log("filetype: ", filetype);
-    if (this.props.validFiletypes.get(filetype) === undefined)
+    console.log("filetype:", filetype);
+    if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
       alert("Invalid filetype, please select another file");
       this.refs['file']['value'] = null;
@@ -116,13 +125,13 @@ class FileImportInfo extends PureClasss<Props>
 
   public handleUploadFile()
   {
-    if (this.props.canImport)
+    if (this.props.canImport && this.props.fileChosen && this.props.dbSelected && this.props.tableSelected)
     {
       Actions.uploadFile();
     }
     else
     {
-      alert("Please select a file to upload, and a target database/table");
+      alert("Please select a file to upload, database, and table");
     }
   }
 

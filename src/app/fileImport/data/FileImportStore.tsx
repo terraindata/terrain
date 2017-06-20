@@ -63,6 +63,9 @@ class FileImportStateC
   public tableText: string = "";
   public file: string = "";
   public filetype: string = "";
+  public fileChosen: boolean = false;
+  public dbSelected: boolean = false;
+  public tableSelected: boolean = false;
 }
 const FileImportState_Record = Immutable.Record(new FileImportStateC());
 export interface FileImportState extends FileImportStateC, IRecord<FileImportState> { }

@@ -67,6 +67,10 @@ const FileImportActions =
     (file: string, filetype: string) =>
       $(ActionTypes.chooseFile, { file, filetype }),
 
+    unchooseFile:
+    () =>
+      $(ActionTypes.unchooseFile, {}),
+
     uploadFile:
     () =>
       $(ActionTypes.uploadFile, {}),

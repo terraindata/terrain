@@ -118,7 +118,7 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { clusterIndex, dbText, tableText } = fileImportState;
+    const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen } = fileImportState;
 
     return (
       <div>
@@ -131,11 +131,14 @@ class FileImport extends PureClasss<any>
             canSelectDb={true}
             dbs={this.MapToList(this.state.databases)}
             dbText={dbText}
+            dbSelected={dbSelected}
             canSelectTable={true}
             tables={this.MapToList(this.state.tables)}
             tableText={tableText}
+            tableSelected={tableSelected}
             canImport={true}
             validFiletypes={FILETYPES}
+            fileChosen={fileChosen}
           />
         </div>
       </div>

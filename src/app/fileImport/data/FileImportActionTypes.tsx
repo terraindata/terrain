@@ -53,6 +53,7 @@ const FileImportActionTypes =
     changeDbText: '',
     changeTableText: '',
     chooseFile: '',
+    unchooseFile: '',
     uploadFile: '',
   };
 

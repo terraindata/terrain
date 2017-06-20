@@ -61,20 +61,42 @@ FileImportReducers[ActionTypes.changeCluster] =
 FileImportReducers[ActionTypes.changeDbText] =
   (state, action) =>
   {
-    return state.set('dbText', action.payload.dbText);
+    if (action.payload.dbText)
+    {
+      return state.set('dbText', action.payload.dbText).set('dbSelected', true);
+    }
+    else
+    {
+      return state.set('dbText', action.payload.dbText).set('dbSelected', false);
+    }
   };
 
 FileImportReducers[ActionTypes.changeTableText] =
   (state, action) =>
   {
-    return state.set('tableText', action.payload.tableText);
+    if (action.payload.tableText)
+    {
+      return state.set('tableText', action.payload.tableText).set('tableSelected', true);
+    }
+    else
+    {
+      return state.set('tableText', action.payload.tableText).set('tableSelected', false);
+    }
   };
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
-  {
-    return state.set('file', action.payload.file).set('filetype', action.payload.filetype);
-  };
+    state
+      .set('file', action.payload.file)
+      .set('filetype', action.payload.filetype)
+      .set('fileChosen', true)
+  ;
+
+FileImportReducers[ActionTypes.unchooseFile] =
+  (state, action) =>
+    state
+      .set('fileChosen', false)
+;
 
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
