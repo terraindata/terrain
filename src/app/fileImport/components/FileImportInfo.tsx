@@ -73,6 +73,7 @@ export interface Props
   tableText: string;
 
   canImport: boolean;
+  validFiletypes: List<string>;
 }
 
 class FileImportInfo extends PureClasss<Props>
@@ -96,6 +97,12 @@ class FileImportInfo extends PureClasss<Props>
   {
     const filetype = file.target.files[0].name.split('.').pop();
     console.log("filetype: ", filetype);
+    if (this.props.validFiletypes.get(filetype) === undefined)
+    {
+      alert("Invalid filetype, please select another file");
+      this.refs['file']['value'] = null;
+      return;
+    }
 
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);

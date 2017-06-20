@@ -69,6 +69,7 @@ export interface Props
 
 const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
 const DBS = Immutable.List(['movies', 'new']);
+const FILETYPES = Immutable.List(['json', 'csv']);
 
 class FileImport extends PureClasss<any>
 {
@@ -99,14 +100,16 @@ class FileImport extends PureClasss<any>
     });
   }
 
-  private MapToList(map: IMMap<string, any>) {
+  private MapToList(map: IMMap<string, any>)
+  {
     if (map === undefined)
     {
       return List();
     }
 
     const list = [];
-    map.forEach((value, key) => {
+    map.forEach((value, key) =>
+    {
       list.push(key);
     })
     return List(list);
@@ -132,6 +135,7 @@ class FileImport extends PureClasss<any>
             tables={this.MapToList(this.state.tables)}
             tableText={tableText}
             canImport={true}
+            validFiletypes={FILETYPES}
           />
         </div>
       </div>
