@@ -184,21 +184,23 @@ class CardField extends PureClasss<Props>
     if (dY < 0)
     {
       // if dragged up, search from top down
-      for
-      (
+      for (
         index = 0;
         this.state.midpoints[index] < this.state.originalElTop + dY;
         index++
-      );
+      ) {
+        ;
+      }
     }
     else
     {
-      for
-      (
+      for (
         index = this.state.midpoints.length - 1;
         this.state.midpoints[index] > this.state.originalElBottom + dY;
         index--
-      );
+      ) {
+          ;
+        }
     }
 
     const sibs = Util.siblings(this.refs['all']);
