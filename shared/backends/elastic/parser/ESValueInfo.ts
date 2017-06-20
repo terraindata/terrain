@@ -60,6 +60,8 @@ export default class ESValueInfo
 
   private static empyObjectChildren: { [name: string]: ESPropertyInfo } = {};
 
+  private static emptyErrorList: ESParserError[] = [];
+
   /**
    * The JSON type of the value.
    */
@@ -89,7 +91,7 @@ export default class ESValueInfo
    * If errors were detected associated with this value, they will be in this list
    * in the order in which they were detected.
    */
-  public errors: ESParserError[] | null;
+  public errors: ESParserError[];
 
   /**
    * When interpreted, this is set to the detected ESClause for this value
@@ -108,14 +110,14 @@ export default class ESValueInfo
     this.tokens = [];
     this.arrayChildren = ESValueInfo.empyArrayChildren;
     this.objectChildren = ESValueInfo.empyObjectChildren;
-    this.errors = null;
+    this.errors = ESValueInfo.emptyErrorList;
     this.clause = null;
     this.delegateClause = null;
   }
 
   public attachError(error: ESParserError): void
   {
-    if (this.errors === null)
+    if (this.errors.length === 0)
     {
       this.errors = [error];
     }
