@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESJSONType from './ESJSONType';
+import ESParameter from './ESParameter';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -69,7 +70,8 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESJSONParser
 {
-  private queryString: string; // stringgit being parsed
+  private queryString: string; // string being parsed
+  private allowParameters: boolean; // if @parameters are allowed (non-compliant)
 
   private charNumber: number; // current parser/tokenizer position in the queryString
 
@@ -88,8 +90,9 @@ export default class ESJSONParser
    * Runs the parser on the given query string. Read needed data by calling the
    * public member functions below.
    * @param queryString query to parse
+   * @param allowParameters
    */
-  public constructor(queryString: string)
+  public constructor(queryString: string, allowParameters: boolean = true)
   {
     this.queryString = queryString;
     this.charNumber = 0;
@@ -98,6 +101,7 @@ export default class ESJSONParser
     this.lastRowNumber = 0;
     this.value = null;
     this.valueInfo = null;
+    this.allowParameters = allowParameters;
 
     this.tokens = [];
     this.valueInfos = [];
@@ -203,7 +207,6 @@ export default class ESJSONParser
         case '"':
           valueInfo.jsonType = ESJSONType.string;
           valueInfo.value = this.readString();
-          this.setToken();
           break;
 
         // number
@@ -220,7 +223,6 @@ export default class ESJSONParser
         case '-':
           valueInfo.jsonType = ESJSONType.number;
           valueInfo.value = this.readNumber();
-          this.setToken();
           break;
 
         // object
@@ -249,21 +251,23 @@ export default class ESJSONParser
         case 't':
           valueInfo.jsonType = ESJSONType.boolean;
           valueInfo.value = this.readTrueValue();
-          this.setToken();
           break;
 
         // false
         case 'f':
           valueInfo.jsonType = ESJSONType.boolean;
           valueInfo.value = this.readFalseValue();
-          this.setToken();
           break;
 
         // null
         case 'n':
           valueInfo.jsonType = ESJSONType.null;
           valueInfo.value = this.readNullValue();
-          this.setToken();
+          break;
+
+        case '@':
+          valueInfo.jsonType = ESJSONType.parameter;
+          valueInfo.value = this.readParameter();
           break;
 
         default:
@@ -457,7 +461,7 @@ export default class ESJSONParser
 
   private readBooleanOrNull(exp: RegExp): boolean
   {
-    const match: any = this.match(exp);
+    const match: string | null = this.match(exp);
     if (match !== null)
     {
       return true;
@@ -469,6 +473,20 @@ export default class ESJSONParser
     return false;
   }
 
+  private readParameter(): ESParameter
+  {
+    let match: string | null = this.match(/^@([a-zA-Z_][a-zA-Z_0-9]*)/);
+    if (match === null)
+    {
+      match = '';
+      this.accumulateErrorOnCurrentToken(
+        'Invalid parameter name. Parameter names must begin with a letter or underscore, ' +
+        'and can only contain letters, underscores, and numbers.');
+    }
+
+    return new ESParameter(match);
+  }
+
   private captureMatch(exp: RegExp): any
   {
     const match: string | null = this.match(exp);
@@ -477,8 +495,7 @@ export default class ESJSONParser
       return null;
     }
 
-    const unescaped: string = JSON.parse(match);
-    return unescaped;
+    return JSON.parse(match);
   }
 
   private match(exp: RegExp): string | null
@@ -491,6 +508,7 @@ export default class ESJSONParser
 
     const match: string = matches[0];
     this.advance(match.length);
+    this.setToken();
     return match;
   }
 

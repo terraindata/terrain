@@ -44,17 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-enum ESJSONType
-{
-  'invalid',
-  'unknown',
-  'null',
-  'boolean',
-  'number',
-  'string',
-  'array',
-  'object',
-  'parameter',
-}
+import EQLConfig from './EQLConfig';
+import ESInterpreter from './ESInterpreter';
+import ESJSONType from './ESJSONType';
+import ESValueInfo from './ESValueInfo';
 
-export default ESJSONType;
+/**
+ * Represents an Elastic Search input parameter for a search template:
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html
+ * Input parameters appear in a EQL query as an at sign followed by a variable name: @myParam
+ * Input parameters are injected into the template in the form {{#toJson}}myParam{{/toJson}}
+ */
+export default class ESParameter
+{
+  public name: string;
+  // public jsonType: ESJSONType; // indicates expected parameter input type
+
+  constructor(name: string)
+  {
+    this.name = name;
+  }
+}
