@@ -62,11 +62,13 @@ class BounceTest
     this.testObj = new ESJSONParser(JSON.stringify(testObj));
   }
 }
+
 function bounceCheck(obj: ESJSONParser): boolean
 {
   const bounced: any = JSON.parse(ESConverter.formatES(obj));
   return deepEqual(bounced, obj.getValue());
 }
+
 function runBounceChecks(tests: BounceTest[])
 {
   let nPassed: number = 0;
@@ -207,39 +209,6 @@ runBounceChecks([
     deepArr,
   ),
 ]);
-/*
-console.log(ESConverter.formatES(new ESJSONParser(JSON.stringify(
-    {
-      'index': 'movies',
-      'type': 'data',
-      'size': 10,
-      'body': {
-        'query': {
-          'bool': {
-            'must_not': [
-              {
-                'match': {
-                  'title': 'Toy Story (1995)',
-                },
-              },
-            ],
-            'must': [
-              {
-                'range': {
-                  'releasedate': {
-                    'gte': '2007-03-24',
-                  },
-                },
-              },
-            ],
-          },
-        },
-      },
-    }))));
-*/
-// const parser = new ESJSONParser('{"foo":[1, 2, {"bar": "xD"}]}');
-// console.log(parser);
-// console.log(parser.getValue());
 
 /* tslint:enable:no-console */
 /* tslint:enable:object-literal-key-quotes */
