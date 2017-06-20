@@ -641,7 +641,7 @@ export const Ajax =
       {
         try
         {
-          const cols: object = JSON.parse(response);
+          const cols: object = typeof response === 'string' ? JSON.parse(response) : response;
           onLoad(cols);
         }
         catch (e)
