@@ -45,11 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as csv from 'csvtojson';
+import * as hashObject from 'hash-object';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
+import * as Util from '../Util';
 
 export interface ImportConfig
 {
@@ -73,7 +75,7 @@ export class Import
         items = await this._parseData(imprt);
       } catch (e)
       {
-        return reject('Could not parse data: ' + String(e));
+        return reject('Error parsing data: ' + String(e));
       }
       if (items.length === 0)
       {
@@ -108,7 +110,23 @@ export class Import
       {
         try
         {
-          resolve(JSON.parse(imprt.contents));
+          const items: object[] = JSON.parse(imprt.contents);
+          if (!Array.isArray(items))
+          {
+            return reject('Input JSON file must parse to an array of objects.');
+          }
+          if (items.length > 0)
+          {
+            const desiredHash: string = hashObject(Util.getEmptyObject(items[0]));
+            for (const obj of items)
+            {
+              if (hashObject(Util.getEmptyObject(obj)) !== desiredHash)
+              {
+                return reject('Objects in provided input JSON do not have the same keys and/or types.');
+              }
+            }
+          }
+          resolve(items);
         } catch (e)
         {
           return reject('JSON format incorrect: ' + String(e));
