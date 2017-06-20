@@ -52,13 +52,25 @@ const moment = require('moment');
 
 const FileImportReducers = {}
 
+FileImportReducers[ActionTypes.changeCluster] =
+  (state, action) =>
+  {
+    return state.set('clusterIndex', action.payload.clusterIndex);
+  };
+
 FileImportReducers[ActionTypes.changeTarget] =
   (state, action) =>
   {
     return state.set('targetIndex', action.payload.targetIndex);
   };
 
-FileImportReducers[ActionTypes.saveFile] =
+FileImportReducers[ActionTypes.changeText] =
+  (state, action) =>
+  {
+    return state.set('text', action.payload.text);
+  };
+
+FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
   {
     console.log(action.payload.file);

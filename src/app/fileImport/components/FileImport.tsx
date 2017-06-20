@@ -63,6 +63,7 @@ export interface Props
   route?: any;
 }
 
+const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
 const TARGETS = Immutable.List(['movies', 'new']);
 
 class FileImport extends PureClasss<any>
@@ -85,17 +86,22 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { targetIndex, file } = fileImportState;
+    const { clusterIndex, targetIndex, text, textarea } = fileImportState;
 
     return (
       <div>
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
+            canSelectCluster={true}
+            clusterIndex={clusterIndex}
+            clusters={CLUSTERS}
             canSelectTarget={true}
             targetIndex={targetIndex}
             targets={TARGETS}
             canImport={true}
+            text={text}
+            textarea={false}
           />
         </div>
       </div>

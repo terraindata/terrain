@@ -58,9 +58,12 @@ import Util from './../../util/Util';
 
 class FileImportStateC
 {
+  public clusterIndex: number = -1;
   public targetIndex: number = -1;
+  public text: string = "";
   public file: string = "";
   public fileName: string = "test";
+  public textarea: boolean = true;
 }
 const FileImportState_Record = Immutable.Record(new FileImportStateC());
 export interface FileImportState extends FileImportStateC, IRecord<FileImportState> { }

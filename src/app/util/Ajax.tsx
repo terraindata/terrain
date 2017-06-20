@@ -636,6 +636,7 @@ export const Ajax =
 
     /* FileImport */
     upload(file: string,
+      filetype: string,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string | MidwayError) => void,
       sqlQuery?: boolean, // unused
@@ -648,6 +649,7 @@ export const Ajax =
         table: 'testtable',    // type
         contents: file,
         dbtype: 'elastic',
+        filetype: filetype,
       };
       const onLoadHandler = (resp) =>
       {

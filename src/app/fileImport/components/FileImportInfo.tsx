@@ -54,36 +54,40 @@ import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
 import FileImportTypes from './../FileImportTypes';
 import { FileImportState } from './../data/FileImportStore';
+import Autocomplete from './../../common/components/Autocomplete';
 
 export interface Props
 {
+  canSelectCluster: boolean;
+  clusterIndex: number;
+  clusters: List<string>;
   canSelectTarget: boolean;
   targetIndex: number;
   targets: List<string>;
   canImport: boolean;
+  text: string;
+  textarea?: boolean;
 }
 
 class FileImportInfo extends PureClasss<Props>
 {
+  public handleClusterChange(clusterIndex: number)
+  {
+    Actions.changeCluster(clusterIndex);
+  }
   public handleTargetChange(targetIndex: number)
   {
     Actions.changeTarget(targetIndex);
   }
 
-  public handleSaveFile(file)
+  public handleChooseFile(file)
   {
-    // console.log(file);
-    // console.log(file.target);
-    // console.log(file.target.files[0]);
-    // console.log(file.target.files[0].type);
-    // console.log(file.target.files[0].name);
-
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
       // const obj = JSON.parse(saveFile);
-      Actions.saveFile(fr.result);
+      Actions.chooseFile(fr.result);
     }
   }
 
@@ -99,17 +103,33 @@ class FileImportInfo extends PureClasss<Props>
     }
   }
 
+  public handleTextareaChange(event)
+  {
+    Actions.changeText(event.target.value);
+  }
+
   public render()
   {
-    const { canSelectTarget } = this.props;
+    const { canSelectCluster, canSelectTarget } = this.props;
 
     return (
       <div>
         <div>
-          <input ref="file" type="file" onChange={this.handleSaveFile} />
+          <input ref="file" type="file" onChange={this.handleChooseFile} />
         </div>
         <div>
-          <h3>Target</h3>
+          <h3>Cluster</h3>
+        </div>
+        <div>
+          <Dropdown
+            selectedIndex={this.props.clusterIndex}
+            options={this.props.clusters}
+            onChange={this.handleClusterChange}
+            canEdit={canSelectCluster}
+          />
+        </div>
+        <div>
+          <h3>Database</h3>
         </div>
         <div>
           <Dropdown
@@ -118,6 +138,30 @@ class FileImportInfo extends PureClasss<Props>
             onChange={this.handleTargetChange}
             canEdit={canSelectTarget}
           />
+        </div>
+        <div>
+          <h3>Table</h3>
+        </div>
+        <div>
+        {
+          this.props.textarea ?
+          <textarea
+            ref='input'
+            disabled={!this.props.canSelectTarget}
+            defaultValue={this.props.text}
+            onChange={this.handleTextareaChange}
+            placeholder={'table'}
+          />
+          :
+          <Autocomplete
+            ref="input"
+            disabled={!canSelectTarget}
+            value={this.props.text}
+            options={this.props.targets}
+            onChange={this.handleTextareaChange}
+            placeholder={'table'}
+          />
+        }
         </div>
         <div>
           <h3 onClick={this.handleUploadFile}>Import</h3>
