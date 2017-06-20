@@ -316,9 +316,9 @@ export default class ESJSONParser
     arrayInfo.value = array;
     arrayInfo.children = [];
 
-    for ( let elementInfo: ESValueInfo | null = this.readValue();
-          elementInfo !== null;
-          elementInfo = this.readValue() )
+    for (let elementInfo: ESValueInfo | null = this.readValue();
+      elementInfo !== null;
+      elementInfo = this.readValue())
     {
       array.push(elementInfo.value);
       arrayInfo.children.push(elementInfo);
@@ -352,9 +352,9 @@ export default class ESJSONParser
     objInfo.value = obj;
     objInfo.children = {};
 
-    for ( let nameInfo: ESValueInfo | null = this.readValue();
-          nameInfo !== null;
-          nameInfo = this.readValue() )
+    for (let nameInfo: ESValueInfo | null = this.readValue();
+      nameInfo !== null;
+      nameInfo = this.readValue())
     {
       let propertyName: any = nameInfo.value;
 
