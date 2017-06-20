@@ -640,7 +640,7 @@ export const Ajax =
       db: string,
       table: string,
       onLoad: (response: MidwayQueryResponse) => void,
-      onError?: (ev: string | MidwayError) => void,
+      onError?: (ev: string) => void,
       sqlQuery?: boolean, // unused
     ): { xhr: XMLHttpRequest, queryId: string }
     {

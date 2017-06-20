@@ -48,6 +48,7 @@ import * as _ from 'underscore';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
+import MidwayError from './../../../../shared/error/MidwayError';
 const moment = require('moment');
 
 const FileImportReducers = {}
@@ -106,8 +107,15 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.filetype,
       state.dbText,
       state.tableText,
-      _.noop,
-      _.noop,
+      (ev) =>
+      {
+        alert("success");
+      },
+      (ev: string) =>
+      {
+        console.log(JSON.parse(ev));
+        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
+      },
       false,
     );
     return state;
