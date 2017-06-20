@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
+import * as util from 'util';
 import * as winston from 'winston';
 import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
 import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
@@ -90,28 +91,8 @@ function testParse(testString: string,
   const interpreter: ESInterpreter = new ESInterpreter(testString, config);
   const parser: ESJSONParser = interpreter.parser;
 
-  const objects = new WeakMap();
-  let count = 0;
-  winston.info(JSON.stringify(parser.getValueInfo(),
-    (key, val) =>
-    {
-      if (val != null && typeof val === 'object')
-      {
-        const id = objects.get(val);
-        if (id === undefined)
-        {
-          objects.set(val, count++);
-        }
-        else
-        {
-          return 'ref ' + String(id);
-        }
-      }
+  winston.info(util.inspect(parser.getValueInfo()));
 
-      return val;
-    }, 2));
-
-  // winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
   // expect(value).toEqual(expectedValue);
   expect(parser.getErrors()).toEqual(expectedErrors);
 }
