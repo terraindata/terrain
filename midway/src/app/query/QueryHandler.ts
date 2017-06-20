@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import {Readable} from 'stream';
+import { Readable } from 'stream';
 import QueryRequest from '../../../../shared/backends/types/QueryRequest';
 import QueryResponse from '../../../../shared/backends/types/QueryResponse';
 
@@ -52,6 +52,7 @@ export abstract class QueryHandler
 {
   constructor()
   {
+    // do nothing
   }
 
   public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
