@@ -51,6 +51,7 @@ import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import KeyboardFocus from './../../common/components/KeyboardFocus';
 import './Dropdown.less';
 
 export interface Props
@@ -78,6 +79,7 @@ class Dropdown extends PureClasss<Props>
       {
         up: false,
         open: false,
+        focusedIndex: -1,
       };
   }
 
@@ -111,6 +113,7 @@ class Dropdown extends PureClasss<Props>
         className={classNames({
           'dropdown-option': true,
           'dropdown-option-selected': index === this.props.selectedIndex,
+          'dropdown-option-focused': index === this.state.focusedIndex,
         })}
         key={index}
         onClick={this.clickHandler(index)}
@@ -160,6 +163,33 @@ class Dropdown extends PureClasss<Props>
       return this.props.optionsDisplayName.get(option);
     }
     return option;
+  }
+
+  handleFocus()
+  {
+    this.setState({
+      focusedIndex: 0,
+    });
+  }
+
+  handleFocusLost()
+  {
+    this.setState({
+      focusedIndex: -1,
+    });
+  }
+
+  handleFocusedIndexChange(focusedIndex: number)
+  {
+    this.setState({
+      focusedIndex,
+    });
+  }
+
+  handleKeyboardSelect(index: number)
+  {
+    this.clickHandler(index)();
+    this.close();
   }
 
   public render()
@@ -222,6 +252,15 @@ class Dropdown extends PureClasss<Props>
           !this.state.up && this.state.open
           && optionsEl
         }
+        <KeyboardFocus
+          onFocus={this.handleFocus}
+          onFocusLost={this.handleFocusLost}
+          index={this.state.focusedIndex}
+          onIndexChange={this.handleFocusedIndexChange}
+          length={this.props.options && this.props.options.size}
+          onSelect={this.handleKeyboardSelect}
+          focusOverride={this.state.open}
+        />
       </div>
     );
   }
