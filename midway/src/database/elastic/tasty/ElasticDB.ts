@@ -225,7 +225,7 @@ export class ElasticDB implements TastyDB
   {
     if (elements.length > 2)
     {
-      this.bulkUpsert(table, elements);
+      await this.bulkUpsert(table, elements);
       return elements;
     }
 
