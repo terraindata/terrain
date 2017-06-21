@@ -210,7 +210,13 @@ const EQLSpec: ESClause[] =
         name: 'body clause',
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { query: null },
+        template: { 
+          index: '',
+          type: '',
+          from: 0,
+          size: 100,
+          query: null 
+        },
       }),
     new ESVariantClause('sort_clause',
       {
