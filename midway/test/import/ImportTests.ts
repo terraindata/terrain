@@ -44,47 +44,104 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import * as Util from '../Util';
-import { Import, ImportConfig } from './Import';
+import { Import, ImportConfig } from '../../src/app/import/Import';
 
-const Router = new KoaRouter();
-export const imprt: Import = new Import();
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+interface Movie
 {
-  winston.info('importing to database');
-  const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['dbtype', 'contents', 'dsn', 'table', 'filetype', 'db']);
-  if (imprtConf.dbtype !== 'elastic')
-  {
-    throw new Error('File import currently is only supported for Elastic databases.');
-  }
-  if (imprtConf.db === '' || imprtConf.table === '')
-  {
-    throw new Error('Index name and document type cannot be empty strings.');
-  }
-  if (imprtConf.db !== imprtConf.db.toLowerCase())
-  {
-    throw new Error('Index name may not contain uppercase letters.');
-  }
-  if (!/^[a-z\d].*$/.test(imprtConf.db))
-  {
-    throw new Error('Index name must start with a lowercase letter or digit.');
-  }
-  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(imprtConf.db))
-  {
-    throw new Error('Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.');
-  }
-  if (/^_.*/.test(imprtConf.table))
-  {
-    throw new Error('Document type may not start with an underscore.');
-  }
+  title: string;
+  releasedate: string;
+}
 
-  ctx.body = await imprt.insert(imprtConf);
+const host: string = 'http://localhost:9200';
+const movies: Movie[] = [];
+
+let imprt: Import;
+
+beforeAll(async () =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  try
+  {
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+
+    imprt = new Import();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
 });
 
-export default Router;
+test('import JSON file', async (done) =>
+{
+  try
+  {
+    winston.info('Testing JSON upload to Elastic.');
+
+    const imprtConf: ImportConfig =
+      {
+        dsn: host,
+        db: 'movies',
+        table: 'data',
+        contents: JSON.stringify(movies),
+        dbtype: 'elastic',
+        filetype: 'json',
+      };
+    winston.info(imprtConf.contents);
+
+    const results: any = await imprt.insert(imprtConf);
+    winston.info(JSON.stringify(results));
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
+    {
+      expect(results[i]).toMatchObject(movies[i]);
+    }
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
+
+test('import CSV file', async (done) =>
+{
+  try
+  {
+    winston.info('Testing CSV upload to Elastic.');
+
+    let csvString: string = 'title,releasedate\n';
+    for (const movie of movies)
+    {
+      csvString += movie.title + ',' + movie.releasedate + '\n';
+    }
+
+    const imprtConf: ImportConfig =
+      {
+        dsn: host,
+        db: 'movies',
+        table: 'data',
+        contents: csvString,
+        dbtype: 'elastic',
+        filetype: 'csv',
+      };
+    winston.info(imprtConf.contents);
+
+    const results: any = await imprt.insert(imprtConf);
+    winston.info(JSON.stringify(results));
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
+    {
+      expect(results[i]).toMatchObject(movies[i]);
+    }
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});

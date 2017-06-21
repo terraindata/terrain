@@ -590,3 +590,67 @@ describe('Query route tests', () =>
       });
   });
 });
+
+describe('File import route tests', () =>
+{
+  test('Import JSON: POST /midway/v1/import/', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/import/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          dsn: 'http://127.0.0.1:9200',
+          db: 'test_elastic_db',
+          table: 'fileImportTestTable',
+          contents: '[{"column1":"hello","column2":"goodbye"}]',
+          dbtype: 'elastic',
+          filetype: 'json',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            column1: 'hello',
+            column2: 'goodbye',
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/import/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Invalid import: POST /midway/v1/import/', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/items/314159265359')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          dsn: 'http://127.0.0.1:9200',
+          db: 'test_elastic_db',
+          table: 'fileImportTestTable',
+          contents: '{"column1":"hello","column2":"goodbye"}',
+          dbtype: 'elastic',
+          filetype: 'json',
+        },
+      })
+      .expect(400)
+      .then((response) =>
+      {
+        winston.info('response: "' + String(response) + '"');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+      });
+  });
+});

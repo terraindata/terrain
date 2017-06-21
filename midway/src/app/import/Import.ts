@@ -56,7 +56,7 @@ import * as Util from '../Util';
 export interface ImportConfig
 {
   dsn: string;        // e.g.,'http://127.0.0.1:9200'
-  db?: string;        // for elastic, index name
+  db: string;         // for elastic, index name
   table: string;      // for elastic, type name
   contents: string;   // should parse directly into a JSON object
   dbtype: string;     // e.g., 'elastic'
@@ -82,12 +82,7 @@ export class Import
         return reject('No data provided in file to upload.');
       }
       const columns: string[] = Object.keys(items[0]);
-      // TODO: handle cases where JSON parsing works but the above line breaks
 
-      if (imprt.db === '' || imprt.table === '')
-      {
-        return reject('Index name and document type cannot be empty strings.');
-      }
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
         ['_id'],
