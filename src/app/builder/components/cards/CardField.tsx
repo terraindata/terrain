@@ -188,7 +188,8 @@ class CardField extends PureClasss<Props>
         index = 0;
         this.state.midpoints[index] < this.state.originalElTop + dY;
         index++
-      ) {
+      )
+      {
         ;
       }
     }
@@ -198,9 +199,10 @@ class CardField extends PureClasss<Props>
         index = this.state.midpoints.length - 1;
         this.state.midpoints[index] > this.state.originalElBottom + dY;
         index--
-      ) {
-          ;
-        }
+      )
+      {
+        ;
+      }
     }
 
     const sibs = Util.siblings(this.refs['all']);

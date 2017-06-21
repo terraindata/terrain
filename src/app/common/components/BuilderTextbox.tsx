@@ -304,18 +304,18 @@ class BuilderTextbox extends PureClasss<Props>
   public renderOption(option, index)
   {
     const onClick = (event) =>
-      {
-        event.preventDefault();
-        event.stopPropagation();
-        return this.props.id;
-      };
+    {
+      event.preventDefault();
+      event.stopPropagation();
+      return this.props.id;
+    };
 
     return (
       <div
         className={'menu-option'}
         key={index}
         onClick={onClick}
-        style={ { width: this.state.dropdownWidth } }
+        style={{ width: this.state.dropdownWidth }}
       >
         <div
           className={'menu-text-padding-no-icon'}
@@ -345,11 +345,11 @@ class BuilderTextbox extends PureClasss<Props>
         })}
         onClick={this.handleDropdown}
       >
-      {
-        <ArrowIcon />
-      }
-      {
-        this.state.open &&
+        {
+          <ArrowIcon />
+        }
+        {
+          this.state.open &&
           <div
             className={classNames({
               'menu-wrapper': false,
@@ -366,7 +366,7 @@ class BuilderTextbox extends PureClasss<Props>
               }
             </div>
           </div>
-      }
+        }
       </div>
     );
   }

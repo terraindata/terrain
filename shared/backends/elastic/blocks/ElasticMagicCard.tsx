@@ -62,7 +62,6 @@ const { make } = BlockUtils;
 export const elasticMagicValue = _block({
   key: '',
   value: '',
-  valueType: CommonElastic.valueTypesList[0],
   static: {
     language: 'elastic',
     removeOnCardRemove: true,
@@ -77,37 +76,13 @@ export const elasticMagicValue = _block({
       }
       else
       {
-        switch (block['valueType'])
+        try
         {
-          case CommonElastic.valueTypes.number:
-            value = +rawValue;
-            break;
-          case CommonElastic.valueTypes.text:
-            value = '' + rawValue;
-            break;
-          case CommonElastic.valueTypes.null:
-            value = null;
-            break;
-          case CommonElastic.valueTypes.bool:
-            value = !rawValue || rawValue === 'false' ? false : true;
-            break;
-          case CommonElastic.valueTypes.array:
-            // TODO ELASTIC
-            value = tqlTranslationFn(rawValue, tqlConfig);
-            break;
-          case CommonElastic.valueTypes.object:
-            // TODO ELASTIC
-            value = tqlTranslationFn(rawValue, tqlConfig);
-            break;
-          default:
-            try
-            {
-              value = JSON.parse(rawValue);
-            }
-            catch (e)
-            {
-              value = rawValue;
-            }
+          value = JSON.parse(rawValue);
+        }
+        catch (e)
+        {
+          value = rawValue;
         }
       }
 
@@ -117,15 +92,6 @@ export const elasticMagicValue = _block({
     },
   },
 });
-
-//           },
-//           // {
-//           //   displayType: DisplayType.DROPDOWN,
-//           //   key: 'valueType',
-//           //   options: Immutable.List(CommonElastic.valueTypesList),
-//           //   centerDropdown: true,
-//           //   dropdownUsesRawValues: true,
-//           // },
 
 const accepts = List(['elasticMagicCard']);
 
@@ -180,6 +146,7 @@ export const elasticMagicCard = _card(
               key: 'value',
               showWhenCards: true,
               autoDisabled: true,
+              // options: Immutable.List(CommonElastic.valueTypesList),
               accepts,
             },
           ],
