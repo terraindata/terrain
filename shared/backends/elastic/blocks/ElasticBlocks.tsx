@@ -49,7 +49,6 @@ const { List, Map } = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
@@ -61,8 +60,17 @@ const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = Commo
 
 const { make } = BlockUtils;
 
-import { elasticArray, elasticBool, elasticKeyValueToggle, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
-import { elasticMagicValue, elasticMagicCard } from './ElasticMagicCard';
+import { elasticArray,
+         elasticBool,
+         elasticKeyValueToggle,
+         elasticKeyValueWrap,
+         elasticNull,
+         elasticNumber,
+         elasticObject,
+         elasticText,
+         elasticValue,
+        } from './ElasticJSONBlocks';
+import { elasticMagicCard, elasticMagicValue } from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
 
 export const ElasticBlocks =

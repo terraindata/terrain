@@ -232,4 +232,3 @@ const parseMagicObject = (obj: object): Cards =>
 
   return Immutable.List([magicCard]);
 };
-
