@@ -44,18 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-import QueryRequest from '../../../../shared/backends/types/QueryRequest';
-import QueryResponse from '../../../../shared/backends/types/QueryResponse';
-
-export abstract class QueryHandler
+/**
+ * Represents an Elastic Search input parameter for a search template:
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html
+ * Input parameters appear in a EQL query as an at sign followed by a variable name: @myParam
+ * Input parameters are injected into the template in the form {{#toJson}}myParam{{/toJson}}
+ */
+export default class ESParameter
 {
-  constructor()
+  public name: string;
+  // public jsonType: ESJSONType; // indicates expected parameter input type
+
+  constructor(name: string)
   {
-    // do nothing
+    this.name = name;
   }
-
-  public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
 }
-
-export default QueryHandler;
