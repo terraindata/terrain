@@ -56,18 +56,22 @@ import ESValueInfo from './ESValueInfo';
 export default class ESStructureClause extends ESClause
 {
   public structure: { [name: string]: string };
+  public required: any[];
 
-  public constructor(settings: any, config: EQLConfig)
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(settings);
+    super(type, settings);
+    this.structure = structure;
+    this.required = required;
+  }
 
-    Object.keys(this.def).forEach(
+  public init(config: EQLConfig): void
+  {
+    Object.keys(this.structure).forEach(
       (key: string): void =>
       {
-        config.declareType(this.def[key]);
+        config.declareType(this.structure[key]);
       });
-
-    this.structure = this.def as { [key: string]: string };
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
@@ -87,7 +91,7 @@ export default class ESStructureClause extends ESClause
       return;
     }
 
-    const children: any = valueInfo.children;
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
 
     // mark properties
     Object.keys(children).forEach(
