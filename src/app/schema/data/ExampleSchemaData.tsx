@@ -46,50 +46,63 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import SchemaTypes from '../SchemaTypes';
 
+let servers = Immutable.Map({});
 let databases = Immutable.Map({});
 let tables = Immutable.Map({});
 let columns = Immutable.Map({});
 
-['movieDB', 'baseballDB'].map(
-  (name) =>
+['Example Database Server'].map(
+  (serverName) =>
   {
-    let db = SchemaTypes._Database({ name });
+    let server = SchemaTypes._Server({ name: serverName });
 
-    ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-      (tableName) =>
+    ['movieDB', 'baseballDB'].map(
+      (dbName) =>
       {
-        let table = SchemaTypes._Table({ name: tableName, databaseId: db.id });
-        db = db.set('tableIds', db.tableIds.push(table.id));
+        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
+        server = server.set('databaseIds', server.databaseIds.push(db.id));
 
-        ['first', 'second', 'third', 'fourth', 'fifth'].map(
-          (colName) =>
+        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
+          (tableName) =>
           {
-            const column = SchemaTypes._Column({
-              name: colName,
-              tableId: table.id,
-              databaseId: db.id,
-              datatype: 'VARCHAR',
-              isNullable: true,
-              defaultValue: '',
-              isPrimaryKey: false,
-            });
+            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
+            db = db.set('tableIds', db.tableIds.push(table.id));
 
-            columns = columns.set(column.id, column);
+            ['first', 'second', 'third', 'fourth', 'fifth'].map(
+              (colName) =>
+              {
+                const column = SchemaTypes._Column({
+                  name: colName,
+                  tableId: table.id,
+                  databaseId: db.id,
+                  serverId: server.id,
+                  datatype: 'VARCHAR',
+                  isNullable: true,
+                  defaultValue: '',
+                  isPrimaryKey: false,
+                });
 
-            table = table.set('columnIds', table.columnIds.push(column.id));
+                columns = columns.set(column.id, column);
+
+                table = table.set('columnIds', table.columnIds.push(column.id));
+              },
+            );
+
+            tables = tables.set(table.id, table);
           },
         );
 
-        tables = tables.set(table.id, table);
+        databases = databases.set(db.id, db);
       },
     );
 
-    databases = databases.set(db.id, db);
+    servers = servers.set(server.id, server);
   },
 );
 
 const ExampleSchemaData =
   SchemaTypes._SchemaState()
+    .set('servers', servers)
     .set('databases', databases)
     .set('columns', columns)
     .set('tables', tables)

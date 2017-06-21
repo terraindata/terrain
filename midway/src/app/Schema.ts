@@ -67,6 +67,7 @@ const appSchemaSQL: string[] = [
      name text NOT NULL,
      type text NOT NULL,
      dsn text NOT NULL,
+     host text NOT NULL,
      status text);`,
   `CREATE TABLE IF NOT EXISTS users
     (id integer PRIMARY KEY,
