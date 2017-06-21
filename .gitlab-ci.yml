@@ -1,7 +1,7 @@
 variables:
   GIT_SSL_NO_VERIFY: "true"
-  GIT_STRATEGY: fetch
-  GET_SOURCES_ATTEMPTS: 3
+  GIT_STRATEGY: "fetch"
+  GET_SOURCES_ATTEMPTS: "3"
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
