@@ -225,6 +225,7 @@ export class ElasticDB implements TastyDB
   {
     if (elements.length > 2)
     {
+      // tslint:disable-next-line:no-floating-promises
       this.bulkUpsert(table, elements);
       return elements;
     }
