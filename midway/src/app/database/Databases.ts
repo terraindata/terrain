@@ -102,9 +102,9 @@ export class Databases
     {
       if (fields !== undefined)
       {
-        return this.select(fields, {id});
+        return this.select(fields, { id });
       }
-      return this.select([], {id});
+      return this.select([], { id });
     }
     if (fields !== undefined)
     {

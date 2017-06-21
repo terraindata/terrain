@@ -163,29 +163,29 @@ export const SchemaStore: Store<SchemaState> =
       },
 
       [SchemaActionTypes.addDbToServer]:
-        (
-          state: SchemaState,
-          action: Action<SchemaTypes.AddDbToServerActionPayload>,
-        ) =>
+      (
+        state: SchemaState,
+        action: Action<SchemaTypes.AddDbToServerActionPayload>,
+      ) =>
+      {
+        const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+
+        let newServer = server;
+        if (state.servers.get(server.id))
         {
-          const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+          newServer = state.servers.get(server.id).set('databaseIds',
+            state.servers.get(server.id).databaseIds.concat(server.databaseIds));
+        }
 
-          let newServer = server;
-          if(state.servers.get(server.id))
-          {
-            newServer = state.servers.get(server.id).set('databaseIds',
-              state.servers.get(server.id).databaseIds.concat(server.databaseIds));
-          }
-
-          return state
-            .setIn(['servers', server.id], newServer)
-            .set('databases', state.databases.merge(databases))
-            .set('tables', state.tables.merge(tables))
-            .set('columns', state.columns.merge(columns))
-            .set('indexes', state.indexes.merge(indexes));
-          // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-          // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
-        },
+        return state
+          .setIn(['servers', server.id], newServer)
+          .set('databases', state.databases.merge(databases))
+          .set('tables', state.tables.merge(tables))
+          .set('columns', state.columns.merge(columns))
+          .set('indexes', state.indexes.merge(indexes));
+        // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+        // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+      },
 
       [SchemaActionTypes.selectId]:
       (state: SchemaState, action: Action<{ id: ID }>) =>
