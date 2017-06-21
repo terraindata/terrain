@@ -53,6 +53,8 @@ import { readFile } from '../Utils';
 
 let server;
 
+/* tslint:disable:max-line-length */
+
 beforeAll(async (done) =>
 {
   const testDBName = 'midwaytest.db';
@@ -589,4 +591,118 @@ describe('Query route tests', () =>
         fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
-});
+
+  test('Elastic Search Query Route: POST /midway/v1/query : templates',
+    async () =>
+    {
+      const template: string = `{
+                   "index" : "movies",
+                   "type" : "data",
+                   "from" : 0,
+                   "size" : {{#toJson}}size{{/toJson}},
+                   "body" : {
+                     "query" : {
+                      }
+                   }
+                }`;
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'putTemplate',
+            body: {
+              id: 'testTemplateQuery',
+              body: {
+                template,
+              },
+            },
+          },
+        }).expect(200).then((response) =>
+        {
+          winston.info(response.text);
+        }).catch((error) =>
+        {
+          fail(error);
+        });
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'getTemplate',
+            body: {
+              id: 'testTemplateQuery',
+            },
+          },
+        }).expect(200).then((response) =>
+        {
+          winston.info(response.text);
+          expect(JSON.parse(response.text)).toMatchObject(
+            {
+              result: {
+                _id: 'testTemplateQuery',
+                lang: 'mustache',
+                found: true,
+                template,
+              }, errors: [], request: { database: 1, type: 'getTemplate', body: { id: 'testTemplateQuery' } },
+            });
+        }).catch((error) =>
+        {
+          fail(error);
+        });
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'deleteTemplate',
+            body: {
+              id: 'testTemplateQuery',
+            },
+          },
+        }).expect(200).then((response) =>
+        {
+          winston.info(response.text);
+        });
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'getTemplate',
+            body: {
+              id: 'testTemplateQuery',
+            },
+          },
+        }).then((response) =>
+        {
+          winston.info(response.text);
+          expect(JSON.parse(response.text)).toMatchObject(
+            {
+              errors: [
+                {
+                  status: 404,
+                  title: 'Not Found',
+                },
+              ],
+            });
+        }).catch((error) =>
+        {
+          fail(error);
+        });
+    });
+})
+  ;
