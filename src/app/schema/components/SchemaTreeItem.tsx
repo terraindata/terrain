@@ -47,11 +47,11 @@ import * as React from 'react';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
-import {columnChildrenConfig, ColumnTreeInfo} from './items/ColumnTreeInfo';
-import {databaseChildrenConfig, DatabaseTreeInfo} from './items/DatabaseTreeInfo';
-import {indexChildrenConfig, IndexTreeInfo} from './items/IndexTreeInfo';
-import {serverChildrenConfig, ServerTreeInfo} from './items/ServerTreeInfo';
-import {tableChildrenConfig, TableTreeInfo} from './items/TableTreeInfo';
+import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
+import { databaseChildrenConfig, DatabaseTreeInfo } from './items/DatabaseTreeInfo';
+import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
+import { serverChildrenConfig, ServerTreeInfo } from './items/ServerTreeInfo';
+import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
@@ -83,13 +83,13 @@ const typeToRendering: {
     canSelect: boolean,
   },
 } = {
-  server:
-  {
-    component: ServerTreeInfo,
-    childConfig: serverChildrenConfig,
-    canSelect: false,
-  },
-  database:
+    server:
+    {
+      component: ServerTreeInfo,
+      childConfig: serverChildrenConfig,
+      canSelect: false,
+    },
+    database:
     {
       component: DatabaseTreeInfo,
       childConfig: databaseChildrenConfig,
@@ -308,7 +308,8 @@ class SchemaTreeItem extends PureClasss<Props>
           <div>
             {
               ['table', 'database', 'server'].map(
-                (type) => {
+                (type) =>
+                {
                   const id = item[type + 'Id'];
 
                   if (id)

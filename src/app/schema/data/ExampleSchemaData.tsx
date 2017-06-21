@@ -52,21 +52,25 @@ let tables = Immutable.Map({});
 let columns = Immutable.Map({});
 
 ['Example Database Server'].map(
-  (serverName) => {
-    let server = SchemaTypes._Server({name: serverName});
+  (serverName) =>
+  {
+    let server = SchemaTypes._Server({ name: serverName });
 
     ['movieDB', 'baseballDB'].map(
-      (dbName) => {
-        let db = SchemaTypes._Database({name: dbName, serverId: server.id});
+      (dbName) =>
+      {
+        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
         server = server.set('databaseIds', server.databaseIds.push(db.id));
 
         ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) => {
-            let table = SchemaTypes._Table({name: tableName, serverId: server.id, databaseId: db.id});
+          (tableName) =>
+          {
+            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
             db = db.set('tableIds', db.tableIds.push(table.id));
 
             ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) => {
+              (colName) =>
+              {
                 const column = SchemaTypes._Column({
                   name: colName,
                   tableId: table.id,

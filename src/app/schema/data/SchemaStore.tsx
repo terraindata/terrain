@@ -67,156 +67,181 @@ export const SchemaStore: Store<SchemaState> =
   Redux.createStore(ReduxActions.handleActions<SchemaState, any>(
     {
       [SchemaActionTypes.fetch]:
-        (state: SchemaState) =>
-        {
-          Ajax.getDbs(
-            (dbs: object) =>
-            {
-              let m1Dbs: BackendInstance[] = [];
-              let m2Dbs: BackendInstance[] = [];
-              _.map((dbs as any),
-                (db: BackendInstance) => {
-                  if (db.source === 'm1')
+      (state: SchemaState) =>
+      {
+        Ajax.getDbs(
+          (dbs: object) =>
+          {
+            const m1Dbs: BackendInstance[] = [];
+            const m2Dbs: BackendInstance[] = [];
+            _.map((dbs as any),
+              (db: BackendInstance) =>
+              {
+                if (db.source === 'm1')
+                {
+                  m1Dbs.push(db);
+                }
+                else
+                {
+                  m2Dbs.push(db);
+                }
+              },
+            );
+            // Group all m1Dbs under a server e.g. "Other Databases"
+            // The m2Dbs are servers, so need to do parsing differently
+            SchemaActions.serverCount(Object.keys(m2Dbs).length);
+            _.map((dbs as any),
+              (db: BackendInstance) =>
+                (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
+                  db['id'],
+                  (schemaData, error) =>
                   {
-                    m1Dbs.push(db);
-                  }
-                  else
-                  {
-                    m2Dbs.push(db);
-                  }
-                },
-              );
-              console.log('m1Dbs:');
-              console.log(m1Dbs);
-              // Group all m1Dbs under a server e.g. "Other Databases"
-              console.log('m2Dbs:');
-              console.log(m2Dbs);
-              // The m2Dbs are servers, so need to do parsing differently
-              // return;
-              SchemaActions.serverCount(Object.keys(m2Dbs).length);
-              _.map((dbs as any),
-                (db: BackendInstance) =>
-                  (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
-                    db['id'],
-                    (schemaData, error) =>
+                    if (!error)
                     {
-                      if (!error)
+                      if (db.source === 'm2')
                       {
-                        if (db.source === 'm2')
+                        if (db['type'] === 'mysql')
                         {
-                          if (db['type'] === 'mysql')
-                          {
-                            console.log('going to parse: ');
-                            console.log(db);
-                            console.log(schemaData);
-                            // SchemaParser.parseMySQLDb(db, colsData, SchemaActions.setDatabase);
-                          }
-                          else if (db['type'] === 'elastic')
-                          {
-                            SchemaParser.parseElasticDb(db, schemaData, SchemaActions.setServer);
-                          }
+                          SchemaParser.parseMySQLDb(db, schemaData, SchemaActions.setServer);
                         }
-                        else
+                        else if (db['type'] === 'elastic')
                         {
-                          // TODO process DBs from m1
+                          SchemaParser.parseElasticDb(db, schemaData, SchemaActions.setServer);
                         }
                       }
-                    },
-                    (error) =>
-                    {
-                      // TODO consider handling individual DB errors
-                    }),
-              );
-            },
-            (dbError) =>
-            {
-              SchemaActions.error(JSON.stringify(dbError));
-            },
-          );
+                      else
+                      {
+                        SchemaParser.parseMySQLDbs_m1(db, schemaData, SchemaActions.addDbToServer);
+                      }
+                    }
+                  },
+                  (error) =>
+                  {
+                    // TODO consider handling individual DB errors
+                  }),
+            );
+          },
+          (dbError) =>
+          {
+            SchemaActions.error(JSON.stringify(dbError));
+          },
+        );
 
-          return state
-            .set('loading', true);
-        },
+        return state
+          .set('loading', true);
+      },
 
       [SchemaActionTypes.serverCount]:
-        (
-          state: SchemaState,
-          action: Action<{
-            serverCount: number,
-          }>,
-        ) =>
-          state.set('serverCount', action.payload.serverCount),
+      (
+        state: SchemaState,
+        action: Action<{
+          serverCount: number,
+        }>,
+      ) =>
+        state.set('serverCount', action.payload.serverCount),
 
       [SchemaActionTypes.setServer]:
+      (
+        state: SchemaState,
+        action: Action<SchemaTypes.SetServerActionPayload>,
+      ) =>
+      {
+        const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+        if (state.servers.size === state.serverCount - 1)
+        {
+          state = state.set('loading', false).set('loaded', true);
+        }
+
+        return state
+          .setIn(['servers', server.id], server)
+          .set('databases', state.databases.merge(databases))
+          .set('tables', state.tables.merge(tables))
+          .set('columns', state.columns.merge(columns))
+          .set('indexes', state.indexes.merge(indexes));
+        // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+        // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+      },
+
+      [SchemaActionTypes.addDbToServer]:
         (
           state: SchemaState,
-          action: Action<SchemaTypes.SetServerActionPayload>,
-        ) => {
-          const {server, databases, tables, columns, indexes, tableNames, columnNames} = action.payload;
-          if (state.servers.size === state.serverCount - 1)
+          action: Action<SchemaTypes.AddDbToServerActionPayload>,
+        ) =>
+        {
+          const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+
+          let newServer = server;
+          if(state.servers.get(server.id))
           {
-            state = state.set('loading', false).set('loaded', true);
+            newServer = state.servers.get(server.id).set('databaseIds',
+              state.servers.get(server.id).databaseIds.concat(server.databaseIds));
           }
 
           return state
-            .setIn(['servers', server.id], server)
+            .setIn(['servers', server.id], newServer)
             .set('databases', state.databases.merge(databases))
             .set('tables', state.tables.merge(tables))
             .set('columns', state.columns.merge(columns))
             .set('indexes', state.indexes.merge(indexes));
-            // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-            // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+          // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+          // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
         },
 
       [SchemaActionTypes.selectId]:
-        (state: SchemaState, action: Action<{ id: ID }>) =>
-          state.set('selectedId', action.payload.id),
+      (state: SchemaState, action: Action<{ id: ID }>) =>
+        state.set('selectedId', action.payload.id),
 
       [SchemaActionTypes.highlightId]:
-        (state: SchemaState, action: Action<{
-          id: ID,
-          inSearchResults: boolean,
-        }>) =>
-          state.set('highlightedId', action.payload.id)
-            .set('highlightedInSearchResults', action.payload.inSearchResults),
+      (state: SchemaState, action: Action<{
+        id: ID,
+        inSearchResults: boolean,
+      }>) =>
+        state.set('highlightedId', action.payload.id)
+          .set('highlightedInSearchResults', action.payload.inSearchResults),
     },
     DEV ? ExampleSchemaData : SchemaTypes._SchemaState(),
   ), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
 
-const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload});
+const $ = (type: string, payload: any) => SchemaStore.dispatch({ type, payload });
 
 export const SchemaActions =
   {
     fetch:
-      () =>
-        $(SchemaActionTypes.fetch, {} ),
+    () =>
+      $(SchemaActionTypes.fetch, {}),
 
     serverCount:
-      (serverCount: number) =>
-        $(SchemaActionTypes.serverCount, { serverCount }),
+    (serverCount: number) =>
+      $(SchemaActionTypes.serverCount, { serverCount }),
 
     error:
-      (error: string) =>
-        $(SchemaActionTypes.error, { error }),
+    (error: string) =>
+      $(SchemaActionTypes.error, { error }),
 
     setServer:
-      (
-        payload: SchemaTypes.SetServerActionPayload,
-      ) =>
-        $(SchemaActionTypes.setServer, payload),
+    (
+      payload: SchemaTypes.SetServerActionPayload,
+    ) =>
+      $(SchemaActionTypes.setServer, payload),
+
+    addDbToServer:
+    (
+      payload: SchemaTypes.AddDbToServerActionPayload,
+    ) =>
+      $(SchemaActionTypes.addDbToServer, payload),
 
     highlightId:
-      (id: ID, inSearchResults: boolean) =>
-        $(SchemaActionTypes.highlightId, {
-          id,
-          inSearchResults,
-        }),
+    (id: ID, inSearchResults: boolean) =>
+      $(SchemaActionTypes.highlightId, {
+        id,
+        inSearchResults,
+      }),
 
     selectId:
-      (id: ID) =>
-        $(SchemaActionTypes.selectId, {
-          id,
-        }),
+    (id: ID) =>
+      $(SchemaActionTypes.selectId, {
+        id,
+      }),
 
   };
 

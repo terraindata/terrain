@@ -61,7 +61,8 @@ export namespace SchemaTypes
     public name: string = '';
   }
 
-  class SchemaStateC {
+  class SchemaStateC
+  {
     public servers: ServerMap = Map<string, Server>({});
     public databases: DatabaseMap = Map<string, Database>({});
     public tables: TableMap = Map<string, Table>({});
@@ -87,11 +88,13 @@ export namespace SchemaTypes
   export const _SchemaState = (config?: { [key: string]: any }) =>
     New<SchemaState>(new SchemaStateC(), config);
 
-  export function serverId(serverName: string) {
+  export function serverId(serverName: string)
+  {
     return serverName;
   }
 
-  class ServerC extends SchemaBaseClass {
+  class ServerC extends SchemaBaseClass
+  {
     public type = 'server';
     public name = '';
 
@@ -102,7 +105,8 @@ export namespace SchemaTypes
     (config: {
       name: string,
       id?: string,
-    }) => {
+    }) =>
+    {
       config.id = serverId(config.name);
       return New<Server>(
         new ServerC(config),
@@ -110,11 +114,13 @@ export namespace SchemaTypes
     };
   export type ServerMap = IMMap<string, Server>;
 
-  export function databaseId(serverName: string, databaseName: string) {
+  export function databaseId(serverName: string, databaseName: string)
+  {
     return serverName + '/' + databaseName;
   }
 
-  class DatabaseC extends SchemaBaseClass {
+  class DatabaseC extends SchemaBaseClass
+  {
     public type = 'database';
     public name = '';
     public databaseType = 'mysql';
@@ -128,7 +134,8 @@ export namespace SchemaTypes
       name: string,
       serverId: string,
       id?: string,
-    }) => {
+    }) =>
+    {
       config.id = databaseId(config.serverId, config.name);
       return New<Database>(
         new DatabaseC(config),
@@ -136,7 +143,8 @@ export namespace SchemaTypes
     };
   export type DatabaseMap = IMMap<string, Database>;
 
-  export function tableId(serverName: string, databaseName: string, tableName: string): string {
+  export function tableId(serverName: string, databaseName: string, tableName: string): string
+  {
     return serverName + '/' + databaseName + '.' + tableName;
   }
 
@@ -156,7 +164,8 @@ export namespace SchemaTypes
     serverId: string,
     databaseId: string,
     id?: string,
-  }) => {
+  }) =>
+  {
     config.id = tableId(config.serverId, config.databaseId, config.name);
     return New<Table>(new TableC(config), config, 'string');
   };
@@ -201,7 +210,8 @@ export namespace SchemaTypes
   };
   export type ColumnMap = IMMap<string, Column>;
 
-  export function indexId(serverId: string, databaseName: string, tableName: string, indexName: string) {
+  export function indexId(serverId: string, databaseName: string, tableName: string, indexName: string)
+  {
     return serverId + '/' + databaseName + '.' + tableName + '.i.' + indexName;
   }
 
@@ -225,7 +235,8 @@ export namespace SchemaTypes
 
     indexType: string,
     id?: string,
-  }) => {
+  }) =>
+  {
     config.id = indexId(config.serverId, config.databaseId, config.tableId, config.tableId);
     return New<Index>(new IndexC(config), config, 'string');
   };
@@ -261,7 +272,18 @@ export namespace SchemaTypes
 
   export type TableNamesByDb = IMMap<string, List<string>>;
   export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
-  export interface SetServerActionPayload {
+  export interface SetServerActionPayload
+  {
+    server: Server;
+    databases: IMMap<string, Database>;
+    tables: IMMap<string, Table>;
+    columns: IMMap<string, Column>;
+    indexes: IMMap<string, Index>;
+    columnNames: IMMap<string, List<string>>;
+    tableNames: List<string>;
+  }
+  export interface AddDbToServerActionPayload
+  {
     server: Server;
     databases: IMMap<string, Database>;
     tables: IMMap<string, Table>;

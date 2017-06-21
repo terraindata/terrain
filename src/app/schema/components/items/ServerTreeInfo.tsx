@@ -78,7 +78,7 @@ export class ServerTreeInfo extends PureClasss<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { server.databaseIds.size }
+            {server.databaseIds.size}
           </span> databases
         </div>
       </div>
@@ -87,11 +87,11 @@ export class ServerTreeInfo extends PureClasss<Props>
 }
 
 export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-[
-  {
-    label: 'Databases',
-    type: 'database',
-  },
-];
+  [
+    {
+      label: 'Databases',
+      type: 'database',
+    },
+  ];
 
 export default ServerTreeInfo;

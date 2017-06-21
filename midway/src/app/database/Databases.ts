@@ -63,6 +63,7 @@ export interface DatabaseConfig
   name: string;
   type: string;
   dsn: string;
+  host: string;
   status?: string;
 }
 
@@ -79,6 +80,7 @@ export class Databases
         'name',
         'type',
         'dsn',
+        'host',
         'status',
       ],
     );
@@ -94,11 +96,19 @@ export class Databases
     return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
   }
 
-  public async get(id?: number): Promise<DatabaseConfig[]>
+  public async get(id?: number, fields?: string[]): Promise<DatabaseConfig[]>
   {
     if (id !== undefined)
     {
-      return this.select([], { id });
+      if (fields !== undefined)
+      {
+        return this.select(fields, {id});
+      }
+      return this.select([], {id});
+    }
+    if (fields !== undefined)
+    {
+      return this.select(fields, {});
     }
     return this.select([], {});
   }

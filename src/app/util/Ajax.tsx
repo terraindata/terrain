@@ -475,8 +475,10 @@ export const Ajax =
 
     getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
-      return Ajax.req('get', 'versions/items/' + id, {}, (response: any) => {
-        try {
+      return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>
+      {
+        try
+        {
           onLoad(response);
         }
         catch (e)

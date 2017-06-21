@@ -47,7 +47,7 @@ import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { DragDropContext } from 'react-dnd';
-const {browserHistory} = require('react-router');
+const { browserHistory } = require('react-router');
 
 import SchemaView from './SchemaView';
 

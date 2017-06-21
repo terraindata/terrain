@@ -65,11 +65,13 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
   }
   else if (type === 'mysql')
   {
-    const halves = dsnString.split('@');
-    const q1 = halves[0].split(':');
-    const q2 = halves[1].split(':');
+    const idx = dsnString.lastIndexOf('@');
+    const h0 = dsnString.substr(0, idx);
+    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
+    const q1 = h0.split(':');
+    const q2 = h1.split(':');
 
-    if (halves.length !== 2 || q1.length !== 2 || q2.length !== 2)
+    if (q1.length !== 2 || q2.length !== 2)
     {
       throw new Error('Error interpreting DSN parameter for MySQL.');
     }
