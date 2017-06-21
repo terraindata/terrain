@@ -47,7 +47,7 @@ import * as React from 'react';
 import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
+import Radium = require('radium');
 
 export interface Props
 {
