@@ -70,7 +70,6 @@ export namespace SchemaTypes
     public indexes: IndexMap = Map<string, Index>({});
 
     public serverCount: number = -1;
-    // public dbCount: number = -1;
     public loading: boolean = false;
     public loaded: boolean = false;
     public schemaError: boolean = false;
