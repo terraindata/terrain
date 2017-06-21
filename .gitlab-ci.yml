@@ -1,5 +1,7 @@
 variables:
   GIT_SSL_NO_VERIFY: "true"
+  GIT_STRATEGY: fetch
+  GET_SOURCES_ATTEMPTS: 3
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -13,7 +15,7 @@ before_script:
 stages:
   - lint
   - fix
-  - test-backend
+  - test
 
 lint:
   script:
@@ -30,7 +32,20 @@ test-backend:
    - yarn run test-back-setup
    - yarn run test-back
    - yarn run test-back-teardown
-  stage: test-backend
+  stage: test
   artifacts:
     paths:
       - coverage
+
+test-frontend:
+  script:
+   - yarn run build
+  stage: test
+
+test-frontend-prod:
+  script:
+   - yarn run build-prod
+  only:
+   - master
+  stage: test
+
