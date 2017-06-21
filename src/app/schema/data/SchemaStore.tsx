@@ -57,6 +57,7 @@ import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
 
+type Server = SchemaTypes.Server;
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
@@ -71,22 +72,46 @@ export const SchemaStore: Store<SchemaState> =
         Ajax.getDbs(
           (dbs: object) =>
           {
-            SchemaActions.dbCount(Object.keys(dbs).length);
+            const m1Dbs: BackendInstance[] = [];
+            const m2Dbs: BackendInstance[] = [];
+            _.map((dbs as any),
+              (db: BackendInstance) =>
+              {
+                if (db.source === 'm1')
+                {
+                  m1Dbs.push(db);
+                }
+                else
+                {
+                  m2Dbs.push(db);
+                }
+              },
+            );
+            // Group all m1Dbs under a server e.g. "Other Databases"
+            // The m2Dbs are servers, so need to do parsing differently
+            SchemaActions.serverCount(Object.keys(m2Dbs).length);
             _.map((dbs as any),
               (db: BackendInstance) =>
                 (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
                   db['id'],
-                  (colsData, error) =>
+                  (schemaData, error) =>
                   {
                     if (!error)
                     {
-                      if (db['type'] === 'mysql')
+                      if (db.source === 'm2')
                       {
-                        SchemaParser.parseMySQLDb(db, colsData, SchemaActions.setDatabase);
+                        if (db['type'] === 'mysql')
+                        {
+                          SchemaParser.parseMySQLDb(db, schemaData, SchemaActions.setServer);
+                        }
+                        else if (db['type'] === 'elastic')
+                        {
+                          SchemaParser.parseElasticDb(db, schemaData, SchemaActions.setServer);
+                        }
                       }
-                      else if (db['type'] === 'elastic')
+                      else
                       {
-                        SchemaParser.parseElasticDb(db, colsData, SchemaActions.setDatabase);
+                        SchemaParser.parseMySQLDbs_m1(db, schemaData, SchemaActions.addDbToServer);
                       }
                     }
                   },
@@ -106,34 +131,60 @@ export const SchemaStore: Store<SchemaState> =
           .set('loading', true);
       },
 
-      [SchemaActionTypes.dbCount]:
+      [SchemaActionTypes.serverCount]:
       (
         state: SchemaState,
         action: Action<{
-          dbCount: number,
+          serverCount: number,
         }>,
       ) =>
-        state.set('dbCount', action.payload.dbCount),
+        state.set('serverCount', action.payload.serverCount),
 
-      [SchemaActionTypes.setDatabase]:
+      [SchemaActionTypes.setServer]:
       (
         state: SchemaState,
-        action: Action<SchemaTypes.SetDbActionPayload>,
+        action: Action<SchemaTypes.SetServerActionPayload>,
       ) =>
       {
-        const { database, tables, columns, indexes, tableNames, columnNames } = action.payload;
-        if (state.databases.size === state.dbCount - 1)
+        const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+        if (state.servers.size === state.serverCount - 1)
         {
           state = state.set('loading', false).set('loaded', true);
         }
 
         return state
-          .setIn(['databases', database.id], database)
+          .setIn(['servers', server.id], server)
+          .set('databases', state.databases.merge(databases))
           .set('tables', state.tables.merge(tables))
           .set('columns', state.columns.merge(columns))
-          .set('indexes', state.indexes.merge(indexes))
-          .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-          .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+          .set('indexes', state.indexes.merge(indexes));
+        // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+        // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+      },
+
+      [SchemaActionTypes.addDbToServer]:
+      (
+        state: SchemaState,
+        action: Action<SchemaTypes.AddDbToServerActionPayload>,
+      ) =>
+      {
+        const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+
+        let newServer = server;
+        if (state.servers.get(server.id))
+        {
+          newServer = state.servers.get(server.id).set('databaseIds',
+            state.servers.get(server.id).databaseIds.concat(server.databaseIds));
+        }
+
+        return state
+          .setIn(['servers', server.id], newServer)
+          .set('databases', state.databases.merge(databases))
+          .set('tables', state.tables.merge(tables))
+          .set('columns', state.columns.merge(columns))
+          .set('indexes', state.indexes.merge(indexes));
+        // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+        // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
       },
 
       [SchemaActionTypes.selectId]:
@@ -159,19 +210,25 @@ export const SchemaActions =
     () =>
       $(SchemaActionTypes.fetch, {}),
 
-    dbCount:
-    (dbCount: number) =>
-      $(SchemaActionTypes.dbCount, { dbCount }),
+    serverCount:
+    (serverCount: number) =>
+      $(SchemaActionTypes.serverCount, { serverCount }),
 
     error:
     (error: string) =>
       $(SchemaActionTypes.error, { error }),
 
-    setDatabase:
+    setServer:
     (
-      payload: SchemaTypes.SetDbActionPayload,
+      payload: SchemaTypes.SetServerActionPayload,
     ) =>
-      $(SchemaActionTypes.setDatabase, payload),
+      $(SchemaActionTypes.setServer, payload),
+
+    addDbToServer:
+    (
+      payload: SchemaTypes.AddDbToServerActionPayload,
+    ) =>
+      $(SchemaActionTypes.addDbToServer, payload),
 
     highlightId:
     (id: ID, inSearchResults: boolean) =>
