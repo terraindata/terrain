@@ -56,9 +56,9 @@ import ESPropertyInfo from './ESPropertyInfo';
 export default class ESValueInfo
 {
 
-  private static empyArrayChildren: ESValueInfo[] = [];
+  private static emptyArrayChildren: ESValueInfo[] = [];
 
-  private static empyObjectChildren: { [name: string]: ESPropertyInfo } = {};
+  private static emptyObjectChildren: { [name: string]: ESPropertyInfo } = {};
 
   private static emptyErrorList: ESParserError[] = [];
 
@@ -108,8 +108,8 @@ export default class ESValueInfo
     this.jsonType = ESJSONType.invalid;
     this.value = undefined;
     this.tokens = [];
-    this.arrayChildren = ESValueInfo.empyArrayChildren;
-    this.objectChildren = ESValueInfo.empyObjectChildren;
+    this.arrayChildren = ESValueInfo.emptyArrayChildren;
+    this.objectChildren = ESValueInfo.emptyObjectChildren;
     this.errors = ESValueInfo.emptyErrorList;
     this.clause = null;
     this.delegateClause = null;
