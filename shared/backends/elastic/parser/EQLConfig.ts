@@ -211,4 +211,8 @@ export default class EQLConfig
     }
   }
 
+  public getClauses()
+  {
+    return this.clauses;
+  }
 }

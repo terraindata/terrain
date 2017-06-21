@@ -55,11 +55,15 @@ import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarD
 import CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
-import {EQLSpec, EQLSpecClause, DefType, BaseType} from '../parser/EQLSpec';
+import {DefType, BaseType} from '../parser/EQLSpec';
 
 import EQLConfig from '../parser/EQLConfig';
-console.log(EQLConfig);
-console.log(new EQLConfig());
+import ESClause from '../parser/ESClause';
+import ESStructureClause from '../parser/ESStructureClause';
+import ESEnumClause from '../parser/ESEnumClause';
+
+const clauses = (new EQLConfig()).getClauses();
+console.log(clauses);
 
 const { valueTypes } = CommonElastic;
 
@@ -95,10 +99,20 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
   }
 }
 
-_.mapObject(EQLSpec, (clause: EQLSpecClause, type: string) =>
+let colorIndex = 1;
+const numColors = 21;
+
+_.mapObject(clauses, (clause: ESClause, type: string) =>
 {
   const cardType = 'elasticElastic' + type;
-  const { def, desc, url, values, template, autocomplete, name } = clause;
+  const { def, desc, url, values, template, required, name } = clause;
+  
+  if (clause instanceof ESStructureClause)
+  {
+    console.log('structure');
+  }
+  
+  // if ()
   
   if(typeof def === 'string')
   {
