@@ -43,54 +43,63 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
 import * as _ from 'underscore';
-const Redux = require('redux');
+import Util from '../../util/Util';
+import Classs from './../../common/components/Classs';
+import PreviewRow from './PreviewRow';
+import PreviewHeader from './PreviewHeader';
 
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import AuthStore from './../../auth/data/AuthStore';
-import RoleStore from './../../roles/data/RolesStore';
-import UserStore from './../../users/data/UserStore';
-import FileImportTypes from './../FileImportTypes';
-import Actions from './FileImportActions';
-import FileImportActionTypes from './FileImportActionTypes';
-import Util from './../../util/Util';
-
-class FileImportStateC
+export interface Props
 {
-  public clusterIndex: number = -1;
-  public dbText: string = "";
-  public tableText: string = "";
-  public file: string = "";
-  public filetype: string = "";
-  public fileChosen: boolean = false;
-  public dbSelected: boolean = false;
-  public tableSelected: boolean = false;
-  public test: number = -2;
-  public previewRows: object[] = null;
+  nrows: number;
+  previewRows: object[];
 }
-const FileImportState_Record = Immutable.Record(new FileImportStateC());
-export interface FileImportState extends FileImportStateC, IRecord<FileImportState> { }
-export const _FileImportState = (config?: any) =>
+
+class Preview extends Classs<Props>
 {
-  return new FileImportState_Record(Util.extendId(config || {})) as any as FileImportState;
-};
-
-const DefaultState = _FileImportState();
-
-import FileImportReducers from './FileImportReducers';
-
-export const FileImportStore: IStore<FileImportState> = Redux.createStore(
-  (state: FileImportState = DefaultState, action) =>
+  public render()
   {
-    if (FileImportReducers[action.type])
+    const rows = [];
+    if (this.props.previewRows)
     {
-      state = FileImportReducers[action.type](state, action);
+      for (let i = 0; i < this.props.nrows; i++)
+      {
+        const r = this.props.previewRows[i];
+        const items = [];
+        for (const property in r)
+        {
+          if (r.hasOwnProperty(property) && property !== '_id')
+          {
+            items.push(r[property]);
+          }
+        }
+
+        rows.push(
+          <PreviewRow
+            id={i}
+            key={r._id}
+            items={items}
+          />
+        )
+      }
     }
 
-    return state;
+    return (
+      <table>
+        <thead key="thead">
+          <PreviewHeader
+            columns={'column names'}
+          />
+        </thead>
+        <tbody key="tbody">
+          { rows }
+        </tbody>
+      </table>
+    );
   }
-  , DefaultState);
+}
 
-export default FileImportStore;
-
+export default Preview;

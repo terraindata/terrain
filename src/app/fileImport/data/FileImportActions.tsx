@@ -74,6 +74,10 @@ const FileImportActions =
     uploadFile:
     () =>
       $(ActionTypes.uploadFile, {}),
+
+    previewFile:
+    (preview: object[]) =>
+      $(ActionTypes.previewFile, { preview }),
   };
 
 export default FileImportActions;

@@ -46,9 +46,11 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../../util/Util';
+import Actions from './FileImportActions';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
 import MidwayError from './../../../../shared/error/MidwayError';
+import MidwayQueryResponse from "../../../../shared/backends/types/MidwayQueryResponse";
 const moment = require('moment');
 
 const FileImportReducers = {}
@@ -107,18 +109,33 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.filetype,
       state.dbText,
       state.tableText,
-      (ev) =>
+      (resp: object[]) =>
       {
+        console.log(resp);
+        const preview = [];
+        for (let i = 0; i < 2; i++)
+        {
+          preview.push(resp[i]);
+        }
+        console.log("preview :", preview);
+
         alert("success");
+        // return state.set('previewRows', preview);
+        Actions.previewFile(preview);
       },
-      (ev: string) =>
+      (err: string) =>
       {
-        console.log(JSON.parse(ev));
-        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
       },
       false,
     );
     return state;
+  };
+
+FileImportReducers[ActionTypes.previewFile] =
+  (state, action) =>
+  {
+    return state.set('previewRows', action.payload.preview);
   };
 
 export default FileImportReducers;

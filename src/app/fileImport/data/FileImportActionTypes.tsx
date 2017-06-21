@@ -55,6 +55,7 @@ const FileImportActionTypes =
     chooseFile: '',
     unchooseFile: '',
     uploadFile: '',
+    previewFile: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

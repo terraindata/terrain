@@ -56,7 +56,7 @@ const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
-//import List = Immutable.List;
+import Preview from './Preview';
 const { List } = Immutable;
 
 export interface Props
@@ -68,8 +68,8 @@ export interface Props
 }
 
 const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
-const DBS = Immutable.List(['movies', 'new']);
 const FILETYPES = Immutable.List(['json', 'csv']);
+const NUM_PREVIEW_ROWS = 2;
 
 class FileImport extends PureClasss<any>
 {
@@ -100,7 +100,7 @@ class FileImport extends PureClasss<any>
     });
   }
 
-  private MapToList(map: IMMap<string, any>)
+  private getMapKeys(map: IMMap<string, any>)
   {
     if (map === undefined)
     {
@@ -118,10 +118,11 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen } = fileImportState;
-
+    const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen, previewRows } = fileImportState;
+    // console.log("import render ", previewRows);
+    console.log(this.state);
     return (
-      <div>
+      <div className="fileImport">
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
@@ -129,16 +130,22 @@ class FileImport extends PureClasss<any>
             clusterIndex={clusterIndex}
             clusters={CLUSTERS}
             canSelectDb={true}
-            dbs={this.MapToList(this.state.databases)}
+            dbs={this.getMapKeys(this.state.databases)}
             dbText={dbText}
             dbSelected={dbSelected}
             canSelectTable={true}
-            tables={this.MapToList(this.state.tables)}
+            tables={this.getMapKeys(this.state.tables)}
             tableText={tableText}
             tableSelected={tableSelected}
             canImport={true}
             validFiletypes={FILETYPES}
             fileChosen={fileChosen}
+          />
+        </div>
+        <div>
+          <Preview
+            nrows={NUM_PREVIEW_ROWS}
+            previewRows={previewRows}
           />
         </div>
       </div>

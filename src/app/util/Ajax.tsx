@@ -639,7 +639,7 @@ export const Ajax =
       filetype: string,
       db: string,
       table: string,
-      onLoad: (response: MidwayQueryResponse) => void,
+      onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
       sqlQuery?: boolean, // unused
     ): { xhr: XMLHttpRequest, queryId: string }
@@ -656,8 +656,8 @@ export const Ajax =
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>
       {
-        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-        onLoad(queryResult);
+        // const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(resp);
       };
       const xhr = Ajax.req(
         'post',
