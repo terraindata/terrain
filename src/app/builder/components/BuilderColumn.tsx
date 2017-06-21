@@ -64,6 +64,7 @@ const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../../shared/items/types/Query';
 import Ajax from './../../util/Ajax';
 
+import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import Manual from './../../manual/components/Manual';
@@ -85,7 +86,7 @@ enum COLUMNS
 {
   Builder,
   Results,
-  TQL,
+  Editor,
   Inputs,
   Schema,
 }
@@ -239,7 +240,7 @@ const BuilderColumn = React.createClass<any, any>(
             resultsState={this.props.resultsState}
           />;
 
-        case COLUMNS.TQL:
+        case COLUMNS.Editor:
           return <BuilderTQLColumn
             canEdit={canEdit}
             addColumn={this.props.onAddManualColumn}
@@ -313,10 +314,16 @@ const BuilderColumn = React.createClass<any, any>(
     render()
     {
       const { query, canEdit, cantEditReason } = this.props;
-
+      console.log(backgroundColor(Colors().builder.builderColumn.background));
       return this.renderPanel((
-        <div className={'builder-column builder-column-' + this.props.index}>
-          <div className='builder-title-bar'>
+        <div
+          className={'builder-column builder-column-' + this.props.index}
+          style={backgroundColor(Colors().base)}
+        >
+          <div
+            className='builder-title-bar'
+            style={backgroundColor(Colors().builder.builderColumn.background)}
+          >
             {
               this.props.index === 0 ? null : (
                 <div className='builder-resize-handle' ref='resize-handle'>
@@ -367,8 +374,9 @@ const BuilderColumn = React.createClass<any, any>(
               'builder-column-content-scroll':
               this.state.column === COLUMNS.Builder ||
               this.state.column === COLUMNS.Inputs,
-            })
-            }>
+            })}
+            style={backgroundColor(Colors().builder.builderColumn.background)}
+          >
             {
               this.renderContent(canEdit)
             }

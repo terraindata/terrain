@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
+import { Colors, backgroundColor, fontColor, link } from '../../common/Colors';
 import './Switch.less';
 
 export interface Props
@@ -77,7 +78,10 @@ class Switch extends Classs<Props>
 
     return (
       <div className={classes} onClick={this.handleSwitch}>
-        <div className='switch-on' />
+        <div
+          className='switch-on'
+          style={backgroundColor(Colors().text.link, Colors().text.linkHover)}
+        />
         <div className='switch-first'>
           {this.props.first}
         </div>

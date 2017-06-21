@@ -69,6 +69,7 @@ export interface Props
   small?: boolean;
   style?: any;
   id?: ID;
+  vertical?: boolean;
 }
 
 export class Menu extends PureClasss<Props>
@@ -177,6 +178,7 @@ export class Menu extends PureClasss<Props>
           'menu-wrapper': true,
           'menu-wrapper-small': this.props.small,
           'menu-open': this.state.open,
+          'menu-vertical': this.props.vertical,
         })}
         style={this.props.style ? this.props.style : null}
       >

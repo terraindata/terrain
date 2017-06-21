@@ -89,6 +89,7 @@ import DeployModal from './deploy/components/DeployModal';
 import Ajax from './util/Ajax';
 import Util from './util/Util';
 import EasterEggs from './x/components/EasterEggs';
+import { Colors, backgroundColor, fontColor } from './common/Colors';
 
 import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
@@ -127,12 +128,12 @@ const links =
     // },
     {
       icon: <LibraryIcon />,
-      text: 'Library',
+      text: 'Manage',
       route: '/library',
     },
     {
       icon: <BuilderIcon />,
-      text: 'Builder',
+      text: 'Build',
       route: '/builder',
     },
     {
@@ -341,11 +342,13 @@ class App extends PureClasss<Props>
       <div
         className='app'
         onMouseMove={this.handleMouseMove}
+        style={fontColor(Colors().text.baseLight)}
       >
         {
           this.state.loggedInAndLoaded &&
           <div
             className='app-top-bar'
+            style={backgroundColor(Colors().titleBar.base)}
           >
             <TerrainIcon
               className='app-top-bar-icon'

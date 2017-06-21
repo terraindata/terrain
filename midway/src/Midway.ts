@@ -47,7 +47,7 @@ THE SOFTWARE.
 import App from './app/App';
 import CmdLineArgs from './app/CmdLineArgs';
 
-const app = new App(CmdLineArgs);
-const server = app.start();
+export const app = new App(CmdLineArgs);
+export const server = app.start();
 
 export default server;

@@ -5,18 +5,14 @@
 @top-height: 24px;
 @title-width: 110px;
 @stroke-height: 5px;
-@card-border-radius: 6px;
+@card-border-radius: 0px;
 @card-padding-horizontal: 15px;
 @card-padding-vertical: 7px;
   
 .card {
-  // min-width: 400px;
-  // width: 600px;
- // .standard-margin;
-  // height: 0px;
   position: relative;
- 
- border-radius: @card-border-radius;
+  border-radius: @card-border-radius;
+  padding: 6px;
  
   .card-inner {
     border: 1px solid @medium-dark-green;
@@ -131,6 +127,10 @@
       width: 42px;
       fill: #fff;
     }
+  }
+  
+  .card-handle-icon {
+    width: 10px;
   }
 }
 

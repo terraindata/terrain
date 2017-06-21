@@ -48,6 +48,7 @@ import * as React from 'react';
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
 import './InfoArea.less';
+import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -77,8 +78,14 @@ class InfoArea extends PureClasss<Props>
     }
 
     return (
-      <div className={'info-area-' + thing} onClick={onClick ? this.props.onClick : null}>
-        {this.props[thing]}
+      <div
+        className={'info-area-' + thing}
+        onClick={onClick ? this.props.onClick : null}
+        style={fontColor(thing == 'small' ? Colors().text.secondaryLight : Colors().text.baseLight)}
+      >
+        {
+          this.props[thing]
+        }
       </div>
     );
   }
