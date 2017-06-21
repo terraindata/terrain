@@ -138,6 +138,10 @@ class BuilderTextbox extends PureClasss<Props>
 
   public getCreatingType(): string
   {
+    if (!this.props.language)
+    {
+      return undefined;
+    }
     return AllBackendsMap[this.props.language].creatingType;
   }
 
