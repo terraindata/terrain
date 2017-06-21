@@ -95,7 +95,7 @@ class Preview extends Classs<Props>
           />
         </thead>
         <tbody key="tbody">
-          { rows }
+          {rows}
         </tbody>
       </table>
     );

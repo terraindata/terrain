@@ -71,11 +71,11 @@ class PreviewRow extends Classs<Props>
     const row = [];
     for (let i = 0; i < this.props.items.length; i++)
     {
-      row.push(<td key={10 * this.props.id + i}>{ this.props.items[i] }</td>);
+      row.push(<td key={10 * this.props.id + i}>{this.props.items[i]}</td>);
     }
 
     return (
-      <tr>{ row }</tr>
+      <tr>{row}</tr>
     );
   }
 }

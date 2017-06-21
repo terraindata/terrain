@@ -60,7 +60,7 @@ class PreviewHeader extends Classs<Props>
   public render()
   {
     return (
-      <tr>{ this.props.columns }</tr>
+      <tr>{this.props.columns}</tr>
     );
   }
 }
