@@ -97,7 +97,7 @@ FileImportReducers[ActionTypes.unchooseFile] =
   (state, action) =>
     state
       .set('fileChosen', false)
-;
+  ;
 
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>

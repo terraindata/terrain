@@ -50,8 +50,8 @@ import { Import, ImportConfig } from '../../src/app/import/Import';
 
 interface Movie
 {
-    title: string;
-    releasedate: string;
+  title: string;
+  releasedate: string;
 }
 
 const host: string = 'http://localhost:9200';
@@ -61,87 +61,87 @@ let imprt: Import;
 
 beforeAll(async () =>
 {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'debug';
-    try
-    {
-        movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
-        movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  try
+  {
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
 
-        imprt = new Import();
-    }
-    catch (e)
-    {
-        fail(e);
-    }
+    imprt = new Import();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
 });
 
 test('import JSON file', async (done) =>
 {
-    try
-    {
-        winston.info('Testing JSON upload to Elastic.');
+  try
+  {
+    winston.info('Testing JSON upload to Elastic.');
 
-        const imprtConf: ImportConfig =
-            {
-                dsn: host,
-                db: 'movies',
-                table: 'data',
-                contents: JSON.stringify(movies),
-                dbtype: 'elastic',
-                filetype: 'json',
-            };
-        winston.info(imprtConf.contents);
+    const imprtConf: ImportConfig =
+      {
+        dsn: host,
+        db: 'movies',
+        table: 'data',
+        contents: JSON.stringify(movies),
+        dbtype: 'elastic',
+        filetype: 'json',
+      };
+    winston.info(imprtConf.contents);
 
-        const results: any = await imprt.insert(imprtConf);
-        winston.info(JSON.stringify(results));
-        expect(results).not.toBeUndefined();
-        for (let i = 0; i < results.length; i++)
-        {
-            expect(results[i]).toMatchObject(movies[i]);
-        }
-    }
-    catch (e)
+    const results: any = await imprt.insert(imprtConf);
+    winston.info(JSON.stringify(results));
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
     {
-        fail(e);
+      expect(results[i]).toMatchObject(movies[i]);
     }
-    done();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
 });
 
 test('import CSV file', async (done) =>
 {
-    try
+  try
+  {
+    winston.info('Testing CSV upload to Elastic.');
+
+    let csvString: string = 'title,releasedate\n';
+    for (const movie of movies)
     {
-        winston.info('Testing CSV upload to Elastic.');
-
-        let csvString: string = 'title,releasedate\n';
-        for (const movie of movies)
-        {
-            csvString += movie.title + ',' + movie.releasedate + '\n';
-        }
-
-        const imprtConf: ImportConfig =
-            {
-                dsn: host,
-                db: 'movies',
-                table: 'data',
-                contents: csvString,
-                dbtype: 'elastic',
-                filetype: 'csv',
-            };
-        winston.info(imprtConf.contents);
-
-        const results: any = await imprt.insert(imprtConf);
-        winston.info(JSON.stringify(results));
-        expect(results).not.toBeUndefined();
-        for (let i = 0; i < results.length; i++)
-        {
-            expect(results[i]).toMatchObject(movies[i]);
-        }
+      csvString += movie.title + ',' + movie.releasedate + '\n';
     }
-    catch (e)
+
+    const imprtConf: ImportConfig =
+      {
+        dsn: host,
+        db: 'movies',
+        table: 'data',
+        contents: csvString,
+        dbtype: 'elastic',
+        filetype: 'csv',
+      };
+    winston.info(imprtConf.contents);
+
+    const results: any = await imprt.insert(imprtConf);
+    winston.info(JSON.stringify(results));
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
     {
-        fail(e);
+      expect(results[i]).toMatchObject(movies[i]);
     }
-    done();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
 });
