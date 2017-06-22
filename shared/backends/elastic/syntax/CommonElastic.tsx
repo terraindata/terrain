@@ -70,7 +70,7 @@ namespace CommonElastic
     };
 
   export const acceptsValues = List(
-    ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull'],
+    ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull', 'elasticScore', 'elasticTransform'],
   );
 
   export const Directions: string[] = ['ascending', 'descending'];
