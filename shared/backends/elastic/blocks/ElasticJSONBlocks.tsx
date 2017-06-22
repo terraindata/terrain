@@ -314,8 +314,8 @@ export const elasticWeight = _block(
           b: 1,
           numerators: [[block['key']['input'], 1]],
           denominators: [],
-          ranges: block['key']['scorepoints'].map((scorePoint) => tqlTranslationFn(scorePoint.value, tqlConfig)),
-          outputs: block['key']['scorepoints'].map((scorePoint) => tqlTranslationFn(scorePoint.score, tqlConfig)),
+          ranges: block['key']['scorePoints'].map((scorePoint) => scorePoint.value),
+          outputs: block['key']['scorePoints'].map((scorePoint) => scorePoint.score),
         };
       },
       init: () =>
@@ -443,7 +443,6 @@ export const elasticTransform = _card(
         }
         return '' + card.input;
       },
-      tql: null,
       display: [
         {
           displayType: DisplayType.CARDTEXT,
