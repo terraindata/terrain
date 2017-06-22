@@ -57,8 +57,6 @@ import Actions from './../data/FileImportActions';
 import FileImportTypes from './../FileImportTypes';
 import { FileImportState } from './../data/FileImportStore';
 import Autocomplete from './../../common/components/Autocomplete';
-import BuilderTextbox from './../../common/components/BuilderTextbox';
-import SchemaTypes from './../../schema/SchemaTypes'
 
 export interface Props
 {
@@ -129,8 +127,9 @@ class FileImportInfo extends PureClasss<Props>
     }
     // else if (filetype === 'csv')
     // {
-    //   // extract first 10 lines of file
-    //   csv({ flatKeys: true, checkColumn: true }).fromString(file).on('error', (e) =>
+    //   // extract first n lines of file
+    //   const newFile = extractCsv(file, this.props.rowsCount);
+    //   csv({ flatKeys: true, checkColumn: true }).fromString(newFile).on('error', (e) =>
     //   {
     //     alert('CSV format incorrect: ' + String(e));
     //     return;
@@ -163,6 +162,7 @@ class FileImportInfo extends PureClasss<Props>
     // read and show preview
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
+    fr.
     fr.onloadend = () =>
     {
       console.log("File chosen contents: ", fr.result);

@@ -61,9 +61,7 @@ export interface Props
 class Preview extends Classs<Props>
 {
   public state: {
-    columns: List<IColumn>;
   } = {
-    columns: this.getColumns(this.props),
   };
 
   public getColumns(props: Props): List<IColumn>
@@ -96,7 +94,7 @@ class Preview extends Classs<Props>
     console.log("columns: ", this.state.columns);
     return (
       <Table
-        columns={this.state.columns}
+        columns={this.getColumns(this.props)}
         rowGetter={this.getRow}
         rowsCount={this.props.rowsCount}
         rowKey={'id'}

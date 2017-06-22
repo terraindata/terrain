@@ -119,7 +119,7 @@ class FileImport extends PureClasss<any>
   {
     const { fileImportState } = this.state;
     const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen, previewRows } = fileImportState;
-    console.log(previewRows);
+
     return (
       <div className="fileImport">
         <h2>File Import Page</h2>
@@ -144,8 +144,8 @@ class FileImport extends PureClasss<any>
           previewRows &&
           <div>
             <Preview
-            rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
-            previewRows={previewRows}
+              rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
+              previewRows={previewRows}
             />
           </div>
         }
