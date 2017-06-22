@@ -465,7 +465,7 @@ export const elasticTransform = _card(
           // help: ManualConfig.help['scorePoints'],
         },
       ],
-
+      tql: (block: Block) => '',
       init: () => (
         {
           scorePoints: List([
