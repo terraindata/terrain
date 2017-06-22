@@ -53,8 +53,11 @@ import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
 const CodeMirror = require('./Codemirror.js');
 
-// Style sheets and addons for CodeMirror
+// syntax highlighters
+import ElasticHighlighter from '../highlighters/ElasticHighlighter';
+import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
+// Style sheets and addons for CodeMirror
 require('./tql.js');
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
@@ -80,6 +83,7 @@ export interface Props
   tql: string;
   canEdit: boolean;
 
+  language?: string;
   theme?: string;
   highlightedLine?: number;
 
@@ -97,6 +101,8 @@ export interface Props
 
 class TQLEditor extends PureClasss<Props>
 {
+  public highlighter: SyntaxHighlighter;
+
   public render()
   {
     const options =
@@ -111,7 +117,7 @@ class TQLEditor extends PureClasss<Props>
         foldGutter: true,
         lint: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-
+        mode: "",
         revertButtons: false,
         connect: 'align',
 
@@ -147,8 +153,26 @@ class TQLEditor extends PureClasss<Props>
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
         onFocusChange={this.props.onFocusChange}
+        onCodeMirrorMount={this.registerCodeMirror}
       />
     );
+  }
+
+  public handleChanges(cm, changes): void
+  {
+    // const marker = instance.markText({line: 0, ch: 0}, {line: 1, ch: 1}, {className: "cm-number"});
+    // const parser: ESJSONParser = new ESJSONParser(instance.getValue());
+    // tslint:disable-next-line no-console
+    console.log(this.props.language);
+  }
+
+  private registerCodeMirror(cmInstance)
+  {
+    if (this.props.language === 'elastic') // make this a switch if there are more languages
+    {
+      this.highlighter = new ElasticHighlighter();
+    }
+    cmInstance.on("changes", this.highlighter.handleChanges.bind(this.highlighter));
   }
 }
 

@@ -404,6 +404,7 @@ class BuilderTQLColumn extends PureClasss<Props>
           <TQLEditor
             tql={this.state.tql}
             canEdit={this.props.canEdit}
+            language={this.props.variant.language}
             theme={this.state.theme}
 
             onChange={this.updateTql}
