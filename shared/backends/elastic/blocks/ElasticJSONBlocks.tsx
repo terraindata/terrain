@@ -301,18 +301,27 @@ export const elasticNull = _card({
 export const elasticWeight = _block(
   {
     key: '',
-    ranges: [],
-    outputs: [],
+    // ranges: [],
+    // outputs: [],
     weight: 1,
     static: {
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        // block['key']['weight'] = '$weight';
         return {
-          weight: Number(block['weight']),
-          ranges: block['ranges'],
-          outputs: block['outputs'],
+          weight: block['weight'],
+          a: 0,
+          b: 1,
+          numerators: [[block['key']['input'], 1]],
+          denominators: [],
+          ranges: block['key']['scorepoints'].map((scorePoint) => tqlTranslationFn(scorePoint.value, tqlConfig)),
+          outputs: block['key']['scorepoints'].map((scorePoint) => tqlTranslationFn(scorePoint.score, tqlConfig)),
+        };
+      },
+      init: () =>
+      {
+        return {
+          key: BlockUtils.make(elasticTransform),
         };
       },
       removeOnCardRemove: true,
@@ -434,17 +443,7 @@ export const elasticTransform = _card(
         }
         return '' + card.input;
       },
-      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-      {
-
-        return {
-          a: 0.0,
-          b: 1.0,
-          // weight: block['weight'],
-          ranges: block['scorePoints'].map((scoreBlock) => tqlTranslationFn(block['scorePoints'].get(0), tqlConfig)).toArray(),
-          outputs: block['scorePoints'].map((scoreBlock) => tqlTranslationFn(block['scorePoints'].get(1), tqlConfig)).toArray(),
-        };
-      },
+      tql: null,
       display: [
         {
           displayType: DisplayType.CARDTEXT,
