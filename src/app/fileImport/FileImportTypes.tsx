@@ -43,103 +43,30 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+import Util from './../util/Util';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
+import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
 
-import * as request from 'request';
-
-export function getRequest(url)
+// This module will contain all of the different 'types' (i.e. models) relevant to auth
+export namespace FileImportTypes
 {
-  return new Promise((resolve, reject) =>
+  // This type represents the state of the FileImportStore
+  class FileImportStateC extends BaseClass
   {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
-}
-
-export function verifyParameters(parameters: any, required: string[]): void
-{
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
   }
-
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
+  // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
+  //  This first line exports a type that you will actually use in other files.
+  //  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
+  export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
+  //  This second line exports a function to create a new instance of the FileImportState Immutable backed class
+  //  It's a replacement for a constructor.
+  //  This is necessary because simply doing `new FileImportStateC` will not create an Immutable version
+  //   and you can't use `new` simply with Immutable Records.
+  export const _FileImportState = (config?: { [key: string]: any }) =>
+    New<FileImportState>(new FileImportStateC(config), config);
 }
 
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
-  }
-  return obj;
-}
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
-
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
-    {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
-    }
-    return res;
-  },
-    emptyObj);
-}
+export default FileImportTypes;

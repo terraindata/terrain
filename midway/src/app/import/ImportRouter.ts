@@ -44,102 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-export function getRequest(url)
-{
-  return new Promise((resolve, reject) =>
-  {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
-}
+import * as Util from '../Util';
+import { Import, ImportConfig } from './Import';
 
-export function verifyParameters(parameters: any, required: string[]): void
+const Router = new KoaRouter();
+export const imprt: Import = new Import();
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  if (parameters === undefined)
+  winston.info('importing to database');
+  const imprtConf: ImportConfig = ctx.request.body.body;
+  Util.verifyParameters(imprtConf, ['dbtype', 'contents', 'dsn', 'table', 'filetype', 'db']);
+  if (imprtConf.dbtype !== 'elastic')
   {
-    throw new Error('No parameters found.');
+    throw new Error('File import currently is only supported for Elastic databases.');
   }
 
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
-}
+  ctx.body = await imprt.insert(imprtConf);
+});
 
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
-  }
-  return obj;
-}
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
-
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
-    {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
-    }
-    return res;
-  },
-    emptyObj);
-}
+export default Router;

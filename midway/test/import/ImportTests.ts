@@ -44,102 +44,104 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
+import * as winston from 'winston';
 
-export function getRequest(url)
+import { Import, ImportConfig } from '../../src/app/import/Import';
+
+interface Movie
 {
-  return new Promise((resolve, reject) =>
+  title: string;
+  releasedate: string;
+}
+
+const host: string = 'http://localhost:9200';
+const movies: Movie[] = [];
+
+let imprt: Import;
+
+beforeAll(async () =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  try
   {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
+    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+
+    imprt = new Import();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+});
+
+test('import JSON file', async (done) =>
+{
+  try
+  {
+    winston.info('Testing JSON upload to Elastic.');
+
+    const imprtConf: ImportConfig =
       {
-        resolve(body);
-      }
-      else
+        dsn: host,
+        db: 'movies',
+        table: 'data',
+        contents: JSON.stringify(movies),
+        dbtype: 'elastic',
+        filetype: 'json',
+      };
+    winston.info(imprtConf.contents);
+
+    const results: any = await imprt.insert(imprtConf);
+    winston.info(JSON.stringify(results));
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
+    {
+      expect(results[i]).toMatchObject(movies[i]);
+    }
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
+
+test('import CSV file', async (done) =>
+{
+  try
+  {
+    winston.info('Testing CSV upload to Elastic.');
+
+    let csvString: string = 'title,releasedate\n';
+    for (const movie of movies)
+    {
+      csvString += movie.title + ',' + movie.releasedate + '\n';
+    }
+
+    const imprtConf: ImportConfig =
       {
-        reject(error);
-      }
-    });
-  });
-}
+        dsn: host,
+        db: 'movies',
+        table: 'data',
+        contents: csvString,
+        dbtype: 'elastic',
+        filetype: 'csv',
+      };
+    winston.info(imprtConf.contents);
 
-export function verifyParameters(parameters: any, required: string[]): void
-{
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
-  }
-
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
+    const results: any = await imprt.insert(imprtConf);
+    winston.info(JSON.stringify(results));
+    expect(results).not.toBeUndefined();
+    for (let i = 0; i < results.length; i++)
     {
-      throw new Error('Parameter "' + key + '" not found in request object.');
+      expect(results[i]).toMatchObject(movies[i]);
     }
   }
-}
-
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
+  catch (e)
   {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
+    fail(e);
   }
-  return obj;
-}
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
-
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
-    {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
-    }
-    return res;
-  },
-    emptyObj);
-}
+  done();
+});

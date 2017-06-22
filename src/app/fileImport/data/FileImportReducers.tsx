@@ -43,103 +43,82 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+import Util from './../../util/Util';
+import ActionTypes from './FileImportActionTypes';
+import Ajax from './../../util/Ajax';
+import MidwayError from './../../../../shared/error/MidwayError';
+const moment = require('moment');
 
-import * as request from 'request';
+const FileImportReducers = {}
 
-export function getRequest(url)
-{
-  return new Promise((resolve, reject) =>
+FileImportReducers[ActionTypes.changeCluster] =
+  (state, action) =>
   {
-    request(url, (error, res, body) =>
+    return state.set('clusterIndex', action.payload.clusterIndex);
+  };
+
+FileImportReducers[ActionTypes.changeDbText] =
+  (state, action) =>
+  {
+    if (action.payload.dbText)
     {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
-}
-
-export function verifyParameters(parameters: any, required: string[]): void
-{
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
-  }
-
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
-}
-
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
-  }
-  return obj;
-}
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
+      return state.set('dbText', action.payload.dbText).set('dbSelected', true);
     }
     else
     {
-      resolve(response);
+      return state.set('dbText', action.payload.dbText).set('dbSelected', false);
     }
   };
-}
 
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
+FileImportReducers[ActionTypes.changeTableText] =
+  (state, action) =>
   {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
+    if (action.payload.tableText)
     {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
+      return state.set('tableText', action.payload.tableText).set('tableSelected', true);
     }
-    return res;
-  },
-    emptyObj);
-}
+    else
+    {
+      return state.set('tableText', action.payload.tableText).set('tableSelected', false);
+    }
+  };
+
+FileImportReducers[ActionTypes.chooseFile] =
+  (state, action) =>
+    state
+      .set('file', action.payload.file)
+      .set('filetype', action.payload.filetype)
+      .set('fileChosen', true)
+  ;
+
+FileImportReducers[ActionTypes.unchooseFile] =
+  (state, action) =>
+    state
+      .set('fileChosen', false)
+  ;
+
+FileImportReducers[ActionTypes.uploadFile] =
+  (state, action) =>
+  {
+    const { xhr, queryId } = Ajax.upload(
+      state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      (ev) =>
+      {
+        alert("success");
+      },
+      (ev: string) =>
+      {
+        console.log(JSON.parse(ev));
+        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
+      },
+      false,
+    );
+    return state;
+  };
+
+export default FileImportReducers;

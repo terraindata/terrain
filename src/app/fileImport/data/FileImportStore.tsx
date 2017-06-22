@@ -43,103 +43,52 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+const Redux = require('redux');
 
-import * as request from 'request';
+import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import AuthStore from './../../auth/data/AuthStore';
+import RoleStore from './../../roles/data/RolesStore';
+import UserStore from './../../users/data/UserStore';
+import FileImportTypes from './../FileImportTypes';
+import Actions from './FileImportActions';
+import FileImportActionTypes from './FileImportActionTypes';
+import Util from './../../util/Util';
 
-export function getRequest(url)
+class FileImportStateC
 {
-  return new Promise((resolve, reject) =>
-  {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
+  public clusterIndex: number = -1;
+  public dbText: string = "";
+  public tableText: string = "";
+  public file: string = "";
+  public filetype: string = "";
+  public fileChosen: boolean = false;
+  public dbSelected: boolean = false;
+  public tableSelected: boolean = false;
 }
-
-export function verifyParameters(parameters: any, required: string[]): void
+const FileImportState_Record = Immutable.Record(new FileImportStateC());
+export interface FileImportState extends FileImportStateC, IRecord<FileImportState> { }
+export const _FileImportState = (config?: any) =>
 {
-  if (parameters === undefined)
+  return new FileImportState_Record(Util.extendId(config || {})) as any as FileImportState;
+};
+
+const DefaultState = _FileImportState();
+
+import FileImportReducers from './FileImportReducers';
+
+export const FileImportStore: IStore<FileImportState> = Redux.createStore(
+  (state: FileImportState = DefaultState, action) =>
   {
-    throw new Error('No parameters found.');
+    if (FileImportReducers[action.type])
+    {
+      state = FileImportReducers[action.type](state, action);
+    }
+
+    return state;
   }
+  , DefaultState);
 
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
-}
+export default FileImportStore;
 
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
-  }
-  return obj;
-}
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
-
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
-    {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
-    }
-    return res;
-  },
-    emptyObj);
-}

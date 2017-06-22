@@ -636,6 +636,45 @@ export const Ajax =
 
       return { queryId, xhr };
     },
+
+    /* FileImport */
+    upload(file: string,
+      filetype: string,
+      db: string,
+      table: string,
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: string) => void,
+      sqlQuery?: boolean, // unused
+    ): { xhr: XMLHttpRequest, queryId: string }
+    {
+      const queryId = '' + Math.random();
+      const payload: object = {
+        dsn: 'http://127.0.0.1:9200',
+        db: db,
+        table: table,
+        contents: file,
+        dbtype: 'elastic',
+        filetype: filetype,
+      };
+      console.log("payload: ", payload);
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
+      const xhr = Ajax.req(
+        'post',
+        'import/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+
+      return { queryId, xhr };
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1
