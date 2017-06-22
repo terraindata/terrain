@@ -69,7 +69,7 @@ export interface Props
 
 const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
 const FILETYPES = Immutable.List(['json', 'csv']);
-const NUM_PREVIEW_ROWS = 2;
+const ROWS_COUNT = 10;
 
 class FileImport extends PureClasss<any>
 {
@@ -119,35 +119,36 @@ class FileImport extends PureClasss<any>
   {
     const { fileImportState } = this.state;
     const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen, previewRows } = fileImportState;
-    // console.log("import render ", previewRows);
-    console.log(this.state);
+    console.log(previewRows);
     return (
       <div className="fileImport">
         <h2>File Import Page</h2>
-        <div>
-          <FileImportInfo
-            canSelectCluster={true}
-            clusterIndex={clusterIndex}
-            clusters={CLUSTERS}
-            canSelectDb={true}
-            dbs={this.getMapKeys(this.state.databases)}
-            dbText={dbText}
-            dbSelected={dbSelected}
-            canSelectTable={true}
-            tables={this.getMapKeys(this.state.tables)}
-            tableText={tableText}
-            tableSelected={tableSelected}
-            canImport={true}
-            validFiletypes={FILETYPES}
-            fileChosen={fileChosen}
-          />
-        </div>
-        <div>
-          <Preview
-            nrows={NUM_PREVIEW_ROWS}
+        <FileImportInfo
+          canSelectCluster={true}
+          clusterIndex={clusterIndex}
+          clusters={CLUSTERS}
+          canSelectDb={true}
+          dbs={this.getMapKeys(this.state.databases)}
+          dbText={dbText}
+          dbSelected={dbSelected}
+          canSelectTable={true}
+          tables={this.getMapKeys(this.state.tables)}
+          tableText={tableText}
+          tableSelected={tableSelected}
+          canImport={true}
+          validFiletypes={FILETYPES}
+          fileChosen={fileChosen}
+          rowsCount={ROWS_COUNT}
+        />
+        {
+          previewRows &&
+          <div>
+            <Preview
+            rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
             previewRows={previewRows}
-          />
-        </div>
+            />
+          </div>
+        }
       </div>
     );
   }

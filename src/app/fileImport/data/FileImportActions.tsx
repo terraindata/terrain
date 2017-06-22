@@ -76,7 +76,7 @@ const FileImportActions =
       $(ActionTypes.uploadFile, {}),
 
     previewFile:
-    (preview: object[]) =>
+    (preview: object) =>
       $(ActionTypes.previewFile, { preview }),
   };
 

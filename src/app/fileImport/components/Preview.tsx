@@ -45,59 +45,62 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import PreviewRow from './PreviewRow';
-import PreviewHeader from './PreviewHeader';
+import { IColumn, Table } from './../../common/components/Table';
 
 export interface Props
 {
-  nrows: number;
+  rowsCount: number;
   previewRows: object[];
 }
 
 class Preview extends Classs<Props>
 {
-  public render()
-  {
-    const rows = [];
-    if (this.props.previewRows)
-    {
-      for (let i = 0; i < this.props.nrows; i++)
-      {
-        const r = this.props.previewRows[i];
-        const items = [];
-        for (const property in r)
-        {
-          if (r.hasOwnProperty(property) && property !== '_id')
-          {
-            items.push(r[property]);
-          }
-        }
+  public state: {
+    columns: List<IColumn>;
+  } = {
+    columns: this.getColumns(this.props),
+  };
 
-        rows.push(
-          <PreviewRow
-            id={i}
-            key={r._id}
-            items={items}
-          />
-        )
+  public getColumns(props: Props): List<IColumn>
+  {
+    const { previewRows } = props;
+    const cols: IColumn[] = [];
+
+    for (const property in previewRows[0])
+    {
+      if (previewRows[0].hasOwnProperty(property))
+      {
+        cols.push({
+          key: property,
+          name: property,
+        });
       }
     }
+    return Immutable.List(cols);
+  }
 
+  public getRow(i: number): Object
+  {
+    return this.props.previewRows[i];
+  }
+
+  public render()
+  {
+    console.log("rowsCount: ", this.props.rowsCount);
+    console.log("rows: ", this.props.previewRows);
+    console.log("columns: ", this.state.columns);
     return (
-      <table>
-        <thead key="thead">
-          <PreviewHeader
-            columns={'column names'}
-          />
-        </thead>
-        <tbody key="tbody">
-          {rows}
-        </tbody>
-      </table>
+      <Table
+        columns={this.state.columns}
+        rowGetter={this.getRow}
+        rowsCount={this.props.rowsCount}
+        rowKey={'id'}
+      />
     );
   }
 }

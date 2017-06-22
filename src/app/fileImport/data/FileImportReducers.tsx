@@ -111,17 +111,17 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.tableText,
       (resp: object[]) =>
       {
-        console.log(resp);
-        const preview = [];
-        for (let i = 0; i < 2; i++)
-        {
-          preview.push(resp[i]);
-        }
-        console.log("preview :", preview);
+        // console.log(resp);
+        // const preview = [];
+        // for (let i = 0; i < 2; i++)
+        // {
+        //   preview.push(resp[i]);
+        // }
+        // console.log("preview :", preview);
 
         alert("success");
         // return state.set('previewRows', preview);
-        Actions.previewFile(preview);
+        // Actions.previewFile(preview);
       },
       (err: string) =>
       {

@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
+// import * as csv from 'csvtojson';
+// import * as hashObject from 'hash-object';
 const { List } = Immutable;
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
@@ -77,6 +79,7 @@ export interface Props
   canImport: boolean;
   validFiletypes: List<string>;
   fileChosen: boolean;
+  rowsCount: number;
 }
 
 class FileImportInfo extends PureClasss<Props>
@@ -96,6 +99,50 @@ class FileImportInfo extends PureClasss<Props>
     Actions.changeTableText(event);
   }
 
+  public parseData(file: string, filetype: string): object[]
+  {
+    const preview = [];
+    if (filetype === 'json')
+    {
+      const items: object[] = JSON.parse(file);
+      if (!Array.isArray(items))
+      {
+        alert('Input JSON file must parse to an array of objects.');
+        return;
+      }
+      // if (items.length > 0)
+      // {
+      //   const desiredHash: string = hashObject(getEmptyObject(items[0]));
+      //   for (const obj of items)
+      //   {
+      //     if (hashObject(getEmptyObject(obj)) !== desiredHash)
+      //     {
+      //       alert('Objects in provided input JSON do not have the same keys and/or types.');
+      //       return;
+      //     }
+      //   }
+      // }
+      for (let i = 0; i < Math.min(items.length, this.props.rowsCount); i++)
+      {
+        preview.push(items[i]);
+      }
+    }
+    // else if (filetype === 'csv')
+    // {
+    //   // extract first 10 lines of file
+    //   csv({ flatKeys: true, checkColumn: true }).fromString(file).on('error', (e) =>
+    //   {
+    //     alert('CSV format incorrect: ' + String(e));
+    //     return;
+    //   });
+    // }
+    else
+    {
+      return;
+    }
+    return preview;
+  }
+
   public handleChooseFile(file)
   {
     if (!file.target.files[0])
@@ -104,22 +151,26 @@ class FileImportInfo extends PureClasss<Props>
       return;
     }
 
+    // filetype error check
     const filetype = file.target.files[0].name.split('.').pop();
-    console.log("filetype:", filetype);
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
-      alert("Invalid filetype, please select another file");
+      alert("Invalid filetype: " + filetype + ", please select another file");
       this.refs['file']['value'] = null;
       return;
     }
 
+    // read and show preview
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      // const obj = JSON.parse(saveFile);
-      console.log("contents: ", fr.result);
+      console.log("File chosen contents: ", fr.result);
+      const preview = this.parseData(fr.result, filetype);
+
+      console.log("Parsed preview: ", preview);
       Actions.chooseFile(fr.result, filetype);
+      Actions.previewFile(preview);
     }
   }
 
