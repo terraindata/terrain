@@ -61,11 +61,13 @@ export interface ImportConfig
   contents: string;   // should parse directly into a JSON object
   dbtype: string;     // e.g., 'elastic'
   filetype: string;   // either 'json' or 'csv'
+
+  primaryKey: string;  // new column name of primary key
 }
 
 export class Import
 {
-  public async insert(imprt: ImportConfig): Promise<ImportConfig>
+  public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
@@ -106,7 +108,7 @@ export class Import
 
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
-        ['_id'],
+        [imprt.primaryKey],
         columns,
         imprt.db,
       );

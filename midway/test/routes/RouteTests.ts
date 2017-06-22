@@ -604,9 +604,10 @@ describe('File import route tests', () =>
           dsn: 'http://127.0.0.1:9200',
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: '[{"column1":"hello","column2":"goodbye"}]',
+          contents: '[{"pkey":1,"column1":"hello","column2":"goodbye"}]',
           dbtype: 'elastic',
           filetype: 'json',
+          primaryKey: 'pkey',
         },
       })
       .expect(200)
@@ -638,9 +639,10 @@ describe('File import route tests', () =>
           dsn: 'http://127.0.0.1:9200',
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: '{"column1":"hello","column2":"goodbye"}',
+          contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           dbtype: 'elastic',
           filetype: 'json',
+          primaryKey: 'pkey',
         },
       })
       .expect(400)

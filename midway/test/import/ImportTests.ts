@@ -50,6 +50,7 @@ import { Import, ImportConfig } from '../../src/app/import/Import';
 
 interface Movie
 {
+  pkey: string;
   title: string;
   releasedate: string;
 }
@@ -65,8 +66,8 @@ beforeAll(async () =>
   (winston as any).level = 'debug';
   try
   {
-    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
-    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[0] = { pkey: '1', title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+    movies[1] = { pkey: '2', title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
 
     imprt = new Import();
   }
@@ -90,10 +91,11 @@ test('import JSON file', async (done) =>
         contents: JSON.stringify(movies),
         dbtype: 'elastic',
         filetype: 'json',
+        primaryKey: 'pkey',
       };
     winston.info(imprtConf.contents);
 
-    const results: any = await imprt.insert(imprtConf);
+    const results: any = await imprt.upsert(imprtConf);
     winston.info(JSON.stringify(results));
     expect(results).not.toBeUndefined();
     for (let i = 0; i < results.length; i++)
@@ -114,10 +116,10 @@ test('import CSV file', async (done) =>
   {
     winston.info('Testing CSV upload to Elastic.');
 
-    let csvString: string = 'title,releasedate\n';
+    let csvString: string = 'pkey,title,releasedate\n';
     for (const movie of movies)
     {
-      csvString += movie.title + ',' + movie.releasedate + '\n';
+      csvString += movie.pkey + ',' + movie.title + ',' + movie.releasedate + '\n';
     }
 
     const imprtConf: ImportConfig =
@@ -128,10 +130,11 @@ test('import CSV file', async (done) =>
         contents: csvString,
         dbtype: 'elastic',
         filetype: 'csv',
+        primaryKey: 'pkey',
       };
     winston.info(imprtConf.contents);
 
-    const results: any = await imprt.insert(imprtConf);
+    const results: any = await imprt.upsert(imprtConf);
     winston.info(JSON.stringify(results));
     expect(results).not.toBeUndefined();
     for (let i = 0; i < results.length; i++)

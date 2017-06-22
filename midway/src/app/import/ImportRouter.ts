@@ -64,7 +64,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     throw new Error('File import currently is only supported for Elastic databases.');
   }
 
-  ctx.body = await imprt.insert(imprtConf);
+  ctx.body = await imprt.upsert(imprtConf);
 });
 
 export default Router;
