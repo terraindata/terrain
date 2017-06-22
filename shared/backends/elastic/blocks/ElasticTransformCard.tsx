@@ -42,7 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { List, Map } = Immutable;
@@ -50,75 +49,93 @@ const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
-import { _block, Block, TQLFn } from '../../../blocks/types/Block';
+import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 import CommonElastic from '../syntax/CommonElastic';
-
-import Util from '../../../../src/app/util/Util';
-
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
-const { make } = BlockUtils;
+import TransformCard from '../../../../src/app/builder/components/charts/TransformCard';
 
-import { elasticArray, elasticBool, elasticKeyValueToggle, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
-import elasticRootCard from './ElasticRootCard';
-import { elasticScore, elasticWeight } from './ElasticScoreCard';
-import { elasticTransform, scorePoint } from './ElasticTransformCard';
+const transformScoreInputTypes = CommonElastic.acceptsValues;
 
-export const ElasticBlocks =
+export const scorePoint = _block(
   {
-    // JSON
+    value: 0,
+    score: 0,
 
-    elasticObject,
-    elasticArray,
-
-    // JSON Value blocks
-    elasticBool,
-    elasticNumber,
-    elasticText,
-    elasticNull,
-
-    elasticScore,
-    scorePoint,
-    elasticTransform,
-    elasticWeight,
-
-    elasticRootCard,
-
-    elasticCreating: _card( // a placeholder for when a card is being created
+    static: {
+      language: 'elastic',
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        static:
-        {
-          language: 'elastic',
-          tql: '',
-          title: 'New Card',
-          colors: ['#777', '#777'],
-          preview: '',
-          display: null,
-          // manualEntry: null,
-        },
-      }),
+        return [block['value'], block['score']];
+      },
+    },
+  });
 
-    elasticKeyValueWrap,
-
-    // JSON toggle the type blocks
-    elasticKeyValueToggle,
-    elasticValue,
-
-  };
-
-BlockUtils.initBlocks(ElasticBlocks);
-
-// TODO remove
-const cards = {};
-for (const key in ElasticBlocks)
-{
-  if (ElasticBlocks[key]._isCard && ElasticBlocks[key].static.manualEntry)
+export const elasticTransform = _card(
   {
-    cards[ElasticBlocks[key].static.manualEntry.name] = key;
-  }
-}
-export const cardList = cards;
+    input: '',
+    scorePoints: List([]),
 
-export default ElasticBlocks;
+    domain: List([0, 100]),
+    hasCustomDomain: false, // has the user set a custom domain
+
+    static: {
+      language: 'elastic',
+      // manualEntry: ManualConfig.cards['transform'],
+      colors: ['#4b979a', '#aef3f6'],
+      title: 'Transform',
+      preview: (card: any) =>
+      {
+        if (card.input._isCard)
+        {
+          return '' + BlockUtils.getPreview(card.input);
+        }
+        return '' + card.input;
+      },
+      display: [
+        {
+          displayType: DisplayType.CARDTEXT,
+          // help: ManualConfig.help['input'],
+          key: 'input',
+          placeholder: 'Input field',
+          accepts: transformScoreInputTypes,
+          showWhenCards: true,
+        },
+        {
+          displayType: DisplayType.CARDSFORTEXT,
+          key: 'input',
+          accepts: transformScoreInputTypes,
+        },
+        {
+          displayType: DisplayType.COMPONENT,
+          component: TransformCard,
+          requiresBuilderState: true,
+          key: null,
+          // help: ManualConfig.help['scorePoints'],
+        },
+      ],
+      tql: (block: Block) => '',
+      init: () => (
+        {
+          scorePoints: List([
+            BlockUtils.make(scorePoint, {
+              id: 'point0',
+              value: 2,
+              score: 0.2,
+            }),
+            BlockUtils.make(scorePoint, {
+              id: 'point1',
+              value: 15,
+              score: 0.5,
+            }),
+          ]),
+        }
+      ),
+
+      metaFields: ['domain', 'hasCustomDomain'],
+    },
+  });
+
+export default elasticTransform;
