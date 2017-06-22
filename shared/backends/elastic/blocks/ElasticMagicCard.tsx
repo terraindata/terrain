@@ -60,6 +60,36 @@ const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = Commo
 const { List, Map } = Immutable;
 const { make } = BlockUtils;
 
+function parseValue(rawValue: any, tqlTranslationFn: TQLTranslationFn, tqlConfig: object): any
+{
+  let value: any;
+
+  if (rawValue._isBlock)
+  {
+    value = tqlTranslationFn(rawValue, tqlConfig);
+  }
+  else
+  {
+    // const parser: ESParser = new ESParser(rawValue);
+    // if (parser.getErrors().length > 0)
+    // {
+    //   value = rawValue;
+    // }
+    // else
+    // {
+    //   value = parser.getValue();
+    // }
+    try {
+      value = JSON.parse(rawValue);
+    }
+    catch (e)
+    {
+      value = rawValue;
+    }
+  }
+  return value;
+}
+
 export const elasticMagicValue = _block({
   key: '',
   value: '',
@@ -68,34 +98,100 @@ export const elasticMagicValue = _block({
     removeOnCardRemove: true,
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      const rawValue = block['value'];
-      let value: any;
-
-      if (rawValue._isBlock)
-      {
-        value = tqlTranslationFn(rawValue, tqlConfig);
-      }
-      else
-      {
-        const parser: ESParser = new ESParser(rawValue);
-        if (parser.getErrors().length > 0)
-        {
-          value = rawValue;
-        }
-        else
-        {
-          value = parser.getValue();
-        }
-      }
-
       return {
-        [block['key']]: value,
+        [block['key']]: parseValue(block['value'], tqlTranslationFn, tqlConfig),
       };
     },
   },
 });
 
-const accepts = List(['elasticMagicCard']);
+export const elasticMagicListItem = _block({
+  value: '',
+  static: {
+    language: 'elastic',
+    removeOnCardRemove: true,
+    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+    {
+      return parseValue(block['value'], tqlTranslationFn, tqlConfig);
+    },
+  },
+});
+
+const accepts = List(['elasticMagicCard', 'elasticMagicList']);
+
+export const elasticMagicList = _card(
+  {
+    values: List([]),
+    method: '',
+
+    static: {
+      language: 'elastic',
+      title: 'List',
+      colors: ['#3a91a6', '#a1eafb'],
+      preview: (c: Card) =>
+      {
+        let str: string = '';
+        const len: number = Math.max(c['values'].length, 3);
+        for (let i = 0; i < len; ++i)
+        {
+          str += c['values'].get(i);
+          if (i !== len - 1)
+          {
+            str += ',';
+          }
+        }
+        return str;
+      },
+
+      accepts,
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+      {
+        const arr: any[] = [];
+
+        block['values'].map(
+          (card: Card) =>
+          {
+            arr.push(tqlTranslationFn(card, tqlConfig));
+          },
+        );
+
+        return arr;
+      },
+      init: () => ({
+        values: List([
+          make(elasticMagicListItem),
+        ]),
+      }),
+      display:
+      {
+        displayType: DisplayType.ROWS,
+        key: 'values',
+        english: 'elasticMagicListItem',
+        factoryType: 'elasticMagicListItem',
+        provideParentData: true,
+        row:
+        {
+          noDataPadding: true,
+          inner:
+          [
+            {
+              displayType: DisplayType.CARDTEXT,
+              key: 'value',
+              showWhenCards: true,
+              autoDisabled: true,
+              // options: Immutable.List(CommonElastic.valueTypesList),
+              accepts,
+            },
+          ],
+          below:
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'value',
+          },
+        },
+      },
+    },
+  });
 
 export const elasticMagicCard = _card(
   {

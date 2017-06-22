@@ -155,7 +155,13 @@ const parseMagicObject = (obj: object): Cards =>
   const values: Card[] = _.map(obj,
     (value: any, key: string) =>
     {
-      if (typeof value === 'object' && !Array.isArray(value))
+      if (Array.isArray(value))
+      {
+        return make(Blocks.elasticMagicList, {
+          values: parseMagicObject(value),
+        });
+      }
+      else if (typeof value === 'object')
       {
         const cards: Cards = parseMagicObject(value);
         return make(Blocks.elasticMagicValue, {

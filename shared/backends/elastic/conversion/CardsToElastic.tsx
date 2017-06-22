@@ -82,7 +82,7 @@ export interface ElasticObjectInterface
 
 class CardsToElastic
 {
-  static toElastic(query: Query, options: Options = {}): string
+  public static toElastic(query: Query, options: Options = {}): string
   {
     const elasticObj: ElasticObjectInterface = {};
 
@@ -108,7 +108,7 @@ class CardsToElastic
     // return q;
   }
 
-  static blockToElastic(block: Block, options: Options = {}): string | object
+  public static blockToElastic(block: Block, options: Options = {}): string | object
   {
     if (block && block.static.tql)
     {
