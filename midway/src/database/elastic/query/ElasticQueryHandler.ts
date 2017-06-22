@@ -52,13 +52,17 @@ import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
+import * as Elastic from 'elasticsearch';
+
 import QueryRequest from '../../../../../shared/backends/types/QueryRequest';
 import QueryResponse from '../../../../../shared/backends/types/QueryResponse';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
+import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
+
 /**
  * Implements the QueryHandler interface for ElasticSearch
  */
@@ -121,21 +125,36 @@ export default class ElasticQueryHandler extends QueryHandler
       }
     }
 
-    if (type === 'search')
+    const client: ElasticClient = this.controller.getClient();
+    switch (type)
     {
-      if (request.streaming === true)
-      {
-        const client = this.controller.getClient().getDelegate();
-        const sq: Readable = new ElasticsearchScrollStream(client, request.body);
-        return sq;
-      } else
-      {
-        // NB: streaming not yet implemented
+      case 'search':
+        if (request.streaming === true)
+        {
+          return new ElasticsearchScrollStream(client.getDelegate(), request.body);
+        }
+
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          this.controller.getClient().search(body, this.makeQueryCallback(resolve, reject));
+          client.search(body, this.makeQueryCallback(resolve, reject));
         });
-      }
+
+      case 'deleteTemplate':
+      case 'getTemplate':
+      case 'putTemplate':
+        const handler: any = client[type];
+        if (typeof handler !== 'function')
+        {
+          break;
+        }
+
+        return new Promise<QueryResponse>((resolve, reject) =>
+        {
+          handler.call(client, body, this.makeQueryCallback(resolve, reject));
+        });
+
+      default:
+        break;
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');
