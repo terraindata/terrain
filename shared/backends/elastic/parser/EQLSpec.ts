@@ -162,7 +162,7 @@ const EQLSpec: ESClause[] =
         name: 'root clause',
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { index: '', type: '', from: 0, size: 1000, body: { query: {} } },
+        template: { index: '', type: '', from: 0, size: 1000, body: null },
         autocomplete: ['index', 'type'],
       }),
     new ESStringClause('index', { desc: 'Selects which index to search.' }),
@@ -210,13 +210,7 @@ const EQLSpec: ESClause[] =
         name: 'body clause',
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { 
-          index: '',
-          type: '',
-          from: 0,
-          size: 100,
-          query: null 
-        },
+        template: { query: null },
       }),
     new ESVariantClause('sort_clause',
       {
