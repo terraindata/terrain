@@ -46,17 +46,18 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
+
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
+import ESParser from '../parser/ESJSONParser';
 import * as CommonElastic from '../syntax/CommonElastic';
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+const { List, Map } = Immutable;
 const { make } = BlockUtils;
 
 export const elasticMagicValue = _block({
@@ -76,13 +77,14 @@ export const elasticMagicValue = _block({
       }
       else
       {
-        try
-        {
-          value = JSON.parse(rawValue);
-        }
-        catch (e)
+        const parser: ESParser = new ESParser(rawValue);
+        if (parser.getErrors().length > 0)
         {
           value = rawValue;
+        }
+        else
+        {
+          value = parser.getValue();
         }
       }
 
