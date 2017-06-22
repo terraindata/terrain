@@ -69,6 +69,27 @@ export class Import
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
+      if (imprt.db === '' || imprt.table === '')
+      {
+        throw new Error('Index name and document type cannot be empty strings.');
+      }
+      if (imprt.db !== imprt.db.toLowerCase())
+      {
+        throw new Error('Index name may not contain uppercase letters.');
+      }
+      if (!/^[a-z\d].*$/.test(imprt.db))
+      {
+        throw new Error('Index name must start with a lowercase letter or digit.');
+      }
+      if (!/^[a-z\d][a-z\d\._\+-]*$/.test(imprt.db))
+      {
+        throw new Error('Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.');
+      }
+      if (/^_.*/.test(imprt.table))
+      {
+        throw new Error('Document type may not start with an underscore.');
+      }
+
       let items: object[];
       try
       {
