@@ -51,7 +51,7 @@ import Map = Immutable.Map;
 
 import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
-import CommonElastic from '../syntax/CommonElastic';
+import * as CommonElastic from '../syntax/CommonElastic';
 
 import BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';

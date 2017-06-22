@@ -52,7 +52,6 @@ import CommonBlocks from '../../../blocks/CommonBlocks';
 import { _block, Block, TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
 
 import Util from '../../../../src/app/util/Util';
 
