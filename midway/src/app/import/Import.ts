@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as csv from 'csvtojson';
 import * as hashObject from 'hash-object';
+import * as winston from 'winston';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
@@ -62,7 +63,12 @@ export interface ImportConfig
   dbtype: string;     // e.g., 'elastic'
   filetype: string;   // either 'json' or 'csv'
 
-  primaryKey: string;  // new column name of primary key
+  csvHeaderMissing: boolean;    // TODO: should be optional
+  // columnMap: Map<string, string> | string[];             // oldName to newName
+  columnMap: object;    // either object mapping string to string, or an array of strings
+  // columnsToInclude: Map<string, boolean> | boolean[];
+  // columnTypes: Map<string, string> | string[];        // oldName to number/text/boolean/object/date
+  primaryKey: string;  // newName of primary key
 }
 
 export class Import
@@ -104,7 +110,7 @@ export class Import
       {
         return reject('No data provided in file to upload.');
       }
-      const columns: string[] = Object.keys(items[0]);
+      const columns: string[] = this._getColumnNames(imprt);
 
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
@@ -143,15 +149,35 @@ export class Import
                 return reject('Objects in provided input JSON do not have the same keys and/or types.');
               }
             }
+            const renamedItems: object[] = items.map((obj) =>
+            {
+              const renamedObj: object = {};
+              for (const oldName in imprt.columnMap)
+              {
+                if (imprt.columnMap.hasOwnProperty(oldName))
+                {
+                  renamedObj[imprt.columnMap[oldName]] = obj[oldName];
+                }
+              }
+              return renamedObj;
+            });
+            resolve(renamedItems);
+          } else
+          {
+            resolve(items);
           }
-          resolve(items);
         } catch (e)
         {
           return reject('JSON format incorrect: ' + String(e));
         }
       } else if (imprt.filetype === 'csv')
       {
-        csv({ flatKeys: true, checkColumn: true }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
+        csv({
+          flatKeys: true,
+          checkColumn: true,
+          noheader: imprt.csvHeaderMissing,
+          headers: this._getColumnNames(imprt),
+        }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
           resolve(jsonArrObj);
         }).on('error', (e) =>
@@ -163,6 +189,21 @@ export class Import
         return reject('Invalid file-type provided.');
       }
     });
+  }
+
+  private _getColumnNames(imprt: ImportConfig): string[]
+  {
+    let columns: string[];
+    if (Array.isArray(imprt.columnMap))
+    {
+      winston.info('found array for column map');
+      columns = imprt.columnMap;
+    } else
+    {
+      winston.info('found object map for column map');
+      columns = Object.keys(imprt.columnMap).map((key) => imprt.columnMap[key]);
+    }
+    return columns;
   }
 }
 

@@ -91,6 +91,13 @@ test('import JSON file', async (done) =>
         contents: JSON.stringify(movies),
         dbtype: 'elastic',
         filetype: 'json',
+        csvHeaderMissing: false,
+        columnMap:
+        {
+          pkey: 'pkey',
+          title: 'title',
+          releasedate: 'releasedate',
+        },
         primaryKey: 'pkey',
       };
     winston.info(imprtConf.contents);
@@ -130,6 +137,13 @@ test('import CSV file', async (done) =>
         contents: csvString,
         dbtype: 'elastic',
         filetype: 'csv',
+        csvHeaderMissing: false,
+        columnMap:
+        {
+          pkey: 'pkey',
+          title: 'title',
+          releasedate: 'releasedate',
+        },
         primaryKey: 'pkey',
       };
     winston.info(imprtConf.contents);

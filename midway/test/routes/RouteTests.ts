@@ -607,6 +607,13 @@ describe('File import route tests', () =>
           contents: '[{"pkey":1,"column1":"hello","column2":"goodbye"}]',
           dbtype: 'elastic',
           filetype: 'json',
+          csvHeaderMissing: false,
+          columnMap:
+          {
+            pkey: 'pkey',
+            column1: 'column1',
+            column2: 'column2',
+          },
           primaryKey: 'pkey',
         },
       })
@@ -642,6 +649,13 @@ describe('File import route tests', () =>
           contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           dbtype: 'elastic',
           filetype: 'json',
+          csvHeaderMissing: false,
+          columnMap:
+          {
+            pkey: 'pkey',
+            column1: 'column1',
+            column2: 'column2',
+          },
           primaryKey: 'pkey',
         },
       })
