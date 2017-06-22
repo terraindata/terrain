@@ -127,7 +127,7 @@ class App
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter.routes());
     this.app.use(AnalyticsRouter.routes());
-    this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/assets' }));
+    this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
   }
 
   public async start(): Promise<http.Server>
