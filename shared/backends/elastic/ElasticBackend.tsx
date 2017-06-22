@@ -65,7 +65,6 @@ class ElasticBackend implements Backend
     ElasticBlocks.elasticMagicCard.type,
     ElasticBlocks.elasticRootCard.type,
     ElasticBlocks.elasticKeyValueWrap.type,
-    ElasticBlocks.elasticKeyValueToggle.type,
   ]);
 
   // Ordering of the cards deck

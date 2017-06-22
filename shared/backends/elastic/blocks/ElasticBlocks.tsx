@@ -61,7 +61,6 @@ const { make } = BlockUtils;
 
 import { elasticArray,
          elasticBool,
-         elasticKeyValueToggle,
          elasticKeyValueWrap,
          elasticNull,
          elasticNumber,
@@ -105,11 +104,6 @@ export const ElasticBlocks =
       }),
 
     elasticKeyValueWrap,
-
-    // JSON toggle the type blocks
-    elasticKeyValueToggle,
-    elasticValue,
-
   };
 
 BlockUtils.initBlocks(ElasticBlocks);

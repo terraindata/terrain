@@ -150,56 +150,6 @@ const parseValueSingleCard = (value: any): Card =>
   }
 };
 
-const parseObjectToggle = (obj: object): Cards =>
-{
-  const arr: Card[] = _.map(obj,
-    (rawVal: any, key: string) =>
-    {
-      // For the Toggle cards, use the valueType
-      let valueType = CommonElastic.valueTypes.null;
-
-      const value = rawVal;
-
-      switch (typeof rawVal)
-      {
-        case 'string':
-          valueType = CommonElastic.valueTypes.text;
-          break;
-        case 'number':
-          valueType = CommonElastic.valueTypes.number;
-          break;
-        case 'boolean':
-          valueType = CommonElastic.valueTypes.bool;
-          break;
-        case 'object':
-          if (value === null)
-          {
-            valueType = CommonElastic.valueTypes.null;
-          }
-          else if (Array.isArray(value))
-          {
-            valueType = CommonElastic.valueTypes.array;
-          }
-          // not yet done
-          break;
-        default:
-          throw new Error('Elastic Parsing: Unsupported value: ' + value);
-      }
-
-      return make(
-        Blocks.elasticKeyValueToggle,
-        {
-          key,
-          value,
-          valueType,
-        },
-      );
-    },
-  );
-
-  return Immutable.List(arr);
-};
-
 const parseMagicObject = (obj: object): Cards =>
 {
   const values: Card[] = _.map(obj,
