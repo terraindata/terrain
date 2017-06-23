@@ -641,16 +641,16 @@ export const Ajax =
       filetype: string,
       db: string,
       table: string,
+      connectionId: number,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string) => void,
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const payload: object = {
-        dsn: 'http://127.0.0.1:9200',
+        dsn: connectionId,
         db,
         table,
         contents: file,
-        dbtype: 'elastic',
         filetype,
       };
       console.log("payload: ", payload);

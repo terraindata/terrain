@@ -51,11 +51,13 @@ import Ajax from './../../util/Ajax';
 
 const FileImportReducers = {}
 
-FileImportReducers[ActionTypes.changeCluster] =
+FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
-  {
-    return state.set('clusterIndex', action.payload.clusterIndex);
-  };
+    state
+      .set('serverIndex', action.payload.serverIndex)
+      .set('connectionId', action.payload.connectionId)
+      .set('serverSelected', true)
+  ;
 
 FileImportReducers[ActionTypes.changeDbText] =
   (state, action) =>
@@ -89,6 +91,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.filetype,
       state.dbText,
       state.tableText,
+      state.connectionId,
       (ev) =>
       {
         alert("success");
