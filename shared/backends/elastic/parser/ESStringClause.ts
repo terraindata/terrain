@@ -47,6 +47,7 @@ THE SOFTWARE.
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 
 /**
  * A clause which is a string
@@ -66,5 +67,22 @@ export default class ESStringClause extends ESClause
     {
       interpreter.accumulateError(valueInfo, 'This value should be a string.');
     }
+  }
+  
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || '',
+      
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'value',
+          // TODO autocomplete
+        },
+        tql: (stringBlock) => stringBlock['value'],
+      }
+    });
   }
 }

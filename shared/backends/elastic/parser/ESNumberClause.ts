@@ -47,6 +47,7 @@ THE SOFTWARE.
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 
 /**
  * A clause which is a number
@@ -66,5 +67,22 @@ export default class ESNumberClause extends ESClause
     {
       interpreter.accumulateError(valueInfo, 'This value should be a number.');
     }
+  }
+  
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || 0,
+      
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.NUM,
+          key: 'value',
+          // TODO autocomplete?
+        },
+        tql: (numBlock) => +numBlock['value'],
+      }
+    });
   }
 }

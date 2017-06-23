@@ -48,6 +48,7 @@ import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 
 /**
  * A clause which can only take on a restricted set of values.
@@ -85,5 +86,23 @@ export default class ESEnumClause extends ESClause
       }
     }
     valueInfo.clause = this;
+  }
+  
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || this.values[0],
+      
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.DROPDOWN,
+          key: 'value',
+          options: Immutable.List(this.values),
+          dropdownUsesRawValues: true,
+        },
+        tql: (block) => block['value'],
+      }
+    });
   }
 }

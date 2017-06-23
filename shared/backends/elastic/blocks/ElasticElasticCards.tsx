@@ -70,28 +70,25 @@ const { valueTypes } = CommonElastic;
 let colorIndex = 0;
 const numColors = 21;
 
-const ElasticElasticCards: { [type: string]: any } = 
-  _.omit(
-    _.mapObject(clauses, 
-      (clause) => 
-      {
-        const card = clause.getCard();
-        const colorKey = ((++colorIndex) % numColors) + 1;
-        
-        if (card)
-        {
-          card['static']['colors'] = [
-            Colors().builder.cards['card' + colorKey],
-            Colors().builder.cards['card' + colorKey + 'BG'],
-          ];
-        }
-        
-        return card;
-      }
-    ),
+const ElasticElasticCards: { [type: string]: any } = {};
+_.mapObject(
+  clauses,
+  (clause, key) => 
+  {
+    const card = clause.getCard();
     
-    (card) => !card // omit if the value was falsy
-  );
+    if (card)
+    {
+      const colorKey = ((++colorIndex) % numColors) + 1;
+      card['static']['colors'] = [
+        Colors().builder.cards['card' + colorKey],
+        Colors().builder.cards['card' + colorKey + 'BG'],
+      ];
+      
+      ElasticElasticCards['eql' + key] = card;
+    }
+  }
+);
 
 const getDisplayForType = (type: string, canBeCards?: boolean): Display | Display[] =>
 {

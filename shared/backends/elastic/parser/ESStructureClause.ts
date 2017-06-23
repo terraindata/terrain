@@ -44,11 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'underscore';
+
 import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
+import BlockUtils from '../../../blocks/BlockUtils';
+import ElasticBlocks from '../blocks/ElasticBlocks';
 
 /**
  * A clause with a well-defined structure.
@@ -119,5 +124,73 @@ export default class ESStructureClause extends ESClause
         interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
       }
     });
+  }
+  
+  public getCard()
+  {
+    let firstKey: string;
+    let initMap: {[key: string]: () => any};
+    
+    const valueMap = _.mapObject(
+      this.structure,
+      (type, key) =>
+      {
+        firstKey = firstKey || key;
+        
+        if (this.template)
+        {
+          // need to set up default value
+          const defaultValue = this.template[key];
+          if(defaultValue !== undefined)
+          {
+            if (defaultValue === null)
+            {
+              // need to create a clause card of the given key type
+              // We do this by adding a function to init.
+              initMap = initMap || {}; // initialize init
+              initMap[key] = () => BlockUtils.make(ElasticBlocks['eql' + key]); // make card
+              // TODO if deep nested objects, make sure they all get init'd
+              //   could be done in init by checking the config
+              
+              return null; 
+              // return null since init will fill in with a new object
+              // on creation. We don't want each new Card to share the same
+              // object reference. Returning null will preserve the key
+              // in the Record class.
+            }
+            
+            if (typeof defaultValue === 'object')
+            {
+              throw new Error('Nested object provided in template, unhandled case. ' +
+                'Type: ' + this.type + ' - Template value: ' + defaultValue);
+            }
+            
+            return this.template[key];
+          }
+        }
+        
+        
+      });
+    
+    
+    
+    return this.seedCard(_.extend(
+        valueMap, 
+        {
+          static: {
+            preview: '[' + firstKey + ']',
+            display: {
+              displayType: DisplayType.DROPDOWN,
+              key: 'value',
+              options: Immutable.List([
+                'false',
+                'true',
+              ]),
+            },
+            tql: (boolBlock) => !! boolBlock['value'],
+          }
+        }
+      )
+    );
   }
 }

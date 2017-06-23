@@ -53,6 +53,7 @@ import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import './Dropdown.less';
+import { Colors, fontColor} from '../../common/Colors';
 
 export interface Props
 {
@@ -168,7 +169,7 @@ class Dropdown extends PureClasss<Props>
   handleFocus()
   {
     this.setState({
-      focusedIndex: 0,
+      focusedIndex: -1,
     });
   }
 
@@ -221,6 +222,7 @@ class Dropdown extends PureClasss<Props>
           'dropdown-center': this.props.centerAlign,
           [this.props.className]: !!this.props.className,
         })}
+        style={fontColor(Colors().text.baseDark)}
       >
         {
           this.state.up && this.state.open
