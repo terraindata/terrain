@@ -48,19 +48,18 @@ import * as csv from 'csvtojson';
 import * as hashObject from 'hash-object';
 import * as winston from 'winston';
 
-import ElasticConfig from '../../database/elastic/ElasticConfig';
-import ElasticController from '../../database/elastic/ElasticController';
+import DatabaseController from '../../database/DatabaseController';
 import * as DBUtil from '../../database/Util';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
 
 export interface ImportConfig
 {
-  dsn: string;        // e.g.,'http://127.0.0.1:9200'
+  dbid: number;       // instance id
   db: string;         // for elastic, index name
   table: string;      // for elastic, type name
   contents: string;   // should parse directly into a JSON object
-  dbtype: string;     // e.g., 'elastic'
   filetype: string;   // either 'json' or 'csv'
 
   csvHeaderMissing: boolean;    // TODO: should be optional
@@ -80,23 +79,23 @@ export class Import
     {
       if (imprt.db === '' || imprt.table === '')
       {
-        throw new Error('Index name and document type cannot be empty strings.');
+        return reject('Index name and document type cannot be empty strings.');
       }
       if (imprt.db !== imprt.db.toLowerCase())
       {
-        throw new Error('Index name may not contain uppercase letters.');
+        return reject('Index name may not contain uppercase letters.');
       }
       if (!/^[a-z\d].*$/.test(imprt.db))
       {
-        throw new Error('Index name must start with a lowercase letter or digit.');
+        return reject('Index name must start with a lowercase letter or digit.');
       }
       if (!/^[a-z\d][a-z\d\._\+-]*$/.test(imprt.db))
       {
-        throw new Error('Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.');
+        return reject('Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.');
       }
       if (/^_.*/.test(imprt.table))
       {
-        throw new Error('Document type may not start with an underscore.');
+        return reject('Document type may not start with an underscore.');
       }
 
       let items: object[];
@@ -120,10 +119,17 @@ export class Import
         imprt.db,
       );
 
-      const elasticConfig: ElasticConfig = DBUtil.DSNToConfig(imprt.dbtype, imprt.dsn) as ElasticConfig;
-      const elasticController: ElasticController = new ElasticController(elasticConfig, 0, 'Import');
+      const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + imprt.dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('File import currently is only supported for Elastic databases.');
+      }
 
-      resolve(await elasticController.getTasty().upsert(insertTable, items) as ImportConfig);
+      resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
     });
   }
 

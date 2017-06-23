@@ -58,12 +58,8 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   winston.info('importing to database');
   const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['dbtype', 'contents', 'dsn', 'table', 'filetype', 'db']);
+  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'table', 'filetype', 'db']);
   Util.verifyParameters(imprtConf, ['columnMap', 'columnsToInclude', 'primaryKey']);
-  if (imprtConf.dbtype !== 'elastic')
-  {
-    throw new Error('File import currently is only supported for Elastic databases.');
-  }
 
   ctx.body = await imprt.upsert(imprtConf);
 });

@@ -54,7 +54,7 @@ let columns = Immutable.Map({});
 ['Example Database Server'].map(
   (serverName) =>
   {
-    let server = SchemaTypes._Server({ name: serverName });
+    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
 
     ['movieDB', 'baseballDB'].map(
       (dbName) =>

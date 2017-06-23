@@ -608,7 +608,6 @@ export const Ajax =
       } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const queryId = '' + Math.random();
       const payload: QueryRequest = {
         type: 'search', // can be other things in the future
         database: db.id as number, // should be passed by caller
@@ -622,6 +621,7 @@ export const Ajax =
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
         onLoad(queryResult);
       };
+      const queryId = '' + Math.random();
       const xhr = Ajax.req(
         'post',
         'query/',
@@ -637,24 +637,21 @@ export const Ajax =
       return { queryId, xhr };
     },
 
-    /* FileImport */
-    upload(file: string,
+    importFile(file: string,
       filetype: string,
       db: string,
       table: string,
+      connectionId: number,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string) => void,
-      sqlQuery?: boolean, // unused
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const queryId = '' + Math.random();
       const payload: object = {
-        dsn: 'http://127.0.0.1:9200',
-        db: db,
-        table: table,
+        dbid: connectionId,
+        db,
+        table,
         contents: file,
-        dbtype: 'elastic',
-        filetype: filetype,
+        filetype,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>
@@ -672,7 +669,7 @@ export const Ajax =
         },
       );
 
-      return { queryId, xhr };
+      return;
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)

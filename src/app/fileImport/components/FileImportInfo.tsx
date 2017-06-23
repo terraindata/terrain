@@ -49,20 +49,18 @@ const { List } = Immutable;
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
-import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
-import FileImportTypes from './../FileImportTypes';
-import { FileImportState } from './../data/FileImportStore';
 import Autocomplete from './../../common/components/Autocomplete';
-import BuilderTextbox from './../../common/components/BuilderTextbox';
-import SchemaTypes from './../../schema/SchemaTypes'
+import SchemaTypes from '../../schema/SchemaTypes';
 
 export interface Props
 {
-  canSelectCluster: boolean;
-  clusterIndex: number;
-  clusters: List<string>;
+  canSelectServer: boolean;
+  serverIndex: number;
+  servers: SchemaTypes.ServerMap;
+  serverNames: List<string>;
+  serverSelected: boolean;
 
   canSelectDb: boolean;
   dbs: List<string>;
@@ -81,19 +79,20 @@ export interface Props
 
 class FileImportInfo extends PureClasss<Props>
 {
-  public handleClusterChange(clusterIndex: number)
+  public handleServerChange(serverIndex: number)
   {
-    Actions.changeCluster(clusterIndex);
+    const key = this.props.serverNames.get(serverIndex);
+    Actions.changeServer(serverIndex, this.props.servers.get(key).connectionId);
   }
 
-  public handleAutocompleteDbChange(event)
+  public handleAutocompleteDbChange(value)
   {
-    Actions.changeDbText(event);
+    Actions.changeDbText(value);
   }
 
-  public handleAutocompleteTableChange(event)
+  public handleAutocompleteTableChange(value)
   {
-    Actions.changeTableText(event);
+    Actions.changeTableText(value);
   }
 
   public handleChooseFile(file)
@@ -125,19 +124,19 @@ class FileImportInfo extends PureClasss<Props>
 
   public handleUploadFile()
   {
-    if (this.props.canImport && this.props.fileChosen && this.props.dbSelected && this.props.tableSelected)
+    if (this.props.canImport && this.props.fileChosen && this.props.serverSelected && this.props.dbSelected && this.props.tableSelected)
     {
       Actions.uploadFile();
     }
     else
     {
-      alert("Please select a file to upload, database, and table");
+      alert("Please select a file to upload, server, database, and table");
     }
   }
 
   public render()
   {
-    const { canSelectCluster, canSelectDb, canSelectTable } = this.props;
+    const { canSelectServer, canSelectDb, canSelectTable } = this.props;
 
     return (
       <div>
@@ -145,14 +144,14 @@ class FileImportInfo extends PureClasss<Props>
           <input ref="file" type="file" onChange={this.handleChooseFile} />
         </div>
         <div>
-          <h3>Cluster</h3>
+          <h3>Server</h3>
         </div>
         <div>
           <Dropdown
-            selectedIndex={this.props.clusterIndex}
-            options={this.props.clusters}
-            onChange={this.handleClusterChange}
-            canEdit={canSelectCluster}
+            selectedIndex={this.props.serverIndex}
+            options={this.props.serverNames}
+            onChange={this.handleServerChange}
+            canEdit={canSelectServer}
           />
         </div>
         <div>
