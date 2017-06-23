@@ -106,7 +106,6 @@ const accepts = List(['elasticMagicCard', 'elasticMagicList']);
 export const elasticMagicList = _card(
   {
     values: List([]),
-    method: '',
 
     static: {
       language: 'elastic',
@@ -130,16 +129,8 @@ export const elasticMagicList = _card(
       accepts,
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        const arr: any[] = [];
-
-        block['values'].map(
-          (card: Card) =>
-          {
-            arr.push(tqlTranslationFn(card, tqlConfig));
-          },
-        );
-
-        return arr;
+        return block['values'].map((card: Card) =>
+          tqlTranslationFn(card, tqlConfig)).toArray();
       },
       init: () => ({
         values: List([
@@ -150,9 +141,9 @@ export const elasticMagicList = _card(
       {
         displayType: DisplayType.ROWS,
         key: 'values',
-        english: 'elasticMagicListItem',
+        english: 'List Entry',
         factoryType: 'elasticMagicListItem',
-        provideParentData: true,
+        provideParentData: false,
         row:
         {
           noDataPadding: true,
@@ -180,7 +171,6 @@ export const elasticMagicList = _card(
 export const elasticMagicCard = _card(
   {
     values: List([]),
-    method: '',
 
     static: {
       language: 'elastic',
@@ -192,7 +182,6 @@ export const elasticMagicCard = _card(
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
         const elasticObj: object = {};
-
         block['values'].map(
           (card: Card) =>
           {
@@ -211,9 +200,9 @@ export const elasticMagicCard = _card(
       {
         displayType: DisplayType.ROWS,
         key: 'values',
-        english: 'elasticMagicValue',
+        english: 'Key / Value',
         factoryType: 'elasticMagicValue',
-        provideParentData: true,
+        provideParentData: false,
         row:
         {
           noDataPadding: true,

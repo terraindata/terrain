@@ -154,18 +154,21 @@ const parseValueSingleCard = (value: any): Card =>
 const parseMagicArray = (arr: any[]): Card =>
 {
   const values: Card[] = _.map(arr,
-    (v: any) =>
+    (value: any) =>
     {
-      if (Array.isArray(v) && (v !== []))
+      if (Array.isArray(value) && (value !== []))
       {
-        v = parseMagicArray(v);
+        value = parseMagicArray(value);
       }
-      else if (typeof v === 'object' && (v !== null || v !== {}))
+      else if (typeof value === 'object' && (value !== null || value !== {}))
       {
-        v = parseMagicObject(v).first();
+        value = parseMagicObject(value).first();
+      }
+      else
+      {
+        value = JSON.stringify(CommonElastic.parseESValue(value));
       }
 
-      const value = JSON.stringify(CommonElastic.parseESValue(v));
       return make(Blocks.elasticMagicListItem, {
         value,
       });
@@ -184,28 +187,34 @@ const parseMagicObject = (obj: object): Cards =>
 {
   if (obj === {} || obj === null)
   {
-    return make(Blocks.elasticMagicValue, {
-      value: obj,
-    });
+    return Immutable.List([
+      make(Blocks.elasticMagicValue, {
+        value: obj,
+      }),
+    ],
+    );
   }
 
   const values: Card[] = _.map(obj,
-    (v: any, key: string) =>
+    (value: any, key: string) =>
     {
-      if (v === null || v === {})
+      if (value === null || value === {})
       {
-        v = v;
+        value = JSON.stringify(CommonElastic.parseESValue(value));
       }
-      else if (Array.isArray(v) && (v !== []))
+      else if (Array.isArray(value) && (value !== []))
       {
-        v = parseMagicArray(v);
+        value = parseMagicArray(value);
       }
-      else if (typeof v === 'object' && (v !== null || v !== {}))
+      else if (typeof value === 'object' && (value !== null || value !== {}))
       {
-        v = parseMagicObject(v).first();
+        value = parseMagicObject(value).first();
+      }
+      else
+      {
+        value = JSON.stringify(CommonElastic.parseESValue(value));
       }
 
-      const value = JSON.stringify(CommonElastic.parseESValue(v));
       return make(Blocks.elasticMagicValue, {
         key,
         value,
