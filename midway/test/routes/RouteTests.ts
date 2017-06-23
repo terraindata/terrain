@@ -730,6 +730,12 @@ describe('File import route tests', () =>
             column1: 'column1',
             column2: 'column2',
           },
+          columnsToInclude:
+          {
+            pkey: true,
+            column1: true,
+            column2: true,
+          },
           primaryKey: 'pkey',
         },
       })
@@ -771,6 +777,12 @@ describe('File import route tests', () =>
             pkey: 'pkey',
             column1: 'column1',
             column2: 'column2',
+          },
+          columnsToInclude:
+          {
+            pkey: true,
+            column1: true,
+            column2: true,
           },
           primaryKey: 'pkey',
         },

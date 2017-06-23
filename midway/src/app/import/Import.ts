@@ -67,6 +67,7 @@ export interface ImportConfig
   // columnMap: Map<string, string> | string[];             // oldName to newName
   columnMap: object;    // either object mapping string to string, or an array of strings
   // columnsToInclude: Map<string, boolean> | boolean[];
+  columnsToInclude: object;   // either object mapping string to boolean, or an array of booleans
   // columnTypes: Map<string, string> | string[];        // oldName to number/text/boolean/object/date
   primaryKey: string;  // newName of primary key
 }
@@ -110,7 +111,7 @@ export class Import
       {
         return reject('No data provided in file to upload.');
       }
-      const columns: string[] = this._getColumnNames(imprt);
+      const columns: string[] = this._getArrayFromMap(imprt.columnMap);
 
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
@@ -149,6 +150,20 @@ export class Import
                 return reject('Objects in provided input JSON do not have the same keys and/or types.');
               }
             }
+
+            for (const oldName in imprt.columnMap)
+            {
+              if (imprt.columnMap.hasOwnProperty(oldName))
+              {
+                if (!imprt.columnsToInclude[oldName])
+                {
+                  delete imprt.columnMap[oldName];
+                }
+              }
+            }
+
+            // NOTE: rebuilds the entire object to handle renaming of fields ; depending on how many fields we expect
+            // to be renamed, this could be much slower than directly deleting and updating fields
             const renamedItems: object[] = items.map((obj) =>
             {
               const renamedObj: object = {};
@@ -172,11 +187,21 @@ export class Import
         }
       } else if (imprt.filetype === 'csv')
       {
+        const includeColumns: boolean[] = this._getArrayFromMap(imprt.columnsToInclude);
+        const columnIndicesToInclude: number[] = includeColumns.reduce((res, val, ind) =>
+        {
+          if (val)
+          {
+            res.push(ind);
+          }
+          return res;
+        }, [] as number[]);
         csv({
           flatKeys: true,
           checkColumn: true,
           noheader: imprt.csvHeaderMissing,
-          headers: this._getColumnNames(imprt),
+          headers: this._getArrayFromMap(imprt.columnMap),
+          includeColumns: columnIndicesToInclude,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
           resolve(jsonArrObj);
@@ -191,19 +216,18 @@ export class Import
     });
   }
 
-  private _getColumnNames(imprt: ImportConfig): string[]
+  // TODO: how to make this generic but support both string[] and boolean[] output?
+  private _getArrayFromMap(mapOrArray: object): any[]
   {
-    let columns: string[];
-    if (Array.isArray(imprt.columnMap))
+    let array: any[];
+    if (Array.isArray(mapOrArray))
     {
-      winston.info('found array for column map');
-      columns = imprt.columnMap;
+      array = mapOrArray;
     } else
     {
-      winston.info('found object map for column map');
-      columns = Object.keys(imprt.columnMap).map((key) => imprt.columnMap[key]);
+      array = Object.keys(mapOrArray).map((key) => mapOrArray[key]);
     }
-    return columns;
+    return array;
   }
 }
 

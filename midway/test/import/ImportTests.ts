@@ -98,6 +98,12 @@ test('import JSON file', async (done) =>
           title: 'title',
           releasedate: 'releasedate',
         },
+        columnsToInclude:
+        {
+          pkey: true,
+          title: true,
+          releasedate: true,
+        },
         primaryKey: 'pkey',
       };
     winston.info(imprtConf.contents);
@@ -143,6 +149,12 @@ test('import CSV file', async (done) =>
           pkey: 'pkey',
           title: 'title',
           releasedate: 'releasedate',
+        },
+        columnsToInclude:
+        {
+          pkey: true,
+          title: true,
+          releasedate: true,
         },
         primaryKey: 'pkey',
       };
