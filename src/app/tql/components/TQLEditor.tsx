@@ -157,7 +157,7 @@ class TQLEditor extends PureClasss<Props>
       />
     );
   }
-
+  /*
   public handleChanges(cm, changes): void
   {
     // const marker = instance.markText({line: 0, ch: 0}, {line: 1, ch: 1}, {className: "cm-number"});
@@ -165,12 +165,14 @@ class TQLEditor extends PureClasss<Props>
     // tslint:disable-next-line no-console
     console.log(this.props.language);
   }
-
+  */
   private registerCodeMirror(cmInstance)
   {
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
       this.highlighter = new ElasticHighlighter();
+      // tslint:disable-next-line no-console
+      console.log(this.props.language);
     }
     cmInstance.on("changes", this.highlighter.handleChanges.bind(this.highlighter));
   }
