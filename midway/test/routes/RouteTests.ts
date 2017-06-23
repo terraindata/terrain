@@ -747,7 +747,7 @@ describe('File import route tests', () =>
         expect(respData.length).toBeGreaterThan(0);
         expect(respData[0])
           .toMatchObject({
-              pkey: 1,
+            pkey: 1,
             column1: 'hello',
             column2: 'goodbye',
           });
@@ -772,20 +772,20 @@ describe('File import route tests', () =>
           contents: 'pkey,column1,column2\n1,hi,hello\n2,bye,goodbye',
           filetype: 'csv',
 
-            csvHeaderMissing: false,
-            columnMap:
-                {
-                    pkey: 'pkey',
-                    column1: 'column1',
-                    column2: 'column2',
-                },
-            columnsToInclude:
-                {
-                    pkey: true,
-                    column1: true,
-                    column2: true,
-                },
-            primaryKey: 'pkey',
+          csvHeaderMissing: false,
+          columnMap:
+          {
+            pkey: 'pkey',
+            column1: 'column1',
+            column2: 'column2',
+          },
+          columnsToInclude:
+          {
+            pkey: true,
+            column1: true,
+            column2: true,
+          },
+          primaryKey: 'pkey',
         },
       })
       .expect(200)
@@ -796,13 +796,13 @@ describe('File import route tests', () =>
         expect(respData.length).toBeGreaterThan(0);
         expect(respData[0])
           .toMatchObject({
-              pkey: '1',
+            pkey: '1',
             column1: 'hi',
             column2: 'hello',
           });
         expect(respData[1])
           .toMatchObject({
-              pkey: '2',
+            pkey: '2',
             column1: 'bye',
             column2: 'goodbye',
           });
