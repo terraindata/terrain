@@ -73,10 +73,14 @@ class ElasticHighlighter extends SyntaxHighlighter
     const tokens: ESParserToken[] = parser.getTokens();
     for (let i = 0; i < tokens.length; i++)
     {
+      if (i !== 1)
+      {
+        continue;
+      }
       if (tokens[i].valueInfo)
       {
         const valueInfo: ESValueInfo = tokens[i].valueInfo;
-        let style: string = '';
+        let style: string = 'cm-number';
         switch (valueInfo.jsonType)
         {
           case ESJSONType.invalid:
@@ -99,13 +103,15 @@ class ElasticHighlighter extends SyntaxHighlighter
             break;
         }
         const coords: TextCoordinates = this.getTokenCoordinates(tokens[i]);
-        const marker = instance.markText(coords[0], coords[1], { className: style });
+        const marker = instance.markText(coords[0], coords[1], { className: style});
         // tslint:disable-next-line no-console
         // console.log([coords[0], coords[1], {className: style}]);
         console.log(style);
+        console.log(marker);
         this.markers.push(marker);
       }
     }
+    console.log(instance);
   }
 
   protected clearMarkers(): void
@@ -119,7 +125,7 @@ class ElasticHighlighter extends SyntaxHighlighter
 
   protected getTokenCoordinates(token: ESParserToken): TextCoordinates
   {
-    const row0 = token.row + 1;
+    const row0 = token.row;
     const col0 = token.col;
     const lines = token.substring.replace('\r', '').replace('\n', '').split('\n');
     const row1 = row0 + lines.length - 1;
