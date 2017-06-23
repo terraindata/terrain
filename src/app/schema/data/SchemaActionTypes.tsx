@@ -48,9 +48,10 @@ import Util from './../../util/Util';
 export let SchemaActionTypes =
   {
     fetch: '',
-    setDatabase: '', // sets the schema for a database
+    setServer: '', // sets the schema for a database
+    addDbToServer: '',
     error: '',
-    dbCount: '',
+    serverCount: '',
 
     highlightId: '',
     selectId: '',
