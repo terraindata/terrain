@@ -647,7 +647,7 @@ export const Ajax =
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const payload: object = {
-        dsn: connectionId,
+        dbid: connectionId,
         db,
         table,
         contents: file,
