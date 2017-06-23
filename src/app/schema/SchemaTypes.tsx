@@ -96,6 +96,7 @@ export namespace SchemaTypes
   {
     public type = 'server';
     public name = '';
+    public connectionId: number = -1;
 
     public databaseIds: List<string> = List([]);
   }
@@ -103,6 +104,7 @@ export namespace SchemaTypes
   export const _Server =
     (config: {
       name: string,
+      connectionId: number,
       id?: string,
     }) =>
     {
