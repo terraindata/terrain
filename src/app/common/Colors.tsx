@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const color = require('color');
+const Color = require('color');
 
 interface Theme
 {
@@ -137,15 +137,15 @@ interface Theme
     cards: {
       cardBase: string,
 
-      card01: string,
-      card02: string,
-      card03: string,
-      card04: string,
-      card05: string,
-      card06: string,
-      card07: string,
-      card08: string,
-      card09: string,
+      card1: string,
+      card2: string,
+      card3: string,
+      card4: string,
+      card5: string,
+      card6: string,
+      card7: string,
+      card8: string,
+      card9: string,
       card10: string,
       card11: string,
       card12: string,
@@ -158,6 +158,28 @@ interface Theme
       card19: string,
       card20: string,
       card21: string,
+      
+      card1BG: string,
+      card2BG: string,
+      card3BG: string,
+      card4BG: string,
+      card5BG: string,
+      card6BG: string,
+      card7BG: string,
+      card8BG: string,
+      card9BG: string,
+      card10BG: string,
+      card11BG: string,
+      card12BG: string,
+      card13BG: string,
+      card14BG: string,
+      card15BG: string,
+      card16BG: string,
+      card17BG: string,
+      card18BG: string,
+      card19BG: string,
+      card20BG: string,
+      card21BG: string,
     },
 
     //builder column
@@ -182,8 +204,8 @@ const DARK: Theme =
       baseLight: '#FFFFFF',
       secondaryLight: 'rgba(255,255,255,0.80)',
 
-      link: color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-      linkHover: color('#4C7C9C').lighten(0.5).saturate(0.15).string()
+      link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string()
     },
 
     // main title bar
@@ -262,15 +284,15 @@ const DARK: Theme =
       cards: {
         cardBase: '#424242', // TODO
 
-        card01: '#559DCE',
-        card02: '#397DD0',
-        card03: '#D14F42',
-        card04: '#D55A44',
-        card05: '#DA6846',
-        card06: '#DD7547',
-        card07: '#DD8846',
-        card08: '#DAA043',
-        card09: '#D9B540',
+        card1: '#559DCE',
+        card2: '#397DD0',
+        card3: '#D14F42',
+        card4: '#D55A44',
+        card5: '#DA6846',
+        card6: '#DD7547',
+        card7: '#DD8846',
+        card8: '#DAA043',
+        card9: '#D9B540',
         card10: '#86A760',
         card11: '#659F72',
         card12: '#4B977F',
@@ -283,6 +305,28 @@ const DARK: Theme =
         card19: '#319AA9',
         card20: '#4A979A',
         card21: '#3A91A5',
+        
+        card1BG: Color("#559DCE").alpha(0.7).string(),
+        card2BG: Color("#397DD0").alpha(0.7).string(),
+        card3BG: Color("#D14F42").alpha(0.7).string(),
+        card4BG: Color("#D55A44").alpha(0.7).string(),
+        card5BG: Color("#DA6846").alpha(0.7).string(),
+        card6BG: Color("#DD7547").alpha(0.7).string(),
+        card7BG: Color("#DD8846").alpha(0.7).string(),
+        card8BG: Color("#DAA043").alpha(0.7).string(),
+        card9BG: Color("#D9B540").alpha(0.7).string(),
+        card10BG: Color("#86A760").alpha(0.7).string(),
+        card11BG: Color("#659F72").alpha(0.7).string(),
+        card12BG: Color("#4B977F").alpha(0.7).string(),
+        card13BG: Color("#39908B").alpha(0.7).string(),
+        card14BG: Color("#2E8C9A").alpha(0.7).string(),
+        card15BG: Color("#2589AA").alpha(0.7).string(),
+        card16BG: Color("#466AA3").alpha(0.7).string(),
+        card17BG: Color("#824BA0").alpha(0.7).string(),
+        card18BG: Color("#B161BC").alpha(0.7).string(),
+        card19BG: Color("#319AA9").alpha(0.7).string(),
+        card20BG: Color("#4A979A").alpha(0.7).string(),
+        card21BG: Color("#3A91A5").alpha(0.7).string(),
       },
 
       //builder column
@@ -352,3 +396,5 @@ export function getStyle(color: string, style: string, hoverColor?: string)
 
   return dynamicMap[curTheme][color][style][hoverColor];
 }
+
+export default Colors;

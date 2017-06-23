@@ -47,6 +47,10 @@ THE SOFTWARE.
 import EQLConfig from './EQLConfig';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
+import * as _ from 'underscore';
+import { Card, _card } from '../../../blocks/types/Card';
+import { TQLFn } from '../../../blocks/types/Block';
+import { Display } from '../../../blocks/displays/Display';
 
 /**
  * Represents an Elastic Search query clause
@@ -115,6 +119,46 @@ abstract class ESClause
     {
       this[name] = defaultValueFunction();
     }
+  }
+  
+  protected seedCard(obj: {
+    [field: string]: any;
+
+    static: {
+      colors?: string[]; // optional, filled below
+      title?: string; // optional, filled below
+      
+      preview: string | ((c: Card) => string);
+      display: Display | Display[];
+      tql: TQLFn;
+      accepts?: List<string>;
+
+      getChildTerms?: (card: Card, schemaState) => List<string>;
+      getNeighborTerms?: (card: Card, schemaState) => List<string>;
+      getParentTerms?: (card: Card, schemaState) => List<string>;
+
+      metaFields?: string[];
+
+      init?: () => {
+        [k: string]: any;
+      };
+    };
+  }): any
+  {
+    obj['static'] = _.extend({
+      title: this.name,
+      colors: [],
+      language: 'elastic',
+      
+      anythingAccepts: true, // TODO remove after testing
+    }, obj['static']);
+    
+    return _card(obj as any);
+  }
+  
+  public getCard(): any
+  {
+    return null;
   }
 }
 

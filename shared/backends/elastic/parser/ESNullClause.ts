@@ -67,4 +67,15 @@ export default class ESNullClause extends ESClause
       interpreter.accumulateError(valueInfo, 'This value should be null.');
     }
   }
+  
+  public getCard()
+  {
+    return this.seedCard({
+      static: {
+        preview: '',
+        display: [],
+        tql: () => null,
+      }
+    });
+  }
 }

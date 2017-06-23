@@ -55,19 +55,43 @@ import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarD
 import CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
-import {DefType, BaseType} from '../parser/EQLSpec';
-
 import EQLConfig from '../parser/EQLConfig';
 import ESClause from '../parser/ESClause';
 import ESStructureClause from '../parser/ESStructureClause';
 import ESEnumClause from '../parser/ESEnumClause';
+
+import Colors from '../../../../src/app/common/Colors';
 
 const clauses = (new EQLConfig()).getClauses();
 console.log(clauses);
 
 const { valueTypes } = CommonElastic;
 
-const ElasticElasticCards: { [type: string]: any } = {};
+let colorIndex = 0;
+const numColors = 21;
+
+const ElasticElasticCards: { [type: string]: any } = 
+  _.omit(
+    _.mapObject(clauses, 
+      (clause) => 
+      {
+        const card = clause.getCard();
+        const colorKey = ((++colorIndex) % numColors) + 1;
+        
+        if (card)
+        {
+          card['static']['colors'] = [
+            Colors().builder.cards['card' + colorKey],
+            Colors().builder.cards['card' + colorKey + 'BG'],
+          ];
+        }
+        
+        return card;
+      }
+    ),
+    
+    (card) => !card // omit if the value was falsy
+  );
 
 const getDisplayForType = (type: string, canBeCards?: boolean): Display | Display[] =>
 {
@@ -99,148 +123,143 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
   }
 }
 
-let colorIndex = 1;
-const numColors = 21;
-
-_.mapObject(clauses, (clause: ESClause, type: string) =>
-{
-  const cardType = 'elasticElastic' + type;
-  const { def, desc, url, values, template, required, name } = clause;
+//   const cardType = 'elasticElastic' + type;
+//   const { def, desc, url, values, template, required, name } = clause;
   
-  if (clause instanceof ESStructureClause)
-  {
-    console.log('structure');
-  }
+//   if (clause instanceof ESStructureClause)
+//   {
+//     console.log('structure');
+//   }
   
-  // if ()
+//   // if ()
   
-  if(typeof def === 'string')
-  {
-    let singleValueConfig: {
-      type: string;
-      default: any;
-      canBeCards?: boolean;
-      autocomplete?: any; // TODO
-    } = null;
+//   if(typeof def === 'string')
+//   {
+//     let singleValueConfig: {
+//       type: string;
+//       default: any;
+//       canBeCards?: boolean;
+//       autocomplete?: any; // TODO
+//     } = null;
     
-    switch(def)
-    {
-      case 'any':
-        singleValueConfig = {
-          type: CommonElastic.valueTypes.text, // TODO switch to auto?,
-          default: template || '',
-          canBeCards: true,
-        };
-        break;
+//     switch(def)
+//     {
+//       case 'any':
+//         singleValueConfig = {
+//           type: CommonElastic.valueTypes.text, // TODO switch to auto?,
+//           default: template || '',
+//           canBeCards: true,
+//         };
+//         break;
 
-      case 'null':
-        singleValueConfig = {
-          type: CommonElastic.valueTypes.null,
-          default: template || '',
-        }
-        break;
+//       case 'null':
+//         singleValueConfig = {
+//           type: CommonElastic.valueTypes.null,
+//           default: template || '',
+//         }
+//         break;
 
-      case 'boolean':
-        singleValueConfig = {
-          type: CommonElastic.valueTypes.bool,
-          default: template || 1,
-        }
-        break;
+//       case 'boolean':
+//         singleValueConfig = {
+//           type: CommonElastic.valueTypes.bool,
+//           default: template || 1,
+//         }
+//         break;
 
-      case 'number':
-        singleValueConfig = {
-          type: CommonElastic.valueTypes.number,
-          default: template || 0,
-        }
-        break;
+//       case 'number':
+//         singleValueConfig = {
+//           type: CommonElastic.valueTypes.number,
+//           default: template || 0,
+//         }
+//         break;
 
-      case 'string':
-        singleValueConfig = {
-          type: CommonElastic.valueTypes.text,
-          default: template || '',
-        }
-        break;
+//       case 'string':
+//         singleValueConfig = {
+//           type: CommonElastic.valueTypes.text,
+//           default: template || '',
+//         }
+//         break;
 
-      case 'base':
-        break;
+//       case 'base':
+//         break;
 
-      case 'field':
-        break;
+//       case 'field':
+//         break;
 
-      case 'query':
-        break;
+//       case 'query':
+//         break;
 
-      case 'field_type':
-        break;
+//       case 'field_type':
+//         break;
 
-      case 'enum':
-        break;
+//       case 'enum':
+//         break;
 
-      case 'variant':
-        break;
+//       case 'variant':
+//         break;
 
-      case 'term_value':
-        break;
+//       case 'term_value':
+//         break;
 
-      case 'term_values':
-        break;
+//       case 'term_values':
+//         break;
 
-      case 'painless':
-        break;
+//       case 'painless':
+//         break;
       
-      default:
+//       default:
         
-    }
+//     }
     
-    if (singleValueConfig)
-    {
-      let display = getDisplayForType(singleValueConfig.type);
+//     if (singleValueConfig)
+//     {
+//       let display = getDisplayForType(singleValueConfig.type);
       
-      ElasticElasticCards[cardType] = _card({
-        value: singleValueConfig.default,
+//       ElasticElasticCards[cardType] = _card({
+//         value: singleValueConfig.default,
         
-        static:
-        {
-          title: name || type,
-          colors: ['#456', '#789'],
-          language: 'elastic',
-          preview: '[value]',
+//         static:
+//         {
+//           title: name || type,
+//           colors: ['#456', '#789'],
+//           language: 'elastic',
+//           preview: '[value]',
           
-          tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-          {
-            let value = block['value'];
+//           tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+//           {
+//             let value = block['value'];
             
-            if(singleValueConfig.type === valueTypes.number)
-            {
-              value = +value;
-            }
+//             if(singleValueConfig.type === valueTypes.number)
+//             {
+//               value = +value;
+//             }
             
-            if(singleValueConfig.type === valueTypes.bool)
-            {
-              value = !! value;
-            }
+//             if(singleValueConfig.type === valueTypes.bool)
+//             {
+//               value = !! value;
+//             }
             
-            if(singleValueConfig.type === valueTypes.null)
-            {
-              value = null;
-            }
+//             if(singleValueConfig.type === valueTypes.null)
+//             {
+//               value = null;
+//             }
             
-            if(value['_isBlock'])
-            {
-              value = tqlTranslationFn(value['_isBlock'], tqlConfig);
-            }
+//             if(value['_isBlock'])
+//             {
+//               value = tqlTranslationFn(value['_isBlock'], tqlConfig);
+//             }
             
-            return {
-              [type]: value,
-            };
-          },
+//             return {
+//               [type]: value,
+//             };
+//           },
           
-          display,
-        },
-      });
-    }
-  }
-});
+//           display,
+//         },
+//       });
+//     }
+//   }
+// });
 
 
 _card({

@@ -52,6 +52,7 @@ import * as _ from 'underscore';
 import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import Util from '../../util/Util';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 export interface Props
 {
@@ -80,8 +81,8 @@ class BuilderTextboxCards extends React.Component<Props, any>
 
   public isCreating()
   {
-    return false; // TODO
-    // return this.props.value && this.props.value['type'] === 'creating';
+    return this.props.value 
+      && this.props.value['type'] === AllBackendsMap[this.props.language].creatingType;
   }
 
   public render()

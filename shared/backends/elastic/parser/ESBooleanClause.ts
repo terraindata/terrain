@@ -44,9 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.id
 
+import * as Immutable from 'immutable';
+
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 
 /**
  * A clause which is a boolean
@@ -66,5 +69,25 @@ export default class ESBooleanClause extends ESClause
     {
       interpreter.accumulateError(valueInfo, 'This value should be a boolean.');
     }
+  }
+  
+  public getCard()
+  {
+    return this.seedCard({
+      value: true,
+      
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.DROPDOWN,
+          key: 'value',
+          options: Immutable.List([
+            'false',
+            'true',
+          ]),
+        },
+        tql: (boolBlock) => !! boolBlock['value'],
+      }
+    });
   }
 }

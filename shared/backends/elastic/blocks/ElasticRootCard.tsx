@@ -78,7 +78,7 @@ export const elasticRootCard = _card({
     tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
       return {
-        index: rootBlock['index'],
+        index: tqlTranslationFn(rootBlock['index'], tqlConfig),
         type: rootBlock['rootType'],
         from: rootBlock['from'],
         size: rootBlock['rootSize'],
@@ -90,13 +90,17 @@ export const elasticRootCard = _card({
     display:
     [
       {
-        displayType: DisplayType.TEXT,
+        displayType: DisplayType.CARDTEXT, // TODO change
         key: 'index',
         getAutoTerms: (schemaState) =>
         {
           return Immutable.List(['movies', 'baseball', 'zazzle']);
         },
         // autoDisabled: true,
+      },
+      {
+        displayType: DisplayType.CARDSFORTEXT, // TODO change
+        key: 'index',
       },
       {
         displayType: DisplayType.TEXT,
