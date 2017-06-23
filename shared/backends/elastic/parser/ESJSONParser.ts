@@ -161,6 +161,11 @@ export default class ESJSONParser
     return this.errors;
   }
 
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
+  }
+
   public accumulateError(error: ESParserError): void
   {
     this.errors.push(error);
@@ -576,6 +581,8 @@ export default class ESJSONParser
   {
     const element: ESParserToken = this.getCurrentToken();
     element.length = this.charNumber - element.charNumber;
+    element.toRow = this.getRow();
+    element.toCol = this.getCol();
     element.substring = this.queryString.substring(element.charNumber, element.charNumber + element.length);
   }
 
