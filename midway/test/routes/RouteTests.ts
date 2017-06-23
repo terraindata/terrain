@@ -717,11 +717,10 @@ describe('File import route tests', () =>
         id: 1,
         accessToken: 'AccessToken',
         body: {
-          dsn: 'http://127.0.0.1:9200',
+          dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
           contents: '[{"column1":"hello","column2":"goodbye"}]',
-          dbtype: 'elastic',
           filetype: 'json',
         },
       })
@@ -743,6 +742,44 @@ describe('File import route tests', () =>
       });
   });
 
+  test('Import CSV: POST /midway/v1/import/', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/import/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          dbid: 1,
+          db: 'test_elastic_db',
+          table: 'fileImportTestTable',
+          contents: 'column1,column2\nhi,hello\nbye,goodbye',
+          filetype: 'csv',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            column1: 'hi',
+            column2: 'hello',
+          });
+        expect(respData[1])
+          .toMatchObject({
+            column1: 'bye',
+            column2: 'goodbye',
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/import/ request returned an error: ' + String(error));
+      });
+  });
+
   test('Invalid import: POST /midway/v1/import/', async () =>
   {
     await request(server)
@@ -751,11 +788,10 @@ describe('File import route tests', () =>
         id: 1,
         accessToken: 'AccessToken',
         body: {
-          dsn: 'http://127.0.0.1:9200',
+          dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
           contents: '{"column1":"hello","column2":"goodbye"}',
-          dbtype: 'elastic',
           filetype: 'json',
         },
       })
