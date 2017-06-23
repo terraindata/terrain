@@ -59,11 +59,17 @@ import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
 // Style sheets and addons for CodeMirror
 require('./tql.js');
+
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/fold/foldgutter.css';
+import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/lint/lint.js';
+import 'codemirror/mode/javascript/javascript.js';
+
+import './eslint.js';
+
 import './cobalt.less';
 import './codemirror.less';
 import './monokai.less';
@@ -81,6 +87,7 @@ import './dialog.less';
 export interface Props
 {
   tql: string;
+  language?: string;
   canEdit: boolean;
 
   language?: string;
@@ -123,6 +130,11 @@ class TQLEditor extends PureClasss<Props>
 
         origLeft: this.props.diffTql,
       };
+
+    if (this.props.language === 'elastic')
+    {
+      options['mode'] = 'application/json';
+    }
 
     if (this.props.isDiff)
     {
