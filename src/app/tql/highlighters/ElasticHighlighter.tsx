@@ -103,7 +103,7 @@ class ElasticHighlighter extends SyntaxHighlighter
             break;
         }
         const coords: TextCoordinates = this.getTokenCoordinates(tokens[i]);
-        const marker = instance.markText(coords[0], coords[1], { className: style});
+        const marker = instance.markText(coords[0], coords[1], { className: style });
         // tslint:disable-next-line no-console
         // console.log([coords[0], coords[1], {className: style}]);
         console.log(style);
