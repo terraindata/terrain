@@ -99,17 +99,16 @@ class VariantVersions extends PureClasss<Props>
 
   public fetchVariants(props)
   {
-    // TODO
-    // this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
-    // {
-    //   if (versions)
-    //   {
-    //     versions.reverse();
-    //     this.setState({
-    //       versions,
-    //     });
-    //   }
-    // });
+    this.xhr = Ajax.getVersions(props.variant.id, (versions) =>
+    {
+      if (versions)
+      {
+        versions.reverse();
+        this.setState({
+          versions,
+        });
+      }
+    });
   }
 
   public componentWillMount()

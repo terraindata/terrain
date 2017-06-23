@@ -47,12 +47,14 @@ THE SOFTWARE.
 enum ESJSONType
 {
   'invalid',
+  'unknown',
   'null',
   'boolean',
   'number',
   'string',
   'array',
   'object',
+  'parameter',
 }
 
 export default ESJSONType;

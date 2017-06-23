@@ -63,26 +63,6 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   {
     throw new Error('File import currently is only supported for Elastic databases.');
   }
-  if (imprtConf.db === '' || imprtConf.table === '')
-  {
-    throw new Error('Index name and document type cannot be empty strings.');
-  }
-  if (imprtConf.db !== imprtConf.db.toLowerCase())
-  {
-    throw new Error('Index name may not contain uppercase letters.');
-  }
-  if (!/^[a-z\d].*$/.test(imprtConf.db))
-  {
-    throw new Error('Index name must start with a lowercase letter or digit.');
-  }
-  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(imprtConf.db))
-  {
-    throw new Error('Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.');
-  }
-  if (/^_.*/.test(imprtConf.table))
-  {
-    throw new Error('Document type may not start with an underscore.');
-  }
 
   ctx.body = await imprt.insert(imprtConf);
 });

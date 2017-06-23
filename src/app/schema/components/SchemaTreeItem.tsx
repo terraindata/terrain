@@ -50,8 +50,9 @@ import PureClasss from './../../common/components/PureClasss';
 import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
 import { databaseChildrenConfig, DatabaseTreeInfo } from './items/DatabaseTreeInfo';
 import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
+import { serverChildrenConfig, ServerTreeInfo } from './items/ServerTreeInfo';
 import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
-import Radium = require('radium');
+const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 import FadeInOut from '../../common/components/FadeInOut';
@@ -82,6 +83,12 @@ const typeToRendering: {
     canSelect: boolean,
   },
 } = {
+    server:
+    {
+      component: ServerTreeInfo,
+      childConfig: serverChildrenConfig,
+      canSelect: false,
+    },
     database:
     {
       component: DatabaseTreeInfo,
@@ -300,7 +307,7 @@ class SchemaTreeItem extends PureClasss<Props>
         nameText = (
           <div>
             {
-              ['table', 'database'].map(
+              ['table', 'database', 'server'].map(
                 (type) =>
                 {
                   const id = item[type + 'Id'];
