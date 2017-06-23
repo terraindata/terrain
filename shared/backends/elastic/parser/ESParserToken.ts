@@ -57,6 +57,8 @@ export default class ESParserToken
   public charNumber: number; // number of chars into the source that this token begins
   public row: number; // row in which this token begins (rows start at 0)
   public col: number; // column in which this token begins (cols start at 0)
+  public toRow: number;
+  public toCol: number;
   public length: number; // token length in chars
   public substring: string; // token substring
 
@@ -73,6 +75,8 @@ export default class ESParserToken
     this.charNumber = charNumber;
     this.row = row;
     this.col = col;
+    this.toRow = row;
+    this.toCol = col;
     this.length = length;
     this.substring = substring;
     this.valueInfo = null;

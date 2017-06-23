@@ -44,54 +44,37 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESJSONParser from './ESJSONParser';
-import ESParserError from './ESParserError';
-import ESParserToken from './ESParserToken';
-import ESParserPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
+import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig'
 
-/**
- * An instrumented interpreter that takes the output of ESJSONParser and
- * decorates the results with ES-specific information.
- */
-export default class ESInterpreter
-{
-  public parser: ESJSONParser; // source parser
-  public config: EQLConfig; // query language description
+const eslintConfig = new EQLConfig();
 
-  /**
-   * Runs the interpreter on the given query string. Read needed data by calling the
-   * public member functions below. You can also pass in an existing ESJSONParser
-   * to run the interpreter on it's result.
-   * @param query the query string or parser to interpret
-   */
-  public constructor(query: string | ESJSONParser, config: EQLConfig)
-  {
-    this.config = config;
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
 
-    if (typeof query === 'string')
-    {
-      this.parser = new ESJSONParser(query);
-    } else
-    {
-      this.parser = query;
-    }
-
-    if (this.parser.getValue() !== null && this.parser.hasError() === false)
-    {
-      try
-      {
-        this.config.getClause('root').mark(this, this.parser.getValueInfo());
-      } catch (e)
-      {
-        this.accumulateError(this.parser.getValueInfo(), 'Failed to mark the json object ' + e.message);
+    CodeMirror.registerHelper("lint", "json", function(text) {
+      var found = [];
+      try {
+        //const t = new ESInterpreter(text, eslintConfig);
+        const t = new ESInterpreter(text, eslintConfig);
+        const errors = t.parser.errors;
+        for (let e of errors)
+        {
+          const token = e.token;
+          found.push({from: CodeMirror.Pos(token.row, token.col),
+            to: CodeMirror.Pos(token.toRow, token.toCol),
+            message: e.message});
+        }
+      } catch(e) {
+        console.log('Exception when parsing ' + text + " error: " + e);
       }
-    }
-  }
-
-  public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
-  {
-    this.parser.accumulateError(new ESParserError(info.tokens[0], message, isWarning));
-  }
-}
+      return found;
+  });
+});
