@@ -45,8 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
+
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 import { _block, Block, TQLFn } from '../../../blocks/types/Block';
@@ -55,22 +54,12 @@ import { Input, InputType } from '../../../blocks/types/Input';
 
 import Util from '../../../../src/app/util/Util';
 
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-
-const { make } = BlockUtils;
-
-import {
-  elasticArray,
-  elasticBool,
-  elasticKeyValueWrap,
-  elasticNull,
-  elasticNumber,
-  elasticObject,
-  elasticText,
-  elasticValue,
-} from './ElasticJSONBlocks';
+import { elasticArray, elasticBool, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
 import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
+
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+const { make } = BlockUtils;
 
 export const ElasticBlocks =
   {

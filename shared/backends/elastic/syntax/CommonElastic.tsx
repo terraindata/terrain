@@ -47,7 +47,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-const { List } = Immutable;
+
+import ESParser from '../parser/ESJSONParser';
 
 export const valueTypes =
   {
@@ -71,7 +72,7 @@ export const valueTypesDisplayNames =
     null: 'Null',
   };
 
-export const acceptsValues = List(
+export const acceptsValues = Immutable.List(
   ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull'],
 );
 
@@ -125,3 +126,33 @@ export const CombinatorTQL = {
   [Combinator.AND]: 'AND',
   [Combinator.OR]: 'OR',
 };
+
+export function parseESValue(value: any): any
+{
+  let v: any;
+  if (typeof value !== 'string')
+  {
+    value = JSON.stringify(value);
+  }
+
+  const parser: ESParser = new ESParser(value);
+  if (parser.getErrors().length > 0)
+  {
+    v = value;
+  }
+  else
+  {
+    v = parser.getValue();
+  }
+
+  // try
+  // {
+  //   v = JSON.parse(value);
+  // }
+  // catch (e)
+  // {
+  //   v = value;
+  // }
+
+  return v;
+}

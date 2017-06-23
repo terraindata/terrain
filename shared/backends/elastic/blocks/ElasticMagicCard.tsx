@@ -53,7 +53,6 @@ import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-import ESParser from '../parser/ESJSONParser';
 import * as CommonElastic from '../syntax/CommonElastic';
 
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
@@ -70,22 +69,7 @@ function parseValue(rawValue: any, tqlTranslationFn: TQLTranslationFn, tqlConfig
   }
   else
   {
-    // const parser: ESParser = new ESParser(rawValue);
-    // if (parser.getErrors().length > 0)
-    // {
-    //   value = rawValue;
-    // }
-    // else
-    // {
-    //   value = parser.getValue();
-    // }
-    try {
-      value = JSON.parse(rawValue);
-    }
-    catch (e)
-    {
-      value = rawValue;
-    }
+    value = CommonElastic.parseESValue(rawValue);
   }
   return value;
 }

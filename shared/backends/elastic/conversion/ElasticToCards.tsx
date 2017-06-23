@@ -56,8 +56,9 @@ import * as CommonElastic from '../syntax/CommonElastic';
 import BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
-const { make } = BlockUtils;
 import Blocks from '../blocks/ElasticBlocks';
+
+const { make } = BlockUtils;
 
 export default function ElasticToCards(
   query: Query,
@@ -150,32 +151,65 @@ const parseValueSingleCard = (value: any): Card =>
   }
 };
 
+const parseMagicArray = (arr: any[]): Card =>
+{
+  const values: Card[] = _.map(arr,
+    (v: any) =>
+    {
+      if (Array.isArray(v) && (v !== []))
+      {
+        v = parseMagicArray(v);
+      }
+      else if (typeof v === 'object' && (v !== null || v !== {}))
+      {
+        v = parseMagicObject(v).first();
+      }
+
+      const value = JSON.stringify(CommonElastic.parseESValue(v));
+      return make(Blocks.elasticMagicListItem, {
+        value,
+      });
+    },
+  );
+
+  return make(
+    Blocks.elasticMagicList,
+    {
+      values: Immutable.List(values),
+    },
+  );
+};
+
 const parseMagicObject = (obj: object): Cards =>
 {
+  if (obj === {} || obj === null)
+  {
+    return make(Blocks.elasticMagicValue, {
+      value: obj,
+    });
+  }
+
   const values: Card[] = _.map(obj,
-    (value: any, key: string) =>
+    (v: any, key: string) =>
     {
-      if (Array.isArray(value))
+      if (v === null || v === {})
       {
-        return make(Blocks.elasticMagicList, {
-          values: parseMagicObject(value),
-        });
+        v = v;
       }
-      else if (typeof value === 'object')
+      else if (Array.isArray(v) && (v !== []))
       {
-        const cards: Cards = parseMagicObject(value);
-        return make(Blocks.elasticMagicValue, {
-          key,
-          value: cards.first(),
-        });
+        v = parseMagicArray(v);
       }
-      else
+      else if (typeof v === 'object' && (v !== null || v !== {}))
       {
-        return make(Blocks.elasticMagicValue, {
-          key,
-          value,
-        });
+        v = parseMagicObject(v).first();
       }
+
+      const value = JSON.stringify(CommonElastic.parseESValue(v));
+      return make(Blocks.elasticMagicValue, {
+        key,
+        value,
+      });
     },
   );
 
