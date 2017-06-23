@@ -98,7 +98,6 @@ FileImportReducers[ActionTypes.uploadFile] =
         console.log(JSON.parse(ev));
         alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
       },
-      false,
     );
     return state;
   };

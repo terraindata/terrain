@@ -601,6 +601,7 @@ export const Ajax =
       db: BackendInstance,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string | MidwayError) => void,
+      sqlQuery?: boolean, // unused
       options: {
         streaming?: boolean,
         streamingTo?: string,
@@ -620,6 +621,7 @@ export const Ajax =
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
         onLoad(queryResult);
       };
+      const queryId = '' + Math.random();
       const xhr = Ajax.req(
         'post',
         'query/',
@@ -641,10 +643,8 @@ export const Ajax =
       table: string,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string) => void,
-      sqlQuery?: boolean, // unused
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const queryId = '' + Math.random();
       const payload: object = {
         dsn: 'http://127.0.0.1:9200',
         db,
@@ -669,7 +669,7 @@ export const Ajax =
         },
       );
 
-      return { queryId, xhr };
+      return;
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
