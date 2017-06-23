@@ -48,8 +48,6 @@ import * as _ from 'underscore';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
-import MidwayError from './../../../../shared/error/MidwayError';
-const moment = require('moment');
 
 const FileImportReducers = {}
 
@@ -61,29 +59,13 @@ FileImportReducers[ActionTypes.changeCluster] =
 
 FileImportReducers[ActionTypes.changeDbText] =
   (state, action) =>
-  {
-    if (action.payload.dbText)
-    {
-      return state.set('dbText', action.payload.dbText).set('dbSelected', true);
-    }
-    else
-    {
-      return state.set('dbText', action.payload.dbText).set('dbSelected', false);
-    }
-  };
+    state
+      .set('dbText', action.payload.dbText).set('dbSelected', !!action.payload.dbText);
 
 FileImportReducers[ActionTypes.changeTableText] =
   (state, action) =>
-  {
-    if (action.payload.tableText)
-    {
-      return state.set('tableText', action.payload.tableText).set('tableSelected', true);
-    }
-    else
-    {
-      return state.set('tableText', action.payload.tableText).set('tableSelected', false);
-    }
-  };
+    state
+      .set('tableText', action.payload.tableText).set('tableSelected', !!action.payload.tableText);
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
@@ -102,7 +84,7 @@ FileImportReducers[ActionTypes.unchooseFile] =
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
-    const { xhr, queryId } = Ajax.upload(
+    const { xhr, queryId } = Ajax.importFile(
       state.file,
       state.filetype,
       state.dbText,

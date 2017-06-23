@@ -598,14 +598,12 @@ export const Ajax =
       db: BackendInstance,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string | MidwayError) => void,
-      sqlQuery?: boolean, // unused
       options: {
         streaming?: boolean,
         streamingTo?: string,
       } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const queryId = '' + Math.random();
       const payload: QueryRequest = {
         type: 'search', // can be other things in the future
         database: db.id as number, // should be passed by caller
@@ -634,8 +632,7 @@ export const Ajax =
       return { queryId, xhr };
     },
 
-    /* FileImport */
-    upload(file: string,
+    importFile(file: string,
       filetype: string,
       db: string,
       table: string,
@@ -647,11 +644,11 @@ export const Ajax =
       const queryId = '' + Math.random();
       const payload: object = {
         dsn: 'http://127.0.0.1:9200',
-        db: db,
-        table: table,
+        db,
+        table,
         contents: file,
         dbtype: 'elastic',
-        filetype: filetype,
+        filetype,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>

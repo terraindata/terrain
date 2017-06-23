@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
 import ActionTypes from './FileImportActionTypes';
-import { _FileImportState, FileImportState, FileImportStore } from './FileImportStore';
+import { FileImportStore } from './FileImportStore';
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 

@@ -49,14 +49,9 @@ const { List } = Immutable;
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
-import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
-import FileImportTypes from './../FileImportTypes';
-import { FileImportState } from './../data/FileImportStore';
 import Autocomplete from './../../common/components/Autocomplete';
-import BuilderTextbox from './../../common/components/BuilderTextbox';
-import SchemaTypes from './../../schema/SchemaTypes'
 
 export interface Props
 {
@@ -86,14 +81,14 @@ class FileImportInfo extends PureClasss<Props>
     Actions.changeCluster(clusterIndex);
   }
 
-  public handleAutocompleteDbChange(event)
+  public handleAutocompleteDbChange(value)
   {
-    Actions.changeDbText(event);
+    Actions.changeDbText(value);
   }
 
-  public handleAutocompleteTableChange(event)
+  public handleAutocompleteTableChange(value)
   {
-    Actions.changeTableText(event);
+    Actions.changeTableText(value);
   }
 
   public handleChooseFile(file)

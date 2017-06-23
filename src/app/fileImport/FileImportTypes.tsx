@@ -56,6 +56,14 @@ export namespace FileImportTypes
   // This type represents the state of the FileImportStore
   class FileImportStateC extends BaseClass
   {
+    public clusterIndex: number = -1;
+    public dbText: string = "";
+    public tableText: string = "";
+    public file: string = "";
+    public filetype: string = "";
+    public fileChosen: boolean = false;
+    public dbSelected: boolean = false;
+    public tableSelected: boolean = false;
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
   //  This first line exports a type that you will actually use in other files.
