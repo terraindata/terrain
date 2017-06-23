@@ -49,9 +49,6 @@ import Util from './../../util/Util';
 import Actions from './FileImportActions';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
-import MidwayError from './../../../../shared/error/MidwayError';
-import MidwayQueryResponse from "../../../../shared/backends/types/MidwayQueryResponse";
-const moment = require('moment');
 
 const FileImportReducers = {}
 

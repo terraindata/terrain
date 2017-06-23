@@ -162,7 +162,6 @@ class FileImportInfo extends PureClasss<Props>
     // read and show preview
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
-    fr.
     fr.onloadend = () =>
     {
       console.log("File chosen contents: ", fr.result);

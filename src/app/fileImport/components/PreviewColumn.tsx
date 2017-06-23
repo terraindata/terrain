@@ -50,75 +50,63 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import { IColumn, Table } from './../../common/components/Table';
-import PreviewHeader from './PreviewHeader';
+import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
+import Dropdown from './../../common/components/Dropdown';
 
 export interface Props
 {
-  rowsCount: number;
-  columnsCount: number;
-  previewRows: object[];
+  datatypeIndex: number;
+  datatypes: List<string>;
+  canSelectDatatype: boolean;
+
+  columnText: string;
+  canSelectColumn: boolean;
+
+  columnSelected: boolean;
 }
 
-const DATATYPES = Immutable.List(['text', 'number', 'date']);
-
-class Preview extends Classs<Props>
+class PreviewColumn extends Classs<Props>
 {
-  public state: {
-    columnNames?: List<string>;
-    columnsCount?: number;
-  } = {
-  };
-
-  public getColumns(props: Props): List<IColumn>
+  public handleDatatypeChange()
   {
-    const { previewRows } = props;
-    const cols: IColumn[] = [];
 
-    let columnsCount = 0;
-    for (const property in previewRows[0])
-    {
-      columnsCount++;
-      if (previewRows[0].hasOwnProperty(property))
-      {
-        cols.push({
-          key: property,
-          name: property,
-        });
-      }
-    }
-    this.setState({
-      columnsCount: columnsCount,
-    });
-    return Immutable.List(cols);
   }
 
-  public getRow(i: number): Object
+  public handleAutocompleteHeaderChange()
   {
-    return this.props.previewRows[i];
+
+  }
+
+  public handleCheckChange()
+  {
+
   }
 
   public render()
   {
-    console.log("rowsCount: ", this.props.rowsCount);
-    console.log("rows: ", this.props.previewRows);
-    console.log("columns: ", this.getColumns(this.props));
     return (
       <div>
-        <PreviewHeader
-          columns={this.getColumns(this.props)}
-          columnsCount={this.props.columnsCount}
-          datatypes={DATATYPES}
+        <Dropdown
+          selectedIndex={this.props.datatypeIndex}
+          options={this.props.datatypes}
+          onChange={this.handleDatatypeChange}
+          canEdit={this.props.canSelectDatatype}
         />
-        <Table
-          columns={this.getColumns(this.props)}
-          rowGetter={this.getRow}
-          rowsCount={this.props.rowsCount}
-          rowKey={'id'}
+        <Autocomplete
+          value={this.props.columnText}
+          options={null}
+          onChange={this.handleAutocompleteHeaderChange}
+          placeholder={'database'}
+          disabled={!this.props.canSelectColumn}
+        />
+        <CheckBox
+          checked={true}
+          onChange={this.handleCheckChange}
         />
       </div>
     );
   }
 }
 
-export default Preview;
+export default PreviewColumn;

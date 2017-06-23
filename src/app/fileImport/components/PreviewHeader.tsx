@@ -50,75 +50,38 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import { IColumn, Table } from './../../common/components/Table';
-import PreviewHeader from './PreviewHeader';
+import PreviewColumn from './PreviewColumn';
+import { IColumn } from './../../common/components/Table';
 
 export interface Props
 {
-  rowsCount: number;
+  columns: List<IColumn>;
   columnsCount: number;
-  previewRows: object[];
+  datatypes: List<string>;
 }
 
-const DATATYPES = Immutable.List(['text', 'number', 'date']);
-
-class Preview extends Classs<Props>
+class PreviewHeader extends Classs<Props>
 {
-  public state: {
-    columnNames?: List<string>;
-    columnsCount?: number;
-  } = {
-  };
-
-  public getColumns(props: Props): List<IColumn>
-  {
-    const { previewRows } = props;
-    const cols: IColumn[] = [];
-
-    let columnsCount = 0;
-    for (const property in previewRows[0])
-    {
-      columnsCount++;
-      if (previewRows[0].hasOwnProperty(property))
-      {
-        cols.push({
-          key: property,
-          name: property,
-        });
-      }
-    }
-    this.setState({
-      columnsCount: columnsCount,
-    });
-    return Immutable.List(cols);
-  }
-
-  public getRow(i: number): Object
-  {
-    return this.props.previewRows[i];
-  }
-
   public render()
   {
-    console.log("rowsCount: ", this.props.rowsCount);
-    console.log("rows: ", this.props.previewRows);
-    console.log("columns: ", this.getColumns(this.props));
+    const previewCols = [];
+    for (let i = 0; i < this.props.columnsCount; i++)
+    {
+      previewCols.push(
+        <PreviewColumn
+          datatypeIndex={}
+          datatypes={this.props.datatypes}
+          canSelectDatatype={true}
+          columnText={}
+          canSelectColumn={true}
+          columnSelected={true}
+        />
+      )
+    }
     return (
-      <div>
-        <PreviewHeader
-          columns={this.getColumns(this.props)}
-          columnsCount={this.props.columnsCount}
-          datatypes={DATATYPES}
-        />
-        <Table
-          columns={this.getColumns(this.props)}
-          rowGetter={this.getRow}
-          rowsCount={this.props.rowsCount}
-          rowKey={'id'}
-        />
-      </div>
+      previewCols
     );
   }
 }
 
-export default Preview;
+export default PreviewHeader;
