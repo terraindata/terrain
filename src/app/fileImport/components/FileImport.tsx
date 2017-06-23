@@ -65,15 +65,17 @@ export interface Props
   route?: any;
 }
 
-const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
+// const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
 const FILETYPES = Immutable.List(['json', 'csv']);
 
 class FileImport extends PureClasss<any>
 {
   public state: {
     fileImportState: FileImportTypes.FileImportState;
-    dbs?: List<string>;
-    tables?: List<string>;
+    servers?: SchemaTypes.ServerMap;
+    serverNames?: List<string>;
+    dbNames?: List<string>;
+    tableNames?: List<string>;
   } = {
     fileImportState: FileImportStore.getState(),
   };
@@ -90,8 +92,10 @@ class FileImport extends PureClasss<any>
       updater: (schemaState: SchemaTypes.SchemaState) =>
       {
         this.setState({
-          dbs: this.getKeyListSafely(schemaState.databases),
-          tables: this.getKeyListSafely(schemaState.tables),
+          servers: schemaState.servers,
+          serverNames: this.getKeyListSafely(schemaState.servers),
+          dbNames: this.getKeyListSafely(schemaState.databases),
+          tableNames: this.getKeyListSafely(schemaState.tables),
         });
       }
     });
@@ -109,22 +113,24 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen } = fileImportState;
+    const { serverSelected, serverIndex, dbText, tableText, dbSelected, tableSelected, fileChosen } = fileImportState;
 
     return (
       <div>
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
-            canSelectCluster={true}
-            clusterIndex={clusterIndex}
-            clusters={CLUSTERS}
+            canSelectServer={true}
+            servers={this.state.servers}
+            serverNames={this.state.serverNames}
+            serverIndex={serverIndex}
+            serverSelected={serverSelected}
             canSelectDb={true}
-            dbs={this.state.dbs}
+            dbs={this.state.dbNames}
             dbText={dbText}
             dbSelected={dbSelected}
             canSelectTable={true}
-            tables={this.state.tables}
+            tables={this.state.tableNames}
             tableText={tableText}
             tableSelected={tableSelected}
             canImport={true}

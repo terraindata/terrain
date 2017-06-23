@@ -51,9 +51,9 @@ const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, paylo
 
 const FileImportActions =
   {
-    changeCluster:
-    (clusterIndex: number) =>
-      $(ActionTypes.changeCluster, { clusterIndex }),
+    changeServer:
+    (serverIndex: number, connectionId: number) =>
+      $(ActionTypes.changeServer, { serverIndex, connectionId }),
 
     changeDbText:
     (dbText: string) =>

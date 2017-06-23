@@ -49,7 +49,7 @@ import Util from './../../util/Util';
 
 const FileImportActionTypes =
   {
-    changeCluster: '',
+    changeServer: '',
     changeDbText: '',
     changeTableText: '',
     chooseFile: '',
