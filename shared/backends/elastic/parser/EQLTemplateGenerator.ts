@@ -44,17 +44,79 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-enum ESJSONType
-{
-  invalid,
-  unknown,
-  null,
-  boolean,
-  number,
-  string,
-  array,
-  object,
-  parameter,
-}
+import ESValueInfo from './ESValueInfo';
+import ESJSONType from './ESJSONType';
+import ESPropertyInfo from './ESPropertyInfo';
 
-export default ESJSONType;
+export default class EQLTemplateGenerator
+{
+  private result: string;
+
+  public static generate(source: ESValueInfo): string
+  {
+    return (new EQLTemplateGenerator(source)).result;
+  }
+
+  public constructor(source: ESValueInfo)
+  {
+    this.result = '';
+    this.convert(source);
+  }
+
+  public convert(source: ESValueInfo): void
+  {
+    let i: number = 0;
+
+    switch (source.jsonType)
+    {
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+      case ESJSONType.string:
+        this.result += JSON.stringify(source.value);
+        break;
+
+      case ESJSONType.parameter:
+        this.result += '{{#toJson}}' + source.value.name + '{{/toJson}}';
+        break;
+
+      case ESJSONType.array:
+        this.result += '[';
+        source.arrayChildren.forEach(
+          (child: ESValueInfo): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            this.convert(child);
+          });
+        this.result += ']';
+        break;
+
+      case ESJSONType.object:
+        this.result += ' { '; // extra spaces to avoid confusion with mustache tags
+
+        Object.keys(source.objectChildren).forEach(
+          (name: string): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            const kvp: ESPropertyInfo = source.objectChildren[name];
+            this.convert(kvp.propertyName);
+            this.result += ':';
+            this.convert(kvp.propertyValue);
+          });
+
+        this.result += ' } '; // extra spaces to avoid confusion with mustache tags
+        break;
+
+      default:
+        throw new Error('Unconvertable value type found: ' + source.jsonType);
+    }
+  }
+}
