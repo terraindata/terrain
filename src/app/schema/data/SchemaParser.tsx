@@ -64,6 +64,7 @@ export namespace SchemaParser
   {
     let server: Server = SchemaTypes._Server({
       name: 'Other MySQL Databases',
+      connectionId: -1,
     });
     const serverId = server.id;
 
@@ -171,6 +172,7 @@ export namespace SchemaParser
   {
     let server = SchemaTypes._Server({
       name: rawServer['name'],
+      connectionId: rawServer['id'],
     });
     const serverId = server.id;
 
@@ -266,6 +268,7 @@ export namespace SchemaParser
   {
     let server = SchemaTypes._Server({
       name: elasticServer['name'],
+      connectionId: elasticServer['id'],
     });
     const serverId = server.id;
 
