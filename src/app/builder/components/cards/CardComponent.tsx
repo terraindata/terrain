@@ -72,7 +72,7 @@ import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
 import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
-const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
+const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
@@ -544,9 +544,7 @@ class _CardComponent extends PureClasss<Props>
                   'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
                   'card-title-card-hovering': this.state.hovering,
                 })}
-                style={{
-                  background: card.static.colors[0],
-                }}
+                
                 onClick={this.handleTitleClick}
               >
                 {
@@ -557,9 +555,14 @@ class _CardComponent extends PureClasss<Props>
                 }
                 {
                   this.state.hovering &&
-                  <ArrowIcon className='card-arrow-icon' onClick={this.toggleClose} />
+                  <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
                 }
-                <div className='card-title-inner'>
+                <div
+                  className='card-title-inner'
+                  style={{
+                    background: card.static.colors[0],
+                  }}
+                >
                   {
                     title
                   }

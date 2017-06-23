@@ -128,10 +128,6 @@
       fill: #fff;
     }
   }
-  
-  .card-handle-icon {
-    width: 10px;
-  }
 }
 
 .card-title {
@@ -154,15 +150,21 @@
   
   .card-title-inner {
     white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 6px;
+    
+    position: absolute;
+    top: 7px;
+    left: 37px;
   }
 
-  .card-arrow-icon {
+  .card-minimize-icon {
     display: inline-block;
     fill: rgba(255,255,255,0.5);
     width: 10px;
     position: absolute;
-    top: 8px;
-    left: 5px;
+    top: 11px;
+    left: 21px;
     .transition;
     opacity: 0;
     
@@ -171,20 +173,37 @@
     }
   }
   
+  .card-handle-icon {
+    .transition;
+    .rotate90;
+    width: 20px;
+    fill: rgba(255,255,255,0.5);
+    &:hover {
+      fill: rgba(255,255,255,0.75);
+    }
+    &:active {
+      fill: #fff;
+    }
+    
+    position: absolute;
+    top: 8px;
+    left: 2px;
+  }
+  
   &.card-title-closed {
     width: calc(~"100% - 1px");
     padding-right: 20px;
     border-radius: calc(@card-border-radius - 1px);
-    .card-arrow-icon {
+    .card-minimize-icon {
       .rotate(-90deg);
-      top: 11px;
+      top: 13px;
       opacity: 1;
-      left: 2px;
+      left: 18px;
     }
   }
   
   &.card-title-card-hovering {
-    .card-arrow-icon {
+    .card-minimize-icon {
       opacity: 1;
     }
   }
