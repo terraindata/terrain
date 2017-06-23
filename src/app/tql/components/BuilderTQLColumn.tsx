@@ -73,6 +73,7 @@ export interface Props
   params?: any;
   addColumn?: (number, string?) => void;
   columnIndex: number;
+  language: string;
 }
 
 class BuilderTQLColumn extends PureClasss<Props>
@@ -403,7 +404,7 @@ class BuilderTQLColumn extends PureClasss<Props>
         >
           <TQLEditor
             tql={this.state.tql}
-            language={this.props.query.language}
+            language={this.props.language}
             canEdit={this.props.canEdit}
             theme={this.state.theme}
 
