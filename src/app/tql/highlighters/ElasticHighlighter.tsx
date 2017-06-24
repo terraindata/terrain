@@ -49,7 +49,7 @@ import ESParserToken from '../../../../shared/backends/elastic/parser/ESParserTo
 import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
-type TextCoordinates = [{ line: number, ch: number }, { line: number, ch: number }];
+// type TextCoordinates = [{ line: number, ch: number }, { line: number, ch: number }];
 
 class ElasticHighlighter extends SyntaxHighlighter
 {
@@ -73,14 +73,10 @@ class ElasticHighlighter extends SyntaxHighlighter
     const tokens: ESParserToken[] = parser.getTokens();
     for (let i = 0; i < tokens.length; i++)
     {
-      if (i !== 1)
-      {
-        continue;
-      }
       if (tokens[i].valueInfo)
       {
         const valueInfo: ESValueInfo = tokens[i].valueInfo;
-        let style: string = 'cm-number';
+        let style: string = '';
         switch (valueInfo.jsonType)
         {
           case ESJSONType.invalid:
@@ -99,19 +95,22 @@ class ElasticHighlighter extends SyntaxHighlighter
             style = 'cm-bracket';
             break;
           case ESJSONType.parameter:
-            style = 'cm-meta';
+            style = 'cm-variable-2';
             break;
         }
-        const coords: TextCoordinates = this.getTokenCoordinates(tokens[i]);
+        const coords = this.getTokenCoordinates(tokens[i]);
         const marker = instance.markText(coords[0], coords[1], { className: style });
+        // console.log(valueInfo.jsonType);
+        // console.log(coords[0]);
+        // console.log(coords[1]);
         // tslint:disable-next-line no-console
         // console.log([coords[0], coords[1], {className: style}]);
-        console.log(style);
-        console.log(marker);
+        // console.log(style);
+        // console.log(marker);
         this.markers.push(marker);
       }
     }
-    console.log(instance);
+    // console.log(instance);
   }
 
   protected clearMarkers(): void
@@ -123,20 +122,23 @@ class ElasticHighlighter extends SyntaxHighlighter
     this.markers = [];
   }
 
-  protected getTokenCoordinates(token: ESParserToken): TextCoordinates
+  protected getTokenCoordinates(token: ESParserToken)// : TextCoordinates
   {
     const row0 = token.row;
-    const col0 = token.col;
-    const lines = token.substring.replace('\r', '').replace('\n', '').split('\n');
+    const col0 = token.col - 1;
+    // console.log('--------------------');
+    // console.log(token.col);
+    // console.log(token.length);
+    const lines = token.substring.replace('', '').split('\n');
     const row1 = row0 + lines.length - 1;
     const col1 = lines.length === 1 ? col0 + token.length : lines[lines.length - 1].length;
     // tslint:disable-next-line no-console
-    console.log('-------------------');
+    // console.log('-------------------');
     // console.log(token.substring);
-    console.log(lines);
-    console.log(row0, col0);
-    console.log(row1, col1);
-    return [{ line: row0, ch: col1 }, { line: row1, ch: col1 }];
+    // console.log(lines);
+    // console.log(row0, col0);
+    // console.log(row1, col1);
+    return [{ line: row0, ch: col0 }, { line: row1, ch: col1 }];
   }
 }
 export default ElasticHighlighter;

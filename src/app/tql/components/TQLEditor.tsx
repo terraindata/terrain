@@ -90,7 +90,7 @@ export interface Props
   language?: string;
   canEdit: boolean;
 
-  language?: string;
+  // language?: string;
   theme?: string;
   highlightedLine?: number;
 
@@ -133,7 +133,7 @@ class TQLEditor extends PureClasss<Props>
 
     if (this.props.language === 'elastic')
     {
-      options['mode'] = 'application/json';
+      // options['mode'] = 'application/json';
     }
 
     if (this.props.isDiff)
@@ -186,7 +186,10 @@ class TQLEditor extends PureClasss<Props>
       // tslint:disable-next-line no-console
       console.log(this.props.language);
     }
-    cmInstance.on("changes", this.highlighter.handleChanges.bind(this.highlighter));
+    if (this.highlighter)
+    {
+      cmInstance.on("changes", this.highlighter.handleChanges.bind(this.highlighter));
+    }
   }
 }
 
