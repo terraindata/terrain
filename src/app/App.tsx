@@ -144,7 +144,7 @@ const links =
       route: '/schema',
     },
     {
-      icon: <ReportingIcon />,
+      icon: <ReportingIcon />,    // need new icon
       text: 'Import',
       route: '/import',
     },

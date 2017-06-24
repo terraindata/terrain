@@ -46,7 +46,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 const { List } = Immutable;
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
 import Util from './../../util/Util';
@@ -116,7 +115,6 @@ class FileImportInfo extends PureClasss<Props>
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      // const obj = JSON.parse(saveFile);
       console.log("contents: ", fr.result);
       Actions.chooseFile(fr.result, filetype);
     }

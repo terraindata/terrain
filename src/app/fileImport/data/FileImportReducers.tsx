@@ -86,13 +86,13 @@ FileImportReducers[ActionTypes.unchooseFile] =
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
-    const { xhr, queryId } = Ajax.importFile(
+    Ajax.importFile(
       state.file,
       state.filetype,
       state.dbText,
       state.tableText,
       state.connectionId,
-      (ev) =>
+      () =>
       {
         alert("success");
       },
