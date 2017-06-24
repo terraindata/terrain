@@ -723,7 +723,6 @@ describe('File import route tests', () =>
           contents: '[{"pkey":1,"column1":"hello","column2":"goodbye"}]',
           filetype: 'json',
 
-          csvHeaderMissing: false,
           columnMap:
           {
             pkey: 'pkey',
@@ -827,7 +826,6 @@ describe('File import route tests', () =>
           contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           filetype: 'json',
 
-          csvHeaderMissing: false,
           columnMap:
           {
             pkey: 'pkey',

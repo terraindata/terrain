@@ -49,7 +49,6 @@ import * as hashObject from 'hash-object';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
-import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
@@ -62,11 +61,11 @@ export interface ImportConfig
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
 
-  csvHeaderMissing: boolean;    // TODO: should be optional
+  csvHeaderMissing?: boolean;    // default: false
   // columnMap: Map<string, string> | string[];             // oldName to newName
-  columnMap: object;    // either object mapping string to string, or an array of strings
+  columnMap: object | string[];    // either object mapping string to string, or an array of strings
   // columnsToInclude: Map<string, boolean> | boolean[];
-  columnsToInclude: object;   // either object mapping string to boolean, or an array of booleans
+  columnsToInclude: object | boolean[];   // either object mapping string to boolean, or an array of booleans
   // columnTypes: Map<string, string> | string[];        // oldName to number/text/boolean/object/date
   primaryKey: string;  // newName of primary key
 }
@@ -77,25 +76,10 @@ export class Import
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
-      if (imprt.db === '' || imprt.table === '')
+      const configError: string = this._verifyConfig(imprt);
+      if (configError !== '')
       {
-        return reject('Index name and document type cannot be empty strings.');
-      }
-      if (imprt.db !== imprt.db.toLowerCase())
-      {
-        return reject('Index name may not contain uppercase letters.');
-      }
-      if (!/^[a-z\d].*$/.test(imprt.db))
-      {
-        return reject('Index name must start with a lowercase letter or digit.');
-      }
-      if (!/^[a-z\d][a-z\d\._\+-]*$/.test(imprt.db))
-      {
-        return reject('Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.');
-      }
-      if (/^_.*/.test(imprt.table))
-      {
-        return reject('Document type may not start with an underscore.');
+        return reject(configError);
       }
 
       let items: object[];
@@ -110,7 +94,7 @@ export class Import
       {
         return reject('No data provided in file to upload.');
       }
-      const columns: string[] = this._getArrayFromMap(imprt.columnMap);
+      const columns: string[] = this._getArrayFromMap(imprt.columnMap) as string[];
 
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
@@ -131,6 +115,84 @@ export class Import
 
       resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
     });
+  }
+
+  // TODO: move into shared Util file
+  /* returns an error message if there are any; else returns empty string */
+  private _isValidIndexName(name: string): string
+  {
+    if (name === '')
+    {
+      return 'Index name cannot be an empty string.';
+    }
+    if (name !== name.toLowerCase())
+    {
+      return 'Index name may not contain uppercase letters.';
+    }
+    if (!/^[a-z\d].*$/.test(name))
+    {
+      return 'Index name must start with a lowercase letter or digit.';
+    }
+    if (!/^[a-z\d][a-z\d\._\+-]*$/.test(name))
+    {
+      return 'Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.';
+    }
+    return '';
+  }
+  /* returns an error message if there are any; else returns empty string */
+  private _isValidTypeName(name: string): string
+  {
+    if (name === '')
+    {
+      return 'Document type cannot be an empty string.';
+    }
+    if (/^_.*/.test(name))
+    {
+      return 'Document type may not start with an underscore.';
+    }
+    return '';
+  }
+
+  /* returns an error message if there are any; else returns empty string */
+  private _verifyConfig(imprt: ImportConfig): string
+  {
+    const indexError: string = this._isValidIndexName(imprt.db);
+    if (indexError !== '')
+    {
+      return indexError;
+    }
+    const typeError: string = this._isValidTypeName(imprt.table);
+    if (typeError !== '')
+    {
+      return typeError;
+    }
+
+    if (imprt.filetype !== 'csv' || imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
+    {
+      imprt.csvHeaderMissing = false;
+      const cmNames: string = JSON.stringify(Object.keys(imprt.columnMap).sort());
+      const ctiNames: string = JSON.stringify(Object.keys(imprt.columnsToInclude).sort());
+      if (cmNames !== ctiNames)
+      {
+        return 'List of names in columnMap and columnsToInclude do not match.';
+      }
+    } else
+    {
+      if (!Array.isArray(imprt.columnMap) || !Array.isArray(imprt.columnsToInclude))
+      {
+        return 'When uploading a headerless CSV, columnMap and columnsToInclude should be arrays.';
+      }
+      if (imprt.columnMap.length !== imprt.columnsToInclude.length)
+      {
+        return 'Lengths of columnMap and columnsToInclude do not match.';
+      }
+    }
+    const columns: string[] = this._getArrayFromMap(imprt.columnMap) as string[];
+    if (columns.indexOf(imprt.primaryKey) === -1)
+    {
+      return 'A column to be uploaded must be specified as the primary key.';
+    }
+    return '';
   }
 
   private async _parseData(imprt: ImportConfig): Promise<object[]>
@@ -193,7 +255,7 @@ export class Import
         }
       } else if (imprt.filetype === 'csv')
       {
-        const includeColumns: boolean[] = this._getArrayFromMap(imprt.columnsToInclude);
+        const includeColumns: boolean[] = this._getArrayFromMap(imprt.columnsToInclude) as boolean[];
         const columnIndicesToInclude: number[] = includeColumns.reduce((res, val, ind) =>
         {
           if (val)
@@ -222,13 +284,12 @@ export class Import
     });
   }
 
-  // TODO: how to make this generic but support both string[] and boolean[] output?
-  private _getArrayFromMap(mapOrArray: object): any[]
+  private _getArrayFromMap(mapOrArray: object): string[] | boolean[]
   {
-    let array: any[];
+    let array: string[] | boolean[];
     if (Array.isArray(mapOrArray))
     {
-      array = mapOrArray;
+      return array = mapOrArray;
     } else
     {
       array = Object.keys(mapOrArray).map((key) => mapOrArray[key]);
