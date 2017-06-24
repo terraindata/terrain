@@ -77,6 +77,7 @@ export namespace CommonBlocks
     singleChild?: boolean;
     isAggregate?: boolean;
     language: string;
+    init?: () => any,
   }
 
   export const _wrapperCard = (config: IWrapperCardConfig) =>
@@ -116,6 +117,8 @@ export namespace CommonBlocks
 
         tql: config.tql,
         tqlGlue: config.tqlGlue,
+        
+        init: config.init,
       },
     });
   };
