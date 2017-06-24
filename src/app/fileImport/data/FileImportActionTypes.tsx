@@ -56,6 +56,9 @@ const FileImportActionTypes =
     unchooseFile: '',
     uploadFile: '',
     previewFile: '',
+    // setMapDatatype: '',
+    // setMapName: '',
+    setMapCheck: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

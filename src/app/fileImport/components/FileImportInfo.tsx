@@ -57,6 +57,7 @@ import Actions from './../data/FileImportActions';
 import FileImportTypes from './../FileImportTypes';
 import { FileImportState } from './../data/FileImportStore';
 import Autocomplete from './../../common/components/Autocomplete';
+import Preview from "./Preview";
 
 export interface Props
 {
@@ -166,10 +167,18 @@ class FileImportInfo extends PureClasss<Props>
     {
       console.log("File chosen contents: ", fr.result);
       const preview = this.parseData(fr.result, filetype);
-
       console.log("Parsed preview: ", preview);
+
+      const previewMaps = [];
+      const map = FileImportTypes._PreviewMap();
+
+      for (let i = 0; i < preview.length; i++)
+      {
+        previewMaps.push(map);
+      }
+
       Actions.chooseFile(fr.result, filetype);
-      Actions.previewFile(preview);
+      Actions.previewFile(preview, List(previewMaps));
     }
   }
 

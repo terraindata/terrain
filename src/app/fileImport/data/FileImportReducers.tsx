@@ -106,25 +106,17 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.filetype,
       state.dbText,
       state.tableText,
+      state.columnMap,
+      state.columnsToInclude,
+      state.columnTypes,
       (resp: object[]) =>
       {
-        // console.log(resp);
-        // const preview = [];
-        // for (let i = 0; i < 2; i++)
-        // {
-        //   preview.push(resp[i]);
-        // }
-        // console.log("preview :", preview);
-
         alert("success");
-        // return state.set('previewRows', preview);
-        // Actions.previewFile(preview);
       },
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
       },
-      false,
     );
     return state;
   };
@@ -134,5 +126,12 @@ FileImportReducers[ActionTypes.previewFile] =
   {
     return state.set('previewRows', action.payload.preview);
   };
+
+FileImportReducers[ActionTypes.setMapCheck] =
+  (state, action) =>
+    state.setIn(
+      ['previewMaps', action.payload.previewMap.id],
+      action.payload.previewMap,
+    );
 
 export default FileImportReducers;

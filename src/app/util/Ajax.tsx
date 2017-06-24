@@ -639,19 +639,23 @@ export const Ajax =
       filetype: string,
       db: string,
       table: string,
+      columnMap: Map<string, string> | List<string>,
+      columnsToInclude: Map<string, boolean> | List<boolean>,
+      columnTypes: Map<string, string> | List<string>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      sqlQuery?: boolean, // unused
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const queryId = '' + Math.random();
       const payload: object = {
         dsn: 'http://127.0.0.1:9200',
-        db: db,
-        table: table,
+        db,
+        table,
         contents: file,
         dbtype: 'elastic',
-        filetype: filetype,
+        filetype,
+        columnMap,
+        columnsToInclude,
+        columnTypes,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>
@@ -669,7 +673,7 @@ export const Ajax =
         },
       );
 
-      return { queryId, xhr };
+      return;
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)

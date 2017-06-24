@@ -118,7 +118,7 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen, previewRows } = fileImportState;
+    const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen, previewRows, previewMaps } = fileImportState;
 
     return (
       <div className="fileImport">
@@ -146,6 +146,7 @@ class FileImport extends PureClasss<any>
             <Preview
               rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
               previewRows={previewRows}
+              previewMaps={null}
             />
           </div>
         }

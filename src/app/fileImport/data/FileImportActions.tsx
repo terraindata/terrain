@@ -46,6 +46,8 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import ActionTypes from './FileImportActionTypes';
 import { _FileImportState, FileImportState, FileImportStore } from './FileImportStore';
+import FileImportTypes from '../FileImportTypes';
+type PreviewMap = FileImportTypes.PreviewMap;
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
@@ -76,8 +78,20 @@ const FileImportActions =
       $(ActionTypes.uploadFile, {}),
 
     previewFile:
-    (preview: object) =>
-      $(ActionTypes.previewFile, { preview }),
+    (preview: object, previewMaps: List<PreviewMap>) =>
+      $(ActionTypes.previewFile, { preview, previewMaps }),
+
+    // setMapDatatype:
+    // (previewMap: PreviewMap) =>
+    //   $(ActionTypes.setMapDatatype, { previewMap }),
+    //
+    // setMapName:
+    // (previewMap: PreviewMap) =>
+    //   $(ActionTypes.setMapName, { previewMap }),
+
+    setMapCheck:
+    (previewMap: PreviewMap) =>
+      $(ActionTypes.setMapCheck, { previewMap }),
   };
 
 export default FileImportActions;

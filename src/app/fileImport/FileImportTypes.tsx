@@ -67,6 +67,19 @@ export namespace FileImportTypes
   //   and you can't use `new` simply with Immutable Records.
   export const _FileImportState = (config?: { [key: string]: any }) =>
     New<FileImportState>(new FileImportStateC(config), config);
+
+  class PreviewMapC
+  {
+    // public datatypeIndex = -1;
+    // public columnName = '';
+    public isChosen = true;
+  }
+  const PreviewMap_Record = Immutable.Record(new PreviewMapC());
+  export interface PreviewMap extends PreviewMapC, IRecord<PreviewMap> { }
+  export const _PreviewMap = (config?: any) =>
+  {
+    return new PreviewMap_Record(config) as any as PreviewMap;
+  };
 }
 
 export default FileImportTypes;

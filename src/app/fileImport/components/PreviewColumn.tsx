@@ -53,55 +53,62 @@ import Classs from './../../common/components/Classs';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import FileImportTypes from '../FileImportTypes';
+import Actions from './../data/FileImportActions';
+
+type PreviewMap = FileImportTypes.PreviewMap;
 
 export interface Props
 {
-  datatypeIndex: number;
+  id: number;
+  previewMaps: List<PreviewMap>;
+
   datatypes: List<string>;
   canSelectDatatype: boolean;
-
-  columnText: string;
   canSelectColumn: boolean;
-
-  columnSelected: boolean;
 }
 
 class PreviewColumn extends Classs<Props>
 {
-  public handleDatatypeChange()
-  {
-
-  }
-
-  public handleAutocompleteHeaderChange()
-  {
-
-  }
+  // public handleDatatypeChange(value)
+  // {
+  //   Actions.setMapDatatype(
+  //     this.props.previewMap
+  //   );
+  // }
+  //
+  // public handleAutocompleteHeaderChange(value)
+  // {
+  //   Actions.setMapName(id, value);
+  // }
+// <Dropdown
+// selectedIndex={this.props.previewMap.datatypeIndex}
+// options={this.props.datatypes}
+// onChange={this.handleDatatypeChange}
+// canEdit={this.props.canSelectDatatype}
+// />
+// <Autocomplete
+//   value={this.props.previewMap.columnName}
+// options={null}
+// onChange={this.handleAutocompleteHeaderChange}
+// placeholder={'column name'}
+// disabled={!this.props.canSelectColumn}
+// />
 
   public handleCheckChange()
   {
-
+    Actions.setMapCheck(
+      this.props.previewMaps.get(this.props.id)
+        .set('isChosen', false) as PreviewMap,
+    );
   }
 
   public render()
   {
     return (
       <div>
-        <Dropdown
-          selectedIndex={this.props.datatypeIndex}
-          options={this.props.datatypes}
-          onChange={this.handleDatatypeChange}
-          canEdit={this.props.canSelectDatatype}
-        />
-        <Autocomplete
-          value={this.props.columnText}
-          options={null}
-          onChange={this.handleAutocompleteHeaderChange}
-          placeholder={'database'}
-          disabled={!this.props.canSelectColumn}
-        />
         <CheckBox
-          checked={true}
+          checked={this.props.previewMaps.get(this.props.id).isChosen}
           onChange={this.handleCheckChange}
         />
       </div>
