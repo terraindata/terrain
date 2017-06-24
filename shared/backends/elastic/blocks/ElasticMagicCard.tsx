@@ -62,7 +62,6 @@ const { make } = BlockUtils;
 function parseValue(rawValue: any, tqlTranslationFn: TQLTranslationFn, tqlConfig: object): any
 {
   let value: any;
-
   if (rawValue._isBlock)
   {
     value = tqlTranslationFn(rawValue, tqlConfig);
@@ -101,6 +100,38 @@ export const elasticMagicListItem = _block({
   },
 });
 
+function previewList(card: Card, depth: number = 0): string
+{
+  let str: string = '';
+  const len: number = Math.min(card['values'].size, 3 - depth);
+  for (let i = 0; i < len; ++i)
+  {
+    const block: Block = card['values'].get(i);
+    const value = block['value'];
+    if (value._isBlock)
+    {
+      str += '[' + previewList(value, depth + 1) + ']';
+    }
+    else
+    {
+      str += value;
+    }
+
+    if (i !== len - 1)
+    {
+      str += ', ';
+    }
+    else
+    {
+      if (i < card['values'].size - 1)
+      {
+        str += ', ...';
+      }
+    }
+  }
+  return str;
+}
+
 const accepts = List(['elasticMagicCard', 'elasticMagicList']);
 
 export const elasticMagicList = _card(
@@ -111,20 +142,7 @@ export const elasticMagicList = _card(
       language: 'elastic',
       title: 'List',
       colors: ['#3a91a6', '#a1eafb'],
-      preview: (c: Card) =>
-      {
-        let str: string = '';
-        const len: number = Math.max(c['values'].length, 3);
-        for (let i = 0; i < len; ++i)
-        {
-          str += c['values'].get(i);
-          if (i !== len - 1)
-          {
-            str += ',';
-          }
-        }
-        return str;
-      },
+      preview: previewList,
 
       accepts,
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
