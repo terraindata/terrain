@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Immutable from 'immutable';
+
 import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';

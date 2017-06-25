@@ -167,20 +167,26 @@ export default class ESStructureClause extends ESClause
         );
         
         return {
-          cards: Immutable.List(cards);
+          cards: Immutable.List(cards),
         };
       }
     }
-    const init = initMap && () =>
-    {
-      return _.mapObject(initMap, (initFn) => initFn());
-    }
     
-    return _wrapperCard({
-      color: [],
+    return CommonBlocks._wrapperCard({
+      colors: [],
       title: this.type,
       language: 'elastic',
-      tql: (boolBlock) => !! boolBlock['value'],
+      tql: (block, tqlTranslationFn, tqlConfig) => {
+        let json: object = {};
+        block['cards'].map(
+          (card) =>
+          {
+            _.extend(json, {
+              [card.type.substr(3)]: tqlTranslationFn(card, tqlConfig),
+            });
+          }
+        );
+      },
       
       accepts,
       init,
