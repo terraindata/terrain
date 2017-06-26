@@ -61,22 +61,22 @@ const TEXT =
   {
     live:
     {
-      main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, and it will be accessible for production queries.',
-      confirm: 'I approve of deploying this TQL to Live for this variant.',
+      main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
+      confirm: 'I approve of deploying this query to Live for this variant.',
       button: 'Deploy to Live',
     },
 
     default:
     {
-      main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, it will be indexed, and it will be accessible for production queries.',
-      confirm: 'I approve of deploying this TQL to Live for this variant, and making it the Default for this algorithm.',
+      main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
+      confirm: 'I approve of deploying this query to Live for this variant, and making it the Default for this algorithm.',
       button: 'Deploy to Live and Make Default',
     },
 
     notLive:
     {
-      main: 'You are removing the following variant from Live. Its TQL will be removed from production servers, and it will not be accessible for production queries.',
-      confirm: 'I approve of removing this TQL from Live for this variant.',
+      main: 'You are removing the following variant from Live. The variant query will be removed from the database servers.',
+      confirm: 'I approve of removing this query from Live for this variant.',
       button: 'Remove from Live',
     },
   };
