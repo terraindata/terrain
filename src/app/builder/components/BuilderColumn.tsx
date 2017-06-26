@@ -247,6 +247,7 @@ const BuilderColumn = React.createClass<any, any>(
             query={query}
             variant={this.props.variant}
             resultsState={this.props.resultsState}
+            language={this.props.language}
           />;
 
         case COLUMNS.Schema:
