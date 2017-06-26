@@ -72,9 +72,9 @@ export namespace FileImportTypes
     public previewRows: object[] = null;
     public columnsCount: number = 0;
 
-    public columnsToInclude: List<boolean> = null;
-    public columnNames: List<string> = null;
-    public columnDatatypes: List<number> = null;
+    public columnsToInclude: Map<string, boolean> = null;
+    public columnNames: Map<string, string> = null;
+    public columnTypes: Map<string, number> = null;
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
   //  This first line exports a type that you will actually use in other files.

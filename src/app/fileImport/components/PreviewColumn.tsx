@@ -59,22 +59,22 @@ import './PreviewColumn.less';
 
 export interface Props
 {
-  id: number;
-  isChecked: boolean;
-  columnName: string;
-  datatypeIndex: number;
-  // previewMaps: List<PreviewMap>;
+  key: string;
+  id: string;
+  isIncluded: boolean;
+  name: string;
+  typeIndex: number;
 
-  datatypes: List<string>;
-  canSelectDatatype: boolean;
+  types: List<string>;
+  canSelectType: boolean;
   canSelectColumn: boolean;
 }
 
 class PreviewColumn extends Classs<Props>
 {
-  public handleDatatypeChange(datatypeIndex)
+  public handleIncludedChange()
   {
-    Actions.setMapDatatype(this.props.id, datatypeIndex);
+    Actions.setMapIncluded(this.props.id);
   }
 
   public handleAutocompleteHeaderChange(value)
@@ -82,9 +82,9 @@ class PreviewColumn extends Classs<Props>
     Actions.setMapName(this.props.id, value);
   }
 
-  public handleCheckChange()
+  public handleTypeChange(typeIndex)
   {
-    Actions.setMapCheck(this.props.id);
+    Actions.setMapType(this.props.id, typeIndex);
   }
 
   public render()
@@ -92,21 +92,21 @@ class PreviewColumn extends Classs<Props>
     return (
       <div className="preview-column">
         <CheckBox
-          checked={this.props.isChecked}
-          onChange={this.handleCheckChange}
+          checked={this.props.isIncluded}
+          onChange={this.handleIncludedChange}
         />
         <Autocomplete
-          value={this.props.columnName}
+          value={this.props.name}
           options={null}
           onChange={this.handleAutocompleteHeaderChange}
-          placeholder={'column name'}
+          placeholder={this.props.id}
           disabled={!this.props.canSelectColumn}
         />
         <Dropdown
-          selectedIndex={this.props.datatypeIndex}
-          options={this.props.datatypes}
-          onChange={this.handleDatatypeChange}
-          canEdit={this.props.canSelectDatatype}
+          selectedIndex={this.props.typeIndex}
+          options={this.props.types}
+          onChange={this.handleTypeChange}
+          canEdit={this.props.canSelectType}
         />
       </div>
     );

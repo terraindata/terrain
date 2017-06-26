@@ -50,7 +50,7 @@ import Actions from './FileImportActions';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
 // import * as hashObject from 'hash-object';
-const { List } = Immutable;
+const { List, Map } = Immutable;
 
 const FileImportReducers = {}
 
@@ -90,75 +90,117 @@ FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
     const columnTypes = [];
-    state.columnDatatypes.forEach((value) => {
-      switch(value)
-      {
-        case 0:
-          columnTypes.push('text');
-          break;
-        case 1:
-          columnTypes.push('number');
-          break;
-        case 2:
-          columnTypes.push('date');
-          break;
-      }
-    });
 
-    Ajax.importFile(
-      state.file,
-      state.filetype,
-      state.dbText,
-      state.tableText,
-      state.connectionId,
-      state.columnNames,
-      state.columnsToInclude,
-      List(columnTypes),
-      () =>
-      {
-        alert("success");
-      },
-      (err: string) =>
-      {
-        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-      },
-    );
+    if (state.filetype === 'json')
+    {
+      state.columnTypes.forEach((value, key) => {
+        switch(value)
+        {
+          case -1:
+            alert('You must select a type for each column');
+            return state;
+          case 0:
+            columnTypes.push([key, 'text']);
+            break;
+          case 1:
+            columnTypes.push([key, 'number']);
+            break;
+          case 2:
+            columnTypes.push([key, 'date']);
+            break;
+        }
+      });
+
+      Ajax.importFile(
+        state.file,
+        state.filetype,
+        state.dbText,
+        state.tableText,
+        state.connectionId,
+        state.columnNames,
+        state.columnsToInclude,
+        Map<string, string>(columnTypes),
+        () =>
+        {
+          alert("success");
+        },
+        (err: string) =>
+        {
+          alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        },
+      );
+    }
+    else if (state.filetype === 'csv')
+    {
+      state.columnTypes.forEach((value, key) => {
+        switch(value)
+        {
+          case -1:
+            alert('You must select a type for each column');
+            return state;
+          case 0:
+            columnTypes.push('text');
+            break;
+          case 1:
+            columnTypes.push('number');
+            break;
+          case 2:
+            columnTypes.push('date');
+            break;
+        }
+      });
+
+      Ajax.importFile(
+        state.file,
+        state.filetype,
+        state.dbText,
+        state.tableText,
+        state.connectionId,
+        state.columnNames.toList(),
+        state.columnsToInclude.toList(),
+        List<string>(columnTypes),
+        () =>
+        {
+          alert("success");
+        },
+        (err: string) =>
+        {
+          alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        },
+      );
+    }
     return state;
   };
 
 FileImportReducers[ActionTypes.previewFile] =
   (state, action) =>
   {
+    const columnsToInclude = [];
+    const columnNames = [];
+    const columnTypes = [];
+
     let colsCount = 0;
-    for (const property in action.payload.preview[0])
-    {
-      if (action.payload.preview[0].hasOwnProperty(property))
-      {
+    for (const property in action.payload.preview[0]) {
+      if (action.payload.preview[0].hasOwnProperty(property)) {
+        columnsToInclude.push([property, true]);
+        columnNames.push([property, '']);
+        columnTypes.push([property, -1]);
         colsCount++;
       }
     }
 
-    const columnsToInclude = [];
-    const columnNames = [];
-    const columnDatatypes = [];
-
-    for (let i = 0; i < colsCount; i++)
-    {
-      columnsToInclude.push(true);
-      columnNames.push('');
-      columnDatatypes.push(-1);
-    }
     return state
-            .set('previewRows', action.payload.preview)
-            .set('columnsCount', colsCount)
-            .set('columnsToInclude', List(columnsToInclude))
-            .set('columnNames', List(columnNames))
-            .set('columnDatatypes', List(columnDatatypes));
+      .set('previewRows', action.payload.preview)
+      .set('columnsCount', colsCount)
+      .set('columnsToInclude', Map(columnsToInclude))
+      .set('columnNames', Map(columnNames))
+      .set('columnTypes', Map(columnTypes));
   };
 
-FileImportReducers[ActionTypes.setMapCheck] =
+FileImportReducers[ActionTypes.setMapIncluded] =
   (state, action) =>
     state
+      .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
       .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
   ;
 
@@ -168,10 +210,10 @@ FileImportReducers[ActionTypes.setMapName] =
       .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
   ;
 
-FileImportReducers[ActionTypes.setMapDatatype] =
+FileImportReducers[ActionTypes.setMapType] =
   (state, action) =>
-  {
-    return state.set('columnDatatypes', state.columnDatatypes.set(action.payload.id, action.payload.datatypeIndex));
-  }
+    state
+      .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
+  ;
 
 export default FileImportReducers;

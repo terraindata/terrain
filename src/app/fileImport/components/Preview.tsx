@@ -57,23 +57,18 @@ import './Preview.less';
 
 export interface Props
 {
-  rowsCount: number;
   previewRows: object[];
-  columnsToInclude: List<boolean>;
-  columnNames: List<string>;
+  rowsCount: number;
   columnsCount: number;
-  columnDatatypes: List<number>;
+  columnsToInclude: Map<string, boolean>;
+  columnNames: Map<string, string>;
+  columnTypes: Map<string, number>;
 }
 
 const DATATYPES = Immutable.List(['text', 'number', 'date']);
 
 class Preview extends Classs<Props>
 {
-  public state: {
-    columnsCount?: number;
-  } = {
-  };
-
   public getColumns(props: Props): List<IColumn>
   {
     const { previewRows } = props;
@@ -108,17 +103,21 @@ class Preview extends Classs<Props>
     // console.log("rows: ", this.props.previewRows);
     // console.log("columns: ", this.getColumns(this.props));
 
+    const oldNames = this.getColumns(this.props);
+
     const previewCols = [];
     for (let i = 0; i < this.props.columnsCount; i++)
     {
+      const oldName = oldNames.get(i).name;
       previewCols.push(
         <PreviewColumn
-          id={i}
-          isChecked={this.props.columnsToInclude.get(i)}
-          columnName={this.props.columnNames.get(i)}
-          datatypeIndex={this.props.columnDatatypes.get(i)}
-          datatypes={DATATYPES}
-          canSelectDatatype={true}
+          key={oldName}
+          id={oldName}
+          isIncluded={this.props.columnsToInclude.get(oldName)}
+          name={this.props.columnNames.get(oldName)}
+          typeIndex={this.props.columnTypes.get(oldName)}
+          types={DATATYPES}
+          canSelectType={true}
           canSelectColumn={true}
         />
       )
@@ -130,7 +129,7 @@ class Preview extends Classs<Props>
           { previewCols }
         </div>
         <Table
-          columns={this.getColumns(this.props)}
+          columns={oldNames}
           rowGetter={this.getRow}
           rowsCount={this.props.rowsCount}
           rowKey={'id'}

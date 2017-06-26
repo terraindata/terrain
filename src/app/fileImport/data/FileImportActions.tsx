@@ -47,7 +47,6 @@ import * as _ from 'underscore';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
 import FileImportTypes from '../FileImportTypes';
-type PreviewMap = FileImportTypes.PreviewMap;
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
@@ -81,17 +80,17 @@ const FileImportActions =
     (preview: object) =>
       $(ActionTypes.previewFile, { preview }),
 
-    setMapCheck:
-    (id: number) =>
-      $(ActionTypes.setMapCheck, { id }),
+    setMapIncluded:
+    (id: string) =>
+      $(ActionTypes.setMapIncluded, { id }),
 
     setMapName:
-      (id: number, columnName: string) =>
+      (id: string, columnName: string) =>
         $(ActionTypes.setMapName, { id, columnName }),
 
-    setMapDatatype:
-      (id: number, datatypeIndex: number) =>
-        $(ActionTypes.setMapDatatype, { id, datatypeIndex }),
+    setMapType:
+      (id: string, typeIndex: number) =>
+        $(ActionTypes.setMapType, { id, typeIndex }),
   };
 
 export default FileImportActions;

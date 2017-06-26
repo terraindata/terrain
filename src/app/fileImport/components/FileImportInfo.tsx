@@ -56,6 +56,7 @@ import Preview from "./Preview";
 import SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
 import FileImportTypes from './../FileImportTypes';
+import * as Papa from 'papaparse';
 
 export interface Props
 {
@@ -102,14 +103,19 @@ class FileImportInfo extends PureClasss<Props>
   public parseData(file: string, filetype: string): object[]
   {
     const preview = [];
+    let items = [];
+
     if (filetype === 'json')
     {
-      const items: object[] = JSON.parse(file);
+      items = JSON.parse(file);
       if (!Array.isArray(items))
       {
         alert('Input JSON file must parse to an array of objects.');
+        this.refs['file']['value'] = null;
         return;
       }
+      console.log("Parsed json: ", items);
+
       // if (items.length > 0)
       // {
       //   const desiredHash: string = hashObject(getEmptyObject(items[0]));
@@ -122,24 +128,36 @@ class FileImportInfo extends PureClasss<Props>
       //     }
       //   }
       // }
-      for (let i = 0; i < Math.min(items.length, this.props.rowsCount); i++)
+    }
+    else if (filetype === 'csv')
+    {
+      const config = {
+        header: true,
+        preview: this.props.rowsCount,
+        error: (err) => {
+          alert('CSV format incorrect: ' + String(err));
+          this.refs['file']['value'] = null;
+          return;
+        },
+        skipEmptyLines: true,
+      }
+      items = Papa.parse(file, config).data;
+      console.log("Parsed csv: ", items);
+
+      for (let i = 1; i < items.length; i++)
       {
-        preview.push(items[i]);
+        if (items[i].length !== items[0].length)
+        {
+          alert('CSV format incorrect: each row must have same number of fields');
+          this.refs['file']['value'] = null;
+          return;
+        }
       }
     }
-    // else if (filetype === 'csv')
-    // {
-    //   // extract first n lines of file
-    //   const newFile = extractCsv(file, this.props.rowsCount);
-    //   csv({ flatKeys: true, checkColumn: true }).fromString(newFile).on('error', (e) =>
-    //   {
-    //     alert('CSV format incorrect: ' + String(e));
-    //     return;
-    //   });
-    // }
-    else
+
+    for (let i = 0; i < Math.min(items.length, this.props.rowsCount); i++)
     {
-      return;
+      preview.push(items[i]);
     }
     return preview;
   }
@@ -168,7 +186,6 @@ class FileImportInfo extends PureClasss<Props>
     {
       console.log("File chosen contents: ", fr.result);
       const preview = this.parseData(fr.result, filetype);
-      console.log("Parsed preview: ", preview);
 
       Actions.chooseFile(fr.result, filetype);
       Actions.previewFile(preview);
@@ -177,14 +194,58 @@ class FileImportInfo extends PureClasss<Props>
 
   public handleUploadFile()
   {
-    if (this.props.canImport && this.props.fileChosen && this.props.serverSelected && this.props.dbSelected && this.props.tableSelected)
+    if (!this.props.canImport)
     {
-      Actions.uploadFile();
+      alert('You do not have permission to upload files');
+      return;
     }
-    else
+    if (!this.props.fileChosen)
     {
-      alert("Please select a file to upload, server, database, and table");
+      alert('Please select a file to upload');
+      return;
     }
+    if (!this.props.serverSelected)
+    {
+      alert('Please select a server');
+      return;
+    }
+    if (!this.props.dbSelected)
+    {
+      alert('Please select a database');
+      return;
+    }
+    if (!this.props.tableSelected)
+    {
+      alert('Please select a table');
+      return;
+    }
+    if (this.props.dbText === '' || this.props.tableText === '')
+    {
+      alert('Database and table names cannot be empty strings');
+      return;
+    }
+    if (this.props.dbText !== this.props.dbText.toLowerCase())
+    {
+      alert('Database may not contain uppercase letters');
+      return;
+    }
+    if (!/^[a-z\d].*$/.test(this.props.dbText))
+    {
+      alert('Database name must start with a lowercase letter or digit');
+      return;
+    }
+    if (!/^[a-z\d][a-z\d\._\+-]*$/.test(this.props.dbText))
+    {
+      alert('Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses');
+      return;
+    }
+    if (/^_.*/.test(this.props.tableText))
+    {
+      alert('Table name may not start with an underscore');
+      return;
+    }
+
+    Actions.uploadFile();
   }
 
   public render()

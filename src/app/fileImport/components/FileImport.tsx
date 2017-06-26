@@ -55,7 +55,7 @@ import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
 import Preview from './Preview';
 
-const { List } = Immutable;
+const { List, Map } = Immutable;
 
 export interface Props
 {
@@ -105,8 +105,8 @@ class FileImport extends PureClasss<any>
   {
     const { fileImportState } = this.state;
     const { serverSelected, serverIndex, dbSelected, dbText, tableSelected,
-      tableText, fileChosen, previewRows, columnsToInclude, columnNames, columnsCount, columnDatatypes } = fileImportState;
-    
+      tableText, fileChosen, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes } = fileImportState;
+
     return (
       <div className="fileImport">
         <h2>File Import Page</h2>
@@ -134,12 +134,12 @@ class FileImport extends PureClasss<any>
         {
           previewRows &&
           <Preview
-            rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
             previewRows={previewRows}
+            rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
+            columnsCount={columnsCount}
             columnsToInclude={columnsToInclude}
             columnNames={columnNames}
-            columnsCount={columnsCount}
-            columnDatatypes={columnDatatypes}
+            columnTypes={columnTypes}
           />
         }
       </div>

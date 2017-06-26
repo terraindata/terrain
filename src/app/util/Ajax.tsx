@@ -65,6 +65,7 @@ import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
+// const { List, Map } = Immutable;
 
 export const Ajax =
   {
@@ -641,10 +642,10 @@ export const Ajax =
       filetype: string,
       db: string,
       table: string,
-     connectionId: number,
+      connectionId: number,
       columnNames: Map<string, string> | List<string>,
       columnsToInclude: Map<string, boolean> | List<boolean>,
-      columnTypes: Map<string, string> | List<string>,
+      columnTypes: Immutable.Map<string, string> | List<string>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     ): { xhr: XMLHttpRequest, queryId: string }
