@@ -61,13 +61,15 @@ export interface ImportConfig
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
 
-  csvHeaderMissing?: boolean;    // default: false
-  // columnMap: Map<string, string> | string[];             // oldName to newName
-  columnMap: object | string[];    // either object mapping string to string, or an array of strings
-  // columnsToInclude: Map<string, boolean> | boolean[];       // oldName to boolean
-  columnsToInclude: object | boolean[];   // either object mapping string to boolean, or an array of booleans
-  // columnTypes: Map<string, string> | string[];        // oldName to number/text/boolean (eventually add object/date)
-  columnTypes: object | string[];    // either object mapping string to string, or an array of strings
+  csvHeaderMissing?: boolean;       // if filetype is 'csv', default is to assume the first line contains headers
+                                    // --- set this to true if this is not the case
+  columnMap: object | string[];     // if filetype is 'json': object mapping string (oldName) to string (newName)
+                                    // if filetype is 'csv': array of strings (newName)
+  columnsToInclude: object | boolean[];     // if filetype is 'json': object mapping string (oldName) to boolean
+                                            // if filetype is 'csv': array of booleans
+  columnTypes: object | string[];   // if filetype is 'json': object mapping string (oldName) to string (type)
+                                    // if filetype is 'csv': array of strings (type)
+                                    // supported types: text/number/boolean ; in progress: date/null/object
   primaryKey: string;  // newName of primary key
 }
 
@@ -335,6 +337,8 @@ export class Import
       }
     });
   }
+  /* constructs an empty object with the specified field names and types, and returns its hash
+     nameToType: maps field name (string) to type (string) */
   private _buildDesiredHash(nameToType: object): string
   {
     const obj: object = {};
@@ -356,6 +360,7 @@ export class Import
     }
     return hashObject(Util.getEmptyObject(obj));
   }
+  /* true if all items in "items," when emptied, hash to "targetHash"; else false */
   private _checkHash(items: object[], targetHash: string): boolean
   {
     for (const obj of items)
