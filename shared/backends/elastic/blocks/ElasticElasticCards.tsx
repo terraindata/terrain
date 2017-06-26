@@ -71,6 +71,7 @@ let colorIndex = 0;
 const numColors = 21;
 
 const ElasticElasticCards: { [type: string]: any } = {};
+const referenceCards: ESClause[] = [];
 _.mapObject(
   clauses,
   (clause, key) => 
@@ -79,16 +80,54 @@ _.mapObject(
     
     if (card)
     {
-      const colorKey = ((++colorIndex) % numColors) + 1;
-      card['static']['colors'] = [
-        Colors().builder.cards['card' + colorKey],
-        Colors().builder.cards['card' + colorKey + 'BG'],
-      ];
-      
-      ElasticElasticCards[clause.getCardType()] = card;
+      if (typeof card === 'string')
+      {
+        referenceCards.push(clause);
+      }
+      else
+      {
+        const colorKey = ((++colorIndex) % numColors) + 1;
+        card['static']['colors'] = [
+          Colors().builder.cards['card' + colorKey],
+          Colors().builder.cards['card' + colorKey + 'BG'],
+        ];
+        
+        ElasticElasticCards[clause.getCardType()] = card;
+      }
     }
   }
 );
+
+// add reference card types
+referenceCards.map((clause) =>
+{
+  const type = 'eql' + clause.type;
+  const cardDef = ElasticElasticCards[clause.getCard()];
+  if (cardDef)
+  {
+    const refCardDef = _.extend({}, cardDef, {
+      type,
+    });
+    const colorKey = ((++colorIndex) % numColors) + 1;
+    refCardDef['static'] = _.extend({},
+      refCardDef['static'], 
+      {
+        colors:  [
+          Colors().builder.cards['card' + colorKey],
+          Colors().builder.cards['card' + colorKey + 'BG'],
+        ],
+        title: clause.name,
+        // TODO add url, description, etc.
+      }
+    );
+    ElasticElasticCards['eql' + type] = refCardDef;
+  }
+  else
+  {
+    console.log('No ref card def for ' + type);
+    // TODO this should probably throw an error
+  }
+});
 
 const getDisplayForType = (type: string, canBeCards?: boolean): Display | Display[] =>
 {
