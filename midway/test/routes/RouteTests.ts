@@ -735,6 +735,12 @@ describe('File import route tests', () =>
             column1: true,
             column2: true,
           },
+          columnTypes:
+          {
+            pkey: 'number',
+            column1: 'text',
+            column2: 'text',
+          },
           primaryKey: 'pkey',
         },
       })
@@ -772,18 +778,9 @@ describe('File import route tests', () =>
           filetype: 'csv',
 
           csvHeaderMissing: false,
-          columnMap:
-          {
-            pkey: 'pkey',
-            column1: 'column1',
-            column2: 'column2',
-          },
-          columnsToInclude:
-          {
-            pkey: true,
-            column1: true,
-            column2: true,
-          },
+          columnMap: ['pkey', 'column1', 'column2'],
+          columnsToInclude: [true, true, true],
+          columnTypes: ['number', 'text', 'text'],
           primaryKey: 'pkey',
         },
       })
@@ -795,13 +792,13 @@ describe('File import route tests', () =>
         expect(respData.length).toBeGreaterThan(0);
         expect(respData[0])
           .toMatchObject({
-            pkey: '1',
+            pkey: 1,
             column1: 'hi',
             column2: 'hello',
           });
         expect(respData[1])
           .toMatchObject({
-            pkey: '2',
+            pkey: 2,
             column1: 'bye',
             column2: 'goodbye',
           });
@@ -815,7 +812,7 @@ describe('File import route tests', () =>
   test('Invalid import: POST /midway/v1/import/', async () =>
   {
     await request(server)
-      .post('/midway/v1/items/314159265359')
+      .post('/midway/v1/import/')
       .send({
         id: 1,
         accessToken: 'AccessToken',
@@ -838,6 +835,12 @@ describe('File import route tests', () =>
             column1: true,
             column2: true,
           },
+          columnTypes:
+          {
+            pkey: 'number',
+            column1: 'text',
+            column2: 'text',
+          },
           primaryKey: 'pkey',
         },
       })
@@ -848,7 +851,7 @@ describe('File import route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+        fail('POST /midway/v1/import/ request returned an error: ' + String(error));
       });
   });
 });

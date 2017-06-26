@@ -57,7 +57,7 @@
     "color": "^1.0.3",
     "command-line-args": "^4.0.3",
     "command-line-usage": "^4.0.0",
-    "csvtojson": "^1.1.6",
+    "csvtojson": "^1.1.7",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
     "diff-match-patch": "^1.0.0",

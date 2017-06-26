@@ -64,9 +64,10 @@ export interface ImportConfig
   csvHeaderMissing?: boolean;    // default: false
   // columnMap: Map<string, string> | string[];             // oldName to newName
   columnMap: object | string[];    // either object mapping string to string, or an array of strings
-  // columnsToInclude: Map<string, boolean> | boolean[];
+  // columnsToInclude: Map<string, boolean> | boolean[];       // oldName to boolean
   columnsToInclude: object | boolean[];   // either object mapping string to boolean, or an array of booleans
-  // columnTypes: Map<string, string> | string[];        // oldName to number/text/boolean/object/date
+  // columnTypes: Map<string, string> | string[];        // oldName to number/text/boolean (eventually add object/date)
+  columnTypes: object | string[];    // either object mapping string to string, or an array of strings
   primaryKey: string;  // newName of primary key
 }
 
@@ -172,29 +173,42 @@ export class Import
       imprt.csvHeaderMissing = false;
       const cmNames: string = JSON.stringify(Object.keys(imprt.columnMap).sort());
       const ctiNames: string = JSON.stringify(Object.keys(imprt.columnsToInclude).sort());
-      if (cmNames !== ctiNames)
+      const ctNames: string = JSON.stringify(Object.keys(imprt.columnTypes).sort());
+      if (cmNames !== ctiNames || cmNames !== ctNames)
       {
-        return 'List of names in columnMap and columnsToInclude do not match.';
+        return 'List of names in columnMap, columnsToInclude, and columnTypes do not match.';
       }
     } else
     {
-        if (imprt.csvHeaderMissing === undefined)
-        {
-            imprt.csvHeaderMissing = false;
-        }
-      if (!Array.isArray(imprt.columnMap) || !Array.isArray(imprt.columnsToInclude))
+      if (imprt.csvHeaderMissing === undefined)
       {
-        return 'When uploading a CSV file, columnMap and columnsToInclude should be arrays.';
+        imprt.csvHeaderMissing = false;
       }
-      if (imprt.columnMap.length !== imprt.columnsToInclude.length)
+      if (!Array.isArray(imprt.columnMap) || !Array.isArray(imprt.columnsToInclude) || !Array.isArray(imprt.columnTypes))
       {
-        return 'Lengths of columnMap and columnsToInclude do not match.';
+        return 'When uploading a CSV file, columnMap, columnsToInclude, and columnTypes should be arrays.';
+      }
+      if (imprt.columnMap.length !== imprt.columnsToInclude.length || imprt.columnMap.length !== imprt.columnTypes.length)
+      {
+        return 'Lengths of columnMap, columnsToInclude, and columnTypes do not match.';
       }
     }
     const columns: string[] = this._getArrayFromMap(imprt.columnMap);
     if (columns.indexOf(imprt.primaryKey) === -1)
     {
       return 'A column to be uploaded must be specified as the primary key.';
+    }
+    if (columns.indexOf('') !== -1)
+    {
+      return 'The empty string is not a valid column name.';
+    }
+    const columnTypes: string[] = this._getArrayFromMap(imprt.columnTypes);
+    if (columnTypes.some((val, ind, arr) =>
+    {
+      return val !== 'text' && val !== 'number';
+    }))
+    {
+      return 'Invalid data type encountered.';
     }
     return '';
   }
@@ -214,13 +228,10 @@ export class Import
           }
           if (items.length > 0)
           {
-            const desiredHash: string = hashObject(Util.getEmptyObject(items[0]));
-            for (const obj of items)
+            const desiredHash: string = this._buildDesiredHash(imprt.columnTypes);
+            if (!this._checkHash(items, desiredHash))
             {
-              if (hashObject(Util.getEmptyObject(obj)) !== desiredHash)
-              {
-                return reject('Objects in provided input JSON do not have the same keys and/or types.');
-              }
+              return reject('Objects in provided input JSON do not match the specified keys and/or types.');
             }
 
             for (const oldName in imprt.columnMap)
@@ -267,15 +278,53 @@ export class Import
           }
           return res;
         }, [] as number[]);
+        const columnParsers: object = {};
+        (imprt.columnTypes as string[]).forEach((val, ind) =>
+        {
+          if (val === 'number')
+          {
+            columnParsers[imprt.columnMap[ind]] = 'number';
+          } else if (val === 'boolean')
+          {
+            columnParsers[imprt.columnMap[ind]] = (item, head, resultRow, row, colIdx) =>
+            {
+              if (item === 'true')
+              {
+                return true;
+              } else if (item === 'false')
+              {
+                return false;
+              } else
+              {
+                return '';
+              }
+            };
+          }
+        });
         csv({
           flatKeys: true,
           checkColumn: true,
           noheader: imprt.csvHeaderMissing,
           headers: imprt.columnMap as string[],
           includeColumns: columnIndicesToInclude,
+          colParser: columnParsers,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
-          resolve(jsonArrObj);
+          const nameToType: object = {};
+          (imprt.columnMap as string[]).forEach((val, ind) =>
+          {
+            if (imprt.columnsToInclude[ind])
+            {
+              nameToType[val] = imprt.columnTypes[ind];
+            }
+          });
+          if (this._checkHash(jsonArrObj, this._buildDesiredHash(nameToType)))
+          {
+            resolve(jsonArrObj);
+          } else
+          {
+            return reject('Objects in provided input CSV do not match the specified keys and/or types.');
+          }
         }).on('error', (e) =>
         {
           return reject('CSV format incorrect: ' + String(e));
@@ -285,6 +334,38 @@ export class Import
         return reject('Invalid file-type provided.');
       }
     });
+  }
+  private _buildDesiredHash(nameToType: object): string
+  {
+    const obj: object = {};
+    for (const name in nameToType)
+    {
+      if (nameToType.hasOwnProperty(name))
+      {
+        if (nameToType[name] === 'number')
+        {
+          obj[name] = 0;
+        } else if (nameToType[name] === 'boolean')
+        {
+          obj[name] = false;
+        } else
+        {
+          obj[name] = '';
+        }
+      }
+    }
+    return hashObject(Util.getEmptyObject(obj));
+  }
+  private _checkHash(items: object[], targetHash: string): boolean
+  {
+    for (const obj of items)
+    {
+      if (hashObject(Util.getEmptyObject(obj)) !== targetHash)
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
   private _getArrayFromMap(mapOrArray: object | string[]): string[]
