@@ -61,15 +61,19 @@ export interface ImportConfig
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
 
-  csvHeaderMissing?: boolean;       // if filetype is 'csv', default is to assume the first line contains headers
-                                    // --- set this to true if this is not the case
-  columnMap: object | string[];     // if filetype is 'json': object mapping string (oldName) to string (newName)
-                                    // if filetype is 'csv': array of strings (newName)
-  columnsToInclude: object | boolean[];     // if filetype is 'json': object mapping string (oldName) to boolean
-                                            // if filetype is 'csv': array of booleans
-  columnTypes: object | string[];   // if filetype is 'json': object mapping string (oldName) to string (type)
-                                    // if filetype is 'csv': array of strings (type)
-                                    // supported types: text/number/boolean ; in progress: date/null/object
+  // if filetype is 'csv', default is to assume the first line contains headers
+  // set this to true if this is not the case
+  csvHeaderMissing?: boolean;
+  // if filetype is 'json': object mapping string (oldName) to string (newName)
+  // if filetype is 'csv': array of strings (newName)
+  columnMap: object | string[];
+  // if filetype is 'json': object mapping string (oldName) to boolean
+  // if filetype is 'csv': array of booleans
+  columnsToInclude: object | boolean[];
+  // if filetype is 'json': object mapping string (oldName) to string (type)
+  // if filetype is 'csv': array of strings (type)
+  // supported types: text/number/boolean ; in progress: date/null/object
+  columnTypes: object | string[];
   primaryKey: string;  // newName of primary key
 }
 
