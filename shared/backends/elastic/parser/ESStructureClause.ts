@@ -53,6 +53,7 @@ import ESInterpreter from './ESInterpreter';
 import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
+import Block from '../../../blocks/types/Block';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 import BlockUtils from '../../../blocks/BlockUtils';
 import ElasticBlocks from '../blocks/ElasticBlocks';
@@ -128,7 +129,117 @@ export default class ESStructureClause extends ESClause
     });
   }
   
+  
+  
   public getCard()
+  {
+    let firstKey: string;
+    // let display: Display[] = [];
+    // let initMap: {[key: string]: () => any};
+    
+    const valueMap = _.mapObject(
+      this.structure,
+      (type, key) =>
+      {
+        firstKey = firstKey || key;
+        
+        // TODO if we want to shortcut some types, e.g.
+        //  instead of "size" rendering a Size card, "size"
+        //  just rendering a textbox with the size properties
+        
+        return null; 
+        // return null so that the Record-class preserves the key,
+        // and we can fill in a default value using init
+        
+        // if (this.template)
+        // {
+        //   // need to set up default value
+        //   const defaultValue = this.template[key];
+        //   if(defaultValue !== undefined)
+        //   {
+        //     if (defaultValue === null)
+        //     {
+        //       // need to create a clause card of the given key type
+        //       // We do this by adding a function to init.
+        //       initMap = initMap || {}; // initialize init
+        //       initMap[key] = () => BlockUtils.make(ElasticBlocks['eql' + key]); // make card
+        //       // TODO if deep nested objects, make sure they all get init'd
+        //       //   could be done in init by checking the config
+              
+        //       return null; 
+        //       // return null since init will fill in with a new object
+        //       // on creation. We don't want each new Card to share the same
+        //       // object reference. Returning null will preserve the key
+        //       // in the Record class.
+        //     }
+            
+        //     if (typeof defaultValue === 'object')
+        //     {
+        //       throw new Error('Nested object provided in template, unhandled case. ' +
+        //         'Type: ' + this.type + ' - Template value: ' + defaultValue);
+        //     }
+            
+        //     return this.template[key];
+        //   }
+        }
+      );
+    
+    const propertyKeys = Immutable.List(_.keys(this.structure));
+    
+    return this.seedCard({
+        properties: Immutable.List([]),
+        
+        {
+          static:
+          {
+            preview: '[properties.size] properties',
+            display:
+            {
+              displayType: DisplayType.ROWS,
+              key: 'properties',
+              english: 'property',
+              factoryType: 'elasticStructureProperty',
+              
+              row: 
+              {
+                inner:
+                {
+                  displayType: DisplayType.DROPDOWN,
+                  key: 'key',
+                  
+                  options: propertyKeys,
+                  dropdownUsesRawValues: true,
+                },
+                // {
+                //   [
+                //     {
+                      
+                //     },
+                //   ],
+                // },
+                
+                below:
+                {
+                  displayType: DisplayType.CARDS,
+                  key: 'cards',
+                },
+              },
+              
+            },
+            tql: (boolBlock) => !! boolBlock['value'],
+          }
+        }
+      }
+    );
+  }
+  
+  public getSupplementalBlocks(): Block[]
+  {
+    
+  }
+  
+  
+  public getWrapperCard()
   {
     const accepts = Immutable.List(
       _.keys(this.structure).map(type => 'eql' + type)
@@ -191,72 +302,5 @@ export default class ESStructureClause extends ESClause
       accepts,
       init,
     });
-    
-    // This was code from a previous approach that I don't want to 
-    //  delete until we're sure we're happy with this approach.
-    // let firstKey: string;
-    // let initMap: {[key: string]: () => any};
-    
-    // const valueMap = _.mapObject(
-    //   this.structure,
-    //   (type, key) =>
-    //   {
-    //     // firstKey = firstKey || key;
-        
-    //     if (this.template)
-    //     {
-    //       // need to set up default value
-    //       const defaultValue = this.template[key];
-    //       if(defaultValue !== undefined)
-    //       {
-    //         if (defaultValue === null)
-    //         {
-    //           // need to create a clause card of the given key type
-    //           // We do this by adding a function to init.
-    //           initMap = initMap || {}; // initialize init
-    //           initMap[key] = () => BlockUtils.make(ElasticBlocks['eql' + key]); // make card
-    //           // TODO if deep nested objects, make sure they all get init'd
-    //           //   could be done in init by checking the config
-              
-    //           return null; 
-    //           // return null since init will fill in with a new object
-    //           // on creation. We don't want each new Card to share the same
-    //           // object reference. Returning null will preserve the key
-    //           // in the Record class.
-    //         }
-            
-    //         if (typeof defaultValue === 'object')
-    //         {
-    //           throw new Error('Nested object provided in template, unhandled case. ' +
-    //             'Type: ' + this.type + ' - Template value: ' + defaultValue);
-    //         }
-            
-    //         return this.template[key];
-    //       }
-    //     }
-        
-        
-    //   });
-    
-    
-    
-    // return this.seedCard(_.extend(
-    //     valueMap, 
-    //     {
-    //       static: {
-    //         preview: '[' + firstKey + ']',
-    //         display: {
-    //           displayType: DisplayType.DROPDOWN,
-    //           key: 'value',
-    //           options: Immutable.List([
-    //             'false',
-    //             'true',
-    //           ]),
-    //         },
-    //         tql: (boolBlock) => !! boolBlock['value'],
-    //       }
-    //     }
-    //   )
-    // );
   }
 }
