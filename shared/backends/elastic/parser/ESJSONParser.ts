@@ -203,9 +203,11 @@ export default class ESJSONParser
   private readValue(): ESValueInfo | null
   {
     const valueInfo: ESValueInfo = this.beginValueInfo();
+    const token: ESParserToken = this.accumulateToken();
 
     const nextChar: string = this.peek();
-    const token: ESParserToken = this.accumulateToken();
+
+    let jsonType: ESJSONType = ESJSONType.invalid;
 
     try
     {
@@ -213,7 +215,7 @@ export default class ESJSONParser
       {
         // string
         case '"':
-          valueInfo.jsonType = ESJSONType.string;
+          jsonType = ESJSONType.string;
           valueInfo.value = this.readString();
           break;
 
@@ -229,13 +231,13 @@ export default class ESJSONParser
         case '8':
         case '9':
         case '-':
-          valueInfo.jsonType = ESJSONType.number;
+          jsonType = ESJSONType.number;
           valueInfo.value = this.readNumber();
           break;
 
         // object
         case '{':
-          valueInfo.jsonType = ESJSONType.object;
+          jsonType = ESJSONType.object;
           this.advance();
           this.readObject(valueInfo);
           break;
@@ -246,7 +248,7 @@ export default class ESJSONParser
 
         // array
         case '[':
-          valueInfo.jsonType = ESJSONType.array;
+          jsonType = ESJSONType.array;
           this.advance();
           this.readArray(valueInfo);
           break;
@@ -257,24 +259,24 @@ export default class ESJSONParser
 
         // true
         case 't':
-          valueInfo.jsonType = ESJSONType.boolean;
+          jsonType = ESJSONType.boolean;
           valueInfo.value = this.readTrueValue();
           break;
 
         // false
         case 'f':
-          valueInfo.jsonType = ESJSONType.boolean;
+          jsonType = ESJSONType.boolean;
           valueInfo.value = this.readFalseValue();
           break;
 
         // null
         case 'n':
-          valueInfo.jsonType = ESJSONType.null;
+          jsonType = ESJSONType.null;
           valueInfo.value = this.readNullValue();
           break;
 
         case '@':
-          valueInfo.jsonType = ESJSONType.parameter;
+          jsonType = ESJSONType.parameter;
           valueInfo.value = this.readParameter();
           break;
 
@@ -286,6 +288,9 @@ export default class ESJSONParser
     }
     finally
     {
+      token.jsonType = jsonType;
+      valueInfo.jsonType = jsonType;
+
       if (valueInfo.value === undefined)
       {
         // if no value was read, erase the token information accumulated
@@ -359,21 +364,21 @@ export default class ESJSONParser
       array.push(elementInfo.value);
       arrayInfo.arrayChildren.push(elementInfo);
 
-      // read next delimiter
+      // read array delimiter, ','
       const propertyDelimiter: string = this.peek();
       if (propertyDelimiter !== ',')
       {
         break;
       }
 
-      this.accumulateToken();
-      this.advance(); // skip over ','
+      this.accumulateToken(arrayInfo, ESJSONType.arrayDelimiter);
+      this.advance();
     }
 
     // at the end of the list, make sure that the terminating char is ']'
     if (this.peek() === ']')
     {
-      this.accumulateToken(arrayInfo);
+      this.accumulateToken(arrayInfo, ESJSONType.arrayTerminator);
       this.advance();
     }
     else
@@ -401,11 +406,16 @@ export default class ESJSONParser
         propertyName = String(propertyName);
       }
 
+      // set name to property type
+      nameInfo.jsonType = ESJSONType.property;
+
+      // check for duplicates
       if (obj.hasOwnProperty(propertyName))
       {
         this.accumulateErrorOnCurrentToken('Duplicate property names are not allowed');
       }
 
+      // install a property info into the parent object
       const propertyInfo: ESPropertyInfo = new ESPropertyInfo(nameInfo);
       objInfo.objectChildren[propertyName] = propertyInfo;
 
@@ -417,17 +427,19 @@ export default class ESJSONParser
       {
         if (kvpDelimiter === ',')
         {
+          // eat object delimiter, ','
           this.accumulateErrorOnCurrentToken('Object property\'s value is missing');
-          this.accumulateToken();
-          this.advance(); // skip over the comma
+          this.accumulateToken(objInfo, ESJSONType.objectDelimiter);
+          this.advance();
           continue;
         }
 
         break;
       }
 
-      this.accumulateToken(nameInfo);
-      this.advance(); // skip ':'
+      // eat property delimiter, ':'
+      this.accumulateToken(nameInfo, ESJSONType.propertyDelimiter);
+      this.advance();
 
       // read property value
       const propertyValueInfo: ESValueInfo | null = this.readValue();
@@ -449,14 +461,16 @@ export default class ESJSONParser
         break;
       }
 
-      this.accumulateToken(nameInfo);
-      this.advance(); // skip over ','
+      // eat object delimiter, ','
+      this.accumulateToken(objInfo, ESJSONType.objectDelimiter);
+      this.advance();
     }
 
     // at the end of the object, make sure that the terminating char is '}'
     if (this.peek() === '}')
     {
-      this.accumulateToken(objInfo);
+      // eat object terminator, ','
+      this.accumulateToken(objInfo, ESJSONType.objectTerminator);
       this.advance();
     }
     else
@@ -546,7 +560,7 @@ export default class ESJSONParser
     return match;
   }
 
-  private accumulateToken(valueInfo: ESValueInfo | null = null): ESParserToken
+  private accumulateToken(valueInfo: ESValueInfo | null = null, jsonType: ESJSONType | null = null): ESParserToken
   {
     const element: ESParserToken =
       new ESParserToken(this.charNumber,
@@ -554,6 +568,12 @@ export default class ESJSONParser
         this.getCol(),
         1,
         this.queryString.substring(this.charNumber, this.charNumber + 1));
+
+    if (jsonType !== null)
+    {
+      element.jsonType = jsonType;
+    }
+
     this.tokens.push(element);
 
     // link up the ValueInfo and the Token
@@ -616,7 +636,7 @@ export default class ESJSONParser
       const c: string = this.queryString.charAt(this.lastCheckedRowChar);
       if (c === '\n')
       {
-        this.lastRowChar = this.lastCheckedRowChar;
+        this.lastRowChar = this.lastCheckedRowChar + 1;
         ++this.lastRowNumber;
       }
     }
