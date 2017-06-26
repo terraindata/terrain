@@ -111,7 +111,7 @@ export const elasticScore = _card(
                 key: 'key',
                 // help: ManualConfig.help['key'],
                 placeholder: 'Field',
-                accepts: List(['elasticScore', 'elasticTransform']),
+                accepts: List(['elasticTransform']),
                 showWhenCards: true,
               },
               {
