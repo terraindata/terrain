@@ -43,70 +43,38 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import SchemaTypes from '../SchemaTypes';
 
-let servers = Immutable.Map({});
-let databases = Immutable.Map({});
-let tables = Immutable.Map({});
-let columns = Immutable.Map({});
+import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig'
 
-['Example Database Server'].map(
-  (serverName) =>
-  {
-    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
+const eslintConfig = new EQLConfig();
 
-    ['movieDB', 'baseballDB'].map(
-      (dbName) =>
-      {
-        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
-        server = server.set('databaseIds', server.databaseIds.push(db.id));
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
 
-        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) =>
-          {
-            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
-            db = db.set('tableIds', db.tableIds.push(table.id));
-
-            ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) =>
-              {
-                const column = SchemaTypes._Column({
-                  name: colName,
-                  tableId: table.id,
-                  databaseId: db.id,
-                  serverId: server.id,
-                  datatype: 'VARCHAR',
-                  isNullable: true,
-                  defaultValue: '',
-                  isPrimaryKey: false,
-                });
-
-                columns = columns.set(column.id, column);
-
-                table = table.set('columnIds', table.columnIds.push(column.id));
-              },
-            );
-
-            tables = tables.set(table.id, table);
-          },
-        );
-
-        databases = databases.set(db.id, db);
-      },
-    );
-
-    servers = servers.set(server.id, server);
-  },
-);
-
-const ExampleSchemaData =
-  SchemaTypes._SchemaState()
-    .set('servers', servers)
-    .set('databases', databases)
-    .set('columns', columns)
-    .set('tables', tables)
-    .set('loading', false)
-    .set('loaded', true);
-
-export default ExampleSchemaData;
+    CodeMirror.registerHelper("lint", "json", function(text) {
+      var found = [];
+      try {
+        //const t = new ESInterpreter(text, eslintConfig);
+        const t = new ESInterpreter(text, eslintConfig);
+        const errors = t.parser.errors;
+        for (let e of errors)
+        {
+          const token = e.token;
+          found.push({from: CodeMirror.Pos(token.row, token.col),
+            to: CodeMirror.Pos(token.toRow, token.toCol),
+            message: e.message});
+        }
+      } catch(e) {
+        console.log('Exception when parsing ' + text + " error: " + e);
+      }
+      return found;
+  });
+});
