@@ -5,7 +5,7 @@
   "multiple newline string 2" : "f''_'s;ddV@&N*(NV%^78#$^%*VN(%/////jasjoo \\n basdfhjkasfhjkar \\n bazasdjkl;as@#HCD$*(CNH^$djkl",
   "multiple escaped string" : "\"\b\f\n\r\t foo \b\f\"\n\r\t bar \b\f\n\r\t\" baz \t\r\n\"\f\b\"",
   "hex escaped string" : "\u7F1A\uFEED\uF00D\uBACD\uBAD9\u123D\u8FAC\u4ADC\u654A\u321B\uFFFF\u0000",
-  "mixed escaping" :"\n\u1234\t\uFEED\basdf\u001Fdnwyuqi\b\\\" dhuFH#*f3DF! \n \r \t \uF00D\"\\ adshjk \n",
+  "mixed escaping" : "\n\u1234\t\uFEED\basdf\u001Fdnwyuqi\b\\\" dhuFH#*f3DF! \n \r \t \uF00D\"\\ adshjk \n",
   "zero" : "0",
   "one" : "1",
   "integer" : "1234567",
@@ -25,6 +25,12 @@
   "null" : null,
   "empty object" : {},
   "empty list" : [],
+  "basic search" : {
+    "index" : "movies",
+    "type" : "data",
+    "from" : 0,
+    "size" : "10"
+  },
   "search" : {
     "max_score" : null,
     "hits" : [

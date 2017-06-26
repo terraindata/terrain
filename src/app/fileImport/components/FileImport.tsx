@@ -50,9 +50,7 @@ import PureClasss from './../../common/components/PureClasss';;
 import FileImportStore from './../data/FileImportStore';
 import FileImportInfo from './FileImportInfo';
 import FileImportTypes from './../FileImportTypes';
-import './FileImport.less';
 const HTML5Backend = require('react-dnd-html5-backend');
-import { browserHistory } from 'react-router';
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
 const { List } = Immutable;
@@ -65,7 +63,6 @@ export interface Props
   route?: any;
 }
 
-// const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
 const FILETYPES = Immutable.List(['json', 'csv']);
 
 class FileImport extends PureClasss<any>
@@ -101,19 +98,10 @@ class FileImport extends PureClasss<any>
     });
   }
 
-  private getKeyListSafely(map: IMMap<string, any>)
-  {
-    if (map === undefined)
-    {
-      return List<string>();
-    }
-    return map.keySeq().toList();
-  }
-
   public render()
   {
     const { fileImportState } = this.state;
-    const { serverSelected, serverIndex, dbText, tableText, dbSelected, tableSelected, fileChosen } = fileImportState;
+    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected, tableText, fileChosen } = fileImportState;
 
     return (
       <div>
@@ -140,6 +128,15 @@ class FileImport extends PureClasss<any>
         </div>
       </div>
     );
+  }
+
+  private getKeyListSafely(map: IMMap<string, any>)
+  {
+    if (map === undefined)
+    {
+      return List<string>();
+    }
+    return map.keySeq().toList();
   }
 }
 

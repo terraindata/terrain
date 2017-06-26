@@ -82,6 +82,9 @@ function testParse(testString: string,
   const errors = parser.getErrors();
 
   winston.info(util.inspect(parser.getValueInfo()));
+  winston.info(util.inspect(parser.getTokens()));
+  winston.info(util.inspect(parser.getValueInfos()));
+
   winston.info(util.inspect(errors));
 
   expect(value).toEqual(expectedValue);
@@ -182,4 +185,12 @@ test('parse invalid json objects', () =>
         token: { charNumber: 1, row: 0, col: 1 },
       },
     ]);
+
+  testParse(`{
+  "index": "movies",
+  "type": "data",
+  "from": 0,
+  "size": "10"
+}`, JSON.parse(`{"from": 0, "index": "movies", "size": "10", "type": "data"}`), []);
+
 });

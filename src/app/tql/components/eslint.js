@@ -43,66 +43,38 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Util from './../../util/Util';
-import ActionTypes from './FileImportActionTypes';
-import Ajax from './../../util/Ajax';
 
-const FileImportReducers = {}
+import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig'
 
-FileImportReducers[ActionTypes.changeServer] =
-  (state, action) =>
-    state
-      .set('serverIndex', action.payload.serverIndex)
-      .set('connectionId', action.payload.connectionId)
-      .set('serverSelected', true)
-  ;
+const eslintConfig = new EQLConfig();
 
-FileImportReducers[ActionTypes.changeDbText] =
-  (state, action) =>
-    state
-      .set('dbText', action.payload.dbText).set('dbSelected', !!action.payload.dbText);
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
 
-FileImportReducers[ActionTypes.changeTableText] =
-  (state, action) =>
-    state
-      .set('tableText', action.payload.tableText).set('tableSelected', !!action.payload.tableText);
-
-FileImportReducers[ActionTypes.chooseFile] =
-  (state, action) =>
-    state
-      .set('file', action.payload.file)
-      .set('filetype', action.payload.filetype)
-      .set('fileChosen', true)
-  ;
-
-FileImportReducers[ActionTypes.unchooseFile] =
-  (state, action) =>
-    state
-      .set('fileChosen', false)
-  ;
-
-FileImportReducers[ActionTypes.uploadFile] =
-  (state, action) =>
-  {
-    Ajax.importFile(
-      state.file,
-      state.filetype,
-      state.dbText,
-      state.tableText,
-      state.connectionId,
-      () =>
-      {
-        alert("success");
-      },
-      (ev: string) =>
-      {
-        console.log(JSON.parse(ev));
-        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
-      },
-    );
-    return state;
-  };
-
-export default FileImportReducers;
+    CodeMirror.registerHelper("lint", "json", function(text) {
+      var found = [];
+      try {
+        //const t = new ESInterpreter(text, eslintConfig);
+        const t = new ESInterpreter(text, eslintConfig);
+        const errors = t.parser.errors;
+        for (let e of errors)
+        {
+          const token = e.token;
+          found.push({from: CodeMirror.Pos(token.row, token.col),
+            to: CodeMirror.Pos(token.toRow, token.toCol),
+            message: e.message});
+        }
+      } catch(e) {
+        console.log('Exception when parsing ' + text + " error: " + e);
+      }
+      return found;
+  });
+});

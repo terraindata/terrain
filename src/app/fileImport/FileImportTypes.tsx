@@ -48,7 +48,6 @@ import * as _ from 'underscore';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
 import { BaseClass, New } from '../Classes';
-import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
 export namespace FileImportTypes
