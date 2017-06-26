@@ -59,7 +59,7 @@ import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
 // Style sheets and addons for CodeMirror
 require('./tql.js');
-
+require('./elastic.js');
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/edit/matchbrackets.js';
@@ -90,7 +90,6 @@ export interface Props
   language?: string;
   canEdit: boolean;
 
-  // language?: string;
   theme?: string;
   highlightedLine?: number;
 
@@ -124,7 +123,6 @@ class TQLEditor extends PureClasss<Props>
         foldGutter: true,
         lint: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-        mode: "",
         revertButtons: false,
         connect: 'align',
 
@@ -133,7 +131,7 @@ class TQLEditor extends PureClasss<Props>
 
     if (this.props.language === 'elastic')
     {
-      // options['mode'] = 'application/json';
+      options['mode'] = 'elastic';
     }
 
     if (this.props.isDiff)
@@ -169,27 +167,26 @@ class TQLEditor extends PureClasss<Props>
       />
     );
   }
-  /*
-  public handleChanges(cm, changes): void
+
+  private handleHighlight(cmInstance): void
   {
-    // const marker = instance.markText({line: 0, ch: 0}, {line: 1, ch: 1}, {className: "cm-number"});
-    // const parser: ESJSONParser = new ESJSONParser(instance.getValue());
-    // tslint:disable-next-line no-console
-    console.log(this.props.language);
+    // console.log(cmInstance.getMode());
   }
-  */
+
   private registerCodeMirror(cmInstance)
   {
+    // cmInstance.on("changes", this.handleHighlight);
+
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
       this.highlighter = new ElasticHighlighter();
-      // tslint:disable-next-line no-console
-      console.log(this.props.language);
     }
     if (this.highlighter)
     {
       cmInstance.on("changes", this.highlighter.handleChanges.bind(this.highlighter));
+      this.highlighter.handleChanges(cmInstance, []); // this may not be safe
     }
+
   }
 }
 

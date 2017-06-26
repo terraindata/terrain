@@ -47,8 +47,13 @@ abstract class SyntaxHighlighter
 {
   /*
    *  @param cm CodeMirror instance
+   *  Called when text loads
    */
-  public abstract handleChanges(cm, changes: object[]): void;
+  public abstract initialHighlight(codeMirrorInstance): void;
 
+  /*
+   *  @param cm CodeMirror instance
+   */
+  public abstract handleChanges(codeMirrorInstance, changes: object[]): void;
 }
 export default SyntaxHighlighter;

@@ -49,8 +49,6 @@ import ESParserToken from '../../../../shared/backends/elastic/parser/ESParserTo
 import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
-// type TextCoordinates = [{ line: number, ch: number }, { line: number, ch: number }];
-
 class ElasticHighlighter extends SyntaxHighlighter
 {
   protected markers: any[];
@@ -61,13 +59,13 @@ class ElasticHighlighter extends SyntaxHighlighter
     this.markers = [];
   }
 
-  /*
-   *  Handle the 'changes' event emitted by CodeMirror
-   */
+  public initialHighlight(instance): void
+  {
+    this.handleChanges(instance, []);
+  }
+
   public handleChanges(instance, changes: object[]): void
   {
-    // const marker = instance.markText({line: 0, ch: 0}, {line: 1, ch: 1}, {className: "cm-number"});
-    // tslint:disable-next-line no-console
     this.clearMarkers();
     const parser = new ESJSONParser(instance.getValue());
     const tokens: ESParserToken[] = parser.getTokens();
@@ -100,17 +98,9 @@ class ElasticHighlighter extends SyntaxHighlighter
         }
         const coords = this.getTokenCoordinates(tokens[i]);
         const marker = instance.markText(coords[0], coords[1], { className: style });
-        // console.log(valueInfo.jsonType);
-        // console.log(coords[0]);
-        // console.log(coords[1]);
-        // tslint:disable-next-line no-console
-        // console.log([coords[0], coords[1], {className: style}]);
-        // console.log(style);
-        // console.log(marker);
         this.markers.push(marker);
       }
     }
-    // console.log(instance);
   }
 
   protected clearMarkers(): void
@@ -124,23 +114,7 @@ class ElasticHighlighter extends SyntaxHighlighter
 
   protected getTokenCoordinates(token: ESParserToken)// : TextCoordinates
   {
-    const row0 = token.row;
-    const col0 = token.col - 1;
-    // console.log('--------------------');
-    // console.log(token.col);
-    // console.log(token.length);
-    const lines = token.substring.replace('', '').split('\n');
-    const row1 = row0 + lines.length - 1;
-    const col1 = lines.length === 1 ? col0 + token.length : lines[lines.length - 1].length;
-    // tslint:disable-next-line no-console
-    // console.log('-------------------');
-    // console.log(token.substring);
-    // console.log(lines);
-    // console.log(row0, col0);
-    // console.log(row1, col1);
-    return [{ line: row0, ch: col0 }, { line: row1, ch: col1 }];
+    return [{ line: token.row, ch: token.col - 1 }, { line: token.toRow, ch: token.toCol }];
   }
 }
 export default ElasticHighlighter;
-
-/* tslint:disable */
