@@ -80,7 +80,6 @@ class LibraryInfoColumn extends PureClasss<Props>
   public handleLanguageChange(langIndex: number)
   {
     const language = LANGUAGES.get(langIndex);
-    console.log(this.props.variant.query);
     Actions.variants.change(
       this.props.variant
         .set('language', language)

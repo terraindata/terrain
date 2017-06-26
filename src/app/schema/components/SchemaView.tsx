@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Radium = require('radium');
+
+const Radium = require('radium');
 import * as $ from 'jquery';
 import * as React from 'react';
 import FadeInOut from '../../common/components/FadeInOut';
@@ -75,7 +76,7 @@ class SchemaView extends PureClasss<Props>
     search: string;
 
     // from Store
-    databases?: SchemaTypes.DatabaseMap;
+    servers?: SchemaTypes.ServerMap;
     highlightedId?: ID;
   } = {
     highlightedIndex: -1,
@@ -87,8 +88,8 @@ class SchemaView extends PureClasss<Props>
     super(props);
 
     this._subscribe(SchemaStore, {
-      stateKey: 'databases',
-      storeKeyPath: ['databases'],
+      stateKey: 'servers',
+      storeKeyPath: ['servers'],
     });
 
     this._subscribe(SchemaStore, {
@@ -161,6 +162,8 @@ class SchemaView extends PureClasss<Props>
         // esc
         // this.refs['input']['blur']();
         break;
+      default:
+        break;
     }
   }
 
@@ -218,9 +221,9 @@ class SchemaView extends PureClasss<Props>
             </FadeInOut>
 
             <SchemaTreeList
-              itemType='database'
-              itemIds={this.state.databases && this.state.databases.keySeq().toList()}
-              label={'Databases'}
+              itemType='server'
+              itemIds={this.state.servers && this.state.servers.keySeq().toList()}
+              label={'Servers'}
               topLevel={true}
               search={search}
             />
@@ -237,9 +240,6 @@ class SchemaView extends PureClasss<Props>
             this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
           ]}
         >
-          <SchemaResults
-            databases={this.state.databases}
-          />
         </div>
       </div>
     );

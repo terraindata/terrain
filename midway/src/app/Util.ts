@@ -144,3 +144,40 @@ export function verifyParameters(parameters: any, required: string[]): void
     }
   }
 }
+
+export function getEmptyObject(payload: object): object
+{
+  let emptyObj: any = {};
+  if (Array.isArray(payload))
+  {
+    emptyObj = [];
+  }
+  return Object.keys(payload).reduce((res, item) =>
+  {
+    switch (typeof (payload[item]))
+    {
+      case 'boolean':
+        res[item] = false;
+        break;
+
+      case 'number':
+        res[item] = 0;
+        break;
+      case 'object':
+        if (payload[item] === null)
+        {
+          res[item] = null;
+        }
+        else
+        {
+          res[item] = getEmptyObject(payload[item]);
+        }
+        break;
+
+      default:
+        res[item] = '';
+    }
+    return res;
+  },
+    emptyObj);
+}

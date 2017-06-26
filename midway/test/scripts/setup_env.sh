@@ -84,8 +84,8 @@ docker pull $elastic_image &
 wait
 
 docker run -v${sqlite_path}:/data/ -u$(id -u):$(id -g) $sqlite_image
-MYSQL_ID=$(docker run --rm -d --name moviesdb-mysql -p $mysql_port:$mysql_port $mysql_image)
-ELASTIC_ID=$(docker run --rm -d --name moviesdb-elk -p $elastic_port:$elastic_port $elastic_image)
+MYSQL_ID=$(docker run -d --name moviesdb-mysql -p $mysql_port:$mysql_port $mysql_image)
+ELASTIC_ID=$(docker run -d --name moviesdb-elk -p $elastic_port:$elastic_port $elastic_image)
 
 if [ -z "$ELASTIC_ID" -o -z "$MYSQL_ID" ]; then
 	echo "Docker services failed to start..."

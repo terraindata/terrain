@@ -83,7 +83,7 @@ class ElasticClient
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
   {
     this.log('bulk', params);
-    return this.delegate.bulk(params, callback);
+    this.delegate.bulk(params, callback);
   }
 
   /**
@@ -93,7 +93,25 @@ class ElasticClient
     callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void
   {
     this.log('delete', params);
-    return this.delegate.delete(params, callback);
+    this.delegate.delete(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-deletetemplate
+   */
+  public deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void
+  {
+    this.log('deleteTemplate', params);
+    this.delegate.deleteTemplate(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-gettemplate
+   */
+  public getTemplate(params: Elastic.GetTemplateParams, callback: (error: any, response: any) => void): void
+  {
+    this.log('getTemplate', params);
+    this.delegate.getTemplate(params, callback);
   }
 
   /**
@@ -102,7 +120,7 @@ class ElasticClient
   public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void
   {
     this.log('index', params);
-    return this.delegate.index(params, callback);
+    this.delegate.index(params, callback);
   }
 
   /**
@@ -111,7 +129,16 @@ class ElasticClient
   public putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void
   {
     this.log('putScript', params);
-    return this.delegate.putScript(params, callback);
+    this.delegate.putScript(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-puttemplate
+   */
+  public putTemplate(params: Elastic.PutTemplateParams, callback: (err: any, response: any, status: any) => void): void
+  {
+    this.log('putTemplate', params);
+    this.delegate.putTemplate(params, callback);
   }
 
   /**
@@ -121,7 +148,7 @@ class ElasticClient
     callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
   {
     this.log('search', params);
-    return this.delegate.search(params, callback);
+    this.delegate.search(params, callback);
   }
 
   public getDelegate(): Elastic.Client

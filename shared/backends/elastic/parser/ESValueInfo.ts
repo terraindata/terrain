@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESClause from './ESClause';
+import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -54,10 +55,32 @@ import ESPropertyInfo from './ESPropertyInfo';
  */
 export default class ESValueInfo
 {
+
+  private static emptyArrayChildren: ESValueInfo[] = [];
+
+  private static emptyObjectChildren: { [name: string]: ESPropertyInfo } = {};
+
+  private static emptyErrorList: ESParserError[] = [];
+
+  /**
+   * The JSON type of the value.
+   */
+  public jsonType: ESJSONType;
+
   /**
    * The parsed value
    */
   public value: any;
+
+  /**
+   * If value is an array, a corresponding ESValueInfo[]. An empty list otherwise.
+   */
+  public arrayChildren: ESValueInfo[];
+
+  /**
+   * If value is an object, a corresponding object mapping keys. An empty object otherwise.
+   */
+  public objectChildren: { [name: string]: ESPropertyInfo };
 
   /**
    * The tokens belonging to the value, in order of appearance
@@ -65,18 +88,10 @@ export default class ESValueInfo
   public tokens: ESParserToken[];
 
   /**
-   * If value is a terminal node, children is null
-   * If value is an array, children is a corresponding ESValueInfo[]
-   * If value is an object, children is a corresponding object mapping keys
-   *  to {name:ESValueInfo, value:ESValueInfo} tuples.
-   */
-  public children: null | ESValueInfo[] | { [name: string]: ESPropertyInfo };
-
-  /**
    * If errors were detected associated with this value, they will be in this list
    * in the order in which they were detected.
    */
-  public errors: ESParserError[] | null;
+  public errors: ESParserError[];
 
   /**
    * When interpreted, this is set to the detected ESClause for this value
@@ -88,19 +103,21 @@ export default class ESValueInfo
    */
   public delegateClause: ESClause | null;
 
-  public constructor(value?: any, tokens: ESParserToken[] = [])
+  public constructor()
   {
-    this.value = value;
-    this.tokens = tokens;
-    this.children = null;
-    this.errors = null;
+    this.jsonType = ESJSONType.invalid;
+    this.value = undefined;
+    this.tokens = [];
+    this.arrayChildren = ESValueInfo.emptyArrayChildren;
+    this.objectChildren = ESValueInfo.emptyObjectChildren;
+    this.errors = ESValueInfo.emptyErrorList;
     this.clause = null;
     this.delegateClause = null;
   }
 
   public attachError(error: ESParserError): void
   {
-    if (this.errors === null)
+    if (this.errors.length === 0)
     {
       this.errors = [error];
     }

@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
+import * as util from 'util';
 import * as winston from 'winston';
 import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
 import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
@@ -73,15 +74,26 @@ beforeAll(async (done) =>
 
 function testParse(testString: string,
   expectedValue: any,
-  expectedErrors: ESParserError[] = [])
+  expectedErrors: any[] = [])
 {
   winston.info('testing \'' + testString + '\'');
   const parser: ESParser = new ESParser(testString);
   const value = parser.getValue();
+  const errors = parser.getErrors();
 
-  // winston.info(JSON.stringify(parser.getValueInfos(), null, 1));
+  winston.info(util.inspect(parser.getValueInfo()));
+  winston.info(util.inspect(parser.getTokens()));
+  winston.info(util.inspect(parser.getValueInfos()));
+
+  winston.info(util.inspect(errors));
+
   expect(value).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
+
+  expect(errors.length).toEqual(expectedErrors.length);
+  for (let i = 0; i < errors.length; ++i)
+  {
+    expect(errors[i]).toMatchObject(expectedErrors[i]);
+  }
 }
 
 test('parse valid json objects', () =>
@@ -95,6 +107,90 @@ test('parse valid json objects', () =>
       testParse(JSON.stringify(testValue), testValue);
       testParse(JSON.stringify(testValue, null, 1), testValue);
       testParse(JSON.stringify(testValue, null, 2), testValue);
+      testParse(JSON.stringify(testValue, null, 3), testValue);
       testParse(JSON.stringify(testValue, null, 4), testValue);
     });
+});
+
+test('parse invalid json objects', () =>
+{
+  testParse('string', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('fulse', false,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('falsey', false,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('tru', true,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('trueee', true,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('n', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('nil', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('nullllleray', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('["string]', ['string'],
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 1, row: 0, col: 1 },
+      },
+    ]);
+
+  testParse(`{
+  "index": "movies",
+  "type": "data",
+  "from": 0,
+  "size": "10"
+}`, JSON.parse(`{"from": 0, "index": "movies", "size": "10", "type": "data"}`), []);
+
 });

@@ -45,146 +45,74 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import EQLSpec from './EQLSpec';
-import ESAnyClause from './ESAnyClause';
 import ESArrayClause from './ESArrayClause';
-import ESBaseClause from './ESBaseClause';
-import ESBooleanClause from './ESBooleanClause';
 import ESClause from './ESClause';
-import ESEnumClause from './ESEnumClause';
 import ESMapClause from './ESMapClause';
-import ESNullClause from './ESNullClause';
-import ESNumberClause from './ESNumberClause';
-import ESReferenceClause from './ESReferenceClause';
-import ESStringClause from './ESStringClause';
-import ESStructureClause from './ESStructureClause';
-import ESVariantClause from './ESVariantClause';
 
 /**
  *
  */
 export default class EQLConfig
 {
-
-  private undefinedTypes: { [name: string]: boolean };
   private clauses: { [name: string]: ESClause };
 
-  public constructor(clauseConfiguration: any = EQLSpec)
+  public constructor(clauseConfiguration: ESClause[] = EQLSpec)
   {
-    this.undefinedTypes = {};
     this.clauses = {};
 
-    // winston.info(JSON.stringify(clauseConfiguration));
-    Object.keys(clauseConfiguration).forEach(
-      (key: string): void => this.defineType(key, clauseConfiguration[key]));
-
-    // TODO: validate id references and other settings
-  }
-
-  public defineType(name: string, settings: any): void
-  {
-    // winston.info('defining "' + id + '"');
-
-    this.declareType(name, settings);
-    if (this.clauses[name] !== undefined)
-    {
-      return;
-    }
-
-    const def: any = settings.def;
-    let clause: ESClause;
-    if (typeof (def) === 'object')
-    {
-      // structured object id
-      clause = new ESStructureClause(settings, this);
-    }
-    else if (typeof (def) === 'string')
-    {
-      switch (def)
+    clauseConfiguration.forEach(
+      (clause: ESClause): void =>
       {
-        case 'enum':
-          clause = new ESEnumClause(settings);
-          break;
-        case 'variant':
-          clause = new ESVariantClause(settings, this);
-          break;
-        default:
-          // reference clause
-          clause = new ESReferenceClause(settings, this);
-          break;
-      }
-    }
-    else
-    {
-      throw new Error('Unknown clause "' + 'name:' + String(name) + ',' + 'def:' + String(def) + ' ".');
-    }
+        this.validateTypename(clause.type);
+        this.clauses[clause.type] = clause;
+      });
 
-    // winston.info('registering clause "' + id + '"');
-    this.clauses[name] = clause;
-    delete this.undefinedTypes[name];
+    clauseConfiguration.forEach(
+      (clause: ESClause): void =>
+      {
+        clause.init(this);
+      });
   }
 
-  public declareType(name: string, settings: any = {}): void
+  public declareType(type: string, settings: any = {}): void
   {
-    if (this.clauses[name] !== undefined)
+    if (this.clauses[type] !== undefined)
     {
       return; // already declared
     }
 
     // winston.info('declare "' + id + '"');
-    settings.name = name;
+    settings.type = type;
     let clause: ESClause | null = null;
-    switch (name)
+
+    this.validateTypename(type);
+
+    if (type.endsWith('[]'))
     {
-      case 'null':
-        clause = new ESNullClause(settings);
-        break;
-      case 'boolean':
-        clause = new ESBooleanClause(settings);
-        break;
-      case 'number':
-        clause = new ESNumberClause(settings);
-        break;
-      case 'string':
-        clause = new ESStringClause(settings);
-        break;
-      case 'base':
-        clause = new ESBaseClause(settings);
-        break;
-      case 'any':
-        clause = new ESAnyClause(settings);
-        break;
+      // array
+      clause = new ESArrayClause(type, type.substring(0, type.length - 2), settings);
+    }
+    else if (type.startsWith('{'))
+    {
+      // map
+      if (type.charAt(0) !== '{' || type.charAt(type.length - 1) !== '}' ||
+        type.indexOf(' ') !== -1)
+      {
+        throw new Error('Unsupported map type "' + type + '".');
+      }
 
-      default:
-        this.validateTypename(name);
-
-        if (name.endsWith('[]'))
-        {
-          // array
-          clause = new ESArrayClause(settings, name.substring(0, name.length - 2));
-        }
-        else if (name.startsWith('{'))
-        {
-          // map
-          if (name.charAt(0) !== '{' || name.charAt(name.length - 1) !== '}' ||
-            name.indexOf(' ') !== -1)
-          {
-            throw new Error('Unsupported map name "' + name + '".');
-          }
-
-          const components: string[] = name.substring(1, name.length - 1).split(':');
-          clause = new ESMapClause(settings, components[0], components[1], this);
-        }
-        else
-        {
-          // undefined reference id
-          this.undefinedTypes[name] = true;
-        }
-        break;
+      const components: string[] = type.substring(1, type.length - 1).split(':');
+      clause = new ESMapClause(type, components[0], components[1], settings);
+    }
+    else
+    {
+      // undefined reference id
+      throw new Error('Unknown clause type: "' + type + '"');
     }
 
     if (clause !== null)
     {
-      this.clauses[name] = clause;
+      this.clauses[type] = clause;
     }
   }
 
@@ -210,5 +138,4 @@ export default class EQLConfig
       throw new Error('Unknown clause id "' + id + '"');
     }
   }
-
 }

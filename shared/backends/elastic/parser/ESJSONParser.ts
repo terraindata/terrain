@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESJSONType from './ESJSONType';
+import ESParameter from './ESParameter';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -68,7 +70,8 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESJSONParser
 {
-  private queryString: string; // stringgit being parsed
+  private queryString: string; // string being parsed
+  private allowParameters: boolean; // if @parameters are allowed (non-compliant)
 
   private charNumber: number; // current parser/tokenizer position in the queryString
 
@@ -87,8 +90,9 @@ export default class ESJSONParser
    * Runs the parser on the given query string. Read needed data by calling the
    * public member functions below.
    * @param queryString query to parse
+   * @param allowParameters
    */
-  public constructor(queryString: string)
+  public constructor(queryString: string, allowParameters: boolean = true)
   {
     this.queryString = queryString;
     this.charNumber = 0;
@@ -97,6 +101,7 @@ export default class ESJSONParser
     this.lastRowNumber = 0;
     this.value = null;
     this.valueInfo = null;
+    this.allowParameters = allowParameters;
 
     this.tokens = [];
     this.valueInfos = [];
@@ -111,6 +116,7 @@ export default class ESJSONParser
     // check ending
     if (this.peek() !== '')
     {
+      this.accumulateToken();
       this.accumulateErrorOnCurrentToken('Unexpected token at the end of the query string');
     }
   }
@@ -155,6 +161,11 @@ export default class ESJSONParser
     return this.errors;
   }
 
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
+  }
+
   public accumulateError(error: ESParserError): void
   {
     this.errors.push(error);
@@ -163,7 +174,7 @@ export default class ESJSONParser
   private peek(): string
   {
     // skip whitespace
-    this.match(/\s*/);
+    this.match(/^\s*/);
 
     // handle EOF
     if (this.charNumber >= this.queryString.length)
@@ -192,16 +203,18 @@ export default class ESJSONParser
   private readValue(): ESValueInfo | null
   {
     const valueInfo: ESValueInfo = this.beginValueInfo();
+
+    const nextChar: string = this.peek();
     const token: ESParserToken = this.accumulateToken();
 
     try
     {
-      switch (this.peek())
+      switch (nextChar)
       {
         // string
         case '"':
+          valueInfo.jsonType = ESJSONType.string;
           valueInfo.value = this.readString();
-          this.setToken();
           break;
 
         // number
@@ -216,12 +229,13 @@ export default class ESJSONParser
         case '8':
         case '9':
         case '-':
+          valueInfo.jsonType = ESJSONType.number;
           valueInfo.value = this.readNumber();
-          this.setToken();
           break;
 
         // object
         case '{':
+          valueInfo.jsonType = ESJSONType.object;
           this.advance();
           this.readObject(valueInfo);
           break;
@@ -232,6 +246,7 @@ export default class ESJSONParser
 
         // array
         case '[':
+          valueInfo.jsonType = ESJSONType.array;
           this.advance();
           this.readArray(valueInfo);
           break;
@@ -242,25 +257,30 @@ export default class ESJSONParser
 
         // true
         case 't':
+          valueInfo.jsonType = ESJSONType.boolean;
           valueInfo.value = this.readTrueValue();
-          this.setToken();
           break;
 
         // false
         case 'f':
+          valueInfo.jsonType = ESJSONType.boolean;
           valueInfo.value = this.readFalseValue();
-          this.setToken();
           break;
 
         // null
         case 'n':
+          valueInfo.jsonType = ESJSONType.null;
           valueInfo.value = this.readNullValue();
-          this.setToken();
+          break;
+
+        case '@':
+          valueInfo.jsonType = ESJSONType.parameter;
+          valueInfo.value = this.readParameter();
           break;
 
         default:
           this.accumulateErrorOnCurrentToken('Unknown token found when expecting a value');
-          this.advance();
+          this.matchAndSetToken(/^.[a-zA-Z_0-9]*/); // try to skip the token
           break;
       }
     }
@@ -284,7 +304,7 @@ export default class ESJSONParser
 
   private readString(): string
   {
-    const result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F]+)*")/);
+    let result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F]+)*")/);
     if (typeof result === 'string')
     {
       return result;
@@ -292,7 +312,23 @@ export default class ESJSONParser
 
     // try to capture an invalid token
     this.accumulateErrorOnCurrentToken('Unknown string format');
-    this.match(/^(?:\\.|[^"\\])*"/);
+
+    // try to capture a string that ends in double quotes
+    result = this.matchAndSetToken(/^"(?:\\.|[^"\\])*"/);
+    if (result !== null)
+    {
+      return result.substring(1, result.length - 1);
+    }
+
+    // try to capture a string that ends with some JSON control char
+    result = this.matchAndSetToken(/^"[^,:\[\]{}"]+/);
+
+    if (result !== null)
+    {
+      return result.substring(1, result.length);
+    }
+
+    this.advance();
     return '';
   }
 
@@ -306,7 +342,7 @@ export default class ESJSONParser
 
     // try to capture an invalid token
     this.accumulateErrorOnCurrentToken('Unknown number format');
-    this.match(/^([\-.eE0-9]+)/);
+    this.matchAndSetToken(/^([\-.eE0-9]+)/);
     return 0;
   }
 
@@ -314,14 +350,14 @@ export default class ESJSONParser
   {
     const array: any[] = [];
     arrayInfo.value = array;
-    arrayInfo.children = [];
+    arrayInfo.arrayChildren = [];
 
     for (let elementInfo: ESValueInfo | null = this.readValue();
       elementInfo !== null;
       elementInfo = this.readValue())
     {
       array.push(elementInfo.value);
-      arrayInfo.children.push(elementInfo);
+      arrayInfo.arrayChildren.push(elementInfo);
 
       // read next delimiter
       const propertyDelimiter: string = this.peek();
@@ -350,7 +386,7 @@ export default class ESJSONParser
   {
     const obj: object = {};
     objInfo.value = obj;
-    objInfo.children = {};
+    objInfo.objectChildren = {};
 
     for (let nameInfo: ESValueInfo | null = this.readValue();
       nameInfo !== null;
@@ -371,7 +407,7 @@ export default class ESJSONParser
       }
 
       const propertyInfo: ESPropertyInfo = new ESPropertyInfo(nameInfo);
-      objInfo.children[propertyName] = propertyInfo;
+      objInfo.objectChildren[propertyName] = propertyInfo;
 
       // read delimiter between property name and value
       const kvpDelimiter: string = this.peek();
@@ -431,25 +467,25 @@ export default class ESJSONParser
 
   private readTrueValue(): boolean
   {
-    this.readBooleanOrNull(/^true/);
+    this.readBooleanOrNull(/^true(?!\w)/);
     return true;
   }
 
   private readFalseValue(): boolean
   {
-    this.readBooleanOrNull(/^false/);
+    this.readBooleanOrNull(/^false(?!\w)/);
     return false;
   }
 
   private readNullValue(): null
   {
-    this.readBooleanOrNull(/^null/);
+    this.readBooleanOrNull(/^null(?!\w)/);
     return null;
   }
 
   private readBooleanOrNull(exp: RegExp): boolean
   {
-    const match: any = this.match(exp);
+    const match: string | null = this.matchAndSetToken(exp);
     if (match !== null)
     {
       return true;
@@ -457,20 +493,44 @@ export default class ESJSONParser
 
     // try to capture an invalid token
     this.accumulateErrorOnCurrentToken('Unknown value type, possibly a boolean null (true, false, and null, are valid).');
-    this.match(/^\w+/);
+    this.matchAndSetToken(/^\w+/);
     return false;
+  }
+
+  private readParameter(): ESParameter
+  {
+    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_][a-zA-Z_0-9]*)/);
+    if (match === null)
+    {
+      match = '';
+      this.accumulateErrorOnCurrentToken(
+        'Invalid parameter name. Parameter names must begin with a letter or underscore, ' +
+        'and can only contain letters, underscores, and numbers.');
+    }
+
+    return new ESParameter(match);
   }
 
   private captureMatch(exp: RegExp): any
   {
-    const match: string | null = this.match(exp);
+    const match: string | null = this.matchAndSetToken(exp);
     if (match === null)
     {
       return null;
     }
 
-    const unescaped: string = JSON.parse(match);
-    return unescaped;
+    return JSON.parse(match);
+  }
+
+  private matchAndSetToken(exp: RegExp): string | null
+  {
+    const result: string | null = this.match(exp);
+    if (result !== null)
+    {
+      this.setToken();
+    }
+
+    return result;
   }
 
   private match(exp: RegExp): string | null
@@ -486,7 +546,7 @@ export default class ESJSONParser
     return match;
   }
 
-  private accumulateToken(valueInfo?: ESValueInfo): ESParserToken
+  private accumulateToken(valueInfo: ESValueInfo | null = null): ESParserToken
   {
     const element: ESParserToken =
       new ESParserToken(this.charNumber,
@@ -497,13 +557,18 @@ export default class ESJSONParser
     this.tokens.push(element);
 
     // link up the ValueInfo and the Token
-    if (valueInfo === undefined)
+    if (valueInfo === null)
     {
       valueInfo = this.getCurrentValueInfo();
     }
 
     element.valueInfo = valueInfo;
-    valueInfo.tokens.push(element);
+
+    if (valueInfo !== null)
+    {
+      valueInfo.tokens.push(element);
+    }
+
     return element;
   }
 
@@ -516,6 +581,8 @@ export default class ESJSONParser
   {
     const element: ESParserToken = this.getCurrentToken();
     element.length = this.charNumber - element.charNumber;
+    element.toRow = this.getRow();
+    element.toCol = this.getCol();
     element.substring = this.queryString.substring(element.charNumber, element.charNumber + element.length);
   }
 
@@ -526,8 +593,13 @@ export default class ESJSONParser
     return element;
   }
 
-  private getCurrentValueInfo(): ESValueInfo
+  private getCurrentValueInfo(): ESValueInfo | null
   {
+    if (this.valueInfos.length === 0)
+    {
+      return null;
+    }
+
     return this.valueInfos[this.valueInfos.length - 1];
   }
 
