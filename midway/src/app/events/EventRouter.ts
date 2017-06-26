@@ -44,40 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// Part of events PoC
-
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
 import { EventConfig, EventRequestConfig, Events } from './Events';
-// export * from './Events';
 
 export const events: Events = new Events();
 
 const Router = new KoaRouter();
 
-/*
- * Get an event tracker.
- *
- */
+
+// Get an event tracker.
 Router.post('/', async (ctx, next) =>
 {
-  try
-  {
-    ctx.body = JSON.stringify(await events.JSONHandler(ctx.request.ip, ctx.request.body));
-  }
-  catch (e)
-  {
-    ctx.body = '';
-  }
+  ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body);
 });
 
-/*
- * Handle client response for event tracker
- *
- */
+
+// Handle client response for event tracker
 Router.post('/update/', async (ctx, next) =>
 {
   try

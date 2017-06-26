@@ -64,8 +64,7 @@ const timeSalt: string = srs({ length: 256 }); // time salt
 
 interface EventBaseConfig
 {
-  date?: number;
-  eventId: string;
+  date?: string;
   id?: number;
   ip?: string;
   message?: string;
@@ -75,8 +74,7 @@ interface EventBaseConfig
 
 export interface EventConfig extends EventBaseConfig
 {
-  message: string;
-  payload: any;
+  eventId: string;
   type: string;
 }
 
@@ -301,11 +299,10 @@ export class Events
    * Store the validated event in the datastore
    *
    */
-  public async storeEvent(event: EventConfig): Promise<any>
+  public async storeEvent(event: EventConfig): Promise<EventConfig>
   {
     event.payload = JSON.stringify(event.payload);
-    const events: object[] = [event as object];
-    return await this.elasticController.getTasty().upsert(this.eventTable, events);
+    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 }
 
