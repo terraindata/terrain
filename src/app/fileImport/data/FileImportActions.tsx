@@ -43,103 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as _ from 'underscore';
+import ActionTypes from './FileImportActionTypes';
+import { FileImportStore } from './FileImportStore';
 
-import * as request from 'request';
+const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
-export function getRequest(url)
-{
-  return new Promise((resolve, reject) =>
+const FileImportActions =
   {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
-}
+    changeServer:
+    (serverIndex: number, connectionId: number) =>
+      $(ActionTypes.changeServer, { serverIndex, connectionId }),
 
-export function verifyParameters(parameters: any, required: string[]): void
-{
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
-  }
+    changeDbText:
+    (dbText: string) =>
+      $(ActionTypes.changeDbText, { dbText }),
 
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
-}
+    changeTableText:
+    (tableText: string) =>
+      $(ActionTypes.changeTableText, { tableText }),
 
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
-  }
-  return obj;
-}
+    chooseFile:
+    (file: string, filetype: string) =>
+      $(ActionTypes.chooseFile, { file, filetype }),
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
+    unchooseFile:
+    () =>
+      $(ActionTypes.unchooseFile, {}),
+
+    uploadFile:
+    () =>
+      $(ActionTypes.uploadFile, {}),
   };
-}
 
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
-    {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
-    }
-    return res;
-  },
-    emptyObj);
-}
+export default FileImportActions;
