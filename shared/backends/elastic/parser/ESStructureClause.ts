@@ -53,7 +53,7 @@ import ESInterpreter from './ESInterpreter';
 import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
-import Block from '../../../blocks/types/Block';
+import { Block, _block } from '../../../blocks/types/Block';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 import BlockUtils from '../../../blocks/BlockUtils';
 import ElasticBlocks from '../blocks/ElasticBlocks';
@@ -131,7 +131,7 @@ export default class ESStructureClause extends ESClause
   
   
   
-  public getCard()
+  public getRowsCard()
   {
     let firstKey: string;
     // let display: Display[] = [];
@@ -189,53 +189,68 @@ export default class ESStructureClause extends ESClause
     return this.seedCard({
         properties: Immutable.List([]),
         
+        static:
         {
-          static:
+          preview: '[properties.size] properties',
+          display:
           {
-            preview: '[properties.size] properties',
-            display:
+            displayType: DisplayType.ROWS,
+            key: 'properties',
+            english: 'property',
+            factoryType: this.getBlockType(),
+            
+            row: 
             {
-              displayType: DisplayType.ROWS,
-              key: 'properties',
-              english: 'property',
-              factoryType: 'elasticStructureProperty',
-              
-              row: 
+              inner:
               {
-                inner:
-                {
-                  displayType: DisplayType.DROPDOWN,
-                  key: 'key',
-                  
-                  options: propertyKeys,
-                  dropdownUsesRawValues: true,
-                },
-                // {
-                //   [
-                //     {
-                      
-                //     },
-                //   ],
-                // },
+                displayType: DisplayType.DROPDOWN,
+                key: 'key',
                 
-                below:
-                {
-                  displayType: DisplayType.CARDS,
-                  key: 'cards',
-                },
+                options: propertyKeys,
+                dropdownUsesRawValues: true,
               },
+              // {
+              //   [
+              //     {
+                    
+              //     },
+              //   ],
+              // },
               
+              below:
+              {
+                displayType: DisplayType.CARDS,
+                key: 'cards',
+              },
             },
-            tql: (boolBlock) => !! boolBlock['value'],
-          }
+            
+          },
+          tql: (boolBlock) => !! boolBlock['value'],
         }
       }
     );
   }
   
-  public getSupplementalBlocks(): Block[]
+  private getBlockType(): string
   {
-    
+    return this.type + 'ValueBlock';
+  }
+  
+  public getSupplementalBlocks(): {[type: string]: Block}
+  {
+    return {
+      [this.getBlockType()]: _block({
+        key: '',
+        clauseType: '',
+        cardValue: null,
+        
+        static:
+        {
+          tql: '',
+          language: 'elastic',
+        },
+      }),
+    };
   }
   
   
@@ -259,11 +274,13 @@ export default class ESStructureClause extends ESClause
             this.template,
             (templateValue, templateKey) =>
             {
-              if (ElasticBlocks['eql' + templateKey])
+              const clauseType = templateKey === null ? templateValue : templateKey;
+              if (ElasticBlocks['eql' + clauseType])
               {
                 return BlockUtils.make(
-                  ElasticBlocks['eql' + templateKey],
-                  templateValue && {
+                  ElasticBlocks['eql' + clauseType],
+                  {
+                    key: templateKey,
                     value: templateValue,
                     // all base cards have a 'value' key
                   }
@@ -283,24 +300,32 @@ export default class ESStructureClause extends ESClause
       }
     }
     
-    return CommonBlocks._wrapperCard({
-      colors: [],
-      title: this.type,
-      language: 'elastic',
-      tql: (block, tqlTranslationFn, tqlConfig) => {
-        let json: object = {};
-        block['cards'].map(
-          (card) =>
-          {
-            _.extend(json, {
-              [card.type.substr(3)]: tqlTranslationFn(card, tqlConfig),
-            });
-          }
-        );
-      },
-      
-      accepts,
-      init,
-    });
+    return this.seedCard(
+      CommonBlocks._wrapperCard({
+        colors: [],
+        title: this.type,
+        language: 'elastic',
+        tql: (block, tqlTranslationFn, tqlConfig) => {
+          let json: object = {};
+          block['cards'].map(
+            (card) =>
+            {
+              _.extend(json, {
+                [card['key']]: tqlTranslationFn(card, tqlConfig),
+              });
+            }
+          );
+          return json;
+        },
+        
+        accepts,
+        init,
+      })
+    );
   }
+  
+  public getCard()
+  {
+    return this.getWrapperCard();
+  }  
 }

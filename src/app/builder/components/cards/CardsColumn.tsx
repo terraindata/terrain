@@ -126,8 +126,7 @@ class CardsColumn extends PureClasss<Props>
 
   public getFirstCard()
   {
-    const type = AllBackendsMap[this.props.language].topLevelCards.get(0);
-    return AllBackendsMap[this.props.language].blocks[type];
+    return AllBackendsMap[this.props.language].rootCard;
   }
 
   public createCard()

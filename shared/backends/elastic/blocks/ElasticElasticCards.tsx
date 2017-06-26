@@ -85,7 +85,7 @@ _.mapObject(
         Colors().builder.cards['card' + colorKey + 'BG'],
       ];
       
-      ElasticElasticCards['eql' + key] = card;
+      ElasticElasticCards[clause.getCardType()] = card;
     }
   }
 );

@@ -50,7 +50,7 @@ import ESValueInfo from './ESValueInfo';
 import * as _ from 'underscore';
 import { Card, _card } from '../../../blocks/types/Card';
 import { TQLFn } from '../../../blocks/types/Block';
-import { Display } from '../../../blocks/displays/Display';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 
 /**
  * Represents an Elastic Search query clause
@@ -145,6 +145,7 @@ abstract class ESClause
     };
   }): any
   {
+    // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: this.name,
       colors: [],
@@ -153,6 +154,37 @@ abstract class ESClause
       anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
     
+    if(true) // switch this on for wrapper card approach
+    {
+      if(obj['key'] !== undefined)
+      {
+        throw new Error('Key method was already defined for block ' + this.type);
+      }
+      // Define a key, which will be optionally used to supply the key
+      //  for a key/val pair, if one is needed
+      obj['key'] = '';
+      
+      // prepend the display with our standard key text display
+      if (!obj['static']['display'])
+      {
+        obj['static']['display'] = KEY_DISPLAY;
+      }
+      else if (Array.isArray(obj['static']['display']))
+      {
+        console.log('pushed');
+        (obj['static']['display'] as any).push(KEY_DISPLAY);
+      }
+      else
+      {
+        console.log('made array');
+        obj['static']['display'] = [
+          KEY_DISPLAY,
+          obj['static']['display'],
+        ] as any;
+      }
+      console.log(this.type, obj['static']['display']);
+    }
+    
     return _card(obj as any);
   }
   
@@ -160,6 +192,18 @@ abstract class ESClause
   {
     return null;
   }
+  
+  public getCardType(): string
+  {
+    return 'eql' + this.type;
+  }
 }
+
+const KEY_DISPLAY: Display =
+{
+  displayType: DisplayType.TEXT,
+  key: 'key',
+  autoDisabled: true, // TODO consider autocomplete for key?
+};
 
 export default ESClause;
