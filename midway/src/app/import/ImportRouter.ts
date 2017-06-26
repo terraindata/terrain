@@ -43,70 +43,24 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import SchemaTypes from '../SchemaTypes';
 
-let servers = Immutable.Map({});
-let databases = Immutable.Map({});
-let tables = Immutable.Map({});
-let columns = Immutable.Map({});
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-['Example Database Server'].map(
-  (serverName) =>
-  {
-    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
+import * as Util from '../Util';
+import { Import, ImportConfig } from './Import';
 
-    ['movieDB', 'baseballDB'].map(
-      (dbName) =>
-      {
-        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
-        server = server.set('databaseIds', server.databaseIds.push(db.id));
+const Router = new KoaRouter();
+export const imprt: Import = new Import();
 
-        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) =>
-          {
-            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
-            db = db.set('tableIds', db.tableIds.push(table.id));
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('importing to database');
+  const imprtConf: ImportConfig = ctx.request.body.body;
+  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'table', 'filetype', 'db']);
 
-            ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) =>
-              {
-                const column = SchemaTypes._Column({
-                  name: colName,
-                  tableId: table.id,
-                  databaseId: db.id,
-                  serverId: server.id,
-                  datatype: 'VARCHAR',
-                  isNullable: true,
-                  defaultValue: '',
-                  isPrimaryKey: false,
-                });
+  ctx.body = await imprt.insert(imprtConf);
+});
 
-                columns = columns.set(column.id, column);
-
-                table = table.set('columnIds', table.columnIds.push(column.id));
-              },
-            );
-
-            tables = tables.set(table.id, table);
-          },
-        );
-
-        databases = databases.set(db.id, db);
-      },
-    );
-
-    servers = servers.set(server.id, server);
-  },
-);
-
-const ExampleSchemaData =
-  SchemaTypes._SchemaState()
-    .set('servers', servers)
-    .set('databases', databases)
-    .set('columns', columns)
-    .set('tables', tables)
-    .set('loading', false)
-    .set('loaded', true);
-
-export default ExampleSchemaData;
+export default Router;

@@ -44,69 +44,65 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import SchemaTypes from '../SchemaTypes';
+import * as _ from 'underscore';
+import Util from './../../util/Util';
+import ActionTypes from './FileImportActionTypes';
+import Ajax from './../../util/Ajax';
 
-let servers = Immutable.Map({});
-let databases = Immutable.Map({});
-let tables = Immutable.Map({});
-let columns = Immutable.Map({});
+const FileImportReducers = {}
 
-['Example Database Server'].map(
-  (serverName) =>
+FileImportReducers[ActionTypes.changeServer] =
+  (state, action) =>
+    state
+      .set('serverIndex', action.payload.serverIndex)
+      .set('connectionId', action.payload.connectionId)
+      .set('serverSelected', true)
+  ;
+
+FileImportReducers[ActionTypes.changeDbText] =
+  (state, action) =>
+    state
+      .set('dbText', action.payload.dbText).set('dbSelected', !!action.payload.dbText);
+
+FileImportReducers[ActionTypes.changeTableText] =
+  (state, action) =>
+    state
+      .set('tableText', action.payload.tableText).set('tableSelected', !!action.payload.tableText);
+
+FileImportReducers[ActionTypes.chooseFile] =
+  (state, action) =>
+    state
+      .set('file', action.payload.file)
+      .set('filetype', action.payload.filetype)
+      .set('fileChosen', true)
+  ;
+
+FileImportReducers[ActionTypes.unchooseFile] =
+  (state, action) =>
+    state
+      .set('fileChosen', false)
+  ;
+
+FileImportReducers[ActionTypes.uploadFile] =
+  (state, action) =>
   {
-    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
-
-    ['movieDB', 'baseballDB'].map(
-      (dbName) =>
+    Ajax.importFile(
+      state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+      () =>
       {
-        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
-        server = server.set('databaseIds', server.databaseIds.push(db.id));
-
-        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) =>
-          {
-            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
-            db = db.set('tableIds', db.tableIds.push(table.id));
-
-            ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) =>
-              {
-                const column = SchemaTypes._Column({
-                  name: colName,
-                  tableId: table.id,
-                  databaseId: db.id,
-                  serverId: server.id,
-                  datatype: 'VARCHAR',
-                  isNullable: true,
-                  defaultValue: '',
-                  isPrimaryKey: false,
-                });
-
-                columns = columns.set(column.id, column);
-
-                table = table.set('columnIds', table.columnIds.push(column.id));
-              },
-            );
-
-            tables = tables.set(table.id, table);
-          },
-        );
-
-        databases = databases.set(db.id, db);
+        alert("success");
+      },
+      (ev: string) =>
+      {
+        console.log(JSON.parse(ev));
+        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
       },
     );
+    return state;
+  };
 
-    servers = servers.set(server.id, server);
-  },
-);
-
-const ExampleSchemaData =
-  SchemaTypes._SchemaState()
-    .set('servers', servers)
-    .set('databases', databases)
-    .set('columns', columns)
-    .set('tables', tables)
-    .set('loading', false)
-    .set('loaded', true);
-
-export default ExampleSchemaData;
+export default FileImportReducers;

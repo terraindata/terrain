@@ -44,69 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import SchemaTypes from '../SchemaTypes';
+import * as _ from 'underscore';
+import Util from './../util/Util';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 
-let servers = Immutable.Map({});
-let databases = Immutable.Map({});
-let tables = Immutable.Map({});
-let columns = Immutable.Map({});
-
-['Example Database Server'].map(
-  (serverName) =>
+// This module will contain all of the different 'types' (i.e. models) relevant to auth
+export namespace FileImportTypes
+{
+  // This type represents the state of the FileImportStore
+  class FileImportStateC extends BaseClass
   {
-    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
+    public serverSelected: boolean = false;
+    public serverIndex: number = -1;
+    public connectionId: number = -1;
 
-    ['movieDB', 'baseballDB'].map(
-      (dbName) =>
-      {
-        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
-        server = server.set('databaseIds', server.databaseIds.push(db.id));
+    public dbSelected: boolean = false;
+    public dbText: string = "";
 
-        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) =>
-          {
-            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
-            db = db.set('tableIds', db.tableIds.push(table.id));
+    public tableSelected: boolean = false;
+    public tableText: string = "";
 
-            ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) =>
-              {
-                const column = SchemaTypes._Column({
-                  name: colName,
-                  tableId: table.id,
-                  databaseId: db.id,
-                  serverId: server.id,
-                  datatype: 'VARCHAR',
-                  isNullable: true,
-                  defaultValue: '',
-                  isPrimaryKey: false,
-                });
+    public file: string = "";
+    public filetype: string = "";
+    public fileChosen: boolean = false;
+  }
+  // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
+  //  This first line exports a type that you will actually use in other files.
+  //  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
+  export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
+  //  This second line exports a function to create a new instance of the FileImportState Immutable backed class
+  //  It's a replacement for a constructor.
+  //  This is necessary because simply doing `new FileImportStateC` will not create an Immutable version
+  //   and you can't use `new` simply with Immutable Records.
+  export const _FileImportState = (config?: { [key: string]: any }) =>
+    New<FileImportState>(new FileImportStateC(config), config);
+}
 
-                columns = columns.set(column.id, column);
-
-                table = table.set('columnIds', table.columnIds.push(column.id));
-              },
-            );
-
-            tables = tables.set(table.id, table);
-          },
-        );
-
-        databases = databases.set(db.id, db);
-      },
-    );
-
-    servers = servers.set(server.id, server);
-  },
-);
-
-const ExampleSchemaData =
-  SchemaTypes._SchemaState()
-    .set('servers', servers)
-    .set('databases', databases)
-    .set('columns', columns)
-    .set('tables', tables)
-    .set('loading', false)
-    .set('loaded', true);
-
-export default ExampleSchemaData;
+export default FileImportTypes;

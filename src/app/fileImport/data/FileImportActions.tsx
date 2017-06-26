@@ -43,70 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import SchemaTypes from '../SchemaTypes';
+import * as _ from 'underscore';
+import ActionTypes from './FileImportActionTypes';
+import { FileImportStore } from './FileImportStore';
 
-let servers = Immutable.Map({});
-let databases = Immutable.Map({});
-let tables = Immutable.Map({});
-let columns = Immutable.Map({});
+const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
-['Example Database Server'].map(
-  (serverName) =>
+const FileImportActions =
   {
-    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
+    changeServer:
+    (serverIndex: number, connectionId: number) =>
+      $(ActionTypes.changeServer, { serverIndex, connectionId }),
 
-    ['movieDB', 'baseballDB'].map(
-      (dbName) =>
-      {
-        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
-        server = server.set('databaseIds', server.databaseIds.push(db.id));
+    changeDbText:
+    (dbText: string) =>
+      $(ActionTypes.changeDbText, { dbText }),
 
-        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) =>
-          {
-            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
-            db = db.set('tableIds', db.tableIds.push(table.id));
+    changeTableText:
+    (tableText: string) =>
+      $(ActionTypes.changeTableText, { tableText }),
 
-            ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) =>
-              {
-                const column = SchemaTypes._Column({
-                  name: colName,
-                  tableId: table.id,
-                  databaseId: db.id,
-                  serverId: server.id,
-                  datatype: 'VARCHAR',
-                  isNullable: true,
-                  defaultValue: '',
-                  isPrimaryKey: false,
-                });
+    chooseFile:
+    (file: string, filetype: string) =>
+      $(ActionTypes.chooseFile, { file, filetype }),
 
-                columns = columns.set(column.id, column);
+    unchooseFile:
+    () =>
+      $(ActionTypes.unchooseFile, {}),
 
-                table = table.set('columnIds', table.columnIds.push(column.id));
-              },
-            );
+    uploadFile:
+    () =>
+      $(ActionTypes.uploadFile, {}),
+  };
 
-            tables = tables.set(table.id, table);
-          },
-        );
-
-        databases = databases.set(db.id, db);
-      },
-    );
-
-    servers = servers.set(server.id, server);
-  },
-);
-
-const ExampleSchemaData =
-  SchemaTypes._SchemaState()
-    .set('servers', servers)
-    .set('databases', databases)
-    .set('columns', columns)
-    .set('tables', tables)
-    .set('loading', false)
-    .set('loaded', true);
-
-export default ExampleSchemaData;
+export default FileImportActions;

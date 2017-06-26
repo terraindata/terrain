@@ -161,6 +161,11 @@ export default class ESJSONParser
     return this.errors;
   }
 
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
+  }
+
   public accumulateError(error: ESParserError): void
   {
     this.errors.push(error);
@@ -169,7 +174,7 @@ export default class ESJSONParser
   private peek(): string
   {
     // skip whitespace
-    this.match(/\s*/);
+    this.match(/^\s*/);
 
     // handle EOF
     if (this.charNumber >= this.queryString.length)
@@ -198,11 +203,13 @@ export default class ESJSONParser
   private readValue(): ESValueInfo | null
   {
     const valueInfo: ESValueInfo = this.beginValueInfo();
+
+    const nextChar: string = this.peek();
     const token: ESParserToken = this.accumulateToken();
 
     try
     {
-      switch (this.peek())
+      switch (nextChar)
       {
         // string
         case '"':
@@ -273,7 +280,7 @@ export default class ESJSONParser
 
         default:
           this.accumulateErrorOnCurrentToken('Unknown token found when expecting a value');
-          this.matchAndSetToken(/^.[a-zA-Z_0-9 \t]*/); // try to skip the token
+          this.matchAndSetToken(/^.[a-zA-Z_0-9]*/); // try to skip the token
           break;
       }
     }
@@ -574,6 +581,8 @@ export default class ESJSONParser
   {
     const element: ESParserToken = this.getCurrentToken();
     element.length = this.charNumber - element.charNumber;
+    element.toRow = this.getRow();
+    element.toCol = this.getCol();
     element.substring = this.queryString.substring(element.charNumber, element.charNumber + element.length);
   }
 

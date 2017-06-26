@@ -44,69 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import SchemaTypes from '../SchemaTypes';
+import * as _ from 'underscore';
+const Redux = require('redux');
 
-let servers = Immutable.Map({});
-let databases = Immutable.Map({});
-let tables = Immutable.Map({});
-let columns = Immutable.Map({});
+import FileImportTypes from './../FileImportTypes';
+import Util from './../../util/Util';
 
-['Example Database Server'].map(
-  (serverName) =>
+const DefaultState = FileImportTypes._FileImportState();
+
+import FileImportReducers from './FileImportReducers';
+
+export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
+  (state: FileImportTypes.FileImportState = DefaultState, action) =>
   {
-    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
+    if (FileImportReducers[action.type])
+    {
+      state = FileImportReducers[action.type](state, action);
+    }
 
-    ['movieDB', 'baseballDB'].map(
-      (dbName) =>
-      {
-        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
-        server = server.set('databaseIds', server.databaseIds.push(db.id));
+    return state;
+  }
+  , DefaultState);
 
-        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) =>
-          {
-            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
-            db = db.set('tableIds', db.tableIds.push(table.id));
+export default FileImportStore;
 
-            ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) =>
-              {
-                const column = SchemaTypes._Column({
-                  name: colName,
-                  tableId: table.id,
-                  databaseId: db.id,
-                  serverId: server.id,
-                  datatype: 'VARCHAR',
-                  isNullable: true,
-                  defaultValue: '',
-                  isPrimaryKey: false,
-                });
-
-                columns = columns.set(column.id, column);
-
-                table = table.set('columnIds', table.columnIds.push(column.id));
-              },
-            );
-
-            tables = tables.set(table.id, table);
-          },
-        );
-
-        databases = databases.set(db.id, db);
-      },
-    );
-
-    servers = servers.set(server.id, server);
-  },
-);
-
-const ExampleSchemaData =
-  SchemaTypes._SchemaState()
-    .set('servers', servers)
-    .set('databases', databases)
-    .set('columns', columns)
-    .set('tables', tables)
-    .set('loading', false)
-    .set('loaded', true);
-
-export default ExampleSchemaData;
