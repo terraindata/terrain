@@ -46,6 +46,44 @@ THE SOFTWARE.
 
 import * as request from 'request';
 
+export function getEmptyObject(payload: object): object
+{
+  let emptyObj: any = {};
+  if (Array.isArray(payload))
+  {
+    emptyObj = [];
+  }
+  return Object.keys(payload).reduce((res, item) =>
+  {
+    switch (typeof (payload[item]))
+    {
+      case 'boolean':
+        res[item] = false;
+        break;
+
+      case 'number':
+        res[item] = 0;
+        break;
+
+      case 'object':
+        if (payload[item] === null)
+        {
+          res[item] = null;
+        }
+        else
+        {
+          res[item] = getEmptyObject(payload[item]);
+        }
+        break;
+
+      default:
+        res[item] = '';
+    }
+    return res;
+  },
+    emptyObj);
+}
+
 export function getRequest(url)
 {
   return new Promise((resolve, reject) =>
@@ -64,20 +102,19 @@ export function getRequest(url)
   });
 }
 
-export function verifyParameters(parameters: any, required: string[]): void
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
-  if (parameters === undefined)
+  return (error: Error, response: T) =>
   {
-    throw new Error('No parameters found.');
-  }
-
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
+    if (error !== null && error !== undefined)
     {
-      throw new Error('Parameter "' + key + '" not found in request object.');
+      reject(error);
     }
-  }
+    else
+    {
+      resolve(response);
+    }
+  };
 }
 
 export function updateObject<T>(obj: T, newObj: T): T
@@ -92,17 +129,18 @@ export function updateObject<T>(obj: T, newObj: T): T
   return obj;
 }
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+export function verifyParameters(parameters: any, required: string[]): void
 {
-  return (error: Error, response: T) =>
+  if (parameters === undefined)
   {
-    if (error !== null && error !== undefined)
+    throw new Error('No parameters found.');
+  }
+
+  for (const key of required)
+  {
+    if (parameters.hasOwnProperty(key) === false)
     {
-      reject(error);
+      throw new Error('Parameter "' + key + '" not found in request object.');
     }
-    else
-    {
-      resolve(response);
-    }
-  };
+  }
 }

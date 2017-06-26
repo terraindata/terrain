@@ -61,35 +61,35 @@ import * as Util from '../Util';
 const timeInterval: number = 5; // minutes before refreshing
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
 const timeSalt: string = srs({ length: 256 }); // time salt
-const payloadSkeleton: object = {}; // payload object where key is the eventId and the value is the empty payload
 
-export interface EventConfig
+interface EventBaseConfig
 {
   date?: number;
   eventId: string;
   id?: number;
   ip?: string;
-  message: string;
-  payload: any;
-  type: string;
+  message?: string;
+  payload?: any;
   url?: string;
 }
 
-export interface EventRequestConfig
+export interface EventConfig extends EventBaseConfig
 {
-  date?: number;
-  eventId: string;
-  id?: number;
+  message: string;
+  payload: any;
+  type: string;
+}
+
+export interface EventRequestConfig extends EventBaseConfig
+{
   ip: string;
-  message?: string;
-  payload?: object;
-  url?: string;
   variantId?: string;
 }
 
 export class Events
 {
   private eventTable: Tasty.Table;
+  private payloadTable: Tasty.Table;
   private elasticController: ElasticController;
 
   constructor()
@@ -108,6 +108,16 @@ export class Events
       ],
       'events',
     );
+
+    this.payloadTable = new Tasty.Table(
+      'data',
+      ['eventId'],
+      [
+        'meta',
+        'payload',
+      ],
+      'payload',
+    );
   }
 
   /*
@@ -116,22 +126,25 @@ export class Events
    */
   public async decodeMessage(event: EventConfig): Promise<boolean>
   {
-    const checkTime = this.getClosestTime();
-    const message = event['message'];
-    const emptyPayloadHash: string = hashObj(this.getEmptyObject(event.payload));
-    for (let tp = 0; tp < timePeriods; ++tp)
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      const newTime: number = checkTime - tp * timeInterval * 60;
-      const privateKey: string = this.getUniqueId(event.ip as string, event.eventId, newTime);
-      const decodedMsg: string = this.decrypt(message, privateKey);
-      if (this.isJSON(decodedMsg) && emptyPayloadHash === hashObj(JSON.parse(decodedMsg)))
+      const checkTime = this.getClosestTime();
+      const message = event['message'];
+      const emptyPayloadHash: string = hashObj(Util.getEmptyObject(event.payload));
+      for (let tp = 0; tp < timePeriods; ++tp)
       {
+        const newTime: number = checkTime - tp * timeInterval * 60;
+        const privateKey: string = this.getUniqueId(event.ip as string, event.eventId, newTime);
+        const decodedMsg: string = this.decrypt(message, privateKey);
+        if (this.isJSON(decodedMsg) && emptyPayloadHash === hashObj(JSON.parse(decodedMsg)))
+        {
 
-        await this.storeEvent(event);
-        return true;
+          await this.storeEvent(event);
+          return resolve(true);
+        }
       }
-    }
-    return false;
+      return resolve(false);
+    });
   }
 
   /*
@@ -154,7 +167,7 @@ export class Events
   {
     return new Promise<EventRequestConfig>(async (resolve, reject) =>
     {
-      eventReq.payload = payloadSkeleton[eventReq.eventId];
+      eventReq.payload = JSON.parse(await this.getPayload(Number(eventReq.eventId)));
       const privateKey: string = this.getUniqueId(eventReq.ip, eventReq.eventId);
       eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
@@ -183,16 +196,15 @@ export class Events
    */
   public isJSON(str: string): boolean
   {
-    let res: any = false;
     try
     {
-      res = JSON.parse(str);
+      JSON.parse(str);
     }
     catch (e)
     {
       return false;
     }
-    return res;
+    return true;
   }
 
   /*
@@ -207,45 +219,20 @@ export class Events
   }
 
   /*
-   * Create an object with the same keys but empty values
+   * Get payload from datastore given the eventId
    *
    */
-  public getEmptyObject(payload: object): object
+  public async getPayload(eventId: number): Promise<string>
   {
-    let emptyObj: any = {};
-    if (Array.isArray(payload))
+    return new Promise<string>(async (resolve, reject) =>
     {
-      emptyObj = [];
-    }
-    return Object.keys(payload).reduce((res, item) =>
-    {
-      switch (typeof (payload[item]))
+      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, ['payload'], { eventId }) as object[];
+      if (payloads.length === 0)
       {
-        case 'boolean':
-          res[item] = false;
-          break;
-
-        case 'number':
-          res[item] = 0;
-          break;
-          
-        case 'object':
-          if (payload[item] === null)
-          {
-            res[item] = null;
-          }
-          else
-          {
-            res[item] = this.getEmptyObject(payload[item]);
-          }
-          break;
-
-        default:
-          res[item] = '';
+        return resolve('');
       }
-      return res;
-    },
-      emptyObj);
+      resolve(payloads[0].toString());
+    });
   }
 
   /*
@@ -255,10 +242,7 @@ export class Events
   public getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): string
   {
     currTime = currTime !== undefined ? currTime : this.getClosestTime();
-    if (uniqueId === undefined)
-    {
-      uniqueId = '';
-    }
+    uniqueId = uniqueId !== undefined ? uniqueId : '';
     return sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16);
   }
 
@@ -272,15 +256,14 @@ export class Events
     {
       if (req === undefined || (Object.keys(req).length === 0 && req.constructor === Object) || req.length === 0)
       {
-        resolve();
-        return;
+        return resolve();
       }
 
       const JSONArr: object[] = req;
       const encodedEventArr: EventRequestConfig[] = [];
       for (const jsonObj of JSONArr)
       {
-        if (jsonObj['eventId'] === undefined || !(jsonObj['eventId'] in payloadSkeleton))
+        if (jsonObj['eventId'] === undefined || !(await this.payloadExists(Number(jsonObj['eventId']))))
         {
           continue;
         }
@@ -295,10 +278,22 @@ export class Events
       }
       if (encodedEventArr.length === 0)
       {
-        resolve();
-        return;
+        return resolve();
       }
       resolve(JSON.stringify(encodedEventArr));
+    });
+  }
+
+  /*
+   * Check if eventId exists in payload table
+   *
+   */
+  public async payloadExists(eventId: number): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, [], { eventId }) as object[];
+      return resolve(payloads.length === 0 ? false : true);
     });
   }
 
