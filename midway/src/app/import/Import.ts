@@ -205,7 +205,7 @@ export class Import
     const columnTypes: string[] = this._getArrayFromMap(imprt.columnTypes);
     if (columnTypes.some((val, ind, arr) =>
     {
-      return val !== 'text' && val !== 'number';
+      return val !== 'text' && val !== 'number' && val !== 'boolean';
     }))
     {
       return 'Invalid data type encountered.';
@@ -296,7 +296,7 @@ export class Import
                 return false;
               } else
               {
-                return '';
+                return '';   // type error that will be caught in post-processing
               }
             };
           }
