@@ -78,7 +78,16 @@ export default class ESInterpreter
       this.parser = query;
     }
 
-    this.config.getClause('root').mark(this, this.parser.getValueInfo());
+    if (this.parser.getValue() !== null && this.parser.hasError() === false)
+    {
+      try
+      {
+        this.config.getClause('root').mark(this, this.parser.getValueInfo());
+      } catch (e)
+      {
+        this.accumulateError(this.parser.getValueInfo(), 'Failed to mark the json object ' + String(e.message));
+      }
+    }
   }
 
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void

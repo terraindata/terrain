@@ -43,83 +43,66 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+import Util from './../../util/Util';
+import ActionTypes from './FileImportActionTypes';
+import Ajax from './../../util/Ajax';
 
-import ElasticConfig from '../database/elastic/ElasticConfig';
-import ElasticController from '../database/elastic/ElasticController';
+const FileImportReducers = {}
 
-import MySQLConfig from '../database/mysql/MySQLConfig';
-import MySQLController from '../database/mysql/MySQLController';
+FileImportReducers[ActionTypes.changeServer] =
+  (state, action) =>
+    state
+      .set('serverIndex', action.payload.serverIndex)
+      .set('connectionId', action.payload.connectionId)
+      .set('serverSelected', true)
+  ;
 
-import SQLiteConfig from '../database/sqlite/SQLiteConfig';
-import SQLiteController from '../database/sqlite/SQLiteController';
+FileImportReducers[ActionTypes.changeDbText] =
+  (state, action) =>
+    state
+      .set('dbText', action.payload.dbText).set('dbSelected', !!action.payload.dbText);
 
-import DatabaseController from './DatabaseController';
+FileImportReducers[ActionTypes.changeTableText] =
+  (state, action) =>
+    state
+      .set('tableText', action.payload.tableText).set('tableSelected', !!action.payload.tableText);
 
-export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
-{
-  if (type === 'sqlite')
+FileImportReducers[ActionTypes.chooseFile] =
+  (state, action) =>
+    state
+      .set('file', action.payload.file)
+      .set('filetype', action.payload.filetype)
+      .set('fileChosen', true)
+  ;
+
+FileImportReducers[ActionTypes.unchooseFile] =
+  (state, action) =>
+    state
+      .set('fileChosen', false)
+  ;
+
+FileImportReducers[ActionTypes.uploadFile] =
+  (state, action) =>
   {
-    return {
-      filename: dsnString,
-    } as SQLiteConfig;
-  }
-  else if (type === 'mysql')
-  {
-    const idx = dsnString.lastIndexOf('@');
-    const h0 = dsnString.substr(0, idx);
-    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
-    const q1 = h0.split(':');
-    const q2 = h1.split(':');
+    Ajax.importFile(
+      state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+      () =>
+      {
+        alert("success");
+      },
+      (ev: string) =>
+      {
+        console.log(JSON.parse(ev));
+        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
+      },
+    );
+    return state;
+  };
 
-    if (q1.length !== 2 || q2.length !== 2)
-    {
-      throw new Error('Error interpreting DSN parameter for MySQL.');
-    }
-
-    const user: string = q1[0];
-    const password: string = q1[1];
-    const host: string = q2[0];
-    const port: number = parseInt(q2[1], 10);
-
-    return {
-      user,
-      password,
-      host,
-      port,
-    } as MySQLConfig;
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    return {
-      hosts: [dsnString],
-    } as ElasticConfig;
-  }
-  else
-  {
-    throw new Error('Error parsing database connection parameters.');
-  }
-}
-
-export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
-{
-  type = type.toLowerCase();
-  if (type === 'sqlite')
-  {
-    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, 0, 'SQLite');
-  }
-  else if (type === 'mysql')
-  {
-    const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, 0, 'MySQL');
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic');
-  }
-  else
-  {
-    throw new Error('Error making new database controller.');
-  }
-}
+export default FileImportReducers;

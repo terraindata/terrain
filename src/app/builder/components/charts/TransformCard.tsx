@@ -451,6 +451,7 @@ class TransformCard extends PureClasss<Props>
           keyPath={this.props.keyPath}
           canEdit={this.props.canEdit}
           width={width}
+          language={this.props.language}
         />
       </div>
     );

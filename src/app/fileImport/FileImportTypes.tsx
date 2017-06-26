@@ -43,83 +43,42 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+import Util from './../util/Util';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 
-import ElasticConfig from '../database/elastic/ElasticConfig';
-import ElasticController from '../database/elastic/ElasticController';
-
-import MySQLConfig from '../database/mysql/MySQLConfig';
-import MySQLController from '../database/mysql/MySQLController';
-
-import SQLiteConfig from '../database/sqlite/SQLiteConfig';
-import SQLiteController from '../database/sqlite/SQLiteController';
-
-import DatabaseController from './DatabaseController';
-
-export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
+// This module will contain all of the different 'types' (i.e. models) relevant to auth
+export namespace FileImportTypes
 {
-  if (type === 'sqlite')
+  // This type represents the state of the FileImportStore
+  class FileImportStateC extends BaseClass
   {
-    return {
-      filename: dsnString,
-    } as SQLiteConfig;
-  }
-  else if (type === 'mysql')
-  {
-    const idx = dsnString.lastIndexOf('@');
-    const h0 = dsnString.substr(0, idx);
-    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
-    const q1 = h0.split(':');
-    const q2 = h1.split(':');
+    public serverSelected: boolean = false;
+    public serverIndex: number = -1;
+    public connectionId: number = -1;
 
-    if (q1.length !== 2 || q2.length !== 2)
-    {
-      throw new Error('Error interpreting DSN parameter for MySQL.');
-    }
+    public dbSelected: boolean = false;
+    public dbText: string = "";
 
-    const user: string = q1[0];
-    const password: string = q1[1];
-    const host: string = q2[0];
-    const port: number = parseInt(q2[1], 10);
+    public tableSelected: boolean = false;
+    public tableText: string = "";
 
-    return {
-      user,
-      password,
-      host,
-      port,
-    } as MySQLConfig;
+    public file: string = "";
+    public filetype: string = "";
+    public fileChosen: boolean = false;
   }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    return {
-      hosts: [dsnString],
-    } as ElasticConfig;
-  }
-  else
-  {
-    throw new Error('Error parsing database connection parameters.');
-  }
+  // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
+  //  This first line exports a type that you will actually use in other files.
+  //  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
+  export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
+  //  This second line exports a function to create a new instance of the FileImportState Immutable backed class
+  //  It's a replacement for a constructor.
+  //  This is necessary because simply doing `new FileImportStateC` will not create an Immutable version
+  //   and you can't use `new` simply with Immutable Records.
+  export const _FileImportState = (config?: { [key: string]: any }) =>
+    New<FileImportState>(new FileImportStateC(config), config);
 }
 
-export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
-{
-  type = type.toLowerCase();
-  if (type === 'sqlite')
-  {
-    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, 0, 'SQLite');
-  }
-  else if (type === 'mysql')
-  {
-    const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, 0, 'MySQL');
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic');
-  }
-  else
-  {
-    throw new Error('Error making new database controller.');
-  }
-}
+export default FileImportTypes;

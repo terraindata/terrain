@@ -43,83 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+const Redux = require('redux');
 
-import ElasticConfig from '../database/elastic/ElasticConfig';
-import ElasticController from '../database/elastic/ElasticController';
+import FileImportTypes from './../FileImportTypes';
+import Util from './../../util/Util';
 
-import MySQLConfig from '../database/mysql/MySQLConfig';
-import MySQLController from '../database/mysql/MySQLController';
+const DefaultState = FileImportTypes._FileImportState();
 
-import SQLiteConfig from '../database/sqlite/SQLiteConfig';
-import SQLiteController from '../database/sqlite/SQLiteController';
+import FileImportReducers from './FileImportReducers';
 
-import DatabaseController from './DatabaseController';
-
-export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
-{
-  if (type === 'sqlite')
+export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
+  (state: FileImportTypes.FileImportState = DefaultState, action) =>
   {
-    return {
-      filename: dsnString,
-    } as SQLiteConfig;
-  }
-  else if (type === 'mysql')
-  {
-    const idx = dsnString.lastIndexOf('@');
-    const h0 = dsnString.substr(0, idx);
-    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
-    const q1 = h0.split(':');
-    const q2 = h1.split(':');
-
-    if (q1.length !== 2 || q2.length !== 2)
+    if (FileImportReducers[action.type])
     {
-      throw new Error('Error interpreting DSN parameter for MySQL.');
+      state = FileImportReducers[action.type](state, action);
     }
 
-    const user: string = q1[0];
-    const password: string = q1[1];
-    const host: string = q2[0];
-    const port: number = parseInt(q2[1], 10);
+    return state;
+  }
+  , DefaultState);
 
-    return {
-      user,
-      password,
-      host,
-      port,
-    } as MySQLConfig;
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    return {
-      hosts: [dsnString],
-    } as ElasticConfig;
-  }
-  else
-  {
-    throw new Error('Error parsing database connection parameters.');
-  }
-}
+export default FileImportStore;
 
-export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
-{
-  type = type.toLowerCase();
-  if (type === 'sqlite')
-  {
-    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, 0, 'SQLite');
-  }
-  else if (type === 'mysql')
-  {
-    const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, 0, 'MySQL');
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic');
-  }
-  else
-  {
-    throw new Error('Error making new database controller.');
-  }
-}

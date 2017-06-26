@@ -44,82 +44,37 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ElasticConfig from '../database/elastic/ElasticConfig';
-import ElasticController from '../database/elastic/ElasticController';
+import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig'
 
-import MySQLConfig from '../database/mysql/MySQLConfig';
-import MySQLController from '../database/mysql/MySQLController';
+const eslintConfig = new EQLConfig();
 
-import SQLiteConfig from '../database/sqlite/SQLiteConfig';
-import SQLiteController from '../database/sqlite/SQLiteController';
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
 
-import DatabaseController from './DatabaseController';
-
-export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
-{
-  if (type === 'sqlite')
-  {
-    return {
-      filename: dsnString,
-    } as SQLiteConfig;
-  }
-  else if (type === 'mysql')
-  {
-    const idx = dsnString.lastIndexOf('@');
-    const h0 = dsnString.substr(0, idx);
-    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
-    const q1 = h0.split(':');
-    const q2 = h1.split(':');
-
-    if (q1.length !== 2 || q2.length !== 2)
-    {
-      throw new Error('Error interpreting DSN parameter for MySQL.');
-    }
-
-    const user: string = q1[0];
-    const password: string = q1[1];
-    const host: string = q2[0];
-    const port: number = parseInt(q2[1], 10);
-
-    return {
-      user,
-      password,
-      host,
-      port,
-    } as MySQLConfig;
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    return {
-      hosts: [dsnString],
-    } as ElasticConfig;
-  }
-  else
-  {
-    throw new Error('Error parsing database connection parameters.');
-  }
-}
-
-export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
-{
-  type = type.toLowerCase();
-  if (type === 'sqlite')
-  {
-    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, 0, 'SQLite');
-  }
-  else if (type === 'mysql')
-  {
-    const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, 0, 'MySQL');
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic');
-  }
-  else
-  {
-    throw new Error('Error making new database controller.');
-  }
-}
+    CodeMirror.registerHelper("lint", "json", function(text) {
+      var found = [];
+      try {
+        //const t = new ESInterpreter(text, eslintConfig);
+        const t = new ESInterpreter(text, eslintConfig);
+        const errors = t.parser.errors;
+        for (let e of errors)
+        {
+          const token = e.token;
+          found.push({from: CodeMirror.Pos(token.row, token.col),
+            to: CodeMirror.Pos(token.toRow, token.toCol),
+            message: e.message});
+        }
+      } catch(e) {
+        console.log('Exception when parsing ' + text + " error: " + e);
+      }
+      return found;
+  });
+});

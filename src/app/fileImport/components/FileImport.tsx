@@ -43,43 +43,104 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss';
-const HTML5Backend = require('react-dnd-html5-backend');
 import { DragDropContext } from 'react-dnd';
-const { browserHistory } = require('react-router');
-
-import SchemaView from './SchemaView';
+import PureClasss from './../../common/components/PureClasss';;
+import FileImportStore from './../data/FileImportStore';
+import FileImportInfo from './FileImportInfo';
+import FileImportTypes from './../FileImportTypes';
+const HTML5Backend = require('react-dnd-html5-backend');
+import SchemaStore from './../../schema/data/SchemaStore';
+import SchemaTypes from './../../schema/SchemaTypes';
+const { List } = Immutable;
 
 export interface Props
 {
   params?: any;
-  location?: {
-    pathname: string;
-  };
+  location?: any;
+  router?: any;
+  route?: any;
 }
 
-class SchemaPage extends PureClasss<Props>
+const FILETYPES = Immutable.List(['json', 'csv']);
+
+class FileImport extends PureClasss<any>
 {
   public state: {
-    on: boolean;
-    name?: string;
+    fileImportState: FileImportTypes.FileImportState;
+    servers?: SchemaTypes.ServerMap;
+    serverNames?: List<string>;
+    dbNames?: List<string>;
+    tableNames?: List<string>;
   } = {
-    on: false,
+    fileImportState: FileImportStore.getState(),
   };
+
+  constructor(props)
+  {
+    super(props);
+
+    this._subscribe(FileImportStore, {
+      stateKey: 'fileImportState',
+    });
+
+    this._subscribe(SchemaStore, {
+      updater: (schemaState: SchemaTypes.SchemaState) =>
+      {
+        this.setState({
+          servers: schemaState.servers,
+          serverNames: this.getKeyListSafely(schemaState.servers),
+          dbNames: this.getKeyListSafely(schemaState.databases),
+          tableNames: this.getKeyListSafely(schemaState.tables),
+        });
+      }
+    });
+  }
 
   public render()
   {
+    const { fileImportState } = this.state;
+    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected, tableText, fileChosen } = fileImportState;
+
     return (
-      <SchemaView
-        fullPage={true}
-        showSearch={true}
-      />
+      <div>
+        <h2>File Import Page</h2>
+        <div>
+          <FileImportInfo
+            canSelectServer={true}
+            servers={this.state.servers}
+            serverNames={this.state.serverNames}
+            serverIndex={serverIndex}
+            serverSelected={serverSelected}
+            canSelectDb={true}
+            dbs={this.state.dbNames}
+            dbText={dbText}
+            dbSelected={dbSelected}
+            canSelectTable={true}
+            tables={this.state.tableNames}
+            tableText={tableText}
+            tableSelected={tableSelected}
+            canImport={true}
+            validFiletypes={FILETYPES}
+            fileChosen={fileChosen}
+          />
+        </div>
+      </div>
     );
+  }
+
+  private getKeyListSafely(map: IMMap<string, any>)
+  {
+    if (map === undefined)
+    {
+      return List<string>();
+    }
+    return map.keySeq().toList();
   }
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const SchemaExport = DragDropContext(HTML5Backend)(SchemaPage) as any;
+const ExportFileImport = DragDropContext(HTML5Backend)(FileImport) as any;
 
-export default SchemaExport;
+export default ExportFileImport;

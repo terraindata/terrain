@@ -321,7 +321,6 @@ class CardField extends PureClasss<Props>
 
     const isData = typeof this.props.data[this.props.row.inner['key']] !== 'string';
     const renderTools = !row.hideToolsWhenNotString || !isData;
-
     return (
       <div
         ref='all'
