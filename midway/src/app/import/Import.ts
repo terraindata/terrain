@@ -94,7 +94,7 @@ export class Import
       {
         return reject('No data provided in file to upload.');
       }
-      const columns: string[] = this._getArrayFromMap(imprt.columnMap) as string[];
+      const columns: string[] = this._getArrayFromMap(imprt.columnMap);
 
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
@@ -167,7 +167,7 @@ export class Import
       return typeError;
     }
 
-    if (imprt.filetype !== 'csv' || imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
+    if (imprt.filetype !== 'csv')
     {
       imprt.csvHeaderMissing = false;
       const cmNames: string = JSON.stringify(Object.keys(imprt.columnMap).sort());
@@ -178,16 +178,20 @@ export class Import
       }
     } else
     {
+        if (imprt.csvHeaderMissing === undefined)
+        {
+            imprt.csvHeaderMissing = false;
+        }
       if (!Array.isArray(imprt.columnMap) || !Array.isArray(imprt.columnsToInclude))
       {
-        return 'When uploading a headerless CSV, columnMap and columnsToInclude should be arrays.';
+        return 'When uploading a CSV file, columnMap and columnsToInclude should be arrays.';
       }
       if (imprt.columnMap.length !== imprt.columnsToInclude.length)
       {
         return 'Lengths of columnMap and columnsToInclude do not match.';
       }
     }
-    const columns: string[] = this._getArrayFromMap(imprt.columnMap) as string[];
+    const columns: string[] = this._getArrayFromMap(imprt.columnMap);
     if (columns.indexOf(imprt.primaryKey) === -1)
     {
       return 'A column to be uploaded must be specified as the primary key.';
@@ -255,8 +259,7 @@ export class Import
         }
       } else if (imprt.filetype === 'csv')
       {
-        const includeColumns: boolean[] = this._getArrayFromMap(imprt.columnsToInclude) as boolean[];
-        const columnIndicesToInclude: number[] = includeColumns.reduce((res, val, ind) =>
+        const columnIndicesToInclude: number[] = (imprt.columnsToInclude as boolean[]).reduce((res, val, ind) =>
         {
           if (val)
           {
@@ -268,7 +271,7 @@ export class Import
           flatKeys: true,
           checkColumn: true,
           noheader: imprt.csvHeaderMissing,
-          headers: this._getArrayFromMap(imprt.columnMap),
+          headers: imprt.columnMap as string[],
           includeColumns: columnIndicesToInclude,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
@@ -284,9 +287,9 @@ export class Import
     });
   }
 
-  private _getArrayFromMap(mapOrArray: object): string[] | boolean[]
+  private _getArrayFromMap(mapOrArray: object | string[]): string[]
   {
-    let array: string[] | boolean[];
+    let array: string[];
     if (Array.isArray(mapOrArray))
     {
       return array = mapOrArray;
