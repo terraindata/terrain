@@ -145,14 +145,5 @@ export function parseESValue(value: any): any
     v = parser.getValue();
   }
 
-  // try
-  // {
-  //   v = JSON.parse(value);
-  // }
-  // catch (e)
-  // {
-  //   v = value;
-  // }
-
   return v;
 }

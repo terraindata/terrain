@@ -200,7 +200,7 @@ const parseMagicObject = (obj: object): Cards =>
     {
       if (value === null || value === {})
       {
-        value = JSON.stringify(CommonElastic.parseESValue(value));
+        value = JSON.stringify(value);
       }
       else if (Array.isArray(value) && (value !== []))
       {
