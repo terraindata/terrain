@@ -48,7 +48,6 @@ import * as _ from 'underscore';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
 import { BaseClass, New } from '../Classes';
-import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
 export namespace FileImportTypes
@@ -56,6 +55,26 @@ export namespace FileImportTypes
   // This type represents the state of the FileImportStore
   class FileImportStateC extends BaseClass
   {
+    public serverSelected: boolean = false;
+    public serverIndex: number = -1;
+    public connectionId: number = -1;
+
+    public dbSelected: boolean = false;
+    public dbText: string = "";
+
+    public tableSelected: boolean = false;
+    public tableText: string = "";
+
+    public file: string = "";
+    public filetype: string = "";
+    public fileChosen: boolean = false;
+
+    public previewRows: object[] = null;
+    public columnsCount: number = 0;
+
+    public columnsToInclude: List<boolean> = null;
+    public columnNames: List<string> = null;
+    public columnDatatypes: List<number> = null;
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
   //  This first line exports a type that you will actually use in other files.
@@ -67,19 +86,6 @@ export namespace FileImportTypes
   //   and you can't use `new` simply with Immutable Records.
   export const _FileImportState = (config?: { [key: string]: any }) =>
     New<FileImportState>(new FileImportStateC(config), config);
-
-  class PreviewMapC
-  {
-    // public datatypeIndex = -1;
-    // public columnName = '';
-    public isChosen = true;
-  }
-  const PreviewMap_Record = Immutable.Record(new PreviewMapC());
-  export interface PreviewMap extends PreviewMapC, IRecord<PreviewMap> { }
-  export const _PreviewMap = (config?: any) =>
-  {
-    return new PreviewMap_Record(config) as any as PreviewMap;
-  };
 }
 
 export default FileImportTypes;

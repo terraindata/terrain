@@ -144,9 +144,9 @@ const links =
       route: '/schema',
     },
     {
-      icon: <ReportingIcon />,
+      icon: <ReportingIcon />,    // need new icon
       text: 'Import',
-      route: '/fileImport',
+      route: '/import',
     },
     // {
     //   icon: <ManualIcon />,
@@ -257,7 +257,6 @@ class App extends PureClasss<Props>
     UserActions.fetch();
     LibraryActions.fetch();
     SchemaActions.fetch();
-    // FileImportActions.fetch();
     // RolesActions.fetch();
   }
 
@@ -438,7 +437,7 @@ const router = (
 
       <Route path='/schema' component={SchemaPage} />
 
-      <Route path='/fileImport' component={FileImport} />
+      <Route path='/import' component={FileImport} />
     </Route>
   </Router>
 );

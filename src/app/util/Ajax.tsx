@@ -440,7 +440,7 @@ export const Ajax =
           }
           else
           {
-            onError('Nothing found' as any);
+            onError && onError('Nothing found' as any);
           }
         },
         {
@@ -473,16 +473,19 @@ export const Ajax =
       // }
     },
 
-    getVersions(id: ID, onLoad: (versions: any) => void)
+    getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
-      // TODO
-
-      // const url = '/versions/' + id;
-      // return Ajax._get(url, '', (response: any) =>
-      // {
-      //   const versions = JSON.parse(response);
-      //   onLoad(versions);
-      // });
+      return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>
+      {
+        try
+        {
+          onLoad(response);
+        }
+        catch (e)
+        {
+          onError && onError(response as any);
+        }
+      });
     },
 
     getVersion(id: ID, onLoad: (version: any) => void)
@@ -605,7 +608,6 @@ export const Ajax =
       } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const queryId = '' + Math.random();
       const payload: QueryRequest = {
         type: 'search', // can be other things in the future
         database: db.id as number, // should be passed by caller
@@ -619,6 +621,7 @@ export const Ajax =
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
         onLoad(queryResult);
       };
+      const queryId = '' + Math.random();
       const xhr = Ajax.req(
         'post',
         'query/',
@@ -634,12 +637,12 @@ export const Ajax =
       return { queryId, xhr };
     },
 
-    /* FileImport */
-    upload(file: string,
+    importFile(file: string,
       filetype: string,
       db: string,
       table: string,
-      columnMap: Map<string, string> | List<string>,
+     connectionId: number,
+      columnNames: Map<string, string> | List<string>,
       columnsToInclude: Map<string, boolean> | List<boolean>,
       columnTypes: Map<string, string> | List<string>,
       onLoad: (resp: object[]) => void,
@@ -647,20 +650,18 @@ export const Ajax =
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const payload: object = {
-        dsn: 'http://127.0.0.1:9200',
+        dbid: connectionId,
         db,
         table,
         contents: file,
-        dbtype: 'elastic',
         filetype,
-        columnMap,
+        columnNames,
         columnsToInclude,
         columnTypes,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>
       {
-        // const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
         onLoad(resp);
       };
       const xhr = Ajax.req(
@@ -683,7 +684,7 @@ export const Ajax =
       {
         try
         {
-          const cols: object = JSON.parse(response);
+          const cols: object = typeof response === 'string' ? JSON.parse(response) : response;
           onLoad(cols);
         }
         catch (e)

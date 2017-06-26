@@ -44,104 +44,54 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
+import * as React from 'react';
+import SchemaTypes from '../../SchemaTypes';
+import Styles from '../SchemaTreeStyles';
+import PureClasss from './../../../common/components/PureClasss';
+const Radium = require('radium');
 
-import { Import, ImportConfig } from '../../src/app/import/Import';
-
-interface Movie
+export interface Props
 {
-  title: string;
-  releasedate: string;
+  item: SchemaTypes.Server;
 }
 
-const host: string = 'http://localhost:9200';
-const movies: Movie[] = [];
-
-let imprt: Import;
-
-beforeAll(async () =>
+class State
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-  try
-  {
-    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
-    movies[1] = { title: 'Alien: Covenant', releasedate: new Date('01/01/17').toISOString().substring(0, 10) };
+}
 
-    imprt = new Import();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
-
-test('import JSON file', async (done) =>
+@Radium
+export class ServerTreeInfo extends PureClasss<Props>
 {
-  try
+  public state: State = new State();
+
+  public render()
   {
-    winston.info('Testing JSON upload to Elastic.');
+    const server = this.props.item;
 
-    const imprtConf: ImportConfig =
-      {
-        dsn: host,
-        db: 'movies',
-        table: 'data',
-        contents: JSON.stringify(movies),
-        dbtype: 'elastic',
-        filetype: 'json',
-      };
-    winston.info(imprtConf.contents);
+    return (
+      <div
+        style={Styles.infoPieces}
+      >
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {server.databaseIds.size}
+          </span> databases
+        </div>
+      </div>
+    );
+  }
+}
 
-    const results: any = await imprt.insert(imprtConf);
-    winston.info(JSON.stringify(results));
-    expect(results).not.toBeUndefined();
-    for (let i = 0; i < results.length; i++)
+export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
+  [
     {
-      expect(results[i]).toMatchObject(movies[i]);
-    }
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
+      label: 'Databases',
+      type: 'database',
+    },
+  ];
 
-test('import CSV file', async (done) =>
-{
-  try
-  {
-    winston.info('Testing CSV upload to Elastic.');
-
-    let csvString: string = 'title,releasedate\n';
-    for (const movie of movies)
-    {
-      csvString += movie.title + ',' + movie.releasedate + '\n';
-    }
-
-    const imprtConf: ImportConfig =
-      {
-        dsn: host,
-        db: 'movies',
-        table: 'data',
-        contents: csvString,
-        dbtype: 'elastic',
-        filetype: 'csv',
-      };
-    winston.info(imprtConf.contents);
-
-    const results: any = await imprt.insert(imprtConf);
-    winston.info(JSON.stringify(results));
-    expect(results).not.toBeUndefined();
-    for (let i = 0; i < results.length; i++)
-    {
-      expect(results[i]).toMatchObject(movies[i]);
-    }
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
+export default ServerTreeInfo;

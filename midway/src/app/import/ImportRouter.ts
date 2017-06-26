@@ -58,31 +58,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   winston.info('importing to database');
   const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['dbtype', 'contents', 'dsn', 'table', 'filetype', 'db']);
-  if (imprtConf.dbtype !== 'elastic')
-  {
-    throw new Error('File import currently is only supported for Elastic databases.');
-  }
-  if (imprtConf.db === '' || imprtConf.table === '')
-  {
-    throw new Error('Index name and document type cannot be empty strings.');
-  }
-  if (imprtConf.db !== imprtConf.db.toLowerCase())
-  {
-    throw new Error('Index name may not contain uppercase letters.');
-  }
-  if (!/^[a-z\d].*$/.test(imprtConf.db))
-  {
-    throw new Error('Index name must start with a lowercase letter or digit.');
-  }
-  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(imprtConf.db))
-  {
-    throw new Error('Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.');
-  }
-  if (/^_.*/.test(imprtConf.table))
-  {
-    throw new Error('Document type may not start with an underscore.');
-  }
+  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'table', 'filetype', 'db']);
 
   ctx.body = await imprt.insert(imprtConf);
 });

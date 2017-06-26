@@ -64,12 +64,12 @@ conf.plugins = [
     TDB_HOST: "'//" + process.env.TDB_HOST + ":7344'"
   }),
 
-,  // Minify code.
+  // Minify code.
   new webpack.optimize.UglifyJsPlugin()
 ];
 
 // ,enable babel plugins on tsx loader
-if(conf .module.rules[0].loader !== 'babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
+if(conf.module.rules[0].loader !== 'babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
 {
   throw new Error('Expected first loader to be babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}} but found '
     + conf.module.rules[0].loader);

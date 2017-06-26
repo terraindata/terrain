@@ -55,13 +55,15 @@ import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import FileImportTypes from '../FileImportTypes';
 import Actions from './../data/FileImportActions';
-
-type PreviewMap = FileImportTypes.PreviewMap;
+import './PreviewColumn.less';
 
 export interface Props
 {
   id: number;
-  previewMaps: List<PreviewMap>;
+  isChecked: boolean;
+  columnName: string;
+  datatypeIndex: number;
+  // previewMaps: List<PreviewMap>;
 
   datatypes: List<string>;
   canSelectDatatype: boolean;
@@ -70,46 +72,41 @@ export interface Props
 
 class PreviewColumn extends Classs<Props>
 {
-  // public handleDatatypeChange(value)
-  // {
-  //   Actions.setMapDatatype(
-  //     this.props.previewMap
-  //   );
-  // }
-  //
-  // public handleAutocompleteHeaderChange(value)
-  // {
-  //   Actions.setMapName(id, value);
-  // }
-// <Dropdown
-// selectedIndex={this.props.previewMap.datatypeIndex}
-// options={this.props.datatypes}
-// onChange={this.handleDatatypeChange}
-// canEdit={this.props.canSelectDatatype}
-// />
-// <Autocomplete
-//   value={this.props.previewMap.columnName}
-// options={null}
-// onChange={this.handleAutocompleteHeaderChange}
-// placeholder={'column name'}
-// disabled={!this.props.canSelectColumn}
-// />
+  public handleDatatypeChange(datatypeIndex)
+  {
+    Actions.setMapDatatype(this.props.id, datatypeIndex);
+  }
+
+  public handleAutocompleteHeaderChange(value)
+  {
+    Actions.setMapName(this.props.id, value);
+  }
 
   public handleCheckChange()
   {
-    Actions.setMapCheck(
-      this.props.previewMaps.get(this.props.id)
-        .set('isChosen', false) as PreviewMap,
-    );
+    Actions.setMapCheck(this.props.id);
   }
 
   public render()
   {
     return (
-      <div>
+      <div className="preview-column">
         <CheckBox
-          checked={this.props.previewMaps.get(this.props.id).isChosen}
+          checked={this.props.isChecked}
           onChange={this.handleCheckChange}
+        />
+        <Autocomplete
+          value={this.props.columnName}
+          options={null}
+          onChange={this.handleAutocompleteHeaderChange}
+          placeholder={'column name'}
+          disabled={!this.props.canSelectColumn}
+        />
+        <Dropdown
+          selectedIndex={this.props.datatypeIndex}
+          options={this.props.datatypes}
+          onChange={this.handleDatatypeChange}
+          canEdit={this.props.canSelectDatatype}
         />
       </div>
     );

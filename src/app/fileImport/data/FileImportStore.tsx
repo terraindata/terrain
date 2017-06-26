@@ -47,50 +47,15 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Redux = require('redux');
 
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import AuthStore from './../../auth/data/AuthStore';
-import RoleStore from './../../roles/data/RolesStore';
-import UserStore from './../../users/data/UserStore';
 import FileImportTypes from './../FileImportTypes';
-import Actions from './FileImportActions';
-import FileImportActionTypes from './FileImportActionTypes';
 import Util from './../../util/Util';
-const { List } = Immutable;
 
-type PreviewMap = FileImportTypes.PreviewMap;
-
-class FileImportStateC
-{
-  public clusterIndex: number = -1;
-  public dbText: string = "";
-  public dbSelected: boolean = false;
-
-  public tableText: string = "";
-  public tableSelected: boolean = false;
-
-  public file: string = "";
-  public filetype: string = "";
-  public fileChosen: boolean = false;
-
-  public previewRows: object[] = null;
-  public previewMaps: List<PreviewMap> = List([]);
-  public columnMap: Map<string, string> | List<string> = null;
-  public columnsToInclude: Map<string, boolean> | List<boolean> = null;
-  public columnTypes: Map<string, string> | List<string> = null;
-}
-const FileImportState_Record = Immutable.Record(new FileImportStateC());
-export interface FileImportState extends FileImportStateC, IRecord<FileImportState> { }
-export const _FileImportState = (config?: any) =>
-{
-  return new FileImportState_Record(Util.extendId(config || {})) as any as FileImportState;
-};
-
-const DefaultState = _FileImportState();
+const DefaultState = FileImportTypes._FileImportState();
 
 import FileImportReducers from './FileImportReducers';
 
-export const FileImportStore: IStore<FileImportState> = Redux.createStore(
-  (state: FileImportState = DefaultState, action) =>
+export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
+  (state: FileImportTypes.FileImportState = DefaultState, action) =>
   {
     if (FileImportReducers[action.type])
     {

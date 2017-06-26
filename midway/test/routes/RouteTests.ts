@@ -53,6 +53,8 @@ import { readFile } from '../Utils';
 
 let server;
 
+/* tslint:disable:max-line-length */
+
 beforeAll(async (done) =>
 {
   const testDBName = 'midwaytest.db';
@@ -73,6 +75,7 @@ beforeAll(async (done) =>
           name: 'My ElasticSearch Instance',
           type: 'elastic',
           dsn: 'http://127.0.0.1:9200',
+          host: 'http://127.0.0.1:9200',
         },
       ],
     };
@@ -589,6 +592,119 @@ describe('Query route tests', () =>
         fail('POST /midway/v1/query/ request returned an error: ' + String(error));
       });
   });
+
+  test('Elastic Search Query Route: POST /midway/v1/query : templates',
+    async () =>
+    {
+      const template: string = `{
+                   "index" : "movies",
+                   "type" : "data",
+                   "from" : 0,
+                   "size" : {{#toJson}}size{{/toJson}},
+                   "body" : {
+                     "query" : {
+                      }
+                   }
+                }`;
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'putTemplate',
+            body: {
+              id: 'testTemplateQuery',
+              body: {
+                template,
+              },
+            },
+          },
+        }).expect(200).then((response) =>
+        {
+          winston.info(response.text);
+        }).catch((error) =>
+        {
+          fail(error);
+        });
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'getTemplate',
+            body: {
+              id: 'testTemplateQuery',
+            },
+          },
+        }).expect(200).then((response) =>
+        {
+          winston.info(response.text);
+          expect(JSON.parse(response.text)).toMatchObject(
+            {
+              result: {
+                _id: 'testTemplateQuery',
+                lang: 'mustache',
+                found: true,
+                template,
+              }, errors: [], request: { database: 1, type: 'getTemplate', body: { id: 'testTemplateQuery' } },
+            });
+        }).catch((error) =>
+        {
+          fail(error);
+        });
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'deleteTemplate',
+            body: {
+              id: 'testTemplateQuery',
+            },
+          },
+        }).expect(200).then((response) =>
+        {
+          winston.info(response.text);
+        });
+
+      await request(server)
+        .post('/midway/v1/query/')
+        .send({
+          id: 1,
+          accessToken: 'AccessToken',
+          body: {
+            database: 1,
+            type: 'getTemplate',
+            body: {
+              id: 'testTemplateQuery',
+            },
+          },
+        }).then((response) =>
+        {
+          winston.info(response.text);
+          expect(JSON.parse(response.text)).toMatchObject(
+            {
+              errors: [
+                {
+                  status: 404,
+                  title: 'Not Found',
+                },
+              ],
+            });
+        }).catch((error) =>
+        {
+          fail(error);
+        });
+    });
 });
 
 describe('File import route tests', () =>
@@ -601,11 +717,10 @@ describe('File import route tests', () =>
         id: 1,
         accessToken: 'AccessToken',
         body: {
-          dsn: 'http://127.0.0.1:9200',
+          dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
           contents: '[{"column1":"hello","column2":"goodbye"}]',
-          dbtype: 'elastic',
           filetype: 'json',
         },
       })
@@ -627,6 +742,44 @@ describe('File import route tests', () =>
       });
   });
 
+  test('Import CSV: POST /midway/v1/import/', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/import/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          dbid: 1,
+          db: 'test_elastic_db',
+          table: 'fileImportTestTable',
+          contents: 'column1,column2\nhi,hello\nbye,goodbye',
+          filetype: 'csv',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            column1: 'hi',
+            column2: 'hello',
+          });
+        expect(respData[1])
+          .toMatchObject({
+            column1: 'bye',
+            column2: 'goodbye',
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/import/ request returned an error: ' + String(error));
+      });
+  });
+
   test('Invalid import: POST /midway/v1/import/', async () =>
   {
     await request(server)
@@ -635,11 +788,10 @@ describe('File import route tests', () =>
         id: 1,
         accessToken: 'AccessToken',
         body: {
-          dsn: 'http://127.0.0.1:9200',
+          dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
           contents: '{"column1":"hello","column2":"goodbye"}',
-          dbtype: 'elastic',
           filetype: 'json',
         },
       })

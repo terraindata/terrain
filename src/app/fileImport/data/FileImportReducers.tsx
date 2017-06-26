@@ -49,40 +49,28 @@ import Util from './../../util/Util';
 import Actions from './FileImportActions';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
+// import * as hashObject from 'hash-object';
+const { List } = Immutable;
 
 const FileImportReducers = {}
 
-FileImportReducers[ActionTypes.changeCluster] =
+FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
-  {
-    return state.set('clusterIndex', action.payload.clusterIndex);
-  };
+    state
+      .set('serverIndex', action.payload.serverIndex)
+      .set('connectionId', action.payload.connectionId)
+      .set('serverSelected', true)
+  ;
 
 FileImportReducers[ActionTypes.changeDbText] =
   (state, action) =>
-  {
-    if (action.payload.dbText)
-    {
-      return state.set('dbText', action.payload.dbText).set('dbSelected', true);
-    }
-    else
-    {
-      return state.set('dbText', action.payload.dbText).set('dbSelected', false);
-    }
-  };
+    state
+      .set('dbText', action.payload.dbText).set('dbSelected', !!action.payload.dbText);
 
 FileImportReducers[ActionTypes.changeTableText] =
   (state, action) =>
-  {
-    if (action.payload.tableText)
-    {
-      return state.set('tableText', action.payload.tableText).set('tableSelected', true);
-    }
-    else
-    {
-      return state.set('tableText', action.payload.tableText).set('tableSelected', false);
-    }
-  };
+    state
+      .set('tableText', action.payload.tableText).set('tableSelected', !!action.payload.tableText);
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
@@ -101,15 +89,32 @@ FileImportReducers[ActionTypes.unchooseFile] =
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
-    const { xhr, queryId } = Ajax.upload(
+    const columnTypes = [];
+    state.columnDatatypes.forEach((value) => {
+      switch(value)
+      {
+        case 0:
+          columnTypes.push('text');
+          break;
+        case 1:
+          columnTypes.push('number');
+          break;
+        case 2:
+          columnTypes.push('date');
+          break;
+      }
+    });
+
+    Ajax.importFile(
       state.file,
       state.filetype,
       state.dbText,
       state.tableText,
-      state.columnMap,
+      state.connectionId,
+      state.columnNames,
       state.columnsToInclude,
-      state.columnTypes,
-      (resp: object[]) =>
+      List(columnTypes),
+      () =>
       {
         alert("success");
       },
@@ -124,14 +129,49 @@ FileImportReducers[ActionTypes.uploadFile] =
 FileImportReducers[ActionTypes.previewFile] =
   (state, action) =>
   {
-    return state.set('previewRows', action.payload.preview);
+    let colsCount = 0;
+    for (const property in action.payload.preview[0])
+    {
+      if (action.payload.preview[0].hasOwnProperty(property))
+      {
+        colsCount++;
+      }
+    }
+
+    const columnsToInclude = [];
+    const columnNames = [];
+    const columnDatatypes = [];
+
+    for (let i = 0; i < colsCount; i++)
+    {
+      columnsToInclude.push(true);
+      columnNames.push('');
+      columnDatatypes.push(-1);
+    }
+    return state
+            .set('previewRows', action.payload.preview)
+            .set('columnsCount', colsCount)
+            .set('columnsToInclude', List(columnsToInclude))
+            .set('columnNames', List(columnNames))
+            .set('columnDatatypes', List(columnDatatypes));
   };
 
 FileImportReducers[ActionTypes.setMapCheck] =
   (state, action) =>
-    state.setIn(
-      ['previewMaps', action.payload.previewMap.id],
-      action.payload.previewMap,
-    );
+    state
+      .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
+  ;
+
+FileImportReducers[ActionTypes.setMapName] =
+  (state, action) =>
+    state
+      .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
+  ;
+
+FileImportReducers[ActionTypes.setMapDatatype] =
+  (state, action) =>
+  {
+    return state.set('columnDatatypes', state.columnDatatypes.set(action.payload.id, action.payload.datatypeIndex));
+  }
 
 export default FileImportReducers;

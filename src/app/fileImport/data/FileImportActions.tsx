@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
 import ActionTypes from './FileImportActionTypes';
-import { _FileImportState, FileImportState, FileImportStore } from './FileImportStore';
+import { FileImportStore } from './FileImportStore';
 import FileImportTypes from '../FileImportTypes';
 type PreviewMap = FileImportTypes.PreviewMap;
 
@@ -53,9 +53,9 @@ const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, paylo
 
 const FileImportActions =
   {
-    changeCluster:
-    (clusterIndex: number) =>
-      $(ActionTypes.changeCluster, { clusterIndex }),
+    changeServer:
+    (serverIndex: number, connectionId: number) =>
+      $(ActionTypes.changeServer, { serverIndex, connectionId }),
 
     changeDbText:
     (dbText: string) =>
@@ -78,20 +78,20 @@ const FileImportActions =
       $(ActionTypes.uploadFile, {}),
 
     previewFile:
-    (preview: object, previewMaps: List<PreviewMap>) =>
-      $(ActionTypes.previewFile, { preview, previewMaps }),
-
-    // setMapDatatype:
-    // (previewMap: PreviewMap) =>
-    //   $(ActionTypes.setMapDatatype, { previewMap }),
-    //
-    // setMapName:
-    // (previewMap: PreviewMap) =>
-    //   $(ActionTypes.setMapName, { previewMap }),
+    (preview: object) =>
+      $(ActionTypes.previewFile, { preview }),
 
     setMapCheck:
-    (previewMap: PreviewMap) =>
-      $(ActionTypes.setMapCheck, { previewMap }),
+    (id: number) =>
+      $(ActionTypes.setMapCheck, { id }),
+
+    setMapName:
+      (id: number, columnName: string) =>
+        $(ActionTypes.setMapName, { id, columnName }),
+
+    setMapDatatype:
+      (id: number, datatypeIndex: number) =>
+        $(ActionTypes.setMapDatatype, { id, datatypeIndex }),
   };
 
 export default FileImportActions;

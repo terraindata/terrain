@@ -49,14 +49,12 @@ import { DragDropContext } from 'react-dnd';
 import PureClasss from './../../common/components/PureClasss';;
 import FileImportStore from './../data/FileImportStore';
 import FileImportInfo from './FileImportInfo';
-import { FileImportState } from './../data/FileImportStore';
 import FileImportTypes from './../FileImportTypes';
-import './FileImport.less';
 const HTML5Backend = require('react-dnd-html5-backend');
-import { browserHistory } from 'react-router';
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
 import Preview from './Preview';
+
 const { List } = Immutable;
 
 export interface Props
@@ -67,16 +65,17 @@ export interface Props
   route?: any;
 }
 
-const CLUSTERS = Immutable.List(['test1', 'test2', 'test3']);
 const FILETYPES = Immutable.List(['json', 'csv']);
 const ROWS_COUNT = 10;
 
 class FileImport extends PureClasss<any>
 {
   public state: {
-    fileImportState: FileImportState;
-    databases?: SchemaTypes.DatabaseMap;
-    tables?: SchemaTypes.TableMap;
+    fileImportState: FileImportTypes.FileImportState;
+    servers?: SchemaTypes.ServerMap;
+    serverNames?: List<string>;
+    dbNames?: List<string>;
+    tableNames?: List<string>;
   } = {
     fileImportState: FileImportStore.getState(),
   };
@@ -90,68 +89,70 @@ class FileImport extends PureClasss<any>
     });
 
     this._subscribe(SchemaStore, {
-      stateKey: 'databases',
-      storeKeyPath: ['databases'],
+      updater: (schemaState: SchemaTypes.SchemaState) =>
+      {
+        this.setState({
+          servers: schemaState.servers,
+          serverNames: this.getKeyListSafely(schemaState.servers),
+          dbNames: this.getKeyListSafely(schemaState.databases),
+          tableNames: this.getKeyListSafely(schemaState.tables),
+        });
+      }
     });
-
-    this._subscribe(SchemaStore, {
-      stateKey: 'tables',
-      storeKeyPath: ['tables'],
-    });
-  }
-
-  private getMapKeys(map: IMMap<string, any>)
-  {
-    if (map === undefined)
-    {
-      return List();
-    }
-
-    const list = [];
-    map.forEach((value, key) =>
-    {
-      list.push(key);
-    })
-    return List(list);
   }
 
   public render()
   {
     const { fileImportState } = this.state;
-    const { clusterIndex, dbText, tableText, dbSelected, tableSelected, fileChosen, previewRows, previewMaps } = fileImportState;
-
+    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected,
+      tableText, fileChosen, previewRows, columnsToInclude, columnNames, columnsCount, columnDatatypes } = fileImportState;
+    
     return (
       <div className="fileImport">
         <h2>File Import Page</h2>
-        <FileImportInfo
-          canSelectCluster={true}
-          clusterIndex={clusterIndex}
-          clusters={CLUSTERS}
-          canSelectDb={true}
-          dbs={this.getMapKeys(this.state.databases)}
-          dbText={dbText}
-          dbSelected={dbSelected}
-          canSelectTable={true}
-          tables={this.getMapKeys(this.state.tables)}
-          tableText={tableText}
-          tableSelected={tableSelected}
-          canImport={true}
-          validFiletypes={FILETYPES}
-          fileChosen={fileChosen}
-          rowsCount={ROWS_COUNT}
-        />
+        <div>
+          <FileImportInfo
+            canSelectServer={true}
+            servers={this.state.servers}
+            serverNames={this.state.serverNames}
+            serverIndex={serverIndex}
+            serverSelected={serverSelected}
+            canSelectDb={true}
+            dbs={this.state.dbNames}
+            dbText={dbText}
+            dbSelected={dbSelected}
+            canSelectTable={true}
+            tables={this.state.tableNames}
+            tableText={tableText}
+            tableSelected={tableSelected}
+            canImport={true}
+            validFiletypes={FILETYPES}
+            fileChosen={fileChosen}
+            rowsCount={ROWS_COUNT}
+          />
+        </div>
         {
           previewRows &&
-          <div>
-            <Preview
-              rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
-              previewRows={previewRows}
-              previewMaps={null}
-            />
-          </div>
+          <Preview
+            rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
+            previewRows={previewRows}
+            columnsToInclude={columnsToInclude}
+            columnNames={columnNames}
+            columnsCount={columnsCount}
+            columnDatatypes={columnDatatypes}
+          />
         }
       </div>
     );
+  }
+
+  private getKeyListSafely(map: IMMap<string, any>)
+  {
+    if (map === undefined)
+    {
+      return List<string>();
+    }
+    return map.keySeq().toList();
   }
 }
 

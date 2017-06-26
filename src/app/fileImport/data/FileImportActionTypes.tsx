@@ -49,16 +49,16 @@ import Util from './../../util/Util';
 
 const FileImportActionTypes =
   {
-    changeCluster: '',
+    changeServer: '',
     changeDbText: '',
     changeTableText: '',
     chooseFile: '',
     unchooseFile: '',
     uploadFile: '',
     previewFile: '',
-    // setMapDatatype: '',
-    // setMapName: '',
     setMapCheck: '',
+    setMapName: '',
+    setMapDatatype: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

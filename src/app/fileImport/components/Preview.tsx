@@ -53,13 +53,16 @@ import Classs from './../../common/components/Classs';
 import { IColumn, Table } from './../../common/components/Table';
 import PreviewColumn from './PreviewColumn';
 import FileImportTypes from '../FileImportTypes';
+import './Preview.less';
 
-type PreviewMap = FileImportTypes.PreviewMap;
 export interface Props
 {
   rowsCount: number;
   previewRows: object[];
-  previewMaps: List<PreviewMap>;
+  columnsToInclude: List<boolean>;
+  columnNames: List<string>;
+  columnsCount: number;
+  columnDatatypes: List<number>;
 }
 
 const DATATYPES = Immutable.List(['text', 'number', 'date']);
@@ -76,10 +79,8 @@ class Preview extends Classs<Props>
     const { previewRows } = props;
     const cols: IColumn[] = [];
 
-    let colsCount = 0;
     for (const property in previewRows[0])
     {
-      colsCount++;
       if (previewRows[0].hasOwnProperty(property))
       {
         cols.push({
@@ -88,9 +89,6 @@ class Preview extends Classs<Props>
         });
       }
     }
-    this.setState({
-      columnsCount: colsCount,
-    });
     return Immutable.List(cols);
   }
 
@@ -99,28 +97,38 @@ class Preview extends Classs<Props>
     return this.props.previewRows[i];
   }
 
+  // public shouldComponentUpdate(nextProps, nextState)
+  // {
+  //   return this.props.rowsCount !== nextProps.rowsCount;
+  // }
+
   public render()
   {
-    console.log("rowsCount: ", this.props.rowsCount);
-    console.log("rows: ", this.props.previewRows);
-    console.log("columns: ", this.getColumns(this.props));
+    // console.log("rowsCount: ", this.props.rowsCount);
+    // console.log("rows: ", this.props.previewRows);
+    // console.log("columns: ", this.getColumns(this.props));
 
-    // const previewCols = [];
-    // for (let i = 0; i < this.state.columnsCount; i++)
-    // {
-    //   previewCols.push(
-    //     <PreviewColumn
-    //       id={i}
-    //       previewMaps={this.props.previewMaps}
-    //       datatypes={DATATYPES}
-    //       canSelectDatatype={true}
-    //       canSelectColumn={true}
-    //     />
-    //   )
-    // }
+    const previewCols = [];
+    for (let i = 0; i < this.props.columnsCount; i++)
+    {
+      previewCols.push(
+        <PreviewColumn
+          id={i}
+          isChecked={this.props.columnsToInclude.get(i)}
+          columnName={this.props.columnNames.get(i)}
+          datatypeIndex={this.props.columnDatatypes.get(i)}
+          datatypes={DATATYPES}
+          canSelectDatatype={true}
+          canSelectColumn={true}
+        />
+      )
+    }
 
     return (
-      <div>
+      <div className="preview">
+        <div className="preview-cols-container">
+          { previewCols }
+        </div>
         <Table
           columns={this.getColumns(this.props)}
           rowGetter={this.getRow}
