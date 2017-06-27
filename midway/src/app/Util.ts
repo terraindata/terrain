@@ -130,16 +130,55 @@ export function getEmptyObject(payload: object): object
         {
           res[item] = null;
         }
-        else if (payload[item] instanceof Date)
-        {
-          res[item] = new Date(0);
-        }
         else
         {
           res[item] = getEmptyObject(payload[item]);
         }
         break;
 
+      default:
+        res[item] = '';
+    }
+    return res;
+  },
+    emptyObj);
+}
+
+export function getEmptyESObject(payload: object): object
+{
+  let emptyObj: any = {};
+  if (Array.isArray(payload))
+  {
+    emptyObj = [];
+  }
+  return Object.keys(payload).reduce((res, item) =>
+  {
+    switch (typeof (payload[item]))
+    {
+      case 'boolean':
+        res[item] = false;
+        break;
+      case 'number':
+        res[item] = 0;
+        break;
+      case 'object':
+        if (payload[item] === null)
+        {
+          res[item] = null;
+        }
+        else if (payload[item] instanceof Date)
+        {
+          res[item] = new Date(0);
+        }
+        else if (Array.isArray(payload[item]))
+        {
+          res[item] = [];
+        }
+        else
+        {
+          res[item] = {};
+        }
+        break;
       case 'undefined':
         res[item] = undefined;
         break;

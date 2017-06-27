@@ -433,7 +433,7 @@ export class Import
     let ind: number = 0;
     for (const obj of items)
     {
-      if (hashObject(Util.getEmptyObject(obj)) === targetHash)
+      if (hashObject(Util.getEmptyESObject(obj)) === targetHash)
       {
         ind++;
         continue;
@@ -494,7 +494,7 @@ export class Import
         }
       }
     }
-    return hashObject(Util.getEmptyObject(obj));
+    return hashObject(Util.getEmptyESObject(obj));
   }
 
   private _getArrayFromMap(mapOrArray: object | string[]): string[]
