@@ -72,7 +72,7 @@ export interface ImportConfig
   columnsToInclude: object | boolean[];
   // if filetype is 'json': object mapping string (oldName) to string (type)
   // if filetype is 'csv': array of strings (type)
-  // supported types: text/number/boolean/date ; in progress: null/object
+  // supported types: string/number/boolean/date/null ; in progress: object
   columnTypes: object | string[];
   primaryKey: string;  // newName of primary key
 }
@@ -211,7 +211,7 @@ export class Import
     const columnTypes: string[] = this._getArrayFromMap(imprt.columnTypes);
     if (columnTypes.some((val, ind, arr) =>
     {
-      return val !== 'text' && val !== 'number' && val !== 'boolean' && val !== 'date';
+      return val !== 'string' && val !== 'number' && val !== 'boolean' && val !== 'date';
     }))
     {
       return 'Invalid data type encountered.';
@@ -261,8 +261,7 @@ export class Import
               });
             }
 
-            const desiredHash: string = this._buildDesiredHash(imprt.columnTypes);
-            if (!this._checkHash(items, desiredHash))
+            if (!this._checkTypes(items, imprt.columnTypes))
             {
               return reject('Objects in provided input JSON do not match the specified keys and/or types.');
             }
@@ -329,7 +328,7 @@ export class Import
               nameToType[val] = imprt.columnTypes[ind];
             }
           });
-          if (this._checkHash(jsonArrObj, this._buildDesiredHash(nameToType)))
+          if (this._checkTypes(jsonArrObj, nameToType))
           {
             resolve(jsonArrObj);
           } else
@@ -346,8 +345,119 @@ export class Import
       }
     });
   }
+  private _buildCSVColumnParsers(imprt: ImportConfig): object
+  {
+    const columnParsers: object = {};
+    (imprt.columnTypes as string[]).forEach((val, ind) =>
+    {
+      switch (val)
+      {
+        case 'number':
+          columnParsers[imprt.columnMap[ind]] = (item) =>
+          {
+            const num: number = Number(item);
+            if (!isNaN(num))
+            {
+              return num;
+            } else
+            {
+              if (item === '')
+              {
+                return null;
+              } else
+              {
+                return '';   // type error that will be caught in post-processing
+              }
+            }
+          };
+          break;
+        case 'boolean':
+          columnParsers[imprt.columnMap[ind]] = (item) =>
+          {
+            if (item === 'true')
+            {
+              return true;
+            } else if (item === 'false')
+            {
+              return false;
+            } else if (item === '')
+            {
+              return null;
+            } else
+            {
+              return '';   // type error that will be caught in post-processing
+            }
+          };
+          break;
+        case 'date':
+          columnParsers[imprt.columnMap[ind]] = (item) =>
+          {
+            const date: number = Date.parse(item);
+            if (!isNaN(date))
+            {
+              return new Date(date);
+            } else
+            {
+              if (item === '')
+              {
+                return null;
+              } else
+              {
+                return '';   // type error that will be caught in post-processing
+              }
+            }
+          };
+          break;
+        default:    // TODO: how to get around lint requiring this?
+          break;
+      }
+    });
+    return columnParsers;
+  }
+
+  /* returns whether all objects in "items" have the fields and types specified by nameToType
+   * nameToType: maps field name (string) to type (string) */
+  private _checkTypes(items: object[], nameToType: object): boolean
+  {
+    const targetHash: string = this._buildDesiredHash(nameToType);
+    const targetKeys: string = JSON.stringify(Object.keys(nameToType).sort());
+    for (const obj of items)
+    {
+      if (hashObject(Util.getEmptyObject(obj)) === targetHash)
+      {
+        continue;
+      }
+      if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
+      {
+        return false;
+      }
+      for (const key in obj)
+      {
+        if (obj.hasOwnProperty(key))
+        {
+          if (obj[key] !== null)
+          {
+            if (nameToType[key] === 'date')
+            {
+              if (!(obj[key] instanceof Date))
+              {
+                return false;
+              }
+            } else
+            {
+              if (nameToType[key] !== typeof (obj[key]))
+              {
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+    return true;
+  }
   /* constructs an empty object with the specified field names and types, and returns its hash
-     nameToType: maps field name (string) to type (string) */
+   * nameToType: maps field name (string) to type (string) */
   private _buildDesiredHash(nameToType: object): string
   {
     const obj: object = {};
@@ -372,63 +482,6 @@ export class Import
       }
     }
     return hashObject(Util.getEmptyObject(obj));
-  }
-  /* true if all items in "items," when emptied, hash to "targetHash"; else false */
-  private _checkHash(items: object[], targetHash: string): boolean
-  {
-    for (const obj of items)
-    {
-      if (hashObject(Util.getEmptyObject(obj)) !== targetHash)
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-  private _buildCSVColumnParsers(imprt: ImportConfig): object
-  {
-    const columnParsers: object = {};
-    (imprt.columnTypes as string[]).forEach((val, ind) =>
-    {
-      switch (val)
-      {
-        case 'number':
-          columnParsers[imprt.columnMap[ind]] = 'number';
-          break;
-        case 'boolean':
-          columnParsers[imprt.columnMap[ind]] = (item, head, resultRow, row, colIdx) =>
-          {
-            if (item === 'true')
-            {
-              return true;
-            } else if (item === 'false')
-            {
-              return false;
-            } else
-            {
-              return '';   // type error that will be caught in post-processing
-            }
-          };
-          break;
-        case 'date':
-          columnParsers[imprt.columnMap[ind]] = (item, head, resultRow, row, colIdx) =>
-          {
-            const date: number = Date.parse(item);
-            if (!isNaN(date))
-            {
-              // return new Date(date).toISOString();
-              return new Date(date);
-            } else
-            {
-              return '';   // type error that will be caught in post-processing
-            }
-          };
-          break;
-        default:    // TODO: how to get around lint requiring this?
-          break;
-      }
-    });
-    return columnParsers;
   }
 
   private _getArrayFromMap(mapOrArray: object | string[]): string[]

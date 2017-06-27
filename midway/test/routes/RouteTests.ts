@@ -738,8 +738,8 @@ describe('File import route tests', () =>
           columnTypes:
           {
             pkey: 'number',
-            column1: 'text',
-            column2: 'text',
+            column1: 'string',
+            column2: 'string',
           },
           primaryKey: 'pkey',
         },
@@ -780,7 +780,7 @@ describe('File import route tests', () =>
           csvHeaderMissing: false,
           columnMap: ['pkey', 'column1', 'column2'],
           columnsToInclude: [true, true, true],
-          columnTypes: ['number', 'text', 'text'],
+          columnTypes: ['number', 'string', 'string'],
           primaryKey: 'pkey',
         },
       })
@@ -838,8 +838,8 @@ describe('File import route tests', () =>
           columnTypes:
           {
             pkey: 'number',
-            column1: 'text',
-            column2: 'text',
+            column1: 'string',
+            column2: 'string',
           },
           primaryKey: 'pkey',
         },
