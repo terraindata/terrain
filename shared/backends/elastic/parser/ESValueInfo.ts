@@ -105,7 +105,7 @@ export default class ESValueInfo
 
   public constructor()
   {
-    this.jsonType = ESJSONType.invalid;
+    this.jsonType = ESJSONType.unknown;
     this.value = undefined;
     this.tokens = [];
     this.arrayChildren = ESValueInfo.emptyArrayChildren;
