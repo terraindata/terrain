@@ -85,12 +85,12 @@ const FileImportActions =
       $(ActionTypes.setMapIncluded, { id }),
 
     setMapName:
-      (id: string, columnName: string) =>
-        $(ActionTypes.setMapName, { id, columnName }),
+    (id: string, columnName: string) =>
+      $(ActionTypes.setMapName, { id, columnName }),
 
     setMapType:
-      (id: string, typeIndex: number) =>
-        $(ActionTypes.setMapType, { id, typeIndex }),
+    (id: string, typeIndex: number) =>
+      $(ActionTypes.setMapType, { id, typeIndex }),
   };
 
 export default FileImportActions;

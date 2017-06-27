@@ -74,6 +74,7 @@ class PreviewColumn extends Classs<Props>
 {
   public handleIncludedChange()
   {
+    console.log("checkbox click");
     Actions.setMapIncluded(this.props.id);
   }
 

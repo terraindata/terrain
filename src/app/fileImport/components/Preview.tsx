@@ -69,6 +69,23 @@ const DATATYPES = Immutable.List(['text', 'number', 'date']);
 
 class Preview extends Classs<Props>
 {
+  public columnRenderer(name: string)
+  {
+    console.log(this.props.columnsToInclude.get(name));
+    return (
+      <PreviewColumn
+        key={name}
+        id={name}
+        isIncluded={this.props.columnsToInclude.get(name)}
+        name={this.props.columnNames.get(name)}
+        typeIndex={this.props.columnTypes.get(name)}
+        types={DATATYPES}
+        canSelectType={true}
+        canSelectColumn={true}
+      />
+    );
+  }
+
   public getColumns(props: Props): List<IColumn>
   {
     const { previewRows } = props;
@@ -76,11 +93,13 @@ class Preview extends Classs<Props>
 
     for (const property in previewRows[0])
     {
+      console.log('column');
       if (previewRows[0].hasOwnProperty(property))
       {
         cols.push({
           key: property,
           name: property,
+          headerRenderer: this.columnRenderer(property),
         });
       }
     }
@@ -103,36 +122,35 @@ class Preview extends Classs<Props>
     // console.log("rows: ", this.props.previewRows);
     // console.log("columns: ", this.getColumns(this.props));
 
-    const oldNames = this.getColumns(this.props);
-
-    const previewCols = [];
-    for (let i = 0; i < this.props.columnsCount; i++)
-    {
-      const oldName = oldNames.get(i).name;
-      previewCols.push(
-        <PreviewColumn
-          key={oldName}
-          id={oldName}
-          isIncluded={this.props.columnsToInclude.get(oldName)}
-          name={this.props.columnNames.get(oldName)}
-          typeIndex={this.props.columnTypes.get(oldName)}
-          types={DATATYPES}
-          canSelectType={true}
-          canSelectColumn={true}
-        />
-      )
-    }
+    // const oldNames = this.getColumns(this.props);
+    //
+    // const previewCols = [];
+    // for (let i = 0; i < this.props.columnsCount; i++)
+    // {
+    //   const oldName = oldNames.get(i).name;
+    //   previewCols.push(
+    //     <PreviewColumn
+    //       key={oldName}
+    //       id={oldName}
+    //       isIncluded={this.props.columnsToInclude.get(oldName)}
+    //       name={this.props.columnNames.get(oldName)}
+    //       typeIndex={this.props.columnTypes.get(oldName)}
+    //       types={DATATYPES}
+    //       canSelectType={true}
+    //       canSelectColumn={true}
+    //     />
+    //   )
+    // }
+    console.log("render preview");
 
     return (
       <div className="preview">
-        <div className="preview-cols-container">
-          { previewCols }
-        </div>
         <Table
-          columns={oldNames}
+          columns={_.clone(this.getColumns(this.props))}
           rowGetter={this.getRow}
           rowsCount={this.props.rowsCount}
           rowKey={'id'}
+          headerRowHeight={200}
         />
       </div>
     );

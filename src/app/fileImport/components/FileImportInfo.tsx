@@ -134,7 +134,8 @@ class FileImportInfo extends PureClasss<Props>
       const config = {
         header: true,
         preview: this.props.rowsCount,
-        error: (err) => {
+        error: (err) =>
+        {
           alert('CSV format incorrect: ' + String(err));
           this.refs['file']['value'] = null;
           return;

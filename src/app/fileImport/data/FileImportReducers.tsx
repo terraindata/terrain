@@ -93,8 +93,9 @@ FileImportReducers[ActionTypes.uploadFile] =
 
     if (state.filetype === 'json')
     {
-      state.columnTypes.forEach((value, key) => {
-        switch(value)
+      state.columnTypes.forEach((value, key) =>
+      {
+        switch (value)
         {
           case -1:
             alert('You must select a type for each column');
@@ -132,8 +133,9 @@ FileImportReducers[ActionTypes.uploadFile] =
     }
     else if (state.filetype === 'csv')
     {
-      state.columnTypes.forEach((value, key) => {
-        switch(value)
+      state.columnTypes.forEach((value, key) =>
+      {
+        switch (value)
         {
           case -1:
             alert('You must select a type for each column');
@@ -180,8 +182,10 @@ FileImportReducers[ActionTypes.previewFile] =
     const columnTypes = [];
 
     let colsCount = 0;
-    for (const property in action.payload.preview[0]) {
-      if (action.payload.preview[0].hasOwnProperty(property)) {
+    for (const property in action.payload.preview[0])
+    {
+      if (action.payload.preview[0].hasOwnProperty(property))
+      {
         columnsToInclude.push([property, true]);
         columnNames.push([property, '']);
         columnTypes.push([property, -1]);

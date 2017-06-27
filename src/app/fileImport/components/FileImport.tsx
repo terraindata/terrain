@@ -106,7 +106,7 @@ class FileImport extends PureClasss<any>
     const { fileImportState } = this.state;
     const { serverSelected, serverIndex, dbSelected, dbText, tableSelected,
       tableText, fileChosen, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes } = fileImportState;
-
+    console.log(columnsToInclude);
     return (
       <div className="fileImport">
         <h2>File Import Page</h2>
