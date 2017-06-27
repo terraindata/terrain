@@ -55,62 +55,25 @@ import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import FileImportTypes from '../FileImportTypes';
 import Actions from './../data/FileImportActions';
-import './PreviewColumn.less';
 
 export interface Props
 {
   key: string;
-  id: string;
-  isIncluded: boolean;
-  name: string;
-  typeIndex: number;
-
-  types: List<string>;
-  canSelectType: boolean;
-  canSelectColumn: boolean;
+  items: object[];
 }
 
-class PreviewColumn extends Classs<Props>
+class PreviewRow extends Classs<Props>
 {
-  public handleIncludedChange()
-  {
-    Actions.setMapIncluded(this.props.id);
-  }
-
-  public handleAutocompleteHeaderChange(value)
-  {
-    Actions.setMapName(this.props.id, value);
-  }
-
-  public handleTypeChange(typeIndex)
-  {
-    Actions.setMapType(this.props.id, typeIndex);
-  }
-
   public render()
   {
+    const row = Object.keys(this.props.items).map((key) =>
+      <td>{ this.props.items[key] }</td>
+    );
+
     return (
-      <th>
-        <CheckBox
-          checked={this.props.isIncluded}
-          onChange={this.handleIncludedChange}
-        />
-        <Autocomplete
-          value={this.props.name}
-          options={null}
-          onChange={this.handleAutocompleteHeaderChange}
-          placeholder={this.props.id}
-          disabled={!this.props.canSelectColumn}
-        />
-        <Dropdown
-          selectedIndex={this.props.typeIndex}
-          options={this.props.types}
-          onChange={this.handleTypeChange}
-          canEdit={this.props.canSelectType}
-        />
-      </th>
+      <tr>{ row }</tr>
     );
   }
 }
 
-export default PreviewColumn;
+export default PreviewRow;

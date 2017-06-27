@@ -66,7 +66,6 @@ export interface IColumn
 {
   key: string;
   name: string;
-  headerRenderer?: any;
   resizable?: boolean;
   width?: number;
 }
@@ -82,7 +81,6 @@ export interface Props
   menuOptions?: List<MenuOption>;
   rowKey: string;
   rowHeight?: number;
-  headerRowHeight?: number;
 
   containerWidth?: number;
   containerHeight?: number;
