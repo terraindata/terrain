@@ -72,7 +72,7 @@ export interface ImportConfig
   columnsToInclude: object | boolean[];
   // if filetype is 'json': object mapping string (oldName) to string (type)
   // if filetype is 'csv': array of strings (type)
-  // supported types: text/number/boolean ; in progress: date/null/object
+  // supported types: text/number/boolean/date ; in progress: null/object
   columnTypes: object | string[];
   primaryKey: string;  // newName of primary key
 }
@@ -211,7 +211,7 @@ export class Import
     const columnTypes: string[] = this._getArrayFromMap(imprt.columnTypes);
     if (columnTypes.some((val, ind, arr) =>
     {
-      return val !== 'text' && val !== 'number' && val !== 'boolean';
+      return val !== 'text' && val !== 'number' && val !== 'boolean' && val !== 'date';
     }))
     {
       return 'Invalid data type encountered.';
@@ -234,6 +234,33 @@ export class Import
           }
           if (items.length > 0)
           {
+            // parse dates
+            const dateColumns: string[] = [];
+            for (const colName in imprt.columnTypes)
+            {
+              if (imprt.columnTypes.hasOwnProperty(colName))
+              {
+                if (imprt.columnTypes[colName] === 'date')
+                {
+                  dateColumns.push(colName);
+                }
+              }
+            }
+            if (dateColumns.length > 0)
+            {
+              items.forEach((item) =>
+              {
+                dateColumns.forEach((colName) =>
+                {
+                  const date: number = Date.parse(item[colName]);
+                  if (!isNaN(date))
+                  {
+                    item[colName] = new Date(date);
+                  }
+                });
+              });
+            }
+
             const desiredHash: string = this._buildDesiredHash(imprt.columnTypes);
             if (!this._checkHash(items, desiredHash))
             {
@@ -284,29 +311,7 @@ export class Import
           }
           return res;
         }, [] as number[]);
-        const columnParsers: object = {};
-        (imprt.columnTypes as string[]).forEach((val, ind) =>
-        {
-          if (val === 'number')
-          {
-            columnParsers[imprt.columnMap[ind]] = 'number';
-          } else if (val === 'boolean')
-          {
-            columnParsers[imprt.columnMap[ind]] = (item, head, resultRow, row, colIdx) =>
-            {
-              if (item === 'true')
-              {
-                return true;
-              } else if (item === 'false')
-              {
-                return false;
-              } else
-              {
-                return '';   // type error that will be caught in post-processing
-              }
-            };
-          }
-        });
+        const columnParsers: object = this._buildCSVColumnParsers(imprt);
         csv({
           flatKeys: true,
           checkColumn: true,
@@ -350,15 +355,19 @@ export class Import
     {
       if (nameToType.hasOwnProperty(name))
       {
-        if (nameToType[name] === 'number')
+        switch (nameToType[name])
         {
-          obj[name] = 0;
-        } else if (nameToType[name] === 'boolean')
-        {
-          obj[name] = false;
-        } else
-        {
-          obj[name] = '';
+          case 'number':
+            obj[name] = 0;
+            break;
+          case 'boolean':
+            obj[name] = false;
+            break;
+          case 'date':
+            obj[name] = new Date(0);
+            break;
+          default:
+            obj[name] = '';
         }
       }
     }
@@ -375,6 +384,51 @@ export class Import
       }
     }
     return true;
+  }
+  private _buildCSVColumnParsers(imprt: ImportConfig): object
+  {
+    const columnParsers: object = {};
+    (imprt.columnTypes as string[]).forEach((val, ind) =>
+    {
+      switch (val)
+      {
+        case 'number':
+          columnParsers[imprt.columnMap[ind]] = 'number';
+          break;
+        case 'boolean':
+          columnParsers[imprt.columnMap[ind]] = (item, head, resultRow, row, colIdx) =>
+          {
+            if (item === 'true')
+            {
+              return true;
+            } else if (item === 'false')
+            {
+              return false;
+            } else
+            {
+              return '';   // type error that will be caught in post-processing
+            }
+          };
+          break;
+        case 'date':
+          columnParsers[imprt.columnMap[ind]] = (item, head, resultRow, row, colIdx) =>
+          {
+            const date: number = Date.parse(item);
+            if (!isNaN(date))
+            {
+              // return new Date(date).toISOString();
+              return new Date(date);
+            } else
+            {
+              return '';   // type error that will be caught in post-processing
+            }
+          };
+          break;
+        default:    // TODO: how to get around lint requiring this?
+          break;
+      }
+    });
+    return columnParsers;
   }
 
   private _getArrayFromMap(mapOrArray: object | string[]): string[]
