@@ -45,27 +45,29 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
+
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
 
 import Util from '../../../../src/app/util/Util';
 
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-
-const { make } = BlockUtils;
-
-import { elasticArray, elasticBool, elasticKeyValueToggle, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
+import { elasticArray, elasticBool, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
+import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
+
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+const { make } = BlockUtils;
 
 export const ElasticBlocks =
   {
+    elasticMagicValue,
+    elasticMagicList,
+    elasticMagicListItem,
+    elasticMagicCard,
+
     // JSON
 
     elasticObject,
@@ -94,11 +96,6 @@ export const ElasticBlocks =
       }),
 
     elasticKeyValueWrap,
-
-    // JSON toggle the type blocks
-    elasticKeyValueToggle,
-    elasticValue,
-
   };
 
 BlockUtils.initBlocks(ElasticBlocks);
