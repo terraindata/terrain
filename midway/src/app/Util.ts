@@ -140,6 +140,9 @@ export function getEmptyObject(payload: object): object
         }
         break;
 
+      case 'undefined':
+        res[item] = undefined;
+        break;
       default:
         res[item] = '';
     }

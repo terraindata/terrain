@@ -720,26 +720,32 @@ describe('File import route tests', () =>
           dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: '[{"pkey":1,"column1":"hello","column2":"goodbye"}]',
+          contents: '[{"pkey":1,"column1":"hello","column2":"goodbye","column3":false,"column4":null}]',
           filetype: 'json',
 
           columnMap:
           {
             pkey: 'pkey',
-            column1: 'column1',
-            column2: 'column2',
+            column1: 'col1',
+            column2: 'col2',
+            column3: 'col3',
+            column4: 'col4',
           },
           columnsToInclude:
           {
             pkey: true,
             column1: true,
-            column2: true,
+            column2: false,
+            column3: true,
+            column4: true,
           },
           columnTypes:
           {
             pkey: 'number',
             column1: 'string',
             column2: 'string',
+            column3: 'boolean',
+            column4: 'date',
           },
           primaryKey: 'pkey',
         },
@@ -753,8 +759,9 @@ describe('File import route tests', () =>
         expect(respData[0])
           .toMatchObject({
             pkey: 1,
-            column1: 'hello',
-            column2: 'goodbye',
+            col1: 'hello',
+            col3: false,
+            col4: null,
           });
       })
       .catch((error) =>
@@ -774,13 +781,13 @@ describe('File import route tests', () =>
           dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: 'pkey,column1,column2\n1,hi,hello\n2,bye,goodbye',
+          contents: 'pkey,column1,column2,sillyname,column4\n1,hi,hello,false,1970-01-01\n2,bye,goodbye,,',
           filetype: 'csv',
 
           csvHeaderMissing: false,
-          columnMap: ['pkey', 'column1', 'column2'],
-          columnsToInclude: [true, true, true],
-          columnTypes: ['number', 'string', 'string'],
+          columnMap: ['pkey', 'column1', 'column2', 'column3', 'column4'],
+          columnsToInclude: [true, true, false, true, true],
+          columnTypes: ['number', 'string', 'string', 'boolean', 'date'],
           primaryKey: 'pkey',
         },
       })
@@ -794,13 +801,15 @@ describe('File import route tests', () =>
           .toMatchObject({
             pkey: 1,
             column1: 'hi',
-            column2: 'hello',
+            column3: false,
+            column4: new Date(Date.parse('1970-01-01')).toISOString(),
           });
         expect(respData[1])
           .toMatchObject({
             pkey: 2,
             column1: 'bye',
-            column2: 'goodbye',
+            column3: null,
+            column4: null,
           });
       })
       .catch((error) =>

@@ -261,9 +261,10 @@ export class Import
               });
             }
 
-            if (!this._checkTypes(items, imprt.columnTypes))
+            const typeError: string = this._checkTypes(items, imprt.columnTypes);
+            if (typeError !== '')
             {
-              return reject('Objects in provided input JSON do not match the specified keys and/or types.');
+              return reject('Objects in provided input JSON do not match the specified keys and/or types: ' + typeError);
             }
 
             for (const oldName in imprt.columnMap)
@@ -328,12 +329,13 @@ export class Import
               nameToType[val] = imprt.columnTypes[ind];
             }
           });
-          if (this._checkTypes(jsonArrObj, nameToType))
+          const typeError: string = this._checkTypes(jsonArrObj, nameToType);
+          if (typeError === '')
           {
             resolve(jsonArrObj);
           } else
           {
-            return reject('Objects in provided input CSV do not match the specified keys and/or types.');
+            return reject('Objects in provided input CSV do not match the specified keys and/or types: ' + typeError);
           }
         }).on('error', (e) =>
         {
@@ -415,21 +417,25 @@ export class Import
     return columnParsers;
   }
 
-  /* returns whether all objects in "items" have the fields and types specified by nameToType
+  /* checks whether all objects in "items" have the fields and types specified by nameToType
+   * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to type (string) */
-  private _checkTypes(items: object[], nameToType: object): boolean
+  private _checkTypes(items: object[], nameToType: object): string
   {
     const targetHash: string = this._buildDesiredHash(nameToType);
     const targetKeys: string = JSON.stringify(Object.keys(nameToType).sort());
+
+    let ind: number = 0;
     for (const obj of items)
     {
       if (hashObject(Util.getEmptyObject(obj)) === targetHash)
       {
+        ind++;
         continue;
       }
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
-        return false;
+        return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
       }
       for (const key in obj)
       {
@@ -441,20 +447,22 @@ export class Import
             {
               if (!(obj[key] instanceof Date))
               {
-                return false;
+                return 'Field "' + key + '" of object number ' + String(ind) + ' does not match the specified type: date.';
               }
             } else
             {
               if (nameToType[key] !== typeof (obj[key]))
               {
-                return false;
+                return 'Field "' + key + '" of object number ' + String(ind) +
+                  ' does not match the specified type: ' + String(nameToType[key]);
               }
             }
           }
         }
       }
+      ind++;
     }
-    return true;
+    return '';
   }
   /* constructs an empty object with the specified field names and types, and returns its hash
    * nameToType: maps field name (string) to type (string) */
