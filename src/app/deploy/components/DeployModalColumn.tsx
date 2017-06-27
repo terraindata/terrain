@@ -209,7 +209,7 @@ class DeployModalColumn extends PureClasss<Props>
             </span>
             <span className='deploy-modal-info-bold'>
               {
-                ItemStatus[variant.status]
+                variant.status
               }
             </span>
           </div>
@@ -219,7 +219,7 @@ class DeployModalColumn extends PureClasss<Props>
             </span>
             <span className='deploy-modal-info-bold'>
               {
-                ItemStatus[status]
+                status
               }
             </span>
           </div>
