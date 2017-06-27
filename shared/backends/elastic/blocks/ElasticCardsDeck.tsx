@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Blocks from './ElasticBlocks';
-import ElasticElasticCards from './ElasticElasticCards';
+import { ElasticElasticCardDeckTypes } from './ElasticElasticCards';
 
 export const ElasticCardsDeck =
   Immutable.fromJS(
@@ -80,7 +80,7 @@ export const ElasticCardsDeck =
         Blocks.elasticValue.type,
       ],
       
-      _.keys(ElasticElasticCards),
+      ElasticElasticCardDeckTypes,
     ],
   );
 

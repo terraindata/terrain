@@ -440,7 +440,7 @@ export const Ajax =
           }
           else
           {
-            onError('Nothing found' as any);
+            onError && onError('Nothing found' as any);
           }
         },
         {
@@ -457,6 +457,13 @@ export const Ajax =
         (variantItem: Item) =>
         {
           onLoad(variantItem as LibraryTypes.Variant);
+        },
+        (error) =>
+        {
+          if(error as any === 'Nothing found')
+          {
+            onLoad(null);
+          }
         },
       );
       // }

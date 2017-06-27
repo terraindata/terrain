@@ -54,9 +54,11 @@ import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { Block, _block } from '../../../blocks/types/Block';
+import { Card } from '../../../blocks/types/Card';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 import BlockUtils from '../../../blocks/BlockUtils';
 import ElasticBlocks from '../blocks/ElasticBlocks';
+import SpecializedCreateCardTool from '../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
 
 /**
  * A clause with a well-defined structure.
@@ -133,99 +135,174 @@ export default class ESStructureClause extends ESClause
   
   public getRowsCard()
   {
-    let firstKey: string;
     // let display: Display[] = [];
     // let initMap: {[key: string]: () => any};
     
-    const valueMap = _.mapObject(
-      this.structure,
-      (type, key) =>
-      {
-        firstKey = firstKey || key;
+    // const valueMap = _.mapObject(
+    //   this.structure,
+    //   (type, key) =>
+    //   {
+    //     // TODO if we want to shortcut some types, e.g.
+    //     //  instead of "size" rendering a Size card, "size"
+    //     //  just rendering a textbox with the size properties
         
-        // TODO if we want to shortcut some types, e.g.
-        //  instead of "size" rendering a Size card, "size"
-        //  just rendering a textbox with the size properties
+    //     return null; 
+    //     // return null so that the Record-class preserves the key,
+    //     // and we can fill in a default value using init
         
-        return null; 
-        // return null so that the Record-class preserves the key,
-        // and we can fill in a default value using init
-        
-        // if (this.template)
-        // {
-        //   // need to set up default value
-        //   const defaultValue = this.template[key];
-        //   if(defaultValue !== undefined)
-        //   {
-        //     if (defaultValue === null)
-        //     {
-        //       // need to create a clause card of the given key type
-        //       // We do this by adding a function to init.
-        //       initMap = initMap || {}; // initialize init
-        //       initMap[key] = () => BlockUtils.make(ElasticBlocks['eql' + key]); // make card
-        //       // TODO if deep nested objects, make sure they all get init'd
-        //       //   could be done in init by checking the config
+    //     // if (this.template)
+    //     // {
+    //     //   // need to set up default value
+    //     //   const defaultValue = this.template[key];
+    //     //   if(defaultValue !== undefined)
+    //     //   {
+    //     //     if (defaultValue === null)
+    //     //     {
+    //     //       // need to create a clause card of the given key type
+    //     //       // We do this by adding a function to init.
+    //     //       initMap = initMap || {}; // initialize init
+    //     //       initMap[key] = () => BlockUtils.make(ElasticBlocks['eql' + key]); // make card
+    //     //       // TODO if deep nested objects, make sure they all get init'd
+    //     //       //   could be done in init by checking the config
               
-        //       return null; 
-        //       // return null since init will fill in with a new object
-        //       // on creation. We don't want each new Card to share the same
-        //       // object reference. Returning null will preserve the key
-        //       // in the Record class.
-        //     }
+    //     //       return null; 
+    //     //       // return null since init will fill in with a new object
+    //     //       // on creation. We don't want each new Card to share the same
+    //     //       // object reference. Returning null will preserve the key
+    //     //       // in the Record class.
+    //     //     }
             
-        //     if (typeof defaultValue === 'object')
-        //     {
-        //       throw new Error('Nested object provided in template, unhandled case. ' +
-        //         'Type: ' + this.type + ' - Template value: ' + defaultValue);
-        //     }
+    //     //     if (typeof defaultValue === 'object')
+    //     //     {
+    //     //       throw new Error('Nested object provided in template, unhandled case. ' +
+    //     //         'Type: ' + this.type + ' - Template value: ' + defaultValue);
+    //     //     }
             
-        //     return this.template[key];
-        //   }
-        }
-      );
+    //     //     return this.template[key];
+    //     //   }
+    //     }
+    //   );
     
     const propertyKeys = Immutable.List(_.keys(this.structure));
     
     return this.seedCard({
         properties: Immutable.List([]),
         
+        // provide options of all possible card types
+        childOptions: Immutable.List(_.map(
+          this.structure,
+          (type, key) =>
+          ({
+            text: key,
+            type: 'eql' + type,
+          })
+        )),
+        childOptionClickHandler: (card: Card, option: { text: string, type: string }): Card =>
+        {
+          // reducer to apply the option to the card
+          return card.update('properties', properties =>
+            properties.push(
+              BlockUtils.make(
+                ElasticBlocks[this.getBlockType()],
+                {
+                  key: option.text,
+                  cardValue: BlockUtils.make(
+                    ElasticBlocks[option.type]
+                  )
+                }
+              )
+            )
+          );
+        },
+        
         static:
         {
           preview: '[properties.size] properties',
           display:
-          {
-            displayType: DisplayType.ROWS,
-            key: 'properties',
-            english: 'property',
-            factoryType: this.getBlockType(),
-            
-            row: 
+          [
             {
-              inner:
-              {
-                displayType: DisplayType.DROPDOWN,
-                key: 'key',
-                
-                options: propertyKeys,
-                dropdownUsesRawValues: true,
-              },
-              // {
-              //   [
-              //     {
-                    
-              //     },
-              //   ],
-              // },
+              displayType: DisplayType.ROWS,
+              key: 'properties',
+              english: 'property',
+              factoryType: this.getBlockType(),
+              provideParentData: true, // need this to grey out the type dropdown
               
-              below:
+              row: 
               {
-                displayType: DisplayType.CARDS,
-                key: 'cards',
+                inner:
+                {
+                  displayType: DisplayType.DROPDOWN,
+                  key: 'key',
+                  
+                  options: propertyKeys,
+                  dropdownUsesRawValues: true,
+                },
+                
+                below:
+                {
+                  displayType: DisplayType.CARDSFORTEXT,
+                  key: 'cardValue',
+                },
               },
+              
             },
-            
+            {
+              provideParentData: true, // need this to grey out the type dropdown
+              displayType: DisplayType.COMPONENT,
+              component: SpecializedCreateCardTool,
+              key: null,
+              // help: ManualConfig.help['score'],
+            },
+          ],
+          
+          tql: (card, tqlTranslationFn, tqlConfig) =>
+          {
+            const json: object = {};
+            card.properties.map(
+              (property) =>
+              {
+                _.extend(json, tqlTranslationFn(property, tqlConfig));
+              }
+            );
+            return json;
           },
-          tql: (boolBlock) => !! boolBlock['value'],
+          
+          init: () =>
+          {
+            if (this.template)
+            {
+              let properties = [];
+              _.mapObject(
+                this.template,
+                (value: any, key: string) =>
+                {
+                  const clauseType = this.structure[key];
+                  let card = BlockUtils.make(
+                    ElasticBlocks['eql' + clauseType]
+                  );
+                  
+                  if (value !== null)
+                  {
+                    card = card.set('value', value); // TODO confirm that this works
+                  }
+                  
+                  const propertyBlock = BlockUtils.make(
+                    ElasticBlocks[this.getBlockType()],
+                    {
+                      key,
+                      cardValue: card,
+                    }
+                  );
+                  
+                  properties.push(propertyBlock);
+                }
+              );
+              return {
+                properties: Immutable.List(properties),
+              };
+            }
+            return {};       
+          },
         }
       }
     );
@@ -241,12 +318,17 @@ export default class ESStructureClause extends ESClause
     return {
       [this.getBlockType()]: _block({
         key: '',
-        clauseType: '',
+        // clauseType: '',
         cardValue: null,
         
         static:
         {
-          tql: '',
+          tql: (block, tqlTranslationFn, tqlConfig) =>
+          {
+            return {
+              [block['key']]: tqlTranslationFn(block['cardValue'], tqlConfig),
+            };
+          },
           language: 'elastic',
         },
       }),
@@ -326,6 +408,7 @@ export default class ESStructureClause extends ESClause
   
   public getCard()
   {
-    return this.getWrapperCard();
+    // return this.getWrapperCard();
+    return this.getRowsCard()
   }  
 }

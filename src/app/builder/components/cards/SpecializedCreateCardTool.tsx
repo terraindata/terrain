@@ -43,79 +43,94 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
+import * as classNames from 'classnames';
+import * as React from 'react';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
-import BlockUtils from '../../../blocks/BlockUtils';
-import CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
-import { _block, Block, TQLFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { Card } from '../../../../../shared/blocks/types/Card';
+import PureClasss from '../../../common/components/PureClasss';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
 
-import Util from '../../../../src/app/util/Util';
+import CreateCardTool from './CreateCardTool';
 
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-
-const { make } = BlockUtils;
-
-import { elasticArray, elasticObject, elasticValue, elasticBool, elasticNull, elasticNumber, elasticText, elasticKeyValueToggle, elasticKeyValueWrap } from './ElasticJSONBlocks';
-import elasticRootCard from './ElasticRootCard';
-
-import { ElasticElasticCards, ElasticElasticCardDeckTypes } from './ElasticElasticCards';
-
-export const ElasticBlocks = _.extend(
-  {
-    // JSON 
-    
-    elasticObject,
-    elasticArray,
-    
-    // JSON Value blocks
-    elasticBool,
-    elasticNumber,
-    elasticText,
-    elasticNull,
-    
-    elasticRootCard,
-
-    elasticCreating: _card( // a placeholder for when a card is being created
-    {
-      static:
-      {
-        language: 'elastic',
-        tql: '',
-        title: 'New Card',
-        colors: ['#777', '#777'],
-        preview: '',
-        display: null,
-        // manualEntry: null,
-      },
-    }),
-    
-    elasticKeyValueWrap,
-        
-    // JSON toggle the type blocks
-    elasticKeyValueToggle,
-    elasticValue,
-    
-  },
-  ElasticElasticCards
-);
-
-BlockUtils.initBlocks(ElasticBlocks);
-
-// TODO remove
-const cards = {};
-for (const key in ElasticBlocks)
+export interface Props
 {
-  if (ElasticBlocks[key]._isCard && ElasticBlocks[key].static.manualEntry)
+  keyPath: KeyPath;
+  data: Card;
+  canEdit: boolean;
+  helpOn: boolean;
+  className: string;
+  onChange: (keyPath: KeyPath, value: any, notDirty: boolean) => void;
+  // builderState: d.requiresBuilderState && BuilderStore.getState(),
+  language: string;
+}
+
+class SpecializedCreateCardTool extends PureClasss<Props>
+{
+  state: {
+    options?: List<{
+      text: string;
+      type: string;
+    }>;
+    open: boolean,
+  } = {
+    options: this.getOptions(this.props),
+    open: false,
+  };
+  
+  private getOptions(props: Props)
   {
-    cards[ElasticBlocks[key].static.manualEntry.name] = key;
+    const allOptions = props.data['childOptions'];
+    
+    // TODO filter based on what's already used
+    
+    return allOptions;
+  }
+  
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if(nextProps.data !== this.props.data)
+    {
+      this.setState({
+        options: this.getOptions(nextProps),
+      });
+    } 
+  }
+  
+  public onClick(index: number)
+  {
+    const option = this.state.options.get(index);
+    const card = this.props.data['childOptionClickHandler'](
+      this.props.data, option
+    );
+
+    console.log(this.props.keyPath, card);
+    Actions.change(
+      this.props.keyPath,
+      card,
+    );
+  }
+
+  public render()
+  {
+    return (
+      <CreateCardTool
+        index={0}
+        keyPath={this.props.keyPath}
+        canEdit={this.props.canEdit}
+        language={this.props.language}
+        className={this.props.className}
+
+        open={this.state.open}
+        onToggle={this._toggle('open')}
+        
+        overrideText={this.state.options}
+        overrideClick={this.onClick}
+      />
+    );
   }
 }
-export const cardList = cards;
 
-export default ElasticBlocks;
+export default SpecializedCreateCardTool;

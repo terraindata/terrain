@@ -95,7 +95,6 @@ class CardsDeck extends PureClasss<Props>
   {
     const ordering = AllBackendsMap[this.props.language].cardsDeck;
     const cards = AllBackendsMap[this.props.language].blocks;
-
     if (ordering === undefined)
     {
       throw new Error('Unable to find backend of type ' + this.props.language);

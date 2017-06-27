@@ -63,15 +63,16 @@ import ESEnumClause from '../parser/ESEnumClause';
 import Colors from '../../../../src/app/common/Colors';
 
 const clauses = (new EQLConfig()).getClauses();
-console.log(clauses);
 
 const { valueTypes } = CommonElastic;
 
 let colorIndex = 0;
 const numColors = 21;
 
-const ElasticElasticCards: { [type: string]: any } = {};
+export const ElasticElasticCards: { [type: string]: any } = {};
+export const ElasticElasticCardDeckTypes: string[] = [];
 const referenceCards: ESClause[] = [];
+
 _.mapObject(
   clauses,
   (clause, key) => 
@@ -94,14 +95,23 @@ _.mapObject(
         
         ElasticElasticCards[clause.getCardType()] = card;
       }
+      
+      ElasticElasticCardDeckTypes.push(clause.getCardType());
     }
+    
+    const blocks = clause.getSupplementalBlocks();
+    _.mapObject(blocks, (val, key) =>
+    {
+      ElasticElasticCards[key] = val;
+    });
+    
   }
 );
 
 // add reference card types
 referenceCards.map((clause) =>
 {
-  const type = 'eql' + clause.type;
+  const type = clause.getCardType();
   const cardDef = ElasticElasticCards[clause.getCard()];
   if (cardDef)
   {
@@ -120,7 +130,7 @@ referenceCards.map((clause) =>
         // TODO add url, description, etc.
       }
     );
-    ElasticElasticCards['eql' + type] = refCardDef;
+    ElasticElasticCards[type] = refCardDef;
   }
   else
   {
