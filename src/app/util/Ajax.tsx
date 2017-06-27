@@ -639,14 +639,16 @@ export const Ajax =
       return { queryId, xhr };
     },
 
-    deployQuery(body: object,
+    deployQuery(
+      type: string,
+      body: object,
       db: BackendInstance,
       onLoad: (response: MidwayQueryResponse) => void,
       onError?: (ev: string | MidwayError) => void,
     )
     {
       const payload: QueryRequest = {
-        type: 'putTemplate',
+        type,
         database: db.id as number,
         databasetype: db.type,
         body,
