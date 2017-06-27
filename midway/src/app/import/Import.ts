@@ -199,12 +199,17 @@ export class Import
         return 'Lengths of columnMap, columnsToInclude, and columnTypes do not match.';
       }
     }
-    const columns: string[] = this._getArrayFromMap(imprt.columnMap);
-    if (columns.indexOf(imprt.primaryKey) === -1)
+    const columnList: string[] = this._getArrayFromMap(imprt.columnMap);
+    const columns: Set<string> = new Set(columnList);
+    if (columns.size !== columnList.length)
+    {
+      return 'Provided column names must be distinct.';
+    }
+    if (!columns.has(imprt.primaryKey))
     {
       return 'A column to be uploaded must be specified as the primary key.';
     }
-    if (columns.indexOf('') !== -1)
+    if (columns.has(''))
     {
       return 'The empty string is not a valid column name.';
     }
