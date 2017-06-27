@@ -51,13 +51,6 @@ import SyntaxHighlighter from './SyntaxHighlighter';
 
 class ElasticHighlighter extends SyntaxHighlighter
 {
-  protected markers: any[];
-
-  constructor()
-  {
-    super();
-    this.markers = [];
-  }
 
   public initialHighlight(instance): void
   {
@@ -66,7 +59,7 @@ class ElasticHighlighter extends SyntaxHighlighter
 
   public handleChanges(instance, changes: object[]): void
   {
-    this.clearMarkers();
+    this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
     const tokens: ESParserToken[] = parser.getTokens();
     for (let i = 0; i < tokens.length; i++)
@@ -74,7 +67,7 @@ class ElasticHighlighter extends SyntaxHighlighter
       if (tokens[i].valueInfo)
       {
         const valueInfo: ESValueInfo = tokens[i].valueInfo;
-        let style: string = '';
+        let style: string;
         switch (valueInfo.jsonType)
         {
           case ESJSONType.invalid:
@@ -95,24 +88,25 @@ class ElasticHighlighter extends SyntaxHighlighter
           case ESJSONType.parameter:
             style = 'cm-variable-2';
             break;
+          default:
+            style = '';
         }
         const coords = this.getTokenCoordinates(tokens[i]);
         const marker = instance.markText(coords[0], coords[1], { className: style });
-        this.markers.push(marker);
       }
     }
   }
 
-  protected clearMarkers(): void
+  protected clearMarkers(instance): void
   {
-    for (let i = 0; i < this.markers.length; i++)
+    const markers: any[] = instance.getAllMarks()
+    for (let i = 0; i < markers.length; i++)
     {
-      this.markers[i].clear();
+      markers[i].clear();
     }
-    this.markers = [];
   }
 
-  protected getTokenCoordinates(token: ESParserToken)// : TextCoordinates
+  protected getTokenCoordinates(token: ESParserToken)
   {
     return [{ line: token.row, ch: token.col - 1 }, { line: token.toRow, ch: token.toCol }];
   }

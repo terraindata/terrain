@@ -58,8 +58,8 @@ import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
 // Style sheets and addons for CodeMirror
-require('./tql.js');
 require('./elastic.js');
+require('./tql.js');
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/edit/matchbrackets.js';
@@ -133,6 +133,14 @@ class TQLEditor extends PureClasss<Props>
     {
       options['mode'] = 'elastic';
     }
+    else if (this.props.language === 'mysql')
+    {
+      options['mode'] = 'tql';
+    }
+    else
+    {
+      options['mode'] = '';
+    }
 
     if (this.props.isDiff)
     {
@@ -168,25 +176,23 @@ class TQLEditor extends PureClasss<Props>
     );
   }
 
-  private handleHighlight(cmInstance): void
+  private handleChanges(cmInstance, changes: object[])
   {
-    // console.log(cmInstance.getMode());
+    if (this.props.language === 'elastic')
+    {
+      const highlighter = new ElasticHighlighter();
+      highlighter.handleChanges(cmInstance, changes);
+    }
   }
 
   private registerCodeMirror(cmInstance)
   {
-    // cmInstance.on("changes", this.handleHighlight);
-
+    cmInstance.on('changes', this.handleChanges);
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
-      this.highlighter = new ElasticHighlighter();
+      const highlighter = new ElasticHighlighter();
+      highlighter.initialHighlight(cmInstance);
     }
-    if (this.highlighter)
-    {
-      cmInstance.on("changes", this.highlighter.handleChanges.bind(this.highlighter));
-      this.highlighter.handleChanges(cmInstance, []); // this may not be safe
-    }
-
   }
 }
 

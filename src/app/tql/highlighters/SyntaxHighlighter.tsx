@@ -43,6 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+/*
+ *  May want the SyntaxHighlighter to be stateless across highlight calls
+ *  There may be bugs that result from switching tabs that have different highlighter instances
+ */
 abstract class SyntaxHighlighter
 {
   /*
@@ -52,7 +57,7 @@ abstract class SyntaxHighlighter
   public abstract initialHighlight(codeMirrorInstance): void;
 
   /*
-   *  @param cm CodeMirror instance
+   *  @param cm CodeMirror instance. Handles "changes" event as described in CodeMirror docs
    */
   public abstract handleChanges(codeMirrorInstance, changes: object[]): void;
 }
