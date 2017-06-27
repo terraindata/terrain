@@ -480,16 +480,19 @@ export const Ajax =
       // }
     },
 
-    getVersions(id: ID, onLoad: (versions: any) => void)
+    getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
-      // TODO
-
-      // const url = '/versions/' + id;
-      // return Ajax._get(url, '', (response: any) =>
-      // {
-      //   const versions = JSON.parse(response);
-      //   onLoad(versions);
-      // });
+      return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>
+      {
+        try
+        {
+          onLoad(response);
+        }
+        catch (e)
+        {
+          onError && onError(response as any);
+        }
+      });
     },
 
     getVersion(id: ID, onLoad: (version: any) => void)
@@ -612,7 +615,6 @@ export const Ajax =
       } = {},
     ): { xhr: XMLHttpRequest, queryId: string }
     {
-      const queryId = '' + Math.random();
       const payload: QueryRequest = {
         type: 'search', // can be other things in the future
         database: db.id as number, // should be passed by caller
@@ -626,6 +628,7 @@ export const Ajax =
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
         onLoad(queryResult);
       };
+      const queryId = '' + Math.random();
       const xhr = Ajax.req(
         'post',
         'query/',
@@ -640,6 +643,42 @@ export const Ajax =
 
       return { queryId, xhr };
     },
+
+    importFile(file: string,
+      filetype: string,
+      db: string,
+      table: string,
+      connectionId: number,
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: string) => void,
+    ): { xhr: XMLHttpRequest, queryId: string }
+    {
+      const payload: object = {
+        dbid: connectionId,
+        db,
+        table,
+        contents: file,
+        filetype,
+      };
+      console.log("payload: ", payload);
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
+      const xhr = Ajax.req(
+        'post',
+        'import/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+
+      return;
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1
@@ -647,7 +686,7 @@ export const Ajax =
       {
         try
         {
-          const cols: object = JSON.parse(response);
+          const cols: object = typeof response === 'string' ? JSON.parse(response) : response;
           onLoad(cols);
         }
         catch (e)

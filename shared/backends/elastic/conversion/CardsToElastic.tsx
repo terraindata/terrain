@@ -42,9 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import CommonElastic from '../syntax/CommonElastic';
+import * as CommonElastic from '../syntax/CommonElastic';
 
 import BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
@@ -80,7 +82,7 @@ export interface ElasticObjectInterface
 
 class CardsToElastic
 {
-  static toElastic(query: Query, options: Options = {}): string
+  public static toElastic(query: Query, options: Options = {}): string
   {
     const elasticObj: ElasticObjectInterface = {};
 
@@ -106,13 +108,13 @@ class CardsToElastic
     // return q;
   }
 
-  static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
+  public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
   {
     if (typeof block !== 'object')
     {
       return block;
     }
-    
+
     if (block && block.static.tql)
     {
       const tql = block.static.tql as TQLRecursiveObjectFn;

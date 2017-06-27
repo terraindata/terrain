@@ -45,41 +45,42 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
+
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
 
 import Util from '../../../../src/app/util/Util';
 
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-
-const { make } = BlockUtils;
-
-import { elasticArray, elasticObject, elasticValue, elasticBool, elasticNull, elasticNumber, elasticText, elasticKeyValueToggle, elasticKeyValueWrap } from './ElasticJSONBlocks';
+import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
+import { elasticArray, elasticBool, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
+import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
 
-import { ElasticElasticCards, ElasticElasticCardDeckTypes } from './ElasticElasticCards';
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+const { make } = BlockUtils;
 
 export const ElasticBlocks = _.extend(
   {
-    // JSON 
-    
+    // JSON
+
     elasticObject,
     elasticArray,
-    
+
     // JSON Value blocks
     elasticBool,
     elasticNumber,
     elasticText,
     elasticNull,
-    
+
     elasticRootCard,
+
+    elasticMagicValue,
+    elasticMagicList,
+    elasticMagicListItem,
+    elasticMagicCard,
 
     elasticCreating: _card( // a placeholder for when a card is being created
     {
@@ -94,15 +95,12 @@ export const ElasticBlocks = _.extend(
         // manualEntry: null,
       },
     }),
-    
+
     elasticKeyValueWrap,
-        
     // JSON toggle the type blocks
-    elasticKeyValueToggle,
     elasticValue,
-    
   },
-  ElasticElasticCards
+  ElasticElasticCards,
 );
 
 BlockUtils.initBlocks(ElasticBlocks);

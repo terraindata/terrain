@@ -129,7 +129,7 @@ export namespace UserTypes
       }
     }
 
-    return MIDWAY_HOST + '/assets/profiles/profile' + index + '.jpg';
+    return MIDWAY_HOST + '/midway/v1/assets/profiles/profile' + index + '.jpg';
   }
 }
 

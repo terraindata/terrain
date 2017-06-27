@@ -70,9 +70,7 @@ abstract class ESClause
    */
   public def: string | { [key: string]: string | null };
 
-  public required: string[]; // list of required properties
-
-  public template: null | { [key: string]: any }; // template for this clause type
+  public template: any; // template for this clause type
 
   protected settings;
 

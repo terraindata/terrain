@@ -55,35 +55,35 @@ import SQLiteController from '../database/sqlite/SQLiteController';
 
 import DatabaseController from './DatabaseController';
 
-export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
+export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
 {
   if (type === 'sqlite')
   {
     return {
-      filename: dsn,
+      filename: dsnString,
     } as SQLiteConfig;
   }
   else if (type === 'mysql')
   {
-    let host: string = 'localhost';
-    let port: number = 3306;
+    const idx = dsnString.lastIndexOf('@');
+    const h0 = dsnString.substr(0, idx);
+    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
+    const q1 = h0.split(':');
+    const q2 = h1.split(':');
 
-    const hp = dsn.split(':');
-    if (hp.length === 1)
-    {
-      host = dsn;
-    }
-    else if (hp.length === 2)
-    {
-      host = hp[0];
-      port = parseInt(hp[1], 10);
-    }
-    else
+    if (q1.length !== 2 || q2.length !== 2)
     {
       throw new Error('Error interpreting DSN parameter for MySQL.');
     }
 
+    const user: string = q1[0];
+    const password: string = q1[1];
+    const host: string = q2[0];
+    const port: number = parseInt(q2[1], 10);
+
     return {
+      user,
+      password,
       host,
       port,
     } as MySQLConfig;
@@ -91,7 +91,7 @@ export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConf
   else if (type === 'elasticsearch' || type === 'elastic')
   {
     return {
-      hosts: [dsn],
+      hosts: [dsnString],
     } as ElasticConfig;
   }
   else
@@ -100,22 +100,22 @@ export function DSNToConfig(type: string, dsn: string): SQLiteConfig | MySQLConf
   }
 }
 
-export function makeDatabaseController(type: string, dsn: string): SQLiteController | MySQLController | ElasticController
+export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
 {
   type = type.toLowerCase();
   if (type === 'sqlite')
   {
-    const config = DSNToConfig(type, dsn) as SQLiteConfig;
+    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
     return new SQLiteController(config, 0, 'SQLite');
   }
   else if (type === 'mysql')
   {
-    const config = DSNToConfig(type, dsn) as MySQLConfig;
+    const config = DSNToConfig(type, dsnString) as MySQLConfig;
     return new MySQLController(config, 0, 'MySQL');
   }
   else if (type === 'elasticsearch' || type === 'elastic')
   {
-    const config = DSNToConfig(type, dsn) as ElasticConfig;
+    const config = DSNToConfig(type, dsnString) as ElasticConfig;
     return new ElasticController(config, 0, 'Elastic');
   }
   else
