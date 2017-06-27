@@ -44,102 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
+import ESJSONType from './ESJSONType';
+import ESParameter from './ESParameter';
+import ESPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
 
-export function getRequest(url)
+export default class EQLTemplateGenerator
 {
-  return new Promise((resolve, reject) =>
+  public static generate(source: ESValueInfo): string
   {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
-}
-
-export function verifyParameters(parameters: any, required: string[]): void
-{
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
+    return (new EQLTemplateGenerator(source)).result;
   }
 
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
-}
+  private result: string;
 
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
+  public constructor(source: ESValueInfo)
   {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
+    this.result = '';
+    this.convert(source);
   }
-  return obj;
-}
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
+  public convert(source: ESValueInfo): void
   {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
+    let i: number = 0;
 
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
+    switch (source.jsonType)
     {
-      case 'boolean':
-        res[item] = false;
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+      case ESJSONType.string:
+        this.result += JSON.stringify(source.value);
         break;
 
-      case 'number':
-        res[item] = 0;
+      case ESJSONType.parameter:
+        const param: ESParameter = source.value as ESParameter;
+        this.result += ' {{#toJson}}' + param.name + '{{/toJson}} ';
         break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
+
+      case ESJSONType.array:
+        this.result += '[';
+        source.arrayChildren.forEach(
+          (child: ESValueInfo): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            this.convert(child);
+          });
+        this.result += ']';
+        break;
+
+      case ESJSONType.object:
+        this.result += ' { '; // extra spaces to avoid confusion with mustache tags
+
+        Object.keys(source.objectChildren).forEach(
+          (name: string): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            const kvp: ESPropertyInfo = source.objectChildren[name];
+            this.convert(kvp.propertyName);
+            this.result += ':';
+
+            if (kvp.propertyValue === null)
+            {
+              throw new Error('Property with no value found.');
+            }
+
+            this.convert(kvp.propertyValue);
+          });
+
+        this.result += ' } '; // extra spaces to avoid confusion with mustache tags
         break;
 
       default:
-        res[item] = '';
+        throw new Error('Unconvertable value type found.');
     }
-    return res;
-  },
-    emptyObj);
+  }
 }

@@ -44,102 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
+import * as fs from 'fs';
+import * as util from 'util';
+import * as winston from 'winston';
+import EQLTemplateGenerator from '../../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
+import ESValueInfo from '../../../../../shared/backends/elastic/parser/ESValueInfo';
+import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
-export function getRequest(url)
+/* tslint:disable:no-trailing-whitespace */
+
+beforeAll(async (done) =>
 {
-  return new Promise((resolve, reject) =>
-  {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  done();
+});
+
+function testGeneration(testString: string, expectedValue: string)
+{
+  winston.info('testing \'' + testString + '\'');
+
+  const parser: ESParser = new ESParser(testString);
+  const valueInfo: ESValueInfo = parser.getValueInfo();
+  const errors: ESParserError[] = parser.getErrors();
+
+  expect(errors.length).toEqual(0);
+
+  const result = EQLTemplateGenerator.generate(valueInfo);
+
+  winston.info(result);
+  expect(result).toEqual(expectedValue);
 }
 
-export function verifyParameters(parameters: any, required: string[]): void
+test('test generate template queries', () =>
 {
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
-  }
+  testGeneration('true', 'true');
+  testGeneration('false', 'false');
+  testGeneration('null', 'null');
+  testGeneration('0', '0');
+  testGeneration('1.923e-21', '1.923e-21');
+  testGeneration('123', '123');
+  testGeneration('9990000000000', '9990000000000');
+  testGeneration('0.999', '0.999');
+  testGeneration('[]', '[]');
+  testGeneration('{}', ' {  } ');
 
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
-}
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
+    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
 
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
-  }
-  return obj;
-}
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
+    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
-
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
-    {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
-    }
-    return res;
-  },
-    emptyObj);
-}
+});
