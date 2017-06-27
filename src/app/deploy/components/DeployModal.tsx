@@ -114,11 +114,6 @@ class DeployModal extends PureClasss<Props>
   public handleDeploy()
   {
     const variant = this.state.changingStatusOf;
-    const tql = variant ? variant.query.tql : '';
-    if (tql === '')
-    {
-      return;
-    }
 
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
@@ -127,6 +122,7 @@ class DeployModal extends PureClasss<Props>
 
     if (this.state.changingStatusTo === ItemStatus.Live && variant.status !== 'LIVE')
     {
+      const tql = variant ? variant.query.tql : '';
       const parser: ESParser = new ESParser(tql);
       const valueInfo: ESValueInfo = parser.getValueInfo();
       if (parser.getErrors().length > 0)
