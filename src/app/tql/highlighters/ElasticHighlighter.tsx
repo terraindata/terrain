@@ -70,9 +70,12 @@ class ElasticHighlighter extends SyntaxHighlighter
         let style: string;
         switch (valueInfo.jsonType)
         {
+          // invalid types
+          case ESJSONType.unknown:
           case ESJSONType.invalid:
             style = 'cm-error';
             break;
+          // true JSON types
           case ESJSONType.null:
           case ESJSONType.boolean:
           case ESJSONType.number:
@@ -81,10 +84,19 @@ class ElasticHighlighter extends SyntaxHighlighter
           case ESJSONType.string:
             style = 'cm-string';
             break;
+          case ESJSONType.property:
+            style = 'cm-property';
+            break;
           case ESJSONType.array:
           case ESJSONType.object:
+          // delimiter types
+          case ESJSONType.arrayDelimiter:
+          case ESJSONType.arrayTerminator:
+          case ESJSONType.objectDelimiter:
+          case ESJSONType.objectTerminator:
             style = 'cm-bracket';
             break;
+          // additional types
           case ESJSONType.parameter:
             style = 'cm-variable-2';
             break;
@@ -108,7 +120,7 @@ class ElasticHighlighter extends SyntaxHighlighter
 
   protected getTokenCoordinates(token: ESParserToken)
   {
-    return [{ line: token.row, ch: token.col - 1 }, { line: token.toRow, ch: token.toCol }];
+    return [{ line: token.row, ch: token.col}, { line: token.toRow, ch: token.toCol }];
   }
 }
 export default ElasticHighlighter;
