@@ -81,7 +81,7 @@ export interface Display
   key: string;
   // key can be null for FLEX but nothing else
 
-  //Manual information
+  // Manual information
   help?: string | string[];
 
   className?: string | ((data: any) => string);
