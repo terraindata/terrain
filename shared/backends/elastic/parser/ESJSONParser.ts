@@ -406,8 +406,9 @@ export default class ESJSONParser
         propertyName = String(propertyName);
       }
 
-      // set name to property type
+      // set name value info and token to property type
       nameInfo.jsonType = ESJSONType.property;
+      this.getCurrentToken().jsonType = ESJSONType.property;
 
       // check for duplicates
       if (obj.hasOwnProperty(propertyName))
