@@ -216,7 +216,9 @@ export const Ajax =
           }
         }
         catch (e)
-        { }
+        {
+          ;
+        }
       }
       else if (config.urlArgs)
       {
