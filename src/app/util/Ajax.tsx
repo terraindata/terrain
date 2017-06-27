@@ -614,7 +614,7 @@ export const Ajax =
         type: 'search', // can be other things in the future
         database: db.id as number, // should be passed by caller
         streaming: options.streaming,
-        databasetype: 'elastic',
+        databasetype: db.type,
         body,
       };
 
