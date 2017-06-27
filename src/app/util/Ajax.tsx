@@ -639,6 +639,36 @@ export const Ajax =
       return { queryId, xhr };
     },
 
+    deployQuery(body: object,
+      db: BackendInstance,
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: string | MidwayError) => void,
+    )
+    {
+      const payload: QueryRequest = {
+        type: 'putTemplate',
+        database: db.id as number,
+        databasetype: db.type,
+        body,
+      };
+
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
+
+      Ajax.req(
+        'post',
+        'query/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+    },
+
     importFile(file: string,
       filetype: string,
       db: string,
