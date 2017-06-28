@@ -658,11 +658,11 @@ export const Ajax =
         table,
         contents: file,
         filetype,
-        columnNames,
+        columnMap: columnNames,
         columnsToInclude,
         columnTypes,
         primaryKey,
-        hasCsvHeader,
+        csvHeaderMissing: !hasCsvHeader,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>

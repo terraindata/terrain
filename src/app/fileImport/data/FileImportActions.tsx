@@ -64,12 +64,12 @@ const FileImportActions =
       $(ActionTypes.changeTableText, { tableText }),
 
     changeHasCsvHeader:
-      () =>
-        $(ActionTypes.changeHasCsvHeader, { }),
+    () =>
+      $(ActionTypes.changeHasCsvHeader, {}),
 
     changePrimaryKey:
-      (id: string) =>
-        $(ActionTypes.changePrimaryKey, { id }),
+    (id: string) =>
+      $(ActionTypes.changePrimaryKey, { id }),
 
     chooseFile:
     (file: string, filetype: string, preview: object) =>
@@ -77,7 +77,7 @@ const FileImportActions =
 
     uploadFile:
     () =>
-      $(ActionTypes.uploadFile, { }),
+      $(ActionTypes.uploadFile, {}),
 
     setColumnsToInclude:
     (id: string) =>
