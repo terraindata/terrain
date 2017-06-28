@@ -172,7 +172,7 @@ export function getEmptyESObject(payload: object): object
         }
         else if (Array.isArray(payload[item]))
         {
-          res[item] = [];
+          res[item] = [1];
         }
         else
         {

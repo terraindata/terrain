@@ -72,13 +72,15 @@ export interface ImportConfig
   columnsToInclude: object | boolean[];
   // if filetype is 'json': object mapping string (oldName) to string (type)
   // if filetype is 'csv': array of strings (type)
-  // supported types: string/number/boolean/date/null ; in progress: object
+  // supported types: string/number/boolean/date/array/object/(null)
   columnTypes: object | string[];
   primaryKey: string;  // newName of primary key
 }
 
 export class Import
 {
+  private supportedColumnTypes: Set<string> = new Set(['string', 'number', 'boolean', 'date', 'array', 'object']);
+
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
@@ -103,6 +105,13 @@ export class Import
       }
       const columns: string[] = this._getArrayFromMap(imprt.columnMap);
 
+      winston.info(hashObject(new Date(0)));
+      winston.info(hashObject([1]));
+      winston.info(hashObject({ test: new Date(0) }));
+      winston.info(hashObject({ test: [1] }));
+      winston.info('got parsed data!');
+      winston.info(JSON.stringify(items));
+
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
         [imprt.primaryKey],
@@ -120,6 +129,7 @@ export class Import
         return reject('File import currently is only supported for Elastic databases.');
       }
 
+      winston.info('about to upsert via tasty...');
       resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
     });
   }
@@ -216,7 +226,7 @@ export class Import
     const columnTypes: string[] = this._getArrayFromMap(imprt.columnTypes);
     if (columnTypes.some((val, ind, arr) =>
     {
-      return val !== 'string' && val !== 'number' && val !== 'boolean' && val !== 'date';
+      return !(this.supportedColumnTypes.has(val));
     }))
     {
       return 'Invalid data type encountered.';
@@ -326,6 +336,8 @@ export class Import
           colParser: columnParsers,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
+          winston.info('hello');
+          winston.info(JSON.stringify(jsonArrObj));
           const nameToType: object = {};
           (imprt.columnMap as string[]).forEach((val, ind) =>
           {
@@ -334,9 +346,11 @@ export class Import
               nameToType[val] = imprt.columnTypes[ind];
             }
           });
+          winston.info('about to start check');
           const typeError: string = this._checkTypes(jsonArrObj, nameToType);
           if (typeError === '')
           {
+            winston.info('finished check');
             resolve(jsonArrObj);
           } else
           {
@@ -359,6 +373,9 @@ export class Import
     {
       switch (val)
       {
+        case 'string':
+          columnParsers[imprt.columnMap[ind]] = 'string';
+          break;
         case 'number':
           columnParsers[imprt.columnMap[ind]] = (item) =>
           {
@@ -415,8 +432,23 @@ export class Import
             }
           };
           break;
-        default:    // TODO: how to get around lint requiring this?
-          break;
+        default:  // "array" and "object" cases
+          columnParsers[imprt.columnMap[ind]] = (item) =>
+          {
+            if (item === '')
+            {
+              return null;
+            }
+            try
+            {
+              winston.info('attempting to parse: ' + String(item));
+              const res: object = JSON.parse(item);
+              return res;
+            } catch (e)
+            {
+              return '';   // type error that will be caught in post-processing
+            }
+          };
       }
     });
     return columnParsers;
@@ -433,8 +465,10 @@ export class Import
     let ind: number = 0;
     for (const obj of items)
     {
+      winston.info('checktypes: emptied obj: ' + JSON.stringify(Util.getEmptyESObject(obj)));
       if (hashObject(Util.getEmptyESObject(obj)) === targetHash)
       {
+        winston.info('checktypes: hash matches');
         ind++;
         continue;
       }
@@ -450,12 +484,21 @@ export class Import
           {
             if (nameToType[key] === 'date')
             {
+              winston.info('checktypes: date type encountered');
               if (!(obj[key] instanceof Date))
               {
                 return 'Field "' + key + '" of object number ' + String(ind) + ' does not match the specified type: date.';
               }
+            } else if (nameToType[key] === 'array')
+            {
+              winston.info('checktypes: array type encountered');
+              if (!(Array.isArray(obj[key])))
+              {
+                return 'Field "' + key + '" of object number ' + String(ind) + ' does not match the specified type: array.';
+              }
             } else
             {
+              winston.info('checktypes: nondate nonarray type encountered');
               if (nameToType[key] !== typeof (obj[key]))
               {
                 return 'Field "' + key + '" of object number ' + String(ind) +
@@ -489,11 +532,18 @@ export class Import
           case 'date':
             obj[name] = new Date(0);
             break;
+          case 'array':
+            obj[name] = [1];
+            break;
+          case 'object':
+            obj[name] = {};
+            break;
           default:
             obj[name] = '';
         }
       }
     }
+    winston.info('desired emptied obj: ' + JSON.stringify(Util.getEmptyESObject(obj)));
     return hashObject(Util.getEmptyESObject(obj));
   }
 
