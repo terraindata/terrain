@@ -65,6 +65,7 @@ import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
+// const { List, Map } = Immutable;
 
 export const Ajax =
   {
@@ -216,7 +217,9 @@ export const Ajax =
           }
         }
         catch (e)
-        { }
+        {
+          ;
+        }
       }
       else if (config.urlArgs)
       {
@@ -612,7 +615,7 @@ export const Ajax =
         type: 'search', // can be other things in the future
         database: db.id as number, // should be passed by caller
         streaming: options.streaming,
-        databasetype: 'elastic',
+        databasetype: db.type,
         body,
       };
 
@@ -637,13 +640,50 @@ export const Ajax =
       return { queryId, xhr };
     },
 
+    deployQuery(
+      type: string,
+      body: object,
+      db: BackendInstance,
+      onLoad: (response: MidwayQueryResponse) => void,
+      onError?: (ev: string | MidwayError) => void,
+    )
+    {
+      const payload: QueryRequest = {
+        type,
+        database: db.id as number,
+        databasetype: db.type,
+        body,
+      };
+
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
+
+      Ajax.req(
+        'post',
+        'query/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+    },
+
     importFile(file: string,
       filetype: string,
       db: string,
       table: string,
       connectionId: number,
-      onLoad: (response: MidwayQueryResponse) => void,
+      columnNames: Map<string, string> | List<string>,
+      columnsToInclude: Map<string, boolean> | List<boolean>,
+      columnTypes: Immutable.Map<string, string> | List<string>,
+      primaryKey: string,
+      onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
+      hasCsvHeader?: boolean,
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const payload: object = {
@@ -652,12 +692,16 @@ export const Ajax =
         table,
         contents: file,
         filetype,
+        columnMap: columnNames,
+        columnsToInclude,
+        columnTypes,
+        primaryKey,
+        csvHeaderMissing: !hasCsvHeader,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>
       {
-        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-        onLoad(queryResult);
+        onLoad(resp);
       };
       const xhr = Ajax.req(
         'post',

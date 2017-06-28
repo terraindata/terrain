@@ -214,6 +214,11 @@ export class Import
     {
       return 'A column to be uploaded must be specified as the primary key.';
     }
+    const primaryKeyInd: string = Object.keys(imprt.columnMap).find((key) => imprt.columnMap[key] === imprt.primaryKey) as string;
+    if (!imprt.columnsToInclude[primaryKeyInd])
+    {
+      return 'The primary key column must be included in the upload.';
+    }
     if (columns.has(''))
     {
       return 'The empty string is not a valid column name.';

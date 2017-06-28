@@ -43,40 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
+import Classs from './../../common/components/Classs';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+export interface Props
+{
+  key: string;
+  items: object[];
+}
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+class PreviewRow extends Classs<Props>
+{
+  public shouldComponentUpdate(nextProps: Props)
+  {
+    return this.props.items !== nextProps.items;
+  }
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+  public render()
+  {
+    const row = Object.keys(this.props.items).map((key) =>
+      <td key={key}>{this.props.items[key]}</td>
+    );
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+    return (
+      <tr>{row}</tr>
+    );
+  }
+}
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
-    ],
-  );
-
-export default ElasticCardsDeck;
+export default PreviewRow;

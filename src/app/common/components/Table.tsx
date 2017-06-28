@@ -54,6 +54,7 @@ import * as classNames from 'classnames';
 import { Menu, MenuOption } from '../../common/components/Menu';
 import Util from '../../util/Util';
 import PureClasss from './PureClasss';
+import { ReactPropTypes } from "react";
 const Dimensions = require('react-dimensions');
 
 const LEFT_COLOR_FROM = hexToRgb('#a2af93');
@@ -102,7 +103,6 @@ class _Table extends PureClasss<Props>
 
   public render()
   {
-    console.log(this.props.containerHeight);
     return (
       <ReactDataGrid
         {...this.props}
