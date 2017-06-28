@@ -429,6 +429,9 @@ class _CardComponent extends PureClasss<Props>
 
         if (cardEnd < visibleStart || cardStart > visibleEnd)
         {
+          // TODO fix bug here where you have the CreateCardTool open
+          //  and scroll to the bottom of the column and it expands
+          //  cardHeight ad infinitum
           return (
             <div
               className='card card-placeholder'

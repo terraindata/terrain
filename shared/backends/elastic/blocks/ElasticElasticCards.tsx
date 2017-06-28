@@ -51,7 +51,7 @@ import BlockUtils from '../../../blocks/BlockUtils';
 import { _card, Card, CardString, CardConfig } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 import CommonElastic from '../syntax/CommonElastic';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
@@ -307,68 +307,5 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
 //   }
 // });
 
-
-_card({
-  index: '',
-  from: 0,
-  rootType: '',
-  rootSize: 100,
-
-  body: '',
-  sort: '',
-
-  cards: L(),
-
-  static:
-  {
-    title: 'Root',
-    colors: ['#456', '#789'],
-    preview: '[index], [rootType]',
-    language: 'elastic',
-
-    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      return {
-        index: rootBlock['index'],
-        type: rootBlock['rootType'],
-        from: rootBlock['from'],
-        size: rootBlock['rootSize'],
-      };
-    },
-
-    display:
-    [
-      {
-        displayType: DisplayType.TEXT,
-        key: 'index',
-        getAutoTerms: (schemaState) =>
-        {
-          return Immutable.List(['movies', 'baseball', 'zazzle']);
-        }
-        // autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.TEXT,
-        key: 'rootType',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'from',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'rootSize',
-        autoDisabled: true,
-      },
-
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-      },
-    ]
-  },
-});
 
 export default ElasticElasticCards;

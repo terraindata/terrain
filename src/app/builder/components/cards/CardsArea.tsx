@@ -75,6 +75,7 @@ export interface Props
   accepts?: List<string>;
   noCardTool?: boolean;
   singleChild?: boolean;
+  hideCreateCardTool?: boolean;
 }
 
 interface KeyState
@@ -233,19 +234,20 @@ class CardsArea extends PureClasss<Props>
           />
 
           {
-            renderCardTool &&
-            <CreateCardTool
-              language={this.props.language}
-              canEdit={this.props.canEdit}
-              keyPath={this.props.keyPath}
-              index={props.cards.size}
-              open={this.state.cardToolOpen}
-              className='nested-create-card-tool-wrapper'
-              accepts={this.props.accepts}
-              onToggle={this._toggle('cardToolOpen')}
-              hidePlaceholder={this.props.singleChild || cards.size === 0}
-              cannotClose={cards.size === 0}
-            />
+            !this.props.hideCreateCardTool &&
+              renderCardTool &&
+                <CreateCardTool
+                  language={this.props.language}
+                  canEdit={this.props.canEdit}
+                  keyPath={this.props.keyPath}
+                  index={props.cards.size}
+                  open={this.state.cardToolOpen}
+                  className='nested-create-card-tool-wrapper'
+                  accepts={this.props.accepts}
+                  onToggle={this._toggle('cardToolOpen')}
+                  hidePlaceholder={this.props.singleChild || cards.size === 0}
+                  cannotClose={cards.size === 0}
+                />
           }
 
         </div>

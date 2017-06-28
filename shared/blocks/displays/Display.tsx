@@ -124,6 +124,7 @@ export interface Display
   // for cards areas
   singleChild?: boolean;
   accepts?: List<string>;
+  hideCreateCardTool?: boolean;
 
   provideParentData?: boolean;
   // if true, it passes the parent data down

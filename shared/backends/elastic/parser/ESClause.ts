@@ -154,33 +154,33 @@ abstract class ESClause
       anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
     
-    // if(false) // switch this on for wrapper card approach
-    // {
-    //   if(obj['key'] !== undefined)
-    //   {
-    //     throw new Error('Key method was already defined for block ' + this.type);
-    //   }
-    //   // Define a key, which will be optionally used to supply the key
-    //   //  for a key/val pair, if one is needed
-    //   obj['key'] = '';
+    if(true) // switch this on for wrapper card approach
+    {
+      if(obj['key'] !== undefined)
+      {
+        throw new Error('Key method was already defined for block ' + this.type);
+      }
+      // Define a key, which will be optionally used to supply the key
+      //  for a key/val pair, if one is needed
+      obj['key'] = '';
       
-    //   // prepend the display with our standard key text display
-    //   if (!obj['static']['display'])
-    //   {
-    //     obj['static']['display'] = KEY_DISPLAY;
-    //   }
-    //   else if (Array.isArray(obj['static']['display']))
-    //   {
-    //     (obj['static']['display'] as any).push(KEY_DISPLAY);
-    //   }
-    //   else
-    //   {
-    //     obj['static']['display'] = [
-    //       KEY_DISPLAY,
-    //       obj['static']['display'],
-    //     ] as any;
-    //   }
-    // }
+      // prepend the display with our standard key text display
+      if (!obj['static']['display'])
+      {
+        obj['static']['display'] = KEY_DISPLAY;
+      }
+      else if (Array.isArray(obj['static']['display']))
+      {
+        (obj['static']['display'] as any).unshift(KEY_DISPLAY);
+      }
+      else
+      {
+        obj['static']['display'] = [
+          KEY_DISPLAY,
+          obj['static']['display'],
+        ] as any;
+      }
+    }
     
     return _card(obj as any);
   }

@@ -70,7 +70,7 @@ export interface Props
   open?: boolean;
   dy?: number;
   className?: string;
-  accepts?: List<string>;
+  accepts: List<string>;
   onToggle?: () => void;
   onClose?: () => void; // like toggle, but only called when explicitly closed
   onMinimize?: () => void; // TODO see if these should be consolidated
@@ -221,6 +221,7 @@ class CreateCardTool extends PureClasss<Props>
 //               curIndex++;
 
     const cardTypeList = this.props.overrideText || this.props.accepts;
+    const isEmpty = cardTypeList.size === 0;
     
     return (
       <div
@@ -231,6 +232,12 @@ class CreateCardTool extends PureClasss<Props>
         ref='selector'
       >
         <div className='create-card-selector-inner'>
+          {
+            isEmpty &&
+              <div className='create-card-empty'>
+                There are no remaining cards that can be created here.
+              </div>
+          }
           {
             this.props.overrideText
             ?

@@ -52,7 +52,7 @@ import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+import { Display, DisplayType, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { Block, _block } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import CommonBlocks from '../../../blocks/CommonBlocks';
@@ -189,14 +189,24 @@ export default class ESStructureClause extends ESClause
         properties: Immutable.List([]),
         
         // provide options of all possible card types
-        childOptions: Immutable.List(_.map(
-          this.structure,
-          (type, key) =>
-          ({
-            text: key,
-            type: 'eql' + type,
-          })
-        )),
+        getChildOptions: (card) =>
+        {
+          return Immutable.List(_.compact(_.map(
+            this.structure,
+            (type, key) =>
+            {
+              if(card['properties'].find((p) => p.key === key))
+              {
+                return null;
+              }
+              return {
+                text: key,
+                type: 'eql' + type,
+              };
+            }
+          )));
+        },
+        
         childOptionClickHandler: (card: Card, option: { text: string, type: string }): Card =>
         {
           // reducer to apply the option to the card
@@ -383,32 +393,87 @@ export default class ESStructureClause extends ESClause
     }
     
     return this.seedCard(
-      CommonBlocks._wrapperCard({
-        colors: [],
-        title: this.type,
-        language: 'elastic',
-        tql: (block, tqlTranslationFn, tqlConfig) => {
-          let json: object = {};
-          block['cards'].map(
-            (card) =>
+      {
+        cards: Immutable.List([]),
+        
+        
+        // provide options of all possible card types
+        getChildOptions: (card) =>
+        {
+          return Immutable.List(_.compact(_.map(
+            this.structure,
+            (type, key) =>
             {
-              _.extend(json, {
-                [card['key']]: tqlTranslationFn(card, tqlConfig),
-              });
+              if(card['cards'].find((p) => p.key === key))
+              {
+                return null;
+              }
+              return {
+                text: key,
+                type: 'eql' + type,
+              };
             }
-          );
-          return json;
+          )));
         },
         
-        accepts,
-        init,
-      })
+        childOptionClickHandler: (card, option: { text: string, type: string }): Card =>
+        {
+          // reducer to apply the option to the card
+          return card.update('cards', cards =>
+            cards.push(
+              BlockUtils.make(
+                ElasticBlocks[option.type],
+                {
+                  key: option.text,
+                }
+              )
+            )
+          );
+        },
+      
+        static:      
+        {
+          tql: (block, tqlTranslationFn, tqlConfig) => {
+            let json: object = {};
+            block['cards'].map(
+              (card) =>
+              {
+                _.extend(json, {
+                  [card['key']]: tqlTranslationFn(card, tqlConfig),
+                });
+              }
+            );
+            return json;
+          },
+          
+          preview: '[cards.size] Properties',
+          
+          accepts,
+          init,
+          
+          display: [
+            _.extend(
+              {
+                hideCreateCardTool: true,
+              },
+              wrapperDisplay, // displays cards
+            ),
+            {
+              provideParentData: true, // need this to grey out the type dropdown
+              displayType: DisplayType.COMPONENT,
+              component: SpecializedCreateCardTool,
+              key: null,
+              // help: ManualConfig.help['score'],
+            },
+          ],
+        },
+      }
     );
   }
   
   public getCard()
   {
-    // return this.getWrapperCard();
-    return this.getRowsCard()
+    return this.getWrapperCard();
+    // return this.getRowsCard()
   }  
 }

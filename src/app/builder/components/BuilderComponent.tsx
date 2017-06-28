@@ -184,6 +184,7 @@ class BuilderComponent extends PureClasss<Props>
           accepts={st && st.accepts}
           singleChild={d.singleChild}
           language={this.props.language}
+          hideCreateCardTool={d.hideCreateCardTool}
         />;
         break;
       case DisplayType.CARDTEXT:

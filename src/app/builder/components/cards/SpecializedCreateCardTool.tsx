@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { Card } from '../../../../../shared/blocks/types/Card';
@@ -67,6 +68,8 @@ export interface Props
   language: string;
 }
 
+const emptyList = Immutable.List([]);
+
 class SpecializedCreateCardTool extends PureClasss<Props>
 {
   state: {
@@ -75,18 +78,27 @@ class SpecializedCreateCardTool extends PureClasss<Props>
       type: string;
     }>;
     open: boolean,
-  } = {
-    options: this.getOptions(this.props),
-    open: false,
   };
   
-  private getOptions(props: Props)
+  constructor(props: Props)
   {
-    const allOptions = props.data['childOptions'];
+    super(props);
+    this.state = {
+      options: this.getOptions(this.props),
+      open: false,
+    };
+  }
+  
+  public getOptions(props: Props)
+  {
+    const options = props.data['getChildOptions'](props.data);
     
-    // TODO filter based on what's already used
+    if(this.state && options.equals(this.state.options))
+    {
+      return this.state.options;
+    }
     
-    return allOptions;
+    return options;
   }
   
   public componentWillReceiveProps(nextProps: Props)
@@ -122,6 +134,7 @@ class SpecializedCreateCardTool extends PureClasss<Props>
         canEdit={this.props.canEdit}
         language={this.props.language}
         className={this.props.className}
+        accepts={emptyList}
 
         open={this.state.open}
         onToggle={this._toggle('open')}

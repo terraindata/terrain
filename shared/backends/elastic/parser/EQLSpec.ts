@@ -405,7 +405,7 @@ const EQLSpec: ESClause[] =
         name: 'query clause',
         desc: 'Controls match, term, and range filtering and matching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-query.html',
-        template: {},
+        template: { bool: null },
       }),
     new ESArrayClause('ids',
       'string',
@@ -433,6 +433,7 @@ const EQLSpec: ESClause[] =
       {
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
+        template: { must: null, must_not: null, should: null, minimum_should_match: null },
       }),
     new ESVariantClause('must',
       {
@@ -491,10 +492,10 @@ const EQLSpec: ESClause[] =
     new ESVariantClause('term_value',
       {
         object: 'term_settings',
-        null: 'base',
-        boolean: 'base',
-        number: 'base',
-        string: 'base',
+        null: 'null',
+        boolean: 'boolean',
+        number: 'number',
+        string: 'string',
       },
       { required: ['value'] }),
     new ESStructureClause('term_settings',
