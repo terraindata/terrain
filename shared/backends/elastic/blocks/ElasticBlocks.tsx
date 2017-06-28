@@ -57,8 +57,11 @@ import Util from '../../../../src/app/util/Util';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 const { make } = BlockUtils;
 
-import { elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
-  elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
+import
+{
+  elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
+  elasticNumber, elasticObject, elasticText, elasticValue
+} from './ElasticJSONBlocks';
 import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';

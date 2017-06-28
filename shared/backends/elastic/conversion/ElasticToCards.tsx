@@ -215,9 +215,9 @@ const parseMagicObject = (obj: object): Cards =>
     return Immutable.List([
       make(
         Blocks.elasticScore,
-      {
-        weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
-      })
+        {
+          weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
+        })
     ]);
   }
 
