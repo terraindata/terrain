@@ -133,9 +133,8 @@ class ElasticHighlighter extends SyntaxHighlighter
     for (const fToken of traverseTokens(parser.getValueInfo()))
     {
       const token: ESParserToken = fToken.parserToken;
-      if (token.valueInfo)
+      if (true)
       {
-        const valueInfo: ESValueInfo = token.valueInfo;
         const style: string = this.getStyle(fToken);
         instance.markText(
           { line: token.row, ch: token.col },
@@ -154,7 +153,7 @@ class ElasticHighlighter extends SyntaxHighlighter
     {
       return 'cm-property';
     }
-    switch (fToken.parserToken.valueInfo.jsonType)
+    switch (fToken.parserToken.jsonType)
     {
       // invalid types
       case ESJSONType.unknown:
