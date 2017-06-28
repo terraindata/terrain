@@ -154,7 +154,8 @@ class BuilderComponent extends PureClasss<Props>
 
     const keyPath = d.key !== null ? this._ikeyPath(parentKeyPath, d.key) : parentKeyPath;
     const value = data.get(d.key);
-    let isNumber = false, typeErrorMessage = null;
+    let isNumber = false;
+    let typeErrorMessage = null;
     let isTextbox = false;
     let acceptsCards = false;
     const key = data.get('id') + ',' + d.key;
@@ -209,7 +210,6 @@ class BuilderComponent extends PureClasss<Props>
         let selectedIndex = value;
         if (d.dropdownUsesRawValues)
         {
-          console.log(d.options, value);
           selectedIndex = d.options.indexOf(value);
         }
 
@@ -392,6 +392,7 @@ class BuilderComponent extends PureClasss<Props>
             showWhenCards={d.showWhenCards}
             onFocus={d.onFocus}
             onBlur={d.onBlur}
+            options={d.options}
             display={d}
             autoDisabled={d.autoDisabled}
             autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}

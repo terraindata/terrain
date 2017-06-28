@@ -42,28 +42,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-const L = () => List([]);
+
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import BlockUtils from '../../../blocks/BlockUtils';
 import { _card, Card, CardString, CardConfig } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
+import * as CommonElastic from '../syntax/CommonElastic';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import EQLConfig from '../parser/EQLConfig';
 import ESClause from '../parser/ESClause';
-import ESStructureClause from '../parser/ESStructureClause';
 import ESEnumClause from '../parser/ESEnumClause';
+import ESStructureClause from '../parser/ESStructureClause';
 
 import Colors from '../../../../src/app/common/Colors';
 
-const clauses = (new EQLConfig()).getClauses();
+const { List, Map } = Immutable;
+const L = () => List([]);
 
+const clauses = (new EQLConfig()).getClauses();
 const { valueTypes } = CommonElastic;
 
 let colorIndex = 0;
@@ -75,10 +78,10 @@ const referenceCards: ESClause[] = [];
 
 _.mapObject(
   clauses,
-  (clause, key) => 
+  (clause, key) =>
   {
     const card = clause.getCard();
-    
+
     if (card)
     {
       if (typeof card === 'string')
@@ -92,20 +95,19 @@ _.mapObject(
           Colors().builder.cards['card' + colorKey],
           Colors().builder.cards['card' + colorKey + 'BG'],
         ];
-        
+
         ElasticElasticCards[clause.getCardType()] = card;
       }
-      
+
       ElasticElasticCardDeckTypes.push(clause.getCardType());
     }
-    
+
     const blocks = clause.getSupplementalBlocks();
     _.mapObject(blocks, (val, key) =>
     {
       ElasticElasticCards[key] = val;
     });
-    
-  }
+  },
 );
 
 // add reference card types

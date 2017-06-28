@@ -76,6 +76,7 @@ import Sidebar from './common/components/Sidebar';
 import Library from './library/components/Library';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
+import FileImport from './fileImport/components/FileImport';
 import Account from './users/components/Account';
 import EditProfile from './users/components/EditProfile';
 import Notifications from './users/components/Notifications';
@@ -97,6 +98,8 @@ import BuilderStore from './builder/data/BuilderStore'; // for error reporting
 // data that needs to be loaded
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
+import FileImportActions from './fileImport/data/FileImportActions';
+import FileImportStore from './fileImport/data/FileImportStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
@@ -111,6 +114,7 @@ const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
+const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 
@@ -140,6 +144,11 @@ const links =
       icon: <ReportingIcon />,
       text: 'Schema',
       route: '/schema',
+    },
+    {
+      icon: <ImportIcon />,
+      text: 'Import',
+      route: '/import',
     },
     // {
     //   icon: <ManualIcon />,
@@ -234,6 +243,7 @@ class App extends PureClasss<Props>
       stateKey: 'schemaLoaded',
       storeKeyPath: ['loaded'],
     });
+
 
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];
@@ -430,6 +440,8 @@ const router = (
       <Route path='/browser/:a/:b/:c' component={Redirect} />
 
       <Route path='/schema' component={SchemaPage} />
+
+      <Route path='/import' component={FileImport} />
     </Route>
   </Router>
 );

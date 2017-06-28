@@ -66,6 +66,7 @@ export interface Props
   keyPath: KeyPath;
   canEdit: boolean;
   width: number;
+  language: string;
 }
 
 const MAX_BARS = 100;
@@ -232,7 +233,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
-            language={null}
+            language={this.props.language}
           />
           <BuilderTextbox
             value={this.props.maxDomain.get(1)}
@@ -242,7 +243,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
-            language={null}
+            language={this.props.language}
           />
         </div>
 

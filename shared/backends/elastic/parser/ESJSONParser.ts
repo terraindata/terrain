@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESJSONType from './ESJSONType';
+import ESParameter from './ESParameter';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -69,7 +70,8 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESJSONParser
 {
-  private queryString: string; // stringgit being parsed
+  private queryString: string; // string being parsed
+  private allowParameters: boolean; // if @parameters are allowed (non-compliant)
 
   private charNumber: number; // current parser/tokenizer position in the queryString
 
@@ -88,8 +90,9 @@ export default class ESJSONParser
    * Runs the parser on the given query string. Read needed data by calling the
    * public member functions below.
    * @param queryString query to parse
+   * @param allowParameters
    */
-  public constructor(queryString: string)
+  public constructor(queryString: string, allowParameters: boolean = true)
   {
     this.queryString = queryString;
     this.charNumber = 0;
@@ -98,6 +101,7 @@ export default class ESJSONParser
     this.lastRowNumber = 0;
     this.value = null;
     this.valueInfo = null;
+    this.allowParameters = allowParameters;
 
     this.tokens = [];
     this.valueInfos = [];
@@ -112,6 +116,7 @@ export default class ESJSONParser
     // check ending
     if (this.peek() !== '')
     {
+      this.accumulateToken();
       this.accumulateErrorOnCurrentToken('Unexpected token at the end of the query string');
     }
   }
@@ -156,6 +161,11 @@ export default class ESJSONParser
     return this.errors;
   }
 
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
+  }
+
   public accumulateError(error: ESParserError): void
   {
     this.errors.push(error);
@@ -164,7 +174,7 @@ export default class ESJSONParser
   private peek(): string
   {
     // skip whitespace
-    this.match(/\s*/);
+    this.match(/^\s*/);
 
     // handle EOF
     if (this.charNumber >= this.queryString.length)
@@ -195,15 +205,18 @@ export default class ESJSONParser
     const valueInfo: ESValueInfo = this.beginValueInfo();
     const token: ESParserToken = this.accumulateToken();
 
+    const nextChar: string = this.peek();
+
+    let jsonType: ESJSONType = ESJSONType.invalid;
+
     try
     {
-      switch (this.peek())
+      switch (nextChar)
       {
         // string
         case '"':
-          valueInfo.jsonType = ESJSONType.string;
+          jsonType = ESJSONType.string;
           valueInfo.value = this.readString();
-          this.setToken();
           break;
 
         // number
@@ -218,14 +231,13 @@ export default class ESJSONParser
         case '8':
         case '9':
         case '-':
-          valueInfo.jsonType = ESJSONType.number;
+          jsonType = ESJSONType.number;
           valueInfo.value = this.readNumber();
-          this.setToken();
           break;
 
         // object
         case '{':
-          valueInfo.jsonType = ESJSONType.object;
+          jsonType = ESJSONType.object;
           this.advance();
           this.readObject(valueInfo);
           break;
@@ -236,7 +248,7 @@ export default class ESJSONParser
 
         // array
         case '[':
-          valueInfo.jsonType = ESJSONType.array;
+          jsonType = ESJSONType.array;
           this.advance();
           this.readArray(valueInfo);
           break;
@@ -247,33 +259,38 @@ export default class ESJSONParser
 
         // true
         case 't':
-          valueInfo.jsonType = ESJSONType.boolean;
+          jsonType = ESJSONType.boolean;
           valueInfo.value = this.readTrueValue();
-          this.setToken();
           break;
 
         // false
         case 'f':
-          valueInfo.jsonType = ESJSONType.boolean;
+          jsonType = ESJSONType.boolean;
           valueInfo.value = this.readFalseValue();
-          this.setToken();
           break;
 
         // null
         case 'n':
-          valueInfo.jsonType = ESJSONType.null;
+          jsonType = ESJSONType.null;
           valueInfo.value = this.readNullValue();
-          this.setToken();
+          break;
+
+        case '@':
+          jsonType = ESJSONType.parameter;
+          valueInfo.value = this.readParameter();
           break;
 
         default:
           this.accumulateErrorOnCurrentToken('Unknown token found when expecting a value');
-          this.advance();
+          this.matchAndSetToken(/^.[a-zA-Z_0-9]*/); // try to skip the token
           break;
       }
     }
     finally
     {
+      token.jsonType = jsonType;
+      valueInfo.jsonType = jsonType;
+
       if (valueInfo.value === undefined)
       {
         // if no value was read, erase the token information accumulated
@@ -292,7 +309,7 @@ export default class ESJSONParser
 
   private readString(): string
   {
-    const result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F]+)*")/);
+    let result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F]+)*")/);
     if (typeof result === 'string')
     {
       return result;
@@ -300,7 +317,23 @@ export default class ESJSONParser
 
     // try to capture an invalid token
     this.accumulateErrorOnCurrentToken('Unknown string format');
-    this.match(/^(?:\\.|[^"\\])*"/);
+
+    // try to capture a string that ends in double quotes
+    result = this.matchAndSetToken(/^"(?:\\.|[^"\\])*"/);
+    if (result !== null)
+    {
+      return result.substring(1, result.length - 1);
+    }
+
+    // try to capture a string that ends with some JSON control char
+    result = this.matchAndSetToken(/^"[^,:\[\]{}"]+/);
+
+    if (result !== null)
+    {
+      return result.substring(1, result.length);
+    }
+
+    this.advance();
     return '';
   }
 
@@ -314,7 +347,7 @@ export default class ESJSONParser
 
     // try to capture an invalid token
     this.accumulateErrorOnCurrentToken('Unknown number format');
-    this.match(/^([\-.eE0-9]+)/);
+    this.matchAndSetToken(/^([\-.eE0-9]+)/);
     return 0;
   }
 
@@ -331,21 +364,21 @@ export default class ESJSONParser
       array.push(elementInfo.value);
       arrayInfo.arrayChildren.push(elementInfo);
 
-      // read next delimiter
+      // read array delimiter, ','
       const propertyDelimiter: string = this.peek();
       if (propertyDelimiter !== ',')
       {
         break;
       }
 
-      this.accumulateToken();
-      this.advance(); // skip over ','
+      this.accumulateToken(arrayInfo, ESJSONType.arrayDelimiter);
+      this.advance();
     }
 
     // at the end of the list, make sure that the terminating char is ']'
     if (this.peek() === ']')
     {
-      this.accumulateToken(arrayInfo);
+      this.accumulateToken(arrayInfo, ESJSONType.arrayTerminator);
       this.advance();
     }
     else
@@ -373,11 +406,17 @@ export default class ESJSONParser
         propertyName = String(propertyName);
       }
 
+      // set name value info and token to property type
+      nameInfo.jsonType = ESJSONType.property;
+      this.getCurrentToken().jsonType = ESJSONType.property;
+
+      // check for duplicates
       if (obj.hasOwnProperty(propertyName))
       {
         this.accumulateErrorOnCurrentToken('Duplicate property names are not allowed');
       }
 
+      // install a property info into the parent object
       const propertyInfo: ESPropertyInfo = new ESPropertyInfo(nameInfo);
       objInfo.objectChildren[propertyName] = propertyInfo;
 
@@ -389,17 +428,19 @@ export default class ESJSONParser
       {
         if (kvpDelimiter === ',')
         {
+          // eat object delimiter, ','
           this.accumulateErrorOnCurrentToken('Object property\'s value is missing');
-          this.accumulateToken();
-          this.advance(); // skip over the comma
+          this.accumulateToken(objInfo, ESJSONType.objectDelimiter);
+          this.advance();
           continue;
         }
 
         break;
       }
 
-      this.accumulateToken(nameInfo);
-      this.advance(); // skip ':'
+      // eat property delimiter, ':'
+      this.accumulateToken(nameInfo, ESJSONType.propertyDelimiter);
+      this.advance();
 
       // read property value
       const propertyValueInfo: ESValueInfo | null = this.readValue();
@@ -421,14 +462,16 @@ export default class ESJSONParser
         break;
       }
 
-      this.accumulateToken(nameInfo);
-      this.advance(); // skip over ','
+      // eat object delimiter, ','
+      this.accumulateToken(objInfo, ESJSONType.objectDelimiter);
+      this.advance();
     }
 
     // at the end of the object, make sure that the terminating char is '}'
     if (this.peek() === '}')
     {
-      this.accumulateToken(objInfo);
+      // eat object terminator, ','
+      this.accumulateToken(objInfo, ESJSONType.objectTerminator);
       this.advance();
     }
     else
@@ -439,25 +482,25 @@ export default class ESJSONParser
 
   private readTrueValue(): boolean
   {
-    this.readBooleanOrNull(/^true/);
+    this.readBooleanOrNull(/^true(?!\w)/);
     return true;
   }
 
   private readFalseValue(): boolean
   {
-    this.readBooleanOrNull(/^false/);
+    this.readBooleanOrNull(/^false(?!\w)/);
     return false;
   }
 
   private readNullValue(): null
   {
-    this.readBooleanOrNull(/^null/);
+    this.readBooleanOrNull(/^null(?!\w)/);
     return null;
   }
 
   private readBooleanOrNull(exp: RegExp): boolean
   {
-    const match: any = this.match(exp);
+    const match: string | null = this.matchAndSetToken(exp);
     if (match !== null)
     {
       return true;
@@ -465,20 +508,44 @@ export default class ESJSONParser
 
     // try to capture an invalid token
     this.accumulateErrorOnCurrentToken('Unknown value type, possibly a boolean null (true, false, and null, are valid).');
-    this.match(/^\w+/);
+    this.matchAndSetToken(/^\w+/);
     return false;
+  }
+
+  private readParameter(): ESParameter
+  {
+    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_][a-zA-Z_0-9]*)/);
+    if (match === null)
+    {
+      match = '';
+      this.accumulateErrorOnCurrentToken(
+        'Invalid parameter name. Parameter names must begin with a letter or underscore, ' +
+        'and can only contain letters, underscores, and numbers.');
+    }
+
+    return new ESParameter(match);
   }
 
   private captureMatch(exp: RegExp): any
   {
-    const match: string | null = this.match(exp);
+    const match: string | null = this.matchAndSetToken(exp);
     if (match === null)
     {
       return null;
     }
 
-    const unescaped: string = JSON.parse(match);
-    return unescaped;
+    return JSON.parse(match);
+  }
+
+  private matchAndSetToken(exp: RegExp): string | null
+  {
+    const result: string | null = this.match(exp);
+    if (result !== null)
+    {
+      this.setToken();
+    }
+
+    return result;
   }
 
   private match(exp: RegExp): string | null
@@ -494,7 +561,7 @@ export default class ESJSONParser
     return match;
   }
 
-  private accumulateToken(valueInfo?: ESValueInfo): ESParserToken
+  private accumulateToken(valueInfo: ESValueInfo | null = null, jsonType: ESJSONType | null = null): ESParserToken
   {
     const element: ESParserToken =
       new ESParserToken(this.charNumber,
@@ -502,16 +569,27 @@ export default class ESJSONParser
         this.getCol(),
         1,
         this.queryString.substring(this.charNumber, this.charNumber + 1));
+
+    if (jsonType !== null)
+    {
+      element.jsonType = jsonType;
+    }
+
     this.tokens.push(element);
 
     // link up the ValueInfo and the Token
-    if (valueInfo === undefined)
+    if (valueInfo === null)
     {
       valueInfo = this.getCurrentValueInfo();
     }
 
     element.valueInfo = valueInfo;
-    valueInfo.tokens.push(element);
+
+    if (valueInfo !== null)
+    {
+      valueInfo.tokens.push(element);
+    }
+
     return element;
   }
 
@@ -524,6 +602,8 @@ export default class ESJSONParser
   {
     const element: ESParserToken = this.getCurrentToken();
     element.length = this.charNumber - element.charNumber;
+    element.toRow = this.getRow();
+    element.toCol = this.getCol();
     element.substring = this.queryString.substring(element.charNumber, element.charNumber + element.length);
   }
 
@@ -534,8 +614,13 @@ export default class ESJSONParser
     return element;
   }
 
-  private getCurrentValueInfo(): ESValueInfo
+  private getCurrentValueInfo(): ESValueInfo | null
   {
+    if (this.valueInfos.length === 0)
+    {
+      return null;
+    }
+
     return this.valueInfos[this.valueInfos.length - 1];
   }
 
@@ -552,7 +637,7 @@ export default class ESJSONParser
       const c: string = this.queryString.charAt(this.lastCheckedRowChar);
       if (c === '\n')
       {
-        this.lastRowChar = this.lastCheckedRowChar;
+        this.lastRowChar = this.lastCheckedRowChar + 1;
         ++this.lastRowNumber;
       }
     }

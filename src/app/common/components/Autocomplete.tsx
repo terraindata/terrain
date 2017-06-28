@@ -241,13 +241,16 @@ class Autocomplete extends PureClasss<Props>
 
   public renderOption(option: string, index: number)
   {
-    const first = option, second = '', third = '';
+    let first = option;
+    let second = '';
+    let third = '';
+
     if (this.state.value && this.state.value.length)
     {
       const i = option.toLowerCase().indexOf(this.state.value.toLowerCase());
-      const first = option.substr(0, i);
-      const second = option.substr(i, this.state.value.length);
-      const third = option.substr(this.state.value.length + i);
+      first = option.substr(0, i);
+      second = option.substr(i, this.state.value.length);
+      third = option.substr(this.state.value.length + i);
     }
 
     return (

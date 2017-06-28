@@ -50,6 +50,11 @@ import QueryResponse from '../../../../shared/backends/types/QueryResponse';
 
 export abstract class QueryHandler
 {
+  constructor()
+  {
+    // do nothing
+  }
+
   public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
 }
 
