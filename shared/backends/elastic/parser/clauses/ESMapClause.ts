@@ -44,22 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which can be any valid JSON value
+ * A clause that corresponds to an object of uniform type values.
  */
-export default class ESAnyClause extends ESClause
+export default class ESMapClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public nameType: string;
+  public valueType: string;
+
+  public constructor(type: string, nameType: string, valueType: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESMapClause);
+    this.nameType = nameType;
+    this.valueType = valueType;
+  }
+
+  public init(config: EQLConfig): void
+  {
+    config.declareType(this.nameType);
+    config.declareType(this.valueType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
+
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.object))
+    {
+      return;
+    }
+
+    // mark properties
+    const childClause: ESClause = interpreter.config.getClause(this.valueType);
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
+
+        if (viTuple.propertyValue !== null)
+        {
+          childClause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
   }
 }

@@ -44,66 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause that corresponds to an object of uniform type values.
+ * A clause that corresponds to an array of uniform type.
  */
-export default class ESMapClause extends ESClause
+export default class ESArrayClause extends ESClause
 {
-  public nameType: string;
-  public valueType: string;
+  public elementID: string;
 
-  public constructor(type: string, nameType: string, valueType: string, settings: any)
+  public constructor(type: string, elementID: string, settings: any)
   {
-    super(type, settings);
-    this.nameType = nameType;
-    this.valueType = valueType;
-  }
-
-  public init(config: EQLConfig): void
-  {
-    config.declareType(this.nameType);
-    config.declareType(this.valueType);
+    super(type, settings, ESClauseType.ESArrayClause);
+    this.elementID = elementID;
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'object')
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.array))
     {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
       return;
     }
 
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found an array instead.');
-      return;
-    }
-
-    // mark properties
-    const childClause: ESClause = interpreter.config.getClause(this.valueType);
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-    Object.keys(children).forEach(
-      (name: string): void =>
+    // mark children
+    const childClause: ESClause = interpreter.config.getClause(this.elementID);
+    const children: ESValueInfo[] = valueInfo.arrayChildren;
+    children.forEach(
+      (element: ESValueInfo): void =>
       {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
-
-        if (viTuple.propertyValue !== null)
-        {
-          childClause.mark(interpreter, viTuple.propertyValue);
-        }
+        childClause.mark(interpreter, element);
       });
   }
+
 }

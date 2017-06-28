@@ -44,56 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 
 /**
- * A clause which is one of several possible types
+ * A clause which is a field name (column name)
  */
-export default class ESVariantClause extends ESClause
+export default class ESIndexClause extends ESStringClause
 {
-  public subtypes: { [jsonType: string]: string };
-
-  public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-    this.subtypes = subtypes;
+    super(type, settings, ESClauseType.ESIndexClause);
   }
 
-  public init(config: EQLConfig): void
-  {
-    Object.keys(this.subtypes).forEach(
-      (key: string): void =>
-      {
-        config.declareType(this.subtypes[key]);
-      });
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this; // only sticks if subclause isn't detected
-
-    const value: any = valueInfo.value;
-    let valueType: string = typeof (value);
-    if (Array.isArray(value))
-    {
-      valueType = 'array';
-    }
-
-    const subtype: string | undefined = this.subtypes[valueType];
-    if (subtype === undefined)
-    {
-      interpreter.accumulateError(valueInfo,
-        'Unknown clause type. Expected one of these types: ' +
-        JSON.stringify(Object.keys(this.subtypes), null, 2) +
-        ', but found a ' +
-        valueType +
-        ' instead.');
-      return;
-    }
-
-    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
-  }
+  // TODO: add field validation here
 }

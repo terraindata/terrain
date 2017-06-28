@@ -44,43 +44,31 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause that corresponds to an array of uniform type.
+ * A clause which can be a specific terminal type
  */
-export default class ESArrayClause extends ESClause
+export default class ESTerminalClause extends ESClause
 {
-  public elementID: string;
+  private jsonType: ESJSONType;
 
-  public constructor(type: string, elementID: string, settings: any)
+  public constructor(type: string,
+    settings: any,
+    clauseType: ESClauseType,
+    jsonType: ESJSONType)
   {
-    super(type, settings);
-    this.elementID = elementID;
+    super(type, settings, clauseType);
+    this.jsonType = jsonType;
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-
-    const value: any = valueInfo.value;
-    if (!Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    // mark children
-    const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    const children: ESValueInfo[] = valueInfo.arrayChildren;
-    children.forEach(
-      (element: ESValueInfo): void =>
-      {
-        childClause.mark(interpreter, element);
-      });
+    this.typeCheck(interpreter, valueInfo, this.jsonType);
   }
-
 }

@@ -42,29 +42,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.id
+// Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-
-/**
- * A clause which is a boolean
- */
-export default class ESBooleanClause extends ESClause
+enum ESClauseType
 {
-  public constructor(type: string, settings: any)
-  {
-    super(type, settings);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'boolean')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a boolean.');
-    }
-  }
+  ESAnyClause,
+  ESArrayClause,
+  ESBaseClause,
+  ESBooleanClause,
+  ESEnumClause,
+  ESFieldClause,
+  ESIndexClause,
+  ESMapClause,
+  ESNullClause,
+  ESNumberClause,
+  ESObjectClause,
+  ESPropertyClause,
+  ESReferenceClause,
+  ESStringClause,
+  ESStructureClause,
+  ESTypeClause,
+  ESVariantClause,
 }
+
+export default ESClauseType;
