@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { List, Map } = Immutable;
@@ -116,7 +118,17 @@ export const elasticTransform = _card(
           // help: ManualConfig.help['scorePoints'],
         },
       ],
-      tql: (block: Block) => '',
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+      {
+        return {
+          a: 0,
+          b: 1,
+          numerators: [[block['input'], 1]],
+          denominators: [],
+          ranges: block['scorePoints'].map((scorePt) => scorePt.value),
+          outputs: block['scorePoints'].map((scorePt) => scorePt.score),
+        };
+      },
       init: () => (
         {
           scorePoints: List([

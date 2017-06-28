@@ -151,15 +151,11 @@ export const elasticWeight = _block(
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        return {
+        const obj: object = {
           weight: block['weight'],
-          a: 0,
-          b: 1,
-          numerators: [[block['key']['input'], 1]],
-          denominators: [],
-          ranges: block['key']['scorePoints'].map((scorePoint) => scorePoint.value),
-          outputs: block['key']['scorePoints'].map((scorePoint) => scorePoint.score),
         };
+        _.extend(obj, tqlTranslationFn(block['key'], tqlConfig));
+        return obj;
       },
       init: () =>
       {
