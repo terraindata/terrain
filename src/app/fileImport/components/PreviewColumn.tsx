@@ -43,53 +43,85 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 import * as _ from 'underscore';
-import ActionTypes from './FileImportActionTypes';
-import { FileImportStore } from './FileImportStore';
+import Util from '../../util/Util';
+import Classs from './../../common/components/Classs';
+import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
+import Dropdown from './../../common/components/Dropdown';
+import Actions from './../data/FileImportActions';
+import './PreviewColumn.less';
 
-const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
+export interface Props
+{
+  key: string;
+  id: string;
+  isIncluded: boolean;
+  name: string;
+  typeIndex: number;
+  isPrimaryKey: boolean;
 
-const FileImportActions =
+  types: List<string>;
+  canSelectType: boolean;
+  canSelectColumn: boolean;
+}
+
+class PreviewColumn extends Classs<Props>
+{
+  public handleIncludedChange()
   {
-    changeServer:
-    (connectionId: number) =>
-      $(ActionTypes.changeServer, { connectionId }),
+    Actions.setColumnsToInclude(this.props.id);
+  }
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+  public handleAutocompleteHeaderChange(value)
+  {
+    Actions.setColumnNames(this.props.id, value);
+  }
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+  public handleTypeChange(typeIndex)
+  {
+    Actions.setColumnTypes(this.props.id, typeIndex);
+  }
 
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
+  public handlePrimaryKeyChange()
+  {
+    Actions.changePrimaryKey(this.props.id);
+  }
 
-    changePrimaryKey:
-    (id: string) =>
-      $(ActionTypes.changePrimaryKey, { id }),
+  public render()
+  {
+    return (
+      <th>
+        include
+        <CheckBox
+          checked={this.props.isIncluded}
+          onChange={this.handleIncludedChange}
+        />
+        primary key
+        <CheckBox
+          checked={this.props.isPrimaryKey}
+          onChange={this.handlePrimaryKeyChange}
+        />
+        <Autocomplete
+          value={this.props.name}
+          options={null}
+          onChange={this.handleAutocompleteHeaderChange}
+          placeholder={this.props.id}
+          disabled={!this.props.canSelectColumn}
+        />
+        <Dropdown
+          selectedIndex={this.props.typeIndex}
+          options={this.props.types}
+          onChange={this.handleTypeChange}
+          canEdit={this.props.canSelectType}
+        />
+      </th>
+    );
+  }
+}
 
-    chooseFile:
-    (file: string, filetype: string, preview: object) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview }),
-
-    uploadFile:
-    () =>
-      $(ActionTypes.uploadFile, {}),
-
-    setColumnsToInclude:
-    (id: string) =>
-      $(ActionTypes.setColumnsToInclude, { id }),
-
-    setColumnNames:
-    (id: string, columnName: string) =>
-      $(ActionTypes.setColumnNames, { id, columnName }),
-
-    setColumnTypes:
-    (id: string, typeIndex: number) =>
-      $(ActionTypes.setColumnTypes, { id, typeIndex }),
-  };
-
-export default FileImportActions;
+export default PreviewColumn;

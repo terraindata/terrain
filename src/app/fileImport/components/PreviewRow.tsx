@@ -43,53 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 import * as _ from 'underscore';
-import ActionTypes from './FileImportActionTypes';
-import { FileImportStore } from './FileImportStore';
+import Util from '../../util/Util';
+import Classs from './../../common/components/Classs';
 
-const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
+export interface Props
+{
+  key: string;
+  items: object[];
+}
 
-const FileImportActions =
+class PreviewRow extends Classs<Props>
+{
+  public shouldComponentUpdate(nextProps: Props)
   {
-    changeServer:
-    (connectionId: number) =>
-      $(ActionTypes.changeServer, { connectionId }),
+    return this.props.items !== nextProps.items;
+  }
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+  public render()
+  {
+    const row = Object.keys(this.props.items).map((key) =>
+      <td key={key}>{this.props.items[key]}</td>
+    );
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+    return (
+      <tr>{row}</tr>
+    );
+  }
+}
 
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
-
-    changePrimaryKey:
-    (id: string) =>
-      $(ActionTypes.changePrimaryKey, { id }),
-
-    chooseFile:
-    (file: string, filetype: string, preview: object) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview }),
-
-    uploadFile:
-    () =>
-      $(ActionTypes.uploadFile, {}),
-
-    setColumnsToInclude:
-    (id: string) =>
-      $(ActionTypes.setColumnsToInclude, { id }),
-
-    setColumnNames:
-    (id: string, columnName: string) =>
-      $(ActionTypes.setColumnNames, { id, columnName }),
-
-    setColumnTypes:
-    (id: string, typeIndex: number) =>
-      $(ActionTypes.setColumnTypes, { id, typeIndex }),
-  };
-
-export default FileImportActions;
+export default PreviewRow;

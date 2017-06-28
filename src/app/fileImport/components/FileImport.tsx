@@ -46,13 +46,14 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
-import PureClasss from './../../common/components/PureClasss';;
-import FileImportStore from './../data/FileImportStore';
 import FileImportInfo from './FileImportInfo';
+import FileImportStore from './../data/FileImportStore';
 import FileImportTypes from './../FileImportTypes';
-const HTML5Backend = require('react-dnd-html5-backend');
+import PureClasss from './../../common/components/PureClasss';
+import Preview from './Preview';
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
+const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
 export interface Props
@@ -64,6 +65,7 @@ export interface Props
 }
 
 const FILETYPES = Immutable.List(['json', 'csv']);
+const NUMBER_PREVIEW_ROWS = 5;
 
 class FileImport extends PureClasss<any>
 {
@@ -101,31 +103,39 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected, tableText, fileChosen } = fileImportState;
+    const { dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
 
     return (
-      <div>
+      <div className="fileImport">
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
             canSelectServer={true}
             servers={this.state.servers}
             serverNames={this.state.serverNames}
-            serverIndex={serverIndex}
-            serverSelected={serverSelected}
             canSelectDb={true}
             dbs={this.state.dbNames}
             dbText={dbText}
-            dbSelected={dbSelected}
             canSelectTable={true}
             tables={this.state.tableNames}
             tableText={tableText}
-            tableSelected={tableSelected}
             canImport={true}
             validFiletypes={FILETYPES}
-            fileChosen={fileChosen}
+            previewRowsCount={NUMBER_PREVIEW_ROWS}
+            hasCsvHeader={hasCsvHeader}
           />
         </div>
+        {
+          previewRows &&
+          <Preview
+            previewRows={previewRows}
+            columnsCount={columnsCount}
+            primaryKey={primaryKey}
+            columnsToInclude={columnsToInclude}
+            columnNames={columnNames}
+            columnTypes={columnTypes}
+          />
+        }
       </div>
     );
   }

@@ -43,53 +43,78 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 import * as _ from 'underscore';
-import ActionTypes from './FileImportActionTypes';
-import { FileImportStore } from './FileImportStore';
+import Util from '../../util/Util';
+import Classs from './../../common/components/Classs';
+import PreviewColumn from './PreviewColumn';
+import PreviewRow from './PreviewRow';
+import './Preview.less';
 
-const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
+export interface Props
+{
+  previewRows: object[];
+  columnsCount: number;
+  primaryKey: string;
+  columnsToInclude: Map<string, boolean>;
+  columnNames: Map<string, string>;
+  columnTypes: Map<string, number>;
+}
 
-const FileImportActions =
+const DATATYPES = Immutable.List(['text', 'number', 'date']);
+
+class Preview extends Classs<Props>
+{
+  public shouldComponentUpdate(nextProps: Props)
   {
-    changeServer:
-    (connectionId: number) =>
-      $(ActionTypes.changeServer, { connectionId }),
+    const { previewRows, columnsToInclude, columnNames, columnTypes } = this.props;
+    return previewRows !== nextProps.previewRows || columnsToInclude !== nextProps.columnsToInclude ||
+      columnNames !== nextProps.columnNames || columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey;
+  }
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+  public render()
+  {
+    const previewCols = [];
+    this.props.columnNames.forEach((value, key) =>
+    {
+      previewCols.push(
+        <PreviewColumn
+          key={key}
+          id={key}
+          isIncluded={this.props.columnsToInclude.get(key)}
+          name={this.props.columnNames.get(key)}
+          typeIndex={this.props.columnTypes.get(key)}
+          types={DATATYPES}
+          canSelectType={true}
+          canSelectColumn={true}
+          isPrimaryKey={this.props.primaryKey ? this.props.primaryKey === value : false}
+        />
+      );
+    });
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+    const previewRows = Object.keys(this.props.previewRows).map((key) =>
+      <PreviewRow
+        key={key}
+        items={this.props.previewRows[key]}
+      />
+    );
 
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
+    return (
+      <table>
+        <thead>
+          <tr>
+            {previewCols}
+          </tr>
+        </thead>
+        <tbody>
+          {previewRows}
+        </tbody>
+      </table>
+    );
+  }
+}
 
-    changePrimaryKey:
-    (id: string) =>
-      $(ActionTypes.changePrimaryKey, { id }),
-
-    chooseFile:
-    (file: string, filetype: string, preview: object) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview }),
-
-    uploadFile:
-    () =>
-      $(ActionTypes.uploadFile, {}),
-
-    setColumnsToInclude:
-    (id: string) =>
-      $(ActionTypes.setColumnsToInclude, { id }),
-
-    setColumnNames:
-    (id: string, columnName: string) =>
-      $(ActionTypes.setColumnNames, { id, columnName }),
-
-    setColumnTypes:
-    (id: string, typeIndex: number) =>
-      $(ActionTypes.setColumnTypes, { id, typeIndex }),
-  };
-
-export default FileImportActions;
+export default Preview;
