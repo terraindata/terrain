@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -50,6 +51,7 @@ import * as ReactDOM from 'react-dom';
 import PureClasss from './../../common/components/PureClasss';
 import './DeployModal.less';
 
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
@@ -57,6 +59,10 @@ import LibraryStore from '../../library/data/LibraryStore';
 import LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
+
+import EQLTemplateGenerator from '../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
 
 export interface Props
 {
@@ -107,9 +113,41 @@ class DeployModal extends PureClasss<Props>
 
   public handleDeploy()
   {
-    LibraryActions.variants.status(
-      this.state.changingStatusOf, this.state.changingStatusTo, true,
-    );
+    const variant = this.state.changingStatusOf;
+
+    const state = LibraryStore.getState();
+    const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
+    const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
+    const id: string = group.name + '.' + algorithm.name + '.' + variant.name;
+
+    if (this.state.changingStatusTo === ItemStatus.Live && variant.status !== 'LIVE')
+    {
+      const tql = variant ? variant.query.tql : '';
+      const parser: ESParser = new ESParser(tql);
+      const valueInfo: ESValueInfo = parser.getValueInfo();
+      if (parser.getErrors().length > 0)
+      {
+        // TODO: handle and display error.
+        return;
+      }
+
+      const template = EQLTemplateGenerator.generate(valueInfo);
+      const body: object = {
+        id,
+        body: {
+          template
+        }
+      }
+      LibraryActions.variants.deploy(variant, 'putTemplate', body, this.state.changingStatusTo);
+    }
+    else if (this.state.changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
+    {
+      // undeploy this variant
+      const body: object = {
+        id
+      }
+      LibraryActions.variants.deploy(variant, 'deleteTemplate', body, this.state.changingStatusTo);
+    }
   }
 
   public renderTQLColumn(defaultVariant: LibraryTypes.Variant)
