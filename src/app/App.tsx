@@ -342,7 +342,7 @@ class App extends PureClasss<Props>
     {
       return (
         <InfoArea
-          large="Terraformer cannot be used successfully on this browser in 'private' / 'icognito' mode. Plesae switch to another browser or turn off incognito mode."
+          large="Terraformer cannot be used successfully on this browser in 'private' / 'incognito' mode. Please switch to another browser or turn off incognito mode."
         />
       );
     }
