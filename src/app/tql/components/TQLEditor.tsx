@@ -107,8 +107,6 @@ export interface Props
 
 class TQLEditor extends PureClasss<Props>
 {
-  public highlighter: SyntaxHighlighter;
-
   public render()
   {
     const options =

@@ -43,16 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+
+// parser imports
 import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/backends/elastic/parser/ESJSONType';
 import ESParserToken from '../../../../shared/backends/elastic/parser/ESParserToken';
+import ESPropertyInfo from '../../../../shared/backends/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
 
+// interpreter and clause imports
 import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig';
 import ESClause from '../../../../shared/backends/elastic/parser/ESClause';
+import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
 import ESStructureClause from '../../../../shared/backends/elastic/parser/ESStructureClause';
 
+// other imports
 import SyntaxHighlighter from './SyntaxHighlighter';
 
 interface FlaggedToken
@@ -61,23 +66,33 @@ interface FlaggedToken
   parserToken: ESParserToken
 }
 
-function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null)
+/*
+ *  Generator that performs recursive DFS on valueInfo tree.
+ *  Eventually yields all tokens in the tree, flagging properties if they are elastic keywords
+ *  parentClause is not null for property name values, null for all else.
+ */
+function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null = null): IterableIterator<FlaggedToken>
 {
+  if (!valueInfo)
+  {
+    return;
+  }
+
   for (const token of valueInfo.tokens)
   {
     const isKw: boolean =
-      parentClause instanceof ESStructureClause &&
-      token.jsonType === ESJSONType.property &&
-      token.substring.trim().replace(/["']/g, '') in parentClause.structure;
+      parentClause && parentClause.hasOwnProperty('structure') &&
+      token.substring.trim().replace(/["']/g, '') in parentClause['structure'];
+      // trim & replace to turn '    "property"' into 'property'
     const fToken: FlaggedToken = { isKeyword: isKw, parserToken: token };
     yield fToken;
-    // console.log(token.substring.trim().replace(/["']/g, ''));
   }
+
   if (valueInfo.arrayChildren)
   {
     for (const child of valueInfo.arrayChildren)
     {
-      yield* traverseTokens(child, null);
+      yield* traverseTokens(child);
     }
   }
   if (valueInfo.objectChildren)
@@ -85,26 +100,20 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null)
     const keys: string[] = Object.keys(valueInfo.objectChildren);
     for (const key of keys)
     {
-      const child: ESValueInfo = valueInfo.objectChildren[key].propertyValue;
-      const keyChild: ESValueInfo = valueInfo.objectChildren[key].propertyName;
+      const propertyInfo: ESPropertyInfo = valueInfo.objectChildren[key];
+      const valueChild: ESValueInfo = propertyInfo.propertyValue;
+      const keyChild: ESValueInfo = propertyInfo.propertyName;
       yield* traverseTokens(keyChild, valueInfo.clause);
-      yield* traverseTokens(child, null);
+      yield* traverseTokens(valueChild);
     }
   }
 }
-/*
- * Does not return tokens in sequential order.
- */
-function getFlaggedTokens(parser: ESJSONParser)
-{
-  const tokens: FlaggedToken[] = [];
-  for (const token of traverseTokens(parser.getValueInfo(), null))
-  {
-    tokens.push(token);
-  }
-  return tokens;
-}
 
+/*
+ * Elastic highlighter - should not maintain state across highlight calls.
+ * Constructed once per highlight. If extending this, can add configuration to the
+ * constructor.
+ */
 class ElasticHighlighter extends SyntaxHighlighter
 {
   public static config = new EQLConfig();
@@ -119,73 +128,70 @@ class ElasticHighlighter extends SyntaxHighlighter
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
     const interpreter = new ESInterpreter(parser, ElasticHighlighter.config);
-    const tokens: FlaggedToken[] = getFlaggedTokens(parser);
-    console.log(parser.getTokens());
-    console.log(tokens);
-    for (let i = 0; i < tokens.length; i++)
+    const rootValueInfo: ESValueInfo = parser.getValueInfo();
+
+    for (const fToken of traverseTokens(parser.getValueInfo()))
     {
-      const token: ESParserToken = tokens[i].parserToken;
+      const token: ESParserToken = fToken.parserToken;
       if (token.valueInfo)
       {
         const valueInfo: ESValueInfo = token.valueInfo;
-        let style: string;
-        switch (valueInfo.jsonType)
-        {
-          // invalid types
-          case ESJSONType.unknown:
-          case ESJSONType.invalid:
-            style = 'cm-error';
-            break;
-          // true JSON types
-          case ESJSONType.null:
-          case ESJSONType.boolean:
-          case ESJSONType.number:
-            style = 'cm-number';
-            break;
-          case ESJSONType.string:
-            style = 'cm-string';
-            break;
-          case ESJSONType.property:
-            style = 'cm-property';
-            break;
-          case ESJSONType.array:
-          case ESJSONType.object:
-          // delimiter types
-          case ESJSONType.arrayDelimiter:
-          case ESJSONType.arrayTerminator:
-          case ESJSONType.objectDelimiter:
-          case ESJSONType.objectTerminator:
-            style = 'cm-bracket';
-            break;
-          // additional types
-          case ESJSONType.parameter:
-            style = 'cm-variable-2';
-            break;
-          default:
-            style = '';
-        }
-        if (tokens[i].isKeyword)
-        {
-          style = 'cm-variable-3';
-        }
-        const coords = this.getTokenCoordinates(token);
-        const marker = instance.markText(coords[0], coords[1], { className: style });
+        const style: string = this.getStyle(fToken);
+        instance.markText(
+          { line: token.row, ch: token.col },
+          { line: token.toRow, ch: token.toCol },
+          { className: style }
+        );
+        // markText returns a TextMarker object. In the goal of being stateless though,
+        // we clear the markers by grabbing them from the code mirror instance instead
       }
+    }
+  }
+
+  protected getStyle(fToken: FlaggedToken): string
+  {
+    if (fToken.isKeyword)
+    {
+      return 'cm-property';
+    }
+    switch (fToken.parserToken.valueInfo.jsonType)
+    {
+      // invalid types
+      case ESJSONType.unknown:
+      case ESJSONType.invalid:
+        return 'cm-error';
+      // true JSON types
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+        return 'cm-number';
+      case ESJSONType.string:
+      case ESJSONType.property:
+        return 'cm-string';
+      case ESJSONType.array:
+      case ESJSONType.object:
+      // delimiter types
+      case ESJSONType.arrayDelimiter:
+      case ESJSONType.arrayTerminator:
+      case ESJSONType.objectDelimiter:
+      case ESJSONType.objectTerminator:
+        return 'cm-bracket';
+      // additional types
+      case ESJSONType.parameter:
+        return 'cm-variable-2';
+      default:
+        return '';
     }
   }
 
   protected clearMarkers(instance): void
   {
-    const markers: any[] = instance.getAllMarks()
+    const markers: any[] = instance.getAllMarks();
     for (let i = 0; i < markers.length; i++)
     {
       markers[i].clear();
     }
   }
 
-  protected getTokenCoordinates(token: ESParserToken)
-  {
-    return [{ line: token.row, ch: token.col }, { line: token.toRow, ch: token.toCol }];
-  }
 }
 export default ElasticHighlighter;

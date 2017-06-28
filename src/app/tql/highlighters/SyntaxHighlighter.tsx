@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 /*
- *  May want the SyntaxHighlighter to be stateless across highlight calls
- *  There may be bugs that result from switching tabs that have different highlighter instances
+ *  SyntaxHighlighter should be stateless across highlight calls because there may be
+ *  bugs that result from switching tabs of different variants.
  */
 abstract class SyntaxHighlighter
 {
