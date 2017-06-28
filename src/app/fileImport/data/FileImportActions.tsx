@@ -46,15 +46,14 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
-import FileImportTypes from '../FileImportTypes';
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
 const FileImportActions =
   {
     changeServer:
-    (serverIndex: number, connectionId: number) =>
-      $(ActionTypes.changeServer, { serverIndex, connectionId }),
+    (connectionId: number) =>
+      $(ActionTypes.changeServer, { connectionId }),
 
     changeDbText:
     (dbText: string) =>
@@ -64,41 +63,33 @@ const FileImportActions =
     (tableText: string) =>
       $(ActionTypes.changeTableText, { tableText }),
 
-    chooseFile:
-    (file: string, filetype: string) =>
-      $(ActionTypes.chooseFile, { file, filetype }),
+    changeHasCsvHeader:
+      () =>
+        $(ActionTypes.changeHasCsvHeader, { }),
 
-    unchooseFile:
-    () =>
-      $(ActionTypes.unchooseFile, {}),
+    changePrimaryKey:
+      (id: string) =>
+        $(ActionTypes.changePrimaryKey, { id }),
+
+    chooseFile:
+    (file: string, filetype: string, preview: object) =>
+      $(ActionTypes.chooseFile, { file, filetype, preview }),
 
     uploadFile:
     () =>
-      $(ActionTypes.uploadFile, {}),
+      $(ActionTypes.uploadFile, { }),
 
-    previewFile:
-    (preview: object) =>
-      $(ActionTypes.previewFile, { preview }),
-
-    setMapIncluded:
+    setColumnsToInclude:
     (id: string) =>
-      $(ActionTypes.setMapIncluded, { id }),
+      $(ActionTypes.setColumnsToInclude, { id }),
 
-    setMapName:
+    setColumnNames:
     (id: string, columnName: string) =>
-      $(ActionTypes.setMapName, { id, columnName }),
+      $(ActionTypes.setColumnNames, { id, columnName }),
 
-    setMapType:
+    setColumnTypes:
     (id: string, typeIndex: number) =>
-      $(ActionTypes.setMapType, { id, typeIndex }),
-
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
-
-    changePrimaryKey:
-    (id: string) =>
-      $(ActionTypes.changePrimaryKey, { id }),
+      $(ActionTypes.setColumnTypes, { id, typeIndex }),
   };
 
 export default FileImportActions;

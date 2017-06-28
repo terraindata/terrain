@@ -50,11 +50,6 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import Autocomplete from './../../common/components/Autocomplete';
-import CheckBox from './../../common/components/CheckBox';
-import Dropdown from './../../common/components/Dropdown';
-import FileImportTypes from '../FileImportTypes';
-import Actions from './../data/FileImportActions';
 
 export interface Props
 {
@@ -64,7 +59,6 @@ export interface Props
 
 class PreviewRow extends Classs<Props>
 {
-  // assume no row modification? add new preview property
   public shouldComponentUpdate(nextProps: Props)
   {
     return this.props.items !== nextProps.items;

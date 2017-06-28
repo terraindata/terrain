@@ -45,60 +45,74 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
-// import * as csv from 'csvtojson';
-// import * as hashObject from 'hash-object';
-const { List } = Immutable;
+import * as Papa from 'papaparse';
+import PureClasss from './../../common/components/PureClasss';
 import Dropdown from './../../common/components/Dropdown';
 import CheckBox from './../../common/components/CheckBox';
-import PureClasss from './../../common/components/PureClasss';
-import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
-import Preview from "./Preview";
 import SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
-import FileImportTypes from './../FileImportTypes';
-import * as Papa from 'papaparse';
+import Util from './../../util/Util';
 
 export interface Props
 {
   canSelectServer: boolean;
-  serverIndex: number;
   servers: SchemaTypes.ServerMap;
   serverNames: List<string>;
-  serverSelected: boolean;
 
   canSelectDb: boolean;
   dbs: List<string>;
   dbText: string;
-  dbSelected: boolean;
 
   canSelectTable: boolean;
   tables: List<string>;
   tableText: string;
-  tableSelected: boolean;
 
   canImport: boolean;
   validFiletypes: List<string>;
-  fileChosen: boolean;
-  rowsCount: number;
+  previewRowsCount: number;
   hasCsvHeader: boolean;
 }
 
 class FileImportInfo extends PureClasss<Props>
 {
+  public state: {
+    serverIndex: number,
+    serverSelected: boolean;
+    dbSelected: boolean;
+    tableSelected: boolean;
+    fileSelected: boolean;
+  } = {
+    serverIndex: -1,
+    serverSelected: false,
+    dbSelected: false,
+    tableSelected: false,
+    fileSelected: false,
+  };
+
   public handleServerChange(serverIndex: number)
   {
+    this.setState({
+      serverIndex,
+      serverSelected: true,
+    });
     const key = this.props.serverNames.get(serverIndex);
-    Actions.changeServer(serverIndex, this.props.servers.get(key).connectionId);
+    Actions.changeServer(this.props.servers.get(key).connectionId);
   }
 
   public handleAutocompleteDbChange(value)
   {
+    this.setState({
+      dbSelected: !!value,
+    });
     Actions.changeDbText(value);
   }
 
   public handleAutocompleteTableChange(value)
   {
+    this.setState({
+      tableSelected: !!value,
+    });
     Actions.changeTableText(value);
   }
 
@@ -109,6 +123,7 @@ class FileImportInfo extends PureClasss<Props>
 
   public parseData(file: string, filetype: string): object[]
   {
+    // TODO: read JSON line by line and return items
     const preview = [];
     let items = [];
 
@@ -140,7 +155,7 @@ class FileImportInfo extends PureClasss<Props>
     {
       const config = {
         header: this.props.hasCsvHeader,
-        preview: this.props.rowsCount,
+        preview: this.props.previewRowsCount,
         error: (err) =>
         {
           alert('CSV format incorrect: ' + String(err));
@@ -163,7 +178,7 @@ class FileImportInfo extends PureClasss<Props>
       }
     }
 
-    for (let i = 0; i < Math.min(items.length, this.props.rowsCount); i++)
+    for (let i = 0; i < Math.min(items.length, this.props.previewRowsCount); i++)
     {
       preview.push(items[i]);
     }
@@ -172,13 +187,21 @@ class FileImportInfo extends PureClasss<Props>
 
   public handleChooseFile(file)
   {
+    // TODO: Stop browser caching input file
     if (!file.target.files[0])
     {
-      Actions.unchooseFile();
+      this.setState({
+        fileSelected: false,
+      });
       return;
     }
+    else
+    {
+      this.setState({
+        fileSelected: true,
+      });
+    }
 
-    // filetype error check
     const filetype = file.target.files[0].name.split('.').pop();
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
@@ -187,17 +210,14 @@ class FileImportInfo extends PureClasss<Props>
       return;
     }
 
-    // read and show preview
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
       console.log("File chosen contents: ", fr.result);
       const preview = this.parseData(fr.result, filetype);
-      console.log('preview: ', preview);
 
-      Actions.chooseFile(fr.result, filetype);
-      Actions.previewFile(preview);
+      Actions.chooseFile(fr.result, filetype, preview);
     }
   }
 
@@ -208,22 +228,22 @@ class FileImportInfo extends PureClasss<Props>
       alert('You do not have permission to upload files');
       return;
     }
-    if (!this.props.fileChosen)
+    if (!this.state.fileSelected)
     {
       alert('Please select a file to upload');
       return;
     }
-    if (!this.props.serverSelected)
+    if (!this.state.serverSelected)
     {
       alert('Please select a server');
       return;
     }
-    if (!this.props.dbSelected)
+    if (!this.state.dbSelected)
     {
       alert('Please select a database');
       return;
     }
-    if (!this.props.tableSelected)
+    if (!this.state.tableSelected)
     {
       alert('Please select a table');
       return;
@@ -276,7 +296,7 @@ class FileImportInfo extends PureClasss<Props>
         </div>
         <div>
           <Dropdown
-            selectedIndex={this.props.serverIndex}
+            selectedIndex={this.state.serverIndex}
             options={this.props.serverNames}
             onChange={this.handleServerChange}
             canEdit={canSelectServer}

@@ -53,8 +53,6 @@ import Classs from './../../common/components/Classs';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
-import RadioButtons from './../../common/components/RadioButtons';
-import FileImportTypes from '../FileImportTypes';
 import Actions from './../data/FileImportActions';
 import './PreviewColumn.less';
 
@@ -76,17 +74,17 @@ class PreviewColumn extends Classs<Props>
 {
   public handleIncludedChange()
   {
-    Actions.setMapIncluded(this.props.id);
+    Actions.setColumnsToInclude(this.props.id);
   }
 
   public handleAutocompleteHeaderChange(value)
   {
-    Actions.setMapName(this.props.id, value);
+    Actions.setColumnNames(this.props.id, value);
   }
 
   public handleTypeChange(typeIndex)
   {
-    Actions.setMapType(this.props.id, typeIndex);
+    Actions.setColumnTypes(this.props.id, typeIndex);
   }
 
   public handlePrimaryKeyChange()

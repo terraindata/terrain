@@ -46,7 +46,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../util/Util';
-const { List, Map } = Immutable;
 import { BaseClass, New } from '../Classes';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
@@ -55,19 +54,11 @@ export namespace FileImportTypes
   // This type represents the state of the FileImportStore
   class FileImportStateC extends BaseClass
   {
-    public serverSelected: boolean = false;
-    public serverIndex: number = -1;
     public connectionId: number = -1;
-
-    public dbSelected: boolean = false;
     public dbText: string = '';
-
-    public tableSelected: boolean = false;
     public tableText: string = '';
-
     public file: string = '';
     public filetype: string = '';
-    public fileChosen: boolean = false;
 
     public previewRows: object[] = null;
     public columnsCount: number = 0;

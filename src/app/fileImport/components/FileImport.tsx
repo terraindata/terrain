@@ -46,16 +46,15 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
-import PureClasss from './../../common/components/PureClasss';;
-import FileImportStore from './../data/FileImportStore';
 import FileImportInfo from './FileImportInfo';
+import FileImportStore from './../data/FileImportStore';
 import FileImportTypes from './../FileImportTypes';
-const HTML5Backend = require('react-dnd-html5-backend');
+import PureClasss from './../../common/components/PureClasss';
+import Preview from './Preview';
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
-import Preview from './Preview';
-
-const { List, Map } = Immutable;
+const HTML5Backend = require('react-dnd-html5-backend');
+const { List } = Immutable;
 
 export interface Props
 {
@@ -66,7 +65,7 @@ export interface Props
 }
 
 const FILETYPES = Immutable.List(['json', 'csv']);
-const ROWS_COUNT = 10;
+const NUMBER_PREVIEW_ROWS = 5;
 
 class FileImport extends PureClasss<any>
 {
@@ -104,8 +103,7 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected, tableText, fileChosen, previewRows,
-      columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
+    const { dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
 
     return (
       <div className="fileImport">
@@ -115,20 +113,15 @@ class FileImport extends PureClasss<any>
             canSelectServer={true}
             servers={this.state.servers}
             serverNames={this.state.serverNames}
-            serverIndex={serverIndex}
-            serverSelected={serverSelected}
             canSelectDb={true}
             dbs={this.state.dbNames}
             dbText={dbText}
-            dbSelected={dbSelected}
             canSelectTable={true}
             tables={this.state.tableNames}
             tableText={tableText}
-            tableSelected={tableSelected}
             canImport={true}
             validFiletypes={FILETYPES}
-            fileChosen={fileChosen}
-            rowsCount={ROWS_COUNT}
+            previewRowsCount={NUMBER_PREVIEW_ROWS}
             hasCsvHeader={hasCsvHeader}
           />
         </div>
@@ -136,7 +129,6 @@ class FileImport extends PureClasss<any>
           previewRows &&
           <Preview
             previewRows={previewRows}
-            rowsCount={Math.min(ROWS_COUNT, previewRows.length)}
             columnsCount={columnsCount}
             primaryKey={primaryKey}
             columnsToInclude={columnsToInclude}

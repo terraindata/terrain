@@ -50,16 +50,13 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-import { IColumn, Table } from './../../common/components/Table';
 import PreviewColumn from './PreviewColumn';
 import PreviewRow from './PreviewRow';
-import FileImportTypes from '../FileImportTypes';
 import './Preview.less';
 
 export interface Props
 {
   previewRows: object[];
-  rowsCount: number;
   columnsCount: number;
   primaryKey: string;
   columnsToInclude: Map<string, boolean>;
@@ -71,13 +68,11 @@ const DATATYPES = Immutable.List(['text', 'number', 'date']);
 
 class Preview extends Classs<Props>
 {
-  // assume no row modification?
   public shouldComponentUpdate(nextProps: Props)
   {
     const { previewRows, columnsToInclude, columnNames, columnTypes } = this.props;
-    const update = previewRows !== nextProps.previewRows || columnsToInclude !== nextProps.columnsToInclude ||
+    return previewRows !== nextProps.previewRows || columnsToInclude !== nextProps.columnsToInclude ||
       columnNames !== nextProps.columnNames || columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey;
-    return update;
   }
 
   public render()
@@ -85,8 +80,6 @@ class Preview extends Classs<Props>
     const previewCols = [];
     this.props.columnNames.forEach((value, key) =>
     {
-      const isPrimaryKey = this.props.primaryKey ? this.props.primaryKey === value : false;
-
       previewCols.push(
         <PreviewColumn
           key={key}
@@ -97,7 +90,7 @@ class Preview extends Classs<Props>
           types={DATATYPES}
           canSelectType={true}
           canSelectColumn={true}
-          isPrimaryKey={isPrimaryKey}
+          isPrimaryKey={this.props.primaryKey ? this.props.primaryKey === value : false}
         />
       );
     });
