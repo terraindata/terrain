@@ -43,40 +43,58 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+import * as fs from 'fs';
+import * as util from 'util';
+import * as winston from 'winston';
+import EQLTemplateGenerator from '../../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
+import ESValueInfo from '../../../../../shared/backends/elastic/parser/ESValueInfo';
+import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+/* tslint:disable:no-trailing-whitespace */
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  done();
+});
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+function testGeneration(testString: string, expectedValue: string)
+{
+  winston.info('testing \'' + testString + '\'');
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
-    ],
-  );
+  const parser: ESParser = new ESParser(testString);
+  const valueInfo: ESValueInfo = parser.getValueInfo();
+  const errors: ESParserError[] = parser.getErrors();
 
-export default ElasticCardsDeck;
+  expect(errors.length).toEqual(0);
+
+  const result = EQLTemplateGenerator.generate(valueInfo);
+
+  winston.info(result);
+  expect(result).toEqual(expectedValue);
+}
+
+test('test generate template queries', () =>
+{
+  testGeneration('true', 'true');
+  testGeneration('false', 'false');
+  testGeneration('null', 'null');
+  testGeneration('0', '0');
+  testGeneration('1.923e-21', '1.923e-21');
+  testGeneration('123', '123');
+  testGeneration('9990000000000', '9990000000000');
+  testGeneration('0.999', '0.999');
+  testGeneration('[]', '[]');
+  testGeneration('{}', ' {  } ');
+
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
+    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
+
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
+    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
+
+});

@@ -43,40 +43,89 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+import ESJSONType from './ESJSONType';
+import ESParameter from './ESParameter';
+import ESPropertyInfo from './ESPropertyInfo';
+import ESValueInfo from './ESValueInfo';
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+export default class EQLTemplateGenerator
+{
+  public static generate(source: ESValueInfo): string
+  {
+    return (new EQLTemplateGenerator(source)).result;
+  }
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+  private result: string;
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+  public constructor(source: ESValueInfo)
+  {
+    this.result = '';
+    this.convert(source);
+  }
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
-    ],
-  );
+  public convert(source: ESValueInfo): void
+  {
+    let i: number = 0;
 
-export default ElasticCardsDeck;
+    switch (source.jsonType)
+    {
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+      case ESJSONType.string:
+      case ESJSONType.property:
+        this.result += JSON.stringify(source.value);
+        break;
+
+      case ESJSONType.parameter:
+        const param: ESParameter = source.value as ESParameter;
+        this.result += ' {{#toJson}}' + param.name + '{{/toJson}} ';
+        break;
+
+      case ESJSONType.array:
+        this.result += '[';
+        source.arrayChildren.forEach(
+          (child: ESValueInfo): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            this.convert(child);
+          });
+        this.result += ']';
+        break;
+
+      case ESJSONType.object:
+        this.result += ' { '; // extra spaces to avoid confusion with mustache tags
+
+        Object.keys(source.objectChildren).forEach(
+          (name: string): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            const kvp: ESPropertyInfo = source.objectChildren[name];
+            this.convert(kvp.propertyName);
+            this.result += ':';
+
+            if (kvp.propertyValue === null)
+            {
+              throw new Error('Property with no value found.');
+            }
+
+            this.convert(kvp.propertyValue);
+          });
+
+        this.result += ' } '; // extra spaces to avoid confusion with mustache tags
+        break;
+
+      default:
+        throw new Error('Unconvertable value type found.');
+    }
+  }
+}

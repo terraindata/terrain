@@ -106,14 +106,14 @@ FileImportReducers[ActionTypes.chooseFile] =
     const columnTypes = [];
     let colsCount = 0;
 
-    if (state.filetype === 'csv' && !state.hasCsvHeader)
+    if (action.payload.filetype === 'csv' && !state.hasCsvHeader)
     {
       console.log('headerless csv');
       for (let i = 0; i < action.payload.preview[0].length; i++)
       {
         columnsToInclude.push(['column' + i, true]);
-        columnNames.push(['column' + i, '']);
-        columnTypes.push(['column' + i, -1]);
+        columnNames.push(['column' + i, 'column' + i]);
+        columnTypes.push(['column' + i, 0]);
         colsCount++;
       }
     }
@@ -125,8 +125,8 @@ FileImportReducers[ActionTypes.chooseFile] =
         if (action.payload.preview[0].hasOwnProperty(property))
         {
           columnsToInclude.push([property, true]);
-          columnNames.push([property, '']);
-          columnTypes.push([property, -1]);
+          columnNames.push([property, property]);
+          columnTypes.push([property, 0]);
           colsCount++;
         }
       }
@@ -152,9 +152,6 @@ FileImportReducers[ActionTypes.uploadFile] =
     {
       switch (value)
       {
-        case -1:
-          alert('You must select a type for each column');
-          return state;
         case 0:
           isCsv ? columnTypes.push('string') : columnTypes.push([key, 'string']);
           break;

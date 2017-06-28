@@ -54,14 +54,16 @@ import UserStore from './../../users/data/UserStore';
 import LibraryTypes from './../LibraryTypes';
 import Actions from './LibraryActions';
 import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
-type Group = LibraryTypes.Group;
-type Algorithm = LibraryTypes.Algorithm;
-type Variant = LibraryTypes.Variant;
+
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import BuilderActions from '../../builder/data/BuilderActions';
 import Util from './../../util/Util';
 
 import Ajax from './../../util/Ajax';
+
+type Group = LibraryTypes.Group;
+type Algorithm = LibraryTypes.Algorithm;
+type Variant = LibraryTypes.Variant;
 
 class LibraryStateC
 {
