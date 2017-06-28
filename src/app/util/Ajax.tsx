@@ -646,6 +646,7 @@ export const Ajax =
       columnNames: Map<string, string> | List<string>,
       columnsToInclude: Map<string, boolean> | List<boolean>,
       columnTypes: Immutable.Map<string, string> | List<string>,
+      primaryKey: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
@@ -660,6 +661,7 @@ export const Ajax =
         columnNames,
         columnsToInclude,
         columnTypes,
+        primaryKey,
         hasCsvHeader,
       };
       console.log("payload: ", payload);

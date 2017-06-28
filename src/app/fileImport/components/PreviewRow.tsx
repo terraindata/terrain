@@ -72,7 +72,6 @@ class PreviewRow extends Classs<Props>
 
   public render()
   {
-    console.log('preview row');
     const row = Object.keys(this.props.items).map((key) =>
       <td key={key}>{this.props.items[key]}</td>
     );

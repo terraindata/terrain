@@ -53,6 +53,7 @@ import Classs from './../../common/components/Classs';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import RadioButtons from './../../common/components/RadioButtons';
 import FileImportTypes from '../FileImportTypes';
 import Actions from './../data/FileImportActions';
 import './PreviewColumn.less';
@@ -64,6 +65,7 @@ export interface Props
   isIncluded: boolean;
   name: string;
   typeIndex: number;
+  isPrimaryKey: boolean;
 
   types: List<string>;
   canSelectType: boolean;
@@ -87,14 +89,24 @@ class PreviewColumn extends Classs<Props>
     Actions.setMapType(this.props.id, typeIndex);
   }
 
+  public handlePrimaryKeyChange()
+  {
+    Actions.changePrimaryKey(this.props.id);
+  }
+
   public render()
   {
-    console.log('preview column');
     return (
       <th>
+        include
         <CheckBox
           checked={this.props.isIncluded}
           onChange={this.handleIncludedChange}
+        />
+        primary key
+        <CheckBox
+          checked={this.props.isPrimaryKey}
+          onChange={this.handlePrimaryKeyChange}
         />
         <Autocomplete
           value={this.props.name}

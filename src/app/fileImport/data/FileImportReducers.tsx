@@ -121,6 +121,7 @@ FileImportReducers[ActionTypes.uploadFile] =
         state.columnNames,
         state.columnsToInclude,
         Map<string, string>(columnTypes),
+        state.primaryKey,
         () =>
         {
           alert("success");
@@ -161,6 +162,7 @@ FileImportReducers[ActionTypes.uploadFile] =
         state.columnNames.toList(),
         state.columnsToInclude.toList(),
         List<string>(columnTypes),
+        state.primaryKey,
         () =>
         {
           alert("success");
@@ -185,7 +187,7 @@ FileImportReducers[ActionTypes.previewFile] =
 
     if (state.filetype === 'csv' && !state.hasCsvHeader)
     {
-      console.log('headerless csv - ', state.hasCsvHeader);
+      console.log('headerless csv');
       for (let i = 0; i < action.payload.preview[0].length; i++)
       {
         columnsToInclude.push(['column' + i, true]);
@@ -207,7 +209,6 @@ FileImportReducers[ActionTypes.previewFile] =
           colsCount++;
         }
       }
-      console.log(columnNames);
     }
 
     return state
@@ -240,6 +241,12 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
       .set('hasCsvHeader', !state.hasCsvHeader);
+;
+
+FileImportReducers[ActionTypes.changePrimaryKey] =
+  (state, action) =>
+    state
+      .set('primaryKey', state.columnNames.get(action.payload.id));
 ;
 
 export default FileImportReducers;

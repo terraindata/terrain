@@ -259,7 +259,6 @@ class FileImportInfo extends PureClasss<Props>
 
   public render()
   {
-    console.log('fileimportinfo');
     const { canSelectServer, canSelectDb, canSelectTable } = this.props;
 
     return (

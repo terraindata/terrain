@@ -60,6 +60,7 @@ const FileImportActionTypes =
     setMapName: '',
     setMapType: '',
     changeHasCsvHeader: '',
+    changePrimaryKey: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

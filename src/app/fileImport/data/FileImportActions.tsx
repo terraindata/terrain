@@ -95,6 +95,10 @@ const FileImportActions =
     changeHasCsvHeader:
     () =>
       $(ActionTypes.changeHasCsvHeader, {}),
+
+    changePrimaryKey:
+    (id: string) =>
+      $(ActionTypes.changePrimaryKey, { id }),
   };
 
 export default FileImportActions;
