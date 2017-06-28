@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as util from 'util';
-import * as winston from 'winston';
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
@@ -53,7 +51,6 @@ import ESJSONType from '../ESJSONType';
 import ESPropertyInfo from '../ESPropertyInfo';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESPropertyClause from './ESPropertyClause';
 
 /**
  * A clause with a well-defined structure.
@@ -109,7 +106,6 @@ export default class ESStructureClause extends ESClause
 
           propertyClause.mark(interpreter, viTuple.propertyName);
           clause.mark(interpreter, viTuple.propertyValue);
-          winston.info(util.inspect(viTuple));
         }
       });
 
