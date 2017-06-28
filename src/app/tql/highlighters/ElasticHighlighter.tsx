@@ -43,14 +43,71 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/backends/elastic/parser/ESJSONType';
 import ESParserToken from '../../../../shared/backends/elastic/parser/ESParserToken';
 import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
+
+import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig';
+import ESClause from '../../../../shared/backends/elastic/parser/ESClause';
+import ESStructureClause from '../../../../shared/backends/elastic/parser/ESStructureClause';
+
 import SyntaxHighlighter from './SyntaxHighlighter';
+
+interface FlaggedToken
+{
+  isKeyword: boolean,
+  parserToken: ESParserToken
+}
+
+function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null)
+{
+  for (const token of valueInfo.tokens)
+  {
+    const isKw: boolean =
+    parentClause instanceof ESStructureClause &&
+    token.jsonType === ESJSONType.property &&
+    token.substring.trim().replace(/["']/g, '') in parentClause.structure;
+    const fToken: FlaggedToken = {isKeyword: isKw, parserToken: token};
+    yield fToken;
+    // console.log(token.substring.trim().replace(/["']/g, ''));
+  }
+  if (valueInfo.arrayChildren)
+  {
+    for (const child of valueInfo.arrayChildren)
+    {
+      yield *traverseTokens(child, null);
+    }
+  }
+  if (valueInfo.objectChildren)
+  {
+    const keys: string[] = Object.keys(valueInfo.objectChildren);
+    for (const key of keys)
+    {
+      const child: ESValueInfo = valueInfo.objectChildren[key].propertyValue;
+      const keyChild: ESValueInfo = valueInfo.objectChildren[key].propertyName;
+      yield *traverseTokens(keyChild, valueInfo.clause);
+      yield *traverseTokens(child, null);
+    }
+  }
+}
+/*
+ * Does not return tokens in sequential order.
+ */
+function getFlaggedTokens(parser: ESJSONParser)
+{
+  const tokens: FlaggedToken[] = [];
+  for (const token of traverseTokens(parser.getValueInfo(), null))
+  {
+    tokens.push(token);
+  }
+  return tokens;
+}
 
 class ElasticHighlighter extends SyntaxHighlighter
 {
+  public static config = new EQLConfig();
 
   public initialHighlight(instance): void
   {
@@ -61,12 +118,16 @@ class ElasticHighlighter extends SyntaxHighlighter
   {
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
-    const tokens: ESParserToken[] = parser.getTokens();
+    const interpreter = new ESInterpreter(parser, ElasticHighlighter.config);
+    const tokens: FlaggedToken[] = getFlaggedTokens(parser);
+    console.log(parser.getTokens());
+    console.log(tokens);
     for (let i = 0; i < tokens.length; i++)
     {
-      if (tokens[i].valueInfo)
+      const token: ESParserToken = tokens[i].parserToken;
+      if (token.valueInfo)
       {
-        const valueInfo: ESValueInfo = tokens[i].valueInfo;
+        const valueInfo: ESValueInfo = token.valueInfo;
         let style: string;
         switch (valueInfo.jsonType)
         {
@@ -103,7 +164,11 @@ class ElasticHighlighter extends SyntaxHighlighter
           default:
             style = '';
         }
-        const coords = this.getTokenCoordinates(tokens[i]);
+        if (tokens[i].isKeyword)
+        {
+          style = 'cm-variable-3';
+        }
+        const coords = this.getTokenCoordinates(token);
         const marker = instance.markText(coords[0], coords[1], { className: style });
       }
     }
@@ -120,7 +185,7 @@ class ElasticHighlighter extends SyntaxHighlighter
 
   protected getTokenCoordinates(token: ESParserToken)
   {
-    return [{ line: token.row, ch: token.col}, { line: token.toRow, ch: token.toCol }];
+    return [{ line: token.row, ch: token.col }, { line: token.toRow, ch: token.toCol }];
   }
 }
 export default ElasticHighlighter;
