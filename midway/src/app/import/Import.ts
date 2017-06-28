@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import sha1 = require('sha1');
+
 import * as csv from 'csvtojson';
-import * as hashObject from 'hash-object';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import * as Util from '../Util';
 
 export interface ImportConfig
 {
@@ -104,11 +104,6 @@ export class Import
         return reject('No data provided in file to upload.');
       }
       const columns: string[] = this._getArrayFromMap(imprt.columnMap);
-
-      winston.info(hashObject(new Date(0)));
-      winston.info(hashObject([1]));
-      winston.info(hashObject({ test: new Date(0) }));
-      winston.info(hashObject({ test: [1] }));
       winston.info('got parsed data!');
       winston.info(JSON.stringify(items));
 
@@ -442,8 +437,7 @@ export class Import
             try
             {
               winston.info('attempting to parse: ' + String(item));
-              const res: object = JSON.parse(item);
-              return res;
+              return JSON.parse(item);
             } catch (e)
             {
               return '';   // type error that will be caught in post-processing
@@ -465,8 +459,7 @@ export class Import
     let ind: number = 0;
     for (const obj of items)
     {
-      winston.info('checktypes: emptied obj: ' + JSON.stringify(Util.getEmptyESObject(obj)));
-      if (hashObject(Util.getEmptyESObject(obj)) === targetHash)
+      if (this._hashObjectStructure(obj) === targetHash)
       {
         winston.info('checktypes: hash matches');
         ind++;
@@ -482,28 +475,10 @@ export class Import
         {
           if (obj[key] !== null)
           {
-            if (nameToType[key] === 'date')
+            if (nameToType[key] !== this._getType(obj[key]))
             {
-              winston.info('checktypes: date type encountered');
-              if (!(obj[key] instanceof Date))
-              {
-                return 'Field "' + key + '" of object number ' + String(ind) + ' does not match the specified type: date.';
-              }
-            } else if (nameToType[key] === 'array')
-            {
-              winston.info('checktypes: array type encountered');
-              if (!(Array.isArray(obj[key])))
-              {
-                return 'Field "' + key + '" of object number ' + String(ind) + ' does not match the specified type: array.';
-              }
-            } else
-            {
-              winston.info('checktypes: nondate nonarray type encountered');
-              if (nameToType[key] !== typeof (obj[key]))
-              {
-                return 'Field "' + key + '" of object number ' + String(ind) +
-                  ' does not match the specified type: ' + String(nameToType[key]);
-              }
+              return 'Field "' + key + '" of object number ' + String(ind) +
+                ' does not match the specified type: ' + String(nameToType[key]);
             }
           }
         }
@@ -512,39 +487,51 @@ export class Import
     }
     return '';
   }
-  /* constructs an empty object with the specified field names and types, and returns its hash
+  /* return the target hash an object with the specified field names and types should have
    * nameToType: maps field name (string) to type (string) */
   private _buildDesiredHash(nameToType: object): string
   {
-    const obj: object = {};
+    let strToHash: string = 'object';   // TODO: check
     for (const name in nameToType)
     {
       if (nameToType.hasOwnProperty(name))
       {
-        switch (nameToType[name])
-        {
-          case 'number':
-            obj[name] = 0;
-            break;
-          case 'boolean':
-            obj[name] = false;
-            break;
-          case 'date':
-            obj[name] = new Date(0);
-            break;
-          case 'array':
-            obj[name] = [1];
-            break;
-          case 'object':
-            obj[name] = {};
-            break;
-          default:
-            obj[name] = '';
-        }
+        strToHash += '|' + name + ':' + (nameToType[name] as string) + '|';
       }
     }
-    winston.info('desired emptied obj: ' + JSON.stringify(Util.getEmptyESObject(obj)));
-    return hashObject(Util.getEmptyESObject(obj));
+    return sha1(strToHash);
+  }
+  /* returns a hash based on the object's field names and data types */
+  private _hashObjectStructure(payload: object): string
+  {
+    let strToHash: string = this._getType(payload);
+    strToHash = Object.keys(payload).reduce((res, item) =>
+    {
+      res += '|' + item + ':' + this._getType(payload[item]) + '|';
+      return res;
+    },
+      strToHash);
+    return sha1(strToHash);
+  }
+  private _getType(obj: object): string
+  {
+    if (typeof obj === 'object')
+    {
+      if (obj === null)
+      {
+        return 'null';
+      }
+      else if (obj instanceof Date)
+      {
+        return 'date';
+      }
+      else if (Array.isArray(obj))
+      {
+        return 'array';
+      }
+    }
+    // handles "string", "number", "boolean", "object", and "undefined" cases
+    return typeof obj;
   }
 
   private _getArrayFromMap(mapOrArray: object | string[]): string[]
