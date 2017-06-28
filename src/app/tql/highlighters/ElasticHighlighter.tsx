@@ -66,10 +66,10 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null)
   for (const token of valueInfo.tokens)
   {
     const isKw: boolean =
-    parentClause instanceof ESStructureClause &&
-    token.jsonType === ESJSONType.property &&
-    token.substring.trim().replace(/["']/g, '') in parentClause.structure;
-    const fToken: FlaggedToken = {isKeyword: isKw, parserToken: token};
+      parentClause instanceof ESStructureClause &&
+      token.jsonType === ESJSONType.property &&
+      token.substring.trim().replace(/["']/g, '') in parentClause.structure;
+    const fToken: FlaggedToken = { isKeyword: isKw, parserToken: token };
     yield fToken;
     // console.log(token.substring.trim().replace(/["']/g, ''));
   }
@@ -77,7 +77,7 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null)
   {
     for (const child of valueInfo.arrayChildren)
     {
-      yield *traverseTokens(child, null);
+      yield* traverseTokens(child, null);
     }
   }
   if (valueInfo.objectChildren)
@@ -87,8 +87,8 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null)
     {
       const child: ESValueInfo = valueInfo.objectChildren[key].propertyValue;
       const keyChild: ESValueInfo = valueInfo.objectChildren[key].propertyName;
-      yield *traverseTokens(keyChild, valueInfo.clause);
-      yield *traverseTokens(child, null);
+      yield* traverseTokens(keyChild, valueInfo.clause);
+      yield* traverseTokens(child, null);
     }
   }
 }
