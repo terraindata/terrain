@@ -164,6 +164,12 @@ FileImportReducers[ActionTypes.uploadFile] =
         case 3:
           isCsv ? columnTypes.push('date') : columnTypes.push([key, 'date']);
           break;
+        case 4:
+          isCsv ? columnTypes.push('array') : columnTypes.push([key, 'array']);
+          break;
+        case 5:
+          isCsv ? columnTypes.push('object') : columnTypes.push([key, 'object']);
+          break;
       }
     });
     const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
