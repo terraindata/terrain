@@ -113,7 +113,25 @@ const parseObjectWrap = (obj: object): Cards =>
 
 const parseElasticWeightBlock = (obj: object): Block =>
 {
-  return make(Blocks.elasticWeight, obj);
+  const scorePoints = [];
+  for (let i = 0; i < obj['ranges'].length; ++i)
+  {
+    scorePoints.push(
+      make(Blocks.scorePoint, {
+        value: obj['ranges'][i],
+        score: obj['outputs'][i],
+      }));
+  }
+
+  const card = make(Blocks.elasticTransform, {
+    input: obj['numerators'][0][0],
+    scorePoints: Immutable.List(scorePoints),
+  });
+
+  return make(Blocks.elasticWeight, {
+    key: card,
+    weight: obj['weight'],
+  });
 };
 
 const parseArrayWrap = (arr: any[]): Cards =>
@@ -217,7 +235,7 @@ const parseMagicObject = (obj: object): Cards =>
         Blocks.elasticScore,
         {
           weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
-        })
+        }),
     ]);
   }
 

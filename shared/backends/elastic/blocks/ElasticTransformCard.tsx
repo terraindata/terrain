@@ -133,12 +133,10 @@ export const elasticTransform = _card(
         {
           scorePoints: List([
             BlockUtils.make(scorePoint, {
-              id: 'point0',
               value: 2,
               score: 0.2,
             }),
             BlockUtils.make(scorePoint, {
-              id: 'point1',
               value: 15,
               score: 0.5,
             }),

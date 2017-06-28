@@ -152,8 +152,9 @@ export const elasticWeight = _block(
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
         const obj: object = {
-          weight: block['weight'],
+          weight: parseInt(block['weight'], 10),
         };
+
         _.extend(obj, tqlTranslationFn(block['key'], tqlConfig));
         return obj;
       },
