@@ -64,7 +64,7 @@ export interface Props
   columnTypes: Map<string, number>;
 }
 
-const DATATYPES = Immutable.List(['text', 'number', 'date']);
+const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date']);
 
 class Preview extends Classs<Props>
 {

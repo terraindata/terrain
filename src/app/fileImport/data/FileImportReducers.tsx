@@ -156,12 +156,15 @@ FileImportReducers[ActionTypes.uploadFile] =
           alert('You must select a type for each column');
           return state;
         case 0:
-          isCsv ? columnTypes.push('text') : columnTypes.push([key, 'text']);
+          isCsv ? columnTypes.push('string') : columnTypes.push([key, 'string']);
           break;
         case 1:
           isCsv ? columnTypes.push('number') : columnTypes.push([key, 'number']);
           break;
         case 2:
+          isCsv ? columnTypes.push('boolean') : columnTypes.push([key, 'boolean']);
+          break;
+        case 3:
           isCsv ? columnTypes.push('date') : columnTypes.push([key, 'date']);
           break;
       }
