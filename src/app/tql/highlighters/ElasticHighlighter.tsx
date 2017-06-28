@@ -83,7 +83,7 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null =
     const isKw: boolean =
       parentClause && parentClause.hasOwnProperty('structure') &&
       token.substring.trim().replace(/["']/g, '') in parentClause['structure'];
-      // trim & replace to turn '    "property"' into 'property'
+    // trim & replace to turn '    "property"' into 'property'
     const fToken: FlaggedToken = { isKeyword: isKw, parserToken: token };
     yield fToken;
   }
