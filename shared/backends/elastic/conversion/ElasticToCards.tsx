@@ -81,7 +81,7 @@ export default function ElasticToCards(
   }
 }
 
-const isScoreCard = (obj: Object): boolean =>
+const isScoreCard = (obj: object): boolean =>
 {
   return obj.hasOwnProperty('script')
     && obj['script'].hasOwnProperty('stored')
@@ -111,7 +111,7 @@ const parseObjectWrap = (obj: object): Cards =>
   return Immutable.List(arr);
 };
 
-const parseElasticWeightBlock = (obj: Object): Block =>
+const parseElasticWeightBlock = (obj: object): Block =>
 {
   return make(Blocks.elasticWeight, obj);
 };
@@ -181,7 +181,7 @@ const parseMagicArray = (arr: any[]): Card =>
       }
       else
       {
-        value = JSON.stringify(CommonElastic.parseESValue(value));
+        value = CommonElastic.parseESValue(value);
       }
 
       return make(Blocks.elasticMagicListItem, {
@@ -200,15 +200,6 @@ const parseMagicArray = (arr: any[]): Card =>
 
 const parseMagicObject = (obj: object): Cards =>
 {
-
-  if (isScoreCard(obj))
-  {
-    return make(
-      Blocks.elasticScore,
-     {
-       weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
-     });
-  }
   if (obj === {} || obj === null)
   {
     return Immutable.List([
@@ -217,6 +208,17 @@ const parseMagicObject = (obj: object): Cards =>
       }),
     ],
     );
+  }
+
+  if (isScoreCard(obj))
+  {
+    return Immutable.List([
+      make(
+        Blocks.elasticScore,
+      {
+        weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
+      })
+    ]);
   }
 
   const values: Card[] = _.map(obj,
@@ -236,7 +238,7 @@ const parseMagicObject = (obj: object): Cards =>
       }
       else
       {
-        value = JSON.stringify(CommonElastic.parseESValue(value));
+        value = CommonElastic.parseESValue(value);
       }
 
       return make(Blocks.elasticMagicValue, {
