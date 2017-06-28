@@ -42,87 +42,108 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-const { List } = Immutable;
 
-namespace CommonElastic
+import ESParser from '../parser/ESJSONParser';
+
+export const valueTypes =
+  {
+    auto: 'auto',
+    text: 'text',
+    number: 'number',
+    object: 'object',
+    array: 'array',
+    bool: 'bool',
+    null: 'null',
+  };
+export const valueTypesList = _.map(valueTypes, (v) => v);
+export const valueTypesDisplayNames =
+  {
+    auto: 'Auto',
+    text: 'Text',
+    number: 'Number',
+    object: 'Map',
+    array: 'List',
+    bool: 'True / False',
+    null: 'Null',
+  };
+
+export const acceptsValues = Immutable.List(
+  ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull'],
+);
+
+export const Directions: string[] = ['ascending', 'descending'];
+export const Combinators: string[] = ['&', 'or'];
+export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
+
+export enum Operator
 {
-  export const valueTypes =
-    {
-      text: 'text',
-      number: 'number',
-      object: 'object',
-      array: 'array',
-      bool: 'bool',
-      null: 'null',
-    };
-  export const valueTypesList = _.map(valueTypes, (v) => v);
-  export const valueTypesDisplayNames =
-    {
-      text: 'Text',
-      number: 'Number',
-      object: 'Map',
-      array: 'List',
-      bool: 'True / False',
-      null: 'Null',
-    };
-
-  export const acceptsValues = List(
-    ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull'],
-  );
-
-  export const Directions: string[] = ['ascending', 'descending'];
-  export const Combinators: string[] = ['&', 'or'];
-  export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
-
-  export enum Operator
-  {
-    EQ,
-    NE,
-    GE,
-    GT,
-    LE,
-    LT,
-    IN,
-    NIN,
-    LIKE,
-  }
-
-  export const OperatorTQL = {
-    [Operator.EQ]: '=',
-    [Operator.NE]: '!=',
-    [Operator.GE]: '>=',
-    [Operator.GT]: '>',
-    [Operator.LE]: '<=',
-    [Operator.LT]: '<',
-    [Operator.IN]: 'IN',
-    [Operator.NIN]: 'NOT IN',
-    [Operator.LIKE]: 'LIKE',
-  };
-
-  export enum Direction
-  {
-    ASC,
-    DESC,
-  }
-
-  export const DirectionTQL = {
-    [Direction.ASC]: 'ASC',
-    [Direction.DESC]: 'DESC',
-  };
-
-  export enum Combinator
-  {
-    AND,
-    OR,
-  }
-
-  export const CombinatorTQL = {
-    [Combinator.AND]: 'AND',
-    [Combinator.OR]: 'OR',
-  };
+  EQ,
+  NE,
+  GE,
+  GT,
+  LE,
+  LT,
+  IN,
+  NIN,
+  LIKE,
 }
 
-export default CommonElastic;
+export const OperatorTQL = {
+  [Operator.EQ]: '=',
+  [Operator.NE]: '!=',
+  [Operator.GE]: '>=',
+  [Operator.GT]: '>',
+  [Operator.LE]: '<=',
+  [Operator.LT]: '<',
+  [Operator.IN]: 'IN',
+  [Operator.NIN]: 'NOT IN',
+  [Operator.LIKE]: 'LIKE',
+};
+
+export enum Direction
+{
+  ASC,
+  DESC,
+}
+
+export const DirectionTQL = {
+  [Direction.ASC]: 'ASC',
+  [Direction.DESC]: 'DESC',
+};
+
+export enum Combinator
+{
+  AND,
+  OR,
+}
+
+export const CombinatorTQL = {
+  [Combinator.AND]: 'AND',
+  [Combinator.OR]: 'OR',
+};
+
+export function parseESValue(value: any): any
+{
+  let v: any;
+  if (typeof value !== 'string')
+  {
+    value = JSON.stringify(value);
+  }
+
+  const parser: ESParser = new ESParser(value);
+  if (parser.getErrors().length > 0)
+  {
+    v = value;
+  }
+  else
+  {
+    v = parser.getValue();
+  }
+
+  return v;
+}
