@@ -79,11 +79,29 @@ export default function ElasticToCards(
   }
 }
 
+const isScoreCard = (obj: Object): boolean =>
+{
+  return obj.hasOwnProperty('script')
+    && obj['script'].hasOwnProperty('stored')
+    && obj['script'].hasOwnProperty('params')
+    && obj['script']['stored'] === 'terrain_PWLScore'
+    && obj['script']['params'].hasOwnProperty('factors')
+    && Array.isArray(obj['script']['params']['factors']);
+};
+
 const parseObjectWrap = (obj: Object): Cards =>
 {
   const arr: Card[] = _.map(obj,
     (value: any, key: string) =>
     {
+      if (isScoreCard(obj))
+      {
+        return make(
+          Blocks.elasticScore,
+         {
+           weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
+         });
+      }
       return make(
         Blocks.elasticKeyValueWrap,
         {
@@ -97,6 +115,11 @@ const parseObjectWrap = (obj: Object): Cards =>
   );
 
   return Immutable.List(arr);
+};
+
+const parseElasticWeightBlock = (obj: Object): Block =>
+{
+  return make(Blocks.elasticWeight, obj);
 };
 
 const parseArrayWrap = (arr: any[]): Cards =>
