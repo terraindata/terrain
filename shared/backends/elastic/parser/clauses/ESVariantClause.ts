@@ -47,6 +47,7 @@ THE SOFTWARE.
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
 
@@ -74,14 +75,9 @@ export default class ESVariantClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this; // only sticks if subclause isn't detected
+    valueInfo.parentClause = this;
 
-    const value: any = valueInfo.value;
-    let valueType: string = typeof (value);
-    if (Array.isArray(value))
-    {
-      valueType = 'array';
-    }
+    const valueType: string = ESJSONType[valueInfo.jsonType];
 
     const subtype: string | undefined = this.subtypes[valueType];
     if (subtype === undefined)

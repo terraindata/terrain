@@ -51,16 +51,15 @@ enum ESJSONType
   invalid, // bad type
 
   // true JSON types
-  'null',
+  'null', // 2
   boolean,
   number,
   string,
-  property, // the name string of an objects property
   array,
   object,
 
   // additional types
-  parameter, // an input parameter for an ES query
+  parameter, // 8: an input parameter for an ES query
 
   // delimiter types
   arrayDelimiter,

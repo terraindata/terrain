@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
 
@@ -65,12 +66,8 @@ export default class ESArrayClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-
-    const value: any = valueInfo.value;
-    if (!Array.isArray(value))
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.array))
     {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
       return;
     }
 

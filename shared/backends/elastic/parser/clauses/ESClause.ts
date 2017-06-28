@@ -47,6 +47,7 @@ THE SOFTWARE.
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 
 /**
@@ -107,6 +108,21 @@ abstract class ESClause
 
   public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
 
+  protected typeCheck(interpreter: ESInterpreter,
+    valueInfo: ESValueInfo,
+    expected: ESJSONType): boolean
+  {
+    if (valueInfo.jsonType !== expected)
+    {
+      interpreter.accumulateError(valueInfo,
+        'Expected a ' + ESJSONType[expected] + ', but found a ' +
+        ESJSONType[valueInfo.jsonType] + ' instead.');
+      return false;
+    }
+
+    return true;
+  }
+
   private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
   {
     if (settings[name] !== undefined)
@@ -118,6 +134,7 @@ abstract class ESClause
       this[name] = defaultValueFunction();
     }
   }
+
 }
 
 export default ESClause;

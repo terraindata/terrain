@@ -45,27 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.id
 
 import ESClauseType from '../ESClauseType';
-import ESInterpreter from '../ESInterpreter';
-import ESValueInfo from '../ESValueInfo';
-import ESClause from './ESClause';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
 /**
  * A clause which is a boolean
  */
-export default class ESBooleanClause extends ESClause
+export default class ESBooleanClause extends ESTerminalClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings, ESClauseType.ESBooleanClause);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'boolean')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a boolean.');
-    }
+    super(type, settings, ESClauseType.ESBooleanClause, ESJSONType.boolean);
   }
 }

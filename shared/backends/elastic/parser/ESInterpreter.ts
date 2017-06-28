@@ -90,6 +90,6 @@ export default class ESInterpreter
 
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
-    this.parser.accumulateError(new ESParserError(info.tokens[0], message, isWarning));
+    this.parser.accumulateError(new ESParserError(info.tokens[0], info, message, isWarning));
   }
 }

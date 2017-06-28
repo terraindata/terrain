@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
 
@@ -62,15 +63,21 @@ export default class ESBaseClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) === 'object')
+    switch (valueInfo.jsonType)
     {
-      const foundType: string = Array.isArray(value) ? 'array' : 'object';
-      interpreter.accumulateError(
-        valueInfo,
-        'Found an ' +
-        foundType +
-        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+      case ESJSONType.string:
+        break;
+
+      default:
+        interpreter.accumulateError(
+          valueInfo,
+          'Found an ' +
+          ESJSONType[valueInfo.jsonType] +
+          ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+        break;
     }
   }
 }

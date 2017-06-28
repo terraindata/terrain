@@ -56,6 +56,7 @@ import ESMapClause from './clauses/ESMapClause';
 import ESNullClause from './clauses/ESNullClause';
 import ESNumberClause from './clauses/ESNumberClause';
 import ESObjectClause from './clauses/ESObjectClause';
+import ESPropertyClause from './clauses/ESPropertyClause';
 import ESReferenceClause from './clauses/ESReferenceClause';
 import ESStringClause from './clauses/ESStringClause';
 import ESStructureClause from './clauses/ESStructureClause';
@@ -90,6 +91,7 @@ const EQLSpec: ESClause[] =
         desc: 'A JSON object. Objects consist of name : value pairs enclosed in curly braces and separated by commas. See json.org for more information.',
         url: 'http://www.json.org/',
       }),
+    new ESPropertyClause('property', {}),
     new ESFieldClause('field',
       {
         name: 'field',
@@ -357,8 +359,8 @@ const EQLSpec: ESClause[] =
       {
         object: 'includeExclude',
         boolean: 'boolean',
-        string: 'string',
-        array: 'string[]',
+        string: 'field',
+        array: 'field[]',
       },
       {
         name: 'source clause',
@@ -367,8 +369,8 @@ const EQLSpec: ESClause[] =
       }),
     new ESStructureClause('includeExclude',
       {
-        includes: 'string[]',
-        excludes: 'string[]',
+        includes: 'field[]',
+        excludes: 'field[]',
       },
       [],
       { name: 'include and exclude lists', desc: 'Filters in include values and out exclude values.' }),

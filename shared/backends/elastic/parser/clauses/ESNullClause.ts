@@ -45,27 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESClauseType from '../ESClauseType';
-import ESInterpreter from '../ESInterpreter';
-import ESValueInfo from '../ESValueInfo';
-import ESClause from './ESClause';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
 /**
  * A clause which is a null
  */
-export default class ESNullClause extends ESClause
+export default class ESNullClause extends ESTerminalClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings, ESClauseType.ESNullClause);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (value !== null)
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be null.');
-    }
+    super(type, settings, ESClauseType.ESNullClause, ESJSONType.null);
   }
 }

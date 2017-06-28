@@ -44,12 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as util from 'util';
+import * as winston from 'winston';
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
 import ESPropertyInfo from '../ESPropertyInfo';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
+import ESPropertyClause from './ESPropertyClause';
 
 /**
  * A clause with a well-defined structure.
@@ -78,21 +82,10 @@ export default class ESStructureClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-
-    const value = valueInfo.value;
-    if (typeof (value) !== 'object')
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
-      return;
-    }
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    const propertyClause: ESClause = interpreter.config.getClause('property');
 
     // mark properties
     Object.keys(children).forEach(
@@ -100,15 +93,23 @@ export default class ESStructureClause extends ESClause
       {
         const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
 
+        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
+
         if (!this.structure.hasOwnProperty(name))
         {
           interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
-          return;
         }
-
-        if (viTuple.propertyValue !== null)
+        else if (viTuple.propertyValue === null)
         {
-          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
+          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
+        }
+        else
+        {
+          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
+
+          propertyClause.mark(interpreter, viTuple.propertyName);
+          clause.mark(interpreter, viTuple.propertyValue);
+          winston.info(util.inspect(viTuple));
         }
       });
 

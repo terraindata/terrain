@@ -47,6 +47,7 @@ THE SOFTWARE.
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
 import ESPropertyInfo from '../ESPropertyInfo';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
@@ -76,18 +77,8 @@ export default class ESMapClause extends ESClause
   {
     valueInfo.clause = this;
 
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'object')
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.object))
     {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found an array instead.');
       return;
     }
 

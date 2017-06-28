@@ -57,6 +57,7 @@ enum ESClauseType
   ESNullClause,
   ESNumberClause,
   ESObjectClause,
+  ESPropertyClause,
   ESReferenceClause,
   ESStringClause,
   ESStructureClause,
