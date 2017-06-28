@@ -170,6 +170,8 @@ FileImportReducers[ActionTypes.uploadFile] =
       }
     });
     const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
+    const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
+    const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
 
     Ajax.importFile(
       state.file,
@@ -177,8 +179,8 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.dbText,
       state.tableText,
       state.connectionId,
-      state.columnNames,
-      state.columnsToInclude,
+      cNames,
+      cToInclude,
       cTypes,
       state.primaryKey,
       () =>
