@@ -91,6 +91,10 @@ const FileImportActions =
     setMapType:
     (id: string, typeIndex: number) =>
       $(ActionTypes.setMapType, { id, typeIndex }),
+
+    changeHasCsvHeader:
+    () =>
+      $(ActionTypes.changeHasCsvHeader, {}),
   };
 
 export default FileImportActions;

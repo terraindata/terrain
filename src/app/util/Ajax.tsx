@@ -648,6 +648,7 @@ export const Ajax =
       columnTypes: Immutable.Map<string, string> | List<string>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
+      hasCsvHeader?: boolean,
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const payload: object = {
@@ -659,6 +660,7 @@ export const Ajax =
         columnNames,
         columnsToInclude,
         columnTypes,
+        hasCsvHeader,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>

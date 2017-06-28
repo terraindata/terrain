@@ -169,6 +169,7 @@ FileImportReducers[ActionTypes.uploadFile] =
         {
           alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         },
+        state.hasCsvHeader,
       );
     }
     return state;
@@ -180,17 +181,33 @@ FileImportReducers[ActionTypes.previewFile] =
     const columnsToInclude = [];
     const columnNames = [];
     const columnTypes = [];
-
     let colsCount = 0;
-    for (const property in action.payload.preview[0])
+
+    if (state.filetype === 'csv' && !state.hasCsvHeader)
     {
-      if (action.payload.preview[0].hasOwnProperty(property))
+      console.log('headerless csv - ', state.hasCsvHeader);
+      for (let i = 0; i < action.payload.preview[0].length; i++)
       {
-        columnsToInclude.push([property, true]);
-        columnNames.push([property, '']);
-        columnTypes.push([property, -1]);
+        columnsToInclude.push(['column' + i, true]);
+        columnNames.push(['column' + i, '']);
+        columnTypes.push(['column' + i, -1]);
         colsCount++;
       }
+    }
+    else
+    {
+      console.log('json or csv with header');
+      for (const property in action.payload.preview[0])
+      {
+        if (action.payload.preview[0].hasOwnProperty(property))
+        {
+          columnsToInclude.push([property, true]);
+          columnNames.push([property, '']);
+          columnTypes.push([property, -1]);
+          colsCount++;
+        }
+      }
+      console.log(columnNames);
     }
 
     return state
@@ -205,7 +222,6 @@ FileImportReducers[ActionTypes.setMapIncluded] =
   (state, action) =>
     state
       .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
-      .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
   ;
 
 FileImportReducers[ActionTypes.setMapName] =
@@ -219,5 +235,11 @@ FileImportReducers[ActionTypes.setMapType] =
     state
       .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
   ;
+
+FileImportReducers[ActionTypes.changeHasCsvHeader] =
+  (state, action) =>
+    state
+      .set('hasCsvHeader', !state.hasCsvHeader);
+;
 
 export default FileImportReducers;

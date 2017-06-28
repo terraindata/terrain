@@ -70,20 +70,48 @@ const DATATYPES = Immutable.List(['text', 'number', 'date']);
 
 class Preview extends Classs<Props>
 {
+  // assume no row modification?
+  public shouldComponentUpdate(nextProps: Props)
+  {
+    const { previewRows, columnsToInclude, columnNames, columnTypes } = this.props;
+    const update = previewRows !== nextProps.previewRows || columnsToInclude !== nextProps.columnsToInclude || columnNames !== nextProps.columnNames || columnTypes !== nextProps.columnTypes;
+    return update;
+  }
+
   public render()
   {
-    const previewCols = Object.keys(this.props.previewRows[0]).map((key) =>
-      <PreviewColumn
-        key={key}
-        id={key}
-        isIncluded={this.props.columnsToInclude.get(key)}
-        name={this.props.columnNames.get(key)}
-        typeIndex={this.props.columnTypes.get(key)}
-        types={DATATYPES}
-        canSelectType={true}
-        canSelectColumn={true}
-      />
-    );
+    console.log('preview');
+    // const previewCols = Object.keys(this.props.previewRows[0]).map((key) =>
+    //   <PreviewColumn
+    //     key={key}
+    //     id={key}
+    //     isIncluded={this.props.columnsToInclude.get(key)}
+    //     name={this.props.columnNames.get(key)}
+    //     typeIndex={this.props.columnTypes.get(key)}
+    //     types={DATATYPES}
+    //     canSelectType={true}
+    //     canSelectColumn={true}
+    //   />
+    // );
+
+    console.log('columnNames: ', this.props.columnNames);
+    const previewCols = [];
+    this.props.columnNames.forEach((value, key) =>
+    {
+      previewCols.push(
+        <PreviewColumn
+          key={key}
+          id={key}
+          isIncluded={this.props.columnsToInclude.get(key)}
+          name={this.props.columnNames.get(key)}
+          typeIndex={this.props.columnTypes.get(key)}
+          types={DATATYPES}
+          canSelectType={true}
+          canSelectColumn={true}
+        />
+      );
+    });
+    console.log('previewCols: ', previewCols);
 
     const previewRows = Object.keys(this.props.previewRows).map((key) =>
       <PreviewRow
@@ -96,11 +124,11 @@ class Preview extends Classs<Props>
       <table>
         <thead>
           <tr>
-            { previewCols }
+            {previewCols}
           </tr>
         </thead>
         <tbody>
-          { previewRows }
+          {previewRows}
         </tbody>
       </table>
     );

@@ -103,9 +103,10 @@ class FileImport extends PureClasss<any>
 
   public render()
   {
+    console.log('fileimport');
     const { fileImportState } = this.state;
-    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected,
-      tableText, fileChosen, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes } = fileImportState;
+    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected, tableText, fileChosen, previewRows,
+      columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader } = fileImportState;
 
     return (
       <div className="fileImport">
@@ -129,6 +130,7 @@ class FileImport extends PureClasss<any>
             validFiletypes={FILETYPES}
             fileChosen={fileChosen}
             rowsCount={ROWS_COUNT}
+            hasCsvHeader={hasCsvHeader}
           />
         </div>
         {

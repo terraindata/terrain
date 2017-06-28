@@ -64,14 +64,21 @@ export interface Props
 
 class PreviewRow extends Classs<Props>
 {
+  // assume no row modification? add new preview property
+  public shouldComponentUpdate(nextProps: Props)
+  {
+    return this.props.items !== nextProps.items;
+  }
+
   public render()
   {
+    console.log('preview row');
     const row = Object.keys(this.props.items).map((key) =>
-      <td>{ this.props.items[key] }</td>
+      <td key={key}>{this.props.items[key]}</td>
     );
 
     return (
-      <tr>{ row }</tr>
+      <tr>{row}</tr>
     );
   }
 }

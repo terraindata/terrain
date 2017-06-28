@@ -89,6 +89,7 @@ class PreviewColumn extends Classs<Props>
 
   public render()
   {
+    console.log('preview column');
     return (
       <th>
         <CheckBox

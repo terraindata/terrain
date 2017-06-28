@@ -75,6 +75,8 @@ export namespace FileImportTypes
     public columnsToInclude: Map<string, boolean> = null;
     public columnNames: Map<string, string> = null;
     public columnTypes: Map<string, number> = null;
+
+    public hasCsvHeader: boolean = true;
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
   //  This first line exports a type that you will actually use in other files.

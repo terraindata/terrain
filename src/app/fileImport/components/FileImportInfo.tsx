@@ -49,6 +49,7 @@ import * as React from 'react';
 // import * as hashObject from 'hash-object';
 const { List } = Immutable;
 import Dropdown from './../../common/components/Dropdown';
+import CheckBox from './../../common/components/CheckBox';
 import PureClasss from './../../common/components/PureClasss';
 import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
@@ -80,6 +81,7 @@ export interface Props
   validFiletypes: List<string>;
   fileChosen: boolean;
   rowsCount: number;
+  hasCsvHeader: boolean;
 }
 
 class FileImportInfo extends PureClasss<Props>
@@ -98,6 +100,11 @@ class FileImportInfo extends PureClasss<Props>
   public handleAutocompleteTableChange(value)
   {
     Actions.changeTableText(value);
+  }
+
+  public handleCsvHeaderChange()
+  {
+    Actions.changeHasCsvHeader();
   }
 
   public parseData(file: string, filetype: string): object[]
@@ -132,7 +139,7 @@ class FileImportInfo extends PureClasss<Props>
     else if (filetype === 'csv')
     {
       const config = {
-        header: true,
+        header: this.props.hasCsvHeader,
         preview: this.props.rowsCount,
         error: (err) =>
         {
@@ -187,6 +194,7 @@ class FileImportInfo extends PureClasss<Props>
     {
       console.log("File chosen contents: ", fr.result);
       const preview = this.parseData(fr.result, filetype);
+      console.log('preview: ', preview);
 
       Actions.chooseFile(fr.result, filetype);
       Actions.previewFile(preview);
@@ -251,12 +259,18 @@ class FileImportInfo extends PureClasss<Props>
 
   public render()
   {
+    console.log('fileimportinfo');
     const { canSelectServer, canSelectDb, canSelectTable } = this.props;
 
     return (
       <div>
         <div>
           <input ref="file" type="file" onChange={this.handleChooseFile} />
+          has header row (csv only)
+          <CheckBox
+            checked={this.props.hasCsvHeader}
+            onChange={this.handleCsvHeaderChange}
+          />
         </div>
         <div>
           <h3>Server</h3>
