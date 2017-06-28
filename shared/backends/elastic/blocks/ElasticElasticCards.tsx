@@ -78,6 +78,7 @@ const referenceCards: ESClause[] = [];
 
 _.mapObject(
   clauses,
+  
   (clause, key) =>
   {
     const card = clause.getCard();

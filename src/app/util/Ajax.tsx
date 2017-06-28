@@ -566,7 +566,10 @@ export const Ajax =
           {
             onLoad(null, v);
           }
-          onLoad(v.query, v);
+          else
+          {
+            onLoad(v.query, v);
+          }
         },
       );
     },
