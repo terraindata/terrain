@@ -44,32 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-enum ESJSONType
+enum ESClauseType
 {
-  // invalid types
-  unknown, // unclassified type
-  invalid, // bad type
-
-  // true JSON types
-  'null',
-  boolean,
-  number,
-  string,
-  property, // the name string of an objects property
-  array,
-  object,
-
-  // additional types
-  parameter, // an input parameter for an ES query
-
-  // delimiter types
-  arrayDelimiter,
-  arrayTerminator,
-
-  propertyDelimiter,
-  objectDelimiter,
-  objectTerminator,
-
+  ESAnyClause,
+  ESArrayClause,
+  ESBaseClause,
+  ESBooleanClause,
+  ESEnumClause,
+  ESFieldClause,
+  ESIndexClause,
+  ESMapClause,
+  ESNullClause,
+  ESNumberClause,
+  ESObjectClause,
+  ESReferenceClause,
+  ESStringClause,
+  ESStructureClause,
+  ESTypeClause,
+  ESVariantClause,
 }
 
-export default ESJSONType;
+export default ESClauseType;

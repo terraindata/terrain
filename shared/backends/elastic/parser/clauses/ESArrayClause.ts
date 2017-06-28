@@ -44,32 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-enum ESJSONType
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
+import ESClause from './ESClause';
+
+/**
+ * A clause that corresponds to an array of uniform type.
+ */
+export default class ESArrayClause extends ESClause
 {
-  // invalid types
-  unknown, // unclassified type
-  invalid, // bad type
+  public elementID: string;
 
-  // true JSON types
-  'null',
-  boolean,
-  number,
-  string,
-  property, // the name string of an objects property
-  array,
-  object,
+  public constructor(type: string, elementID: string, settings: any)
+  {
+    super(type, settings, ESClauseType.ESArrayClause);
+    this.elementID = elementID;
+  }
 
-  // additional types
-  parameter, // an input parameter for an ES query
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
 
-  // delimiter types
-  arrayDelimiter,
-  arrayTerminator,
+    const value: any = valueInfo.value;
+    if (!Array.isArray(value))
+    {
+      interpreter.accumulateError(
+        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
+      return;
+    }
 
-  propertyDelimiter,
-  objectDelimiter,
-  objectTerminator,
+    // mark children
+    const childClause: ESClause = interpreter.config.getClause(this.elementID);
+    const children: ESValueInfo[] = valueInfo.arrayChildren;
+    children.forEach(
+      (element: ESValueInfo): void =>
+      {
+        childClause.mark(interpreter, element);
+      });
+  }
 
 }
-
-export default ESJSONType;

@@ -44,27 +44,33 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a number
+ * A clause which is a terminal (base) value: null, boolean, number, or string
  */
-export default class ESObjectClause extends ESClause
+export default class ESBaseClause extends ESClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESBaseClause);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
     const value: any = valueInfo.value;
-    if (typeof (value) !== 'object' && !Array.isArray(value))
+    if (typeof (value) === 'object')
     {
-      interpreter.accumulateError(valueInfo, 'This value should be an object.');
+      const foundType: string = Array.isArray(value) ? 'array' : 'object';
+      interpreter.accumulateError(
+        valueInfo,
+        'Found an ' +
+        foundType +
+        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
     }
   }
 }

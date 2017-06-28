@@ -44,80 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause with a well-defined structure.
+ * A clause which is a null
  */
-export default class ESStructureClause extends ESClause
+export default class ESNullClause extends ESClause
 {
-  public structure: { [name: string]: string };
-  public required: any[];
-
-  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-    this.structure = structure;
-    this.required = required;
-  }
-
-  public init(config: EQLConfig): void
-  {
-    Object.keys(this.structure).forEach(
-      (key: string): void =>
-      {
-        config.declareType(this.structure[key]);
-      });
+    super(type, settings, ESClauseType.ESNullClause);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-
-    const value = valueInfo.value;
-    if (typeof (value) !== 'object')
+    const value: any = valueInfo.value;
+    if (value !== null)
     {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
-      return;
+      interpreter.accumulateError(valueInfo, 'This value should be null.');
     }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
-      return;
-    }
-
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-
-    // mark properties
-    Object.keys(children).forEach(
-      (name: string): void =>
-      {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        if (!this.structure.hasOwnProperty(name))
-        {
-          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
-          return;
-        }
-
-        if (viTuple.propertyValue !== null)
-        {
-          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
-        }
-      });
-
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] !== undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
   }
 }

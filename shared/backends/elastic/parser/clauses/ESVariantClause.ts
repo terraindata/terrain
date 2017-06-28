@@ -44,10 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
  * A clause which is one of several possible types
@@ -58,7 +59,7 @@ export default class ESVariantClause extends ESClause
 
   public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESVariantClause);
     this.subtypes = subtypes;
   }
 

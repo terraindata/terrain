@@ -47,8 +47,6 @@ THE SOFTWARE.
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
 import ESParserError from './ESParserError';
-import ESParserToken from './ESParserToken';
-import ESParserPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
 /**

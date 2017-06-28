@@ -44,32 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-enum ESJSONType
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
+import ESClause from './ESClause';
+
+/**
+ * A clause which can be any valid JSON value
+ */
+export default class ESAnyClause extends ESClause
 {
-  // invalid types
-  unknown, // unclassified type
-  invalid, // bad type
+  public constructor(type: string, settings: any)
+  {
+    super(type, settings, ESClauseType.ESAnyClause);
+  }
 
-  // true JSON types
-  'null',
-  boolean,
-  number,
-  string,
-  property, // the name string of an objects property
-  array,
-  object,
-
-  // additional types
-  parameter, // an input parameter for an ES query
-
-  // delimiter types
-  arrayDelimiter,
-  arrayTerminator,
-
-  propertyDelimiter,
-  objectDelimiter,
-  objectTerminator,
-
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
+  }
 }
-
-export default ESJSONType;

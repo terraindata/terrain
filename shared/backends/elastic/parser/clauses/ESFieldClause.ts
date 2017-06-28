@@ -42,29 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.id
+// Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 
 /**
- * A clause which is a boolean
+ * A clause which is a field name (column name)
  */
-export default class ESBooleanClause extends ESClause
+export default class ESFieldClause extends ESStringClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESFieldClause);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'boolean')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a boolean.');
-    }
-  }
+  // TODO: add field validation here
 }

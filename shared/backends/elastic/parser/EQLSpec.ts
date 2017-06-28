@@ -44,20 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESAnyClause from './ESAnyClause';
-import ESArrayClause from './ESArrayClause';
-import ESBaseClause from './ESBaseClause';
-import ESBooleanClause from './ESBooleanClause';
-import ESClause from './ESClause';
-import ESEnumClause from './ESEnumClause';
-import ESMapClause from './ESMapClause';
-import ESNullClause from './ESNullClause';
-import ESNumberClause from './ESNumberClause';
-import ESObjectClause from './ESObjectClause';
-import ESReferenceClause from './ESReferenceClause';
-import ESStringClause from './ESStringClause';
-import ESStructureClause from './ESStructureClause';
-import ESVariantClause from './ESVariantClause';
+import ESAnyClause from './clauses/ESAnyClause';
+import ESArrayClause from './clauses/ESArrayClause';
+import ESBaseClause from './clauses/ESBaseClause';
+import ESBooleanClause from './clauses/ESBooleanClause';
+import ESClause from './clauses/ESClause';
+import ESEnumClause from './clauses/ESEnumClause';
+import ESFieldClause from './clauses/ESFieldClause';
+import ESIndexClause from './clauses/ESIndexClause';
+import ESMapClause from './clauses/ESMapClause';
+import ESNullClause from './clauses/ESNullClause';
+import ESNumberClause from './clauses/ESNumberClause';
+import ESObjectClause from './clauses/ESObjectClause';
+import ESReferenceClause from './clauses/ESReferenceClause';
+import ESStringClause from './clauses/ESStringClause';
+import ESStructureClause from './clauses/ESStructureClause';
+import ESTypeClause from './clauses/ESTypeClause';
+import ESVariantClause from './clauses/ESVariantClause';
 
 /* tslint:disable:max-line-length */
 
@@ -87,7 +90,7 @@ const EQLSpec: ESClause[] =
         desc: 'A JSON object. Objects consist of name : value pairs enclosed in curly braces and separated by commas. See json.org for more information.',
         url: 'http://www.json.org/',
       }),
-    new ESStringClause('field',
+    new ESFieldClause('field',
       {
         name: 'field',
         desc: 'The name of a document field.',
@@ -165,8 +168,8 @@ const EQLSpec: ESClause[] =
         template: { index: '', type: '', from: 0, size: 1000, body: { query: {} } },
         autocomplete: ['index', 'type'],
       }),
-    new ESStringClause('index', { desc: 'Selects which index to search.' }),
-    new ESStringClause('type', { desc: 'Selects which type to search.' }),
+    new ESIndexClause('index', { desc: 'Selects which index to search.' }),
+    new ESTypeClause('type', { desc: 'Selects which type to search.' }),
     new ESNumberClause('from',
       {
         desc: 'How many results to skip over. This is usually used to implement pagination.',

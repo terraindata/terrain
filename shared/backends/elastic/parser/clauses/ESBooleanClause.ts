@@ -42,68 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.id
 
-import EQLConfig from './EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause that corresponds to an object of uniform type values.
+ * A clause which is a boolean
  */
-export default class ESMapClause extends ESClause
+export default class ESBooleanClause extends ESClause
 {
-  public nameType: string;
-  public valueType: string;
-
-  public constructor(type: string, nameType: string, valueType: string, settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-    this.nameType = nameType;
-    this.valueType = valueType;
-  }
-
-  public init(config: EQLConfig): void
-  {
-    config.declareType(this.nameType);
-    config.declareType(this.valueType);
+    super(type, settings, ESClauseType.ESBooleanClause);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-
     const value: any = valueInfo.value;
-    if (typeof (value) !== 'object')
+    if (typeof (value) !== 'boolean')
     {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
-      return;
+      interpreter.accumulateError(valueInfo, 'This value should be a boolean.');
     }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found an array instead.');
-      return;
-    }
-
-    // mark properties
-    const childClause: ESClause = interpreter.config.getClause(this.valueType);
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-    Object.keys(children).forEach(
-      (name: string): void =>
-      {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
-
-        if (viTuple.propertyValue !== null)
-        {
-          childClause.mark(interpreter, viTuple.propertyValue);
-        }
-      });
   }
 }

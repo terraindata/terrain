@@ -44,27 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a number
+ * A clause which is a string
  */
-export default class ESNumberClause extends ESClause
+export default class ESStringClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public constructor(type: string, settings: any, clauseType: ESClauseType = ESClauseType.ESStringClause)
   {
-    super(type, settings);
+    super(type, settings, clauseType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
     const value: any = valueInfo.value;
-    if (typeof (value) !== 'number')
+    if (typeof (value) !== 'string')
     {
-      interpreter.accumulateError(valueInfo, 'This value should be a number.');
+      interpreter.accumulateError(valueInfo, 'This value should be a string.');
     }
   }
 }

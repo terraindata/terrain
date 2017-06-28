@@ -44,43 +44,81 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause that corresponds to an array of uniform type.
+ * A clause with a well-defined structure.
  */
-export default class ESArrayClause extends ESClause
+export default class ESStructureClause extends ESClause
 {
-  public elementID: string;
+  public structure: { [name: string]: string };
+  public required: any[];
 
-  public constructor(type: string, elementID: string, settings: any)
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(type, settings);
-    this.elementID = elementID;
+    super(type, settings, ESClauseType.ESStructureClause);
+    this.structure = structure;
+    this.required = required;
+  }
+
+  public init(config: EQLConfig): void
+  {
+    Object.keys(this.structure).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.structure[key]);
+      });
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
 
-    const value: any = valueInfo.value;
-    if (!Array.isArray(value))
+    const value = valueInfo.value;
+    if (typeof (value) !== 'object')
     {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
       return;
     }
 
-    // mark children
-    const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    const children: ESValueInfo[] = valueInfo.arrayChildren;
-    children.forEach(
-      (element: ESValueInfo): void =>
-      {
-        childClause.mark(interpreter, element);
-      });
-  }
+    if (Array.isArray(value))
+    {
+      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
+      return;
+    }
 
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+
+    // mark properties
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        if (!this.structure.hasOwnProperty(name))
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
+          return;
+        }
+
+        if (viTuple.propertyValue !== null)
+        {
+          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
+        }
+      });
+
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
+  }
 }

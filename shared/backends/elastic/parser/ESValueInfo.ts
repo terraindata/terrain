@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
+import ESClause from './clauses/ESClause';
 import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
