@@ -44,45 +44,65 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
+import * as _ from 'underscore';
+import Util from './../../util/Util';
+import ActionTypes from './FileImportActionTypes';
+import Ajax from './../../util/Ajax';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+const FileImportReducers = {}
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+FileImportReducers[ActionTypes.changeServer] =
+  (state, action) =>
+    state
+      .set('serverIndex', action.payload.serverIndex)
+      .set('connectionId', action.payload.connectionId)
+      .set('serverSelected', true)
+  ;
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+FileImportReducers[ActionTypes.changeDbText] =
+  (state, action) =>
+    state
+      .set('dbText', action.payload.dbText).set('dbSelected', !!action.payload.dbText);
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+FileImportReducers[ActionTypes.changeTableText] =
+  (state, action) =>
+    state
+      .set('tableText', action.payload.tableText).set('tableSelected', !!action.payload.tableText);
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
+FileImportReducers[ActionTypes.chooseFile] =
+  (state, action) =>
+    state
+      .set('file', action.payload.file)
+      .set('filetype', action.payload.filetype)
+      .set('fileChosen', true)
+  ;
 
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
+FileImportReducers[ActionTypes.unchooseFile] =
+  (state, action) =>
+    state
+      .set('fileChosen', false)
+  ;
 
-export default ElasticCardsDeck;
+FileImportReducers[ActionTypes.uploadFile] =
+  (state, action) =>
+  {
+    Ajax.importFile(
+      state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+      () =>
+      {
+        alert("success");
+      },
+      (ev: string) =>
+      {
+        console.log(JSON.parse(ev));
+        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
+      },
+    );
+    return state;
+  };
+
+export default FileImportReducers;

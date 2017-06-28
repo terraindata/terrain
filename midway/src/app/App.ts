@@ -49,8 +49,7 @@ import * as Koa from 'koa';
 import * as winston from 'winston';
 
 import babelRegister = require('babel-register');
-import convert = require('koa-convert');
-import session = require('koa-generic-session');
+import session = require('koa-session');
 import serve = require('koa-static-server');
 import cors = require('kcors');
 import srs = require('secure-random-string');
@@ -114,7 +113,7 @@ class App
     this.app.proxy = true;
     this.app.keys = [srs({ length: 256 })];
     this.app.use(cors());
-    this.app.use(convert(session()));
+    this.app.use(session(undefined, this.app));
 
     this.app.use(Middleware.bodyParser());
     this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));

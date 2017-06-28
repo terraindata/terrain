@@ -43,46 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
+import * as _ from 'underscore';
+import ActionTypes from './FileImportActionTypes';
+import { FileImportStore } from './FileImportStore';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+const FileImportActions =
+  {
+    changeServer:
+    (serverIndex: number, connectionId: number) =>
+      $(ActionTypes.changeServer, { serverIndex, connectionId }),
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+    changeDbText:
+    (dbText: string) =>
+      $(ActionTypes.changeDbText, { dbText }),
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+    changeTableText:
+    (tableText: string) =>
+      $(ActionTypes.changeTableText, { tableText }),
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
+    chooseFile:
+    (file: string, filetype: string) =>
+      $(ActionTypes.chooseFile, { file, filetype }),
 
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
+    unchooseFile:
+    () =>
+      $(ActionTypes.unchooseFile, {}),
 
-export default ElasticCardsDeck;
+    uploadFile:
+    () =>
+      $(ActionTypes.uploadFile, {}),
+  };
+
+export default FileImportActions;

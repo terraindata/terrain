@@ -43,46 +43,24 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+import * as Util from '../Util';
+import { Import, ImportConfig } from './Import';
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+const Router = new KoaRouter();
+export const imprt: Import = new Import();
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('importing to database');
+  const imprtConf: ImportConfig = ctx.request.body.body;
+  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'table', 'filetype', 'db']);
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
+  ctx.body = await imprt.insert(imprtConf);
+});
 
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
-
-export default ElasticCardsDeck;
+export default Router;

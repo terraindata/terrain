@@ -44,45 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
+import * as _ from 'underscore';
+import Util from './../util/Util';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+// This module will contain all of the different 'types' (i.e. models) relevant to auth
+export namespace FileImportTypes
+{
+  // This type represents the state of the FileImportStore
+  class FileImportStateC extends BaseClass
+  {
+    public serverSelected: boolean = false;
+    public serverIndex: number = -1;
+    public connectionId: number = -1;
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+    public dbSelected: boolean = false;
+    public dbText: string = "";
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+    public tableSelected: boolean = false;
+    public tableText: string = "";
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+    public file: string = "";
+    public filetype: string = "";
+    public fileChosen: boolean = false;
+  }
+  // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
+  //  This first line exports a type that you will actually use in other files.
+  //  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
+  export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
+  //  This second line exports a function to create a new instance of the FileImportState Immutable backed class
+  //  It's a replacement for a constructor.
+  //  This is necessary because simply doing `new FileImportStateC` will not create an Immutable version
+  //   and you can't use `new` simply with Immutable Records.
+  export const _FileImportState = (config?: { [key: string]: any }) =>
+    New<FileImportState>(new FileImportStateC(config), config);
+}
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
-
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
-
-export default ElasticCardsDeck;
+export default FileImportTypes;

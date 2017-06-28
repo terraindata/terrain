@@ -52,7 +52,7 @@ import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarD
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
+import * as CommonElastic from '../syntax/CommonElastic';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import TransformCard from '../../../../src/app/builder/components/charts/TransformCard';

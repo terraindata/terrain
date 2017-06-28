@@ -44,45 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
+import * as _ from 'underscore';
+const Redux = require('redux');
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+import FileImportTypes from './../FileImportTypes';
+import Util from './../../util/Util';
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+const DefaultState = FileImportTypes._FileImportState();
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+import FileImportReducers from './FileImportReducers';
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
+  (state: FileImportTypes.FileImportState = DefaultState, action) =>
+  {
+    if (FileImportReducers[action.type])
+    {
+      state = FileImportReducers[action.type](state, action);
+    }
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
+    return state;
+  }
+  , DefaultState);
 
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
+export default FileImportStore;
 
-export default ElasticCardsDeck;
