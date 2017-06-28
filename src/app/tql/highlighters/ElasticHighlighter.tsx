@@ -52,10 +52,10 @@ import ESPropertyInfo from '../../../../shared/backends/elastic/parser/ESPropert
 import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
 
 // interpreter and clause imports
+import ESClause from '../../../../shared/backends/elastic/parser/clauses/ESClause';
+import ESStructureClause from '../../../../shared/backends/elastic/parser/clauses/ESStructureClause';
 import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig';
-import ESClause from '../../../../shared/backends/elastic/parser/ESClause';
 import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
-import ESStructureClause from '../../../../shared/backends/elastic/parser/ESStructureClause';
 
 // other imports
 import SyntaxHighlighter from './SyntaxHighlighter';
@@ -165,13 +165,13 @@ class ElasticHighlighter extends SyntaxHighlighter
       case ESJSONType.number:
         return 'cm-number';
       case ESJSONType.string:
-      case ESJSONType.property:
         return 'cm-string';
       case ESJSONType.array:
       case ESJSONType.object:
       // delimiter types
       case ESJSONType.arrayDelimiter:
       case ESJSONType.arrayTerminator:
+      case ESJSONType.propertyDelimiter:
       case ESJSONType.objectDelimiter:
       case ESJSONType.objectTerminator:
         return 'cm-bracket';
@@ -179,7 +179,8 @@ class ElasticHighlighter extends SyntaxHighlighter
       case ESJSONType.parameter:
         return 'cm-variable-2';
       default:
-        return '';
+        return fToken.parserToken.jsonType;
+      // if you see a 'not assignable' linter error here then the switch is missing a case
     }
   }
 
@@ -191,6 +192,6 @@ class ElasticHighlighter extends SyntaxHighlighter
       markers[i].clear();
     }
   }
-
 }
+
 export default ElasticHighlighter;
