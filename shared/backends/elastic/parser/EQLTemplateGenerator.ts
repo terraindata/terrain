@@ -91,7 +91,7 @@ export default class EQLTemplateGenerator
 
       case ESJSONType.array:
         this.result += '[';
-        source.arrayChildren.forEach(
+        source.forEachElement(
           (child: ESValueInfo): void =>
           {
             if (i++ > 0)
@@ -107,24 +107,23 @@ export default class EQLTemplateGenerator
       case ESJSONType.object:
         this.result += ' { '; // extra spaces to avoid confusion with mustache tags
 
-        Object.keys(source.objectChildren).forEach(
-          (name: string): void =>
+        source.forEachProperty(
+          (property: ESPropertyInfo): void =>
           {
             if (i++ > 0)
             {
               this.result += ',';
             }
 
-            const kvp: ESPropertyInfo = source.objectChildren[name];
-            this.convert(kvp.propertyName);
+            this.convert(property.propertyName);
             this.result += ':';
 
-            if (kvp.propertyValue === null)
+            if (property.propertyValue === null)
             {
               throw new Error('Property with no value found.');
             }
 
-            this.convert(kvp.propertyValue);
+            this.convert(property.propertyValue);
           });
 
         this.result += ' } '; // extra spaces to avoid confusion with mustache tags
