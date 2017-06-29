@@ -98,6 +98,7 @@ export const _Query = (config?: Object) =>
   config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
+  config['meta'] = Immutable.Map<string, any>(config['meta']);
 
   const query = new Query_Record(config) as any as Query;
 
