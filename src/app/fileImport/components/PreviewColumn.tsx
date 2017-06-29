@@ -73,6 +73,7 @@ export interface Props
   datatypes: List<string>;
   transformTypes: List<string>;
   handleRenameTransform(name: string, oldName: string, newName: string);
+  addCurRenameTransform();
 }
 
 class PreviewColumn extends Classs<Props>
@@ -139,6 +140,7 @@ class PreviewColumn extends Classs<Props>
           datatype={this.props.datatypes.get(this.props.typeIndex)}
           transformTypes={this.props.transformTypes}
           newName={this.props.name}
+          addCurRenameTransform={this.props.addCurRenameTransform}
         />
       </th>
     );

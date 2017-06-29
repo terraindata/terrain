@@ -114,21 +114,35 @@ FileImportReducers[ActionTypes.addTransform] =
       .set('transforms', state.transforms.push(action.payload.transform))
   ;
 
-FileImportReducers[ActionTypes.setCurTransform] =
+FileImportReducers[ActionTypes.setPreviewTransform] =
   (state, action) =>
   {
-    console.log('current transform: ', state.curTransform);
-    console.log('adding transform: ', action.payload.transform);
-    // if (state.curTransform.name) {
-    //   if (action.payload.transform.name === 'rename' && state.curTransform.args.oldName !== action.payload.transform.args.oldName) {
-    //     Actions.addCurTransform();
-    //   }
-    //   else if (state.curTransform.name !== action.payload.transform.name) {
-    //     Actions.addCurTransform();
-    //   }
-    // }
-    return state.set('curTransform', action.payload.transform);
+    return state
+      .set('previewTransform', action.payload.transform);
   }
+  ;
+
+FileImportReducers[ActionTypes.clearPreviewTransform] =
+  (state, action) =>
+    state
+      .set('previewTransform', { name: '', args: { colName: '', text: '' } })
+  ;
+
+// FileImportReducers[ActionTypes.setCurTransform] =
+//   (state, action) =>
+//   {
+//     console.log('current transform: ', state.curTransform);
+//     console.log('adding transform: ', action.payload.transform);
+//     if (state.curTransform.name) {
+//       if (action.payload.transform.name === 'rename' && state.curTransform.args.oldName !== action.payload.transform.args.oldName) {
+//         Actions.addCurTransform();
+//       }
+//       else if (state.curTransform.name !== action.payload.transform.name) {
+//         Actions.addCurTransform();
+//       }
+//     }
+//     return state.set('curTransform', action.payload.transform);
+//   }
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
@@ -174,7 +188,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('columnNames', List(columnNames))
       .set('columnsToInclude', List(columnsToInclude))
       .set('columnTypes', List(columnTypes));
-  }
+  };
 
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
@@ -220,7 +234,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       Map<string, boolean>(cToIncludeMap),
       Map<string, string>(cTypesMap),
       state.primaryKey,
-      state.transformations,
+      state.transforms,
       () =>
       {
         alert("success");

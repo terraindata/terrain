@@ -50,24 +50,46 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import Actions from './../data/FileImportActions';
 
 export interface Props
 {
-  key: string;
   items: object[];
+  transformCol: string,
+  transformText: string;
+  transformType: string;
 }
 
 class PreviewRow extends Classs<Props>
 {
+  public stringTransform(item: string)
+  {
+    if (this.props.transformType === 'append')
+    {
+      return item + this.props.transformText;
+    }
+    else if (this.props.transformType === 'prepend')
+    {
+      return this.props.transformText + item;
+    }
+  }
   public shouldComponentUpdate(nextProps: Props)
   {
-    return this.props.items !== nextProps.items;
+    return this.props.items !== nextProps.items || nextProps.transformCol !== undefined;
   }
 
   public render()
   {
+    console.log(this.props.transformType, this.props.transformText, this.props.transformCol);
+    // const row = Object.keys(this.props.items).map((key) => {
+    //   console.log(key);
+    //   return <td key={key}>{ this.props.items[key] }</td>;
+    // });
     const row = Object.keys(this.props.items).map((key) =>
-      <td key={key}>{this.props.items[key]}</td>
+      key === this.props.transformCol ?
+        <td key={key}>{this.stringTransform(this.props.items[key])}</td>
+        :
+        <td key={key}>{this.props.items[key]}</td>
     );
 
     return (

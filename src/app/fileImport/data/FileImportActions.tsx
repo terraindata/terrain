@@ -95,9 +95,17 @@ const FileImportActions =
     (transform: object) =>
       $(ActionTypes.addTransform, { transform }),
 
-    setCurTransform:
-      (transform: object) =>
-        $(ActionTypes.setCurTransform, { transform }),
+    // setCurTransform:
+    //   (transform: object) =>
+    //     $(ActionTypes.setCurTransform, { transform }),
+
+    setPreviewTransform:
+    (transform: object) =>
+      $(ActionTypes.setPreviewTransform, { transform }),
+
+    clearPreviewTransform:
+    () =>
+      $(ActionTypes.clearPreviewTransform, {}),
   };
 
 export default FileImportActions;

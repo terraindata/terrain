@@ -104,7 +104,7 @@ class FileImport extends PureClasss<any>
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
-      primaryKey, oldNames, curTransform } = fileImportState;
+      primaryKey, oldNames, previewTransform } = fileImportState;
 
     return (
       <div className="fileImport">
@@ -136,7 +136,7 @@ class FileImport extends PureClasss<any>
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
             oldNames={oldNames}
-            curTransform={curTransform}
+            previewTransform={previewTransform}
           />
         }
       </div>

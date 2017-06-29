@@ -60,7 +60,9 @@ const FileImportActionTypes =
     setColumnNames: '',
     setColumnTypes: '',
     addTransform: '',
-    setCurTransform: '',
+    //setCurTransform: '',
+    setPreviewTransform: '',
+    clearPreviewTransform: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

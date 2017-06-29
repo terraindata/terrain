@@ -72,7 +72,7 @@ export namespace FileImportTypes
     public hasCsvHeader: boolean = true;
     public primaryKey: string = '';
 
-    public curTransform: object = { name: '', args: {} }
+    public previewTransform: any = { name: '', args: { colName: '', text: '' } };
     public transforms: List<object> = List([]);     // TODO: make Command type below
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes

@@ -65,7 +65,7 @@ export interface Props
   columnsToInclude: List<boolean>;
   columnTypes: List<number>;
   oldNames: List<string>;
-  curTransform: object;
+  previewTransform: any;
 }
 
 const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date']);
@@ -74,7 +74,7 @@ const TRANSFORM_TYPES = Immutable.List(['append', 'prepend', 'split', 'merge']);
 class Preview extends Classs<Props>
 {
   public state: {
-    curTransform: {
+    curRenameTransform: {
       name: string,
       args: {
         oldName?: string | string[],
@@ -84,7 +84,7 @@ class Preview extends Classs<Props>
       },
     }
   } = {
-    curTransform: {
+    curRenameTransform: {
       name: '',
       args: {
       },
@@ -93,14 +93,14 @@ class Preview extends Classs<Props>
 
   public handleRenameTransform(name: string, oldName: string, newName: string)
   {
-    if (this.state.curTransform.name && this.state.curTransform.args.oldName !== oldName)
+    if (this.state.curRenameTransform.name && this.state.curRenameTransform.args.oldName !== oldName)
     {
-      console.log('adding transform: ', this.state.curTransform.args);
-      Actions.addTransform(this.state.curTransform);
+      console.log('adding transform rename: ', this.state.curRenameTransform.args);
+      Actions.addTransform(this.state.curRenameTransform);
     }
-    console.log('setting current transform: ' + oldName + ', ' + newName);
+    console.log('setting current rename transform: ' + oldName + ', ' + newName);
     this.setState({
-      curTransform: {
+      curRenameTransform: {
         name,
         args: {
           oldName,
@@ -110,15 +110,31 @@ class Preview extends Classs<Props>
     });
   }
 
+  public addCurRenameTransform()
+  {
+    if (this.state.curRenameTransform.name)
+    {
+      console.log('adding transform rename: ', this.state.curRenameTransform.args);
+      Actions.addTransform(this.state.curRenameTransform);
+      this.setState({
+        curRenameTransform: {
+          name: '',
+          args: {
+          },
+        }
+      });
+    }
+  }
+
   public handleUploadFile()
   {
     // TODO: error checking from FileImportInfo
-    if (this.state.curTransform.name)
+    if (this.state.curRenameTransform.name)
     {
-      Actions.addTransform(this.state.curTransform);
+      Actions.addTransform(this.state.curRenameTransform);
     }
 
-    // if (this.props.curTransform.name)
+    // if (this.props.curRenameTransform.name)
     // Actions.addCurTransform();
     Actions.uploadFile();
   }
@@ -127,7 +143,7 @@ class Preview extends Classs<Props>
   {
     const { previewRows, columnNames, columnsToInclude, columnTypes } = this.props;
     return previewRows !== nextProps.previewRows || columnNames !== nextProps.columnNames || columnsToInclude !== nextProps.columnsToInclude ||
-      columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey;
+      columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey || nextProps.previewTransform.name !== '';
   }
 
   public render()
@@ -135,7 +151,8 @@ class Preview extends Classs<Props>
     // console.log('columnNames', this.props.columnNames);
     // console.log('columnsToInclude', this.props.columnsToInclude);
     // console.log('columnTypes', this.props.columnTypes);
-    // console.log('current transform: ', this.state.curTransform);
+    // console.log('current transform: ', this.state.curRenameTransform);
+    console.log('previewTransform: ', this.props.previewTransform);
 
     const previewCols = [];
     this.props.columnNames.forEach((value, key) =>
@@ -155,6 +172,7 @@ class Preview extends Classs<Props>
           datatypes={DATATYPES}
           transformTypes={TRANSFORM_TYPES}
           handleRenameTransform={this.handleRenameTransform}
+          addCurRenameTransform={this.addCurRenameTransform}
         />
       );
     });
@@ -163,6 +181,9 @@ class Preview extends Classs<Props>
       <PreviewRow
         key={key}
         items={this.props.previewRows[key]}
+        transformCol={this.props.previewTransform.args.colName}
+        transformType={this.props.previewTransform.name}
+        transformText={this.props.previewTransform.args.text}
       />
     );
 

@@ -60,6 +60,7 @@ export interface Props
   datatype: string;
   transformTypes: List<string>;
   newName: string;
+  addCurRenameTransform();
 }
 
 class TransformBox extends Classs<Props>
@@ -88,10 +89,22 @@ class TransformBox extends Classs<Props>
 
   public handleTransformClick()
   {
-    console.log('adding transform ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
-        this.props.newName + ', text: ' + this.state.transformText);
+    // if not empty, add current rename transform and set it to empty string
+    this.props.addCurRenameTransform();
 
-    // if not empty, add current transform and set it to empty string
+    // add this transform to total list, and the transform to be executed on preview rows
+    console.log('adding transform ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
+      this.props.newName + ', text: ' + this.state.transformText);
+
+    Actions.setPreviewTransform(
+      {
+        name: this.props.transformTypes.get(this.state.transformTypeIndex),
+        args: {
+          colName: this.props.newName,
+          text: this.state.transformText,
+        }
+      }
+    );
 
     Actions.addTransform(
       {
@@ -108,8 +121,8 @@ class TransformBox extends Classs<Props>
   {
     return (
       <div>
-      {
-        this.props.datatype === 'string' &&
+        {
+          this.props.datatype === 'string' &&
           <div>
             <Dropdown
               selectedIndex={this.state.transformTypeIndex}
@@ -128,7 +141,7 @@ class TransformBox extends Classs<Props>
               Transform
             </button>
           </div>
-      }
+        }
       </div>
     )
   }
