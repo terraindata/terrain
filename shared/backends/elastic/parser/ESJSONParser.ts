@@ -288,9 +288,6 @@ export default class ESJSONParser
     }
     finally
     {
-      token.jsonType = jsonType;
-      valueInfo.jsonType = jsonType;
-
       if (valueInfo.value === undefined)
       {
         // if no value was read, erase the token information accumulated
@@ -303,6 +300,9 @@ export default class ESJSONParser
     {
       return null;
     }
+
+    token.jsonType = jsonType;
+    valueInfo.jsonType = jsonType;
 
     return valueInfo;
   }
@@ -405,10 +405,6 @@ export default class ESJSONParser
           'Object property names must be strings, but found a ' + typeof propertyName + ' instead');
         propertyName = String(propertyName);
       }
-
-      // set name value info and token to property type
-      nameInfo.jsonType = ESJSONType.property;
-      this.getCurrentToken().jsonType = ESJSONType.property;
 
       // check for duplicates
       if (obj.hasOwnProperty(propertyName))
@@ -583,7 +579,7 @@ export default class ESJSONParser
       valueInfo = this.getCurrentValueInfo();
     }
 
-    element.valueInfo = valueInfo;
+    // element.valueInfo = valueInfo;
 
     if (valueInfo !== null)
     {
@@ -626,7 +622,8 @@ export default class ESJSONParser
 
   private accumulateErrorOnCurrentToken(message: string): void
   {
-    this.errors.push(new ESParserError(this.getCurrentToken(), message));
+    this.errors.push(new ESParserError(
+      this.getCurrentToken(), this.getCurrentValueInfo() as ESValueInfo, message));
   }
 
   private getRow(): number

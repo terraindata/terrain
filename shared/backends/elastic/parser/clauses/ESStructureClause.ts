@@ -44,40 +44,85 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import * as _ from 'underscore';
+
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause with a type that references another def.
- * This is used to specify clause types with special names or descriptions,
- * but which are composed wholly of another type.
- *
- * For example, a bool clause contains "must", "must_not", and "should" properties,
- * each of which has a unique function, but all of these properties contain a "query" clause.
- *
- * Another example is a setting property such as "boost", which must contain a
- * "number" as its value.
+ * A clause with a well-defined structure.
  */
-export default class ESReferenceClause extends ESClause
+export default class ESStructureClause extends ESClause
 {
-  public delegateType: string;
+  public structure: { [name: string]: string };
+  public required: any[];
 
-  public constructor(type: string, delegateType: string, settings: any)
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(type, settings);
-    this.delegateType = delegateType;
+    super(type, settings, ESClauseType.ESStructureClause);
+    this.structure = structure;
+    this.required = required;
   }
 
   public init(config: EQLConfig): void
   {
-    config.declareType(this.delegateType);
+    Object.keys(this.structure).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.structure[key]);
+      });
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
     valueInfo.clause = this;
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
+
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    const propertyClause: ESClause = interpreter.config.getClause('property');
+
+    // mark properties
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
+
+        if (!this.structure.hasOwnProperty(name))
+        {
+          interpreter.accumulateError(viTuple.propertyName,
+            'Unknown property \"' + name +
+            '\". Expected one of these properties: ' +
+            JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+            true);
+          return;
+        }
+        else if (viTuple.propertyValue === null)
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
+        }
+        else
+        {
+          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
+
+          propertyClause.mark(interpreter, viTuple.propertyName);
+          clause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
+
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 }

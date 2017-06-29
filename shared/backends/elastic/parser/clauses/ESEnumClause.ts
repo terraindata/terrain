@@ -44,32 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a terminal (base) value: null, boolean, number, or string
+ * A clause which can only take on a restricted set of values.
  */
-export default class ESBaseClause extends ESClause
+export default class ESEnumClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public values: any[];
+  public valueMap: any;
+
+  public constructor(type: string, values: any[], settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESEnumClause);
+
+    this.values = values;
+    this.valueMap = new Map();
+    for (let i = 0; i < this.values.length; ++i)
+    {
+      const value = this.values[i];
+      this.valueMap.set(value, i);
+    }
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) === 'object')
+    if (this.valueMap.get(valueInfo.value) === undefined)
     {
-      const foundType: string = Array.isArray(value) ? 'array' : 'object';
-      interpreter.accumulateError(
-        valueInfo,
-        'Found an ' +
-        foundType +
-        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+      if (this.values.length > 10)
+      {
+        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
+      }
+      else
+      {
+        interpreter.accumulateError(valueInfo,
+          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
+      }
     }
+    valueInfo.clause = this;
   }
 }
