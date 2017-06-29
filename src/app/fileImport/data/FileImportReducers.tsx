@@ -86,12 +86,12 @@ FileImportReducers[ActionTypes.setColumnNames] =
     if (state.columnNames.get(action.payload.id) === state.primaryKey)
     {
       return state
-              .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
-              .set('primaryKey', action.payload.columnName);
+        .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
+        .set('primaryKey', action.payload.columnName);
     } else
     {
       return state
-              .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName));
+        .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName));
     }
   };
 
@@ -156,30 +156,37 @@ FileImportReducers[ActionTypes.chooseFile] =
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
-    const isCsv = state.filetype === 'csv';
-    const columnTypes = [];
-    state.columnTypes.forEach((value, key) =>
-    {
-      switch (value)
-      {
-        case 0:
-          isCsv ? columnTypes.push('string') : columnTypes.push([key, 'string']);
-          break;
-        case 1:
-          isCsv ? columnTypes.push('number') : columnTypes.push([key, 'number']);
-          break;
-        case 2:
-          isCsv ? columnTypes.push('boolean') : columnTypes.push([key, 'boolean']);
-          break;
-        case 3:
-          isCsv ? columnTypes.push('date') : columnTypes.push([key, 'date']);
-          break;
-      }
-    });
+    // const isCsv = state.filetype === 'csv';
+    // const columnTypes = [];
+    // state.columnTypes.forEach((value, key) =>
+    // {
+    //   switch (value)
+    //   {
+    //     case 0:
+    //       isCsv ? columnTypes.push('string') : columnTypes.push([key, 'string']);
+    //       break;
+    //     case 1:
+    //       isCsv ? columnTypes.push('number') : columnTypes.push([key, 'number']);
+    //       break;
+    //     case 2:
+    //       isCsv ? columnTypes.push('boolean') : columnTypes.push([key, 'boolean']);
+    //       break;
+    //     case 3:
+    //       isCsv ? columnTypes.push('date') : columnTypes.push([key, 'date']);
+    //       break;
+    //   }
+    // });
     // const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
     // const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
     // const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
 
+    const cToIncludeMap = [];
+    const cTypesMap = [];
+    state.columnNames.forEach((value, key) =>
+    {
+      cToIncludeMap.push([value, state.columnsToInclude.get(key)]);
+      cTypesMap.push([value, state.columnTypes.get(key)]);
+    });
     Ajax.importFile(
       state.file,
       state.filetype,
@@ -187,8 +194,8 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.tableText,
       state.connectionId,
       state.oldNames,
-      state.columnsToInclude,
-      state.columnTypes,
+      Map<string, boolean>(cToIncludeMap),
+      Map<string, string>(cTypesMap),
       state.primaryKey,
       state.transformations,
       () =>

@@ -77,7 +77,7 @@ const FileImportActions =
 
     uploadFile:
     () =>
-      $(ActionTypes.uploadFile, { }),
+      $(ActionTypes.uploadFile, {}),
 
     setColumnsToInclude:
     (id: number) =>

@@ -678,8 +678,8 @@ export const Ajax =
       table: string,
       connectionId: number,
       oldNames: List<string>,                                           // old names
-      columnsToInclude: Map<string, boolean>,                              // new names -> included
-      columnTypes: Map<string, string>,                                    // new names -> type
+      columnsToInclude: Immutable.Map<string, boolean>,                 // new names -> included
+      columnTypes: Immutable.Map<string, string>,                       // new names -> type
       primaryKey: string,
       transformations: List<object>,
       onLoad: (resp: object[]) => void,

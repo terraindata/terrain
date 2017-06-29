@@ -88,7 +88,7 @@ class PreviewColumn extends Classs<Props>
     Actions.addTransformation({
       name: 'rename',
       args: {
-       newName: value,
+        newName: value,
       }
     });
   }
