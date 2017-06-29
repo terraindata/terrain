@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'underscore';
+
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
@@ -94,7 +96,12 @@ export default class ESStructureClause extends ESClause
 
         if (!this.structure.hasOwnProperty(name))
         {
-          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
+          interpreter.accumulateError(viTuple.propertyName,
+            'Unknown property \"' + name +
+            '\". Expected one of these properties: ' +
+            JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+            true);
+          return;
         }
         else if (viTuple.propertyValue === null)
         {
