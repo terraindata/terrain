@@ -54,158 +54,152 @@ const { List, Map } = Immutable;
 const L = () => List([]);
 const { make } = BlockUtils;
 
-export namespace CommonBlocks
+// a card that contains other cards
+export interface IWrapperCard extends Card
 {
-  // a card that contains other cards
-  export interface IWrapperCard extends Card
-  {
-    cards: Cards;
-  }
-
-  // config to define such a card
-  interface IWrapperCardConfig
-  {
-    colors: string[];
-    title: string;
-    // manualEntry: IManualEntry;
-    getChildTerms?: (card: Card) => List<string>;
-    getNeighborTerms?: (card: Card) => List<string>;
-    display?: Display | Display[];
-    tql: TQLFn;
-    tqlGlue?: string;
-    accepts: List<string>;
-    singleChild?: boolean;
-    isAggregate?: boolean;
-    language: string;
-    init?: () => any,
-  }
-
-  export const _wrapperCard = (config: IWrapperCardConfig) =>
-  {
-    return _card({
-      cards: L(),
-
-      static: {
-        title: config.title,
-        colors: config.colors,
-        accepts: config.accepts,
-        language: config.language,
-
-        // manualEntry: config.manualEntry,
-
-        getChildTerms: config.getChildTerms,
-        getNeighborTerms: config.getNeighborTerms,
-
-        preview: (c: IWrapperCard) =>
-        {
-          // var prefix = config.title + ': ';
-          // if(c.type === 'parentheses')
-          // {
-          //   prefix = '';
-          // }
-          if (c.cards.size)
-          {
-            const card = c.cards.get(0);
-            return BlockUtils.getPreview(card);
-          }
-          return 'Nothing';
-        },
-
-        display: config.display || (
-          config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
-        ),
-
-        tql: config.tql,
-        tqlGlue: config.tqlGlue,
-        
-        init: config.init,
-      },
-    });
-  };
-
-  export const _aggregateCard = (config: {
-    colors: string[];
-    title: string;
-    // manualEntry: IManualEntry;
-    tql: TQLFn;
-    defaultValue?: string;
-    language: string;
-  }) => _card({
-    value: '',
-
-    static: {
-      language: config.language,
-      title: config.title,
-      colors: config.colors,
-      // manualEntry: config.manualEntry,
-      preview: '[value]',
-      tql: config.tql,
-      isAggregate: true,
-
-      display:
-      config.defaultValue === undefined
-        ? stringValueDisplay
-        : _.extend({},
-          stringValueDisplay,
-          {
-            defaultValue: config.defaultValue,
-          },
-        )
-      ,
-    },
-  });
-
-  export const _aggregateNestedCard = (config: {
-    colors: string[],
-    title: string,
-    // manualEntry: IManualEntry,
-    tql: TQLFn,
-    accepts: List<string>,
-    init?: () => any,
-    language: string,
-  }) => _card({
-    value: '',
-
-    static: {
-      language: config.language,
-      title: config.title,
-      colors: config.colors,
-      // manualEntry: config.manualEntry,
-      preview: '[value]',
-      tql: config.tql,
-      init: config.init,
-      isAggregate: true,
-
-      display: getCardStringDisplay({
-        accepts: config.accepts,
-      }),
-    },
-  });
-
-  export const _valueCard = (config: {
-    title: string,
-    colors: string[],
-    // manualEntry: IManualEntry,
-    tql: TQLFn,
-    defaultValue: number | string,
-    language: string,
-    string?: boolean,
-  }) => (
-      _card({
-        value: config.defaultValue,
-
-        static: {
-          language: config.language,
-          title: config.title,
-          colors: config.colors,
-          preview: '[value]',
-          display: config.string ? stringValueDisplay : valueDisplay,
-          // manualEntry: config.manualEntry,
-          tql: config.tql,
-        },
-      })
-    );
-
+  cards: Cards;
 }
 
-export default CommonBlocks;
+// config to define such a card
+interface IWrapperCardConfig
+{
+  colors: string[];
+  title: string;
+  // manualEntry: IManualEntry;
+  getChildTerms?: (card: Card) => List<string>;
+  getNeighborTerms?: (card: Card) => List<string>;
+  display?: Display | Display[];
+  tql: TQLFn;
+  tqlGlue?: string;
+  accepts: List<string>;
+  singleChild?: boolean;
+  isAggregate?: boolean;
+  language: string;
+  init?: () => any,
+}
+
+export const _wrapperCard = (config: IWrapperCardConfig) =>
+{
+  return _card({
+    cards: L(),
+
+    static: {
+      title: config.title,
+      colors: config.colors,
+      accepts: config.accepts,
+      language: config.language,
+
+      // manualEntry: config.manualEntry,
+
+      getChildTerms: config.getChildTerms,
+      getNeighborTerms: config.getNeighborTerms,
+
+      preview: (c: IWrapperCard) =>
+      {
+        // var prefix = config.title + ': ';
+        // if(c.type === 'parentheses')
+        // {
+        //   prefix = '';
+        // }
+        if (c.cards.size)
+        {
+          const card = c.cards.get(0);
+          return BlockUtils.getPreview(card);
+        }
+        return 'Nothing';
+      },
+
+      display: config.display || (
+        config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
+      ),
+
+      tql: config.tql,
+      tqlGlue: config.tqlGlue,
+      
+      init: config.init,
+    },
+  });
+};
+
+export const _aggregateCard = (config: {
+  colors: string[];
+  title: string;
+  // manualEntry: IManualEntry;
+  tql: TQLFn;
+  defaultValue?: string;
+  language: string;
+}) => _card({
+  value: '',
+
+  static: {
+    language: config.language,
+    title: config.title,
+    colors: config.colors,
+    // manualEntry: config.manualEntry,
+    preview: '[value]',
+    tql: config.tql,
+    isAggregate: true,
+
+    display:
+    config.defaultValue === undefined
+      ? stringValueDisplay
+      : _.extend({},
+        stringValueDisplay,
+        {
+          defaultValue: config.defaultValue,
+        },
+      )
+    ,
+  },
+});
+
+export const _aggregateNestedCard = (config: {
+  colors: string[],
+  title: string,
+  // manualEntry: IManualEntry,
+  tql: TQLFn,
+  accepts: List<string>,
+  init?: () => any,
+  language: string,
+}) => _card({
+  value: '',
+
+  static: {
+    language: config.language,
+    title: config.title,
+    colors: config.colors,
+    // manualEntry: config.manualEntry,
+    preview: '[value]',
+    tql: config.tql,
+    init: config.init,
+    isAggregate: true,
+
+    display: getCardStringDisplay({
+      accepts: config.accepts,
+    }),
+  },
+});
+
+export const _valueCard = (config: {
+  title: string,
+  colors: string[],
+  // manualEntry: IManualEntry,
+  tql: TQLFn,
+  defaultValue: number | string,
+  language: string,
+  string?: boolean,
+}) => (
+    _card({
+      value: config.defaultValue,
+
+      static: {
+        language: config.language,
+        title: config.title,
+        colors: config.colors,
+        preview: '[value]',
+        display: config.string ? stringValueDisplay : valueDisplay,
+        // manualEntry: config.manualEntry,
+        tql: config.tql,
+      },
+    })
+    );

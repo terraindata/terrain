@@ -118,7 +118,6 @@ class SpecializedCreateCardTool extends PureClasss<Props>
       this.props.data, option
     );
 
-    console.log(this.props.keyPath, card);
     Actions.change(
       this.props.keyPath,
       card,

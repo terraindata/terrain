@@ -205,6 +205,7 @@ const KEY_DISPLAY: Display =
   displayType: DisplayType.TEXT,
   key: 'key',
   autoDisabled: true, // TODO consider autocomplete for key?
+  className: 'card-muted-input',
 };
 
 export default ESClause;

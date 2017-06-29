@@ -53,7 +53,7 @@ import { _card, Card, CardString, CardConfig } from '../../../blocks/types/Card'
 import { Input, InputType } from '../../../blocks/types/Input';
 import * as CommonElastic from '../syntax/CommonElastic';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
-import CommonBlocks from '../../../blocks/CommonBlocks';
+import * as CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import EQLConfig from '../parser/EQLConfig';

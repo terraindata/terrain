@@ -207,7 +207,7 @@ const EQLSpec: ESClause[] =
       },
       [],
       {
-        name: 'body clause',
+        name: 'body',
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { query: null },
@@ -402,7 +402,7 @@ const EQLSpec: ESClause[] =
       },
       [],
       {
-        name: 'query clause',
+        name: 'query',
         desc: 'Controls match, term, and range filtering and matching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-query.html',
         template: { bool: null },
@@ -431,9 +431,10 @@ const EQLSpec: ESClause[] =
       },
       [],
       {
+        name: 'bool',  
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
-        template: { must: null, must_not: null, should: null, minimum_should_match: null },
+        // template: { must: null, must_not: null, should: null, minimum_should_match: null },
       }),
     new ESVariantClause('must',
       {

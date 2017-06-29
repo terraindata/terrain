@@ -55,7 +55,7 @@ import ESValueInfo from './ESValueInfo';
 import { Display, DisplayType, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { Block, _block } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
-import CommonBlocks from '../../../blocks/CommonBlocks';
+import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import BlockUtils from '../../../blocks/BlockUtils';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 import SpecializedCreateCardTool from '../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
@@ -366,7 +366,7 @@ export default class ESStructureClause extends ESClause
             this.template,
             (templateValue, templateKey) =>
             {
-              const clauseType = templateKey === null ? templateValue : templateKey;
+              const clauseType = templateValue || this.structure[templateKey];
               if (ElasticBlocks['eql' + clauseType])
               {
                 return BlockUtils.make(

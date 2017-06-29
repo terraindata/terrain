@@ -44,10 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
+
 import EQLConfig from './EQLConfig';
 import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
+import * as CommonBlocks from '../../../blocks/CommonBlocks';
 
 /**
  * A clause which is one of several possible types
@@ -95,5 +99,27 @@ export default class ESVariantClause extends ESClause
     }
 
     interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
+  }
+  
+  public getCard()
+  {
+    return this.seedCard(CommonBlocks._wrapperCard({
+      colors: [],
+      title: this.type + ' (Variant)',
+      tql: (block, tqlFn, tqlConfig) =>
+      {
+        console.log(tqlFn(block['cards'].get(0), tqlConfig));
+        return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+      },
+      singleChild: true,
+      accepts: Immutable.List(
+        _.map(
+          this.subtypes,
+          (type: string, jsonType: string) =>
+            'eql' + type
+        )
+      ),
+      language: 'elastic',
+    }));
   }
 }
