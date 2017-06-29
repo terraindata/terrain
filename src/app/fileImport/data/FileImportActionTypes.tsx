@@ -59,6 +59,7 @@ const FileImportActionTypes =
     setColumnsToInclude: '',
     setColumnNames: '',
     setColumnTypes: '',
+    addTransformation: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

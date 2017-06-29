@@ -47,6 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../util/Util';
 import { BaseClass, New } from '../Classes';
+const { List } = Immutable;
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
 export namespace FileImportTypes
@@ -63,9 +64,11 @@ export namespace FileImportTypes
     public previewRows: object[] = null;
     public columnsCount: number = 0;
 
-    public columnsToInclude: Map<string, boolean> = null;
-    public columnNames: Map<string, string> = null;
-    public columnTypes: Map<string, number> = null;
+    public oldNames: List<string> = null;
+    public columnNames: List<string> = null;
+    public columnsToInclude: List<boolean> = null;
+    public columnTypes: List<number> = null;
+    public transformations: List<object> = List([]);     // TODO: make Command type below
 
     public hasCsvHeader: boolean = true;
     public primaryKey: string = '';

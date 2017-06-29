@@ -103,7 +103,7 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
+    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
 
     return (
       <div className="fileImport">
@@ -131,8 +131,8 @@ class FileImport extends PureClasss<any>
             previewRows={previewRows}
             columnsCount={columnsCount}
             primaryKey={primaryKey}
-            columnsToInclude={columnsToInclude}
             columnNames={columnNames}
+            columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
           />
         }
@@ -140,7 +140,7 @@ class FileImport extends PureClasss<any>
     );
   }
 
-  private getKeyListSafely(map: IMMap<string, any>)
+  public getKeyListSafely(map: IMMap<string, any>)
   {
     if (map === undefined)
     {

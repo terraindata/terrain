@@ -80,16 +80,25 @@ FileImportReducers[ActionTypes.changePrimaryKey] =
       .set('primaryKey', state.columnNames.get(action.payload.id));
 ;
 
+FileImportReducers[ActionTypes.setColumnNames] =
+  (state, action) =>
+  {
+    if (state.columnNames.get(action.payload.id) === state.primaryKey)
+    {
+      return state
+              .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
+              .set('primaryKey', action.payload.columnName);
+    } else
+    {
+      return state
+              .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName));
+    }
+  };
+
 FileImportReducers[ActionTypes.setColumnsToInclude] =
   (state, action) =>
     state
       .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
-  ;
-
-FileImportReducers[ActionTypes.setColumnNames] =
-  (state, action) =>
-    state
-      .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
   ;
 
 FileImportReducers[ActionTypes.setColumnTypes] =
@@ -101,8 +110,8 @@ FileImportReducers[ActionTypes.setColumnTypes] =
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
   {
-    const columnsToInclude = [];
     const columnNames = [];
+    const columnsToInclude = [];
     const columnTypes = [];
     let colsCount = 0;
 
@@ -111,9 +120,9 @@ FileImportReducers[ActionTypes.chooseFile] =
       console.log('headerless csv');
       for (let i = 0; i < action.payload.preview[0].length; i++)
       {
-        columnsToInclude.push(['column' + i, true]);
-        columnNames.push(['column' + i, 'column' + i]);
-        columnTypes.push(['column' + i, 0]);
+        columnNames.push('column' + i);
+        columnsToInclude.push(true);
+        columnTypes.push(0);
         colsCount++;
       }
     }
@@ -124,9 +133,9 @@ FileImportReducers[ActionTypes.chooseFile] =
       {
         if (action.payload.preview[0].hasOwnProperty(property))
         {
-          columnsToInclude.push([property, true]);
-          columnNames.push([property, property]);
-          columnTypes.push([property, 0]);
+          columnNames.push(property);
+          columnsToInclude.push(true);
+          columnTypes.push(0);
           colsCount++;
         }
       }
@@ -138,13 +147,14 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('primaryKey', '')
       .set('previewRows', action.payload.preview)
       .set('columnsCount', colsCount)
-      .set('columnsToInclude', Map(columnsToInclude))
-      .set('columnNames', Map(columnNames))
-      .set('columnTypes', Map(columnTypes));
+      .set('oldNames', List(columnNames))
+      .set('columnNames', List(columnNames))
+      .set('columnsToInclude', List(columnsToInclude))
+      .set('columnTypes', List(columnTypes));
   }
 
 FileImportReducers[ActionTypes.uploadFile] =
-  (state) =>
+  (state, action) =>
   {
     const isCsv = state.filetype === 'csv';
     const columnTypes = [];
@@ -166,9 +176,9 @@ FileImportReducers[ActionTypes.uploadFile] =
           break;
       }
     });
-    const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
-    const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
-    const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
+    // const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
+    // const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
+    // const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
 
     Ajax.importFile(
       state.file,
@@ -176,10 +186,11 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.dbText,
       state.tableText,
       state.connectionId,
-      cNames,
-      cToInclude,
-      cTypes,
+      state.oldNames,
+      state.columnsToInclude,
+      state.columnTypes,
       state.primaryKey,
+      state.transformations,
       () =>
       {
         alert("success");

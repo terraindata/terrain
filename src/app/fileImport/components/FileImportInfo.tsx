@@ -221,61 +221,61 @@ class FileImportInfo extends PureClasss<Props>
     }
   }
 
-  public handleUploadFile()
-  {
-    if (!this.props.canImport)
-    {
-      alert('You do not have permission to upload files');
-      return;
-    }
-    if (!this.state.fileSelected)
-    {
-      alert('Please select a file to upload');
-      return;
-    }
-    if (!this.state.serverSelected)
-    {
-      alert('Please select a server');
-      return;
-    }
-    if (!this.state.dbSelected)
-    {
-      alert('Please select a database');
-      return;
-    }
-    if (!this.state.tableSelected)
-    {
-      alert('Please select a table');
-      return;
-    }
-    if (this.props.dbText === '' || this.props.tableText === '')
-    {
-      alert('Database and table names cannot be empty strings');
-      return;
-    }
-    if (this.props.dbText !== this.props.dbText.toLowerCase())
-    {
-      alert('Database may not contain uppercase letters');
-      return;
-    }
-    if (!/^[a-z\d].*$/.test(this.props.dbText))
-    {
-      alert('Database name must start with a lowercase letter or digit');
-      return;
-    }
-    if (!/^[a-z\d][a-z\d\._\+-]*$/.test(this.props.dbText))
-    {
-      alert('Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses');
-      return;
-    }
-    if (/^_.*/.test(this.props.tableText))
-    {
-      alert('Table name may not start with an underscore');
-      return;
-    }
-
-    Actions.uploadFile();
-  }
+  // public handleUploadFile()
+  // {
+  //   if (!this.props.canImport)
+  //   {
+  //     alert('You do not have permission to upload files');
+  //     return;
+  //   }
+  //   if (!this.state.fileSelected)
+  //   {
+  //     alert('Please select a file to upload');
+  //     return;
+  //   }
+  //   if (!this.state.serverSelected)
+  //   {
+  //     alert('Please select a server');
+  //     return;
+  //   }
+  //   if (!this.state.dbSelected)
+  //   {
+  //     alert('Please select a database');
+  //     return;
+  //   }
+  //   if (!this.state.tableSelected)
+  //   {
+  //     alert('Please select a table');
+  //     return;
+  //   }
+  //   if (this.props.dbText === '' || this.props.tableText === '')
+  //   {
+  //     alert('Database and table names cannot be empty strings');
+  //     return;
+  //   }
+  //   if (this.props.dbText !== this.props.dbText.toLowerCase())
+  //   {
+  //     alert('Database may not contain uppercase letters');
+  //     return;
+  //   }
+  //   if (!/^[a-z\d].*$/.test(this.props.dbText))
+  //   {
+  //     alert('Database name must start with a lowercase letter or digit');
+  //     return;
+  //   }
+  //   if (!/^[a-z\d][a-z\d\._\+-]*$/.test(this.props.dbText))
+  //   {
+  //     alert('Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses');
+  //     return;
+  //   }
+  //   if (/^_.*/.test(this.props.tableText))
+  //   {
+  //     alert('Table name may not start with an underscore');
+  //     return;
+  //   }
+  //
+  //   Actions.uploadFile();
+  // }
 
   public render()
   {
@@ -326,9 +326,6 @@ class FileImportInfo extends PureClasss<Props>
             disabled={!canSelectTable}
           />
         </div>
-        <button onClick={this.handleUploadFile}>
-          Import
-        </button>
       </div>
     );
   }

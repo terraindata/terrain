@@ -677,10 +677,11 @@ export const Ajax =
       db: string,
       table: string,
       connectionId: number,
-      columnNames: Map<string, string> | List<string>,
-      columnsToInclude: Map<string, boolean> | List<boolean>,
-      columnTypes: Immutable.Map<string, string> | List<string>,
+      oldNames: List<string>,                                           // old names
+      columnsToInclude: Map<string, boolean>,                              // new names -> included
+      columnTypes: Map<string, string>,                                    // new names -> type
       primaryKey: string,
+      transformations: List<object>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
@@ -692,11 +693,12 @@ export const Ajax =
         table,
         contents: file,
         filetype,
-        columnMap: columnNames,
+        oldNames,
         columnsToInclude,
         columnTypes,
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
+        transformations,
       };
       console.log("payload: ", payload);
       const onLoadHandler = (resp) =>

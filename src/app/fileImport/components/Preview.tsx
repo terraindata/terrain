@@ -50,33 +50,80 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
+import Actions from './../data/FileImportActions';
 import PreviewColumn from './PreviewColumn';
 import PreviewRow from './PreviewRow';
 import './Preview.less';
+const { Map, List } = Immutable;
 
 export interface Props
 {
   previewRows: object[];
   columnsCount: number;
   primaryKey: string;
-  columnsToInclude: Map<string, boolean>;
-  columnNames: Map<string, string>;
-  columnTypes: Map<string, number>;
+  columnNames: List<string>;
+  columnsToInclude: List<boolean>;
+  columnTypes: List<number>;
 }
 
 const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date']);
 
 class Preview extends Classs<Props>
 {
+  public state: {
+  } = {
+  };
+
+  // public getNewNames(iter: IterableIterator<string>)
+  // {
+  //   const map = [];
+  //   for (const value of iter)
+  //   {
+  //     map.push([value, value]);
+  //   }
+  //   return Map<string, string>(map);
+  // }
+
+  // public getKeys(map: Map<string, boolean>)
+  // {
+  //   const [...keys] = map.keys();
+  //   return List<string>(keys);
+  // }
+
+  // public updateNames(oldName: string, newName: string)
+  // {
+  //   this.setState({
+  //     namesMap: this.state.namesMap.set(oldName, newName),
+  //   });
+  // }
+  //
+  // public updatePrimaryKey(newName: string)
+  // {
+  //   console.log('newName: ', newName);
+  //   this.setState({
+  //     primaryKey: newName,
+  //   });
+  // }
+
+  public handleUploadFile()
+  {
+    // TODO: error checking from FileImportInfo
+    Actions.uploadFile();
+  }
+
   public shouldComponentUpdate(nextProps: Props)
   {
-    const { previewRows, columnsToInclude, columnNames, columnTypes } = this.props;
-    return previewRows !== nextProps.previewRows || columnsToInclude !== nextProps.columnsToInclude ||
-      columnNames !== nextProps.columnNames || columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey;
+    const { previewRows, columnNames, columnsToInclude, columnTypes } = this.props;
+    return previewRows !== nextProps.previewRows || columnNames !== nextProps.columnNames || columnsToInclude !== nextProps.columnsToInclude ||
+      columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey;
   }
 
   public render()
   {
+    console.log('columnNames', this.props.columnNames);
+    // console.log('columnsToInclude', this.props.columnsToInclude);
+    // console.log('columnTypes', this.props.columnTypes);
+
     const previewCols = [];
     this.props.columnNames.forEach((value, key) =>
     {
@@ -90,7 +137,7 @@ class Preview extends Classs<Props>
           types={DATATYPES}
           canSelectType={true}
           canSelectColumn={true}
-          isPrimaryKey={this.props.primaryKey ? this.props.primaryKey === value : false}
+          isPrimaryKey={this.props.columnNames.get(key) === this.props.primaryKey}
         />
       );
     });
@@ -103,16 +150,21 @@ class Preview extends Classs<Props>
     );
 
     return (
-      <table>
-        <thead>
-          <tr>
-            {previewCols}
-          </tr>
-        </thead>
-        <tbody>
-          {previewRows}
-        </tbody>
-      </table>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              {previewCols}
+            </tr>
+          </thead>
+          <tbody>
+            {previewRows}
+          </tbody>
+        </table>
+        <button onClick={this.handleUploadFile}>
+          Import
+        </button>
+      </div>
     );
   }
 }

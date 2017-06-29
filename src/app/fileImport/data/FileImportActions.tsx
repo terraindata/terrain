@@ -68,7 +68,7 @@ const FileImportActions =
       $(ActionTypes.changeHasCsvHeader, {}),
 
     changePrimaryKey:
-    (id: string) =>
+    (id: number) =>
       $(ActionTypes.changePrimaryKey, { id }),
 
     chooseFile:
@@ -77,19 +77,23 @@ const FileImportActions =
 
     uploadFile:
     () =>
-      $(ActionTypes.uploadFile, {}),
+      $(ActionTypes.uploadFile, { }),
 
     setColumnsToInclude:
-    (id: string) =>
+    (id: number) =>
       $(ActionTypes.setColumnsToInclude, { id }),
 
     setColumnNames:
-    (id: string, columnName: string) =>
+    (id: number, columnName: string) =>
       $(ActionTypes.setColumnNames, { id, columnName }),
 
     setColumnTypes:
-    (id: string, typeIndex: number) =>
+    (id: number, typeIndex: number) =>
       $(ActionTypes.setColumnTypes, { id, typeIndex }),
+
+    addTransformation:
+    (transformation: object) =>
+      $(ActionTypes.addTransformation, { transformation }),
   };
 
 export default FileImportActions;

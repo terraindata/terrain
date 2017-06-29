@@ -58,8 +58,8 @@ import './PreviewColumn.less';
 
 export interface Props
 {
-  key: string;
-  id: string;
+  key: number;
+  id: number;
   isIncluded: boolean;
   name: string;
   typeIndex: number;
@@ -77,18 +77,25 @@ class PreviewColumn extends Classs<Props>
     Actions.setColumnsToInclude(this.props.id);
   }
 
-  public handleAutocompleteHeaderChange(value)
-  {
-    Actions.setColumnNames(this.props.id, value);
-  }
-
   public handleTypeChange(typeIndex)
   {
     Actions.setColumnTypes(this.props.id, typeIndex);
   }
 
+  public handleAutocompleteHeaderChange(value)
+  {
+    Actions.setColumnNames(this.props.id, value);
+    Actions.addTransformation({
+      name: 'rename',
+      args: {
+       newName: value,
+      }
+    });
+  }
+
   public handlePrimaryKeyChange()
   {
+    console.log('update primaryKey: ', this.props.name);
     Actions.changePrimaryKey(this.props.id);
   }
 
@@ -110,7 +117,7 @@ class PreviewColumn extends Classs<Props>
           value={this.props.name}
           options={null}
           onChange={this.handleAutocompleteHeaderChange}
-          placeholder={this.props.id}
+          placeholder={''}
           disabled={!this.props.canSelectColumn}
         />
         <Dropdown
