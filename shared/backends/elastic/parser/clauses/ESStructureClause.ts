@@ -44,56 +44,78 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is one of several possible types
+ * A clause with a well-defined structure.
  */
-export default class ESVariantClause extends ESClause
+export default class ESStructureClause extends ESClause
 {
-  public subtypes: { [jsonType: string]: string };
+  public structure: { [name: string]: string };
+  public required: any[];
 
-  public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(type, settings);
-    this.subtypes = subtypes;
+    super(type, settings, ESClauseType.ESStructureClause);
+    this.structure = structure;
+    this.required = required;
   }
 
   public init(config: EQLConfig): void
   {
-    Object.keys(this.subtypes).forEach(
+    Object.keys(this.structure).forEach(
       (key: string): void =>
       {
-        config.declareType(this.subtypes[key]);
+        config.declareType(this.structure[key]);
       });
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this; // only sticks if subclause isn't detected
+    valueInfo.clause = this;
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
-    const value: any = valueInfo.value;
-    let valueType: string = typeof (value);
-    if (Array.isArray(value))
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    const propertyClause: ESClause = interpreter.config.getClause('property');
+
+    // mark properties
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
+
+        if (!this.structure.hasOwnProperty(name))
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
+        }
+        else if (viTuple.propertyValue === null)
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
+        }
+        else
+        {
+          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
+
+          propertyClause.mark(interpreter, viTuple.propertyName);
+          clause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
+
+    // check required members
+    this.required.forEach((name: string): void =>
     {
-      valueType = 'array';
-    }
-
-    const subtype: string | undefined = this.subtypes[valueType];
-    if (subtype === undefined)
-    {
-      interpreter.accumulateError(valueInfo,
-        'Unknown clause type. Expected one of these types: ' +
-        JSON.stringify(Object.keys(this.subtypes), null, 2) +
-        ', but found a ' +
-        valueType +
-        ' instead.');
-      return;
-    }
-
-    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 }

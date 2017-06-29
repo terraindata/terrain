@@ -44,67 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
-function getExpectedFile(): string
+/**
+ * A clause which is a string
+ */
+export default class ESStringClause extends ESTerminalClause
 {
-  return __filename.split('.')[0] + '.expected';
-}
-
-let expected;
-let config: EQLConfig;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
+  public constructor(type: string,
+    settings: any,
+    clauseType: ESClauseType = ESClauseType.ESStringClause,
+    jsonType: ESJSONType = ESJSONType.string)
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(expectedString);
-  try
-  {
-    config = new EQLConfig();
-  } catch (e)
-  {
-    fail(e);
+    super(type, settings, clauseType, jsonType);
   }
-
-  done();
-});
-
-function testParse(testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing \'' + testString + '\'');
-  const interpreter: ESInterpreter = new ESInterpreter(testString, config);
-  const parser: ESJSONParser = interpreter.parser;
-
-  winston.info(util.inspect(parser.getValueInfo()));
-
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
 }
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
-    {
-      const testValue: any = expected[testName];
-
-      // test parsing the value using a few spacing options
-      testParse(JSON.stringify(testValue), testValue);
-    });
-});

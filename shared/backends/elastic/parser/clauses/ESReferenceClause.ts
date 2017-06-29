@@ -44,32 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a terminal (base) value: null, boolean, number, or string
+ * A clause with a type that references another def.
+ * This is used to specify clause types with special names or descriptions,
+ * but which are composed wholly of another type.
+ *
+ * For example, a bool clause contains "must", "must_not", and "should" properties,
+ * each of which has a unique function, but all of these properties contain a "query" clause.
+ *
+ * Another example is a setting property such as "boost", which must contain a
+ * "number" as its value.
  */
-export default class ESBaseClause extends ESClause
+export default class ESReferenceClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public delegateType: string;
+
+  public constructor(type: string, delegateType: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESReferenceClause);
+    this.delegateType = delegateType;
+  }
+
+  public init(config: EQLConfig): void
+  {
+    config.declareType(this.delegateType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
+    interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
     valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) === 'object')
-    {
-      const foundType: string = Array.isArray(value) ? 'array' : 'object';
-      interpreter.accumulateError(
-        valueInfo,
-        'Found an ' +
-        foundType +
-        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
-    }
   }
 }
