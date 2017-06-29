@@ -253,12 +253,9 @@ export class Import
             const dateColumns: string[] = [];
             for (const colName in imprt.columnTypes)
             {
-              if (imprt.columnTypes.hasOwnProperty(colName))
+              if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName] === 'date')
               {
-                if (imprt.columnTypes[colName] === 'date')
-                {
-                  dateColumns.push(colName);
-                }
+                dateColumns.push(colName);
               }
             }
             if (dateColumns.length > 0)
@@ -284,12 +281,9 @@ export class Import
 
             for (const oldName in imprt.columnMap)
             {
-              if (imprt.columnMap.hasOwnProperty(oldName))
+              if (imprt.columnMap.hasOwnProperty(oldName) && !imprt.columnsToInclude[oldName])
               {
-                if (!imprt.columnsToInclude[oldName])
-                {
-                  delete imprt.columnMap[oldName];
-                }
+                delete imprt.columnMap[oldName];
               }
             }
 
@@ -338,14 +332,7 @@ export class Import
         {
           winston.info('hello');
           winston.info(JSON.stringify(jsonArrObj));
-          const nameToType: object = {};
-          (imprt.columnMap as string[]).forEach((val, ind) =>
-          {
-            if (imprt.columnsToInclude[ind])
-            {
-              nameToType[val] = imprt.columnTypes[ind];
-            }
-          });
+          const nameToType: object = this._includedNamesToType(imprt);
           winston.info('about to start check');
           const typeError: string = this._checkTypes(jsonArrObj, nameToType);
           if (typeError === '')
@@ -383,16 +370,12 @@ export class Import
             if (!isNaN(num))
             {
               return num;
-            } else
-            {
-              if (item === '')
-              {
-                return null;
-              } else
-              {
-                return '';   // type error that will be caught in post-processing
-              }
             }
+            if (item === '')
+            {
+              return null;
+            }
+            return '';   // type error that will be caught in post-processing
           };
           break;
         case 'boolean':
@@ -401,16 +384,16 @@ export class Import
             if (item === 'true')
             {
               return true;
-            } else if (item === 'false')
+            }
+            if (item === 'false')
             {
               return false;
-            } else if (item === '')
+            }
+            if (item === '')
             {
               return null;
-            } else
-            {
-              return '';   // type error that will be caught in post-processing
             }
+            return '';   // type error that will be caught in post-processing
           };
           break;
         case 'date':
@@ -420,16 +403,12 @@ export class Import
             if (!isNaN(date))
             {
               return new Date(date);
-            } else
-            {
-              if (item === '')
-              {
-                return null;
-              } else
-              {
-                return '';   // type error that will be caught in post-processing
-              }
             }
+            if (item === '')
+            {
+              return null;
+            }
+            return '';   // type error that will be caught in post-processing
           };
           break;
         default:  // "array" and "object" cases
@@ -476,16 +455,10 @@ export class Import
       }
       for (const key in obj)
       {
-        if (obj.hasOwnProperty(key))
+        if (obj.hasOwnProperty(key) && obj[key] !== null && nameToType[key] !== this._getType(obj[key]))
         {
-          if (obj[key] !== null)
-          {
-            if (nameToType[key] !== this._getType(obj[key]))
-            {
-              return 'Field "' + key + '" of object number ' + String(ind) +
-                ' does not match the specified type: ' + String(nameToType[key]);
-            }
-          }
+          return 'Field "' + key + '" of object number ' + String(ind) +
+            ' does not match the specified type: ' + String(nameToType[key]);
         }
       }
       ind++;
@@ -526,11 +499,11 @@ export class Import
       {
         return 'null';
       }
-      else if (obj instanceof Date)
+      if (obj instanceof Date)
       {
         return 'date';
       }
-      else if (Array.isArray(obj))
+      if (Array.isArray(obj))
       {
         return 'array';
       }
@@ -550,6 +523,18 @@ export class Import
       array = Object.keys(mapOrArray).map((key) => mapOrArray[key]);
     }
     return array;
+  }
+  private _includedNamesToType(imprt: ImportConfig): object
+  {
+    const nameToType: object = {};
+    Object.keys(imprt.columnMap).forEach((ind) =>
+    {
+      if (imprt.columnsToInclude[ind])
+      {
+        nameToType[imprt.columnMap[ind]] = imprt.columnTypes[ind];
+      }
+    });
+    return nameToType;
   }
 }
 
