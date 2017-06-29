@@ -86,11 +86,9 @@ export default class ESVariantClause extends ESClause
     if (subtype === undefined)
     {
       interpreter.accumulateError(valueInfo,
-        'Unknown clause type. Expected one of these types: ' +
-        JSON.stringify(Object.keys(this.subtypes), null, 2) +
-        ', but found a ' +
-        valueType +
-        ' instead.');
+        'Unknown clause type \"' + valueType +
+        '\". Expected one of these types: ' +
+        JSON.stringify(Object.keys(this.subtypes), null, 2));
       return;
     }
 
