@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESJSONType from './ESJSONType';
-import ESParameter from './ESParameter';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -508,10 +507,10 @@ export default class ESJSONParser
     return false;
   }
 
-  private readParameter(): ESParameter
+  private readParameter(): string
   {
     let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_][a-zA-Z_0-9]*)/);
-    if (match === null)
+    if (match === null || !this.allowParameters)
     {
       match = '';
       this.accumulateErrorOnCurrentToken(
@@ -519,7 +518,7 @@ export default class ESJSONParser
         'and can only contain letters, underscores, and numbers.');
     }
 
-    return new ESParameter(match);
+    return match;
   }
 
   private captureMatch(exp: RegExp): any

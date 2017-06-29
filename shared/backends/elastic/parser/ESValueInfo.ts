@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESClause from './clauses/ESClause';
-import ESVariantClause from './clauses/ESVariantClause';
 import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
@@ -88,6 +87,12 @@ export default class ESValueInfo
   public errors: ESParserError[];
 
   /**
+   * When this value is the result of substituting in an parameter,
+   * this is set to the name of that parameter.
+   */
+  public parameter: string | null;
+
+  /**
    * When interpreted, this is set to the detected ESClause for this value
    */
   public clause: ESClause | null;
@@ -112,5 +117,19 @@ export default class ESValueInfo
   public attachError(error: ESParserError): void
   {
     this.errors.push(error);
+  }
+
+  public forEachProperty(func: (property: ESPropertyInfo) => void): void
+  {
+    Object.keys(this.objectChildren).forEach(
+      (name: string): void =>
+      {
+        func(this.objectChildren[name]);
+      });
+  }
+
+  public forEachElement(func: (element: ESValueInfo) => void): void
+  {
+    this.arrayChildren.forEach(func);
   }
 }

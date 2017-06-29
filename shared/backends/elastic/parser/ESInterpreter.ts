@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
 import ESParserError from './ESParserError';
@@ -55,18 +56,29 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESInterpreter
 {
-  public parser: ESJSONParser; // source parser
   public config: EQLConfig; // query language description
+  public params: { [name: string]: ESClause }; // input parameter clause types
+  public parser: ESJSONParser; // source parser
 
   /**
    * Runs the interpreter on the given query string. Read needed data by calling the
    * public member functions below. You can also pass in an existing ESJSONParser
    * to run the interpreter on it's result.
+   *
+   * 1) parse
+   * 2) substitute params
+   * 3) interpret
+   *
    * @param query the query string or parser to interpret
+   * @param config the spec config to use
+   * @param params parameter map to use
    */
-  public constructor(query: string | ESJSONParser, config: EQLConfig)
+  public constructor(query: string | ESJSONParser,
+    config: EQLConfig,
+    params: { [name: string]: ESClause } = {})
   {
     this.config = config;
+    this.params = params;
 
     if (typeof query === 'string')
     {

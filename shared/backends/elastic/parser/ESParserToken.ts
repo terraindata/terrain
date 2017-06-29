@@ -58,12 +58,12 @@ export default class ESParserToken
   public charNumber: number; // number of chars into the source that this token begins
   public row: number; // row in which this token begins (rows start at 0)
   public col: number; // column in which this token begins (cols start at 0)
-  public toRow: number;
-  public toCol: number;
+  public toRow: number; // end row
+  public toCol: number; // end column
   public length: number; // token length in chars
   public substring: string; // token substring
 
-  public errors: ESParserError[];
+  public errors: ESParserError[]; // errors attached to this token
 
   public constructor(charNumber: number,
     row: number,

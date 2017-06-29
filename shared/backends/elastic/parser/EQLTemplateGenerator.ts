@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESJSONType from './ESJSONType';
-import ESParameter from './ESParameter';
 import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
@@ -73,13 +72,21 @@ export default class EQLTemplateGenerator
       case ESJSONType.null:
       case ESJSONType.boolean:
       case ESJSONType.number:
+        this.appendJSON(source.value);
+        break;
+
       case ESJSONType.string:
-        this.result += JSON.stringify(source.value);
+        if (source.parameter !== null)
+        {
+          this.appendParameter(source.parameter);
+          break;
+        }
+
+        this.appendJSON(source.value);
         break;
 
       case ESJSONType.parameter:
-        const param: ESParameter = source.value as ESParameter;
-        this.result += ' {{#toJson}}' + param.name + '{{/toJson}} ';
+        this.appendParameter(source.value);
         break;
 
       case ESJSONType.array:
@@ -126,5 +133,15 @@ export default class EQLTemplateGenerator
       default:
         throw new Error('Unconvertable value type found.');
     }
+  }
+
+  private appendParameter(param: string): void
+  {
+    this.result += ' {{#toJson}}' + param + '{{/toJson}} ';
+  }
+
+  private appendJSON(value: any): void
+  {
+    this.result += JSON.stringify(value);
   }
 }

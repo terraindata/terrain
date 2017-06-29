@@ -84,18 +84,14 @@ export default class ESMapClause extends ESClause
 
     // mark properties
     const childClause: ESClause = interpreter.config.getClause(this.valueType);
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-    Object.keys(children).forEach(
-      (name: string): void =>
+    valueInfo.forEachProperty((viTuple: ESPropertyInfo): void =>
+    {
+      interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
+
+      if (viTuple.propertyValue !== null)
       {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
-
-        if (viTuple.propertyValue !== null)
-        {
-          childClause.mark(interpreter, viTuple.propertyValue);
-        }
-      });
+        childClause.mark(interpreter, viTuple.propertyValue);
+      }
+    });
   }
 }
