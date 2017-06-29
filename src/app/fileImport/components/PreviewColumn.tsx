@@ -53,12 +53,12 @@ import Classs from './../../common/components/Classs';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import TransformBox from './../components/TransformBox';
 import Actions from './../data/FileImportActions';
 import './PreviewColumn.less';
 
 export interface Props
 {
-  key: number;
   id: number;
   isIncluded: boolean;
   name: string;
@@ -68,6 +68,11 @@ export interface Props
   types: List<string>;
   canSelectType: boolean;
   canSelectColumn: boolean;
+  oldNames: List<string>;
+
+  datatypes: List<string>;
+  transformTypes: List<string>;
+  handleRenameTransform(name: string, oldName: string, newName: string);
 }
 
 class PreviewColumn extends Classs<Props>
@@ -82,21 +87,25 @@ class PreviewColumn extends Classs<Props>
     Actions.setColumnTypes(this.props.id, typeIndex);
   }
 
-  public handleAutocompleteHeaderChange(value)
-  {
-    Actions.setColumnNames(this.props.id, value);
-    Actions.addTransformation({
-      name: 'rename',
-      args: {
-        newName: value,
-      }
-    });
-  }
-
   public handlePrimaryKeyChange()
   {
     console.log('update primaryKey: ', this.props.name);
     Actions.changePrimaryKey(this.props.id);
+  }
+
+  public handleAutocompleteHeaderChange(value)
+  {
+    this.props.handleRenameTransform('rename', this.props.oldNames.get(this.props.id), value);
+
+    // Actions.setCurTransform(
+    //   {
+    //     name: 'rename',
+    //     args: {
+    //       oldName: this.props.oldNames.get(this.props.id),
+    //       newName: value,
+    //     }
+    //   });
+    Actions.setColumnNames(this.props.id, value);
   }
 
   public render()
@@ -125,6 +134,11 @@ class PreviewColumn extends Classs<Props>
           options={this.props.types}
           onChange={this.handleTypeChange}
           canEdit={this.props.canSelectType}
+        />
+        <TransformBox
+          datatype={this.props.datatypes.get(this.props.typeIndex)}
+          transformTypes={this.props.transformTypes}
+          newName={this.props.name}
         />
       </th>
     );

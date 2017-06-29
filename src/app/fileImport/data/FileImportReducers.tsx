@@ -47,6 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
+import Actions from './FileImportActions';
 import Ajax from './../../util/Ajax';
 const { List, Map } = Immutable;
 
@@ -80,6 +81,18 @@ FileImportReducers[ActionTypes.changePrimaryKey] =
       .set('primaryKey', state.columnNames.get(action.payload.id));
 ;
 
+FileImportReducers[ActionTypes.setColumnsToInclude] =
+  (state, action) =>
+    state
+      .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
+  ;
+
+FileImportReducers[ActionTypes.setColumnTypes] =
+  (state, action) =>
+    state
+      .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
+  ;
+
 FileImportReducers[ActionTypes.setColumnNames] =
   (state, action) =>
   {
@@ -95,17 +108,27 @@ FileImportReducers[ActionTypes.setColumnNames] =
     }
   };
 
-FileImportReducers[ActionTypes.setColumnsToInclude] =
+FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
     state
-      .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
+      .set('transforms', state.transforms.push(action.payload.transform))
   ;
 
-FileImportReducers[ActionTypes.setColumnTypes] =
+FileImportReducers[ActionTypes.setCurTransform] =
   (state, action) =>
-    state
-      .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
-  ;
+  {
+    console.log('current transform: ', state.curTransform);
+    console.log('adding transform: ', action.payload.transform);
+    // if (state.curTransform.name) {
+    //   if (action.payload.transform.name === 'rename' && state.curTransform.args.oldName !== action.payload.transform.args.oldName) {
+    //     Actions.addCurTransform();
+    //   }
+    //   else if (state.curTransform.name !== action.payload.transform.name) {
+    //     Actions.addCurTransform();
+    //   }
+    // }
+    return state.set('curTransform', action.payload.transform);
+  }
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>

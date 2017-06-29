@@ -43,26 +43,95 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as React from 'react';
 import * as _ from 'underscore';
-import Util from './../../util/Util';
+import Util from '../../util/Util';
+import Classs from './../../common/components/Classs';
+import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
+import Dropdown from './../../common/components/Dropdown';
+import Actions from './../data/FileImportActions';
 
-const FileImportActionTypes =
-  {
-    changeServer: '',
-    changeDbText: '',
-    changeTableText: '',
-    changeHasCsvHeader: '',
-    changePrimaryKey: '',
-    chooseFile: '',
-    uploadFile: '',
-    setColumnsToInclude: '',
-    setColumnNames: '',
-    setColumnTypes: '',
-    addTransform: '',
-    setCurTransform: '',
+export interface Props
+{
+  datatype: string;
+  transformTypes: List<string>;
+  newName: string;
+}
+
+class TransformBox extends Classs<Props>
+{
+  public state: {
+    transformTypeIndex: number;
+    transformText: string;
+  } = {
+    transformTypeIndex: 0,
+    transformText: '',
   };
 
-Util.setValuesToKeys(FileImportActionTypes, '');
+  public handleAutocompleteTransformTextChange(transformText)
+  {
+    this.setState({
+      transformText,
+    })
+  }
 
-export default FileImportActionTypes;
+  public handleTransformTypeChange(transformTypeIndex: number)
+  {
+    this.setState({
+      transformTypeIndex,
+    })
+  }
+
+  public handleTransformClick()
+  {
+    console.log('adding transform ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
+        this.props.newName + ', text: ' + this.state.transformText);
+
+    // if not empty, add current transform and set it to empty string
+
+    Actions.addTransform(
+      {
+        name: this.props.transformTypes.get(this.state.transformTypeIndex),
+        args: {
+          colName: this.props.newName,
+          text: this.state.transformText,
+        }
+      }
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div>
+      {
+        this.props.datatype === 'string' &&
+          <div>
+            <Dropdown
+              selectedIndex={this.state.transformTypeIndex}
+              options={this.props.transformTypes}
+              onChange={this.handleTransformTypeChange}
+              canEdit={true}
+            />
+            <Autocomplete
+              value={this.state.transformText}
+              options={null}
+              onChange={this.handleAutocompleteTransformTextChange}
+              placeholder={''}
+              disabled={false}
+            />
+            <button onClick={this.handleTransformClick}>
+              Transform
+            </button>
+          </div>
+      }
+      </div>
+    )
+  }
+}
+
+export default TransformBox;

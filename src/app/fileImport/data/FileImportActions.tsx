@@ -91,9 +91,13 @@ const FileImportActions =
     (id: number, typeIndex: number) =>
       $(ActionTypes.setColumnTypes, { id, typeIndex }),
 
-    addTransformation:
-    (transformation: object) =>
-      $(ActionTypes.addTransformation, { transformation }),
+    addTransform:
+    (transform: object) =>
+      $(ActionTypes.addTransform, { transform }),
+
+    setCurTransform:
+      (transform: object) =>
+        $(ActionTypes.setCurTransform, { transform }),
   };
 
 export default FileImportActions;

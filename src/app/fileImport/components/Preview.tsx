@@ -64,50 +64,62 @@ export interface Props
   columnNames: List<string>;
   columnsToInclude: List<boolean>;
   columnTypes: List<number>;
+  oldNames: List<string>;
+  curTransform: object;
 }
 
 const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date']);
+const TRANSFORM_TYPES = Immutable.List(['append', 'prepend', 'split', 'merge']);
 
 class Preview extends Classs<Props>
 {
   public state: {
+    curTransform: {
+      name: string,
+      args: {
+        oldName?: string | string[],
+        newName?: string | string[],
+        colName?: string,
+        text?: string,
+      },
+    }
   } = {
+    curTransform: {
+      name: '',
+      args: {
+      },
+    }
   };
 
-  // public getNewNames(iter: IterableIterator<string>)
-  // {
-  //   const map = [];
-  //   for (const value of iter)
-  //   {
-  //     map.push([value, value]);
-  //   }
-  //   return Map<string, string>(map);
-  // }
-
-  // public getKeys(map: Map<string, boolean>)
-  // {
-  //   const [...keys] = map.keys();
-  //   return List<string>(keys);
-  // }
-
-  // public updateNames(oldName: string, newName: string)
-  // {
-  //   this.setState({
-  //     namesMap: this.state.namesMap.set(oldName, newName),
-  //   });
-  // }
-  //
-  // public updatePrimaryKey(newName: string)
-  // {
-  //   console.log('newName: ', newName);
-  //   this.setState({
-  //     primaryKey: newName,
-  //   });
-  // }
+  public handleRenameTransform(name: string, oldName: string, newName: string)
+  {
+    if (this.state.curTransform.name && this.state.curTransform.args.oldName !== oldName)
+    {
+      console.log('adding transform: ', this.state.curTransform.args);
+      Actions.addTransform(this.state.curTransform);
+    }
+    console.log('setting current transform: ' + oldName + ', ' + newName);
+    this.setState({
+      curTransform: {
+        name,
+        args: {
+          oldName,
+          newName,
+        }
+      }
+    });
+  }
 
   public handleUploadFile()
   {
     // TODO: error checking from FileImportInfo
+    if (this.state.curTransform.name)
+    {
+      Actions.addTransform(this.state.curTransform);
+    }
+
+    // if (this.props.curTransform.name)
+    // Actions.addCurTransform();
     Actions.uploadFile();
   }
 
@@ -120,9 +132,10 @@ class Preview extends Classs<Props>
 
   public render()
   {
-    console.log('columnNames', this.props.columnNames);
+    // console.log('columnNames', this.props.columnNames);
     // console.log('columnsToInclude', this.props.columnsToInclude);
     // console.log('columnTypes', this.props.columnTypes);
+    // console.log('current transform: ', this.state.curTransform);
 
     const previewCols = [];
     this.props.columnNames.forEach((value, key) =>
@@ -138,6 +151,10 @@ class Preview extends Classs<Props>
           canSelectType={true}
           canSelectColumn={true}
           isPrimaryKey={this.props.columnNames.get(key) === this.props.primaryKey}
+          oldNames={this.props.oldNames}
+          datatypes={DATATYPES}
+          transformTypes={TRANSFORM_TYPES}
+          handleRenameTransform={this.handleRenameTransform}
         />
       );
     });

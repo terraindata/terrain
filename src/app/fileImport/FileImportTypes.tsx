@@ -68,10 +68,12 @@ export namespace FileImportTypes
     public columnNames: List<string> = null;
     public columnsToInclude: List<boolean> = null;
     public columnTypes: List<number> = null;
-    public transformations: List<object> = List([]);     // TODO: make Command type below
 
     public hasCsvHeader: boolean = true;
     public primaryKey: string = '';
+
+    public curTransform: object = { name: '', args: {} }
+    public transforms: List<object> = List([]);     // TODO: make Command type below
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
   //  This first line exports a type that you will actually use in other files.
