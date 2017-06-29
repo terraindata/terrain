@@ -56,7 +56,8 @@ import { Input, InputType } from '../../../blocks/types/Input';
 import Util from '../../../../src/app/util/Util';
 
 import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
-import {
+import
+{
   elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
   elasticNumber, elasticObject, elasticText, elasticValue,
 } from './ElasticJSONBlocks';
@@ -94,18 +95,18 @@ export const ElasticBlocks = _.extend(
     elasticMagicCard,
 
     elasticCreating: _card( // a placeholder for when a card is being created
-    {
-      static:
       {
-        language: 'elastic',
-        tql: '',
-        title: 'New Card',
-        colors: ['#777', '#777'],
-        preview: '',
-        display: null,
-        // manualEntry: null,
-      },
-    }),
+        static:
+        {
+          language: 'elastic',
+          tql: '',
+          title: 'New Card',
+          colors: ['#777', '#777'],
+          preview: '',
+          display: null,
+          // manualEntry: null,
+        },
+      }),
 
     elasticKeyValueWrap,
     // JSON toggle the type blocks

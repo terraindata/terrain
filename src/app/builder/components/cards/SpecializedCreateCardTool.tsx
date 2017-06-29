@@ -79,7 +79,7 @@ class SpecializedCreateCardTool extends PureClasss<Props>
     }>;
     open: boolean,
   };
-  
+
   constructor(props: Props)
   {
     super(props);
@@ -88,29 +88,29 @@ class SpecializedCreateCardTool extends PureClasss<Props>
       open: false,
     };
   }
-  
+
   public getOptions(props: Props)
   {
     const options = props.data['getChildOptions'](props.data);
-    
-    if(this.state && options.equals(this.state.options))
+
+    if (this.state && options.equals(this.state.options))
     {
       return this.state.options;
     }
-    
+
     return options;
   }
-  
+
   public componentWillReceiveProps(nextProps: Props)
   {
-    if(nextProps.data !== this.props.data)
+    if (nextProps.data !== this.props.data)
     {
       this.setState({
         options: this.getOptions(nextProps),
       });
-    } 
+    }
   }
-  
+
   public onClick(index: number)
   {
     const option = this.state.options.get(index);
@@ -138,7 +138,7 @@ class SpecializedCreateCardTool extends PureClasss<Props>
 
         open={this.state.open}
         onToggle={this._toggle('open')}
-        
+
         overrideText={this.state.options}
         overrideClick={this.onClick}
       />

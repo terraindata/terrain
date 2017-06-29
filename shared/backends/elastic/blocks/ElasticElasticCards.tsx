@@ -78,7 +78,7 @@ const referenceCards: ESClause[] = [];
 
 _.mapObject(
   clauses,
-  
+
   (clause, key) =>
   {
     const card = clause.getCard();
@@ -123,9 +123,9 @@ referenceCards.map((clause) =>
     });
     const colorKey = ((++colorIndex) % numColors) + 1;
     refCardDef['static'] = _.extend({},
-      refCardDef['static'], 
+      refCardDef['static'],
       {
-        colors:  [
+        colors: [
           Colors().builder.cards['card' + colorKey],
           Colors().builder.cards['card' + colorKey + 'BG'],
         ],
@@ -149,7 +149,7 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
     case valueTypes.text:
     case valueTypes.number:
       return {
-        displayType: type === valueTypes.text ? 
+        displayType: type === valueTypes.text ?
           DisplayType.TEXT : DisplayType.NUM,
         key: 'value',
         getAutoTerms: (schemaState) =>
@@ -159,14 +159,14 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
         }
         // autoDisabled: true,
       };
-      
+
     case valueTypes.bool:
       return {
         displayType: DisplayType.DROPDOWN,
         key: 'value',
         options: Immutable.List(['false', 'true']),
       }
-    
+
     case valueTypes.null:
       return [];
   }
@@ -174,14 +174,14 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
 
 //   const cardType = 'elasticElastic' + type;
 //   const { def, desc, url, values, template, required, name } = clause;
-  
+
 //   if (clause instanceof ESStructureClause)
 //   {
 //     console.log('structure');
 //   }
-  
+
 //   // if ()
-  
+
 //   if(typeof def === 'string')
 //   {
 //     let singleValueConfig: {
@@ -190,7 +190,7 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
 //       canBeCards?: boolean;
 //       autocomplete?: any; // TODO
 //     } = null;
-    
+
 //     switch(def)
 //     {
 //       case 'any':
@@ -255,54 +255,54 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
 
 //       case 'painless':
 //         break;
-      
+
 //       default:
-        
+
 //     }
-    
+
 //     if (singleValueConfig)
 //     {
 //       let display = getDisplayForType(singleValueConfig.type);
-      
+
 //       ElasticElasticCards[cardType] = _card({
 //         value: singleValueConfig.default,
-        
+
 //         static:
 //         {
 //           title: name || type,
 //           colors: ['#456', '#789'],
 //           language: 'elastic',
 //           preview: '[value]',
-          
+
 //           tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
 //           {
 //             let value = block['value'];
-            
+
 //             if(singleValueConfig.type === valueTypes.number)
 //             {
 //               value = +value;
 //             }
-            
+
 //             if(singleValueConfig.type === valueTypes.bool)
 //             {
 //               value = !! value;
 //             }
-            
+
 //             if(singleValueConfig.type === valueTypes.null)
 //             {
 //               value = null;
 //             }
-            
+
 //             if(value['_isBlock'])
 //             {
 //               value = tqlTranslationFn(value['_isBlock'], tqlConfig);
 //             }
-            
+
 //             return {
 //               [type]: value,
 //             };
 //           },
-          
+
 //           display,
 //         },
 //       });

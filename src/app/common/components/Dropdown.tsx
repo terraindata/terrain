@@ -53,7 +53,7 @@ import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import './Dropdown.less';
-import { Colors, fontColor} from '../../common/Colors';
+import { Colors, fontColor } from '../../common/Colors';
 
 export interface Props
 {

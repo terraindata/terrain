@@ -91,12 +91,12 @@ export default class ESEnumClause extends ESClause
     }
     valueInfo.clause = this;
   }
-  
+
   public getCard()
   {
     return this.seedCard({
       value: this.template || this.values[0],
-      
+
       static: {
         preview: '[value]',
         display: {

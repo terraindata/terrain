@@ -117,7 +117,7 @@ export namespace CommonBlocks
 
         tql: config.tql,
         tqlGlue: config.tqlGlue,
-        
+
         init: config.init,
       },
     });

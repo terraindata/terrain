@@ -158,7 +158,7 @@ interface Theme
       card19: string,
       card20: string,
       card21: string,
-      
+
       card1BG: string,
       card2BG: string,
       card3BG: string,
@@ -305,7 +305,7 @@ const DARK: Theme =
         card19: '#319AA9',
         card20: '#4A979A',
         card21: '#3A91A5',
-        
+
         card1BG: Color("#559DCE").alpha(0.7).string(),
         card2BG: Color("#397DD0").alpha(0.7).string(),
         card3BG: Color("#D14F42").alpha(0.7).string(),

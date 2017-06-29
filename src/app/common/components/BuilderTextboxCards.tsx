@@ -81,7 +81,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
 
   public isCreating()
   {
-    return this.props.value 
+    return this.props.value
       && this.props.value['type'] === AllBackendsMap[this.props.language].creatingType;
   }
 

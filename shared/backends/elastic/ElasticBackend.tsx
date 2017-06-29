@@ -63,7 +63,7 @@ class ElasticBackend implements Backend
 
   rootCard = ElasticBlocks.eqlroot;
   topLevelCards =
-    Immutable.List(_.keys(ElasticBlocks));
+  Immutable.List(_.keys(ElasticBlocks));
   //  Immutable.List<string>([
   //   ElasticBlocks.elasticRootCard.type,
   //   ElasticBlocks.elasticKeyValueWrap.type,

@@ -119,7 +119,7 @@ abstract class ESClause
     return null;
   }
 
-  public getSupplementalBlocks(): {[type: string]: Block}
+  public getSupplementalBlocks(): { [type: string]: Block }
   {
     return {};
   }
@@ -222,10 +222,10 @@ abstract class ESClause
 }
 
 const KEY_DISPLAY: Display =
-{
-  displayType: DisplayType.TEXT,
-  key: 'key',
-  autoDisabled: true, // TODO consider autocomplete for key?
-};
+  {
+    displayType: DisplayType.TEXT,
+    key: 'key',
+    autoDisabled: true, // TODO consider autocomplete for key?
+  };
 
 export default ESClause;

@@ -76,7 +76,7 @@ export interface Props
   onMinimize?: () => void; // TODO see if these should be consolidated
   hidePlaceholder?: boolean;
   cannotClose?: boolean;
-  
+
   overrideText?: List<{
     text: string;
     type: string;
@@ -99,8 +99,8 @@ class CreateCardTool extends PureClasss<Props>
   handleCardClick(event)
   {
     const index = +Util.rel(event.target);
-    
-    if(this.props.overrideClick)
+
+    if (this.props.overrideClick)
     {
       this.props.overrideClick(index);
     }
@@ -168,11 +168,11 @@ class CreateCardTool extends PureClasss<Props>
       Util.animateToAutoHeight(this.refs['selector']);
     }
   }
-  
+
   private renderCardOption(type: string, index: number)
   {
     const block = AllBackendsMap[this.props.language].blocks[type];
-    if(!block)
+    if (!block)
     {
       console.log('Missing block type: ', block);
       // TODO throw error instead
@@ -193,7 +193,7 @@ class CreateCardTool extends PureClasss<Props>
           backgroundColor: block.static.colors[0],
         }}
       >
-        <div className='create-card-button-inner' rel={''+index}>
+        <div className='create-card-button-inner' rel={'' + index}>
           {
             text
           }
@@ -209,20 +209,20 @@ class CreateCardTool extends PureClasss<Props>
       return null;
     }
 
-// This used to use the following code. Keeping around in case I realize the need for it
-//     let curIndex = -1; // tracks the index of the cards we are actually showing
-// AllBackendsMap[this.props.language].cardsList.map((type: string, index: number) =>
-//             {
-//               if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
-//               {
-//                 return null;
-//               }
+    // This used to use the following code. Keeping around in case I realize the need for it
+    //     let curIndex = -1; // tracks the index of the cards we are actually showing
+    // AllBackendsMap[this.props.language].cardsList.map((type: string, index: number) =>
+    //             {
+    //               if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
+    //               {
+    //                 return null;
+    //               }
 
-//               curIndex++;
+    //               curIndex++;
 
     const cardTypeList = this.props.overrideText || this.props.accepts;
     const isEmpty = cardTypeList.size === 0;
-    
+
     return (
       <div
         className={classNames({
@@ -234,15 +234,15 @@ class CreateCardTool extends PureClasss<Props>
         <div className='create-card-selector-inner'>
           {
             isEmpty &&
-              <div className='create-card-empty'>
-                There are no remaining cards that can be created here.
+            <div className='create-card-empty'>
+              There are no remaining cards that can be created here.
               </div>
           }
           {
             this.props.overrideText
-            ?
+              ?
               this.props.overrideText.map((v, index) => this.renderCardOption(v.type, index))
-            :
+              :
               this.props.accepts.map(this.renderCardOption)
           }
           {

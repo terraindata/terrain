@@ -547,7 +547,7 @@ class _CardComponent extends PureClasss<Props>
                   'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
                   'card-title-card-hovering': this.state.hovering,
                 })}
-                
+
                 onClick={this.handleTitleClick}
               >
                 {

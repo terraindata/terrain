@@ -61,12 +61,12 @@ export default class ESBooleanClause extends ESTerminalClause
   {
     super(type, settings, ESClauseType.ESBooleanClause, ESJSONType.boolean);
   }
-  
+
   public getCard()
   {
     return this.seedCard({
       value: true,
-      
+
       static: {
         preview: '[value]',
         display: {
@@ -77,7 +77,7 @@ export default class ESBooleanClause extends ESTerminalClause
             'true',
           ]),
         },
-        tql: (boolBlock) => !! boolBlock['value'],
+        tql: (boolBlock) => !!boolBlock['value'],
       }
     });
   }

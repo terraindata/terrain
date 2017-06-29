@@ -462,7 +462,7 @@ export const Ajax =
         },
         (error) =>
         {
-          if(error as any === 'Nothing found')
+          if (error as any === 'Nothing found')
           {
             onLoad(null);
           }
