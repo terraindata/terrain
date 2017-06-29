@@ -44,66 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
 /**
- * A clause that corresponds to an object of uniform type values.
+ * A clause which is a null
  */
-export default class ESMapClause extends ESClause
+export default class ESNullClause extends ESTerminalClause
 {
-  public nameType: string;
-  public valueType: string;
-
-  public constructor(type: string, nameType: string, valueType: string, settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-    this.nameType = nameType;
-    this.valueType = valueType;
+    super(type, settings, ESClauseType.ESNullClause, ESJSONType.null);
   }
 
-  public init(config: EQLConfig): void
+  public getCard()
   {
-    config.declareType(this.nameType);
-    config.declareType(this.valueType);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'object')
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found an array instead.');
-      return;
-    }
-
-    // mark properties
-    const childClause: ESClause = interpreter.config.getClause(this.valueType);
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-    Object.keys(children).forEach(
-      (name: string): void =>
-      {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
-
-        if (viTuple.propertyValue !== null)
-        {
-          childClause.mark(interpreter, viTuple.propertyValue);
-        }
-      });
+    return this.seedCard({
+      static: {
+        preview: '',
+        display: [],
+        tql: () => null,
+      },
+    });
   }
 }

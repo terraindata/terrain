@@ -57,9 +57,9 @@ import CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import EQLConfig from '../parser/EQLConfig';
-import ESClause from '../parser/ESClause';
-import ESEnumClause from '../parser/ESEnumClause';
-import ESStructureClause from '../parser/ESStructureClause';
+import ESClause from '../parser/clauses/ESClause';
+import ESEnumClause from '../parser/clauses/ESEnumClause';
+import ESStructureClause from '../parser/clauses/ESStructureClause';
 
 import Colors from '../../../../src/app/common/Colors';
 

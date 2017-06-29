@@ -44,67 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
+import ESClause from './ESClause';
 
-function getExpectedFile(): string
+/**
+ * A clause that corresponds to an object of uniform type values.
+ */
+export default class ESMapClause extends ESClause
 {
-  return __filename.split('.')[0] + '.expected';
-}
+  public nameType: string;
+  public valueType: string;
 
-let expected;
-let config: EQLConfig;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
+  public constructor(type: string, nameType: string, valueType: string, settings: any)
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(expectedString);
-  try
-  {
-    config = new EQLConfig();
-  } catch (e)
-  {
-    fail(e);
+    super(type, settings, ESClauseType.ESMapClause);
+    this.nameType = nameType;
+    this.valueType = valueType;
   }
 
-  done();
-});
+  public init(config: EQLConfig): void
+  {
+    config.declareType(this.nameType);
+    config.declareType(this.valueType);
+  }
 
-function testParse(testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing \'' + testString + '\'');
-  const interpreter: ESInterpreter = new ESInterpreter(testString, config);
-  const parser: ESJSONParser = interpreter.parser;
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
 
-  winston.info(util.inspect(parser.getValueInfo()));
-
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.object))
     {
-      const testValue: any = expected[testName];
+      return;
+    }
 
-      // test parsing the value using a few spacing options
-      testParse(JSON.stringify(testValue), testValue);
-    });
-});
+    // mark properties
+    const childClause: ESClause = interpreter.config.getClause(this.valueType);
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
+
+        if (viTuple.propertyValue !== null)
+        {
+          childClause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
+  }
+}

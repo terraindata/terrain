@@ -44,45 +44,31 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
 
 /**
- * A clause which is a number
+ * A clause which can be a specific terminal type
  */
-export default class ESNumberClause extends ESClause
+export default class ESTerminalClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  private jsonType: ESJSONType;
+
+  public constructor(type: string,
+    settings: any,
+    clauseType: ESClauseType,
+    jsonType: ESJSONType)
   {
-    super(type, settings);
+    super(type, settings, clauseType);
+    this.jsonType = jsonType;
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'number')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a number.');
-    }
-  }
-  
-  public getCard()
-  {
-    return this.seedCard({
-      value: this.template || 0,
-      
-      static: {
-        preview: '[value]',
-        display: {
-          displayType: DisplayType.NUM,
-          key: 'value',
-          // TODO autocomplete?
-        },
-        tql: (numBlock) => +numBlock['value'],
-      }
-    });
+    this.typeCheck(interpreter, valueInfo, this.jsonType);
   }
 }

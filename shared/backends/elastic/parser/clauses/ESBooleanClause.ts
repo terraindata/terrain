@@ -42,45 +42,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.id
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import * as Immutable from 'immutable';
+
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
 
 /**
- * A clause that corresponds to an array of uniform type.
+ * A clause which is a boolean
  */
-export default class ESArrayClause extends ESClause
+export default class ESBooleanClause extends ESTerminalClause
 {
-  public elementID: string;
-
-  public constructor(type: string, elementID: string, settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-    this.elementID = elementID;
+    super(type, settings, ESClauseType.ESBooleanClause, ESJSONType.boolean);
   }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  
+  public getCard()
   {
-    valueInfo.clause = this;
-
-    const value: any = valueInfo.value;
-    if (!Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    // mark children
-    const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    const children: ESValueInfo[] = valueInfo.arrayChildren;
-    children.forEach(
-      (element: ESValueInfo): void =>
-      {
-        childClause.mark(interpreter, element);
-      });
+    return this.seedCard({
+      value: true,
+      
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.DROPDOWN,
+          key: 'value',
+          options: Immutable.List([
+            'false',
+            'true',
+          ]),
+        },
+        tql: (boolBlock) => !! boolBlock['value'],
+      }
+    });
   }
-
 }

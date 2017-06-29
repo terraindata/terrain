@@ -44,56 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is one of several possible types
+ * A clause which is a terminal (base) value: null, boolean, number, or string
  */
-export default class ESVariantClause extends ESClause
+export default class ESBaseClause extends ESClause
 {
-  public subtypes: { [jsonType: string]: string };
-
-  public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-    this.subtypes = subtypes;
-  }
-
-  public init(config: EQLConfig): void
-  {
-    Object.keys(this.subtypes).forEach(
-      (key: string): void =>
-      {
-        config.declareType(this.subtypes[key]);
-      });
+    super(type, settings, ESClauseType.ESBaseClause);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this; // only sticks if subclause isn't detected
-
-    const value: any = valueInfo.value;
-    let valueType: string = typeof (value);
-    if (Array.isArray(value))
+    valueInfo.clause = this;
+    switch (valueInfo.jsonType)
     {
-      valueType = 'array';
-    }
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+      case ESJSONType.string:
+        break;
 
-    const subtype: string | undefined = this.subtypes[valueType];
-    if (subtype === undefined)
-    {
-      interpreter.accumulateError(valueInfo,
-        'Unknown clause type. Expected one of these types: ' +
-        JSON.stringify(Object.keys(this.subtypes), null, 2) +
-        ', but found a ' +
-        valueType +
-        ' instead.');
-      return;
+      default:
+        interpreter.accumulateError(
+          valueInfo,
+          'Found an ' +
+          ESJSONType[valueInfo.jsonType] +
+          ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+        break;
     }
-
-    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
   }
 }

@@ -44,67 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-
-import EQLConfig from './EQLConfig';
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 
 /**
- * A clause which can only take on a restricted set of values.
+ * A clause which is a field name (column name)
  */
-export default class ESEnumClause extends ESClause
+export default class ESFieldClause extends ESStringClause
 {
-  public values: any[];
-  public valueMap: any;
-
-  public constructor(type: string, values: any[], settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-
-    this.values = values;
-    this.valueMap = new Map();
-    for (let i = 0; i < this.values.length; ++i)
-    {
-      const value = this.values[i];
-      this.valueMap.set(value, i);
-    }
+    super(type, settings, ESClauseType.ESFieldClause);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    if (this.valueMap.get(valueInfo.value) === undefined)
-    {
-      if (this.values.length > 10)
-      {
-        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
-      }
-      else
-      {
-        interpreter.accumulateError(valueInfo,
-          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
-      }
-    }
-    valueInfo.clause = this;
-  }
-  
-  public getCard()
-  {
-    return this.seedCard({
-      value: this.template || this.values[0],
-      
-      static: {
-        preview: '[value]',
-        display: {
-          displayType: DisplayType.DROPDOWN,
-          key: 'value',
-          options: Immutable.List(this.values),
-          dropdownUsesRawValues: true,
-        },
-        tql: (block) => block['value'],
-      }
-    });
-  }
+  // TODO: add field validation here
 }

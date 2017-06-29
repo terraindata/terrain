@@ -44,38 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a null
+ * A clause that corresponds to an array of uniform type.
  */
-export default class ESNullClause extends ESClause
+export default class ESArrayClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public elementID: string;
+
+  public constructor(type: string, elementID: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESArrayClause);
+    this.elementID = elementID;
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (value !== null)
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.array))
     {
-      interpreter.accumulateError(valueInfo, 'This value should be null.');
+      return;
     }
+
+    // mark children
+    const childClause: ESClause = interpreter.config.getClause(this.elementID);
+    const children: ESValueInfo[] = valueInfo.arrayChildren;
+    children.forEach(
+      (element: ESValueInfo): void =>
+      {
+        childClause.mark(interpreter, element);
+      });
   }
-  
-  public getCard()
-  {
-    return this.seedCard({
-      static: {
-        preview: '',
-        display: [],
-        tql: () => null,
-      }
-    });
-  }
+
 }

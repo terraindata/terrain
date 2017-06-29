@@ -44,32 +44,53 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a terminal (base) value: null, boolean, number, or string
+ * A clause which is one of several possible types
  */
-export default class ESBaseClause extends ESClause
+export default class ESVariantClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public subtypes: { [jsonType: string]: string };
+
+  public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESVariantClause);
+    this.subtypes = subtypes;
+  }
+
+  public init(config: EQLConfig): void
+  {
+    Object.keys(this.subtypes).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.subtypes[key]);
+      });
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) === 'object')
+    valueInfo.parentClause = this;
+
+    const valueType: string = ESJSONType[valueInfo.jsonType];
+
+    const subtype: string | undefined = this.subtypes[valueType];
+    if (subtype === undefined)
     {
-      const foundType: string = Array.isArray(value) ? 'array' : 'object';
-      interpreter.accumulateError(
-        valueInfo,
-        'Found an ' +
-        foundType +
-        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+      interpreter.accumulateError(valueInfo,
+        'Unknown clause type. Expected one of these types: ' +
+        JSON.stringify(Object.keys(this.subtypes), null, 2) +
+        ', but found a ' +
+        valueType +
+        ' instead.');
+      return;
     }
+
+    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
   }
 }

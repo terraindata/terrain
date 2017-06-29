@@ -44,45 +44,69 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import * as Immutable from 'immutable';
+
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
 
 /**
- * A clause with a type that references another def.
- * This is used to specify clause types with special names or descriptions,
- * but which are composed wholly of another type.
- *
- * For example, a bool clause contains "must", "must_not", and "should" properties,
- * each of which has a unique function, but all of these properties contain a "query" clause.
- *
- * Another example is a setting property such as "boost", which must contain a
- * "number" as its value.
+ * A clause which can only take on a restricted set of values.
  */
-export default class ESReferenceClause extends ESClause
+export default class ESEnumClause extends ESClause
 {
-  public delegateType: string;
+  public values: any[];
+  public valueMap: any;
 
-  public constructor(type: string, delegateType: string, settings: any)
+  public constructor(type: string, values: any[], settings: any)
   {
-    super(type, settings);
-    this.delegateType = delegateType;
-  }
+    super(type, settings, ESClauseType.ESEnumClause);
 
-  public init(config: EQLConfig): void
-  {
-    config.declareType(this.delegateType);
+    this.values = values;
+    this.valueMap = new Map();
+    for (let i = 0; i < this.values.length; ++i)
+    {
+      const value = this.values[i];
+      this.valueMap.set(value, i);
+    }
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
+    if (this.valueMap.get(valueInfo.value) === undefined)
+    {
+      if (this.values.length > 10)
+      {
+        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
+      }
+      else
+      {
+        interpreter.accumulateError(valueInfo,
+          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
+      }
+    }
     valueInfo.clause = this;
   }
   
   public getCard()
   {
-    return 'eql' + this.delegateType;
+    return this.seedCard({
+      value: this.template || this.values[0],
+      
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.DROPDOWN,
+          key: 'value',
+          options: Immutable.List(this.values),
+          dropdownUsesRawValues: true,
+        },
+        tql: (block) => block['value'],
+      }
+    });
   }
 }

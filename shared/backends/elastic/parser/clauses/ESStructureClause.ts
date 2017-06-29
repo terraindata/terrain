@@ -44,21 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 
-import EQLConfig from './EQLConfig';
+import SpecializedCreateCardTool from '../../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
+import BlockUtils from '../../../../blocks/BlockUtils';
+import CommonBlocks from '../../../../blocks/CommonBlocks';
+import { Display, DisplayType, wrapperDisplay, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
+import { _block, Block } from '../../../../blocks/types/Block';
+import { Card } from '../../../../blocks/types/Card';
+import ElasticBlocks from '../../blocks/ElasticBlocks';
+
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
-import { Block, _block } from '../../../blocks/types/Block';
-import { Card } from '../../../blocks/types/Card';
-import CommonBlocks from '../../../blocks/CommonBlocks';
-import BlockUtils from '../../../blocks/BlockUtils';
-import ElasticBlocks from '../blocks/ElasticBlocks';
-import SpecializedCreateCardTool from '../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
 
 /**
  * A clause with a well-defined structure.
@@ -70,7 +73,7 @@ export default class ESStructureClause extends ESClause
 
   public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESStructureClause);
     this.structure = structure;
     this.required = required;
   }
@@ -87,21 +90,10 @@ export default class ESStructureClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-
-    const value = valueInfo.value;
-    if (typeof (value) !== 'object')
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
-      return;
-    }
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    const propertyClause: ESClause = interpreter.config.getClause('property');
 
     // mark properties
     Object.keys(children).forEach(
@@ -109,15 +101,22 @@ export default class ESStructureClause extends ESClause
       {
         const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
 
+        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
+
         if (!this.structure.hasOwnProperty(name))
         {
           interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
-          return;
         }
-
-        if (viTuple.propertyValue !== null)
+        else if (viTuple.propertyValue === null)
         {
-          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
+          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
+        }
+        else
+        {
+          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
+
+          propertyClause.mark(interpreter, viTuple.propertyName);
+          clause.mark(interpreter, viTuple.propertyValue);
         }
       });
 

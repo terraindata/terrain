@@ -44,19 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 import * as _ from 'underscore';
-import { Card, _card } from '../../../blocks/types/Card';
-import { Block, TQLFn } from '../../../blocks/types/Block';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
+import { Block, TQLFn } from '../../../../blocks/types/Block';
+import { _card, Card } from '../../../../blocks/types/Card';
+
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 
 /**
  * Represents an Elastic Search query clause
  */
 abstract class ESClause
 {
+  public clauseType: ESClauseType; // clause type (each class has a unique clause type)
   public type: string; // type name
   public name: string; // human type name
   public desc: string; // clause description
@@ -87,9 +92,11 @@ abstract class ESClause
    *
    * @param type the name to refer to this clause (type)
    * @param settings the settings object to initialize it from
+   * @param clauseType the enum uniquely identifying the clause type
    */
-  public constructor(type: string, settings: any)
+  public constructor(type: string, settings: any, clauseType: ESClauseType)
   {
+    this.clauseType = clauseType;
     this.type = type;
     this.settings = settings;
 
@@ -107,25 +114,43 @@ abstract class ESClause
 
   public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
 
-  private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
+  public getCard(): any
   {
-    if (settings[name] !== undefined)
-    {
-      this[name] = settings[name];
-    }
-    else
-    {
-      this[name] = defaultValueFunction();
-    }
+    return null;
   }
-  
+
+  public getSupplementalBlocks(): {[type: string]: Block}
+  {
+    return {};
+  }
+
+  public getCardType(): string
+  {
+    return 'eql' + this.type;
+  }
+
+  protected typeCheck(interpreter: ESInterpreter,
+    valueInfo: ESValueInfo,
+    expected: ESJSONType): boolean
+  {
+    if (valueInfo.jsonType !== expected)
+    {
+      interpreter.accumulateError(valueInfo,
+        'Expected a ' + ESJSONType[expected] + ', but found a ' +
+        ESJSONType[valueInfo.jsonType] + ' instead.');
+      return false;
+    }
+
+    return true;
+  }
+
   protected seedCard(obj: {
     [field: string]: any;
 
     static: {
       colors?: string[]; // optional, filled below
       title?: string; // optional, filled below
-      
+
       preview: string | ((c: Card) => string);
       display: Display | Display[];
       tql: TQLFn;
@@ -148,20 +173,20 @@ abstract class ESClause
       title: this.name,
       colors: [],
       language: 'elastic',
-      
+
       anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
-    
-    if(true) // switch this on for wrapper card approach
+
+    if (true) // switch this on for wrapper card approach
     {
-      if(obj['key'] !== undefined)
+      if (obj['key'] !== undefined)
       {
         throw new Error('Key method was already defined for block ' + this.type);
       }
       // Define a key, which will be optionally used to supply the key
       //  for a key/val pair, if one is needed
       obj['key'] = '';
-      
+
       // prepend the display with our standard key text display
       if (!obj['static']['display'])
       {
@@ -179,24 +204,20 @@ abstract class ESClause
         ] as any;
       }
     }
-    
+
     return _card(obj as any);
   }
-  
-  public getCard(): any
+
+  private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
   {
-    return null;
-  }
-  
-  
-  public getSupplementalBlocks(): {[type: string]: Block}
-  {
-    return {};
-  }
-  
-  public getCardType(): string
-  {
-    return 'eql' + this.type;
+    if (settings[name] !== undefined)
+    {
+      this[name] = settings[name];
+    }
+    else
+    {
+      this[name] = defaultValueFunction();
+    }
   }
 }
 
