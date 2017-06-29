@@ -560,16 +560,19 @@ class _CardComponent extends PureClasss<Props>
                   this.state.hovering &&
                   <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
                 }
-                <div
-                  className='card-title-inner'
-                  style={{
-                    background: card.static.colors[0],
-                  }}
-                >
-                  {
-                    title
-                  }
-                </div>
+                {
+                  ! localStorage['hideTitle'] &&
+                    <div
+                      className='card-title-inner'
+                      style={{
+                        background: card.static.colors[0],
+                      }}
+                    >
+                      {
+                        title
+                      }
+                    </div>
+                }
 
                 {
                   !this.props.card.closed ? null :

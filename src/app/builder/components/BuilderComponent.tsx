@@ -380,12 +380,13 @@ class BuilderComponent extends PureClasss<Props>
 
     if (isTextbox)
     {
+      const Comp = d.component || BuilderTextbox;
       content = (
         <div
           key={key}
           className='builder-component-wrapper builder-component-wrapper-wide'
         >
-          <BuilderTextbox
+          <Comp
             canEdit={this.props.canEdit}
             top={d.top}
             placeholder={d.placeholder || d.key}

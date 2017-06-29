@@ -52,7 +52,7 @@ import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { Block, _block } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
@@ -380,7 +380,7 @@ export default class ESStructureClause extends ESClause
               }
               else
               {
-                console.log('No block for ' + templateKey);
+                console.log('No block for ' + templateKey, clauseType, templateValue);
               }
             }
           )
@@ -430,6 +430,8 @@ export default class ESStructureClause extends ESClause
             )
           );
         },
+        
+        childrenHaveKeys: true,
       
         static:      
         {
@@ -452,12 +454,11 @@ export default class ESStructureClause extends ESClause
           init,
           
           display: [
-            _.extend(
-              {
-                hideCreateCardTool: true,
-              },
-              wrapperDisplay, // displays cards
-            ),
+            {
+              displayType: DisplayType.CARDS,
+              key: 'cards',
+              hideCreateCardTool: true,
+            },
             {
               provideParentData: true, // need this to grey out the type dropdown
               displayType: DisplayType.COMPONENT,

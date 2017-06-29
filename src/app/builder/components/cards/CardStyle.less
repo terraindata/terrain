@@ -14,6 +14,7 @@
   border-radius: @card-border-radius;
   padding: 6px;
   padding-right: 0px;
+  padding-top: 0px;
  
   .card-inner {
     border: 1px solid @medium-dark-green;
@@ -77,7 +78,7 @@
       box-shadow: inset 0px 0px 10000px rgba(0,0,0,0.5);
       pointer-events: none;
       z-index: 999999;
-      border-radius: 6px;
+      border-radius: @card-border-radius;
       overflow: hidden;
     }
     
@@ -213,8 +214,7 @@
 .cards-area {
   .transition;
 
-  border-top-left-radius: 9px;
-  border-bottom-left-radius: 9px;
+  padding-top: 6px;
   
   .cards-area {
     // for nested cards
@@ -451,7 +451,7 @@
   text-transform: none;
   display: inline-block;
   padding: 2px 10px;
-  border-radius: 4px;
+  border-radius: @card-border-radius;
   background: rgba(255,255,255,0.5);
   background-blend-mode: multiply;
   
@@ -467,7 +467,7 @@
 }
 
 .card-placeholder {
-  border-radius: 6px;
+  border-radius: @card-border-radius;
   opacity: 0.7;
 }
 

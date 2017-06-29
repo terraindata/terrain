@@ -51,6 +51,7 @@ import * as _ from 'underscore';
 import { Card, _card } from '../../../blocks/types/Card';
 import { Block, TQLFn } from '../../../blocks/types/Block';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
+import ElasticKeyBuilderTextbox from '../../../../src/app/common/components/ElasticKeyBuilderTextbox';
 
 /**
  * Represents an Elastic Search query clause
@@ -163,20 +164,37 @@ abstract class ESClause
       obj['key'] = '';
       
       // prepend the display with our standard key text display
-      if (!obj['static']['display'])
+      const objStatic = obj['static'];
+      const display = objStatic['display'];
+      if (!display)
       {
-        obj['static']['display'] = KEY_DISPLAY;
+        objStatic['display'] = KEY_DISPLAY;
       }
-      else if (Array.isArray(obj['static']['display']))
+      else if (Array.isArray(display))
       {
-        (obj['static']['display'] as any).unshift(KEY_DISPLAY);
+        (display as Display[]).unshift(KEY_DISPLAY);
       }
       else
       {
-        obj['static']['display'] = [
-          KEY_DISPLAY,
-          obj['static']['display'],
-        ] as any;
+        if (KEY_INLINE_DISPLAYS.indexOf(display.displayType) !== -1)
+        {
+          // we should inline this display
+          objStatic['display'] = {
+            displayType: DisplayType.FLEX,
+            key: null,
+            flex: [
+              KEY_DISPLAY,
+              display,
+            ],
+          }
+        }
+        else
+        {
+          objStatic['display'] = [
+            KEY_DISPLAY,
+            objStatic['display'],
+          ] as any;
+        }
       }
     }
     
@@ -200,12 +218,20 @@ abstract class ESClause
   }
 }
 
+const KEY_INLINE_DISPLAYS = [
+  DisplayType.TEXT,
+  DisplayType.CARDTEXT,
+  DisplayType.NUM,
+  DisplayType.DROPDOWN,
+];
+
 const KEY_DISPLAY: Display =
 {
   displayType: DisplayType.TEXT,
   key: 'key',
   autoDisabled: true, // TODO consider autocomplete for key?
-  className: 'card-muted-input',
+  className: 'card-muted-input card-elastic-key-input',
+  component: ElasticKeyBuilderTextbox,
 };
 
 export default ESClause;

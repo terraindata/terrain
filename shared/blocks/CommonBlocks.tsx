@@ -75,15 +75,26 @@ interface IWrapperCardConfig
   singleChild?: boolean;
   isAggregate?: boolean;
   language: string;
-  init?: () => any,
+  init?: () => any;
+  className?: string;
 }
 
 export const _wrapperCard = (config: IWrapperCardConfig) =>
 {
+  const display = config.display || (
+    config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
+  );
+  
+  if(config.className)
+  {
+    (display as Display).className += ' ' + config.className;
+  }
+      
   return _card({
     cards: L(),
 
-    static: {
+    static:
+    {
       title: config.title,
       colors: config.colors,
       accepts: config.accepts,
@@ -109,9 +120,7 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
         return 'Nothing';
       },
 
-      display: config.display || (
-        config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
-      ),
+      display,
 
       tql: config.tql,
       tqlGlue: config.tqlGlue,

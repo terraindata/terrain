@@ -52,6 +52,7 @@ import ESClause from './ESClause';
 import ESInterpreter from './ESInterpreter';
 import ESValueInfo from './ESValueInfo';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
+import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 
 /**
  * A clause which is one of several possible types
@@ -103,23 +104,31 @@ export default class ESVariantClause extends ESClause
   
   public getCard()
   {
-    return this.seedCard(CommonBlocks._wrapperCard({
-      colors: [],
-      title: this.type + ' (Variant)',
-      tql: (block, tqlFn, tqlConfig) =>
+    return this.seedCard({
+      cards: Immutable.List([]),
+      
+      static: 
       {
-        console.log(tqlFn(block['cards'].get(0), tqlConfig));
-        return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
-      },
-      singleChild: true,
-      accepts: Immutable.List(
-        _.map(
-          this.subtypes,
-          (type: string, jsonType: string) =>
-            'eql' + type
-        )
-      ),
-      language: 'elastic',
-    }));
+        title: this.type + ' (Variant)',
+        tql: (block, tqlFn, tqlConfig) =>
+        {
+          return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+        },
+        accepts: Immutable.List(
+          _.map(
+            this.subtypes,
+            (type: string, jsonType: string) =>
+              'eql' + type
+          )
+        ),
+        display:
+        {
+          displayType: DisplayType.CARDS,
+          key: 'cards',
+          singleChild: true,
+        },
+        preview: '',
+      }
+    });
   }
 }

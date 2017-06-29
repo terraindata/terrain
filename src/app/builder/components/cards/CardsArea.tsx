@@ -59,6 +59,7 @@ import CreateCardTool from './CreateCardTool';
 const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
+import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
 
 export interface Props
 {
@@ -185,6 +186,7 @@ class CardsArea extends PureClasss<Props>
             'cards-area': true,
             [this.props.className]: !!this.props.className,
           })}
+          style={backgroundColor(Colors().builder.cards.cardBase)}
         >
           {
             cards.map((card: Card, index: number) =>
