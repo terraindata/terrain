@@ -43,18 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import { ItemStatus } from '../../../../shared/items/types/Item';
 import Util from '../../util/Util';
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import LibraryTypes from './../LibraryTypes';
+import LibraryTypes from '../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
 import { _LibraryState, LibraryState, LibraryStore } from './LibraryStore';
+
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
-import * as Immutable from 'immutable';
-import { ItemStatus } from '../../../../shared/items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
@@ -210,6 +213,21 @@ const Actions =
         newVariant = LibraryTypes.touchVariant(newVariant);
 
         Actions.variants.create(groupId, algorithmId, newVariant);
+      },
+
+      deploy:
+      (variant: Variant, op: string, templateBody: object, toStatus: ItemStatus) =>
+      {
+        Ajax.deployQuery(
+          op,
+          templateBody,
+          variant.db,
+          (response) =>
+          {
+            // on load
+            Actions.variants.status(variant, toStatus, true);
+          },
+        );
       },
 
       status:

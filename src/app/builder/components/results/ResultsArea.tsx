@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import './ResultsArea.less';
 const { Map, List } = Immutable;
@@ -53,6 +54,7 @@ import * as _ from 'underscore';
 const moment = require('moment');
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import BackendInstance from '../../../../../shared/backends/types/BackendInstance';
 import Query from '../../../../../shared/items/types/Query';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
@@ -63,10 +65,10 @@ import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/Spot
 import Result from '../results/Result';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
-import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
-import InfiniteScroll from './../../../common/components/InfiniteScroll';
-import PureClasss from './../../../common/components/PureClasss';
-import Switch from './../../../common/components/Switch';
+
+import InfiniteScroll from '../../../common/components/InfiniteScroll';
+import PureClasss from '../../../common/components/PureClasss';
+import Switch from '../../../common/components/Switch';
 import { getPrimaryKeyFor, MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
 import Radium = require('radium');
 import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
@@ -336,9 +338,9 @@ class ResultsArea extends PureClasss<Props>
       csvQueryId: queryId,
     });
 
-    alert('Your data are being prepared for export, and will automatically download when ready.\n\
+    alert('Your data is being prepared for export, and will be automatically downloaded when ready.\n\
 Note: this exports the results of your query, which may be different from the results in the Results \
-column if you have set a custom results view.');
+column if you have customized the results view.');
   }
 
   /*  handleExport()
