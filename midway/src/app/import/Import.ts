@@ -85,7 +85,17 @@ export class Import
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
-      const configError: string = this._verifyConfig(imprt);
+      const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + imprt.dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('File import currently is only supported for Elastic databases.');
+      }
+
+      const configError: string = this._verifyConfig(imprt, await database.getTasty().schema());
       if (configError !== '')
       {
         return reject(configError);
@@ -103,7 +113,9 @@ export class Import
       {
         return reject('No data provided in file to upload.');
       }
-      const columns: string[] = this._getArrayFromMap(imprt.columnMap);
+      const nameToType: object = this._includedNamesToType(imprt);
+      const columns: string[] = Object.keys(nameToType);
+      const types: string[] = columns.map((val) => this._convertToESType(nameToType[val]));   // TODO: asterisk out the existing fields
       winston.info('got parsed data!');
       winston.info(JSON.stringify(items));
 
@@ -112,21 +124,26 @@ export class Import
         [imprt.primaryKey],
         columns,
         imprt.db,
+        types,
       );
-
-      const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + imprt.dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File import currently is only supported for Elastic databases.');
-      }
+      await database.getTasty().getDB().putMapping(insertTable);
 
       winston.info('about to upsert via tasty...');
       resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
     });
+  }
+  // TODO: remove this temporary test hack
+  private _convertToESType(type: string): string
+  {
+    switch (type)
+    {
+      case 'string':
+        return 'text';
+      case 'number':
+        return 'double';
+      default:    // does not handle "array"
+        return type;
+    }
   }
 
   // TODO: move into shared Util file
@@ -166,7 +183,7 @@ export class Import
   }
 
   /* returns an error message if there are any; else returns empty string */
-  private _verifyConfig(imprt: ImportConfig): string
+  private _verifyConfig(imprt: ImportConfig, schema: Tasty.Schema): string
   {
     const indexError: string = this._isValidIndexName(imprt.db);
     if (indexError !== '')
@@ -204,7 +221,8 @@ export class Import
         return 'Lengths of columnMap, columnsToInclude, and columnTypes do not match.';
       }
     }
-    const columnList: string[] = this._getArrayFromMap(imprt.columnMap);
+    const nameToType: object = this._includedNamesToType(imprt);
+    const columnList: string[] = Object.keys(nameToType);
     const columns: Set<string> = new Set(columnList);
     if (columns.size !== columnList.length)
     {
@@ -212,24 +230,47 @@ export class Import
     }
     if (!columns.has(imprt.primaryKey))
     {
-      return 'A column to be uploaded must be specified as the primary key.';
-    }
-    const primaryKeyInd: string = Object.keys(imprt.columnMap).find((key) => imprt.columnMap[key] === imprt.primaryKey) as string;
-    if (!imprt.columnsToInclude[primaryKeyInd])
-    {
-      return 'The primary key column must be included in the upload.';
+      return 'A column to be included in the uploaded must be specified as the primary key.';
     }
     if (columns.has(''))
     {
       return 'The empty string is not a valid column name.';
     }
-    const columnTypes: string[] = this._getArrayFromMap(imprt.columnTypes);
+    const columnTypes: string[] = this._getArrayFromMap(nameToType);
     if (columnTypes.some((val, ind, arr) =>
     {
       return !(this.supportedColumnTypes.has(val));
     }))
     {
       return 'Invalid data type encountered.';
+    }
+    const schemaError: string = this._isSchemaCompatible(nameToType, schema, imprt.db);
+    if (schemaError !== '')
+    {
+      return schemaError;
+    }
+    return '';
+  }
+  private _isSchemaCompatible(nameToType: object, schema: Tasty.Schema, db: string): string
+  {
+    if (schema.databaseNames().indexOf(db) !== -1)
+    {
+      const fieldsToCheck: Set<string> = new Set(Object.keys(nameToType));
+      for (const table of schema.tableNames(db))
+      {
+        const fields: object = schema.fields(db, table);
+        for (const field in fields)
+        {
+          if (fields.hasOwnProperty(field) && fieldsToCheck.has(field))
+          {
+            winston.info('...schema for field...');
+            winston.info(JSON.stringify(fields[field]));
+            // if fields[field]['type'] isn't compatible with nameToType[field], throw error
+            // TODO: handle types of numbers
+            // TODO: make this recursive to handle objects and arrays
+          }
+        }
+      }
     }
     return '';
   }

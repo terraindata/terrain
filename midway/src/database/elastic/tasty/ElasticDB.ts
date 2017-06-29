@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
+import * as winston from 'winston';
+
 import TastyDB from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
@@ -179,7 +181,24 @@ export class ElasticDB implements TastyDB
   }
 
   /*
-   * Deletes the given objects based on their primary key
+   * Deletes the given index
+   */
+  public async createIndex(indexName)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const params = {
+        index: indexName,
+      };
+
+      this.client.indices.create(
+        params,
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  /*
+   * Deletes the given index
    */
   public async deleteIndex(indexName)
   {
@@ -191,6 +210,36 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.delete(
         params,
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  public async putMapping(table: TastyTable): Promise<object>
+  {
+    const schema: TastySchema = await this.schema();
+    if (schema.databaseNames().indexOf(table.getDatabaseName()) === -1)
+    {
+      await this.createIndex(table.getDatabaseName());
+    }
+
+    const mapping: Map<string, string> = table.getMapping();
+    const payload: object = {};
+    for (const [key, value] of mapping.entries())
+    {
+      if (value !== '*')
+      {
+        payload[key] = { type: value };
+      }
+    }
+    winston.info('putMapping payload: ' + JSON.stringify(payload));
+    return new Promise((resolve, reject) =>
+    {
+      this.client.indices.putMapping(
+        {
+          index: table.getDatabaseName(),
+          type: table.getTableName(),
+          body: { properties: payload },
+        },
         makePromiseCallback(resolve, reject));
     });
   }
