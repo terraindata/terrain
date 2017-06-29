@@ -43,9 +43,7 @@ THE SOFTWARE.
 */
 
 "use strict";
-
 // A dummy mode
-
 (function(mod)
 {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
@@ -56,29 +54,19 @@ THE SOFTWARE.
     mod(CodeMirror);
 })(function(CodeMirror)
 {
-
   CodeMirror.defineMode("elastic", function(config, parserConfig)
   {
-    // Tokenizer
-
-    // Interface
-
     return {
-      startState: function(basecolumn)
+      startState: function()
       {
         return {}
       },
-
       token: function(stream, state)
       {
         stream.skipToEnd();
         return null;
       },
-
       helperType: "elastic"
     };
   });
-
 });
-
-

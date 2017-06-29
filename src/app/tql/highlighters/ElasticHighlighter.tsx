@@ -60,6 +60,15 @@ import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpre
 // other imports
 import SyntaxHighlighter from './SyntaxHighlighter';
 
+/*
+ *  Errors involving this function probably mean a missing a case on a switch.
+ *  See: https://stackoverflow.com/questions/39419170
+ */
+function assertUnreachable(param: never): never
+{
+  throw new Error("Unreachable code reached");
+}
+
 interface FlaggedToken
 {
   isKeyword: boolean,
@@ -147,6 +156,10 @@ class ElasticHighlighter extends SyntaxHighlighter
     }
   }
 
+  /*
+   *  Property names are generally elastic keywords, so they are highlighted as properties.
+   *  If they are not elastic keywords, they are highlighted as strings.
+   */
   protected getStyle(fToken: FlaggedToken): string
   {
     if (fToken.isKeyword)
@@ -179,8 +192,8 @@ class ElasticHighlighter extends SyntaxHighlighter
       case ESJSONType.parameter:
         return 'cm-variable-2';
       default:
-        return fToken.parserToken.jsonType;
-      // if you see a 'not assignable' linter error here then the switch is missing a case
+        assertUnreachable(fToken.parserToken.jsonType);
+      // an error on assertUnreachable might mean a missing case
     }
   }
 
