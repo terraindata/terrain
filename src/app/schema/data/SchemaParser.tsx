@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import SchemaTypes from '../SchemaTypes';
-import BackendInstance from "../../../../shared/backends/types/BackendInstance";
+import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 const { Map, List } = Immutable;
 
 type Server = SchemaTypes.Server;
@@ -60,7 +60,7 @@ export namespace SchemaParser
 {
   export function parseMySQLDbs_m1(db: BackendInstance,
     colsData: object,
-    addDbToServerAction: (payload: SchemaTypes.AddDbToServerActionPayload) => void, )
+    addDbToServerAction: (payload: SchemaTypes.AddDbToServerActionPayload) => void )
   {
     let server: Server = SchemaTypes._Server({
       name: 'Other MySQL Databases',
@@ -107,7 +107,7 @@ export namespace SchemaParser
         PRIVILEGES: string,
         COLUMN_COMMENT: string,
         GENERATION_EXPRESSION: string,
-      }, ) =>
+      } ) =>
       {
         const tableId = SchemaTypes.tableId(serverId, db['name'], col.TABLE_NAME);
         let table = tables.get(tableId);
@@ -168,7 +168,7 @@ export namespace SchemaParser
 
   export function parseMySQLDb(rawServer: object,
     schemaData: object,
-    setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void, )
+    setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void )
   {
     let server = SchemaTypes._Server({
       name: rawServer['name'],
@@ -264,7 +264,7 @@ export namespace SchemaParser
 
   export function parseElasticDb(elasticServer: object,
     schemaData: object,
-    setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void, )
+    setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void )
   {
     let server = SchemaTypes._Server({
       name: elasticServer['name'],

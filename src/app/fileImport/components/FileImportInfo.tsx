@@ -46,12 +46,12 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 const { List } = Immutable;
+import SchemaTypes from '../../schema/SchemaTypes';
+import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
 import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
-import Autocomplete from './../../common/components/Autocomplete';
-import SchemaTypes from '../../schema/SchemaTypes';
 
 export interface Props
 {
@@ -103,10 +103,10 @@ class FileImportInfo extends PureClasss<Props>
     }
 
     const filetype = file.target.files[0].name.split('.').pop();
-    console.log("filetype:", filetype);
+    console.log('filetype:', filetype);
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
-      alert("Invalid filetype, please select another file");
+      alert('Invalid filetype, please select another file');
       this.refs['file']['value'] = null;
       return;
     }
@@ -115,9 +115,9 @@ class FileImportInfo extends PureClasss<Props>
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      console.log("contents: ", fr.result);
+      console.log('contents: ', fr.result);
       Actions.chooseFile(fr.result, filetype);
-    }
+    };
   }
 
   public handleUploadFile()
@@ -128,7 +128,7 @@ class FileImportInfo extends PureClasss<Props>
     }
     else
     {
-      alert("Please select a file to upload, server, database, and table");
+      alert('Please select a file to upload, server, database, and table');
     }
   }
 
@@ -139,7 +139,7 @@ class FileImportInfo extends PureClasss<Props>
     return (
       <div>
         <div>
-          <input ref="file" type="file" onChange={this.handleChooseFile} />
+          <input ref='file' type='file' onChange={this.handleChooseFile} />
         </div>
         <div>
           <h3>Server</h3>

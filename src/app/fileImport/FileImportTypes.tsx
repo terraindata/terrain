@@ -60,13 +60,13 @@ export namespace FileImportTypes
     public connectionId: number = -1;
 
     public dbSelected: boolean = false;
-    public dbText: string = "";
+    public dbText: string = '';
 
     public tableSelected: boolean = false;
-    public tableText: string = "";
+    public tableText: string = '';
 
-    public file: string = "";
-    public filetype: string = "";
+    public file: string = '';
+    public filetype: string = '';
     public fileChosen: boolean = false;
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes

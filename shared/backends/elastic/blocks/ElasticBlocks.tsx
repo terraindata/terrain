@@ -60,7 +60,7 @@ const { make } = BlockUtils;
 import
 {
   elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
-  elasticNumber, elasticObject, elasticText, elasticValue
+  elasticNumber, elasticObject, elasticText, elasticValue,
 } from './ElasticJSONBlocks';
 import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
