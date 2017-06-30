@@ -49,12 +49,12 @@ import * as Immutable from 'immutable';
 
 import ESClause from './ESClause';
 import ESClauseType from '../ESClauseType';
-import EQLConfig from './EQLConfig';
-import ESInterpreter from './ESInterpreter';
+import EQLConfig from '../EQLConfig';
+import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
-import ESValueInfo from './ESValueInfo';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import ESValueInfo from '../ESValueInfo';
+import * as CommonBlocks from '../../../../blocks/CommonBlocks';
+import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
 
 /**
  * A clause which is one of several possible types

@@ -49,7 +49,7 @@ import * as _ from 'underscore';
 
 import SpecializedCreateCardTool from '../../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
 import BlockUtils from '../../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
+import * as CommonBlocks from '../../../../blocks/CommonBlocks';
 import { Display, DisplayType, wrapperDisplay, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
 import { _block, Block } from '../../../../blocks/types/Block';
 import { Card } from '../../../../blocks/types/Card';
