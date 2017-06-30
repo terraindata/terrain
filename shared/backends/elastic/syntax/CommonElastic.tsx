@@ -73,7 +73,13 @@ export const valueTypesDisplayNames =
   };
 
 export const acceptsValues = Immutable.List(
-  ['elasticValue', 'elasticObject', 'elasticArray', 'elasticText', 'elasticBool', 'elasticNumber', 'elasticNull'],
+  ['elasticValue',
+    'elasticObject',
+    'elasticArray',
+    'elasticText',
+    'elasticBool',
+    'elasticNumber',
+    'elasticNull'],
 );
 
 export const Directions: string[] = ['ascending', 'descending'];

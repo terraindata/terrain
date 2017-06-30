@@ -44,90 +44,68 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 
-import EQLConfig from './EQLConfig';
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
 
 /**
- * A clause which is one of several possible types
+ * A clause which can only take on a restricted set of values.
  */
-export default class ESVariantClause extends ESClause
+export default class ESEnumClause extends ESClause
 {
-  public subtypes: { [jsonType: string]: string };
+  public values: any[];
+  public valueMap: any;
 
-  public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
+  public constructor(type: string, values: any[], settings: any)
   {
-    super(type, settings);
-    this.subtypes = subtypes;
-  }
+    super(type, settings, ESClauseType.ESEnumClause);
 
-  public init(config: EQLConfig): void
-  {
-    Object.keys(this.subtypes).forEach(
-      (key: string): void =>
-      {
-        config.declareType(this.subtypes[key]);
-      });
+    this.values = values;
+    this.valueMap = new Map();
+    for (let i = 0; i < this.values.length; ++i)
+    {
+      const value = this.values[i];
+      this.valueMap.set(value, i);
+    }
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this; // only sticks if subclause isn't detected
-
-    const value: any = valueInfo.value;
-    let valueType: string = typeof (value);
-    if (Array.isArray(value))
+    if (this.valueMap.get(valueInfo.value) === undefined)
     {
-      valueType = 'array';
+      if (this.values.length > 10)
+      {
+        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
+      }
+      else
+      {
+        interpreter.accumulateError(valueInfo,
+          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
+      }
     }
-
-    const subtype: string | undefined = this.subtypes[valueType];
-    if (subtype === undefined)
-    {
-      interpreter.accumulateError(valueInfo,
-        'Unknown clause type. Expected one of these types: ' +
-        JSON.stringify(Object.keys(this.subtypes), null, 2) +
-        ', but found a ' +
-        valueType +
-        ' instead.');
-      return;
-    }
-
-    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
+    valueInfo.clause = this;
   }
-  
+
   public getCard()
   {
     return this.seedCard({
-      cards: Immutable.List([]),
-      
-      static: 
-      {
-        title: this.type + ' (Variant)',
-        tql: (block, tqlFn, tqlConfig) =>
-        {
-          return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+      value: this.template || this.values[0],
+
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.DROPDOWN,
+          key: 'value',
+          options: Immutable.List(this.values),
+          dropdownUsesRawValues: true,
         },
-        accepts: Immutable.List(
-          _.map(
-            this.subtypes,
-            (type: string, jsonType: string) =>
-              'eql' + type
-          )
-        ),
-        display:
-        {
-          displayType: DisplayType.CARDS,
-          key: 'cards',
-          singleChild: true,
-        },
-        preview: '',
+        tql: (block) => block['value'],
       }
     });
   }

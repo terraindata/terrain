@@ -44,67 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-
-import EQLConfig from './EQLConfig';
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
 
 /**
- * A clause which can only take on a restricted set of values.
+ * A clause that corresponds to an object of uniform type values.
  */
-export default class ESEnumClause extends ESClause
+export default class ESMapClause extends ESClause
 {
-  public values: any[];
-  public valueMap: any;
+  public nameType: string;
+  public valueType: string;
 
-  public constructor(type: string, values: any[], settings: any)
+  public constructor(type: string, nameType: string, valueType: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESMapClause);
+    this.nameType = nameType;
+    this.valueType = valueType;
+  }
 
-    this.values = values;
-    this.valueMap = new Map();
-    for (let i = 0; i < this.values.length; ++i)
-    {
-      const value = this.values[i];
-      this.valueMap.set(value, i);
-    }
+  public init(config: EQLConfig): void
+  {
+    config.declareType(this.nameType);
+    config.declareType(this.valueType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    if (this.valueMap.get(valueInfo.value) === undefined)
-    {
-      if (this.values.length > 10)
-      {
-        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
-      }
-      else
-      {
-        interpreter.accumulateError(valueInfo,
-          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
-      }
-    }
     valueInfo.clause = this;
-  }
-  
-  public getCard()
-  {
-    return this.seedCard({
-      value: this.template || this.values[0],
-      
-      static: {
-        preview: '[value]',
-        display: {
-          displayType: DisplayType.DROPDOWN,
-          key: 'value',
-          options: Immutable.List(this.values),
-          dropdownUsesRawValues: true,
-        },
-        tql: (block) => block['value'],
-      }
-    });
+
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.object))
+    {
+      return;
+    }
+
+    // mark properties
+    const childClause: ESClause = interpreter.config.getClause(this.valueType);
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
+
+        if (viTuple.propertyValue !== null)
+        {
+          childClause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
   }
 }

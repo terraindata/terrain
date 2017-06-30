@@ -44,32 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 
 /**
- * A clause which is a terminal (base) value: null, boolean, number, or string
+ * A clause which is a field name (column name)
  */
-export default class ESBaseClause extends ESClause
+export default class ESTypeClause extends ESStringClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESTypeClause);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) === 'object')
-    {
-      const foundType: string = Array.isArray(value) ? 'array' : 'object';
-      interpreter.accumulateError(
-        valueInfo,
-        'Found an ' +
-        foundType +
-        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
-    }
-  }
+  // TODO: add field validation here
 }

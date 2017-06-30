@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
@@ -55,9 +56,15 @@ import { Input, InputType } from '../../../blocks/types/Input';
 import Util from '../../../../src/app/util/Util';
 
 import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
-import { elasticArray, elasticBool, elasticKeyValueWrap, elasticNull, elasticNumber, elasticObject, elasticText, elasticValue } from './ElasticJSONBlocks';
+import
+{
+  elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
+  elasticNumber, elasticObject, elasticText, elasticValue,
+} from './ElasticJSONBlocks';
 import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
 import elasticRootCard from './ElasticRootCard';
+import { elasticScore, elasticWeight } from './ElasticScoreCard';
+import { elasticTransform, scorePoint } from './ElasticTransformCard';
 
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 const { make } = BlockUtils;
@@ -75,6 +82,11 @@ export const ElasticBlocks = _.extend(
     elasticText,
     elasticNull,
 
+    elasticScore,
+    scorePoint,
+    elasticTransform,
+    elasticWeight,
+
     elasticRootCard,
 
     elasticMagicValue,
@@ -83,18 +95,18 @@ export const ElasticBlocks = _.extend(
     elasticMagicCard,
 
     elasticCreating: _card( // a placeholder for when a card is being created
-    {
-      static:
       {
-        language: 'elastic',
-        tql: '',
-        title: 'New Card',
-        colors: ['#777', '#777'],
-        preview: '',
-        display: null,
-        // manualEntry: null,
-      },
-    }),
+        static:
+        {
+          language: 'elastic',
+          tql: '',
+          title: 'New Card',
+          colors: ['#777', '#777'],
+          preview: '',
+          display: null,
+          // manualEntry: null,
+        },
+      }),
 
     elasticKeyValueWrap,
     // JSON toggle the type blocks

@@ -44,38 +44,38 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
 
 /**
- * A clause which is a null
+ * A clause which is a string
  */
-export default class ESNullClause extends ESClause
+export default class ESStringClause extends ESTerminalClause
 {
-  public constructor(type: string, settings: any)
+  public constructor(type: string,
+    settings: any,
+    clauseType: ESClauseType = ESClauseType.ESStringClause,
+    jsonType: ESJSONType = ESJSONType.string)
   {
-    super(type, settings);
+    super(type, settings, clauseType, jsonType);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (value !== null)
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be null.');
-    }
-  }
-  
   public getCard()
   {
     return this.seedCard({
+      value: this.template || '',
       static: {
-        preview: '',
-        display: [],
-        tql: () => null,
-      }
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'value',
+          // TODO autocomplete
+        },
+        tql: (stringBlock) => stringBlock['value'],
+      },
     });
   }
 }

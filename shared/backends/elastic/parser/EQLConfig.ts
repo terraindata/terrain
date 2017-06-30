@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESArrayClause from './clauses/ESArrayClause';
+import ESClause from './clauses/ESClause';
+import ESMapClause from './clauses/ESMapClause';
 import EQLSpec from './EQLSpec';
-import ESArrayClause from './ESArrayClause';
-import ESClause from './ESClause';
-import ESMapClause from './ESMapClause';
 
 /**
  *

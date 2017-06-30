@@ -44,67 +44,88 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 
-function getExpectedFile(): string
+import ESClause from './ESClause';
+import ESClauseType from '../ESClauseType';
+import EQLConfig from './EQLConfig';
+import ESInterpreter from './ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from './ESValueInfo';
+import * as CommonBlocks from '../../../blocks/CommonBlocks';
+import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+
+/**
+ * A clause which is one of several possible types
+ */
+export default class ESVariantClause extends ESClause
 {
-  return __filename.split('.')[0] + '.expected';
-}
+  public subtypes: { [jsonType: string]: string };
 
-let expected;
-let config: EQLConfig;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
+  public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(expectedString);
-  try
-  {
-    config = new EQLConfig();
-  } catch (e)
-  {
-    fail(e);
+    super(type, settings, ESClauseType.ESVariantClause);
+    this.subtypes = subtypes;
   }
 
-  done();
-});
+  public init(config: EQLConfig): void
+  {
+    Object.keys(this.subtypes).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.subtypes[key]);
+      });
+  }
 
-function testParse(testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing \'' + testString + '\'');
-  const interpreter: ESInterpreter = new ESInterpreter(testString, config);
-  const parser: ESJSONParser = interpreter.parser;
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.parentClause = this;
 
-  winston.info(util.inspect(parser.getValueInfo()));
+    const valueType: string = ESJSONType[valueInfo.jsonType];
 
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
+    const subtype: string | undefined = this.subtypes[valueType];
+    if (subtype === undefined)
     {
-      const testValue: any = expected[testName];
+      interpreter.accumulateError(valueInfo,
+        'Unknown clause type. Expected one of these types: ' +
+        JSON.stringify(Object.keys(this.subtypes), null, 2) +
+        ', but found a ' +
+        valueType +
+        ' instead.');
+      return;
+    }
 
-      // test parsing the value using a few spacing options
-      testParse(JSON.stringify(testValue), testValue);
+    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
+  }
+  
+  public getCard()
+  {
+    return this.seedCard({
+      cards: Immutable.List([]),
+      
+      static: 
+      {
+        title: this.type + ' (Variant)',
+        tql: (block, tqlFn, tqlConfig) =>
+        {
+          return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+        },
+        accepts: Immutable.List(
+          _.map(
+            this.subtypes,
+            (type: string, jsonType: string) =>
+              'eql' + type
+          )
+        ),
+        display:
+        {
+          displayType: DisplayType.CARDS,
+          key: 'cards',
+          singleChild: true,
+        },
+        preview: '',
+      }
     });
-});
+  }
+}

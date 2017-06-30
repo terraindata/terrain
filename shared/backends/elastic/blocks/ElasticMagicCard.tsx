@@ -132,7 +132,7 @@ function previewList(card: Card, depth: number = 0): string
   return str;
 }
 
-const accepts = List(['elasticMagicCard', 'elasticMagicList']);
+const accepts = List(['elasticMagicCard', 'elasticMagicList', 'elasticScore']);
 
 export const elasticMagicList = _card(
   {

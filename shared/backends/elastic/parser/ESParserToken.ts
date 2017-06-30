@@ -53,11 +53,7 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESParserToken
 {
-  private static emptyErrorList: ESParserError[] = [];
-
   public jsonType: ESJSONType; // The JSON type of this token
-
-  public valueInfo: ESValueInfo | null; // value info that this token belongs to
 
   public charNumber: number; // number of chars into the source that this token begins
   public row: number; // row in which this token begins (rows start at 0)
@@ -76,7 +72,6 @@ export default class ESParserToken
     substring: string)
   {
     this.jsonType = ESJSONType.unknown;
-    this.valueInfo = null;
 
     this.charNumber = charNumber;
     this.row = row;
@@ -86,23 +81,11 @@ export default class ESParserToken
     this.length = length;
     this.substring = substring;
 
-    this.errors = ESParserToken.emptyErrorList;
+    this.errors = [];
   }
 
   public attachError(error: ESParserError): void
   {
-    if (this.valueInfo !== null)
-    {
-      this.valueInfo.attachError(error);
-    }
-
-    if (this.errors.length === 0)
-    {
-      this.errors = [error];
-    }
-    else
-    {
-      this.errors.push(error);
-    }
+    this.errors.push(error);
   }
 }

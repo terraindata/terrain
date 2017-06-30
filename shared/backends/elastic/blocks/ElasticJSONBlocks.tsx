@@ -91,7 +91,7 @@ export const elasticObject = _wrapperCard({
   },
   title: 'Object',
   colors: ['#123', '#456'],
-  accepts: List(['elasticKeyValueWrap', 'elasticKeyValueToggle']),
+  accepts: List(['elasticKeyValueWrap']),
 });
 
 export const elasticArray = _wrapperCard({

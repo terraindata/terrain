@@ -44,45 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 
 /**
- * A clause which is a string
+ * A clause which is a field name (column name)
  */
-export default class ESStringClause extends ESClause
+export default class ESIndexClause extends ESStringClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESIndexClause);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'string')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a string.');
-    }
-  }
-  
-  public getCard()
-  {
-    return this.seedCard({
-      value: this.template || '',
-      
-      static: {
-        preview: '[value]',
-        display: {
-          displayType: DisplayType.TEXT,
-          key: 'value',
-          // TODO autocomplete
-        },
-        tql: (stringBlock) => stringBlock['value'],
-      }
-    });
-  }
+  // TODO: add field validation here
 }

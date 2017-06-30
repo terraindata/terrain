@@ -46,36 +46,27 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
 
 /**
  * A clause which is a boolean
  */
-export default class ESBooleanClause extends ESClause
+export default class ESBooleanClause extends ESTerminalClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESBooleanClause, ESJSONType.boolean);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'boolean')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a boolean.');
-    }
-  }
-  
   public getCard()
   {
     return this.seedCard({
       value: true,
-      
+
       static: {
         preview: '[value]',
         display: {
@@ -86,7 +77,7 @@ export default class ESBooleanClause extends ESClause
             'true',
           ]),
         },
-        tql: (boolBlock) => !! boolBlock['value'],
+        tql: (boolBlock) => !!boolBlock['value'],
       }
     });
   }

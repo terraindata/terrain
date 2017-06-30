@@ -237,19 +237,19 @@ class CardsArea extends PureClasss<Props>
 
           {
             !this.props.hideCreateCardTool &&
-              renderCardTool &&
-                <CreateCardTool
-                  language={this.props.language}
-                  canEdit={this.props.canEdit}
-                  keyPath={this.props.keyPath}
-                  index={props.cards.size}
-                  open={this.state.cardToolOpen}
-                  className='nested-create-card-tool-wrapper'
-                  accepts={this.props.accepts}
-                  onToggle={this._toggle('cardToolOpen')}
-                  hidePlaceholder={this.props.singleChild || cards.size === 0}
-                  cannotClose={cards.size === 0}
-                />
+            renderCardTool &&
+            <CreateCardTool
+              language={this.props.language}
+              canEdit={this.props.canEdit}
+              keyPath={this.props.keyPath}
+              index={props.cards.size}
+              open={this.state.cardToolOpen}
+              className='nested-create-card-tool-wrapper'
+              accepts={this.props.accepts}
+              onToggle={this._toggle('cardToolOpen')}
+              hidePlaceholder={this.props.singleChild || cards.size === 0}
+              cannotClose={cards.size === 0}
+            />
           }
 
         </div>

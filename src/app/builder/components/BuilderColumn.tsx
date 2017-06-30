@@ -315,7 +315,7 @@ const BuilderColumn = React.createClass<any, any>(
     render()
     {
       const { query, canEdit, cantEditReason } = this.props;
-      
+
       return this.renderPanel((
         <div
           className={'builder-column builder-column-' + this.props.index}

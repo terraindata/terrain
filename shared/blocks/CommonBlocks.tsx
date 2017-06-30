@@ -107,11 +107,6 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
 
       preview: (c: IWrapperCard) =>
       {
-        // var prefix = config.title + ': ';
-        // if(c.type === 'parentheses')
-        // {
-        //   prefix = '';
-        // }
         if (c.cards.size)
         {
           const card = c.cards.get(0);
