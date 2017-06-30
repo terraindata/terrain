@@ -57,6 +57,10 @@ const CodeMirror = require('./Codemirror.js');
 import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
+// Formatting and Parsing
+import ESConverter from '../../../../shared/backends/elastic/conversion/formatter/ESConverter';
+import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
+
 // Style sheets and addons for CodeMirror
 require('./elastic.js');
 require('./tql.js');
@@ -86,6 +90,7 @@ import './dialog.less';
 
 export interface Props
 {
+
   tql: string;
   language?: string;
   canEdit: boolean;
@@ -95,6 +100,8 @@ export interface Props
 
   isDiff?: boolean;
   diffTql?: string;
+
+  onTQLEditorInit?(editorInstance: TQLEditor): void; // callback to pass back TQLEditor instance
 
   onChange?(tql: string);
   onFocusChange?(focused: boolean);
@@ -107,6 +114,11 @@ export interface Props
 
 class TQLEditor extends PureClasss<Props>
 {
+  // public state: {
+  //   codeMirrorInstance?;
+  // } = {
+  // };
+
   public render()
   {
     const options =
@@ -174,6 +186,32 @@ class TQLEditor extends PureClasss<Props>
     );
   }
 
+  // public componentDidMount()
+  // {
+  //   if (this.props.onTQLEditorInit)
+  //   {
+  //     this.props.onTQLEditorInit(this);
+  //   }
+  // }
+
+  /*
+   *  Don't format the query if it has errors
+   */
+  // public autoFormatQuery(): string | null
+  // {
+  //   if (this.state.codeMirrorInstance && this.props.language === 'elastic')
+  //   {
+  //     const parser: ESJSONParser = new ESJSONParser(this.state.codeMirrorInstance.getValue());
+  //     if (!parser.hasError())
+  //     {
+  //       const newText: string = ESConverter.formatES(parser);
+  //       // this.state.codeMirrorInstance.setValue(newText);
+  //       return newText;
+  //     }
+  //   }
+  //   return null;
+  // }
+
   private handleChanges(cmInstance, changes: object[])
   {
     if (this.props.language === 'elastic')
@@ -185,6 +223,9 @@ class TQLEditor extends PureClasss<Props>
 
   private registerCodeMirror(cmInstance)
   {
+    this.setState({
+      codeMirrorInstance: cmInstance
+    });
     cmInstance.on('changes', this.handleChanges);
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
@@ -192,6 +233,7 @@ class TQLEditor extends PureClasss<Props>
       highlighter.initialHighlight(cmInstance);
     }
   }
+
 }
 
 export default TQLEditor;

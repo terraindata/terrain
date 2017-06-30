@@ -63,6 +63,9 @@ import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';
 
+import ESConverter from '../../../../shared/backends/elastic/conversion/formatter/ESConverter';
+import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
+
 export interface Props
 {
   variant?: LibraryTypes.Variant;
@@ -91,6 +94,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
     resultsBarOpen: boolean;
+    editorInstance?: TQLEditor;
   } = {
     tql: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
@@ -133,6 +137,15 @@ class BuilderTQLColumn extends PureClasss<Props>
       if (tql === this.state.tql)
       {
         return;
+      }
+
+      if (noAction && this.state.editorInstance) // autoformat query
+      {
+        const formattedText: string | null = this.autoFormatQuery(tql);
+        if (formattedText)
+        {
+          tql = formattedText;
+        }
       }
 
       // this.checkForFolding(tql);
@@ -450,6 +463,21 @@ class BuilderTQLColumn extends PureClasss<Props>
       </div>
     );
   }
+
+  private autoFormatQuery(input: string): string | null
+  {
+    if (this.props.language === 'elastic')
+    {
+      const parser: ESJSONParser = new ESJSONParser(input);
+      if (!parser.hasError())
+      {
+        const newText: string = ESConverter.formatES(parser);
+        return newText;
+      }
+    }
+    return null;
+  }
+
 }
 
 export default BuilderTQLColumn;
