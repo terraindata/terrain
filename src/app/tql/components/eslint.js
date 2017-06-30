@@ -59,7 +59,8 @@ const eslintConfig = new EQLConfig();
 })(function(CodeMirror) {
   "use strict";
 
-    CodeMirror.registerHelper("lint", "elastic", function(text) {
+    CodeMirror.registerHelper("lint", "elastic", function(text) 
+    {
       var found = [];
       try {
         //const t = new ESInterpreter(text, eslintConfig);
