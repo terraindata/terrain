@@ -79,17 +79,17 @@ const FileImportActions =
     () =>
       $(ActionTypes.uploadFile, {}),
 
-    setColumnsToInclude:
+    setColumnToInclude:
     (id: string) =>
-      $(ActionTypes.setColumnsToInclude, { id }),
+      $(ActionTypes.setColumnToInclude, { id }),
 
-    setColumnNames:
+    setColumnName:
     (id: string, columnName: string) =>
-      $(ActionTypes.setColumnNames, { id, columnName }),
+      $(ActionTypes.setColumnName, { id, columnName }),
 
-    setColumnTypes:
+    setColumnType:
     (id: string, typeIndex: number) =>
-      $(ActionTypes.setColumnTypes, { id, typeIndex }),
+      $(ActionTypes.setColumnType, { id, typeIndex }),
   };
 
 export default FileImportActions;

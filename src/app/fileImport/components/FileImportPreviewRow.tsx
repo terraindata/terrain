@@ -49,72 +49,34 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
-import PreviewColumn from './PreviewColumn';
-import PreviewRow from './PreviewRow';
-import './Preview.less';
+import PureClasss from './../../common/components/PureClasss';
 
 export interface Props
 {
-  previewRows: object[];
-  columnsCount: number;
-  primaryKey: string;
-  columnsToInclude: Map<string, boolean>;
-  columnNames: Map<string, string>;
-  columnTypes: Map<string, number>;
+  items: object;
 }
 
-const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date', 'array', 'object']);
-
-class Preview extends Classs<Props>
+class FileImportPreviewRow extends PureClasss<Props>
 {
   public shouldComponentUpdate(nextProps: Props)
   {
-    const { previewRows, columnsToInclude, columnNames, columnTypes } = this.props;
-    return previewRows !== nextProps.previewRows || columnsToInclude !== nextProps.columnsToInclude ||
-      columnNames !== nextProps.columnNames || columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey;
+    return this.props.items !== nextProps.items;
   }
 
   public render()
   {
-    const previewCols = [];
-    this.props.columnNames.forEach((value, key) =>
-    {
-      previewCols.push(
-        <PreviewColumn
-          key={key}
-          id={key}
-          isIncluded={this.props.columnsToInclude.get(key)}
-          name={this.props.columnNames.get(key)}
-          typeIndex={this.props.columnTypes.get(key)}
-          types={DATATYPES}
-          canSelectType={true}
-          canSelectColumn={true}
-          isPrimaryKey={this.props.primaryKey ? this.props.primaryKey === value : false}
-        />
-      );
-    });
-
-    const previewRows = Object.keys(this.props.previewRows).map((key) =>
-      <PreviewRow
-        key={key}
-        items={this.props.previewRows[key]}
-      />
+    const row = Object.keys(this.props.items).map((key) =>
+      <td key={key}>
+        {
+          this.props.items[key]
+        }
+      </td>
     );
 
     return (
-      <table>
-        <thead>
-          <tr>
-            {previewCols}
-          </tr>
-        </thead>
-        <tbody>
-          {previewRows}
-        </tbody>
-      </table>
+      <tr>{row}</tr>
     );
   }
 }
 
-export default Preview;
+export default FileImportPreviewRow;

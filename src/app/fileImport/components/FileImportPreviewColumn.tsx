@@ -49,31 +49,79 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import PureClasss from './../../common/components/PureClasss';
+import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
+import Dropdown from './../../common/components/Dropdown';
+import Actions from './../data/FileImportActions';
+import './FileImportPreviewColumn.less';
 
 export interface Props
 {
   key: string;
-  items: object[];
+  id: string;
+  isIncluded: boolean;
+  name: string;
+  typeIndex: number;
+  isPrimaryKey: boolean;
+
+  types: List<string>;
+  canSelectType: boolean;
+  canSelectColumn: boolean;
 }
 
-class PreviewRow extends Classs<Props>
+class FileImportPreviewColumn extends PureClasss<Props>
 {
-  public shouldComponentUpdate(nextProps: Props)
+  public handleIncludedChange()
   {
-    return this.props.items !== nextProps.items;
+    Actions.setColumnToInclude(this.props.id);
+  }
+
+  public handleAutocompleteHeaderChange(value)
+  {
+    Actions.setColumnName(this.props.id, value);
+  }
+
+  public handleTypeChange(typeIndex)
+  {
+    Actions.setColumnType(this.props.id, typeIndex);
+  }
+
+  public handlePrimaryKeyChange()
+  {
+    Actions.changePrimaryKey(this.props.id);
   }
 
   public render()
   {
-    const row = Object.keys(this.props.items).map((key) =>
-      <td key={key}>{this.props.items[key]}</td>
-    );
-
     return (
-      <tr>{row}</tr>
+      <th>
+        include
+        <CheckBox
+          checked={this.props.isIncluded}
+          onChange={this.handleIncludedChange}
+        />
+        primary key
+        <CheckBox
+          checked={this.props.isPrimaryKey}
+          onChange={this.handlePrimaryKeyChange}
+        />
+        <Autocomplete
+          value={this.props.name}
+          options={null}
+          onChange={this.handleAutocompleteHeaderChange}
+          placeholder={this.props.id}
+          disabled={!this.props.canSelectColumn}
+        />
+        <Dropdown
+          selectedIndex={this.props.typeIndex}
+          options={this.props.types}
+          onChange={this.handleTypeChange}
+          canEdit={this.props.canSelectType}
+        />
+      </th>
     );
   }
 }
 
-export default PreviewRow;
+export default FileImportPreviewColumn;

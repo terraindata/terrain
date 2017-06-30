@@ -63,9 +63,9 @@ export namespace FileImportTypes
     public previewRows: object[] = null;
     public columnsCount: number = 0;
 
-    public columnsToInclude: Map<string, boolean> = null;
-    public columnNames: Map<string, string> = null;
-    public columnTypes: Map<string, number> = null;
+    public columnsToInclude: IMMap<string, boolean> = null;
+    public columnNames: IMMap<string, string> = null;
+    public columnTypes: IMMap<string, number> = null;
 
     public hasCsvHeader: boolean = true;
     public primaryKey: string = '';
@@ -80,6 +80,16 @@ export namespace FileImportTypes
   //   and you can't use `new` simply with Immutable Records.
   export const _FileImportState = (config?: { [key: string]: any }) =>
     New<FileImportState>(new FileImportStateC(config), config);
+
+  export const ELASTIC_TYPES =
+    [
+      'string',
+      'number',
+      'boolean',
+      'date',
+      'array',
+      'object',
+    ]
 }
 
 export default FileImportTypes;

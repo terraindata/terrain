@@ -50,7 +50,7 @@ import FileImportInfo from './FileImportInfo';
 import FileImportStore from './../data/FileImportStore';
 import FileImportTypes from './../FileImportTypes';
 import PureClasss from './../../common/components/PureClasss';
-import Preview from './Preview';
+import FileImportPreview from './FileImportPreview';
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
 const HTML5Backend = require('react-dnd-html5-backend');
@@ -106,7 +106,7 @@ class FileImport extends PureClasss<any>
     const { dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
 
     return (
-      <div className="fileImport">
+      <div className="file-import">
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
@@ -127,7 +127,7 @@ class FileImport extends PureClasss<any>
         </div>
         {
           previewRows &&
-          <Preview
+          <FileImportPreview
             previewRows={previewRows}
             columnsCount={columnsCount}
             primaryKey={primaryKey}

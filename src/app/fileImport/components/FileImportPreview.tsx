@@ -43,107 +43,90 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// import 'bootstrap/dist/css/bootstrap.css';
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-const ReactDataGrid = require('react-data-grid');
-
-import './Table.less';
-
-import * as classNames from 'classnames';
-import { Menu, MenuOption } from '../../common/components/Menu';
 import Util from '../../util/Util';
-import PureClasss from './PureClasss';
-const Dimensions = require('react-dimensions');
-
-const LEFT_COLOR_FROM = hexToRgb('#a2af93');
-const LEFT_COLOR_TO = hexToRgb('#828c76');
-const TOP_COLOR_FROM = hexToRgb('#565d4e');
-const TOP_COLOR_TO = hexToRgb('#3e3c3c');
-
-export interface IColumn
-{
-  key: string;
-  name: string;
-  resizable?: boolean;
-  width?: number;
-}
+import PureClasss from './../../common/components/PureClasss';
+import FileImportPreviewColumn from './FileImportPreviewColumn';
+import FileImportPreviewRow from './FileImportPreviewRow';
+import FileImportTypes from './../FileImportTypes';
+import './FileImportPreview.less';
+const { List } = Immutable;
 
 export interface Props
 {
-  columns: List<IColumn>;
-  rowGetter: (index: number) => Object;
-  rowsCount: number;
-  // rows: List<Map<any, any>>;
-  random?: number;
-  onCellClick?: (r: number, c: number) => void;
-  menuOptions?: List<MenuOption>;
-  rowKey: string;
-  rowHeight?: number;
-
-  containerWidth?: number;
-  containerHeight?: number;
+  previewRows: object[];
+  columnsCount: number;
+  primaryKey: string;
+  columnsToInclude: IMMap<string, boolean>;
+  columnNames: IMMap<string, string>;
+  columnTypes: IMMap<string, number>;
 }
 
-const HEADER_ROW_HEIGHT = 35;
-const MAX_INIT_HEIGHT = 40;
-const MAX_INIT_WIDTH = 300;
+const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date', 'array', 'object']);
 
-class _Table extends PureClasss<Props>
+class FileImportPreview extends PureClasss<Props>
 {
-  public state: {
-  } = {
-  };
-
-  constructor(props: Props)
-  {
-    super(props);
-  }
-
   public render()
   {
-    return (
-      <ReactDataGrid
-        {...this.props}
-        columns={this.props.columns.toJS()}
-        minHeight={this.props.containerHeight}
-        minWidth={this.props.containerWidth}
+    const previewCols = this.props.columnNames.map((value, key) =>
+      <FileImportPreviewColumn
+        key={key}
+        id={key}
+        isIncluded={this.props.columnsToInclude.get(key)}
+        name={this.props.columnNames.get(key)}
+        typeIndex={this.props.columnTypes.get(key)}
+        types={DATATYPES}
+        canSelectType={true}
+        canSelectColumn={true}
+        isPrimaryKey={this.props.primaryKey === value}
       />
+    );
+
+    // const previewRows = Object.keys(this.props.previewRows).map((key) =>
+    //   <FileImportPreviewRow
+    //     key={key}
+    //     items={this.props.previewRows[key]}
+    //   />
+    // );
+
+    return (
+      <table>
+        <thead>
+          <tr>
+            {
+              this.props.columnNames.map((value, key) =>
+                <FileImportPreviewColumn
+                  key={key}
+                  id={key}
+                  isIncluded={this.props.columnsToInclude.get(key)}
+                  name={this.props.columnNames.get(key)}
+                  typeIndex={this.props.columnTypes.get(key)}
+                  types={List(FileImportTypes.ELASTIC_TYPES)}
+                  canSelectType={true}
+                  canSelectColumn={true}
+                  isPrimaryKey={this.props.primaryKey === value}
+                />
+              ).toArray()
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            this.props.previewRows.map((items, key) =>
+              <FileImportPreviewRow
+                key={key}
+                items={items}
+              />
+            )
+          }
+        </tbody>
+      </table>
     );
   }
 }
 
-export const Table = Dimensions({
-  elementResize: true,
-  containerStyle: {
-    height: '100%',
-  },
-})(_Table);
-
-function hexToRgb(hex)
-{
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16),
-  } : null;
-}
-
-/**
- * Ported from sass implementation in C
- * https://github.com/sass/libsass/blob/0e6b4a2850092356aa3ece07c6b249f0221caced/functions.cpp#L209
- */
-function mixColors(color1, color2, amount)
-{
-  const weight1 = amount;
-  const weight2 = 1 - amount;
-
-  const r = Math.round(weight1 * color1.r + weight2 * color2.r);
-  const g = Math.round(weight1 * color1.g + weight2 * color2.g);
-  const b = Math.round(weight1 * color1.b + weight2 * color2.b);
-
-  return { r, g, b };
-}
-
-export default Table;
+export default FileImportPreview;

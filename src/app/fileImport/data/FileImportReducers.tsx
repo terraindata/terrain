@@ -48,6 +48,7 @@ import * as _ from 'underscore';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
+import FileImportTypes from './../FileImportTypes';
 const { List, Map } = Immutable;
 
 const FileImportReducers = {}
@@ -71,31 +72,31 @@ FileImportReducers[ActionTypes.changeTableText] =
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
-      .set('hasCsvHeader', !state.hasCsvHeader);
-;
+      .set('hasCsvHeader', !state.hasCsvHeader)
+  ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
-      .set('primaryKey', state.columnNames.get(action.payload.id));
-;
-
-FileImportReducers[ActionTypes.setColumnsToInclude] =
-  (state, action) =>
-    state
-      .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
+      .set('primaryKey', state.columnNames.get(action.payload.id))
   ;
 
-FileImportReducers[ActionTypes.setColumnNames] =
+FileImportReducers[ActionTypes.setColumnToInclude] =
   (state, action) =>
     state
-      .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
+      .updateIn(['columnsToInclude', action.payload.id], (isColIncluded: boolean) => !isColIncluded)
   ;
 
-FileImportReducers[ActionTypes.setColumnTypes] =
+FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
     state
-      .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
+      .setIn(['columnNames', action.payload.id], action.payload.columnName)
+  ;
+
+FileImportReducers[ActionTypes.setColumnType] =
+  (state, action) =>
+    state
+      .setIn(['columnTypes', action.payload.id], action.payload.typeIndex)
   ;
 
 FileImportReducers[ActionTypes.chooseFile] =
@@ -109,27 +110,24 @@ FileImportReducers[ActionTypes.chooseFile] =
     if (action.payload.filetype === 'csv' && !state.hasCsvHeader)
     {
       console.log('headerless csv');
-      for (let i = 0; i < action.payload.preview[0].length; i++)
+      action.payload.preview[0].map((value, i) =>
       {
         columnsToInclude.push(['column' + i, true]);
         columnNames.push(['column' + i, 'column' + i]);
         columnTypes.push(['column' + i, 0]);
         colsCount++;
-      }
+      });
     }
     else
     {
       console.log('csv with header/json');
-      for (const property in action.payload.preview[0])
+      _.map(action.payload.preview[0], (value, key) =>
       {
-        if (action.payload.preview[0].hasOwnProperty(property))
-        {
-          columnsToInclude.push([property, true]);
-          columnNames.push([property, property]);
-          columnTypes.push([property, 0]);
-          colsCount++;
-        }
-      }
+        columnsToInclude.push([key, true]);
+        columnNames.push([key, key]);
+        columnTypes.push([key, 0]);
+        colsCount++;
+      });
     }
 
     return state
@@ -141,7 +139,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('columnsToInclude', Map(columnsToInclude))
       .set('columnNames', Map(columnNames))
       .set('columnTypes', Map(columnTypes));
-  }
+  };
 
 FileImportReducers[ActionTypes.uploadFile] =
   (state) =>
@@ -150,28 +148,10 @@ FileImportReducers[ActionTypes.uploadFile] =
     const columnTypes = [];
     state.columnTypes.forEach((value, key) =>
     {
-      switch (value)
-      {
-        case 0:
-          isCsv ? columnTypes.push('string') : columnTypes.push([key, 'string']);
-          break;
-        case 1:
-          isCsv ? columnTypes.push('number') : columnTypes.push([key, 'number']);
-          break;
-        case 2:
-          isCsv ? columnTypes.push('boolean') : columnTypes.push([key, 'boolean']);
-          break;
-        case 3:
-          isCsv ? columnTypes.push('date') : columnTypes.push([key, 'date']);
-          break;
-        case 4:
-          isCsv ? columnTypes.push('array') : columnTypes.push([key, 'array']);
-          break;
-        case 5:
-          isCsv ? columnTypes.push('object') : columnTypes.push([key, 'object']);
-          break;
-      }
+      const typeName = FileImportTypes.ELASTIC_TYPES[value];
+      columnTypes.push(isCsv ? typeName : [key, typeName]);
     });
+
     const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
     const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
     const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
