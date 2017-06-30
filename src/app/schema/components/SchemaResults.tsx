@@ -55,7 +55,7 @@ import BackendInstance from './../../../../shared/backends/types/BackendInstance
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
 import { _Query, Query } from '../../../../shared/items/types/Query';
 import { _ResultsState, ResultsManager, ResultsState } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';

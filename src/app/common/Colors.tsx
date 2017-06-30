@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import { extend } from 'underscore';
 const Color = require('color');
 
 interface Theme
@@ -59,6 +60,12 @@ interface Theme
 
     link: string, // TODO
     linkHover: string,
+  },
+  
+  button: {
+    text: string,
+    background: string,
+    backgroundHover: string,
   },
 
   // main title bar
@@ -198,14 +205,22 @@ const DARK: Theme =
     base: '#2F2F2F',
 
     // text
-    text: {
+    text:
+    {
       baseDark: '#000000',
       secondaryDark: 'rgba(0,0,0,0.50)',
       baseLight: '#FFFFFF',
       secondaryLight: 'rgba(255,255,255,0.80)',
 
       link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string()
+      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+    },
+    
+    button:
+    {
+      text: '#FFFFFF',
+      background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+      backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
     },
 
     // main title bar
@@ -365,6 +380,14 @@ export function fontColor(color: string, hoverColor?: string)
 export function link()
 {
   return fontColor(Colors().text.link, Colors().text.linkHover);
+}
+
+export function buttonColors()
+{
+  return extend({},
+    backgroundColor(Colors().button.background, Colors().button.backgroundHover),
+    fontColor(Colors().button.text)
+  );
 }
 
 export function getStyle(color: string, style: string, hoverColor?: string)

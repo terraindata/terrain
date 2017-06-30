@@ -48,7 +48,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
 import SpecializedCreateCardTool from '../../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
-import BlockUtils from '../../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../../blocks/CommonBlocks';
 import { Display, DisplayType, wrapperDisplay, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
 import { _block, Block } from '../../../../blocks/types/Block';
@@ -365,14 +365,14 @@ export default class ESStructureClause extends ESClause
             this.template,
             (templateValue, templateKey) =>
             {
-              const clauseType = templateValue || this.structure[templateKey];
-              if (ElasticBlocks['eql' + clauseType])
+              const clauseType = 'eql' + (templateValue || this.structure[templateKey]);
+              if (ElasticBlocks[clauseType])
               {
                 return BlockUtils.make(
-                  ElasticBlocks['eql' + clauseType],
+                  ElasticBlocks[clauseType],
                   {
                     key: templateKey,
-                    value: templateValue,
+                    // value: templateValue === null ? undefined : templateValue,
                     // all base cards have a 'value' key
                   }
                 );

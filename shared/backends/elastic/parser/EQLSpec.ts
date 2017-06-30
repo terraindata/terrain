@@ -167,10 +167,15 @@ const EQLSpec: ESClause[] =
         name: 'root clause',
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { index: '', type: '', from: 0, size: 1000, body: null },
+        template: { index: null, type: null, from: null, size: null, body: null },
         autocomplete: ['index', 'type'],
       }),
-    new ESIndexClause('index', { desc: 'Selects which index to search.' }),
+    new ESIndexClause('index',
+      { 
+        desc: 'Selects which index to search.',
+        template: '',
+      }
+    ),
     new ESTypeClause('type', { desc: 'Selects which type to search.' }),
     new ESNumberClause('from',
       {
@@ -181,6 +186,7 @@ const EQLSpec: ESClause[] =
       {
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
+        template: 1000,
       }),
     new ESStructureClause('body',
       {

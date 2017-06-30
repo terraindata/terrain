@@ -51,333 +51,327 @@ import { Block, BlockConfig } from './types/Block';
 import { Card, Cards } from './types/Card';
 // import { AllBackendsMap } from '../backends/AllBackends';
 
-namespace BlockUtils
+export function getChildIds(_block: Block): IMMap<ID, boolean>
 {
-  export function getChildIds(_block: Block): IMMap<ID, boolean>
-  {
-    let map = Map<ID, boolean>({});
+  let map = Map<ID, boolean>({});
 
-    if (Immutable.Iterable.isIterable(_block))
+  if (Immutable.Iterable.isIterable(_block))
+  {
+    const block = _block.toMap();
+    if (block.get('id'))
     {
-      const block = _block.toMap();
-      if (block.get('id'))
-      {
-        map = map.set(block.get('id'), true);
-      }
-      block.map((value) => map = map.merge(getChildIds(value)));
+      map = map.set(block.get('id'), true);
     }
-
-    return map;
+    block.map((value) => map = map.merge(getChildIds(value)));
   }
 
-  export function forAllCards(
-    block: Block | List<Block>,
-    fn: (card: Card, keyPath: KeyPath) => void,
-  )
-  {
-    forAllBlocks(
-      block,
-      (block: Block, keyPath: KeyPath) =>
-      {
-        if (block['_isCard'])
-        {
-          fn(block as any, keyPath);
-        }
-      },
-    );
-  }
+  return map;
+}
 
-  export function forAllBlocks(
-    block: Block | List<Block>,
-    fn: (block: Block, keyPath: KeyPath) => void,
-    keyPath: KeyPath = List([]),
-    stopAtFirstBlock?: boolean,
-    excludeWrappedCards?: boolean,
-  )
-  {
-    if (block)
+export function forAllCards(
+  block: Block | List<Block>,
+  fn: (card: Card, keyPath: KeyPath) => void,
+)
+{
+  forAllBlocks(
+    block,
+    (block: Block, keyPath: KeyPath) =>
     {
-      if (block['_isBlock'])
+      if (block['_isCard'])
       {
-        fn(block as Block, keyPath);
+        fn(block as any, keyPath);
       }
-      if (
-        Immutable.Iterable.isIterable(block)
-        && (!stopAtFirstBlock || !block['_isBlock'] || !keyPath.size)
-      )
-      {
-        (block.toMap() as any).map(
-          (b, key) =>
+    },
+  );
+}
+
+export function forAllBlocks(
+  block: Block | List<Block>,
+  fn: (block: Block, keyPath: KeyPath) => void,
+  keyPath: KeyPath = List([]),
+  stopAtFirstBlock?: boolean,
+  excludeWrappedCards?: boolean,
+)
+{
+  if (block)
+  {
+    if (block['_isBlock'])
+    {
+      fn(block as Block, keyPath);
+    }
+    if (
+      Immutable.Iterable.isIterable(block)
+      && (!stopAtFirstBlock || !block['_isBlock'] || !keyPath.size)
+    )
+    {
+      (block.toMap() as any).map(
+        (b, key) =>
+        {
+          if (!excludeWrappedCards || key !== 'cards')
           {
-            if (!excludeWrappedCards || key !== 'cards')
-            {
-              forAllBlocks(
-                b as Block,
-                fn,
-                keyPath.push(key),
-                stopAtFirstBlock,
-                excludeWrappedCards,
-              );
-            }
-          },
-        );
-      }
+            forAllBlocks(
+              b as Block,
+              fn,
+              keyPath.push(key),
+              stopAtFirstBlock,
+              excludeWrappedCards,
+            );
+          }
+        },
+      );
     }
   }
+}
 
-  export function transformAlias(transformCard: Card): string
+export function transformAlias(transformCard: Card): string
+{
+  return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
+}
+
+// This creates a new instance of a card / block
+// Usage: BlockUtils.make(MySQLBlocks.sort)
+export const make = (block: BlockConfig, extraConfig?: { [key: string]: any }) =>
+{
+  const { type } = block;
+
+  block = _.extend({}, block); // shallow clone
+
+  if (block.static.init)
   {
-    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
+    block = _.extend({}, block, block.static.init());
   }
 
-  // This creates a new instance of a card / block
-  // Usage: BlockUtils.make(MySQLBlocks.sort)
-  export const make = (block: BlockConfig, extraConfig?: { [key: string]: any }) =>
+  if (extraConfig)
   {
-    const { type } = block;
+    block = _.extend(block, extraConfig);
+  }
 
-    block = _.extend({}, block); // shallow clone
-
-    if (block.static.init)
-    {
-      block = _.extend({}, block, block.static.init());
-    }
-
-    if (extraConfig)
-    {
-      block = _.extend(block, extraConfig);
-    }
-
-    if (block.static)
-    {
-      delete block.static;
-    }
-
-    if (!block.id || !block.id.length)
-    {
-      block.id = 'block-' + Math.random();
-    }
-
-    return blockTypeToBlockRecord[block.type](block);
-  };
-
-  // private, maps a type (string) to the backing Immutable Record
-  // types are added when initBlocks is called
-  const blockTypeToBlockRecord: any = {};
-
-  // Given a plain JS object, construct the Record for it and its children
-  export const recordFromJS = (value: any, Blocks) =>
+  if (block.static)
   {
-    if (value && value.static && Immutable.Iterable.isIterable(value))
-    {
-      // already a block / record
-      // change to a better way of checking if you can think of one
-      return value;
-    }
+    delete block.static;
+  }
 
-    if (Array.isArray(value) || typeof value === 'object')
-    {
-      if (Immutable.Iterable.isIterable(value))
-      {
-        value = value.map((v) => recordFromJS(v, Blocks));
-      }
-      else
-      {
-        value = _.reduce(value, (memo, v, key) =>
-        {
-          memo[key] = recordFromJS(v, Blocks);
-          return memo;
-        }, Array.isArray(value) ? [] : {});
-      }
+  if (!block.id || !block.id.length)
+  {
+    block.id = 'block-' + Math.random();
+  }
 
-      const type = value.type || (typeof value.get === 'function' && value.get('type'));
-      if (type && Blocks[type])
-      {
-        value = make(Blocks[type], value);
-      }
-      else
-      {
-        value = Immutable.fromJS(value);
-      }
-    }
+  return blockTypeToBlockRecord[block.type](block);
+};
 
+// private, maps a type (string) to the backing Immutable Record
+// types are added when initBlocks is called
+const blockTypeToBlockRecord: any = {};
+
+// Given a plain JS object, construct the Record for it and its children
+export const recordFromJS = (value: any, Blocks) =>
+{
+  if (value && value.static && Immutable.Iterable.isIterable(value))
+  {
+    // already a block / record
+    // change to a better way of checking if you can think of one
     return value;
-  };
+  }
 
-  // Prepare cards/records for save, trimming static values
-  export const cardsForServer = (value: any) =>
+  if (Array.isArray(value) || typeof value === 'object')
   {
     if (Immutable.Iterable.isIterable(value))
     {
-      value = value.toJS();
+      value = value.map((v) => recordFromJS(v, Blocks));
     }
-
-    if (value && value.static)
+    else
     {
-      delete value.static;
-    }
-
-    if (Array.isArray(value))
-    {
-      value.map(cardsForServer);
-    }
-    else if (typeof value === 'object')
-    {
-      for (const i in value)
+      value = _.reduce(value, (memo, v, key) =>
       {
-        cardsForServer(value[i]);
+        memo[key] = recordFromJS(v, Blocks);
+        return memo;
+      }, Array.isArray(value) ? [] : {});
+    }
+
+    const type = value.type || (typeof value.get === 'function' && value.get('type'));
+    if (type && Blocks[type])
+    {
+      value = make(Blocks[type], value);
+    }
+    else
+    {
+      value = Immutable.fromJS(value);
+    }
+  }
+
+  return value;
+};
+
+// Prepare cards/records for save, trimming static values
+export const cardsForServer = (value: any) =>
+{
+  if (Immutable.Iterable.isIterable(value))
+  {
+    value = value.toJS();
+  }
+
+  if (value && value.static)
+  {
+    delete value.static;
+  }
+
+  if (Array.isArray(value))
+  {
+    value.map(cardsForServer);
+  }
+  else if (typeof value === 'object')
+  {
+    for (const i in value)
+    {
+      cardsForServer(value[i]);
+    }
+  }
+  return value;
+};
+
+// returns preview for a given card
+export function getPreview(card: Card): string
+{
+  if (!card)
+  {
+    return;
+  }
+
+  if (!card.static)
+  {
+    if (typeof card === 'string' || typeof card === 'number')
+    {
+      return card + '';
+    }
+
+    try
+    {
+      return JSON.stringify(card);
+    } catch (e)
+    {
+      return 'No preview';
+    }
+  }
+
+  const { preview } = card.static;
+  if (typeof preview === 'string')
+  {
+    return preview.replace(/\[[a-z\.]*\]/g, (str) =>
+    {
+      const pattern = str.substr(1, str.length - 2);
+      const keys = pattern.split('.');
+      if (keys.length === 1)
+      {
+        const value = card[keys[0]];
+        if (value && value['_isCard'])
+        {
+          return getPreview(value);
+        }
+        return value;
       }
-    }
-    return value;
-  };
-
-  // returns preview for a given card
-  export function getPreview(card: Card): string
-  {
-    if (!card)
-    {
-      return;
-    }
-
-    if (!card.static)
-    {
-      if (typeof card === 'string' || typeof card === 'number')
+      if (keys[1] === 'length' || keys[1] === 'size')
       {
-        return card + '';
+        return card[keys[0]].size;
       }
-
-      try
-      {
-        return JSON.stringify(card);
-      } catch (e)
-      {
-        return 'No preview';
-      }
-    }
-
-    const { preview } = card.static;
-    if (typeof preview === 'string')
-    {
-      return preview.replace(/\[[a-z\.]*\]/g, (str) =>
-      {
-        const pattern = str.substr(1, str.length - 2);
-        const keys = pattern.split('.');
-        if (keys.length === 1)
-        {
-          const value = card[keys[0]];
-          if (value['_isCard'])
-          {
-            return getPreview(value);
-          }
-          return value;
-        }
-        if (keys[1] === 'length' || keys[1] === 'size')
-        {
-          return card[keys[0]].size;
-        }
-        return card[keys[0]].toArray().map(
-          (v) =>
-            getPreview(v[keys[1]]),
-        ).join(', ');
-      });
-    }
-    else if (typeof preview === 'function')
-    {
-      return preview(card);
-    }
-    return 'No preview';
+      return card[keys[0]].toArray().map(
+        (v) =>
+          getPreview(v[keys[1]]),
+      ).join(', ');
+    });
   }
-
-  // Must be called on the Blocks def for each language
-  // Used to add types to the Blocks and add them to the typeToRecord config
-  //  if you can think of a better way to do this, be my guest.
-  export function initBlocks(Blocks)
+  else if (typeof preview === 'function')
   {
-    _.map(
-      Blocks as ({ [card: string]: any }),
-      (v, i) =>
-      {
-        // Set the "type" field for all blocks equal to its key
-        Blocks[i].type = i;
-        // finally, add Blocks to the blockTypeToBlockRecord map
-        blockTypeToBlockRecord[i] = Immutable.Record(Blocks[i]);
-      },
-    );
+    return preview(card);
   }
-
-  // given an existing list of cards and a new list to update to,
-  //  reconcile the two into a new list that maintains as many of the
-  //  card references from the current list as possible, while applying
-  //  the structure of the new list
-  export function reconcileCards(currentCards: Cards, newCards: Cards): Cards
-  {
-    let currentCardIndex = 0;
-    return newCards.map(
-      (card, index) =>
-      {
-        // search for a card of the same type
-        let tempIndex = currentCardIndex;
-        while (
-          tempIndex < currentCards.size &&
-          currentCards.get(tempIndex).type !== card.type
-        )
-        {
-          tempIndex++;
-        }
-
-        if (tempIndex !== currentCards.size)
-        {
-          // found a matching card, assign the id and meta fields, and update currentCardIndex
-          const currentCard = currentCards.get(tempIndex) as Card;
-          currentCardIndex = tempIndex + 1;
-          return reconcileBlock(currentCard, card) as Card;
-
-        }
-        // else, no matching card found, move on
-        return card;
-      },
-    ).toList();
-  }
-
-  export function reconcileBlock(currentBlock: Block, newBlock: Block): Block
-  {
-    if (!currentBlock || currentBlock.type !== newBlock.type)
-    {
-      return newBlock;
-    }
-
-    let block = newBlock;
-
-    block.static.metaFields && block.static.metaFields.map(
-      (metaField) =>
-        block = block.set(metaField, currentBlock[metaField]),
-    );
-
-    if (block['cards'])
-    {
-      block = block.set('cards',
-        reconcileCards(currentBlock['cards'], block['cards']),
-      );
-    }
-
-    BlockUtils.forAllBlocks(
-      block,
-      (childBlock, keyPath) =>
-      {
-        const currentChildBlock = currentBlock.getIn(keyPath);
-        if (keyPath.size && currentChildBlock)
-        {
-          block = block.setIn(keyPath, reconcileBlock(currentChildBlock, childBlock));
-        }
-      },
-      List([]),
-      true,
-      true,
-    );
-
-    return block;
-  }
-
+  return 'No preview';
 }
 
-export default BlockUtils;
+// Must be called on the Blocks def for each language
+// Used to add types to the Blocks and add them to the typeToRecord config
+//  if you can think of a better way to do this, be my guest.
+export function initBlocks(Blocks)
+{
+  _.map(
+    Blocks as ({ [card: string]: any }),
+    (v, i) =>
+    {
+      // Set the "type" field for all blocks equal to its key
+      Blocks[i].type = i;
+      // finally, add Blocks to the blockTypeToBlockRecord map
+      blockTypeToBlockRecord[i] = Immutable.Record(Blocks[i]);
+    },
+  );
+}
+
+// given an existing list of cards and a new list to update to,
+//  reconcile the two into a new list that maintains as many of the
+//  card references from the current list as possible, while applying
+//  the structure of the new list
+export function reconcileCards(currentCards: Cards, newCards: Cards): Cards
+{
+  let currentCardIndex = 0;
+  return newCards.map(
+    (card, index) =>
+    {
+      // search for a card of the same type
+      let tempIndex = currentCardIndex;
+      while (
+        tempIndex < currentCards.size &&
+        currentCards.get(tempIndex).type !== card.type
+      )
+      {
+        tempIndex++;
+      }
+
+      if (tempIndex !== currentCards.size)
+      {
+        // found a matching card, assign the id and meta fields, and update currentCardIndex
+        const currentCard = currentCards.get(tempIndex) as Card;
+        currentCardIndex = tempIndex + 1;
+        return reconcileBlock(currentCard, card) as Card;
+
+      }
+      // else, no matching card found, move on
+      return card;
+    },
+  ).toList();
+}
+
+export function reconcileBlock(currentBlock: Block, newBlock: Block): Block
+{
+  if (!currentBlock || currentBlock.type !== newBlock.type)
+  {
+    return newBlock;
+  }
+
+  let block = newBlock;
+
+  block.static.metaFields && block.static.metaFields.map(
+    (metaField) =>
+      block = block.set(metaField, currentBlock[metaField]),
+  );
+
+  if (block['cards'])
+  {
+    block = block.set('cards',
+      reconcileCards(currentBlock['cards'], block['cards']),
+    );
+  }
+
+  forAllBlocks(
+    block,
+    (childBlock, keyPath) =>
+    {
+      const currentChildBlock = currentBlock.getIn(keyPath);
+      if (keyPath.size && currentChildBlock)
+      {
+        block = block.setIn(keyPath, reconcileBlock(currentChildBlock, childBlock));
+      }
+    },
+    List([]),
+    true,
+    true,
+  );
+
+  return block;
+}

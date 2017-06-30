@@ -48,7 +48,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { Card } from '../../../../../shared/blocks/types/Card';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';

@@ -52,7 +52,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
 import { Display } from '../../../../shared/blocks/displays/Display';
 import { Block } from '../../../../shared/blocks/types/Block';
 import { Card, CardString } from '../../../../shared/blocks/types/Card';

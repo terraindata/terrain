@@ -43,75 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Radium from 'radium';
-import * as classNames from 'classnames';
-import * as React from 'react';
-import PureClasss from '../../common/components/PureClasss';
-import Util from '../../util/Util';
-import './InfoArea.less';
-import { Colors, backgroundColor, fontColor, buttonColors } from '../../common/Colors';
 
-const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
-const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
 
-export interface Props
+/**
+ * A clause which is a terminal (base) value: null, boolean, number, or string
+ */
+export default class ESBaseClause extends ESClause
 {
-  large?: string;
-  small?: string;
-  button?: string;
-  onClick?: () => void;
-  inline?: boolean; // render inline, rather than absolutely middle
-}
-
-@Radium
-class InfoArea extends PureClasss<Props>
-{
-  constructor(props)
+  public constructor(type: string, settings: any)
   {
-    super(props);
-    Util.bind(this, 'renderThing');
+    super(type, settings);
   }
 
-  public renderThing(thing: string, onClick?: boolean)
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    if (!this.props[thing])
+    valueInfo.clause = this;
+    const value: any = valueInfo.value;
+    if (typeof (value) === 'object')
     {
-      return null;
+      const foundType: string = Array.isArray(value) ? 'array' : 'object';
+      interpreter.accumulateError(
+        valueInfo,
+        'Found an ' +
+        foundType +
+        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
     }
-    
-    let style = fontColor(thing == 'small' ? Colors().text.secondaryLight : Colors().text.baseLight);
-    if (thing === 'button')
-    {
-      style = buttonColors();
-    }
-
-    return (
-      <div
-        className={'info-area-' + thing}
-        onClick={onClick ? this.props.onClick : null}
-        style={style}
-      >
-        {
-          this.props[thing]
-        }
-      </div>
-    );
-  }
-
-  public render()
-  {
-    return (
-      <div
-        className={classNames({
-          'info-area': true,
-          'info-area-inline': this.props.inline,
-        })}
-      >
-        {this.renderThing('large')}
-        {this.renderThing('small')}
-        {this.renderThing('button', true)}
-      </div>
-    );
   }
 }
-export default InfoArea;

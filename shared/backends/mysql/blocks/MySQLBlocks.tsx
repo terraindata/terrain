@@ -47,7 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { List, Map } = Immutable;
 const L = () => List([]);
-import BlockUtils from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLFn } from '../../../blocks/types/Block';

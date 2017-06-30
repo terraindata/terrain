@@ -50,6 +50,13 @@ import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
 
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { List } from 'immutable';
+import { DisplayType } from '../../../../blocks/displays/Display';
+import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
+import ElasticBlocks from '../../blocks/ElasticBlocks';
+
+
 /**
  * A clause that corresponds to an array of uniform type.
  */
@@ -79,6 +86,34 @@ export default class ESArrayClause extends ESClause
       {
         childClause.mark(interpreter, element);
       });
+  }
+
+  public getCard()
+  {
+    return this.seedCard({
+      cards: List([]),
+      
+      static:
+      {
+        preview: '[cards.size] ' + this.type + '(s)',
+        
+        display:
+        {
+          displayType: DisplayType.CARDS,
+          key: 'cards',
+          accepts: List(['eql' + this.type]),
+        },
+        
+        init: () => List([
+          BlockUtils.make(ElasticBlocks['eql' + this.type]),
+        ]),
+        
+        tql: (block, tqlFn, tqlConfig) => 
+        {
+          return block['cards'].map(card => tqlFn(card, tqlConfig)).toArray();
+        },
+      },
+    });
   }
 
 }

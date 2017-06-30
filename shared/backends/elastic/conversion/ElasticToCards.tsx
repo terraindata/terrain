@@ -53,7 +53,7 @@ import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import * as CommonElastic from '../syntax/CommonElastic';
 
-import BlockUtils from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';

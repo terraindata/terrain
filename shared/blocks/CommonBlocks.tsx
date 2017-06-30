@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
-import BlockUtils from './BlockUtils';
+import * as BlockUtils from './BlockUtils';
 import { Display, getCardStringDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from './displays/Display';
 import { Block, TQLFn } from './types/Block';
 import { _card, Card, Cards } from './types/Card';

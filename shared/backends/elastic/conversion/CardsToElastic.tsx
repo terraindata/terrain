@@ -48,7 +48,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as CommonElastic from '../syntax/CommonElastic';
 
-import BlockUtils from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
