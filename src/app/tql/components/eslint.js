@@ -59,21 +59,24 @@ const eslintConfig = new EQLConfig();
 })(function(CodeMirror) {
   "use strict";
 
-    CodeMirror.registerHelper("lint", "elastic", function(text) 
+    CodeMirror.registerHelper("lint", "elastic", function(text)
     {
       var found = [];
-      try {
-        //const t = new ESInterpreter(text, eslintConfig);
+      try
+      {
         const t = new ESInterpreter(text, eslintConfig);
-        const errors = t.parser.errors;
-        for (let e of errors)
+        for (let e of t.parser.errors)
         {
           const token = e.token;
-          found.push({from: CodeMirror.Pos(token.row, token.col),
+          found.push({
+            from: CodeMirror.Pos(token.row, token.col),
             to: CodeMirror.Pos(token.toRow, token.toCol),
-            message: e.message});
+            message: e.message
+          });
         }
-      } catch(e) {
+      }
+      catch(e)
+      {
         console.log('Exception when parsing ' + text + " error: " + e);
       }
       return found;
