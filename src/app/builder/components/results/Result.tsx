@@ -57,6 +57,7 @@ import Actions from '../../data/BuilderActions';
 import { spotlightAction } from '../../data/SpotlightStore';
 import Classs from './../../../common/components/Classs';
 import { MAX_RESULTS, Result } from './ResultsManager';
+import { Colors, backgroundColor, fontColor, borderColor } from '../../../common/Colors';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -128,7 +129,10 @@ class ResultComponent extends Classs<Props> {
       <div className='result-field' key={field}>
         {
           showField &&
-          <div className='result-field-name'>
+          <div
+            className='result-field-name'
+            style={fontColor(Colors().text.baseLight)}
+          >
             {
               field
             }
@@ -257,9 +261,15 @@ class ResultComponent extends Classs<Props> {
         className={classes}
         onDoubleClick={this.expand}
       >
-        <div className='result-inner'>
+        <div
+          className='result-inner'
+          style={borderColor(Colors().text.secondaryLight)}
+        >
           <div className='result-name'>
-            <div className='result-name-inner'>
+            <div
+              className='result-name-inner'
+              style={fontColor(Colors().text.baseLight)}
+            >
               {
                 this.renderSpotlight()
               }

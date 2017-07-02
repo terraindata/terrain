@@ -73,11 +73,13 @@ export default class ESIndexClause extends ESStringClause
           key: 'value',
           getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
           {
-          	return List(['movies', 'books', 'assassinations']);
-          	// TODO change from tables to dbs?
-          	// const db = BuilderStore.getState().db.name; // TODO correct?
-           //  const tableNames = schemaState.tableNamesByDb.get(db);
-           //  return tableNames;
+          	// TODO cache list in schema state
+          	const server = BuilderStore.getState().db.name;
+            return schemaState.databases.toList().filter(
+              (db) => db.serverId === server
+            ).map(
+              (db) => db.name
+            ).toList();
           },
         },
         tql: (stringBlock) => stringBlock['value'],

@@ -101,12 +101,15 @@ export default class ESArrayClause extends ESClause
         {
           displayType: DisplayType.CARDS,
           key: 'cards',
-          accepts: List(['eql' + this.type]),
+          accepts: List(['eql' + this.elementID]),
         },
         
-        init: () => List([
-          BlockUtils.make(ElasticBlocks['eql' + this.elementID]),
-        ]),
+        init: () => 
+        ({
+          cards: List([
+            BlockUtils.make(ElasticBlocks['eql' + this.elementID]),
+          ]),
+        }),
         
         tql: (block, tqlFn, tqlConfig) => 
         {

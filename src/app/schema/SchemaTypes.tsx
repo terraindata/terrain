@@ -80,6 +80,7 @@ export namespace SchemaTypes
     public highlightedInSearchResults: boolean = false;
 
     // for the builder, a list of names for each db
+    public dbNamesByServer: TableNamesByDb = Map<string, List<string>>({});
     public tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
     public columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
   }

@@ -377,6 +377,11 @@ export function fontColor(color: string, hoverColor?: string)
   return getStyle(color, 'color', hoverColor);
 }
 
+export function borderColor(color: string, hoverColor?: string)
+{
+  return getStyle(color, 'borderColor', hoverColor);
+}
+
 export function link()
 {
   return fontColor(Colors().text.link, Colors().text.linkHover);
