@@ -50,8 +50,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
+import PureClasss from './../../common/components/PureClasss';
 import './Dropdown.less';
 import { Colors, fontColor } from '../../common/Colors';
 

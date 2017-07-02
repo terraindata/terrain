@@ -190,7 +190,7 @@ class CardField extends PureClasss<Props>
         index++
       )
       {
-        ;
+        
       }
     }
     else
@@ -201,7 +201,7 @@ class CardField extends PureClasss<Props>
         index--
       )
       {
-        ;
+        
       }
     }
 

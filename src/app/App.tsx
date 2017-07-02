@@ -73,10 +73,10 @@ import Placeholder from './common/components/Placeholder';
 import PureClasss from './common/components/PureClasss';
 import Redirect from './common/components/Redirect';
 import Sidebar from './common/components/Sidebar';
+import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/Library';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
-import FileImport from './fileImport/components/FileImport';
 import Account from './users/components/Account';
 import EditProfile from './users/components/EditProfile';
 import Notifications from './users/components/Notifications';
@@ -243,7 +243,6 @@ class App extends PureClasss<Props>
       stateKey: 'schemaLoaded',
       storeKeyPath: ['loaded'],
     });
-
 
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];

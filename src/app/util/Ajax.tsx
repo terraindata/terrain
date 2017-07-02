@@ -217,7 +217,7 @@ export const Ajax =
         }
         catch (e)
         {
-          ;
+          
         }
       }
       else if (config.urlArgs)
@@ -697,7 +697,7 @@ export const Ajax =
         contents: file,
         filetype,
       };
-      console.log("payload: ", payload);
+      console.log('payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
