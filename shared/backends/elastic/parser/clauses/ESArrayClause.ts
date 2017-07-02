@@ -105,7 +105,7 @@ export default class ESArrayClause extends ESClause
         },
         
         init: () => List([
-          BlockUtils.make(ElasticBlocks['eql' + this.type]),
+          BlockUtils.make(ElasticBlocks['eql' + this.elementID]),
         ]),
         
         tql: (block, tqlFn, tqlConfig) => 
