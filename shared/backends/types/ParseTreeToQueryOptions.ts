@@ -43,39 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
+interface ParseTreeToQueryOptions
+{
+  allFields?: boolean; // amend the final Select card to include all possible fields.
+  limit?: number;
+  count?: boolean;
+}
 
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
-
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
-
-    CodeMirror.registerHelper("lint", "json", function(text)
-    {
-      var found = [];
-      try
-      {
-        const t = new ESInterpreter(text);
-        for (let e of t.parser.errors)
-        {
-          const token = e.token;
-          found.push({
-            from: CodeMirror.Pos(token.row, token.col),
-            to: CodeMirror.Pos(token.toRow, token.toCol),
-            message: e.message
-          });
-        }
-      }
-      catch(e)
-      {
-        console.log('Exception when parsing ' + text + " error: " + e);
-      }
-      return found;
-  });
-});
+export default ParseTreeToQueryOptions;

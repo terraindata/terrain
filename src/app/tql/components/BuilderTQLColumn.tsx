@@ -114,11 +114,6 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (!this.state.focused && nextProps.query.tql !== this.state.tql)
-    {
-      this.updateTql(nextProps.query.tql, true);
-    }
-
     if (nextProps.resultsState.errorLine)
     {
       this.highlightError(nextProps.resultsState.errorLine);
@@ -130,11 +125,6 @@ class BuilderTQLColumn extends PureClasss<Props>
     if (this.state.runMode === 'auto')
     {
       // auto mode
-      if (tql === this.state.tql)
-      {
-        return;
-      }
-
       // this.checkForFolding(tql);
       this.setState({
         tql,
@@ -143,21 +133,18 @@ class BuilderTQLColumn extends PureClasss<Props>
         termDefinitionOpen: false,
       });
 
-      if (!noAction && tql !== this.props.query.tql)
+      if (!noAction)
       {
         this.sendTqlAction();
       }
     } else
     {
-      if (tql !== this.state.tql)
-      {
-        this.setState({
-          tql,
-          highlightedLine: null,
-          syntaxHelpOpen: false,
-          termDefinitionOpen: false,
-        });
-      }
+      this.setState({
+        tql,
+        highlightedLine: null,
+        syntaxHelpOpen: false,
+        termDefinitionOpen: false,
+      });
       if (manualRequest === true && noAction === false)
       {
         this.sendTqlAction();
@@ -383,6 +370,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   public render()
   {
     const manualEntry = null;
+
     // cardList[this.state.cardName] &&
     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
 
@@ -403,7 +391,7 @@ class BuilderTQLColumn extends PureClasss<Props>
           className='tql-section'
         >
           <TQLEditor
-            tql={this.state.tql}
+            tql={this.props.query.tql}
             language={this.props.language}
             canEdit={this.props.canEdit}
             theme={this.state.theme}

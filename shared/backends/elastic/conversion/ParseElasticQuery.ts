@@ -44,38 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import {Query} from '../../../items/types/Query';
+import ESInterpreter from '../parser/ESInterpreter';
+import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
 
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
+export function ParseElasticQuery(tql: string)
+{
+  return new ESInterpreter(tql);
+}
 
-    CodeMirror.registerHelper("lint", "json", function(text)
+export function ElasticParseTreeToQuery(query: Query, options: ParseTreeToQueryOptions): string
+{
+  const queryObject = JSON.parse(JSON.stringify(query.parseTree.parser.getValue()));
+  if (options.allFields === true)
+  {
+    if (queryObject.body && queryObject.body._source)
     {
-      var found = [];
-      try
-      {
-        const t = new ESInterpreter(text);
-        for (let e of t.parser.errors)
-        {
-          const token = e.token;
-          found.push({
-            from: CodeMirror.Pos(token.row, token.col),
-            to: CodeMirror.Pos(token.toRow, token.toCol),
-            message: e.message
-          });
-        }
-      }
-      catch(e)
-      {
-        console.log('Exception when parsing ' + text + " error: " + e);
-      }
-      return found;
-  });
-});
+      queryObject.body._source = [];
+    }
+  }
+  return JSON.stringify(queryObject);
+}

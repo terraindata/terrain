@@ -128,6 +128,7 @@ interface ResultsQuery
 interface State
 {
   queriedTql?: string;
+  lastQueryMutation?: number;
   midwayQueryResponse?: MidwayQueryResponse;
   midwayAllQueryResponse?: MidwayQueryResponse;
   query?: ResultsQuery;
@@ -415,14 +416,20 @@ export class ResultsManager extends PureClasss<Props>
 
   private queryM2Results(query: Query, db: BackendInstance)
   {
-    const eql = AllBackendsMap[query.language].queryToCode(
+    if (query.parseTree === null || query.parseTree.hasError())
+    {
+      return;
+    }
+
+    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
       query,
       {},
     );
 
-    if (eql && eql !== this.state.queriedTql)
+    if (query.lastMutation !== this.state.lastQueryMutation)
     {
       this.setState({
+        lastQueryMutation: query.lastMutation,
         queriedTql: eql,
         query: Ajax.query(
           eql,
@@ -440,7 +447,7 @@ export class ResultsManager extends PureClasss<Props>
       let allfieldEql;
       try
       {
-        allfieldEql = AllBackendsMap[query.language].queryToCode(
+        allfieldEql = AllBackendsMap[query.language].parseTreeToQueryString(
           query,
           { allFields: true },
         );

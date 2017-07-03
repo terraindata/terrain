@@ -70,6 +70,10 @@ class MySQLBackend implements Backend
 
   codeToQuery = SQLToCards;
 
+  parseQuery = (tql) => null;
+
+  parseTreeToQueryString = CardsToSQL.toSQL;
+
   syntaxConfig = syntaxConfig;
 
   // function to get transform bars?

@@ -65,19 +65,26 @@ export default function ElasticToCards(
   queryReady: (query: Query) => void,
 ): Query
 {
-  try
+  if (query.parseTree === null || query.parseTree.hasError())
   {
-    const obj = JSON.parse(query.tql);
-    let cards = parseMagicObject(obj);
-    cards = BlockUtils.reconcileCards(query.cards, cards);
-    return query
-      .set('cards', cards)
-      .set('cardsAndCodeInSync', true);
-  }
-  catch (e)
-  {
+    // TODO: we may want to show some error messages on the cards.
     return query
       .set('cardsAndCodeInSync', false);
+  } else
+  {
+    try
+    {
+      let cards = parseMagicObject(query.parseTree.parser.getValue());
+      cards = BlockUtils.reconcileCards(query.cards, cards);
+      return query
+        .set('cards', cards)
+        .set('cardsAndCodeInSync', true);
+    }
+    catch (e)
+    {
+      return query
+        .set('cardsAndCodeInSync', false);
+    }
   }
 }
 
