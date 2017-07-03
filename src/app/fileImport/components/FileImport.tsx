@@ -46,10 +46,10 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
-import PureClasss from './../../common/components/PureClasss';;
+import PureClasss from './../../common/components/PureClasss'; 
 import FileImportStore from './../data/FileImportStore';
-import FileImportInfo from './FileImportInfo';
 import FileImportTypes from './../FileImportTypes';
+import FileImportInfo from './FileImportInfo';
 const HTML5Backend = require('react-dnd-html5-backend');
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
@@ -95,7 +95,7 @@ class FileImport extends PureClasss<any>
           tableNames: this.getKeyListSafely(schemaState.tables),
         });
       }
-    });
+,    });
   }
 
   public render()

@@ -135,17 +135,17 @@ class DeployModal extends PureClasss<Props>
       const body: object = {
         id,
         body: {
-          template
-        }
-      }
+          template,
+        },
+      };
       LibraryActions.variants.deploy(variant, 'putTemplate', body, this.state.changingStatusTo);
     }
     else if (this.state.changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
     {
       // undeploy this variant
       const body: object = {
-        id
-      }
+        id,
+      };
       LibraryActions.variants.deploy(variant, 'deleteTemplate', body, this.state.changingStatusTo);
     }
   }
