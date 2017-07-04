@@ -73,7 +73,23 @@ export default class ESTypeClause extends ESStringClause
           key: 'value',
           getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
           {
-          	return List(['movie', 'rating', 'director', 'actor']);
+            const cards = BuilderStore.getState().query.cards;
+            const isIndexCard = (card) => card['type'] === 'eqlindex';
+            const indexCard = cards.find(isIndexCard) || 
+              (
+                cards.get(0) && cards.get(0)['cards'].find(isIndexCard)
+              );
+            
+            if (indexCard)
+            {
+              console.log(indexCard);
+              const index = indexCard['value'];
+              return schemaState.tables.filter(
+                (table) => table.databaseId === index
+              ).toList();
+            }
+            
+            return emptyList;
           	// TODO change to get db from actual query value
           	// const db = BuilderStore.getState().db.name;
            //  const tableNames = schemaState.tableNamesByDb.get(db);
@@ -85,3 +101,5 @@ export default class ESTypeClause extends ESStringClause
     });
   }
 }
+
+const emptyList = List([]);

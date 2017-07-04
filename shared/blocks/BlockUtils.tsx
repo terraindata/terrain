@@ -375,3 +375,21 @@ export function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 
   return block;
 }
+
+// export const findBlock = 
+//   (blocks: List<Block>, predicate: (block: Block) => boolean) =>
+//   {
+//     return blocks.reduce(
+//       (memo, block) =>
+//       {
+//         if (memo)
+//         {
+//           return memo;
+//         }
+        
+//         if (predicate(block))
+//         {
+//           return block;
+//         }
+//       });
+//   };
