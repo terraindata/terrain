@@ -128,7 +128,7 @@ interface ResultsQuery
 interface State
 {
   queriedTql?: string;
-  lastQueryMutation?: number;
+  lastQuery?: Query;
   midwayQueryResponse?: MidwayQueryResponse;
   midwayAllQueryResponse?: MidwayQueryResponse;
   query?: ResultsQuery;
@@ -421,15 +421,15 @@ export class ResultsManager extends PureClasss<Props>
       return;
     }
 
-    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {},
-    );
-
-    if (query.lastMutation !== this.state.lastQueryMutation)
+    if (query !== this.state.lastQuery)
     {
+      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+        query,
+        {},
+      );
+
       this.setState({
-        lastQueryMutation: query.lastMutation,
+        lastQuery: query,
         queriedTql: eql,
         query: Ajax.query(
           eql,
@@ -444,10 +444,10 @@ export class ResultsManager extends PureClasss<Props>
           },
         ),
       });
-      let allfieldEql;
+      let allFieldsQueryCode;
       try
       {
-        allfieldEql = AllBackendsMap[query.language].parseTreeToQueryString(
+        allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
           query,
           { allFields: true },
         );
@@ -456,11 +456,11 @@ export class ResultsManager extends PureClasss<Props>
       {
         console.log('Could not generate all field Elastic request, reason:' + err);
       }
-      if (allfieldEql)
+      if (allFieldsQueryCode)
       {
         this.setState({
           allQuery: Ajax.query(
-            allfieldEql,
+            allFieldsQueryCode,
             db,
             (resp) =>
             {

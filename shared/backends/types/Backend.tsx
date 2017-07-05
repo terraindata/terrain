@@ -89,7 +89,7 @@ export interface Backend
 
   parseTreeToQueryString(
     query: Query,
-    optios: ParseTreeToQueryOptions,
+    options: ParseTreeToQueryOptions,
   ): string;
 
   syntaxConfig: object;
