@@ -49,7 +49,7 @@ import { Link } from 'react-router';
 import Classs from './../../common/components/Classs';
 import ColorManager from './../../util/ColorManager';
 import UserStore from './../data/UserStore';
-import UserTypes from './../UserTypes';
+import * as UserTypes from './../UserTypes';
 import './UserThumbnail.less';
 
 type User = UserTypes.User;

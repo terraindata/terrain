@@ -55,8 +55,8 @@ import LibraryStore from '../library/data/LibraryStore';
 import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
-import LibraryTypes from './../library/LibraryTypes';
-import UserTypes from './../users/UserTypes';
+import * as LibraryTypes from './../library/LibraryTypes';
+import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
 
@@ -217,7 +217,7 @@ export const Ajax =
         }
         catch (e)
         {
-          
+
         }
       }
       else if (config.urlArgs)

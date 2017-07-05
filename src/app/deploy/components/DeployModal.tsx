@@ -56,7 +56,7 @@ import { ItemStatus } from '../../../../shared/items/types/Item';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
 import LibraryStore from '../../library/data/LibraryStore';
-import LibraryTypes from '../../library/LibraryTypes';
+import * as LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
 

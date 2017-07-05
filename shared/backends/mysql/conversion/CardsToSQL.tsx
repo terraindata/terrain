@@ -46,7 +46,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import CommonSQL from '../syntax/CommonSQL';
 
-import BlockUtils from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLStringFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';

@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
-import BlockUtils from '../../../blocks/BlockUtils';
-import CommonBlocks from '../../../blocks/CommonBlocks';
+import * as BlockUtils from '../../../blocks/BlockUtils';
+import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
