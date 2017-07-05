@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import BlockUtils from '../../blocks/BlockUtils';
+import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 const { List } = Immutable;
 import { AllBackendsMap } from '../../backends/AllBackends';

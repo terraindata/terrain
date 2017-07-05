@@ -48,7 +48,7 @@ import './LibraryItemCategory.less';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { ItemStatus } from '../../../../shared/items/types/Item';
-import LibraryTypes from '../LibraryTypes';
+import * as LibraryTypes from '../LibraryTypes';
 import Classs from './../../common/components/Classs';
 
 export interface Props

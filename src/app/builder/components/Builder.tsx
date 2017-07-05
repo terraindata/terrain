@@ -60,7 +60,7 @@ import { ItemStatus } from '../../../../shared/items/types/Item';
 import Query from '../../../../shared/items/types/Query';
 import LibraryActions from '../../library/data/LibraryActions';
 import { LibraryState, LibraryStore } from '../../library/data/LibraryStore';
-import LibraryTypes from '../../library/LibraryTypes';
+import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesActions from '../../roles/data/RolesActions';
 import RolesStore from '../../roles/data/RolesStore';
 import UserActions from '../../users/data/UserActions';

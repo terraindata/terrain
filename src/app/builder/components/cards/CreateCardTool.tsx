@@ -47,7 +47,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { Card } from '../../../../../shared/blocks/types/Card';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import PureClasss from '../../../common/components/PureClasss';

@@ -50,24 +50,19 @@ const { List, Map } = Immutable;
 import { BaseClass, New } from '../Classes';
 
 // This module will contain all of the different 'types' (i.e. models) relevant to auth
-export namespace AuthTypes
+// This type represents the state of the AuthStore
+class AuthStateC extends BaseClass
 {
-  // This type represents the state of the AuthStore
-  class AuthStateC extends BaseClass
-  {
-    public accessToken: string = '';
-    public id: number = -1;
-  }
-  // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
-  //  This first line exports a type that you will actually use in other files.
-  //  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
-  export type AuthState = AuthStateC & IRecord<AuthStateC>;
-  //  This second line exports a function to create a new instance of the AuthState Immutable backed class
-  //  It's a replacement for a constructor.
-  //  This is necessary because simply doing `new AuthStateC` will not create an Immutable version
-  //   and you can't use `new` simply with Immutable Records.
-  export const _AuthState = (config?: { [key: string]: any }) =>
-    New<AuthState>(new AuthStateC(config), config);
+  public accessToken: string = '';
+  public id: number = -1;
 }
-
-export default AuthTypes;
+// These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
+//  This first line exports a type that you will actually use in other files.
+//  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
+export type AuthState = AuthStateC & IRecord<AuthStateC>;
+//  This second line exports a function to create a new instance of the AuthState Immutable backed class
+//  It's a replacement for a constructor.
+//  This is necessary because simply doing `new AuthStateC` will not create an Immutable version
+//   and you can't use `new` simply with Immutable Records.
+export const _AuthState = (config?: { [key: string]: any }) =>
+  New<AuthState>(new AuthStateC(config), config);

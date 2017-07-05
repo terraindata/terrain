@@ -54,7 +54,7 @@ import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import Query from '../../../../shared/items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultsManager';
 import { MenuOption } from '../../common/components/Menu';
-import LibraryTypes from '../../library/LibraryTypes';
+import * as LibraryTypes from '../../library/LibraryTypes';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
 import PureClasss from './../../common/components/PureClasss';

@@ -46,7 +46,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
 import Query from '../../../../shared/items/types/Query';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';

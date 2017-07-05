@@ -54,7 +54,7 @@ import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import LibraryActions from '../data/LibraryActions';
-import LibraryTypes from '../LibraryTypes';
+import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';
 
