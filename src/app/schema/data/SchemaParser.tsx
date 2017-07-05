@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import SchemaTypes from '../SchemaTypes';
+import * as SchemaTypes from '../SchemaTypes';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 const { Map, List } = Immutable;
 
@@ -56,22 +56,130 @@ type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
 
-export namespace SchemaParser
+export function parseMySQLDbs_m1(db: BackendInstance,
+  colsData: object,
+  addDbToServerAction: (payload: SchemaTypes.AddDbToServerActionPayload) => void)
 {
-  export function parseMySQLDbs_m1(db: BackendInstance,
-    colsData: object,
-    addDbToServerAction: (payload: SchemaTypes.AddDbToServerActionPayload) => void )
-  {
-    let server: Server = SchemaTypes._Server({
-      name: 'Other MySQL Databases',
-      connectionId: -1,
+  let server: Server = SchemaTypes._Server({
+    name: 'Other MySQL Databases',
+    connectionId: -1,
+  });
+  const serverId = server.id;
+
+  let databases: IMMap<string, Database> = Map<string, Database>({});
+
+  let database = SchemaTypes._Database({
+    name: db['name'],
+    serverId: serverId as string,
+  });
+  const databaseId = database.id;
+  server = server.set('databaseIds', server.databaseIds.push(databaseId));
+
+  let tables: IMMap<string, Table> = Map<string, Table>({});
+  let columns: IMMap<string, Column> = Map<string, Column>({});
+  const indexes: IMMap<string, Index> = Map<string, Index>({});
+
+  let tableNames = List<string>([]);
+  let columnNamesByTable = Map<string, List<string>>([]);
+
+  _.map((colsData as any),
+    (col: {
+      TABLE_CATALOG: string,
+      TABLE_SCHEMA: string,
+      TABLE_NAME: string,
+      COLUMN_NAME: string,
+      ORDINAL_POSITION: number,
+      COLUMN_DEFAULT: string,
+      IS_NULLABLE: string,
+      DATA_TYPE: string,
+      CHARACTER_MAXIMUM_LENGTH: number,
+      CHARACTER_OCTET_LENGTH: number,
+      NUMERIC_PRECISION: number,
+      NUMERIC_SCALE: number,
+      DATETIME_PRECISION: number,
+      CHARACTER_SET_NAME: string,
+      COLLATION_NAME: string,
+      COLUMN_TYPE: string,
+      COLUMN_KEY: string,
+      EXTRA: string,
+      PRIVILEGES: string,
+      COLUMN_COMMENT: string,
+      GENERATION_EXPRESSION: string,
+    }) =>
+    {
+      const tableId = SchemaTypes.tableId(serverId, db['name'], col.TABLE_NAME);
+      let table = tables.get(tableId);
+
+      if (!table)
+      {
+        table = SchemaTypes._Table({
+          name: col.TABLE_NAME,
+          serverId,
+          databaseId,
+        });
+        tables = tables.set(tableId, table);
+        tableNames = tableNames.push(table.name);
+        database = database.set(
+          'tableIds', database.tableIds.push(tableId),
+        );
+      }
+
+      const column = SchemaTypes._Column({
+        name: col.COLUMN_NAME,
+        serverId,
+        databaseId,
+        tableId,
+        defaultValue: col.COLUMN_DEFAULT,
+        datatype: col.DATA_TYPE,
+        isNullable: col.IS_NULLABLE === 'YES',
+        isPrimaryKey: col.COLUMN_KEY === 'PRI',
+      });
+
+      columns = columns.set(column.id, column);
+
+      if (!columnNamesByTable.get(table.id))
+      {
+        columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+      }
+      columnNamesByTable = columnNamesByTable.update(table.id,
+        (list) => list.push(column.name),
+      );
+
+      tables = tables.setIn(
+        [tableId, 'columnIds'],
+        table.columnIds.push(column.id),
+      );
     });
-    const serverId = server.id;
 
-    let databases: IMMap<string, Database> = Map<string, Database>({});
+  databases = databases.set(databaseId, database);
 
+  addDbToServerAction({
+    server,
+    databases,
+    tables,
+    columns,
+    indexes,
+    tableNames,
+    columnNames: columnNamesByTable,
+  });
+}
+
+export function parseMySQLDb(rawServer: object,
+  schemaData: object,
+  setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void)
+{
+  let server = SchemaTypes._Server({
+    name: rawServer['name'],
+    connectionId: rawServer['id'],
+  });
+  const serverId = server.id;
+
+  let databases: IMMap<string, Database> = Map<string, Database>({});
+
+  _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
+  {
     let database = SchemaTypes._Database({
-      name: db['name'],
+      name: databaseKey.toString(),
       serverId: serverId as string,
     });
     const databaseId = database.id;
@@ -82,80 +190,64 @@ export namespace SchemaParser
     const indexes: IMMap<string, Index> = Map<string, Index>({});
 
     let tableNames = List<string>([]);
+    let columnIds = List<string>([]);
     let columnNamesByTable = Map<string, List<string>>([]);
 
-    _.map((colsData as any),
-      (col: {
-        TABLE_CATALOG: string,
-        TABLE_SCHEMA: string,
-        TABLE_NAME: string,
-        COLUMN_NAME: string,
-        ORDINAL_POSITION: number,
-        COLUMN_DEFAULT: string,
-        IS_NULLABLE: string,
-        DATA_TYPE: string,
-        CHARACTER_MAXIMUM_LENGTH: number,
-        CHARACTER_OCTET_LENGTH: number,
-        NUMERIC_PRECISION: number,
-        NUMERIC_SCALE: number,
-        DATETIME_PRECISION: number,
-        CHARACTER_SET_NAME: string,
-        COLLATION_NAME: string,
-        COLUMN_TYPE: string,
-        COLUMN_KEY: string,
-        EXTRA: string,
-        PRIVILEGES: string,
-        COLUMN_COMMENT: string,
-        GENERATION_EXPRESSION: string,
-      } ) =>
+    _.each((databaseValue as any),
+      (tableFields, tableName, tableList) =>
       {
-        const tableId = SchemaTypes.tableId(serverId, db['name'], col.TABLE_NAME);
+        const tableId = SchemaTypes.tableId(server['name'], database['name'], (tableName as any) as string);
         let table = tables.get(tableId);
 
         if (!table)
         {
           table = SchemaTypes._Table({
-            name: col.TABLE_NAME,
-            serverId,
+            name: (tableName as any) as string,
             databaseId,
+            serverId,
           });
           tables = tables.set(tableId, table);
           tableNames = tableNames.push(table.name);
           database = database.set(
             'tableIds', database.tableIds.push(tableId),
           );
+          database = database.set(
+            'databaseType', 'mysql',
+          );
         }
 
-        const column = SchemaTypes._Column({
-          name: col.COLUMN_NAME,
-          serverId,
-          databaseId,
-          tableId,
-          defaultValue: col.COLUMN_DEFAULT,
-          datatype: col.DATA_TYPE,
-          isNullable: col.IS_NULLABLE === 'YES',
-          isPrimaryKey: col.COLUMN_KEY === 'PRI',
-        });
-
-        columns = columns.set(column.id, column);
-
-        if (!columnNamesByTable.get(table.id))
+        _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
         {
-          columnNamesByTable = columnNamesByTable.set(table.id, List([]));
-        }
-        columnNamesByTable = columnNamesByTable.update(table.id,
-          (list) => list.push(column.name),
-        );
+          const column = SchemaTypes._Column({
+            name: (fieldName as any) as string,
+            serverId,
+            databaseId,
+            tableId,
+            datatype: fieldProperties['type'],
+          });
+
+          columns = columns.set(column.id, column);
+
+          if (!columnNamesByTable.get(table.id))
+          {
+            columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+          }
+          columnNamesByTable = columnNamesByTable.update(table.id,
+            (list) => list.push(column.name),
+          );
+
+          columnIds = columnIds.push(column.id);
+        });
 
         tables = tables.setIn(
           [tableId, 'columnIds'],
-          table.columnIds.push(column.id),
+          columnIds,
         );
       });
 
     databases = databases.set(databaseId, database);
 
-    addDbToServerAction({
+    setServerAction({
       server,
       databases,
       tables,
@@ -164,199 +256,102 @@ export namespace SchemaParser
       tableNames,
       columnNames: columnNamesByTable,
     });
-  }
 
-  export function parseMySQLDb(rawServer: object,
-    schemaData: object,
-    setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void )
-  {
-    let server = SchemaTypes._Server({
-      name: rawServer['name'],
-      connectionId: rawServer['id'],
-    });
-    const serverId = server.id;
-
-    let databases: IMMap<string, Database> = Map<string, Database>({});
-
-    _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
-    {
-      let database = SchemaTypes._Database({
-        name: databaseKey.toString(),
-        serverId: serverId as string,
-      });
-      const databaseId = database.id;
-      server = server.set('databaseIds', server.databaseIds.push(databaseId));
-
-      let tables: IMMap<string, Table> = Map<string, Table>({});
-      let columns: IMMap<string, Column> = Map<string, Column>({});
-      const indexes: IMMap<string, Index> = Map<string, Index>({});
-
-      let tableNames = List<string>([]);
-      let columnIds = List<string>([]);
-      let columnNamesByTable = Map<string, List<string>>([]);
-
-      _.each((databaseValue as any),
-        (tableFields, tableName, tableList) =>
-        {
-          const tableId = SchemaTypes.tableId(server['name'], database['name'], (tableName as any) as string);
-          let table = tables.get(tableId);
-
-          if (!table)
-          {
-            table = SchemaTypes._Table({
-              name: (tableName as any) as string,
-              databaseId,
-              serverId,
-            });
-            tables = tables.set(tableId, table);
-            tableNames = tableNames.push(table.name);
-            database = database.set(
-              'tableIds', database.tableIds.push(tableId),
-            );
-            database = database.set(
-              'databaseType', 'mysql',
-            );
-          }
-
-          _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
-          {
-            const column = SchemaTypes._Column({
-              name: (fieldName as any) as string,
-              serverId,
-              databaseId,
-              tableId,
-              datatype: fieldProperties['type'],
-            });
-
-            columns = columns.set(column.id, column);
-
-            if (!columnNamesByTable.get(table.id))
-            {
-              columnNamesByTable = columnNamesByTable.set(table.id, List([]));
-            }
-            columnNamesByTable = columnNamesByTable.update(table.id,
-              (list) => list.push(column.name),
-            );
-
-            columnIds = columnIds.push(column.id);
-          });
-
-          tables = tables.setIn(
-            [tableId, 'columnIds'],
-            columnIds,
-          );
-        });
-
-      databases = databases.set(databaseId, database);
-
-      setServerAction({
-        server,
-        databases,
-        tables,
-        columns,
-        indexes,
-        tableNames,
-        columnNames: columnNamesByTable,
-      });
-
-    });
-  }
-
-  export function parseElasticDb(elasticServer: object,
-    schemaData: object,
-    setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void )
-  {
-    let server = SchemaTypes._Server({
-      name: elasticServer['name'],
-      connectionId: elasticServer['id'],
-    });
-    const serverId = server.id;
-
-    let databases: IMMap<string, Database> = Map<string, Database>({});
-
-    _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
-    {
-      let database = SchemaTypes._Database({
-        name: databaseKey.toString(),
-        serverId: serverId as string,
-      });
-      const databaseId = database.id;
-      server = server.set('databaseIds', server.databaseIds.push(databaseId));
-
-      let tables: IMMap<string, Table> = Map<string, Table>({});
-      let columns: IMMap<string, Column> = Map<string, Column>({});
-      const indexes: IMMap<string, Index> = Map<string, Index>({});
-
-      let tableNames = List<string>([]);
-      let columnIds = List<string>([]);
-      let columnNamesByTable = Map<string, List<string>>([]);
-
-      _.each((databaseValue as any),
-        (tableFields, tableName, tableList) =>
-        {
-          const tableId = SchemaTypes.tableId(server['name'], database['name'], (tableName as any) as string);
-          let table = tables.get(tableId);
-
-          if (!table)
-          {
-            table = SchemaTypes._Table({
-              name: (tableName as any) as string,
-              databaseId,
-              serverId,
-            });
-            tables = tables.set(tableId, table);
-            tableNames = tableNames.push(table.name);
-            database = database.set(
-              'tableIds', database.tableIds.push(tableId),
-            );
-            database = database.set(
-              'databaseType', 'elastic',
-            );
-          }
-
-          _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
-          {
-            const column = SchemaTypes._Column({
-              name: (fieldName as any) as string,
-              serverId,
-              databaseId,
-              tableId,
-              datatype: fieldProperties['type'],
-            });
-
-            columns = columns.set(column.id, column);
-
-            if (!columnNamesByTable.get(table.id))
-            {
-              columnNamesByTable = columnNamesByTable.set(table.id, List([]));
-            }
-            columnNamesByTable = columnNamesByTable.update(table.id,
-              (list) => list.push(column.name),
-            );
-
-            columnIds = columnIds.push(column.id);
-          });
-
-          tables = tables.setIn(
-            [tableId, 'columnIds'],
-            columnIds,
-          );
-        });
-
-      databases = databases.set(databaseId, database);
-
-      setServerAction({
-        server,
-        databases,
-        tables,
-        columns,
-        indexes,
-        tableNames,
-        columnNames: columnNamesByTable,
-      });
-
-    });
-  }
+  });
 }
 
-export default SchemaParser;
+export function parseElasticDb(elasticServer: object,
+  schemaData: object,
+  setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void)
+{
+  let server = SchemaTypes._Server({
+    name: elasticServer['name'],
+    connectionId: elasticServer['id'],
+  });
+  const serverId = server.id;
+
+  let databases: IMMap<string, Database> = Map<string, Database>({});
+
+  _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
+  {
+    let database = SchemaTypes._Database({
+      name: databaseKey.toString(),
+      serverId: serverId as string,
+    });
+    const databaseId = database.id;
+    server = server.set('databaseIds', server.databaseIds.push(databaseId));
+
+    let tables: IMMap<string, Table> = Map<string, Table>({});
+    let columns: IMMap<string, Column> = Map<string, Column>({});
+    const indexes: IMMap<string, Index> = Map<string, Index>({});
+
+    let tableNames = List<string>([]);
+    let columnIds = List<string>([]);
+    let columnNamesByTable = Map<string, List<string>>([]);
+
+    _.each((databaseValue as any),
+      (tableFields, tableName, tableList) =>
+      {
+        const tableId = SchemaTypes.tableId(server['name'], database['name'], (tableName as any) as string);
+        let table = tables.get(tableId);
+
+        if (!table)
+        {
+          table = SchemaTypes._Table({
+            name: (tableName as any) as string,
+            databaseId,
+            serverId,
+          });
+          tables = tables.set(tableId, table);
+          tableNames = tableNames.push(table.name);
+          database = database.set(
+            'tableIds', database.tableIds.push(tableId),
+          );
+          database = database.set(
+            'databaseType', 'elastic',
+          );
+        }
+
+        _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
+        {
+          const column = SchemaTypes._Column({
+            name: (fieldName as any) as string,
+            serverId,
+            databaseId,
+            tableId,
+            datatype: fieldProperties['type'],
+          });
+
+          columns = columns.set(column.id, column);
+
+          if (!columnNamesByTable.get(table.id))
+          {
+            columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+          }
+          columnNamesByTable = columnNamesByTable.update(table.id,
+            (list) => list.push(column.name),
+          );
+
+          columnIds = columnIds.push(column.id);
+        });
+
+        tables = tables.setIn(
+          [tableId, 'columnIds'],
+          columnIds,
+        );
+      });
+
+    databases = databases.set(databaseId, database);
+
+    setServerAction({
+      server,
+      databases,
+      tables,
+      columns,
+      indexes,
+      tableNames,
+      columnNames: columnNamesByTable,
+    });
+
+  });
+}

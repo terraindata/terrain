@@ -51,6 +51,7 @@ import ElasticBlocks from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';
 import ElasticToCards from './conversion/ElasticToCards';
+import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
 const syntaxConfig = require('./syntax/ElasticSyntaxConfig.json');
 
 class ElasticBackend implements Backend
@@ -78,6 +79,10 @@ class ElasticBackend implements Backend
   queryToCode = CardsToElastic.toElastic;
 
   codeToQuery = ElasticToCards;
+
+  parseQuery = ParseElasticQuery;
+
+  parseTreeToQueryString = ElasticParseTreeToQuery;
 
   syntaxConfig = syntaxConfig;
 

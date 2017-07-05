@@ -45,94 +45,89 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import { BaseClass, New } from '../Classes';
-import RoleTypes from './../roles/RoleTypes';
+import * as RoleTypes from './../roles/RoleTypes';
 
-export namespace UserTypes
+class UserC extends BaseClass
 {
-  class UserC extends BaseClass
+  // db-level fields
+  public isSuperUser = false;
+  public isDisabled = false;
+  public email = '';
+
+  // metadata fields
+  public name = '';
+  public whatIDo = '';
+  public skype = '';
+  public timeZone = 158;
+  public phone = '';
+  public imgSrc = '';
+  public tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
+
+  // notifications fields
+  public sound = 'chime';
+  public emailNotificationType = 'Activities of any kind';
+  public emailNotificationTiming = 'Once every 15 minutes';
+  public desktopNotificationType = 'Activities of any kind';
+  public emailNews = 'on';
+
+  // DB level fields
+  public dbFields = [
+    'id',
+    'email',
+    'isDisabled',
+    'isSuperUser',
+    'name',
+    'oldPassword',
+    'password',
+    'timezone',
+  ];
+
+  // "static" fields to exclude
+  public excludeFields = ['dbFields', 'excludeFields'];
+
+  // groupRoles: Immutable.Map({}),
+}
+export type User = UserC & IRecord<UserC>;
+export const _User = (config: { [key: string]: any } = {}) =>
+{
+  config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
+  return New<User>(new UserC(config), config);
+};
+
+export type UserMap = Immutable.Map<ID, User>;
+
+class UserStateC extends BaseClass
+{
+  public loading = false;
+  public loaded = false;
+  public users = Immutable.Map<ID, User>({});
+  public currentUser: User = null;
+}
+export type UserState = UserStateC & IRecord<UserStateC>;
+export const _UserState = (config?: { [key: string]: any }) =>
+  New<UserState>(new UserStateC(config), config);
+
+export function profileUrlFor(user: User): string
+{
+  if (user && user.imgSrc)
   {
-    // db-level fields
-    public isSuperUser = false;
-    public isDisabled = false;
-    public email = '';
-
-    // metadata fields
-    public name = '';
-    public whatIDo = '';
-    public skype = '';
-    public timeZone = 158;
-    public phone = '';
-    public imgSrc = '';
-    public tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
-
-    // notifications fields
-    public sound = 'chime';
-    public emailNotificationType = 'Activities of any kind';
-    public emailNotificationTiming = 'Once every 15 minutes';
-    public desktopNotificationType = 'Activities of any kind';
-    public emailNews = 'on';
-
-    // DB level fields
-    public dbFields = [
-      'id',
-      'email',
-      'isDisabled',
-      'isSuperUser',
-      'name',
-      'oldPassword',
-      'password',
-      'timezone',
-    ];
-
-    // "static" fields to exclude
-    public excludeFields = ['dbFields', 'excludeFields'];
-
-    // groupRoles: Immutable.Map({}),
+    return user.imgSrc;
   }
-  export type User = UserC & IRecord<UserC>;
-  export const _User = (config: { [key: string]: any } = {}) =>
-  {
-    config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
-    return New<User>(new UserC(config), config);
-  };
 
-  export type UserMap = Immutable.Map<ID, UserTypes.User>;
-
-  class UserStateC extends BaseClass
+  let index: number = 0;
+  if (user)
   {
-    public loading = false;
-    public loaded = false;
-    public users = Immutable.Map<ID, User>({});
-    public currentUser: UserTypes.User = null;
-  }
-  export type UserState = UserStateC & IRecord<UserStateC>;
-  export const _UserState = (config?: { [key: string]: any }) =>
-    New<UserState>(new UserStateC(config), config);
-
-  export function profileUrlFor(user: User): string
-  {
-    if (user && user.imgSrc)
+    if (typeof user.id === 'string')
     {
-      return user.imgSrc;
+      index = (user.id.charCodeAt(0) % numProfileImages);
     }
-
-    let index: number = 0;
-    if (user)
+    if (typeof user.id === 'number')
     {
-      if (typeof user.id === 'string')
-      {
-        index = (user.id.charCodeAt(0) % numProfileImages);
-      }
-      if (typeof user.id === 'number')
-      {
-        index = (user.id % numProfileImages);
-      }
+      index = (user.id % numProfileImages);
     }
-
-    return MIDWAY_HOST + '/midway/v1/assets/profiles/profile' + index + '.jpg';
   }
+
+  return MIDWAY_HOST + '/midway/v1/assets/profiles/profile' + index + '.jpg';
 }
 
 const numProfileImages = 9;
-
-export default UserTypes;

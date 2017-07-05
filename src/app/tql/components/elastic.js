@@ -42,56 +42,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
-import * as React from 'react';
-import * as SchemaTypes from '../../SchemaTypes';
-import Styles from '../SchemaTreeStyles';
-import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
-
-export interface Props
+"use strict";
+// A dummy mode
+(function(mod)
 {
-  item: SchemaTypes.Server;
-}
-
-class State
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror)
 {
-}
-
-@Radium
-export class ServerTreeInfo extends PureClasss<Props>
-{
-  public state: State = new State();
-
-  public render()
+  CodeMirror.defineMode("elastic", function(config, parserConfig)
   {
-    const server = this.props.item;
-
-    return (
-      <div
-        style={Styles.infoPieces}
-      >
-        <div
-          style={Styles.infoPiece}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {server.databaseIds.size}
-          </span> databases
-        </div>
-      </div>
-    );
-  }
-}
-
-export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-  [
-    {
-      label: 'Databases',
-      type: 'database',
-    },
-  ];
-
-export default ServerTreeInfo;
+    return {
+      startState: function()
+      {
+        return {}
+      },
+      token: function(stream, state)
+      {
+        stream.skipToEnd();
+        return null;
+      },
+      helperType: "elastic"
+    };
+  });
+});

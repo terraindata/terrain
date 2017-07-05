@@ -53,10 +53,13 @@ import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
 const CodeMirror = require('./Codemirror.js');
 
+// syntax highlighters
+import ElasticHighlighter from '../highlighters/ElasticHighlighter';
+import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
+
 // Style sheets and addons for CodeMirror
-
+require('./elastic.js');
 require('./tql.js');
-
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/edit/matchbrackets.js';
@@ -118,7 +121,6 @@ class TQLEditor extends PureClasss<Props>
         foldGutter: true,
         lint: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-
         revertButtons: false,
         connect: 'align',
 
@@ -127,7 +129,15 @@ class TQLEditor extends PureClasss<Props>
 
     if (this.props.language === 'elastic')
     {
-      options['mode'] = 'application/json';
+      options['mode'] = 'elastic';
+    }
+    else if (this.props.language === 'mysql')
+    {
+      options['mode'] = 'tql';
+    }
+    else
+    {
+      options['mode'] = '';
     }
 
     if (this.props.isDiff)
@@ -159,8 +169,28 @@ class TQLEditor extends PureClasss<Props>
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
         onFocusChange={this.props.onFocusChange}
+        onCodeMirrorMount={this.registerCodeMirror}
       />
     );
+  }
+
+  private handleChanges(cmInstance, changes: object[])
+  {
+    if (this.props.language === 'elastic')
+    {
+      const highlighter = new ElasticHighlighter();
+      highlighter.handleChanges(cmInstance, changes);
+    }
+  }
+
+  private registerCodeMirror(cmInstance)
+  {
+    cmInstance.on('changes', this.handleChanges);
+    if (this.props.language === 'elastic') // make this a switch if there are more languages
+    {
+      const highlighter = new ElasticHighlighter();
+      highlighter.initialHighlight(cmInstance);
+    }
   }
 }
 

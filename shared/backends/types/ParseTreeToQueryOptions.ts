@@ -43,55 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-import * as React from 'react';
-import * as SchemaTypes from '../../SchemaTypes';
-import Styles from '../SchemaTreeStyles';
-import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
-
-export interface Props
+// Copyright 2017 Terrain Data, Inc.
+interface ParseTreeToQueryOptions
 {
-  item: SchemaTypes.Server;
+  allFields?: boolean; // amend the final Select card to include all possible fields.
+  limit?: number;
+  count?: boolean;
 }
 
-class State
-{
-}
-
-@Radium
-export class ServerTreeInfo extends PureClasss<Props>
-{
-  public state: State = new State();
-
-  public render()
-  {
-    const server = this.props.item;
-
-    return (
-      <div
-        style={Styles.infoPieces}
-      >
-        <div
-          style={Styles.infoPiece}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {server.databaseIds.size}
-          </span> databases
-        </div>
-      </div>
-    );
-  }
-}
-
-export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-  [
-    {
-      label: 'Databases',
-      type: 'database',
-    },
-  ];
-
-export default ServerTreeInfo;
+export default ParseTreeToQueryOptions;

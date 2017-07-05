@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 const { List } = Immutable;
-import SchemaTypes from '../../schema/SchemaTypes';
+import * as SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import PureClasss from './../../common/components/PureClasss';

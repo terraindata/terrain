@@ -50,7 +50,7 @@ import Radium = require('radium');
 import * as React from 'react';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
-import SchemaTypes from '../SchemaTypes';
+import * as SchemaTypes from '../SchemaTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';

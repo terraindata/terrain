@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import RoleTypes from './../roles/RoleTypes';
-import UserTypes from './../users/UserTypes';
+import * as RoleTypes from './../roles/RoleTypes';
+import * as UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
 import BackendInstance from '../../../shared/backends/types/BackendInstance';
@@ -57,198 +57,194 @@ import { BaseClass, New } from '../Classes';
 
 // TODO MOD refactor
 
-export namespace LibraryTypes
+class VariantC extends ItemC
 {
-  class VariantC extends ItemC
+  public type = ItemType.Variant;
+
+  public algorithmId: number = -1;
+  public groupId: number = -1;
+
+  public excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
+  // TODO try super or prototype
+
+  public lastEdited = '';
+  public lastUserId = -1;
+  public version = false;
+  public language = 'elastic';
+
+  // don't use this!
+  // TODO remove when variants can be saved without queries
+  public query: Query = null;
+}
+export interface Variant extends VariantC, IRecord<Variant> { }
+const Variant_Record = Immutable.Record(new VariantC());
+export const _Variant = (config?: any) =>
+{
+  // NOTE: we do not want a default value for the config param because
+  //  we want to know the difference between creating a new variant with
+  //  no params vs. an old version with no modelVersion param
+  if (config && !config.modelVersion)
   {
-    public type = ItemType.Variant;
-
-    public algorithmId: number = -1;
-    public groupId: number = -1;
-
-    public excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
-
-    public lastEdited = '';
-    public lastUserId = -1;
-    public version = false;
-    public language = 'elastic';
-
-    // TODO remove when variants can be saved without queries
-    public query: Query = null;
-  }
-  export interface Variant extends VariantC, IRecord<Variant> { }
-  const Variant_Record = Immutable.Record(new VariantC());
-  export const _Variant = (config?: any) =>
-  {
-    // NOTE: we do not want a default value for the config param because
-    //  we want to know the difference between creating a new variant with
-    //  no params vs. an old version with no modelVersion param
-    if (config && !config.modelVersion)
-    {
-      // from modelVersion 0 to 1
-      config.modelVersion = 1;
-      config.query = {
-        cards: config.cards,
-        inputs: config.inputs,
-        resultsConfig: config.resultsConfig,
-        tql: config.tql,
-        deckOpen: config.deckOpen,
-        variantId: config.id,
-        language: 'mysql',
-      };
-    }
-
-    if (config && config.modelVersion === 1)
-    {
-      // from 1 to 2
-      // TODO if necessary
-    }
-
-    config = config || {};
-    config.language = config.language || 'elastic';
-
-    config.query = config.query || {};
-    config.query.language = config.language;
-    config.query = _Query(config.query);
-
-    let v = new Variant_Record(config) as any as Variant;
-    if (!config || !config.lastUserId || !config.lastEdited)
-    {
-      v = touchVariant(v);
-    }
-    return v;
-  };
-
-  export function touchVariant(v: Variant): Variant
-  {
-    return v
-      .set('lastEdited', new Date())
-      .set('lastUserId', +localStorage['id'])
-      ;
-  }
-
-  export function variantForSave(v: Variant): Variant
-  {
-    return v.set('query', queryForSave(v.query));
-  }
-
-  class AlgorithmC extends ItemC
-  {
-    public type = ItemType.Algorithm;
-
-    public groupId = -1;
-
-    public lastEdited = '';
-    public lastUsername = '';
-
-    public variantsOrder = List([]);
-    public language = 'elastic';
-
-    public excludeFields = ['dbFields', 'excludeFields', 'groupId'];
-  }
-  const Algorithm_Record = Immutable.Record(new AlgorithmC());
-  export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
-  export const _Algorithm = (config?: any) =>
-  {
-    if (config && (!config.modelVersion || config.modelVersion === 1))
-    {
-      // from 0 and 1 to 2
-      // TODO
-    }
-
-    config = config || {};
-    config.variantsOrder = List(config.variantsOrder || []);
-    return new Algorithm_Record(config) as any as Algorithm;
-  };
-
-  export const groupColors =
-    [
-      '#00A7F7',
-      '#00BCD6',
-      '#009788',
-      '#48B14B',
-      '#8AC541',
-      '#CCDD1F',
-      '#FFEC18',
-      '#FFC200',
-      '#FF9900',
-      '#5F7D8C',
-    ];
-
-  class GroupC extends ItemC
-  {
-    public type = ItemType.Group;
-
-    public lastEdited = '';
-    public lastUserId = '';
-    public userIds = List([]);
-    public algorithmsOrder = List([]);
-    public defaultLanguage = 'elastic';
-  }
-  const Group_Record = Immutable.Record(new GroupC());
-  export interface Group extends GroupC, IRecord<Group> { }
-  export const _Group = (config: any = {}) =>
-  {
-    if (config && (!config.modelVersion || config.modelVersion === 1))
-    {
-      // from 0 and 1 to 2
-      // TODO
-    }
-
-    config = config || {};
-    config.userIds = List(config.userIds || []);
-    config.algorithmsOrder = List(config.algorithmsOrder || []);
-    return new Group_Record(config) as any as Group;
-  };
-
-  export function nameForStatus(status: ItemStatus): string
-  {
-    switch (status)
-    {
-      case ItemStatus.Approve:
-        return 'Approve';
-      case ItemStatus.Archive:
-        return 'Archive';
-      case ItemStatus.Build:
-        return 'Build';
-      case ItemStatus.Live:
-        return 'Live';
-      case ItemStatus.Default:
-        return 'Default';
-      default:
-        return 'None';
-    }
-  }
-
-  export function colorForStatus(status: ItemStatus): string
-  {
-    switch (status)
-    {
-      case ItemStatus.Approve:
-        return '#bf5bff';
-      case ItemStatus.Archive:
-        return '#ff735b';
-      case ItemStatus.Build:
-        return '#00a7f7';
-      case ItemStatus.Live:
-        return '#48b14b';
-      case ItemStatus.Default:
-        return '#957048';
-      default:
-        return '#000';
-    }
-  }
-
-  export const typeToConstructor: {
-    [key: string]: (...args) => Item,
-  } =
-    {
-      [ItemType.Query]: _Query,
-      [ItemType.Variant]: _Variant,
-      [ItemType.Algorithm]: _Algorithm,
-      [ItemType.Group]: _Group,
+    // from modelVersion 0 to 1
+    config.modelVersion = 1;
+    config.query = {
+      cards: config.cards,
+      inputs: config.inputs,
+      resultsConfig: config.resultsConfig,
+      tql: config.tql,
+      deckOpen: config.deckOpen,
+      variantId: config.id,
+      language: 'mysql',
     };
+  }
 
+  if (config && config.modelVersion === 1)
+  {
+    // from 1 to 2
+    // TODO if necessary
+  }
+
+  config = config || {};
+  config.language = config.language || 'elastic';
+
+  config.query = config.query || {};
+  config.query.language = config.language;
+  config.query = _Query(config.query);
+
+  let v = new Variant_Record(config) as any as Variant;
+  if (!config || !config.lastUserId || !config.lastEdited)
+  {
+    v = touchVariant(v);
+  }
+  return v;
+};
+
+export function touchVariant(v: Variant): Variant
+{
+  return v
+    .set('lastEdited', new Date())
+    .set('lastUserId', +localStorage['id'])
+    ;
 }
 
-export default LibraryTypes;
+export function variantForSave(v: Variant): Variant
+{
+  return v.set('query', queryForSave(v.query));
+}
+
+class AlgorithmC extends ItemC
+{
+  public type = ItemType.Algorithm;
+
+  public groupId = -1;
+
+  public lastEdited = '';
+  public lastUsername = '';
+
+  public variantsOrder = List([]);
+  public language = 'elastic';
+
+  public excludeFields = ['dbFields', 'excludeFields', 'groupId'];
+}
+const Algorithm_Record = Immutable.Record(new AlgorithmC());
+export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
+export const _Algorithm = (config?: any) =>
+{
+  if (config && (!config.modelVersion || config.modelVersion === 1))
+  {
+    // from 0 and 1 to 2
+    // TODO
+  }
+
+  config = config || {};
+  config.variantsOrder = List(config.variantsOrder || []);
+  return new Algorithm_Record(config) as any as Algorithm;
+};
+
+export const groupColors =
+  [
+    '#00A7F7',
+    '#00BCD6',
+    '#009788',
+    '#48B14B',
+    '#8AC541',
+    '#CCDD1F',
+    '#FFEC18',
+    '#FFC200',
+    '#FF9900',
+    '#5F7D8C',
+  ];
+
+class GroupC extends ItemC
+{
+  public type = ItemType.Group;
+
+  public lastEdited = '';
+  public lastUserId = '';
+  public userIds = List([]);
+  public algorithmsOrder = List([]);
+  public defaultLanguage = 'elastic';
+}
+const Group_Record = Immutable.Record(new GroupC());
+export interface Group extends GroupC, IRecord<Group> { }
+export const _Group = (config: any = {}) =>
+{
+  if (config && (!config.modelVersion || config.modelVersion === 1))
+  {
+    // from 0 and 1 to 2
+    // TODO
+  }
+
+  config = config || {};
+  config.userIds = List(config.userIds || []);
+  config.algorithmsOrder = List(config.algorithmsOrder || []);
+  return new Group_Record(config) as any as Group;
+};
+
+export function nameForStatus(status: ItemStatus): string
+{
+  switch (status)
+  {
+    case ItemStatus.Approve:
+      return 'Approve';
+    case ItemStatus.Archive:
+      return 'Archive';
+    case ItemStatus.Build:
+      return 'Build';
+    case ItemStatus.Live:
+      return 'Live';
+    case ItemStatus.Default:
+      return 'Default';
+    default:
+      return 'None';
+  }
+}
+
+export function colorForStatus(status: ItemStatus): string
+{
+  switch (status)
+  {
+    case ItemStatus.Approve:
+      return '#bf5bff';
+    case ItemStatus.Archive:
+      return '#ff735b';
+    case ItemStatus.Build:
+      return '#00a7f7';
+    case ItemStatus.Live:
+      return '#48b14b';
+    case ItemStatus.Default:
+      return '#957048';
+    default:
+      return '#000';
+  }
+}
+
+export const typeToConstructor: {
+  [key: string]: (...args) => Item,
+} =
+  {
+    [ItemType.Query]: _Query,
+    [ItemType.Variant]: _Variant,
+    [ItemType.Algorithm]: _Algorithm,
+    [ItemType.Group]: _Group,
+  };
