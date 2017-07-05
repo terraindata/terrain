@@ -72,8 +72,8 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKey, { id }),
 
     chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview }),
+    (file: string, filetype: string, preview: List<List<string>>, oldNames: List<string>) =>
+      $(ActionTypes.chooseFile, { file, filetype, preview, oldNames }),
 
     uploadFile:
     () =>
@@ -82,18 +82,6 @@ const FileImportActions =
     addTransform:
     (transform: object) =>
       $(ActionTypes.addTransform, { transform }),
-
-    // setCurTransform:
-    //   (transform: object) =>
-    //     $(ActionTypes.setCurTransform, { transform }),
-
-    setPreviewTransform:
-    (transform: any) =>
-      $(ActionTypes.setPreviewTransform, { transform }),
-
-    clearPreviewTransform:
-    () =>
-      $(ActionTypes.clearPreviewTransform, {}),
 
     setColumnToInclude:
     (id: number) =>
@@ -110,14 +98,6 @@ const FileImportActions =
     updatePreviewRows:
     (transform: any) =>
       $(ActionTypes.updatePreviewRows, { transform }),
-
-    // updatePreviewRows:
-    //   (rowId: number, colId: number, value: string) =>
-    //     $(ActionTypes.updatePreviewRows, { rowId, colId, value }),
-
-    // setCurPreviewRows:
-    //   (curPreviewRows: Immutable.List<Immutable.List<string>>) =>
-    //     $(ActionTypes.setColumnType, { curPreviewRows }),
   };
 
 export default FileImportActions;

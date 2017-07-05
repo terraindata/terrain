@@ -68,9 +68,15 @@ class TransformBox extends Classs<Props>
   public state: {
     transformTypeIndex: number;
     transformText: string;
+    splitNewNames: string[];
+    mergeNewName: string;
+    mergeOldName: string;
   } = {
     transformTypeIndex: 0,
     transformText: '',
+    splitNewNames: ['', ''],
+    mergeNewName: '',
+    mergeOldName: '',
   };
 
   public handleAutocompleteTransformTextChange(transformText)
@@ -87,6 +93,38 @@ class TransformBox extends Classs<Props>
     })
   }
 
+  public handleSplitNameAChange(splitNameA)
+  {
+    const newNames = this.state.splitNewNames.slice();
+    newNames[0] = splitNameA;
+    this.setState({
+      splitNewNames: newNames,
+    });
+  }
+
+  public handleSplitNameBChange(splitNameB)
+  {
+    const newNames = this.state.splitNewNames.slice();
+    newNames[1] = splitNameB;
+    this.setState({
+      splitNewNames: newNames,
+    });
+  }
+
+  public handleMergeNewNameChange(mergeNewName)
+  {
+    this.setState({
+      mergeNewName,
+    })
+  }
+
+  public handleMergeOldNameChange(mergeOldName)
+  {
+    this.setState({
+      mergeOldName,
+    });
+  }
+
   public handleTransformClick()
   {
     // if not empty, add current rename transform and set it to empty string
@@ -96,24 +134,17 @@ class TransformBox extends Classs<Props>
     console.log('adding transform: ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
       this.props.newName + ', text: ' + this.state.transformText);
 
-    // Actions.setPreviewTransform(
-    //   {
-    //     name: this.props.transformTypes.get(this.state.transformTypeIndex),
-    //     args: {
-    //       colName: this.props.newName,
-    //       text: this.state.transformText,
-    //     }
-    //   }
-    // );
 
     Actions.updatePreviewRows({
       name: this.props.transformTypes.get(this.state.transformTypeIndex),
       args: {
         colName: this.props.newName,
         text: this.state.transformText,
+        newNames: this.state.splitNewNames,
+        mergeNewName: this.state.mergeNewName,
+        oldName: this.state.mergeOldName,
       }
     });
-    // Actions.clearPreviewTransform();
 
     Actions.addTransform(
       {
@@ -147,9 +178,47 @@ class TransformBox extends Classs<Props>
               value={this.state.transformText}
               options={null}
               onChange={this.handleAutocompleteTransformTextChange}
-              placeholder={''}
+              placeholder={'text'}
               disabled={false}
             />
+            {
+              this.props.transformTypes.get(this.state.transformTypeIndex) === 'split' &&
+              <div>
+                <Autocomplete
+                  value={this.state.splitNewNames[0]}
+                  options={null}
+                  onChange={this.handleSplitNameAChange}
+                  placeholder={'new column 1'}
+                  disabled={false}
+                />
+                <Autocomplete
+                  value={this.state.splitNewNames[1]}
+                  options={null}
+                  onChange={this.handleSplitNameBChange}
+                  placeholder={'new column 2'}
+                  disabled={false}
+                />
+              </div>
+            }
+            {
+              this.props.transformTypes.get(this.state.transformTypeIndex) === 'merge' &&
+              <div>
+                <Autocomplete
+                  value={this.state.mergeNewName}
+                  options={null}
+                  onChange={this.handleMergeNewNameChange}
+                  placeholder={'new column name'}
+                  disabled={false}
+                />
+                <Autocomplete
+                  value={this.state.mergeOldName}
+                  options={null}
+                  onChange={this.handleMergeOldNameChange}
+                  placeholder={'column to merge'}
+                  disabled={false}
+                />
+              </div>
+            }
             <button onClick={this.handleTransformClick}>
               Transform
             </button>

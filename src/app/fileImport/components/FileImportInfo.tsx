@@ -124,7 +124,7 @@ class FileImportInfo extends PureClasss<Props>
     Actions.changeHasCsvHeader();
   }
 
-  public parseData(file: string, filetype: string): List<List<string>>
+  public parseAndChooseFile(file: string, filetype: string)
   {
     // TODO: read JSON line by line and return items
     let items = [];
@@ -135,7 +135,6 @@ class FileImportInfo extends PureClasss<Props>
       if (!Array.isArray(items))
       {
         alert('Input JSON file must parse to an array of objects.');
-        this.refs['file']['value'] = null;
         return;
       }
       console.log("Parsed json: ", items);
@@ -179,13 +178,19 @@ class FileImportInfo extends PureClasss<Props>
     }
 
     items.splice(this.props.previewRowsCount, items.length - this.props.previewRowsCount);
-    const preview = items.map((item, i) =>
+    const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
         value
       )
     );
+    console.log("previewRows: ", previewRows);
 
-    return List<List<string>>(preview);
+    const columnNames = _.map(items[0], (value, index) =>
+      filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
+    );
+    console.log('colNames: ', columnNames);
+
+    Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
   }
 
   public handleChooseFile(file)
@@ -212,14 +217,7 @@ class FileImportInfo extends PureClasss<Props>
     fr.onloadend = () =>
     {
       console.log("File chosen contents: ", fr.result);
-      const preview = this.parseData(fr.result, filetype);
-      console.log("preview: ", preview);
-
-      if (preview)
-      {
-        Actions.chooseFile(fr.result, filetype, preview);
-      }
-
+      this.parseAndChooseFile(fr.result, filetype);
       this.refs['file']['value'] = null;
     }
   }

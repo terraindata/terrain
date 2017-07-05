@@ -113,44 +113,11 @@ FileImportReducers[ActionTypes.addTransform] =
       .set('transforms', state.transforms.push(action.payload.transform))
   ;
 
-FileImportReducers[ActionTypes.setPreviewTransform] =
-  (state, action) =>
-  {
-    return state
-      .set('previewTransform', action.payload.transform);
-  };
-
-FileImportReducers[ActionTypes.clearPreviewTransform] =
-  (state, action) =>
-    state
-      .set('previewTransform', { name: '', args: { colName: '', text: '' } })
-  ;
-
 FileImportReducers[ActionTypes.updatePreviewRows] =
   (state, action) =>
   {
-    // const transformCol = state.columnNames.indexOf(action.payload.transform.args.colName);
-    // state.previewRows.map((row, i) =>
-    // {
-    //   row.map((item, j) =>
-    //   {
-    //     if (j === transformCol)
-    //     {
-    //       Actions.updatePreviewRows(i, j, this.stringTransform(item));
-    //       if (action.payload.transform.name === 'append');
-    //       {
-    //
-    //       }
-    //     }
-    //   });
-    // });
-    //
-    // return state.update('previewRows', (rows) =>
-    //   rows[][transformCol] + action.payload.transform.args.text
-    // )
-
     console.log('reducer: ' + action.payload.transform.name + ', ' + action.payload.transform.args.colName + ', ' +
-      action.payload.transform.args.text);
+      action.payload.transform.args.text + ', ' + action.payload.transform.args.newNames);
 
     const transformName = action.payload.transform.name;
     if (transformName === 'append')
@@ -189,56 +156,77 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     }
     else if (transformName === 'split')
     {
-      const splitCol = state.columnNames.indexOf(action.payload.transform.args.oldName);
+      const splitCol = state.columnNames.indexOf(action.payload.transform.args.colName);
+
+      const newPreviewRows = [];
+      state.previewRows.map((row, i) =>
+      {
+        const newRow = [];
+        row.map((value, j) =>
+        {
+          if (j === splitCol)
+          {
+            // const parts = value.split(action.payload.transform.args.text);
+            // console.log('parts: ', parts);
+            // newRow.push(parts[0]);
+            // newRow.push(parts[1]);
+
+            // const parts = value.split(/_(.+)/)[1];
+            // newRow.push(parts[0]);
+            // newRow.push(parts[1]);
+
+            newRow.push(value.split(action.payload.transform.args.text)[0]);
+            newRow.push(value.split(action.payload.transform.args.text).slice(1).join(action.payload.transform.args.text));
+          }
+          else
+          {
+            newRow.push(value);
+          }
+        });
+        newPreviewRows.push(newRow);
+      });
+
       return state
-        .set('previewRows', )
+        .set('previewRows', List(newPreviewRows))
         .set('columnNames', state.columnNames
-          .set(splitCol, action.payload.transform.newName[0])
-          .insert(splitCol, action.payload.transform.newName[1]))
-        .set('columnsToInclude', state.columnsToInclude.insert(splitCol, true))
-        .set('columnTypes', state.columnTypes.insert(splitCol, 'string'))
+          .set(splitCol, action.payload.transform.args.newNames[0])
+          .insert(splitCol + 1, action.payload.transform.args.newNames[1]))
+        .set('columnsToInclude', state.columnsToInclude.insert(splitCol + 1, true))
+        .set('columnTypes', state.columnTypes.insert(splitCol + 1, 0))
     }
     else if (transformName === 'merge')
     {
-      const mergeCol1 = state.columnNames.indexOf(action.payload.transform.args.oldName[0]);
-      const mergeCol2 = state.columnNames.indexOf(action.payload.transform.args.oldName[1]);
+      const mergeCol1 = state.columnNames.indexOf(action.payload.transform.args.colName);
+      const mergeCol2 = state.columnNames.indexOf(action.payload.transform.args.oldName);
+      console.log('merge: ' + mergeCol1 + ', ' + mergeCol2);
+      const newPreviewRows = [];
+      state.previewRows.map((row, i) =>
+      {
+        const newRow = [];
+        row.map((value, j) =>
+        {
+          if (j === mergeCol1)
+          {
+            newRow.push(value + action.payload.transform.args.text + row[mergeCol2]);
+          }
+          else
+          {
+            newRow.push(value);
+          }
+        });
+        newRow.splice(mergeCol2, 1);
+        newPreviewRows.push(newRow);
+      });
+
       return state
-        .set('previewRows', )
+        .set('previewRows', newPreviewRows)
         .set('columnNames', state.columnNames
           .delete(mergeCol2)
-          .set(mergeCol1, action.payload.transform.args.newName))
+          .set(mergeCol1, action.payload.transform.args.mergeNewName))
         .set('columnsToInclude', state.columnsToInclude.delete(mergeCol2))
         .set('columnTypes', state.columnTypes.delete(mergeCol2))
     }
   };
-
-// FileImportReducers[ActionTypes.updatePreviewRows] =
-//   (state, action) =>
-//     state
-//       .setIn(['previewRows', action.paylod.rowId, action.payload.colId] , action.payload.value)
-//   ;
-
-// FileImportReducers[ActionTypes.setCurPreviewRows] =
-//   (state, action) =>
-//     state
-//       .set('curPreviewRows', action.payload.curPreviewRows)
-//   ;
-
-// FileImportReducers[ActionTypes.setCurTransform] =
-//   (state, action) =>
-//   {
-//     console.log('current transform: ', state.curTransform);
-//     console.log('adding transform: ', action.payload.transform);
-//     if (state.curTransform.name) {
-//       if (action.payload.transform.name === 'rename' && state.curTransform.args.oldName !== action.payload.transform.args.oldName) {
-//         Actions.addCurTransform();
-//       }
-//       else if (state.curTransform.name !== action.payload.transform.name) {
-//         Actions.addCurTransform();
-//       }
-//     }
-//     return state.set('curTransform', action.payload.transform);
-//   }
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
@@ -248,28 +236,13 @@ FileImportReducers[ActionTypes.chooseFile] =
     const columnTypes = [];
     let colsCount = 0;
 
-    if (action.payload.filetype === 'csv' && !state.hasCsvHeader)
+    _.map(action.payload.preview.get(0), (value, key) =>
     {
-      console.log('headerless csv');
-      action.payload.preview.get(0).map((value, i) =>
-      {
-        columnNames.push('column' + i);
-        columnsToInclude.push(true);
-        columnTypes.push(0);
-        colsCount++;
-      });
-    }
-    else
-    {
-      console.log('csv with header/json');
-      _.map(action.payload.preview.get(0), (value, key) =>
-      {
-        columnNames.push(key);
-        columnsToInclude.push(true);
-        columnTypes.push(0);
-        colsCount++;
-      });
-    }
+      columnNames.push(action.payload.oldNames.get(key));
+      columnsToInclude.push(true);
+      columnTypes.push(0);
+      colsCount++;
+    });
 
     // console.log(columnNames, columnsToInclude, columnTypes);
 
@@ -278,7 +251,6 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('filetype', action.payload.filetype)
       .set('primaryKey', '')
       .set('previewRows', action.payload.preview)
-      .set('curPreviewRows', action.payload.preview)
       .set('columnsCount', colsCount)
       .set('oldNames', List(columnNames))
       .set('columnNames', List(columnNames))

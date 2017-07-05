@@ -67,13 +67,6 @@ export interface Props
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<number>;
-
-  // columnsToInclude: IMMap<string, boolean>;
-  // columnNames: IMMap<string, string>;
-  // columnTypes: IMMap<string, number>;
-
-  previewTransform: any;
-  // curPreviewRows: List<List<string>>;
 }
 
 class FileImportPreview extends PureClasss<Props>
@@ -82,8 +75,8 @@ class FileImportPreview extends PureClasss<Props>
     curRenameTransform: {
       name: string,
       args: {
-        oldName?: string | string[],
-        newName?: string | string[],
+        oldName?: string,
+        newName?: string,
       },
     }
   } = {
@@ -129,18 +122,6 @@ class FileImportPreview extends PureClasss<Props>
     }
   }
 
-  public stringTransform(item: string): string
-  {
-    if (this.props.previewTransform.name === 'append')
-    {
-      return item + this.props.previewTransform.args.text;
-    }
-    else if (this.props.previewTransform.name === 'prepend')
-    {
-      return this.props.previewTransform.args.text + item;
-    }
-  }
-
   public handleUploadFile()
   {
     // TODO: error checking from FileImportInfo
@@ -149,47 +130,8 @@ class FileImportPreview extends PureClasss<Props>
       Actions.addTransform(this.state.curRenameTransform);
     }
 
-    // if (this.props.curRenameTransform.name)
-    // Actions.addCurTransform();
     Actions.uploadFile();
   }
-
-  // public componentWillReceiveProps(nextProps: Props)
-  // {
-  //   // if (nextProps.previewTransform.name)
-  //   // {
-  //   //   this.props.previewRows.map((row, i) =>
-  //   //   {
-  //   //     row.map((item, j) =>
-  //   //     {
-  //   //       if (this.props.columnNames.indexOf(this.props.previewTransform.args.colName) === i)
-  //   //       {
-  //   //         Actions.updatePreviewRows(i, j, this.stringTransform(item));
-  //   //       }
-  //   //     });
-  //   //   });
-  //   // }
-  //
-  //   if (nextProps.previewTransform.name !== '')
-  //   {
-  //     console.log('updatePreviewRows, transform: ', nextProps.previewTransform);
-  //     Actions.updatePreviewRows(nextProps.previewTransform);
-  //     Actions.clearPreviewTransform();
-  //   }
-  //
-  //   // if (nextProps.previewTransform.name === 'append' || nextProps.previewTransform.name === 'prepend')
-  //   // {
-  //   //   Actions.updatePreviewRows(name, transformCol, text);
-  //   // }
-  //   // else if (nextProps.previewTransform.name === 'split')
-  //   // {
-  //   //   Actions.splitPreviewRows();
-  //   // }
-  //   // else if (nextProps.previewTransform.name === 'merge')
-  //   // {
-  //   //   Actions.mergePreviewRows();
-  //   // }
-  // }
 
   public render()
   {
