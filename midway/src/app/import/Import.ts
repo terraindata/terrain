@@ -126,13 +126,13 @@ export class Import
       {
         return reject(configError);
       }
-      // const expectedMapping: object = this._getMappingForSchema(imprt);
-      // const mappingForSchema: object | string =
-      //     this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.db);
-      // if (typeof mappingForSchema === 'string')
-      // {
-      //     return reject(mappingForSchema);
-      // }
+      const expectedMapping: object = this._getMappingForSchema(imprt);
+      const mappingForSchema: object | string =
+        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.db);
+      if (typeof mappingForSchema === 'string')
+      {
+        return reject(mappingForSchema);
+      }
 
       let items: object[];
       try
@@ -155,9 +155,9 @@ export class Import
         [imprt.primaryKey],
         columns,
         imprt.db,
-        // mappingForSchema,
+        mappingForSchema,
       );
-      // await database.getTasty().getDB().putMapping(insertTable);
+      await database.getTasty().getDB().putMapping(insertTable);
 
       winston.info('about to upsert via tasty...');
       resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
@@ -301,11 +301,12 @@ export class Import
           if (this._isCompatibleType(mapping['properties'][field], fields[field]))
           {
             fieldsToCheck.delete(field);
-            delete mapping[field];
+            delete mapping['properties'][field];
           }
           else
           {
-            return 'error message';       // TODO: make more informative
+            return 'Type mismatch for field ' + field + '. Cannot cast "' +
+              this._getESType(mapping['properties'][field]) + '" to "' + String(fields[field]['type']) + '".';
           }
         }
       }
@@ -597,7 +598,7 @@ export class Import
       }
       for (const key in obj)
       {
-        // TODO: fix to handle new "nameToType" format, and recursively check arrays
+        // TODO: recursively check arrays, update equality check to something more intelligent
         if (obj.hasOwnProperty(key) && obj[key] !== null && nameToType[key]['type'] !== this._getType(obj[key]))
         {
           return 'Field "' + key + '" of object number ' + String(ind) +
