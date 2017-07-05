@@ -43,51 +43,25 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import ElasticBlocks from './blocks/ElasticBlocks';
-import ElasticCardsDeck from './blocks/ElasticCardsDeck';
-import CardsToElastic from './conversion/CardsToElastic';
-import ElasticToCards from './conversion/ElasticToCards';
-import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
-const syntaxConfig = require('./syntax/ElasticSyntaxConfig.json');
 
-class ElasticBackend implements Backend
+import { Query } from '../../../items/types/Query';
+import ESInterpreter from '../parser/ESInterpreter';
+import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
+
+export function ParseElasticQuery(tql: string)
 {
-  type = 'elastic';
-  name = 'Elastic';
-
-  blocks = ElasticBlocks;
-  creatingType = ElasticBlocks.elasticCreating.type;
-
-  rootCard = ElasticBlocks.eqlroot;
-  topLevelCards =
-  Immutable.List(_.keys(ElasticBlocks));
-  //  Immutable.List<string>([
-  //   ElasticBlocks.elasticRootCard.type,
-  //   ElasticBlocks.elasticKeyValueWrap.type,
-  //   ElasticBlocks.elasticMagicCard.type,
-  //   ElasticBlocks.elasticRootCard.type,
-  // ]);
-
-  // Ordering of the cards deck
-  cardsDeck = ElasticCardsDeck;
-  cardsList = cardsDeckToList(ElasticCardsDeck);
-
-  queryToCode = CardsToElastic.toElastic;
-
-  codeToQuery = ElasticToCards;
-
-  parseQuery = ParseElasticQuery;
-
-  parseTreeToQueryString = ElasticParseTreeToQuery;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
+  return new ESInterpreter(tql);
 }
 
-export default new ElasticBackend();
+export function ElasticParseTreeToQuery(query: Query, options: ParseTreeToQueryOptions): string
+{
+  const queryObject = JSON.parse(JSON.stringify(query.parseTree.parser.getValue()));
+  if (options.allFields === true)
+  {
+    if (queryObject.body && queryObject.body._source)
+    {
+      queryObject.body._source = [];
+    }
+  }
+  return JSON.stringify(queryObject);
+}

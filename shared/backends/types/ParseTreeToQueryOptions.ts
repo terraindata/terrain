@@ -43,51 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import ElasticBlocks from './blocks/ElasticBlocks';
-import ElasticCardsDeck from './blocks/ElasticCardsDeck';
-import CardsToElastic from './conversion/CardsToElastic';
-import ElasticToCards from './conversion/ElasticToCards';
-import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
-const syntaxConfig = require('./syntax/ElasticSyntaxConfig.json');
-
-class ElasticBackend implements Backend
+// Copyright 2017 Terrain Data, Inc.
+interface ParseTreeToQueryOptions
 {
-  type = 'elastic';
-  name = 'Elastic';
-
-  blocks = ElasticBlocks;
-  creatingType = ElasticBlocks.elasticCreating.type;
-
-  rootCard = ElasticBlocks.eqlroot;
-  topLevelCards =
-  Immutable.List(_.keys(ElasticBlocks));
-  //  Immutable.List<string>([
-  //   ElasticBlocks.elasticRootCard.type,
-  //   ElasticBlocks.elasticKeyValueWrap.type,
-  //   ElasticBlocks.elasticMagicCard.type,
-  //   ElasticBlocks.elasticRootCard.type,
-  // ]);
-
-  // Ordering of the cards deck
-  cardsDeck = ElasticCardsDeck;
-  cardsList = cardsDeckToList(ElasticCardsDeck);
-
-  queryToCode = CardsToElastic.toElastic;
-
-  codeToQuery = ElasticToCards;
-
-  parseQuery = ParseElasticQuery;
-
-  parseTreeToQueryString = ElasticParseTreeToQuery;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
+  allFields?: boolean; // amend the final Select card to include all possible fields.
+  limit?: number;
+  count?: boolean;
 }
 
-export default new ElasticBackend();
+export default ParseTreeToQueryOptions;

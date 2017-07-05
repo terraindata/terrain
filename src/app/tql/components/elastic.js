@@ -42,52 +42,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import ElasticBlocks from './blocks/ElasticBlocks';
-import ElasticCardsDeck from './blocks/ElasticCardsDeck';
-import CardsToElastic from './conversion/CardsToElastic';
-import ElasticToCards from './conversion/ElasticToCards';
-import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
-const syntaxConfig = require('./syntax/ElasticSyntaxConfig.json');
-
-class ElasticBackend implements Backend
+"use strict";
+// A dummy mode
+(function(mod)
 {
-  type = 'elastic';
-  name = 'Elastic';
-
-  blocks = ElasticBlocks;
-  creatingType = ElasticBlocks.elasticCreating.type;
-
-  rootCard = ElasticBlocks.eqlroot;
-  topLevelCards =
-  Immutable.List(_.keys(ElasticBlocks));
-  //  Immutable.List<string>([
-  //   ElasticBlocks.elasticRootCard.type,
-  //   ElasticBlocks.elasticKeyValueWrap.type,
-  //   ElasticBlocks.elasticMagicCard.type,
-  //   ElasticBlocks.elasticRootCard.type,
-  // ]);
-
-  // Ordering of the cards deck
-  cardsDeck = ElasticCardsDeck;
-  cardsList = cardsDeckToList(ElasticCardsDeck);
-
-  queryToCode = CardsToElastic.toElastic;
-
-  codeToQuery = ElasticToCards;
-
-  parseQuery = ParseElasticQuery;
-
-  parseTreeToQueryString = ElasticParseTreeToQuery;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
-}
-
-export default new ElasticBackend();
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror)
+{
+  CodeMirror.defineMode("elastic", function(config, parserConfig)
+  {
+    return {
+      startState: function()
+      {
+        return {}
+      },
+      token: function(stream, state)
+      {
+        stream.skipToEnd();
+        return null;
+      },
+      helperType: "elastic"
+    };
+  });
+});

@@ -49,6 +49,7 @@ import { Cards } from '../../blocks/types/Card';
 const { List } = Immutable;
 import { AllBackendsMap } from '../../backends/AllBackends';
 import { _ResultsConfig, ResultsConfig } from '../../results/types/ResultsConfig';
+import ESInterpreter from '../../backends/elastic/parser/ESInterpreter';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -76,6 +77,8 @@ class QueryC
   inputs: List<any> = List([]);
   resultsConfig = null; //: ResultsConfig = null;
   tql: string = '';
+  parseTree: ESInterpreter = null;
+  lastMutation: number = 0;
   deckOpen: boolean = true;
 
   cardsAndCodeInSync: boolean = false;
@@ -98,6 +101,7 @@ export const _Query = (config?: Object) =>
   config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
+  config['meta'] = Immutable.Map<string, any>(config['meta']);
 
   const query = new Query_Record(config) as any as Query;
 
@@ -108,6 +112,7 @@ export function queryForSave(query: Query): Object
 {
   query = query
     .set('cards', BlockUtils.cardsForServer(query.cards))
+    .set('parseTree', null)
     .set('resultsConfig', query.resultsConfig.toJS());
   return query.toJS();
 }
