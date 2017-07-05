@@ -79,6 +79,7 @@ export default class ESTypeClause extends ESStringClause
               (
                 cards.get(0) && cards.get(0)['cards'].find(isIndexCard)
               );
+            // TODO idea: have the selected index and type stored on the Query object
             
             if (indexCard)
             {
@@ -90,10 +91,6 @@ export default class ESTypeClause extends ESStringClause
             }
             
             return emptyList;
-          	// TODO change to get db from actual query value
-          	// const db = BuilderStore.getState().db.name;
-           //  const tableNames = schemaState.tableNamesByDb.get(db);
-           //  return tableNames;
           },
         },
         tql: (stringBlock) => stringBlock['value'],

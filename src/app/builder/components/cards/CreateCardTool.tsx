@@ -106,7 +106,7 @@ class CreateCardTool extends PureClasss<Props>
     }
     else
     {
-      const type = this.props.accepts.get(index);
+      const type = this.getCardTypeList().get(index);
       this.createCard(type);
     }
   }
@@ -201,6 +201,16 @@ class CreateCardTool extends PureClasss<Props>
       </a>
     );
   }
+  
+  getCardTypeList(): List<string>
+  {
+    if(this.props.overrideText)
+    {
+      // TODO consider memoizing this.
+      return this.props.overrideText.map((t) => t.type).toList();
+    }
+    return this.props.accepts || AllBackendsMap[this.props.language].cardsList;
+  }
 
   public renderCardSelector()
   {
@@ -220,7 +230,7 @@ class CreateCardTool extends PureClasss<Props>
 
     //               curIndex++;
 
-    const cardTypeList = this.props.overrideText || this.props.accepts;
+    const cardTypeList = this.getCardTypeList();
     const isEmpty = cardTypeList.size === 0;
 
     return (
@@ -239,11 +249,7 @@ class CreateCardTool extends PureClasss<Props>
               </div>
           }
           {
-            this.props.overrideText
-              ?
-              this.props.overrideText.map((v, index) => this.renderCardOption(v.type, index))
-              :
-              this.props.accepts.map(this.renderCardOption)
+            cardTypeList.map(this.renderCardOption)
           }
           {
             _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
@@ -314,7 +320,7 @@ class CreateCardTool extends PureClasss<Props>
 
   handleKeyboardSelect(index: number)
   {
-    const type = this.props.accepts.get(index);
+    const type = this.getCardTypeList().get(index);
     this.createCard(type);
   }
 
@@ -344,6 +350,8 @@ class CreateCardTool extends PureClasss<Props>
         };
     }
 
+    const cardTypeList = this.getCardTypeList();
+    
     return (
       <div
         className={classes}
@@ -367,7 +375,7 @@ class CreateCardTool extends PureClasss<Props>
           onFocusLost={this.handleFocusLost}
           index={this.state.focusedIndex}
           onIndexChange={this.handleFocusedIndexChange}
-          length={this.props.accepts && this.props.accepts.size}
+          length={cardTypeList.size}
           onSelect={this.handleKeyboardSelect}
         />
       </div>
