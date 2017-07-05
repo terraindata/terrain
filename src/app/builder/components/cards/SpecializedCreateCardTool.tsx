@@ -43,55 +43,106 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import * as classNames from 'classnames';
 import * as React from 'react';
-import * as SchemaTypes from '../../SchemaTypes';
-import Styles from '../SchemaTreeStyles';
-import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { Card } from '../../../../../shared/blocks/types/Card';
+import PureClasss from '../../../common/components/PureClasss';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
+
+import CreateCardTool from './CreateCardTool';
 
 export interface Props
 {
-  item: SchemaTypes.Server;
+  keyPath: KeyPath;
+  data: Card;
+  canEdit: boolean;
+  helpOn: boolean;
+  className: string;
+  onChange: (keyPath: KeyPath, value: any, notDirty: boolean) => void;
+  // builderState: d.requiresBuilderState && BuilderStore.getState(),
+  language: string;
 }
 
-class State
-{
-}
+const emptyList = Immutable.List([]);
 
-@Radium
-export class ServerTreeInfo extends PureClasss<Props>
+class SpecializedCreateCardTool extends PureClasss<Props>
 {
-  public state: State = new State();
+  state: {
+    options?: List<{
+      text: string;
+      type: string;
+    }>;
+    open: boolean,
+  };
+
+  constructor(props: Props)
+  {
+    super(props);
+    this.state = {
+      options: this.getOptions(this.props),
+      open: false,
+    };
+  }
+
+  public getOptions(props: Props)
+  {
+    const options = props.data['getChildOptions'](props.data);
+
+    if (this.state && options.equals(this.state.options))
+    {
+      return this.state.options;
+    }
+
+    return options;
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.data !== this.props.data)
+    {
+      this.setState({
+        options: this.getOptions(nextProps),
+      });
+    }
+  }
+
+  public onClick(index: number)
+  {
+    const option = this.state.options.get(index);
+    const card = this.props.data['childOptionClickHandler'](
+      this.props.data, option
+    );
+
+    Actions.change(
+      this.props.keyPath,
+      card,
+    );
+  }
 
   public render()
   {
-    const server = this.props.item;
-
     return (
-      <div
-        style={Styles.infoPieces}
-      >
-        <div
-          style={Styles.infoPiece}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {server.databaseIds.size}
-          </span> databases
-        </div>
-      </div>
+      <CreateCardTool
+        index={0}
+        keyPath={this.props.keyPath}
+        canEdit={this.props.canEdit}
+        language={this.props.language}
+        className={this.props.className}
+        accepts={emptyList}
+
+        open={this.state.open}
+        onToggle={this._toggle('open')}
+
+        overrideText={this.state.options}
+        overrideClick={this.onClick}
+      />
     );
   }
 }
 
-export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-  [
-    {
-      label: 'Databases',
-      type: 'database',
-    },
-  ];
-
-export default ServerTreeInfo;
+export default SpecializedCreateCardTool;

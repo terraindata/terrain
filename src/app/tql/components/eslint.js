@@ -45,9 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
-import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig'
-
-const eslintConfig = new EQLConfig();
 
 (function(mod) {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
@@ -59,12 +56,12 @@ const eslintConfig = new EQLConfig();
 })(function(CodeMirror) {
   "use strict";
 
-    CodeMirror.registerHelper("lint", "json", function(text)
+    CodeMirror.registerHelper("lint", "elastic", function(text)
     {
       var found = [];
       try
       {
-        const t = new ESInterpreter(text, eslintConfig);
+        const t = new ESInterpreter(text);
         for (let e of t.parser.errors)
         {
           const token = e.token;

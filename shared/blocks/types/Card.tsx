@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
-import BlockUtils from '../BlockUtils';
+import * as BlockUtils from '../BlockUtils';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, TQLFn, verifyBlockConfigKeys } from './Block';
 

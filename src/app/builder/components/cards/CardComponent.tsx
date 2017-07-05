@@ -66,7 +66,7 @@ import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';

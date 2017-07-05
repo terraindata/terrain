@@ -52,7 +52,7 @@ import UserActions from './../../users/data/UserActions';
 import Actions from './../data/LibraryActions';
 import { LibraryState } from './../data/LibraryStore';
 import Store from './../data/LibraryStore';
-import LibraryTypes from './../LibraryTypes';
+import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import GroupsColumn from './GroupsColumn';
 import './Library.less';

@@ -50,7 +50,7 @@ import * as React from 'react';
 import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
-import SchemaTypes from '../SchemaTypes';
+import * as SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeItem from './SchemaTreeItem';
 import SchemaTreeStyles from './SchemaTreeStyles';

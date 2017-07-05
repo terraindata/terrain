@@ -50,7 +50,7 @@ import * as _ from 'underscore';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import Util from '../../util/Util';
-import LibraryTypes from '../LibraryTypes';
+import * as LibraryTypes from '../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
 import { _LibraryState, LibraryState, LibraryStore } from './LibraryStore';

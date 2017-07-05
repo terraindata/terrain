@@ -49,9 +49,9 @@ import * as React from 'react';
 import Classs from './../../common/components/Classs';
 import Menu from './../../common/components/Menu';
 import RolesActions from './../../roles/data/RolesActions';
-import RoleTypes from './../../roles/RoleTypes';
+import * as RoleTypes from './../../roles/RoleTypes';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import UserTypes from './../../users/UserTypes';
+import * as UserTypes from './../../users/UserTypes';
 import './LibraryInfoColumn.less';
 
 type GroupRoleMap = RoleTypes.GroupRoleMap;

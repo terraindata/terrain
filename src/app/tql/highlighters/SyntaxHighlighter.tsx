@@ -44,54 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as React from 'react';
-import * as SchemaTypes from '../../SchemaTypes';
-import Styles from '../SchemaTreeStyles';
-import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
-
-export interface Props
+/*
+ *  SyntaxHighlighter should be stateless across highlight calls because there may be
+ *  bugs that result from switching tabs of different variants.
+ */
+abstract class SyntaxHighlighter
 {
-  item: SchemaTypes.Server;
+  /*
+   *  @param cm CodeMirror instance
+   *  Called when text loads
+   */
+  public abstract initialHighlight(codeMirrorInstance): void;
+
+  /*
+   *  @param cm CodeMirror instance. Handles "changes" event as described in CodeMirror docs
+   */
+  public abstract handleChanges(codeMirrorInstance, changes: object[]): void;
 }
-
-class State
-{
-}
-
-@Radium
-export class ServerTreeInfo extends PureClasss<Props>
-{
-  public state: State = new State();
-
-  public render()
-  {
-    const server = this.props.item;
-
-    return (
-      <div
-        style={Styles.infoPieces}
-      >
-        <div
-          style={Styles.infoPiece}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {server.databaseIds.size}
-          </span> databases
-        </div>
-      </div>
-    );
-  }
-}
-
-export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-  [
-    {
-      label: 'Databases',
-      type: 'database',
-    },
-  ];
-
-export default ServerTreeInfo;
+export default SyntaxHighlighter;
