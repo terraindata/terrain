@@ -123,3 +123,34 @@ export function makeDatabaseController(type: string, dsnString: string): SQLiteC
     throw new Error('Error making new database controller.');
   }
 }
+
+/* constructs payload for ElasticDB.putMapping() from the provided mapping
+ * mapping: maps field name (string) to type (string or object (in the case of "object"/"nested" type)) */
+export function constructESMapping(mapping: object): object
+{
+  const body: object = {};
+  for (const key in mapping)
+  {
+    if (mapping.hasOwnProperty(key) && key !== '__isNested__')
+    {
+      if (typeof mapping[key] === 'string')
+      {
+        body[key] = { type: mapping[key] };
+        if (mapping[key] === 'text')
+        {
+          body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
+        }
+      }
+      else if (typeof mapping[key] === 'object')
+      {
+        body[key] = constructESMapping(mapping[key]);
+      }
+    }
+  }
+  const payload: object = { properties: body };
+  if (mapping['__isNested__'] !== undefined)
+  {
+    payload['type'] = 'nested';
+  }
+  return payload;
+}

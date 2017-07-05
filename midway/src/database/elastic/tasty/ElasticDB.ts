@@ -52,6 +52,7 @@ import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback } from '../../../tasty/Utils';
+import * as DBUtil from '../../Util';
 import ElasticClient from '../client/ElasticClient';
 import ElasticGenerator from './ElasticGenerator';
 import ElasticQuery from './ElasticQuery';
@@ -222,15 +223,7 @@ export class ElasticDB implements TastyDB
       await this.createIndex(table.getDatabaseName());
     }
 
-    const mapping: Map<string, string> = table.getMapping();
-    const payload: object = {};
-    for (const [key, value] of mapping.entries())
-    {
-      if (value !== '*')
-      {
-        payload[key] = { type: value };
-      }
-    }
+    const payload: object = DBUtil.constructESMapping(table.getMapping());
     winston.info('putMapping payload: ' + JSON.stringify(payload));
     return new Promise((resolve, reject) =>
     {

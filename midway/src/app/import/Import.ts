@@ -50,6 +50,7 @@ import * as csv from 'csvtojson';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
+import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 
@@ -70,16 +71,41 @@ export interface ImportConfig
   // if filetype is 'json': object mapping string (oldName) to boolean
   // if filetype is 'csv': array of booleans
   columnsToInclude: object | boolean[];
-  // if filetype is 'json': object mapping string (oldName) to string (type)
-  // if filetype is 'csv': array of strings (type)
-  // supported types: string/number/boolean/date/array/object/(null)
-  columnTypes: object | string[];
+  // if filetype is 'json': object mapping string (oldName) to object (contains "type" field)
+  // if filetype is 'csv': array of objects (contains "type" field)
+  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
+  columnTypes: object | object[];
   primaryKey: string;  // newName of primary key
 }
 
 export class Import
 {
-  private supportedColumnTypes: Set<string> = new Set(['string', 'number', 'boolean', 'date', 'array', 'object']);
+  private compatibleTypes: object =
+  {
+    text: new Set(['text']),
+    byte: new Set(['text', 'byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']),
+    short: new Set(['text', 'short', 'integer', 'long', 'float', 'double']),
+    integer: new Set(['text', 'integer', 'long', 'double']),
+    long: new Set(['text', 'long']),
+    half_float: new Set(['text', 'half_float', 'float', 'double']),
+    float: new Set(['text', 'float', 'double']),
+    double: new Set(['text', 'double']),
+    boolean: new Set(['text', 'boolean']),
+    date: new Set(['text', 'date']),
+    // object: new Set(['object', 'nested']),
+    // nested: new Set(['nested']),
+  };
+  // private maxValues: object =
+  // {
+  //   byte: Math.pow(2, 7),
+  //   short: Math.pow(2, 15),
+  //   integer: Math.pow(2, 31),
+  //   long: Math.pow(2, 63),
+  //   half_float: Math.pow(2, 11),
+  //   float: Math.pow(2, 24),
+  //   double: Math.pow(2, 53),
+  // };
+  private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
 
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
@@ -95,11 +121,18 @@ export class Import
         return reject('File import currently is only supported for Elastic databases.');
       }
 
-      const configError: string = this._verifyConfig(imprt, await database.getTasty().schema());
+      const configError: string = this._verifyConfig(imprt);
       if (configError !== '')
       {
         return reject(configError);
       }
+      // const expectedMapping: object = this._getMappingForSchema(imprt);
+      // const mappingForSchema: object | string =
+      //     this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.db);
+      // if (typeof mappingForSchema === 'string')
+      // {
+      //     return reject(mappingForSchema);
+      // }
 
       let items: object[];
       try
@@ -113,9 +146,7 @@ export class Import
       {
         return reject('No data provided in file to upload.');
       }
-      const nameToType: object = this._includedNamesToType(imprt);
-      const columns: string[] = Object.keys(nameToType);
-      const types: string[] = columns.map((val) => this._convertToESType(nameToType[val]));   // TODO: asterisk out the existing fields
+      const columns: string[] = Object.keys(this._includedNamesToType(imprt));
       winston.info('got parsed data!');
       winston.info(JSON.stringify(items));
 
@@ -124,27 +155,29 @@ export class Import
         [imprt.primaryKey],
         columns,
         imprt.db,
-        types,
+        // mappingForSchema,
       );
-      await database.getTasty().getDB().putMapping(insertTable);
+      // await database.getTasty().getDB().putMapping(insertTable);
 
       winston.info('about to upsert via tasty...');
       resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
     });
   }
-  // TODO: remove this temporary test hack
-  private _convertToESType(type: string): string
-  {
-    switch (type)
-    {
-      case 'string':
-        return 'text';
-      case 'number':
-        return 'double';
-      default:    // does not handle "array"
-        return type;
-    }
-  }
+  // // TODO: remove this temporary test hack
+  // private _convertToESType(type: string): string
+  // {
+  //   switch (type)
+  //   {
+  //     case 'string':
+  //       return 'text';
+  //     case 'number':
+  //       return 'double';
+  //     case 'object':
+  //       return 'nested';
+  //     default:    // does not handle "array"
+  //       return type;
+  //   }
+  // }
 
   // TODO: move into shared Util file
   /* returns an error message if there are any; else returns empty string */
@@ -183,7 +216,7 @@ export class Import
   }
 
   /* returns an error message if there are any; else returns empty string */
-  private _verifyConfig(imprt: ImportConfig, schema: Tasty.Schema): string
+  private _verifyConfig(imprt: ImportConfig): string
   {
     const indexError: string = this._isValidIndexName(imprt.db);
     if (indexError !== '')
@@ -236,7 +269,8 @@ export class Import
     {
       return 'The empty string is not a valid column name.';
     }
-    const columnTypes: string[] = this._getArrayFromMap(nameToType);
+    // const columnTypes: string[] = this._getArrayFromMap(nameToType);
+    const columnTypes: string[] = columnList.map((val) => nameToType[val]['type']);
     if (columnTypes.some((val, ind, arr) =>
     {
       return !(this.supportedColumnTypes.has(val));
@@ -244,36 +278,103 @@ export class Import
     {
       return 'Invalid data type encountered.';
     }
-    const schemaError: string = this._isSchemaCompatible(nameToType, schema, imprt.db);
-    if (schemaError !== '')
-    {
-      return schemaError;
-    }
     return '';
   }
-  private _isSchemaCompatible(nameToType: object, schema: Tasty.Schema, db: string): string
+  // filter out values that already exist (and don't need to be inserted) ; return error if there is one
+  private _checkMappingAgainstSchema(mapping: object, schema: Tasty.Schema, database: string): object | string
   {
-    if (schema.databaseNames().indexOf(db) !== -1)
+    if (schema.databaseNames().indexOf(database) === -1)
     {
-      const fieldsToCheck: Set<string> = new Set(Object.keys(nameToType));
-      for (const table of schema.tableNames(db))
+      return mapping;
+    }
+    // check for conflicts with existing mapping
+    const fieldsToCheck: Set<string> = new Set(Object.keys(mapping['properties']));
+    for (const table of schema.tableNames(database))
+    {
+      const fields: object = schema.fields(database, table);
+      for (const field in fields)
       {
-        const fields: object = schema.fields(db, table);
-        for (const field in fields)
+        if (fields.hasOwnProperty(field) && fieldsToCheck.has(field))
         {
-          if (fields.hasOwnProperty(field) && fieldsToCheck.has(field))
+          winston.info('...schema for field...');
+          winston.info(JSON.stringify(fields[field]));
+          if (this._isCompatibleType(mapping['properties'][field], fields[field]))
           {
-            winston.info('...schema for field...');
-            winston.info(JSON.stringify(fields[field]));
-            // if fields[field]['type'] isn't compatible with nameToType[field], throw error
-            // TODO: handle types of numbers
-            // TODO: make this recursive to handle objects and arrays
+            fieldsToCheck.delete(field);
+            delete mapping[field];
+          }
+          else
+          {
+            return 'error message';       // TODO: make more informative
           }
         }
       }
     }
-    return '';
+    return mapping;
   }
+  // start with mapping from import config, check against existing schema
+  // build object representing expected mapping
+  private _getMappingForSchema(imprt: ImportConfig): object
+  {
+    const nameToType: object = this._includedNamesToType(imprt);
+    // create mapping containing new fields
+    const mapping: object = {};
+    Object.keys(nameToType).forEach((val) =>
+    {
+      // mapping[val] = this._formatTypeForMapping(nameToType[val]);
+      mapping[val] = this._getESType(nameToType[val]);
+    });
+    return DBUtil.constructESMapping(mapping);
+  }
+  // proposed: contains "type" field (string), and "innerType" field (object) in the case of array/object types
+  // existing: field specification from ES mapping (contains "type" field (string), "properties" field (in the case of objects))
+  private _isCompatibleType(proposed: object, existing: object, withinArray: boolean = false): boolean
+  {
+    const proposedType: string = this._getESType(proposed);
+    return this.compatibleTypes[proposedType] !== undefined && this.compatibleTypes[proposedType].has(existing['type']);
+  }
+  // typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types
+  private _getESType(typeObject: object, withinArray: boolean = false): string
+  {
+    switch (typeObject['type'])
+    {
+      case 'array':
+        return this._getESType(typeObject['innerType'], true);
+      // case 'object':
+      //     return withinArray ? 'nested' : 'object';
+      default:
+        return typeObject['type'];
+    }
+  }
+  // typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types
+  // returns: type (string or object (in the case of "object"/"nested" type)
+  // private _formatTypeForMapping(typeObject: object): string | object
+  // {
+  //     const esType: string = this._getESType(typeObject);
+  //     if (esType !== 'object' && esType !== 'nested')
+  //     {
+  //         return esType;
+  //     }
+  //     const mappingType: object = {};
+  //     if (esType === 'nested')
+  //     {
+  //         mappingType['__isNested__'] = true;
+  //     }
+  //     let innerObject: object = typeObject;
+  //     while (innerObject['type'] === 'array')
+  //     {
+  //         innerObject = innerObject['innerType'];
+  //     }
+  //     if (innerObject['type'] !== 'object')
+  //     {
+  //         throw new Error('Improperly formatted type encountered while translating for schema.');
+  //     }
+  //     Object.keys(innerObject).forEach((key) =>
+  //     {
+  //         mappingType[key] = this._formatTypeForMapping(innerObject[key]);
+  //     });
+  //     return mappingType;
+  // }
 
   private async _parseData(imprt: ImportConfig): Promise<object[]>
   {
@@ -294,7 +395,7 @@ export class Import
             const dateColumns: string[] = [];
             for (const colName in imprt.columnTypes)
             {
-              if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName] === 'date')
+              if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName]['type'] === 'date')
               {
                 dateColumns.push(colName);
               }
@@ -397,11 +498,11 @@ export class Import
   private _buildCSVColumnParsers(imprt: ImportConfig): object
   {
     const columnParsers: object = {};
-    (imprt.columnTypes as string[]).forEach((val, ind) =>
+    (imprt.columnTypes as object[]).map((val) => this._getESType(val)).forEach((val, ind) =>
     {
       switch (val)
       {
-        case 'string':
+        case 'text':
           columnParsers[imprt.columnMap[ind]] = 'string';
           break;
         case 'number':
@@ -475,7 +576,7 @@ export class Import
 
   /* checks whether all objects in "items" have the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
-   * nameToType: maps field name (string) to type (string) */
+   * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(items: object[], nameToType: object): string
   {
     const targetHash: string = this._buildDesiredHash(nameToType);
@@ -496,35 +597,37 @@ export class Import
       }
       for (const key in obj)
       {
-        if (obj.hasOwnProperty(key) && obj[key] !== null && nameToType[key] !== this._getType(obj[key]))
+        // TODO: fix to handle new "nameToType" format, and recursively check arrays
+        if (obj.hasOwnProperty(key) && obj[key] !== null && nameToType[key]['type'] !== this._getType(obj[key]))
         {
           return 'Field "' + key + '" of object number ' + String(ind) +
-            ' does not match the specified type: ' + String(nameToType[key]);
+            ' does not match the specified type: ' + String(nameToType[key]['type']);
         }
       }
       ind++;
     }
     return '';
   }
+  // TODO: make this recursive to handle contents of the array!
   /* return the target hash an object with the specified field names and types should have
-   * nameToType: maps field name (string) to type (string) */
+   * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _buildDesiredHash(nameToType: object): string
   {
-    let strToHash: string = 'object';   // TODO: check
-    for (const name in nameToType)
+    let strToHash: string = 'object';
+    const nameToTypeArr: string[] = Object.keys(nameToType).sort();
+    nameToTypeArr.forEach((name) =>
     {
-      if (nameToType.hasOwnProperty(name))
-      {
-        strToHash += '|' + name + ':' + (nameToType[name] as string) + '|';
-      }
-    }
+      strToHash += '|' + name + ':' + (nameToType[name]['type'] as string) + '|';
+    });
     return sha1(strToHash);
   }
+  // TODO: merge with jason's copy in shared util
+  // TODO: make this recursive to handle contents of the array!
   /* returns a hash based on the object's field names and data types */
   private _hashObjectStructure(payload: object): string
   {
     let strToHash: string = this._getType(payload);
-    strToHash = Object.keys(payload).reduce((res, item) =>
+    strToHash = Object.keys(payload).sort().reduce((res, item) =>
     {
       res += '|' + item + ':' + this._getType(payload[item]) + '|';
       return res;
@@ -549,22 +652,31 @@ export class Import
         return 'array';
       }
     }
-    // handles "string", "number", "boolean", "object", and "undefined" cases
+    if (typeof obj === 'string')
+    {
+      return 'text';
+    }
+    // TODO: support other numeric types
+    if (typeof obj === 'number')
+    {
+      return ((obj as number) % 1 === 0) ? 'long' : 'double';    // TODO: get linter to stop complaining
+    }
+    // handles "boolean", "object", and "undefined" cases
     return typeof obj;
   }
 
-  private _getArrayFromMap(mapOrArray: object | string[]): string[]
-  {
-    let array: string[];
-    if (Array.isArray(mapOrArray))
-    {
-      return array = mapOrArray;
-    } else
-    {
-      array = Object.keys(mapOrArray).map((key) => mapOrArray[key]);
-    }
-    return array;
-  }
+  // private _getArrayFromMap(mapOrArray: object | string[]): string[]
+  // {
+  //   let array: string[];
+  //   if (Array.isArray(mapOrArray))
+  //   {
+  //     return array = mapOrArray;
+  //   } else
+  //   {
+  //     array = Object.keys(mapOrArray).map((key) => mapOrArray[key]);
+  //   }
+  //   return array;
+  // }
   private _includedNamesToType(imprt: ImportConfig): object
   {
     const nameToType: object = {};

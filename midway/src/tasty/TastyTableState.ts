@@ -55,9 +55,9 @@ export default class TastyTableState
   public columns: Map<string, TastyColumn>;
   public primaryKeys: string[];
   public columnNames: string[]; // sorted list of columns
-  public columnMapping: Map<string, string>; // map field name to type
+  public columnMapping: object; // map field name (string) to type (string or object (in the case of "object"/"nested" type))
 
-  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[], database: string = '', columnTypes?: string[])
+  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[], database: string = '', columnMapping: object = {})
   {
     // primary key is a list, so that composite keys can be supported
     this.table = table;
@@ -66,22 +66,7 @@ export default class TastyTableState
     this.columns = new Map();
     this.primaryKeys = primaryKeys;
     this.columnNames = columns.concat(primaryKeys).sort();
-    this.columnMapping = new Map();
-
-    if (columnTypes !== undefined)
-    {
-      if (columns.length !== columnTypes.length)
-      {
-        throw new Error('If provided, columnTypes and columns must match in length.');
-      }
-      columnTypes.forEach((val, ind) =>
-      {
-        if (val !== '*')
-        {
-          this.columnMapping.set(columns[ind], val);
-        }
-      });
-    }
+    this.columnMapping = columnMapping;
   }
 
   public init(): void

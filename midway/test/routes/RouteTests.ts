@@ -741,11 +741,11 @@ describe('File import route tests', () =>
           },
           columnTypes:
           {
-            pkey: 'number',
-            column1: 'string',
-            column2: 'string',
-            column3: 'boolean',
-            column4: 'date',
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column2: { type: 'text' },
+            column3: { type: 'boolean' },
+            column4: { type: 'date' },
           },
           primaryKey: 'pkey',
         },
@@ -787,7 +787,11 @@ describe('File import route tests', () =>
           csvHeaderMissing: false,
           columnMap: ['pkey', 'column1', 'column2', 'column3', 'column4'],
           columnsToInclude: [true, true, false, true, true],
-          columnTypes: ['number', 'string', 'string', 'boolean', 'date'],
+          columnTypes: [{ type: 'long' },
+          { type: 'text' },
+          { type: 'text' },
+          { type: 'boolean' },
+          { type: 'date' }],
           primaryKey: 'pkey',
         },
       })
@@ -846,9 +850,9 @@ describe('File import route tests', () =>
           },
           columnTypes:
           {
-            pkey: 'number',
-            column1: 'string',
-            column2: 'string',
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column2: { type: 'text' },
           },
           primaryKey: 'pkey',
         },

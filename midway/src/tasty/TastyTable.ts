@@ -52,10 +52,10 @@ export default class TastyTable
   // tslint:disable:variable-name
   private ___tastyTableState___: TastyTableState;
 
-  constructor(name: string, primaryKeys: string[], columns: string[], database?: string, columnTypes?: string[])
+  constructor(name: string, primaryKeys: string[], columns: string[], database?: string, columnMapping?: object)
   {
     this.___tastyTableState___ = new TastyTableState(
-      this, name, primaryKeys, columns, database, columnTypes);
+      this, name, primaryKeys, columns, database, columnMapping);
     this.___tastyTableState___.init();
 
     this.___tastyTableState___.columns.forEach(
@@ -94,7 +94,7 @@ export default class TastyTable
     return this.___tastyTableState___.columnNames;
   }
 
-  public getMapping(): Map<string, string>
+  public getMapping(): object
   {
     return this.___tastyTableState___.columnMapping;
   }
