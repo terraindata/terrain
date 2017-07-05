@@ -58,13 +58,6 @@ export class SchemaBaseClass extends BaseClass
   public name: string = '';
 }
 
-export class SchemaBaseClass extends BaseClass
-{
-  public id: string;
-  public type: string = '';
-  public name: string = '';
-}
-
 class SchemaStateC
 {
   public servers: ServerMap = Map<string, Server>({});
@@ -91,11 +84,6 @@ class SchemaStateC
 export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 export const _SchemaState = (config?: { [key: string]: any }) =>
   New<SchemaState>(new SchemaStateC(), config);
-
-export function serverId(serverName: string)
-{
-  return serverName;
-}
 
 export function serverId(serverName: string)
 {
