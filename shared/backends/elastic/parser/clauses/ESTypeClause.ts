@@ -73,7 +73,8 @@ export default class ESTypeClause extends ESStringClause
           key: 'value',
           getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
           {
-            const cards = BuilderStore.getState().query.cards;
+            const state = BuilderStore.getState();
+            const cards = state.query.cards;
             const isIndexCard = (card) => card['type'] === 'eqlindex';
             const indexCard = cards.find(isIndexCard) || 
               (
@@ -83,10 +84,12 @@ export default class ESTypeClause extends ESStringClause
             
             if (indexCard)
             {
-              console.log(indexCard);
               const index = indexCard['value'];
+              const indexId = state.db.name + '/' + index;
               return schemaState.tables.filter(
-                (table) => table.databaseId === index
+                (table) => table.databaseId === indexId
+              ).map(
+                (table) => table.name
               ).toList();
             }
             

@@ -67,14 +67,12 @@ export namespace LibraryTypes
     public groupId: number = -1;
 
     public excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
-    // TODO try super or prototype
 
     public lastEdited = '';
     public lastUserId = -1;
     public version = false;
     public language = 'elastic';
 
-    // don't use this!
     // TODO remove when variants can be saved without queries
     public query: Query = null;
   }

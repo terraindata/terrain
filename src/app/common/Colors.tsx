@@ -57,6 +57,7 @@ interface Theme
     secondaryDark: string,
     baseLight: string,
     secondaryLight: string,
+    thirdLight: string,
 
     link: string, // TODO
     linkHover: string,
@@ -193,6 +194,12 @@ interface Theme
     builderColumn: {
       background: string,
     },
+    
+    results:
+    {
+      background: string,
+      lines: string,
+    },
   },
 }
 
@@ -211,6 +218,7 @@ const DARK: Theme =
       secondaryDark: 'rgba(0,0,0,0.50)',
       baseLight: '#FFFFFF',
       secondaryLight: 'rgba(255,255,255,0.80)',
+      thirdLight: 'rgba(255,255,255,0.5)',
 
       link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
       linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
@@ -347,6 +355,12 @@ const DARK: Theme =
       //builder column
       builderColumn: {
         background: '#2F2F2F',
+      },
+      
+      results:
+      {
+        background: '#151515',
+        lines: 'rgba(255,255,255,0.25)',
       },
     },
   };

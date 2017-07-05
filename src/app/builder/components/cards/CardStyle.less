@@ -476,12 +476,16 @@
   color: #fff;
   .transition;
   
-  &:hover {
+  &:hover, &[value=""] {
     background: rgba(255,255,255,0.25);
   }
   
   &:focus {
     background: #fff;
     color: #242424;
+  }
+  
+  &::placeholder {
+    color: rgba(255,255,255,0.75);
   }
 }

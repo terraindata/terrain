@@ -47,6 +47,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import * as Radium from 'radium';
 import './Result.less';
 const { List } = Immutable;
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -81,6 +82,7 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 }
 
+@Radium
 class ResultComponent extends Classs<Props> {
   // state: {
   //   isSpotlit: boolean;
@@ -126,12 +128,16 @@ class ResultComponent extends Classs<Props> {
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
-      <div className='result-field' key={field}>
+      <div
+        className='result-field'
+        key={field}
+        style={borderColor(Colors().builder.results.lines)}
+      >
         {
           showField &&
           <div
             className='result-field-name'
-            style={fontColor(Colors().text.baseLight)}
+            style={fontColor(Colors().text.thirdLight)}
           >
             {
               field
@@ -263,7 +269,10 @@ class ResultComponent extends Classs<Props> {
       >
         <div
           className='result-inner'
-          style={borderColor(Colors().text.secondaryLight)}
+          style={[
+            borderColor(Colors().builder.results.lines),
+            backgroundColor(Colors().builder.results.background),
+          ]}
         >
           <div className='result-name'>
             <div
