@@ -44,41 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
-import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig'
+/*
+ *  SyntaxHighlighter should be stateless across highlight calls because there may be
+ *  bugs that result from switching tabs of different variants.
+ */
+abstract class SyntaxHighlighter
+{
+  /*
+   *  @param cm CodeMirror instance
+   *  Called when text loads
+   */
+  public abstract initialHighlight(codeMirrorInstance): void;
 
-const eslintConfig = new EQLConfig();
-
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
-
-    CodeMirror.registerHelper("lint", "elastic", function(text)
-    {
-      var found = [];
-      try
-      {
-        const t = new ESInterpreter(text, eslintConfig);
-        for (let e of t.parser.errors)
-        {
-          const token = e.token;
-          found.push({
-            from: CodeMirror.Pos(token.row, token.col),
-            to: CodeMirror.Pos(token.toRow, token.toCol),
-            message: e.message
-          });
-        }
-      }
-      catch(e)
-      {
-        console.log('Exception when parsing ' + text + " error: " + e);
-      }
-      return found;
-  });
-});
+  /*
+   *  @param cm CodeMirror instance. Handles "changes" event as described in CodeMirror docs
+   */
+  public abstract handleChanges(codeMirrorInstance, changes: object[]): void;
+}
+export default SyntaxHighlighter;

@@ -42,43 +42,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
-import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig'
-
-const eslintConfig = new EQLConfig();
-
-(function(mod) {
+"use strict";
+// A dummy mode
+(function(mod)
+{
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../../../node_modules/codemirror/lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
   else // Plain browser env
     mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
-
-    CodeMirror.registerHelper("lint", "elastic", function(text)
-    {
-      var found = [];
-      try
+})(function(CodeMirror)
+{
+  CodeMirror.defineMode("elastic", function(config, parserConfig)
+  {
+    return {
+      startState: function()
       {
-        const t = new ESInterpreter(text, eslintConfig);
-        for (let e of t.parser.errors)
-        {
-          const token = e.token;
-          found.push({
-            from: CodeMirror.Pos(token.row, token.col),
-            to: CodeMirror.Pos(token.toRow, token.toCol),
-            message: e.message
-          });
-        }
-      }
-      catch(e)
+        return {}
+      },
+      token: function(stream, state)
       {
-        console.log('Exception when parsing ' + text + " error: " + e);
-      }
-      return found;
+        stream.skipToEnd();
+        return null;
+      },
+      helperType: "elastic"
+    };
   });
 });
