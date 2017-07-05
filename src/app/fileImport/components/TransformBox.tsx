@@ -93,18 +93,27 @@ class TransformBox extends Classs<Props>
     this.props.addCurRenameTransform();
 
     // add this transform to total list, and the transform to be executed on preview rows
-    console.log('adding transform ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
+    console.log('adding transform: ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
       this.props.newName + ', text: ' + this.state.transformText);
 
-    Actions.setPreviewTransform(
-      {
-        name: this.props.transformTypes.get(this.state.transformTypeIndex),
-        args: {
-          colName: this.props.newName,
-          text: this.state.transformText,
-        }
+    // Actions.setPreviewTransform(
+    //   {
+    //     name: this.props.transformTypes.get(this.state.transformTypeIndex),
+    //     args: {
+    //       colName: this.props.newName,
+    //       text: this.state.transformText,
+    //     }
+    //   }
+    // );
+
+    Actions.updatePreviewRows({
+      name: this.props.transformTypes.get(this.state.transformTypeIndex),
+      args: {
+        colName: this.props.newName,
+        text: this.state.transformText,
       }
-    );
+    });
+    // Actions.clearPreviewTransform();
 
     Actions.addTransform(
       {
@@ -115,6 +124,10 @@ class TransformBox extends Classs<Props>
         }
       }
     );
+
+    this.setState({
+      transformText: '',
+    })
   }
 
   public render()

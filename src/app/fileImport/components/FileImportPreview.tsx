@@ -49,29 +49,34 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import PureClasss from './../../common/components/PureClasss';
+import FileImportPreviewColumn from './FileImportPreviewColumn';
+import FileImportPreviewRow from './FileImportPreviewRow';
+import FileImportTypes from './../FileImportTypes';
 import Actions from './../data/FileImportActions';
-import PreviewColumn from './PreviewColumn';
-import PreviewRow from './PreviewRow';
-import './Preview.less';
-const { Map, List } = Immutable;
+import './FileImportPreview.less';
+const { List } = Immutable;
 
 export interface Props
 {
-  previewRows: object[];
+  previewRows: List<List<string>>;
   columnsCount: number;
   primaryKey: string;
-  columnNames: List<string>;
-  columnsToInclude: List<boolean>;
-  columnTypes: List<number>;
   oldNames: List<string>;
+
+  columnsToInclude: List<boolean>;
+  columnNames: List<string>;
+  columnTypes: List<number>;
+
+  // columnsToInclude: IMMap<string, boolean>;
+  // columnNames: IMMap<string, string>;
+  // columnTypes: IMMap<string, number>;
+
   previewTransform: any;
+  // curPreviewRows: List<List<string>>;
 }
 
-const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date']);
-const TRANSFORM_TYPES = Immutable.List(['append', 'prepend', 'split', 'merge']);
-
-class Preview extends Classs<Props>
+class FileImportPreview extends PureClasss<Props>
 {
   public state: {
     curRenameTransform: {
@@ -79,8 +84,6 @@ class Preview extends Classs<Props>
       args: {
         oldName?: string | string[],
         newName?: string | string[],
-        colName?: string,
-        text?: string,
       },
     }
   } = {
@@ -126,6 +129,18 @@ class Preview extends Classs<Props>
     }
   }
 
+  public stringTransform(item: string): string
+  {
+    if (this.props.previewTransform.name === 'append')
+    {
+      return item + this.props.previewTransform.args.text;
+    }
+    else if (this.props.previewTransform.name === 'prepend')
+    {
+      return this.props.previewTransform.args.text + item;
+    }
+  }
+
   public handleUploadFile()
   {
     // TODO: error checking from FileImportInfo
@@ -139,64 +154,81 @@ class Preview extends Classs<Props>
     Actions.uploadFile();
   }
 
-  public shouldComponentUpdate(nextProps: Props)
-  {
-    const { previewRows, columnNames, columnsToInclude, columnTypes } = this.props;
-    return previewRows !== nextProps.previewRows || columnNames !== nextProps.columnNames || columnsToInclude !== nextProps.columnsToInclude ||
-      columnTypes !== nextProps.columnTypes || this.props.primaryKey !== nextProps.primaryKey || nextProps.previewTransform.name !== '';
-  }
+  // public componentWillReceiveProps(nextProps: Props)
+  // {
+  //   // if (nextProps.previewTransform.name)
+  //   // {
+  //   //   this.props.previewRows.map((row, i) =>
+  //   //   {
+  //   //     row.map((item, j) =>
+  //   //     {
+  //   //       if (this.props.columnNames.indexOf(this.props.previewTransform.args.colName) === i)
+  //   //       {
+  //   //         Actions.updatePreviewRows(i, j, this.stringTransform(item));
+  //   //       }
+  //   //     });
+  //   //   });
+  //   // }
+  //
+  //   if (nextProps.previewTransform.name !== '')
+  //   {
+  //     console.log('updatePreviewRows, transform: ', nextProps.previewTransform);
+  //     Actions.updatePreviewRows(nextProps.previewTransform);
+  //     Actions.clearPreviewTransform();
+  //   }
+  //
+  //   // if (nextProps.previewTransform.name === 'append' || nextProps.previewTransform.name === 'prepend')
+  //   // {
+  //   //   Actions.updatePreviewRows(name, transformCol, text);
+  //   // }
+  //   // else if (nextProps.previewTransform.name === 'split')
+  //   // {
+  //   //   Actions.splitPreviewRows();
+  //   // }
+  //   // else if (nextProps.previewTransform.name === 'merge')
+  //   // {
+  //   //   Actions.mergePreviewRows();
+  //   // }
+  // }
 
   public render()
   {
-    // console.log('columnNames', this.props.columnNames);
-    // console.log('columnsToInclude', this.props.columnsToInclude);
-    // console.log('columnTypes', this.props.columnTypes);
-    // console.log('current transform: ', this.state.curRenameTransform);
-    console.log('previewTransform: ', this.props.previewTransform);
-
-    const previewCols = [];
-    this.props.columnNames.forEach((value, key) =>
-    {
-      previewCols.push(
-        <PreviewColumn
-          key={key}
-          id={key}
-          isIncluded={this.props.columnsToInclude.get(key)}
-          name={this.props.columnNames.get(key)}
-          typeIndex={this.props.columnTypes.get(key)}
-          types={DATATYPES}
-          canSelectType={true}
-          canSelectColumn={true}
-          isPrimaryKey={this.props.columnNames.get(key) === this.props.primaryKey}
-          oldNames={this.props.oldNames}
-          datatypes={DATATYPES}
-          transformTypes={TRANSFORM_TYPES}
-          handleRenameTransform={this.handleRenameTransform}
-          addCurRenameTransform={this.addCurRenameTransform}
-        />
-      );
-    });
-
-    const previewRows = Object.keys(this.props.previewRows).map((key) =>
-      <PreviewRow
-        key={key}
-        items={this.props.previewRows[key]}
-        transformCol={this.props.previewTransform.args.colName}
-        transformType={this.props.previewTransform.name}
-        transformText={this.props.previewTransform.args.text}
-      />
-    );
-
+    console.log('render previewRows: ', this.props.previewRows);
     return (
       <div>
         <table>
           <thead>
             <tr>
-              {previewCols}
+              {
+                this.props.columnNames.map((value, key) =>
+                  <FileImportPreviewColumn
+                    key={key}
+                    id={key}
+                    isIncluded={this.props.columnsToInclude.get(key)}
+                    name={this.props.columnNames.get(key)}
+                    typeIndex={this.props.columnTypes.get(key)}
+                    isPrimaryKey={this.props.primaryKey === value}
+                    oldNames={this.props.oldNames}
+                    canSelectType={true}
+                    canSelectColumn={true}
+                    datatypes={List(FileImportTypes.ELASTIC_TYPES)}
+                    transformTypes={List(FileImportTypes.TRANSFORM_TYPES)}
+                    handleRenameTransform={this.handleRenameTransform}
+                    addCurRenameTransform={this.addCurRenameTransform}
+                  />
+                ).toArray()
+              }
             </tr>
           </thead>
           <tbody>
-            {previewRows}
+            {
+              this.props.previewRows.map((items, key) =>
+                <FileImportPreviewRow
+                  key={key}
+                  items={items}
+                />
+              )
+            }
           </tbody>
         </table>
         <button onClick={this.handleUploadFile}>
@@ -207,4 +239,4 @@ class Preview extends Classs<Props>
   }
 }
 
-export default Preview;
+export default FileImportPreview;

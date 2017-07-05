@@ -49,13 +49,13 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import PureClasss from './../../common/components/PureClasss';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TransformBox from './../components/TransformBox';
 import Actions from './../data/FileImportActions';
-import './PreviewColumn.less';
+import './FileImportPreviewColumn.less';
 
 export interface Props
 {
@@ -65,27 +65,26 @@ export interface Props
   typeIndex: number;
   isPrimaryKey: boolean;
 
-  types: List<string>;
+  datatypes: List<string>;
   canSelectType: boolean;
   canSelectColumn: boolean;
   oldNames: List<string>;
 
-  datatypes: List<string>;
   transformTypes: List<string>;
   handleRenameTransform(name: string, oldName: string, newName: string);
   addCurRenameTransform();
 }
 
-class PreviewColumn extends Classs<Props>
+class FileImportPreviewColumn extends PureClasss<Props>
 {
   public handleIncludedChange()
   {
-    Actions.setColumnsToInclude(this.props.id);
+    Actions.setColumnToInclude(this.props.id);
   }
 
   public handleTypeChange(typeIndex)
   {
-    Actions.setColumnTypes(this.props.id, typeIndex);
+    Actions.setColumnType(this.props.id, typeIndex);
   }
 
   public handlePrimaryKeyChange()
@@ -106,7 +105,7 @@ class PreviewColumn extends Classs<Props>
     //       newName: value,
     //     }
     //   });
-    Actions.setColumnNames(this.props.id, value);
+    Actions.setColumnName(this.props.id, value);
   }
 
   public render()
@@ -132,7 +131,7 @@ class PreviewColumn extends Classs<Props>
         />
         <Dropdown
           selectedIndex={this.props.typeIndex}
-          options={this.props.types}
+          options={this.props.datatypes}
           onChange={this.handleTypeChange}
           canEdit={this.props.canSelectType}
         />
@@ -147,4 +146,4 @@ class PreviewColumn extends Classs<Props>
   }
 }
 
-export default PreviewColumn;
+export default FileImportPreviewColumn;

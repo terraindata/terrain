@@ -61,19 +61,21 @@ export namespace FileImportTypes
     public file: string = '';
     public filetype: string = '';
 
-    public previewRows: object[] = null;
+    // public previewRows: object[] = null;
+    public previewRows: List<List<string>> = null;
     public columnsCount: number = 0;
-
-    public oldNames: List<string> = null;
-    public columnNames: List<string> = null;
-    public columnsToInclude: List<boolean> = null;
-    public columnTypes: List<number> = null;
 
     public hasCsvHeader: boolean = true;
     public primaryKey: string = '';
 
-    public previewTransform: any = { name: '', args: { colName: '', text: '' } };
-    public transforms: List<object> = List([]);     // TODO: make Command type below
+    public oldNames: Immutable.List<string> = null;
+    public columnNames: Immutable.List<string> = null;
+    public columnsToInclude: Immutable.List<boolean> = null;
+    public columnTypes: Immutable.List<number> = null;
+
+    public transforms: Immutable.List<object> = List([]);     // TODO: make Command type below
+    public previewTransform: any = { name: '', args: {} };
+    public curPreviewRows: Immutable.List<Immutable.List<string>> = null;
   }
   // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
   //  This first line exports a type that you will actually use in other files.
@@ -85,6 +87,48 @@ export namespace FileImportTypes
   //   and you can't use `new` simply with Immutable Records.
   export const _FileImportState = (config?: { [key: string]: any }) =>
     New<FileImportState>(new FileImportStateC(config), config);
+
+  // class TransformC
+  // {
+  //   public name = '';
+  //   public args = {
+  //     colName: '',
+  //     text
+  //   };
+  // }
+  // const Transform_Record = Immutable.Record(new TransformC());
+  // export interface Transform extends TransformC, IRecord<Transform> { }
+  // export const _Transform = (config?: any) =>
+  // {
+  //   config = config || {};
+  //   return new Transform_Record(config) as any as Transform;
+  // };
+
+  export const NUMBER_PREVIEW_ROWS = 5;
+
+  export const FILE_TYPES =
+    [
+      'json',
+      'csv',
+    ];
+
+  export const ELASTIC_TYPES =
+    [
+      'string',
+      'number',
+      'boolean',
+      'date',
+      'array',
+      'object',
+    ];
+
+  export const TRANSFORM_TYPES =
+    [
+      'append',
+      'prepend',
+      'split',
+      'merge',
+    ];
 }
 
 export default FileImportTypes;

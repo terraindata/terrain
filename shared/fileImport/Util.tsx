@@ -43,81 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'underscore';
-import ActionTypes from './FileImportActionTypes';
-import { FileImportStore } from './FileImportStore';
 
-const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
-
-const FileImportActions =
+export function dbTableErrorCheck(dbText: string, tableText: string): string
+{
+  if (dbText === '' || tableText === '')
   {
-    changeServer:
-    (connectionId: number) =>
-      $(ActionTypes.changeServer, { connectionId }),
-
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
-
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
-
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
-
-    changePrimaryKey:
-    (id: number) =>
-      $(ActionTypes.changePrimaryKey, { id }),
-
-    chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview }),
-
-    uploadFile:
-    () =>
-      $(ActionTypes.uploadFile, {}),
-
-    addTransform:
-    (transform: object) =>
-      $(ActionTypes.addTransform, { transform }),
-
-    // setCurTransform:
-    //   (transform: object) =>
-    //     $(ActionTypes.setCurTransform, { transform }),
-
-    setPreviewTransform:
-    (transform: any) =>
-      $(ActionTypes.setPreviewTransform, { transform }),
-
-    clearPreviewTransform:
-    () =>
-      $(ActionTypes.clearPreviewTransform, {}),
-
-    setColumnToInclude:
-    (id: number) =>
-      $(ActionTypes.setColumnToInclude, { id }),
-
-    setColumnName:
-    (id: number, columnName: string) =>
-      $(ActionTypes.setColumnName, { id, columnName }),
-
-    setColumnType:
-    (id: number, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { id, typeIndex }),
-
-    updatePreviewRows:
-    (transform: any) =>
-      $(ActionTypes.updatePreviewRows, { transform }),
-
-    // updatePreviewRows:
-    //   (rowId: number, colId: number, value: string) =>
-    //     $(ActionTypes.updatePreviewRows, { rowId, colId, value }),
-
-    // setCurPreviewRows:
-    //   (curPreviewRows: Immutable.List<Immutable.List<string>>) =>
-    //     $(ActionTypes.setColumnType, { curPreviewRows }),
-  };
-
-export default FileImportActions;
+    return 'Database and table names cannot be empty strings';
+  }
+  if (dbText !== dbText.toLowerCase())
+  {
+    return 'Database may not contain uppercase letters';
+  }
+  if (!/^[a-z\d].*$/.test(dbText))
+  {
+    return 'Database name must start with a lowercase letter or digit';
+  }
+  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(dbText))
+  {
+    return 'Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses';
+  }
+  if (/^_.*/.test(tableText))
+  {
+    return 'Table name may not start with an underscore';
+  }
+  return '';
+}

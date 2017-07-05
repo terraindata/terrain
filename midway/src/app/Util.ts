@@ -130,19 +130,12 @@ export function getEmptyObject(payload: object): object
         {
           res[item] = null;
         }
-        else if (payload[item] instanceof Date)
-        {
-          res[item] = new Date(0);
-        }
         else
         {
           res[item] = getEmptyObject(payload[item]);
         }
         break;
 
-      case 'undefined':
-        res[item] = undefined;
-        break;
       default:
         res[item] = '';
     }

@@ -49,6 +49,7 @@ import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
 import Actions from './FileImportActions';
 import Ajax from './../../util/Ajax';
+import FileImportTypes from './../FileImportTypes';
 const { List, Map } = Immutable;
 
 const FileImportReducers = {}
@@ -72,28 +73,28 @@ FileImportReducers[ActionTypes.changeTableText] =
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
-      .set('hasCsvHeader', !state.hasCsvHeader);
-;
+      .set('hasCsvHeader', !state.hasCsvHeader)
+  ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
-      .set('primaryKey', state.columnNames.get(action.payload.id));
-;
-
-FileImportReducers[ActionTypes.setColumnsToInclude] =
-  (state, action) =>
-    state
-      .set('columnsToInclude', state.columnsToInclude.set(action.payload.id, !state.columnsToInclude.get(action.payload.id)))
+      .set('primaryKey', state.columnNames.get(action.payload.id))
   ;
 
-FileImportReducers[ActionTypes.setColumnTypes] =
+FileImportReducers[ActionTypes.setColumnToInclude] =
+  (state, action) =>
+    state
+      .updateIn(['columnsToInclude', action.payload.id], (isColIncluded: boolean) => !isColIncluded)
+  ;
+
+FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
     state
       .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
   ;
 
-FileImportReducers[ActionTypes.setColumnNames] =
+FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
   {
     if (state.columnNames.get(action.payload.id) === state.primaryKey)
@@ -101,11 +102,9 @@ FileImportReducers[ActionTypes.setColumnNames] =
       return state
         .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
         .set('primaryKey', action.payload.columnName);
-    } else
-    {
-      return state
-        .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName));
     }
+    return state
+      .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName));
   };
 
 FileImportReducers[ActionTypes.addTransform] =
@@ -119,14 +118,111 @@ FileImportReducers[ActionTypes.setPreviewTransform] =
   {
     return state
       .set('previewTransform', action.payload.transform);
-  }
-  ;
+  };
 
 FileImportReducers[ActionTypes.clearPreviewTransform] =
   (state, action) =>
     state
       .set('previewTransform', { name: '', args: { colName: '', text: '' } })
   ;
+
+FileImportReducers[ActionTypes.updatePreviewRows] =
+  (state, action) =>
+  {
+    // const transformCol = state.columnNames.indexOf(action.payload.transform.args.colName);
+    // state.previewRows.map((row, i) =>
+    // {
+    //   row.map((item, j) =>
+    //   {
+    //     if (j === transformCol)
+    //     {
+    //       Actions.updatePreviewRows(i, j, this.stringTransform(item));
+    //       if (action.payload.transform.name === 'append');
+    //       {
+    //
+    //       }
+    //     }
+    //   });
+    // });
+    //
+    // return state.update('previewRows', (rows) =>
+    //   rows[][transformCol] + action.payload.transform.args.text
+    // )
+
+    console.log('reducer: ' + action.payload.transform.name + ', ' + action.payload.transform.args.colName + ', ' +
+      action.payload.transform.args.text);
+
+    const transformName = action.payload.transform.name;
+    if (transformName === 'append')
+    {
+      const appendCol = state.columnNames.indexOf(action.payload.transform.args.colName);
+
+      const newPreviewRows = [];
+      state.previewRows.map((row, i) =>
+      {
+        const newRow = [];
+        row.map((value, j) =>
+        {
+          j === appendCol ? newRow.push(value + action.payload.transform.args.text) : newRow.push(value);
+        });
+        newPreviewRows.push(newRow);
+      });
+      return state
+        .set('previewRows', List(newPreviewRows))
+    }
+    else if (transformName === 'prepend')
+    {
+      const prependCol = state.columnNames.indexOf(action.payload.transform.args.colName);
+
+      const newPreviewRows = [];
+      state.previewRows.map((row, i) =>
+      {
+        const newRow = [];
+        row.map((value, j) =>
+        {
+          j === prependCol ? newRow.push(action.payload.transform.args.text + value) : newRow.push(value);
+        });
+        newPreviewRows.push(newRow);
+      });
+      return state
+        .set('previewRows', List(newPreviewRows))
+    }
+    else if (transformName === 'split')
+    {
+      const splitCol = state.columnNames.indexOf(action.payload.transform.args.oldName);
+      return state
+        .set('previewRows', )
+        .set('columnNames', state.columnNames
+          .set(splitCol, action.payload.transform.newName[0])
+          .insert(splitCol, action.payload.transform.newName[1]))
+        .set('columnsToInclude', state.columnsToInclude.insert(splitCol, true))
+        .set('columnTypes', state.columnTypes.insert(splitCol, 'string'))
+    }
+    else if (transformName === 'merge')
+    {
+      const mergeCol1 = state.columnNames.indexOf(action.payload.transform.args.oldName[0]);
+      const mergeCol2 = state.columnNames.indexOf(action.payload.transform.args.oldName[1]);
+      return state
+        .set('previewRows', )
+        .set('columnNames', state.columnNames
+          .delete(mergeCol2)
+          .set(mergeCol1, action.payload.transform.args.newName))
+        .set('columnsToInclude', state.columnsToInclude.delete(mergeCol2))
+        .set('columnTypes', state.columnTypes.delete(mergeCol2))
+    }
+  };
+
+// FileImportReducers[ActionTypes.updatePreviewRows] =
+//   (state, action) =>
+//     state
+//       .setIn(['previewRows', action.paylod.rowId, action.payload.colId] , action.payload.value)
+//   ;
+
+// FileImportReducers[ActionTypes.setCurPreviewRows] =
+//   (state, action) =>
+//     state
+//       .set('curPreviewRows', action.payload.curPreviewRows)
+//   ;
 
 // FileImportReducers[ActionTypes.setCurTransform] =
 //   (state, action) =>
@@ -155,34 +251,34 @@ FileImportReducers[ActionTypes.chooseFile] =
     if (action.payload.filetype === 'csv' && !state.hasCsvHeader)
     {
       console.log('headerless csv');
-      for (let i = 0; i < action.payload.preview[0].length; i++)
+      action.payload.preview.get(0).map((value, i) =>
       {
         columnNames.push('column' + i);
         columnsToInclude.push(true);
         columnTypes.push(0);
         colsCount++;
-      }
+      });
     }
     else
     {
       console.log('csv with header/json');
-      for (const property in action.payload.preview[0])
+      _.map(action.payload.preview.get(0), (value, key) =>
       {
-        if (action.payload.preview[0].hasOwnProperty(property))
-        {
-          columnNames.push(property);
-          columnsToInclude.push(true);
-          columnTypes.push(0);
-          colsCount++;
-        }
-      }
+        columnNames.push(key);
+        columnsToInclude.push(true);
+        columnTypes.push(0);
+        colsCount++;
+      });
     }
+
+    // console.log(columnNames, columnsToInclude, columnTypes);
 
     return state
       .set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', '')
       .set('previewRows', action.payload.preview)
+      .set('curPreviewRows', action.payload.preview)
       .set('columnsCount', colsCount)
       .set('oldNames', List(columnNames))
       .set('columnNames', List(columnNames))
@@ -223,7 +319,14 @@ FileImportReducers[ActionTypes.uploadFile] =
     {
       cToIncludeMap.push([value, state.columnsToInclude.get(key)]);
       cTypesMap.push([value, state.columnTypes.get(key)]);
+      // const typeName = FileImportTypes.ELASTIC_TYPES[value];
+      // columnTypes.push(isCsv ? typeName : [key, typeName]);
     });
+
+    // const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
+    // const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
+    // const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
+
     Ajax.importFile(
       state.file,
       state.filetype,

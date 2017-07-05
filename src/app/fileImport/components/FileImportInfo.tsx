@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as Papa from 'papaparse';
+import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
 import Dropdown from './../../common/components/Dropdown';
 import CheckBox from './../../common/components/CheckBox';
@@ -53,6 +54,8 @@ import Actions from './../data/FileImportActions';
 import SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
 import Util from './../../util/Util';
+import { dbTableErrorCheck } from "../../../../shared/fileImport/Util";
+const { List } = Immutable;
 
 export interface Props
 {
@@ -121,10 +124,9 @@ class FileImportInfo extends PureClasss<Props>
     Actions.changeHasCsvHeader();
   }
 
-  public parseData(file: string, filetype: string): object[]
+  public parseData(file: string, filetype: string): List<List<string>>
   {
     // TODO: read JSON line by line and return items
-    const preview = [];
     let items = [];
 
     if (filetype === 'json')
@@ -159,7 +161,6 @@ class FileImportInfo extends PureClasss<Props>
         error: (err) =>
         {
           alert('CSV format incorrect: ' + String(err));
-          this.refs['file']['value'] = null;
           return;
         },
         skipEmptyLines: true,
@@ -167,46 +168,42 @@ class FileImportInfo extends PureClasss<Props>
       items = Papa.parse(file, config).data;
       console.log("Parsed csv: ", items);
 
-      for (let i = 1; i < items.length; i++)
+      items.map((item) =>
       {
-        if (items[i].length !== items[0].length)
+        if (item.length !== items[0].length)
         {
           alert('CSV format incorrect: each row must have same number of fields');
-          this.refs['file']['value'] = null;
           return;
         }
-      }
+      });
     }
 
-    for (let i = 0; i < Math.min(items.length, this.props.previewRowsCount); i++)
-    {
-      preview.push(items[i]);
-    }
-    return preview;
+    items.splice(this.props.previewRowsCount, items.length - this.props.previewRowsCount);
+    const preview = items.map((item, i) =>
+      _.map(item, (value, key) =>
+        value
+      )
+    );
+
+    return List<List<string>>(preview);
   }
 
   public handleChooseFile(file)
   {
-    // TODO: Stop browser caching input file
-    if (!file.target.files[0])
+    const fileSelected = !!file.target.files[0];
+    this.setState({
+      fileSelected,
+    });
+    if (!fileSelected)
     {
-      this.setState({
-        fileSelected: false,
-      });
       return;
     }
-    else
-    {
-      this.setState({
-        fileSelected: true,
-      });
-    }
+
 
     const filetype = file.target.files[0].name.split('.').pop();
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
       alert("Invalid filetype: " + filetype + ", please select another file");
-      this.refs['file']['value'] = null;
       return;
     }
 
@@ -216,66 +213,54 @@ class FileImportInfo extends PureClasss<Props>
     {
       console.log("File chosen contents: ", fr.result);
       const preview = this.parseData(fr.result, filetype);
+      console.log("preview: ", preview);
 
-      Actions.chooseFile(fr.result, filetype, preview);
+      if (preview)
+      {
+        Actions.chooseFile(fr.result, filetype, preview);
+      }
+
+      this.refs['file']['value'] = null;
     }
   }
 
-  // public handleUploadFile()
-  // {
-  //   if (!this.props.canImport)
-  //   {
-  //     alert('You do not have permission to upload files');
-  //     return;
-  //   }
-  //   if (!this.state.fileSelected)
-  //   {
-  //     alert('Please select a file to upload');
-  //     return;
-  //   }
-  //   if (!this.state.serverSelected)
-  //   {
-  //     alert('Please select a server');
-  //     return;
-  //   }
-  //   if (!this.state.dbSelected)
-  //   {
-  //     alert('Please select a database');
-  //     return;
-  //   }
-  //   if (!this.state.tableSelected)
-  //   {
-  //     alert('Please select a table');
-  //     return;
-  //   }
-  //   if (this.props.dbText === '' || this.props.tableText === '')
-  //   {
-  //     alert('Database and table names cannot be empty strings');
-  //     return;
-  //   }
-  //   if (this.props.dbText !== this.props.dbText.toLowerCase())
-  //   {
-  //     alert('Database may not contain uppercase letters');
-  //     return;
-  //   }
-  //   if (!/^[a-z\d].*$/.test(this.props.dbText))
-  //   {
-  //     alert('Database name must start with a lowercase letter or digit');
-  //     return;
-  //   }
-  //   if (!/^[a-z\d][a-z\d\._\+-]*$/.test(this.props.dbText))
-  //   {
-  //     alert('Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses');
-  //     return;
-  //   }
-  //   if (/^_.*/.test(this.props.tableText))
-  //   {
-  //     alert('Table name may not start with an underscore');
-  //     return;
-  //   }
-  //
-  //   Actions.uploadFile();
-  // }
+  public handleUploadFile()
+  {
+    if (!this.props.canImport)
+    {
+      alert('You do not have permission to upload files');
+      return;
+    }
+    if (!this.state.fileSelected)
+    {
+      alert('Please select a file to upload');
+      return;
+    }
+    if (!this.state.serverSelected)
+    {
+      alert('Please select a server');
+      return;
+    }
+    if (!this.state.dbSelected)
+    {
+      alert('Please select a database');
+      return;
+    }
+    if (!this.state.tableSelected)
+    {
+      alert('Please select a table');
+      return;
+    }
+
+    const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
+    if (msg)
+    {
+      alert(msg);
+      return;
+    }
+
+    Actions.uploadFile();
+  }
 
   public render()
   {
@@ -284,7 +269,7 @@ class FileImportInfo extends PureClasss<Props>
     return (
       <div>
         <div>
-          <input ref="file" type="file" onChange={this.handleChooseFile} />
+          <input ref="file" type="file" name="abc" onChange={this.handleChooseFile} />
           has header row (csv only)
           <CheckBox
             checked={this.props.hasCsvHeader}
