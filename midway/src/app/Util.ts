@@ -44,7 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import sha1 = require('sha1');
+
 import * as request from 'request';
+
+export function buildDesiredHash(nameToType: object): string
+{
+  let strToHash: string = 'object';   // TODO: check
+  const nameToTypeArr: any[] = Object.keys(nameToType).sort();
+  for (const name in nameToTypeArr)
+  {
+    if (nameToType.hasOwnProperty(name))
+    {
+      strToHash += '|' + name + ':' + (nameToType[name] as string) + '|';
+    }
+  }
+  return sha1(strToHash);
+}
 
 export function getEmptyObject(payload: object): object
 {
@@ -64,7 +80,6 @@ export function getEmptyObject(payload: object): object
       case 'number':
         res[item] = 0;
         break;
-
       case 'object':
         if (payload[item] === null)
         {
@@ -143,41 +158,4 @@ export function verifyParameters(parameters: any, required: string[]): void
       throw new Error('Parameter "' + key + '" not found in request object.');
     }
   }
-}
-
-export function getEmptyObject(payload: object): object
-{
-  let emptyObj: any = {};
-  if (Array.isArray(payload))
-  {
-    emptyObj = [];
-  }
-  return Object.keys(payload).reduce((res, item) =>
-  {
-    switch (typeof (payload[item]))
-    {
-      case 'boolean':
-        res[item] = false;
-        break;
-
-      case 'number':
-        res[item] = 0;
-        break;
-      case 'object':
-        if (payload[item] === null)
-        {
-          res[item] = null;
-        }
-        else
-        {
-          res[item] = getEmptyObject(payload[item]);
-        }
-        break;
-
-      default:
-        res[item] = '';
-    }
-    return res;
-  },
-    emptyObj);
 }

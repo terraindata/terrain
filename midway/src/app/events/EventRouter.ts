@@ -55,13 +55,11 @@ export const events: Events = new Events();
 
 const Router = new KoaRouter();
 
-
 // Get an event tracker.
 Router.post('/', async (ctx, next) =>
 {
   ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body);
 });
-
 
 // Handle client response for event tracker
 Router.post('/update/', async (ctx, next) =>

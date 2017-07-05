@@ -80,6 +80,7 @@ export interface EventConfig extends EventBaseConfig
 
 export interface EventRequestConfig extends EventBaseConfig
 {
+  eventId: string;
   ip: string;
   variantId?: string;
 }
@@ -127,14 +128,14 @@ export class Events
     return new Promise<boolean>(async (resolve, reject) =>
     {
       const checkTime = this.getClosestTime();
-      const message = event['message'];
-      const emptyPayloadHash: string = hashObj(Util.getEmptyObject(event.payload));
+      const message = event['message'] as string;
+      const emptyPayloadHash: string = Util.buildDesiredHash(event.payload);
       for (let tp = 0; tp < timePeriods; ++tp)
       {
         const newTime: number = checkTime - tp * timeInterval * 60;
-        const privateKey: string = this.getUniqueId(event.ip as string, event.eventId, newTime);
+        const privateKey: string = await this.getUniqueId(event.ip as string, event.eventId, newTime);
         const decodedMsg: string = this.decrypt(message, privateKey);
-        if (this.isJSON(decodedMsg) && emptyPayloadHash === hashObj(JSON.parse(decodedMsg)))
+        if (this.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
         {
 
           await this.storeEvent(event);
@@ -166,7 +167,7 @@ export class Events
     return new Promise<EventRequestConfig>(async (resolve, reject) =>
     {
       eventReq.payload = JSON.parse(await this.getPayload(Number(eventReq.eventId)));
-      const privateKey: string = this.getUniqueId(eventReq.ip, eventReq.eventId);
+      const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.eventId);
       eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
       resolve(eventReq);
@@ -237,11 +238,14 @@ export class Events
    * Generate a random string that will be used as a private key for encryption/decryption
    *
    */
-  public getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): string
+  public async getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): Promise<string>
   {
-    currTime = currTime !== undefined ? currTime : this.getClosestTime();
-    uniqueId = uniqueId !== undefined ? uniqueId : '';
-    return sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16);
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      currTime = currTime !== undefined ? currTime : this.getClosestTime();
+      uniqueId = uniqueId !== undefined ? uniqueId : '';
+      resolve(sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16));
+    });
   }
 
   /*
