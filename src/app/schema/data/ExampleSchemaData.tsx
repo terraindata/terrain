@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import SchemaTypes from '../SchemaTypes';
+import * as SchemaTypes from '../SchemaTypes';
 
 let servers = Immutable.Map({});
 let databases = Immutable.Map({});

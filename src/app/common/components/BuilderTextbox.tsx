@@ -56,7 +56,7 @@ import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
 import { Display } from '../../../../shared/blocks/displays/Display';
 import { Block } from '../../../../shared/blocks/types/Block';
 import { Card, CardString } from '../../../../shared/blocks/types/Card';
-import BuilderHelpers from '../../builder/BuilderHelpers';
+import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';

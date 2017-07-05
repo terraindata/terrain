@@ -206,4 +206,4 @@ export const _valueCard = (config: {
         tql: config.tql,
       },
     })
-    );
+  );

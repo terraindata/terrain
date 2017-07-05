@@ -48,7 +48,7 @@ import * as React from 'react';
 import CommonSQL from '../../backends/mysql/syntax/CommonSQL';
 const { Combinators, Operators } = CommonSQL;
 
-// import SchemaTypes from '../schema/SchemaTypes';
+// import * as SchemaTypes from '../schema/SchemaTypes';
 // const ManualConfig = require('./../manual/ManualConfig.json');
 
 export enum DisplayType
