@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import List = Immutable.List;
@@ -49,14 +51,14 @@ import Map = Immutable.Map;
 
 import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
-import CommonElastic from '../syntax/CommonElastic';
+import * as CommonElastic from '../syntax/CommonElastic';
 
 import BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
-const { make } = BlockUtils;
-
 import Blocks from '../blocks/ElasticBlocks';
+
+const { make } = BlockUtils;
 
 export default function ElasticToCards(
   query: Query,
@@ -66,7 +68,7 @@ export default function ElasticToCards(
   try
   {
     const obj = JSON.parse(query.tql);
-    let cards = parseObjectWrap(obj);
+    let cards = parseMagicObject(obj);
     cards = BlockUtils.reconcileCards(query.cards, cards);
     return query
       .set('cards', cards)
@@ -79,7 +81,17 @@ export default function ElasticToCards(
   }
 }
 
-const parseObjectWrap = (obj: Object): Cards =>
+const isScoreCard = (obj: object): boolean =>
+{
+  return obj.hasOwnProperty('script')
+    && obj['script'].hasOwnProperty('stored')
+    && obj['script'].hasOwnProperty('params')
+    && obj['script']['stored'] === 'terrain_PWLScore'
+    && obj['script']['params'].hasOwnProperty('factors')
+    && Array.isArray(obj['script']['params']['factors']);
+};
+
+const parseObjectWrap = (obj: object): Cards =>
 {
   const arr: Card[] = _.map(obj,
     (value: any, key: string) =>
@@ -97,6 +109,29 @@ const parseObjectWrap = (obj: Object): Cards =>
   );
 
   return Immutable.List(arr);
+};
+
+const parseElasticWeightBlock = (obj: object): Block =>
+{
+  const scorePoints = [];
+  for (let i = 0; i < obj['ranges'].length; ++i)
+  {
+    scorePoints.push(
+      make(Blocks.scorePoint, {
+        value: obj['ranges'][i],
+        score: obj['outputs'][i],
+      }));
+  }
+
+  const card = make(Blocks.elasticTransform, {
+    input: obj['numerators'][0][0],
+    scorePoints: Immutable.List(scorePoints),
+  });
+
+  return make(Blocks.elasticWeight, {
+    key: card,
+    weight: obj['weight'],
+  });
 };
 
 const parseArrayWrap = (arr: any[]): Cards =>
@@ -144,55 +179,99 @@ const parseValueSingleCard = (value: any): Card =>
           },
         );
       }
+    default:
+      throw new Error('Elastic Parsing: Unsupported value: ' + value);
   }
-
-  throw new Error('Elastic Parsing: Unsupported value: ' + value);
 };
 
-const parseObjectToggle = (obj: Object): Cards =>
+const parseMagicArray = (arr: any[]): Card =>
 {
-  const arr: Card[] = _.map(obj,
-    (rawVal: any, key: string) =>
+  const values: Card[] = _.map(arr,
+    (value: any) =>
     {
-      // For the Toggle cards, use the valueType
-      let valueType = CommonElastic.valueTypes.null;
-
-      const value = rawVal;
-
-      switch (typeof rawVal)
+      if (Array.isArray(value) && (value !== []))
       {
-        case 'string':
-          valueType = CommonElastic.valueTypes.text;
-
-          break;
-        case 'number':
-          valueType = CommonElastic.valueTypes.number;
-          break;
-        case 'boolean':
-          valueType = CommonElastic.valueTypes.bool;
-          break;
-        case 'object':
-          if (value === null)
-          {
-            valueType = CommonElastic.valueTypes.null;
-          }
-          else if (Array.isArray(value))
-          {
-            // not yet done
-          }
-        // not yet done
+        value = parseMagicArray(value);
+      }
+      else if (typeof value === 'object' && (value !== null || value !== {}))
+      {
+        value = parseMagicObject(value).first();
+      }
+      else
+      {
+        value = CommonElastic.parseESValue(value);
       }
 
-      return make(
-        Blocks.elasticKeyValueToggle,
-        {
-          key,
-          value,
-          valueType,
-        },
-      );
+      return make(Blocks.elasticMagicListItem, {
+        value,
+      });
     },
   );
 
-  return Immutable.List(arr);
+  return make(
+    Blocks.elasticMagicList,
+    {
+      values: Immutable.List(values),
+    },
+  );
+};
+
+const parseMagicObject = (obj: object): Cards =>
+{
+  if (obj === {} || obj === null)
+  {
+    return Immutable.List([
+      make(Blocks.elasticMagicValue, {
+        value: obj,
+      }),
+    ],
+    );
+  }
+
+  if (isScoreCard(obj))
+  {
+    return Immutable.List([
+      make(
+        Blocks.elasticScore,
+        {
+          weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
+        }),
+    ]);
+  }
+
+  const values: Card[] = _.map(obj,
+    (value: any, key: string) =>
+    {
+      if (value === null || value === {})
+      {
+        value = JSON.stringify(value);
+      }
+      else if (Array.isArray(value) && (value !== []))
+      {
+        value = parseMagicArray(value);
+      }
+      else if (typeof value === 'object' && (value !== null || value !== {}))
+      {
+        value = parseMagicObject(value).first();
+      }
+      else
+      {
+        value = CommonElastic.parseESValue(value);
+      }
+
+      return make(Blocks.elasticMagicValue, {
+        key,
+        value,
+      });
+    },
+  );
+
+  const magicCard = make(
+    Blocks.elasticMagicCard,
+    {
+      values: Immutable.List(values),
+    },
+  );
+
+  return Immutable.List([magicCard]);
 };

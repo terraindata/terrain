@@ -43,46 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+/**
+ * A clause which is a field name (column name)
+ */
+export default class ESFieldClause extends ESStringClause
+{
+  public constructor(type: string, settings: any)
+  {
+    super(type, settings, ESClauseType.ESFieldClause);
+  }
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
-
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
-
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
-
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
-
-export default ElasticCardsDeck;
+  // TODO: add field validation here
+}

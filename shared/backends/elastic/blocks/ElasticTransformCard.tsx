@@ -50,78 +50,102 @@ const { List, Map } = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
+import * as CommonElastic from '../syntax/CommonElastic';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
-const accepts = Immutable.List(['elasticKeyValueWrap']);
+import TransformCard from '../../../../src/app/builder/components/charts/TransformCard';
 
-export const elasticRootCard = _card({
-  index: '',
-  from: 0,
-  rootType: '',
-  rootSize: 100,
+const transformScoreInputTypes = CommonElastic.acceptsValues;
 
-  body: '',
-  sort: '',
-
-  cards: L(),
-
-  static:
+export const scorePoint = _block(
   {
-    title: 'Root',
-    colors: ['#456', '#789'],
-    preview: '[index], [rootType]',
-    language: 'elastic',
+    value: 0,
+    score: 0,
 
-    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      return {
-        index: rootBlock['index'],
-        type: rootBlock['rootType'],
-        from: rootBlock['from'],
-        size: rootBlock['rootSize'],
-      };
+    static: {
+      language: 'elastic',
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+      {
+        return [block['value'], block['score']];
+      },
     },
+  });
 
-    accepts,
+export const elasticTransform = _card(
+  {
+    input: '',
+    scorePoints: List([]),
 
-    display:
-    [
+    domain: List([0, 100]),
+    hasCustomDomain: false, // has the user set a custom domain
+
+    static: {
+      language: 'elastic',
+      // manualEntry: ManualConfig.cards['transform'],
+      colors: ['#4b979a', '#aef3f6'],
+      title: 'Transform',
+      preview: (card: any) =>
       {
-        displayType: DisplayType.TEXT,
-        key: 'index',
-        getAutoTerms: (schemaState) =>
+        if (card.input._isCard)
         {
-          return Immutable.List(['movies', 'baseball', 'zazzle']);
+          return '' + BlockUtils.getPreview(card.input);
+        }
+        return '' + card.input;
+      },
+      display: [
+        {
+          displayType: DisplayType.CARDTEXT,
+          // help: ManualConfig.help['input'],
+          key: 'input',
+          placeholder: 'Input field',
+          accepts: transformScoreInputTypes,
+          showWhenCards: true,
         },
-        // autoDisabled: true,
-      },
+        {
+          displayType: DisplayType.CARDSFORTEXT,
+          key: 'input',
+          accepts: transformScoreInputTypes,
+        },
+        {
+          displayType: DisplayType.COMPONENT,
+          component: TransformCard,
+          requiresBuilderState: true,
+          key: null,
+          // help: ManualConfig.help['scorePoints'],
+        },
+      ],
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        displayType: DisplayType.TEXT,
-        key: 'rootType',
-        autoDisabled: true,
+        return {
+          a: 0,
+          b: 1,
+          numerators: [[block['input'], 1]],
+          denominators: [],
+          ranges: block['scorePoints'].map((scorePt) => scorePt.value),
+          outputs: block['scorePoints'].map((scorePt) => scorePt.score),
+        };
       },
-      {
-        displayType: DisplayType.NUM,
-        key: 'from',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'rootSize',
-        autoDisabled: true,
-      },
+      init: () => (
+        {
+          scorePoints: List([
+            BlockUtils.make(scorePoint, {
+              value: 2,
+              score: 0.2,
+            }),
+            BlockUtils.make(scorePoint, {
+              value: 15,
+              score: 0.5,
+            }),
+          ]),
+        }
+      ),
 
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-        accepts,
-      },
-    ],
-  },
-});
+      metaFields: ['domain', 'hasCustomDomain'],
+    },
+  });
 
-export default elasticRootCard;
+export default elasticTransform;

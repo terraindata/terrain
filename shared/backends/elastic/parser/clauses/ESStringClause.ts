@@ -43,46 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
-
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
-
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
-
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
-
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
-
-export default ElasticCardsDeck;
+/**
+ * A clause which is a string
+ */
+export default class ESStringClause extends ESTerminalClause
+{
+  public constructor(type: string,
+    settings: any,
+    clauseType: ESClauseType = ESClauseType.ESStringClause,
+    jsonType: ESJSONType = ESJSONType.string)
+  {
+    super(type, settings, clauseType, jsonType);
+  }
+}

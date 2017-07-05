@@ -44,56 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
+import ESJSONType from './ESJSONType';
+import ESParameter from './ESParameter';
+import ESPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
-/**
- * A clause which is one of several possible types
- */
-export default class ESVariantClause extends ESClause
+export default class EQLTemplateGenerator
 {
-  public subtypes: { [jsonType: string]: string };
-
-  public constructor(type: string, subtypes: { [jsonType: string]: string }, settings: any)
+  public static generate(source: ESValueInfo): string
   {
-    super(type, settings);
-    this.subtypes = subtypes;
+    return (new EQLTemplateGenerator(source)).result;
   }
 
-  public init(config: EQLConfig): void
+  private result: string;
+
+  public constructor(source: ESValueInfo)
   {
-    Object.keys(this.subtypes).forEach(
-      (key: string): void =>
-      {
-        config.declareType(this.subtypes[key]);
-      });
+    this.result = '';
+    this.convert(source);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  public convert(source: ESValueInfo): void
   {
-    valueInfo.clause = this; // only sticks if subclause isn't detected
+    let i: number = 0;
 
-    const value: any = valueInfo.value;
-    let valueType: string = typeof (value);
-    if (Array.isArray(value))
+    switch (source.jsonType)
     {
-      valueType = 'array';
-    }
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+      case ESJSONType.string:
+        this.result += JSON.stringify(source.value);
+        break;
 
-    const subtype: string | undefined = this.subtypes[valueType];
-    if (subtype === undefined)
-    {
-      interpreter.accumulateError(valueInfo,
-        'Unknown clause type. Expected one of these types: ' +
-        JSON.stringify(Object.keys(this.subtypes), null, 2) +
-        ', but found a ' +
-        valueType +
-        ' instead.');
-      return;
-    }
+      case ESJSONType.parameter:
+        const param: ESParameter = source.value as ESParameter;
+        this.result += ' {{#toJson}}' + param.name + '{{/toJson}} ';
+        break;
 
-    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
+      case ESJSONType.array:
+        this.result += '[';
+        source.arrayChildren.forEach(
+          (child: ESValueInfo): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            this.convert(child);
+          });
+        this.result += ']';
+        break;
+
+      case ESJSONType.object:
+        this.result += ' { '; // extra spaces to avoid confusion with mustache tags
+
+        Object.keys(source.objectChildren).forEach(
+          (name: string): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            const kvp: ESPropertyInfo = source.objectChildren[name];
+            this.convert(kvp.propertyName);
+            this.result += ':';
+
+            if (kvp.propertyValue === null)
+            {
+              throw new Error('Property with no value found.');
+            }
+
+            this.convert(kvp.propertyValue);
+          });
+
+        this.result += ' } '; // extra spaces to avoid confusion with mustache tags
+        break;
+
+      default:
+        throw new Error('Unconvertable value type found.');
+    }
   }
 }

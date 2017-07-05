@@ -44,46 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
 /**
- * A clause which can only take on a restricted set of values.
+ * A clause which is a null
  */
-export default class ESEnumClause extends ESClause
+export default class ESNullClause extends ESTerminalClause
 {
-  public values: any[];
-  public valueMap: any;
-
-  public constructor(type: string, values: any[], settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-
-    this.values = values;
-    this.valueMap = new Map();
-    for (let i = 0; i < this.values.length; ++i)
-    {
-      const value = this.values[i];
-      this.valueMap.set(value, i);
-    }
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    if (this.valueMap.get(valueInfo.value) === undefined)
-    {
-      if (this.values.length > 10)
-      {
-        interpreter.accumulateError(valueInfo, 'Unknown value for this clause.');
-      }
-      else
-      {
-        interpreter.accumulateError(valueInfo,
-          'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
-      }
-    }
-    valueInfo.clause = this;
+    super(type, settings, ESClauseType.ESNullClause, ESJSONType.null);
   }
 }

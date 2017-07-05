@@ -43,46 +43,59 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Blocks from './ElasticBlocks';
 
-export const ElasticCardsDeck =
-  Immutable.fromJS(
-    [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
+import ESClause from './ESClause';
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+/**
+ * A clause that corresponds to an object of uniform type values.
+ */
+export default class ESMapClause extends ESClause
+{
+  public nameType: string;
+  public valueType: string;
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+  public constructor(type: string, nameType: string, valueType: string, settings: any)
+  {
+    super(type, settings, ESClauseType.ESMapClause);
+    this.nameType = nameType;
+    this.valueType = valueType;
+  }
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+  public init(config: EQLConfig): void
+  {
+    config.declareType(this.nameType);
+    config.declareType(this.valueType);
+  }
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    valueInfo.clause = this;
 
-      [
-        // Score and transform cards
-        Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
-      ],
-    ],
-  );
+    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.object))
+    {
+      return;
+    }
 
-export default ElasticCardsDeck;
+    // mark properties
+    const childClause: ESClause = interpreter.config.getClause(this.valueType);
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
+
+        if (viTuple.propertyValue !== null)
+        {
+          childClause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
+  }
+}

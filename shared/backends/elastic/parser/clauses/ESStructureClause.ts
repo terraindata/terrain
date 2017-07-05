@@ -44,66 +44,85 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import * as _ from 'underscore';
+
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause that corresponds to an object of uniform type values.
+ * A clause with a well-defined structure.
  */
-export default class ESMapClause extends ESClause
+export default class ESStructureClause extends ESClause
 {
-  public nameType: string;
-  public valueType: string;
+  public structure: { [name: string]: string };
+  public required: any[];
 
-  public constructor(type: string, nameType: string, valueType: string, settings: any)
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(type, settings);
-    this.nameType = nameType;
-    this.valueType = valueType;
+    super(type, settings, ESClauseType.ESStructureClause);
+    this.structure = structure;
+    this.required = required;
   }
 
   public init(config: EQLConfig): void
   {
-    config.declareType(this.nameType);
-    config.declareType(this.valueType);
+    Object.keys(this.structure).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.structure[key]);
+      });
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'object')
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be a map, but found an array instead.');
-      return;
-    }
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    const propertyClause: ESClause = interpreter.config.getClause('property');
 
     // mark properties
-    const childClause: ESClause = interpreter.config.getClause(this.valueType);
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
     Object.keys(children).forEach(
       (name: string): void =>
       {
         const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
 
-        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
+        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
 
-        if (viTuple.propertyValue !== null)
+        if (!this.structure.hasOwnProperty(name))
         {
-          childClause.mark(interpreter, viTuple.propertyValue);
+          interpreter.accumulateError(viTuple.propertyName,
+            'Unknown property \"' + name +
+            '\". Expected one of these properties: ' +
+            JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+            true);
+          return;
+        }
+        else if (viTuple.propertyValue === null)
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
+        }
+        else
+        {
+          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
+
+          propertyClause.mark(interpreter, viTuple.propertyName);
+          clause.mark(interpreter, viTuple.propertyValue);
         }
       });
+
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 }

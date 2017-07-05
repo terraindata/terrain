@@ -53,17 +53,21 @@ import ESValueInfo from './ESValueInfo';
 export default class ESParserError
 {
   public token: ESParserToken; // token which triggered the error
+  public valueInfo: ESValueInfo; // value info which triggered the error
   public isWarning: boolean;
   public message: string; // what went wrong
 
   public constructor(token: ESParserToken,
+    valueInfo: ESValueInfo,
     message: string,
     isWarning: boolean = false)
   {
     this.token = token;
+    this.valueInfo = valueInfo;
     this.message = message;
     this.isWarning = isWarning;
 
     this.token.attachError(this);
+    this.valueInfo.attachError(this);
   }
 }

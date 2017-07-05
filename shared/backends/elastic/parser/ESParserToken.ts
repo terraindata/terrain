@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
 
@@ -52,7 +53,7 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESParserToken
 {
-  private static emptyErrorList: ESParserError[] = [];
+  public jsonType: ESJSONType; // The JSON type of this token
 
   public charNumber: number; // number of chars into the source that this token begins
   public row: number; // row in which this token begins (rows start at 0)
@@ -62,8 +63,6 @@ export default class ESParserToken
   public length: number; // token length in chars
   public substring: string; // token substring
 
-  public valueInfo: ESValueInfo | null; // value info that this token belongs to
-
   public errors: ESParserError[];
 
   public constructor(charNumber: number,
@@ -72,6 +71,8 @@ export default class ESParserToken
     length: number,
     substring: string)
   {
+    this.jsonType = ESJSONType.unknown;
+
     this.charNumber = charNumber;
     this.row = row;
     this.col = col;
@@ -79,24 +80,12 @@ export default class ESParserToken
     this.toCol = col;
     this.length = length;
     this.substring = substring;
-    this.valueInfo = null;
-    this.errors = ESParserToken.emptyErrorList;
+
+    this.errors = [];
   }
 
   public attachError(error: ESParserError): void
   {
-    if (this.valueInfo !== null)
-    {
-      this.valueInfo.attachError(error);
-    }
-
-    if (this.errors.length === 0)
-    {
-      this.errors = [error];
-    }
-    else
-    {
-      this.errors.push(error);
-    }
+    this.errors.push(error);
   }
 }

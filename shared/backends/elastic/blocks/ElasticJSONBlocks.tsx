@@ -42,101 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { List, Map } = Immutable;
 const L = () => List([]);
 import BlockUtils from '../../../blocks/BlockUtils';
 import CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-import CommonElastic from '../syntax/CommonElastic';
+import * as CommonElastic from '../syntax/CommonElastic';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-
-export const elasticKeyValueToggle = _card({
-  key: '',
-  value: '',
-  valueType: CommonElastic.valueTypesList[0],
-
-  static:
-  {
-    language: 'elastic',
-    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      const rawValue = block['value'];
-      let value: any;
-
-      switch (block['valueType'])
-      {
-        case CommonElastic.valueTypes.number:
-          value = +rawValue;
-          break;
-        case CommonElastic.valueTypes.text:
-          value = '' + rawValue;
-          break;
-        case CommonElastic.valueTypes.null:
-          value = null;
-          break;
-        case CommonElastic.valueTypes.bool:
-          value = !rawValue || rawValue === 'false' ? false : true;
-          break;
-        case CommonElastic.valueTypes.array:
-          // TODO ELASTIC
-          value = tqlTranslationFn(rawValue, tqlConfig);
-          break;
-        case CommonElastic.valueTypes.object:
-          // TODO ELASTIC
-          value = tqlTranslationFn(rawValue, tqlConfig);
-          break;
-      }
-
-      return {
-        [block['key']]: value,
-      };
-    },
-    title: 'Property T',
-    colors: ['#789', '#abc'],
-    preview: '[key]: [value]',
-
-    display:
-    {
-      displayType: DisplayType.FLEX,
-      key: null,
-
-      flex:
-      [
-        {
-          displayType: DisplayType.TEXT,
-          key: 'key',
-          autoDisabled: true,
-        },
-        {
-          displayType: DisplayType.DROPDOWN,
-          key: 'valueType',
-          options: Immutable.List(CommonElastic.valueTypesList),
-          centerDropdown: true,
-          dropdownUsesRawValues: true,
-        },
-        {
-          displayType: DisplayType.CARDTEXT,
-          key: 'value',
-          top: false,
-          showWhenCards: true,
-          accepts: CommonElastic.acceptsValues,
-        },
-      ],
-
-      below:
-      {
-        displayType: DisplayType.CARDSFORTEXT,
-        key: 'value',
-        accepts: CommonElastic.acceptsValues,
-      },
-    },
-  },
-});
 
 export const elasticValue = _card({
   key: '',
@@ -172,7 +91,7 @@ export const elasticObject = _wrapperCard({
   },
   title: 'Object',
   colors: ['#123', '#456'],
-  accepts: List(['elasticKeyValueWrap', 'elasticKeyValueToggle']),
+  accepts: List(['elasticKeyValueWrap']),
 });
 
 export const elasticArray = _wrapperCard({

@@ -102,6 +102,7 @@ export interface Props
   isNumber?: boolean;
   typeErrorMessage?: string;
 
+  options?: List<string | El>;
   showWhenCards?: boolean;
   display?: Display;
 

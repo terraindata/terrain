@@ -44,40 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import * as fs from 'fs';
+import * as util from 'util';
+import * as winston from 'winston';
+import EQLTemplateGenerator from '../../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
+import ESValueInfo from '../../../../../shared/backends/elastic/parser/ESValueInfo';
+import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
-/**
- * A clause with a type that references another def.
- * This is used to specify clause types with special names or descriptions,
- * but which are composed wholly of another type.
- *
- * For example, a bool clause contains "must", "must_not", and "should" properties,
- * each of which has a unique function, but all of these properties contain a "query" clause.
- *
- * Another example is a setting property such as "boost", which must contain a
- * "number" as its value.
- */
-export default class ESReferenceClause extends ESClause
+/* tslint:disable:no-trailing-whitespace */
+
+beforeAll(async (done) =>
 {
-  public delegateType: string;
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  done();
+});
 
-  public constructor(type: string, delegateType: string, settings: any)
-  {
-    super(type, settings);
-    this.delegateType = delegateType;
-  }
+function testGeneration(testString: string, expectedValue: string)
+{
+  winston.info('testing \'' + testString + '\'');
 
-  public init(config: EQLConfig): void
-  {
-    config.declareType(this.delegateType);
-  }
+  const parser: ESParser = new ESParser(testString);
+  const valueInfo: ESValueInfo = parser.getValueInfo();
+  const errors: ESParserError[] = parser.getErrors();
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
-    valueInfo.clause = this;
-  }
+  expect(errors.length).toEqual(0);
+
+  const result = EQLTemplateGenerator.generate(valueInfo);
+
+  winston.info(result);
+  expect(result).toEqual(expectedValue);
 }
+
+test('test generate template queries', () =>
+{
+  testGeneration('true', 'true');
+  testGeneration('false', 'false');
+  testGeneration('null', 'null');
+  testGeneration('0', '0');
+  testGeneration('1.923e-21', '1.923e-21');
+  testGeneration('123', '123');
+  testGeneration('9990000000000', '9990000000000');
+  testGeneration('0.999', '0.999');
+  testGeneration('[]', '[]');
+  testGeneration('{}', ' {  } ');
+
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
+    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
+
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
+    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
+
+});

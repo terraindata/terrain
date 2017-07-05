@@ -47,8 +47,6 @@ THE SOFTWARE.
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
 import ESParserError from './ESParserError';
-import ESParserToken from './ESParserToken';
-import ESParserPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
 
 /**
@@ -92,6 +90,6 @@ export default class ESInterpreter
 
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
-    this.parser.accumulateError(new ESParserError(info.tokens[0], message, isWarning));
+    this.parser.accumulateError(new ESParserError(info.tokens[0], info, message, isWarning));
   }
 }

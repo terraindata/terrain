@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
+import ESClause from './clauses/ESClause';
+import ESVariantClause from './clauses/ESVariantClause';
 import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
@@ -55,13 +56,6 @@ import ESPropertyInfo from './ESPropertyInfo';
  */
 export default class ESValueInfo
 {
-
-  private static emptyArrayChildren: ESValueInfo[] = [];
-
-  private static emptyObjectChildren: { [name: string]: ESPropertyInfo } = {};
-
-  private static emptyErrorList: ESParserError[] = [];
-
   /**
    * The JSON type of the value.
    */
@@ -99,31 +93,24 @@ export default class ESValueInfo
   public clause: ESClause | null;
 
   /**
-   * In the case of a variant clause, this is set to the delegate clause used
+   * In the case of a variant clause, this is set to the variant clause
    */
-  public delegateClause: ESClause | null;
+  public parentClause: ESClause | null;
 
   public constructor()
   {
-    this.jsonType = ESJSONType.invalid;
+    this.jsonType = ESJSONType.unknown;
     this.value = undefined;
     this.tokens = [];
-    this.arrayChildren = ESValueInfo.emptyArrayChildren;
-    this.objectChildren = ESValueInfo.emptyObjectChildren;
-    this.errors = ESValueInfo.emptyErrorList;
+    this.arrayChildren = [];
+    this.objectChildren = {};
+    this.errors = [];
     this.clause = null;
-    this.delegateClause = null;
+    this.parentClause = null;
   }
 
   public attachError(error: ESParserError): void
   {
-    if (this.errors.length === 0)
-    {
-      this.errors = [error];
-    }
-    else
-    {
-      this.errors.push(error);
-    }
+    this.errors.push(error);
   }
 }

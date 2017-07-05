@@ -113,6 +113,7 @@ const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
+const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 
@@ -144,7 +145,7 @@ const links =
       route: '/schema',
     },
     {
-      icon: <ReportingIcon />,    // need new icon
+      icon: <ImportIcon />,
       text: 'Import',
       route: '/import',
     },
@@ -341,7 +342,7 @@ class App extends PureClasss<Props>
     {
       return (
         <InfoArea
-          large="Terraformer cannot be used successfully on this browser in 'private' / 'icognito' mode. Plesae switch to another browser or turn off incognito mode."
+          large="Terraformer cannot be used successfully on this browser in 'private' / 'incognito' mode. Please switch to another browser or turn off incognito mode."
         />
       );
     }
