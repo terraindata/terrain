@@ -138,4 +138,9 @@ export default class EQLConfig
       throw new Error('Unknown clause id "' + id + '"');
     }
   }
+
+  public getClauses()
+  {
+    return this.clauses;
+  }
 }

@@ -70,12 +70,18 @@ export interface Props
   open?: boolean;
   dy?: number;
   className?: string;
-  onMinimize?: () => void;
-  accepts?: List<string>;
+  accepts: List<string>;
   onToggle?: () => void;
   onClose?: () => void; // like toggle, but only called when explicitly closed
+  onMinimize?: () => void; // TODO see if these should be consolidated
   hidePlaceholder?: boolean;
   cannotClose?: boolean;
+
+  overrideText?: List<{
+    text: string;
+    type: string;
+  }>; // can override the options displayed
+  overrideClick?: (index: number) => void; // override the click handler
 }
 
 class CreateCardTool extends PureClasss<Props>
@@ -92,8 +98,17 @@ class CreateCardTool extends PureClasss<Props>
 
   handleCardClick(event)
   {
-    const type = Util.rel(event.target);
-    this.createCard(type);
+    const index = +Util.rel(event.target);
+
+    if (this.props.overrideClick)
+    {
+      this.props.overrideClick(index);
+    }
+    else
+    {
+      const type = this.props.accepts.get(index);
+      this.createCard(type);
+    }
   }
 
   public createCard(type)
@@ -154,6 +169,39 @@ class CreateCardTool extends PureClasss<Props>
     }
   }
 
+  private renderCardOption(type: string, index: number)
+  {
+    const block = AllBackendsMap[this.props.language].blocks[type];
+    if (!block)
+    {
+      console.log('Missing block type: ', block);
+      // TODO throw error instead
+      return null;
+    }
+    const text = this.props.overrideText ? this.props.overrideText.get(index).text : block.static.title;
+    // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
+    return (
+      <a
+        className={classNames({
+          'create-card-button': true,
+          'create-card-button-focused': this.state.focusedIndex === index,
+        })}
+        key={'' + index}
+        rel={'' + index}
+        onClick={this.handleCardClick}
+        style={{
+          backgroundColor: block.static.colors[0],
+        }}
+      >
+        <div className='create-card-button-inner' rel={'' + index}>
+          {
+            text
+          }
+        </div>
+      </a>
+    );
+  }
+
   public renderCardSelector()
   {
     if (this.state.closed)
@@ -161,7 +209,19 @@ class CreateCardTool extends PureClasss<Props>
       return null;
     }
 
-    let curIndex = -1; // tracks the index of the cards we are actually showing
+    // This used to use the following code. Keeping around in case I realize the need for it
+    //     let curIndex = -1; // tracks the index of the cards we are actually showing
+    // AllBackendsMap[this.props.language].cardsList.map((type: string, index: number) =>
+    //             {
+    //               if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
+    //               {
+    //                 return null;
+    //               }
+
+    //               curIndex++;
+
+    const cardTypeList = this.props.overrideText || this.props.accepts;
+    const isEmpty = cardTypeList.size === 0;
 
     return (
       <div
@@ -173,40 +233,17 @@ class CreateCardTool extends PureClasss<Props>
       >
         <div className='create-card-selector-inner'>
           {
-            AllBackendsMap[this.props.language].cardsList.map((type: string, index: number) =>
-            {
-              if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
-              {
-                return null;
-              }
-
-              curIndex++;
-
-              const card = BlockUtils.make(
-                AllBackendsMap[this.props.language].blocks[type],
-              );
-              // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
-              return (
-                <a
-                  className={classNames({
-                    'create-card-button': true,
-                    'create-card-button-focused': this.state.focusedIndex === curIndex,
-                  })}
-                  key={type}
-                  rel={type}
-                  onClick={this.handleCardClick}
-                  style={{
-                    backgroundColor: card.static.colors[0],
-                  }}
-                >
-                  <div className='create-card-button-inner' rel={type}>
-                    {
-                      card.static.title
-                    }
-                  </div>
-                </a>
-              );
-            })
+            isEmpty &&
+            <div className='create-card-empty'>
+              There are no remaining cards that can be created here.
+              </div>
+          }
+          {
+            this.props.overrideText
+              ?
+              this.props.overrideText.map((v, index) => this.renderCardOption(v.type, index))
+              :
+              this.props.accepts.map(this.renderCardOption)
           }
           {
             _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)

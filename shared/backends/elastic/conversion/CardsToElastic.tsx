@@ -108,8 +108,13 @@ class CardsToElastic
     // return q;
   }
 
-  public static blockToElastic(block: Block, options: Options = {}): string | object
+  public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
   {
+    if (typeof block !== 'object')
+    {
+      return block;
+    }
+
     if (block && block.static.tql)
     {
       const tql = block.static.tql as TQLRecursiveObjectFn;

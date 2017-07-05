@@ -43,92 +43,106 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as React from 'react';
 import * as _ from 'underscore';
+import * as Immutable from 'immutable';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { Card } from '../../../../../shared/blocks/types/Card';
+import PureClasss from '../../../common/components/PureClasss';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
 
-export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
-export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);
-export type TQLStringFn = string | ((block: Block) => string);
-export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
+import CreateCardTool from './CreateCardTool';
 
-// A Block is a card or a distinct piece / group of card pieces
-export interface Block extends IRecord<Block>
+export interface Props
 {
-  id: string;
-  type: string;
-  _isBlock: boolean;
-
-  // fields not saved on server
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    topTql?: string;
-    accepts?: List<string>;
-
-    // remove this block if it contains a card and the card is removed
-    //  will not remove field if it is the last in its parents' list
-    removeOnCardRemove?: boolean;
-
-    metaFields: string[];
-
-    [field: string]: any;
-  };
-
-  [field: string]: any;
+  keyPath: KeyPath;
+  data: Card;
+  canEdit: boolean;
+  helpOn: boolean;
+  className: string;
+  onChange: (keyPath: KeyPath, value: any, notDirty: boolean) => void;
+  // builderState: d.requiresBuilderState && BuilderStore.getState(),
+  language: string;
 }
 
-export interface BlockConfig
+const emptyList = Immutable.List([]);
+
+class SpecializedCreateCardTool extends PureClasss<Props>
 {
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    accepts?: List<string>;
-    removeOnCardRemove?: boolean;
-    metaFields?: string[];
-    [field: string]: any;
+  state: {
+    options?: List<{
+      text: string;
+      type: string;
+    }>;
+    open: boolean,
   };
 
-  [field: string]: any;
-}
+  constructor(props: Props)
+  {
+    super(props);
+    this.state = {
+      options: this.getOptions(this.props),
+      open: false,
+    };
+  }
 
-export const allBlocksMetaFields = ['id'];
+  public getOptions(props: Props)
+  {
+    const options = props.data['getChildOptions'](props.data);
 
-const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn', 'map'];
-export const verifyBlockConfigKeys = (config: object) =>
-{
-  RESERVED_WORDS.map(
-    (word) =>
+    if (this.state && options.equals(this.state.options))
     {
-      if (config[word])
-      {
-        throw new Error('Creating card: ' + word + ' is a reserved word. ' + JSON.stringify(config));
-      }
-    },
-  );
-};
+      return this.state.options;
+    }
 
-// helper function to populate common fields for an Block
-export const _block = (config: BlockConfig): Block =>
-{
-  verifyBlockConfigKeys(config);
-
-  const blockConfig: Block = _.extend({
-    id: '',
-    type: '',
-    _isBlock: true,
-  }, config);
-
-  if (blockConfig.static.metaFields)
-  {
-    blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
-  }
-  else
-  {
-    blockConfig.static.metaFields = allBlocksMetaFields;
+    return options;
   }
 
-  return blockConfig;
-};
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.data !== this.props.data)
+    {
+      this.setState({
+        options: this.getOptions(nextProps),
+      });
+    }
+  }
 
-export default Block;
+  public onClick(index: number)
+  {
+    const option = this.state.options.get(index);
+    const card = this.props.data['childOptionClickHandler'](
+      this.props.data, option
+    );
+
+    Actions.change(
+      this.props.keyPath,
+      card,
+    );
+  }
+
+  public render()
+  {
+    return (
+      <CreateCardTool
+        index={0}
+        keyPath={this.props.keyPath}
+        canEdit={this.props.canEdit}
+        language={this.props.language}
+        className={this.props.className}
+        accepts={emptyList}
+
+        open={this.state.open}
+        onToggle={this._toggle('open')}
+
+        overrideText={this.state.options}
+        overrideClick={this.onClick}
+      />
+    );
+  }
+}
+
+export default SpecializedCreateCardTool;

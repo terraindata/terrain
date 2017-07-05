@@ -460,6 +460,14 @@ export const Ajax =
         {
           onLoad(variantItem as LibraryTypes.Variant);
         },
+        (error) =>
+        {
+          if (error as any === 'Nothing found')
+          {
+            onLoad(null);
+          }
+        },
+
       );
       // }
       // TODO
@@ -561,7 +569,10 @@ export const Ajax =
           {
             onLoad(null, v);
           }
-          onLoad(v.query, v);
+          else
+          {
+            onLoad(v.query, v);
+          }
         },
       );
     },

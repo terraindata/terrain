@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import {Query} from '../../../items/types/Query';
+import { Query } from '../../../items/types/Query';
 import ESInterpreter from '../parser/ESInterpreter';
 import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
 
