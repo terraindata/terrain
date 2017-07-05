@@ -43,78 +43,25 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as BlockUtils from '../../blocks/BlockUtils';
-import { Cards } from '../../blocks/types/Card';
-const { List } = Immutable;
-import { AllBackendsMap } from '../../backends/AllBackends';
-import { _ResultsConfig, ResultsConfig } from '../../results/types/ResultsConfig';
-import ESInterpreter from '../../backends/elastic/parser/ESInterpreter';
 
-// A query can be viewed and edited in the Builder
-// currently, only Variants have Queries, 1:1, but that may change
-class QueryC
+import {Query} from '../../../items/types/Query';
+import ESInterpreter from '../parser/ESInterpreter';
+import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
+
+export function ParseElasticQuery(tql: string)
 {
-  type: 'QUERY' = 'QUERY';
-  parent: number = -1;
-  name: string = '';
-  status: 'BUILD' | 'LIVE' = 'BUILD';
-
-  language: 'elastic' | 'mysql' = 'elastic';
-
-  id: ID = -1;
-  variantId: number = -1;
-
-  // TODO change?
-  db: {
-    id: ID;
-    name: string;
-    source: 'm1' | 'm2';
-    type: string;
-  } = {} as any;
-
-  cards: Cards = List([]);
-  inputs: List<any> = List([]);
-  resultsConfig = null; //: ResultsConfig = null;
-  tql: string = '';
-  parseTree: ESInterpreter = null;
-  lastMutation: number = 0;
-  deckOpen: boolean = true;
-
-  cardsAndCodeInSync: boolean = false;
-  parseError: string = null;
-
-  meta: IMMap<string, any> = Immutable.Map<string, any>({});
-
-  dbFields = ['id', 'parent', 'name', 'status', 'type'];
-  excludeFields = ['dbFields', 'excludeFields'];
-
-  modelVersion = 2; // 2 is for the first version of Node midway
-}
-const Query_Record = Immutable.Record(new QueryC());
-export interface Query extends QueryC, IRecord<Query> { }
-
-export const _Query = (config?: Object) =>
-{
-  config = config || {};
-  const Blocks = AllBackendsMap[config['language'] || 'elastic'].blocks;
-  config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);
-  config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
-  config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
-  config['meta'] = Immutable.Map<string, any>(config['meta']);
-
-  const query = new Query_Record(config) as any as Query;
-
-  return query;
-};
-
-export function queryForSave(query: Query): Object
-{
-  query = query
-    .set('cards', BlockUtils.cardsForServer(query.cards))
-    .set('parseTree', null)
-    .set('resultsConfig', query.resultsConfig.toJS());
-  return query.toJS();
+  return new ESInterpreter(tql);
 }
 
-export default Query;
+export function ElasticParseTreeToQuery(query: Query, options: ParseTreeToQueryOptions): string
+{
+  const queryObject = JSON.parse(JSON.stringify(query.parseTree.parser.getValue()));
+  if (options.allFields === true)
+  {
+    if (queryObject.body && queryObject.body._source)
+    {
+      queryObject.body._source = [];
+    }
+  }
+  return JSON.stringify(queryObject);
+}

@@ -124,6 +124,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         return state;
       }
 
+      if (action.payload.query.tql)
+      {
+        query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(action.payload.query.tql));
+      } else
+      {
+        query = query.set('parseTree', null);
+      }
+
       if (!action.payload.query.cardsAndCodeInSync)
       {
         if (action.payload.query.tql)
@@ -327,13 +335,15 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     {
       // TODO MOD convert
       let { query } = state;
-      query = query.set('tql', action.payload.tql);
+      const tql: string = action.payload.tql;
+      query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql)
+        .set('parseTree', AllBackendsMap[query.language].parseQuery(tql));
       query = AllBackendsMap[query.language].codeToQuery(
         query,
         Actions.changeQuery,
       );
-
-      return state.set('query', query);
+      state = state.set('query', query);
+      return state;
     },
 
     [ActionTypes.hoverCard]:

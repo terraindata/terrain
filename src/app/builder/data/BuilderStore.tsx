@@ -148,10 +148,11 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     {
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
+      const tql: string = AllBackendsMap[state.query.language].queryToCode(state.query, {})
       state = state
-        .setIn(['query', 'tql'],
-        AllBackendsMap[state.query.language].queryToCode(state.query, {}),
-      )
+        .setIn(['query', 'tql'], tql)
+        .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(tql))
+        .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
         .setIn(['query', 'cardsAndCodeInSync'], true);
     }
 
