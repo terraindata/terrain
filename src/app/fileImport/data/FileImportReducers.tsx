@@ -47,9 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
-import Actions from './FileImportActions';
 import Ajax from './../../util/Ajax';
-import FileImportTypes from './../FileImportTypes';
 const { List, Map } = Immutable;
 
 const FileImportReducers = {}
@@ -116,77 +114,42 @@ FileImportReducers[ActionTypes.addTransform] =
 FileImportReducers[ActionTypes.updatePreviewRows] =
   (state, action) =>
   {
-    console.log('reducer: ' + action.payload.transform.name + ', ' + action.payload.transform.args.colName + ', ' +
-      action.payload.transform.args.text + ', ' + action.payload.transform.args.newNames);
+    // console.log('reducer: ' + action.payload.transform.name + ', ' + action.payload.transform.args.colName + ', ' +
+    //   action.payload.transform.args.text + ', ' + action.payload.transform.args.newNames);
 
-    if (action.payload.transform.name === 'append')
+    const transformCol = state.columnNames.indexOf(action.payload.transform.args.transformCol);
+    if (action.payload.transform.name === 'append' || action.payload.transform.name === 'prepend')
     {
-      const appendCol = state.columnNames.indexOf(action.payload.transform.args.colName);
-
-      const newPreviewRows = [];
-      state.previewRows.map((row, i) =>
-      {
-        const newRow = [];
-        row.map((value, j) =>
-        {
-          j === appendCol ? newRow.push(value + action.payload.transform.args.text) : newRow.push(value);
-        });
-        newPreviewRows.push(newRow);
-      });
-      return state
-        .set('previewRows', List(newPreviewRows))
-    }
-    else if (action.payload.transform.name === 'prepend')
-    {
-      const prependCol = state.columnNames.indexOf(action.payload.transform.args.colName);
-
-      const newPreviewRows = [];
-      state.previewRows.map((row, i) =>
-      {
-        const newRow = [];
-        row.map((value, j) =>
-        {
-          j === prependCol ? newRow.push(action.payload.transform.args.text + value) : newRow.push(value);
-        });
-        newPreviewRows.push(newRow);
-      });
-      // return state.set('previewRows', List(newPreviewRows))
-      const test = state.previewRows.splice();
-      console.log(test.map((row, i) =>
-        row.map((col, j) =>
-          j === prependCol ? action.payload.transform.args.text + col : col
-        )
-      ));
-
       return state
         .set('previewRows', List(state.previewRows.map((row, i) =>
           row.map((col, j) =>
-            j === prependCol ? action.payload.transform.args.text + col : col
-          )
+          {
+            if (j === transformCol && action.payload.transform.name === 'append')
+            {
+              return col + action.payload.transform.args.text;
+            }
+            else if (j === transformCol && action.payload.transform.name === 'prepend')
+            {
+              return action.payload.transform.args.text + col;
+            }
+            else
+            {
+              return col;
+            }
+          }))
         )
-        ))
+        )
     }
     else if (action.payload.transform.name === 'split')
     {
-      const splitCol = state.columnNames.indexOf(action.payload.transform.args.colName);
-
       const newPreviewRows = [];
       state.previewRows.map((row, i) =>
       {
         const newRow = [];
         row.map((value, j) =>
         {
-          if (j === splitCol)
+          if (j === transformCol)
           {
-            // const parts = value.split(action.payload.transform.args.text);
-            // console.log('parts: ', parts);
-            // newRow.push(parts[0]);
-            // newRow.push(parts[1]);
-
-            // const parts = value.split(/_(.+)/)[1];
-            // newRow.push(parts[0]);
-            // newRow.push(parts[1]);
-
             newRow.push(value.split(action.payload.transform.args.text)[0]);
             newRow.push(value.split(action.payload.transform.args.text).slice(1).join(action.payload.transform.args.text));
           }
@@ -201,43 +164,34 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
       return state
         .set('previewRows', List(newPreviewRows))
         .set('columnNames', state.columnNames
-          .set(splitCol, action.payload.transform.args.newNames[0])
-          .insert(splitCol + 1, action.payload.transform.args.newNames[1]))
-        .set('columnsToInclude', state.columnsToInclude.insert(splitCol + 1, true))
-        .set('columnTypes', state.columnTypes.insert(splitCol + 1, 0))
+          .set(transformCol, action.payload.transform.args.splitNames[0])
+          .insert(transformCol + 1, action.payload.transform.args.splitNames[1]))
+        .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
+        .set('columnTypes', state.columnTypes.insert(transformCol + 1, 0))
     }
     else if (action.payload.transform.name === 'merge')
     {
-      const mergeCol1 = state.columnNames.indexOf(action.payload.transform.args.colName);
-      const mergeCol2 = state.columnNames.indexOf(action.payload.transform.args.oldName);
-      console.log('merge: ' + mergeCol1 + ', ' + mergeCol2);
+      const mergeCol = state.columnNames.indexOf(action.payload.transform.args.mergeNames[0]);
 
       const newPreviewRows = [];
       state.previewRows.map((row, i) =>
       {
         const newRow = [];
-        row.map((value, j) =>
+        row.map((col, j) =>
         {
-          if (j === mergeCol1)
-          {
-            newRow.push(value + action.payload.transform.args.text + row[mergeCol2]);
-          }
-          else
-          {
-            newRow.push(value);
-          }
+          j === transformCol ? newRow.push(col + action.payload.transform.args.text + row[mergeCol]) : newRow.push(col)
         });
-        newRow.splice(mergeCol2, 1);
+        newRow.splice(mergeCol, 1);
         newPreviewRows.push(newRow);
       });
 
       return state
         .set('previewRows', newPreviewRows)
         .set('columnNames', state.columnNames
-          .delete(mergeCol2)
-          .set(mergeCol1, action.payload.transform.args.mergeNewName))
-        .set('columnsToInclude', state.columnsToInclude.delete(mergeCol2))
-        .set('columnTypes', state.columnTypes.delete(mergeCol2))
+          .set(transformCol, action.payload.transform.args.mergeNames[1])
+          .delete(mergeCol))
+        .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
+        .set('columnTypes', state.columnTypes.delete(mergeCol))
     }
   };
 

@@ -68,15 +68,13 @@ class TransformBox extends Classs<Props>
   public state: {
     transformTypeIndex: number;
     transformText: string;
-    splitNewNames: string[];
-    mergeNewName: string;
-    mergeOldName: string;
+    splitNames: string[];
+    mergeNames: string[];
   } = {
     transformTypeIndex: 0,
     transformText: '',
-    splitNewNames: ['', ''],
-    mergeNewName: '',
-    mergeOldName: '',
+    splitNames: ['', ''],
+    mergeNames: ['', ''],
   };
 
   public handleAutocompleteTransformTextChange(transformText)
@@ -95,34 +93,30 @@ class TransformBox extends Classs<Props>
 
   public handleSplitNameAChange(splitNameA)
   {
-    const newNames = this.state.splitNewNames.slice();
-    newNames[0] = splitNameA;
     this.setState({
-      splitNewNames: newNames,
+      splitNames: this.state.splitNames[0] = splitNameA,
     });
   }
 
   public handleSplitNameBChange(splitNameB)
   {
-    const newNames = this.state.splitNewNames.slice();
-    newNames[1] = splitNameB;
     this.setState({
-      splitNewNames: newNames,
+      splitNames: this.state.splitNames[1] = splitNameB,
+    });
+  }
+
+  public handleMergeOldNameChange(mergeOldName)
+  {
+    this.setState({
+      mergeNames: this.state.mergeNames[0] = mergeOldName,
     });
   }
 
   public handleMergeNewNameChange(mergeNewName)
   {
     this.setState({
-      mergeNewName,
+      mergeNames: this.state.mergeNames[1] = mergeNewName,
     })
-  }
-
-  public handleMergeOldNameChange(mergeOldName)
-  {
-    this.setState({
-      mergeOldName,
-    });
   }
 
   public handleTransformClick()
@@ -134,27 +128,55 @@ class TransformBox extends Classs<Props>
     console.log('adding transform: ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
       this.props.newName + ', text: ' + this.state.transformText);
 
-
+    const transformName = this.props.transformTypes.get(this.state.transformTypeIndex);
     Actions.updatePreviewRows({
-      name: this.props.transformTypes.get(this.state.transformTypeIndex),
+      name: transformName,
       args: {
-        colName: this.props.newName,
+        transformCol: this.props.newName,
         text: this.state.transformText,
-        newNames: this.state.splitNewNames,
-        mergeNewName: this.state.mergeNewName,
-        oldName: this.state.mergeOldName,
+        splitNames: this.state.splitNames,
+        mergeNames: this.state.mergeNames,
       }
     });
 
-    Actions.addTransform(
-      {
-        name: this.props.transformTypes.get(this.state.transformTypeIndex),
-        args: {
-          colName: this.props.newName,
-          text: this.state.transformText,
+    if (transformName === 'append' || transformName === 'prepend')
+    {
+      Actions.addTransform(
+        {
+          name: transformName,
+          args: {
+            colName: this.props.newName,
+            text: this.state.transformText,
+          }
         }
-      }
-    );
+      );
+    }
+    else if (transformName === 'split')
+    {
+      Actions.addTransform(
+        {
+          name: transformName,
+          args: {
+            oldName: this.props.newName,
+            newName: this.state.splitNames,
+            text: this.state.transformText,
+          }
+        }
+      );
+    }
+    else if (transformName === 'merge')
+    {
+      Actions.addTransform(
+        {
+          name: transformName,
+          args: {
+            oldName: [this.props.newName, this.state.mergeNames[0]],
+            newName: this.state.mergeNames[1],
+            text: this.state.transformText,
+          }
+        }
+      );
+    }
 
     this.setState({
       transformText: '',
@@ -185,14 +207,14 @@ class TransformBox extends Classs<Props>
               this.props.transformTypes.get(this.state.transformTypeIndex) === 'split' &&
               <div>
                 <Autocomplete
-                  value={this.state.splitNewNames[0]}
+                  value={this.state.splitNames[0]}
                   options={null}
                   onChange={this.handleSplitNameAChange}
                   placeholder={'new column 1'}
                   disabled={false}
                 />
                 <Autocomplete
-                  value={this.state.splitNewNames[1]}
+                  value={this.state.splitNames[1]}
                   options={null}
                   onChange={this.handleSplitNameBChange}
                   placeholder={'new column 2'}
@@ -204,14 +226,14 @@ class TransformBox extends Classs<Props>
               this.props.transformTypes.get(this.state.transformTypeIndex) === 'merge' &&
               <div>
                 <Autocomplete
-                  value={this.state.mergeNewName}
+                  value={this.state.mergeNames[1]}
                   options={null}
                   onChange={this.handleMergeNewNameChange}
                   placeholder={'new column name'}
                   disabled={false}
                 />
                 <Autocomplete
-                  value={this.state.mergeOldName}
+                  value={this.state.mergeNames[0]}
                   options={null}
                   onChange={this.handleMergeOldNameChange}
                   placeholder={'column to merge'}

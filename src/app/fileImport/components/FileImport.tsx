@@ -45,14 +45,14 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as FileImportTypes from './../FileImportTypes';
+import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
 import FileImportInfo from './FileImportInfo';
 import FileImportStore from './../data/FileImportStore';
-import FileImportTypes from './../FileImportTypes';
 import PureClasss from './../../common/components/PureClasss';
 import FileImportPreview from './FileImportPreview';
 import SchemaStore from './../../schema/data/SchemaStore';
-import SchemaTypes from './../../schema/SchemaTypes';
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
