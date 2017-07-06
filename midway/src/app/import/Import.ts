@@ -298,20 +298,6 @@ export class Import
     }
     return payload;
   }
-  /* return ES type from type specification format of ImportConfig
-   * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
-  private _getESType(typeObject: object, withinArray: boolean = false): string
-  {
-    switch (typeObject['type'])
-    {
-      case 'array':
-        return this._getESType(typeObject['innerType'], true);
-      case 'object':
-        return withinArray ? 'nested' : 'object';
-      default:
-        return typeObject['type'];
-    }
-  }
 
   /* check for conflicts with existing schema, return error (string) if there is one
    * filters out fields already present in the existing mapping (since they don't need to be inserted)
@@ -452,14 +438,10 @@ export class Import
           colParser: columnParsers,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
-          winston.info('hello');
-          winston.info(JSON.stringify(jsonArrObj));
           const nameToType: object = this._includedNamesToType(imprt);
-          winston.info('about to start check');
           const typeError: string = this._checkTypes(jsonArrObj, nameToType);
           if (typeError === '')
           {
-            winston.info('finished check');
             resolve(jsonArrObj);
           } else
           {
@@ -542,7 +524,6 @@ export class Import
             }
             try
             {
-              winston.info('attempting to parse: ' + String(item));
               return JSON.parse(item);
             } catch (e)
             {
@@ -627,6 +608,77 @@ export class Import
     }
     return true;
   }
+  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
+  private _isTypeConsistent(arr: object[]): boolean
+  {
+    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
+  }
+  private _isTypeConsistentHelper(arr: object[]): string
+  {
+    const types: Set<string> = new Set();
+    arr.forEach((obj) =>
+    {
+      types.add(this._getType(obj));
+    });
+    if (types.size !== 1)
+    {
+      return 'inconsistent';
+    }
+    const type: string = types.entries().next().value[0];
+    if (type === 'array')
+    {
+      const innerTypes: Set<string> = new Set();
+      arr.forEach((obj) =>
+      {
+        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
+      });
+      if (innerTypes.size !== 1)
+      {
+        return 'inconsistent';
+      }
+      return innerTypes.entries().next().value[0];
+    }
+    return type;
+  }
+  private _getType(obj: object): string
+  {
+    if (typeof obj === 'object')
+    {
+      if (obj === null)
+      {
+        return 'null';
+      }
+      if (obj instanceof Date)
+      {
+        return 'date';
+      }
+      if (Array.isArray(obj))
+      {
+        return 'array';
+      }
+    }
+    if (typeof obj === 'string')
+    {
+      return 'text';
+    }
+    // handles "number", "boolean", "object", and "undefined" cases
+    return typeof obj;
+  }
+  /* return ES type from type specification format of ImportConfig
+   * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
+  private _getESType(typeObject: object, withinArray: boolean = false): string
+  {
+    switch (typeObject['type'])
+    {
+      case 'array':
+        return this._getESType(typeObject['innerType'], true);
+      case 'object':
+        return withinArray ? 'nested' : 'object';
+      default:
+        return typeObject['type'];
+    }
+  }
+
   /* return the target hash an object with the specified field names and types should have
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _buildDesiredHash(nameToType: object): string
@@ -683,62 +735,6 @@ export class Import
       }
     }
     return structStr;
-  }
-  private _getType(obj: object): string
-  {
-    if (typeof obj === 'object')
-    {
-      if (obj === null)
-      {
-        return 'null';
-      }
-      if (obj instanceof Date)
-      {
-        return 'date';
-      }
-      if (Array.isArray(obj))
-      {
-        return 'array';
-      }
-    }
-    if (typeof obj === 'string')
-    {
-      return 'text';
-    }
-    // handles "number", "boolean", "object", and "undefined" cases
-    return typeof obj;
-  }
-  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
-  private _isTypeConsistent(arr: object[]): boolean
-  {
-    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
-  }
-  private _isTypeConsistentHelper(arr: object[]): string
-  {
-    const types: Set<string> = new Set();
-    arr.forEach((obj) =>
-    {
-      types.add(this._getType(obj));
-    });
-    if (types.size !== 1)
-    {
-      return 'inconsistent';
-    }
-    const type: string = types.entries().next().value[0];
-    if (type === 'array')
-    {
-      const innerTypes: Set<string> = new Set();
-      arr.forEach((obj) =>
-      {
-        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
-      });
-      if (innerTypes.size !== 1)
-      {
-        return 'inconsistent';
-      }
-      return innerTypes.entries().next().value[0];
-    }
-    return type;
   }
 
   private _includedNamesToType(imprt: ImportConfig): object
