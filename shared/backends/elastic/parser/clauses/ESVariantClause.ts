@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 
 import ESClause from './ESClause';
 import ESClauseType from '../ESClauseType';
@@ -99,8 +99,10 @@ export default class ESVariantClause extends ESClause
   
   public getCard()
   {
+    // TODO try an inline approach
+    
     return this.seedCard({
-      cards: Immutable.List([]),
+      cards: List([]),
       
       static: 
       {
@@ -109,7 +111,7 @@ export default class ESVariantClause extends ESClause
         {
           return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
-        accepts: Immutable.List(
+        accepts: List(
           _.map(
             this.subtypes,
             (type: string, jsonType: string) =>

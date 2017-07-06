@@ -128,7 +128,7 @@ class SpecializedCreateCardTool extends PureClasss<Props>
   {
     return (
       <CreateCardTool
-        index={0}
+        index={null}
         keyPath={this.props.keyPath}
         canEdit={this.props.canEdit}
         language={this.props.language}
