@@ -44,36 +44,105 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import * as Immutable from 'immutable';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { Card } from '../../../../../shared/blocks/types/Card';
+import PureClasss from '../../../common/components/PureClasss';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
+
+import CreateCardTool from './CreateCardTool';
 
 export interface Props
 {
-  key: string;
-  items: object[];
+  keyPath: KeyPath;
+  data: Card;
+  canEdit: boolean;
+  helpOn: boolean;
+  className: string;
+  onChange: (keyPath: KeyPath, value: any, notDirty: boolean) => void;
+  // builderState: d.requiresBuilderState && BuilderStore.getState(),
+  language: string;
 }
 
-class PreviewRow extends Classs<Props>
+const emptyList = Immutable.List([]);
+
+class SpecializedCreateCardTool extends PureClasss<Props>
 {
-  public shouldComponentUpdate(nextProps: Props)
+  state: {
+    options?: List<{
+      text: string;
+      type: string;
+    }>;
+    open: boolean,
+  };
+
+  constructor(props: Props)
   {
-    return this.props.items !== nextProps.items;
+    super(props);
+    this.state = {
+      options: this.getOptions(this.props),
+      open: false,
+    };
+  }
+
+  public getOptions(props: Props)
+  {
+    const options = props.data['getChildOptions'](props.data);
+
+    if (this.state && options.equals(this.state.options))
+    {
+      return this.state.options;
+    }
+
+    return options;
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.data !== this.props.data)
+    {
+      this.setState({
+        options: this.getOptions(nextProps),
+      });
+    }
+  }
+
+  public onClick(index: number)
+  {
+    const option = this.state.options.get(index);
+    const card = this.props.data['childOptionClickHandler'](
+      this.props.data, option
+    );
+
+    Actions.change(
+      this.props.keyPath,
+      card,
+    );
   }
 
   public render()
   {
-    const row = Object.keys(this.props.items).map((key) =>
-      <td key={key}>{this.props.items[key]}</td>
-    );
-
     return (
-      <tr>{row}</tr>
+      <CreateCardTool
+        index={0}
+        keyPath={this.props.keyPath}
+        canEdit={this.props.canEdit}
+        language={this.props.language}
+        className={this.props.className}
+        accepts={emptyList}
+
+        open={this.state.open}
+        onToggle={this._toggle('open')}
+
+        overrideText={this.state.options}
+        overrideClick={this.onClick}
+      />
     );
   }
 }
 
-export default PreviewRow;
+export default SpecializedCreateCardTool;

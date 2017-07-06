@@ -56,9 +56,9 @@ const FileImportActionTypes =
     changePrimaryKey: '',
     chooseFile: '',
     uploadFile: '',
-    setColumnsToInclude: '',
-    setColumnNames: '',
-    setColumnTypes: '',
+    setColumnToInclude: '',
+    setColumnName: '',
+    setColumnType: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

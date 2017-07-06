@@ -44,27 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-
-/**
- * A clause which is a number
- */
-export default class ESNumberClause extends ESClause
+export function dbTableErrorCheck(dbText: string, tableText: string): string
 {
-  public constructor(type: string, settings: any)
+  if (dbText === '' || tableText === '')
   {
-    super(type, settings);
+    return 'Database and table names cannot be empty strings';
   }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  if (dbText !== dbText.toLowerCase())
   {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'number')
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be a number.');
-    }
+    return 'Database may not contain uppercase letters';
   }
+  if (!/^[a-z\d].*$/.test(dbText))
+  {
+    return 'Database name must start with a lowercase letter or digit';
+  }
+  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(dbText))
+  {
+    return 'Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses';
+  }
+  if (/^_.*/.test(tableText))
+  {
+    return 'Table name may not start with an underscore';
+  }
+  return '';
 }

@@ -45,29 +45,24 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 
-export namespace RoleTypes
-{
-  const _Role = Immutable.Record(
-    {
-      groupId: '',
-      userId: '',
-      admin: false,
-      builder: false,
-    });
-  export class Role extends _Role
+const _Role = Immutable.Record(
   {
-    public groupId: ID;
-    public userId: string;
-    public admin: boolean;
-    public builder: boolean;
-  }
-  // { { userId: Role }
-  export type GroupRoleMap = Immutable.Map<ID, Role>;
-  // { groupId: { userId: Role }}
-  export type RoleMap = Immutable.Map<ID, GroupRoleMap>;
-
-  // if
-  // roles.getIn([groupId, userId])
+    groupId: '',
+    userId: '',
+    admin: false,
+    builder: false,
+  });
+export class Role extends _Role
+{
+  public groupId: ID;
+  public userId: string;
+  public admin: boolean;
+  public builder: boolean;
 }
+// { { userId: Role }
+export type GroupRoleMap = Immutable.Map<ID, Role>;
+// { groupId: { userId: Role }}
+export type RoleMap = Immutable.Map<ID, GroupRoleMap>;
 
-export default RoleTypes;
+// if
+// roles.getIn([groupId, userId])

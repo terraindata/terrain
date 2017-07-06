@@ -43,85 +43,32 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as $ from 'jquery';
-import * as Immutable from 'immutable';
-import * as React from 'react';
-import * as _ from 'underscore';
-import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
-import Autocomplete from './../../common/components/Autocomplete';
-import CheckBox from './../../common/components/CheckBox';
-import Dropdown from './../../common/components/Dropdown';
-import Actions from './../data/FileImportActions';
-import './PreviewColumn.less';
 
-export interface Props
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
+import ESClause from './ESClause';
+
+/**
+ * A clause which can be a specific terminal type
+ */
+export default class ESTerminalClause extends ESClause
 {
-  key: string;
-  id: string;
-  isIncluded: boolean;
-  name: string;
-  typeIndex: number;
-  isPrimaryKey: boolean;
+  private jsonType: ESJSONType;
 
-  types: List<string>;
-  canSelectType: boolean;
-  canSelectColumn: boolean;
-}
-
-class PreviewColumn extends Classs<Props>
-{
-  public handleIncludedChange()
+  public constructor(type: string,
+    settings: any,
+    clauseType: ESClauseType,
+    jsonType: ESJSONType)
   {
-    Actions.setColumnsToInclude(this.props.id);
+    super(type, settings, clauseType);
+    this.jsonType = jsonType;
   }
 
-  public handleAutocompleteHeaderChange(value)
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    Actions.setColumnNames(this.props.id, value);
-  }
-
-  public handleTypeChange(typeIndex)
-  {
-    Actions.setColumnTypes(this.props.id, typeIndex);
-  }
-
-  public handlePrimaryKeyChange()
-  {
-    Actions.changePrimaryKey(this.props.id);
-  }
-
-  public render()
-  {
-    return (
-      <th>
-        include
-        <CheckBox
-          checked={this.props.isIncluded}
-          onChange={this.handleIncludedChange}
-        />
-        primary key
-        <CheckBox
-          checked={this.props.isPrimaryKey}
-          onChange={this.handlePrimaryKeyChange}
-        />
-        <Autocomplete
-          value={this.props.name}
-          options={null}
-          onChange={this.handleAutocompleteHeaderChange}
-          placeholder={this.props.id}
-          disabled={!this.props.canSelectColumn}
-        />
-        <Dropdown
-          selectedIndex={this.props.typeIndex}
-          options={this.props.types}
-          onChange={this.handleTypeChange}
-          canEdit={this.props.canSelectType}
-        />
-      </th>
-    );
+    valueInfo.clause = this;
+    this.typeCheck(interpreter, valueInfo, this.jsonType);
   }
 }
-
-export default PreviewColumn;

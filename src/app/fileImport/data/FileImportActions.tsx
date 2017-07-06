@@ -52,8 +52,8 @@ const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, paylo
 const FileImportActions =
   {
     changeServer:
-    (connectionId: number) =>
-      $(ActionTypes.changeServer, { connectionId }),
+    (connectionId: number, name: string) =>
+      $(ActionTypes.changeServer, { connectionId, name }),
 
     changeDbText:
     (dbText: string) =>
@@ -79,17 +79,17 @@ const FileImportActions =
     () =>
       $(ActionTypes.uploadFile, {}),
 
-    setColumnsToInclude:
+    setColumnToInclude:
     (id: string) =>
-      $(ActionTypes.setColumnsToInclude, { id }),
+      $(ActionTypes.setColumnToInclude, { id }),
 
-    setColumnNames:
+    setColumnName:
     (id: string, columnName: string) =>
-      $(ActionTypes.setColumnNames, { id, columnName }),
+      $(ActionTypes.setColumnName, { id, columnName }),
 
-    setColumnTypes:
+    setColumnType:
     (id: string, typeIndex: number) =>
-      $(ActionTypes.setColumnTypes, { id, typeIndex }),
+      $(ActionTypes.setColumnType, { id, typeIndex }),
   };
 
 export default FileImportActions;

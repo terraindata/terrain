@@ -51,7 +51,7 @@ import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 
 import LibraryStore from '../../library/data/LibraryStore';
-import LibraryTypes from '../../library/LibraryTypes';
+import * as LibraryTypes from '../../library/LibraryTypes';
 
 const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');

@@ -12,13 +12,14 @@
             "./node_modules/@types"
         ],
         "experimentalDecorators": true,
-        "allowJs": true,
         "declaration": false,
         "outDir": "./build/"
     },
     "exclude": [
+        "**/*bundle*.js",
         "node_modules",
         "midway",
-        "build"
+        "build",
+        "coverage"
     ]
 }

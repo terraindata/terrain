@@ -46,19 +46,20 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as Papa from 'papaparse';
-import PureClasss from './../../common/components/PureClasss';
+import * as SchemaTypes from '../../schema/SchemaTypes';
+import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
+import PureClasss from './../../common/components/PureClasss';
 import CheckBox from './../../common/components/CheckBox';
 import Actions from './../data/FileImportActions';
-import SchemaTypes from '../../schema/SchemaTypes';
-import Autocomplete from './../../common/components/Autocomplete';
 import Util from './../../util/Util';
+import { dbTableErrorCheck } from "../../../../shared/fileImport/Util";
+const { List } = Immutable;
 
 export interface Props
 {
   canSelectServer: boolean;
   servers: SchemaTypes.ServerMap;
-  serverNames: List<string>;
 
   canSelectDb: boolean;
   dbs: List<string>;
@@ -96,8 +97,8 @@ class FileImportInfo extends PureClasss<Props>
       serverIndex,
       serverSelected: true,
     });
-    const key = this.props.serverNames.get(serverIndex);
-    Actions.changeServer(this.props.servers.get(key).connectionId);
+    const serverName = this.props.servers.keySeq().toList().get(serverIndex);
+    Actions.changeServer(this.props.servers.get(serverName).connectionId, serverName);
   }
 
   public handleAutocompleteDbChange(value)
@@ -124,7 +125,6 @@ class FileImportInfo extends PureClasss<Props>
   public parseData(file: string, filetype: string): object[]
   {
     // TODO: read JSON line by line and return items
-    const preview = [];
     let items = [];
 
     if (filetype === 'json')
@@ -178,29 +178,21 @@ class FileImportInfo extends PureClasss<Props>
       }
     }
 
-    for (let i = 0; i < Math.min(items.length, this.props.previewRowsCount); i++)
-    {
-      preview.push(items[i]);
-    }
-    return preview;
+    items.splice(this.props.previewRowsCount, items.length - this.props.previewRowsCount);
+    return items;
   }
 
   public handleChooseFile(file)
   {
-    // TODO: Stop browser caching input file
-    if (!file.target.files[0])
+    const fileSelected = !!file.target.files[0];
+    this.setState({
+      fileSelected,
+    });
+    if (!fileSelected)
     {
-      this.setState({
-        fileSelected: false,
-      });
       return;
     }
-    else
-    {
-      this.setState({
-        fileSelected: true,
-      });
-    }
+
 
     const filetype = file.target.files[0].name.split('.').pop();
     if (this.props.validFiletypes.indexOf(filetype) === -1)
@@ -218,6 +210,7 @@ class FileImportInfo extends PureClasss<Props>
       const preview = this.parseData(fr.result, filetype);
 
       Actions.chooseFile(fr.result, filetype, preview);
+      this.refs['file']['value'] = null;
     }
   }
 
@@ -248,29 +241,11 @@ class FileImportInfo extends PureClasss<Props>
       alert('Please select a table');
       return;
     }
-    if (this.props.dbText === '' || this.props.tableText === '')
+
+    const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
+    if (msg)
     {
-      alert('Database and table names cannot be empty strings');
-      return;
-    }
-    if (this.props.dbText !== this.props.dbText.toLowerCase())
-    {
-      alert('Database may not contain uppercase letters');
-      return;
-    }
-    if (!/^[a-z\d].*$/.test(this.props.dbText))
-    {
-      alert('Database name must start with a lowercase letter or digit');
-      return;
-    }
-    if (!/^[a-z\d][a-z\d\._\+-]*$/.test(this.props.dbText))
-    {
-      alert('Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses');
-      return;
-    }
-    if (/^_.*/.test(this.props.tableText))
-    {
-      alert('Table name may not start with an underscore');
+      alert(msg);
       return;
     }
 
@@ -284,7 +259,7 @@ class FileImportInfo extends PureClasss<Props>
     return (
       <div>
         <div>
-          <input ref="file" type="file" onChange={this.handleChooseFile} />
+          <input ref="file" type="file" name="abc" onChange={this.handleChooseFile} />
           has header row (csv only)
           <CheckBox
             checked={this.props.hasCsvHeader}
@@ -297,7 +272,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Dropdown
             selectedIndex={this.state.serverIndex}
-            options={this.props.serverNames}
+            options={this.props.servers ? this.props.servers.keySeq().toList() : List<string>()}
             onChange={this.handleServerChange}
             canEdit={canSelectServer}
           />
@@ -308,7 +283,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Autocomplete
             value={this.props.dbText}
-            options={this.props.dbs}
+            options={this.props.dbs || List([])}
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={!canSelectDb}
@@ -320,7 +295,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Autocomplete
             value={this.props.tableText}
-            options={this.props.tables}
+            options={this.props.tables || List([])}
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={!canSelectTable}

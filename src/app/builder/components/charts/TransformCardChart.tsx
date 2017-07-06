@@ -49,7 +49,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import PureClasss from '../../../common/components/PureClasss';
 import Util from '../../../util/Util';
 

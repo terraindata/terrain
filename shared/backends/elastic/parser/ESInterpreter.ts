@@ -47,9 +47,9 @@ THE SOFTWARE.
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
 import ESParserError from './ESParserError';
-import ESParserToken from './ESParserToken';
-import ESParserPropertyInfo from './ESPropertyInfo';
 import ESValueInfo from './ESValueInfo';
+
+export const ESInterpreterDefaultConfig = new EQLConfig();
 
 /**
  * An instrumented interpreter that takes the output of ESJSONParser and
@@ -66,7 +66,7 @@ export default class ESInterpreter
    * to run the interpreter on it's result.
    * @param query the query string or parser to interpret
    */
-  public constructor(query: string | ESJSONParser, config: EQLConfig)
+  public constructor(query: string | ESJSONParser, config: EQLConfig = ESInterpreterDefaultConfig)
   {
     this.config = config;
 
@@ -92,6 +92,11 @@ export default class ESInterpreter
 
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
-    this.parser.accumulateError(new ESParserError(info.tokens[0], message, isWarning));
+    this.parser.accumulateError(new ESParserError(info.tokens[0], info, message, isWarning));
+  }
+
+  public hasError()
+  {
+    return this.parser === null || this.parser.hasError();
   }
 }

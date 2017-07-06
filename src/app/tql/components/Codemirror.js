@@ -71,6 +71,8 @@ var CodeMirror = React.createClass({
     hideTermDefinition: React.PropTypes.func,
     highlightedLine: React.PropTypes.number,
 
+    onCodeMirrorMount: React.PropTypes.func,
+
     isDiff: React.PropTypes.bool,
     diff: React.PropTypes.string,
 
@@ -119,6 +121,7 @@ var CodeMirror = React.createClass({
       this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
       this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
       this.codeMirror.setSize("100%", "100%");
+      this.props.onCodeMirrorMount && this.props.onCodeMirrorMount(this.codeMirror);
     }
   },
 

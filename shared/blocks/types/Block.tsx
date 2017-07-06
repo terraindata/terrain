@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
 
-export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object);
-export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object);
+export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
+export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);
 export type TQLStringFn = string | ((block: Block) => string);
 export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
 

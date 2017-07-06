@@ -48,7 +48,7 @@ const { Map, List } = Immutable;
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import Block from '../../../../../shared/blocks/types/Block';
 import { Card, CardString } from '../../../../../shared/blocks/types/Card';
 import { M1QueryResponse } from '../../../util/AjaxM1';

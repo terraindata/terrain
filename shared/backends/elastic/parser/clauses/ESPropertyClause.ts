@@ -44,22 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 /**
- * A clause which can be any valid JSON value
+ * A clause that is a property name
  */
-export default class ESAnyClause extends ESClause
+export default class ESPropertyClause extends ESStringClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
+    super(type, settings, ESClauseType.ESPropertyClause);
   }
 }

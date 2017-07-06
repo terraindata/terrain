@@ -44,10 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
  * A clause which can only take on a restricted set of values.
@@ -59,7 +60,7 @@ export default class ESEnumClause extends ESClause
 
   public constructor(type: string, values: any[], settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESEnumClause);
 
     this.values = values;
     this.valueMap = new Map();

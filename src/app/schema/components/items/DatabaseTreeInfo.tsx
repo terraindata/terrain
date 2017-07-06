@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import SchemaTypes from '../../SchemaTypes';
+import * as SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import PureClasss from './../../../common/components/PureClasss';
 import Radium = require('radium');

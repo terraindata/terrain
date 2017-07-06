@@ -53,7 +53,7 @@ import PureClasss from './../../common/components/PureClasss';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
 import Actions from './../data/LibraryActions';
-import LibraryTypes from './../LibraryTypes';
+import * as LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
 

@@ -48,7 +48,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as CommonElastic from '../syntax/CommonElastic';
 
-import BlockUtils from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
@@ -108,8 +108,13 @@ class CardsToElastic
     // return q;
   }
 
-  public static blockToElastic(block: Block, options: Options = {}): string | object
+  public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
   {
+    if (typeof block !== 'object')
+    {
+      return block;
+    }
+
     if (block && block.static.tql)
     {
       const tql = block.static.tql as TQLRecursiveObjectFn;

@@ -43,44 +43,69 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as Immutable from 'immutable';
+import * as React from 'react';
+import * as FileImportTypes from './../FileImportTypes';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
+import PureClasss from './../../common/components/PureClasss';
+import FileImportPreviewColumn from './FileImportPreviewColumn';
+import FileImportPreviewRow from './FileImportPreviewRow';
+import './FileImportPreview.less';
+const { List } = Immutable;
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-
-/**
- * A clause that corresponds to an array of uniform type.
- */
-export default class ESArrayClause extends ESClause
+export interface Props
 {
-  public elementID: string;
-
-  public constructor(type: string, elementID: string, settings: any)
-  {
-    super(type, settings);
-    this.elementID = elementID;
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-
-    const value: any = valueInfo.value;
-    if (!Array.isArray(value))
-    {
-      interpreter.accumulateError(
-        valueInfo, 'Clause must be an array, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    // mark children
-    const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    const children: ESValueInfo[] = valueInfo.arrayChildren;
-    children.forEach(
-      (element: ESValueInfo): void =>
-      {
-        childClause.mark(interpreter, element);
-      });
-  }
-
+  previewRows: object[];
+  columnsCount: number;
+  primaryKey: string;
+  columnsToInclude: IMMap<string, boolean>;
+  columnNames: IMMap<string, string>;
+  columnTypes: IMMap<string, number>;
+  columnOptions: List<string>;
 }
+
+class FileImportPreview extends PureClasss<Props>
+{
+  public render()
+  {
+    return (
+      <table>
+        <thead>
+          <tr>
+            {
+              this.props.columnNames.map((value, key) =>
+                <FileImportPreviewColumn
+                  key={key}
+                  id={key}
+                  isIncluded={this.props.columnsToInclude.get(key)}
+                  name={this.props.columnNames.get(key)}
+                  typeIndex={this.props.columnTypes.get(key)}
+                  types={List(FileImportTypes.ELASTIC_TYPES)}
+                  canSelectType={true}
+                  canSelectColumn={true}
+                  isPrimaryKey={this.props.primaryKey === value}
+                  columnOptions={this.props.columnOptions}
+                />
+              ).toArray()
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            this.props.previewRows.map((items, key) =>
+              <FileImportPreviewRow
+                key={key}
+                items={items}
+              />
+            )
+          }
+        </tbody>
+      </table>
+    );
+  }
+}
+
+export default FileImportPreview;

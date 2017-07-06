@@ -42,29 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.id
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
 /**
- * A clause which is a null
+ * A clause which is a boolean
  */
-export default class ESNullClause extends ESClause
+export default class ESBooleanClause extends ESTerminalClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (value !== null)
-    {
-      interpreter.accumulateError(valueInfo, 'This value should be null.');
-    }
+    super(type, settings, ESClauseType.ESBooleanClause, ESJSONType.boolean);
   }
 }

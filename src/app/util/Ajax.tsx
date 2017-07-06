@@ -55,8 +55,8 @@ import LibraryStore from '../library/data/LibraryStore';
 import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
-import LibraryTypes from './../library/LibraryTypes';
-import UserTypes from './../users/UserTypes';
+import * as LibraryTypes from './../library/LibraryTypes';
+import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
 
@@ -218,7 +218,7 @@ export const Ajax =
         }
         catch (e)
         {
-          ;
+
         }
       }
       else if (config.urlArgs)
@@ -461,6 +461,14 @@ export const Ajax =
         {
           onLoad(variantItem as LibraryTypes.Variant);
         },
+        (error) =>
+        {
+          if (error as any === 'Nothing found')
+          {
+            onLoad(null);
+          }
+        },
+
       );
       // }
       // TODO
@@ -562,7 +570,10 @@ export const Ajax =
           {
             onLoad(null, v);
           }
-          onLoad(v.query, v);
+          else
+          {
+            onLoad(v.query, v);
+          }
         },
       );
     },
@@ -677,9 +688,9 @@ export const Ajax =
       db: string,
       table: string,
       connectionId: number,
-      columnNames: Map<string, string> | List<string>,
-      columnsToInclude: Map<string, boolean> | List<boolean>,
-      columnTypes: Immutable.Map<string, string> | List<string>,
+      columnNames: IMMap<string, string> | Immutable.List<string>,
+      columnsToInclude: IMMap<string, boolean> | Immutable.List<boolean>,
+      columnTypes: IMMap<string, string> | Immutable.List<string>,
       primaryKey: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
@@ -698,7 +709,7 @@ export const Ajax =
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
       };
-      console.log("payload: ", payload);
+      console.log('payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
