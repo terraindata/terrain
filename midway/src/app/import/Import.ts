@@ -578,6 +578,7 @@ export class Import
         ind++;
         continue;
       }
+      winston.info('checktypes: hashes do not match');
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
         return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
@@ -586,25 +587,51 @@ export class Import
       {
         if (obj.hasOwnProperty(key) && obj[key] !== null)
         {
-          const thisType: string = this._getType(obj[key]);
-          if (thisType === 'number' && this.numericTypes.has(nameToType[key]['type']))
-          {
-            continue;
-          }
-          if (nameToType[key]['type'] !== thisType)
+          if (!this._checkTypesHelper(obj[key], nameToType[key]))
           {
             return 'Field "' + key + '" of object number ' + String(ind) +
-              ' does not match the specified type: ' + String(nameToType[key]['type']);
-          }
-          if (thisType === 'array')
-          {
-            // TODO: (recursively) check all array elements are of the same type, and the correct one
+              ' does not match the specified type: ' + JSON.stringify(nameToType[key]);
           }
         }
       }
       ind++;
     }
+
+    // check that all elements of arrays are of the same type
+    for (const field of Object.keys(nameToType))
+    {
+      if (nameToType[field]['type'] === 'array')
+      {
+        ind = 0;
+        for (const obj of items)
+        {
+          if (!this._isTypeConsistent(obj[field]))
+          {
+            return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
+          }
+          ind++;
+        }
+      }
+    }
     return '';
+  }
+  /* manually checks types (rather than checking hashes) ; handles arrays recursively */
+  private _checkTypesHelper(item: object, typeObj: object): boolean
+  {
+    const thisType: string = this._getType(item);
+    if (thisType === 'number' && this.numericTypes.has(typeObj['type']))
+    {
+      return true;
+    }
+    if (typeObj['type'] !== thisType)
+    {
+      return false;
+    }
+    if (thisType === 'array')
+    {
+      return this._checkTypesHelper(item[0], typeObj['innerType']);
+    }
+    return true;
   }
   /* return the target hash an object with the specified field names and types should have
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
@@ -685,6 +712,38 @@ export class Import
     }
     // handles "number", "boolean", "object", and "undefined" cases
     return typeof obj;
+  }
+  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
+  private _isTypeConsistent(arr: object[]): boolean
+  {
+    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
+  }
+  private _isTypeConsistentHelper(arr: object[]): string
+  {
+    const types: Set<string> = new Set();
+    arr.forEach((obj) =>
+    {
+      types.add(this._getType(obj));
+    });
+    if (types.size !== 1)
+    {
+      return 'inconsistent';
+    }
+    const type: string = types.entries().next().value[0];
+    if (type === 'array')
+    {
+      const innerTypes: Set<string> = new Set();
+      arr.forEach((obj) =>
+      {
+        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
+      });
+      if (innerTypes.size !== 1)
+      {
+        return 'inconsistent';
+      }
+      return innerTypes.entries().next().value[0];
+    }
+    return type;
   }
 
   // private _getArrayFromMap(mapOrArray: object | string[]): string[]
