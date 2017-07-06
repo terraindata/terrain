@@ -43,26 +43,40 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as React from 'react';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
-const Redux = require('redux');
-import Util from './../../util/Util';
+import Util from '../../util/Util';
+import PureClasss from './../../common/components/PureClasss';
 
-const DefaultState = FileImportTypes._FileImportState();
+export interface Props
+{
+  items: object;
+}
 
-import FileImportReducers from './FileImportReducers';
-
-export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
-  (state: FileImportTypes.FileImportState = DefaultState, action) =>
+class FileImportPreviewRow extends PureClasss<Props>
+{
+  public shouldComponentUpdate(nextProps: Props)
   {
-    if (FileImportReducers[action.type])
-    {
-      state = FileImportReducers[action.type](state, action);
-    }
-
-    return state;
+    return this.props.items !== nextProps.items;
   }
-  , DefaultState);
 
-export default FileImportStore;
+  public render()
+  {
+    const row = Object.keys(this.props.items).map((key) =>
+      <td key={key}>
+        {
+          this.props.items[key]
+        }
+      </td>
+    );
+
+    return (
+      <tr>{row}</tr>
+    );
+  }
+}
+
+export default FileImportPreviewRow;
