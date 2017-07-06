@@ -83,14 +83,18 @@ export default class ESMapClause extends ESClause
     }
 
     // mark properties
-    const childClause: ESClause = interpreter.config.getClause(this.valueType);
+    const nameClause: ESClause = interpreter.config.getClause(this.nameType);
+    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
+
     valueInfo.forEachProperty((viTuple: ESPropertyInfo): void =>
     {
-      interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
+      viTuple.propertyName.clause = nameClause;
+      // interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
 
       if (viTuple.propertyValue !== null)
       {
-        childClause.mark(interpreter, viTuple.propertyValue);
+        viTuple.propertyValue.clause = valueClause;
+        // childClause.mark(interpreter, viTuple.propertyValue);
       }
     });
   }

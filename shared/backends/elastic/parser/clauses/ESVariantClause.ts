@@ -75,8 +75,6 @@ export default class ESVariantClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.parentClause = this;
-
     const valueType: string = ESJSONType[valueInfo.jsonType];
 
     const subtype: string | undefined = this.subtypes[valueType];
@@ -89,6 +87,11 @@ export default class ESVariantClause extends ESClause
       return;
     }
 
-    interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
+    const subclause: ESClause = interpreter.config.getClause(subtype);
+
+    valueInfo.parentClause = this;
+    valueInfo.clause = subclause;
+
+    subclause.mark(interpreter, valueInfo);
   }
 }

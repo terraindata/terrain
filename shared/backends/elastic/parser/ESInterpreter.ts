@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as winston from 'winston';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
@@ -92,7 +93,19 @@ export default class ESInterpreter
     {
       try
       {
-        this.config.getClause('root').mark(this, this.parser.getValueInfo());
+        // this.config.getClause('root').mark(this, this.parser.getValueInfo());
+
+        const root: ESValueInfo = this.parser.getValueInfo();
+        root.clause = this.config.getClause('root');
+        root.recursivelyVisit(
+          (info: ESValueInfo): void =>
+          {
+            winston.info('visiting ' + info.tokens[0].substring);
+            if (info.clause !== null)
+            {
+              info.clause.mark(this, info);
+            }
+          });
       } catch (e)
       {
         this.accumulateError(this.parser.getValueInfo(), 'Failed to mark the json object ' + String(e.message));
@@ -102,6 +115,6 @@ export default class ESInterpreter
 
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
-    this.parser.accumulateError(new ESParserError(info.tokens[0], info, message, isWarning));
+    this.parser.accumulateErrorOnValueInfo(info, message, isWarning);
   }
 }

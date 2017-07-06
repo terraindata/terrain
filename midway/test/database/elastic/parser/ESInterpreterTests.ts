@@ -91,7 +91,7 @@ function testParse(testString: string,
   const interpreter: ESInterpreter = new ESInterpreter(testString, config);
   const parser: ESJSONParser = interpreter.parser;
 
-  winston.info(util.inspect(parser.getValueInfo()));
+  winston.info(util.inspect(parser.getValueInfo(), false, 16));
 
   expect(parser.getValue()).toEqual(expectedValue);
   expect(parser.getErrors()).toEqual(expectedErrors);

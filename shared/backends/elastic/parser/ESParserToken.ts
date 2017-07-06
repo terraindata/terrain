@@ -63,7 +63,7 @@ export default class ESParserToken
   public length: number; // token length in chars
   public substring: string; // token substring
 
-  public _errors: null | ESParserError[]; // errors attached to this token
+  public _errors: null | ESParserError[]; // errors attached to this token, null if none
 
   public constructor(charNumber: number,
     row: number,

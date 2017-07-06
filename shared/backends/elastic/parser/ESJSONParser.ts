@@ -170,6 +170,11 @@ export default class ESJSONParser
     this.errors.push(error);
   }
 
+  public accumulateErrorOnValueInfo(info: ESValueInfo, message: string, isWarning: boolean = false): void
+  {
+    this.accumulateError(new ESParserError(info.tokens[0], info, message, isWarning));
+  }
+
   private peek(): string
   {
     // skip whitespace
@@ -360,7 +365,7 @@ export default class ESJSONParser
       elementInfo = this.readValue())
     {
       array.push(elementInfo.value);
-      arrayInfo.arrayChildren.push(elementInfo);
+      arrayInfo.addArrayChild(elementInfo);
 
       // read array delimiter, ','
       const propertyDelimiter: string = this.peek();
@@ -411,7 +416,7 @@ export default class ESJSONParser
 
       // install a property info into the parent object
       const propertyInfo: ESPropertyInfo = new ESPropertyInfo(nameInfo);
-      objInfo.objectChildren[propertyName] = propertyInfo;
+      objInfo.addObjectChild(propertyName, propertyInfo);
 
       // read delimiter between property name and value
       const kvpDelimiter: string = this.peek();

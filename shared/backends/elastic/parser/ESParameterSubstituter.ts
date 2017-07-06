@@ -44,41 +44,42 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClauseType from '../ESClauseType';
-import ESInterpreter from '../ESInterpreter';
-import ESJSONType from '../ESJSONType';
-import ESValueInfo from '../ESValueInfo';
-import ESClause from './ESClause';
+import ESClause from './clauses/ESClause';
+import ESParserError from './ESParserError';
+import ESValueInfo from './ESValueInfo';
+import ESJSONType from './ESJSONType';
+import ESPropertyInfo from './ESPropertyInfo';
+import ESJSONParser from './ESJSONParser';
 
 /**
- * A clause that corresponds to an array of uniform type.
+ * Substitutes values in for parameters in a query described by a tree of ESValueInfo objects
  */
-export default class ESArrayClause extends ESClause
+export default class ESParameterSubstituter
 {
-  public elementID: string;
+  private parser: ESJSONParser;
+  private params: { [name: string]: ESClause };
 
-  public constructor(type: string, elementID: string, settings: any)
+  public constructor(parser: ESJSONParser,
+    params: { [name: string]: ESClause } = {})
   {
-    super(type, settings, ESClauseType.ESArrayClause);
-    this.elementID = elementID;
-  }
+    this.parser = parser;
+    this.params = params;
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    // valueInfo.clause = this;
-    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.array))
-    {
-      return;
-    }
-
-    // mark children
-    const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    valueInfo.forEachElement(
-      (element: ESValueInfo): void =>
+    this.parser.getValueInfo().recursivelyVisit(
+      (info: ESValueInfo): void =>
       {
-        element.clause = childClause;
-        // childClause.mark(interpreter, element);
+        if (info.parameter === null)
+        {
+          return;
+        }
+
+        if (!this.params.hasOwnProperty(info.parameter))
+        {
+          parser.accumulateErrorOnValueInfo(info, 'Undefined parameter.');
+          return;
+        }
+
+        //this.ele
       });
   }
-
 }

@@ -88,18 +88,18 @@ export default class ESValueInfo
   public parentClause: ESClause | null;
 
   /**
-   * If value is an object, a corresponding object mapping keys. An empty object otherwise.
+   * If value is an object, a corresponding object mapping keys. null otherwise.
    */
   private _objectChildren: null | { [name: string]: ESPropertyInfo };
 
   /**
-   * If value is an array, a corresponding ESValueInfo[]. An empty list otherwise.
+   * If value is an array, a corresponding ESValueInfo[]. null otherwise.
    */
   private _arrayChildren: null | ESValueInfo[];
 
   /**
    * If errors were detected associated with this value, they will be in this list
-   * in the order in which they were detected.
+   * in the order in which they were detected. null otherwise.
    */
   private _errors: null | ESParserError[];
 
@@ -116,16 +116,31 @@ export default class ESValueInfo
   }
 
   /**
-   * If value is an object, a corresponding object mapping keys. An empty object otherwise.
+   * If value is an object, a corresponding object mapping keys, empty otherwise.
    */
   public get objectChildren(): { [name: string]: ESPropertyInfo }
   {
     return (this._objectChildren === null) ? {} : this._objectChildren;
   }
 
+  public addObjectChild(name: string, info: ESPropertyInfo): void
+  {
+    this._objectChildren = this.objectChildren;
+    this._objectChildren[name] = info;
+  }
+
+  /**
+   * If value is an array, a corresponding ESValueInfo[], empty otherwise.
+   */
   public get arrayChildren(): ESValueInfo[]
   {
     return (this._arrayChildren === null) ? [] : this._arrayChildren;
+  }
+
+  public addArrayChild(info: ESValueInfo): void
+  {
+    this._arrayChildren = this.arrayChildren;
+    this._arrayChildren.push(info);
   }
 
   /**
@@ -155,5 +170,25 @@ export default class ESValueInfo
   public forEachElement(func: (element: ESValueInfo) => void): void
   {
     this.arrayChildren.forEach(func);
+  }
+
+  public recursivelyVisit(func: (element: ESValueInfo) => void): void
+  {
+    func(this);
+
+    this.forEachProperty((property: ESPropertyInfo): void =>
+    {
+      property.propertyName.recursivelyVisit(func);
+
+      if (property.propertyValue !== null)
+      {
+        property.propertyValue.recursivelyVisit(func);
+      }
+    });
+
+    this.forEachElement((element: ESValueInfo): void =>
+    {
+      element.recursivelyVisit(func);
+    });
   }
 }

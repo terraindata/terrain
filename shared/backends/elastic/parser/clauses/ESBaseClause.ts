@@ -62,7 +62,7 @@ export default class ESBaseClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
+    // valueInfo.clause = this;
     switch (valueInfo.jsonType)
     {
       case ESJSONType.null:

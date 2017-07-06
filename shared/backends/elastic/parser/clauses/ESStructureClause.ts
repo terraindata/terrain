@@ -80,7 +80,7 @@ export default class ESStructureClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
+    // valueInfo.clause = this;
     this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
@@ -105,6 +105,7 @@ export default class ESStructureClause extends ESClause
         }
 
         const name: string = viTuple.propertyName.value as string;
+        viTuple.propertyName.clause = propertyClause;
 
         if (!this.structure.hasOwnProperty(name))
         {
@@ -121,9 +122,10 @@ export default class ESStructureClause extends ESClause
         }
         else
         {
-          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
-          propertyClause.mark(interpreter, viTuple.propertyName);
-          clause.mark(interpreter, viTuple.propertyValue);
+          const valueClause: ESClause = interpreter.config.getClause(this.structure[name]);
+          viTuple.propertyValue.clause = valueClause;
+          // propertyClause.mark(interpreter, viTuple.propertyName);
+          // clause.mark(interpreter, viTuple.propertyValue);
         }
       });
   }
