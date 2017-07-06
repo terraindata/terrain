@@ -75,12 +75,7 @@ export default class ESMapClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
-
-    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.object))
-    {
-      return;
-    }
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     // mark properties
     const nameClause: ESClause = interpreter.config.getClause(this.nameType);
@@ -89,12 +84,9 @@ export default class ESMapClause extends ESClause
     valueInfo.forEachProperty((viTuple: ESPropertyInfo): void =>
     {
       viTuple.propertyName.clause = nameClause;
-      // interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
-
       if (viTuple.propertyValue !== null)
       {
         viTuple.propertyValue.clause = valueClause;
-        // childClause.mark(interpreter, viTuple.propertyValue);
       }
     });
   }

@@ -65,11 +65,7 @@ export default class ESArrayClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    // valueInfo.clause = this;
-    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.array))
-    {
-      return;
-    }
+    this.typeCheck(interpreter, valueInfo, ESJSONType.array);
 
     // mark children
     const childClause: ESClause = interpreter.config.getClause(this.elementID);
@@ -77,7 +73,6 @@ export default class ESArrayClause extends ESClause
       (element: ESValueInfo): void =>
       {
         element.clause = childClause;
-        // childClause.mark(interpreter, element);
       });
   }
 

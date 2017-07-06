@@ -85,7 +85,5 @@ export default class ESEnumClause extends ESClause
           'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
       }
     }
-
-    // valueInfo.clause = this;
   }
 }

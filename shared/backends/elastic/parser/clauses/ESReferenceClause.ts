@@ -79,6 +79,5 @@ export default class ESReferenceClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
-    // valueInfo.clause = this;
   }
 }
