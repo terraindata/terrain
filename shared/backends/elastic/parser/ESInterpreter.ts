@@ -96,7 +96,7 @@ export default class ESInterpreter
         const root: ESValueInfo = this.parser.getValueInfo();
         root.clause = this.config.getClause('root');
         root.recursivelyVisit(
-          (info: ESValueInfo): void =>
+          (info: ESValueInfo): boolean =>
           {
             if (info.parameter !== undefined)
             {
@@ -104,13 +104,15 @@ export default class ESInterpreter
               {
                 this.accumulateError(info, 'Undefined parameter.');
               }
-              return; // don't validate parameters
+              return false; // don't validate parameters
             }
 
             if (info.clause !== undefined)
             {
               info.clause.mark(this, info);
             }
+
+            return true;
           });
       } catch (e)
       {

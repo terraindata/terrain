@@ -55,7 +55,6 @@ import ESPropertyInfo from './ESPropertyInfo';
  */
 export default class ESValueInfo
 {
-
   /**
    * The JSON type of the value.
    */
@@ -166,9 +165,12 @@ export default class ESValueInfo
     this.arrayChildren.forEach(func);
   }
 
-  public recursivelyVisit(func: (element: ESValueInfo) => void): void
+  public recursivelyVisit(func: (element: ESValueInfo) => boolean): void
   {
-    func(this);
+    if (!func(this))
+    {
+      return;
+    }
 
     this.forEachProperty((property: ESPropertyInfo): void =>
     {

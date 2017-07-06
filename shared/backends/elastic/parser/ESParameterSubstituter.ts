@@ -57,29 +57,30 @@ import ESJSONParser from './ESJSONParser';
 export default class ESParameterSubstituter
 {
   private parser: ESJSONParser;
-  private params: { [name: string]: ESClause };
+  private params: { [name: string]: ESValueInfo };
 
   public constructor(parser: ESJSONParser,
-    params: { [name: string]: ESClause } = {})
+    params: { [name: string]: ESValueInfo } = {})
   {
     this.parser = parser;
     this.params = params;
 
     this.parser.getValueInfo().recursivelyVisit(
-      (info: ESValueInfo): void =>
+      (info: ESValueInfo): boolean =>
       {
         if (info.parameter === null)
         {
-          return;
+          return true;
         }
 
         if (!this.params.hasOwnProperty(info.parameter))
         {
           parser.accumulateErrorOnValueInfo(info, 'Undefined parameter.');
-          return;
+          return true;
         }
 
-        //this.ele
+
+        return true;
       });
   }
 }
