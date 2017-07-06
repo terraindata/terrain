@@ -119,8 +119,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     console.log('reducer: ' + action.payload.transform.name + ', ' + action.payload.transform.args.colName + ', ' +
       action.payload.transform.args.text + ', ' + action.payload.transform.args.newNames);
 
-    const transformName = action.payload.transform.name;
-    if (transformName === 'append')
+    if (action.payload.transform.name === 'append')
     {
       const appendCol = state.columnNames.indexOf(action.payload.transform.args.colName);
 
@@ -137,7 +136,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
       return state
         .set('previewRows', List(newPreviewRows))
     }
-    else if (transformName === 'prepend')
+    else if (action.payload.transform.name === 'prepend')
     {
       const prependCol = state.columnNames.indexOf(action.payload.transform.args.colName);
 
@@ -151,10 +150,23 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
         });
         newPreviewRows.push(newRow);
       });
+      // return state.set('previewRows', List(newPreviewRows))
+      const test = state.previewRows.splice();
+      console.log(test.map((row, i) =>
+        row.map((col, j) =>
+          j === prependCol ? action.payload.transform.args.text + col : col
+        )
+      ));
+
       return state
-        .set('previewRows', List(newPreviewRows))
+        .set('previewRows', List(state.previewRows.map((row, i) =>
+          row.map((col, j) =>
+            j === prependCol ? action.payload.transform.args.text + col : col
+          )
+        )
+        ))
     }
-    else if (transformName === 'split')
+    else if (action.payload.transform.name === 'split')
     {
       const splitCol = state.columnNames.indexOf(action.payload.transform.args.colName);
 
@@ -194,11 +206,12 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
         .set('columnsToInclude', state.columnsToInclude.insert(splitCol + 1, true))
         .set('columnTypes', state.columnTypes.insert(splitCol + 1, 0))
     }
-    else if (transformName === 'merge')
+    else if (action.payload.transform.name === 'merge')
     {
       const mergeCol1 = state.columnNames.indexOf(action.payload.transform.args.colName);
       const mergeCol2 = state.columnNames.indexOf(action.payload.transform.args.oldName);
       console.log('merge: ' + mergeCol1 + ', ' + mergeCol2);
+
       const newPreviewRows = [];
       state.previewRows.map((row, i) =>
       {
