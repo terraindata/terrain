@@ -94,7 +94,6 @@ class BuilderTQLColumn extends PureClasss<Props>
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
     resultsBarOpen: boolean;
-    editorInstance?: TQLEditor;
   } = {
     tql: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
@@ -130,15 +129,6 @@ class BuilderTQLColumn extends PureClasss<Props>
     {
       // auto mode
       // this.checkForFolding(tql);
-
-      if (noAction && this.state.editorInstance) // autoformat query
-      {
-        const formattedText: string | null = this.autoFormatQuery(tql);
-        if (formattedText)
-        {
-          tql = formattedText;
-        }
-      }
 
       this.setState({
         tql,
@@ -453,18 +443,11 @@ class BuilderTQLColumn extends PureClasss<Props>
     );
   }
 
-  private autoFormatQuery(input: string): string | null
+  private registerTQLEditor(editor: TQLEditor): void
   {
-    if (this.props.language === 'elastic')
-    {
-      const parser: ESJSONParser = new ESJSONParser(input);
-      if (!parser.hasError())
-      {
-        const newText: string = ESConverter.formatES(parser);
-        return newText;
-      }
-    }
-    return null;
+    this.setState({
+      editorInstance: editor
+    });
   }
 
 }

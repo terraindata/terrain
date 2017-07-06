@@ -55,6 +55,9 @@ import { Input, InputType } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
+import ESJSONParser from '../parser/ESJSONParser';
+import ESConverter from './formatter/ESConverter';
+
 const join = (j, index) => (index === 0 ? '' : j);
 const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
 const removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, '\n');
@@ -101,8 +104,8 @@ class CardsToElastic
       }
     }
 
-    return JSON.stringify(elasticObj, null, 2);
-
+    const text: string = JSON.stringify(elasticObj);
+    return ESConverter.formatES(new ESJSONParser(text));
     // let q: string = query.tql;
 
     // return q;

@@ -114,10 +114,11 @@ export interface Props
 
 class TQLEditor extends PureClasss<Props>
 {
-  // public state: {
-  //   codeMirrorInstance?;
-  // } = {
-  // };
+  public state: {
+    codeMirrorInstance // CodeMirror instance does not have a defined type.
+  } = {
+    codeMirrorInstance: null
+  };
 
   public render()
   {
@@ -125,7 +126,10 @@ class TQLEditor extends PureClasss<Props>
       {
         readOnly: !this.props.canEdit,
         lineNumbers: true,
-        extraKeys: { 'Ctrl-F': 'findPersistent' },
+        extraKeys: {
+          'Ctrl-F': 'findPersistent',
+          'Ctrl-Alt-F': this.handleAutoFormatRequest
+        },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
         matchBrackets: true,
@@ -186,31 +190,42 @@ class TQLEditor extends PureClasss<Props>
     );
   }
 
-  // public componentDidMount()
-  // {
-  //   if (this.props.onTQLEditorInit)
-  //   {
-  //     this.props.onTQLEditorInit(this);
-  //   }
-  // }
+  public componentDidMount()
+  {
+    if (this.props.onTQLEditorInit)
+    {
+      this.props.onTQLEditorInit(this);
+    }
+  }
 
   /*
-   *  Don't format the query if it has errors
+   *  Returns the formatted query, or null if the query has errors.
    */
-  // public autoFormatQuery(): string | null
-  // {
-  //   if (this.state.codeMirrorInstance && this.props.language === 'elastic')
-  //   {
-  //     const parser: ESJSONParser = new ESJSONParser(this.state.codeMirrorInstance.getValue());
-  //     if (!parser.hasError())
-  //     {
-  //       const newText: string = ESConverter.formatES(parser);
-  //       // this.state.codeMirrorInstance.setValue(newText);
-  //       return newText;
-  //     }
-  //   }
-  //   return null;
-  // }
+  public autoFormatQuery(input: string): string | null
+  {
+    if (this.props.language === 'elastic')
+    {
+      const parser: ESJSONParser = new ESJSONParser(input);
+      if (!parser.hasError())
+      {
+        const newText: string = ESConverter.formatES(parser);
+        return newText;
+      }
+    }
+    return null;
+  }
+
+  private handleAutoFormatRequest(cmInstance): void
+  {
+    if (this.props.language === 'elastic')
+    {
+      const formatted = this.autoFormatQuery(cmInstance.getValue());
+      if (formatted)
+      {
+        this.state.codeMirrorInstance.setValue(formatted);
+      }
+    }
+  }
 
   private handleChanges(cmInstance, changes: object[])
   {
