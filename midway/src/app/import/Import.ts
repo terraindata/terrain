@@ -50,7 +50,6 @@ import * as csv from 'csvtojson';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
-import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 
@@ -71,8 +70,8 @@ export interface ImportConfig
   // if filetype is 'json': object mapping string (oldName) to boolean
   // if filetype is 'csv': array of booleans
   columnsToInclude: object | boolean[];
-  // if filetype is 'json': object mapping string (oldName) to object (contains "type" field)
-  // if filetype is 'csv': array of objects (contains "type" field)
+  // if filetype is 'json': object mapping string (oldName) to object (contains "type" field, "innerType" field if array type)
+  // if filetype is 'csv': array of objects (contains "type" field, "innerType" field if array type)
   // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
   columnTypes: object | object[];
   primaryKey: string;  // newName of primary key
@@ -255,14 +254,75 @@ export class Import
     }
     return '';
   }
-  // filter out values that already exist (and don't need to be inserted) ; return error if there is one
+
+  /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
+  private _getMappingForSchema(imprt: ImportConfig): object
+  {
+    const nameToType: object = this._includedNamesToType(imprt);
+    // create mapping containing new fields
+    const mapping: object = {};
+    Object.keys(nameToType).forEach((val) =>
+    {
+      mapping[val] = this._getESType(nameToType[val]);
+    });
+    return this._getMappingForSchemaHelper(mapping);
+  }
+  /* recursive helper function for _getMappingForSchema(...)
+   * mapping: maps field name (string) to type (string or object (in the case of "object"/"nested" type))
+   * NOTE: contains functionality to handle "object"/"nested" types, though they are not yet supported by Import */
+  private _getMappingForSchemaHelper(mapping: object): object
+  {
+    const body: object = {};
+    for (const key in mapping)
+    {
+      if (mapping.hasOwnProperty(key) && key !== '__isNested__')
+      {
+        if (typeof mapping[key] === 'string')
+        {
+          body[key] = { type: mapping[key] };
+          if (mapping[key] === 'text')
+          {
+            body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
+          }
+        }
+        else if (typeof mapping[key] === 'object')
+        {
+          body[key] = this._getMappingForSchemaHelper(mapping[key]);
+        }
+      }
+    }
+    const payload: object = { properties: body };
+    if (mapping['__isNested__'] !== undefined)
+    {
+      payload['type'] = 'nested';
+    }
+    return payload;
+  }
+  /* return ES type from type specification format of ImportConfig
+   * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
+  private _getESType(typeObject: object, withinArray: boolean = false): string
+  {
+    switch (typeObject['type'])
+    {
+      case 'array':
+        return this._getESType(typeObject['innerType'], true);
+      case 'object':
+        return withinArray ? 'nested' : 'object';
+      default:
+        return typeObject['type'];
+    }
+  }
+
+  /* check for conflicts with existing schema, return error (string) if there is one
+   * filters out fields already present in the existing mapping (since they don't need to be inserted)
+   * mapping: ES mapping
+   * returns: filtered mapping (object) or error message (string) */
   private _checkMappingAgainstSchema(mapping: object, schema: Tasty.Schema, database: string): object | string
   {
     if (schema.databaseNames().indexOf(database) === -1)
     {
       return mapping;
     }
-    // check for conflicts with existing mapping
     const fieldsToCheck: Set<string> = new Set(Object.keys(mapping['properties']));
     for (const table of schema.tableNames(database))
     {
@@ -281,45 +341,19 @@ export class Import
           else
           {
             return 'Type mismatch for field ' + field + '. Cannot cast "' +
-              this._getESType(mapping['properties'][field]) + '" to "' + String(fields[field]['type']) + '".';
+              String(mapping['properties'][field]['type']) + '" to "' + String(fields[field]['type']) + '".';
           }
         }
       }
     }
     return mapping;
   }
-  // start with mapping from import config, check against existing schema
-  // build object representing expected mapping
-  private _getMappingForSchema(imprt: ImportConfig): object
+  /* proposed: ES mapping
+   * existing: ES mapping */
+  private _isCompatibleType(proposed: object, existing: object): boolean
   {
-    const nameToType: object = this._includedNamesToType(imprt);
-    // create mapping containing new fields
-    const mapping: object = {};
-    Object.keys(nameToType).forEach((val) =>
-    {
-      mapping[val] = this._getESType(nameToType[val]);
-    });
-    return DBUtil.constructESMapping(mapping);
-  }
-  // proposed: contains "type" field (string), and "innerType" field (object) in the case of array/object types
-  // existing: field specification from ES mapping (contains "type" field (string), "properties" field (in the case of objects))
-  private _isCompatibleType(proposed: object, existing: object, withinArray: boolean = false): boolean
-  {
-    const proposedType: string = this._getESType(proposed);
+    const proposedType: string = proposed['type'];
     return this.compatibleTypes[proposedType] !== undefined && this.compatibleTypes[proposedType].has(existing['type']);
-  }
-  // typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types
-  private _getESType(typeObject: object, withinArray: boolean = false): string
-  {
-    switch (typeObject['type'])
-    {
-      case 'array':
-        return this._getESType(typeObject['innerType'], true);
-      case 'object':
-        return withinArray ? 'nested' : 'object';
-      default:
-        return typeObject['type'];
-    }
   }
 
   private async _parseData(imprt: ImportConfig): Promise<object[]>
@@ -572,6 +606,7 @@ export class Import
         }
       }
     }
+
     return '';
   }
   /* manually checks types (rather than checking hashes) ; handles arrays recursively */
@@ -604,6 +639,7 @@ export class Import
     });
     return sha1(strToHash);
   }
+  /* recursive helper to handle arrays */
   private _buildDesiredHashHelper(typeObj: object): string
   {
     if (this.numericTypes.has(typeObj['type']))

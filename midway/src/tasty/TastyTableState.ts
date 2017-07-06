@@ -55,7 +55,7 @@ export default class TastyTableState
   public columns: Map<string, TastyColumn>;
   public primaryKeys: string[];
   public columnNames: string[]; // sorted list of columns
-  public columnMapping: object; // map field name (string) to type (string or object (in the case of "object"/"nested" type))
+  public columnMapping: object; // ES mapping format
 
   constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[], database: string = '', columnMapping: object = {})
   {
