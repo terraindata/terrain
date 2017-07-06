@@ -63,9 +63,6 @@ import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';
 
-import ESConverter from '../../../../shared/backends/elastic/conversion/formatter/ESConverter';
-import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
-
 export interface Props
 {
   variant?: LibraryTypes.Variant;
@@ -129,7 +126,6 @@ class BuilderTQLColumn extends PureClasss<Props>
     {
       // auto mode
       // this.checkForFolding(tql);
-
       this.setState({
         tql,
         highlightedLine: null,
@@ -442,14 +438,6 @@ class BuilderTQLColumn extends PureClasss<Props>
       </div>
     );
   }
-
-  private registerTQLEditor(editor: TQLEditor): void
-  {
-    this.setState({
-      editorInstance: editor
-    });
-  }
-
 }
 
 export default BuilderTQLColumn;
