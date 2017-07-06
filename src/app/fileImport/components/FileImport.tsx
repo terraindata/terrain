@@ -114,15 +114,19 @@ class FileImport extends PureClasss<any>
             canSelectDb={true}
             dbs={
               this.state.servers && serverText && this.state.servers.get(serverText) ?
-                this.state.servers.get(serverText).databaseIds
+                List(this.state.servers.get(serverText).databaseIds.map((value, index) =>
+                  value.split('/').pop()
+                ))
                 :
                 List([])
             }
             dbText={dbText}
             canSelectTable={true}
             tables={
-              this.state.dbs && dbText && this.state.dbs.get(dbText) ?
-                this.state.dbs.get(dbText).tableIds
+              this.state.dbs && dbText && this.state.dbs.get(serverText + '/' + dbText) ?
+                List(this.state.dbs.get(serverText + '/' + dbText).tableIds.map((value, index) =>
+                  value.split('.').pop()
+                ))
                 :
                 List([])
             }
@@ -143,8 +147,8 @@ class FileImport extends PureClasss<any>
             columnNames={columnNames}
             columnTypes={columnTypes}
             columnOptions={
-              this.state.tables && tableText && this.state.tables.get(tableText) ?
-                List(this.state.tables.get(tableText).columnIds.map((value, index) =>
+              this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?
+                List(this.state.tables.get(serverText + '/' + dbText + '.' + tableText).columnIds.map((value, index) =>
                   value.split('.').pop()
                 ))
                 :
