@@ -47,12 +47,12 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as FileImportTypes from './../FileImportTypes';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 const { List } = Immutable;
 
@@ -67,34 +67,10 @@ export interface Props
   columnOptions: List<string>;
 }
 
-const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date', 'array', 'object']);
-
 class FileImportPreview extends PureClasss<Props>
 {
   public render()
   {
-    const previewCols = this.props.columnNames.map((value, key) =>
-      <FileImportPreviewColumn
-        key={key}
-        id={key}
-        isIncluded={this.props.columnsToInclude.get(key)}
-        name={this.props.columnNames.get(key)}
-        typeIndex={this.props.columnTypes.get(key)}
-        types={DATATYPES}
-        canSelectType={true}
-        canSelectColumn={true}
-        isPrimaryKey={this.props.primaryKey === value}
-        columnOptions={this.props.columnOptions}
-      />
-    );
-
-    // const previewRows = Object.keys(this.props.previewRows).map((key) =>
-    //   <FileImportPreviewRow
-    //     key={key}
-    //     items={this.props.previewRows[key]}
-    //   />
-    // );
-
     return (
       <table>
         <thead>

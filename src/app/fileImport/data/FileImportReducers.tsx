@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
+import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
-import Ajax from './../../util/Ajax';
-import * as FileImportTypes from './../FileImportTypes';
 const { List, Map } = Immutable;
 
-const FileImportReducers = {}
+const FileImportReducers = {};
 
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
@@ -169,7 +169,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.primaryKey,
       () =>
       {
-        alert("success");
+        alert('success');
       },
       (err: string) =>
       {

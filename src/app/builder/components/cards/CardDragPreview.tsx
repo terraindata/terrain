@@ -51,7 +51,7 @@ import PureClasss from '../../../common/components/PureClasss';
 import './CardDragPreview.less';
 const classNames = require('classnames');
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';

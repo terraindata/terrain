@@ -45,14 +45,14 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as FileImportTypes from './../FileImportTypes';
+import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
 import FileImportInfo from './FileImportInfo';
 import FileImportStore from './../data/FileImportStore';
-import * as FileImportTypes from './../FileImportTypes';
-import PureClasss from './../../common/components/PureClasss';
 import FileImportPreview from './FileImportPreview';
+import PureClasss from './../../common/components/PureClasss';
 import SchemaStore from './../../schema/data/SchemaStore';
-import * as SchemaTypes from './../../schema/SchemaTypes';
 import { server } from "../../../../midway/src/Midway";
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
@@ -64,9 +64,6 @@ export interface Props
   router?: any;
   route?: any;
 }
-
-const FILETYPES = Immutable.List(['json', 'csv']);
-const NUMBER_PREVIEW_ROWS = 5;
 
 class FileImport extends PureClasss<any>
 {
@@ -96,6 +93,7 @@ class FileImport extends PureClasss<any>
           tables: schemaState.tables,
         });
       }
+      ,
     });
   }
 
@@ -132,8 +130,8 @@ class FileImport extends PureClasss<any>
             }
             tableText={tableText}
             canImport={true}
-            validFiletypes={FILETYPES}
-            previewRowsCount={NUMBER_PREVIEW_ROWS}
+            validFiletypes={List(FileImportTypes.FILE_TYPES)}
+            previewRowsCount={FileImportTypes.NUMBER_PREVIEW_ROWS}
             hasCsvHeader={hasCsvHeader}
           />
         </div>

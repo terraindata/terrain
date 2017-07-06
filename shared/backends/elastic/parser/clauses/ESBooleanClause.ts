@@ -42,82 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.id
 
-import EQLConfig from './EQLConfig';
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESPropertyInfo from './ESPropertyInfo';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESJSONType from '../ESJSONType';
+import ESTerminalClause from './ESTerminalClause';
 
 /**
- * A clause with a well-defined structure.
+ * A clause which is a boolean
  */
-export default class ESStructureClause extends ESClause
+export default class ESBooleanClause extends ESTerminalClause
 {
-  public structure: { [name: string]: string };
-  public required: any[];
-
-  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
+  public constructor(type: string, settings: any)
   {
-    super(type, settings);
-    this.structure = structure;
-    this.required = required;
-  }
-
-  public init(config: EQLConfig): void
-  {
-    Object.keys(this.structure).forEach(
-      (key: string): void =>
-      {
-        config.declareType(this.structure[key]);
-      });
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-
-    const value = valueInfo.value;
-    if (typeof (value) !== 'object')
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found a ' + typeof (value) + ' instead.');
-      return;
-    }
-
-    if (Array.isArray(value))
-    {
-      interpreter.accumulateError(valueInfo, 'Clause must be an object, but found an array instead.');
-      return;
-    }
-
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-
-    // mark properties
-    Object.keys(children).forEach(
-      (name: string): void =>
-      {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        if (!this.structure.hasOwnProperty(name))
-        {
-          interpreter.accumulateError(viTuple.propertyName, 'Unknown property.', true);
-          return;
-        }
-
-        if (viTuple.propertyValue !== null)
-        {
-          interpreter.config.getClause(this.structure[name]).mark(interpreter, viTuple.propertyValue);
-        }
-      });
-
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] !== undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
+    super(type, settings, ESClauseType.ESBooleanClause, ESJSONType.boolean);
   }
 }

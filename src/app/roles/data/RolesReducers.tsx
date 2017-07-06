@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Ajax from './../../util/Ajax';
-import RoleTypes from './../RoleTypes';
+import * as RoleTypes from './../RoleTypes';
 import Actions from './RolesActions';
 import ActionTypes from './RolesActionTypes';
 

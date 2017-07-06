@@ -47,7 +47,7 @@ import * as React from 'react';
 import { Link } from 'react-router';
 import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';
-import UserTypes from '../UserTypes';
+import * as UserTypes from '../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
 import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';

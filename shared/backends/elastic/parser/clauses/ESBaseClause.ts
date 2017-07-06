@@ -44,27 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a number
+ * A clause which is a terminal (base) value: null, boolean, number, or string
  */
-export default class ESNumberClause extends ESClause
+export default class ESBaseClause extends ESClause
 {
   public constructor(type: string, settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESBaseClause);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'number')
+    switch (valueInfo.jsonType)
     {
-      interpreter.accumulateError(valueInfo, 'This value should be a number.');
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+      case ESJSONType.string:
+        break;
+
+      default:
+        interpreter.accumulateError(
+          valueInfo,
+          'Found an ' +
+          ESJSONType[valueInfo.jsonType] +
+          ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
+        break;
     }
   }
 }

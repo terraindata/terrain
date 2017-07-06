@@ -47,7 +47,7 @@ import * as React from 'react';
 import Util from '../../util/Util';
 
 // type StoreKeyPath = string[] | (() => string[]);
-interface Config
+interface SubscriptionConfig
 {
   stateKey?: string;
   storeKeyPath?: ID[] | (() => ID[]);
@@ -120,7 +120,7 @@ class Classs<T> extends React.Component<T, any>
   // subscribes to a Redux store
   public _subscribe(
     store: Store,
-    config: Config,
+    config: SubscriptionConfig,
   )
   {
     const update = () =>
@@ -149,7 +149,7 @@ class Classs<T> extends React.Component<T, any>
     }
   }
 
-  public _update(store: Store, config: Config)
+  public _update(store: Store, config: SubscriptionConfig)
   {
     if (this._unmounted)
     {

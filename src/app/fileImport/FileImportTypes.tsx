@@ -79,6 +79,14 @@ export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
 export const _FileImportState = (config?: { [key: string]: any }) =>
   New<FileImportState>(new FileImportStateC(config), config);
 
+export const NUMBER_PREVIEW_ROWS = 5;
+
+export const FILE_TYPES =
+  [
+    'json',
+    'csv',
+  ]
+
 export const ELASTIC_TYPES =
   [
     'string',

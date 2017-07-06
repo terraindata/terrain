@@ -51,7 +51,6 @@ import * as winston from 'winston';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import * as Util from '../Util';
 
 const Router = new KoaRouter();
 
@@ -87,7 +86,6 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('get schema');
-  const request = ctx.request.body.body;
   ctx.body = await getSchema(ctx.params.database);
 });
 
