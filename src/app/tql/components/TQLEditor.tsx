@@ -101,8 +101,6 @@ export interface Props
   isDiff?: boolean;
   diffTql?: string;
 
-  onTQLEditorInit?(editorInstance: TQLEditor): void; // callback to pass back TQLEditor instance
-
   onChange?(tql: string);
   onFocusChange?(focused: boolean);
 
@@ -188,14 +186,6 @@ class TQLEditor extends PureClasss<Props>
         onCodeMirrorMount={this.registerCodeMirror}
       />
     );
-  }
-
-  public componentDidMount()
-  {
-    if (this.props.onTQLEditorInit)
-    {
-      this.props.onTQLEditorInit(this);
-    }
   }
 
   /*
