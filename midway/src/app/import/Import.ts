@@ -106,6 +106,7 @@ export class Import
   //   double: Math.pow(2, 53),
   // };
   private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
+  private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
 
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
@@ -163,21 +164,6 @@ export class Import
       resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
     });
   }
-  // // TODO: remove this temporary test hack
-  // private _convertToESType(type: string): string
-  // {
-  //   switch (type)
-  //   {
-  //     case 'string':
-  //       return 'text';
-  //     case 'number':
-  //       return 'double';
-  //     case 'object':
-  //       return 'nested';
-  //     default:    // does not handle "array"
-  //       return type;
-  //   }
-  // }
 
   // TODO: move into shared Util file
   /* returns an error message if there are any; else returns empty string */
@@ -598,18 +584,28 @@ export class Import
       }
       for (const key in obj)
       {
-        // TODO: recursively check arrays, update equality check to something more intelligent
-        if (obj.hasOwnProperty(key) && obj[key] !== null && nameToType[key]['type'] !== this._getType(obj[key]))
+        if (obj.hasOwnProperty(key) && obj[key] !== null)
         {
-          return 'Field "' + key + '" of object number ' + String(ind) +
-            ' does not match the specified type: ' + String(nameToType[key]['type']);
+          const thisType: string = this._getType(obj[key]);
+          if (thisType === 'number' && this.numericTypes.has(nameToType[key]['type']))
+          {
+            continue;
+          }
+          if (nameToType[key]['type'] !== thisType)
+          {
+            return 'Field "' + key + '" of object number ' + String(ind) +
+              ' does not match the specified type: ' + String(nameToType[key]['type']);
+          }
+          if (thisType === 'array')
+          {
+            // TODO: (recursively) check all array elements are of the same type, and the correct one
+          }
         }
       }
       ind++;
     }
     return '';
   }
-  // TODO: make this recursive to handle contents of the array!
   /* return the target hash an object with the specified field names and types should have
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _buildDesiredHash(nameToType: object): string
@@ -618,23 +614,53 @@ export class Import
     const nameToTypeArr: string[] = Object.keys(nameToType).sort();
     nameToTypeArr.forEach((name) =>
     {
-      strToHash += '|' + name + ':' + (nameToType[name]['type'] as string) + '|';
+      strToHash += '|' + name + ':' + this._buildDesiredHashHelper(nameToType[name]) + '|';
     });
     return sha1(strToHash);
   }
+  private _buildDesiredHashHelper(typeObj: object): string
+  {
+    if (this.numericTypes.has(typeObj['type']))
+    {
+      return 'number';
+    }
+    if (typeObj['type'] === 'array')
+    {
+      return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
+    }
+    return typeObj['type'];
+  }
   // TODO: merge with jason's copy in shared util
-  // TODO: make this recursive to handle contents of the array!
-  /* returns a hash based on the object's field names and data types */
+  /* returns a hash based on the object's field names and data types
+   * handles object fields recursively ; only checks the type of the first element of arrays */
   private _hashObjectStructure(payload: object): string
   {
-    let strToHash: string = this._getType(payload);
-    strToHash = Object.keys(payload).sort().reduce((res, item) =>
+    return sha1(this._getObjectStructureStr(payload));
+  }
+  private _getObjectStructureStr(payload: object): string
+  {
+    let structStr: string = this._getType(payload);
+    if (structStr === 'object')
     {
-      res += '|' + item + ':' + this._getType(payload[item]) + '|';
-      return res;
-    },
-      strToHash);
-    return sha1(strToHash);
+      structStr = Object.keys(payload).sort().reduce((res, item) =>
+      {
+        res += '|' + item + ':' + this._getObjectStructureStr(payload[item]) + '|';
+        return res;
+      },
+        structStr);
+    }
+    else if (structStr === 'array')
+    {
+      if (Object.keys(structStr).length > 0)
+      {
+        structStr += '-' + this._getObjectStructureStr(payload[0]);
+      }
+      else
+      {
+        structStr += '-empty';
+      }
+    }
+    return structStr;
   }
   private _getType(obj: object): string
   {
@@ -657,12 +683,7 @@ export class Import
     {
       return 'text';
     }
-    // TODO: support other numeric types
-    if (typeof obj === 'number')
-    {
-      return ((obj as number) % 1 === 0) ? 'long' : 'double';    // TODO: get linter to stop complaining
-    }
-    // handles "boolean", "object", and "undefined" cases
+    // handles "number", "boolean", "object", and "undefined" cases
     return typeof obj;
   }
 
