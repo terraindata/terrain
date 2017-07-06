@@ -55,6 +55,7 @@ import ESPropertyInfo from './ESPropertyInfo';
  */
 export default class ESValueInfo
 {
+
   /**
    * The JSON type of the value.
    */
@@ -66,28 +67,12 @@ export default class ESValueInfo
   public value: any;
 
   /**
-   * If value is an array, a corresponding ESValueInfo[]. An empty list otherwise.
-   */
-  public arrayChildren: ESValueInfo[];
-
-  /**
-   * If value is an object, a corresponding object mapping keys. An empty object otherwise.
-   */
-  public objectChildren: { [name: string]: ESPropertyInfo };
-
-  /**
    * The tokens belonging to the value, in order of appearance
    */
   public tokens: ESParserToken[];
 
   /**
-   * If errors were detected associated with this value, they will be in this list
-   * in the order in which they were detected.
-   */
-  public errors: ESParserError[];
-
-  /**
-   * When this value is the result of substituting in an parameter,
+   * When this value is the result of substituting in a parameter,
    * this is set to the name of that parameter.
    */
   public parameter: string | null;
@@ -102,21 +87,60 @@ export default class ESValueInfo
    */
   public parentClause: ESClause | null;
 
+  /**
+   * If value is an object, a corresponding object mapping keys. An empty object otherwise.
+   */
+  private _objectChildren: null | { [name: string]: ESPropertyInfo };
+
+  /**
+   * If value is an array, a corresponding ESValueInfo[]. An empty list otherwise.
+   */
+  private _arrayChildren: null | ESValueInfo[];
+
+  /**
+   * If errors were detected associated with this value, they will be in this list
+   * in the order in which they were detected.
+   */
+  private _errors: null | ESParserError[];
+
   public constructor()
   {
     this.jsonType = ESJSONType.unknown;
     this.value = undefined;
     this.tokens = [];
-    this.arrayChildren = [];
-    this.objectChildren = {};
-    this.errors = [];
+    this._arrayChildren = null;
+    this._errors = null;
+    this._objectChildren = null;
     this.clause = null;
     this.parentClause = null;
   }
 
+  /**
+   * If value is an object, a corresponding object mapping keys. An empty object otherwise.
+   */
+  public get objectChildren(): { [name: string]: ESPropertyInfo }
+  {
+    return (this._objectChildren === null) ? {} : this._objectChildren;
+  }
+
+  public get arrayChildren(): ESValueInfo[]
+  {
+    return (this._arrayChildren === null) ? [] : this._arrayChildren;
+  }
+
+  /**
+   * If errors were detected associated with this value, they will be in this list
+   * in the order in which they were detected.
+   */
+  public get errors(): ESParserError[]
+  {
+    return (this._errors === null) ? [] : this._errors;
+  }
+
   public attachError(error: ESParserError): void
   {
-    this.errors.push(error);
+    this._errors = this.errors;
+    this._errors.push(error);
   }
 
   public forEachProperty(func: (property: ESPropertyInfo) => void): void

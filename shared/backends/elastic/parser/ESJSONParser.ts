@@ -354,7 +354,6 @@ export default class ESJSONParser
   {
     const array: any[] = [];
     arrayInfo.value = array;
-    arrayInfo.arrayChildren = [];
 
     for (let elementInfo: ESValueInfo | null = this.readValue();
       elementInfo !== null;
@@ -390,7 +389,6 @@ export default class ESJSONParser
   {
     const obj: object = {};
     objInfo.value = obj;
-    objInfo.objectChildren = {};
 
     for (let nameInfo: ESValueInfo | null = this.readValue();
       nameInfo !== null;
