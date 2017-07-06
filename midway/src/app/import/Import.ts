@@ -460,7 +460,10 @@ export class Import
   private _buildCSVColumnParsers(imprt: ImportConfig): object
   {
     const columnParsers: object = {};
-    (imprt.columnTypes as object[]).map((val) => this._getESType(val)).forEach((val, ind) =>
+    (imprt.columnTypes as object[]).map((val) =>
+    {
+      return this.numericTypes.has(val['type']) ? 'number' : val['type'];
+    }).forEach((val, ind) =>
     {
       switch (val)
       {
