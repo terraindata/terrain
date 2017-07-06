@@ -53,6 +53,7 @@ import PureClasss from './../../common/components/PureClasss';
 import FileImportPreview from './FileImportPreview';
 import SchemaStore from './../../schema/data/SchemaStore';
 import SchemaTypes from './../../schema/SchemaTypes';
+import { server } from "../../../../midway/src/Midway";
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
@@ -72,9 +73,8 @@ class FileImport extends PureClasss<any>
   public state: {
     fileImportState: FileImportTypes.FileImportState;
     servers?: SchemaTypes.ServerMap;
-    serverNames?: List<string>;
-    dbNames?: List<string>;
-    tableNames?: List<string>;
+    dbs?: SchemaTypes.DatabaseMap;
+    tables?: SchemaTypes.TableMap;
   } = {
     fileImportState: FileImportStore.getState(),
   };
@@ -88,13 +88,12 @@ class FileImport extends PureClasss<any>
     });
 
     this._subscribe(SchemaStore, {
-      updater: (schemaState: SchemaTypes.SchemaState) =>
+      updater: (schemaState: SchemaTypes.SchemaState, ) =>
       {
         this.setState({
           servers: schemaState.servers,
-          serverNames: this.getKeyListSafely(schemaState.servers),
-          dbNames: this.getKeyListSafely(schemaState.databases),
-          tableNames: this.getKeyListSafely(schemaState.tables),
+          dbs: schemaState.databases,
+          tables: schemaState.tables,
         });
       }
     });
@@ -103,7 +102,7 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
+    const { serverText, dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
 
     return (
       <div className="file-import">
@@ -112,12 +111,21 @@ class FileImport extends PureClasss<any>
           <FileImportInfo
             canSelectServer={true}
             servers={this.state.servers}
-            serverNames={this.state.serverNames}
             canSelectDb={true}
-            dbs={this.state.dbNames}
+            dbs={
+              this.state.servers && serverText && this.state.servers.get(serverText) ?
+                this.state.servers.get(serverText).databaseIds
+                :
+                List([])
+            }
             dbText={dbText}
             canSelectTable={true}
-            tables={this.state.tableNames}
+            tables={
+              this.state.dbs && dbText && this.state.dbs.get(dbText) ?
+                this.state.dbs.get(dbText).tableIds
+                :
+                List([])
+            }
             tableText={tableText}
             canImport={true}
             validFiletypes={FILETYPES}
@@ -134,19 +142,18 @@ class FileImport extends PureClasss<any>
             columnsToInclude={columnsToInclude}
             columnNames={columnNames}
             columnTypes={columnTypes}
+            columnOptions={
+              this.state.tables && tableText && this.state.tables.get(tableText) ?
+                List(this.state.tables.get(tableText).columnIds.map((value, index) =>
+                  value.split('.').pop()
+                ))
+                :
+                List([])
+            }
           />
         }
       </div>
     );
-  }
-
-  private getKeyListSafely(map: IMMap<string, any>)
-  {
-    if (map === undefined)
-    {
-      return List<string>();
-    }
-    return map.keySeq().toList();
   }
 }
 

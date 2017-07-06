@@ -68,6 +68,7 @@ export interface Props
   types: List<string>;
   canSelectType: boolean;
   canSelectColumn: boolean;
+  columnOptions: List<string>;
 }
 
 class FileImportPreviewColumn extends PureClasss<Props>
@@ -108,7 +109,7 @@ class FileImportPreviewColumn extends PureClasss<Props>
         />
         <Autocomplete
           value={this.props.name}
-          options={null}
+          options={this.props.columnOptions}
           onChange={this.handleAutocompleteHeaderChange}
           placeholder={this.props.id}
           disabled={!this.props.canSelectColumn}

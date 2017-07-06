@@ -54,12 +54,12 @@ import SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
 import Util from './../../util/Util';
 import { dbTableErrorCheck } from "../../../../shared/fileImport/Util";
+const { List } = Immutable;
 
 export interface Props
 {
   canSelectServer: boolean;
   servers: SchemaTypes.ServerMap;
-  serverNames: List<string>;
 
   canSelectDb: boolean;
   dbs: List<string>;
@@ -97,8 +97,8 @@ class FileImportInfo extends PureClasss<Props>
       serverIndex,
       serverSelected: true,
     });
-    const key = this.props.serverNames.get(serverIndex);
-    Actions.changeServer(this.props.servers.get(key).connectionId);
+    const serverName = this.props.servers.keySeq().toList().get(serverIndex);
+    Actions.changeServer(this.props.servers.get(serverName).connectionId, serverName);
   }
 
   public handleAutocompleteDbChange(value)
@@ -272,7 +272,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Dropdown
             selectedIndex={this.state.serverIndex}
-            options={this.props.serverNames}
+            options={this.props.servers ? this.props.servers.keySeq().toList() : List<string>()}
             onChange={this.handleServerChange}
             canEdit={canSelectServer}
           />
@@ -283,7 +283,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Autocomplete
             value={this.props.dbText}
-            options={this.props.dbs}
+            options={this.props.dbs || List([])}
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={!canSelectDb}
@@ -295,7 +295,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Autocomplete
             value={this.props.tableText}
-            options={this.props.tables}
+            options={this.props.tables || List([])}
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={!canSelectTable}

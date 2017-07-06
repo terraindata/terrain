@@ -64,6 +64,7 @@ export interface Props
   columnsToInclude: IMMap<string, boolean>;
   columnNames: IMMap<string, string>;
   columnTypes: IMMap<string, number>;
+  columnOptions: List<string>;
 }
 
 const DATATYPES = Immutable.List(['string', 'number', 'boolean', 'date', 'array', 'object']);
@@ -83,6 +84,7 @@ class FileImportPreview extends PureClasss<Props>
         canSelectType={true}
         canSelectColumn={true}
         isPrimaryKey={this.props.primaryKey === value}
+        columnOptions={this.props.columnOptions}
       />
     );
 
@@ -109,6 +111,7 @@ class FileImportPreview extends PureClasss<Props>
                   canSelectType={true}
                   canSelectColumn={true}
                   isPrimaryKey={this.props.primaryKey === value}
+                  columnOptions={this.props.columnOptions}
                 />
               ).toArray()
             }

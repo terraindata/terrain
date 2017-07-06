@@ -55,6 +55,7 @@ export namespace FileImportTypes
   class FileImportStateC extends BaseClass
   {
     public connectionId: number = -1;
+    public serverText: string = '';
     public dbText: string = '';
     public tableText: string = '';
     public file: string = '';

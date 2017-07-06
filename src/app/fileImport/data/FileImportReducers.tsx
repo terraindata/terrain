@@ -57,6 +57,7 @@ FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
       .set('connectionId', action.payload.connectionId)
+      .set('serverText', action.payload.name)
   ;
 
 FileImportReducers[ActionTypes.changeDbText] =
