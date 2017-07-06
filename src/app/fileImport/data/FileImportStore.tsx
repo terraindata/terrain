@@ -47,7 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Redux = require('redux');
 
-import FileImportTypes from './../FileImportTypes';
+import * as FileImportTypes from './../FileImportTypes';
 import Util from './../../util/Util';
 
 const DefaultState = FileImportTypes._FileImportState();

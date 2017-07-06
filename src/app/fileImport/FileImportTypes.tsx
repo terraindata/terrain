@@ -48,49 +48,43 @@ import * as _ from 'underscore';
 import Util from './../util/Util';
 import { BaseClass, New } from '../Classes';
 
-// This module will contain all of the different 'types' (i.e. models) relevant to auth
-export namespace FileImportTypes
+// This type represents the state of the FileImportStore
+class FileImportStateC extends BaseClass
 {
-  // This type represents the state of the FileImportStore
-  class FileImportStateC extends BaseClass
-  {
-    public connectionId: number = -1;
-    public serverText: string = '';
-    public dbText: string = '';
-    public tableText: string = '';
-    public file: string = '';
-    public filetype: string = '';
+  public connectionId: number = -1;
+  public serverText: string = '';
+  public dbText: string = '';
+  public tableText: string = '';
+  public file: string = '';
+  public filetype: string = '';
 
-    public previewRows: object[] = null;
-    public columnsCount: number = 0;
+  public previewRows: object[] = null;
+  public columnsCount: number = 0;
 
-    public columnsToInclude: IMMap<string, boolean> = null;
-    public columnNames: IMMap<string, string> = null;
-    public columnTypes: IMMap<string, number> = null;
+  public columnsToInclude: IMMap<string, boolean> = null;
+  public columnNames: IMMap<string, string> = null;
+  public columnTypes: IMMap<string, number> = null;
 
-    public hasCsvHeader: boolean = true;
-    public primaryKey: string = '';
-  }
-  // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
-  //  This first line exports a type that you will actually use in other files.
-  //  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
-  export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
-  //  This second line exports a function to create a new instance of the FileImportState Immutable backed class
-  //  It's a replacement for a constructor.
-  //  This is necessary because simply doing `new FileImportStateC` will not create an Immutable version
-  //   and you can't use `new` simply with Immutable Records.
-  export const _FileImportState = (config?: { [key: string]: any }) =>
-    New<FileImportState>(new FileImportStateC(config), config);
-
-  export const ELASTIC_TYPES =
-    [
-      'string',
-      'number',
-      'boolean',
-      'date',
-      'array',
-      'object',
-    ]
+  public hasCsvHeader: boolean = true;
+  public primaryKey: string = '';
 }
+// These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
+//  This first line exports a type that you will actually use in other files.
+//  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
+export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
+//  This second line exports a function to create a new instance of the FileImportState Immutable backed class
+//  It's a replacement for a constructor.
+//  This is necessary because simply doing `new FileImportStateC` will not create an Immutable version
+//   and you can't use `new` simply with Immutable Records.
+export const _FileImportState = (config?: { [key: string]: any }) =>
+  New<FileImportState>(new FileImportStateC(config), config);
 
-export default FileImportTypes;
+export const ELASTIC_TYPES =
+  [
+    'string',
+    'number',
+    'boolean',
+    'date',
+    'array',
+    'object',
+  ];

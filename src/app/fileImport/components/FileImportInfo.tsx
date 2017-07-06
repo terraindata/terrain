@@ -50,7 +50,7 @@ import PureClasss from './../../common/components/PureClasss';
 import Dropdown from './../../common/components/Dropdown';
 import CheckBox from './../../common/components/CheckBox';
 import Actions from './../data/FileImportActions';
-import SchemaTypes from '../../schema/SchemaTypes';
+import * as SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
 import Util from './../../util/Util';
 import { dbTableErrorCheck } from "../../../../shared/fileImport/Util";

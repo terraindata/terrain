@@ -52,7 +52,7 @@ import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import FileImportTypes from './../FileImportTypes';
+import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 const { List } = Immutable;
 

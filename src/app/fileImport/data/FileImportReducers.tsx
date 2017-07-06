@@ -48,7 +48,7 @@ import * as _ from 'underscore';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
 import Ajax from './../../util/Ajax';
-import FileImportTypes from './../FileImportTypes';
+import * as FileImportTypes from './../FileImportTypes';
 const { List, Map } = Immutable;
 
 const FileImportReducers = {}
