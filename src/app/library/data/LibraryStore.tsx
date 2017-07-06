@@ -51,7 +51,7 @@ import BackendInstance from './../../../../shared/backends/types/BackendInstance
 import AuthStore from './../../auth/data/AuthStore';
 import RoleStore from './../../roles/data/RolesStore';
 import UserStore from './../../users/data/UserStore';
-import LibraryTypes from './../LibraryTypes';
+import * as LibraryTypes from './../LibraryTypes';
 import Actions from './LibraryActions';
 import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
 

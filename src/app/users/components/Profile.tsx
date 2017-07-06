@@ -52,7 +52,7 @@ import InfoArea from './../../common/components/InfoArea';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import UserStore from './../data/UserStore';
-import UserTypes from './../UserTypes';
+import * as UserTypes from './../UserTypes';
 import './Profile.less';
 
 export interface Props

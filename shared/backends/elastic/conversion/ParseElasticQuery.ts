@@ -44,54 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as React from 'react';
-import * as SchemaTypes from '../../SchemaTypes';
-import Styles from '../SchemaTreeStyles';
-import PureClasss from './../../../common/components/PureClasss';
-const Radium = require('radium');
+import { Query } from '../../../items/types/Query';
+import ESInterpreter from '../parser/ESInterpreter';
+import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
 
-export interface Props
+export function ParseElasticQuery(tql: string)
 {
-  item: SchemaTypes.Server;
+  return new ESInterpreter(tql);
 }
 
-class State
+export function ElasticParseTreeToQuery(query: Query, options: ParseTreeToQueryOptions): string
 {
-}
-
-@Radium
-export class ServerTreeInfo extends PureClasss<Props>
-{
-  public state: State = new State();
-
-  public render()
+  const queryObject = JSON.parse(JSON.stringify(query.parseTree.parser.getValue()));
+  if (options.allFields === true)
   {
-    const server = this.props.item;
-
-    return (
-      <div
-        style={Styles.infoPieces}
-      >
-        <div
-          style={Styles.infoPiece}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {server.databaseIds.size}
-          </span> databases
-        </div>
-      </div>
-    );
-  }
-}
-
-export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
-  [
+    if (queryObject.body && queryObject.body._source)
     {
-      label: 'Databases',
-      type: 'database',
-    },
-  ];
-
-export default ServerTreeInfo;
+      queryObject.body._source = [];
+    }
+  }
+  return JSON.stringify(queryObject);
+}

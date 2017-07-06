@@ -51,72 +51,67 @@ import * as Immutable from 'immutable';
 import SchemaStore from '../schema/data/SchemaStore';
 import { BuilderState, BuilderStore } from './data/BuilderStore';
 
-export namespace BuilderHelpers
+export function getTermsForKeyPath(keyPath: KeyPath): List<string>
 {
-  export function getTermsForKeyPath(keyPath: KeyPath): List<string>
+  const state = BuilderStore.getState();
+
+  const terms = getTermsForKeyPathHelper(keyPath, state);
+
+  // TODO migrate inputs reduction to the Query class if we get a query class
+  const inputs = state.query && state.query.inputs;
+  if (inputs && inputs.size)
   {
-    const state = BuilderStore.getState();
-
-    const terms = getTermsForKeyPathHelper(keyPath, state);
-
-    // TODO migrate inputs reduction to the Query class if we get a query class
-    const inputs = state.query && state.query.inputs;
-    if (inputs && inputs.size)
+    const inputTerms = inputs.map(
+      (input: Input) => 'input.' + input.key,
+    ).toList();
+    if (terms)
     {
-      const inputTerms = inputs.map(
-        (input: Input) => 'input.' + input.key,
-      ).toList();
-      if (terms)
-      {
-        return inputTerms.concat(terms).toList();
-      }
-      return inputTerms;
+      return inputTerms.concat(terms).toList();
     }
-
-    return terms;
+    return inputTerms;
   }
 
-  function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
-  {
-    if (!keyPath.size)
-    {
-      return Immutable.List([]);
-    }
-
-    let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
-
-    const block = BuilderStore.getState().getIn(keyPath);
-
-    if (block._isCard)
-    {
-      const card = block as Card;
-
-      if (card.static.getChildTerms)
-      {
-        terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
-      }
-
-      if (card.static.getNeighborTerms)
-      {
-        terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
-      }
-
-      if (card['cards'])
-      {
-        card['cards'].map(
-          (childCard: Card) =>
-          {
-            if (childCard.static.getParentTerms)
-            {
-              terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
-            }
-          },
-        );
-      }
-    }
-
-    return terms;
-  }
+  return terms;
 }
 
-export default BuilderHelpers;
+function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
+{
+  if (!keyPath.size)
+  {
+    return Immutable.List([]);
+  }
+
+  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
+
+  const block = BuilderStore.getState().getIn(keyPath);
+
+  if (block._isCard)
+  {
+    const card = block as Card;
+
+    if (card.static.getChildTerms)
+    {
+      terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
+    }
+
+    if (card.static.getNeighborTerms)
+    {
+      terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
+    }
+
+    if (card['cards'])
+    {
+      card['cards'].map(
+        (childCard: Card) =>
+        {
+          if (childCard.static.getParentTerms)
+          {
+            terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
+          }
+        },
+      );
+    }
+  }
+
+  return terms;
+}

@@ -53,7 +53,7 @@ import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import * as CommonElastic from '../syntax/CommonElastic';
 
-import BlockUtils from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
@@ -65,21 +65,38 @@ export default function ElasticToCards(
   queryReady: (query: Query) => void,
 ): Query
 {
-  try
+  if (query.parseTree === null || query.parseTree.hasError())
   {
-    const obj = JSON.parse(query.tql);
-    let cards = parseMagicObject(obj);
-    cards = BlockUtils.reconcileCards(query.cards, cards);
-    return query
-      .set('cards', cards)
-      .set('cardsAndCodeInSync', true);
-  }
-  catch (e)
-  {
+    // TODO: we may want to show some error messages on the cards.
     return query
       .set('cardsAndCodeInSync', false);
+  } else
+  {
+    try
+    {
+      let cards = parseMagicObject(query.parseTree.parser.getValue());
+      cards = BlockUtils.reconcileCards(query.cards, cards);
+      return query
+        .set('cards', cards)
+        .set('cardsAndCodeInSync', true);
+    }
+    catch (e)
+    {
+      return query
+        .set('cardsAndCodeInSync', false);
+    }
   }
 }
+
+const isScoreCard = (obj: object): boolean =>
+{
+  return obj.hasOwnProperty('script')
+    && obj['script'].hasOwnProperty('stored')
+    && obj['script'].hasOwnProperty('params')
+    && obj['script']['stored'] === 'terrain_PWLScore'
+    && obj['script']['params'].hasOwnProperty('factors')
+    && Array.isArray(obj['script']['params']['factors']);
+};
 
 const parseObjectWrap = (obj: object): Cards =>
 {
@@ -99,6 +116,29 @@ const parseObjectWrap = (obj: object): Cards =>
   );
 
   return Immutable.List(arr);
+};
+
+const parseElasticWeightBlock = (obj: object): Block =>
+{
+  const scorePoints = [];
+  for (let i = 0; i < obj['ranges'].length; ++i)
+  {
+    scorePoints.push(
+      make(Blocks.scorePoint, {
+        value: obj['ranges'][i],
+        score: obj['outputs'][i],
+      }));
+  }
+
+  const card = make(Blocks.elasticTransform, {
+    input: obj['numerators'][0][0],
+    scorePoints: Immutable.List(scorePoints),
+  });
+
+  return make(Blocks.elasticWeight, {
+    key: card,
+    weight: obj['weight'],
+  });
 };
 
 const parseArrayWrap = (arr: any[]): Cards =>
@@ -166,7 +206,7 @@ const parseMagicArray = (arr: any[]): Card =>
       }
       else
       {
-        value = JSON.stringify(CommonElastic.parseESValue(value));
+        value = CommonElastic.parseESValue(value);
       }
 
       return make(Blocks.elasticMagicListItem, {
@@ -195,6 +235,17 @@ const parseMagicObject = (obj: object): Cards =>
     );
   }
 
+  if (isScoreCard(obj))
+  {
+    return Immutable.List([
+      make(
+        Blocks.elasticScore,
+        {
+          weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
+        }),
+    ]);
+  }
+
   const values: Card[] = _.map(obj,
     (value: any, key: string) =>
     {
@@ -212,7 +263,7 @@ const parseMagicObject = (obj: object): Cards =>
       }
       else
       {
-        value = JSON.stringify(CommonElastic.parseESValue(value));
+        value = CommonElastic.parseESValue(value);
       }
 
       return make(Blocks.elasticMagicValue, {

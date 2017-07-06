@@ -46,7 +46,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
 import Query from '../../../../shared/items/types/Query';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
@@ -122,6 +122,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       {
         // wrong XHR
         return state;
+      }
+
+      if (action.payload.query.tql)
+      {
+        query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(action.payload.query.tql));
+      } else
+      {
+        query = query.set('parseTree', null);
       }
 
       if (!action.payload.query.cardsAndCodeInSync)
@@ -327,13 +335,15 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     {
       // TODO MOD convert
       let { query } = state;
-      query = query.set('tql', action.payload.tql);
+      const tql: string = action.payload.tql;
+      query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql)
+        .set('parseTree', AllBackendsMap[query.language].parseQuery(tql));
       query = AllBackendsMap[query.language].codeToQuery(
         query,
         Actions.changeQuery,
       );
-
-      return state.set('query', query);
+      state = state.set('query', query);
+      return state;
     },
 
     [ActionTypes.hoverCard]:

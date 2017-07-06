@@ -48,7 +48,7 @@ import * as _ from 'underscore';
 import AuthStore from './../../auth/data/AuthStore';
 import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
-import UserTypes from './../UserTypes';
+import * as UserTypes from './../UserTypes';
 import Actions from './UserActions';
 import ActionTypes from './UserActionTypes';
 

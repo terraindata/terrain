@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { Link } from 'react-router';
-import UserTypes from '../UserTypes';
+import * as UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
 import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';
