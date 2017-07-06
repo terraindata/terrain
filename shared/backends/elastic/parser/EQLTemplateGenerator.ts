@@ -76,7 +76,7 @@ export default class EQLTemplateGenerator
         break;
 
       case ESJSONType.string:
-        if (source.parameter !== null)
+        if (source.parameter !== undefined)
         {
           this.appendParameter(source.parameter);
           break;

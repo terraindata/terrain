@@ -63,7 +63,7 @@ export default class ESParserToken
   public length: number; // token length in chars
   public substring: string; // token substring
 
-  public _errors: null | ESParserError[]; // errors attached to this token, null if none
+  public _errors: undefined | ESParserError[]; // errors attached to this token, null if none
 
   public constructor(charNumber: number,
     row: number,
@@ -80,12 +80,11 @@ export default class ESParserToken
     this.toCol = col;
     this.length = length;
     this.substring = substring;
-    this._errors = null;
   }
 
   public get errors(): ESParserError[]
   {
-    return (this._errors === null) ? [] : this._errors;
+    return (this._errors === undefined) ? [] : this._errors;
   }
 
   public attachError(error: ESParserError): void

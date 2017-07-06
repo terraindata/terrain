@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
+import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
 
@@ -93,15 +93,21 @@ export default class ESInterpreter
     {
       try
       {
-        // this.config.getClause('root').mark(this, this.parser.getValueInfo());
-
         const root: ESValueInfo = this.parser.getValueInfo();
         root.clause = this.config.getClause('root');
         root.recursivelyVisit(
           (info: ESValueInfo): void =>
           {
-            winston.info('visiting ' + info.tokens[0].substring);
-            if (info.clause !== null)
+            if (info.parameter !== undefined)
+            {
+              if (!this.params.hasOwnProperty(info.parameter))
+              {
+                this.accumulateError(info, 'Undefined parameter.');
+              }
+              return; // don't validate parameters
+            }
+
+            if (info.clause !== undefined)
             {
               info.clause.mark(this, info);
             }

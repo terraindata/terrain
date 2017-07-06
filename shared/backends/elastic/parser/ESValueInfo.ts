@@ -64,7 +64,7 @@ export default class ESValueInfo
   /**
    * The parsed value
    */
-  public value: any;
+  public value: undefined | any;
 
   /**
    * The tokens belonging to the value, in order of appearance
@@ -75,44 +75,38 @@ export default class ESValueInfo
    * When this value is the result of substituting in a parameter,
    * this is set to the name of that parameter.
    */
-  public parameter: string | null;
+  public parameter: undefined | string;
 
   /**
    * When interpreted, this is set to the detected ESClause for this value
    */
-  public clause: ESClause | null;
+  public clause: undefined | ESClause;
 
   /**
    * In the case of a variant clause, this is set to the variant clause
    */
-  public parentClause: ESClause | null;
+  public parentClause: undefined | ESClause;
 
   /**
-   * If value is an object, a corresponding object mapping keys. null otherwise.
+   * If value is an object, a corresponding object mapping keys, undefined otherwise.
    */
-  private _objectChildren: null | { [name: string]: ESPropertyInfo };
+  private _objectChildren: undefined | { [name: string]: ESPropertyInfo };
 
   /**
-   * If value is an array, a corresponding ESValueInfo[]. null otherwise.
+   * If value is an array, a corresponding ESValueInfo[], undefined otherwise.
    */
-  private _arrayChildren: null | ESValueInfo[];
+  private _arrayChildren: undefined | ESValueInfo[];
 
   /**
    * If errors were detected associated with this value, they will be in this list
-   * in the order in which they were detected. null otherwise.
+   * in the order in which they were detected, undefined otherwise.
    */
-  private _errors: null | ESParserError[];
+  private _errors: undefined | ESParserError[];
 
   public constructor()
   {
     this.jsonType = ESJSONType.unknown;
-    this.value = undefined;
     this.tokens = [];
-    this._arrayChildren = null;
-    this._errors = null;
-    this._objectChildren = null;
-    this.clause = null;
-    this.parentClause = null;
   }
 
   /**
@@ -120,7 +114,7 @@ export default class ESValueInfo
    */
   public get objectChildren(): { [name: string]: ESPropertyInfo }
   {
-    return (this._objectChildren === null) ? {} : this._objectChildren;
+    return (this._objectChildren === undefined) ? {} : this._objectChildren;
   }
 
   public addObjectChild(name: string, info: ESPropertyInfo): void
@@ -134,7 +128,7 @@ export default class ESValueInfo
    */
   public get arrayChildren(): ESValueInfo[]
   {
-    return (this._arrayChildren === null) ? [] : this._arrayChildren;
+    return (this._arrayChildren === undefined) ? [] : this._arrayChildren;
   }
 
   public addArrayChild(info: ESValueInfo): void
@@ -149,7 +143,7 @@ export default class ESValueInfo
    */
   public get errors(): ESParserError[]
   {
-    return (this._errors === null) ? [] : this._errors;
+    return (this._errors === undefined) ? [] : this._errors;
   }
 
   public attachError(error: ESParserError): void
