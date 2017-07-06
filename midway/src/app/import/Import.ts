@@ -95,16 +95,6 @@ export class Import
     // object: new Set(['object', 'nested']),
     // nested: new Set(['nested']),
   };
-  // private maxValues: object =
-  // {
-  //   byte: Math.pow(2, 7),
-  //   short: Math.pow(2, 15),
-  //   integer: Math.pow(2, 31),
-  //   long: Math.pow(2, 63),
-  //   half_float: Math.pow(2, 11),
-  //   float: Math.pow(2, 24),
-  //   double: Math.pow(2, 53),
-  // };
   private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
   private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
 
@@ -255,7 +245,6 @@ export class Import
     {
       return 'The empty string is not a valid column name.';
     }
-    // const columnTypes: string[] = this._getArrayFromMap(nameToType);
     const columnTypes: string[] = columnList.map((val) => nameToType[val]['type']);
     if (columnTypes.some((val, ind, arr) =>
     {
@@ -308,7 +297,6 @@ export class Import
     const mapping: object = {};
     Object.keys(nameToType).forEach((val) =>
     {
-      // mapping[val] = this._formatTypeForMapping(nameToType[val]);
       mapping[val] = this._getESType(nameToType[val]);
     });
     return DBUtil.constructESMapping(mapping);
@@ -327,41 +315,12 @@ export class Import
     {
       case 'array':
         return this._getESType(typeObject['innerType'], true);
-      // case 'object':
-      //     return withinArray ? 'nested' : 'object';
+      case 'object':
+        return withinArray ? 'nested' : 'object';
       default:
         return typeObject['type'];
     }
   }
-  // typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types
-  // returns: type (string or object (in the case of "object"/"nested" type)
-  // private _formatTypeForMapping(typeObject: object): string | object
-  // {
-  //     const esType: string = this._getESType(typeObject);
-  //     if (esType !== 'object' && esType !== 'nested')
-  //     {
-  //         return esType;
-  //     }
-  //     const mappingType: object = {};
-  //     if (esType === 'nested')
-  //     {
-  //         mappingType['__isNested__'] = true;
-  //     }
-  //     let innerObject: object = typeObject;
-  //     while (innerObject['type'] === 'array')
-  //     {
-  //         innerObject = innerObject['innerType'];
-  //     }
-  //     if (innerObject['type'] !== 'object')
-  //     {
-  //         throw new Error('Improperly formatted type encountered while translating for schema.');
-  //     }
-  //     Object.keys(innerObject).forEach((key) =>
-  //     {
-  //         mappingType[key] = this._formatTypeForMapping(innerObject[key]);
-  //     });
-  //     return mappingType;
-  // }
 
   private async _parseData(imprt: ImportConfig): Promise<object[]>
   {
@@ -746,18 +705,6 @@ export class Import
     return type;
   }
 
-  // private _getArrayFromMap(mapOrArray: object | string[]): string[]
-  // {
-  //   let array: string[];
-  //   if (Array.isArray(mapOrArray))
-  //   {
-  //     return array = mapOrArray;
-  //   } else
-  //   {
-  //     array = Object.keys(mapOrArray).map((key) => mapOrArray[key]);
-  //   }
-  //   return array;
-  // }
   private _includedNamesToType(imprt: ImportConfig): object
   {
     const nameToType: object = {};
