@@ -43,26 +43,86 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as React from 'react';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
-const Redux = require('redux');
-import Util from './../../util/Util';
+import Util from '../../util/Util';
+import PureClasss from './../../common/components/PureClasss';
+import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
+import Dropdown from './../../common/components/Dropdown';
+import Actions from './../data/FileImportActions';
+import './FileImportPreviewColumn.less';
 
-const DefaultState = FileImportTypes._FileImportState();
+export interface Props
+{
+  key: string;
+  id: string;
+  isIncluded: boolean;
+  name: string;
+  typeIndex: number;
+  isPrimaryKey: boolean;
 
-import FileImportReducers from './FileImportReducers';
+  types: List<string>;
+  canSelectType: boolean;
+  canSelectColumn: boolean;
+  columnOptions: List<string>;
+}
 
-export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
-  (state: FileImportTypes.FileImportState = DefaultState, action) =>
+class FileImportPreviewColumn extends PureClasss<Props>
+{
+  public handleIncludedChange()
   {
-    if (FileImportReducers[action.type])
-    {
-      state = FileImportReducers[action.type](state, action);
-    }
-
-    return state;
+    Actions.setColumnToInclude(this.props.id);
   }
-  , DefaultState);
 
-export default FileImportStore;
+  public handleAutocompleteHeaderChange(value)
+  {
+    Actions.setColumnName(this.props.id, value);
+  }
+
+  public handleTypeChange(typeIndex)
+  {
+    Actions.setColumnType(this.props.id, typeIndex);
+  }
+
+  public handlePrimaryKeyChange()
+  {
+    Actions.changePrimaryKey(this.props.id);
+  }
+
+  public render()
+  {
+    return (
+      <th>
+        include
+        <CheckBox
+          checked={this.props.isIncluded}
+          onChange={this.handleIncludedChange}
+        />
+        primary key
+        <CheckBox
+          checked={this.props.isPrimaryKey}
+          onChange={this.handlePrimaryKeyChange}
+        />
+        <Autocomplete
+          value={this.props.name}
+          options={this.props.columnOptions}
+          onChange={this.handleAutocompleteHeaderChange}
+          placeholder={this.props.id}
+          disabled={!this.props.canSelectColumn}
+        />
+        <Dropdown
+          selectedIndex={this.props.typeIndex}
+          options={this.props.types}
+          onChange={this.handleTypeChange}
+          canEdit={this.props.canSelectType}
+        />
+      </th>
+    );
+  }
+}
+
+export default FileImportPreviewColumn;
