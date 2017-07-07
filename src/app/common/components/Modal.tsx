@@ -68,6 +68,11 @@ export interface Props
   thirdButtonText?: string;
   onThirdButton?: () => void;
   pre?: boolean;
+  showTextbox?: boolean;
+  textboxValue?: string;
+  initialTextboxValue?: string;
+  textboxPlaceholderValue?: string;
+  onTextboxValueChange?: (newValue: string) => void;
 }
 
 class Modal extends PureClasss<Props>
@@ -76,6 +81,14 @@ class Modal extends PureClasss<Props>
   {
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
+  }
+
+  public handleTextboxChange(evt)
+  {
+    if (this.props.onTextboxValueChange)
+    {
+      this.props.onTextboxValueChange(evt.target.value);
+    }
   }
 
   public render()
@@ -135,6 +148,16 @@ class Modal extends PureClasss<Props>
                   children: this.props.message,
                 },
               )
+            }
+            {
+              this.props.showTextbox &&
+              <input
+                type='text'
+                placeholder={this.props.textboxPlaceholderValue}
+                defaultValue={this.props.initialTextboxValue}
+                value={this.props.textboxValue}
+                onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
+              />
             }
             {
               this.props.children

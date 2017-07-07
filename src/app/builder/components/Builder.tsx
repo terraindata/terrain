@@ -115,9 +115,11 @@ class Builder extends PureClasss<Props>
 
     nonexistentVariantIds: List<ID>;
 
-    saving?: boolean;
-
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
+
+    saving?: boolean;
+    savingAs?: boolean;
+
   } = {
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
@@ -140,6 +142,8 @@ class Builder extends PureClasss<Props>
   public initialColSizes: any;
 
   public confirmedLeave: boolean = false;
+
+  protected saveAsTextboxValue: string = '';
 
   constructor(props: Props)
   {
@@ -428,6 +432,12 @@ class Builder extends PureClasss<Props>
         onClick: this.onSave,
         enabled: this.shouldSave(builderState),
       },
+      {
+        text: 'Save As',
+        icon: <SaveIcon />,
+        onClick: this.onSaveAs,
+        enabled: true,
+      },
       //   {
       //     text: 'Duplicate',
       //     icon: <DuplicateIcon />,
@@ -461,6 +471,14 @@ class Builder extends PureClasss<Props>
       }
     }
     this.save();
+  }
+
+  public onSaveAs()
+  {
+    this.saveAsTextboxValue = Util.duplicateNameFor(this.getVariant().name);
+    this.setState({
+      savingAs: true,
+    });
   }
 
   public onSaveSuccess(variant: Variant)
@@ -792,6 +810,64 @@ class Builder extends PureClasss<Props>
     browserHistory.push(this.state.nextLocation);
   }
 
+  public handleSaveAsTextboxChange(newValue: string): void
+  {
+    this.saveAsTextboxValue = newValue;
+  }
+
+  public handleModalSaveAs()
+  {
+
+    let variant = LibraryTypes.touchVariant(this.getVariant());
+    variant = variant.set('query', this.getQuery());
+
+    // TODO remove if queries/variants model changes
+    if (5 === 5)
+    {
+      return;
+    }
+
+    LibraryActions.variants.change(variant);
+    this.onSaveSuccess(variant);
+    Actions.save(); // register that we are saving
+
+    let configArr = window.location.pathname.split('/')[2].split(',');
+    let currentVariant;
+    configArr = configArr.map((tab) =>
+    {
+      if (tab.substr(0, 1) === '!')
+      {
+        currentVariant = tab.substr(1).split('@')[0];
+        return '!' + currentVariant;
+      }
+      return tab;
+    },
+    );
+    for (let i = 0; i < configArr.length; i++)
+    {
+      if (configArr[i] === currentVariant)
+      {
+        configArr.splice(i, 1);
+      }
+    }
+    const newConfig = configArr.join(',');
+    if (newConfig !== this.props.params.config)
+    {
+      browserHistory.replace(`/builder/${newConfig}`);
+    }
+
+    this.setState({
+      savingAs: false
+    });
+  }
+
+  public handleModalSaveAsCancel()
+  {
+    this.setState({
+      savingAs: false
+    });
+  }
+
   public render()
   {
     const config = this.props.params.config;
@@ -838,7 +914,19 @@ class Builder extends PureClasss<Props>
           thirdButtonText="Don't Save"
           onThirdButton={this.handleModalDontSave}
         />
-
+        <Modal
+          open={this.state.savingAs}
+          message={'Enter New Variant Name: '}
+          title='Save As'
+          confirmButtonText='Save'
+          confirm={true}
+          onClose={this.handleModalSaveAsCancel}
+          onConfirm={this.handleModalSaveAs}
+          initialTextboxValue={this.saveAsTextboxValue}
+          textboxPlaceholderValue={'Variant Name'}
+          showTextbox={true}
+          onTextboxValueChange={this.handleSaveAsTextboxChange}
+        />
         <ResultsManager
           query={query}
           resultsState={this.state.builderState.resultsState}
