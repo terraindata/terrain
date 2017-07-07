@@ -64,17 +64,13 @@ export interface ImportConfig
   // if filetype is 'csv', default is to assume the first line contains headers
   // set this to true if this is not the case
   csvHeaderMissing?: boolean;
-  // if filetype is 'json': object mapping string (oldName) to string (newName)
-  // if filetype is 'csv': array of strings (newName)
-  columnMap: object | string[];
-  // if filetype is 'json': object mapping string (oldName) to boolean
-  // if filetype is 'csv': array of booleans
-  columnsToInclude: object | boolean[];
-  // if filetype is 'json': object mapping string (oldName) to object (contains "type" field, "innerType" field if array type)
-  // if filetype is 'csv': array of objects (contains "type" field, "innerType" field if array type)
+  // array of strings (oldName)
+  columnMap: string[];
+  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
   // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
   columnTypes: object | object[];
   primaryKey: string;  // newName of primary key
+  transformations: object[];  // list of in-order data transformations
 }
 
 export class Import
@@ -132,14 +128,40 @@ export class Import
       {
         return reject('Error parsing data: ' + String(e));
       }
+      winston.info('got parsed data!');
+      winston.info(JSON.stringify(items));
       if (items.length === 0)
       {
         return reject('No data provided in file to upload.');
       }
-      const columns: string[] = Object.keys(this._includedNamesToType(imprt));
-      winston.info('got parsed data!');
-      winston.info(JSON.stringify(items));
+      try
+      {
+        items = await this._applyTransforms(items, imprt.transformations);
+      } catch (e)
+      {
+        return reject('Failed to apply transforms: ' + String(e));
+      }
+      winston.info('applied transforms!');
+      // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
+      items = items.map((val) =>
+      {
+        const trimmedVal: object = {};
+        for (const name in imprt.columnTypes)
+        {
+          if (imprt.columnTypes.hasOwnProperty(name))
+          {
+            trimmedVal[name] = val[name];
+          }
+        }
+        return trimmedVal;
+      });
+      const typeError: string = this._checkTypes(items, imprt);
+      if (typeError !== '')
+      {
+        return reject(typeError);
+      }
 
+      const columns: string[] = Object.keys(imprt.columnTypes);
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.table,
         [imprt.primaryKey],
@@ -204,33 +226,12 @@ export class Import
       return typeError;
     }
 
-    if (imprt.filetype !== 'csv')
+    if (imprt.csvHeaderMissing === undefined)
     {
       imprt.csvHeaderMissing = false;
-      const cmNames: string = JSON.stringify(Object.keys(imprt.columnMap).sort());
-      const ctiNames: string = JSON.stringify(Object.keys(imprt.columnsToInclude).sort());
-      const ctNames: string = JSON.stringify(Object.keys(imprt.columnTypes).sort());
-      if (cmNames !== ctiNames || cmNames !== ctNames)
-      {
-        return 'List of names in columnMap, columnsToInclude, and columnTypes do not match.';
-      }
-    } else
-    {
-      if (imprt.csvHeaderMissing === undefined)
-      {
-        imprt.csvHeaderMissing = false;
-      }
-      if (!Array.isArray(imprt.columnMap) || !Array.isArray(imprt.columnsToInclude) || !Array.isArray(imprt.columnTypes))
-      {
-        return 'When uploading a CSV file, columnMap, columnsToInclude, and columnTypes should be arrays.';
-      }
-      if (imprt.columnMap.length !== imprt.columnsToInclude.length || imprt.columnMap.length !== imprt.columnTypes.length)
-      {
-        return 'Lengths of columnMap, columnsToInclude, and columnTypes do not match.';
-      }
     }
-    const nameToType: object = this._includedNamesToType(imprt);
-    const columnList: string[] = Object.keys(nameToType);
+
+    const columnList: string[] = Object.keys(imprt.columnTypes);
     const columns: Set<string> = new Set(columnList);
     if (columns.size !== columnList.length)
     {
@@ -244,7 +245,7 @@ export class Import
     {
       return 'The empty string is not a valid column name.';
     }
-    const columnTypes: string[] = columnList.map((val) => nameToType[val]['type']);
+    const columnTypes: string[] = columnList.map((val) => imprt.columnTypes[val]['type']);
     if (columnTypes.some((val, ind, arr) =>
     {
       return !(this.supportedColumnTypes.has(val));
@@ -258,12 +259,11 @@ export class Import
   /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
   private _getMappingForSchema(imprt: ImportConfig): object
   {
-    const nameToType: object = this._includedNamesToType(imprt);
     // create mapping containing new fields
     const mapping: object = {};
-    Object.keys(nameToType).forEach((val) =>
+    Object.keys(imprt.columnTypes).forEach((val) =>
     {
-      mapping[val] = this._getESType(nameToType[val]);
+      mapping[val] = this._getESType(imprt.columnTypes[val]);
     });
     return this._getMappingForSchemaHelper(mapping);
   }
@@ -355,98 +355,109 @@ export class Import
           {
             return reject('Input JSON file must parse to an array of objects.');
           }
-          if (items.length > 0)
+          // if (items.length > 0)
+          // {
+          // parse dates
+          // const dateColumns: string[] = [];
+          // for (const colName in imprt.columnTypes)
+          // {
+          //   if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName]['type'] === 'date')
+          //   {
+          //     dateColumns.push(colName);
+          //   }
+          // }
+          // if (dateColumns.length > 0)
+          // {
+          //   items.forEach((item) =>
+          //   {
+          //     dateColumns.forEach((colName) =>
+          //     {
+          //       const date: number = Date.parse(item[colName]);
+          //       if (!isNaN(date))
+          //       {
+          //         item[colName] = new Date(date);
+          //       }
+          //     });
+          //   });
+          // }
+
+          // const typeError: string = this._checkTypes(items, imprt.columnTypes);
+          // if (typeError !== '')
+          // {
+          //   return reject('Objects in provided input JSON do not match the specified keys and/or types: ' + typeError);
+          // }
+
+          // for (const oldName in imprt.columnMap)
+          // {
+          //   if (imprt.columnMap.hasOwnProperty(oldName) && !imprt.columnsToInclude[oldName])
+          //   {
+          //     delete imprt.columnMap[oldName];
+          //   }
+          // }
+
+          // NOTE: rebuilds the entire object to handle renaming of fields ; depending on how many fields we expect
+          // to be renamed, this could be much slower than directly deleting and updating fields
+          // const renamedItems: object[] = items.map((obj) =>
+          // {
+          //   const renamedObj: object = {};
+          //   for (const oldName in imprt.columnMap)
+          //   {
+          //     if (imprt.columnMap.hasOwnProperty(oldName))
+          //     {
+          //       renamedObj[imprt.columnMap[oldName]] = obj[oldName];
+          //     }
+          //   }
+          //   return renamedObj;
+          // });
+          // resolve(renamedItems);
+
+          const expectedCols: string = JSON.stringify(imprt.columnMap.sort());
+          for (const obj of items)
           {
-            // parse dates
-            const dateColumns: string[] = [];
-            for (const colName in imprt.columnTypes)
+            if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
             {
-              if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName]['type'] === 'date')
-              {
-                dateColumns.push(colName);
-              }
+              // TODO: make more informative, relax condition
+              return reject('JSON file contains an object that does not contain the expected fields.');
             }
-            if (dateColumns.length > 0)
-            {
-              items.forEach((item) =>
-              {
-                dateColumns.forEach((colName) =>
-                {
-                  const date: number = Date.parse(item[colName]);
-                  if (!isNaN(date))
-                  {
-                    item[colName] = new Date(date);
-                  }
-                });
-              });
-            }
-
-            const typeError: string = this._checkTypes(items, imprt.columnTypes);
-            if (typeError !== '')
-            {
-              return reject('Objects in provided input JSON do not match the specified keys and/or types: ' + typeError);
-            }
-
-            for (const oldName in imprt.columnMap)
-            {
-              if (imprt.columnMap.hasOwnProperty(oldName) && !imprt.columnsToInclude[oldName])
-              {
-                delete imprt.columnMap[oldName];
-              }
-            }
-
-            // NOTE: rebuilds the entire object to handle renaming of fields ; depending on how many fields we expect
-            // to be renamed, this could be much slower than directly deleting and updating fields
-            const renamedItems: object[] = items.map((obj) =>
-            {
-              const renamedObj: object = {};
-              for (const oldName in imprt.columnMap)
-              {
-                if (imprt.columnMap.hasOwnProperty(oldName))
-                {
-                  renamedObj[imprt.columnMap[oldName]] = obj[oldName];
-                }
-              }
-              return renamedObj;
-            });
-            resolve(renamedItems);
-          } else
-          {
-            resolve(items);
           }
+          resolve(items);
+          // } else
+          // {
+          //   resolve(items);
+          // }
         } catch (e)
         {
           return reject('JSON format incorrect: ' + String(e));
         }
       } else if (imprt.filetype === 'csv')
       {
-        const columnIndicesToInclude: number[] = (imprt.columnsToInclude as boolean[]).reduce((res, val, ind) =>
-        {
-          if (val)
-          {
-            res.push(ind);
-          }
-          return res;
-        }, [] as number[]);
-        const columnParsers: object = this._buildCSVColumnParsers(imprt);
+        // const columnIndicesToInclude: number[] = (imprt.columnsToInclude as boolean[]).reduce((res, val, ind) =>
+        // {
+        //   if (val)
+        //   {
+        //     res.push(ind);
+        //   }
+        //   return res;
+        // }, [] as number[]);
+        // const columnParsers: object = this._buildCSVColumnParsers(imprt);
         csv({
           flatKeys: true,
           checkColumn: true,
           noheader: imprt.csvHeaderMissing,
-          headers: imprt.columnMap as string[],
-          includeColumns: columnIndicesToInclude,
-          colParser: columnParsers,
+          headers: imprt.columnMap,
+          // includeColumns: columnIndicesToInclude,
+          // colParser: columnParsers,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
-          const nameToType: object = this._includedNamesToType(imprt);
-          const typeError: string = this._checkTypes(jsonArrObj, nameToType);
-          if (typeError === '')
-          {
-            resolve(jsonArrObj);
-          } else
-          {
-            return reject('Objects in provided input CSV do not match the specified keys and/or types: ' + typeError);
-          }
+          // const nameToType: object = this._includedNamesToType(imprt);
+          // const typeError: string = this._checkTypes(jsonArrObj, nameToType);
+          // if (typeError === '')
+          // {
+          resolve(jsonArrObj);
+          // } else
+          // {
+          //   return reject('Objects in provided input CSV do not match the specified keys and/or types: ' + typeError);
+          // }
         }).on('error', (e) =>
         {
           return reject('CSV format incorrect: ' + String(e));
@@ -457,127 +468,240 @@ export class Import
       }
     });
   }
-  private _buildCSVColumnParsers(imprt: ImportConfig): object
-  {
-    const columnParsers: object = {};
-    (imprt.columnTypes as object[]).map((val) =>
-    {
-      return this.numericTypes.has(val['type']) ? 'number' : val['type'];
-    }).forEach((val, ind) =>
-    {
-      switch (val)
-      {
-        case 'text':
-          columnParsers[imprt.columnMap[ind]] = 'string';
-          break;
-        case 'number':
-          columnParsers[imprt.columnMap[ind]] = (item) =>
-          {
-            const num: number = Number(item);
-            if (!isNaN(num))
-            {
-              return num;
-            }
-            if (item === '')
-            {
-              return null;
-            }
-            return '';   // type error that will be caught in post-processing
-          };
-          break;
-        case 'boolean':
-          columnParsers[imprt.columnMap[ind]] = (item) =>
-          {
-            if (item === 'true')
-            {
-              return true;
-            }
-            if (item === 'false')
-            {
-              return false;
-            }
-            if (item === '')
-            {
-              return null;
-            }
-            return '';   // type error that will be caught in post-processing
-          };
-          break;
-        case 'date':
-          columnParsers[imprt.columnMap[ind]] = (item) =>
-          {
-            const date: number = Date.parse(item);
-            if (!isNaN(date))
-            {
-              return new Date(date);
-            }
-            if (item === '')
-            {
-              return null;
-            }
-            return '';   // type error that will be caught in post-processing
-          };
-          break;
-        default:  // "array" and "object" cases
-          columnParsers[imprt.columnMap[ind]] = (item) =>
-          {
-            if (item === '')
-            {
-              return null;
-            }
-            try
-            {
-              return JSON.parse(item);
-            } catch (e)
-            {
-              return '';   // type error that will be caught in post-processing
-            }
-          };
-      }
-    });
-    return columnParsers;
-  }
+  // private _buildCSVColumnParsers(imprt: ImportConfig): object
+  // {
+  //   const columnParsers: object = {};
+  //   (imprt.columnTypes as object[]).map((val) =>
+  //   {
+  //     return this.numericTypes.has(val['type']) ? 'number' : val['type'];
+  //   }).forEach((val, ind) =>
+  //   {
+  //     switch (val)
+  //     {
+  //       case 'text':
+  //         columnParsers[imprt.columnMap[ind]] = 'string';
+  //         break;
+  //       case 'number':
+  //         columnParsers[imprt.columnMap[ind]] = (item) =>
+  //         {
+  //           const num: number = Number(item);
+  //           if (!isNaN(num))
+  //           {
+  //             return num;
+  //           }
+  //           if (item === '')
+  //           {
+  //             return null;
+  //           }
+  //           return '';   // type error that will be caught in post-processing
+  //         };
+  //         break;
+  //       case 'boolean':
+  //         columnParsers[imprt.columnMap[ind]] = (item) =>
+  //         {
+  //           if (item === 'true')
+  //           {
+  //             return true;
+  //           }
+  //           if (item === 'false')
+  //           {
+  //             return false;
+  //           }
+  //           if (item === '')
+  //           {
+  //             return null;
+  //           }
+  //           return '';   // type error that will be caught in post-processing
+  //         };
+  //         break;
+  //       case 'date':
+  //         columnParsers[imprt.columnMap[ind]] = (item) =>
+  //         {
+  //           const date: number = Date.parse(item);
+  //           if (!isNaN(date))
+  //           {
+  //             return new Date(date);
+  //           }
+  //           if (item === '')
+  //           {
+  //             return null;
+  //           }
+  //           return '';   // type error that will be caught in post-processing
+  //         };
+  //         break;
+  //       default:  // "array" and "object" cases
+  //         columnParsers[imprt.columnMap[ind]] = (item) =>
+  //         {
+  //           if (item === '')
+  //           {
+  //             return null;
+  //           }
+  //           try
+  //           {
+  //             return JSON.parse(item);
+  //           } catch (e)
+  //           {
+  //             return '';   // type error that will be caught in post-processing
+  //           }
+  //         };
+  //     }
+  //   });
+  //   return columnParsers;
+  // }
 
+  // TODO: recursive array type checking for CSVs, handle arrays of dates
   /* checks whether all objects in "items" have the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(items: object[], nameToType: object): string
+  private _checkTypes(items: object[], imprt: ImportConfig): string
   {
-    const targetHash: string = this._buildDesiredHash(nameToType);
-    const targetKeys: string = JSON.stringify(Object.keys(nameToType).sort());
-
     let ind: number = 0;
-    for (const obj of items)
+    if (imprt.filetype === 'json')
     {
-      if (this._hashObjectStructure(obj) === targetHash)
+      const targetHash: string = this._buildDesiredHash(imprt.columnTypes);
+      const targetKeys: string = JSON.stringify(Object.keys(imprt.columnTypes).sort());
+
+      // parse dates
+      const dateColumns: string[] = [];
+      for (const colName in imprt.columnTypes)
       {
-        winston.info('checktypes: hash matches');
-        ind++;
-        continue;
-      }
-      winston.info('checktypes: hashes do not match');
-      if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
-      {
-        return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
-      }
-      for (const key in obj)
-      {
-        if (obj.hasOwnProperty(key) && obj[key] !== null)
+        if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName]['type'] === 'date')
         {
-          if (!this._checkTypesHelper(obj[key], nameToType[key]))
-          {
-            return 'Field "' + key + '" of object number ' + String(ind) +
-              ' does not match the specified type: ' + JSON.stringify(nameToType[key]);
-          }
+          dateColumns.push(colName);
         }
       }
-      ind++;
+      if (dateColumns.length > 0)
+      {
+        items.forEach((item) =>
+        {
+          // TODO: reduce redundancy with CSV parser below
+          dateColumns.forEach((colName) =>
+          {
+            const date: number = Date.parse(item[colName]);
+            if (!isNaN(date))
+            {
+              item[colName] = new Date(date);
+            }
+          });
+        });
+      }
+
+      for (const obj of items)
+      {
+        if (this._hashObjectStructure(obj) === targetHash)
+        {
+          winston.info('checktypes: hash matches');
+          ind++;
+          continue;
+        }
+        winston.info('checktypes: hashes do not match');
+        if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
+        {
+          return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
+        }
+        for (const key in obj)
+        {
+          if (obj.hasOwnProperty(key) && obj[key] !== null)
+          {
+            if (!this._checkTypesHelper(obj[key], imprt.columnTypes[key]))
+            {
+              return 'Field "' + key + '" of object number ' + String(ind) +
+                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
+            }
+          }
+        }
+        ind++;
+      }
+    }
+    else if (imprt.filetype === 'csv')
+    {
+      for (const obj of items)
+      {
+        for (const name in imprt.columnTypes)
+        {
+          if (imprt.columnTypes.hasOwnProperty(name))
+          {
+            switch (this.numericTypes.has(imprt.columnTypes[name]['type']) ? 'number' : imprt.columnTypes[name]['type'])
+            {
+              case 'number':
+                winston.info('\n');
+                winston.info(obj[name]);
+                winston.info('\n');
+                const num: number = Number(obj[name]);
+                if (!isNaN(num))
+                {
+                  obj[name] = num;
+                }
+                else if (obj[name] === '')
+                {
+                  obj[name] = null;
+                }
+                else
+                {
+                  return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: number';
+                }
+                break;
+              case 'boolean':
+                if (obj[name] === 'true')
+                {
+                  obj[name] = true;
+                }
+                else if (obj[name] === 'false')
+                {
+                  obj[name] = false;
+                }
+                else if (obj[name] === '')
+                {
+                  obj[name] = null;
+                }
+                else
+                {
+                  return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: boolean';
+                }
+                break;
+              case 'date':
+                const date: number = Date.parse(obj[name]);
+                if (!isNaN(date))
+                {
+                  obj[name] = new Date(date);
+                }
+                else if (obj[name] === '')
+                {
+                  obj[name] = null;
+                }
+                else
+                {
+                  return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: date';
+                }
+                break;
+              case 'array':
+                if (obj[name] === '')
+                {
+                  obj[name] = null;
+                }
+                else
+                {
+                  try
+                  {
+                    obj[name] = JSON.parse(obj[name]);
+                  } catch (e)
+                  {
+                    return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: array';
+                  }
+                }
+                break;
+              default:  // "text" case, leave as string
+            }
+          }
+        }
+        ind++;
+      }
     }
 
     // check that all elements of arrays are of the same type
-    for (const field of Object.keys(nameToType))
+    for (const field of Object.keys(imprt.columnTypes))
     {
-      if (nameToType[field]['type'] === 'array')
+      if (imprt.columnTypes[field]['type'] === 'array')
       {
         ind = 0;
         for (const obj of items)
@@ -740,17 +864,113 @@ export class Import
     return structStr;
   }
 
-  private _includedNamesToType(imprt: ImportConfig): object
+  private async _applyTransforms(items: object[], transforms: object[]): Promise<object[]>
   {
-    const nameToType: object = {};
-    Object.keys(imprt.columnMap).forEach((ind) =>
+    return new Promise<object[]>(async (resolve, reject) =>
     {
-      if (imprt.columnsToInclude[ind])
+      for (const transform of transforms)
       {
-        nameToType[imprt.columnMap[ind]] = imprt.columnTypes[ind];
+        switch (transform['name'])
+        {
+          case 'rename':
+            const oldName: string | undefined = transform['args']['oldName'];
+            const newName: string | undefined = transform['args']['newName'];
+            if (oldName === undefined || newName === undefined)
+            {
+              return reject('Rename transformation must supply oldName and newName arguments.');
+            }
+            for (const obj of items)
+            {
+              obj[newName] = obj[oldName];
+              delete obj[oldName];
+            }
+            break;
+          case 'split':
+            const oldCol: string | undefined = transform['args']['oldName'];
+            const newCols: string[] | undefined = transform['args']['newName'];
+            const splitText: string | undefined = transform['args']['text'];
+            if (oldCol === undefined || newCols === undefined || splitText === undefined)
+            {
+              return reject('Split transformation must supply oldName, newName, and text arguments.');
+            }
+            if (newCols.length !== 2)
+            {
+              return reject('Split transformation currently only supports splitting into two columns.');
+            }
+            if (typeof items[0][oldCol] !== 'string')
+            {
+              return reject('Can only split columns containing text.');
+            }
+            for (const obj of items)
+            {
+              const ind: number = obj[oldCol].indexOf(splitText);
+              if (ind === -1)
+              {
+                obj[newCols[0]] = obj[oldCol];
+                obj[newCols[1]] = '';
+                delete obj[oldCol];
+              }
+              else
+              {
+                obj[newCols[0]] = obj[oldCol].substring(0, ind);
+                obj[newCols[1]] = obj[oldCol].substring(ind + splitText.length);
+                delete obj[oldCol];
+              }
+            }
+            break;
+          case 'merge':
+            const oldCols: string[] | undefined = transform['args']['oldName'];
+            const newCol: string | undefined = transform['args']['newName'];
+            const mergeText: string | undefined = transform['args']['text'];
+            if (oldCols === undefined || newCol === undefined || mergeText === undefined)
+            {
+              return reject('Merge transformation must supply oldName, newName, and text arguments.');
+            }
+            if (oldCols.length !== 2)
+            {
+              return reject('Merge transformation currently only supports merging of two columns.');
+            }
+            if (typeof items[0][oldCols[0]] !== 'string' || typeof items[0][oldCols[1]] !== 'string')
+            {
+              return reject('Can only merge columns containing text.');
+            }
+            for (const obj of items)
+            {
+              obj[newCol] = String(obj[oldCols[0]]) + mergeText + String(obj[oldCols[1]]);
+              delete obj[oldCols[0]];
+              delete obj[oldCols[1]];
+            }
+            break;
+          default:
+            if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
+            {
+              return reject('Invalid transform name encountered: ' + String(transform['name']));
+            }
+            const colName: string | undefined = transform['args']['colName'];
+            const text: string | undefined = transform['args']['text'];
+            if (colName === undefined || text === undefined)
+            {
+              return reject('Prepend/append transformation must supply colName and text arguments.');
+            }
+            if (typeof items[0][colName] !== 'string')
+            {
+              return reject('Can only prepend/append to columns containing text.');
+            }
+            for (const obj of items)
+            {
+              if (transform['name'] === 'prepend')
+              {
+                obj[colName] = text + String(obj[colName]);
+              }
+              else
+              {
+                obj[colName] = String(obj[colName]) + text;
+              }
+            }
+        }
       }
+      resolve(items);
     });
-    return nameToType;
   }
 }
 

@@ -720,34 +720,24 @@ describe('File import route tests', () =>
           dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: '[{"pkey":1,"column1":"hello","column2":"goodbye","column3":false,"column4":null}]',
+          contents: '[{"pkey":1,"column1":"hello","col2":"goodbye","col3":false,"col4":null}]',
           filetype: 'json',
 
-          columnMap:
-          {
-            pkey: 'pkey',
-            column1: 'col1',
-            column2: 'col2',
-            column3: 'col3',
-            column4: 'col4',
-          },
-          columnsToInclude:
-          {
-            pkey: true,
-            column1: true,
-            column2: false,
-            column3: true,
-            column4: true,
-          },
+          columnMap: ['pkey', 'column1', 'col2', 'col3', 'col4'],
           columnTypes:
           {
             pkey: { type: 'long' },
-            column1: { type: 'text' },
-            column2: { type: 'text' },
-            column3: { type: 'boolean' },
-            column4: { type: 'date' },
+            col1: { type: 'text' },
+            col3: { type: 'boolean' },
+            col4: { type: 'date' },
           },
           primaryKey: 'pkey',
+          transformations: [
+            {
+              name: 'rename',
+              args: { oldName: 'column1', newName: 'col1' },
+            },
+          ],
         },
       })
       .expect(200)
@@ -786,13 +776,15 @@ describe('File import route tests', () =>
 
           csvHeaderMissing: false,
           columnMap: ['pkey', 'column1', 'column2', 'column3', 'column4'],
-          columnsToInclude: [true, true, false, true, true],
-          columnTypes: [{ type: 'long' },
-          { type: 'text' },
-          { type: 'text' },
-          { type: 'boolean' },
-          { type: 'date' }],
+          columnTypes:
+          {
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column3: { type: 'boolean' },
+            column4: { type: 'date' },
+          },
           primaryKey: 'pkey',
+          transformations: [],
         },
       })
       .expect(200)
@@ -836,18 +828,7 @@ describe('File import route tests', () =>
           contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           filetype: 'json',
 
-          columnMap:
-          {
-            pkey: 'pkey',
-            column1: 'column1',
-            column2: 'column2',
-          },
-          columnsToInclude:
-          {
-            pkey: true,
-            column1: true,
-            column2: true,
-          },
+          columnMap: ['pkey', 'column1', 'column2'],
           columnTypes:
           {
             pkey: { type: 'long' },
@@ -855,6 +836,7 @@ describe('File import route tests', () =>
             column2: { type: 'text' },
           },
           primaryKey: 'pkey',
+          transformations: [],
         },
       })
       .expect(400)
