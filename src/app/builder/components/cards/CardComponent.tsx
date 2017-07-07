@@ -561,7 +561,7 @@ class _CardComponent extends PureClasss<Props>
                   <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
                 }
                 {
-                  ! localStorage['hideTitle'] &&
+                  ! (this.props.card && this.props.card['noTitle']) &&
                     <div
                       className='card-title-inner'
                       style={{

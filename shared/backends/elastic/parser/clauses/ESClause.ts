@@ -169,13 +169,16 @@ abstract class ESClause
     };
   }): any
   {
+    // hide the title for elastic
+    obj['noTitle'] = true;
+    
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: this.name,
       colors: [],
       language: 'elastic',
 
-      anythingAccepts: true, // TODO remove after testing
+      // anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach
