@@ -76,8 +76,8 @@ export default class ESInterpreter
    * @param params parameter map to use
    */
   public constructor(query: string | ESJSONParser,
-    config: EQLConfig,
-    params: { [name: string]: ESClause } = {})
+    params: { [name: string]: ESClause } = {},
+    config: EQLConfig = ESInterpreterDefaultConfig)
   {
     this.config = config;
     this.params = params;

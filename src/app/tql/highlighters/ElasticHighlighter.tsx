@@ -125,8 +125,6 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null =
  */
 class ElasticHighlighter extends SyntaxHighlighter
 {
-  public static config = new EQLConfig();
-
   public initialHighlight(instance): void
   {
     this.handleChanges(instance, []);
@@ -136,7 +134,7 @@ class ElasticHighlighter extends SyntaxHighlighter
   {
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
-    const interpreter = new ESInterpreter(parser, ElasticHighlighter.config);
+    const interpreter = new ESInterpreter(parser);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();
 
     for (const fToken of traverseTokens(parser.getValueInfo()))
