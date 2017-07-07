@@ -61,7 +61,7 @@ import './FileImportPreviewColumn.less';
 
 export interface Props
 {
-  id: number;
+  columnId: number;
   isIncluded: boolean;
   name: string;
   columnType: any;
@@ -82,19 +82,19 @@ class FileImportPreviewColumn extends PureClasss<Props>
 {
   public handleIncludedChange()
   {
-    Actions.setColumnToInclude(this.props.id);
+    Actions.setColumnToInclude(this.props.columnId);
   }
 
   public handlePrimaryKeyChange()
   {
     console.log('update primaryKey: ', this.props.name);
-    Actions.changePrimaryKey(this.props.id);
+    Actions.changePrimaryKey(this.props.columnId);
   }
 
   public handleAutocompleteHeaderChange(value)
   {
-    this.props.handleRenameTransform('rename', this.props.oldNames.get(this.props.id), value);
-    Actions.setColumnName(this.props.id, value);
+    this.props.handleRenameTransform('rename', this.props.oldNames.get(this.props.columnId), value);
+    Actions.setColumnName(this.props.columnId, value);
   }
 
   public render()
@@ -119,7 +119,7 @@ class FileImportPreviewColumn extends PureClasss<Props>
           disabled={!this.props.canSelectColumn}
         />
         <TypeDropdown
-          columnId={this.props.id}
+          columnId={this.props.columnId}
           recursionId={0}
           columnType={this.props.columnType}
           datatypes={this.props.datatypes}

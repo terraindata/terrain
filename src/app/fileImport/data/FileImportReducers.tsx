@@ -107,7 +107,7 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
-      .set('primaryKey', state.columnNames.get(action.payload.id))
+      .set('primaryKey', action.payload.id)
   ;
 
 FileImportReducers[ActionTypes.setColumnToInclude] =
@@ -124,7 +124,7 @@ FileImportReducers[ActionTypes.setColumnType] =
     const columnTypes = state.columnTypes.toArray();
     columnTypes[action.payload.columnId] = recSetType(columnTypes[action.payload.columnId], 0, action.payload.recursionId, action.payload.typeIndex);
 
-    if (action.payload.typeIndex === 4)
+    if (FileImportTypes.ELASTIC_TYPES[action.payload.typeIndex] === 'array')
     {
       columnTypes[action.payload.columnId] = recAddType(columnTypes[action.payload.columnId]);
     }
@@ -143,12 +143,6 @@ FileImportReducers[ActionTypes.deleteColumnType] =
 FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
   {
-    if (state.columnNames.get(action.payload.id) === state.primaryKey)
-    {
-      return state
-        .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName))
-        .set('primaryKey', action.payload.columnName);
-    }
     return state
       .set('columnNames', state.columnNames.set(action.payload.id, action.payload.columnName));
   };
@@ -264,7 +258,7 @@ FileImportReducers[ActionTypes.chooseFile] =
     return state
       .set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
-      .set('primaryKey', '')
+      .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
       .set('columnsCount', colsCount)
       .set('oldNames', List(columnNames))
@@ -294,7 +288,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.connectionId,
       state.oldNames,
       Map<string, object>(cTypesMap),
-      state.primaryKey,
+      state.columnNames.get(state.primaryKey),
       state.transforms,
       () =>
       {

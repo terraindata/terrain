@@ -64,7 +64,7 @@ class FileImportStateC extends BaseClass
   public columnsCount: number = 0;
 
   public hasCsvHeader: boolean = true;
-  public primaryKey: string = '';
+  public primaryKey: number = -1;
 
   public oldNames: Immutable.List<string> = null;
   public columnNames: Immutable.List<string> = null;

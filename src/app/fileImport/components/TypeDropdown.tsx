@@ -48,6 +48,7 @@ import * as $ from 'jquery';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
 import Actions from './../data/FileImportActions';
 import PureClasss from './../../common/components/PureClasss';
@@ -87,7 +88,7 @@ class TypeDropdown extends PureClasss<Props>
           canEdit={true}
         />
         {
-          this.props.columnType.type === 4 &&
+          FileImportTypes.ELASTIC_TYPES[this.props.columnType.type] === 'array' &&
           <TypeDropdown
             columnId={this.props.columnId}
             recursionId={this.props.recursionId + 1}
