@@ -203,7 +203,6 @@ class FileImportInfo extends PureClasss<Props>
       return;
     }
 
-
     const filetype = file.target.files[0].name.split('.').pop();
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
@@ -221,43 +220,43 @@ class FileImportInfo extends PureClasss<Props>
     }
   }
 
-  public handleUploadFile()
-  {
-    if (!this.props.canImport)
-    {
-      alert('You do not have permission to upload files');
-      return;
-    }
-    if (!this.state.fileSelected)
-    {
-      alert('Please select a file to upload');
-      return;
-    }
-    if (!this.state.serverSelected)
-    {
-      alert('Please select a server');
-      return;
-    }
-    if (!this.state.dbSelected)
-    {
-      alert('Please select a database');
-      return;
-    }
-    if (!this.state.tableSelected)
-    {
-      alert('Please select a table');
-      return;
-    }
-
-    const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
-    if (msg)
-    {
-      alert(msg);
-      return;
-    }
-
-    Actions.uploadFile();
-  }
+  // public handleUploadFile()
+  // {
+  //   if (!this.props.canImport)
+  //   {
+  //     alert('You do not have permission to upload files');
+  //     return;
+  //   }
+  //   if (!this.state.fileSelected)
+  //   {
+  //     alert('Please select a file to upload');
+  //     return;
+  //   }
+  //   if (!this.state.serverSelected)
+  //   {
+  //     alert('Please select a server');
+  //     return;
+  //   }
+  //   if (!this.state.dbSelected)
+  //   {
+  //     alert('Please select a database');
+  //     return;
+  //   }
+  //   if (!this.state.tableSelected)
+  //   {
+  //     alert('Please select a table');
+  //     return;
+  //   }
+  //
+  //   const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
+  //   if (msg)
+  //   {
+  //     alert(msg);
+  //     return;
+  //   }
+  //
+  //   Actions.uploadFile();
+  // }
 
   public render()
   {

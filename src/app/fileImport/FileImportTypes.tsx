@@ -69,8 +69,7 @@ class FileImportStateC extends BaseClass
   public oldNames: Immutable.List<string> = null;
   public columnNames: Immutable.List<string> = null;
   public columnsToInclude: Immutable.List<boolean> = null;
-  public columnTypes: Immutable.List<number> = null;
-  public colTypes: List<object> = null;
+  public columnTypes: List<object> = null;
 
   public transforms: Immutable.List<object> = List([]);
 }

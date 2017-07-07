@@ -67,8 +67,7 @@ export interface Props
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<number>;
-  colTypes: List<object>;
+  columnTypes: List<object>;
   columnOptions: List<string>;
 }
 
@@ -151,8 +150,7 @@ class FileImportPreview extends PureClasss<Props>
                     id={key}
                     isIncluded={this.props.columnsToInclude.get(key)}
                     name={this.props.columnNames.get(key)}
-                    typeIndex={this.props.columnTypes.get(key)}
-                    colType={this.props.colTypes.get(key)}
+                    columnType={this.props.columnTypes.get(key)}
                     isPrimaryKey={this.props.primaryKey === value}
                     oldNames={this.props.oldNames}
                     canSelectType={true}

@@ -64,8 +64,7 @@ export interface Props
   id: number;
   isIncluded: boolean;
   name: string;
-  typeIndex: number;
-  colType: object;
+  columnType: any;
   isPrimaryKey: boolean;
 
   datatypes: List<string>;
@@ -86,11 +85,6 @@ class FileImportPreviewColumn extends PureClasss<Props>
     Actions.setColumnToInclude(this.props.id);
   }
 
-  public handleTypeChange(typeIndex)
-  {
-    Actions.setColumnType(this.props.id, typeIndex);
-  }
-
   public handlePrimaryKeyChange()
   {
     console.log('update primaryKey: ', this.props.name);
@@ -105,28 +99,6 @@ class FileImportPreviewColumn extends PureClasss<Props>
 
   public render()
   {
-    // let recursionId = 0;
-    // const recurseType = (obj) =>
-    // {
-    //   recursionId++;
-    //   return (
-    //   <div>
-    //     <TypeDropdown
-    //       columnId={this.props.id}
-    //       recursionId={recursionId}
-    //       typeIndex={obj.type}
-    //       datatypes={this.props.datatypes}
-    //     />
-    //     {
-    //       obj.type === 4 && recurseType(obj.colType)
-    //     }
-    //   </div>
-    //   );
-    // };
-
-    // const typeDropdowns = recurseType(this.props.colType);
-    console.log('colType: ', this.props.colType);
-
     return (
       <th>
         include
@@ -146,20 +118,14 @@ class FileImportPreviewColumn extends PureClasss<Props>
           placeholder={''}
           disabled={!this.props.canSelectColumn}
         />
-        <Dropdown
-          selectedIndex={this.props.typeIndex}
-          options={this.props.datatypes}
-          onChange={this.handleTypeChange}
-          canEdit={this.props.canSelectType}
-        />
         <TypeDropdown
           columnId={this.props.id}
           recursionId={0}
-          colType={this.props.colType}
+          columnType={this.props.columnType}
           datatypes={this.props.datatypes}
         />
         <TransformBox
-          datatype={this.props.datatypes.get(this.props.typeIndex)}
+          datatype={this.props.datatypes.get(this.props.columnType.type)}
           transformTypes={this.props.transformTypes}
           newName={this.props.name}
           addCurRenameTransform={this.props.addCurRenameTransform}

@@ -53,24 +53,23 @@ const { List, Map } = Immutable;
 
 const FileImportReducers = {};
 
-const recSetType = (colType, count, recursionId, typeIndex) =>
+const recSetType = (columnType, count, recursionId, typeIndex) =>
 {
-  count++;
-  count < recursionId ? recSetType(colType.colType, count, recursionId, typeIndex) : colType.type = typeIndex;
-  return colType;
+  count < recursionId ? recSetType(columnType.columnType, count + 1, recursionId, typeIndex) : columnType.type = typeIndex;
+  return columnType;
 };
 
-const recAddType = (colType) =>
+const recAddType = (columnType) =>
 {
-  colType.colType ? recAddType(colType.colType) : colType.colType = { type: 0 };
-  return colType;
+  columnType.columnType ? recAddType(columnType.columnType) : columnType.columnType = { type: 0 };
+  return columnType;
 };
 
-const myFunc = (colType) =>
+const recDeleteType = (columnType, count, recursionId) =>
 {
-  colType.type = 1;
-  return colType;
-}
+  count < recursionId - 1 && columnType.columnType ? recDeleteType(columnType.columnType, count + 1, recursionId) : delete columnType.columnType;
+  return columnType;
+};
 
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
@@ -109,27 +108,26 @@ FileImportReducers[ActionTypes.setColumnToInclude] =
 
 FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
-    state
-      .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
-  ;
-
-FileImportReducers[ActionTypes.setColType] =
-  (state, action) =>
   {
-    // return state.setIn(['colTypes', action.payload.columnId], myFunc(state.colTypes.get(action.payload.columnId));
-    // return state.setIn(['colTypes', action.payload.columnId], recurseType(state.colTypes.get(action.payload.columnId), 0, action.payload.recursionId, action.payload.typeIndex))
+    // console.log(action.payload.recursionId + ', ' + action.payload.typeIndex);
 
-    const colTypes = state.colTypes.toArray();
-    colTypes[action.payload.columnId] = recSetType(colTypes[action.payload.columnId], 0, action.payload.recursionId, action.payload.typeIndex);
-    return state.set('colTypes', List(colTypes));
+    const columnTypes = state.columnTypes.toArray();
+    columnTypes[action.payload.columnId] = recSetType(columnTypes[action.payload.columnId], 0, action.payload.recursionId, action.payload.typeIndex);
+
+    if (action.payload.typeIndex === 4)
+    {
+      columnTypes[action.payload.columnId] = recAddType(columnTypes[action.payload.columnId]);
+    }
+
+    return state.set('columnTypes', List(columnTypes));
   };
 
-FileImportReducers[ActionTypes.addColType] =
+FileImportReducers[ActionTypes.deleteColumnType] =
   (state, action) =>
   {
-    const colTypes = state.colTypes.toArray();
-    colTypes[action.payload.columnId] = recAddType(colTypes[action.payload.columnId]);
-    return state.set('colTypes', List(colTypes));
+    const columnTypes = state.columnTypes.toArray();
+    columnTypes[action.payload.columnId] = recDeleteType(columnTypes[action.payload.columnId], 0, action.payload.recursionId);
+    return state.set('columnTypes', List(columnTypes));
   };
 
 FileImportReducers[ActionTypes.setColumnName] =
@@ -207,7 +205,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
           .set(transformCol, action.payload.transform.args.splitNames[0])
           .insert(transformCol + 1, action.payload.transform.args.splitNames[1]))
         .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
-        .set('columnTypes', state.columnTypes.insert(transformCol + 1, 0))
+        .set('columnTypes', state.columnTypes.insert(transformCol + 1, { type: 0 }))
     }
     else if (action.payload.transform.name === 'merge')
     {
@@ -241,16 +239,13 @@ FileImportReducers[ActionTypes.chooseFile] =
     const columnNames = [];
     const columnsToInclude = [];
     const columnTypes = [];
-    const colTypes = [];
     let colsCount = 0;
 
     _.map(action.payload.preview.get(0), (value, key) =>
     {
       columnNames.push(action.payload.oldNames.get(key));
       columnsToInclude.push(true);
-      columnTypes.push(0);
-      // colTypes.push({type: 4, colType: {type: 4, colType: {type: 2}}});
-      colTypes.push({ type: 0 });
+      columnTypes.push({ type: 0 });
       colsCount++;
     });
 
@@ -266,49 +261,18 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('columnNames', List(columnNames))
       .set('columnsToInclude', List(columnsToInclude))
       .set('columnTypes', List(columnTypes))
-      .set('colTypes', List(colTypes))
   };
 
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
-    // const isCsv = state.filetype === 'csv';
-    // const columnTypes = [];
-    // state.columnTypes.forEach((value, key) =>
-    // {
-    //   switch (value)
-    //   {
-    //     case 0:
-    //       isCsv ? columnTypes.push('string') : columnTypes.push([key, 'string']);
-    //       break;
-    //     case 1:
-    //       isCsv ? columnTypes.push('number') : columnTypes.push([key, 'number']);
-    //       break;
-    //     case 2:
-    //       isCsv ? columnTypes.push('boolean') : columnTypes.push([key, 'boolean']);
-    //       break;
-    //     case 3:
-    //       isCsv ? columnTypes.push('date') : columnTypes.push([key, 'date']);
-    //       break;
-    //   }
-    // });
-    // const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
-    // const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
-    // const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
-
     const cToIncludeMap = [];
     const cTypesMap = [];
     state.columnNames.forEach((value, key) =>
     {
       cToIncludeMap.push([value, state.columnsToInclude.get(key)]);
       cTypesMap.push([value, state.columnTypes.get(key)]);
-      // const typeName = FileImportTypes.ELASTIC_TYPES[value];
-      // columnTypes.push(isCsv ? typeName : [key, typeName]);
     });
-
-    // const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
-    // const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
-    // const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
 
     Ajax.importFile(
       state.file,
@@ -318,7 +282,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.connectionId,
       state.oldNames,
       Map<string, boolean>(cToIncludeMap),
-      Map<string, string>(cTypesMap),
+      Map<string, object>(cTypesMap),
       state.primaryKey,
       state.transforms,
       () =>

@@ -690,7 +690,7 @@ export const Ajax =
       connectionId: number,
       oldNames: List<string>,                                           // old names
       columnsToInclude: Immutable.Map<string, boolean>,                 // new names -> included
-      columnTypes: Immutable.Map<string, string>,                       // new names -> type
+      columnTypes: Immutable.Map<string, object>,                       // new names -> type
       primaryKey: string,
       transformations: List<object>,
       onLoad: (resp: object[]) => void,

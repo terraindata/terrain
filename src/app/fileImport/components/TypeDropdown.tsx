@@ -57,7 +57,7 @@ export interface Props
 {
   columnId: number,
   recursionId: number;
-  colType: any;
+  columnType: any;
   datatypes: List<string>;
 }
 
@@ -65,47 +65,33 @@ class TypeDropdown extends PureClasss<Props>
 {
   public handleTypeChange(typeIndex)
   {
-    Actions.setColType(this.props.columnId, this.props.recursionId, typeIndex);
+    Actions.setColumnType(this.props.columnId, this.props.recursionId, typeIndex);
   }
 
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    if (this.props.colType.type !== 4 && nextProps.colType.type === 4)
-    {
-      Actions.addColType(this.props.columnId);
-    }
-  }
-
-  // add columnType object at recursion depth, components will mount in ascending order
-  public componentWillMount()
-  {
-
-  }
-
-  // remove columnType object at recursionId depth (thereby removing all levels below) if it exists
   public componentWillUnmount()
   {
-
+    Actions.deleteColumnType(this.props.columnId, this.props.recursionId);
   }
 
   public render()
   {
-    console.log('col id: ', this.props.columnId);
-    console.log('recursion id: ', this.props.recursionId);
+    // console.log('typeDropdown: ', this.props.columnType);
+    // console.log('col id: ', this.props.columnId);
+    // console.log('recursion id: ', this.props.recursionId);
     return (
       <div>
         <Dropdown
-          selectedIndex={this.props.colType.type}
+          selectedIndex={this.props.columnType.type}
           options={this.props.datatypes}
           onChange={this.handleTypeChange}
           canEdit={true}
         />
         {
-          this.props.colType.type === 4 &&
+          this.props.columnType.type === 4 &&
           <TypeDropdown
             columnId={this.props.columnId}
             recursionId={this.props.recursionId + 1}
-            colType={this.props.colType.colType}
+            columnType={this.props.columnType.columnType}
             datatypes={this.props.datatypes}
           />
         }
