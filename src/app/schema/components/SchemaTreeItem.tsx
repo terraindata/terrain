@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
-import SchemaTypes from '../SchemaTypes';
+import * as SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
 import { databaseChildrenConfig, DatabaseTreeInfo } from './items/DatabaseTreeInfo';

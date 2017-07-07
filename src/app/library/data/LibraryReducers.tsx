@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import Util from './../../util/Util';
-import LibraryTypes from './../LibraryTypes';
+import * as LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import { LibraryState } from './LibraryStore';
 

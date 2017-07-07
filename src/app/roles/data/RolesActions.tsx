@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import RoleTypes from './../RoleTypes';
+import * as RoleTypes from './../RoleTypes';
 import ActionTypes from './RolesActionTypes';
 import Store from './RolesStore';
 

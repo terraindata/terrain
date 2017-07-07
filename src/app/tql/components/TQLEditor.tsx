@@ -53,10 +53,17 @@ import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
 const CodeMirror = require('./Codemirror.js');
 
+// syntax highlighters
+import ElasticHighlighter from '../highlighters/ElasticHighlighter';
+import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
+
+// Formatting and Parsing
+import ESConverter from '../../../../shared/backends/elastic/conversion/formatter/ESConverter';
+import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
+
 // Style sheets and addons for CodeMirror
-
+require('./elastic.js');
 require('./tql.js');
-
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/edit/matchbrackets.js';
@@ -83,6 +90,7 @@ import './dialog.less';
 
 export interface Props
 {
+
   tql: string;
   language?: string;
   canEdit: boolean;
@@ -104,13 +112,22 @@ export interface Props
 
 class TQLEditor extends PureClasss<Props>
 {
+  public state: {
+    codeMirrorInstance // CodeMirror instance does not have a defined type.
+  } = {
+    codeMirrorInstance: null
+  };
+
   public render()
   {
     const options =
       {
         readOnly: !this.props.canEdit,
         lineNumbers: true,
-        extraKeys: { 'Ctrl-F': 'findPersistent' },
+        extraKeys: {
+          'Ctrl-F': 'findPersistent',
+          'Ctrl-Alt-F': this.handleAutoFormatRequest
+        },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
         matchBrackets: true,
@@ -118,7 +135,6 @@ class TQLEditor extends PureClasss<Props>
         foldGutter: true,
         lint: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-
         revertButtons: false,
         connect: 'align',
 
@@ -127,7 +143,15 @@ class TQLEditor extends PureClasss<Props>
 
     if (this.props.language === 'elastic')
     {
-      options['mode'] = 'application/json';
+      options['mode'] = 'elastic';
+    }
+    else if (this.props.language === 'mysql')
+    {
+      options['mode'] = 'tql';
+    }
+    else
+    {
+      options['mode'] = '';
     }
 
     if (this.props.isDiff)
@@ -159,9 +183,62 @@ class TQLEditor extends PureClasss<Props>
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
         onFocusChange={this.props.onFocusChange}
+        onCodeMirrorMount={this.registerCodeMirror}
       />
     );
   }
+
+  /*
+   *  Returns the formatted query, or null if the query has errors.
+   */
+  public autoFormatQuery(input: string): string | null
+  {
+    if (this.props.language === 'elastic')
+    {
+      const parser: ESJSONParser = new ESJSONParser(input);
+      if (!parser.hasError())
+      {
+        const newText: string = ESConverter.formatES(parser);
+        return newText;
+      }
+    }
+    return null;
+  }
+
+  private handleAutoFormatRequest(cmInstance): void
+  {
+    if (this.props.language === 'elastic')
+    {
+      const formatted = this.autoFormatQuery(cmInstance.getValue());
+      if (formatted)
+      {
+        this.state.codeMirrorInstance.setValue(formatted);
+      }
+    }
+  }
+
+  private handleChanges(cmInstance, changes: object[])
+  {
+    if (this.props.language === 'elastic')
+    {
+      const highlighter = new ElasticHighlighter();
+      highlighter.handleChanges(cmInstance, changes);
+    }
+  }
+
+  private registerCodeMirror(cmInstance)
+  {
+    this.setState({
+      codeMirrorInstance: cmInstance
+    });
+    cmInstance.on('changes', this.handleChanges);
+    if (this.props.language === 'elastic') // make this a switch if there are more languages
+    {
+      const highlighter = new ElasticHighlighter();
+      highlighter.initialHighlight(cmInstance);
+    }
+  }
+
 }
 
 export default TQLEditor;

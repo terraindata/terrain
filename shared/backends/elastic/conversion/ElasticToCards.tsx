@@ -53,7 +53,7 @@ import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
 import * as CommonElastic from '../syntax/CommonElastic';
 
-import BlockUtils from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
@@ -65,19 +65,26 @@ export default function ElasticToCards(
   queryReady: (query: Query) => void,
 ): Query
 {
-  try
+  if (query.parseTree === null || query.parseTree.hasError())
   {
-    const obj = JSON.parse(query.tql);
-    let cards = parseMagicObject(obj);
-    cards = BlockUtils.reconcileCards(query.cards, cards);
-    return query
-      .set('cards', cards)
-      .set('cardsAndCodeInSync', true);
-  }
-  catch (e)
-  {
+    // TODO: we may want to show some error messages on the cards.
     return query
       .set('cardsAndCodeInSync', false);
+  } else
+  {
+    try
+    {
+      let cards = parseMagicObject(query.parseTree.parser.getValue());
+      cards = BlockUtils.reconcileCards(query.cards, cards);
+      return query
+        .set('cards', cards)
+        .set('cardsAndCodeInSync', true);
+    }
+    catch (e)
+    {
+      return query
+        .set('cardsAndCodeInSync', false);
+    }
   }
 }
 

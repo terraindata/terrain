@@ -55,8 +55,8 @@ import LibraryStore from '../library/data/LibraryStore';
 import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
-import LibraryTypes from './../library/LibraryTypes';
-import UserTypes from './../users/UserTypes';
+import * as LibraryTypes from './../library/LibraryTypes';
+import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
 
@@ -65,6 +65,7 @@ import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
+// const { List, Map } = Immutable;
 
 export const Ajax =
   {
@@ -217,7 +218,7 @@ export const Ajax =
         }
         catch (e)
         {
-          ;
+
         }
       }
       else if (config.urlArgs)
@@ -460,6 +461,14 @@ export const Ajax =
         {
           onLoad(variantItem as LibraryTypes.Variant);
         },
+        (error) =>
+        {
+          if (error as any === 'Nothing found')
+          {
+            onLoad(null);
+          }
+        },
+
       );
       // }
       // TODO
@@ -561,7 +570,10 @@ export const Ajax =
           {
             onLoad(null, v);
           }
-          onLoad(v.query, v);
+          else
+          {
+            onLoad(v.query, v);
+          }
         },
       );
     },
@@ -676,8 +688,13 @@ export const Ajax =
       db: string,
       table: string,
       connectionId: number,
-      onLoad: (response: MidwayQueryResponse) => void,
+      columnNames: IMMap<string, string> | Immutable.List<string>,
+      columnsToInclude: IMMap<string, boolean> | Immutable.List<boolean>,
+      columnTypes: IMMap<string, string> | Immutable.List<string>,
+      primaryKey: string,
+      onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
+      hasCsvHeader?: boolean,
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const payload: object = {
@@ -686,12 +703,16 @@ export const Ajax =
         table,
         contents: file,
         filetype,
+        columnMap: columnNames,
+        columnsToInclude,
+        columnTypes,
+        primaryKey,
+        csvHeaderMissing: !hasCsvHeader,
       };
-      console.log("payload: ", payload);
+      console.log('payload: ', payload);
       const onLoadHandler = (resp) =>
       {
-        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-        onLoad(queryResult);
+        onLoad(resp);
       };
       const xhr = Ajax.req(
         'post',

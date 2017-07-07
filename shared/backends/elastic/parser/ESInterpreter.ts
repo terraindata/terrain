@@ -51,6 +51,8 @@ import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
 
+export const ESInterpreterDefaultConfig = new EQLConfig();
+
 /**
  * An instrumented interpreter that takes the output of ESJSONParser and
  * decorates the results with ES-specific information.
@@ -130,5 +132,10 @@ export default class ESInterpreter
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
     this.parser.accumulateErrorOnValueInfo(info, message, isWarning);
+  }
+
+  public hasError()
+  {
+    return this.parser === null || this.parser.hasError();
   }
 }

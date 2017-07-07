@@ -53,7 +53,7 @@ import './ManualEntry.less';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 import * as Immutable from 'immutable';
-import BlockUtils from '../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
 import Card from './../../builder/components/cards/CardComponent';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');

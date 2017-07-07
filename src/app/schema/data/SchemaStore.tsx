@@ -48,14 +48,14 @@ import * as _ from 'underscore';
 import Redux = require('redux');
 import { Store } from 'redux';
 import * as ReduxActions from 'redux-actions';
-import SchemaTypes from '../SchemaTypes';
+import * as SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
 import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
-import SchemaParser from './SchemaParser';
+import * as SchemaParser from './SchemaParser';
 
 type Server = SchemaTypes.Server;
 type Database = SchemaTypes.Database;

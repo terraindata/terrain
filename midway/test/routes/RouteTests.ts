@@ -720,8 +720,34 @@ describe('File import route tests', () =>
           dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: '[{"column1":"hello","column2":"goodbye"}]',
+          contents: '[{"pkey":1,"column1":"hello","column2":"goodbye","column3":false,"column4":null}]',
           filetype: 'json',
+
+          columnMap:
+          {
+            pkey: 'pkey',
+            column1: 'col1',
+            column2: 'col2',
+            column3: 'col3',
+            column4: 'col4',
+          },
+          columnsToInclude:
+          {
+            pkey: true,
+            column1: true,
+            column2: false,
+            column3: true,
+            column4: true,
+          },
+          columnTypes:
+          {
+            pkey: 'number',
+            column1: 'string',
+            column2: 'string',
+            column3: 'boolean',
+            column4: 'date',
+          },
+          primaryKey: 'pkey',
         },
       })
       .expect(200)
@@ -732,8 +758,10 @@ describe('File import route tests', () =>
         expect(respData.length).toBeGreaterThan(0);
         expect(respData[0])
           .toMatchObject({
-            column1: 'hello',
-            column2: 'goodbye',
+            pkey: 1,
+            col1: 'hello',
+            col3: false,
+            col4: null,
           });
       })
       .catch((error) =>
@@ -753,8 +781,14 @@ describe('File import route tests', () =>
           dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: 'column1,column2\nhi,hello\nbye,goodbye',
+          contents: 'pkey,column1,column2,sillyname,column4\n1,hi,hello,false,1970-01-01\n2,bye,goodbye,,',
           filetype: 'csv',
+
+          csvHeaderMissing: false,
+          columnMap: ['pkey', 'column1', 'column2', 'column3', 'column4'],
+          columnsToInclude: [true, true, false, true, true],
+          columnTypes: ['number', 'string', 'string', 'boolean', 'date'],
+          primaryKey: 'pkey',
         },
       })
       .expect(200)
@@ -765,13 +799,17 @@ describe('File import route tests', () =>
         expect(respData.length).toBeGreaterThan(0);
         expect(respData[0])
           .toMatchObject({
+            pkey: 1,
             column1: 'hi',
-            column2: 'hello',
+            column3: false,
+            column4: new Date(Date.parse('1970-01-01')).toISOString(),
           });
         expect(respData[1])
           .toMatchObject({
+            pkey: 2,
             column1: 'bye',
-            column2: 'goodbye',
+            column3: null,
+            column4: null,
           });
       })
       .catch((error) =>
@@ -783,7 +821,7 @@ describe('File import route tests', () =>
   test('Invalid import: POST /midway/v1/import/', async () =>
   {
     await request(server)
-      .post('/midway/v1/items/314159265359')
+      .post('/midway/v1/import/')
       .send({
         id: 1,
         accessToken: 'AccessToken',
@@ -791,8 +829,28 @@ describe('File import route tests', () =>
           dbid: 1,
           db: 'test_elastic_db',
           table: 'fileImportTestTable',
-          contents: '{"column1":"hello","column2":"goodbye"}',
+          contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           filetype: 'json',
+
+          columnMap:
+          {
+            pkey: 'pkey',
+            column1: 'column1',
+            column2: 'column2',
+          },
+          columnsToInclude:
+          {
+            pkey: true,
+            column1: true,
+            column2: true,
+          },
+          columnTypes:
+          {
+            pkey: 'number',
+            column1: 'string',
+            column2: 'string',
+          },
+          primaryKey: 'pkey',
         },
       })
       .expect(400)
@@ -802,7 +860,7 @@ describe('File import route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+        fail('POST /midway/v1/import/ request returned an error: ' + String(error));
       });
   });
 });

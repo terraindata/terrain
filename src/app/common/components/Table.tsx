@@ -102,7 +102,6 @@ class _Table extends PureClasss<Props>
 
   public render()
   {
-    console.log(this.props.containerHeight);
     return (
       <ReactDataGrid
         {...this.props}

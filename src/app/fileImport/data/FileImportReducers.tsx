@@ -45,62 +45,137 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
+import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
-import Ajax from './../../util/Ajax';
+const { List, Map } = Immutable;
 
-const FileImportReducers = {}
+const FileImportReducers = {};
 
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
-      .set('serverIndex', action.payload.serverIndex)
       .set('connectionId', action.payload.connectionId)
-      .set('serverSelected', true)
+      .set('serverText', action.payload.name)
   ;
 
 FileImportReducers[ActionTypes.changeDbText] =
   (state, action) =>
     state
-      .set('dbText', action.payload.dbText).set('dbSelected', !!action.payload.dbText);
+      .set('dbText', action.payload.dbText);
 
 FileImportReducers[ActionTypes.changeTableText] =
   (state, action) =>
     state
-      .set('tableText', action.payload.tableText).set('tableSelected', !!action.payload.tableText);
+      .set('tableText', action.payload.tableText);
+
+FileImportReducers[ActionTypes.changeHasCsvHeader] =
+  (state, action) =>
+    state
+      .set('hasCsvHeader', !state.hasCsvHeader)
+  ;
+
+FileImportReducers[ActionTypes.changePrimaryKey] =
+  (state, action) =>
+    state
+      .set('primaryKey', state.columnNames.get(action.payload.id))
+  ;
+
+FileImportReducers[ActionTypes.setColumnToInclude] =
+  (state, action) =>
+    state
+      .updateIn(['columnsToInclude', action.payload.id], (isColIncluded: boolean) => !isColIncluded)
+  ;
+
+FileImportReducers[ActionTypes.setColumnName] =
+  (state, action) =>
+    state
+      .setIn(['columnNames', action.payload.id], action.payload.columnName)
+  ;
+
+FileImportReducers[ActionTypes.setColumnType] =
+  (state, action) =>
+    state
+      .setIn(['columnTypes', action.payload.id], action.payload.typeIndex)
+  ;
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
-    state
+  {
+    const columnsToInclude = [];
+    const columnNames = [];
+    const columnTypes = [];
+    let colsCount = 0;
+
+    if (action.payload.filetype === 'csv' && !state.hasCsvHeader)
+    {
+      console.log('headerless csv');
+      action.payload.preview[0].map((value, i) =>
+      {
+        columnsToInclude.push(['column' + i, true]);
+        columnNames.push(['column' + i, 'column' + i]);
+        columnTypes.push(['column' + i, 0]);
+        colsCount++;
+      });
+    }
+    else
+    {
+      console.log('csv with header/json');
+      _.map(action.payload.preview[0], (value, key) =>
+      {
+        columnsToInclude.push([key, true]);
+        columnNames.push([key, key]);
+        columnTypes.push([key, 0]);
+        colsCount++;
+      });
+    }
+
+    return state
       .set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
-      .set('fileChosen', true)
-  ;
-
-FileImportReducers[ActionTypes.unchooseFile] =
-  (state, action) =>
-    state
-      .set('fileChosen', false)
-  ;
+      .set('primaryKey', '')
+      .set('previewRows', action.payload.preview)
+      .set('columnsCount', colsCount)
+      .set('columnsToInclude', Map(columnsToInclude))
+      .set('columnNames', Map(columnNames))
+      .set('columnTypes', Map(columnTypes));
+  };
 
 FileImportReducers[ActionTypes.uploadFile] =
-  (state, action) =>
+  (state) =>
   {
+    const isCsv = state.filetype === 'csv';
+    const columnTypes = [];
+    state.columnTypes.forEach((value, key) =>
+    {
+      const typeName = FileImportTypes.ELASTIC_TYPES[value];
+      columnTypes.push(isCsv ? typeName : [key, typeName]);
+    });
+
+    const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
+    const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
+    const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
+
     Ajax.importFile(
       state.file,
       state.filetype,
       state.dbText,
       state.tableText,
       state.connectionId,
+      cNames,
+      cToInclude,
+      cTypes,
+      state.primaryKey,
       () =>
       {
-        alert("success");
+        alert('success');
       },
-      (ev: string) =>
+      (err: string) =>
       {
-        console.log(JSON.parse(ev));
-        alert('Error uploading file: ' + JSON.parse(ev).errors[0].detail);
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
       },
+      state.hasCsvHeader,
     );
     return state;
   };

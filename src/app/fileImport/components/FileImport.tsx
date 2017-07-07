@@ -45,14 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as FileImportTypes from './../FileImportTypes';
+import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
-import PureClasss from './../../common/components/PureClasss';;
-import FileImportStore from './../data/FileImportStore';
 import FileImportInfo from './FileImportInfo';
-import FileImportTypes from './../FileImportTypes';
-const HTML5Backend = require('react-dnd-html5-backend');
+import FileImportStore from './../data/FileImportStore';
+import FileImportPreview from './FileImportPreview';
+import PureClasss from './../../common/components/PureClasss';
 import SchemaStore from './../../schema/data/SchemaStore';
-import SchemaTypes from './../../schema/SchemaTypes';
+import { server } from "../../../../midway/src/Midway";
+const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
 export interface Props
@@ -63,16 +65,13 @@ export interface Props
   route?: any;
 }
 
-const FILETYPES = Immutable.List(['json', 'csv']);
-
 class FileImport extends PureClasss<any>
 {
   public state: {
     fileImportState: FileImportTypes.FileImportState;
     servers?: SchemaTypes.ServerMap;
-    serverNames?: List<string>;
-    dbNames?: List<string>;
-    tableNames?: List<string>;
+    dbs?: SchemaTypes.DatabaseMap;
+    tables?: SchemaTypes.TableMap;
   } = {
     fileImportState: FileImportStore.getState(),
   };
@@ -86,57 +85,77 @@ class FileImport extends PureClasss<any>
     });
 
     this._subscribe(SchemaStore, {
-      updater: (schemaState: SchemaTypes.SchemaState) =>
+      updater: (schemaState: SchemaTypes.SchemaState, ) =>
       {
         this.setState({
           servers: schemaState.servers,
-          serverNames: this.getKeyListSafely(schemaState.servers),
-          dbNames: this.getKeyListSafely(schemaState.databases),
-          tableNames: this.getKeyListSafely(schemaState.tables),
+          dbs: schemaState.databases,
+          tables: schemaState.tables,
         });
       }
+      ,
     });
   }
 
   public render()
   {
     const { fileImportState } = this.state;
-    const { serverSelected, serverIndex, dbSelected, dbText, tableSelected, tableText, fileChosen } = fileImportState;
+    const { serverText, dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
 
     return (
-      <div>
+      <div className="file-import">
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
             canSelectServer={true}
             servers={this.state.servers}
-            serverNames={this.state.serverNames}
-            serverIndex={serverIndex}
-            serverSelected={serverSelected}
             canSelectDb={true}
-            dbs={this.state.dbNames}
+            dbs={
+              this.state.servers && serverText && this.state.servers.get(serverText) ?
+                List(this.state.servers.get(serverText).databaseIds.map((value, index) =>
+                  value.split('/').pop()
+                ))
+                :
+                List([])
+            }
             dbText={dbText}
-            dbSelected={dbSelected}
             canSelectTable={true}
-            tables={this.state.tableNames}
+            tables={
+              this.state.dbs && dbText && this.state.dbs.get(serverText + '/' + dbText) ?
+                List(this.state.dbs.get(serverText + '/' + dbText).tableIds.map((value, index) =>
+                  value.split('.').pop()
+                ))
+                :
+                List([])
+            }
             tableText={tableText}
-            tableSelected={tableSelected}
             canImport={true}
-            validFiletypes={FILETYPES}
-            fileChosen={fileChosen}
+            validFiletypes={List(FileImportTypes.FILE_TYPES)}
+            previewRowsCount={FileImportTypes.NUMBER_PREVIEW_ROWS}
+            hasCsvHeader={hasCsvHeader}
           />
         </div>
+        {
+          previewRows &&
+          <FileImportPreview
+            previewRows={previewRows}
+            columnsCount={columnsCount}
+            primaryKey={primaryKey}
+            columnsToInclude={columnsToInclude}
+            columnNames={columnNames}
+            columnTypes={columnTypes}
+            columnOptions={
+              this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?
+                List(this.state.tables.get(serverText + '/' + dbText + '.' + tableText).columnIds.map((value, index) =>
+                  value.split('.').pop()
+                ))
+                :
+                List([])
+            }
+          />
+        }
       </div>
     );
-  }
-
-  private getKeyListSafely(map: IMMap<string, any>)
-  {
-    if (map === undefined)
-    {
-      return List<string>();
-    }
-    return map.keySeq().toList();
   }
 }
 

@@ -53,7 +53,7 @@ import Ajax from './../../util/Ajax';
 import AuthStore from './../../auth/data/AuthStore';
 import Util from './../../util/Util';
 
-import UserTypes from './../UserTypes';
+import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
 import UserReducers from './UserReducers';
 
