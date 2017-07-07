@@ -55,8 +55,8 @@ import LibraryStore from '../library/data/LibraryStore';
 import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
-import LibraryTypes from './../library/LibraryTypes';
-import UserTypes from './../users/UserTypes';
+import * as LibraryTypes from './../library/LibraryTypes';
+import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
 
@@ -218,7 +218,7 @@ export const Ajax =
         }
         catch (e)
         {
-          ;
+
         }
       }
       else if (config.urlArgs)
@@ -461,6 +461,14 @@ export const Ajax =
         {
           onLoad(variantItem as LibraryTypes.Variant);
         },
+        (error) =>
+        {
+          if (error as any === 'Nothing found')
+          {
+            onLoad(null);
+          }
+        },
+
       );
       // }
       // TODO
@@ -562,7 +570,10 @@ export const Ajax =
           {
             onLoad(null, v);
           }
-          onLoad(v.query, v);
+          else
+          {
+            onLoad(v.query, v);
+          }
         },
       );
     },
@@ -700,7 +711,7 @@ export const Ajax =
         csvHeaderMissing: !hasCsvHeader,
         transformations,
       };
-      console.log("payload: ", payload);
+      console.log('payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);

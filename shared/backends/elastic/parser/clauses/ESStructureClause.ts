@@ -44,27 +44,85 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'underscore';
+
+import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESPropertyInfo from '../ESPropertyInfo';
+import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause which is a number
+ * A clause with a well-defined structure.
  */
-export default class ESObjectClause extends ESClause
+export default class ESStructureClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public structure: { [name: string]: string };
+  public required: any[];
+
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
   {
-    super(type, settings);
+    super(type, settings, ESClauseType.ESStructureClause);
+    this.structure = structure;
+    this.required = required;
+  }
+
+  public init(config: EQLConfig): void
+  {
+    Object.keys(this.structure).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.structure[key]);
+      });
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'object' && !Array.isArray(value))
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
+
+    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
+    const propertyClause: ESClause = interpreter.config.getClause('property');
+
+    // mark properties
+    Object.keys(children).forEach(
+      (name: string): void =>
+      {
+        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+
+        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
+
+        if (!this.structure.hasOwnProperty(name))
+        {
+          interpreter.accumulateError(viTuple.propertyName,
+            'Unknown property \"' + name +
+            '\". Expected one of these properties: ' +
+            JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+            true);
+          return;
+        }
+        else if (viTuple.propertyValue === null)
+        {
+          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
+        }
+        else
+        {
+          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
+
+          propertyClause.mark(interpreter, viTuple.propertyName);
+          clause.mark(interpreter, viTuple.propertyValue);
+        }
+      });
+
+    // check required members
+    this.required.forEach((name: string): void =>
     {
-      interpreter.accumulateError(valueInfo, 'This value should be an object.');
-    }
+      if (children[name] !== undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 }

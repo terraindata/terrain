@@ -43,33 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-
-/**
- * A clause which is a terminal (base) value: null, boolean, number, or string
- */
-export default class ESBaseClause extends ESClause
+// Copyright 2017 Terrain Data, Inc.
+interface ParseTreeToQueryOptions
 {
-  public constructor(type: string, settings: any)
-  {
-    super(type, settings);
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) === 'object')
-    {
-      const foundType: string = Array.isArray(value) ? 'array' : 'object';
-      interpreter.accumulateError(
-        valueInfo,
-        'Found an ' +
-        foundType +
-        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
-    }
-  }
+  allFields?: boolean; // amend the final Select card to include all possible fields.
+  limit?: number;
+  count?: boolean;
 }
+
+export default ParseTreeToQueryOptions;

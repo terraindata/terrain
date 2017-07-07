@@ -47,13 +47,14 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
 import * as FileImportTypes from './../FileImportTypes';
+import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 import Actions from './../data/FileImportActions';
+
 import './FileImportPreview.less';
 const { List } = Immutable;
 
@@ -67,6 +68,8 @@ export interface Props
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<number>;
+  colTypes: List<object>;
+  columnOptions: List<string>;
 }
 
 class FileImportPreview extends PureClasss<Props>
@@ -149,6 +152,7 @@ class FileImportPreview extends PureClasss<Props>
                     isIncluded={this.props.columnsToInclude.get(key)}
                     name={this.props.columnNames.get(key)}
                     typeIndex={this.props.columnTypes.get(key)}
+                    colType={this.props.colTypes.get(key)}
                     isPrimaryKey={this.props.primaryKey === value}
                     oldNames={this.props.oldNames}
                     canSelectType={true}
@@ -157,6 +161,7 @@ class FileImportPreview extends PureClasss<Props>
                     transformTypes={List(FileImportTypes.TRANSFORM_TYPES)}
                     handleRenameTransform={this.handleRenameTransform}
                     addCurRenameTransform={this.addCurRenameTransform}
+                    columnOptions={this.props.columnOptions}
                   />
                 ).toArray()
               }

@@ -43,28 +43,75 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as Immutable from 'immutable';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
+import Actions from './../data/FileImportActions';
+import PureClasss from './../../common/components/PureClasss';
+import Dropdown from './../../common/components/Dropdown';
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
-
-/**
- * A clause which is a string
- */
-export default class ESStringClause extends ESClause
+export interface Props
 {
-  public constructor(type: string, settings: any)
+  columnId: number,
+  recursionId: number;
+  colType: any;
+  datatypes: List<string>;
+}
+
+class TypeDropdown extends PureClasss<Props>
+{
+  public handleTypeChange(typeIndex)
   {
-    super(type, settings);
+    Actions.setColType(this.props.columnId, this.props.recursionId, typeIndex);
   }
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  public componentWillReceiveProps(nextProps: Props)
   {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) !== 'string')
+    if (this.props.colType.type !== 4 && nextProps.colType.type === 4)
     {
-      interpreter.accumulateError(valueInfo, 'This value should be a string.');
+      Actions.addColType(this.props.columnId);
     }
   }
+
+  // add columnType object at recursion depth, components will mount in ascending order
+  public componentWillMount()
+  {
+
+  }
+
+  // remove columnType object at recursionId depth (thereby removing all levels below) if it exists
+  public componentWillUnmount()
+  {
+
+  }
+
+  public render()
+  {
+    console.log('col id: ', this.props.columnId);
+    console.log('recursion id: ', this.props.recursionId);
+    return (
+      <div>
+        <Dropdown
+          selectedIndex={this.props.colType.type}
+          options={this.props.datatypes}
+          onChange={this.handleTypeChange}
+          canEdit={true}
+        />
+        {
+          this.props.colType.type === 4 &&
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionId={this.props.recursionId + 1}
+            colType={this.props.colType.colType}
+            datatypes={this.props.datatypes}
+          />
+        }
+      </div>
+    );
+  }
 }
+
+export default TypeDropdown;

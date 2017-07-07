@@ -48,12 +48,14 @@ import * as $ from 'jquery';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TransformBox from './../components/TransformBox';
+import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import './FileImportPreviewColumn.less';
 
@@ -63,6 +65,7 @@ export interface Props
   isIncluded: boolean;
   name: string;
   typeIndex: number;
+  colType: object;
   isPrimaryKey: boolean;
 
   datatypes: List<string>;
@@ -71,6 +74,7 @@ export interface Props
   oldNames: List<string>;
 
   transformTypes: List<string>;
+  columnOptions: List<string>;
   handleRenameTransform(name: string, oldName: string, newName: string);
   addCurRenameTransform();
 }
@@ -101,6 +105,28 @@ class FileImportPreviewColumn extends PureClasss<Props>
 
   public render()
   {
+    // let recursionId = 0;
+    // const recurseType = (obj) =>
+    // {
+    //   recursionId++;
+    //   return (
+    //   <div>
+    //     <TypeDropdown
+    //       columnId={this.props.id}
+    //       recursionId={recursionId}
+    //       typeIndex={obj.type}
+    //       datatypes={this.props.datatypes}
+    //     />
+    //     {
+    //       obj.type === 4 && recurseType(obj.colType)
+    //     }
+    //   </div>
+    //   );
+    // };
+
+    // const typeDropdowns = recurseType(this.props.colType);
+    console.log('colType: ', this.props.colType);
+
     return (
       <th>
         include
@@ -115,7 +141,7 @@ class FileImportPreviewColumn extends PureClasss<Props>
         />
         <Autocomplete
           value={this.props.name}
-          options={null}
+          options={this.props.columnOptions}
           onChange={this.handleAutocompleteHeaderChange}
           placeholder={''}
           disabled={!this.props.canSelectColumn}
@@ -125,6 +151,12 @@ class FileImportPreviewColumn extends PureClasss<Props>
           options={this.props.datatypes}
           onChange={this.handleTypeChange}
           canEdit={this.props.canSelectType}
+        />
+        <TypeDropdown
+          columnId={this.props.id}
+          recursionId={0}
+          colType={this.props.colType}
+          datatypes={this.props.datatypes}
         />
         <TransformBox
           datatype={this.props.datatypes.get(this.props.typeIndex)}

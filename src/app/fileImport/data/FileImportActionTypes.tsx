@@ -60,6 +60,8 @@ const FileImportActionTypes =
     setColumnToInclude: '',
     setColumnName: '',
     setColumnType: '',
+    setColType: '',
+    addColType: '',
     updatePreviewRows: '',
   };
 

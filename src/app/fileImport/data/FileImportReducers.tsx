@@ -45,17 +45,38 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
+import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import ActionTypes from './FileImportActionTypes';
-import Ajax from './../../util/Ajax';
 const { List, Map } = Immutable;
 
-const FileImportReducers = {}
+const FileImportReducers = {};
+
+const recSetType = (colType, count, recursionId, typeIndex) =>
+{
+  count++;
+  count < recursionId ? recSetType(colType.colType, count, recursionId, typeIndex) : colType.type = typeIndex;
+  return colType;
+};
+
+const recAddType = (colType) =>
+{
+  colType.colType ? recAddType(colType.colType) : colType.colType = { type: 0 };
+  return colType;
+};
+
+const myFunc = (colType) =>
+{
+  colType.type = 1;
+  return colType;
+}
 
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
       .set('connectionId', action.payload.connectionId)
+      .set('serverText', action.payload.name)
   ;
 
 FileImportReducers[ActionTypes.changeDbText] =
@@ -91,6 +112,25 @@ FileImportReducers[ActionTypes.setColumnType] =
     state
       .set('columnTypes', state.columnTypes.set(action.payload.id, action.payload.typeIndex))
   ;
+
+FileImportReducers[ActionTypes.setColType] =
+  (state, action) =>
+  {
+    // return state.setIn(['colTypes', action.payload.columnId], myFunc(state.colTypes.get(action.payload.columnId));
+    // return state.setIn(['colTypes', action.payload.columnId], recurseType(state.colTypes.get(action.payload.columnId), 0, action.payload.recursionId, action.payload.typeIndex))
+
+    const colTypes = state.colTypes.toArray();
+    colTypes[action.payload.columnId] = recSetType(colTypes[action.payload.columnId], 0, action.payload.recursionId, action.payload.typeIndex);
+    return state.set('colTypes', List(colTypes));
+  };
+
+FileImportReducers[ActionTypes.addColType] =
+  (state, action) =>
+  {
+    const colTypes = state.colTypes.toArray();
+    colTypes[action.payload.columnId] = recAddType(colTypes[action.payload.columnId]);
+    return state.set('colTypes', List(colTypes));
+  };
 
 FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
@@ -201,6 +241,7 @@ FileImportReducers[ActionTypes.chooseFile] =
     const columnNames = [];
     const columnsToInclude = [];
     const columnTypes = [];
+    const colTypes = [];
     let colsCount = 0;
 
     _.map(action.payload.preview.get(0), (value, key) =>
@@ -208,6 +249,8 @@ FileImportReducers[ActionTypes.chooseFile] =
       columnNames.push(action.payload.oldNames.get(key));
       columnsToInclude.push(true);
       columnTypes.push(0);
+      // colTypes.push({type: 4, colType: {type: 4, colType: {type: 2}}});
+      colTypes.push({ type: 0 });
       colsCount++;
     });
 
@@ -222,7 +265,8 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('oldNames', List(columnNames))
       .set('columnNames', List(columnNames))
       .set('columnsToInclude', List(columnsToInclude))
-      .set('columnTypes', List(columnTypes));
+      .set('columnTypes', List(columnTypes))
+      .set('colTypes', List(colTypes))
   };
 
 FileImportReducers[ActionTypes.uploadFile] =
@@ -279,7 +323,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.transforms,
       () =>
       {
-        alert("success");
+        alert('success');
       },
       (err: string) =>
       {

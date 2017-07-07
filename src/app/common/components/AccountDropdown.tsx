@@ -51,7 +51,7 @@ import Actions from '../../builder/data/BuilderActions';
 import PureClasss from '../../common/components/PureClasss';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
-import UserTypes from '../../users/UserTypes';
+import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import './AccountDropdown.less';
 import Modal from './Modal';

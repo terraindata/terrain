@@ -74,7 +74,6 @@ export default class EQLTemplateGenerator
       case ESJSONType.boolean:
       case ESJSONType.number:
       case ESJSONType.string:
-      case ESJSONType.property:
         this.result += JSON.stringify(source.value);
         break;
 

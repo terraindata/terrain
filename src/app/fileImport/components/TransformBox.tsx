@@ -93,29 +93,37 @@ class TransformBox extends Classs<Props>
 
   public handleSplitNameAChange(splitNameA)
   {
+    const names = this.state.splitNames.slice();
+    names[0] = splitNameA;
     this.setState({
-      splitNames: this.state.splitNames[0] = splitNameA,
+      splitNames: names,
     });
   }
 
   public handleSplitNameBChange(splitNameB)
   {
+    const names = this.state.splitNames.slice();
+    names[1] = splitNameB;
     this.setState({
-      splitNames: this.state.splitNames[1] = splitNameB,
+      splitNames: names,
     });
   }
 
   public handleMergeOldNameChange(mergeOldName)
   {
+    const names = this.state.mergeNames.slice();
+    names[0] = mergeOldName;
     this.setState({
-      mergeNames: this.state.mergeNames[0] = mergeOldName,
+      mergeNames: names,
     });
   }
 
   public handleMergeNewNameChange(mergeNewName)
   {
+    const names = this.state.mergeNames.slice();
+    names[1] = mergeNewName;
     this.setState({
-      mergeNames: this.state.mergeNames[1] = mergeNewName,
+      mergeNames: names,
     })
   }
 
@@ -188,7 +196,7 @@ class TransformBox extends Classs<Props>
     return (
       <div>
         {
-          this.props.datatype === 'string' &&
+          this.props.datatype === 'text' &&
           <div>
             <Dropdown
               selectedIndex={this.state.transformTypeIndex}

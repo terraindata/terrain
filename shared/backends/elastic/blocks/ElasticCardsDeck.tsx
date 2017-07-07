@@ -76,6 +76,12 @@ export const ElasticCardsDeck =
         Blocks.elasticMagicCard.type,
         Blocks.elasticMagicList.type,
       ],
+
+      [
+        // Score and transform cards
+        Blocks.elasticScore.type,
+        Blocks.elasticTransform.type,
+      ],
     ],
   );
 

@@ -53,6 +53,7 @@ const { List } = Immutable;
 class FileImportStateC extends BaseClass
 {
   public connectionId: number = -1;
+  public serverText: string = '';
   public dbText: string = '';
   public tableText: string = '';
   public file: string = '';
@@ -69,6 +70,7 @@ class FileImportStateC extends BaseClass
   public columnNames: Immutable.List<string> = null;
   public columnsToInclude: Immutable.List<boolean> = null;
   public columnTypes: Immutable.List<number> = null;
+  public colTypes: List<object> = null;
 
   public transforms: Immutable.List<object> = List([]);
 }
@@ -93,7 +95,7 @@ export const FILE_TYPES =
 
 export const ELASTIC_TYPES =
   [
-    'string',
+    'text',
     'number',
     'boolean',
     'date',

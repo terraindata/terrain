@@ -44,76 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from './EQLConfig';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import ESClauseType from '../ESClauseType';
+import ESStringClause from './ESStringClause';
 
 /**
- * Represents an Elastic Search query clause
+ * A clause which is a field name (column name)
  */
-abstract class ESClause
+export default class ESTypeClause extends ESStringClause
 {
-  public type: string; // type name
-  public name: string; // human type name
-  public desc: string; // clause description
-  public url: string; // clause documentation url
-
-  /**
-   * Type definition for this clause. It should be one of these:
-   * + A parent type name that this clause inherits from (ex: boost inherits from number)
-   * + An object containing all allowed properties and their types.
-   *   (a null property value means the type is the same as the name of the property)
-   */
-  public def: string | { [key: string]: string | null };
-
-  public template: any; // template for this clause type
-
-  protected settings;
-
-  /**
-   * + null types mean custom or disabled type validation
-   * + no name means use name with underscores removed
-   * + null value in type means same name as property name
-   * + typename with [] after it means array
-   * + typename with {} after it means object of type
-   * + type "enum" uses "values" member to list enumerated values
-   * + array type means any of these types
-   * + object type means structured def definition
-   * + string type references another def
-   *
-   * @param type the name to refer to this clause (type)
-   * @param settings the settings object to initialize it from
-   */
   public constructor(type: string, settings: any)
   {
-    this.type = type;
-    this.settings = settings;
-
-    this.setPropertyFromSettings(settings, 'name', () => this.type.replace('_', ' '));
-    this.setPropertyFromSettings(settings, 'desc', () => '');
-    this.setPropertyFromSettings(settings, 'url', () => '');
-    this.setPropertyFromSettings(settings, 'def', () => 'value');
-    this.setPropertyFromSettings(settings, 'template', () => null);
+    super(type, settings, ESClauseType.ESTypeClause);
   }
 
-  public init(config: EQLConfig): void
-  {
-    // default is to do nothing
-  }
-
-  public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
-
-  private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
-  {
-    if (settings[name] !== undefined)
-    {
-      this[name] = settings[name];
-    }
-    else
-    {
-      this[name] = defaultValueFunction();
-    }
-  }
+  // TODO: add field validation here
 }
-
-export default ESClause;

@@ -47,28 +47,27 @@ THE SOFTWARE.
 enum ESJSONType
 {
   // invalid types
-  'unknown', // unclassified type
-  'invalid', // bad type
+  unknown, // unclassified type
+  invalid, // bad type
 
   // true JSON types
-  'null',
-  'boolean',
-  'number',
-  'string',
-  'property', // the name string of an object's property
-  'array',
-  'object',
+  'null', // 2
+  boolean,
+  number,
+  string,
+  array,
+  object,
 
   // additional types
-  'parameter', // an input parameter for an ES query
+  parameter, // 8: an input parameter for an ES query
 
   // delimiter types
-  'arrayDelimiter',
-  'arrayTerminator',
+  arrayDelimiter,
+  arrayTerminator,
 
-  'propertyDelimiter',
-  'objectDelimiter',
-  'objectTerminator',
+  propertyDelimiter,
+  objectDelimiter,
+  objectTerminator,
 
 }
 

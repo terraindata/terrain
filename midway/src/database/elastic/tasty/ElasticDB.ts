@@ -45,11 +45,14 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
+import * as winston from 'winston';
+
 import TastyDB from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback } from '../../../tasty/Utils';
+// import * as DBUtil from '../../Util';
 import ElasticClient from '../client/ElasticClient';
 import ElasticGenerator from './ElasticGenerator';
 import ElasticQuery from './ElasticQuery';
@@ -179,7 +182,24 @@ export class ElasticDB implements TastyDB
   }
 
   /*
-   * Deletes the given objects based on their primary key
+   * Deletes the given index
+   */
+  public async createIndex(indexName)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const params = {
+        index: indexName,
+      };
+
+      this.client.indices.create(
+        params,
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  /*
+   * Deletes the given index
    */
   public async deleteIndex(indexName)
   {
@@ -191,6 +211,30 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.delete(
         params,
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  public async putMapping(table: TastyTable): Promise<object>
+  {
+    const schema: TastySchema = await this.schema();
+    if (schema.databaseNames().indexOf(table.getDatabaseName()) === -1)
+    {
+      await this.createIndex(table.getDatabaseName());
+    }
+
+    // const payload: object = DBUtil.constructESMapping(table.getMapping());
+    const payload: object = table.getMapping();
+    winston.info('putMapping payload: ' + JSON.stringify(payload));
+    return new Promise((resolve, reject) =>
+    {
+      this.client.indices.putMapping(
+        {
+          index: table.getDatabaseName(),
+          type: table.getTableName(),
+          // body: { properties: payload },
+          body: payload,
+        },
         makePromiseCallback(resolve, reject));
     });
   }

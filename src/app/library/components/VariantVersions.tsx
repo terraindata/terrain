@@ -49,15 +49,15 @@ import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import UserStore from './../../users/data/UserStore';
-import UserTypes from './../../users/UserTypes';
+import * as UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
-import LibraryTypes from './../LibraryTypes';
+import * as LibraryTypes from './../LibraryTypes';
 // import * as moment from 'moment';
 const moment = require('moment');
 import { browserHistory } from 'react-router';
 import RolesStore from '../../roles/data/RolesStore';
-import RoleTypes from '../../roles/RoleTypes';
+import * as RoleTypes from '../../roles/RoleTypes';
 
 type Variant = LibraryTypes.Variant;
 type User = UserTypes.User;

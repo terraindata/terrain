@@ -49,6 +49,7 @@ import * as Immutable from 'immutable';
 import { BlockConfig } from '../../blocks/types/Block';
 import Query from '../../items/types/Query';
 import CardsToCodeOptions from './CardsToCodeOptions';
+import ParseTreeToQueryOptions from './ParseTreeToQueryOptions';
 
 export interface Backend
 {
@@ -81,6 +82,15 @@ export interface Backend
     query: Query,
     queryReady: (query: Query) => void,
   ): Query;
+
+  parseQuery(
+    tql: string,
+  ): any;
+
+  parseTreeToQueryString(
+    query: Query,
+    options: ParseTreeToQueryOptions,
+  ): string;
 
   syntaxConfig: object;
 
