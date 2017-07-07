@@ -56,6 +56,8 @@ import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
+import ESValueInfo from '../parser/ESValueInfo';
+
 const { make } = BlockUtils;
 
 export default function ElasticToCards(
@@ -72,8 +74,9 @@ export default function ElasticToCards(
   {
     try
     {
-      console.log(query.parseTree);
-      let cards = parseMagicObject(query.parseTree.parser.getValue());
+      // let cards = parseMagicObject(query.parseTree.parser.getValue());
+      const rootValueInfo = query.parseTree.parser.getValueInfo();
+      let cards = List([ parseCardFromValueInfo(rootValueInfo) ]);
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
@@ -85,6 +88,48 @@ export default function ElasticToCards(
         .set('cardsAndCodeInSync', false);
     }
   }
+}
+
+const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
+{
+  if (!valueInfo)
+  {
+    return BlockUtils.make(Blocks['eqlnull']);
+  }
+  
+  let valueMap: { value?: any, cards?: List<Card>} = {};
+  
+  const clauseCardType = 'eql' + valueInfo.clause.type;
+  
+  if (typeof valueInfo.value !== 'object')
+  {
+    valueMap.value = valueInfo.value;
+  }
+  
+  if (valueInfo.arrayChildren && valueInfo.arrayChildren.length)
+  {
+    valueMap.cards = List(valueInfo.arrayChildren.map(parseCardFromValueInfo));
+  }
+  
+  if (valueInfo.objectChildren && _.size(valueInfo.objectChildren))
+  {
+    if (valueMap.cards)
+    {
+      console.log('Error with: ', valueInfo);
+      throw new Error('Found both arrayChildren and objectChildren in a ValueInfo');
+    }
+    
+    valueMap.cards = List(_.map(valueInfo.objectChildren,
+      (propertyInfo, key: string) =>
+      {
+        let card = parseCardFromValueInfo(propertyInfo.propertyValue);
+        card = card.set('key', key);
+        return card;
+      }
+    ));
+  }
+  
+  return BlockUtils.make(Blocks[clauseCardType], valueMap);
 }
 
 const isScoreCard = (obj: object): boolean =>
