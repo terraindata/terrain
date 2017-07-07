@@ -95,11 +95,16 @@ export const FILE_TYPES =
 export const ELASTIC_TYPES =
   [
     'text',
-    'number',
+    'long',
     'boolean',
     'date',
     'array',
-    'object',
+    'double',
+    'short',
+    'byte',
+    'integer',
+    'half_float',
+    'float',
   ];
 
 export const TRANSFORM_TYPES =
