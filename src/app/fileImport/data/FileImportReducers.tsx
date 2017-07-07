@@ -283,7 +283,6 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.tableText,
       state.connectionId,
       state.oldNames,
-      Map<string, boolean>(cToIncludeMap),
       Map<string, object>(cTypesMap),
       state.primaryKey,
       state.transforms,
