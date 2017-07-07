@@ -65,7 +65,7 @@ export interface ImportConfig
   // set this to true if this is not the case
   csvHeaderMissing?: boolean;
   // array of strings (oldName)
-  columnMap: string[];
+  originalNames: string[];
   // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
   // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
   columnTypes: object | object[];
@@ -355,63 +355,8 @@ export class Import
           {
             return reject('Input JSON file must parse to an array of objects.');
           }
-          // if (items.length > 0)
-          // {
-          // parse dates
-          // const dateColumns: string[] = [];
-          // for (const colName in imprt.columnTypes)
-          // {
-          //   if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName]['type'] === 'date')
-          //   {
-          //     dateColumns.push(colName);
-          //   }
-          // }
-          // if (dateColumns.length > 0)
-          // {
-          //   items.forEach((item) =>
-          //   {
-          //     dateColumns.forEach((colName) =>
-          //     {
-          //       const date: number = Date.parse(item[colName]);
-          //       if (!isNaN(date))
-          //       {
-          //         item[colName] = new Date(date);
-          //       }
-          //     });
-          //   });
-          // }
 
-          // const typeError: string = this._checkTypes(items, imprt.columnTypes);
-          // if (typeError !== '')
-          // {
-          //   return reject('Objects in provided input JSON do not match the specified keys and/or types: ' + typeError);
-          // }
-
-          // for (const oldName in imprt.columnMap)
-          // {
-          //   if (imprt.columnMap.hasOwnProperty(oldName) && !imprt.columnsToInclude[oldName])
-          //   {
-          //     delete imprt.columnMap[oldName];
-          //   }
-          // }
-
-          // NOTE: rebuilds the entire object to handle renaming of fields ; depending on how many fields we expect
-          // to be renamed, this could be much slower than directly deleting and updating fields
-          // const renamedItems: object[] = items.map((obj) =>
-          // {
-          //   const renamedObj: object = {};
-          //   for (const oldName in imprt.columnMap)
-          //   {
-          //     if (imprt.columnMap.hasOwnProperty(oldName))
-          //     {
-          //       renamedObj[imprt.columnMap[oldName]] = obj[oldName];
-          //     }
-          //   }
-          //   return renamedObj;
-          // });
-          // resolve(renamedItems);
-
-          const expectedCols: string = JSON.stringify(imprt.columnMap.sort());
+          const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
           for (const obj of items)
           {
             if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
@@ -421,43 +366,20 @@ export class Import
             }
           }
           resolve(items);
-          // } else
-          // {
-          //   resolve(items);
-          // }
         } catch (e)
         {
           return reject('JSON format incorrect: ' + String(e));
         }
       } else if (imprt.filetype === 'csv')
       {
-        // const columnIndicesToInclude: number[] = (imprt.columnsToInclude as boolean[]).reduce((res, val, ind) =>
-        // {
-        //   if (val)
-        //   {
-        //     res.push(ind);
-        //   }
-        //   return res;
-        // }, [] as number[]);
-        // const columnParsers: object = this._buildCSVColumnParsers(imprt);
         csv({
           flatKeys: true,
           checkColumn: true,
           noheader: imprt.csvHeaderMissing,
-          headers: imprt.columnMap,
-          // includeColumns: columnIndicesToInclude,
-          // colParser: columnParsers,
+          headers: imprt.originalNames,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
-          // const nameToType: object = this._includedNamesToType(imprt);
-          // const typeError: string = this._checkTypes(jsonArrObj, nameToType);
-          // if (typeError === '')
-          // {
           resolve(jsonArrObj);
-          // } else
-          // {
-          //   return reject('Objects in provided input CSV do not match the specified keys and/or types: ' + typeError);
-          // }
         }).on('error', (e) =>
         {
           return reject('CSV format incorrect: ' + String(e));
@@ -468,86 +390,6 @@ export class Import
       }
     });
   }
-  // private _buildCSVColumnParsers(imprt: ImportConfig): object
-  // {
-  //   const columnParsers: object = {};
-  //   (imprt.columnTypes as object[]).map((val) =>
-  //   {
-  //     return this.numericTypes.has(val['type']) ? 'number' : val['type'];
-  //   }).forEach((val, ind) =>
-  //   {
-  //     switch (val)
-  //     {
-  //       case 'text':
-  //         columnParsers[imprt.columnMap[ind]] = 'string';
-  //         break;
-  //       case 'number':
-  //         columnParsers[imprt.columnMap[ind]] = (item) =>
-  //         {
-  //           const num: number = Number(item);
-  //           if (!isNaN(num))
-  //           {
-  //             return num;
-  //           }
-  //           if (item === '')
-  //           {
-  //             return null;
-  //           }
-  //           return '';   // type error that will be caught in post-processing
-  //         };
-  //         break;
-  //       case 'boolean':
-  //         columnParsers[imprt.columnMap[ind]] = (item) =>
-  //         {
-  //           if (item === 'true')
-  //           {
-  //             return true;
-  //           }
-  //           if (item === 'false')
-  //           {
-  //             return false;
-  //           }
-  //           if (item === '')
-  //           {
-  //             return null;
-  //           }
-  //           return '';   // type error that will be caught in post-processing
-  //         };
-  //         break;
-  //       case 'date':
-  //         columnParsers[imprt.columnMap[ind]] = (item) =>
-  //         {
-  //           const date: number = Date.parse(item);
-  //           if (!isNaN(date))
-  //           {
-  //             return new Date(date);
-  //           }
-  //           if (item === '')
-  //           {
-  //             return null;
-  //           }
-  //           return '';   // type error that will be caught in post-processing
-  //         };
-  //         break;
-  //       default:  // "array" and "object" cases
-  //         columnParsers[imprt.columnMap[ind]] = (item) =>
-  //         {
-  //           if (item === '')
-  //           {
-  //             return null;
-  //           }
-  //           try
-  //           {
-  //             return JSON.parse(item);
-  //           } catch (e)
-  //           {
-  //             return '';   // type error that will be caught in post-processing
-  //           }
-  //         };
-  //     }
-  //   });
-  //   return columnParsers;
-  // }
 
   // TODO: recursive array type checking for CSVs, handle arrays of dates
   /* checks whether all objects in "items" have the fields and types specified by nameToType
