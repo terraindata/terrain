@@ -50,7 +50,6 @@ import * as csv from 'csvtojson';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
-import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 
@@ -71,8 +70,8 @@ export interface ImportConfig
   // if filetype is 'json': object mapping string (oldName) to boolean
   // if filetype is 'csv': array of booleans
   columnsToInclude: object | boolean[];
-  // if filetype is 'json': object mapping string (oldName) to object (contains "type" field)
-  // if filetype is 'csv': array of objects (contains "type" field)
+  // if filetype is 'json': object mapping string (oldName) to object (contains "type" field, "innerType" field if array type)
+  // if filetype is 'csv': array of objects (contains "type" field, "innerType" field if array type)
   // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
   columnTypes: object | object[];
   primaryKey: string;  // newName of primary key
@@ -255,14 +254,61 @@ export class Import
     }
     return '';
   }
-  // filter out values that already exist (and don't need to be inserted) ; return error if there is one
+
+  /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
+  private _getMappingForSchema(imprt: ImportConfig): object
+  {
+    const nameToType: object = this._includedNamesToType(imprt);
+    // create mapping containing new fields
+    const mapping: object = {};
+    Object.keys(nameToType).forEach((val) =>
+    {
+      mapping[val] = this._getESType(nameToType[val]);
+    });
+    return this._getMappingForSchemaHelper(mapping);
+  }
+  /* recursive helper function for _getMappingForSchema(...)
+   * mapping: maps field name (string) to type (string or object (in the case of "object"/"nested" type))
+   * NOTE: contains functionality to handle "object"/"nested" types, though they are not yet supported by Import */
+  private _getMappingForSchemaHelper(mapping: object): object
+  {
+    const body: object = {};
+    for (const key in mapping)
+    {
+      if (mapping.hasOwnProperty(key) && key !== '__isNested__')
+      {
+        if (typeof mapping[key] === 'string')
+        {
+          body[key] = { type: mapping[key] };
+          if (mapping[key] === 'text')
+          {
+            body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
+          }
+        }
+        else if (typeof mapping[key] === 'object')
+        {
+          body[key] = this._getMappingForSchemaHelper(mapping[key]);
+        }
+      }
+    }
+    const payload: object = { properties: body };
+    if (mapping['__isNested__'] !== undefined)
+    {
+      payload['type'] = 'nested';
+    }
+    return payload;
+  }
+
+  /* check for conflicts with existing schema, return error (string) if there is one
+   * filters out fields already present in the existing mapping (since they don't need to be inserted)
+   * mapping: ES mapping
+   * returns: filtered mapping (object) or error message (string) */
   private _checkMappingAgainstSchema(mapping: object, schema: Tasty.Schema, database: string): object | string
   {
     if (schema.databaseNames().indexOf(database) === -1)
     {
       return mapping;
     }
-    // check for conflicts with existing mapping
     const fieldsToCheck: Set<string> = new Set(Object.keys(mapping['properties']));
     for (const table of schema.tableNames(database))
     {
@@ -281,45 +327,19 @@ export class Import
           else
           {
             return 'Type mismatch for field ' + field + '. Cannot cast "' +
-              this._getESType(mapping['properties'][field]) + '" to "' + String(fields[field]['type']) + '".';
+              String(mapping['properties'][field]['type']) + '" to "' + String(fields[field]['type']) + '".';
           }
         }
       }
     }
     return mapping;
   }
-  // start with mapping from import config, check against existing schema
-  // build object representing expected mapping
-  private _getMappingForSchema(imprt: ImportConfig): object
+  /* proposed: ES mapping
+   * existing: ES mapping */
+  private _isCompatibleType(proposed: object, existing: object): boolean
   {
-    const nameToType: object = this._includedNamesToType(imprt);
-    // create mapping containing new fields
-    const mapping: object = {};
-    Object.keys(nameToType).forEach((val) =>
-    {
-      mapping[val] = this._getESType(nameToType[val]);
-    });
-    return DBUtil.constructESMapping(mapping);
-  }
-  // proposed: contains "type" field (string), and "innerType" field (object) in the case of array/object types
-  // existing: field specification from ES mapping (contains "type" field (string), "properties" field (in the case of objects))
-  private _isCompatibleType(proposed: object, existing: object, withinArray: boolean = false): boolean
-  {
-    const proposedType: string = this._getESType(proposed);
+    const proposedType: string = proposed['type'];
     return this.compatibleTypes[proposedType] !== undefined && this.compatibleTypes[proposedType].has(existing['type']);
-  }
-  // typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types
-  private _getESType(typeObject: object, withinArray: boolean = false): string
-  {
-    switch (typeObject['type'])
-    {
-      case 'array':
-        return this._getESType(typeObject['innerType'], true);
-      case 'object':
-        return withinArray ? 'nested' : 'object';
-      default:
-        return typeObject['type'];
-    }
   }
 
   private async _parseData(imprt: ImportConfig): Promise<object[]>
@@ -418,14 +438,10 @@ export class Import
           colParser: columnParsers,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
-          winston.info('hello');
-          winston.info(JSON.stringify(jsonArrObj));
           const nameToType: object = this._includedNamesToType(imprt);
-          winston.info('about to start check');
           const typeError: string = this._checkTypes(jsonArrObj, nameToType);
           if (typeError === '')
           {
-            winston.info('finished check');
             resolve(jsonArrObj);
           } else
           {
@@ -444,7 +460,10 @@ export class Import
   private _buildCSVColumnParsers(imprt: ImportConfig): object
   {
     const columnParsers: object = {};
-    (imprt.columnTypes as object[]).map((val) => this._getESType(val)).forEach((val, ind) =>
+    (imprt.columnTypes as object[]).map((val) =>
+    {
+      return this.numericTypes.has(val['type']) ? 'number' : val['type'];
+    }).forEach((val, ind) =>
     {
       switch (val)
       {
@@ -508,7 +527,6 @@ export class Import
             }
             try
             {
-              winston.info('attempting to parse: ' + String(item));
               return JSON.parse(item);
             } catch (e)
             {
@@ -572,6 +590,7 @@ export class Import
         }
       }
     }
+
     return '';
   }
   /* manually checks types (rather than checking hashes) ; handles arrays recursively */
@@ -592,6 +611,77 @@ export class Import
     }
     return true;
   }
+  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
+  private _isTypeConsistent(arr: object[]): boolean
+  {
+    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
+  }
+  private _isTypeConsistentHelper(arr: object[]): string
+  {
+    const types: Set<string> = new Set();
+    arr.forEach((obj) =>
+    {
+      types.add(this._getType(obj));
+    });
+    if (types.size !== 1)
+    {
+      return 'inconsistent';
+    }
+    const type: string = types.entries().next().value[0];
+    if (type === 'array')
+    {
+      const innerTypes: Set<string> = new Set();
+      arr.forEach((obj) =>
+      {
+        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
+      });
+      if (innerTypes.size !== 1)
+      {
+        return 'inconsistent';
+      }
+      return innerTypes.entries().next().value[0];
+    }
+    return type;
+  }
+  private _getType(obj: object): string
+  {
+    if (typeof obj === 'object')
+    {
+      if (obj === null)
+      {
+        return 'null';
+      }
+      if (obj instanceof Date)
+      {
+        return 'date';
+      }
+      if (Array.isArray(obj))
+      {
+        return 'array';
+      }
+    }
+    if (typeof obj === 'string')
+    {
+      return 'text';
+    }
+    // handles "number", "boolean", "object", and "undefined" cases
+    return typeof obj;
+  }
+  /* return ES type from type specification format of ImportConfig
+   * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
+  private _getESType(typeObject: object, withinArray: boolean = false): string
+  {
+    switch (typeObject['type'])
+    {
+      case 'array':
+        return this._getESType(typeObject['innerType'], true);
+      case 'object':
+        return withinArray ? 'nested' : 'object';
+      default:
+        return typeObject['type'];
+    }
+  }
+
   /* return the target hash an object with the specified field names and types should have
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _buildDesiredHash(nameToType: object): string
@@ -604,6 +694,7 @@ export class Import
     });
     return sha1(strToHash);
   }
+  /* recursive helper to handle arrays */
   private _buildDesiredHashHelper(typeObj: object): string
   {
     if (this.numericTypes.has(typeObj['type']))
@@ -647,62 +738,6 @@ export class Import
       }
     }
     return structStr;
-  }
-  private _getType(obj: object): string
-  {
-    if (typeof obj === 'object')
-    {
-      if (obj === null)
-      {
-        return 'null';
-      }
-      if (obj instanceof Date)
-      {
-        return 'date';
-      }
-      if (Array.isArray(obj))
-      {
-        return 'array';
-      }
-    }
-    if (typeof obj === 'string')
-    {
-      return 'text';
-    }
-    // handles "number", "boolean", "object", and "undefined" cases
-    return typeof obj;
-  }
-  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
-  private _isTypeConsistent(arr: object[]): boolean
-  {
-    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
-  }
-  private _isTypeConsistentHelper(arr: object[]): string
-  {
-    const types: Set<string> = new Set();
-    arr.forEach((obj) =>
-    {
-      types.add(this._getType(obj));
-    });
-    if (types.size !== 1)
-    {
-      return 'inconsistent';
-    }
-    const type: string = types.entries().next().value[0];
-    if (type === 'array')
-    {
-      const innerTypes: Set<string> = new Set();
-      arr.forEach((obj) =>
-      {
-        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
-      });
-      if (innerTypes.size !== 1)
-      {
-        return 'inconsistent';
-      }
-      return innerTypes.entries().next().value[0];
-    }
-    return type;
   }
 
   private _includedNamesToType(imprt: ImportConfig): object
