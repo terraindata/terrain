@@ -270,8 +270,10 @@ FileImportReducers[ActionTypes.uploadFile] =
     const cTypesMap = [];
     state.columnNames.forEach((value, key) =>
     {
-      cToIncludeMap.push([value, state.columnsToInclude.get(key)]);
-      cTypesMap.push([value, state.columnTypes.get(key)]);
+      if (state.columnsToInclude.get(key))
+      {
+        cTypesMap.push([value, state.columnTypes.get(key)]);
+      }
     });
 
     Ajax.importFile(
@@ -281,7 +283,6 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.tableText,
       state.connectionId,
       state.oldNames,
-      Map<string, boolean>(cToIncludeMap),
       Map<string, object>(cTypesMap),
       state.primaryKey,
       state.transforms,

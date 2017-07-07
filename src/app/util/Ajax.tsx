@@ -689,7 +689,6 @@ export const Ajax =
       table: string,
       connectionId: number,
       oldNames: List<string>,                                           // old names
-      columnsToInclude: Immutable.Map<string, boolean>,                 // new names -> included
       columnTypes: Immutable.Map<string, object>,                       // new names -> type
       primaryKey: string,
       transformations: List<object>,
@@ -705,7 +704,6 @@ export const Ajax =
         contents: file,
         filetype,
         oldNames,
-        columnsToInclude,
         columnTypes,
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
