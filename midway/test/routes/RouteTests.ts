@@ -723,7 +723,7 @@ describe('File import route tests', () =>
           contents: '[{"pkey":1,"column1":"hello","col2":"goodbye","col3":false,"col4":null}]',
           filetype: 'json',
 
-          columnMap: ['pkey', 'column1', 'col2', 'col3', 'col4'],
+          originalNames: ['pkey', 'column1', 'col2', 'col3', 'col4'],
           columnTypes:
           {
             pkey: { type: 'long' },
@@ -775,7 +775,7 @@ describe('File import route tests', () =>
           filetype: 'csv',
 
           csvHeaderMissing: false,
-          columnMap: ['pkey', 'column1', 'column2', 'column3', 'column4'],
+          originalNames: ['pkey', 'column1', 'column2', 'column3', 'column4'],
           columnTypes:
           {
             pkey: { type: 'long' },
@@ -828,7 +828,7 @@ describe('File import route tests', () =>
           contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           filetype: 'json',
 
-          columnMap: ['pkey', 'column1', 'column2'],
+          originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
           {
             pkey: { type: 'long' },

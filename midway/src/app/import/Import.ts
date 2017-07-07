@@ -68,7 +68,7 @@ export interface ImportConfig
   originalNames: string[];
   // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
   // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
-  columnTypes: object | object[];
+  columnTypes: object;
   primaryKey: string;  // newName of primary key
   transformations: object[];  // list of in-order data transformations
 }

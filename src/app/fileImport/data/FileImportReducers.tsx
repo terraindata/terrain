@@ -272,7 +272,7 @@ FileImportReducers[ActionTypes.uploadFile] =
     {
       if (state.columnsToInclude.get(key))
       {
-        cTypesMap.push([value, state.columnTypes.get(key)]);
+        cTypesMap.push([value, FileImportTypes.ELASTIC_TYPES[state.columnTypes.get(key)]]);
       }
     });
 

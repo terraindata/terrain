@@ -703,7 +703,7 @@ export const Ajax =
         table,
         contents: file,
         filetype,
-        oldNames,
+        originalNames: oldNames,
         columnTypes,
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
