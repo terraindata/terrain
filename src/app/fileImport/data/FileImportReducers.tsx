@@ -71,6 +71,16 @@ const recDeleteType = (columnType, count, recursionId) =>
   return columnType;
 };
 
+const recToString = (columnType) =>
+{
+  columnType.type = FileImportTypes.ELASTIC_TYPES[columnType.type];
+  if (columnType.columnType)
+  {
+    recToString(columnType.columnType)
+  }
+  return columnType;
+};
+
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
@@ -272,7 +282,7 @@ FileImportReducers[ActionTypes.uploadFile] =
     {
       if (state.columnsToInclude.get(key))
       {
-        cTypesMap.push([value, FileImportTypes.ELASTIC_TYPES[state.columnTypes.get(key)]]);
+        cTypesMap.push([value, recToString(state.columnTypes.get(key))]);
       }
     });
 
