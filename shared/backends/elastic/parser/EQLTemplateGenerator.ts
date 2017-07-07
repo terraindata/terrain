@@ -44,103 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESJSONType from './ESJSONType';
-import ESPropertyInfo from './ESPropertyInfo';
+import ESParameterSubstituter from './ESParameterSubstituter';
 import ESValueInfo from './ESValueInfo';
 
 export default class EQLTemplateGenerator
 {
   public static generate(source: ESValueInfo): string
   {
-    return (new EQLTemplateGenerator(source)).result;
-  }
-
-  private result: string;
-
-  public constructor(source: ESValueInfo)
-  {
-    this.result = '';
-    this.convert(source);
-  }
-
-  public convert(source: ESValueInfo): void
-  {
-    let i: number = 0;
-
-    switch (source.jsonType)
-    {
-      case ESJSONType.null:
-      case ESJSONType.boolean:
-      case ESJSONType.number:
-        this.appendJSON(source.value);
-        break;
-
-      case ESJSONType.string:
-        if (source.parameter !== undefined)
-        {
-          this.appendParameter(source.parameter);
-          break;
-        }
-
-        this.appendJSON(source.value);
-        break;
-
-      case ESJSONType.parameter:
-        this.appendParameter(source.value);
-        break;
-
-      case ESJSONType.array:
-        this.result += '[';
-        source.forEachElement(
-          (child: ESValueInfo): void =>
-          {
-            if (i++ > 0)
-            {
-              this.result += ',';
-            }
-
-            this.convert(child);
-          });
-        this.result += ']';
-        break;
-
-      case ESJSONType.object:
-        this.result += ' { '; // extra spaces to avoid confusion with mustache tags
-
-        source.forEachProperty(
-          (property: ESPropertyInfo): void =>
-          {
-            if (i++ > 0)
-            {
-              this.result += ',';
-            }
-
-            this.convert(property.propertyName);
-            this.result += ':';
-
-            if (property.propertyValue === null)
-            {
-              throw new Error('Property with no value found.');
-            }
-
-            this.convert(property.propertyValue);
-          });
-
-        this.result += ' } '; // extra spaces to avoid confusion with mustache tags
-        break;
-
-      default:
-        throw new Error('Unconvertable value type found.');
-    }
-  }
-
-  private appendParameter(param: string): void
-  {
-    this.result += ' {{#toJson}}' + param + '{{/toJson}} ';
-  }
-
-  private appendJSON(value: any): void
-  {
-    this.result += JSON.stringify(value);
+    return ESParameterSubstituter.generate(source,
+      (param: string): string =>
+      {
+        return ' {{#toJson}}@' + param + '{{/toJson}} ';
+      });
   }
 }

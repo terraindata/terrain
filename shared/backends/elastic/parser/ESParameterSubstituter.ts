@@ -44,43 +44,111 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './clauses/ESClause';
-import ESParserError from './ESParserError';
-import ESValueInfo from './ESValueInfo';
 import ESJSONType from './ESJSONType';
 import ESPropertyInfo from './ESPropertyInfo';
-import ESJSONParser from './ESJSONParser';
+import ESValueInfo from './ESValueInfo';
 
 /**
- * Substitutes values in for parameters in a query described by a tree of ESValueInfo objects
+ * Produces a new query string from a value info root, substituting in a given
+ * string for each parameter, using a lambda to produce the string.
  */
 export default class ESParameterSubstituter
 {
-  private parser: ESJSONParser;
-  private params: { [name: string]: ESValueInfo };
-
-  public constructor(parser: ESJSONParser,
-    params: { [name: string]: ESValueInfo } = {})
+  public static generate(source: ESValueInfo,
+    substitutionFunction: (param: string) => string): string
   {
-    this.parser = parser;
-    this.params = params;
+    return (new ESParameterSubstituter(source, substitutionFunction)).result;
+  }
 
-    this.parser.getValueInfo().recursivelyVisit(
-      (info: ESValueInfo): boolean =>
-      {
-        if (info.parameter === null)
+  private substitutionFunction: (param: string) => string;
+  private result: string;
+
+  public constructor(source: ESValueInfo,
+    substitutionFunction: (param: string) => string)
+  {
+    this.substitutionFunction = substitutionFunction;
+    this.result = '';
+    this.convert(source);
+  }
+
+  public convert(source: ESValueInfo): void
+  {
+    let i: number = 0;
+
+    switch (source.jsonType)
+    {
+      case ESJSONType.null:
+      case ESJSONType.boolean:
+      case ESJSONType.number:
+        this.appendJSON(source.value);
+        break;
+
+      case ESJSONType.string:
+        if (source.parameter !== undefined)
         {
-          return true;
+          this.appendParameter(source.parameter);
+          break;
         }
 
-        if (!this.params.hasOwnProperty(info.parameter))
-        {
-          parser.accumulateErrorOnValueInfo(info, 'Undefined parameter.');
-          return true;
-        }
+        this.appendJSON(source.value);
+        break;
 
+      case ESJSONType.parameter:
+        this.appendParameter(source.parameter as string);
+        break;
 
-        return true;
-      });
+      case ESJSONType.array:
+        this.result += '[';
+        source.forEachElement(
+          (child: ESValueInfo): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            this.convert(child);
+          });
+        this.result += ']';
+        break;
+
+      case ESJSONType.object:
+        this.result += ' { '; // extra spaces to avoid confusion with mustache tags
+
+        source.forEachProperty(
+          (property: ESPropertyInfo): void =>
+          {
+            if (i++ > 0)
+            {
+              this.result += ',';
+            }
+
+            this.convert(property.propertyName);
+            this.result += ':';
+
+            if (property.propertyValue === null)
+            {
+              throw new Error('Property with no value found.');
+            }
+
+            this.convert(property.propertyValue);
+          });
+
+        this.result += ' } '; // extra spaces to avoid confusion with mustache tags
+        break;
+
+      default:
+        throw new Error('Unconvertable value type found.');
+    }
+  }
+
+  private appendParameter(param: string): void
+  {
+    this.result += this.substitutionFunction(param);
+  }
+
+  private appendJSON(value: any): void
+  {
+    this.result += JSON.stringify(value);
   }
 }

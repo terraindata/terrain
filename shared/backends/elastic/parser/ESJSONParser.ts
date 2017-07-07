@@ -282,6 +282,7 @@ export default class ESJSONParser
         case '@':
           jsonType = ESJSONType.parameter;
           valueInfo.value = this.readParameter();
+          valueInfo.parameter = valueInfo.value.substring(1);
           break;
 
         default:

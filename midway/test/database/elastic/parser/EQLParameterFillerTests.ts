@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
+import ESParameterFiller from '../../../../../shared/backends/elastic/parser/EQLParameterFiller';
 import EQLTemplateGenerator from '../../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
 import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
 import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
@@ -59,7 +60,9 @@ beforeAll(async (done) =>
   done();
 });
 
-function testGeneration(testString: string, expectedValue: string)
+function testGeneration(testString: string,
+  params: { [param: string]: any },
+  expectedValue: string)
 {
   winston.info('testing \'' + testString + '\'');
 
@@ -69,7 +72,7 @@ function testGeneration(testString: string, expectedValue: string)
 
   expect(errors.length).toEqual(0);
 
-  const result = EQLTemplateGenerator.generate(valueInfo);
+  const result = ESParameterFiller.generate(valueInfo, params);
 
   winston.info(result);
   expect(result).toEqual(expectedValue);
@@ -77,21 +80,41 @@ function testGeneration(testString: string, expectedValue: string)
 
 test('test generate template queries', () =>
 {
-  testGeneration('true', 'true');
-  testGeneration('false', 'false');
-  testGeneration('null', 'null');
-  testGeneration('0', '0');
-  testGeneration('1.923e-21', '1.923e-21');
-  testGeneration('123', '123');
-  testGeneration('9990000000000', '9990000000000');
-  testGeneration('0.999', '0.999');
-  testGeneration('[]', '[]');
-  testGeneration('{}', ' {  } ');
+  testGeneration('true', {}, 'true');
+  testGeneration('false', {}, 'false');
+  testGeneration('null', {}, 'null');
 
-  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
-    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : 10}`,
+    {},
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
 
-  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
-    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : @size}`,
+    {
+      type: 'data',
+      from: 0,
+      size: 10,
+    },
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+  testGeneration(`
+  {
+    "index" : "movies",
+    "type" : "data",
+    "size" : @size,
+    "from" : @from,
+    "body" : {
+      "query" : {
+        "bool" : {
+          "must_not" : [{"match" : {"title" : @bad_title}}]
+        }
+      }
+    }
+  }`,
+    {
+      from: 0,
+      size: 10,
+      bad_title: 'blah blah',
+    },
+    ` { "index":"movies","type":"data","size":10,"from":0,"body": { "query": { "bool": { "must_not":[ { "match": { "title":"blah blah" }  } ] }  }  }  } `);
 
 });

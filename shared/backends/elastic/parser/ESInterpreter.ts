@@ -67,8 +67,7 @@ export default class ESInterpreter
    * to run the interpreter on it's result.
    *
    * 1) parse
-   * 2) substitute params
-   * 3) interpret
+   * 2) interpret
    *
    * @param query the query string or parser to interpret
    * @param config the spec config to use
@@ -100,10 +99,17 @@ export default class ESInterpreter
           {
             if (info.parameter !== undefined)
             {
-              if (!this.params.hasOwnProperty(info.parameter))
+              const clause: ESClause = this.params[info.parameter];
+              if (clause === undefined)
               {
                 this.accumulateError(info, 'Undefined parameter.');
+              } else if (clause !== info.clause)
+              {
+                const expectedClause: ESClause = info.clause as ESClause;
+                this.accumulateError(info, 'Mismatched clause types. Expected a ' +
+                  expectedClause.name + ' but parameter is a ' + clause.name);
               }
+
               return false; // don't validate parameters
             }
 

@@ -44,54 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
-import EQLTemplateGenerator from '../../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
-import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import ESValueInfo from '../../../../../shared/backends/elastic/parser/ESValueInfo';
+import ESParameterSubstituter from './ESParameterSubstituter';
+import ESValueInfo from './ESValueInfo';
 
-/* tslint:disable:no-trailing-whitespace max-line-length */
-
-beforeAll(async (done) =>
+/**
+ * Fills values in for parameters in a query using a given substitutionFunction,
+ * ultimately producing a new query string.
+ *
+ * Different possible strategies for substituting parameters:
+ * + Emit new JSON, and then reparse if needed
+ * + Emit new JS object and then interpret if needed
+ * + Mutate VI's (reparse if needed)
+ *  + traverse and replace
+ * + Deep Copy + Mutate
+ *  + traverse and copy
+ *  + traverse and replace
+ * + Immutable Substitution -> must first identify mutation locations before copy
+ *  + traverse and mark, copy on return
+ */
+export default class ESParameterFiller
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-  done();
-});
+  public static generate(source: ESValueInfo,
+    params: { [name: string]: any }): string
+  {
+    return ESParameterSubstituter.generate(source,
+      (param: string): string =>
+      {
+        const value: any = params[param];
+        if (value === undefined)
+        {
+          throw new Error('Undefined parameter ' + param + '.');
+        }
 
-function testGeneration(testString: string, expectedValue: string)
-{
-  winston.info('testing \'' + testString + '\'');
-
-  const parser: ESParser = new ESParser(testString);
-  const valueInfo: ESValueInfo = parser.getValueInfo();
-  const errors: ESParserError[] = parser.getErrors();
-
-  expect(errors.length).toEqual(0);
-
-  const result = EQLTemplateGenerator.generate(valueInfo);
-
-  winston.info(result);
-  expect(result).toEqual(expectedValue);
+        return JSON.stringify(value);
+      });
+  }
 }
-
-test('test generate template queries', () =>
-{
-  testGeneration('true', 'true');
-  testGeneration('false', 'false');
-  testGeneration('null', 'null');
-  testGeneration('0', '0');
-  testGeneration('1.923e-21', '1.923e-21');
-  testGeneration('123', '123');
-  testGeneration('9990000000000', '9990000000000');
-  testGeneration('0.999', '0.999');
-  testGeneration('[]', '[]');
-  testGeneration('{}', ' {  } ');
-
-  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
-    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
-
-  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
-    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
-
-});

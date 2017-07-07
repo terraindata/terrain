@@ -168,7 +168,7 @@ const EQLSpec: ESClause[] =
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { index: '', type: '', from: 0, size: 1000, body: { query: {} } },
-        autocomplete: ['index', 'type'],
+        autocomplete: ['index', 'type', 'from', 'size'],
       }),
     new ESIndexClause('index', { desc: 'Selects which index to search.' }),
     new ESTypeClause('type', { desc: 'Selects which type to search.' }),
