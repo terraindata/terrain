@@ -47,6 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Util from './../util/Util';
 import { BaseClass, New } from '../Classes';
+const { List } = Immutable;
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
@@ -58,15 +59,19 @@ class FileImportStateC extends BaseClass
   public file: string = '';
   public filetype: string = '';
 
-  public previewRows: object[] = null;
+  // public previewRows: object[] = null;
+  public previewRows: List<List<string>> = null;
   public columnsCount: number = 0;
-
-  public columnsToInclude: IMMap<string, boolean> = null;
-  public columnNames: IMMap<string, string> = null;
-  public columnTypes: IMMap<string, number> = null;
 
   public hasCsvHeader: boolean = true;
   public primaryKey: string = '';
+
+  public oldNames: Immutable.List<string> = null;
+  public columnNames: Immutable.List<string> = null;
+  public columnsToInclude: Immutable.List<boolean> = null;
+  public columnTypes: List<object> = null;
+
+  public transforms: Immutable.List<object> = List([]);
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -85,14 +90,22 @@ export const FILE_TYPES =
   [
     'json',
     'csv',
-  ]
+  ];
 
 export const ELASTIC_TYPES =
   [
-    'string',
+    'text',
     'number',
     'boolean',
     'date',
     'array',
     'object',
+  ];
+
+export const TRANSFORM_TYPES =
+  [
+    'append',
+    'prepend',
+    'split',
+    'merge',
   ];

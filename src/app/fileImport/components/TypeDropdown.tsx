@@ -48,91 +48,56 @@ import * as $ from 'jquery';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
-import Autocomplete from './../../common/components/Autocomplete';
-import CheckBox from './../../common/components/CheckBox';
-import Dropdown from './../../common/components/Dropdown';
-import TransformBox from './../components/TransformBox';
-import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
-import './FileImportPreviewColumn.less';
+import PureClasss from './../../common/components/PureClasss';
+import Dropdown from './../../common/components/Dropdown';
 
 export interface Props
 {
-  id: number;
-  isIncluded: boolean;
-  name: string;
+  columnId: number,
+  recursionId: number;
   columnType: any;
-  isPrimaryKey: boolean;
-
   datatypes: List<string>;
-  canSelectType: boolean;
-  canSelectColumn: boolean;
-  oldNames: List<string>;
-
-  transformTypes: List<string>;
-  columnOptions: List<string>;
-  handleRenameTransform(name: string, oldName: string, newName: string);
-  addCurRenameTransform();
 }
 
-class FileImportPreviewColumn extends PureClasss<Props>
+class TypeDropdown extends PureClasss<Props>
 {
-  public handleIncludedChange()
+  public handleTypeChange(typeIndex)
   {
-    Actions.setColumnToInclude(this.props.id);
+    Actions.setColumnType(this.props.columnId, this.props.recursionId, typeIndex);
   }
 
-  public handlePrimaryKeyChange()
+  public componentWillUnmount()
   {
-    console.log('update primaryKey: ', this.props.name);
-    Actions.changePrimaryKey(this.props.id);
-  }
-
-  public handleAutocompleteHeaderChange(value)
-  {
-    this.props.handleRenameTransform('rename', this.props.oldNames.get(this.props.id), value);
-    Actions.setColumnName(this.props.id, value);
+    Actions.deleteColumnType(this.props.columnId, this.props.recursionId);
   }
 
   public render()
   {
+    // console.log('typeDropdown: ', this.props.columnType);
+    // console.log('col id: ', this.props.columnId);
+    // console.log('recursion id: ', this.props.recursionId);
     return (
-      <th>
-        include
-        <CheckBox
-          checked={this.props.isIncluded}
-          onChange={this.handleIncludedChange}
+      <div>
+        <Dropdown
+          selectedIndex={this.props.columnType.type}
+          options={this.props.datatypes}
+          onChange={this.handleTypeChange}
+          canEdit={true}
         />
-        primary key
-        <CheckBox
-          checked={this.props.isPrimaryKey}
-          onChange={this.handlePrimaryKeyChange}
-        />
-        <Autocomplete
-          value={this.props.name}
-          options={this.props.columnOptions}
-          onChange={this.handleAutocompleteHeaderChange}
-          placeholder={''}
-          disabled={!this.props.canSelectColumn}
-        />
-        <TypeDropdown
-          columnId={this.props.id}
-          recursionId={0}
-          columnType={this.props.columnType}
-          datatypes={this.props.datatypes}
-        />
-        <TransformBox
-          datatype={this.props.datatypes.get(this.props.columnType.type)}
-          transformTypes={this.props.transformTypes}
-          newName={this.props.name}
-          addCurRenameTransform={this.props.addCurRenameTransform}
-        />
-      </th>
+        {
+          this.props.columnType.type === 4 &&
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionId={this.props.recursionId + 1}
+            columnType={this.props.columnType.columnType}
+            datatypes={this.props.datatypes}
+          />
+        }
+      </div>
     );
   }
 }
 
-export default FileImportPreviewColumn;
+export default TypeDropdown;

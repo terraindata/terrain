@@ -56,9 +56,12 @@ const FileImportActionTypes =
     changePrimaryKey: '',
     chooseFile: '',
     uploadFile: '',
+    addTransform: '',
     setColumnToInclude: '',
     setColumnName: '',
     setColumnType: '',
+    deleteColumnType: '',
+    updatePreviewRows: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

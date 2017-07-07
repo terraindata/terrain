@@ -50,8 +50,8 @@ import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
 import FileImportInfo from './FileImportInfo';
 import FileImportStore from './../data/FileImportStore';
-import FileImportPreview from './FileImportPreview';
 import PureClasss from './../../common/components/PureClasss';
+import FileImportPreview from './FileImportPreview';
 import SchemaStore from './../../schema/data/SchemaStore';
 import { server } from "../../../../midway/src/Midway";
 const HTML5Backend = require('react-dnd-html5-backend');
@@ -100,7 +100,8 @@ class FileImport extends PureClasss<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { serverText, dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
+    const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
+      primaryKey, oldNames } = fileImportState;
 
     return (
       <div className="file-import">
@@ -141,9 +142,10 @@ class FileImport extends PureClasss<any>
             previewRows={previewRows}
             columnsCount={columnsCount}
             primaryKey={primaryKey}
-            columnsToInclude={columnsToInclude}
             columnNames={columnNames}
+            columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
+            oldNames={oldNames}
             columnOptions={
               this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?
                 List(this.state.tables.get(serverText + '/' + dbText + '.' + tableText).columnIds.map((value, index) =>

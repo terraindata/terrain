@@ -46,10 +46,11 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as Papa from 'papaparse';
+import * as _ from 'underscore';
 import * as SchemaTypes from '../../schema/SchemaTypes';
+import PureClasss from './../../common/components/PureClasss';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
-import PureClasss from './../../common/components/PureClasss';
 import CheckBox from './../../common/components/CheckBox';
 import Actions from './../data/FileImportActions';
 import Util from './../../util/Util';
@@ -122,7 +123,7 @@ class FileImportInfo extends PureClasss<Props>
     Actions.changeHasCsvHeader();
   }
 
-  public parseData(file: string, filetype: string): object[]
+  public parseAndChooseFile(file: string, filetype: string)
   {
     // TODO: read JSON line by line and return items
     let items = [];
@@ -133,7 +134,6 @@ class FileImportInfo extends PureClasss<Props>
       if (!Array.isArray(items))
       {
         alert('Input JSON file must parse to an array of objects.');
-        this.refs['file']['value'] = null;
         return;
       }
       console.log("Parsed json: ", items);
@@ -159,7 +159,6 @@ class FileImportInfo extends PureClasss<Props>
         error: (err) =>
         {
           alert('CSV format incorrect: ' + String(err));
-          this.refs['file']['value'] = null;
           return;
         },
         skipEmptyLines: true,
@@ -167,19 +166,30 @@ class FileImportInfo extends PureClasss<Props>
       items = Papa.parse(file, config).data;
       console.log("Parsed csv: ", items);
 
-      for (let i = 1; i < items.length; i++)
+      items.map((item) =>
       {
-        if (items[i].length !== items[0].length)
+        if (item.length !== items[0].length)
         {
           alert('CSV format incorrect: each row must have same number of fields');
-          this.refs['file']['value'] = null;
           return;
         }
-      }
+      });
     }
 
     items.splice(this.props.previewRowsCount, items.length - this.props.previewRowsCount);
-    return items;
+    const previewRows = items.map((item, i) =>
+      _.map(item, (value, key) =>
+        value
+      )
+    );
+    console.log("previewRows: ", previewRows);
+
+    const columnNames = _.map(items[0], (value, index) =>
+      filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
+    );
+    console.log('colNames: ', columnNames);
+
+    Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
   }
 
   public handleChooseFile(file)
@@ -193,12 +203,10 @@ class FileImportInfo extends PureClasss<Props>
       return;
     }
 
-
     const filetype = file.target.files[0].name.split('.').pop();
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
       alert("Invalid filetype: " + filetype + ", please select another file");
-      this.refs['file']['value'] = null;
       return;
     }
 
@@ -207,50 +215,48 @@ class FileImportInfo extends PureClasss<Props>
     fr.onloadend = () =>
     {
       console.log("File chosen contents: ", fr.result);
-      const preview = this.parseData(fr.result, filetype);
-
-      Actions.chooseFile(fr.result, filetype, preview);
+      this.parseAndChooseFile(fr.result, filetype);
       this.refs['file']['value'] = null;
     }
   }
 
-  public handleUploadFile()
-  {
-    if (!this.props.canImport)
-    {
-      alert('You do not have permission to upload files');
-      return;
-    }
-    if (!this.state.fileSelected)
-    {
-      alert('Please select a file to upload');
-      return;
-    }
-    if (!this.state.serverSelected)
-    {
-      alert('Please select a server');
-      return;
-    }
-    if (!this.state.dbSelected)
-    {
-      alert('Please select a database');
-      return;
-    }
-    if (!this.state.tableSelected)
-    {
-      alert('Please select a table');
-      return;
-    }
-
-    const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
-    if (msg)
-    {
-      alert(msg);
-      return;
-    }
-
-    Actions.uploadFile();
-  }
+  // public handleUploadFile()
+  // {
+  //   if (!this.props.canImport)
+  //   {
+  //     alert('You do not have permission to upload files');
+  //     return;
+  //   }
+  //   if (!this.state.fileSelected)
+  //   {
+  //     alert('Please select a file to upload');
+  //     return;
+  //   }
+  //   if (!this.state.serverSelected)
+  //   {
+  //     alert('Please select a server');
+  //     return;
+  //   }
+  //   if (!this.state.dbSelected)
+  //   {
+  //     alert('Please select a database');
+  //     return;
+  //   }
+  //   if (!this.state.tableSelected)
+  //   {
+  //     alert('Please select a table');
+  //     return;
+  //   }
+  //
+  //   const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
+  //   if (msg)
+  //   {
+  //     alert(msg);
+  //     return;
+  //   }
+  //
+  //   Actions.uploadFile();
+  // }
 
   public render()
   {
@@ -301,9 +307,6 @@ class FileImportInfo extends PureClasss<Props>
             disabled={!canSelectTable}
           />
         </div>
-        <button onClick={this.handleUploadFile}>
-          Import
-        </button>
       </div>
     );
   }

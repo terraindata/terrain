@@ -688,10 +688,11 @@ export const Ajax =
       db: string,
       table: string,
       connectionId: number,
-      columnNames: IMMap<string, string> | Immutable.List<string>,
-      columnsToInclude: IMMap<string, boolean> | Immutable.List<boolean>,
-      columnTypes: IMMap<string, string> | Immutable.List<string>,
+      oldNames: List<string>,                                           // old names
+      columnsToInclude: Immutable.Map<string, boolean>,                 // new names -> included
+      columnTypes: Immutable.Map<string, object>,                       // new names -> type
       primaryKey: string,
+      transformations: List<object>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
@@ -703,11 +704,12 @@ export const Ajax =
         table,
         contents: file,
         filetype,
-        columnMap: columnNames,
+        oldNames,
         columnsToInclude,
         columnTypes,
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
+        transformations,
       };
       console.log('payload: ', payload);
       const onLoadHandler = (resp) =>

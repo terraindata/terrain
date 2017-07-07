@@ -50,31 +50,30 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
+import Actions from './../data/FileImportActions';
 
 export interface Props
 {
-  items: object;
+  items: List<string>;
 }
 
 class FileImportPreviewRow extends PureClasss<Props>
 {
-  public shouldComponentUpdate(nextProps: Props)
-  {
-    return this.props.items !== nextProps.items;
-  }
-
   public render()
   {
-    const row = Object.keys(this.props.items).map((key) =>
-      <td key={key}>
-        {
-          this.props.items[key]
-        }
-      </td>
-    );
-
+    // console.log('FileImportPreviewRow items: ', this.props.items);
     return (
-      <tr>{row}</tr>
+      <tr>
+        {
+          this.props.items.map((value, key) =>
+            <td key={key}>
+              {
+                value
+              }
+            </td>
+          )
+        }
+      </tr>
     );
   }
 }

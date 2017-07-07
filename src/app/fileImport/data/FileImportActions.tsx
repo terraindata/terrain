@@ -68,28 +68,40 @@ const FileImportActions =
       $(ActionTypes.changeHasCsvHeader, {}),
 
     changePrimaryKey:
-    (id: string) =>
+    (id: number) =>
       $(ActionTypes.changePrimaryKey, { id }),
 
     chooseFile:
-    (file: string, filetype: string, preview: object) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview }),
+    (file: string, filetype: string, preview: List<List<string>>, oldNames: List<string>) =>
+      $(ActionTypes.chooseFile, { file, filetype, preview, oldNames }),
 
     uploadFile:
     () =>
       $(ActionTypes.uploadFile, {}),
 
+    addTransform:
+    (transform: object) =>
+      $(ActionTypes.addTransform, { transform }),
+
     setColumnToInclude:
-    (id: string) =>
+    (id: number) =>
       $(ActionTypes.setColumnToInclude, { id }),
 
     setColumnName:
-    (id: string, columnName: string) =>
+    (id: number, columnName: string) =>
       $(ActionTypes.setColumnName, { id, columnName }),
 
     setColumnType:
-    (id: string, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { id, typeIndex }),
+    (columnId: number, recursionId: number, typeIndex: number) =>
+      $(ActionTypes.setColumnType, { columnId, recursionId, typeIndex }),
+
+    deleteColumnType:
+    (columnId: number, recursionId: number) =>
+      $(ActionTypes.deleteColumnType, { columnId, recursionId }),
+
+    updatePreviewRows:
+    (transform: any) =>
+      $(ActionTypes.updatePreviewRows, { transform }),
   };
 
 export default FileImportActions;
