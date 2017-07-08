@@ -99,6 +99,7 @@ class FileImport extends PureClasss<any>
 
   public render()
   {
+    console.log(this.state);
     const { fileImportState } = this.state;
     const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
       primaryKey, oldNames } = fileImportState;
