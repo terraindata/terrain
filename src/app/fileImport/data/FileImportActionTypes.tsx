@@ -52,9 +52,13 @@ const FileImportActionTypes =
     changeServer: '',
     changeDbText: '',
     changeTableText: '',
+    changeHasCsvHeader: '',
+    changePrimaryKey: '',
     chooseFile: '',
-    unchooseFile: '',
     uploadFile: '',
+    setColumnToInclude: '',
+    setColumnName: '',
+    setColumnType: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

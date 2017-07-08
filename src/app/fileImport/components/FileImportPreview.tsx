@@ -43,26 +43,69 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as React from 'react';
 import * as FileImportTypes from './../FileImportTypes';
-const Redux = require('redux');
-import Util from './../../util/Util';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
+import PureClasss from './../../common/components/PureClasss';
+import FileImportPreviewColumn from './FileImportPreviewColumn';
+import FileImportPreviewRow from './FileImportPreviewRow';
+import './FileImportPreview.less';
+const { List } = Immutable;
 
-const DefaultState = FileImportTypes._FileImportState();
+export interface Props
+{
+  previewRows: object[];
+  columnsCount: number;
+  primaryKey: string;
+  columnsToInclude: IMMap<string, boolean>;
+  columnNames: IMMap<string, string>;
+  columnTypes: IMMap<string, number>;
+  columnOptions: List<string>;
+}
 
-import FileImportReducers from './FileImportReducers';
-
-export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
-  (state: FileImportTypes.FileImportState = DefaultState, action) =>
+class FileImportPreview extends PureClasss<Props>
+{
+  public render()
   {
-    if (FileImportReducers[action.type])
-    {
-      state = FileImportReducers[action.type](state, action);
-    }
-
-    return state;
+    return (
+      <table>
+        <thead>
+          <tr>
+            {
+              this.props.columnNames.map((value, key) =>
+                <FileImportPreviewColumn
+                  key={key}
+                  id={key}
+                  isIncluded={this.props.columnsToInclude.get(key)}
+                  name={this.props.columnNames.get(key)}
+                  typeIndex={this.props.columnTypes.get(key)}
+                  types={List(FileImportTypes.ELASTIC_TYPES)}
+                  canSelectType={true}
+                  canSelectColumn={true}
+                  isPrimaryKey={this.props.primaryKey === value}
+                  columnOptions={this.props.columnOptions}
+                />
+              ).toArray()
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            this.props.previewRows.map((items, key) =>
+              <FileImportPreviewRow
+                key={key}
+                items={items}
+              />
+            )
+          }
+        </tbody>
+      </table>
+    );
   }
-  , DefaultState);
+}
 
-export default FileImportStore;
+export default FileImportPreview;

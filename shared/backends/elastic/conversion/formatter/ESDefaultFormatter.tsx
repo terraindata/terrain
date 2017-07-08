@@ -63,13 +63,13 @@ class ESDefaultFormatter extends ObjectFormatter
     singularValueToks: ['', ''],
     keyToks: ['\n', ' '],
     singularKeyToks: ['\n', ' '],
-    openObjectToks: ['\n', '\n'],
+    openObjectToks: ['', '\n'],
     closeObjectToks: ['\n', '\n'],
-    openArrayToks: ['\n', '\n'],
+    openArrayToks: ['', '\n'],
     closeArrayToks: ['\n', '\n'],
-    openSingularObjectToks: ['\n', '\n'],
+    openSingularObjectToks: ['', '\n'],
     closeSingularObjectToks: ['\n', '\n'],
-    openSingularArrayToks: ['\n', '\n'],
+    openSingularArrayToks: ['', '\n'],
     closeSingularArrayToks: ['\n', '\n'],
   };
 
@@ -85,7 +85,7 @@ class ESDefaultFormatter extends ObjectFormatter
 
   public getResultText(): string
   {
-    return this.output;
+    return this.output.trim();
   }
 
   protected addText(value: any, key: string, depth: number): void

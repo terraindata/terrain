@@ -43,26 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
-const Redux = require('redux');
-import Util from './../../util/Util';
 
-const DefaultState = FileImportTypes._FileImportState();
-
-import FileImportReducers from './FileImportReducers';
-
-export const FileImportStore: IStore<FileImportTypes.FileImportState> = Redux.createStore(
-  (state: FileImportTypes.FileImportState = DefaultState, action) =>
+export function dbTableErrorCheck(dbText: string, tableText: string): string
+{
+  if (dbText === '' || tableText === '')
   {
-    if (FileImportReducers[action.type])
-    {
-      state = FileImportReducers[action.type](state, action);
-    }
-
-    return state;
+    return 'Database and table names cannot be empty strings';
   }
-  , DefaultState);
-
-export default FileImportStore;
+  if (dbText !== dbText.toLowerCase())
+  {
+    return 'Database may not contain uppercase letters';
+  }
+  if (!/^[a-z\d].*$/.test(dbText))
+  {
+    return 'Database name must start with a lowercase letter or digit';
+  }
+  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(dbText))
+  {
+    return 'Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses';
+  }
+  if (/^_.*/.test(tableText))
+  {
+    return 'Table name may not start with an underscore';
+  }
+  return '';
+}
