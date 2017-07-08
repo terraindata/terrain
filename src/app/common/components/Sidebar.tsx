@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
 import { Colors, backgroundColor, fontColor } from '../../common/Colors';
@@ -70,7 +70,7 @@ export interface Props
   onExpand?: () => void;
 }
 
-export class Sidebar extends PureClasss<Props>
+export class Sidebar extends TerrainComponent<Props>
 {
   public render()
   {

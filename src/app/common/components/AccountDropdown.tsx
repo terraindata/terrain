@@ -48,7 +48,7 @@ import * as React from 'react';
 import { Link } from 'react-router';
 import { browserHistory } from 'react-router';
 import Actions from '../../builder/data/BuilderActions';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
@@ -68,7 +68,7 @@ export interface Props
 {
 }
 
-class AccountDropdown extends PureClasss<Props>
+class AccountDropdown extends TerrainComponent<Props>
 {
   public state: {
     open?: boolean,

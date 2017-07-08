@@ -57,7 +57,7 @@ import { MenuOption } from '../../common/components/Menu';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Switch from './../../common/components/Switch';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
@@ -76,7 +76,7 @@ export interface Props
   language: string;
 }
 
-class BuilderTQLColumn extends PureClasss<Props>
+class BuilderTQLColumn extends TerrainComponent<Props>
 {
   public state: {
     tql: string;

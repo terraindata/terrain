@@ -72,7 +72,7 @@ import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Logout from './common/components/Logout';
 import Placeholder from './common/components/Placeholder';
-import PureClasss from './common/components/PureClasss';
+import TerrainComponent from './common/components/TerrainComponent';
 import Redirect from './common/components/Redirect';
 import Sidebar from './common/components/Sidebar';
 import FileImport from './fileImport/components/FileImport';
@@ -168,7 +168,7 @@ interface Props
 }
 
 @Radium
-class App extends PureClasss<Props>
+class App extends TerrainComponent<Props>
 {
   public state = {
     selectedPage: 3,

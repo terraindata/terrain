@@ -52,7 +52,7 @@ import { Display, DisplayType } from '../../../../shared/blocks/displays/Display
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
 import BuilderActions from '../data/BuilderActions';
@@ -78,7 +78,7 @@ export interface Props
   // as it will cause re-renders
 }
 
-class BuilderComponent extends PureClasss<Props>
+class BuilderComponent extends TerrainComponent<Props>
 {
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {

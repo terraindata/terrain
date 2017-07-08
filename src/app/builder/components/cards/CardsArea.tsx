@@ -56,7 +56,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import CreateCardTool from './CreateCardTool';
 const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
@@ -96,7 +96,7 @@ interface State extends KeyState
 }
 
 @Radium
-class CardsArea extends PureClasss<Props>
+class CardsArea extends TerrainComponent<Props>
 {
   public state: State = {
     keyPath: null,

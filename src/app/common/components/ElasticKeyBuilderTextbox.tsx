@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 // import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import BuilderTextbox from './BuilderTextbox';
 import BuilderStore from '../../builder/data/BuilderStore';
@@ -95,7 +95,7 @@ export interface Props
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
 }
 
-class ElasticKeyBuilderTextbox extends PureClasss<Props>
+class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
 {
   public state: {
     shouldRender: boolean;

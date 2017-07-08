@@ -50,7 +50,7 @@ import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 
 interface ScorePoint
@@ -81,7 +81,7 @@ export interface Props
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
-class TransformCardChart extends PureClasss<Props>
+class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
     selectedPointIds: IMMap<string, boolean>;

@@ -67,7 +67,7 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Switch from '../../../common/components/Switch';
 import { getPrimaryKeyFor, MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
 import Radium = require('radium');
@@ -99,7 +99,7 @@ interface State
 }
 
 @Radium
-class ResultsArea extends PureClasss<Props>
+class ResultsArea extends TerrainComponent<Props>
 {
   public state: State = {
     expanded: false,

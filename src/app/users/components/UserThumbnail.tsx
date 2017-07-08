@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import ColorManager from './../../util/ColorManager';
 import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
@@ -69,7 +69,7 @@ export interface Props
   extra?: string;
 }
 
-class UserThumbnail extends Classs<Props>
+class UserThumbnail extends TerrainComponent<Props>
 {
   public state: {
     user?: User,

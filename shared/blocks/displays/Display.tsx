@@ -119,7 +119,7 @@ export interface Display
   flex?: Display | Display[];
 
   // for components
-  component?: any; // PureClasss?
+  component?: any; // TerrainComponent?
 
   // for cards areas
   singleChild?: boolean;

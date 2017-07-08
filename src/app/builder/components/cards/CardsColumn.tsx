@@ -52,7 +52,7 @@ import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import Switch from './../../../common/components/Switch';
 import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
@@ -81,7 +81,7 @@ export interface Props
   containerHeight?: number;
 }
 
-class CardsColumn extends PureClasss<Props>
+class CardsColumn extends TerrainComponent<Props>
 {
   public state: {
     keyPath: KeyPath;
@@ -297,7 +297,7 @@ class CardsColumn extends PureClasss<Props>
 //   containerWidth?: number;
 //   containerHeight?: number;
 // }
-// class _CardsColumnInner extends PureClasss<InnerProps>
+// class _CardsColumnInner extends TerrainComponent<InnerProps>
 // {
 //   componentWillReceiveProps(nextProps:InnerProps)
 //   {

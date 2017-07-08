@@ -59,9 +59,8 @@ import Util from '../../../util/Util';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import BuilderStore from './../../../builder/data/BuilderStore';
-import Classs from './../../../common/components/Classs';
 import InfoArea from './../../../common/components/InfoArea';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
 const ReactTooltip = require('react-tooltip');
 import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
@@ -182,7 +181,7 @@ interface TabsProps
   onNoVariant(variantId: string);
 }
 
-export class Tabs extends PureClasss<TabsProps> {
+export class Tabs extends TerrainComponent<TabsProps> {
   public state = {
     variants: LibraryStore.getState().variants,
     tabs: null,

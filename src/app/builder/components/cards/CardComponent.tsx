@@ -59,7 +59,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import LayoutManager from '../layout/LayoutManager';
 import { Display } from './../../../../../shared/blocks/displays/Display';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import ManualPopup from './../../../manual/components/ManualPopup';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
@@ -102,7 +102,7 @@ export interface Props
   display?: Display;
 }
 
-class _CardComponent extends PureClasss<Props>
+class _CardComponent extends TerrainComponent<Props>
 {
   public state: {
     selected: boolean;
@@ -120,9 +120,6 @@ class _CardComponent extends PureClasss<Props>
     cardInner: Ref;
     cardBody: Ref;
   };
-
-  // _debugUpdates = true;
-  public _debugName = 'Card';
 
   public dragPreview: any;
 

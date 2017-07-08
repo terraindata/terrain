@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Radium from 'radium';
 import * as classNames from 'classnames';
 import * as React from 'react';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './InfoArea.less';
 import { Colors, backgroundColor, fontColor, buttonColors } from '../../common/Colors';
@@ -64,7 +64,7 @@ export interface Props
 }
 
 @Radium
-class InfoArea extends PureClasss<Props>
+class InfoArea extends TerrainComponent<Props>
 {
   constructor(props)
   {

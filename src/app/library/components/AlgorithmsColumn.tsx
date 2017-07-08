@@ -54,7 +54,7 @@ import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import InfoArea from './../../common/components/InfoArea';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Scoreline from './../../common/components/Scoreline';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
@@ -77,7 +77,7 @@ export interface Props
   groupId: ID;
 }
 
-class AlgorithmsColumn extends PureClasss<Props>
+class AlgorithmsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,

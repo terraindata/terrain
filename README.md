@@ -86,8 +86,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * `yarn start` - starts the Midway server, now running at localhost:3000
 * `yarn run start-front` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
-* Alternatively, `yarn run start-front-m1` will run the front-end pointed at Midway 1 (in Go)
-* Default user login: `luser` / `secret`
+* Default user login: `luser@terraindata.com` / `secret`
 * Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because
   your browser won't have to fetch Open Sans on each load
 
@@ -95,7 +94,7 @@ Whenever new packages are installed by other devs / on other branches, run `yarn
 
 ### Auto Styling
 
-To apply the auto styling / formatting, use `yarn run fix`
+To apply the auto styling / formatting, use `yarn run fix` - a combination of `yarn run style` and `yarn run lint`
 
 ### Configuring Webstorm IDE
 

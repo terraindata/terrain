@@ -50,7 +50,7 @@ import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { Card } from '../../../../../shared/blocks/types/Card';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
@@ -84,7 +84,7 @@ export interface Props
   overrideClick?: (index: number) => void; // override the click handler
 }
 
-class CreateCardTool extends PureClasss<Props>
+class CreateCardTool extends TerrainComponent<Props>
 {
   public state: {
     closed: boolean;

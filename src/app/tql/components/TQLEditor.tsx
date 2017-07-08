@@ -50,7 +50,7 @@ import * as ReactDOM from 'react-dom';
 import './TQLEditor.less';
 const { List } = Immutable;
 import * as _ from 'underscore';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 const CodeMirror = require('./Codemirror.js');
 
 // syntax highlighters
@@ -110,7 +110,7 @@ export interface Props
   hideTermDefinition?();
 }
 
-class TQLEditor extends PureClasss<Props>
+class TQLEditor extends TerrainComponent<Props>
 {
   public state: {
     codeMirrorInstance // CodeMirror instance does not have a defined type.

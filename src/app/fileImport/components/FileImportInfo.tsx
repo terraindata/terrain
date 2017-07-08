@@ -49,7 +49,7 @@ import * as Papa from 'papaparse';
 import * as SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import CheckBox from './../../common/components/CheckBox';
 import Actions from './../data/FileImportActions';
 import Util from './../../util/Util';
@@ -75,7 +75,7 @@ export interface Props
   hasCsvHeader: boolean;
 }
 
-class FileImportInfo extends PureClasss<Props>
+class FileImportInfo extends TerrainComponent<Props>
 {
   public state: {
     serverIndex: number,

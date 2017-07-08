@@ -56,7 +56,7 @@ import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { spotlightAction } from '../../data/SpotlightStore';
-import Classs from './../../../common/components/Classs';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Result } from './ResultsManager';
 import { Colors, backgroundColor, fontColor, borderColor } from '../../../common/Colors';
 
@@ -83,7 +83,7 @@ export interface Props
 }
 
 @Radium
-class ResultComponent extends Classs<Props> {
+class ResultComponent extends TerrainComponent<Props> {
   // state: {
   //   isSpotlit: boolean;
   //   spotlightColor: string;

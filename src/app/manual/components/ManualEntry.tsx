@@ -48,7 +48,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './ManualEntry.less';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
@@ -77,7 +77,7 @@ export interface Props
   bottomLine?: boolean;
 }
 
-class ManualEntry extends Classs<Props>
+class ManualEntry extends TerrainComponent<Props>
 {
 
   public allTqlCards = cardList;

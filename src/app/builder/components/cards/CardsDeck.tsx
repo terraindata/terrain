@@ -51,7 +51,7 @@ import * as _ from 'underscore';
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import Switch from './../../../common/components/Switch';
 import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
 import './CardsDeck.less';
@@ -68,7 +68,7 @@ export interface Props
   language: string;
 }
 
-class CardsDeck extends PureClasss<Props>
+class CardsDeck extends TerrainComponent<Props>
 {
   public state: {
     search: string;
@@ -155,7 +155,7 @@ interface CardProps
   connectDragSource?: (el: El) => El;
 }
 
-class _CardDeckCard extends PureClasss<CardProps>
+class _CardDeckCard extends TerrainComponent<CardProps>
 {
   public render()
   {
