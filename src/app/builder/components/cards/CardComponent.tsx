@@ -77,6 +77,9 @@ const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIco
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
 
+// title width when we don't show a title
+const NO_TITLE_WIDTH = 58;
+
 export interface Props
 {
   card: Card;
@@ -503,7 +506,7 @@ class _CardComponent extends PureClasss<Props>
     //                 addColumn={this.props.addColumn}
     //                 columnIndex={this.props.columnIndex}
     //               />
-
+    
     return (
       <div
         className={classNames({
@@ -515,6 +518,7 @@ class _CardComponent extends PureClasss<Props>
           'card-hovering': this.state.hovering,
           'card-closing': this.state.closing,
           'card-opening': this.state.opening,
+          'card-no-title': card['noTitle'],
           [card.type + '-card']: true,
         })}
         ref='card'
@@ -547,7 +551,10 @@ class _CardComponent extends PureClasss<Props>
                   'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
                   'card-title-card-hovering': this.state.hovering,
                 })}
-
+                style={{
+                  // shrink the width if the card does not have a title
+                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined 
+                }}
                 onClick={this.handleTitleClick}
               >
                 {
@@ -559,6 +566,13 @@ class _CardComponent extends PureClasss<Props>
                 {
                   this.state.hovering &&
                   <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
+                }
+                {
+                  this.props.canEdit &&
+                  this.state.hovering &&
+                  <Menu
+                    options={this.state.menuOptions}
+                  />
                 }
                 {
                   ! (this.props.card && this.props.card['noTitle']) &&
@@ -583,13 +597,6 @@ class _CardComponent extends PureClasss<Props>
                       {BlockUtils.getPreview(card)}
                     </div>
                 }
-                {
-                  this.props.canEdit &&
-                  this.state.hovering &&
-                  <Menu
-                    options={this.state.menuOptions}
-                  />
-                }
               </div>,
             )
           }
@@ -597,7 +604,13 @@ class _CardComponent extends PureClasss<Props>
           {
             (!this.props.card.closed || this.state.opening) &&
             <div className='card-body-wrapper' ref='cardBody'>
-              <div className='card-body'>
+              <div
+                className='card-body'
+                style={{
+                  // shrink the width if the card does not have a title
+                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined 
+                }}
+              >
                 {
                   content
                 }

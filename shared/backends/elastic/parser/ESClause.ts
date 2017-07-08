@@ -144,6 +144,9 @@ abstract class ESClause
     };
   }): any
   {
+    // hide title
+    obj['noTitle'] = true;
+    
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: this.name,

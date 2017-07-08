@@ -49,6 +49,8 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import * as Radium from 'radium';
+
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -93,6 +95,7 @@ interface State extends KeyState
   draggingCardItem: CardItem;
 }
 
+@Radium
 class CardsArea extends PureClasss<Props>
 {
   public state: State = {
@@ -186,7 +189,9 @@ class CardsArea extends PureClasss<Props>
             'cards-area': true,
             [this.props.className]: !!this.props.className,
           })}
-          style={backgroundColor(Colors().builder.cards.cardBase)}
+          style={
+            backgroundColor(Colors().builder.cards.cardBase)
+          }
         >
           {
             cards.map((card: Card, index: number) =>

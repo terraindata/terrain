@@ -48,6 +48,7 @@ import './LibraryColumn.less';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
+import { Colors, backgroundColor, fontColor, link } from '../../common/Colors';
 
 export interface Props
 {
@@ -64,11 +65,15 @@ class LibraryColumn extends Classs<Props>
         className={'library-column library-column-' + this.props.index}
       >
         {
-          this.props.title ?
-            <div className='library-column-title'>
-              {this.props.title}
+          this.props.title &&
+            <div
+              className='library-column-title'
+              style={backgroundColor(Colors().library.titleBar.base)}
+            >
+              {
+                this.props.title
+              }
             </div>
-            : null
         }
         <div className={classNames({
           'library-column-content': true,

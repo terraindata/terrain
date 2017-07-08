@@ -3,8 +3,7 @@
 @card-title-color: @white;
 @title-height: 18px;
 @top-height: 24px;
-// @title-width: 110px; // TODO WRAPPER
-@title-width: 30px;
+@title-width: 110px;
 @stroke-height: 5px;
 @card-border-radius: 0px;
 @card-padding-horizontal: 15px;
@@ -43,19 +42,12 @@
   
   .menu-wrapper {
     top: 5px;
-    left: 84px;
+    left: 34px;
     z-index: 2;
     &.menu-open {
       z-index: 99;
     }
   }
-  
-  &.card-closed {
-    .menu-wrapper {
-      left: calc(~"100% - 27px");
-    }
-  }
-
   
   .card-title-card-hovering {
     .manual-popup-wrapper {
@@ -159,6 +151,8 @@
     position: absolute;
     top: 7px;
     left: 37px;
+    
+    margin-left: 27px;
   }
 
   .card-minimize-icon {
@@ -389,7 +383,13 @@
 
 .card .cards-area, .builder-tb-cards-area {
   margin-right: -4px !important;
-  // margin-left: -108px; // TODO WRAPPER
+  margin-left: -108px;
+}
+
+.card-no-title {
+  .cards-area, .builder-tb-cards-area {
+    margin-left: 0px;
+  }
 }
 
 .builder-comp-list-item.card-fields {
@@ -450,7 +450,10 @@
   opacity: 1;
   margin: 0px 10px;
   text-transform: none;
-  display: inline-block;
+  display: block;
+  position: absolute;
+  top: 8px;
+  left: 120px;
   padding: 2px 10px;
   border-radius: @card-border-radius;
   background: rgba(255,255,255,0.5);

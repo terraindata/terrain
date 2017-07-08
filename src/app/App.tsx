@@ -54,6 +54,8 @@ import './App.less';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as Radium from 'radium';
+
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
 import { browserHistory } from 'react-router';
@@ -164,6 +166,8 @@ interface Props
   };
   children: any;
 }
+
+@Radium
 class App extends PureClasss<Props>
 {
   public state = {
@@ -351,7 +355,11 @@ class App extends PureClasss<Props>
       <div
         className='app'
         onMouseMove={this.handleMouseMove}
-        style={fontColor(Colors().text.baseLight)}
+        key='app'
+        style={[
+          fontColor(Colors().text.baseLight),
+          backgroundColor(Colors().base),
+        ]}
       >
         {
           this.state.loggedInAndLoaded &&
