@@ -119,14 +119,14 @@ abstract class ESClause
       this[name] = defaultValueFunction();
     }
   }
-  
+
   protected seedCard(obj: {
     [field: string]: any;
 
     static: {
       colors?: string[]; // optional, filled below
       title?: string; // optional, filled below
-      
+
       preview: string | ((c: Card) => string);
       display: Display | Display[];
       tql: TQLFn;
@@ -146,26 +146,26 @@ abstract class ESClause
   {
     // hide title
     obj['noTitle'] = true;
-    
+
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: this.name,
       colors: [],
       language: 'elastic',
-      
+
       anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
-    
-    if(true) // switch this on for wrapper card approach
+
+    if (true) // switch this on for wrapper card approach
     {
-      if(obj['key'] !== undefined)
+      if (obj['key'] !== undefined)
       {
         throw new Error('Key method was already defined for block ' + this.type);
       }
       // Define a key, which will be optionally used to supply the key
       //  for a key/val pair, if one is needed
       obj['key'] = '';
-      
+
       // prepend the display with our standard key text display
       const objStatic = obj['static'];
       const display = objStatic['display'];
@@ -200,21 +200,21 @@ abstract class ESClause
         }
       }
     }
-    
+
     return _card(obj as any);
   }
-  
+
   public getCard(): any
   {
     return null;
   }
-  
-  
-  public getSupplementalBlocks(): {[type: string]: Block}
+
+
+  public getSupplementalBlocks(): { [type: string]: Block }
   {
     return {};
   }
-  
+
   public getCardType(): string
   {
     return 'eql' + this.type;
@@ -229,12 +229,12 @@ const KEY_INLINE_DISPLAYS = [
 ];
 
 const KEY_DISPLAY: Display =
-{
-  displayType: DisplayType.TEXT,
-  key: 'key',
-  autoDisabled: true, // TODO consider autocomplete for key?
-  className: 'card-muted-input card-elastic-key-input',
-  component: ElasticKeyBuilderTextbox,
-};
+  {
+    displayType: DisplayType.TEXT,
+    key: 'key',
+    autoDisabled: true, // TODO consider autocomplete for key?
+    className: 'card-muted-input card-elastic-key-input',
+    component: ElasticKeyBuilderTextbox,
+  };
 
 export default ESClause;

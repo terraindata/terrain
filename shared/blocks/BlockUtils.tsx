@@ -386,7 +386,7 @@ export function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 //         {
 //           return memo;
 //         }
-        
+
 //         if (predicate(block))
 //         {
 //           return block;

@@ -96,15 +96,15 @@ export default class ESVariantClause extends ESClause
 
     interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
   }
-  
+
   public getCard()
   {
     // TODO try an inline approach
-    
+
     return this.seedCard({
       cards: List([]),
-      
-      static: 
+
+      static:
       {
         title: this.type + ' (Variant)',
         tql: (block, tqlFn, tqlConfig) =>

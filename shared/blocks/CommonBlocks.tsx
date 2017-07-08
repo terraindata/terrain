@@ -84,12 +84,12 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
   const display = config.display || (
     config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
   );
-  
-  if(config.className)
+
+  if (config.className)
   {
     (display as Display).className += ' ' + config.className;
   }
-      
+
   return _card({
     cards: L(),
 
@@ -119,7 +119,7 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
 
       tql: config.tql,
       tqlGlue: config.tqlGlue,
-      
+
       init: config.init,
     },
   });

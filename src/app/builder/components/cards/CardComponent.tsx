@@ -506,7 +506,7 @@ class _CardComponent extends PureClasss<Props>
     //                 addColumn={this.props.addColumn}
     //                 columnIndex={this.props.columnIndex}
     //               />
-    
+
     return (
       <div
         className={classNames({
@@ -553,7 +553,7 @@ class _CardComponent extends PureClasss<Props>
                 })}
                 style={{
                   // shrink the width if the card does not have a title
-                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined 
+                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined
                 }}
                 onClick={this.handleTitleClick}
               >
@@ -575,17 +575,17 @@ class _CardComponent extends PureClasss<Props>
                   />
                 }
                 {
-                  ! (this.props.card && this.props.card['noTitle']) &&
-                    <div
-                      className='card-title-inner'
-                      style={{
-                        background: card.static.colors[0],
-                      }}
-                    >
-                      {
-                        title
-                      }
-                    </div>
+                  !(this.props.card && this.props.card['noTitle']) &&
+                  <div
+                    className='card-title-inner'
+                    style={{
+                      background: card.static.colors[0],
+                    }}
+                  >
+                    {
+                      title
+                    }
+                  </div>
                 }
 
                 {
@@ -608,7 +608,7 @@ class _CardComponent extends PureClasss<Props>
                 className='card-body'
                 style={{
                   // shrink the width if the card does not have a title
-                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined 
+                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined
                 }}
               >
                 {

@@ -61,7 +61,7 @@ export default class ESIndexClause extends ESStringClause
   }
 
   // TODO: add field validation here
-  
+
   public getCard()
   {
     return this.seedCard({
@@ -73,13 +73,13 @@ export default class ESIndexClause extends ESStringClause
           key: 'value',
           getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
           {
-          	// TODO cache list in schema state
-          	const server = BuilderStore.getState().db.name;
+            // TODO cache list in schema state
+            const server = BuilderStore.getState().db.name;
             return schemaState.databases.toList().filter(
               (db) => db.serverId === server
             ).map(
               (db) => db.name
-            ).toList();
+              ).toList();
           },
         },
         tql: (stringBlock) => stringBlock['value'],

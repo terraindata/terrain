@@ -60,33 +60,33 @@ export default class ESObjectClause extends ESTerminalClause
   {
     super(type, settings, ESClauseType.ESObjectClause, ESJSONType.object);
   }
-  
-  
+
+
   public getCard()
   {
     return this.seedCard({
       cards: List([]),
       childrenHaveKeys: true,
-      
+
       static:
       {
         preview: '[cards.size] properties',
-        
+
         display:
         {
           displayType: DisplayType.CARDS,
           key: 'cards',
         },
-        
+
         tql: (block, tqlFn, tqlConfig) => 
         {
-        	const json = {}
+          const json = {}
           block['cards'].map(
-          	(card) =>
-          	{
-          		json[card['key']] = tqlFn(card, tqlConfig);
-          	}
-         	);
+            (card) =>
+            {
+              json[card['key']] = tqlFn(card, tqlConfig);
+            }
+          );
           return json;
         },
       },

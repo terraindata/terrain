@@ -171,7 +171,7 @@ const EQLSpec: ESClause[] =
         autocomplete: ['index', 'type'],
       }),
     new ESIndexClause('index',
-      { 
+      {
         desc: 'Selects which index to search.',
         template: '',
       }
@@ -442,7 +442,7 @@ const EQLSpec: ESClause[] =
       },
       [],
       {
-        name: 'bool',  
+        name: 'bool',
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
         // template: { must: null, must_not: null, should: null, minimum_should_match: null },

@@ -62,7 +62,7 @@ interface Theme
     link: string, // TODO
     linkHover: string,
   },
-  
+
   button: {
     text: string,
     background: string,
@@ -194,7 +194,7 @@ interface Theme
     builderColumn: {
       background: string,
     },
-    
+
     results:
     {
       background: string,
@@ -223,7 +223,7 @@ const DARK: Theme =
       link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
       linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
     },
-    
+
     button:
     {
       text: '#FFFFFF',
@@ -356,7 +356,7 @@ const DARK: Theme =
       builderColumn: {
         background: '#2F2F2F',
       },
-      
+
       results:
       {
         background: '#151515',

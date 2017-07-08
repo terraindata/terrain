@@ -61,7 +61,7 @@ export default class ESFieldClause extends ESStringClause
   }
 
   // TODO: add field validation here
-  
+
   public getCard()
   {
     return this.seedCard({
@@ -73,11 +73,11 @@ export default class ESFieldClause extends ESStringClause
           key: 'value',
           getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
           {
-          	return List(['movieId', 'title', 'budget', 'released', 'revenue']);
-          	// TODO change from tables to dbs?
-          	// const db = BuilderStore.getState().db.name; // TODO correct?
-           //  const tableNames = schemaState.tableNamesByDb.get(db);
-           //  return tableNames;
+            return List(['movieId', 'title', 'budget', 'released', 'revenue']);
+            // TODO change from tables to dbs?
+            // const db = BuilderStore.getState().db.name; // TODO correct?
+            //  const tableNames = schemaState.tableNamesByDb.get(db);
+            //  return tableNames;
           },
         },
         tql: (stringBlock) => stringBlock['value'],

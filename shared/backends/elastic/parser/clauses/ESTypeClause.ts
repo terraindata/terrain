@@ -61,7 +61,7 @@ export default class ESTypeClause extends ESStringClause
   }
 
   // TODO: add field validation here
-  
+
   public getCard()
   {
     return this.seedCard({
@@ -76,12 +76,12 @@ export default class ESTypeClause extends ESStringClause
             const state = BuilderStore.getState();
             const cards = state.query.cards;
             const isIndexCard = (card) => card['type'] === 'eqlindex';
-            const indexCard = cards.find(isIndexCard) || 
+            const indexCard = cards.find(isIndexCard) ||
               (
                 cards.get(0) && cards.get(0)['cards'].find(isIndexCard)
               );
             // TODO idea: have the selected index and type stored on the Query object
-            
+
             if (indexCard)
             {
               const index = indexCard['value'];
@@ -90,9 +90,9 @@ export default class ESTypeClause extends ESStringClause
                 (table) => table.databaseId === indexId
               ).map(
                 (table) => table.name
-              ).toList();
+                ).toList();
             }
-            
+
             return emptyList;
           },
         },

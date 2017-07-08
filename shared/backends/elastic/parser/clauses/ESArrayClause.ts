@@ -92,25 +92,25 @@ export default class ESArrayClause extends ESClause
   {
     return this.seedCard({
       cards: List([]),
-      
+
       static:
       {
         preview: '[cards.size] ' + this.type + '(s)',
-        
+
         display:
         {
           displayType: DisplayType.CARDS,
           key: 'cards',
           accepts: List(['eql' + this.elementID]),
         },
-        
-        init: () => 
-        ({
-          cards: List([
-            BlockUtils.make(ElasticBlocks['eql' + this.elementID]),
-          ]),
-        }),
-        
+
+        init: () =>
+          ({
+            cards: List([
+              BlockUtils.make(ElasticBlocks['eql' + this.elementID]),
+            ]),
+          }),
+
         tql: (block, tqlFn, tqlConfig) => 
         {
           return block['cards'].map(card => tqlFn(card, tqlConfig)).toArray();

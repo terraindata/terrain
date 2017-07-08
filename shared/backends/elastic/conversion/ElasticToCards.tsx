@@ -76,7 +76,7 @@ export default function ElasticToCards(
     {
       // let cards = parseMagicObject(query.parseTree.parser.getValue());
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      let cards = List([ parseCardFromValueInfo(rootValueInfo) ]);
+      let cards = List([parseCardFromValueInfo(rootValueInfo)]);
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
@@ -96,21 +96,21 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   {
     return BlockUtils.make(Blocks['eqlnull']);
   }
-  
-  let valueMap: { value?: any, cards?: List<Card>} = {};
-  
+
+  let valueMap: { value?: any, cards?: List<Card> } = {};
+
   const clauseCardType = 'eql' + valueInfo.clause.type;
-  
+
   if (typeof valueInfo.value !== 'object')
   {
     valueMap.value = valueInfo.value;
   }
-  
+
   if (valueInfo.arrayChildren && valueInfo.arrayChildren.length)
   {
     valueMap.cards = List(valueInfo.arrayChildren.map(parseCardFromValueInfo));
   }
-  
+
   if (valueInfo.objectChildren && _.size(valueInfo.objectChildren))
   {
     if (valueMap.cards)
@@ -118,7 +118,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       console.log('Error with: ', valueInfo);
       throw new Error('Found both arrayChildren and objectChildren in a ValueInfo');
     }
-    
+
     valueMap.cards = List(_.map(valueInfo.objectChildren,
       (propertyInfo, key: string) =>
       {
@@ -128,7 +128,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       }
     ));
   }
-  
+
   return BlockUtils.make(Blocks[clauseCardType], valueMap);
 }
 

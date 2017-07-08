@@ -66,14 +66,14 @@ class LibraryColumn extends Classs<Props>
       >
         {
           this.props.title &&
-            <div
-              className='library-column-title'
-              style={backgroundColor(Colors().library.titleBar.base)}
-            >
-              {
-                this.props.title
-              }
-            </div>
+          <div
+            className='library-column-title'
+            style={backgroundColor(Colors().library.titleBar.base)}
+          >
+            {
+              this.props.title
+            }
+          </div>
         }
         <div className={classNames({
           'library-column-content': true,

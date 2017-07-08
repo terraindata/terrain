@@ -101,22 +101,22 @@ export default class ESMapClause extends ESClause
         }
       });
   }
-  
+
   public getCard()
   {
     const accepts = List(['eql' + this.valueType]);
-    
+
     return this.seedCard({
       cards: List([]),
       childrenHaveKeys: true,
-      
+
       // TODO incorporate nameType into the keys
-      
-      
+
+
       static:
       {
         preview: '[cards.size] properties',
-        
+
         display:
         {
           displayType: DisplayType.CARDS,
@@ -124,7 +124,7 @@ export default class ESMapClause extends ESClause
           accepts,
         },
         accepts,
-        
+
         tql: (block, tqlFn, tqlConfig) => 
         {
           const json = {}
@@ -133,7 +133,7 @@ export default class ESMapClause extends ESClause
             {
               json[card['key']] = tqlFn(card, tqlConfig);
             }
-           );
+          );
           return json;
         },
       },

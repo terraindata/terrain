@@ -102,18 +102,19 @@ class ElasticKeyBuilderTextbox extends PureClasss<Props>
   } = {
     shouldRender: this.computeShouldRender(this.props),
   };
-  
+
   private findParentCardKeyPath(storeState, keyPath: KeyPath)
   {
-    do {
+    do
+    {
       keyPath = keyPath.skipLast(1).toList();
-    } while(
+    } while (
       keyPath.size &&
       !storeState.getIn(keyPath)._isCard
     );
     return keyPath;
   }
-  
+
   private computeShouldRender(props: Props): boolean
   {
     // TODO this is a hacky approach, find a better one
@@ -121,13 +122,13 @@ class ElasticKeyBuilderTextbox extends PureClasss<Props>
     const parentCardKeyPath = this.findParentCardKeyPath(state, this.findParentCardKeyPath(state, props.keyPath));
     // find the parent card's key path. Requires double, since the first
     //  will hit the card this textbox is in.
-    
+
     if (!parentCardKeyPath.size)
     {
       // top level cards don't have keys
       return false;
     }
-    
+
     return state.getIn(parentCardKeyPath).get('childrenHaveKeys');
   }
 
@@ -150,7 +151,7 @@ class ElasticKeyBuilderTextbox extends PureClasss<Props>
         {...this.props}
       />;
     }
-    
+
     return null;
   }
 }

@@ -171,7 +171,7 @@ abstract class ESClause
   {
     // hide the title for elastic
     obj['noTitle'] = true;
-    
+
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: this.name,
@@ -250,12 +250,12 @@ const KEY_INLINE_DISPLAYS = [
 ];
 
 const KEY_DISPLAY: Display =
-{
-  displayType: DisplayType.TEXT,
-  key: 'key',
-  autoDisabled: true, // TODO consider autocomplete for key?
-  className: 'card-muted-input card-elastic-key-input',
-  component: ElasticKeyBuilderTextbox,
-};
+  {
+    displayType: DisplayType.TEXT,
+    key: 'key',
+    autoDisabled: true, // TODO consider autocomplete for key?
+    className: 'card-muted-input card-elastic-key-input',
+    component: ElasticKeyBuilderTextbox,
+  };
 
 export default ESClause;

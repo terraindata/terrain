@@ -82,7 +82,7 @@ export default class ESBaseClause extends ESClause
         break;
     }
   }
-  
+
   public getCard()
   {
     return this.seedCard({

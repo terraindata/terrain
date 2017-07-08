@@ -201,10 +201,10 @@ class CreateCardTool extends PureClasss<Props>
       </a>
     );
   }
-  
+
   getCardTypeList(): List<string>
   {
-    if(this.props.overrideText)
+    if (this.props.overrideText)
     {
       // TODO consider memoizing this.
       return this.props.overrideText.map((t) => t.type).toList();
@@ -351,7 +351,7 @@ class CreateCardTool extends PureClasss<Props>
     }
 
     const cardTypeList = this.getCardTypeList();
-    
+
     return (
       <div
         className={classes}

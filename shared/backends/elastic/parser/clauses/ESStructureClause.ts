@@ -434,10 +434,10 @@ export default class ESStructureClause extends ESClause
             )
           );
         },
-        
+
         childrenHaveKeys: true,
-      
-        static:      
+
+        static:
         {
           tql: (block, tqlTranslationFn, tqlConfig) =>
           {
