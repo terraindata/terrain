@@ -137,19 +137,6 @@ class FileImportInfo extends PureClasss<Props>
         return;
       }
       console.log("Parsed json: ", items);
-
-      // if (items.length > 0)
-      // {
-      //   const desiredHash: string = hashObject(getEmptyObject(items[0]));
-      //   for (const obj of items)
-      //   {
-      //     if (hashObject(getEmptyObject(obj)) !== desiredHash)
-      //     {
-      //       alert('Objects in provided input JSON do not have the same keys and/or types.');
-      //       return;
-      //     }
-      //   }
-      // }
     }
     else if (filetype === 'csv')
     {
@@ -162,7 +149,7 @@ class FileImportInfo extends PureClasss<Props>
           return;
         },
         skipEmptyLines: true,
-      }
+      };
       items = Papa.parse(file, config).data;
       console.log("Parsed csv: ", items);
 

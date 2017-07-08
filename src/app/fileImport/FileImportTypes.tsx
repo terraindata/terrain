@@ -59,7 +59,6 @@ class FileImportStateC extends BaseClass
   public file: string = '';
   public filetype: string = '';
 
-  // public previewRows: object[] = null;
   public previewRows: List<List<string>> = null;
   public columnsCount: number = 0;
 

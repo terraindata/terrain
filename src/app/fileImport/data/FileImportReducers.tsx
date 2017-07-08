@@ -107,13 +107,13 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
-      .set('primaryKey', action.payload.id)
+      .set('primaryKey', action.payload.columnId)
   ;
 
 FileImportReducers[ActionTypes.setColumnToInclude] =
   (state, action) =>
     state
-      .updateIn(['columnsToInclude', action.payload.id], (isColIncluded: boolean) => !isColIncluded)
+      .updateIn(['columnsToInclude', action.payload.columnId], (isColIncluded: boolean) => !isColIncluded)
   ;
 
 FileImportReducers[ActionTypes.setColumnType] =
@@ -145,7 +145,7 @@ FileImportReducers[ActionTypes.deleteColumnType] =
 FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
     state
-      .setIn(['columnNames', action.payload.id], action.payload.columnName)
+      .setIn(['columnNames', action.payload.columnId], action.payload.columnName)
   ;
 
 FileImportReducers[ActionTypes.addTransform] =

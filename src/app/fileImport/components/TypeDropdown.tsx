@@ -76,9 +76,6 @@ class TypeDropdown extends PureClasss<Props>
 
   public render()
   {
-    // console.log('typeDropdown: ', this.props.columnType);
-    // console.log('col id: ', this.props.columnId);
-    // console.log('recursion id: ', this.props.recursionId);
     return (
       <div>
         <Dropdown

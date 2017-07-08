@@ -61,7 +61,6 @@ class FileImportPreviewRow extends PureClasss<Props>
 {
   public render()
   {
-    // console.log('FileImportPreviewRow items: ', this.props.items);
     return (
       <tr>
         {

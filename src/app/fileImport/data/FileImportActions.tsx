@@ -68,8 +68,8 @@ const FileImportActions =
       $(ActionTypes.changeHasCsvHeader, {}),
 
     changePrimaryKey:
-    (id: number) =>
-      $(ActionTypes.changePrimaryKey, { id }),
+    (columnId: number) =>
+      $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
     (file: string, filetype: string, preview: List<List<string>>, oldNames: List<string>) =>
@@ -84,12 +84,12 @@ const FileImportActions =
       $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
-    (id: number) =>
-      $(ActionTypes.setColumnToInclude, { id }),
+    (columnId: number) =>
+      $(ActionTypes.setColumnToInclude, { columnId }),
 
     setColumnName:
-    (id: number, columnName: string) =>
-      $(ActionTypes.setColumnName, { id, columnName }),
+    (columnId: number, columnName: string) =>
+      $(ActionTypes.setColumnName, { columnId, columnName }),
 
     setColumnType:
     (columnId: number, recursionId: number, typeIndex: number) =>
