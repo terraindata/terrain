@@ -211,9 +211,9 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
         .set('primaryKey', primaryKey)
         .set('columnNames', state.columnNames
           .set(transformCol, action.payload.transform.args.mergeNames[1])
-          .delete(mergeCol))
-        .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
-        .set('columnTypes', state.columnTypes.delete(mergeCol))
+          .delete(mergeCol - 1))
+        .set('columnsToInclude', state.columnsToInclude.delete(mergeCol - 1))
+        .set('columnTypes', state.columnTypes.delete(mergeCol - 1))
         .set('previewRows', List(state.previewRows.map((row, i) =>
           row.map((col, j) =>
           {

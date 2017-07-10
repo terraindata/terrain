@@ -91,6 +91,10 @@ class TransformBox extends Classs<Props>
   {
     this.setState({
       transformTypeIndex,
+      mergeIndex: -1,
+      transformText: '',
+      splitNames: ['', ''],
+      mergeNames: ['', ''],
     })
   }
 
@@ -192,7 +196,7 @@ class TransformBox extends Classs<Props>
   {
     // error checking
     const msg = this.transformErrorCheck();
-    if (!msg)
+    if (msg)
     {
       alert(msg);
       return;
