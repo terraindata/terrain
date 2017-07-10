@@ -64,12 +64,12 @@ url = url[0] + url[1].split('/')[0] + '/' + 'silent-cartographer/events/';
 var loadTime = 0;
 var numClicks = 0;
 
-getCurrentTime()
+function getCurrentTime()
 {
   return new Date().toISOString();
 };
 
-getCurrentTimeOnPage()
+function getCurrentTimeOnPage()
 {
   return ((new Date()) - loadTime) / 1000;
 };
@@ -91,9 +91,10 @@ var req =
     eventId: "eventId0",
     eventType: "click",
     payload: {
-      dependencies: ["eventId0", "eventId1"],
+      dependencies: ["eventId1"],
     },
     url: "",
+    value: "",
     variantId: "2",
   },
   {
@@ -101,6 +102,7 @@ var req =
     eventType: "click",
     payload: {},
     url: "",
+    value: "",
     variantId: "3",
   },
   {
@@ -108,6 +110,7 @@ var req =
     eventType: "click",
     payload: {},
     url: "",
+    value: "",
     variantId: "1",
   }
 ];
@@ -159,6 +162,7 @@ function load(uploadObj, resp, callback)
         "date": getCurrentTime(),
         "dependencies": respDepValues,
       };
+      resp["value"] = document.getElementById(resp["eventId"]).value.toString();
       resp["url"] = route;
       var xhttp = new XMLHttpRequest();
       xhttp.open("POST", url+'update/');
