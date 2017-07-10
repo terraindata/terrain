@@ -270,7 +270,6 @@ class TransformBox extends Classs<Props>
 
   public render()
   {
-    console.log("newNames: ", this.props.newNames)
     return (
       <div>
         {
