@@ -49,6 +49,7 @@ import sha1 = require('sha1');
 import * as csv from 'csvtojson';
 import * as winston from 'winston';
 
+import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
@@ -176,68 +177,15 @@ export class Import
     });
   }
 
-  // TODO: move into shared Util file
-  /* returns an error message if there are any; else returns empty string */
-  private _isValidIndexName(name: string): string
-  {
-    if (name === '')
-    {
-      return 'Index name cannot be an empty string.';
-    }
-    if (name !== name.toLowerCase())
-    {
-      return 'Index name may not contain uppercase letters.';
-    }
-    if (!/^[a-z\d].*$/.test(name))
-    {
-      return 'Index name must start with a lowercase letter or digit.';
-    }
-    if (!/^[a-z\d][a-z\d\._\+-]*$/.test(name))
-    {
-      return 'Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.';
-    }
-    return '';
-  }
-  /* returns an error message if there are any; else returns empty string */
-  private _isValidTypeName(name: string): string
-  {
-    if (name === '')
-    {
-      return 'Document type cannot be an empty string.';
-    }
-    if (/^_.*/.test(name))
-    {
-      return 'Document type may not start with an underscore.';
-    }
-    return '';
-  }
-  /* returns an error message if there are any; else returns empty string */
-  private _isValidFieldName(name: string): string
-  {
-    if (name === '')
-    {
-      return 'Field name cannot be an empty string.';
-    }
-    if (/^_.*/.test(name))
-    {
-      return 'Field name may not start with an underscore.';
-    }
-    if (name.indexOf('.') !== -1)
-    {
-      return 'Field name may not contain periods.';
-    }
-    return '';
-  }
-
   /* returns an error message if there are any; else returns empty string */
   private _verifyConfig(imprt: ImportConfig): string
   {
-    const indexError: string = this._isValidIndexName(imprt.db);
+    const indexError: string = SharedUtil.isValidIndexName(imprt.db);
     if (indexError !== '')
     {
       return indexError;
     }
-    const typeError: string = this._isValidTypeName(imprt.table);
+    const typeError: string = SharedUtil.isValidTypeName(imprt.table);
     if (typeError !== '')
     {
       return typeError;
@@ -261,7 +209,7 @@ export class Import
     let fieldError: string;
     for (const colName of columnList)
     {
-      fieldError = this._isValidFieldName(colName);
+      fieldError = SharedUtil.isValidFieldName(colName);
       if (fieldError !== '')
       {
         return fieldError;
