@@ -175,7 +175,9 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     }
     else if (action.payload.transform.name === 'split')
     {
+      const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
       return state
+        .set('primaryKey', primaryKey)
         .set('columnNames', state.columnNames
           .set(transformCol, action.payload.transform.args.splitNames[0])
           .insert(transformCol + 1, action.payload.transform.args.splitNames[1]))
@@ -194,9 +196,19 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     else if (action.payload.transform.name === 'merge')
     {
       const mergeCol = state.columnNames.indexOf(action.payload.transform.args.mergeNames[0]);
-      console.log('mergeCol: ', mergeCol);
+
+      let primaryKey = '';
+      if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
+      {
+        primaryKey = mergeCol < transformCol ? transformCol - 1 : transformCol;
+      }
+      else
+      {
+        primaryKey = state.primaryKey < transformCol ? state.primaryKey : state.primaryKey - 1;
+      }
 
       return state
+        .set('primaryKey', primaryKey)
         .set('columnNames', state.columnNames
           .set(transformCol, action.payload.transform.args.mergeNames[1])
           .delete(mergeCol))
@@ -241,6 +253,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('columnNames', List(columnNames))
       .set('columnsToInclude', List(columnsToInclude))
       .set('columnTypes', List(columnTypes))
+      .set('transforms', List([]))
   };
 
 FileImportReducers[ActionTypes.uploadFile] =
