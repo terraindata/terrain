@@ -167,7 +167,7 @@ class FileImportInfo extends PureClasss<Props>
     items.splice(this.props.previewRowsCount, items.length - this.props.previewRowsCount);
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
-        value
+        typeof value === 'string' ? value : JSON.stringify(value)
       )
     );
     console.log("previewRows: ", previewRows);

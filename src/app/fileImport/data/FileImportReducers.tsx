@@ -216,13 +216,13 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
         .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
         .set('columnTypes', state.columnTypes.delete(mergeCol))
         .set('previewRows', List(state.previewRows.map((row, i) =>
-            row.map((col, j) =>
-            {
-              return j === transformCol ? col + action.payload.transform.args.text + row[mergeCol] : col;
-            }).filter((col, j) =>
-              j !== mergeCol
-              )
-          ))
+          row.map((col, j) =>
+          {
+            return j === transformCol ? col + action.payload.transform.args.text + row[mergeCol] : col;
+          }).filter((col, j) =>
+            j !== mergeCol
+            )
+        ))
         )
     }
     return state;
