@@ -117,8 +117,7 @@ class FileImportPreview extends PureClasss<Props>
       this.setState({
         curRenameTransform: {
           name: '',
-          args: {
-          },
+          args: {},
         }
       });
     }
@@ -140,6 +139,12 @@ class FileImportPreview extends PureClasss<Props>
     if (this.state.curRenameTransform.name)
     {
       Actions.addTransform(this.state.curRenameTransform);
+      this.setState({
+        curRenameTransform: {
+          name: '',
+          args: {},
+        }
+      });
     }
 
     Actions.uploadFile();

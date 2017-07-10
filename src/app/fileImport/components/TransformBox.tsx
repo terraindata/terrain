@@ -101,7 +101,7 @@ class TransformBox extends Classs<Props>
   public handleMergeIndexChange(mergeIndex: number)
   {
     const names = this.state.mergeNames.slice();
-    names[0] = this.props.newNames.delete(this.props.newNames.indexOf(this.props.newName)).get(this.state.mergeIndex);
+    names[0] = this.props.newNames.delete(this.props.newNames.indexOf(this.props.newName)).get(mergeIndex);
     this.setState({
       mergeIndex,
       mergeNames: names,
@@ -270,6 +270,7 @@ class TransformBox extends Classs<Props>
 
   public render()
   {
+    console.log("newNames: ", this.props.newNames)
     return (
       <div>
         {
