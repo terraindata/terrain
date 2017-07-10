@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import InfoArea from './InfoArea';
 
 export interface Props
@@ -53,7 +53,7 @@ export interface Props
   history?: any;
 }
 
-class Placeholder extends PureClasss<Props>
+class Placeholder extends TerrainComponent<Props>
 {
   public componentWillMount()
   {

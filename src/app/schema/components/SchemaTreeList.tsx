@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeItem from './SchemaTreeItem';
 const Radium = require('radium');
 import FadeInOut from '../../common/components/FadeInOut';
@@ -83,7 +83,7 @@ const SEARCH_STYLE = {
 };
 
 @Radium
-class SchemaTreeList extends PureClasss<Props>
+class SchemaTreeList extends TerrainComponent<Props>
 {
   public state = new State();
 

@@ -48,7 +48,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './ManualInfo.less';
 
 export interface Props
@@ -60,7 +60,7 @@ export interface Props
   className?: string;
 }
 
-class ManualInfo extends Classs<Props>
+class ManualInfo extends TerrainComponent<Props>
 {
   constructor(props: Props)
   {

@@ -44,8 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { List } from 'immutable';
 import ESClauseType from '../ESClauseType';
 import ESStringClause from './ESStringClause';
+import { DisplayType } from '../../../../blocks/displays/Display';
+import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
 
 /**
  * A clause which is a field name (column name)
@@ -58,4 +61,29 @@ export default class ESIndexClause extends ESStringClause
   }
 
   // TODO: add field validation here
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || '',
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'value',
+          getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
+          {
+            // TODO cache list in schema state
+            const server = BuilderStore.getState().db.name;
+            return schemaState.databases.toList().filter(
+              (db) => db.serverId === server
+            ).map(
+              (db) => db.name
+              ).toList();
+          },
+        },
+        tql: (stringBlock) => stringBlock['value'],
+      },
+    });
+  }
 }

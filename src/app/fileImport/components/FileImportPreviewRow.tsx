@@ -49,14 +49,14 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
 {
   items: object;
 }
 
-class FileImportPreviewRow extends PureClasss<Props>
+class FileImportPreviewRow extends TerrainComponent<Props>
 {
   public shouldComponentUpdate(nextProps: Props)
   {

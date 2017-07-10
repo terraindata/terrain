@@ -49,7 +49,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './Loading.less';
 
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 
 const Sprites = require('./../../../images/spritesheet_terrainLoading.png');
@@ -68,7 +68,7 @@ export interface Props
 // Frame Breakdown
 // (Appear: frames 0-10) (Loading Appear: frames 11-16) (Loading Loop: frames 17-50) (Disappear: frames 51-56)
 
-class Loading extends PureClasss<Props>
+class Loading extends TerrainComponent<Props>
 {
   public state = {
     stage: 0,

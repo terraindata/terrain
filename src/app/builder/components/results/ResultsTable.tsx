@@ -49,7 +49,7 @@ import * as _ from 'underscore';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { MenuOption } from '../../../common/components/Menu';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import { IColumn, Table } from '../../../common/components/Table';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
@@ -64,7 +64,7 @@ export interface Props
   resultsLoading: boolean;
 }
 
-export default class ResultsTable extends PureClasss<Props>
+export default class ResultsTable extends TerrainComponent<Props>
 {
   public state: {
     random: number;

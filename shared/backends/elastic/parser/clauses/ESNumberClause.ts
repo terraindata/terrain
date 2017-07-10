@@ -48,6 +48,8 @@ import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
 
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
+
 /**
  * A clause which is a number
  */
@@ -56,5 +58,21 @@ export default class ESNumberClause extends ESTerminalClause
   public constructor(type: string, settings: any)
   {
     super(type, settings, ESClauseType.ESNumberClause, ESJSONType.number);
+  }
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || 0,
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.NUM,
+          key: 'value',
+          // TODO autocomplete?
+        },
+        tql: (numBlock) => +numBlock['value'],
+      },
+    });
   }
 }

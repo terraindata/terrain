@@ -48,7 +48,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './DeployModal.less';
 
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
@@ -68,7 +68,7 @@ export interface Props
 {
 }
 
-class DeployModal extends PureClasss<Props>
+class DeployModal extends TerrainComponent<Props>
 {
   public state: {
     changingStatus: boolean;

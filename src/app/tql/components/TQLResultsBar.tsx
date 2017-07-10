@@ -47,7 +47,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { ResultsState } from '../../builder/components/results/ResultsManager';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './TQLResultsBar.less';
 export interface Props
 {
@@ -57,7 +57,7 @@ export interface Props
   onToggle: () => void;
 }
 
-class TQLResultsBar extends PureClasss<Props>
+class TQLResultsBar extends TerrainComponent<Props>
 {
   public resultsFodderRange = _.range(0, 25);
 
