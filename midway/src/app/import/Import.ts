@@ -568,7 +568,10 @@ export class Import
         {
           try
           {
-            item[field] = JSON.parse(item[field]);
+            if (typeof item[field] === 'string')
+            {
+                item[field] = JSON.parse(item[field]);
+            }
           } catch (e)
           {
             return false;
