@@ -570,7 +570,7 @@ export class Import
           {
             if (typeof item[field] === 'string')
             {
-                item[field] = JSON.parse(item[field]);
+              item[field] = JSON.parse(item[field]);
             }
           } catch (e)
           {
