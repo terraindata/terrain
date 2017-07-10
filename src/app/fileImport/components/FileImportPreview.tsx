@@ -153,6 +153,7 @@ class FileImportPreview extends PureClasss<Props>
                     columnType={this.props.columnTypes.get(key)}
                     isPrimaryKey={this.props.primaryKey === key}
                     oldNames={this.props.oldNames}
+                    newNames={this.props.columnNames}
                     canSelectType={true}
                     canSelectColumn={true}
                     datatypes={List(FileImportTypes.ELASTIC_TYPES)}

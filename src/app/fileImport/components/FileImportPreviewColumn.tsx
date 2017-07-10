@@ -71,6 +71,7 @@ export interface Props
   canSelectType: boolean;
   canSelectColumn: boolean;
   oldNames: List<string>;
+  newNames: List<string>;
 
   transformTypes: List<string>;
   columnOptions: List<string>;
@@ -128,6 +129,7 @@ class FileImportPreviewColumn extends PureClasss<Props>
           datatype={this.props.datatypes.get(this.props.columnType.type)}
           transformTypes={this.props.transformTypes}
           newName={this.props.name}
+          newNames={this.props.newNames}
           addCurRenameTransform={this.props.addCurRenameTransform}
         />
       </th>

@@ -60,6 +60,7 @@ export interface Props
   datatype: string;
   transformTypes: List<string>;
   newName: string;
+  newNames: List<string>;
   addCurRenameTransform();
 }
 
@@ -67,11 +68,13 @@ class TransformBox extends Classs<Props>
 {
   public state: {
     transformTypeIndex: number;
+    mergeIndex: number;
     transformText: string;
     splitNames: string[];
     mergeNames: string[];
   } = {
     transformTypeIndex: 0,
+    mergeIndex: -1,
     transformText: '',
     splitNames: ['', ''],
     mergeNames: ['', ''],
@@ -88,6 +91,16 @@ class TransformBox extends Classs<Props>
   {
     this.setState({
       transformTypeIndex,
+    })
+  }
+
+  public handleMergeIndexChange(mergeIndex: number)
+  {
+    const names = this.state.mergeNames.slice();
+    names[0] = this.props.newNames.delete(this.props.newNames.indexOf(this.props.newName)).get(this.state.mergeIndex);
+    this.setState({
+      mergeIndex,
+      mergeNames: names,
     })
   }
 
@@ -109,14 +122,14 @@ class TransformBox extends Classs<Props>
     });
   }
 
-  public handleMergeOldNameChange(mergeOldName)
-  {
-    const names = this.state.mergeNames.slice();
-    names[0] = mergeOldName;
-    this.setState({
-      mergeNames: names,
-    });
-  }
+  // public handleMergeOldNameChange(mergeOldName)
+  // {
+  //   const names = this.state.mergeNames.slice();
+  //   names[0] = mergeOldName;
+  //   this.setState({
+  //     mergeNames: names,
+  //   });
+  // }
 
   public handleMergeNewNameChange(mergeNewName)
   {
@@ -127,8 +140,64 @@ class TransformBox extends Classs<Props>
     })
   }
 
+  public transformErrorCheck()
+  {
+    const transformName = this.props.transformTypes.get(this.state.transformTypeIndex)
+    if (!transformName)
+    {
+      return 'Select a transformation';
+    }
+    if (transformName === 'append' && !this.state.transformText)
+    {
+      return 'Enter text to append';
+    }
+    if (transformName === 'prepend' && !this.state.transformText)
+    {
+      return 'Enter text to prepend';
+    }
+    if (transformName === 'split')
+    {
+      if (!this.state.transformText)
+      {
+        return 'Enter split text';
+      }
+      if (!this.state.splitNames[0])
+      {
+        return 'Enter new column 1 name'
+      }
+      if (!this.state.splitNames[1])
+      {
+        return 'Enter new column 2 name'
+      }
+    }
+    if (transformName === 'merge')
+    {
+      if (!this.state.transformText)
+      {
+        return 'Enter merge text';
+      }
+      if (!this.state.mergeNames[0])
+      {
+        return 'Select column to merge'
+      }
+      if (!this.state.mergeNames[1])
+      {
+        return 'Enter new column name'
+      }
+    }
+    return '';
+  }
+
   public handleTransformClick()
   {
+    // error checking
+    const msg = this.transformErrorCheck();
+    if (!msg)
+    {
+      alert(msg);
+      return;
+    }
+
     // if not empty, add current rename transform and set it to empty string
     this.props.addCurRenameTransform();
 
@@ -187,7 +256,11 @@ class TransformBox extends Classs<Props>
     }
 
     this.setState({
+      transformTypeIndex: 0,
+      mergeIndex: -1,
       transformText: '',
+      splitNames: ['', ''],
+      mergeNames: ['', ''],
     })
   }
 
@@ -240,12 +313,12 @@ class TransformBox extends Classs<Props>
                   placeholder={'new column name'}
                   disabled={false}
                 />
-                <Autocomplete
-                  value={this.state.mergeNames[0]}
-                  options={null}
-                  onChange={this.handleMergeOldNameChange}
-                  placeholder={'column to merge'}
-                  disabled={false}
+                select column to merge
+                <Dropdown
+                  selectedIndex={this.state.mergeIndex}
+                  options={this.props.newNames.delete(this.props.newNames.indexOf(this.props.newName))}
+                  onChange={this.handleMergeIndexChange}
+                  canEdit={true}
                 />
               </div>
             }
