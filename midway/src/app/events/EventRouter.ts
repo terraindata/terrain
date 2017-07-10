@@ -73,6 +73,7 @@ Router.post('/update/', async (ctx, next) =>
         message: ctx.request.body['message'],
         payload: ctx.request.body['payload'],
         type: ctx.request.body['type'],
+        url: ctx.request.body['url'],
       };
     // TODO in production, use this instead
     // await events.decodeMessage(event);
