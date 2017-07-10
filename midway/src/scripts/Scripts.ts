@@ -105,11 +105,12 @@ export async function provisionScripts(controller: DatabaseController)
               },
               makePromiseCallback(resolve, reject));
           });
-        winston.info('Pushed script ' + script.id + ' to database ' + controller.getName());
+        winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());
       }
       catch (e)
       {
-        throw e;
+        winston.warn('Failed to provision script ' + script.id + ' to database '
+                      + controller.getName() + ': ' + e.response);
       }
     }
   }
