@@ -445,7 +445,7 @@ export class Import
         {
           if (obj.hasOwnProperty(key) && obj[key] !== null)
           {
-            if (!this._checkTypesHelper(obj[key], imprt.columnTypes[key]))
+            if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
               return 'Field "' + key + '" of object number ' + String(ind) +
                 ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
@@ -463,76 +463,10 @@ export class Import
         {
           if (imprt.columnTypes.hasOwnProperty(name))
           {
-            switch (this.numericTypes.has(imprt.columnTypes[name]['type']) ? 'number' : imprt.columnTypes[name]['type'])
+            if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
             {
-              case 'number':
-                winston.info('\n');
-                winston.info(obj[name]);
-                winston.info('\n');
-                const num: number = Number(obj[name]);
-                if (!isNaN(num))
-                {
-                  obj[name] = num;
-                }
-                else if (obj[name] === '')
-                {
-                  obj[name] = null;
-                }
-                else
-                {
-                  return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: number';
-                }
-                break;
-              case 'boolean':
-                if (obj[name] === 'true')
-                {
-                  obj[name] = true;
-                }
-                else if (obj[name] === 'false')
-                {
-                  obj[name] = false;
-                }
-                else if (obj[name] === '')
-                {
-                  obj[name] = null;
-                }
-                else
-                {
-                  return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: boolean';
-                }
-                break;
-              case 'date':
-                const date: number = Date.parse(obj[name]);
-                if (!isNaN(date))
-                {
-                  obj[name] = new Date(date);
-                }
-                else if (obj[name] === '')
-                {
-                  obj[name] = null;
-                }
-                else
-                {
-                  return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: date';
-                }
-                break;
-              case 'array':
-                if (obj[name] === '')
-                {
-                  obj[name] = null;
-                }
-                else
-                {
-                  try
-                  {
-                    obj[name] = JSON.parse(obj[name]);
-                  } catch (e)
-                  {
-                    return 'Field "' + name + '" of object number ' + String(ind) + ' does not match the specified type: array';
-                  }
-                }
-                break;
-              default:  // "text" case, leave as string
+              return 'Field "' + name + '" of object number ' + String(ind) +
+                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[name]);
             }
           }
         }
@@ -548,7 +482,7 @@ export class Import
         ind = 0;
         for (const obj of items)
         {
-          if (!this._isTypeConsistent(obj[field]))
+          if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
           {
             return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
           }
@@ -560,7 +494,7 @@ export class Import
     return '';
   }
   /* manually checks types (rather than checking hashes) ; handles arrays recursively */
-  private _checkTypesHelper(item: object, typeObj: object): boolean
+  private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
     const thisType: string = this._getType(item);
     if (thisType === 'number' && this.numericTypes.has(typeObj['type']))
@@ -573,7 +507,92 @@ export class Import
     }
     if (thisType === 'array')
     {
-      return this._checkTypesHelper(item[0], typeObj['innerType']);
+      return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
+    }
+    return true;
+  }
+  private _csvCheckTypesHelper(item: object, typeObj: object, field: string): boolean
+  {
+    switch (this.numericTypes.has(typeObj['type']) ? 'number' : typeObj['type'])
+    {
+      case 'number':
+        const num: number = Number(item[field]);
+        if (!isNaN(num))
+        {
+          item[field] = num;
+        }
+        else if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          return false;
+        }
+        break;
+      case 'boolean':
+        if (item[field] === 'true')
+        {
+          item[field] = true;
+        }
+        else if (item[field] === 'false')
+        {
+          item[field] = false;
+        }
+        else if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          return false;
+        }
+        break;
+      case 'date':
+        const date: number = Date.parse(item[field]);
+        if (!isNaN(date))
+        {
+          item[field] = new Date(date);
+        }
+        else if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          return false;
+        }
+        break;
+      case 'array':
+        if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          try
+          {
+            item[field] = JSON.parse(item[field]);
+          } catch (e)
+          {
+            return false;
+          }
+          if (!Array.isArray(item[field]))
+          {
+            return false;
+          }
+          let i: number = 0;
+          while (i < Object.keys(item[field]).length)    // lint hack to get around not recognizing item as an array
+          {
+            if (!this._csvCheckTypesHelper(item[field], typeObj['innerType'], String(i)))
+            {
+              return false;
+            }
+            i++;
+          }
+        }
+        break;
+      default:  // "text" case, leave as string
     }
     return true;
   }
