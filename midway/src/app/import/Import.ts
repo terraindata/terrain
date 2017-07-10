@@ -211,6 +211,23 @@ export class Import
     }
     return '';
   }
+  /* returns an error message if there are any; else returns empty string */
+  private _isValidFieldName(name: string): string
+  {
+    if (name === '')
+    {
+      return 'Field name cannot be an empty string.';
+    }
+    if (/^_.*/.test(name))
+    {
+      return 'Field name may not start with an underscore.';
+    }
+    if (name.indexOf('.') !== -1)
+    {
+      return 'Field name may not contain periods.';
+    }
+    return '';
+  }
 
   /* returns an error message if there are any; else returns empty string */
   private _verifyConfig(imprt: ImportConfig): string
@@ -241,9 +258,14 @@ export class Import
     {
       return 'A column to be included in the uploaded must be specified as the primary key.';
     }
-    if (columns.has(''))
+    let fieldError: string;
+    for (const colName of columnList)
     {
-      return 'The empty string is not a valid column name.';
+      fieldError = this._isValidFieldName(colName);
+      if (fieldError !== '')
+      {
+        return fieldError;
+      }
     }
     const columnTypes: string[] = columnList.map((val) => imprt.columnTypes[val]['type']);
     if (columnTypes.some((val, ind, arr) =>
