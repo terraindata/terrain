@@ -137,6 +137,7 @@ class FileImportPreview extends PureClasss<Props>
 
   public render()
   {
+    console.log('previewRows: ', this.props.previewRows);
     return (
       <div>
         <table>

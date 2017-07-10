@@ -194,6 +194,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     else if (action.payload.transform.name === 'merge')
     {
       const mergeCol = state.columnNames.indexOf(action.payload.transform.args.mergeNames[0]);
+      console.log('mergeCol: ', mergeCol);
 
       return state
         .set('columnNames', state.columnNames
@@ -204,11 +205,10 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
         .set('previewRows', List(state.previewRows.map((row, i) =>
           row.map((col, j) =>
           {
-            if (j !== mergeCol)
-            {
-              return j === transformCol ? col + action.payload.transform.args.text + row[mergeCol] : col
-            }
-          })
+            return j === transformCol ? col + action.payload.transform.args.text + row[mergeCol] : col;
+          }).filter((col, j) =>
+            j !== mergeCol
+            )
         ))
         )
     }
