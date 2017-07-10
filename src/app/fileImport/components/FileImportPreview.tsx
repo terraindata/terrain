@@ -124,6 +124,16 @@ class FileImportPreview extends PureClasss<Props>
     }
   }
 
+  public handleLoadTemplate()
+  {
+
+  }
+
+  public handleSaveTemplate()
+  {
+
+  }
+
   public handleUploadFile()
   {
     // TODO: error checking from FileImportInfo
@@ -140,6 +150,12 @@ class FileImportPreview extends PureClasss<Props>
     console.log('previewRows: ', this.props.previewRows);
     return (
       <div>
+        <button onClick={this.handleLoadTemplate}>
+          Load Template
+        </button>
+        <button onClick={this.handleSaveTemplate}>
+          Save as Template
+        </button>
         <table>
           <thead>
             <tr>

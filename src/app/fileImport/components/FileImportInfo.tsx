@@ -141,6 +141,7 @@ class FileImportInfo extends PureClasss<Props>
     else if (filetype === 'csv')
     {
       const config = {
+        quoteChar: '\'',
         header: this.props.hasCsvHeader,
         preview: this.props.previewRowsCount,
         error: (err) =>
