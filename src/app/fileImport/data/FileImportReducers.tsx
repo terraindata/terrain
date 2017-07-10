@@ -55,28 +55,28 @@ const FileImportReducers = {};
 
 const recSetType = (columnType, count, recursionId, typeIndex) =>
 {
-  count < recursionId ? recSetType(columnType.columnType, count + 1, recursionId, typeIndex) : columnType.type = typeIndex;
+  count < recursionId ? recSetType(columnType.innerType, count + 1, recursionId, typeIndex) : columnType.type = typeIndex;
   return columnType;
 };
 
 const recAddType = (columnType) =>
 {
-  columnType.columnType ? recAddType(columnType.columnType) : columnType.columnType = { type: 0 };
+  columnType.innerType ? recAddType(columnType.innerType) : columnType.innerType = { type: 0 };
   return columnType;
 };
 
 const recDeleteType = (columnType, count, recursionId) =>
 {
-  count < recursionId - 1 && columnType.columnType ? recDeleteType(columnType.columnType, count + 1, recursionId) : delete columnType.columnType;
+  count < recursionId - 1 && columnType.innerType ? recDeleteType(columnType.innerType, count + 1, recursionId) : delete columnType.innerType;
   return columnType;
 };
 
 const recToString = (columnType) =>
 {
   columnType.type = FileImportTypes.ELASTIC_TYPES[columnType.type];
-  if (columnType.columnType)
+  if (columnType.innerType)
   {
-    recToString(columnType.columnType)
+    recToString(columnType.innerType)
   }
   return columnType;
 };

@@ -89,7 +89,7 @@ class TypeDropdown extends PureClasss<Props>
           <TypeDropdown
             columnId={this.props.columnId}
             recursionId={this.props.recursionId + 1}
-            columnType={this.props.columnType.columnType}
+            columnType={this.props.columnType.innerType}
             datatypes={this.props.datatypes}
           />
         }
