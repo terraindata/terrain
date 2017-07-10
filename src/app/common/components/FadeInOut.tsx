@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
 
 export interface Props
@@ -53,7 +53,7 @@ export interface Props
   children?: any;
 }
 
-class FadeInOut extends PureClasss<Props>
+class FadeInOut extends TerrainComponent<Props>
 {
   public render()
   {

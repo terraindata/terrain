@@ -56,7 +56,7 @@ import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
 import UserThumbnail from './../../users/components/UserThumbnail';
@@ -80,7 +80,7 @@ export interface Props
   algorithmId: ID;
 }
 
-class VariantsColumn extends Classs<Props>
+class VariantsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,

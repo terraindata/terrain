@@ -263,7 +263,7 @@ export function getPreview(card: Card): string
       if (keys.length === 1)
       {
         const value = card[keys[0]];
-        if (value['_isCard'])
+        if (value && value['_isCard'])
         {
           return getPreview(value);
         }
@@ -375,3 +375,21 @@ export function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 
   return block;
 }
+
+// export const findBlock = 
+//   (blocks: List<Block>, predicate: (block: Block) => boolean) =>
+//   {
+//     return blocks.reduce(
+//       (memo, block) =>
+//       {
+//         if (memo)
+//         {
+//           return memo;
+//         }
+
+//         if (predicate(block))
+//         {
+//           return block;
+//         }
+//       });
+//   };

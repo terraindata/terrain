@@ -45,10 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-const Redux = require('redux');
-
-import Util from './../../util/Util';
 import * as FileImportTypes from './../FileImportTypes';
+const Redux = require('redux');
+import Util from './../../util/Util';
 
 const DefaultState = FileImportTypes._FileImportState();
 

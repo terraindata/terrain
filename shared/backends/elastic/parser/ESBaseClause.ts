@@ -43,48 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as _ from 'underscore';
-import Classs from './Classs';
-const shallowCompare = require('react-addons-shallow-compare');
 
-class PureClasss<T> extends Classs<T>
+import ESClause from './ESClause';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
+
+/**
+ * A clause which is a terminal (base) value: null, boolean, number, or string
+ */
+export default class ESBaseClause extends ESClause
 {
-  public props: T;
-  public _debugUpdates = false;
-  public _debugName = 'Not set';
-
-  public shouldComponentUpdate(nextProps: T, nextState: any)
+  public constructor(type: string, settings: any)
   {
-    const shouldUpdate = shallowCompare(this, nextProps, nextState);
-
-    if (this._debugUpdates && shouldUpdate)
-    {
-      this._compareSets(this.props, nextProps, 'props');
-      this._compareSets(this.state, nextState, 'state');
-    }
-
-    return shouldUpdate;
+    super(type, settings);
   }
 
-  public _compareSets(first: any, second: any, setName: string)
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    const firstKeys = _.keys(first);
-    for (const key of firstKeys)
+    valueInfo.clause = this;
+    const value: any = valueInfo.value;
+    if (typeof (value) === 'object')
     {
-      if (first[key] !== second[key])
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-    for (const key in second)
-    {
-      if (firstKeys.indexOf(key) === -1)
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
+      const foundType: string = Array.isArray(value) ? 'array' : 'object';
+      interpreter.accumulateError(
+        valueInfo,
+        'Found an ' +
+        foundType +
+        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
     }
   }
 }
-
-export default PureClasss;

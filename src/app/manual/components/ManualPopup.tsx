@@ -49,7 +49,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import ManualEntry from '../../../../shared/blocks/types/ManualEntry';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './ManualPopup.less';
 const InfoIcon = require('./../../../images/icon_info.svg');
 const OpenIcon = require('./../../../images/icon_open.svg');
@@ -62,7 +62,7 @@ export interface Props
   columnIndex: number;
 }
 
-class ManualPopup extends Classs<Props>
+class ManualPopup extends TerrainComponent<Props>
 {
   constructor(props: Props)
   {

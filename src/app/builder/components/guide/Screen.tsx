@@ -53,7 +53,7 @@ THE SOFTWARE.
 // import Util from '../../../util/Util';
 // import Actions from '../../data/BuilderActions';
 // import Card from '../cards/Card';
-// import PureClasss from './../../../common/components/PureClasss';
+// import TerrainComponent from './../../../common/components/TerrainComponent';
 // import {EExpressionType, EScreen, ICondition, IExpression, IQuery} from './Guide';
 // import SelectScreen from './SelectScreen';
 // const L = Immutable.List;
@@ -71,7 +71,7 @@ THE SOFTWARE.
 
 // }
 
-// class Screen extends PureClasss<Props>
+// class Screen extends TerrainComponent<Props>
 // {
 //   state: State = {
 //   };

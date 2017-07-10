@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { Link } from 'react-router';
 import AuthStore from './../../auth/data/AuthStore';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import Ajax from './../../util/Ajax';
@@ -63,7 +63,7 @@ export interface Props
   children?: any;
 }
 
-class Profile extends Classs<Props>
+class Profile extends TerrainComponent<Props>
 {
   public userUnsubscribe = null;
   public authUnsubscribe = null;

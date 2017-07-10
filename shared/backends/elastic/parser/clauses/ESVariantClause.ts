@@ -44,12 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import EQLConfig from '../EQLConfig';
+import * as _ from 'underscore';
+import { List } from 'immutable';
+
+import ESClause from './ESClause';
 import ESClauseType from '../ESClauseType';
+import EQLConfig from '../EQLConfig';
 import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
-import ESClause from './ESClause';
+import * as CommonBlocks from '../../../../blocks/CommonBlocks';
+import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
 
 /**
  * A clause which is one of several possible types
@@ -90,5 +95,37 @@ export default class ESVariantClause extends ESClause
     }
 
     interpreter.config.getClause(subtype).mark(interpreter, valueInfo);
+  }
+
+  public getCard()
+  {
+    // TODO try an inline approach
+
+    return this.seedCard({
+      cards: List([]),
+
+      static:
+      {
+        title: this.type + ' (Variant)',
+        tql: (block, tqlFn, tqlConfig) =>
+        {
+          return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+        },
+        accepts: List(
+          _.map(
+            this.subtypes,
+            (type: string, jsonType: string) =>
+              'eql' + type
+          )
+        ),
+        display:
+        {
+          displayType: DisplayType.CARDS,
+          key: 'cards',
+          singleChild: true,
+        },
+        preview: '',
+      }
+    });
   }
 }

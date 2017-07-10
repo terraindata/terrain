@@ -60,7 +60,7 @@ import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 
 export const MAX_RESULTS = 200;
 
@@ -139,7 +139,7 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-export class ResultsManager extends PureClasss<Props>
+export class ResultsManager extends TerrainComponent<Props>
 {
   public state: State = {};
 

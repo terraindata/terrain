@@ -49,7 +49,7 @@ import './LibraryVariantInfo.less';
 const { List } = Immutable;
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
 import Actions from './../data/LibraryActions';
@@ -70,7 +70,7 @@ export interface Props
 // TODO MOD centralize
 const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
-class LibraryInfoColumn extends PureClasss<Props>
+class LibraryInfoColumn extends TerrainComponent<Props>
 {
   public handleDbChange(dbIndex: number)
   {

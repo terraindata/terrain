@@ -47,7 +47,8 @@ import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import { Colors, backgroundColor, fontColor, link } from '../../common/Colors';
 
 export interface Props
 {
@@ -55,7 +56,7 @@ export interface Props
   title: string;
 }
 
-class LibraryColumn extends Classs<Props>
+class LibraryColumn extends TerrainComponent<Props>
 {
   public render()
   {
@@ -64,11 +65,15 @@ class LibraryColumn extends Classs<Props>
         className={'library-column library-column-' + this.props.index}
       >
         {
-          this.props.title ?
-            <div className='library-column-title'>
-              {this.props.title}
-            </div>
-            : null
+          this.props.title &&
+          <div
+            className='library-column-title'
+            style={backgroundColor(Colors().library.titleBar.base)}
+          >
+            {
+              this.props.title
+            }
+          </div>
         }
         <div className={classNames({
           'library-column-content': true,

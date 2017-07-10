@@ -65,6 +65,7 @@ import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
+// const { List, Map } = Immutable;
 
 export const Ajax =
   {
@@ -467,7 +468,6 @@ export const Ajax =
             onLoad(null);
           }
         },
-
       );
       // }
       // TODO
@@ -687,8 +687,13 @@ export const Ajax =
       db: string,
       table: string,
       connectionId: number,
-      onLoad: (response: MidwayQueryResponse) => void,
+      columnNames: IMMap<string, string> | Immutable.List<string>,
+      columnsToInclude: IMMap<string, boolean> | Immutable.List<boolean>,
+      columnTypes: IMMap<string, string> | Immutable.List<string>,
+      primaryKey: string,
+      onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
+      hasCsvHeader?: boolean,
     ): { xhr: XMLHttpRequest, queryId: string }
     {
       const payload: object = {
@@ -697,12 +702,16 @@ export const Ajax =
         table,
         contents: file,
         filetype,
+        columnMap: columnNames,
+        columnsToInclude,
+        columnTypes,
+        primaryKey,
+        csvHeaderMissing: !hasCsvHeader,
       };
       console.log('payload: ', payload);
       const onLoadHandler = (resp) =>
       {
-        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-        onLoad(queryResult);
+        onLoad(resp);
       };
       const xhr = Ajax.req(
         'post',

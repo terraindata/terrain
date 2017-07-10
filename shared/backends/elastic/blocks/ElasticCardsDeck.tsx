@@ -43,15 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import Blocks from './ElasticBlocks';
+import { ElasticElasticCardDeckTypes } from './ElasticElasticCards';
 
 export const ElasticCardsDeck =
   Immutable.fromJS(
     [
-      [
-        Blocks.elasticRootCard.type,
-      ],
+      // [
+      //   Blocks.elasticRootCard.type,
+      // ],
 
       [
         // JSON key wraps
@@ -64,13 +67,13 @@ export const ElasticCardsDeck =
         Blocks.elasticArray.type,
       ],
 
-      [
-        // JSON individual value cards
-        Blocks.elasticBool.type,
-        Blocks.elasticNumber.type,
-        Blocks.elasticText.type,
-        Blocks.elasticNull.type,
-      ],
+      // [
+      //   // JSON individual value cards
+      //   Blocks.elasticBool.type,
+      //   Blocks.elasticNumber.type,
+      //   Blocks.elasticText.type,
+      //   Blocks.elasticNull.type,
+      // ],
 
       [
         Blocks.elasticMagicCard.type,
@@ -82,6 +85,8 @@ export const ElasticCardsDeck =
         Blocks.elasticScore.type,
         Blocks.elasticTransform.type,
       ],
+
+      ElasticElasticCardDeckTypes,
     ],
   );
 

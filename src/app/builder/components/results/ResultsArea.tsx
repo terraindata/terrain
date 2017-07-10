@@ -67,9 +67,11 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Switch from '../../../common/components/Switch';
 import { getPrimaryKeyFor, MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
+import Radium = require('radium');
+import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -96,7 +98,8 @@ interface State
   onResultsLoaded?: (unchanged?: boolean) => void;
 }
 
-class ResultsArea extends PureClasss<Props>
+@Radium
+class ResultsArea extends TerrainComponent<Props>
 {
   public state: State = {
     expanded: false,
@@ -420,6 +423,8 @@ column if you have customized the results view.');
         <div
           className='results-top-config'
           onClick={this.handleESresultExport}
+          key='results-area-export'
+          style={link()}
         >
           Export
         </div>
@@ -427,6 +432,8 @@ column if you have customized the results view.');
         <div
           className='results-top-config'
           onClick={this.showConfig}
+          key='results-area-customize'
+          style={link()}
         >
           Customize view
         </div>
@@ -477,11 +484,13 @@ column if you have customized the results view.');
   public render()
   {
     return (
-      <div className={classNames({
-        'results-area': true,
-        'results-area-config-open': this.state.showingConfig,
-        'results-area-table': this.state.resultFormat === 'table',
-      })}>
+      <div
+        className={classNames({
+          'results-area': true,
+          'results-area-config-open': this.state.showingConfig,
+          'results-area-table': this.state.resultFormat === 'table',
+        })}
+      >
         {this.renderTopbar()}
         {this.renderResults()}
         {this.renderExpandedResult()}

@@ -46,9 +46,10 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
+import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -69,7 +70,7 @@ export interface Props
   onExpand?: () => void;
 }
 
-export class Sidebar extends PureClasss<Props>
+export class Sidebar extends TerrainComponent<Props>
 {
   public render()
   {
@@ -79,11 +80,13 @@ export class Sidebar extends PureClasss<Props>
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
+        style={backgroundColor(Colors().sideBar.base)}
       >
         <div
           className='sidebar-selected-square'
           style={{
             top: (this.props.selectedIndex * linkHeight) + 'px',
+            backgroundColor: Colors().sideBar.selectedSquare,
           }}
         />
         {

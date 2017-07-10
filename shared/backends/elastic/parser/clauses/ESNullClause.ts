@@ -57,4 +57,15 @@ export default class ESNullClause extends ESTerminalClause
   {
     super(type, settings, ESClauseType.ESNullClause, ESJSONType.null);
   }
+
+  public getCard()
+  {
+    return this.seedCard({
+      static: {
+        preview: '',
+        display: [],
+        tql: () => null,
+      },
+    });
+  }
 }
