@@ -391,7 +391,6 @@ export class Import
     });
   }
 
-  // TODO: recursive array type checking for CSVs, handle arrays of dates
   /* checks whether all objects in "items" have the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
@@ -407,7 +406,7 @@ export class Import
       const dateColumns: string[] = [];
       for (const colName in imprt.columnTypes)
       {
-        if (imprt.columnTypes.hasOwnProperty(colName) && imprt.columnTypes[colName]['type'] === 'date')
+        if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName]) === 'date')
         {
           dateColumns.push(colName);
         }
@@ -416,14 +415,9 @@ export class Import
       {
         items.forEach((item) =>
         {
-          // TODO: reduce redundancy with CSV parser below
           dateColumns.forEach((colName) =>
           {
-            const date: number = Date.parse(item[colName]);
-            if (!isNaN(date))
-            {
-              item[colName] = new Date(date);
-            }
+            this._parseDatesHelper(item, colName);
           });
         });
       }
@@ -511,6 +505,7 @@ export class Import
     }
     return true;
   }
+  /* parses string input from CSV and checks against expected types ; handles arrays recursively */
   private _csvCheckTypesHelper(item: object, typeObj: object, field: string): boolean
   {
     switch (this.numericTypes.has(typeObj['type']) ? 'number' : typeObj['type'])
@@ -582,7 +577,7 @@ export class Import
             return false;
           }
           let i: number = 0;
-          while (i < Object.keys(item[field]).length)    // lint hack to get around not recognizing item as an array
+          while (i < Object.keys(item[field]).length)    // lint hack to get around not recognizing item[field] as an array
           {
             if (!this._csvCheckTypesHelper(item[field], typeObj['innerType'], String(i)))
             {
@@ -595,6 +590,27 @@ export class Import
       default:  // "text" case, leave as string
     }
     return true;
+  }
+  /* recursively attempts to parse strings to dates */
+  private _parseDatesHelper(item: string | object, field: string)
+  {
+    if (Array.isArray(item[field]))
+    {
+      let i: number = 0;
+      while (i < Object.keys(item[field]).length)   // lint hack to get around not recognizing item[field] as an array
+      {
+        this._parseDatesHelper(item[field], String(i));
+        i++;
+      }
+    }
+    else
+    {
+      const date: number = Date.parse(item[field]);
+      if (!isNaN(date))
+      {
+        item[field] = new Date(date);
+      }
+    }
   }
   /* checks if all elements in the provided array are of the same type ; handles nested arrays */
   private _isTypeConsistent(arr: object[]): boolean
