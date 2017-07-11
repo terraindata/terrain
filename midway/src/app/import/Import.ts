@@ -130,37 +130,18 @@ export class Import
         return reject('Error parsing data: ' + String(e));
       }
       winston.info('got parsed data!');
-      winston.info(JSON.stringify(items));
       if (items.length === 0)
       {
         return reject('No data provided in file to upload.');
       }
       try
       {
-        items = await this._applyTransforms(items, imprt.transformations);
+        items = await this._transformAndCheck(items, imprt);
       } catch (e)
       {
-        return reject('Failed to apply transforms: ' + String(e));
+        return reject(e);
       }
-      winston.info('applied transforms!');
-      // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
-      items = items.map((val) =>
-      {
-        const trimmedVal: object = {};
-        for (const name in imprt.columnTypes)
-        {
-          if (imprt.columnTypes.hasOwnProperty(name))
-          {
-            trimmedVal[name] = val[name];
-          }
-        }
-        return trimmedVal;
-      });
-      const typeError: string = this._checkTypes(items, imprt);
-      if (typeError !== '')
-      {
-        return reject(typeError);
-      }
+      winston.info('transformed data!');
 
       const columns: string[] = Object.keys(imprt.columnTypes);
       const insertTable: Tasty.Table = new Tasty.Table(
@@ -331,7 +312,6 @@ export class Import
           {
             if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
             {
-              // TODO: make more informative, relax condition
               return reject('JSON file contains an object that does not contain the expected fields.');
             }
           }
@@ -362,12 +342,49 @@ export class Import
     });
   }
 
+  /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
+  private async _transformAndCheck(items: object[], imprt: ImportConfig): Promise<object[]>
+  {
+    const promises: Array<Promise<object>> = [];
+    let ind: number = 0;
+    for (let item of items)
+    {
+      promises.push(
+        new Promise<object>(async (thisResolve, thisReject) =>
+        {
+          try
+          {
+            item = await this._applyTransforms(item, imprt.transformations);
+          } catch (e)
+          {
+            return thisReject('Failed to apply transforms: ' + String(e));
+          }
+          // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
+          const trimmedItem: object = {};
+          for (const name in imprt.columnTypes)
+          {
+            if (imprt.columnTypes.hasOwnProperty(name))
+            {
+              trimmedItem[name] = item[name];
+            }
+          }
+          const typeError: string = this._checkTypes(trimmedItem, imprt, ind);
+          if (typeError !== '')
+          {
+            return thisReject(typeError);
+          }
+          thisResolve(trimmedItem);
+        }));
+      ind++;
+    }
+    return Promise.all(promises);
+  }
+
   /* checks whether all objects in "items" have the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(items: object[], imprt: ImportConfig): string
+  private _checkTypes(obj: object, imprt: ImportConfig, ind: number): string
   {
-    let ind: number = 0;
     if (imprt.filetype === 'json')
     {
       const targetHash: string = this._buildDesiredHash(imprt.columnTypes);
@@ -384,58 +401,45 @@ export class Import
       }
       if (dateColumns.length > 0)
       {
-        items.forEach((item) =>
+        dateColumns.forEach((colName) =>
         {
-          dateColumns.forEach((colName) =>
-          {
-            this._parseDatesHelper(item, colName);
-          });
+          this._parseDatesHelper(obj, colName);
         });
       }
 
-      for (const obj of items)
+      if (this._hashObjectStructure(obj) === targetHash)
       {
-        if (this._hashObjectStructure(obj) === targetHash)
+        winston.info('checktypes: hash matches');
+      }
+      winston.info('checktypes: hashes do not match');
+      if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
+      {
+        return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
+      }
+      for (const key in obj)
+      {
+        if (obj.hasOwnProperty(key) && obj[key] !== null)
         {
-          winston.info('checktypes: hash matches');
-          ind++;
-          continue;
-        }
-        winston.info('checktypes: hashes do not match');
-        if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
-        {
-          return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
-        }
-        for (const key in obj)
-        {
-          if (obj.hasOwnProperty(key) && obj[key] !== null)
+          if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
           {
-            if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
-            {
-              return 'Field "' + key + '" of object number ' + String(ind) +
-                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
-            }
+            return 'Field "' + key + '" of object number ' + String(ind) +
+              ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
           }
         }
-        ind++;
       }
     }
     else if (imprt.filetype === 'csv')
     {
-      for (const obj of items)
+      for (const name in imprt.columnTypes)
       {
-        for (const name in imprt.columnTypes)
+        if (imprt.columnTypes.hasOwnProperty(name))
         {
-          if (imprt.columnTypes.hasOwnProperty(name))
+          if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
           {
-            if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
-            {
-              return 'Field "' + name + '" of object number ' + String(ind) +
-                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[name]);
-            }
+            return 'Field "' + name + '" of object number ' + String(ind) +
+              ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[name]);
           }
         }
-        ind++;
       }
     }
 
@@ -444,14 +448,9 @@ export class Import
     {
       if (imprt.columnTypes[field]['type'] === 'array')
       {
-        ind = 0;
-        for (const obj of items)
+        if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
         {
-          if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
-          {
-            return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
-          }
-          ind++;
+          return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
         }
       }
     }
@@ -715,9 +714,9 @@ export class Import
     return structStr;
   }
 
-  private async _applyTransforms(items: object[], transforms: object[]): Promise<object[]>
+  private async _applyTransforms(obj: object, transforms: object[]): Promise<object>
   {
-    return new Promise<object[]>(async (resolve, reject) =>
+    return new Promise<object>(async (resolve, reject) =>
     {
       for (const transform of transforms)
       {
@@ -730,11 +729,8 @@ export class Import
             {
               return reject('Rename transformation must supply oldName and newName arguments.');
             }
-            for (const obj of items)
-            {
-              obj[newName] = obj[oldName];
-              delete obj[oldName];
-            }
+            obj[newName] = obj[oldName];
+            delete obj[oldName];
             break;
           case 'split':
             const oldCol: string | undefined = transform['args']['oldName'];
@@ -748,25 +744,22 @@ export class Import
             {
               return reject('Split transformation currently only supports splitting into two columns.');
             }
-            if (typeof items[0][oldCol] !== 'string')
+            if (typeof obj[oldCol] !== 'string')
             {
               return reject('Can only split columns containing text.');
             }
-            for (const obj of items)
+            const ind: number = obj[oldCol].indexOf(splitText);
+            if (ind === -1)
             {
-              const ind: number = obj[oldCol].indexOf(splitText);
-              if (ind === -1)
-              {
-                obj[newCols[0]] = obj[oldCol];
-                obj[newCols[1]] = '';
-                delete obj[oldCol];
-              }
-              else
-              {
-                obj[newCols[0]] = obj[oldCol].substring(0, ind);
-                obj[newCols[1]] = obj[oldCol].substring(ind + splitText.length);
-                delete obj[oldCol];
-              }
+              obj[newCols[0]] = obj[oldCol];
+              obj[newCols[1]] = '';
+              delete obj[oldCol];
+            }
+            else
+            {
+              obj[newCols[0]] = obj[oldCol].substring(0, ind);
+              obj[newCols[1]] = obj[oldCol].substring(ind + splitText.length);
+              delete obj[oldCol];
             }
             break;
           case 'merge':
@@ -781,16 +774,13 @@ export class Import
             {
               return reject('Merge transformation currently only supports merging of two columns.');
             }
-            if (typeof items[0][oldCols[0]] !== 'string' || typeof items[0][oldCols[1]] !== 'string')
+            if (typeof obj[oldCols[0]] !== 'string' || typeof obj[oldCols[1]] !== 'string')
             {
               return reject('Can only merge columns containing text.');
             }
-            for (const obj of items)
-            {
-              obj[newCol] = String(obj[oldCols[0]]) + mergeText + String(obj[oldCols[1]]);
-              delete obj[oldCols[0]];
-              delete obj[oldCols[1]];
-            }
+            obj[newCol] = String(obj[oldCols[0]]) + mergeText + String(obj[oldCols[1]]);
+            delete obj[oldCols[0]];
+            delete obj[oldCols[1]];
             break;
           default:
             if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
@@ -803,24 +793,21 @@ export class Import
             {
               return reject('Prepend/append transformation must supply colName and text arguments.');
             }
-            if (typeof items[0][colName] !== 'string')
+            if (typeof obj[colName] !== 'string')
             {
               return reject('Can only prepend/append to columns containing text.');
             }
-            for (const obj of items)
+            if (transform['name'] === 'prepend')
             {
-              if (transform['name'] === 'prepend')
-              {
-                obj[colName] = text + String(obj[colName]);
-              }
-              else
-              {
-                obj[colName] = String(obj[colName]) + text;
-              }
+              obj[colName] = text + String(obj[colName]);
+            }
+            else
+            {
+              obj[colName] = String(obj[colName]) + text;
             }
         }
       }
-      resolve(items);
+      resolve(obj);
     });
   }
 }
