@@ -54,7 +54,6 @@ import Dropdown from './../../common/components/Dropdown';
 import CheckBox from './../../common/components/CheckBox';
 import Actions from './../data/FileImportActions';
 import Util from './../../util/Util';
-import { dbTableErrorCheck } from "../../../../shared/fileImport/Util";
 const { List } = Immutable;
 
 export interface Props

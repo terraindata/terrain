@@ -268,7 +268,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.connectionId,
       state.oldNames,
       Map<string, object>(state.columnNames.map((colName, colId) =>
-        state.columnsToInclude.get(colId) && [colName, recToString(_.clone(state.columnTypes.get(colId)))]
+        state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))]
       )),
       state.columnNames.get(state.primaryKey),
       state.transforms,
