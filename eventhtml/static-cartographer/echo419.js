@@ -55,14 +55,14 @@ else
   document.addEventListener('DOMContentLoaded', initialLoad);
 }
 
-var url = document.URL;
+let url = document.URL;
 
 url = url.split(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)/).splice(1);
-var route = '/' + url[1].split('/')[1];
+const route = '/' + url[1].split('/')[1];
 url = url[0] + url[1].split('/')[0] + '/' + 'silent-cartographer/events/';
 
-var loadTime = 0;
-var numClicks = 0;
+let loadTime = 0;
+let numClicks = 0;
 
 function getCurrentTime()
 {
@@ -82,94 +82,105 @@ function initialLoad()
   {
     numClicks += 1;
   };
+  uploadCartography(eventIdLst);
 };
 
 // test purposes only
-var req =
+// var req =
+// [
+//   {
+//     eventId: "eventId0",
+//     eventType: "click",
+//     payload: {
+//       dependencies: ["eventId1"],
+//     },
+//     url: "",
+//     value: "",
+//     variantId: "2",
+//   },
+//   {
+//     eventId: "eventId1",
+//     eventType: "click",
+//     payload: {},
+//     url: "",
+//     value: "",
+//     variantId: "3",
+//   },
+//   {
+//     eventId: "eventId2",
+//     eventType: "click",
+//     payload: {},
+//     url: "",
+//     value: "",
+//     variantId: "1",
+//   }
+// ];
+
+const EventIdLst =
 [
   {
     eventId: "eventId0",
-    eventType: "click",
-    payload: {
-      dependencies: ["eventId1"],
-    },
-    url: "",
-    value: "",
-    variantId: "2",
   },
   {
     eventId: "eventId1",
-    eventType: "click",
-    payload: {},
-    url: "",
-    value: "",
-    variantId: "3",
   },
   {
     eventId: "eventId2",
-    eventType: "click",
-    payload: {},
-    url: "",
-    value: "",
-    variantId: "1",
-  }
+  },
 ];
-
-function uploadCartography(uploadObj, callback)
-{
-  // It's Quiet...
-  if (Array.isArray(uploadObj))
-  {
-    uploadObj.forEach(function(obj)
-    {
-      load(uploadObj, obj);
-    });
-  }
-  else
-  {
-    load(uploadObj, uploadObj);
-  }
-}
 
 function getEventValue(eventObjs, eventId)
 {
-  var eventObjArr = eventObjs.filter(function(obj) {
+  const eventObjArr = eventObjs.filter(function(obj) {
     return obj['eventId'] === eventId;
   });
-  var eventObj = eventObjArr[0];
+  const eventObj = eventObjArr[0];
   return {
     eventId: eventObj["eventId"],
     value: document.getElementById(eventObj["eventId"]).value,
   };
 }
 
-function load(uploadObj, resp, callback)
+function uploadCartography(EventIdLst, resp, callback)
 {
+  // It's Quiet...
   // Too Quiet
-  if (document.getElementById(resp["eventId"]) !== null)
+  const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function()
   {
-    document.getElementById(resp["eventId"]).addEventListener(resp["eventType"], function ()
+    if (xhttp.readyState === 4)
     {
-      var respDependencies = resp["payload"]["dependencies"];
-      var respDepValues = respDependencies.map(function (dependency)
+      respArr = JSON.parse(JSON.parse(xhttp.response));
+      for (let ind = 0; ind < respArr.length; ++ind)
       {
-        return getEventValue(uploadObj, dependency);
-      });
-      resp["payload"] =
-      {
-        "numClicks": numClicks,
-        "loadTime": getCurrentTimeOnPage(),
-        "date": getCurrentTime(),
-        "dependencies": respDepValues,
-      };
-      resp["value"] = document.getElementById(resp["eventId"]).value.toString();
-      resp["url"] = route;
-      var xhttp = new XMLHttpRequest();
-      xhttp.open("POST", url+'update/');
-      xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      xhttp.send(JSON.stringify(resp));
-    });
+        if (document.getElementById(resp["eventId"]) !== null)
+        {
+          document.getElementById(resp["eventId"]).addEventListener(resp["eventType"], function ()
+          {
+            const respDependencies = resp["payload"]["dependencies"];
+            const respDepValues = respDependencies.map(function (dependency)
+            {
+              return getEventValue(respArr, dependency);
+            });
+            resp["payload"] =
+            {
+              "numClicks": numClicks,
+              "loadTime": getCurrentTimeOnPage(),
+              "date": getCurrentTime(),
+              "dependencies": respDepValues,
+            };
+            resp["value"] = document.getElementById(resp["eventId"]).value.toString();
+            resp["url"] = route;
+            const xhttpUpdate = new XMLHttpRequest();
+            xhttpUpdate.open("POST", url+'update/');
+            xhttpUpdate.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttpUpdate.send(JSON.stringify(resp));
+          });
+        }
+      }
+    }
   }
+  xhttp.open("POST", url);
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhttp.send(JSON.stringify(EventIdLst));
 }
-
-// uploadCartography(req);

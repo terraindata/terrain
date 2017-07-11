@@ -62,27 +62,21 @@ const timeInterval: number = 5; // minutes before refreshing
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
 const timeSalt: string = srs({ length: 256 }); // time salt
 
-interface EventBaseConfig
+interface EventTemplateConfig
+{
+  eventId: string;
+  id?: number;
+  ip: string;
+  url?: string;
+  variantId?: string;
+}
+
+export interface EventConfig extends EventTemplateConfig
 {
   date?: string;
-  id?: number;
-  ip?: string;
   message?: string;
   payload?: any;
-  url?: string;
-}
-
-export interface EventConfig extends EventBaseConfig
-{
-  eventId: string;
   type: string;
-}
-
-export interface EventRequestConfig extends EventBaseConfig
-{
-  eventId: string;
-  ip: string;
-  variantId?: string;
 }
 
 export class Events
@@ -101,7 +95,6 @@ export class Events
       [
         'date',
         'ip',
-        'message',
         'payload',
         'type',
       ],
@@ -162,9 +155,9 @@ export class Events
    * Prep an empty payload with the encoded message
    *
    */
-  public async encodeMessage(eventReq: EventRequestConfig): Promise<EventRequestConfig>
+  public async encodeMessage(eventReq: EventTemplateConfig): Promise<EventTemplateConfig>
   {
-    return new Promise<EventRequestConfig>(async (resolve, reject) =>
+    return new Promise<EventTemplateConfig>(async (resolve, reject) =>
     {
       eventReq.payload = JSON.parse(await this.getPayload(Number(eventReq.eventId)));
       const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.eventId);
@@ -221,7 +214,7 @@ export class Events
    * Get payload from datastore given the eventId
    *
    */
-  public async getPayload(eventId: number): Promise<string>
+  public async getPayload(eventId: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -262,14 +255,14 @@ export class Events
       }
 
       const JSONArr: object[] = req;
-      const encodedEventArr: EventRequestConfig[] = [];
+      const encodedEventArr: EventTemplateConfig[] = [];
       for (const jsonObj of JSONArr)
       {
         if (jsonObj['eventId'] === undefined || !(await this.payloadExists(Number(jsonObj['eventId']))))
         {
           continue;
         }
-        const eventRequest: EventRequestConfig =
+        const eventRequest: EventTemplateConfig =
           {
             eventId: jsonObj['eventId'],
             variantId: jsonObj['variantId'],
@@ -290,7 +283,7 @@ export class Events
    * Check if eventId exists in payload table
    *
    */
-  public async payloadExists(eventId: number): Promise<boolean>
+  public async payloadExists(eventId: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
