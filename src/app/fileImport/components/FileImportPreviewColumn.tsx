@@ -57,6 +57,7 @@ import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import './FileImportPreviewColumn.less';
+const { List } = Immutable;
 
 export interface Props
 {
@@ -64,10 +65,7 @@ export interface Props
   isIncluded: boolean;
   columnType: any;
   isPrimaryKey: boolean;
-
-  datatypes: List<string>;
   columnNames: List<string>;
-  transformTypes: List<string>;
   columnOptions: List<string>;
   handleRenameTransform(oldName: string, newName: string);
   addRenameTransform();
@@ -116,11 +114,10 @@ class FileImportPreviewColumn extends PureClasss<Props>
           columnId={this.props.columnId}
           recursionId={0}
           columnType={this.props.columnType}
-          datatypes={this.props.datatypes}
+          datatypes={List(FileImportTypes.ELASTIC_TYPES)}
         />
         <TransformBox
-          datatype={this.props.datatypes.get(this.props.columnType.type)}
-          transformTypes={this.props.transformTypes}
+          datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
           colName={this.props.columnNames.get(this.props.columnId)}
           columnNames={this.props.columnNames}
           addRenameTransform={this.props.addRenameTransform}

@@ -48,6 +48,7 @@ import * as React from 'react';
 import * as Papa from 'papaparse';
 import * as _ from 'underscore';
 import * as SchemaTypes from '../../schema/SchemaTypes';
+import * as FileImportTypes from './../FileImportTypes';
 import PureClasss from './../../common/components/PureClasss';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
@@ -70,8 +71,6 @@ export interface Props
   tableText: string;
 
   canImport: boolean;
-  validFiletypes: List<string>;
-  previewRowsCount: number;
   hasCsvHeader: boolean;
 }
 
@@ -142,7 +141,7 @@ class FileImportInfo extends PureClasss<Props>
       const config = {
         quoteChar: '\'',
         header: this.props.hasCsvHeader,
-        preview: this.props.previewRowsCount,
+        preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
         error: (err) =>
         {
           alert('CSV format incorrect: ' + String(err));
@@ -163,7 +162,7 @@ class FileImportInfo extends PureClasss<Props>
       });
     }
 
-    items.splice(this.props.previewRowsCount, items.length - this.props.previewRowsCount);
+    items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
         typeof value === 'string' ? value : JSON.stringify(value)
@@ -189,7 +188,7 @@ class FileImportInfo extends PureClasss<Props>
     }
 
     const filetype = file.target.files[0].name.split('.').pop();
-    if (this.props.validFiletypes.indexOf(filetype) === -1)
+    if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)
     {
       alert("Invalid filetype: " + filetype + ", please select another file");
       return;

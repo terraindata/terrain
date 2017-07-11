@@ -131,8 +131,6 @@ class FileImport extends PureClasss<any>
             }
             tableText={tableText}
             canImport={true}
-            validFiletypes={List(FileImportTypes.FILE_TYPES)}
-            previewRowsCount={FileImportTypes.NUMBER_PREVIEW_ROWS}
             hasCsvHeader={hasCsvHeader}
           />
         </div>
