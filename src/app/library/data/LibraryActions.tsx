@@ -229,8 +229,6 @@ const Actions =
         newVariant = LibraryTypes.touchVariant(newVariant);
 
         Actions.variants.create(variant.groupId, variant.algorithmId, newVariant, responseHandler);
-
-        return newVariant;
       },
 
       deploy:
