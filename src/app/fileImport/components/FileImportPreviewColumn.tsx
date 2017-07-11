@@ -94,7 +94,7 @@ class FileImportPreviewColumn extends PureClasss<Props>
 
   public handleAutocompleteHeaderChange(value)
   {
-    this.props.handleRenameTransform('rename', this.props.oldNames.get(this.props.columnId), value);
+    this.props.handleRenameTransform('rename', this.props.newNames.get(this.props.columnId), value);
     Actions.setColumnName(this.props.columnId, value);
   }
 
