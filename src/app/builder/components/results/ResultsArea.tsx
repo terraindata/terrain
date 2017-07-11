@@ -69,7 +69,7 @@ import ResultsTable from '../results/ResultsTable';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Switch from '../../../common/components/Switch';
-import { getPrimaryKeyFor, MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
+import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
 import Radium = require('radium');
 import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
 
@@ -166,7 +166,7 @@ class ResultsArea extends TerrainComponent<Props>
           onExpand={this.handleCollapse}
           expanded={true}
           index={-1}
-          primaryKey={getPrimaryKeyFor(result, resultsConfig)}
+          primaryKey={result.primaryKey}
         />
       </div>
     );
@@ -301,7 +301,7 @@ class ResultsArea extends TerrainComponent<Props>
                 onExpand={this.handleExpand}
                 index={index}
                 key={index}
-                primaryKey={getPrimaryKeyFor(result, resultsConfig)}
+                primaryKey={result.primaryKey}
               />
             );
           })

@@ -128,11 +128,44 @@ class TerrainComponent<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
+
   public shouldComponentUpdate(nextProps: T, nextState: any)
   {
-    return shallowCompare(this, nextProps, nextState);
-  }
+    const shouldUpdate = shallowCompare(this, nextProps, nextState);
 
+    if (this._debugUpdates && shouldUpdate)
+    {
+      this._compareSets(this.props, nextProps, 'props');
+      this._compareSets(this.state, nextState, 'state');
+    }
+
+    return shouldUpdate;
+  }
+  
+  // Helpers for debugging React update / perf issues
+  // Simply set _debugUpdates to true in a component you're debugging
+  //  and give the component a _debugName if helpful.
+  protected _debugUpdates = false;
+  protected _debugName = 'Not set';
+
+  private _compareSets(first: any, second: any, setName: string)
+  {
+    const firstKeys = _.keys(first);
+    for (const key of firstKeys)
+    {
+      if (first[key] !== second[key])
+      {
+        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
+      }
+    }
+    for (const key in second)
+    {
+      if (firstKeys.indexOf(key) === -1)
+      {
+        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
+      }
+    }
+  }
   public _unsubscribe()
   {
     this.subscriptions.map((cancelSubscription) => cancelSubscription());

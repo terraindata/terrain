@@ -54,7 +54,7 @@ import { IColumn, Table } from '../../../common/components/Table';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultFields, getResultName, getResultValue } from './Result';
-import { getPrimaryKeyFor, MAX_RESULTS, Results } from './ResultsManager';
+import { MAX_RESULTS, Results } from './ResultsManager';
 
 export interface Props
 {
@@ -253,7 +253,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     const row = rc.split('-')[0];
     const col = rc.split('-')[1];
     const result = this.props.results && this.props.results.get(+row);
-    const id = getPrimaryKeyFor(result, this.props.resultsConfig);
+    const id = result.primaryKey;
     const spotlightColor = ColorManager.colorForKey(id);
 
     const spotlightData = _.extend({}, result);

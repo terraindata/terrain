@@ -91,7 +91,7 @@ class ResultComponent extends TerrainComponent<Props> {
   //   isSpotlit: false,
   //   spotlightColor: "",
   // };
-
+  
   public menuOptions =
   [
     List([
@@ -108,6 +108,24 @@ class ResultComponent extends TerrainComponent<Props> {
       },
     ]),
   ];
+  
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (let key in nextProps)
+    {
+      if (key !== 'result' && this.props[key] !== nextProps[key])
+      {
+        return true;
+      }
+    }
+    
+    if (!_.isEqual(this.props.result.toJS(), nextProps.result.toJS()))
+    {
+      return true;
+    }
+    
+    return false;
+  }
 
   public renderExpandedField(value, field)
   {
