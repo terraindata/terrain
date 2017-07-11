@@ -175,6 +175,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     }
     else if (action.payload.transform.name === 'split')
     {
+      // TODO: adding new columns effect on colToMergeId
       const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
       return state
         .set('primaryKey', primaryKey)
@@ -203,7 +204,8 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     }
     else if (action.payload.transform.name === 'merge')
     {
-      const mergeCol = state.columnNames.indexOf(action.payload.transform.args.mergeNames[0]);
+      const mergeCol = action.payload.transform.args.colToMergeId;
+      console.log(mergeCol);
 
       let primaryKey = '';
       if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
@@ -218,7 +220,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
       return state
         .set('primaryKey', primaryKey)
         .set('columnNames', state.columnNames
-          .set(transformCol, action.payload.transform.args.mergeNames[1])
+          .set(transformCol, action.payload.transform.args.mergeNewName)
           .delete(mergeCol))
         .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
         .set('columnTypes', state.columnTypes.delete(mergeCol))

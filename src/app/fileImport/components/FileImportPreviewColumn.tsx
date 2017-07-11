@@ -67,7 +67,6 @@ export interface Props
 
   datatypes: List<string>;
   columnNames: List<string>;
-  transformTypes: List<string>;
   columnOptions: List<string>;
   handleRenameTransform(oldName: string, newName: string);
   addRenameTransform();
@@ -120,7 +119,6 @@ class FileImportPreviewColumn extends PureClasss<Props>
         />
         <TransformBox
           datatype={this.props.datatypes.get(this.props.columnType.type)}
-          transformTypes={this.props.transformTypes}
           colName={this.props.columnNames.get(this.props.columnId)}
           columnNames={this.props.columnNames}
           addRenameTransform={this.props.addRenameTransform}
