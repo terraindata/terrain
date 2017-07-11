@@ -169,12 +169,10 @@ class FileImportInfo extends PureClasss<Props>
         typeof value === 'string' ? value : JSON.stringify(value)
       )
     );
-    console.log("previewRows: ", previewRows);
 
     const columnNames = _.map(items[0], (value, index) =>
       filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
     );
-    console.log('colNames: ', columnNames);
 
     Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
   }
@@ -203,47 +201,9 @@ class FileImportInfo extends PureClasss<Props>
     {
       console.log("File chosen contents: ", fr.result);
       this.parseAndChooseFile(fr.result, filetype);
-      this.refs['file']['value'] = null;
+      this.refs['file']['value'] = null;                 // prevent file-caching
     }
   }
-
-  // public handleUploadFile()
-  // {
-  //   if (!this.props.canImport)
-  //   {
-  //     alert('You do not have permission to upload files');
-  //     return;
-  //   }
-  //   if (!this.state.fileSelected)
-  //   {
-  //     alert('Please select a file to upload');
-  //     return;
-  //   }
-  //   if (!this.state.serverSelected)
-  //   {
-  //     alert('Please select a server');
-  //     return;
-  //   }
-  //   if (!this.state.dbSelected)
-  //   {
-  //     alert('Please select a database');
-  //     return;
-  //   }
-  //   if (!this.state.tableSelected)
-  //   {
-  //     alert('Please select a table');
-  //     return;
-  //   }
-  //
-  //   const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
-  //   if (msg)
-  //   {
-  //     alert(msg);
-  //     return;
-  //   }
-  //
-  //   Actions.uploadFile();
-  // }
 
   public render()
   {

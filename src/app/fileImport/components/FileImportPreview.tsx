@@ -74,85 +74,73 @@ export interface Props
 class FileImportPreview extends PureClasss<Props>
 {
   public state: {
-    curRenameTransform: {
-      name: string,
-      args: {
-        oldName?: string,
-        newName?: string,
-      },
-    }
+    oldName: string,
+    newName: string,
   } = {
-    curRenameTransform: {
-      name: '',
-      args: {
-      },
-    }
+    oldName: '',
+    newName: '',
   };
 
-  public handleRenameTransform(name: string, oldName: string, newName: string)
+  /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
+   * when changing transform columns or types */
+  public handleRenameTransform(oldName: string, newName: string)
   {
-    if (this.state.curRenameTransform.name && this.state.curRenameTransform.args.oldName !== oldName)
+    if (this.state.oldName && this.state.oldName !== oldName)
     {
-      console.log('adding transform rename: ', this.state.curRenameTransform.args);
-      Actions.addTransform(this.state.curRenameTransform);
-    }
-    console.log('setting current rename transform: ' + oldName + ', ' + newName);
-    this.setState({
-      curRenameTransform: {
-        name,
+      Actions.addTransform({
+        name: 'rename',
         args: {
           oldName,
           newName,
-        }
-      }
-    });
+        },
+      });
+    }
+    console.log('setting rename transform: ', oldName + ' to ' + newName);
+    this.setRenameTransform(oldName, newName);
   }
 
-  public addCurRenameTransform()
+  public addRenameTransform()
   {
-    if (this.state.curRenameTransform.name)
+    if (this.state.oldName)
     {
-      console.log('adding transform rename: ', this.state.curRenameTransform.args);
-      Actions.addTransform(this.state.curRenameTransform);
-      this.setState({
-        curRenameTransform: {
-          name: '',
-          args: {},
-        }
+      console.log('adding rename transform: ', this.state.oldName + ', ' + this.state.newName);
+      Actions.addTransform({
+        name: 'rename',
+        args: {
+          oldName: this.state.oldName,
+          newName: this.state.newName,
+        },
       });
+      this.setRenameTransform('', '');
     }
   }
 
-  public handleLoadTemplate()
+  public setRenameTransform(oldName: string, newName: string)
   {
-
-  }
-
-  public handleSaveTemplate()
-  {
-
+    this.setState({
+      oldName,
+      newName,
+    });
   }
 
   public handleUploadFile()
   {
-    // TODO: error checking from FileImportInfo
-    if (this.state.curRenameTransform.name)
-    {
-      Actions.addTransform(this.state.curRenameTransform);
-      this.setState({
-        curRenameTransform: {
-          name: '',
-          args: {},
-        }
-      });
-    }
-
+    // TODO: database and table name error checking
+    this.addRenameTransform();
     Actions.uploadFile();
+  }
+
+  // TODO: implement Templates
+  public handleLoadTemplate()
+  {
+  }
+
+  public handleSaveTemplate()
+  {
   }
 
   public render()
   {
-    console.log('previewRows: ', this.props.previewRows);
     return (
       <div>
         <button onClick={this.handleLoadTemplate}>
@@ -170,17 +158,13 @@ class FileImportPreview extends PureClasss<Props>
                     key={key}
                     columnId={key}
                     isIncluded={this.props.columnsToInclude.get(key)}
-                    name={this.props.columnNames.get(key)}
                     columnType={this.props.columnTypes.get(key)}
                     isPrimaryKey={this.props.primaryKey === key}
-                    oldNames={this.props.oldNames}
-                    newNames={this.props.columnNames}
-                    canSelectType={true}
-                    canSelectColumn={true}
+                    columnNames={this.props.columnNames}
                     datatypes={List(FileImportTypes.ELASTIC_TYPES)}
                     transformTypes={List(FileImportTypes.TRANSFORM_TYPES)}
                     handleRenameTransform={this.handleRenameTransform}
-                    addCurRenameTransform={this.addCurRenameTransform}
+                    addRenameTransform={this.addRenameTransform}
                     columnOptions={this.props.columnOptions}
                   />
                 ).toArray()
