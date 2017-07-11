@@ -55,8 +55,8 @@ const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon')
 
 export interface Props
 {
-  message: string;
   open: boolean;
+  message?: string;
   title?: string;
   error?: boolean;
   fill?: boolean;

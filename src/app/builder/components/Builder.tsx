@@ -818,47 +818,42 @@ class Builder extends TerrainComponent<Props>
 
   public handleModalSaveAs()
   {
-
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
-
-    // TODO remove if queries/variants model changes
-    if (5 === 5)
+    LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.saveAsTextboxValue,
+    (response, newVariant) =>
     {
-      return;
-    }
+      this.onSaveSuccess(newVariant);
+      Actions.save();
 
-    LibraryActions.variants.change(variant);
-    this.onSaveSuccess(variant);
-    Actions.save(); // register that we are saving
-
-    let configArr = window.location.pathname.split('/')[2].split(',');
-    let currentVariant;
-    configArr = configArr.map((tab) =>
-    {
-      if (tab.substr(0, 1) === '!')
+      let configArr = window.location.pathname.split('/')[2].split(',');
+      let currentVariant;
+      configArr = configArr.map((tab) =>
       {
-        currentVariant = tab.substr(1).split('@')[0];
-        return '!' + currentVariant;
-      }
-      return tab;
-    },
-    );
-    for (let i = 0; i < configArr.length; i++)
-    {
-      if (configArr[i] === currentVariant)
+        if (tab.substr(0, 1) === '!')
+        {
+          currentVariant = tab.substr(1).split('@')[0];
+          return '!' + response.id.toString();
+        }
+        return tab;
+      },
+      );
+      for (let i = 0; i < configArr.length; i++)
       {
-        configArr.splice(i, 1);
+        if (configArr[i] === currentVariant)
+        {
+          configArr.splice(i, 1);
+        }
       }
-    }
-    const newConfig = configArr.join(',');
-    if (newConfig !== this.props.params.config)
-    {
-      browserHistory.replace(`/builder/${newConfig}`);
-    }
 
-    this.setState({
-      savingAs: false
+      this.setState({
+        savingAs: false
+      });
+      const newConfig = configArr.join(',');
+      if (newConfig !== this.props.params.config)
+      {
+        browserHistory.replace(`/builder/${newConfig}`);
+      }
     });
   }
 
@@ -920,7 +915,6 @@ class Builder extends TerrainComponent<Props>
         />
         <Modal
           open={this.state.savingAs}
-          message={'Enter New Variant Name: '}
           title='Save As'
           confirmButtonText='Save'
           confirm={true}
