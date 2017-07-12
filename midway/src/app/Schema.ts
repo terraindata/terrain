@@ -90,6 +90,9 @@ const appSchemaSQL: string[] = [
   `CREATE TABLE IF NOT EXISTS importTemplates
     (id integer PRIMARY KEY,
      name text NOT NULL,
+     dbid integer NOT NULL,
+     dbname text NOT NULL,
+     tablename text NOT NULL,
      csvHeaderMissing bool,
      originalNames text NOT NULL,
      columnTypes text NOT NULL,

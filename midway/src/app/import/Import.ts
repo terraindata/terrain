@@ -57,9 +57,6 @@ import { ImportTemplateBase } from './ImportTemplates';
 
 export interface ImportConfig extends ImportTemplateBase
 {
-  dbid: number;       // instance id
-  db: string;         // for elastic, index name
-  table: string;      // for elastic, type name
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
 }
@@ -105,7 +102,7 @@ export class Import
       }
       const expectedMapping: object = this._getMappingForSchema(imprt);
       const mappingForSchema: object | string =
-        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.db);
+        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
       if (typeof mappingForSchema === 'string')
       {
         return reject(mappingForSchema);
@@ -135,10 +132,10 @@ export class Import
 
       const columns: string[] = Object.keys(imprt.columnTypes);
       const insertTable: Tasty.Table = new Tasty.Table(
-        imprt.table,
+        imprt.tablename,
         [imprt.primaryKey],
         columns,
-        imprt.db,
+        imprt.dbname,
         mappingForSchema,
       );
       await database.getTasty().getDB().putMapping(insertTable);
@@ -151,12 +148,12 @@ export class Import
   /* returns an error message if there are any; else returns empty string */
   private _verifyConfig(imprt: ImportConfig): string
   {
-    const indexError: string = SharedUtil.isValidIndexName(imprt.db);
+    const indexError: string = SharedUtil.isValidIndexName(imprt.dbname);
     if (indexError !== '')
     {
       return indexError;
     }
-    const typeError: string = SharedUtil.isValidTypeName(imprt.table);
+    const typeError: string = SharedUtil.isValidTypeName(imprt.tablename);
     if (typeError !== '')
     {
       return typeError;

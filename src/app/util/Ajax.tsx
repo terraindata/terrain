@@ -685,8 +685,8 @@ export const Ajax =
 
     importFile(file: string,
       filetype: string,
-      db: string,
-      table: string,
+      dbname: string,
+      tablename: string,
       connectionId: number,
       oldNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
@@ -699,8 +699,8 @@ export const Ajax =
     {
       const payload: object = {
         dbid: connectionId,
-        db,
-        table,
+        dbname,
+        tablename,
         contents: file,
         filetype,
         originalNames: oldNames,

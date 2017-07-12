@@ -53,6 +53,10 @@ import * as Util from '../Util';
 
 export interface ImportTemplateBase
 {
+  dbid: number;           // instance id
+  dbname: string;         // for elastic, index name
+  tablename: string;      // for elastic, type name
+
   // if filetype is 'csv', default is to assume the first line contains headers
   // set this to true if this is not the case
   csvHeaderMissing?: boolean;
@@ -75,6 +79,9 @@ interface ImportTemplateConfigStringified
   id?: number;
   name: string;
 
+  dbid: number;
+  dbname: string;
+  tablename: string;
   csvHeaderMissing?: boolean;
   originalNames: string;
   columnTypes: string;
@@ -93,6 +100,9 @@ export class ImportTemplates
       ['id'],
       [
         'name',
+        'dbid',
+        'dbname',
+        'tablename',
         'csvHeaderMissing',
         'originalNames',
         'columnTypes',
@@ -145,6 +155,9 @@ export class ImportTemplates
       {
         id: template['id'],
         name: template['name'],
+        dbid: template['dbid'],
+        dbname: template['dbname'],
+        tablename: template['tablename'],
         csvHeaderMissing: template['csvHeaderMissing'],
         originalNames: JSON.stringify(template['originalNames']),
         columnTypes: JSON.stringify(template['columnTypes']),
@@ -169,6 +182,9 @@ export class ImportTemplates
       {
         id: stringified['id'],
         name: stringified['name'],
+        dbid: stringified['dbid'],
+        dbname: stringified['dbname'],
+        tablename: stringified['tablename'],
         csvHeaderMissing: stringified['csvHeaderMissing'],
         originalNames: JSON.parse(stringified['originalNames']),
         columnTypes: JSON.parse(stringified['columnTypes']),
