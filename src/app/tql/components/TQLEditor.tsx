@@ -50,12 +50,16 @@ import * as ReactDOM from 'react-dom';
 import './TQLEditor.less';
 const { List } = Immutable;
 import * as _ from 'underscore';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 const CodeMirror = require('./Codemirror.js');
 
 // syntax highlighters
 import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
+
+// Formatting and Parsing
+import ESConverter from '../../../../shared/backends/elastic/conversion/formatter/ESConverter';
+import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
 
 // Style sheets and addons for CodeMirror
 require('./elastic.js');
@@ -86,6 +90,7 @@ import './dialog.less';
 
 export interface Props
 {
+
   tql: string;
   language?: string;
   canEdit: boolean;
@@ -105,15 +110,24 @@ export interface Props
   hideTermDefinition?();
 }
 
-class TQLEditor extends PureClasss<Props>
+class TQLEditor extends TerrainComponent<Props>
 {
+  public state: {
+    codeMirrorInstance // CodeMirror instance does not have a defined type.
+  } = {
+    codeMirrorInstance: null
+  };
+
   public render()
   {
     const options =
       {
         readOnly: !this.props.canEdit,
         lineNumbers: true,
-        extraKeys: { 'Ctrl-F': 'findPersistent' },
+        extraKeys: {
+          'Ctrl-F': 'findPersistent',
+          'Ctrl-Alt-F': this.handleAutoFormatRequest
+        },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
         matchBrackets: true,
@@ -174,6 +188,35 @@ class TQLEditor extends PureClasss<Props>
     );
   }
 
+  /*
+   *  Returns the formatted query, or null if the query has errors.
+   */
+  public autoFormatQuery(input: string): string | null
+  {
+    if (this.props.language === 'elastic')
+    {
+      const parser: ESJSONParser = new ESJSONParser(input);
+      if (!parser.hasError())
+      {
+        const newText: string = ESConverter.formatES(parser);
+        return newText;
+      }
+    }
+    return null;
+  }
+
+  private handleAutoFormatRequest(cmInstance): void
+  {
+    if (this.props.language === 'elastic')
+    {
+      const formatted = this.autoFormatQuery(cmInstance.getValue());
+      if (formatted)
+      {
+        this.state.codeMirrorInstance.setValue(formatted);
+      }
+    }
+  }
+
   private handleChanges(cmInstance, changes: object[])
   {
     if (this.props.language === 'elastic')
@@ -185,6 +228,9 @@ class TQLEditor extends PureClasss<Props>
 
   private registerCodeMirror(cmInstance)
   {
+    this.setState({
+      codeMirrorInstance: cmInstance
+    });
     cmInstance.on('changes', this.handleChanges);
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
@@ -192,6 +238,7 @@ class TQLEditor extends PureClasss<Props>
       highlighter.initialHighlight(cmInstance);
     }
   }
+
 }
 
 export default TQLEditor;

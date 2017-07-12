@@ -51,7 +51,7 @@ import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeItem from './SchemaTreeItem';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
@@ -78,7 +78,7 @@ _.map(SchemaTypes.typeToStoreKey as any,
 const SHOW_MORE_INCREMENT = 50;
 
 @Radium
-class SchemaSearchResults extends PureClasss<Props>
+class SchemaSearchResults extends TerrainComponent<Props>
 {
   public state: {
     // since search results are rendered as a list, we want

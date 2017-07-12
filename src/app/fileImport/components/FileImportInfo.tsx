@@ -49,10 +49,10 @@ import * as Papa from 'papaparse';
 import * as _ from 'underscore';
 import * as SchemaTypes from '../../schema/SchemaTypes';
 import * as FileImportTypes from './../FileImportTypes';
-import PureClasss from './../../common/components/PureClasss';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import CheckBox from './../../common/components/CheckBox';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import Util from './../../util/Util';
 const { List } = Immutable;
@@ -71,7 +71,7 @@ export interface Props
   hasCsvHeader: boolean;
 }
 
-class FileImportInfo extends PureClasss<Props>
+class FileImportInfo extends TerrainComponent<Props>
 {
   public state: {
     serverIndex: number,

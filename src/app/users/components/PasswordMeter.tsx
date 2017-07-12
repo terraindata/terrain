@@ -48,7 +48,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './PasswordMeter.less';
 
 const meterSectionValues = [0, 1, 2, 3, 4, 5];
@@ -58,7 +58,7 @@ export interface Props
   value: number;
 }
 
-class PasswordMeter extends Classs<Props>
+class PasswordMeter extends TerrainComponent<Props>
 {
   public renderMeterSection(value)
   {

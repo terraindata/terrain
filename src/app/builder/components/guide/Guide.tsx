@@ -59,7 +59,7 @@ THE SOFTWARE.
 // import Util from '../../../util/Util';
 // import Actions from '../../data/BuilderActions';
 // import Card from '../cards/Card';
-// import PureClasss from './../../../common/components/PureClasss';
+// import TerrainComponent from './../../../common/components/TerrainComponent';
 // const L = Immutable.List;
 // const M = Immutable.Map;
 
@@ -141,7 +141,7 @@ THE SOFTWARE.
 //   return new Query_Record(config || {}) as any as IQuery;
 // };
 
-// class Guide extends PureClasss<Props>
+// class Guide extends TerrainComponent<Props>
 // {
 //   state: State = {
 //     screen: EScreen.FROM,

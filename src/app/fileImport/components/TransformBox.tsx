@@ -50,7 +50,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -65,7 +65,7 @@ export interface Props
   addRenameTransform();
 }
 
-class TransformBox extends Classs<Props>
+class TransformBox extends TerrainComponent<Props>
 {
   public state: {
     transformTypeIndex: number;

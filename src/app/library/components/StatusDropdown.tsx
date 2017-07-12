@@ -56,7 +56,7 @@ import Util from '../../util/Util';
 import LibraryActions from '../data/LibraryActions';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -66,7 +66,7 @@ export interface Props
   noBorder?: boolean;
 }
 
-class StatusDropdown extends PureClasss<Props>
+class StatusDropdown extends TerrainComponent<Props>
 {
   public state = {
     isSuperUser: false,

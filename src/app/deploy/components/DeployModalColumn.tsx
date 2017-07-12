@@ -48,7 +48,7 @@ import * as React from 'react';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 import LibraryStore from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
@@ -91,7 +91,7 @@ export interface Props
   onDeploy();
 }
 
-class DeployModalColumn extends PureClasss<Props>
+class DeployModalColumn extends TerrainComponent<Props>
 {
   public state: {
     confirmChecked: boolean;

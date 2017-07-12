@@ -51,8 +51,9 @@ import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
 import Util from '../../util/Util';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
+import { Colors, fontColor } from '../../common/Colors';
 
 export interface Props
 {
@@ -67,7 +68,7 @@ export interface Props
   optionsDisplayName?: Map<any, string>; // maps value to display name
 }
 
-class Dropdown extends PureClasss<Props>
+class Dropdown extends TerrainComponent<Props>
 {
   public _clickHandlers: { [index: number]: () => void } = {};
 
@@ -168,7 +169,7 @@ class Dropdown extends PureClasss<Props>
   handleFocus()
   {
     this.setState({
-      focusedIndex: 0,
+      focusedIndex: -1,
     });
   }
 
@@ -221,6 +222,7 @@ class Dropdown extends PureClasss<Props>
           'dropdown-center': this.props.centerAlign,
           [this.props.className]: !!this.props.className,
         })}
+        style={fontColor(Colors().text.baseDark)}
       >
         {
           this.state.up && this.state.open

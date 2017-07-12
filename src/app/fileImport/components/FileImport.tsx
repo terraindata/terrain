@@ -50,8 +50,8 @@ import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
 import FileImportInfo from './FileImportInfo';
 import FileImportStore from './../data/FileImportStore';
-import PureClasss from './../../common/components/PureClasss';
 import FileImportPreview from './FileImportPreview';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
@@ -64,7 +64,7 @@ export interface Props
   route?: any;
 }
 
-class FileImport extends PureClasss<any>
+class FileImport extends TerrainComponent<any>
 {
   public state: {
     fileImportState: FileImportTypes.FileImportState;

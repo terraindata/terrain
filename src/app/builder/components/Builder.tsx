@@ -72,10 +72,11 @@ type Variant = LibraryTypes.Variant;
 
 // Components
 
+import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import { notificationManager } from './../../common/components/InAppNotification';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import BuilderColumn from './BuilderColumn';
 import LayoutManager from './layout/LayoutManager';
@@ -97,7 +98,7 @@ export interface Props
   route?: any;
 }
 
-class Builder extends PureClasss<Props>
+class Builder extends TerrainComponent<Props>
 {
   public state: {
     builderState: BuilderState,
@@ -799,10 +800,13 @@ class Builder extends PureClasss<Props>
     const query = this.getQuery();
 
     return (
-      <div className={classNames({
-        'builder': true,
-        'builder-no-column-animation': this.state.noColumnAnimation,
-      })}>
+      <div
+        className={classNames({
+          'builder': true,
+          'builder-no-column-animation': this.state.noColumnAnimation,
+        })}
+        style={backgroundColor(Colors().base)}
+      >
         {
           !config || !config.length ?
             <InfoArea

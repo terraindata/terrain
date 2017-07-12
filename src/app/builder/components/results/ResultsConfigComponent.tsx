@@ -55,7 +55,7 @@ import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Result from '../results/Result';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import Switch from './../../../common/components/Switch';
 import { MAX_RESULTS, Results } from './ResultsManager';
 
@@ -73,7 +73,7 @@ export interface Props
   onClose: () => void;
 }
 
-export class ResultsConfigComponent extends PureClasss<Props>
+export class ResultsConfigComponent extends TerrainComponent<Props>
 {
   public state: {
     lastHover: { index: number, field: string },
@@ -389,7 +389,7 @@ interface ResultsConfigResultProps
   primaryKeys: List<string>;
   onPrimaryKeysChange: (primaryKeys: List<string>) => void;
 }
-class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
+class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 {
   public state: {
     showFormat: boolean;
@@ -644,7 +644,7 @@ interface CRTargetProps
   children?: any;
   isOver?: boolean;
 }
-class CRTargetC extends PureClasss<CRTargetProps>
+class CRTargetC extends TerrainComponent<CRTargetProps>
 {
   public render()
   {

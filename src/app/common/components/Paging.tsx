@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Paging.less';
 
@@ -62,7 +62,7 @@ export interface Props
   onHoverEnd?: () => void;
 }
 
-class Paging extends PureClasss<Props>
+class Paging extends TerrainComponent<Props>
 {
   constructor(props: Props)
   {

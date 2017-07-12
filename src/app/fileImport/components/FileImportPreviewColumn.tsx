@@ -50,7 +50,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import TransformBox from './../components/TransformBox';
@@ -72,7 +72,7 @@ export interface Props
   addRenameTransform();
 }
 
-class FileImportPreviewColumn extends PureClasss<Props>
+class FileImportPreviewColumn extends TerrainComponent<Props>
 {
   public handleIncludedChange()
   {
@@ -93,7 +93,7 @@ class FileImportPreviewColumn extends PureClasss<Props>
   public render()
   {
     return (
-      <th>
+      <th className="column-header">
         include
         <CheckBox
           checked={this.props.isIncluded}

@@ -50,7 +50,7 @@ import * as React from 'react';
 import * as FileImportTypes from './../FileImportTypes';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 import Actions from './../data/FileImportActions';
@@ -71,7 +71,7 @@ export interface Props
   columnOptions: List<string>;
 }
 
-class FileImportPreview extends PureClasss<Props>
+class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
     oldName: string,

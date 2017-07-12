@@ -49,15 +49,16 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
-import Actions from './../data/FileImportActions';
+import TerrainComponent from './../../common/components/TerrainComponent';
+
+import './FileImportPreviewRow.less';
 
 export interface Props
 {
   items: List<string>;
 }
 
-class FileImportPreviewRow extends PureClasss<Props>
+class FileImportPreviewRow extends TerrainComponent<Props>
 {
   public render()
   {
@@ -65,7 +66,7 @@ class FileImportPreviewRow extends PureClasss<Props>
       <tr>
         {
           this.props.items.map((value, key) =>
-            <td key={key}>
+            <td key={key} className="row-element">
               {
                 value
               }

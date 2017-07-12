@@ -47,7 +47,7 @@ import * as React from 'react';
 import { Link } from 'react-router';
 import * as UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import RadioButtons from './../../common/components/RadioButtons';
@@ -68,7 +68,7 @@ export interface Props
   children?: any;
 }
 
-class Notifications extends Classs<Props>
+class Notifications extends TerrainComponent<Props>
 {
   public cancelSubscription = null;
 

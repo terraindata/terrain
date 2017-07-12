@@ -43,10 +43,22 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import Util from '../../util/Util';
 
-// type StoreKeyPath = string[] | (() => string[]);
+/**
+ * This is an extension of React.Component that adds extra
+ * commonly needed functionality:
+ * - shouldComponentUpdate with shallowCompare
+ * - helper method for calling instance functions with arguments
+ * - helper method for toggling a boolean state value
+ * - helper method for subscribing to a Redux state
+*/
+
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
+const shallowCompare = require('react-addons-shallow-compare');
+
+// Defines the configuration options for a Redux subscription
 interface SubscriptionConfig
 {
   stateKey?: string;
@@ -61,8 +73,12 @@ interface Store
   getState: () => any;
 }
 
-class Classs<T> extends React.Component<T, any>
+class TerrainComponent<T> extends React.Component<T, any>
 {
+  public props: T;
+
+  // this is an anti-pattern
+  //  change this if you can think of a better way
   public _unmounted = false;
 
   public subscriptions: Array<() => void> = [];
@@ -112,6 +128,44 @@ class Classs<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
+
+  public shouldComponentUpdate(nextProps: T, nextState: any)
+  {
+    const shouldUpdate = shallowCompare(this, nextProps, nextState);
+
+    if (this._debugUpdates && shouldUpdate)
+    {
+      this._compareSets(this.props, nextProps, 'props');
+      this._compareSets(this.state, nextState, 'state');
+    }
+
+    return shouldUpdate;
+  }
+  
+  // Helpers for debugging React update / perf issues
+  // Simply set _debugUpdates to true in a component you're debugging
+  //  and give the component a _debugName if helpful.
+  protected _debugUpdates = false;
+  protected _debugName = 'Not set';
+
+  private _compareSets(first: any, second: any, setName: string)
+  {
+    const firstKeys = _.keys(first);
+    for (const key of firstKeys)
+    {
+      if (first[key] !== second[key])
+      {
+        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
+      }
+    }
+    for (const key in second)
+    {
+      if (firstKeys.indexOf(key) === -1)
+      {
+        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
+      }
+    }
+  }
   public _unsubscribe()
   {
     this.subscriptions.map((cancelSubscription) => cancelSubscription());
@@ -149,7 +203,7 @@ class Classs<T> extends React.Component<T, any>
     }
   }
 
-  public _update(store: Store, config: SubscriptionConfig)
+  private _update(store: Store, config: SubscriptionConfig)
   {
     if (this._unmounted)
     {
@@ -235,6 +289,7 @@ class Classs<T> extends React.Component<T, any>
     return this._ikeyPaths[str].keyPath;
   }
 
+  // for the construction of instance functions called with arguments
   public _fn(instanceFn: (...args: any[]) => any, ...args: any[]): (...args: any[]) => any
   {
     const fnName = instanceFn['name'];
@@ -281,6 +336,7 @@ class Classs<T> extends React.Component<T, any>
     }
   }
 
+  // return a function that toggles a boolean state variable
   public _toggle(stateKey: string): (() => void)
   {
     return this._togMap[stateKey] || (
@@ -292,4 +348,4 @@ class Classs<T> extends React.Component<T, any>
   }
 }
 
-export default Classs;
+export default TerrainComponent;

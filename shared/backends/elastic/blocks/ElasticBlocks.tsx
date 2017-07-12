@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
@@ -54,9 +55,7 @@ import { Input, InputType } from '../../../blocks/types/Input';
 
 import Util from '../../../../src/app/util/Util';
 
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-const { make } = BlockUtils;
-
+import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
 import
 {
   elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
@@ -67,13 +66,11 @@ import elasticRootCard from './ElasticRootCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';
 import { elasticTransform, scorePoint } from './ElasticTransformCard';
 
-export const ElasticBlocks =
-  {
-    elasticMagicValue,
-    elasticMagicList,
-    elasticMagicListItem,
-    elasticMagicCard,
+const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+const { make } = BlockUtils;
 
+export const ElasticBlocks = _.extend(
+  {
     // JSON
 
     elasticObject,
@@ -92,6 +89,11 @@ export const ElasticBlocks =
 
     elasticRootCard,
 
+    elasticMagicValue,
+    elasticMagicList,
+    elasticMagicListItem,
+    elasticMagicCard,
+
     elasticCreating: _card( // a placeholder for when a card is being created
       {
         static:
@@ -107,7 +109,11 @@ export const ElasticBlocks =
       }),
 
     elasticKeyValueWrap,
-  };
+    // JSON toggle the type blocks
+    elasticValue,
+  },
+  ElasticElasticCards,
+);
 
 BlockUtils.initBlocks(ElasticBlocks);
 

@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import * as SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 const Radium = require('radium');
 
 export interface Props
@@ -60,7 +60,7 @@ class State
 }
 
 @Radium
-export class ServerTreeInfo extends PureClasss<Props>
+export class ServerTreeInfo extends TerrainComponent<Props>
 {
   public state: State = new State();
 

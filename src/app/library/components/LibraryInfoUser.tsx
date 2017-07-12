@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Menu from './../../common/components/Menu';
 import RolesActions from './../../roles/data/RolesActions';
 import * as RoleTypes from './../../roles/RoleTypes';
@@ -64,7 +64,7 @@ interface LibraryInfoUserProps
   groupId: ID;
 }
 
-class LibraryInfoUser extends Classs<LibraryInfoUserProps>
+class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
 {
   public changeRole(newRole: string)
   {
