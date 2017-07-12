@@ -118,6 +118,7 @@ class Builder extends TerrainComponent<Props>
 
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
 
+    saveAsTextboxValue: string;
     saving?: boolean;
     savingAs?: boolean;
 
@@ -138,13 +139,13 @@ class Builder extends TerrainComponent<Props>
     nonexistentVariantIds: List([]),
 
     navigationException: false,
+
+    saveAsTextboxValue: '',
   };
 
   public initialColSizes: any;
 
   public confirmedLeave: boolean = false;
-
-  protected saveAsTextboxValue: string = '';
 
   constructor(props: Props)
   {
@@ -476,8 +477,8 @@ class Builder extends TerrainComponent<Props>
 
   public onSaveAs()
   {
-    this.saveAsTextboxValue = Util.duplicateNameFor(this.getVariant().name);
     this.setState({
+      saveAsTextboxValue: Util.duplicateNameFor(this.getVariant().name),
       savingAs: true,
     });
   }
@@ -813,14 +814,16 @@ class Builder extends TerrainComponent<Props>
 
   public handleSaveAsTextboxChange(newValue: string): void
   {
-    this.saveAsTextboxValue = newValue;
+    this.setState({
+      saveAsTextboxValue: newValue
+    });
   }
 
   public handleModalSaveAs()
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
-    LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.saveAsTextboxValue,
+    LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
     (response, newVariant) =>
     {
       this.onSaveSuccess(newVariant);
@@ -920,7 +923,7 @@ class Builder extends TerrainComponent<Props>
           confirm={true}
           onClose={this.handleModalSaveAsCancel}
           onConfirm={this.handleModalSaveAs}
-          initialTextboxValue={this.saveAsTextboxValue}
+          initialTextboxValue={this.state.saveAsTextboxValue}
           textboxPlaceholderValue={'Variant Name'}
           showTextbox={true}
           onTextboxValueChange={this.handleSaveAsTextboxChange}
