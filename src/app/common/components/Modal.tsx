@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './Modal.less';
 
 const ReactModal = require('react-modal');
@@ -70,7 +70,7 @@ export interface Props
   pre?: boolean;
 }
 
-class Modal extends PureClasss<Props>
+class Modal extends TerrainComponent<Props>
 {
   public closeModalSuccess()
   {

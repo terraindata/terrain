@@ -48,36 +48,39 @@ import * as $ from 'jquery';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Actions from './../data/FileImportActions';
+const { List } = Immutable;
 
 export interface Props
 {
   datatype: string;
-  transformTypes: List<string>;
-  newName: string;
-  newNames: List<string>;
-  addCurRenameTransform();
+  colName: string;
+  columnNames: List<string>;
+  addRenameTransform();
 }
 
-class TransformBox extends Classs<Props>
+class TransformBox extends TerrainComponent<Props>
 {
   public state: {
     transformTypeIndex: number;
     mergeIndex: number;
     transformText: string;
     splitNames: string[];
-    mergeNames: string[];
+    colToMergeId: number;
+    mergeNewName: string;
   } = {
-    transformTypeIndex: 0,
+    transformTypeIndex: -1,
     mergeIndex: -1,
     transformText: '',
     splitNames: ['', ''],
-    mergeNames: ['', ''],
+    colToMergeId: -1,
+    mergeNewName: '',
   };
 
   public handleAutocompleteTransformTextChange(transformText)
@@ -94,17 +97,17 @@ class TransformBox extends Classs<Props>
       mergeIndex: -1,
       transformText: '',
       splitNames: ['', ''],
-      mergeNames: ['', ''],
+      colToMergeId: -1,
+      mergeNewName: '',
     })
   }
 
   public handleMergeIndexChange(mergeIndex: number)
   {
-    const names = this.state.mergeNames.slice();
-    names[0] = this.props.newNames.delete(this.props.newNames.indexOf(this.props.newName)).get(mergeIndex);
+    const mergeName = this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName)).get(mergeIndex);
     this.setState({
       mergeIndex,
-      mergeNames: names,
+      colToMergeId: this.props.columnNames.indexOf(mergeName),
     })
   }
 
@@ -126,27 +129,15 @@ class TransformBox extends Classs<Props>
     });
   }
 
-  // public handleMergeOldNameChange(mergeOldName)
-  // {
-  //   const names = this.state.mergeNames.slice();
-  //   names[0] = mergeOldName;
-  //   this.setState({
-  //     mergeNames: names,
-  //   });
-  // }
-
   public handleMergeNewNameChange(mergeNewName)
   {
-    const names = this.state.mergeNames.slice();
-    names[1] = mergeNewName;
     this.setState({
-      mergeNames: names,
+      mergeNewName,
     })
   }
 
-  public transformErrorCheck()
+  public transformErrorCheck(transformName: string)
   {
-    const transformName = this.props.transformTypes.get(this.state.transformTypeIndex)
     if (!transformName)
     {
       return 'Select a transformation';
@@ -176,15 +167,11 @@ class TransformBox extends Classs<Props>
     }
     if (transformName === 'merge')
     {
-      if (!this.state.transformText)
-      {
-        return 'Enter merge text';
-      }
-      if (!this.state.mergeNames[0])
+      if (!this.props.columnNames.get(this.state.colToMergeId))
       {
         return 'Select column to merge'
       }
-      if (!this.state.mergeNames[1])
+      if (!this.state.mergeNewName)
       {
         return 'Enter new column name'
       }
@@ -194,31 +181,27 @@ class TransformBox extends Classs<Props>
 
   public handleTransformClick()
   {
-    // error checking
-    const msg = this.transformErrorCheck();
+    const transformName = FileImportTypes.TRANSFORM_TYPES[this.state.transformTypeIndex];
+    const msg = this.transformErrorCheck(transformName);
     if (msg)
     {
       alert(msg);
       return;
     }
 
-    // if not empty, add current rename transform and set it to empty string
-    this.props.addCurRenameTransform();
+    this.props.addRenameTransform();
 
-    // add this transform to total list, and the transform to be executed on preview rows
-    console.log('adding transform: ' + this.props.transformTypes.get(this.state.transformTypeIndex) + ' colName: ' +
-      this.props.newName + ', text: ' + this.state.transformText);
-
-    const transformName = this.props.transformTypes.get(this.state.transformTypeIndex);
     Actions.updatePreviewRows({
       name: transformName,
       args: {
-        transformCol: this.props.newName,
+        transformCol: this.props.colName,
         text: this.state.transformText,
         splitNames: this.state.splitNames,
-        mergeNames: this.state.mergeNames,
+        colToMergeId: this.state.colToMergeId,
+        mergeNewName: this.state.mergeNewName,
       }
     });
+    console.log('adding transform: ' + transformName + ' / colName: ' + this.props.colName + ' / text: ' + this.state.transformText);
 
     if (transformName === 'append' || transformName === 'prepend')
     {
@@ -226,7 +209,7 @@ class TransformBox extends Classs<Props>
         {
           name: transformName,
           args: {
-            colName: this.props.newName,
+            colName: this.props.colName,
             text: this.state.transformText,
           }
         }
@@ -238,7 +221,7 @@ class TransformBox extends Classs<Props>
         {
           name: transformName,
           args: {
-            oldName: this.props.newName,
+            oldName: this.props.colName,
             newName: this.state.splitNames,
             text: this.state.transformText,
           }
@@ -251,8 +234,8 @@ class TransformBox extends Classs<Props>
         {
           name: transformName,
           args: {
-            oldName: [this.props.newName, this.state.mergeNames[0]],
-            newName: this.state.mergeNames[1],
+            oldName: [this.props.colName, this.props.columnNames.get(this.state.colToMergeId)],
+            newName: this.state.mergeNewName,
             text: this.state.transformText,
           }
         }
@@ -260,11 +243,12 @@ class TransformBox extends Classs<Props>
     }
 
     this.setState({
-      transformTypeIndex: 0,
+      transformTypeIndex: -1,
       mergeIndex: -1,
       transformText: '',
       splitNames: ['', ''],
-      mergeNames: ['', ''],
+      colToMergeId: -1,
+      mergeNewName: '',
     })
   }
 
@@ -275,21 +259,18 @@ class TransformBox extends Classs<Props>
         {
           this.props.datatype === 'text' &&
           <div>
+            {
+              this.state.transformTypeIndex === -1 &&
+              <p>select transformation</p>
+            }
             <Dropdown
               selectedIndex={this.state.transformTypeIndex}
-              options={this.props.transformTypes}
+              options={List(FileImportTypes.TRANSFORM_TYPES)}
               onChange={this.handleTransformTypeChange}
               canEdit={true}
             />
-            <Autocomplete
-              value={this.state.transformText}
-              options={null}
-              onChange={this.handleAutocompleteTransformTextChange}
-              placeholder={'text'}
-              disabled={false}
-            />
             {
-              this.props.transformTypes.get(this.state.transformTypeIndex) === 'split' &&
+              FileImportTypes.TRANSFORM_TYPES[this.state.transformTypeIndex] === 'split' &&
               <div>
                 <Autocomplete
                   value={this.state.splitNames[0]}
@@ -308,23 +289,36 @@ class TransformBox extends Classs<Props>
               </div>
             }
             {
-              this.props.transformTypes.get(this.state.transformTypeIndex) === 'merge' &&
+              FileImportTypes.TRANSFORM_TYPES[this.state.transformTypeIndex] === 'merge' &&
               <div>
+                {
+                  this.state.mergeIndex === -1 &&
+                  <p>select column to merge</p>
+                }
+                <Dropdown
+                  selectedIndex={this.state.mergeIndex}
+                  options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
+                  onChange={this.handleMergeIndexChange}
+                  canEdit={true}
+                />
                 <Autocomplete
-                  value={this.state.mergeNames[1]}
+                  value={this.state.mergeNewName}
                   options={null}
                   onChange={this.handleMergeNewNameChange}
                   placeholder={'new column name'}
                   disabled={false}
                 />
-                select column to merge
-                <Dropdown
-                  selectedIndex={this.state.mergeIndex}
-                  options={this.props.newNames.delete(this.props.newNames.indexOf(this.props.newName))}
-                  onChange={this.handleMergeIndexChange}
-                  canEdit={true}
-                />
               </div>
+            }
+            {
+              this.state.transformTypeIndex !== -1 &&
+              <Autocomplete
+                value={this.state.transformText}
+                options={null}
+                onChange={this.handleAutocompleteTransformTextChange}
+                placeholder={'text'}
+                disabled={false}
+              />
             }
             <button onClick={this.handleTransformClick}>
               Transform

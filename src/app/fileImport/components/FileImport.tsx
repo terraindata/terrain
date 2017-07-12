@@ -50,10 +50,9 @@ import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
 import FileImportInfo from './FileImportInfo';
 import FileImportStore from './../data/FileImportStore';
-import PureClasss from './../../common/components/PureClasss';
 import FileImportPreview from './FileImportPreview';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
-import { server } from "../../../../midway/src/Midway";
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
@@ -65,7 +64,7 @@ export interface Props
   route?: any;
 }
 
-class FileImport extends PureClasss<any>
+class FileImport extends TerrainComponent<any>
 {
   public state: {
     fileImportState: FileImportTypes.FileImportState;
@@ -131,8 +130,6 @@ class FileImport extends PureClasss<any>
             }
             tableText={tableText}
             canImport={true}
-            validFiletypes={List(FileImportTypes.FILE_TYPES)}
-            previewRowsCount={FileImportTypes.NUMBER_PREVIEW_ROWS}
             hasCsvHeader={hasCsvHeader}
           />
         </div>

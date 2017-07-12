@@ -48,10 +48,11 @@ import * as React from 'react';
 import * as Papa from 'papaparse';
 import * as _ from 'underscore';
 import * as SchemaTypes from '../../schema/SchemaTypes';
-import PureClasss from './../../common/components/PureClasss';
+import * as FileImportTypes from './../FileImportTypes';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import CheckBox from './../../common/components/CheckBox';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import Util from './../../util/Util';
 const { List } = Immutable;
@@ -60,22 +61,17 @@ export interface Props
 {
   canSelectServer: boolean;
   servers: SchemaTypes.ServerMap;
-
   canSelectDb: boolean;
   dbs: List<string>;
   dbText: string;
-
   canSelectTable: boolean;
   tables: List<string>;
   tableText: string;
-
   canImport: boolean;
-  validFiletypes: List<string>;
-  previewRowsCount: number;
   hasCsvHeader: boolean;
 }
 
-class FileImportInfo extends PureClasss<Props>
+class FileImportInfo extends TerrainComponent<Props>
 {
   public state: {
     serverIndex: number,
@@ -142,7 +138,7 @@ class FileImportInfo extends PureClasss<Props>
       const config = {
         quoteChar: '\'',
         header: this.props.hasCsvHeader,
-        preview: this.props.previewRowsCount,
+        preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
         error: (err) =>
         {
           alert('CSV format incorrect: ' + String(err));
@@ -163,18 +159,16 @@ class FileImportInfo extends PureClasss<Props>
       });
     }
 
-    items.splice(this.props.previewRowsCount, items.length - this.props.previewRowsCount);
+    items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
         typeof value === 'string' ? value : JSON.stringify(value)
       )
     );
-    console.log("previewRows: ", previewRows);
 
     const columnNames = _.map(items[0], (value, index) =>
       filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
     );
-    console.log('colNames: ', columnNames);
 
     Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
   }
@@ -191,7 +185,7 @@ class FileImportInfo extends PureClasss<Props>
     }
 
     const filetype = file.target.files[0].name.split('.').pop();
-    if (this.props.validFiletypes.indexOf(filetype) === -1)
+    if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)
     {
       alert("Invalid filetype: " + filetype + ", please select another file");
       return;
@@ -203,47 +197,9 @@ class FileImportInfo extends PureClasss<Props>
     {
       console.log("File chosen contents: ", fr.result);
       this.parseAndChooseFile(fr.result, filetype);
-      this.refs['file']['value'] = null;
+      this.refs['file']['value'] = null;                 // prevent file-caching
     }
   }
-
-  // public handleUploadFile()
-  // {
-  //   if (!this.props.canImport)
-  //   {
-  //     alert('You do not have permission to upload files');
-  //     return;
-  //   }
-  //   if (!this.state.fileSelected)
-  //   {
-  //     alert('Please select a file to upload');
-  //     return;
-  //   }
-  //   if (!this.state.serverSelected)
-  //   {
-  //     alert('Please select a server');
-  //     return;
-  //   }
-  //   if (!this.state.dbSelected)
-  //   {
-  //     alert('Please select a database');
-  //     return;
-  //   }
-  //   if (!this.state.tableSelected)
-  //   {
-  //     alert('Please select a table');
-  //     return;
-  //   }
-  //
-  //   const msg = dbTableErrorCheck(this.props.dbText, this.props.tableText);
-  //   if (msg)
-  //   {
-  //     alert(msg);
-  //     return;
-  //   }
-  //
-  //   Actions.uploadFile();
-  // }
 
   public render()
   {

@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDropArea.less';
 const classNames = require('classnames');
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
@@ -158,7 +158,7 @@ export interface Props
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
 }
 
-class CardDropArea extends PureClasss<Props>
+class CardDropArea extends TerrainComponent<Props>
 {
   public state: {
     draggingCardItem: CardItem;

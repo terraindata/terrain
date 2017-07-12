@@ -49,6 +49,8 @@ import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
+import { DisplayType } from '../../../../blocks/displays/Display';
+import * as CommonElastic from '../../syntax/CommonElastic';
 
 /**
  * A clause which is a terminal (base) value: null, boolean, number, or string
@@ -79,5 +81,20 @@ export default class ESBaseClause extends ESClause
           ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
         break;
     }
+  }
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || '',
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'value',
+        },
+        tql: (block) => CommonElastic.parseESValue(block['value']),
+      },
+    });
   }
 }

@@ -49,7 +49,7 @@ import * as _ from 'underscore';
 import { Input } from '../../../../../shared/blocks/types/Input';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import InputComponent from '../inputs/InputComponent';
@@ -62,7 +62,7 @@ export interface Props
   canEdit: boolean;
 }
 
-class InputsArea extends PureClasss<Props>
+class InputsArea extends TerrainComponent<Props>
 {
   public createInput()
   {

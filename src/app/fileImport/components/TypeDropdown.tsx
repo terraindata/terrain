@@ -51,7 +51,7 @@ import * as _ from 'underscore';
 import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
 import Actions from './../data/FileImportActions';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Dropdown from './../../common/components/Dropdown';
 
 export interface Props
@@ -62,7 +62,7 @@ export interface Props
   datatypes: List<string>;
 }
 
-class TypeDropdown extends PureClasss<Props>
+class TypeDropdown extends TerrainComponent<Props>
 {
   public handleTypeChange(typeIndex)
   {

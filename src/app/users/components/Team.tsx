@@ -49,7 +49,7 @@ import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';
 import * as UserTypes from '../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import Actions from './../data/UserActions';
@@ -66,7 +66,7 @@ export interface Props
   children?: any;
 }
 
-class Team extends Classs<Props>
+class Team extends TerrainComponent<Props>
 {
   public unsub = null;
 

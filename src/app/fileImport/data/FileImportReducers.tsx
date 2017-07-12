@@ -175,6 +175,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
     }
     else if (action.payload.transform.name === 'split')
     {
+      // TODO: adding new columns effect on colToMergeId
       const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
       return state
         .set('primaryKey', primaryKey)
@@ -185,18 +186,26 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
         .set('columnTypes', state.columnTypes.insert(transformCol + 1, { type: 0 }))
         .set('previewRows', List(state.previewRows.map((row, i) =>
           [].concat(...row.map((col, j) =>
-            j === transformCol ?
-              [col.split(action.payload.transform.args.text)[0], col.split(action.payload.transform.args.text).slice(1).join(action.payload.transform.args.text)]
-              :
-              col
+          {
+            if (j === transformCol)
+            {
+              const index = col.indexOf(action.payload.transform.args.text);
+              if (index === -1)
+              {
+                return [col, ''];
+              }
+              return [col.substring(0, index), col.substring(index + action.payload.transform.args.text.length)];
+            }
+            return col;
+          }
           )
           ))
         ))
     }
     else if (action.payload.transform.name === 'merge')
     {
-      const mergeCol = state.columnNames.indexOf(action.payload.transform.args.mergeNames[0]);
-      console.log("mergeCol: ", mergeCol);
+      const mergeCol = action.payload.transform.args.colToMergeId;
+      console.log(mergeCol);
 
       let primaryKey = '';
       if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
@@ -211,7 +220,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
       return state
         .set('primaryKey', primaryKey)
         .set('columnNames', state.columnNames
-          .set(transformCol, action.payload.transform.args.mergeNames[1])
+          .set(transformCol, action.payload.transform.args.mergeNewName)
           .delete(mergeCol))
         .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
         .set('columnTypes', state.columnTypes.delete(mergeCol))

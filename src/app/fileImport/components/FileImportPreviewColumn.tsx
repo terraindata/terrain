@@ -50,36 +50,29 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
-import Dropdown from './../../common/components/Dropdown';
 import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import './FileImportPreviewColumn.less';
+const { List } = Immutable;
 
 export interface Props
 {
   columnId: number;
   isIncluded: boolean;
-  name: string;
   columnType: any;
   isPrimaryKey: boolean;
-
   datatypes: List<string>;
-  canSelectType: boolean;
-  canSelectColumn: boolean;
-  oldNames: List<string>;
-  newNames: List<string>;
-
-  transformTypes: List<string>;
+  columnNames: List<string>;
   columnOptions: List<string>;
-  handleRenameTransform(name: string, oldName: string, newName: string);
-  addCurRenameTransform();
+  handleRenameTransform(oldName: string, newName: string);
+  addRenameTransform();
 }
 
-class FileImportPreviewColumn extends PureClasss<Props>
+class FileImportPreviewColumn extends TerrainComponent<Props>
 {
   public handleIncludedChange()
   {
@@ -88,20 +81,19 @@ class FileImportPreviewColumn extends PureClasss<Props>
 
   public handlePrimaryKeyChange()
   {
-    console.log('update primaryKey: ', this.props.name);
     Actions.changePrimaryKey(this.props.columnId);
   }
 
   public handleAutocompleteHeaderChange(value)
   {
-    this.props.handleRenameTransform('rename', this.props.newNames.get(this.props.columnId), value);
+    this.props.handleRenameTransform(this.props.columnNames.get(this.props.columnId), value);
     Actions.setColumnName(this.props.columnId, value);
   }
 
   public render()
   {
     return (
-      <th>
+      <th className="column-header">
         include
         <CheckBox
           checked={this.props.isIncluded}
@@ -113,24 +105,23 @@ class FileImportPreviewColumn extends PureClasss<Props>
           onChange={this.handlePrimaryKeyChange}
         />
         <Autocomplete
-          value={this.props.name}
+          value={this.props.columnNames.get(this.props.columnId)}
           options={this.props.columnOptions}
           onChange={this.handleAutocompleteHeaderChange}
           placeholder={''}
-          disabled={!this.props.canSelectColumn}
+          disabled={false}
         />
         <TypeDropdown
           columnId={this.props.columnId}
           recursionId={0}
           columnType={this.props.columnType}
-          datatypes={this.props.datatypes}
+          datatypes={List(FileImportTypes.ELASTIC_TYPES)}
         />
         <TransformBox
           datatype={this.props.datatypes.get(this.props.columnType.type)}
-          transformTypes={this.props.transformTypes}
-          newName={this.props.name}
-          newNames={this.props.newNames}
-          addCurRenameTransform={this.props.addCurRenameTransform}
+          colName={this.props.columnNames.get(this.props.columnId)}
+          columnNames={this.props.columnNames}
+          addRenameTransform={this.props.addRenameTransform}
         />
       </th>
     );

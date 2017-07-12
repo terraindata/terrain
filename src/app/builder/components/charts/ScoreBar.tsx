@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
 
 const BORDER_RADIUS = '5px';
@@ -55,7 +55,7 @@ const SCORE_COLORS =
     NEGATIVE: ['#F8B14A', '#FF735B', '#DD333C', '#A50808'],
   };
 
-class ScoreBar extends PureClasss<{
+class ScoreBar extends TerrainComponent<{
   parentData: {
     weights: Array<{ weight: number }>;
   };

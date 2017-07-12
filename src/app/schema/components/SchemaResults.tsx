@@ -52,7 +52,7 @@ import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
@@ -71,7 +71,7 @@ export interface Props
 }
 
 @Radium
-class SchemaResults extends PureClasss<Props>
+class SchemaResults extends TerrainComponent<Props>
 {
   public state: {
     selectedId?: ID,

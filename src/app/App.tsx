@@ -54,6 +54,8 @@ import './App.less';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as Radium from 'radium';
+
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
 import { browserHistory } from 'react-router';
@@ -70,7 +72,7 @@ import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Logout from './common/components/Logout';
 import Placeholder from './common/components/Placeholder';
-import PureClasss from './common/components/PureClasss';
+import TerrainComponent from './common/components/TerrainComponent';
 import Redirect from './common/components/Redirect';
 import Sidebar from './common/components/Sidebar';
 import FileImport from './fileImport/components/FileImport';
@@ -90,6 +92,7 @@ import DeployModal from './deploy/components/DeployModal';
 import Ajax from './util/Ajax';
 import Util from './util/Util';
 import EasterEggs from './x/components/EasterEggs';
+import { Colors, backgroundColor, fontColor } from './common/Colors';
 
 import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
@@ -131,12 +134,12 @@ const links =
     // },
     {
       icon: <LibraryIcon />,
-      text: 'Library',
+      text: 'Manage',
       route: '/library',
     },
     {
       icon: <BuilderIcon />,
-      text: 'Builder',
+      text: 'Build',
       route: '/builder',
     },
     {
@@ -163,7 +166,9 @@ interface Props
   };
   children: any;
 }
-class App extends PureClasss<Props>
+
+@Radium
+class App extends TerrainComponent<Props>
 {
   public state = {
     selectedPage: 3,
@@ -350,11 +355,17 @@ class App extends PureClasss<Props>
       <div
         className='app'
         onMouseMove={this.handleMouseMove}
+        key='app'
+        style={[
+          fontColor(Colors().text.baseLight),
+          backgroundColor(Colors().base),
+        ]}
       >
         {
           this.state.loggedInAndLoaded &&
           <div
             className='app-top-bar'
+            style={backgroundColor(Colors().titleBar.base)}
           >
             <TerrainIcon
               className='app-top-bar-icon'

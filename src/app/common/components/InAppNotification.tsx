@@ -69,7 +69,7 @@ render()
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 const NotificationSystem = require('./notification-system/NotificationSystem');
 const styles = require('./notification-system/styles.js');
 
@@ -100,7 +100,7 @@ const notificationManager = {
   },
 };
 
-class InAppNotification extends Classs<Props>
+class InAppNotification extends TerrainComponent<Props>
 {
 
   constructor(props)

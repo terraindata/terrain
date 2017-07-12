@@ -870,10 +870,10 @@ const LayoutManager = React.createClass<any, any>({
     {
       lmClasses.unshift('lm-window-resized');
     }
-    const lmClassString = lmClasses.join(' ');
+    const lmTerrainComponenttring = lmClasses.join(' ');
 
     return (
-      <div className={lmClassString} ref='layoutManagerDiv'>
+      <div className={lmTerrainComponenttring} ref='layoutManagerDiv'>
         {this.props.layout.columns && this.props.layout.columns.map(this.renderColumn)}
         {this.props.layout.rows && this.props.layout.rows.map(this.renderRow)}
         {this.props.layout.cells && this.props.layout.cells.map(this.renderCell)}

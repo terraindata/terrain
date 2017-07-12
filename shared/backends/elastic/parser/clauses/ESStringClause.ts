@@ -48,6 +48,8 @@ import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
 
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
+
 /**
  * A clause which is a string
  */
@@ -59,5 +61,21 @@ export default class ESStringClause extends ESTerminalClause
     jsonType: ESJSONType = ESJSONType.string)
   {
     super(type, settings, clauseType, jsonType);
+  }
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || '',
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'value',
+          // TODO autocomplete
+        },
+        tql: (stringBlock) => stringBlock['value'],
+      },
+    });
   }
 }

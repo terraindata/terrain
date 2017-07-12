@@ -50,14 +50,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './EasterEggs.less';
 const r = 3;
 export interface Props
 {
 }
 
-class EasterEggs extends PureClasss<Props>
+class EasterEggs extends TerrainComponent<Props>
 {
   public state: {
     christmas: boolean;

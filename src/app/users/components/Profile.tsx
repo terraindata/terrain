@@ -47,7 +47,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
 import AuthStore from './../../auth/data/AuthStore';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
@@ -62,7 +62,7 @@ export interface Props
   children?: any;
 }
 
-class Profile extends Classs<Props>
+class Profile extends TerrainComponent<Props>
 {
   public userUnsubscribe = null;
   public authUnsubscribe = null;
