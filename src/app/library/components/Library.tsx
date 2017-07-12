@@ -126,11 +126,12 @@ class Library extends TerrainComponent<any>
   {
     const { libraryState } = this.state;
 
-    const { groups, algorithms, variants, groupsOrder } = libraryState;
+    const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
     const { params } = this.props;
     const groupId = +params.groupId;
     const algorithmId = +params.algorithmId;
     const variantId = +params.variantId;
+    const multiselect = true;
 
     let group: LibraryTypes.Group;
     let algorithm: LibraryTypes.Algorithm;
@@ -188,6 +189,7 @@ class Library extends TerrainComponent<any>
           {...{
             groups,
             groupsOrder,
+            params,
           }}
         />
         <AlgorithmsColumn
@@ -196,14 +198,18 @@ class Library extends TerrainComponent<any>
             variants,
             algorithmsOrder,
             groupId,
+            params,
           }}
         />
         <VariantsColumn
           {...{
             variants,
+            selectedVariants,
             variantsOrder,
             groupId,
             algorithmId,
+            params,
+            multiselect,
           }}
         />
         <LibraryInfoColumn
