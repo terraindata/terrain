@@ -128,7 +128,6 @@ class TerrainComponent<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
-
   public shouldComponentUpdate(nextProps: T, nextState: any)
   {
     const shouldUpdate = shallowCompare(this, nextProps, nextState);
@@ -141,7 +140,7 @@ class TerrainComponent<T> extends React.Component<T, any>
 
     return shouldUpdate;
   }
-  
+
   // Helpers for debugging React update / perf issues
   // Simply set _debugUpdates to true in a component you're debugging
   //  and give the component a _debugName if helpful.

@@ -113,9 +113,9 @@ export interface Props
 class TQLEditor extends TerrainComponent<Props>
 {
   public state: {
-    codeMirrorInstance // CodeMirror instance does not have a defined type.
+    codeMirrorInstance, // CodeMirror instance does not have a defined type.
   } = {
-    codeMirrorInstance: null
+    codeMirrorInstance: null,
   };
 
   public render()
@@ -126,7 +126,7 @@ class TQLEditor extends TerrainComponent<Props>
         lineNumbers: true,
         extraKeys: {
           'Ctrl-F': 'findPersistent',
-          'Ctrl-Alt-F': this.handleAutoFormatRequest
+          'Ctrl-Alt-F': this.handleAutoFormatRequest,
         },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
@@ -229,7 +229,7 @@ class TQLEditor extends TerrainComponent<Props>
   private registerCodeMirror(cmInstance)
   {
     this.setState({
-      codeMirrorInstance: cmInstance
+      codeMirrorInstance: cmInstance,
     });
     cmInstance.on('changes', this.handleChanges);
     if (this.props.language === 'elastic') // make this a switch if there are more languages

@@ -64,7 +64,7 @@ const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../../shared/items/types/Query';
 import Ajax from './../../util/Ajax';
 
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import Manual from './../../manual/components/Manual';

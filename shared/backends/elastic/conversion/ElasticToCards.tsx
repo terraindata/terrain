@@ -97,7 +97,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     return BlockUtils.make(Blocks['eqlnull']);
   }
 
-  let valueMap: { value?: any, cards?: List<Card> } = {};
+  const valueMap: { value?: any, cards?: List<Card> } = {};
 
   const clauseCardType = 'eql' + valueInfo.clause.type;
 
@@ -125,12 +125,12 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         let card = parseCardFromValueInfo(propertyInfo.propertyValue);
         card = card.set('key', key);
         return card;
-      }
+      },
     ));
   }
 
   return BlockUtils.make(Blocks[clauseCardType], valueMap);
-}
+};
 
 const isScoreCard = (obj: object): boolean =>
 {

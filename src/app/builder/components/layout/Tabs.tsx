@@ -63,7 +63,7 @@ import InfoArea from './../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
 const ReactTooltip = require('react-tooltip');
-import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');

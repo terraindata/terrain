@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 
+import ElasticKeyBuilderTextbox from '../../../../../src/app/common/components/ElasticKeyBuilderTextbox';
 import { Display, DisplayType } from '../../../../blocks/displays/Display';
 import { Block, TQLFn } from '../../../../blocks/types/Block';
 import { _card, Card } from '../../../../blocks/types/Card';
-import ElasticKeyBuilderTextbox from '../../../../../src/app/common/components/ElasticKeyBuilderTextbox';
 
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
@@ -214,7 +214,7 @@ abstract class ESClause
               KEY_DISPLAY,
               display,
             ],
-          }
+          };
         }
         else
         {

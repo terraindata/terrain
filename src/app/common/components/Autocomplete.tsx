@@ -49,9 +49,9 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 export interface Props
 {

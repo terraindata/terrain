@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import * as SchemaTypes from '../SchemaTypes';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import * as SchemaTypes from '../SchemaTypes';
 const { Map, List } = Immutable;
 
 type Server = SchemaTypes.Server;

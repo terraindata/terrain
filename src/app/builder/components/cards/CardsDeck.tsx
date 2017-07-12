@@ -49,11 +49,11 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import TerrainComponent from './../../../common/components/TerrainComponent';
 import Switch from './../../../common/components/Switch';
-import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';

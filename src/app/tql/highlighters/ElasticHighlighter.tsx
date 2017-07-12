@@ -66,13 +66,13 @@ import SyntaxHighlighter from './SyntaxHighlighter';
  */
 function assertUnreachable(param: never): never
 {
-  throw new Error("Unreachable code reached");
+  throw new Error('Unreachable code reached');
 }
 
 interface FlaggedToken
 {
-  isKeyword: boolean,
-  parserToken: ESParserToken
+  isKeyword: boolean;
+  parserToken: ESParserToken;
 }
 
 /*
@@ -148,7 +148,7 @@ class ElasticHighlighter extends SyntaxHighlighter
         instance.markText(
           { line: token.row, ch: token.col },
           { line: token.toRow, ch: token.toCol },
-          { className: style }
+          { className: style },
         );
         // markText returns a TextMarker object. In the goal of being stateless though,
         // we clear the markers by grabbing them from the code mirror instance instead

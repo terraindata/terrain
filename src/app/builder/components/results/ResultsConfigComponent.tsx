@@ -55,8 +55,8 @@ import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Result from '../results/Result';
-import TerrainComponent from './../../../common/components/TerrainComponent';
 import Switch from './../../../common/components/Switch';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Results } from './ResultsManager';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');

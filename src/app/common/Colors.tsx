@@ -49,7 +49,7 @@ interface Theme
 {
 
   // main background color
-  base: string,
+  base: string;
 
   // text
   text: {
@@ -61,25 +61,25 @@ interface Theme
 
     link: string, // TODO
     linkHover: string,
-  },
+  };
 
   button: {
     text: string,
     background: string,
     backgroundHover: string,
-  },
+  };
 
   // main title bar
   titleBar:
   {
     base: string,
-  },
+  };
   // side bar
   sideBar:
   {
     base: string,
     selectedSquare: string,
-  },
+  };
 
   // Library ------
 
@@ -116,8 +116,7 @@ interface Theme
     textbox: {
       base: string,
     },
-  },
-
+  };
 
   // Builder -----------------------------
 
@@ -200,14 +199,13 @@ interface Theme
       background: string,
       lines: string,
     },
-    
+
     inputs:
     {
       background: string,
     },
-  },
+  };
 }
-
 
 const DARK: Theme =
   {
@@ -285,7 +283,6 @@ const DARK: Theme =
       },
     },
 
-
     // Builder -----------------------------
 
     builder: {
@@ -334,27 +331,27 @@ const DARK: Theme =
         card20: '#4A979A',
         card21: '#3A91A5',
 
-        card1BG: Color("#559DCE").alpha(0.7).string(),
-        card2BG: Color("#397DD0").alpha(0.7).string(),
-        card3BG: Color("#D14F42").alpha(0.7).string(),
-        card4BG: Color("#D55A44").alpha(0.7).string(),
-        card5BG: Color("#DA6846").alpha(0.7).string(),
-        card6BG: Color("#DD7547").alpha(0.7).string(),
-        card7BG: Color("#DD8846").alpha(0.7).string(),
-        card8BG: Color("#DAA043").alpha(0.7).string(),
-        card9BG: Color("#D9B540").alpha(0.7).string(),
-        card10BG: Color("#86A760").alpha(0.7).string(),
-        card11BG: Color("#659F72").alpha(0.7).string(),
-        card12BG: Color("#4B977F").alpha(0.7).string(),
-        card13BG: Color("#39908B").alpha(0.7).string(),
-        card14BG: Color("#2E8C9A").alpha(0.7).string(),
-        card15BG: Color("#2589AA").alpha(0.7).string(),
-        card16BG: Color("#466AA3").alpha(0.7).string(),
-        card17BG: Color("#824BA0").alpha(0.7).string(),
-        card18BG: Color("#B161BC").alpha(0.7).string(),
-        card19BG: Color("#319AA9").alpha(0.7).string(),
-        card20BG: Color("#4A979A").alpha(0.7).string(),
-        card21BG: Color("#3A91A5").alpha(0.7).string(),
+        card1BG: Color('#559DCE').alpha(0.7).string(),
+        card2BG: Color('#397DD0').alpha(0.7).string(),
+        card3BG: Color('#D14F42').alpha(0.7).string(),
+        card4BG: Color('#D55A44').alpha(0.7).string(),
+        card5BG: Color('#DA6846').alpha(0.7).string(),
+        card6BG: Color('#DD7547').alpha(0.7).string(),
+        card7BG: Color('#DD8846').alpha(0.7).string(),
+        card8BG: Color('#DAA043').alpha(0.7).string(),
+        card9BG: Color('#D9B540').alpha(0.7).string(),
+        card10BG: Color('#86A760').alpha(0.7).string(),
+        card11BG: Color('#659F72').alpha(0.7).string(),
+        card12BG: Color('#4B977F').alpha(0.7).string(),
+        card13BG: Color('#39908B').alpha(0.7).string(),
+        card14BG: Color('#2E8C9A').alpha(0.7).string(),
+        card15BG: Color('#2589AA').alpha(0.7).string(),
+        card16BG: Color('#466AA3').alpha(0.7).string(),
+        card17BG: Color('#824BA0').alpha(0.7).string(),
+        card18BG: Color('#B161BC').alpha(0.7).string(),
+        card19BG: Color('#319AA9').alpha(0.7).string(),
+        card20BG: Color('#4A979A').alpha(0.7).string(),
+        card21BG: Color('#3A91A5').alpha(0.7).string(),
       },
 
       //builder column
@@ -367,7 +364,7 @@ const DARK: Theme =
         background: '#151515',
         lines: 'rgba(255,255,255,0.25)',
       },
-      
+
       inputs:
       {
         background: '#626262',
@@ -385,10 +382,10 @@ export function Colors()
 {
   // in the future, you will switch out the theme here.
   return Themes[curTheme];
-};
+}
 
 const dynamicMap: any = {
-  DARK: {}
+  DARK: {},
 };
 
 export function backgroundColor(color: string, hoverColor?: string)
@@ -415,7 +412,7 @@ export function buttonColors()
 {
   return extend({},
     backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-    fontColor(Colors().button.text)
+    fontColor(Colors().button.text),
   );
 }
 

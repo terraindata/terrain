@@ -67,11 +67,11 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
-import TerrainComponent from '../../../common/components/TerrainComponent';
 import Switch from '../../../common/components/Switch';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
 import Radium = require('radium');
-import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 const RESULTS_PAGE_SIZE = 20;
 

@@ -46,8 +46,8 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import './Account.less';

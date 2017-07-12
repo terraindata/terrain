@@ -52,9 +52,9 @@ import './App.less';
 
 // Libraries
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as Radium from 'radium';
 
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
@@ -72,9 +72,9 @@ import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Logout from './common/components/Logout';
 import Placeholder from './common/components/Placeholder';
-import TerrainComponent from './common/components/TerrainComponent';
 import Redirect from './common/components/Redirect';
 import Sidebar from './common/components/Sidebar';
+import TerrainComponent from './common/components/TerrainComponent';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/Library';
 import ManualWrapper from './manual/components/ManualWrapper';
@@ -87,12 +87,12 @@ import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
 const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
+import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import DeployModal from './deploy/components/DeployModal';
 import Ajax from './util/Ajax';
 import Util from './util/Util';
 import EasterEggs from './x/components/EasterEggs';
-import { Colors, backgroundColor, fontColor } from './common/Colors';
 
 import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting

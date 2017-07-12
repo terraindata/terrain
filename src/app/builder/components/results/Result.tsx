@@ -45,12 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as Radium from 'radium';
 import './Result.less';
 const { List } = Immutable;
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
@@ -58,7 +59,6 @@ import Actions from '../../data/BuilderActions';
 import { spotlightAction } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Result } from './ResultsManager';
-import { Colors, backgroundColor, fontColor, borderColor } from '../../../common/Colors';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -91,7 +91,7 @@ class ResultComponent extends TerrainComponent<Props> {
   //   isSpotlit: false,
   //   spotlightColor: "",
   // };
-  
+
   public menuOptions =
   [
     List([
@@ -108,22 +108,22 @@ class ResultComponent extends TerrainComponent<Props> {
       },
     ]),
   ];
-  
+
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
-    for (let key in nextProps)
+    for (const key in nextProps)
     {
       if (key !== 'result' && this.props[key] !== nextProps[key])
       {
         return true;
       }
     }
-    
+
     if (!_.isEqual(this.props.result.toJS(), nextProps.result.toJS()))
     {
       return true;
     }
-    
+
     return false;
   }
 

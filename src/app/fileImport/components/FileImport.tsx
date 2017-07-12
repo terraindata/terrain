@@ -45,15 +45,15 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as FileImportTypes from './../FileImportTypes';
-import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
-import FileImportInfo from './FileImportInfo';
-import FileImportStore from './../data/FileImportStore';
-import FileImportPreview from './FileImportPreview';
+import { server } from '../../../../midway/src/Midway';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
-import { server } from "../../../../midway/src/Midway";
+import * as SchemaTypes from './../../schema/SchemaTypes';
+import FileImportStore from './../data/FileImportStore';
+import * as FileImportTypes from './../FileImportTypes';
+import FileImportInfo from './FileImportInfo';
+import FileImportPreview from './FileImportPreview';
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
@@ -85,7 +85,7 @@ class FileImport extends TerrainComponent<any>
     });
 
     this._subscribe(SchemaStore, {
-      updater: (schemaState: SchemaTypes.SchemaState, ) =>
+      updater: (schemaState: SchemaTypes.SchemaState ) =>
       {
         this.setState({
           servers: schemaState.servers,
@@ -103,7 +103,7 @@ class FileImport extends TerrainComponent<any>
     const { serverText, dbText, tableText, previewRows, columnsToInclude, columnNames, columnsCount, columnTypes, hasCsvHeader, primaryKey } = fileImportState;
 
     return (
-      <div className="file-import">
+      <div className='file-import'>
         <h2>File Import Page</h2>
         <div>
           <FileImportInfo
@@ -113,7 +113,7 @@ class FileImport extends TerrainComponent<any>
             dbs={
               this.state.servers && serverText && this.state.servers.get(serverText) ?
                 List(this.state.servers.get(serverText).databaseIds.map((value, index) =>
-                  value.split('/').pop()
+                  value.split('/').pop(),
                 ))
                 :
                 List([])
@@ -123,7 +123,7 @@ class FileImport extends TerrainComponent<any>
             tables={
               this.state.dbs && dbText && this.state.dbs.get(serverText + '/' + dbText) ?
                 List(this.state.dbs.get(serverText + '/' + dbText).tableIds.map((value, index) =>
-                  value.split('.').pop()
+                  value.split('.').pop(),
                 ))
                 :
                 List([])
@@ -147,7 +147,7 @@ class FileImport extends TerrainComponent<any>
             columnOptions={
               this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?
                 List(this.state.tables.get(serverText + '/' + dbText + '.' + tableText).columnIds.map((value, index) =>
-                  value.split('.').pop()
+                  value.split('.').pop(),
                 ))
                 :
                 List([])

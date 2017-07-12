@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Radium from 'radium';
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './InfoArea.less';
-import { Colors, backgroundColor, fontColor, buttonColors } from '../../common/Colors';
 
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');

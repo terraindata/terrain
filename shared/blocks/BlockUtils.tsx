@@ -376,7 +376,7 @@ export function reconcileBlock(currentBlock: Block, newBlock: Block): Block
   return block;
 }
 
-// export const findBlock = 
+// export const findBlock =
 //   (blocks: List<Block>, predicate: (block: Block) => boolean) =>
 //   {
 //     return blocks.reduce(

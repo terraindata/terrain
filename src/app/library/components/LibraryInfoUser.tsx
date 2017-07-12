@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Menu from './../../common/components/Menu';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import * as RoleTypes from './../../roles/RoleTypes';
 import UserThumbnail from './../../users/components/UserThumbnail';

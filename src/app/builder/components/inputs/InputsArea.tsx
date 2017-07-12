@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import { Input } from '../../../../../shared/blocks/types/Input';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
@@ -55,7 +56,6 @@ import Actions from '../../data/BuilderActions';
 import InputComponent from '../inputs/InputComponent';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 export interface Props
 {
@@ -69,8 +69,8 @@ class InputsArea extends TerrainComponent<Props>
   public createInput()
   {
     Actions.create(
-      Immutable.List(['query', 'inputs']), -1, 
-      AllBackendsMap[this.props.language].inputType
+      Immutable.List(['query', 'inputs']), -1,
+      AllBackendsMap[this.props.language].inputType,
     );
   }
 

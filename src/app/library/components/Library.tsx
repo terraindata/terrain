@@ -60,7 +60,7 @@ import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 
 export interface Props
 {

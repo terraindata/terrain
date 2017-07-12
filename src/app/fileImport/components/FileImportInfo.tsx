@@ -44,16 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import * as React from 'react';
 import * as Papa from 'papaparse';
+import * as React from 'react';
+import { dbTableErrorCheck } from '../../../../shared/fileImport/Util';
 import * as SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import CheckBox from './../../common/components/CheckBox';
-import Actions from './../data/FileImportActions';
 import Util from './../../util/Util';
-import { dbTableErrorCheck } from "../../../../shared/fileImport/Util";
+import Actions from './../data/FileImportActions';
 const { List } = Immutable;
 
 export interface Props
@@ -136,7 +136,7 @@ class FileImportInfo extends TerrainComponent<Props>
         this.refs['file']['value'] = null;
         return;
       }
-      console.log("Parsed json: ", items);
+      console.log('Parsed json: ', items);
 
       // if (items.length > 0)
       // {
@@ -163,9 +163,9 @@ class FileImportInfo extends TerrainComponent<Props>
           return;
         },
         skipEmptyLines: true,
-      }
+      };
       items = Papa.parse(file, config).data;
-      console.log("Parsed csv: ", items);
+      console.log('Parsed csv: ', items);
 
       for (let i = 1; i < items.length; i++)
       {
@@ -193,11 +193,10 @@ class FileImportInfo extends TerrainComponent<Props>
       return;
     }
 
-
     const filetype = file.target.files[0].name.split('.').pop();
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
-      alert("Invalid filetype: " + filetype + ", please select another file");
+      alert('Invalid filetype: ' + filetype + ', please select another file');
       this.refs['file']['value'] = null;
       return;
     }
@@ -206,12 +205,12 @@ class FileImportInfo extends TerrainComponent<Props>
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      console.log("File chosen contents: ", fr.result);
+      console.log('File chosen contents: ', fr.result);
       const preview = this.parseData(fr.result, filetype);
 
       Actions.chooseFile(fr.result, filetype, preview);
       this.refs['file']['value'] = null;
-    }
+    };
   }
 
   public handleUploadFile()
@@ -259,7 +258,7 @@ class FileImportInfo extends TerrainComponent<Props>
     return (
       <div>
         <div>
-          <input ref="file" type="file" name="abc" onChange={this.handleChooseFile} />
+          <input ref='file' type='file' name='abc' onChange={this.handleChooseFile} />
           has header row (csv only)
           <CheckBox
             checked={this.props.hasCsvHeader}

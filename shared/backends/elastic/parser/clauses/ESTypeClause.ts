@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ESClauseType from '../ESClauseType';
 import ESStringClause from './ESStringClause';
-import { DisplayType } from '../../../../blocks/displays/Display';
-import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
 
 /**
  * A clause which is a field name (column name)
@@ -87,9 +87,9 @@ export default class ESTypeClause extends ESStringClause
               const index = indexCard['value'];
               const indexId = state.db.name + '/' + index;
               return schemaState.tables.filter(
-                (table) => table.databaseId === indexId
+                (table) => table.databaseId === indexId,
               ).map(
-                (table) => table.name
+                (table) => table.name,
                 ).toList();
             }
 

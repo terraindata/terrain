@@ -67,10 +67,10 @@ import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
-import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
 
@@ -550,7 +550,7 @@ class _CardComponent extends TerrainComponent<Props>
                 })}
                 style={{
                   // shrink the width if the card does not have a title
-                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined
+                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
                 }}
                 onClick={this.handleTitleClick}
               >
@@ -605,7 +605,7 @@ class _CardComponent extends TerrainComponent<Props>
                 className='card-body'
                 style={{
                   // shrink the width if the card does not have a title
-                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined
+                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
                 }}
               >
                 {

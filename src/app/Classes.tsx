@@ -53,7 +53,7 @@ THE SOFTWARE.
  * 1. create a class with a temporary name that extends BaseClass
  * 2. define instance variables and give them default values
  *       (note: Immutable Records must have default values)
- * 3. export a type with your final class name that is a union of your 
+ * 3. export a type with your final class name that is a union of your
  *    temporary name and IRecord of your temp name - this will add
  *    the Record functions to the type of your class
  * 4. export a factory function that calls New with your class and config
@@ -62,7 +62,7 @@ THE SOFTWARE.
  *  it to the server using the utility function below:
  * - excludeFields: which fields to exclude from the server save.
  *    good for temporary state fields which don't need saving
- * - dbFields: including this will create a new `meta` property on 
+ * - dbFields: including this will create a new `meta` property on
  *    the object containing every field not within the dbFields list.
  *    good if the database only stores certain cols and has a meta column
  */
@@ -74,12 +74,12 @@ Example definition for a sub class:
 class TestClassC extends BaseClass
 {
   testString = '';
-  testList = List([]);  
+  testList = List([]);
 }
 export type TestClass = TestClassC & IRecord<TestClassC>;
 export const _TestClass = (config?: {[key:string]: any}) =>
   New<TestClass>(new TestClassC(config), config);
-  
+
 */
 
 import * as Immutable from 'immutable';
@@ -95,7 +95,6 @@ export class BaseClass
     // nada
   }
 }
-
 
 const records: { [class_name: string]: Immutable.Record.Class } = {};
 
@@ -123,7 +122,6 @@ export function New<T>(
 
   return new records[class_name](instance) as any;
 }
-
 
 // This converts the standard Record class format to a plain JS
 //  object for saving to the server

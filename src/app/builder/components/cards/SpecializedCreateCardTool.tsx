@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
 import { Card } from '../../../../../shared/blocks/types/Card';
@@ -115,7 +115,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
   {
     const option = this.state.options.get(index);
     const card = this.props.data['childOptionClickHandler'](
-      this.props.data, option
+      this.props.data, option,
     );
 
     Actions.change(

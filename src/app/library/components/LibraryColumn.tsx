@@ -47,8 +47,8 @@ import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import { Colors, backgroundColor, fontColor, link } from '../../common/Colors';
 
 export interface Props
 {
