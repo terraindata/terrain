@@ -52,6 +52,7 @@ import * as winston from 'winston';
 import AuthRouter from './auth/AuthRouter';
 import DatabaseRouter from './database/DatabaseRouter';
 import ImportRouter from './import/ImportRouter';
+import ImportTemplateRouter from './import/ImportTemplateRouter';
 import ItemRouter from './items/ItemRouter';
 import QueryRouter from './query/QueryRouter';
 import SchemaRouter from './schema/SchemaRouter';
@@ -71,6 +72,7 @@ AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
 AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
+AppRouter.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 // Add future routes here.
 
 // Prefix all routes with /midway

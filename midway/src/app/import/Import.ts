@@ -53,25 +53,15 @@ import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
+import { ImportTemplateConfig } from './ImportTemplates';
 
-export interface ImportConfig
+export interface ImportConfig extends ImportTemplateConfig
 {
   dbid: number;       // instance id
   db: string;         // for elastic, index name
   table: string;      // for elastic, type name
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
-
-  // if filetype is 'csv', default is to assume the first line contains headers
-  // set this to true if this is not the case
-  csvHeaderMissing?: boolean;
-  // array of strings (oldName)
-  originalNames: string[];
-  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
-  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
-  columnTypes: object;
-  primaryKey: string;  // newName of primary key
-  transformations: object[];  // list of in-order data transformations
 }
 
 export class Import
