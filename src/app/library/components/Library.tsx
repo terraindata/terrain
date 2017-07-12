@@ -131,7 +131,7 @@ class Library extends TerrainComponent<any>
     const groupId = +params.groupId;
     const algorithmId = +params.algorithmId;
     const variantId = +params.variantId;
-    const multiselect = true;
+    const multiselect = false;
 
     let group: LibraryTypes.Group;
     let algorithm: LibraryTypes.Algorithm;
@@ -212,13 +212,15 @@ class Library extends TerrainComponent<any>
             multiselect,
           }}
         />
-        <LibraryInfoColumn
-          {...{
-            group,
-            algorithm,
-            variant,
-          }}
-        />
+        {!multiselect ?
+          <LibraryInfoColumn
+            {...{
+              group,
+              algorithm,
+              variant,
+            }}
+          /> : null
+        }
       </div>
     );
   }

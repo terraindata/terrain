@@ -86,7 +86,6 @@ class LibraryColumn extends TerrainComponent<Props>
             this.props['children']
           }
         </div>
-        <div className='library-column-border' />
       </div>
     );
   }
