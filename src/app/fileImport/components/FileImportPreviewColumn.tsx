@@ -74,6 +74,18 @@ export interface Props
 
 class FileImportPreviewColumn extends PureClasss<Props>
 {
+  public state: {
+    editing: boolean;
+  } = {
+    editing: false,
+  };
+
+  public handleEditingChange()
+  {
+    this.setState({
+      editing: ! this.state.editing,
+    });
+  }
   public handleIncludedChange()
   {
     Actions.setColumnToInclude(this.props.columnId);
@@ -92,39 +104,57 @@ class FileImportPreviewColumn extends PureClasss<Props>
 
   public render()
   {
-    return (
-      <th>
-        include
-        <CheckBox
-          checked={this.props.isIncluded}
-          onChange={this.handleIncludedChange}
-        />
-        primary key
-        <CheckBox
-          checked={this.props.isPrimaryKey}
-          onChange={this.handlePrimaryKeyChange}
-        />
-        <Autocomplete
-          value={this.props.columnNames.get(this.props.columnId)}
-          options={this.props.columnOptions}
-          onChange={this.handleAutocompleteHeaderChange}
-          placeholder={''}
-          disabled={false}
-        />
-        <TypeDropdown
-          columnId={this.props.columnId}
-          recursionId={0}
-          columnType={this.props.columnType}
-          datatypes={List(FileImportTypes.ELASTIC_TYPES)}
-        />
-        <TransformBox
-          datatype={this.props.datatypes.get(this.props.columnType.type)}
-          colName={this.props.columnNames.get(this.props.columnId)}
-          columnNames={this.props.columnNames}
-          addRenameTransform={this.props.addRenameTransform}
-        />
-      </th>
-    );
+    if (this.state.editing)
+    {
+      return (
+        <th>
+          include
+          <CheckBox
+            checked={this.props.isIncluded}
+            onChange={this.handleIncludedChange}
+          />
+          primary key
+          <CheckBox
+            checked={this.props.isPrimaryKey}
+            onChange={this.handlePrimaryKeyChange}
+          />
+          <Autocomplete
+            value={this.props.columnNames.get(this.props.columnId)}
+            options={this.props.columnOptions}
+            onChange={this.handleAutocompleteHeaderChange}
+            placeholder={''}
+            disabled={false}
+          />
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionId={0}
+            columnType={this.props.columnType}
+            datatypes={List(FileImportTypes.ELASTIC_TYPES)}
+          />
+          <TransformBox
+            datatype={this.props.datatypes.get(this.props.columnType.type)}
+            colName={this.props.columnNames.get(this.props.columnId)}
+            columnNames={this.props.columnNames}
+            addRenameTransform={this.props.addRenameTransform}
+          />
+          <button onClick={this.handleEditingChange}>
+            Save
+          </button>
+        </th>
+      );
+    }
+    else
+    {
+      return(
+        <th>
+          {this.props.columnNames.get(this.props.columnId)}
+          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+          <button onClick={this.handleEditingChange}>
+            Edit
+          </button>
+        </th>
+      );
+    }
   }
 }
 

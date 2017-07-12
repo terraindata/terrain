@@ -280,7 +280,11 @@ FileImportReducers[ActionTypes.uploadFile] =
         state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))]
       )),
       state.columnNames.get(state.primaryKey),
-      state.transforms,
+      state.transforms.reduce((acc, transform, i) =>
+      {
+        acc[i] = transform;
+        return acc;
+      }, {}),
       () =>
       {
         alert('success');

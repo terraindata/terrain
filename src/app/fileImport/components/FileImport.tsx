@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'underscore';
+import * as Papa from 'papaparse';
 import * as FileImportTypes from './../FileImportTypes';
 import * as SchemaTypes from './../../schema/SchemaTypes';
 import { DragDropContext } from 'react-dnd';
@@ -53,6 +55,10 @@ import FileImportStore from './../data/FileImportStore';
 import PureClasss from './../../common/components/PureClasss';
 import FileImportPreview from './FileImportPreview';
 import SchemaStore from './../../schema/data/SchemaStore';
+import Autocomplete from './../../common/components/Autocomplete';
+import Dropdown from './../../common/components/Dropdown';
+import CheckBox from './../../common/components/CheckBox';
+import Actions from './../data/FileImportActions';
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
@@ -71,8 +77,20 @@ class FileImport extends PureClasss<any>
     servers?: SchemaTypes.ServerMap;
     dbs?: SchemaTypes.DatabaseMap;
     tables?: SchemaTypes.TableMap;
+    stepId: number;
+    serverIndex: number;
+    serverSelected: boolean;
+    dbSelected: boolean;
+    tableSelected: boolean;
+    fileSelected: boolean;
   } = {
     fileImportState: FileImportStore.getState(),
+    stepId: 0,
+    serverIndex: -1,
+    serverSelected: false,
+    dbSelected: false,
+    tableSelected: false,
+    fileSelected: false,
   };
 
   constructor(props)
@@ -92,8 +110,139 @@ class FileImport extends PureClasss<any>
           tables: schemaState.tables,
         });
       }
-      ,
     });
+  }
+
+  public handleNextStepChange()
+  {
+    console.log('increment stepid: ', this.state.stepId + 1);
+    this.setState({
+      stepId: this.state.stepId + 1,
+    });
+  }
+
+  public handlePrevStepChange()
+  {
+    console.log('decrement stepid: ', this.state.stepId - 1);
+    this.setState({
+      stepId: this.state.stepId - 1,
+  });
+  }
+
+  public handleCsvHeaderChange()
+  {
+    Actions.changeHasCsvHeader();
+  }
+
+  public handleServerChange(serverIndex: number)
+  {
+    this.setState({
+      serverIndex,
+      serverSelected: true,
+    });
+    const serverName = this.state.servers.keySeq().toList().get(serverIndex);
+    Actions.changeServer(this.state.servers.get(serverName).connectionId, serverName);
+  }
+
+  public handleAutocompleteDbChange(value)
+  {
+    this.setState({
+      dbSelected: !!value,
+    });
+    Actions.changeDbText(value);
+  }
+
+  public handleAutocompleteTableChange(value)
+  {
+    this.setState({
+      tableSelected: !!value,
+    });
+    Actions.changeTableText(value);
+  }
+
+  public parseAndChooseFile(file: string, filetype: string)
+  {
+    // TODO: read JSON line by line and return items
+    let items = [];
+
+    if (filetype === 'json')
+    {
+      items = JSON.parse(file);
+      if (!Array.isArray(items))
+      {
+        alert('Input JSON file must parse to an array of objects.');
+        return;
+      }
+      console.log("Parsed json: ", items);
+    }
+    else if (filetype === 'csv')
+    {
+      const config = {
+        quoteChar: '\'',
+        // header: this.props.hasCsvHeader,
+        header: true,
+        preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
+        error: (err) =>
+        {
+          alert('CSV format incorrect: ' + String(err));
+          return;
+        },
+        skipEmptyLines: true,
+      };
+      items = Papa.parse(file, config).data;
+      console.log("Parsed csv: ", items);
+
+      items.map((item) =>
+      {
+        if (item.length !== items[0].length)
+        {
+          alert('CSV format incorrect: each row must have same number of fields');
+          return;
+        }
+      });
+    }
+
+    items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
+    const previewRows = items.map((item, i) =>
+      _.map(item, (value, key) =>
+        typeof value === 'string' ? value : JSON.stringify(value)
+      )
+    );
+
+    const columnNames = _.map(items[0], (value, index) =>
+      // filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
+      index
+    );
+
+    Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
+  }
+
+  public handleChooseFile(file)
+  {
+    const fileSelected = !!file.target.files[0];
+    this.setState({
+      fileSelected,
+    });
+    if (!fileSelected)
+    {
+      return;
+    }
+
+    const filetype = file.target.files[0].name.split('.').pop();
+    if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)
+    {
+      alert("Invalid filetype: " + filetype + ", please select another file");
+      return;
+    }
+
+    const fr = new FileReader();
+    fr.readAsText(file.target.files[0]);
+    fr.onloadend = () =>
+    {
+      console.log("File chosen contents: ", fr.result);
+      this.parseAndChooseFile(fr.result, filetype);
+      this.refs['file']['value'] = null;                 // prevent file-caching
+    }
   }
 
   public render()
@@ -102,9 +251,127 @@ class FileImport extends PureClasss<any>
     const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
       primaryKey, oldNames } = fileImportState;
 
+    console.log(this.state.stepId);
+    console.log(serverText + ' ' + dbText + ' ' + tableText);
+
+    switch (this.state.stepId)
+    {
+      case 0:
+        return(
+          <div>
+            <h3>step 1: select a file</h3>
+            <input ref="file" type="file" name="abc" onChange={this.handleChooseFile} />
+            has header row (csv only)
+            <CheckBox
+              checked={hasCsvHeader}
+              onChange={this.handleCsvHeaderChange}
+            />
+            <button onClick={this.handleNextStepChange}>
+              next
+            </button>
+          </div>
+        );
+      case 1:
+        return(
+        <div>
+          <h3>step 2: select a server</h3>
+          <Dropdown
+          selectedIndex={this.state.serverIndex}
+          options={this.state.servers ? this.state.servers.keySeq().toList() : List<string>()}
+          onChange={this.handleServerChange}
+          canEdit={true}
+          />
+          <button onClick={this.handlePrevStepChange}>
+            back
+          </button>
+          <button onClick={this.handleNextStepChange}>
+            next
+          </button>
+        </div>
+        );
+      case 2:
+        return(
+        <div>
+          <h3>step 3: select a database</h3>
+          <Autocomplete
+            value={dbText}
+            options={
+              this.state.servers && serverText && this.state.servers.get(serverText) ?
+                List(this.state.servers.get(serverText).databaseIds.map((value, index) =>
+                  value.split('/').pop()
+                ))
+                :
+                List([])
+            }
+            onChange={this.handleAutocompleteDbChange}
+            placeholder={'database'}
+            disabled={false}
+          />
+          <button onClick={this.handlePrevStepChange}>
+            back
+          </button>
+          <button onClick={this.handleNextStepChange}>
+            next
+          </button>
+        </div>
+        );
+      case 3:
+        return(
+        <div>
+          <h3>step 4: select a table</h3>
+          <Autocomplete
+            value={tableText}
+            options={
+              this.state.dbs && dbText && this.state.dbs.get(serverText + '/' + dbText) ?
+                List(this.state.dbs.get(serverText + '/' + dbText).tableIds.map((value, index) =>
+                  value.split('.').pop()
+                ))
+                :
+                List([])
+            }
+            onChange={this.handleAutocompleteTableChange}
+            placeholder={'table'}
+            disabled={false}
+          />
+          <button onClick={this.handlePrevStepChange}>
+            back
+          </button>
+          <button onClick={this.handleNextStepChange}>
+            next
+          </button>
+        </div>
+        );
+      case 4:
+        return (
+          <div>
+            <h3>step 5: choose and format columns</h3>
+            <FileImportPreview
+              previewRows={previewRows}
+              columnsCount={columnsCount}
+              primaryKey={primaryKey}
+              columnNames={columnNames}
+              columnsToInclude={columnsToInclude}
+              columnTypes={columnTypes}
+              oldNames={oldNames}
+              columnOptions={
+                this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?
+                  List(this.state.tables.get(serverText + '/' + dbText + '.' + tableText).columnIds.map((value, index) =>
+                    value.split('.').pop()
+                  ))
+                  :
+                  List([])
+              }
+            />
+            <button onClick={this.handlePrevStepChange}>
+              back
+            </button>
+          </div>
+        );
+    }
+
+    /*
     return (
-      <div className="file-import">
-        <h2>File Import Page</h2>
+      <div>
         <div>
           <FileImportInfo
             canSelectServer={true}
@@ -154,7 +421,7 @@ class FileImport extends PureClasss<any>
           />
         }
       </div>
-    );
+    );*/
   }
 }
 
