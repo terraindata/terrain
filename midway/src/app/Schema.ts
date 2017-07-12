@@ -87,6 +87,13 @@ const appSchemaSQL: string[] = [
     ip text NOT NULL,
     payload text NOT NULL,
     type text NOT NULL);`,
+  `CREATE TABLE IF NOT EXISTS templates
+    (id integer PRIMARY KEY,
+     csvHeaderMissing bool,
+     originalNames text NOT NULL,
+     columnTypes text NOT NULL,
+     primaryKey text NOT NULL,
+     transformations text NOT NULL);`,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

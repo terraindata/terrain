@@ -65,6 +65,15 @@ export interface ImportTemplateConfig
   primaryKey: string;  // newName of primary key
   transformations: object[];  // list of in-order data transformations
 }
+interface ImportTemplateConfigStringified
+{
+  id?: number;
+  csvHeaderMissing?: boolean;
+  originalNames: string;
+  columnTypes: string;
+  primaryKey: string;
+  transformations: string;
+}
 
 export class ImportTemplates
 {
@@ -76,7 +85,7 @@ export class ImportTemplates
       'importTemplates',
       ['id'],
       [
-        'csvHeaderMissing',    // TODO: find a nicer way get to get these
+        'csvHeaderMissing',
         'originalNames',
         'columnTypes',
         'primaryKey',
@@ -87,26 +96,28 @@ export class ImportTemplates
 
   public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>
   {
-    return App.DB.select(this.templateTable, columns, filter) as Promise<ImportTemplateConfig[]>;
+    return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
+    {
+      const templates: ImportTemplateConfigStringified[] =
+        await App.DB.select(this.templateTable, columns, filter) as ImportTemplateConfigStringified[];
+      resolve(this._parseConfig(templates) as ImportTemplateConfig[]);
+    });
   }
 
   public async get(id?: number): Promise<ImportTemplateConfig[]>
   {
-    if (id !== undefined)
-    {
-      return this.select([], { id });
-    }
-    return this.select([], {});
+    const filter: object = (id !== undefined) ? { id } : {};
+    return this.select([], filter);
   }
 
   public async upsert(user: UserConfig, template: ImportTemplateConfig): Promise<ImportTemplateConfig>
   {
     return new Promise<ImportTemplateConfig>(async (resolve, reject) =>
     {
-      if (template.csvHeaderMissing === undefined)
-      {
-        template['csvHeaderMissing'] = false;
-      }
+      // if (template.csvHeaderMissing === undefined)
+      // {
+      //   template['csvHeaderMissing'] = false;
+      // }
       if (template.id !== undefined)
       {
         const results: ImportTemplateConfig[] = await this.get(template.id);
@@ -118,8 +129,47 @@ export class ImportTemplates
 
         template = Util.updateObject(results[0], template);
       }
-      resolve(await App.DB.upsert(this.templateTable, template) as ImportTemplateConfig);
+      const upserted: ImportTemplateConfigStringified =
+        await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
+      resolve(this._parseConfig(upserted) as ImportTemplateConfig);
     });
+  }
+
+  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateConfigStringified
+  {
+    const stringified: ImportTemplateConfigStringified =
+      {
+        id: template['id'],
+        csvHeaderMissing: template['csvHeaderMissing'],
+        originalNames: JSON.stringify(template['originalNames']),
+        columnTypes: JSON.stringify(template['columnTypes']),
+        primaryKey: template['primaryKey'],
+        transformations: JSON.stringify(template['transformations']),
+      };
+    return stringified;
+  }
+
+  private _parseConfig(stringified: ImportTemplateConfigStringified | ImportTemplateConfigStringified[]):
+    ImportTemplateConfig | ImportTemplateConfig[]
+  {
+    if (Array.isArray(stringified))
+    {
+      return stringified.map((val) => this._parseConfigHelper(val));
+    }
+    return this._parseConfigHelper(stringified);
+  }
+  private _parseConfigHelper(stringified: ImportTemplateConfigStringified): ImportTemplateConfig
+  {
+    const template: ImportTemplateConfig =
+      {
+        id: stringified['id'],
+        csvHeaderMissing: stringified['csvHeaderMissing'],
+        originalNames: JSON.parse(stringified['originalNames']),
+        columnTypes: JSON.parse(stringified['columnTypes']),
+        primaryKey: stringified['primaryKey'],
+        transformations: JSON.parse(stringified['transformations']),
+      };
+    return template;
   }
 }
 
