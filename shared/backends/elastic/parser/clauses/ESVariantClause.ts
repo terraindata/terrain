@@ -54,7 +54,11 @@ import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import * as CommonBlocks from '../../../../blocks/CommonBlocks';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import ElasticBlocks from '../../blocks/ElasticBlocks';
+import { Card } from '../../../../blocks/types/Card';
 import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
+import SpecializedCreateCardTool from '../../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
 
 /**
  * A clause which is one of several possible types
@@ -99,31 +103,68 @@ export default class ESVariantClause extends ESClause
 
   public getCard()
   {
-    // TODO try an inline approach
-
+    const accepts = List(
+      _.map(
+        this.subtypes,
+        (type: string, jsonType: string) =>
+          'eql' + type
+      )
+    );
+    
+    const childOptions = List(
+      _.map(
+        this.subtypes,
+        (type: string, jsonType: string) =>
+          ({
+            text: type,
+            type: 'eql' + type,
+          })
+        )
+      );
+    
     return this.seedCard({
-      cards: List([]),
+      // cards: List([]),
+
+      // provide options of all possible card types
+      getChildOptions: (card) =>
+      {
+        return childOptions;
+      },
+
+      childOptionClickHandler: (card: Card, option: { text: string, type: string }): Card =>
+      {
+        // replace current card with newly made card of type
+        return BlockUtils.make(
+          ElasticBlocks[option.type],
+          {
+            key: card['key'],
+          }
+        );
+      },
 
       static:
       {
         title: this.type + ' (Variant)',
         tql: (block, tqlFn, tqlConfig) =>
         {
-          return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+          return ''; //tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
-        accepts: List(
-          _.map(
-            this.subtypes,
-            (type: string, jsonType: string) =>
-              'eql' + type
-          )
-        ),
+        
+        // accepts,
+        
         display:
         {
-          displayType: DisplayType.CARDS,
-          key: 'cards',
-          singleChild: true,
+          provideParentData: true, // need this to grey out the type dropdown
+          displayType: DisplayType.COMPONENT,
+          component: SpecializedCreateCardTool,
+          key: null,
+          // help: ManualConfig.help['score'],
         },
+        // {
+        //   displayType: DisplayType.CARDS,
+        //   key: null,
+        //   singleChild: true,
+        // },
         preview: '',
       }
     });
