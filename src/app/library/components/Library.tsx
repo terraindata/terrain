@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import UserActions from './../../users/data/UserActions';
 import Actions from './../data/LibraryActions';
@@ -60,6 +60,7 @@ import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
+import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 export interface Props
 {
@@ -73,7 +74,7 @@ export interface Props
   // };
 }
 
-class Library extends PureClasss<any>
+class Library extends TerrainComponent<any>
 {
   public cancelSubscription = null;
 

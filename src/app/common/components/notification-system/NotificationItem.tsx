@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util';
-import Classs from './../../../common/components/Classs';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 
 const Constants = require('./constants');
 const Helpers = require('./helpers');
@@ -83,7 +83,7 @@ export interface Props
   noAnimation: boolean;
 }
 
-class NotificationItem extends Classs<Props> {
+class NotificationItem extends TerrainComponent<Props> {
   public _noAnimation = false;
   public _styles = null;
   public _notificationTimer = null;

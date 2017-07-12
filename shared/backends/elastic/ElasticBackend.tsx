@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import { Backend, cardsDeckToList } from '../types/Backend';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import ElasticBlocks from './blocks/ElasticBlocks';
@@ -60,13 +61,17 @@ class ElasticBackend implements Backend
 
   blocks = ElasticBlocks;
   creatingType = ElasticBlocks.elasticCreating.type;
+  inputType = ElasticBlocks.elasticInput.type;
 
-  rootCard = ElasticBlocks.elasticRootCard;
-  topLevelCards = Immutable.List<string>([
-    ElasticBlocks.elasticMagicCard.type,
-    ElasticBlocks.elasticRootCard.type,
-    ElasticBlocks.elasticKeyValueWrap.type,
-  ]);
+  rootCard = ElasticBlocks.eqlroot;
+  topLevelCards =
+    Immutable.List(_.keys(ElasticBlocks)); // TODO change this to true top level cards
+  //  Immutable.List<string>([
+  //   ElasticBlocks.elasticRootCard.type,
+  //   ElasticBlocks.elasticKeyValueWrap.type,
+  //   ElasticBlocks.elasticMagicCard.type,
+  //   ElasticBlocks.elasticRootCard.type,
+  // ]);
 
   // Ordering of the cards deck
   cardsDeck = ElasticCardsDeck;

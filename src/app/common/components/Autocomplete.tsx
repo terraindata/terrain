@@ -50,7 +50,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 export interface Props
 {
@@ -68,7 +69,7 @@ export interface Props
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
 }
 
-class Autocomplete extends PureClasss<Props>
+class Autocomplete extends TerrainComponent<Props>
 {
   public value: string;
 
@@ -296,6 +297,7 @@ class Autocomplete extends PureClasss<Props>
               'ac-options-open': this.state.open,
             })}
             ref='ac'
+            style={fontColor(Colors().text.baseDark)}
           >
             {
               options.map(this.renderOption)

@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDragPreview.less';
 const classNames = require('classnames');
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
@@ -76,7 +76,7 @@ interface CDPProps
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
 }
 
-class CardDragPreview extends PureClasss<CDPProps>
+class CardDragPreview extends TerrainComponent<CDPProps>
 {
   public noCardColors: string[] = ['#aaa', '#aaa'];
 

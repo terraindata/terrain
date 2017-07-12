@@ -80,4 +80,9 @@ export default class ESReferenceClause extends ESClause
   {
     interpreter.config.getClause(this.delegateType).mark(interpreter, valueInfo);
   }
+
+  public getCard()
+  {
+    return 'eql' + this.delegateType;
+  }
 }

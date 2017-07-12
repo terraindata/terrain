@@ -49,7 +49,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 const { List } = Immutable;
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
 import RolesStore from './../../roles/data/RolesStore';
@@ -67,6 +67,7 @@ import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
 import LibraryInfoUser from './LibraryInfoUser';
 import LibraryVariantInfo from './LibraryVariantInfo';
+import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
@@ -88,7 +89,7 @@ export interface Props
   variant: Variant;
 }
 
-class LibraryInfoColumn extends Classs<Props>
+class LibraryInfoColumn extends TerrainComponent<Props>
 {
   public state: {
     users: UserMap,
@@ -315,7 +316,10 @@ class LibraryInfoColumn extends Classs<Props>
       >
         {
           item ?
-            <div className='library-info'>
+            <div
+              className='library-info'
+              style={backgroundColor(Colors().library.infoColumn.baseUpper)}
+            >
               <div
                 className='library-info-image'
               >
@@ -350,7 +354,10 @@ class LibraryInfoColumn extends Classs<Props>
               }
             </div>
             :
-            <div className='library-info'>
+            <div
+              className='library-info'
+              style={backgroundColor(Colors().library.infoColumn.baseUpper)}
+            >
               <InfoArea
                 large='Select a Group'
               />

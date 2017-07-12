@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
 import { databaseChildrenConfig, DatabaseTreeInfo } from './items/DatabaseTreeInfo';
 import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
@@ -119,7 +119,7 @@ const typeToRendering: {
   };
 
 @Radium
-class SchemaTreeItem extends PureClasss<Props>
+class SchemaTreeItem extends TerrainComponent<Props>
 {
   public state: State = new State();
 

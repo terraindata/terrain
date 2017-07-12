@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './Scoreline.less';
 
 export interface Props
@@ -58,7 +58,7 @@ export interface Props
   hideZeroes: boolean;
 }
 
-class Scoreline extends Classs<Props>
+class Scoreline extends TerrainComponent<Props>
 {
   public renderScore(score: { color: string, score: number, name?: string }, index: number)
   {

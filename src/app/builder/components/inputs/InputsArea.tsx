@@ -49,24 +49,29 @@ import * as _ from 'underscore';
 import { Input } from '../../../../../shared/blocks/types/Input';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import InputComponent from '../inputs/InputComponent';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 
 export interface Props
 {
   inputs: List<Input>;
   canEdit: boolean;
+  language: string;
 }
 
-class InputsArea extends PureClasss<Props>
+class InputsArea extends TerrainComponent<Props>
 {
   public createInput()
   {
-    Actions.create(Immutable.List(['query', 'inputs']), -1, 'input');
+    Actions.create(
+      Immutable.List(['query', 'inputs']), -1, 
+      AllBackendsMap[this.props.language].inputType
+    );
   }
 
   public renderNoInputs()

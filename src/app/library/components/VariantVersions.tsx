@@ -46,7 +46,7 @@ THE SOFTWARE.
 import './VariantVersions.less';
 const classNames = require('classnames');
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import UserStore from './../../users/data/UserStore';
 import * as UserTypes from './../../users/UserTypes';
@@ -68,7 +68,7 @@ export interface Props
   variant: Variant;
 }
 
-class VariantVersions extends PureClasss<Props>
+class VariantVersions extends TerrainComponent<Props>
 {
   public state: {
     users: UserMap,

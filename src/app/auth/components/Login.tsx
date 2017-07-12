@@ -47,7 +47,7 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Ajax from '../../util/Ajax';
 import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
@@ -64,7 +64,7 @@ export interface Props
   onLoadComplete: () => void;
 }
 
-class Login extends PureClasss<Props>
+class Login extends TerrainComponent<Props>
 {
   public state = {
     shifted: false,

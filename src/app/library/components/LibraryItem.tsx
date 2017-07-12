@@ -51,7 +51,7 @@ const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Menu from './../../common/components/Menu';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
@@ -103,7 +103,7 @@ export interface Props
   isDragging?: boolean;
 }
 
-class LibraryItem extends Classs<Props>
+class LibraryItem extends TerrainComponent<Props>
 {
   public state = {
     nameEditing: false,

@@ -44,11 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Immutable from 'immutable';
+
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
 
 /**
  * A clause which can only take on a restricted set of values.
@@ -85,5 +89,23 @@ export default class ESEnumClause extends ESClause
           'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
       }
     }
+  }
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || this.values[0],
+
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.DROPDOWN,
+          key: 'value',
+          options: Immutable.List(this.values),
+          dropdownUsesRawValues: true,
+        },
+        tql: (block) => block['value'],
+      }
+    });
   }
 }

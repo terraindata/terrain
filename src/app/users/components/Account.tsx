@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
@@ -60,7 +60,7 @@ export interface Props
   children?: any;
 }
 
-class Account extends Classs<Props>
+class Account extends TerrainComponent<Props>
 {
   public render()
   {

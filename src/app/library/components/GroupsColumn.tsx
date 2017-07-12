@@ -51,7 +51,7 @@ import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
@@ -71,7 +71,7 @@ export interface Props
   groupsOrder: Immutable.List<ID>;
 }
 
-class GroupsColumn extends Classs<Props>
+class GroupsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,

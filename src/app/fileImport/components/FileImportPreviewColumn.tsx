@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -71,7 +71,7 @@ export interface Props
   columnOptions: List<string>;
 }
 
-class FileImportPreviewColumn extends PureClasss<Props>
+class FileImportPreviewColumn extends TerrainComponent<Props>
 {
   public handleIncludedChange()
   {

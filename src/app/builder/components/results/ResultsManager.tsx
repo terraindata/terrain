@@ -60,7 +60,7 @@ import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 
 export const MAX_RESULTS = 200;
 
@@ -68,6 +68,8 @@ class ResultClass extends BaseClass
 {
   // all available fields for display
   public fields: IMMap<string, string> = Map<string, string>({});
+  
+  public primaryKey: any = '';
 
   public spotlight: any;
 
@@ -139,7 +141,9 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-export class ResultsManager extends PureClasss<Props>
+let RESULTS_CACHE: {[primaryKey: string]: Result};
+
+export class ResultsManager extends TerrainComponent<Props>
 {
   public state: State = {};
 
@@ -505,12 +509,17 @@ export class ResultsManager extends PureClasss<Props>
           'fields',
           result.fields.merge(resultData),
         );
-
+        
+        result = result.set(
+          'primaryKey',
+          getPrimaryKeyFor(result, this.props.query.resultsConfig, index)
+        );
+        
         if (!isAllFields)
         {
           result = result.set('rawFields', Map(resultData));
         }
-
+        
         results = results.set(index, result);
       },
     );
@@ -520,19 +529,21 @@ export class ResultsManager extends PureClasss<Props>
     {
       fields = results.get(0).fields.keySeq().toList();
     }
+    
+    const loading = (isAllFields && !resultsState.hasLoadedResults) ||
+      (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields);
 
     const changes: any = {
       results,
       fields,
       hasError: false,
-      loading: (isAllFields && !resultsState.hasLoadedResults) ||
-      (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
+      loading,
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
       errorLine: null,
       mainErrorMessage: null,
       subErrorMessage: null,
     };
-
+    
     if (!resultsState.hasLoadedCount)
     {
       changes['count'] = results.size;
@@ -700,16 +711,16 @@ export class ResultsManager extends PureClasss<Props>
   }
 }
 
-export function getPrimaryKeyFor(result: any, config: ResultsConfig): string
+function getPrimaryKeyFor(result: Result, config: ResultsConfig, index: number): string
 {
   if (config && config.primaryKeys.size)
   {
     return config.primaryKeys.map(
-      (field) => result[field],
-    ).join('and');
+      (field) => result.fields[field],
+    ).join('-and-');
   }
 
-  return 'result-' + Math.floor(Math.random() * 100000000);
+  return index + ': ' + JSON.stringify(result.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
 }
 
 export default ResultsManager;

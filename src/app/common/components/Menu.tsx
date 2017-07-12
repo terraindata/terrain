@@ -48,7 +48,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
@@ -69,9 +69,10 @@ export interface Props
   small?: boolean;
   style?: any;
   id?: ID;
+  vertical?: boolean;
 }
 
-export class Menu extends PureClasss<Props>
+export class Menu extends TerrainComponent<Props>
 {
   public state: {
     open: boolean;
@@ -177,6 +178,7 @@ export class Menu extends PureClasss<Props>
           'menu-wrapper': true,
           'menu-wrapper-small': this.props.small,
           'menu-open': this.state.open,
+          'menu-vertical': this.props.vertical,
         })}
         style={this.props.style ? this.props.style : null}
       >

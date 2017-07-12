@@ -44,25 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import EQLConfig from './EQLConfig';
+import ESInterpreter from './ESInterpreter';
+import ESValueInfo from './ESValueInfo';
 import * as _ from 'underscore';
-
-import { Display, DisplayType } from '../../../../blocks/displays/Display';
-import { Block, TQLFn } from '../../../../blocks/types/Block';
-import { _card, Card } from '../../../../blocks/types/Card';
-import ElasticKeyBuilderTextbox from '../../../../../src/app/common/components/ElasticKeyBuilderTextbox';
-
-import EQLConfig from '../EQLConfig';
-import ESClauseType from '../ESClauseType';
-import ESInterpreter from '../ESInterpreter';
-import ESJSONType from '../ESJSONType';
-import ESValueInfo from '../ESValueInfo';
+import { Card, _card } from '../../../blocks/types/Card';
+import { Block, TQLFn } from '../../../blocks/types/Block';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
+import ElasticKeyBuilderTextbox from '../../../../src/app/common/components/ElasticKeyBuilderTextbox';
 
 /**
  * Represents an Elastic Search query clause
  */
 abstract class ESClause
 {
-  public clauseType: ESClauseType; // clause type (each class has a unique clause type)
   public type: string; // type name
   public name: string; // human type name
   public desc: string; // clause description
@@ -81,13 +76,21 @@ abstract class ESClause
   protected settings;
 
   /**
+   * + null types mean custom or disabled type validation
+   * + no name means use name with underscores removed
+   * + null value in type means same name as property name
+   * + typename with [] after it means array
+   * + typename with {} after it means object of type
+   * + type "enum" uses "values" member to list enumerated values
+   * + array type means any of these types
+   * + object type means structured def definition
+   * + string type references another def
+   *
    * @param type the name to refer to this clause (type)
    * @param settings the settings object to initialize it from
-   * @param clauseType the enum uniquely identifying the clause type
    */
-  public constructor(type: string, settings: any, clauseType: ESClauseType)
+  public constructor(type: string, settings: any)
   {
-    this.clauseType = clauseType;
     this.type = type;
     this.settings = settings;
 
@@ -105,34 +108,16 @@ abstract class ESClause
 
   public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
 
-  public getCard(): any
+  private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
   {
-    return null;
-  }
-
-  public getSupplementalBlocks(): { [type: string]: Block }
-  {
-    return {};
-  }
-
-  public getCardType(): string
-  {
-    return 'eql' + this.type;
-  }
-
-  protected typeCheck(interpreter: ESInterpreter,
-    valueInfo: ESValueInfo,
-    expected: ESJSONType): boolean
-  {
-    if (valueInfo.jsonType !== expected)
+    if (settings[name] !== undefined)
     {
-      interpreter.accumulateError(valueInfo,
-        'Expected a ' + ESJSONType[expected] + ', but found a ' +
-        ESJSONType[valueInfo.jsonType] + ' instead.');
-      return false;
+      this[name] = settings[name];
     }
-
-    return true;
+    else
+    {
+      this[name] = defaultValueFunction();
+    }
   }
 
   protected seedCard(obj: {
@@ -159,7 +144,7 @@ abstract class ESClause
     };
   }): any
   {
-    // hide the title for elastic
+    // hide title
     obj['noTitle'] = true;
 
     // fill in simple defaults, but allow overrides
@@ -168,7 +153,7 @@ abstract class ESClause
       colors: [],
       language: 'elastic',
 
-      // anythingAccepts: true, // TODO remove after testing
+      anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach
@@ -219,16 +204,20 @@ abstract class ESClause
     return _card(obj as any);
   }
 
-  private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
+  public getCard(): any
   {
-    if (settings[name] !== undefined)
-    {
-      this[name] = settings[name];
-    }
-    else
-    {
-      this[name] = defaultValueFunction();
-    }
+    return null;
+  }
+
+
+  public getSupplementalBlocks(): { [type: string]: Block }
+  {
+    return {};
+  }
+
+  public getCardType(): string
+  {
+    return 'eql' + this.type;
   }
 }
 

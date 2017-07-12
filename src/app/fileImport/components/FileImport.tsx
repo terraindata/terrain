@@ -51,7 +51,7 @@ import { DragDropContext } from 'react-dnd';
 import FileImportInfo from './FileImportInfo';
 import FileImportStore from './../data/FileImportStore';
 import FileImportPreview from './FileImportPreview';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import { server } from "../../../../midway/src/Midway";
 const HTML5Backend = require('react-dnd-html5-backend');
@@ -65,7 +65,7 @@ export interface Props
   route?: any;
 }
 
-class FileImport extends PureClasss<any>
+class FileImport extends TerrainComponent<any>
 {
   public state: {
     fileImportState: FileImportTypes.FileImportState;

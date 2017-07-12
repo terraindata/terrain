@@ -49,7 +49,7 @@ import * as UserTypes from '../UserTypes';
 import AuthActions from './../../auth/data/AuthActions';
 import AuthStore from './../../auth/data/AuthStore';
 import CheckBox from './../../common/components/CheckBox';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import UserStore from './../../users/data/UserStore';
 import Ajax from './../../util/Ajax';
@@ -73,7 +73,7 @@ export interface Props
 
 }
 
-class Settings extends Classs<Props>
+class Settings extends TerrainComponent<Props>
 {
   public cancelSubscription = null;
 

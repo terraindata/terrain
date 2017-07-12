@@ -59,7 +59,7 @@ const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = Commo
 const { List, Map } = Immutable;
 const { make } = BlockUtils;
 
-function parseValue(rawValue: any, tqlTranslationFn: TQLTranslationFn, tqlConfig: object): any
+export function parseValue(rawValue: any, tqlTranslationFn: TQLTranslationFn, tqlConfig: object): any
 {
   let value: any;
   if (rawValue._isBlock)

@@ -59,6 +59,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
+import { Colors, backgroundColor, fontColor, borderColor } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -75,7 +76,7 @@ const InputComponent = React.createClass<any, any>({
     input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     canEdit: React.PropTypes.bool.isRequired,
-    // since inputs still are regular classes, instead of PureClasss, we construct keyPaths for Actions on execution
+    // since inputs still are regular classes, instead of TerrainComponent, we construct keyPaths for Actions on execution
     //  rather than caching. This is fine since inputs aren't nested, there would be no
     //  benefit to caching keyPaths anyways.
   },
@@ -220,7 +221,12 @@ const InputComponent = React.createClass<any, any>({
             :
             <div className='input-spacing' />
         }
-        <div className='input-inner'>
+        <div
+          className='input-inner'
+          style={
+            backgroundColor(Colors().builder.inputs.background)
+          }
+        >
           <div className='input-top-row'>
             <BuilderTextbox
               canEdit={this.props.canEdit}

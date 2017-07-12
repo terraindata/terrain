@@ -61,7 +61,7 @@ import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
@@ -110,7 +110,7 @@ export interface Props
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
 }
 
-class BuilderTextbox extends PureClasss<Props>
+class BuilderTextbox extends TerrainComponent<Props>
 {
   public state: {
     wrongType: boolean;
