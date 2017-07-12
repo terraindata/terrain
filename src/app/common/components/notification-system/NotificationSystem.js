@@ -45,13 +45,14 @@ THE SOFTWARE.
 /* Adapted from https://github.com/igorprado/react-notification-system */
 
 var PropTypes = require('prop-types');
+var createReactClass = require('create-react-class');
 var React = require('react');
 var merge = require('object-assign');
 var NotificationContainer = require('./NotificationContainer');
 var Constants = require('./constants');
 var Styles = require('./styles');
 
-var NotificationSystem = React.createClass({
+var NotificationSystem = createReactClass({
   displayName: "NotificationSystem",
 
   uid: 3400,

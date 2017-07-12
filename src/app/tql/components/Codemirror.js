@@ -46,6 +46,7 @@ THE SOFTWARE.
 'use strict';
 
 var PropTypes = require('prop-types');
+var createReactClass = require('create-react-class');
 var React = require('react');
 var className = require('classnames');
 
@@ -54,7 +55,7 @@ const diff_match_patch = require('diff-match-patch');
 require('./merge.js');
 const Dimensions = require('react-dimensions');
 
-var CodeMirror = React.createClass({
+var CodeMirror = createReactClass({
   displayName: 'CodeMirror',
 
   propTypes:

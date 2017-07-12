@@ -50,6 +50,7 @@ import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as classNames from 'classnames';
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
@@ -69,7 +70,7 @@ import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-const Tab = React.createClass<any, any>({
+const Tab = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:

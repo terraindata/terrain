@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-invalid-this
 
 import * as classNames from 'classnames';
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
@@ -115,7 +116,7 @@ const menuIcons = [
 //   }[];
 // }
 
-const BuilderColumn = React.createClass<any, any>(
+const BuilderColumn = createReactClass<any, any>(
   {
     mixins: [PanelMixin],
 

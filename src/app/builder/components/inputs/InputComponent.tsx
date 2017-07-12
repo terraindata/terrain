@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
@@ -68,7 +69,7 @@ const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
 import { Input, InputType } from '../../../../../shared/blocks/types/Input';
 
-const InputComponent = React.createClass<any, any>({
+const InputComponent = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:

@@ -49,6 +49,7 @@ THE SOFTWARE.
 
 import './LayoutManager.less';
 const Dimensions = require('react-dimensions');
+import createReactClass = require('create-react-class');
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 const shallowCompare = require('react-addons-shallow-compare');
@@ -73,7 +74,7 @@ interface Adjustment
   y: number;
 }
 
-const LayoutManager = React.createClass<any, any>({
+const LayoutManager = createReactClass<any, any>({
   propTypes:
   {
     layout: PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
