@@ -57,7 +57,24 @@ export const templates = new ImportTemplates();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all templates');
-  ctx.body = await templates.get();
+  const request: object = ctx.request.body.body;
+  const filter: object = {};
+  if (request !== undefined)
+  {
+    if (request['dbid'] !== undefined)
+    {
+      filter['dbid'] = request['dbid'];
+    }
+    if (request['dbname'] !== undefined)
+    {
+      filter['dbname'] = request['dbname'];
+    }
+    if (request['tablename'] !== undefined)
+    {
+      filter['tablename'] = request['tablename'];
+    }
+  }
+  ctx.body = await templates.select([], filter);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -79,24 +96,5 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 
   ctx.body = await templates.upsert(ctx.state.user, template);
 });
-
-// Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-// {
-//   winston.info('update existing template');
-//   const template: ImportTemplateConfig = ctx.request.body.body;
-//   if (template.id === undefined)
-//   {
-//     template.id = Number(ctx.params.id);
-//   }
-//   else
-//   {
-//     if (template.id !== Number(ctx.params.id))
-//     {
-//       throw Error('Template ID does not match the supplied id in the URL');
-//     }
-//   }
-//
-//   ctx.body = await templates.upsert(ctx.state.user, template);
-// });
 
 export default Router;
