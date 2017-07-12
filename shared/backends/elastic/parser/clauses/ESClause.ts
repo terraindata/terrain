@@ -178,7 +178,7 @@ abstract class ESClause
       colors: [],
       language: 'elastic',
 
-      // anythingAccepts: true, // TODO remove after testing
+      anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach
