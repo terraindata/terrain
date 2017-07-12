@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 /*Adapted from https://github.com/igorprado/react-notification-system*/
 
+var PropTypes = require('prop-types');
 var React = require('react');
 var NotificationItem = require('./NotificationItem');
 var Constants = require('./constants');
@@ -52,9 +53,9 @@ var NotificationContainer = React.createClass({
   displayName: "NotificationContainer",
 
   propTypes: {
-    position: React.PropTypes.string.isRequired,
-    notifications: React.PropTypes.array.isRequired,
-    getStyles: React.PropTypes.object
+    position: PropTypes.string.isRequired,
+    notifications: PropTypes.array.isRequired,
+    getStyles: PropTypes.object
   },
 
   _style: {},

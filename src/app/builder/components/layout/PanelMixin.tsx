@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this
 
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as _ from 'underscore';
 import './panel.less';
@@ -61,23 +62,23 @@ const Panel = {
 
   propTypes:
   {
-    index: React.PropTypes.number,
+    index: PropTypes.number,
 
-    drag_x: React.PropTypes.bool,
-    drag_y: React.PropTypes.bool,
-    drag_xy: React.PropTypes.bool,
-    dragInsideOnly: React.PropTypes.bool,
+    drag_x: PropTypes.bool,
+    drag_y: PropTypes.bool,
+    drag_xy: PropTypes.bool,
+    dragInsideOnly: PropTypes.bool,
 
-    onPanelDrop: React.PropTypes.func,
+    onPanelDrop: PropTypes.func,
 
-    onMouseDown: React.PropTypes.func,
-    mouseDownRef: React.PropTypes.string,
+    onMouseDown: PropTypes.func,
+    mouseDownRef: PropTypes.string,
 
-    fill: React.PropTypes.bool,
-    reorderonPanelDrag: React.PropTypes.bool,
-    neighborDragging: React.PropTypes.bool,
-    handleRef: React.PropTypes.string,
-    dragHandleRef: React.PropTypes.string,
+    fill: PropTypes.bool,
+    reorderonPanelDrag: PropTypes.bool,
+    neighborDragging: PropTypes.bool,
+    handleRef: PropTypes.string,
+    dragHandleRef: PropTypes.string,
   },
 
   getInitialState()

@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
@@ -120,25 +121,25 @@ const BuilderColumn = React.createClass<any, any>(
 
     propTypes:
     {
-      query: React.PropTypes.object.isRequired,
-      resultsState: React.PropTypes.object.isRequired,
-      variant: React.PropTypes.object.isRequired,
-      className: React.PropTypes.string,
-      index: React.PropTypes.number,
-      canAddColumn: React.PropTypes.bool,
-      canCloseColumn: React.PropTypes.bool,
-      onAddColumn: React.PropTypes.func.isRequired,
-      onAddManualColumn: React.PropTypes.func.isRequired,
-      onCloseColumn: React.PropTypes.func.isRequired,
-      colKey: React.PropTypes.number.isRequired,
-      history: React.PropTypes.any,
-      columnType: React.PropTypes.number,
-      selectedCardName: React.PropTypes.string,
-      switchToManualCol: React.PropTypes.func,
-      changeSelectedCardName: React.PropTypes.func,
-      canEdit: React.PropTypes.bool.isRequired,
-      cantEditReason: React.PropTypes.string,
-      onNavigationException: React.PropTypes.func,
+      query: PropTypes.object.isRequired,
+      resultsState: PropTypes.object.isRequired,
+      variant: PropTypes.object.isRequired,
+      className: PropTypes.string,
+      index: PropTypes.number,
+      canAddColumn: PropTypes.bool,
+      canCloseColumn: PropTypes.bool,
+      onAddColumn: PropTypes.func.isRequired,
+      onAddManualColumn: PropTypes.func.isRequired,
+      onCloseColumn: PropTypes.func.isRequired,
+      colKey: PropTypes.number.isRequired,
+      history: PropTypes.any,
+      columnType: PropTypes.number,
+      selectedCardName: PropTypes.string,
+      switchToManualCol: PropTypes.func,
+      changeSelectedCardName: PropTypes.func,
+      canEdit: PropTypes.bool.isRequired,
+      cantEditReason: PropTypes.string,
+      onNavigationException: PropTypes.func,
     },
 
     getInitialState()

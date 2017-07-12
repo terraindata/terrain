@@ -51,6 +51,7 @@ import './Tabs.less';
 const moment = require('moment');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
@@ -73,12 +74,12 @@ const Tab = React.createClass<any, any>({
 
   propTypes:
   {
-    id: React.PropTypes.string.isRequired,
-    name: React.PropTypes.string.isRequired,
-    selected: React.PropTypes.bool.isRequired,
-    index: React.PropTypes.number.isRequired,
-    onClick: React.PropTypes.func.isRequired,
-    onClose: React.PropTypes.func.isRequired,
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    selected: PropTypes.bool.isRequired,
+    index: PropTypes.number.isRequired,
+    onClick: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
   },
 
   getDefaultProps(): any
