@@ -718,8 +718,8 @@ describe('File import route tests', () =>
         accessToken: 'AccessToken',
         body: {
           dbid: 1,
-          db: 'test_elastic_db',
-          table: 'fileImportTestTable',
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
           contents: '[{"pkey":1,"column1":"hello","col2":"goodbye","col3":false,"col4":null}]',
           filetype: 'json',
 
@@ -769,8 +769,8 @@ describe('File import route tests', () =>
         accessToken: 'AccessToken',
         body: {
           dbid: 1,
-          db: 'test_elastic_db',
-          table: 'fileImportTestTable',
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
           contents: 'pkey,column1,column2,sillyname,column4\n1,hi,hello,false,1970-01-01\n2,bye,goodbye,,',
           filetype: 'csv',
 
@@ -823,8 +823,8 @@ describe('File import route tests', () =>
         accessToken: 'AccessToken',
         body: {
           dbid: 1,
-          db: 'test_elastic_db',
-          table: 'fileImportTestTable',
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
           contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           filetype: 'json',
 
