@@ -213,7 +213,6 @@ const BuilderColumn = React.createClass<any, any>(
       {
         case COLUMNS.Builder:
           return <CardsColumn
-            queryType={query.language}
             cards={query.cards}
             deckOpen={query.deckOpen}
             canEdit={canEdit}
@@ -228,6 +227,7 @@ const BuilderColumn = React.createClass<any, any>(
           return <InputsArea
             inputs={query.inputs}
             canEdit={canEdit}
+            language={query.language}
           />;
 
         case COLUMNS.Results:

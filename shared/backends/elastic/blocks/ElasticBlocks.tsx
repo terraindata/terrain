@@ -111,6 +111,17 @@ export const ElasticBlocks = _.extend(
     elasticKeyValueWrap,
     // JSON toggle the type blocks
     elasticValue,
+    
+    elasticInput: _block(
+      {
+        key: '',
+        value: '',
+        inputType: InputType.NUMBER,
+        static: {
+          language: 'elastic',
+          tql: '',
+        },
+      }),
   },
   ElasticElasticCards,
 );

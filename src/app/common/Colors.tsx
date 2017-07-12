@@ -200,6 +200,11 @@ interface Theme
       background: string,
       lines: string,
     },
+    
+    inputs:
+    {
+      background: string,
+    },
   },
 }
 
@@ -361,6 +366,11 @@ const DARK: Theme =
       {
         background: '#151515',
         lines: 'rgba(255,255,255,0.25)',
+      },
+      
+      inputs:
+      {
+        background: '#626262',
       },
     },
   };

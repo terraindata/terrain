@@ -1077,7 +1077,7 @@ export const MySQLBlocks =
         inputType: InputType.NUMBER,
         static: {
           language: 'mysql',
-          tql: 'VAR $key = $value;',
+          tql: '',
         },
       }),
 

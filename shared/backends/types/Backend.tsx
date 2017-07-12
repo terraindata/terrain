@@ -64,6 +64,7 @@ export interface Backend
     [type: string]: BlockConfig,
   };
   creatingType: string; // type of the block that marks where a card is being created
+  inputType: string; // type of the block for inputs
 
   rootCard: BlockConfig;
   // Cards that can go at the top/root level
