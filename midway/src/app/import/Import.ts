@@ -53,9 +53,9 @@ import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import { ImportTemplateConfig } from './ImportTemplates';
+import { ImportTemplateBase } from './ImportTemplates';
 
-export interface ImportConfig extends ImportTemplateConfig
+export interface ImportConfig extends ImportTemplateBase
 {
   dbid: number;       // instance id
   db: string;         // for elastic, index name

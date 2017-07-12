@@ -223,7 +223,6 @@ export class ElasticDB implements TastyDB
     }
 
     const payload: object = table.getMapping();
-    winston.info('putMapping payload: ' + JSON.stringify(payload));
     return new Promise((resolve, reject) =>
     {
       this.client.indices.putMapping(

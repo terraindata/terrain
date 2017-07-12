@@ -87,8 +87,9 @@ const appSchemaSQL: string[] = [
     ip text NOT NULL,
     payload text NOT NULL,
     type text NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS templates
+  `CREATE TABLE IF NOT EXISTS importTemplates
     (id integer PRIMARY KEY,
+     name text NOT NULL,
      csvHeaderMissing bool,
      originalNames text NOT NULL,
      columnTypes text NOT NULL,

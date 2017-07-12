@@ -51,9 +51,8 @@ import * as App from '../App';
 import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
 
-export interface ImportTemplateConfig
+export interface ImportTemplateBase
 {
-  id?: number;
   // if filetype is 'csv', default is to assume the first line contains headers
   // set this to true if this is not the case
   csvHeaderMissing?: boolean;
@@ -65,9 +64,17 @@ export interface ImportTemplateConfig
   primaryKey: string;  // newName of primary key
   transformations: object[];  // list of in-order data transformations
 }
+
+export interface ImportTemplateConfig extends ImportTemplateBase
+{
+  id?: number;
+  name: string;
+}
 interface ImportTemplateConfigStringified
 {
   id?: number;
+  name: string;
+
   csvHeaderMissing?: boolean;
   originalNames: string;
   columnTypes: string;
@@ -85,6 +92,7 @@ export class ImportTemplates
       'importTemplates',
       ['id'],
       [
+        'name',
         'csvHeaderMissing',
         'originalNames',
         'columnTypes',
@@ -114,10 +122,6 @@ export class ImportTemplates
   {
     return new Promise<ImportTemplateConfig>(async (resolve, reject) =>
     {
-      // if (template.csvHeaderMissing === undefined)
-      // {
-      //   template['csvHeaderMissing'] = false;
-      // }
       if (template.id !== undefined)
       {
         const results: ImportTemplateConfig[] = await this.get(template.id);
@@ -140,6 +144,7 @@ export class ImportTemplates
     const stringified: ImportTemplateConfigStringified =
       {
         id: template['id'],
+        name: template['name'],
         csvHeaderMissing: template['csvHeaderMissing'],
         originalNames: JSON.stringify(template['originalNames']),
         columnTypes: JSON.stringify(template['columnTypes']),
@@ -163,6 +168,7 @@ export class ImportTemplates
     const template: ImportTemplateConfig =
       {
         id: stringified['id'],
+        name: stringified['name'],
         csvHeaderMissing: stringified['csvHeaderMissing'],
         originalNames: JSON.parse(stringified['originalNames']),
         columnTypes: JSON.parse(stringified['columnTypes']),
