@@ -162,13 +162,13 @@ function uploadCartography(EventIdLst, resp, callback)
             {
               return getEventValue(respArr, dependency);
             });
-            resp["payload"] =
+            Object.assign(resp["payload"],
             {
               "numClicks": numClicks,
               "loadTime": getCurrentTimeOnPage(),
               "date": getCurrentTime(),
               "dependencies": respDepValues,
-            };
+            });
             resp["value"] = document.getElementById(resp["eventId"]).value.toString();
             resp["url"] = route;
             const xhttpUpdate = new XMLHttpRequest();
