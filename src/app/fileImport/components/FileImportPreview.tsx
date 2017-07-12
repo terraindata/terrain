@@ -54,6 +54,7 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 import Actions from './../data/FileImportActions';
+import Dropdown from './../../common/components/Dropdown';
 
 import './FileImportPreview.less';
 const { List } = Immutable;
@@ -69,6 +70,7 @@ export interface Props
   columnNames: List<string>;
   columnTypes: List<object>;
   columnOptions: List<string>;
+  templates: List<any>;
 }
 
 class FileImportPreview extends TerrainComponent<Props>
@@ -76,10 +78,17 @@ class FileImportPreview extends TerrainComponent<Props>
   public state: {
     oldName: string,
     newName: string,
+    templateId: number,
   } = {
     oldName: '',
     newName: '',
+    templateId: -1,
   };
+
+  public componentDidMount()
+  {
+    Actions.getTemplates();
+  }
 
   /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
    * when changing transform columns or types */
@@ -130,13 +139,20 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.uploadFile();
   }
 
-  // TODO: implement Templates
+  public handleTemplateChange(templateId: number)
+  {
+    this.setState({
+      templateId,
+    });
+  }
   public handleLoadTemplate()
   {
   }
 
   public handleSaveTemplate()
   {
+    Actions.saveTemplate();
+    Actions.getTemplates();
   }
 
   public render()
@@ -149,6 +165,12 @@ class FileImportPreview extends TerrainComponent<Props>
         <button onClick={this.handleSaveTemplate}>
           Save as Template
         </button>
+        <Dropdown
+          selectedIndex={this.state.templateId}
+          options={List(this.props.templates.map((template, i) => template.name))}
+          onChange={this.handleTemplateChange}
+          canEdit={true}
+        />
         <table>
           <thead>
             <tr>

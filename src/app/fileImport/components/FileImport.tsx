@@ -100,7 +100,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
-      primaryKey, oldNames } = fileImportState;
+      primaryKey, oldNames, templates } = fileImportState;
 
     return (
       <div className="file-import">
@@ -143,6 +143,7 @@ class FileImport extends TerrainComponent<any>
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
             oldNames={oldNames}
+            templates={templates}
             columnOptions={
               this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?
                 List(this.state.tables.get(serverText + '/' + dbText + '.' + tableText).columnIds.map((value, index) =>

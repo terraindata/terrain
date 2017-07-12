@@ -694,7 +694,7 @@ export const Ajax =
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
-    ): { xhr: XMLHttpRequest, queryId: string }
+    )
     {
       const payload: object = {
         dbid: connectionId,
@@ -708,12 +708,12 @@ export const Ajax =
         csvHeaderMissing: !hasCsvHeader,
         transformations,
       };
-      console.log('payload: ', payload);
+      console.log('import payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
       };
-      const xhr = Ajax.req(
+      Ajax.req(
         'post',
         'import/',
         payload,
@@ -724,6 +724,69 @@ export const Ajax =
       );
 
       return;
+    },
+
+    saveTemplate(dbname: string,
+      tablename: string,
+      connectionId: number,
+      oldNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKey: string,
+      transformations: List<object>,
+      name: string,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+      hasCsvHeader?: boolean,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+        originalNames: oldNames,
+        columnTypes,
+        primaryKey,
+        csvHeaderMissing: !hasCsvHeader,
+        transformations,
+        name,
+      };
+      console.log('saveTemplate payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
+    getTemplates(dbname: string,
+      tablename: string,
+      connectionId: number,
+      onLoad: (templates: object[]) => void
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+      };
+      Ajax.req(
+        'get',
+        'templates/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)

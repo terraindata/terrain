@@ -71,6 +71,7 @@ class FileImportStateC extends BaseClass
   public columnTypes: List<object> = null;
 
   public transforms: Immutable.List<object> = List([]);
+  public templates: Immutable.List<object> = List([]);
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.

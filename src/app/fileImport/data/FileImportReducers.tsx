@@ -294,4 +294,52 @@ FileImportReducers[ActionTypes.uploadFile] =
     return state;
   };
 
+FileImportReducers[ActionTypes.saveTemplate] =
+  (state, action) =>
+  {
+    Ajax.saveTemplate(state.dbText,
+      state.tableText,
+      state.connectionId,
+      state.oldNames,
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))]
+      )),
+      state.columnNames.get(state.primaryKey),
+      state.transforms,
+      action.payload.name,
+      () =>
+      {
+        alert('successfully saved template');
+      },
+      (err: string) =>
+      {
+        alert('Error saving template: ' + JSON.parse(err).errors[0].detail);
+      },
+      state.hasCsvHeader,
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.getTemplates] =
+  (state, action) =>
+  {
+    Ajax.getTemplates(
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+
+      (templatesArr) =>
+      {
+        const templates: Immutable.List<object> = Immutable.List<object>(templatesArr);
+        action.payload.setTemplates(templates);
+      }
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setTemplates] =
+  (state, action) =>
+    state.set('templates', action.payload.templates)
+  ;
+
 export default FileImportReducers;
