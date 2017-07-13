@@ -57,7 +57,7 @@ import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultFields, getResultName, getResultValue } from './Result';
-import { MAX_RESULTS, Results } from './ResultsManager';
+import { MAX_RESULTS, Results } from './ResultTypes';
 
 export interface Props
 {
