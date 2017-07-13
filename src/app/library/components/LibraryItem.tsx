@@ -263,7 +263,8 @@ class LibraryItem extends TerrainComponent<Props>
             )
         );
 
-    let shiftedUp: boolean, shiftedDown: boolean;
+    let shiftedUp: boolean;
+    let shiftedDown: boolean;
 
     if (this.props.draggingOverIndex !== -1)
     {

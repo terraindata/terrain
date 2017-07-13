@@ -119,7 +119,9 @@ class CardDragPreview extends TerrainComponent<CDPProps>
   public render()
   {
     const item = this.props.cardItem;
-    let colors: string[], title: string, preview: string;
+    let colors: string[];
+    let title: string;
+    let preview: string;
 
     const Blocks = AllBackendsMap[this.state.language].blocks;
 

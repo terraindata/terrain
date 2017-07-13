@@ -114,7 +114,9 @@ class SchemaResults extends TerrainComponent<Props>
                 this.props.databases
                 && this.props.databases.get(selectedItem['databaseId']);
             console.log('schema resultsDb', resultsDb);
-            let field: string, table: string, where: string;
+            let field: string;
+            let table: string;
+            let where: string;
 
             switch (selectedItem.type)
             {

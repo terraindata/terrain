@@ -958,7 +958,8 @@ const TransformChart = {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     }).sort((a, b) => a - b);
     const index = pointValues.indexOf(scales.realX.invert(cx));
-    let min: number, max: number;
+    let min: number;
+    let max: number;
 
     if (index < 0)
     {

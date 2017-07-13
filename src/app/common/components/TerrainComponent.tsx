@@ -220,7 +220,8 @@ class TerrainComponent<T> extends React.Component<T, any>
     }
 
     let stateKey = config.stateKey;
-    let keyPath: KeyPath | ID[], value: any;
+    let keyPath: KeyPath | ID[];
+    let value: any;
 
     if (config.storeKeyPath)
     {

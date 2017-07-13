@@ -68,7 +68,10 @@ class Account extends TerrainComponent<Props>
     let title = 'Account';
     let selected = '298px';
     const linkWidth = -144;
-    let profileActive: boolean, notificationsActive: boolean, teamActive: boolean, settingsActive: boolean;
+    let profileActive: boolean;
+    let notificationsActive: boolean;
+    let teamActive: boolean;
+    let settingsActive: boolean;
 
     switch (this.props.location.pathname)
     {

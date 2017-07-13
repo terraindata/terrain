@@ -213,7 +213,8 @@ class Notifications extends TerrainComponent<Props>
 
   public renderDesktopNotificationsContent()
   {
-    let desktopNotification: any, sound: any;
+    let desktopNotification: any;
+    let sound: any;
 
     if (this.state.istate.currentUser)
     {
@@ -287,7 +288,8 @@ class Notifications extends TerrainComponent<Props>
 
   public renderEmailNotificationsContent()
   {
-    let emailNotification: any, emailTiming: any;
+    let emailNotification: any;
+    let emailTiming: any;
 
     if (this.state.istate.currentUser)
     {

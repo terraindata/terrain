@@ -251,7 +251,8 @@ class VariantsColumn extends TerrainComponent<Props>
     const variant = this.props.variants.get(id);
     const index = this.props.variantsOrder.indexOf(id);
     const { me, roles } = this.state;
-    let canEdit: boolean, canDrag: boolean;
+    let canEdit: boolean;
+    let canDrag: boolean;
     canEdit = true;
     canDrag = true;
 

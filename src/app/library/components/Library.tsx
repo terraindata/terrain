@@ -125,8 +125,11 @@ class Library extends TerrainComponent<any>
     const algorithmId = +params.algorithmId;
     const variantId = +params.variantId;
 
-    let group: LibraryTypes.Group, algorithm: LibraryTypes.Algorithm, variant: LibraryTypes.Variant;
-    let algorithmsOrder: List<ID>, variantsOrder: List<ID>;
+    let group: LibraryTypes.Group;
+    let algorithm: LibraryTypes.Algorithm;
+    let variant: LibraryTypes.Variant;
+    let algorithmsOrder: List<ID>;
+    let variantsOrder: List<ID>;
 
     if (groupId)
     {

@@ -179,7 +179,8 @@ class TransformCardChart extends TerrainComponent<Props>
     const valueDiff = this.state.initialValue - newValue;
     pointValues.sort(this.sortNumber);
     const pointIndex = this.props.points.findIndex((scorePoint) => scorePoint.id === pointId);
-    let min: number, max: number;
+    let min: number;
+    let max: number;
 
     const points = this.state.initialPoints.map((scorePoint) =>
     {

@@ -92,7 +92,8 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
     }
 
     const isWrapping = cardWillWrap(targetProps, type);
-    let wrappingCardData: any, wrappingKeyPath: KeyPath;
+    let wrappingCardData: any;
+    let wrappingKeyPath: KeyPath;
 
     if (isWrapping)
     {
@@ -102,7 +103,8 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
       Actions.remove(targetProps.keyPath, targetIndex);
     }
 
-    let cardProps: any, indexOffset: number;
+    let cardProps: any;
+    let indexOffset: number;
 
     if (item['new'])
     {
