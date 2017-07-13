@@ -96,7 +96,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 {
   if (!valueInfo)
   {
-    return BlockUtils.make(Blocks['eqlnull']);
+    return BlockUtils.make(Blocks, 'eqlnull');
   }
 
   const valueMap: { value?: any, cards?: List<Card> } = {};
@@ -131,7 +131,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     ));
   }
 
-  return BlockUtils.make(Blocks[clauseCardType], valueMap);
+  return BlockUtils.make(Blocks, clauseCardType, valueMap);
 };
 
 const isScoreCard = (obj: object): boolean =>
@@ -150,7 +150,7 @@ const parseObjectWrap = (obj: object): Cards =>
     (value: any, key: string) =>
     {
       return make(
-        Blocks.elasticKeyValueWrap,
+        Blocks, 'elasticKeyValueWrap',
         {
           key,
           cards: List([
@@ -170,18 +170,18 @@ const parseElasticWeightBlock = (obj: object): Block =>
   for (let i = 0; i < obj['ranges'].length; ++i)
   {
     scorePoints.push(
-      make(Blocks.scorePoint, {
+      make(Blocks, 'scorePoint', {
         value: obj['ranges'][i],
         score: obj['outputs'][i],
       }));
   }
 
-  const card = make(Blocks.elasticTransform, {
+  const card = make(Blocks, 'elasticTransform', {
     input: obj['numerators'][0][0],
     scorePoints: List(scorePoints),
   });
 
-  return make(Blocks.elasticWeight, {
+  return make(Blocks, 'elasticWeight', {
     key: card,
     weight: obj['weight'],
   });
@@ -197,26 +197,26 @@ const parseValueSingleCard = (value: any): Card =>
   switch (typeof value)
   {
     case 'string':
-      return make(Blocks.elasticText, {
+      return make(Blocks, 'elasticText', {
         value,
       });
     case 'number':
-      return make(Blocks.elasticNumber, {
+      return make(Blocks, 'elasticNumber', {
         value,
       });
     case 'boolean':
-      return make(Blocks.elasticBool, {
+      return make(Blocks, 'elasticBool', {
         value: value ? 1 : 0,
       });
     case 'object':
       if (value === null)
       {
-        return make(Blocks.elasticNull);
+        return make(Blocks, 'elasticNull');
       }
       else if (Array.isArray(value))
       {
         return make(
-          Blocks.elasticArray,
+          Blocks, 'elasticArray',
           {
             cards: parseArrayWrap(value),
           },
@@ -226,7 +226,7 @@ const parseValueSingleCard = (value: any): Card =>
       {
         // value is an object
         return make(
-          Blocks.elasticObject,
+          Blocks, 'elasticObject',
           {
             cards: parseObjectWrap(value),
           },
@@ -255,14 +255,14 @@ const parseMagicArray = (arr: any[]): Card =>
         value = CommonElastic.parseESValue(value);
       }
 
-      return make(Blocks.elasticMagicListItem, {
+      return make(Blocks, 'elasticMagicListItem', {
         value,
       });
     },
   );
 
   return make(
-    Blocks.elasticMagicList,
+    Blocks, 'elasticMagicList',
     {
       values: List(values),
     },
@@ -274,7 +274,7 @@ const parseMagicObject = (obj: object): Cards =>
   if (obj === {} || obj === null)
   {
     return List([
-      make(Blocks.elasticMagicValue, {
+      make(Blocks, 'elasticMagicValue', {
         value: obj,
       }),
     ],
@@ -285,7 +285,7 @@ const parseMagicObject = (obj: object): Cards =>
   {
     return List([
       make(
-        Blocks.elasticScore,
+        Blocks, 'elasticScore',
         {
           weights: List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
         }),
@@ -312,7 +312,7 @@ const parseMagicObject = (obj: object): Cards =>
         value = CommonElastic.parseESValue(value);
       }
 
-      return make(Blocks.elasticMagicValue, {
+      return make(Blocks, 'elasticMagicValue', {
         key,
         value,
       });
@@ -320,7 +320,7 @@ const parseMagicObject = (obj: object): Cards =>
   );
 
   const magicCard = make(
-    Blocks.elasticMagicCard,
+    Blocks, 'elasticMagicCard',
     {
       values: List(values),
     },

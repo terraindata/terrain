@@ -209,7 +209,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         {
           const item = action.payload.data ? action.payload.data :
             BlockUtils.make(
-              AllBackendsMap[state.query.language].blocks[action.payload.factoryType],
+              AllBackendsMap[state.query.language].blocks, action.payload.factoryType,
             );
 
           if (action.payload.index === null)

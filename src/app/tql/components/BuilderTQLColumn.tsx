@@ -55,7 +55,7 @@ const { List } = Immutable;
 import * as _ from 'underscore';
 import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
 import Query from '../../../../shared/items/types/Query';
-import { ResultsState } from '../../builder/components/results/ResultsManager';
+import { ResultsState } from '../../builder/components/results/ResultTypes';
 import { MenuOption } from '../../common/components/Menu';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import ElasticHighlighter from '../highlighters/ElasticHighlighter';

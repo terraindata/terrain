@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { ResultsState } from '../../builder/components/results/ResultsManager';
+import { ResultsState } from '../../builder/components/results/ResultTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TQLResultsBar.less';
 export interface Props

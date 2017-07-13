@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:forin no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression
+// tslint:disable:forin no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression no-console
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
@@ -132,16 +132,25 @@ export function transformAlias(transformCard: Card): string
 }
 
 // This creates a new instance of a card / block
-// Usage: BlockUtils.make(MySQLBlocks.sort)
-export const make = (block: BlockConfig, extraConfig?: { [key: string]: any }) =>
+// Usage: BlockUtils.make(MySQLBlocks, 'sort')
+export const make = (blocksConfig: { [type: string]: BlockConfig },
+  blockType: string, extraConfig?: { [key: string]: any }) =>
 {
+  let block = blocksConfig[blockType];
+
+  if (!block)
+  {
+    console.log(blocksConfig, blockType, extraConfig);
+    throw new Error('Unable to find block type ' + blockType);
+  }
+
   const { type } = block;
 
   block = _.extend({}, block); // shallow clone
 
   if (block.static.init)
   {
-    block = _.extend({}, block, block.static.init());
+    block = _.extend({}, block, block.static.init(blocksConfig));
   }
 
   if (extraConfig)
@@ -167,7 +176,7 @@ export const make = (block: BlockConfig, extraConfig?: { [key: string]: any }) =
 const blockTypeToBlockRecord: any = {};
 
 // Given a plain JS object, construct the Record for it and its children
-export const recordFromJS = (value: any, Blocks) =>
+export const recordFromJS = (value: any, Blocks: { [type: string]: BlockConfig }) =>
 {
   if (value && value.static && Immutable.Iterable.isIterable(value))
   {
@@ -194,7 +203,7 @@ export const recordFromJS = (value: any, Blocks) =>
     const type = value.type || (typeof value.get === 'function' && value.get('type'));
     if (type && Blocks[type])
     {
-      value = make(Blocks[type], value);
+      value = make(Blocks, type, value);
     }
     else
     {

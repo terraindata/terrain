@@ -137,7 +137,7 @@ const _mathCard = (config: {
 
       init: () => ({
         fields: List([
-          make(MySQLBlocks.field, { field: '' }),
+          make(MySQLBlocks, 'field', { field: '' }),
         ]),
       }),
 
@@ -245,10 +245,10 @@ export const MySQLBlocks =
 
           init: () => ({
             fields: List([
-              make(MySQLBlocks.field, { field: '*' }),
+              make(MySQLBlocks, 'field', { field: '*' }),
             ]),
             cards: List([
-              make(MySQLBlocks.from),
+              make(MySQLBlocks, 'from'),
             ]),
           }),
 
@@ -326,7 +326,7 @@ export const MySQLBlocks =
         tql: 'FROM\n$tables',
 
         init: () => ({
-          tables: List([make(MySQLBlocks.table)]),
+          tables: List([make(MySQLBlocks, 'table')]),
         }),
 
         getParentTerms:
@@ -562,7 +562,7 @@ export const MySQLBlocks =
           {
             return {
               sorts: List([
-                make(MySQLBlocks.sortBlock),
+                make(MySQLBlocks, 'sortBlock'),
               ]),
             };
           },
@@ -805,7 +805,7 @@ export const MySQLBlocks =
           tql: 'linear_score($weights)',
           init: () => ({
             weights: List([
-              make(MySQLBlocks.weight),
+              make(MySQLBlocks, 'weight'),
             ]),
           }),
           display:
@@ -928,17 +928,17 @@ export const MySQLBlocks =
             {
               scorePoints:
               List([
-                make(MySQLBlocks.scorePoint, {
+                make(MySQLBlocks, 'scorePoint', {
                   id: 'a',
                   value: 0,
                   score: 0.0,
                 }),
-                make(MySQLBlocks.scorePoint, {
+                make(MySQLBlocks, 'scorePoint', {
                   id: 'b',
                   value: 50,
                   score: 0.5,
                 }),
-                make(MySQLBlocks.scorePoint, {
+                make(MySQLBlocks, 'scorePoint', {
                   id: 'c',
                   value: 100,
                   score: 1.0,
@@ -984,7 +984,7 @@ export const MySQLBlocks =
           tql: 'GROUP BY\n$fields',
 
           init: () => ({
-            fields: List([make(MySQLBlocks.field)]),
+            fields: List([make(MySQLBlocks, 'field')]),
           }),
 
           display:

@@ -373,7 +373,14 @@ const Util = {
 
   rel(target): string
   {
-    return Util.attr(target, 'rel');
+    const rel = Util.attr(target, 'rel');
+
+    if (rel === undefined || rel === null)
+    {
+      return Util.attr(target, 'data-rel');
+    }
+
+    return rel;
   },
 
   attr(target, key: string): string

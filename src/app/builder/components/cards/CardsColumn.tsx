@@ -127,14 +127,18 @@ class CardsColumn extends TerrainComponent<Props>
     return AllBackendsMap[this.props.language].topLevelCards;
   }
 
-  public getFirstCard()
+  public getFirstCards(): object[]
   {
-    return AllBackendsMap[this.props.language].rootCard;
+    return AllBackendsMap[this.props.language].rootCards;
   }
 
-  public createCard()
+  public createCards()
   {
-    Actions.create(this.state.keyPath, 0, this.getFirstCard().type);
+    _.map(this.getFirstCards(),
+      (blockConfig: object, index: number) =>
+      {
+        Actions.create(this.state.keyPath, index, blockConfig['type']);
+      });
   }
 
   public toggleLearningMode()
@@ -247,8 +251,8 @@ class CardsColumn extends TerrainComponent<Props>
               !cards.size ? /* "Create your first card." */
                 <InfoArea
                   large={"There aren't any cards in this query."}
-                  button={canEdit && 'Create a ' + this.getFirstCard().static.title + ' Card'}
-                  onClick={this.createCard}
+                  button={canEdit && 'Create a starter set of cards'}
+                  onClick={this.createCards}
                   inline={false}
                 />
                 : null
