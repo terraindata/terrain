@@ -106,6 +106,14 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
+    const { multiselect, params } = this.props;
+
+    if (multiselect && params && params.variantId)
+    {
+      const variantIds = params.variantId.split(',');
+      variantIds.forEach((id) => Actions.variants.select(id));
+    }
+
     this._subscribe(UserStore, {
       stateKey: 'me',
       storeKeyPath: ['currentUser'],
@@ -137,6 +145,16 @@ class VariantsColumn extends TerrainComponent<Props>
       this.setState({
         rendered: false,
       });
+    }
+
+    const { multiselect, selectedVariants } = this.props;
+    const { params } = nextProps;
+    const { groupId, algorithmId } = params;
+    const nextSelectedVariants = nextProps.selectedVariants;
+    if (multiselect && !selectedVariants.equals(nextSelectedVariants))
+    {
+      browserHistory
+        .replace(`/library/${groupId}/${algorithmId}/${nextSelectedVariants.join(',')}`);
     }
   }
 
