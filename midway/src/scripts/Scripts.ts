@@ -44,60 +44,80 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as path from 'path';
 import * as winston from 'winston';
-import QueryHandler from '../app/query/QueryHandler';
+
+import DatabaseController from '../database/DatabaseController';
+import ElasticClient from '../database/elastic/client/ElasticClient';
 import * as Tasty from '../tasty/Tasty';
+import { makePromiseCallback } from '../tasty/Utils';
+import * as Util from './Utils';
 
-/**
- * An client which acts as a selective isomorphic wrapper around
- * the sqlite3 API
- */
-abstract class DatabaseController
+export interface ScriptConfig
 {
-  private id: number; // unique id
-  private lsn: number; // log sequence number
-  private type: string; // connection type
-  private name: string; // connection name
-  private header: string; // log entry header
-
-  constructor(type: string, id: number, name: string)
-  {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-  }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
-  {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.info(header);
-    if (info !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
-  }
-
-  public getType(): string
-  {
-    return this.type;
-  }
-
-  public getName(): string
-  {
-    return this.name;
-  }
-
-  public abstract getClient(): object;
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
+  id: string;
+  lang: string;
+  body: string;
 }
 
-export default DatabaseController;
+export async function findScripts(dir: string): Promise<ScriptConfig[]>
+{
+  return new Promise<ScriptConfig[]>(async (resolve, reject) =>
+  {
+    const scripts: ScriptConfig[] = [];
+    for (const file of await Util.readDirAsync(dir))
+    {
+      const lang = path.extname(file).substr(1);
+      if (lang === 'painless')
+      {
+        const id = path.basename(file, '.' + lang);
+        const body = await Util.readFileAsync(path.resolve(dir, file), 'utf8');
+        scripts.push({ id, lang, body });
+      }
+      else
+      {
+        winston.warn('Ignoring script file with unsupported extension: \"' + file + '\"');
+      }
+    }
+    resolve(scripts);
+  });
+}
+
+export async function provisionScripts(controller: DatabaseController)
+{
+  if (controller.getType() === 'ElasticController')
+  {
+    const client: ElasticClient = controller.getClient() as ElasticClient;
+    const scripts: ScriptConfig[] = await findScripts(__dirname);
+    for (const script of scripts)
+    {
+      try {
+        await new Promise(
+          (resolve, reject) =>
+          {
+            client.putScript(
+              {
+                id: script.id,
+                lang: script.lang,
+                body: {
+                  script: script.body,
+                },
+              },
+              makePromiseCallback(resolve, reject));
+          });
+        winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());
+      }
+      catch (e)
+      {
+        winston.warn('Failed to provision script ' + script.id + ' to database '
+                      + controller.getName() + ': ' + JSON.stringify(e.response));
+      }
+    }
+  }
+  else
+  {
+    winston.warn('Script provisioning not implemented for database type: ' + controller.getType());
+  }
+}
+
+export default provisionScripts;
