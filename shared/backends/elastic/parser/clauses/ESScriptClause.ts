@@ -44,26 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-enum ESClauseType
-{
-  ESAnyClause,
-  ESArrayClause,
-  ESBaseClause,
-  ESBooleanClause,
-  ESEnumClause,
-  ESFieldClause,
-  ESIndexClause,
-  ESMapClause,
-  ESNullClause,
-  ESNumberClause,
-  ESObjectClause,
-  ESPropertyClause,
-  ESReferenceClause,
-  ESStringClause,
-  ESStructureClause,
-  ESTypeClause,
-  ESVariantClause,
-  ESScriptClause,
-}
+// tslint:disable:strict-boolean-expressions restrict-plus-operands member-ordering no-console
 
-export default ESClauseType;
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
+import ESStructureClause from './ESStructureClause';
+
+/**
+ * A clause that calls a script and returns the result for each hit
+ */
+export default class ESScriptClause extends ESStructureClause
+{
+  public constructor(type: string,
+    structure: { [name: string]: string },
+    required: string[],
+    settings: any)
+  {
+    super(type, structure, required, settings, ESClauseType.ESScriptClause);
+  }
+
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    super.mark(interpreter, valueInfo);
+  }
+
+  /**
+   * Get the name of the stored script referenced by this clause.
+   * If the script clause does not reference a stored script,
+   * this returns null.
+   */
+  public getScriptName(valueInfo: ESValueInfo): string | null
+  {
+    if (valueInfo.jsonType !== ESJSONType.object)
+    {
+      return null;
+    }
+
+    const name = valueInfo.value['stored'];
+    if (typeof name !== 'string')
+    {
+      return null;
+    }
+
+    return name;
+  }
+}

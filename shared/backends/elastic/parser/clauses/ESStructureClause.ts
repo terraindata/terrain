@@ -72,9 +72,10 @@ export default class ESStructureClause extends ESClause
   public structure: { [name: string]: string };
   public required: any[];
 
-  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any)
+  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any,
+    clauseType: ESClauseType = ESClauseType.ESStructureClause)
   {
-    super(type, settings, ESClauseType.ESStructureClause);
+    super(type, settings, clauseType);
     this.structure = structure;
     this.required = required;
   }
