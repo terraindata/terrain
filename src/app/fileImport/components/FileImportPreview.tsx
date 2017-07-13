@@ -168,6 +168,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
+    console.log("templates: ", this.props.templates);
     return (
       <div>
         <button onClick={this.handleLoadTemplate}>
@@ -176,12 +177,6 @@ class FileImportPreview extends TerrainComponent<Props>
         <button onClick={this.handleSaveTemplate}>
           Save as Template
         </button>
-        <Dropdown
-          selectedIndex={this.state.templateId}
-          options={List(this.props.templates.map((template, i) => template.name))}
-          onChange={this.handleTemplateChange}
-          canEdit={true}
-        />
         <Autocomplete
           value={this.state.templateText}
           options={null}
@@ -224,6 +219,12 @@ class FileImportPreview extends TerrainComponent<Props>
         <button onClick={this.handleUploadFile}>
           Import
         </button>
+        <Dropdown
+          selectedIndex={this.state.templateId}
+          options={List(this.props.templates.map((template, i) => template.name))}
+          onChange={this.handleTemplateChange}
+          canEdit={true}
+        />
       </div>
     );
   }

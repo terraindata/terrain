@@ -324,12 +324,13 @@ FileImportReducers[ActionTypes.getTemplates] =
   (state, action) =>
   {
     Ajax.getTemplates(
+      state.connectionId,
       state.dbText,
       state.tableText,
-      state.connectionId,
 
       (templatesArr) =>
       {
+        console.log('templatesArr: ', templatesArr);
         const templates: Immutable.List<object> = Immutable.List<object>(templatesArr);
         action.payload.setTemplates(templates);
       }

@@ -767,9 +767,11 @@ export const Ajax =
       return;
     },
 
-    getTemplates(dbname: string,
-      tablename: string,
+    getTemplates(
       connectionId: number,
+      dbname: string,
+      tablename: string,
+
       onLoad: (templates: object[]) => void
     )
     {
@@ -778,6 +780,7 @@ export const Ajax =
         dbname,
         tablename,
       };
+      console.log('getTemplates payload: ', payload);
       Ajax.req(
         'get',
         'templates/',

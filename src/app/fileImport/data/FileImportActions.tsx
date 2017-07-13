@@ -109,7 +109,7 @@ const FileImportActions =
 
     getTemplates:
     () =>
-      $(ActionTypes.getTemplates, {}),
+      $(ActionTypes.getTemplates, { setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
     (templates: List<object>) =>
