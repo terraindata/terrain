@@ -42,6 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:max-classes-per-file
+
 import { List, Map } from 'immutable';
 import { BaseClass, New } from '../../../Classes';
 
@@ -60,7 +64,7 @@ class ResultClass extends BaseClass
   public transformFields: IMMap<string, string> = Map<string, string>({});
 }
 export type Result = ResultClass & IRecord<ResultClass>;
-export const _Result = (config: Object = {}) =>
+export const _Result = (config: object = {}) =>
   New<Result>(new ResultClass(config), config, true); // generates unique IDs
 
 export type Results = List<Result>;
@@ -92,5 +96,5 @@ class ResultsStateC extends BaseClass
   public hasLoadedTransform: boolean = false;
 }
 export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
-export let _ResultsState = (config: Object = {}) =>
+export let _ResultsState = (config: object = {}) =>
   New<ResultsState>(new ResultsStateC(config), config);

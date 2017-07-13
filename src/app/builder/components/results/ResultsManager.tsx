@@ -64,7 +64,7 @@ import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/Spot
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
-import { ResultsState, Result, Results, MAX_RESULTS, _ResultsState, _Result } from './ResultTypes';
+import { _Result, _ResultsState, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
 
 export interface Props
 {

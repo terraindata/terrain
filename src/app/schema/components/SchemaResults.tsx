@@ -60,9 +60,9 @@ import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
 import { _Query, Query } from '../../../../shared/items/types/Query';
-import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
+import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
 
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
