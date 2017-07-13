@@ -68,7 +68,7 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all templates');
+  winston.info('getting filtered templates');
   const request: object = ctx.request.body.body;
   const filter: object = {};
   if (request !== undefined)

@@ -850,3 +850,127 @@ describe('File import route tests', () =>
       });
   });
 });
+
+describe('File import templates route tests', () =>
+{
+  test('Create template: POST /midway/v1/templates/create', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/templates/create')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          name: 'my_template',
+
+          dbid: 1,
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
+
+          originalNames: ['pkey', 'column1', 'column2'],
+          columnTypes:
+          {
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column2: { type: 'text' },
+          },
+          primaryKey: 'pkey',
+          transformations: [],
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            id: 1,
+            name: 'my_template',
+
+            dbid: 1,
+            dbname: 'test_elastic_db',
+            tablename: 'fileImportTestTable',
+
+            originalNames: ['pkey', 'column1', 'column2'],
+            columnTypes:
+            {
+              pkey: { type: 'long' },
+              column1: { type: 'text' },
+              column2: { type: 'text' },
+            },
+            primaryKey: 'pkey',
+            transformations: [],
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/templates/create request returned an error: ' + String(error));
+      });
+  });
+
+  test('Get all templates: GET /midway/v1/templates/', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/templates/')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0]).toMatchObject({
+          id: 1,
+          name: 'my_template',
+
+          dbid: 1,
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
+
+          originalNames: ['pkey', 'column1', 'column2'],
+          columnTypes:
+          {
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column2: { type: 'text' },
+          },
+          primaryKey: 'pkey',
+          transformations: [],
+        });
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/templates/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Get filtered templates: POST /midway/v1/templates/', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/templates/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          // dbid: 1,
+          dbname: 'badname',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toEqual(0);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/templates/ request returned an error: ' + String(error));
+      });
+  });
+});
