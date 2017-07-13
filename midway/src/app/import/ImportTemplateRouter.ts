@@ -57,6 +57,18 @@ export const templates = new ImportTemplates();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all templates');
+  ctx.body = await templates.get();
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting template ID ' + String(ctx.params.id));
+  ctx.body = await templates.get(Number(ctx.params.id));
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all templates');
   const request: object = ctx.request.body.body;
   const filter: object = {};
   if (request !== undefined)
@@ -77,13 +89,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   ctx.body = await templates.select([], filter);
 });
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting template ID ' + String(ctx.params.id));
-  ctx.body = await templates.get(Number(ctx.params.id));
-});
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('add new template');
   const template: ImportTemplateConfig = ctx.request.body.body;

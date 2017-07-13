@@ -757,7 +757,7 @@ export const Ajax =
       };
       Ajax.req(
         'post',
-        'templates/',
+        'templates/create',
         payload,
         onLoadHandler,
         {
@@ -782,7 +782,7 @@ export const Ajax =
       };
       console.log('getTemplates payload: ', payload);
       Ajax.req(
-        'get',
+        'post',
         'templates/',
         payload,
         (response: object[]) =>
