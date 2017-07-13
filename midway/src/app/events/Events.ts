@@ -56,13 +56,16 @@ import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { ItemConfig, Items } from '../items/Items';
 import * as Util from '../Util';
+
+const items: Items = new Items();
 
 const timeInterval: number = 5; // minutes before refreshing
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
 const timeSalt: string = srs({ length: 256 }); // time salt
 
-interface EventTemplateConfig
+export interface EventTemplateConfig
 {
   eventId: string;
   id?: number;
@@ -155,11 +158,11 @@ export class Events
    * Prep an empty payload with the encoded message
    *
    */
-  public async encodeMessage(eventReq: EventTemplateConfig): Promise<EventTemplateConfig>
+  public async encodeMessage(eventReq: EventConfig): Promise<EventConfig>
   {
-    return new Promise<EventTemplateConfig>(async (resolve, reject) =>
+    return new Promise<EventConfig>(async (resolve, reject) =>
     {
-      eventReq.payload = JSON.parse(await this.getPayload(Number(eventReq.eventId)));
+      eventReq.payload = JSON.parse(await this.getPayload(eventReq.eventId));
       const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.eventId);
       eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
@@ -211,6 +214,50 @@ export class Events
   }
 
   /*
+  * Return a list of HTML IDs and relevant info for event tracking purposes
+  *
+  */
+  public async getHTMLIDs(): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      const itemLst: ItemConfig[] = await items.get();
+      const returnLst: object[] = [];
+      itemLst.forEach((item) =>
+      {
+        if (item.status !== 'ARCHIVE' && item.meta !== undefined)
+        {
+          const meta = JSON.parse(item.meta);
+          const returnEvent: object =
+          {
+            dependencies: item.parent === 0 ? [] : ['item' + item.parent],
+            eventId: 'item' + item.id,
+            name: item.name,
+            type: '',
+          };
+          // for now, only use items that are ES
+          if (meta.algorithmsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['type'] = 'group';
+            returnLst.push(returnEvent);
+          }
+          if (meta.variantsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['type'] = 'algorithm';
+            returnLst.push(returnEvent);
+          }
+          if (meta.query !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['type'] = 'variant';
+            returnLst.push(returnEvent);
+          }
+        }
+      });
+      resolve(returnLst);
+    });
+  }
+
+  /*
    * Get payload from datastore given the eventId
    *
    */
@@ -258,16 +305,17 @@ export class Events
       const encodedEventArr: EventTemplateConfig[] = [];
       for (const jsonObj of JSONArr)
       {
-        if (jsonObj['eventId'] === undefined || !(await this.payloadExists(Number(jsonObj['eventId']))))
+        if (jsonObj['eventId'] === undefined || !(await this.payloadExists(jsonObj['eventId'])))
         {
           continue;
         }
-        const eventRequest: EventTemplateConfig =
+        const eventRequest: EventConfig =
           {
             eventId: jsonObj['eventId'],
             variantId: jsonObj['variantId'],
             ip: IPSource,
             url: jsonObj['url'] !== undefined ? jsonObj['url'] : '',
+            type: jsonObj['type'] !== undefined ? jsonObj['type'] : '',
           };
         encodedEventArr.push(await this.encodeMessage(eventRequest));
       }

@@ -49,11 +49,24 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import { EventConfig, EventRequestConfig, Events } from './Events';
+import { EventConfig, Events, EventTemplateConfig } from './Events';
 
 export const events: Events = new Events();
 
 const Router = new KoaRouter();
+
+// Get HTML IDs for event tracking
+Router.get('/ids', async (ctx, next) =>
+{
+  try
+  {
+    ctx.body = JSON.stringify(await events.getHTMLIDs());
+  }
+  catch (e)
+  {
+    ctx.body = '';
+  }
+});
 
 // Get an event tracker.
 Router.post('/', async (ctx, next) =>
