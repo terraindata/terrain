@@ -128,10 +128,10 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
-  public setRenameTransform(oldName: string, newName: string)
+  public setRenameTransform(colName: string, newName: string)
   {
     this.setState({
-      oldName,
+      colName,
       newName,
     });
   }

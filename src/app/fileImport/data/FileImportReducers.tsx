@@ -160,8 +160,11 @@ FileImportReducers[ActionTypes.setColumnName] =
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
-    state
-      .set('transforms', state.transforms.push(action.payload.transform))
+    {
+      console.log(action.payload.transform);
+      return state.set('transforms', state.transforms.push(action.payload.transform));
+    }
+      //state.set('transforms', state.transforms.push(action.payload.transform))
   ;
 
 FileImportReducers[ActionTypes.updatePreviewRows] =
