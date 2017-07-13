@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands max-line-length
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util';

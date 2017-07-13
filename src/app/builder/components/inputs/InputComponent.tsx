@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
 
 import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
@@ -61,6 +61,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
+import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -222,7 +223,12 @@ const InputComponent = createReactClass<any, any>({
             :
             <div className='input-spacing' />
         }
-        <div className='input-inner'>
+        <div
+          className='input-inner'
+          style={
+            backgroundColor(Colors().builder.inputs.background)
+          }
+        >
           <div className='input-top-row'>
             <BuilderTextbox
               canEdit={this.props.canEdit}

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression max-line-length
 
 import './Tabs.less';
 // import * as moment from 'moment';
@@ -65,7 +65,7 @@ import InfoArea from './../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
 const ReactTooltip = require('react-tooltip');
-import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');

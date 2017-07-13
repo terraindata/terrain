@@ -14,7 +14,7 @@ before_script:
 
 stages:
   - lint
-  - fix
+  - style
   - test
 
 lint:
@@ -22,10 +22,10 @@ lint:
    - yarn run lint
   stage: lint
 
-fix:
+style:
   script:
-   - yarn run fix
-  stage: fix
+   - yarn run style
+  stage: style
 
 test-backend:
   script:

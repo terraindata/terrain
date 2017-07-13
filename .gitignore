@@ -4,6 +4,7 @@
 coverage/
 node_modules
 bundle.js
+bundle.js.map
 bundle.prod.js
 bundle.demo.js
 src/commitlog.txt
@@ -16,7 +17,6 @@ src/**/*.jsx
 midway/**/*.jsx
 .idea
 .vscode
-yarn.lock
 midway.db
 moviesdb.db
 *.swp

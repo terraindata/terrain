@@ -44,12 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as _ from 'underscore';
 
+import ElasticKeyBuilderTextbox from '../../../../../src/app/common/components/ElasticKeyBuilderTextbox';
 import { Display, DisplayType } from '../../../../blocks/displays/Display';
 import { Block, TQLFn } from '../../../../blocks/types/Block';
 import { _card, Card } from '../../../../blocks/types/Card';
-import ElasticKeyBuilderTextbox from '../../../../../src/app/common/components/ElasticKeyBuilderTextbox';
 
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
@@ -178,7 +180,7 @@ abstract class ESClause
       colors: [],
       language: 'elastic',
 
-      // anythingAccepts: true, // TODO remove after testing
+      anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach
@@ -214,7 +216,7 @@ abstract class ESClause
               KEY_DISPLAY,
               display,
             ],
-          }
+          };
         }
         else
         {

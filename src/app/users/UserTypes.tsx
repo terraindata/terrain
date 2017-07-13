@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:max-classes-per-file strict-boolean-expressions restrict-plus-operands
+
 import * as Immutable from 'immutable';
 import { BaseClass, New } from '../Classes';
 import * as RoleTypes from './../roles/RoleTypes';

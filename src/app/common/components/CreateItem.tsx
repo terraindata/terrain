@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CreateItem.less';

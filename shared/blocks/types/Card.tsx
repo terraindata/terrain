@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as _ from 'underscore';
 import * as BlockUtils from '../BlockUtils';
 import { Display } from '../displays/Display';

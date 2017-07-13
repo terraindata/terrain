@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -52,8 +55,8 @@ import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
-import TerrainComponent from './../../../common/components/TerrainComponent';
 import Switch from './../../../common/components/Switch';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
 import './CardsColumn.less';

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-console no-unused-expression jsdoc-format max-line-length no-shadowed-variable
+
 /**
  * This is an extension of React.Component that adds extra
  * commonly needed functionality:
@@ -128,7 +130,6 @@ class TerrainComponent<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
-
   public shouldComponentUpdate(nextProps: T, nextState: any)
   {
     const shouldUpdate = shallowCompare(this, nextProps, nextState);
@@ -141,7 +142,7 @@ class TerrainComponent<T> extends React.Component<T, any>
 
     return shouldUpdate;
   }
-  
+
   // Helpers for debugging React update / perf issues
   // Simply set _debugUpdates to true in a component you're debugging
   //  and give the component a _debugName if helpful.
@@ -221,7 +222,8 @@ class TerrainComponent<T> extends React.Component<T, any>
     }
 
     let stateKey = config.stateKey;
-    let keyPath: KeyPath | ID[], value: any;
+    let keyPath: KeyPath | ID[];
+    let value: any;
 
     if (config.storeKeyPath)
     {

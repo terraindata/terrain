@@ -106,7 +106,7 @@ export default class ESEnumClause extends ESClause
           dropdownUsesRawValues: true,
         },
         tql: (block) => block['value'],
-      }
+      },
     });
   }
 }
