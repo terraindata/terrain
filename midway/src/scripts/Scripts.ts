@@ -110,7 +110,7 @@ export async function provisionScripts(controller: DatabaseController)
       catch (e)
       {
         winston.warn('Failed to provision script ' + script.id + ' to database '
-                      + controller.getName() + ': ' + e.response);
+                      + controller.getName() + ': ' + JSON.stringify(e.response));
       }
     }
   }
