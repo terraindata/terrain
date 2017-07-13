@@ -326,7 +326,7 @@ export default class ESJSONParser
     }
 
     // try to capture a string that ends with some JSON control char
-    result = this.matchAndSetToken(/^"[^,:\[\]{}"]+/);
+    result = this.matchAndSetToken(/^".+[^,:\[\]{}"]/);
 
     if (result !== null)
     {
