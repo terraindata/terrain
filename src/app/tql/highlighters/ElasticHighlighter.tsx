@@ -54,7 +54,6 @@ import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo'
 // interpreter and clause imports
 import ESClause from '../../../../shared/backends/elastic/parser/clauses/ESClause';
 import ESStructureClause from '../../../../shared/backends/elastic/parser/clauses/ESStructureClause';
-import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig';
 import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
 
 // other imports
@@ -125,7 +124,11 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null =
  */
 class ElasticHighlighter extends SyntaxHighlighter
 {
-  public static config = new EQLConfig();
+  public static highlightES(instance)
+  {
+    const highlighter = new ElasticHighlighter();
+    highlighter.handleChanges(instance, []);
+  }
 
   public initialHighlight(instance): void
   {
@@ -136,7 +139,7 @@ class ElasticHighlighter extends SyntaxHighlighter
   {
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
-    const interpreter = new ESInterpreter(parser, ElasticHighlighter.config);
+    const interpreter = new ESInterpreter(parser);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();
 
     for (const fToken of traverseTokens(parser.getValueInfo()))

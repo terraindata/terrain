@@ -217,12 +217,15 @@ class TQLEditor extends TerrainComponent<Props>
     }
   }
 
-  private handleChanges(cmInstance, changes: object[])
+  private handleChange(cmInstance, change)
   {
-    if (this.props.language === 'elastic')
+    if (change.origin !== 'setValue')
     {
-      const highlighter = new ElasticHighlighter();
-      highlighter.handleChanges(cmInstance, changes);
+      this.props.onChange(cmInstance.getValue());
+      if (this.props.language === 'elastic')
+      {
+        ElasticHighlighter.highlightES(cmInstance);
+      }
     }
   }
 
@@ -231,11 +234,10 @@ class TQLEditor extends TerrainComponent<Props>
     this.setState({
       codeMirrorInstance: cmInstance
     });
-    cmInstance.on('changes', this.handleChanges);
+    cmInstance.on('change', this.handleChange);
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
-      const highlighter = new ElasticHighlighter();
-      highlighter.initialHighlight(cmInstance);
+      ElasticHighlighter.highlightES(cmInstance);
     }
   }
 

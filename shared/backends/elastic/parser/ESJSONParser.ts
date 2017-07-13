@@ -309,7 +309,7 @@ export default class ESJSONParser
 
   private readString(): string
   {
-    let result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F]+)*")/);
+    let result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F])*")/);
     if (typeof result === 'string')
     {
       return result;

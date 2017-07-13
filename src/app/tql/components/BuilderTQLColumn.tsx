@@ -62,6 +62,7 @@ import Switch from './../../common/components/Switch';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';
+import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 
 export interface Props
 {
@@ -126,6 +127,10 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     {
       // auto mode
       // this.checkForFolding(tql);
+      if (tql === this.state.tql)
+      {
+        return;
+      }
       this.setState({
         tql,
         highlightedLine: null,
