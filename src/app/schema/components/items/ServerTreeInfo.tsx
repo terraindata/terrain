@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires max-classes-per-file
+
 import * as React from 'react';
 import * as SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';

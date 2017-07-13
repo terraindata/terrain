@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires no-shadowed-variable strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Radium = require('radium');

@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
@@ -66,11 +66,11 @@ class FileImportPreviewRow extends TerrainComponent<Props>
       <tr>
         {
           this.props.items.map((value, key) =>
-            <td key={key} className="row-element">
+            <td key={key} className='row-element'>
               {
                 value
               }
-            </td>
+            </td>,
           )
         }
       </tr>

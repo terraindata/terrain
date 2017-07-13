@@ -43,19 +43,22 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty strict-boolean-expressions no-console
+
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
-import * as FileImportTypes from './../FileImportTypes';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
+import Autocomplete from './../../common/components/Autocomplete';
+import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import Autocomplete from './../../common/components/Autocomplete';
-import Actions from './../data/FileImportActions';
-import Dropdown from './../../common/components/Dropdown';
 
 import './FileImportPreview.less';
 const { List } = Immutable;
@@ -177,7 +180,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log("templates: ", this.props.templates);
+    console.log('templates: ', this.props.templates);
     return (
       <div>
         <button onClick={this.handleLoadTemplate}>
@@ -215,7 +218,7 @@ class FileImportPreview extends TerrainComponent<Props>
                     handleRenameTransform={this.handleRenameTransform}
                     addRenameTransform={this.addRenameTransform}
                     columnOptions={this.props.columnOptions}
-                  />
+                  />,
                 ).toArray()
               }
             </tr>
@@ -226,7 +229,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 <FileImportPreviewRow
                   key={key}
                   items={items}
-                />
+                />,
               )
             }
           </tbody>

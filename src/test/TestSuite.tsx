@@ -43,5 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 require('./unit/ActionsTest.tsx');
 require('./unit/LayoutManagerTest.tsx');

@@ -44,32 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClause from './ESClause';
-import ESInterpreter from './ESInterpreter';
-import ESValueInfo from './ESValueInfo';
+import * as fs from 'fs';
+import { makePromiseCallback } from '../tasty/Utils';
 
-/**
- * A clause which is a terminal (base) value: null, boolean, number, or string
- */
-export default class ESBaseClause extends ESClause
+export async function readDirAsync(path: string)
 {
-  public constructor(type: string, settings: any)
+  return new Promise<string[]>(async (resolve, reject) =>
   {
-    super(type, settings);
-  }
+    fs.readdir(path, makePromiseCallback(resolve, reject));
+  });
+}
 
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+export async function readFileAsync(file: string, encoding: string)
+{
+  return new Promise<string>(async (resolve, reject) =>
   {
-    valueInfo.clause = this;
-    const value: any = valueInfo.value;
-    if (typeof (value) === 'object')
-    {
-      const foundType: string = Array.isArray(value) ? 'array' : 'object';
-      interpreter.accumulateError(
-        valueInfo,
-        'Found an ' +
-        foundType +
-        ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
-    }
-  }
+    fs.readFile(file, encoding, makePromiseCallback(resolve, reject));
+  });
 }

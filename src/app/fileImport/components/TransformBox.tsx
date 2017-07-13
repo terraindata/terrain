@@ -43,18 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
 const { List } = Immutable;
 
 export interface Props
@@ -87,7 +90,7 @@ class TransformBox extends TerrainComponent<Props>
   {
     this.setState({
       transformText,
-    })
+    });
   }
 
   public handleTransformTypeChange(transformTypeIndex: number)
@@ -99,7 +102,7 @@ class TransformBox extends TerrainComponent<Props>
       splitNames: ['', ''],
       colToMergeId: -1,
       mergeNewName: '',
-    })
+    });
   }
 
   public handleMergeIndexChange(mergeIndex: number)
@@ -108,7 +111,7 @@ class TransformBox extends TerrainComponent<Props>
     this.setState({
       mergeIndex,
       colToMergeId: this.props.columnNames.indexOf(mergeName),
-    })
+    });
   }
 
   public handleSplitNameAChange(splitNameA)
@@ -133,7 +136,7 @@ class TransformBox extends TerrainComponent<Props>
   {
     this.setState({
       mergeNewName,
-    })
+    });
   }
 
   public transformErrorCheck(transformName: string)
@@ -158,22 +161,22 @@ class TransformBox extends TerrainComponent<Props>
       }
       if (!this.state.splitNames[0])
       {
-        return 'Enter new column 1 name'
+        return 'Enter new column 1 name';
       }
       if (!this.state.splitNames[1])
       {
-        return 'Enter new column 2 name'
+        return 'Enter new column 2 name';
       }
     }
     if (transformName === 'merge')
     {
       if (!this.props.columnNames.get(this.state.colToMergeId))
       {
-        return 'Select column to merge'
+        return 'Select column to merge';
       }
       if (!this.state.mergeNewName)
       {
-        return 'Enter new column name'
+        return 'Enter new column name';
       }
     }
     return '';
@@ -194,7 +197,7 @@ class TransformBox extends TerrainComponent<Props>
     const transform = {
       name: transformName,
       colName: this.props.colName,
-      args: {}
+      args: {},
     };
 
     switch (transformName)
@@ -231,6 +234,7 @@ class TransformBox extends TerrainComponent<Props>
           text: this.state.transformText,
         };
         break;
+      default:
     }
 
     Actions.updatePreviewRows(transform);
@@ -243,7 +247,7 @@ class TransformBox extends TerrainComponent<Props>
       splitNames: ['', ''],
       colToMergeId: -1,
       mergeNewName: '',
-    })
+    });
   }
 
   public render()
@@ -320,7 +324,7 @@ class TransformBox extends TerrainComponent<Props>
           </div>
         }
       </div>
-    )
+    );
   }
 }
 

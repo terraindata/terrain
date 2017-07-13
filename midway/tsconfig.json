@@ -6,20 +6,20 @@
         "sourceMap": false,
         "inlineSources": true,
         "inlineSourceMap": true,
-        "strictNullChecks": true,
+     // "strictNullChecks": true,
         "target": "es6",
         "typeRoots": [
             "../src/typings",
             "../node_modules/@types"
         ],
         "experimentalDecorators": true,
-        "allowJs": true,
         "declaration": false,
         "outDir": "./build/"
     },
     "exclude": [
-        "node_modules",
-        "src",
-        "build"
+        "../node_modules",
+        "../src",
+        "build",
+        "../coverage"
     ]
 }

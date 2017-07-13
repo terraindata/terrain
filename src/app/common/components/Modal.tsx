@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -55,8 +58,8 @@ const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon')
 
 export interface Props
 {
-  message: string;
   open: boolean;
+  message?: string;
   title?: string;
   error?: boolean;
   fill?: boolean;
@@ -68,6 +71,11 @@ export interface Props
   thirdButtonText?: string;
   onThirdButton?: () => void;
   pre?: boolean;
+  showTextbox?: boolean;
+  textboxValue?: string;
+  initialTextboxValue?: string;
+  textboxPlaceholderValue?: string;
+  onTextboxValueChange?: (newValue: string) => void;
 }
 
 class Modal extends TerrainComponent<Props>
@@ -76,6 +84,14 @@ class Modal extends TerrainComponent<Props>
   {
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
+  }
+
+  public handleTextboxChange(evt)
+  {
+    if (this.props.onTextboxValueChange)
+    {
+      this.props.onTextboxValueChange(evt.target.value);
+    }
   }
 
   public render()
@@ -135,6 +151,16 @@ class Modal extends TerrainComponent<Props>
                   children: this.props.message,
                 },
               )
+            }
+            {
+              this.props.showTextbox &&
+              <input
+                type='text'
+                placeholder={this.props.textboxPlaceholderValue}
+                defaultValue={this.props.initialTextboxValue}
+                value={this.props.textboxValue}
+                onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
+              />
             }
             {
               this.props.children

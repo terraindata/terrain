@@ -43,13 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:variable-name strict-boolean-expressions member-access ban-types comment-format
+
 import * as Immutable from 'immutable';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 const { List } = Immutable;
 import { AllBackendsMap } from '../../backends/AllBackends';
-import { _ResultsConfig, ResultsConfig } from '../../results/types/ResultsConfig';
 import ESInterpreter from '../../backends/elastic/parser/ESInterpreter';
+import { _ResultsConfig, ResultsConfig } from '../../results/types/ResultsConfig';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change

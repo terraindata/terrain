@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-console
+
 import MidwayErrorItem from '../../error/MidwayErrorItem';
 import ElasticQueryResult from '../elastic/ElasticQueryResponse';
 import QueryRequest from './QueryRequest';

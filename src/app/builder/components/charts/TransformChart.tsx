@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this restrict-plus-operands radix strict-boolean-expressions no-var-requires only-arrow-functions no-console variable-name max-line-length no-unused-expression no-shadowed-variable
 
 import './TransformChart.less';
 
@@ -958,7 +958,8 @@ const TransformChart = {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     }).sort((a, b) => a - b);
     const index = pointValues.indexOf(scales.realX.invert(cx));
-    let min: number, max: number;
+    let min: number;
+    let max: number;
 
     if (index < 0)
     {

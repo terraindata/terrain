@@ -174,7 +174,7 @@ const EQLSpec: ESClause[] =
       {
         desc: 'Selects which index to search.',
         template: '',
-      }
+      },
     ),
     new ESTypeClause('type', { desc: 'Selects which type to search.' }),
     new ESNumberClause('from',

@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import Util from './../util/Util';
 import { BaseClass, New } from '../Classes';
 const { List } = Immutable;
+import Util from './../util/Util';
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass

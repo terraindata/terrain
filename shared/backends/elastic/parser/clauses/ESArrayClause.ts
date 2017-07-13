@@ -50,12 +50,11 @@ import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
 
-import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { List } from 'immutable';
-import { DisplayType } from '../../../../blocks/displays/Display';
 import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ElasticBlocks from '../../blocks/ElasticBlocks';
-
 
 /**
  * A clause that corresponds to an array of uniform type.
@@ -72,19 +71,14 @@ export default class ESArrayClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
-    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.array))
-    {
-      return;
-    }
+    this.typeCheck(interpreter, valueInfo, ESJSONType.array);
 
     // mark children
     const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    const children: ESValueInfo[] = valueInfo.arrayChildren;
-    children.forEach(
+    valueInfo.forEachElement(
       (element: ESValueInfo): void =>
       {
-        childClause.mark(interpreter, element);
+        element.clause = childClause;
       });
   }
 
@@ -111,9 +105,9 @@ export default class ESArrayClause extends ESClause
             ]),
           }),
 
-        tql: (block, tqlFn, tqlConfig) => 
+        tql: (block, tqlFn, tqlConfig) =>
         {
-          return block['cards'].map(card => tqlFn(card, tqlConfig)).toArray();
+          return block['cards'].map((card) => tqlFn(card, tqlConfig)).toArray();
         },
       },
     });

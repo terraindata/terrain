@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:import-spacing
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
@@ -111,6 +113,17 @@ export const ElasticBlocks = _.extend(
     elasticKeyValueWrap,
     // JSON toggle the type blocks
     elasticValue,
+
+    elasticInput: _block(
+      {
+        key: '',
+        value: '',
+        inputType: InputType.NUMBER,
+        static: {
+          language: 'elastic',
+          tql: '',
+        },
+      }),
   },
   ElasticElasticCards,
 );

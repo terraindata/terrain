@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 var _createClass = function() { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function(Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var PropTypes = require('prop-types');
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -908,21 +910,21 @@ var ReactTooltip = function(_Component)
 }(_react.Component);
 
 ReactTooltip.propTypes = {
-  children: _react.PropTypes.any,
-  place: _react.PropTypes.string,
-  type: _react.PropTypes.string,
-  effect: _react.PropTypes.string,
-  offset: _react.PropTypes.object,
-  multiline: _react.PropTypes.bool,
-  border: _react.PropTypes.bool,
-  class: _react.PropTypes.string,
-  id: _react.PropTypes.string,
-  html: _react.PropTypes.bool,
-  delayHide: _react.PropTypes.number,
-  delayShow: _react.PropTypes.number,
-  event: _react.PropTypes.any,
-  watchWindow: _react.PropTypes.bool,
-  isCapture: _react.PropTypes.bool
+  children: PropTypes.any,
+  place: PropTypes.string,
+  type: PropTypes.string,
+  effect: PropTypes.string,
+  offset: PropTypes.object,
+  multiline: PropTypes.bool,
+  border: PropTypes.bool,
+  class: PropTypes.string,
+  id: PropTypes.string,
+  html: PropTypes.bool,
+  delayHide: PropTypes.number,
+  delayShow: PropTypes.number,
+  event: PropTypes.any,
+  watchWindow: PropTypes.bool,
+  isCapture: PropTypes.bool
 };
 
 /* export default not fit for standalone, it will exports {default:...} */

@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands max-line-length
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -129,7 +132,7 @@ class ManualEntry extends TerrainComponent<Props>
   {
     if (!text)
     {
-      return;
+      return (null);
     }
     let keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
     // Remove ( ) card

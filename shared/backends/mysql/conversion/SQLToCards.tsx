@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands no-unused-expression strict-boolean-expressions no-console
+
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import List = Immutable.List;

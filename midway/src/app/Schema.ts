@@ -108,7 +108,7 @@ export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
   }
   else
   {
-    winston.info('WARNING: Auto-provisioning of app schema not supported for DB of type ' + dbtype);
+    winston.warn('Auto-provisioning of app schema not supported for DB of type ' + dbtype);
   }
 }
 

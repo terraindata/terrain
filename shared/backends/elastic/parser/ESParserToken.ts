@@ -57,12 +57,12 @@ export default class ESParserToken
   public charNumber: number; // number of chars into the source that this token begins
   public row: number; // row in which this token begins (rows start at 0)
   public col: number; // column in which this token begins (cols start at 0)
-  public toRow: number;
-  public toCol: number;
+  public toRow: number; // end row
+  public toCol: number; // end column
   public length: number; // token length in chars
   public substring: string; // token substring
 
-  public errors: ESParserError[];
+  public _errors: undefined | ESParserError[]; // errors attached to this token, null if none
 
   public constructor(charNumber: number,
     row: number,
@@ -79,8 +79,11 @@ export default class ESParserToken
     this.toCol = col;
     this.length = length;
     this.substring = substring;
+  }
 
-    this.errors = [];
+  public get errors(): ESParserError[]
+  {
+    return (this._errors === undefined) ? [] : this._errors;
   }
 
   public attachError(error: ESParserError): void

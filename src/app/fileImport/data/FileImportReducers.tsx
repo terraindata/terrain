@@ -43,11 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands no-console strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
 import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
+import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 const { List, Map } = Immutable;
 
@@ -67,7 +70,10 @@ const recAddType = (columnType) =>
 
 const recDeleteType = (columnType, count, recursionId) =>
 {
-  count < recursionId - 1 && columnType.innerType ? recDeleteType(columnType.innerType, count + 1, recursionId) : delete columnType.innerType;
+  count < recursionId - 1 && columnType.innerType ?
+    recDeleteType(columnType.innerType, count + 1, recursionId)
+    :
+    delete columnType.innerType;
   return columnType;
 };
 
@@ -76,7 +82,7 @@ const recToString = (columnType) =>
   columnType.type = FileImportTypes.ELASTIC_TYPES[columnType.type];
   if (columnType.innerType)
   {
-    recToString(columnType.innerType)
+    recToString(columnType.innerType);
   }
   return columnType;
 };
@@ -86,7 +92,7 @@ const recToNumber = (columnType) =>
   columnType.type = FileImportTypes.ELASTIC_TYPES.indexOf(columnType.type);
   if (columnType.innerType)
   {
-    recToNumber(columnType.innerType)
+    recToNumber(columnType.innerType);
   }
   return columnType;
 };
@@ -130,7 +136,8 @@ FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
   {
     const columnTypes = state.columnTypes.toArray();
-    columnTypes[action.payload.columnId] = recSetType(columnTypes[action.payload.columnId], 0, action.payload.recursionId, action.payload.typeIndex);
+    columnTypes[action.payload.columnId] = recSetType(columnTypes[action.payload.columnId], 0,
+      action.payload.recursionId, action.payload.typeIndex);
 
     if (FileImportTypes.ELASTIC_TYPES[action.payload.typeIndex] === 'array')
     {
@@ -146,7 +153,8 @@ FileImportReducers[ActionTypes.deleteColumnType] =
     if (state.columnTypes.get(action.payload.columnId))
     {
       const columnTypes = state.columnTypes.toArray();
-      columnTypes[action.payload.columnId] = recDeleteType(columnTypes[action.payload.columnId], 0, action.payload.recursionId);
+      columnTypes[action.payload.columnId] = recDeleteType(columnTypes[action.payload.columnId], 0,
+        action.payload.recursionId);
       return state.set('columnTypes', List(columnTypes));
     }
     return state;
@@ -160,12 +168,10 @@ FileImportReducers[ActionTypes.setColumnName] =
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
-    {
-      console.log(action.payload.transform);
-      return state.set('transforms', state.transforms.push(action.payload.transform));
-    }
-      //state.set('transforms', state.transforms.push(action.payload.transform))
-  ;
+  {
+    console.log(action.payload.transform);
+    return state.set('transforms', state.transforms.push(action.payload.transform));
+  };
 
 FileImportReducers[ActionTypes.updatePreviewRows] =
   (state, action) =>
@@ -188,9 +194,9 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
               return transform.name === 'append' ? col + transform.args.text : transform.args.text + col;
             }
             return col;
-          })
-        ))
-        )
+          }),
+        )),
+      );
     }
     else if (transform.name === 'split')
     {
@@ -216,10 +222,9 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
               return [col.substring(0, index), col.substring(index + transform.args.text.length)];
             }
             return col;
-          }
-          )
-          ))
-        ))
+          },
+          )),
+        )));
     }
     else if (transform.name === 'merge')
     {
@@ -247,10 +252,9 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
           {
             return j === transformCol ? col + transform.args.text + row[mergeCol] : col;
           }).filter((col, j) =>
-            j !== mergeCol
-            )
-        ))
-        )
+            j !== mergeCol,
+          ),
+        )));
     }
     return state;
   };
@@ -281,7 +285,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('columnNames', List(columnNames))
       .set('columnsToInclude', List(columnsToInclude))
       .set('columnTypes', List(columnTypes))
-      .set('transforms', List([]))
+      .set('transforms', List([]));
   };
 
 FileImportReducers[ActionTypes.uploadFile] =
@@ -294,8 +298,9 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.tableText,
       state.connectionId,
       state.oldNames,
-      Map<string, FileImportTypes.ColumnType>(state.columnNames.map((colName, colId) =>
-        state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))]
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&
+        [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
       state.columnNames.get(state.primaryKey),
       state.transforms,
@@ -320,7 +325,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.connectionId,
       state.oldNames,
       Map<string, FileImportTypes.ColumnType>(state.columnNames.map((colName, colId) =>
-        state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))]
+        state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
       state.columnNames.get(state.primaryKey),
       state.transforms,
@@ -351,7 +356,7 @@ FileImportReducers[ActionTypes.getTemplates] =
         console.log('templatesArr: ', templatesArr);
         const templates: Immutable.List<FileImportTypes.Template> = Immutable.List<FileImportTypes.Template>(templatesArr);
         action.payload.setTemplates(templates);
-      }
+      },
     );
     return state;
   };
@@ -375,8 +380,8 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('hasCsvHeader', template.hasCsvHeader)
       .set('columnNames', List(_.map(template.columnTypes, (val, key) => key)))
       .set('columnTypes', List(_.map(template.columnTypes, (val, key) => recToNumber(val))))
-      .set('columnsToInclude', List(_.map(template.columnTypes, (val, key) => true)))
+      .set('columnsToInclude', List(_.map(template.columnTypes, (val, key) => true)));
   }
-;
+  ;
 
 export default FileImportReducers;
