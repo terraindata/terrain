@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands radix strict-boolean-expressions ban-types no-var-requires no-unused-expression forin
+// tslint:disable:restrict-plus-operands radix strict-boolean-expressions ban-types no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
 
 import * as $ from 'jquery';
 // import * as moment from 'moment';

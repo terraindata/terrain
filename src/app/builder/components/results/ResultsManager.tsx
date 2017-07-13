@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands radix prefer-const ban-types no-console strict-boolean-expressions max-classes-per-file
+// tslint:disable:restrict-plus-operands radix prefer-const ban-types no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;

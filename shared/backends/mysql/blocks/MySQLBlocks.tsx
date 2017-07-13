@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length no-shadowed-variable
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
