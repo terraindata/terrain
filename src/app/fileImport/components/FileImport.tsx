@@ -102,6 +102,13 @@ class FileImport extends TerrainComponent<any>
     const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
       primaryKey, oldNames, templates } = fileImportState;
 
+    console.log('state');
+    console.log(columnNames);
+    console.log(columnsToInclude);
+    console.log(columnTypes);
+    console.log(primaryKey);
+    console.log(hasCsvHeader);
+
     return (
       <div className="file-import">
         <h2>File Import Page</h2>

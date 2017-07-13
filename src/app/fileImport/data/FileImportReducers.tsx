@@ -81,6 +81,16 @@ const recToString = (columnType) =>
   return columnType;
 };
 
+const recToNumber = (columnType) =>
+{
+  columnType.type = FileImportTypes.ELASTIC_TYPES.indexOf(columnType.type);
+  if (columnType.innerType)
+  {
+    recToNumber(columnType.innerType)
+  }
+  return columnType;
+};
+
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
@@ -350,12 +360,12 @@ FileImportReducers[ActionTypes.loadTemplate] =
     console.log(template);
     console.log(template.columnTypes);
     return state
-      .set('oldNames', template.oldNames)
-      .set('primaryKey', template.primaryKey)
-      .set('transforms', template.transforms)
+      .set('oldNames', template.originalNames)
+      .set('primaryKey', _.map(template.columnTypes, (val, key) => key).indexOf(template.primaryKey))
+      .set('transforms', template.transformations)
       .set('hasCsvHeader', template.hasCsvHeader)
       .set('columnNames', List(_.map(template.columnTypes, (val, key) => key)))
-      .set('columnTypes', List(_.map(template.columnTypes, (val, key) => val)))
+      .set('columnTypes', List(_.map(template.columnTypes, (val, key) => recToNumber(val))))
       .set('columnsToInclude', List(_.map(template.columnTypes, (val, key) => true)))
   }
 ;
