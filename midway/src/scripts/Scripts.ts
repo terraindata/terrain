@@ -91,7 +91,8 @@ export async function provisionScripts(controller: DatabaseController)
     const scripts: ScriptConfig[] = await findScripts(__dirname);
     for (const script of scripts)
     {
-      try {
+      try
+      {
         await new Promise(
           (resolve, reject) =>
           {
@@ -110,7 +111,7 @@ export async function provisionScripts(controller: DatabaseController)
       catch (e)
       {
         winston.warn('Failed to provision script ' + script.id + ' to database '
-                      + controller.getName() + ': ' + JSON.stringify(e.response));
+          + controller.getName() + ': ' + JSON.stringify(e.response));
       }
     }
   }

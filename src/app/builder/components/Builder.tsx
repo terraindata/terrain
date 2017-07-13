@@ -827,40 +827,40 @@ class Builder extends TerrainComponent<Props>
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
     LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
-    (response, newVariant) =>
-    {
-      this.onSaveSuccess(newVariant);
-      Actions.save();
-
-      let configArr = window.location.pathname.split('/')[2].split(',');
-      let currentVariant;
-      configArr = configArr.map((tab) =>
+      (response, newVariant) =>
       {
-        if (tab.substr(0, 1) === '!')
-        {
-          currentVariant = tab.substr(1).split('@')[0];
-          return '!' + response.id.toString();
-        }
-        return tab;
-      },
-      );
-      for (let i = 0; i < configArr.length; i++)
-      {
-        if (configArr[i] === currentVariant)
-        {
-          configArr.splice(i, 1);
-        }
-      }
+        this.onSaveSuccess(newVariant);
+        Actions.save();
 
-      this.setState({
-        savingAs: false
+        let configArr = window.location.pathname.split('/')[2].split(',');
+        let currentVariant;
+        configArr = configArr.map((tab) =>
+        {
+          if (tab.substr(0, 1) === '!')
+          {
+            currentVariant = tab.substr(1).split('@')[0];
+            return '!' + response.id.toString();
+          }
+          return tab;
+        },
+        );
+        for (let i = 0; i < configArr.length; i++)
+        {
+          if (configArr[i] === currentVariant)
+          {
+            configArr.splice(i, 1);
+          }
+        }
+
+        this.setState({
+          savingAs: false
+        });
+        const newConfig = configArr.join(',');
+        if (newConfig !== this.props.params.config)
+        {
+          browserHistory.replace(`/builder/${newConfig}`);
+        }
       });
-      const newConfig = configArr.join(',');
-      if (newConfig !== this.props.params.config)
-      {
-        browserHistory.replace(`/builder/${newConfig}`);
-      }
-    });
   }
 
   public handleModalSaveAsCancel()
