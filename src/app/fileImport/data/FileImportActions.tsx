@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
 
@@ -80,7 +81,7 @@ const FileImportActions =
       $(ActionTypes.uploadFile, {}),
 
     addTransform:
-    (transform: object) =>
+    (transform: FileImportTypes.Transform) =>
       $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
@@ -100,7 +101,7 @@ const FileImportActions =
       $(ActionTypes.deleteColumnType, { columnId, recursionId }),
 
     updatePreviewRows:
-    (transform: any) =>
+    (transform: FileImportTypes.Transform) =>
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
@@ -112,7 +113,7 @@ const FileImportActions =
       $(ActionTypes.getTemplates, { setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
-    (templates: List<object>) =>
+    (templates: List<FileImportTypes.Template>) =>
       $(ActionTypes.setTemplates, { templates }),
 
     loadTemplate:

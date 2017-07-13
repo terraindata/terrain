@@ -69,20 +69,21 @@ export interface Props
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<object>;
+  columnTypes: List<FileImportTypes.ColumnType>;
   columnOptions: List<string>;
-  templates: List<any>;
+  templates: List<FileImportTypes.Template>;
+  transforms: List<FileImportTypes.Transform>;
 }
 
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    oldName: string,
+    colName: string,
     newName: string,
     templateId: number,
     templateText: string,
   } = {
-    oldName: '',
+    colName: '',
     newName: '',
     templateId: -1,
     templateText: '',
@@ -95,31 +96,31 @@ class FileImportPreview extends TerrainComponent<Props>
 
   /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
    * when changing transform columns or types */
-  public handleRenameTransform(oldName: string, newName: string)
+  public handleRenameTransform(colName: string, newName: string)
   {
-    if (this.state.oldName && this.state.oldName !== oldName)
+    if (this.state.colName && this.state.colName !== colName)
     {
       Actions.addTransform({
         name: 'rename',
+        colName,
         args: {
-          oldName,
           newName,
         },
       });
     }
-    console.log('setting rename transform: ', oldName + ' to ' + newName);
-    this.setRenameTransform(oldName, newName);
+    console.log('setting rename transform: ', colName + ' to ' + newName);
+    this.setRenameTransform(colName, newName);
   }
 
   public addRenameTransform()
   {
-    if (this.state.oldName)
+    if (this.state.colName)
     {
-      console.log('adding rename transform: ', this.state.oldName + ', ' + this.state.newName);
+      console.log('adding rename transform: ', this.state.colName + ', ' + this.state.newName);
       Actions.addTransform({
         name: 'rename',
+        colName: this.state.colName,
         args: {
-          oldName: this.state.oldName,
           newName: this.state.newName,
         },
       });
@@ -160,6 +161,12 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     // apply list of transforms to preview in a queue
     Actions.loadTemplate(this.state.templateId);
+
+    console.log('transforms: ', this.props.transforms);
+    this.props.transforms.map((transform) =>
+    {
+      Actions.updatePreviewRows(transform);
+    });
   }
 
   public handleSaveTemplate()
@@ -188,7 +195,7 @@ class FileImportPreview extends TerrainComponent<Props>
         />
         <Dropdown
           selectedIndex={this.state.templateId}
-          options={List(this.props.templates.map((template, i) => template.name))}
+          options={List<string>(this.props.templates.map((template, i) => template.name))}
           onChange={this.handleTemplateChange}
           canEdit={true}
         />

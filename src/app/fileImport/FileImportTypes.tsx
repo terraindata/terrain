@@ -68,10 +68,10 @@ class FileImportStateC extends BaseClass
   public oldNames: Immutable.List<string> = null;
   public columnNames: Immutable.List<string> = null;
   public columnsToInclude: Immutable.List<boolean> = null;
-  public columnTypes: List<object> = null;
+  public columnTypes: List<ColumnType> = null;
 
-  public transforms: Immutable.List<object> = List([]);
-  public templates: Immutable.List<object> = List([]);
+  public transforms: Immutable.List<Transform> = List([]);
+  public templates: Immutable.List<Template> = List([]);
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -83,6 +83,49 @@ export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
 //   and you can't use `new` simply with Immutable Records.
 export const _FileImportState = (config?: { [key: string]: any }) =>
   New<FileImportState>(new FileImportStateC(config), config);
+
+export interface Transform
+{
+  name: string;
+  colName: string;
+  args: {
+    mergeName?: string;
+    newName?: string | string[];
+    text?: string;
+  };
+}
+
+export interface Template
+{
+  name: string;
+  oldNames: List<string>;
+  columnTypes: Immutable.Map<string, object>;
+  transforms: List<object>;
+  hasCsvHeader: boolean;
+  primaryKey: number;
+}
+
+export interface ColumnType
+{
+  type: number;
+  innerType?: ColumnType;
+}
+
+// class TransformC extends BaseClass
+// {
+//   public name = '',
+//   public args = {
+//     public oldName = '',
+//     public newName = '',
+//     public text = '',
+//   }
+// }
+// export type Transform = TransformC & IRecord<TransformC>;
+// export const _Transform = (config: { [key: string]: any } = {}) =>
+// {
+//   config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
+//   return New<Transform>(new TransformC(config), config);
+// };
 
 export const NUMBER_PREVIEW_ROWS = 5;
 
