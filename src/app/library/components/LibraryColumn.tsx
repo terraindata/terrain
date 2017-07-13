@@ -43,12 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import { Colors, backgroundColor, fontColor, link } from '../../common/Colors';
 
 export interface Props
 {

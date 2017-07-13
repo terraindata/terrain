@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
@@ -332,7 +335,6 @@ class BuilderTextbox extends TerrainComponent<Props>
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
-                rel={this.props.rel}
               />
               :
               <Autocomplete

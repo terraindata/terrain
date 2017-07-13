@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -57,8 +60,8 @@ import { MenuOption } from '../../common/components/Menu';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Switch from './../../common/components/Switch';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';

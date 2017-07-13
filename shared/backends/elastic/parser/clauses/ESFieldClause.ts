@@ -44,11 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import { List } from 'immutable';
+import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ESClauseType from '../ESClauseType';
 import ESStringClause from './ESStringClause';
-import { DisplayType } from '../../../../blocks/displays/Display';
-import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
 
 /**
  * A clause which is a field name (column name)

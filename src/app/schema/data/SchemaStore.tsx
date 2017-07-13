@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as _ from 'underscore';
 import Redux = require('redux');
 import { Store } from 'redux';

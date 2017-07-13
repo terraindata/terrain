@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as CommonElastic from '../syntax/CommonElastic';
@@ -106,9 +108,6 @@ class CardsToElastic
 
     const text: string = JSON.stringify(elasticObj);
     return ESConverter.formatES(new ESJSONParser(text));
-    // let q: string = query.tql;
-
-    // return q;
   }
 
   public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean

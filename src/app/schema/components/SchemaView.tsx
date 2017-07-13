@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires restrict-plus-operands no-switch-case-fall-through strict-boolean-expressions
+
 const Radium = require('radium');
 import * as $ from 'jquery';
 import * as React from 'react';

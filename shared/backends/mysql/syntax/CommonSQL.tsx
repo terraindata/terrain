@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-namespace
+
 import * as React from 'react';
 
 namespace CommonSQL

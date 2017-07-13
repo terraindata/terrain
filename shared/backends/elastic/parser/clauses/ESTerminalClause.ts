@@ -68,7 +68,6 @@ export default class ESTerminalClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
     this.typeCheck(interpreter, valueInfo, this.jsonType);
   }
 }

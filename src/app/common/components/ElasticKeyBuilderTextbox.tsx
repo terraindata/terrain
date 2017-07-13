@@ -43,18 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions member-ordering
+
 import './BuilderTextbox.less';
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Display } from '../../../../shared/blocks/displays/Display';
+import { Card, CardString } from '../../../../shared/blocks/types/Card';
+import BuilderStore from '../../builder/data/BuilderStore';
 // import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import BuilderTextbox from './BuilderTextbox';
-import BuilderStore from '../../builder/data/BuilderStore';
-import { Display } from '../../../../shared/blocks/displays/Display';
-import { Card, CardString } from '../../../../shared/blocks/types/Card';
 
 export interface Props
 {

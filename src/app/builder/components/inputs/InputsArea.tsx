@@ -43,9 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import { Input } from '../../../../../shared/blocks/types/Input';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
@@ -60,13 +64,17 @@ export interface Props
 {
   inputs: List<Input>;
   canEdit: boolean;
+  language: string;
 }
 
 class InputsArea extends TerrainComponent<Props>
 {
   public createInput()
   {
-    Actions.create(Immutable.List(['query', 'inputs']), -1, 'input');
+    Actions.create(
+      Immutable.List(['query', 'inputs']), -1,
+      AllBackendsMap[this.props.language].inputType,
+    );
   }
 
   public renderNoInputs()
