@@ -59,7 +59,6 @@ function getExpectedFile(): string
 }
 
 let expected;
-let config: EQLConfig;
 
 beforeAll(async (done) =>
 {
@@ -72,14 +71,6 @@ beforeAll(async (done) =>
   });
 
   expected = JSON.parse(expectedString);
-  try
-  {
-    config = new EQLConfig();
-  } catch (e)
-  {
-    fail(e);
-  }
-
   done();
 });
 
@@ -88,10 +79,10 @@ function testParse(testString: string,
   expectedErrors: ESParserError[] = [])
 {
   winston.info('testing \'' + testString + '\'');
-  const interpreter: ESInterpreter = new ESInterpreter(testString, config);
+  const interpreter: ESInterpreter = new ESInterpreter(testString);
   const parser: ESJSONParser = interpreter.parser;
 
-  winston.info(util.inspect(parser.getValueInfo()));
+  winston.info(util.inspect(parser.getValueInfo(), false, 16));
 
   expect(parser.getValue()).toEqual(expectedValue);
   expect(parser.getErrors()).toEqual(expectedErrors);

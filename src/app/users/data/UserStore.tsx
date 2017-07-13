@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires no-console
+
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 import * as _ from 'underscore';

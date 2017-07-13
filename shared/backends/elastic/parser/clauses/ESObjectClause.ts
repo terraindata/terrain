@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
-import { DisplayType } from '../../../../blocks/displays/Display';
 
 /**
  * A clause which is an object
@@ -60,7 +60,6 @@ export default class ESObjectClause extends ESTerminalClause
   {
     super(type, settings, ESClauseType.ESObjectClause, ESJSONType.object);
   }
-
 
   public getCard()
   {
@@ -78,14 +77,14 @@ export default class ESObjectClause extends ESTerminalClause
           key: 'cards',
         },
 
-        tql: (block, tqlFn, tqlConfig) => 
+        tql: (block, tqlFn, tqlConfig) =>
         {
-          const json = {}
+          const json = {};
           block['cards'].map(
             (card) =>
             {
               json[card['key']] = tqlFn(card, tqlConfig);
-            }
+            },
           );
           return json;
         },

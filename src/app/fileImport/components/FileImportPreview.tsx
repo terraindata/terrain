@@ -44,16 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
-import * as FileImportTypes from './../FileImportTypes';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
+import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import Actions from './../data/FileImportActions';
 
 import './FileImportPreview.less';
 const { List } = Immutable;
@@ -165,7 +166,7 @@ class FileImportPreview extends TerrainComponent<Props>
                     handleRenameTransform={this.handleRenameTransform}
                     addRenameTransform={this.addRenameTransform}
                     columnOptions={this.props.columnOptions}
-                  />
+                  />,
                 ).toArray()
               }
             </tr>
@@ -176,7 +177,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 <FileImportPreviewRow
                   key={key}
                   items={items}
-                />
+                />,
               )
             }
           </tbody>

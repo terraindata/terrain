@@ -43,13 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty strict-boolean-expressions no-var-requires
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import * as Radium from 'radium';
 
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
@@ -61,7 +64,7 @@ import CreateCardTool from './CreateCardTool';
 const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
-import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 export interface Props
 {

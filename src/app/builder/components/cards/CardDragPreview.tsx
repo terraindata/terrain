@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires prefer-const strict-boolean-expressions no-unused-expression
+
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -119,7 +122,9 @@ class CardDragPreview extends TerrainComponent<CDPProps>
   public render()
   {
     const item = this.props.cardItem;
-    let colors: string[], title: string, preview: string;
+    let colors: string[];
+    let title: string;
+    let preview: string;
 
     const Blocks = AllBackendsMap[this.state.language].blocks;
 

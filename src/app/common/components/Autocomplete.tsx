@@ -43,15 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
+
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 export interface Props
 {
@@ -261,7 +264,7 @@ class Autocomplete extends TerrainComponent<Props>
           'ac-option-selected': index === this.state.selectedIndex,
         })}
         onMouseDown={this._fn(this.handleSelect, option)}
-        value={option}
+        data-value={option}
         key={option}
         ref={'opt' + index}
       >

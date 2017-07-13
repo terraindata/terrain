@@ -42,6 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';

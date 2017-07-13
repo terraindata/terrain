@@ -43,14 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands no-unused-expression
+
 import * as React from 'react';
 import { Link } from 'react-router';
 import * as UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import RadioButtons from './../../common/components/RadioButtons';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
@@ -213,7 +216,8 @@ class Notifications extends TerrainComponent<Props>
 
   public renderDesktopNotificationsContent()
   {
-    let desktopNotification: any, sound: any;
+    let desktopNotification: any;
+    let sound: any;
 
     if (this.state.istate.currentUser)
     {
@@ -287,7 +291,8 @@ class Notifications extends TerrainComponent<Props>
 
   public renderEmailNotificationsContent()
   {
-    let emailNotification: any, emailTiming: any;
+    let emailNotification: any;
+    let emailTiming: any;
 
     if (this.state.istate.currentUser)
     {

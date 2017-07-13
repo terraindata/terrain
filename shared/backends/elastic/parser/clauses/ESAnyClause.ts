@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import { DisplayType } from '../../../../blocks/displays/Display';
 
 /**
  * A clause which can be any valid JSON value
@@ -64,7 +64,7 @@ export default class ESAnyClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
+    // do nothing
   }
 
   public getCard()
@@ -89,7 +89,7 @@ export default class ESAnyClause extends ESClause
           singleChild: true,
         },
         preview: '',
-      }
+      },
     });
   }
 }

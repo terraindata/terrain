@@ -44,19 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import Actions from './../data/FileImportActions';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
 
 export interface Props
 {
-  columnId: number,
+  columnId: number;
   recursionId: number;
   columnType: any;
   datatypes: List<string>;

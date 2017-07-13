@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length no-shadowed-variable
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Color = require('color');
@@ -1077,7 +1080,7 @@ export const MySQLBlocks =
         inputType: InputType.NUMBER,
         static: {
           language: 'mysql',
-          tql: 'VAR $key = $value;',
+          tql: '',
         },
       }),
 

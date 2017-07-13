@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions
+
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea';
@@ -60,7 +63,7 @@ import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 
 export interface Props
 {
@@ -125,8 +128,11 @@ class Library extends TerrainComponent<any>
     const algorithmId = +params.algorithmId;
     const variantId = +params.variantId;
 
-    let group: LibraryTypes.Group, algorithm: LibraryTypes.Algorithm, variant: LibraryTypes.Variant;
-    let algorithmsOrder: List<ID>, variantsOrder: List<ID>;
+    let group: LibraryTypes.Group;
+    let algorithm: LibraryTypes.Algorithm;
+    let variant: LibraryTypes.Variant;
+    let algorithmsOrder: List<ID>;
+    let variantsOrder: List<ID>;
 
     if (groupId)
     {
