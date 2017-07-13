@@ -53,6 +53,7 @@ import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
+import Autocomplete from './../../common/components/Autocomplete';
 import Actions from './../data/FileImportActions';
 import Dropdown from './../../common/components/Dropdown';
 
@@ -79,10 +80,12 @@ class FileImportPreview extends TerrainComponent<Props>
     oldName: string,
     newName: string,
     templateId: number,
+    templateText: string,
   } = {
     oldName: '',
     newName: '',
     templateId: -1,
+    templateText: '',
   };
 
   public componentDidMount()
@@ -145,13 +148,21 @@ class FileImportPreview extends TerrainComponent<Props>
       templateId,
     });
   }
+
+  public handleAutocompleteTemplateChange(templateText: string)
+  {
+    this.setState({
+      templateText,
+    });
+  }
+
   public handleLoadTemplate()
   {
   }
 
   public handleSaveTemplate()
   {
-    Actions.saveTemplate();
+    Actions.saveTemplate(this.state.templateText);
     Actions.getTemplates();
   }
 
@@ -170,6 +181,13 @@ class FileImportPreview extends TerrainComponent<Props>
           options={List(this.props.templates.map((template, i) => template.name))}
           onChange={this.handleTemplateChange}
           canEdit={true}
+        />
+        <Autocomplete
+          value={this.state.templateText}
+          options={null}
+          onChange={this.handleAutocompleteTemplateChange}
+          placeholder={'template name'}
+          disabled={false}
         />
         <table>
           <thead>

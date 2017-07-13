@@ -306,7 +306,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       )),
       state.columnNames.get(state.primaryKey),
       state.transforms,
-      action.payload.name,
+      action.payload.templateText,
       () =>
       {
         alert('successfully saved template');

@@ -104,16 +104,16 @@ const FileImportActions =
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    () =>
-      $(ActionTypes.saveTemplate, {}),
+    (templateText: string) =>
+      $(ActionTypes.saveTemplate, { templateText }),
 
     getTemplates:
-      () =>
-        $(ActionTypes.getTemplates, {}),
+    () =>
+      $(ActionTypes.getTemplates, {}),
 
     setTemplates:
-      (templates: List<object>) =>
-        $(ActionTypes.setTemplates, { templates }),
+    (templates: List<object>) =>
+      $(ActionTypes.setTemplates, { templates }),
   };
 
 export default FileImportActions;
