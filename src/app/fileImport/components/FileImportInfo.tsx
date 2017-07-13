@@ -134,7 +134,7 @@ class FileImportInfo extends TerrainComponent<Props>
       {
         alert('Input JSON file must parse to an array of objects.');
         this.refs['file']['value'] = null;
-        return;
+        return [];
       }
       console.log('Parsed json: ', items);
 
@@ -173,7 +173,7 @@ class FileImportInfo extends TerrainComponent<Props>
         {
           alert('CSV format incorrect: each row must have same number of fields');
           this.refs['file']['value'] = null;
-          return;
+          return [];
         }
       }
     }

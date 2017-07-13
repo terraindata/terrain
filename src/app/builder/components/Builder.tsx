@@ -215,7 +215,7 @@ class Builder extends TerrainComponent<Props>
         this.setState({
           navigationException: false,
         });
-        return;
+        return undefined;
       }
 
       if (this.shouldSave())

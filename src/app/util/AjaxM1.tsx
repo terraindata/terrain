@@ -72,7 +72,7 @@ export const Ajax =
         downloadFilename?: string;
         json?: boolean;
         urlArgs?: object;
-      } = {})
+      } = {}): XMLHttpRequest
     {
       // NOTE: OLD_MIDWAY_HOST will be replaced by the build process.
       const host = config.host || OLD_MIDWAY_HOST;

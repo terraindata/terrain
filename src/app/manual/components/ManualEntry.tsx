@@ -129,7 +129,7 @@ class ManualEntry extends TerrainComponent<Props>
   {
     if (!text)
     {
-      return;
+      return (null);
     }
     let keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
     // Remove ( ) card

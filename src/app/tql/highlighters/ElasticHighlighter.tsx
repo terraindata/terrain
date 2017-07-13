@@ -84,7 +84,7 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null =
 {
   if (!valueInfo)
   {
-    return;
+    return {};
   }
 
   for (const token of valueInfo.tokens)

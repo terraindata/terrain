@@ -79,7 +79,7 @@ class InfoArea extends TerrainComponent<Props>
       return null;
     }
 
-    let style = fontColor(thing == 'small' ? Colors().text.secondaryLight : Colors().text.baseLight);
+    let style = fontColor(thing === 'small' ? Colors().text.secondaryLight : Colors().text.baseLight);
     if (thing === 'button')
     {
       style = buttonColors();

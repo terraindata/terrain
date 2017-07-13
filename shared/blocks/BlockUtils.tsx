@@ -234,7 +234,7 @@ export function getPreview(card: Card): string
 {
   if (!card)
   {
-    return;
+    return '';
   }
 
   if (!card.static)
