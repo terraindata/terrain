@@ -63,7 +63,7 @@ export interface Props
 {
   columnId: number;
   isIncluded: boolean;
-  columnType: any;
+  columnType: FileImportTypes.ColumnType;
   isPrimaryKey: boolean;
   datatypes: List<string>;
   columnNames: List<string>;

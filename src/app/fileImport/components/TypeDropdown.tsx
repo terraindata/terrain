@@ -58,7 +58,7 @@ export interface Props
 {
   columnId: number,
   recursionId: number;
-  columnType: any;
+  columnType: FileImportTypes.ColumnType;
   datatypes: List<string>;
 }
 

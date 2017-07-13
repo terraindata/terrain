@@ -191,56 +191,50 @@ class TransformBox extends TerrainComponent<Props>
 
     this.props.addRenameTransform();
 
-    Actions.updatePreviewRows({
+    const transform = {
       name: transformName,
-      args: {
-        transformCol: this.props.colName,
-        text: this.state.transformText,
-        splitNames: this.state.splitNames,
-        colToMergeId: this.state.colToMergeId,
-        mergeNewName: this.state.mergeNewName,
-      }
-    });
-    console.log('adding transform: ' + transformName + ' / colName: ' + this.props.colName + ' / text: ' + this.state.transformText);
+      colName: this.props.colName,
+      args: {}
+    };
 
-    if (transformName === 'append' || transformName === 'prepend')
+    switch (transformName)
     {
-      Actions.addTransform(
-        {
-          name: transformName,
-          args: {
-            colName: this.props.colName,
-            text: this.state.transformText,
-          }
-        }
-      );
+      case 'rename':
+        transform.args = {
+          newName: this.props.colName,
+        };
+        break;
+
+      case 'append':
+        transform.args = {
+          text: this.state.transformText,
+        };
+        break;
+
+      case 'prepend':
+        transform.args = {
+          text: this.state.transformText,
+        };
+        break;
+
+      case 'split':
+        transform.args = {
+          newName: this.state.splitNames,
+          text: this.state.transformText,
+        };
+        break;
+
+      case 'merge':
+        transform.args = {
+          mergeName: this.props.columnNames.get(this.state.colToMergeId),
+          newName: this.state.mergeNewName,
+          text: this.state.transformText,
+        };
+        break;
     }
-    else if (transformName === 'split')
-    {
-      Actions.addTransform(
-        {
-          name: transformName,
-          args: {
-            oldName: this.props.colName,
-            newName: this.state.splitNames,
-            text: this.state.transformText,
-          }
-        }
-      );
-    }
-    else if (transformName === 'merge')
-    {
-      Actions.addTransform(
-        {
-          name: transformName,
-          args: {
-            oldName: [this.props.colName, this.props.columnNames.get(this.state.colToMergeId)],
-            newName: this.state.mergeNewName,
-            text: this.state.transformText,
-          }
-        }
-      );
-    }
+
+    Actions.updatePreviewRows(transform);
+    Actions.addTransform(transform);
 
     this.setState({
       transformTypeIndex: -1,
