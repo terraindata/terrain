@@ -92,7 +92,7 @@ export default class ESTypeClause extends ESStringClause
                 (table) => table.databaseId === indexId,
               ).map(
                 (table) => table.name,
-                ).toList();
+              ).toList();
             }
 
             return emptyList;

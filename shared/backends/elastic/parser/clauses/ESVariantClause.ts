@@ -121,8 +121,8 @@ export default class ESVariantClause extends ESClause
             text: type,
             type: 'eql' + type,
           }),
-        ),
-      );
+      ),
+    );
 
     return this.seedCard({
       // cards: List([]),

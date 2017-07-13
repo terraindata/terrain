@@ -144,7 +144,7 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-let RESULTS_CACHE: {[primaryKey: string]: Result};
+let RESULTS_CACHE: { [primaryKey: string]: Result };
 
 export class ResultsManager extends TerrainComponent<Props>
 {

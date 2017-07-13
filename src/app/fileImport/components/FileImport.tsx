@@ -88,7 +88,7 @@ class FileImport extends TerrainComponent<any>
     });
 
     this._subscribe(SchemaStore, {
-      updater: (schemaState: SchemaTypes.SchemaState ) =>
+      updater: (schemaState: SchemaTypes.SchemaState) =>
       {
         this.setState({
           servers: schemaState.servers,

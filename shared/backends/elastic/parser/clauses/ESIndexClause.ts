@@ -81,7 +81,7 @@ export default class ESIndexClause extends ESStringClause
               (db) => db.serverId === server,
             ).map(
               (db) => db.name,
-              ).toList();
+            ).toList();
           },
         },
         tql: (stringBlock) => stringBlock['value'],
