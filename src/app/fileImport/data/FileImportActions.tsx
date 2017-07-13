@@ -114,6 +114,10 @@ const FileImportActions =
     setTemplates:
     (templates: List<object>) =>
       $(ActionTypes.setTemplates, { templates }),
+
+    loadTemplate:
+    (templateId: number) =>
+      $(ActionTypes.loadTemplate, { templateId }),
   };
 
 export default FileImportActions;

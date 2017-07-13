@@ -343,4 +343,21 @@ FileImportReducers[ActionTypes.setTemplates] =
     state.set('templates', action.payload.templates)
   ;
 
+FileImportReducers[ActionTypes.loadTemplate] =
+  (state, action) =>
+  {
+    const template = state.templates.get(action.payload.templateId);
+    console.log(template);
+    console.log(template.columnTypes);
+    return state
+      .set('oldNames', template.oldNames)
+      .set('primaryKey', template.primaryKey)
+      .set('transforms', template.transforms)
+      .set('hasCsvHeader', template.hasCsvHeader)
+      .set('columnNames', List(_.map(template.columnTypes, (val, key) => key)))
+      .set('columnTypes', List(_.map(template.columnTypes, (val, key) => val)))
+      .set('columnsToInclude', List(_.map(template.columnTypes, (val, key) => true)))
+  }
+;
+
 export default FileImportReducers;

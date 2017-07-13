@@ -158,6 +158,8 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleLoadTemplate()
   {
+    // apply list of transforms to preview in a queue
+    Actions.loadTemplate(this.state.templateId);
   }
 
   public handleSaveTemplate()
@@ -183,6 +185,12 @@ class FileImportPreview extends TerrainComponent<Props>
           onChange={this.handleAutocompleteTemplateChange}
           placeholder={'template name'}
           disabled={false}
+        />
+        <Dropdown
+          selectedIndex={this.state.templateId}
+          options={List(this.props.templates.map((template, i) => template.name))}
+          onChange={this.handleTemplateChange}
+          canEdit={true}
         />
         <table>
           <thead>
@@ -219,12 +227,6 @@ class FileImportPreview extends TerrainComponent<Props>
         <button onClick={this.handleUploadFile}>
           Import
         </button>
-        <Dropdown
-          selectedIndex={this.state.templateId}
-          options={List(this.props.templates.map((template, i) => template.name))}
-          onChange={this.handleTemplateChange}
-          canEdit={true}
-        />
       </div>
     );
   }
