@@ -91,19 +91,32 @@ export default class ESStructureClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
     this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
     const propertyClause: ESClause = interpreter.config.getClause('property');
 
-    // mark properties
-    Object.keys(children).forEach(
-      (name: string): void =>
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
       {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
 
-        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
+    // mark properties
+    valueInfo.forEachProperty(
+      (viTuple: ESPropertyInfo): void =>
+      {
+        viTuple.propertyName.clause = propertyClause;
+
+        if (!this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string))
+        {
+          return;
+        }
+
+        const name: string = viTuple.propertyName.value as string;
 
         if (!this.structure.hasOwnProperty(name))
         {
@@ -120,21 +133,10 @@ export default class ESStructureClause extends ESClause
         }
         else
         {
-          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
-
-          propertyClause.mark(interpreter, viTuple.propertyName);
-          clause.mark(interpreter, viTuple.propertyValue);
+          const valueClause: ESClause = interpreter.config.getClause(this.structure[name]);
+          viTuple.propertyValue.clause = valueClause;
         }
       });
-
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] === undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
   }
 
   public getRowsCard()

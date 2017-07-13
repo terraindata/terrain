@@ -44,73 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClauseType from '../ESClauseType';
-import ESInterpreter from '../ESInterpreter';
-import ESJSONType from '../ESJSONType';
-import ESValueInfo from '../ESValueInfo';
-import ESClause from './ESClause';
-
-import { List } from 'immutable';
-import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { DisplayType } from '../../../../blocks/displays/Display';
-import ElasticBlocks from '../../blocks/ElasticBlocks';
+import ESParameterSubstituter from './ESParameterSubstituter';
+import ESValueInfo from './ESValueInfo';
 
 /**
- * A clause that corresponds to an array of uniform type.
+ * Fills values in for parameters in a query using a given substitutionFunction,
+ * ultimately producing a new query string.
+ *
+ * Different possible strategies for substituting parameters:
+ * + Emit new JSON, and then reparse if needed
+ * + Emit new JS object and then interpret if needed
+ * + Mutate VI's (reparse if needed)
+ *  + traverse and replace
+ * + Deep Copy + Mutate
+ *  + traverse and copy
+ *  + traverse and replace
+ * + Immutable Substitution -> must first identify mutation locations before copy
+ *  + traverse and mark, copy on return
  */
-export default class ESArrayClause extends ESClause
+export default class ESParameterFiller
 {
-  public elementID: string;
-
-  public constructor(type: string, elementID: string, settings: any)
+  public static generate(source: ESValueInfo,
+    params: { [name: string]: any }): string
   {
-    super(type, settings, ESClauseType.ESArrayClause);
-    this.elementID = elementID;
-  }
-
-  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
-  {
-    this.typeCheck(interpreter, valueInfo, ESJSONType.array);
-
-    // mark children
-    const childClause: ESClause = interpreter.config.getClause(this.elementID);
-    valueInfo.forEachElement(
-      (element: ESValueInfo): void =>
+    return ESParameterSubstituter.generate(source,
+      (param: string): string =>
       {
-        element.clause = childClause;
+        const value: any = params[param];
+        if (value === undefined)
+        {
+          throw new Error('Undefined parameter ' + param + '.');
+        }
+
+        return JSON.stringify(value);
       });
   }
-
-  public getCard()
-  {
-    return this.seedCard({
-      cards: List([]),
-
-      static:
-      {
-        preview: '[cards.size] ' + this.type + '(s)',
-
-        display:
-        {
-          displayType: DisplayType.CARDS,
-          key: 'cards',
-          accepts: List(['eql' + this.elementID]),
-        },
-
-        init: () =>
-          ({
-            cards: List([
-              BlockUtils.make(ElasticBlocks['eql' + this.elementID]),
-            ]),
-          }),
-
-        tql: (block, tqlFn, tqlConfig) =>
-        {
-          return block['cards'].map((card) => tqlFn(card, tqlConfig)).toArray();
-        },
-      },
-    });
-  }
-
 }

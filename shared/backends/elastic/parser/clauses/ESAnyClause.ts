@@ -64,7 +64,7 @@ export default class ESAnyClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
+    // do nothing
   }
 
   public getCard()

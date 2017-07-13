@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import { Query } from '../../../items/types/Query';
 import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
-import ESInterpreter from '../parser/ESInterpreter';
+import { default as ESInterpreter } from '../parser/ESInterpreter';
 
 export function ParseElasticQuery(tql: string)
 {

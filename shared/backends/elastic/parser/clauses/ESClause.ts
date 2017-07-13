@@ -83,16 +83,6 @@ abstract class ESClause
   protected settings;
 
   /**
-   * + null types mean custom or disabled type validation
-   * + no name means use name with underscores removed
-   * + null value in type means same name as property name
-   * + typename with [] after it means array
-   * + typename with {} after it means object of type
-   * + type "enum" uses "values" member to list enumerated values
-   * + array type means any of these types
-   * + object type means structured def definition
-   * + string type references another def
-   *
    * @param type the name to refer to this clause (type)
    * @param settings the settings object to initialize it from
    * @param clauseType the enum uniquely identifying the clause type

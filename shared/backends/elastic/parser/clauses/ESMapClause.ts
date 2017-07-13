@@ -78,28 +78,20 @@ export default class ESMapClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
-
-    if (!this.typeCheck(interpreter, valueInfo, ESJSONType.object))
-    {
-      return;
-    }
+    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     // mark properties
-    const childClause: ESClause = interpreter.config.getClause(this.valueType);
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-    Object.keys(children).forEach(
-      (name: string): void =>
+    const nameClause: ESClause = interpreter.config.getClause(this.nameType);
+    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
+
+    valueInfo.forEachProperty((viTuple: ESPropertyInfo): void =>
+    {
+      viTuple.propertyName.clause = nameClause;
+      if (viTuple.propertyValue !== null)
       {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
-
-        interpreter.config.getClause(this.nameType).mark(interpreter, viTuple.propertyName);
-
-        if (viTuple.propertyValue !== null)
-        {
-          childClause.mark(interpreter, viTuple.propertyValue);
-        }
-      });
+        viTuple.propertyValue.clause = valueClause;
+      }
+    });
   }
 
   public getCard()
