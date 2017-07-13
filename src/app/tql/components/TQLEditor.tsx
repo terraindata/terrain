@@ -222,10 +222,10 @@ class TQLEditor extends TerrainComponent<Props>
     if (change.origin !== 'setValue')
     {
       this.props.onChange(cmInstance.getValue());
-      if (this.props.language === 'elastic')
-      {
-        ElasticHighlighter.highlightES(cmInstance);
-      }
+    }
+    if (this.props.language === 'elastic')
+    {
+      ElasticHighlighter.highlightES(cmInstance);
     }
   }
 
