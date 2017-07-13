@@ -44,16 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions member-access
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
+import { Colors, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
-import { Colors, fontColor } from '../../common/Colors';
 
 export interface Props
 {

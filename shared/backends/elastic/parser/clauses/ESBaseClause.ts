@@ -44,13 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
+import { DisplayType } from '../../../../blocks/displays/Display';
+import * as CommonElastic from '../../syntax/CommonElastic';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import { DisplayType } from '../../../../blocks/displays/Display';
-import * as CommonElastic from '../../syntax/CommonElastic';
 
 /**
  * A clause which is a terminal (base) value: null, boolean, number, or string

@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands
+
 import * as React from 'react';
 import * as _ from 'underscore';
 import TerrainComponent from './../../common/components/TerrainComponent';

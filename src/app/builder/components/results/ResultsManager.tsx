@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands radix prefer-const ban-types no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
+
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import { line } from 'd3-shape';
@@ -68,7 +71,7 @@ class ResultClass extends BaseClass
 {
   // all available fields for display
   public fields: IMMap<string, string> = Map<string, string>({});
-  
+
   public primaryKey: any = '';
 
   public spotlight: any;
@@ -141,7 +144,7 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-let RESULTS_CACHE: {[primaryKey: string]: Result};
+let RESULTS_CACHE: { [primaryKey: string]: Result };
 
 export class ResultsManager extends TerrainComponent<Props>
 {
@@ -509,17 +512,17 @@ export class ResultsManager extends TerrainComponent<Props>
           'fields',
           result.fields.merge(resultData),
         );
-        
+
         result = result.set(
           'primaryKey',
-          getPrimaryKeyFor(result, this.props.query.resultsConfig, index)
+          getPrimaryKeyFor(result, this.props.query.resultsConfig, index),
         );
-        
+
         if (!isAllFields)
         {
           result = result.set('rawFields', Map(resultData));
         }
-        
+
         results = results.set(index, result);
       },
     );
@@ -529,7 +532,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       fields = results.get(0).fields.keySeq().toList();
     }
-    
+
     const loading = (isAllFields && !resultsState.hasLoadedResults) ||
       (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields);
 
@@ -543,7 +546,7 @@ export class ResultsManager extends TerrainComponent<Props>
       mainErrorMessage: null,
       subErrorMessage: null,
     };
-    
+
     if (!resultsState.hasLoadedCount)
     {
       changes['count'] = results.size;

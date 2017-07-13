@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { ItemStatus } from '../../../../shared/items/types/Item';

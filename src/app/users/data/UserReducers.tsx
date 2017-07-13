@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import AuthStore from './../../auth/data/AuthStore';

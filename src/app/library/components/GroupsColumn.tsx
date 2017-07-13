@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
+
 import * as React from 'react';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
@@ -51,8 +53,8 @@ import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';

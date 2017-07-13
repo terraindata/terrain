@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires switch-default strict-boolean-expressions restrict-plus-operands no-unused-expression
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -64,7 +64,7 @@ const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../../shared/items/types/Query';
 import Ajax from './../../util/Ajax';
 
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import Manual from './../../manual/components/Manual';

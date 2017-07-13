@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:member-ordering
+
 // A generic type of backend, e.g. mysql or elastic
 
 import * as Immutable from 'immutable';

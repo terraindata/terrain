@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import * as React from 'react';
 import * as _ from 'underscore';
