@@ -135,10 +135,10 @@ class CardsColumn extends TerrainComponent<Props>
   public createCards()
   {
     _.map(this.getFirstCards(),
-       (blockConfig: object, index: number) =>
-       {
-         Actions.create(this.state.keyPath, index, blockConfig['type']);
-       });
+      (blockConfig: object, index: number) =>
+      {
+        Actions.create(this.state.keyPath, index, blockConfig['type']);
+      });
   }
 
   public toggleLearningMode()

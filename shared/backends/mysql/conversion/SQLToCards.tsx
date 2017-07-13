@@ -62,7 +62,7 @@ import { Card, Cards, CardString } from '../../../blocks/types/Card';
 const make = (blockConfig, extraConfig?: object) =>
 {
   return BlockUtils.make(Blocks, blockConfig.type, extraConfig);
-}
+};
 
 import Blocks from '../blocks/MySQLBlocks';
 

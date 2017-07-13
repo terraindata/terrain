@@ -171,11 +171,11 @@ export default class ESStructureClause extends ESClause
       _.keys(this.structure).map((type) => 'eql' + type),
     );
 
-      // If there's a template, we need to create seed cards
-      //  of the template types when this card is initialized.
+    // If there's a template, we need to create seed cards
+    //  of the template types when this card is initialized.
     const init = (blocksConfig) =>
     {
-      let config = {
+      const config = {
         childOptionClickHandler: (card, option: { text: string, type: string }): Card =>
         {
           // reducer to apply the option to the card
@@ -191,7 +191,7 @@ export default class ESStructureClause extends ESClause
           );
         },
       };
-      
+
       if (this.template)
       {
         // create the card list from the template
@@ -221,10 +221,10 @@ export default class ESStructureClause extends ESClause
         );
 
         config['cards'] = Immutable.List(cards);
-      };
-      
+      }
+
       return config;
-    }
+    };
 
     return this.seedCard(
       {

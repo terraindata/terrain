@@ -96,12 +96,12 @@ class CardsToElastic
       {
         const val = CardsToElastic.blockToElastic(card, options);
         const key = card['key'];
-        
-        if(key)
+
+        if (key)
         {
           elasticObj[key] = val;
         }
-        else if(typeof val === 'object' && ! Array.isArray(val))
+        else if (typeof val === 'object' && !Array.isArray(val))
         {
           _.extend(elasticObj, val);
         }

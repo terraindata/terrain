@@ -145,19 +145,19 @@ export const elasticMagicList = _card(
       preview: previewList,
 
       accepts,
-      
+
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
         return block['values'].map((card: Card) =>
           tqlTranslationFn(card, tqlConfig)).toArray();
       },
-      
+
       init: (blocksConfig) => ({
         values: List([
           make(blocksConfig, 'elasticMagicListItem'),
         ]),
       }),
-      
+
       display:
       {
         displayType: DisplayType.ROWS,
@@ -212,13 +212,13 @@ export const elasticMagicCard = _card(
 
         return elasticObj;
       },
-      
+
       init: (blocksConfig) => ({
         values: List([
           make(blocksConfig, 'elasticMagicValue'),
         ]),
       }),
-      
+
       display:
       {
         displayType: DisplayType.ROWS,

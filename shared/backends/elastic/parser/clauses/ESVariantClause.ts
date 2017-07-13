@@ -144,10 +144,10 @@ export default class ESVariantClause extends ESClause
         {
           return ''; //tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
-        
+
         init: (blocksConfig) =>
-        ({
-          childOptionClickHandler: 
+          ({
+            childOptionClickHandler:
             (card: Card, option: { text: string, type: string }): Card =>
             {
               // replace current card with newly made card of type
@@ -158,7 +158,7 @@ export default class ESVariantClause extends ESClause
                 },
               );
             },
-        }),
+          }),
 
         // accepts,
 

@@ -374,12 +374,12 @@ const Util = {
   rel(target): string
   {
     const rel = Util.attr(target, 'rel');
-    
+
     if (rel === undefined || rel === null)
     {
       return Util.attr(target, 'data-rel');
     }
-    
+
     return rel;
   },
 
