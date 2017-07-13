@@ -189,7 +189,7 @@ class SchemaResults extends TerrainComponent<Props>
     ].map(
       (inputConfig) =>
         BlockUtils.make(
-          AllBackendsMap.mysql.blocks.input,
+          AllBackendsMap.mysql.blocks, 'input',
           inputConfig,
         ),
     );
@@ -199,11 +199,11 @@ class SchemaResults extends TerrainComponent<Props>
 
       cards: List([
         BlockUtils.make(
-          AllBackendsMap.mysql.blocks.sfw,
+          AllBackendsMap.mysql.blocks, 'sfw',
           {
             fields: List([
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.field,
+                AllBackendsMap.mysql.blocks, 'field',
                 {
                   field: 'input.field',
                 },
@@ -212,11 +212,11 @@ class SchemaResults extends TerrainComponent<Props>
 
             cards: List([
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.from,
+                AllBackendsMap.mysql.blocks, 'from',
                 {
                   tables: List([
                     BlockUtils.make(
-                      AllBackendsMap.mysql.blocks.table,
+                      AllBackendsMap.mysql.blocks, 'table',
                       {
                         table: 'input.table',
                       },
@@ -226,11 +226,11 @@ class SchemaResults extends TerrainComponent<Props>
               ),
 
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.where,
+                AllBackendsMap.mysql.blocks, 'where',
                 {
                   cards: List([
                     BlockUtils.make(
-                      AllBackendsMap.mysql.blocks.tql,
+                      AllBackendsMap.mysql.blocks, 'tql',
                       {
                         clause: where,
                       },
@@ -240,7 +240,7 @@ class SchemaResults extends TerrainComponent<Props>
               ),
 
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.take,
+                AllBackendsMap.mysql.blocks, 'take',
                 {
                   value: 'input.numRows',
                 },

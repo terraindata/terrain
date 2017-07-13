@@ -63,7 +63,7 @@ class MySQLBackend implements Backend
   blocks = MySQLBlocks;
   creatingType = MySQLBlocks.creating.type;
   inputType = MySQLBlocks.input.type;
-  rootCard = MySQLBlocks.sfw;
+  rootCards = [MySQLBlocks.sfw];
   topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
 
   // Ordering of the cards deck

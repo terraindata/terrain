@@ -54,7 +54,6 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../../blocks/CommonBlocks';
 import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
 import { Card } from '../../../../blocks/types/Card';
-import ElasticBlocks from '../../blocks/ElasticBlocks';
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
@@ -136,16 +135,7 @@ export default class ESVariantClause extends ESClause
         return childOptions;
       },
 
-      childOptionClickHandler: (card: Card, option: { text: string, type: string }): Card =>
-      {
-        // replace current card with newly made card of type
-        return BlockUtils.make(
-          ElasticBlocks[option.type],
-          {
-            key: card['key'],
-          },
-        );
-      },
+      childOptionClickHandler: null, // set in init()
 
       static:
       {
@@ -154,6 +144,21 @@ export default class ESVariantClause extends ESClause
         {
           return ''; //tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
+        
+        init: (blocksConfig) =>
+        ({
+          childOptionClickHandler: 
+            (card: Card, option: { text: string, type: string }): Card =>
+            {
+              // replace current card with newly made card of type
+              return BlockUtils.make(
+                blocksConfig, option.type,
+                {
+                  key: card['key'],
+                },
+              );
+            },
+        }),
 
         // accepts,
 

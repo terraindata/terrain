@@ -261,7 +261,7 @@ class TransformCardChart extends TerrainComponent<Props>
     this.updatePoints(
       points.splice(index, 0,
         BlockUtils.make(
-          AllBackendsMap[this.props.language].blocks.scorePoint, {
+          AllBackendsMap[this.props.language].blocks, 'scorePoint', {
             value,
             score,
           },

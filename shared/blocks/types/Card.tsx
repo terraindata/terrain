@@ -49,7 +49,11 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import * as BlockUtils from '../BlockUtils';
 import { Display } from '../displays/Display';
-import { allBlocksMetaFields, Block, TQLFn, verifyBlockConfigKeys } from './Block';
+import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
+
+export type InitFn = (blockSpec: {[type: string]: BlockConfig}) => {
+  [k: string]: any;
+};
 
 export interface Card extends IRecord<Card>
 {
@@ -82,9 +86,9 @@ export interface Card extends IRecord<Card>
     anythingAccepts?: boolean;
 
     // returns an object with default values for a new card
-    init?: () => {
-      [k: string]: any;
-    };
+    //  receives the appropriate block spec as an argument, to avoid
+    //  a circular dependency
+    init?: InitFn;
 
     // given a card, return the "terms" it generates for autocomplete
     // TODO schemaState type is : SchemaTypes.SchemaState
@@ -133,9 +137,7 @@ export interface CardConfig
 
     metaFields?: string[];
 
-    init?: () => {
-      [k: string]: any;
-    };
+    init?: InitFn;
   };
 }
 
