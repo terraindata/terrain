@@ -16,7 +16,7 @@
     "build-prod": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack --config webpack.config.prod.js --output-filename ./midway/src/assets/bundle.min.js",
     "build": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack --config webpack.config.js --output-filename ./midway/src/assets/bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony -- ./midway/src/Midway.ts",
-    "lint": "yarn run lint-back",
+    "lint": "yarn run lint-front && yarn run lint-back",
     "lint-back": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
     "lint-front": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "find midway src shared -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
