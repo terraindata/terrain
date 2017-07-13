@@ -228,13 +228,23 @@ export class Events
         if (item.status !== 'ARCHIVE' && item.meta !== undefined)
         {
           const meta = JSON.parse(item.meta);
-          const returnEvent: object =
+          let itemParent: any;
+          let itemId: any;
+          if (item.parent !== undefined)
           {
-            dependencies: item.parent === 0 ? [] : ['item' + item.parent],
-            eventId: 'item' + item.id,
-            name: item.name,
-            type: '',
-          };
+            itemParent = item.parent.toString();
+          }
+          if (item.id !== undefined)
+          {
+            itemId = item.id.toString();
+          }
+          const returnEvent: object =
+            {
+              dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
+              eventId: 'item' + (itemId as string),
+              name: item.name,
+              type: '',
+            };
           // for now, only use items that are ES
           if (meta.algorithmsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
           {
