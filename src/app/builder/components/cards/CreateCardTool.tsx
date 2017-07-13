@@ -196,7 +196,7 @@ class CreateCardTool extends TerrainComponent<Props>
           backgroundColor: block.static.colors[0],
         }}
       >
-        <div className='create-card-button-inner' rel={'' + index}>
+        <div className='create-card-button-inner' data-rel={'' + index}>
           {
             text
           }

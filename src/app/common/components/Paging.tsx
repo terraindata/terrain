@@ -258,7 +258,7 @@ class Paging extends TerrainComponent<Props>
                   onMouseOver={this.handlePageMouseOver}
                   onMouseOut={this.handleMouseOut}
                   key={page}
-                  rel={page + ''}
+                  data-rel={page + ''}
                 >
                   {page}
                 </div>

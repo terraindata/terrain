@@ -335,7 +335,6 @@ class BuilderTextbox extends TerrainComponent<Props>
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
-                rel={this.props.rel}
               />
               :
               <Autocomplete

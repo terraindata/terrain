@@ -264,7 +264,7 @@ class Autocomplete extends TerrainComponent<Props>
           'ac-option-selected': index === this.state.selectedIndex,
         })}
         onMouseDown={this._fn(this.handleSelect, option)}
-        value={option}
+        data-value={option}
         key={option}
         ref={'opt' + index}
       >
