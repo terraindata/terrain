@@ -165,8 +165,8 @@ class FileImportInfo extends TerrainComponent<Props>
     items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
-          typeof value === 'string' ? value : JSON.stringify(value),
-        ),
+        typeof value === 'string' ? value : JSON.stringify(value),
+      ),
     );
 
     const columnNames = _.map(items[0], (value, index) =>

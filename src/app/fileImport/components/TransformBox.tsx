@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -138,15 +141,15 @@ class TransformBox extends TerrainComponent<Props>
 
   public transformErrorCheck(transformName: string)
   {
-    if (! transformName)
+    if (!transformName)
     {
       return 'Select a transformation';
     }
-    if (transformName === 'append' && ! this.state.transformText)
+    if (transformName === 'append' && !this.state.transformText)
     {
       return 'Enter text to append';
     }
-    if (transformName === 'prepend' && ! this.state.transformText)
+    if (transformName === 'prepend' && !this.state.transformText)
     {
       return 'Enter text to prepend';
     }
@@ -224,8 +227,8 @@ class TransformBox extends TerrainComponent<Props>
             oldName: this.props.colName,
             newName: this.state.splitNames,
             text: this.state.transformText,
-           },
-         },
+          },
+        },
       );
     }
     else if (transformName === 'merge')
@@ -237,8 +240,8 @@ class TransformBox extends TerrainComponent<Props>
             oldName: [this.props.colName, this.props.columnNames.get(this.state.colToMergeId)],
             newName: this.state.mergeNewName,
             text: this.state.transformText,
-           },
-         },
+          },
+        },
       );
     }
 

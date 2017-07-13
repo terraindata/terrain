@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands no-console
+// tslint:disable:restrict-plus-operands no-console strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
@@ -180,9 +180,9 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
                 action.payload.transform.args.text + col;
             }
             return col;
-          }) ,
-        )) ,
-        );
+          }),
+        )),
+      );
     }
     else if (action.payload.transform.name === 'split')
     {
@@ -287,7 +287,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.oldNames,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&
-          [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
+        [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
       state.columnNames.get(state.primaryKey),
       state.transforms,
