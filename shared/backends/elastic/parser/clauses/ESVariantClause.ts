@@ -44,21 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
-import { List } from 'immutable';
+// tslint:disable:comment-format
 
-import ESClause from './ESClause';
-import ESClauseType from '../ESClauseType';
+import { List } from 'immutable';
+import * as _ from 'underscore';
+
+import SpecializedCreateCardTool from '../../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import * as CommonBlocks from '../../../../blocks/CommonBlocks';
+import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
+import { Card } from '../../../../blocks/types/Card';
+import ElasticBlocks from '../../blocks/ElasticBlocks';
 import EQLConfig from '../EQLConfig';
+import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
-import * as CommonBlocks from '../../../../blocks/CommonBlocks';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import ElasticBlocks from '../../blocks/ElasticBlocks';
-import { Card } from '../../../../blocks/types/Card';
-import { Display, DisplayType, wrapperSingleChildDisplay } from '../../../../blocks/displays/Display';
-import SpecializedCreateCardTool from '../../../../../src/app/builder/components/cards/SpecializedCreateCardTool';
+import ESClause from './ESClause';
 
 /**
  * A clause which is one of several possible types
@@ -110,10 +112,10 @@ export default class ESVariantClause extends ESClause
       _.map(
         this.subtypes,
         (type: string, jsonType: string) =>
-          'eql' + type
-      )
+          'eql' + type,
+      ),
     );
-    
+
     const childOptions = List(
       _.map(
         this.subtypes,
@@ -121,10 +123,10 @@ export default class ESVariantClause extends ESClause
           ({
             text: type,
             type: 'eql' + type,
-          })
-        )
-      );
-    
+          }),
+      ),
+    );
+
     return this.seedCard({
       // cards: List([]),
 
@@ -141,7 +143,7 @@ export default class ESVariantClause extends ESClause
           ElasticBlocks[option.type],
           {
             key: card['key'],
-          }
+          },
         );
       },
 
@@ -152,9 +154,9 @@ export default class ESVariantClause extends ESClause
         {
           return ''; //tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
-        
+
         // accepts,
-        
+
         display:
         {
           provideParentData: true, // need this to grey out the type dropdown
@@ -169,7 +171,7 @@ export default class ESVariantClause extends ESClause
         //   singleChild: true,
         // },
         preview: '',
-      }
+      },
     });
   }
 }

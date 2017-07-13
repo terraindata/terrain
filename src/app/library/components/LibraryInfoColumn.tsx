@@ -44,14 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 const { List } = Immutable;
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesStore from './../../roles/data/RolesStore';
 import * as RoleTypes from './../../roles/RoleTypes';
 import UserStore from './../../users/data/UserStore';
@@ -59,15 +62,14 @@ import * as UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import ColorManager from './../../util/ColorManager';
 import Util from './../../util/Util';
-import Actions from './../data/LibraryActions';
 import LibraryActions from './../data/LibraryActions';
+import Actions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
 import LibraryInfoUser from './LibraryInfoUser';
 import LibraryVariantInfo from './LibraryVariantInfo';
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const GroupIcon = require('./../../../images/icon_badgeGroup.svg');

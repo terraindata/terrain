@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions class-name ban-types interface-name
+
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import * as _ from 'underscore';

@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
+import { DisplayType } from '../../../../blocks/displays/Display';
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
@@ -53,7 +54,6 @@ import ESJSONType from '../ESJSONType';
 import ESPropertyInfo from '../ESPropertyInfo';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
-import { DisplayType } from '../../../../blocks/displays/Display';
 
 /**
  * A clause that corresponds to an object of uniform type values.
@@ -104,7 +104,6 @@ export default class ESMapClause extends ESClause
 
       // TODO incorporate nameType into the keys
 
-
       static:
       {
         preview: '[cards.size] properties',
@@ -117,14 +116,14 @@ export default class ESMapClause extends ESClause
         },
         accepts,
 
-        tql: (block, tqlFn, tqlConfig) => 
+        tql: (block, tqlFn, tqlConfig) =>
         {
-          const json = {}
+          const json = {};
           block['cards'].map(
             (card) =>
             {
               json[card['key']] = tqlFn(card, tqlConfig);
-            }
+            },
           );
           return json;
         },

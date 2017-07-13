@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -92,7 +95,8 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
     }
 
     const isWrapping = cardWillWrap(targetProps, type);
-    let wrappingCardData: any, wrappingKeyPath: KeyPath;
+    let wrappingCardData: any;
+    let wrappingKeyPath: KeyPath;
 
     if (isWrapping)
     {
@@ -102,7 +106,8 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
       Actions.remove(targetProps.keyPath, targetIndex);
     }
 
-    let cardProps: any, indexOffset: number;
+    let cardProps: any;
+    let indexOffset: number;
 
     if (item['new'])
     {

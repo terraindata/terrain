@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
@@ -255,7 +258,7 @@ class Paging extends TerrainComponent<Props>
                   onMouseOver={this.handlePageMouseOver}
                   onMouseOut={this.handleMouseOut}
                   key={page}
-                  rel={page + ''}
+                  data-rel={page + ''}
                 >
                   {page}
                 </div>

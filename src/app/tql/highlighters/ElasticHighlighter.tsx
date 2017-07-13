@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 // parser imports
 import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/backends/elastic/parser/ESJSONType';
@@ -66,13 +68,13 @@ import SyntaxHighlighter from './SyntaxHighlighter';
  */
 function assertUnreachable(param: never): never
 {
-  throw new Error("Unreachable code reached");
+  throw new Error('Unreachable code reached');
 }
 
 interface FlaggedToken
 {
-  isKeyword: boolean,
-  parserToken: ESParserToken
+  isKeyword: boolean;
+  parserToken: ESParserToken;
 }
 
 /*
@@ -84,7 +86,7 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null =
 {
   if (!valueInfo)
   {
-    return;
+    return {};
   }
 
   for (const token of valueInfo.tokens)
@@ -146,7 +148,7 @@ class ElasticHighlighter extends SyntaxHighlighter
         instance.markText(
           { line: token.row, ch: token.col },
           { line: token.toRow, ch: token.toCol },
-          { className: style }
+          { className: style },
         );
         // markText returns a TextMarker object. In the goal of being stateless though,
         // we clear the markers by grabbing them from the code mirror instance instead

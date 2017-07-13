@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:member-ordering switch-default member-access
+
 import * as React from 'react';
 import * as _ from 'underscore';
 import TerrainComponent from '../../common/components/TerrainComponent';

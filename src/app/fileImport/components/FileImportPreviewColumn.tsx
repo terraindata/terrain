@@ -44,15 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import './FileImportPreviewColumn.less';
 

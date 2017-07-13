@@ -43,13 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands interface-name
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less

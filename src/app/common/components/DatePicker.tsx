@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands
+
 import * as React from 'react';
 import './DatePicker.less';
 // import * as moment from 'moment';

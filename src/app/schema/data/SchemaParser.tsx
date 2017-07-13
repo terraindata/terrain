@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import * as SchemaTypes from '../SchemaTypes';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';
+import * as SchemaTypes from '../SchemaTypes';
 const { Map, List } = Immutable;
 
 type Server = SchemaTypes.Server;

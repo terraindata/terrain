@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import './TransformCardPeriscope.less';
 const { Map, List } = Immutable;

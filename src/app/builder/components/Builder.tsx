@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length no-unused-expression
+
 // Libraries
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -72,7 +75,7 @@ type Variant = LibraryTypes.Variant;
 
 // Components
 
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import { notificationManager } from './../../common/components/InAppNotification';
@@ -215,7 +218,7 @@ class Builder extends TerrainComponent<Props>
         this.setState({
           navigationException: false,
         });
-        return;
+        return undefined;
       }
 
       if (this.shouldSave())

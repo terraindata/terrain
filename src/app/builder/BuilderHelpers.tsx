@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import { Block } from '../../../shared/blocks/types/Block';
 import { Card } from '../../../shared/blocks/types/Card';
 import { Input } from '../../../shared/blocks/types/Input';

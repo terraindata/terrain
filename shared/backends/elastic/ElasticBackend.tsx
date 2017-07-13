@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires member-access
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { Backend, cardsDeckToList } from '../types/Backend';
@@ -65,7 +68,7 @@ class ElasticBackend implements Backend
 
   rootCard = ElasticBlocks.eqlroot;
   topLevelCards =
-    Immutable.List(_.keys(ElasticBlocks)); // TODO change this to true top level cards
+  Immutable.List(_.keys(ElasticBlocks)); // TODO change this to true top level cards
   //  Immutable.List<string>([
   //   ElasticBlocks.elasticRootCard.type,
   //   ElasticBlocks.elasticKeyValueWrap.type,

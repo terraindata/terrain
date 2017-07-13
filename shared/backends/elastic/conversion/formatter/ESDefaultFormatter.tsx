@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:restrict-plus-operands
+
 import ElementInfo from './ElementInfo';
 import ObjectFormatter from './ObjectFormatter';
 

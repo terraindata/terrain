@@ -1,4 +1,13 @@
 {
-  "presets": ["es2015"],
-  "plugins": ["transform-async-to-generator", "transform-regenerator", "transform-runtime"]
+  "presets": [
+    ["es2015", {"modules": false}]
+  ],
+
+  "plugins": ["syntax-dynamic-import", "transform-async-to-generator", "transform-regenerator", "transform-runtime"],
+
+  "env": {
+    "test": {
+      "plugins": ["dynamic-import-node"]
+    }
+  }
 }
