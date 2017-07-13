@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 import * as Immutable from 'immutable';
 import * as React from 'react';

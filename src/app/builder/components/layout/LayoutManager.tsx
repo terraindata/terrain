@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable
+
 // somebody please rescue this or kill this
 
 // tslint:disable:no-invalid-this

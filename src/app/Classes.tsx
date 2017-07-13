@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:variable-name strict-boolean-expressions no-console
+
 /**
  * This file provides utility functions for implementing classes
  * from Immutable Records. This gives the typesafety benefits of

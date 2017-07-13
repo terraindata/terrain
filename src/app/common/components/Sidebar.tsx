@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands interface-name
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';

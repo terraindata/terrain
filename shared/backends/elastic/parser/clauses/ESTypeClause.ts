@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import { List } from 'immutable';
 import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
 import { DisplayType } from '../../../../blocks/displays/Display';

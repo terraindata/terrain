@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import BackendInstance from '../../../../shared/backends/types/BackendInstance';

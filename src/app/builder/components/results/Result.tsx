@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';

@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length no-unused-expression
+
 // Libraries
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';

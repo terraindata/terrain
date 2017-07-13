@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import * as React from 'react';

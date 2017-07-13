@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';

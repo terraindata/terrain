@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions interface-name no-var-requires no-unused-expression max-classes-per-file
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';

@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as React from 'react';

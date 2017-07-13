@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format
+
 import { extend } from 'underscore';
 const Color = require('color');
 

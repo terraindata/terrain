@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:comment-format
+
 import { List } from 'immutable';
 import * as _ from 'underscore';
 

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 // parser imports
 import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/backends/elastic/parser/ESJSONType';

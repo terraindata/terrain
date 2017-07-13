@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands no-console
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import Ajax from './../../util/Ajax';

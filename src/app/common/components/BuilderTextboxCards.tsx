@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import { Card, CardString } from '../../../../shared/blocks/types/Card';
 
 import * as classNames from 'classnames';

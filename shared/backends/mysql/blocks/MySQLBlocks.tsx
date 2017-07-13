@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Color = require('color');

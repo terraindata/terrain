@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 

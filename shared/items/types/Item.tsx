@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:member-access
+
 import { BaseClass, New } from '../../../src/app/Classes';
 import BackendInstance from '../../backends/types/BackendInstance';
 

@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions
+
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea';

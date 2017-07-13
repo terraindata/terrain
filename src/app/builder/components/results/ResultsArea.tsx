@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import './ResultsArea.less';
 const { Map, List } = Immutable;

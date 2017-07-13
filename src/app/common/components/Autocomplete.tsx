@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
+
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';

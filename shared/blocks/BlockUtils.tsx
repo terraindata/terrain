@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:forin no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { Map, List } = Immutable;

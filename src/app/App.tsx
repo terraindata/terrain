@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console
+
 /// <reference path="../typings/tsd.d.ts" />
 
 require('babel-polyfill');

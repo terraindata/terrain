@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions return-undefined no-console no-empty max-line-length no-unused-expression no-shadowed-variable
+
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import BackendInstance from '../../../shared/backends/types/BackendInstance';

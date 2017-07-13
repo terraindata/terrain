@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as RoleTypes from './../roles/RoleTypes';

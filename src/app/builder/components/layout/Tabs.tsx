@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression max-line-length
 
 import './Tabs.less';
 // import * as moment from 'moment';
