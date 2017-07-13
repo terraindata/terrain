@@ -713,22 +713,22 @@ export class Import
         switch (transform['name'])
         {
           case 'rename':
-            const oldName: string | undefined = transform['args']['oldName'];
+            const oldName: string | undefined = transform['colName'];
             const newName: string | undefined = transform['args']['newName'];
             if (oldName === undefined || newName === undefined)
             {
-              return reject('Rename transformation must supply oldName and newName arguments.');
+              return reject('Rename transformation must supply colName and newName arguments.');
             }
             obj[newName] = obj[oldName];
             delete obj[oldName];
             break;
           case 'split':
-            const oldCol: string | undefined = transform['args']['oldName'];
+            const oldCol: string | undefined = transform['colName'];
             const newCols: string[] | undefined = transform['args']['newName'];
             const splitText: string | undefined = transform['args']['text'];
             if (oldCol === undefined || newCols === undefined || splitText === undefined)
             {
-              return reject('Split transformation must supply oldName, newName, and text arguments.');
+              return reject('Split transformation must supply colName, newName, and text arguments.');
             }
             if (newCols.length !== 2)
             {
@@ -753,31 +753,28 @@ export class Import
             }
             break;
           case 'merge':
-            const oldCols: string[] | undefined = transform['args']['oldName'];
+            const startCol: string | undefined = transform['colName'];
+            const mergeCol: string | undefined = transform['args']['mergeName'];
             const newCol: string | undefined = transform['args']['newName'];
             const mergeText: string | undefined = transform['args']['text'];
-            if (oldCols === undefined || newCol === undefined || mergeText === undefined)
+            if (startCol === undefined || mergeCol === undefined || newCol === undefined || mergeText === undefined)
             {
-              return reject('Merge transformation must supply oldName, newName, and text arguments.');
+              return reject('Merge transformation must supply colName, mergeName, newName, and text arguments.');
             }
-            if (oldCols.length !== 2)
-            {
-              return reject('Merge transformation currently only supports merging of two columns.');
-            }
-            if (typeof obj[oldCols[0]] !== 'string' || typeof obj[oldCols[1]] !== 'string')
+            if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
             {
               return reject('Can only merge columns containing text.');
             }
-            obj[newCol] = String(obj[oldCols[0]]) + mergeText + String(obj[oldCols[1]]);
-            delete obj[oldCols[0]];
-            delete obj[oldCols[1]];
+            obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
+            delete obj[startCol];
+            delete obj[mergeCol];
             break;
           default:
             if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
             {
               return reject('Invalid transform name encountered: ' + String(transform['name']));
             }
-            const colName: string | undefined = transform['args']['colName'];
+            const colName: string | undefined = transform['colName'];
             const text: string | undefined = transform['args']['text'];
             if (colName === undefined || text === undefined)
             {
