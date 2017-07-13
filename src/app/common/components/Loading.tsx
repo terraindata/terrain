@@ -43,13 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions interface-name no-var-requires no-unused-expression max-classes-per-file
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './Loading.less';
 
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 
 const Sprites = require('./../../../images/spritesheet_terrainLoading.png');
@@ -68,7 +71,7 @@ export interface Props
 // Frame Breakdown
 // (Appear: frames 0-10) (Loading Appear: frames 11-16) (Loading Loop: frames 17-50) (Disappear: frames 51-56)
 
-class Loading extends PureClasss<Props>
+class Loading extends TerrainComponent<Props>
 {
   public state = {
     stage: 0,

@@ -44,6 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
+import { DisplayType } from '../../../../blocks/displays/Display';
+import * as CommonElastic from '../../syntax/CommonElastic';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
@@ -79,5 +83,20 @@ export default class ESBaseClause extends ESClause
           ' when expecting a base type. This value should be a base value: null, boolean, number, or string.');
         break;
     }
+  }
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || '',
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'value',
+        },
+        tql: (block) => CommonElastic.parseESValue(block['value']),
+      },
+    });
   }
 }

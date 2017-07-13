@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as React from 'react';
@@ -50,7 +53,7 @@ import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
 import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 
 interface ScorePoint
@@ -81,7 +84,7 @@ export interface Props
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
-class TransformCardChart extends PureClasss<Props>
+class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
     selectedPointIds: IMMap<string, boolean>;
@@ -179,7 +182,8 @@ class TransformCardChart extends PureClasss<Props>
     const valueDiff = this.state.initialValue - newValue;
     pointValues.sort(this.sortNumber);
     const pointIndex = this.props.points.findIndex((scorePoint) => scorePoint.id === pointId);
-    let min: number, max: number;
+    let min: number;
+    let max: number;
 
     const points = this.state.initialPoints.map((scorePoint) =>
     {

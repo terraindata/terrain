@@ -43,17 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
+
 import * as Immutable from 'immutable';
-import * as React from 'react';
 import * as Papa from 'papaparse';
+import * as React from 'react';
+import { dbTableErrorCheck } from '../../../../shared/fileImport/Util';
 import * as SchemaTypes from '../../schema/SchemaTypes';
 import Autocomplete from './../../common/components/Autocomplete';
-import Dropdown from './../../common/components/Dropdown';
-import PureClasss from './../../common/components/PureClasss';
 import CheckBox from './../../common/components/CheckBox';
-import Actions from './../data/FileImportActions';
+import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Util from './../../util/Util';
-import { dbTableErrorCheck } from "../../../../shared/fileImport/Util";
+import Actions from './../data/FileImportActions';
 const { List } = Immutable;
 
 export interface Props
@@ -75,7 +78,7 @@ export interface Props
   hasCsvHeader: boolean;
 }
 
-class FileImportInfo extends PureClasss<Props>
+class FileImportInfo extends TerrainComponent<Props>
 {
   public state: {
     serverIndex: number,
@@ -134,9 +137,9 @@ class FileImportInfo extends PureClasss<Props>
       {
         alert('Input JSON file must parse to an array of objects.');
         this.refs['file']['value'] = null;
-        return;
+        return [];
       }
-      console.log("Parsed json: ", items);
+      console.log('Parsed json: ', items);
 
       // if (items.length > 0)
       // {
@@ -163,9 +166,9 @@ class FileImportInfo extends PureClasss<Props>
           return;
         },
         skipEmptyLines: true,
-      }
+      };
       items = Papa.parse(file, config).data;
-      console.log("Parsed csv: ", items);
+      console.log('Parsed csv: ', items);
 
       for (let i = 1; i < items.length; i++)
       {
@@ -173,7 +176,7 @@ class FileImportInfo extends PureClasss<Props>
         {
           alert('CSV format incorrect: each row must have same number of fields');
           this.refs['file']['value'] = null;
-          return;
+          return [];
         }
       }
     }
@@ -193,11 +196,10 @@ class FileImportInfo extends PureClasss<Props>
       return;
     }
 
-
     const filetype = file.target.files[0].name.split('.').pop();
     if (this.props.validFiletypes.indexOf(filetype) === -1)
     {
-      alert("Invalid filetype: " + filetype + ", please select another file");
+      alert('Invalid filetype: ' + filetype + ', please select another file');
       this.refs['file']['value'] = null;
       return;
     }
@@ -206,12 +208,12 @@ class FileImportInfo extends PureClasss<Props>
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      console.log("File chosen contents: ", fr.result);
+      console.log('File chosen contents: ', fr.result);
       const preview = this.parseData(fr.result, filetype);
 
       Actions.chooseFile(fr.result, filetype, preview);
       this.refs['file']['value'] = null;
-    }
+    };
   }
 
   public handleUploadFile()
@@ -259,7 +261,7 @@ class FileImportInfo extends PureClasss<Props>
     return (
       <div>
         <div>
-          <input ref="file" type="file" name="abc" onChange={this.handleChooseFile} />
+          <input ref='file' type='file' name='abc' onChange={this.handleChooseFile} />
           has header row (csv only)
           <CheckBox
             checked={this.props.hasCsvHeader}

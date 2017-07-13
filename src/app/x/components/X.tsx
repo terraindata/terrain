@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { Link } from 'react-router';
 import * as _ from 'underscore';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './X.less';
 
 const xes =
@@ -67,7 +67,7 @@ export interface Props
   };
 }
 
-class X extends Classs<Props>
+class X extends TerrainComponent<Props>
 {
   constructor(props)
   {

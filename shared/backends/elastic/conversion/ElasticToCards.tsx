@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
+
+import { List, Map } from 'immutable';
 import * as _ from 'underscore';
-import List = Immutable.List;
-import Map = Immutable.Map;
 
 import AjaxM1 from '../../../../src/app/util/AjaxM1'; // TODO change / remove
 import Query from '../../../items/types/Query';
@@ -57,6 +57,8 @@ import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
+
+import ESValueInfo from '../parser/ESValueInfo';
 
 const { make } = BlockUtils;
 
@@ -74,7 +76,9 @@ export default function ElasticToCards(
   {
     try
     {
-      let cards = parseMagicObject(query.parseTree.parser.getValue());
+      // let cards = parseMagicObject(query.parseTree.parser.getValue());
+      const rootValueInfo = query.parseTree.parser.getValueInfo();
+      let cards = List([parseCardFromValueInfo(rootValueInfo)]);
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
@@ -87,6 +91,48 @@ export default function ElasticToCards(
     }
   }
 }
+
+const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
+{
+  if (!valueInfo)
+  {
+    return BlockUtils.make(Blocks['eqlnull']);
+  }
+
+  const valueMap: { value?: any, cards?: List<Card> } = {};
+
+  const clauseCardType = 'eql' + valueInfo.clause.type;
+
+  if (typeof valueInfo.value !== 'object')
+  {
+    valueMap.value = valueInfo.value;
+  }
+
+  if (valueInfo.arrayChildren && valueInfo.arrayChildren.length)
+  {
+    valueMap.cards = List(valueInfo.arrayChildren.map(parseCardFromValueInfo));
+  }
+
+  if (valueInfo.objectChildren && _.size(valueInfo.objectChildren))
+  {
+    if (valueMap.cards)
+    {
+      console.log('Error with: ', valueInfo);
+      throw new Error('Found both arrayChildren and objectChildren in a ValueInfo');
+    }
+
+    valueMap.cards = List(_.map(valueInfo.objectChildren,
+      (propertyInfo, key: string) =>
+      {
+        let card = parseCardFromValueInfo(propertyInfo.propertyValue);
+        card = card.set('key', key);
+        return card;
+      },
+    ));
+  }
+
+  return BlockUtils.make(Blocks[clauseCardType], valueMap);
+};
 
 const isScoreCard = (obj: object): boolean =>
 {
@@ -107,7 +153,7 @@ const parseObjectWrap = (obj: object): Cards =>
         Blocks.elasticKeyValueWrap,
         {
           key,
-          cards: Immutable.List([
+          cards: List([
             parseValueSingleCard(value),
           ]),
         },
@@ -115,7 +161,7 @@ const parseObjectWrap = (obj: object): Cards =>
     },
   );
 
-  return Immutable.List(arr);
+  return List(arr);
 };
 
 const parseElasticWeightBlock = (obj: object): Block =>
@@ -132,7 +178,7 @@ const parseElasticWeightBlock = (obj: object): Block =>
 
   const card = make(Blocks.elasticTransform, {
     input: obj['numerators'][0][0],
-    scorePoints: Immutable.List(scorePoints),
+    scorePoints: List(scorePoints),
   });
 
   return make(Blocks.elasticWeight, {
@@ -143,7 +189,7 @@ const parseElasticWeightBlock = (obj: object): Block =>
 
 const parseArrayWrap = (arr: any[]): Cards =>
 {
-  return Immutable.List(arr.map(parseValueSingleCard));
+  return List(arr.map(parseValueSingleCard));
 };
 
 const parseValueSingleCard = (value: any): Card =>
@@ -218,7 +264,7 @@ const parseMagicArray = (arr: any[]): Card =>
   return make(
     Blocks.elasticMagicList,
     {
-      values: Immutable.List(values),
+      values: List(values),
     },
   );
 };
@@ -227,7 +273,7 @@ const parseMagicObject = (obj: object): Cards =>
 {
   if (obj === {} || obj === null)
   {
-    return Immutable.List([
+    return List([
       make(Blocks.elasticMagicValue, {
         value: obj,
       }),
@@ -237,11 +283,11 @@ const parseMagicObject = (obj: object): Cards =>
 
   if (isScoreCard(obj))
   {
-    return Immutable.List([
+    return List([
       make(
         Blocks.elasticScore,
         {
-          weights: Immutable.List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
+          weights: List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
         }),
     ]);
   }
@@ -276,9 +322,9 @@ const parseMagicObject = (obj: object): Cards =>
   const magicCard = make(
     Blocks.elasticMagicCard,
     {
-      values: Immutable.List(values),
+      values: List(values),
     },
   );
 
-  return Immutable.List([magicCard]);
+  return List([magicCard]);
 };

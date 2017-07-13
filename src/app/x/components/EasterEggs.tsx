@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty-interface prefer-const max-line-length strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -50,14 +53,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './EasterEggs.less';
 const r = 3;
 export interface Props
 {
 }
 
-class EasterEggs extends PureClasss<Props>
+class EasterEggs extends TerrainComponent<Props>
 {
   public state: {
     christmas: boolean;
@@ -174,7 +177,7 @@ class EasterEggs extends PureClasss<Props>
               />,
             )
           }
-          <iframe className='youtube-player' type='text/html' src='http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1'>&lt;br /&gt;</iframe>
+          <iframe className='youtube-player' src='http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1'>&lt;br /&gt;</iframe>
         </div>
       );
     }

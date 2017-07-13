@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:switch-default strict-boolean-expressions restrict-plus-operands no-console
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { List, Map } = Immutable;
@@ -52,7 +55,7 @@ import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
@@ -71,7 +74,7 @@ export interface Props
 }
 
 @Radium
-class SchemaResults extends PureClasss<Props>
+class SchemaResults extends TerrainComponent<Props>
 {
   public state: {
     selectedId?: ID,
@@ -114,7 +117,9 @@ class SchemaResults extends PureClasss<Props>
                 this.props.databases
                 && this.props.databases.get(selectedItem['databaseId']);
             console.log('schema resultsDb', resultsDb);
-            let field: string, table: string, where: string;
+            let field: string;
+            let table: string;
+            let where: string;
 
             switch (selectedItem.type)
             {

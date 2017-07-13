@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
@@ -61,7 +64,7 @@ import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
@@ -110,7 +113,7 @@ export interface Props
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
 }
 
-class BuilderTextbox extends PureClasss<Props>
+class BuilderTextbox extends TerrainComponent<Props>
 {
   public state: {
     wrongType: boolean;
@@ -332,7 +335,6 @@ class BuilderTextbox extends PureClasss<Props>
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
-                rel={this.props.rel}
               />
               :
               <Autocomplete

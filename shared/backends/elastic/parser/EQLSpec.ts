@@ -167,10 +167,15 @@ const EQLSpec: ESClause[] =
         name: 'root clause',
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { index: '', type: '', from: 0, size: 1000, body: { query: {} } },
+        template: { index: null, type: null, from: null, size: null, body: null },
         autocomplete: ['index', 'type'],
       }),
-    new ESIndexClause('index', { desc: 'Selects which index to search.' }),
+    new ESIndexClause('index',
+      {
+        desc: 'Selects which index to search.',
+        template: '',
+      },
+    ),
     new ESTypeClause('type', { desc: 'Selects which type to search.' }),
     new ESNumberClause('from',
       {
@@ -181,6 +186,7 @@ const EQLSpec: ESClause[] =
       {
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
+        template: 1000,
       }),
     new ESStructureClause('body',
       {
@@ -212,7 +218,7 @@ const EQLSpec: ESClause[] =
       },
       [],
       {
-        name: 'body clause',
+        name: 'body',
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { query: null },
@@ -407,10 +413,10 @@ const EQLSpec: ESClause[] =
       },
       [],
       {
-        name: 'query clause',
+        name: 'query',
         desc: 'Controls match, term, and range filtering and matching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-query.html',
-        template: {},
+        // template: { bool: null },
       }),
     new ESArrayClause('ids',
       'string',
@@ -436,8 +442,10 @@ const EQLSpec: ESClause[] =
       },
       [],
       {
+        name: 'bool',
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
+        // template: { must: null, must_not: null, should: null, minimum_should_match: null },
       }),
     new ESVariantClause('must',
       {
@@ -496,10 +504,10 @@ const EQLSpec: ESClause[] =
     new ESVariantClause('term_value',
       {
         object: 'term_settings',
-        null: 'base',
-        boolean: 'base',
-        number: 'base',
-        string: 'base',
+        null: 'null',
+        boolean: 'boolean',
+        number: 'number',
+        string: 'string',
       },
       { required: ['value'] }),
     new ESStructureClause('term_settings',
@@ -697,10 +705,10 @@ const EQLSpec: ESClause[] =
     new ESVariantClause('match_value',
       {
         object: 'match_settings',
-        null: 'base',
-        boolean: 'base',
-        number: 'base',
-        string: 'base',
+        null: 'null',
+        boolean: 'boolean',
+        number: 'number',
+        string: 'string',
       },
       {}),
     new ESStructureClause('match_settings',

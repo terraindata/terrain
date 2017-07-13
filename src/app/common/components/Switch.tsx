@@ -45,7 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
+import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './Switch.less';
 
 export interface Props
@@ -58,7 +59,7 @@ export interface Props
   medium?: boolean;
 }
 
-class Switch extends Classs<Props>
+class Switch extends TerrainComponent<Props>
 {
   public handleSwitch()
   {
@@ -77,7 +78,10 @@ class Switch extends Classs<Props>
 
     return (
       <div className={classes} onClick={this.handleSwitch}>
-        <div className='switch-on' />
+        <div
+          className='switch-on'
+          style={backgroundColor(Colors().text.link, Colors().text.linkHover)}
+        />
         <div className='switch-first'>
           {this.props.first}
         </div>

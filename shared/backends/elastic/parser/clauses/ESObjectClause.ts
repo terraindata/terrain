@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { List } from 'immutable';
+
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
@@ -57,4 +60,36 @@ export default class ESObjectClause extends ESTerminalClause
   {
     super(type, settings, ESClauseType.ESObjectClause, ESJSONType.object);
   }
+
+  public getCard()
+  {
+    return this.seedCard({
+      cards: List([]),
+      childrenHaveKeys: true,
+
+      static:
+      {
+        preview: '[cards.size] properties',
+
+        display:
+        {
+          displayType: DisplayType.CARDS,
+          key: 'cards',
+        },
+
+        tql: (block, tqlFn, tqlConfig) =>
+        {
+          const json = {};
+          block['cards'].map(
+            (card) =>
+            {
+              json[card['key']] = tqlFn(card, tqlConfig);
+            },
+          );
+          return json;
+        },
+      },
+    });
+  }
+
 }

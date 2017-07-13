@@ -43,9 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands
+
 import * as React from 'react';
 import * as _ from 'underscore';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 const SCROLL_SENSITIVITY = 500;
 
@@ -65,7 +68,7 @@ export interface Props
   children?: any;
 }
 
-class Library extends Classs<Props>
+class Library extends TerrainComponent<Props>
 {
   public state: {
     unchanged: boolean;

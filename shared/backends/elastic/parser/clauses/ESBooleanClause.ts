@@ -44,9 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.id
 
+import * as Immutable from 'immutable';
+
 import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
+
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
 
 /**
  * A clause which is a boolean
@@ -56,5 +60,25 @@ export default class ESBooleanClause extends ESTerminalClause
   public constructor(type: string, settings: any)
   {
     super(type, settings, ESClauseType.ESBooleanClause, ESJSONType.boolean);
+  }
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: true,
+
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.DROPDOWN,
+          key: 'value',
+          options: Immutable.List([
+            'false',
+            'true',
+          ]),
+        },
+        tql: (boolBlock) => !!boolBlock['value'],
+      },
+    });
   }
 }

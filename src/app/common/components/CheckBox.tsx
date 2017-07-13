@@ -43,12 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './CheckBox.less';
 const CheckMark = require('./../../../images/icon_checkMark.svg');
 
@@ -58,7 +61,7 @@ export interface Props
   onChange: () => void;
 }
 
-class CheckBox extends Classs<Props>
+class CheckBox extends TerrainComponent<Props>
 {
   public render()
   {

@@ -86,8 +86,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * `yarn start` - starts the Midway server, now running at localhost:3000
 * `yarn run start-front` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
-* Alternatively, `yarn run start-front-m1` will run the front-end pointed at Midway 1 (in Go)
-* Default user login: `luser` / `secret`
+* Default user login: `luser@terraindata.com` / `secret`
 * Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because
   your browser won't have to fetch Open Sans on each load
 
@@ -95,7 +94,7 @@ Whenever new packages are installed by other devs / on other branches, run `yarn
 
 ### Auto Styling
 
-To apply the auto styling / formatting, use `yarn run fix`
+To apply the auto styling / formatting, use `yarn run fix` - a combination of `yarn run style` and `yarn run lint`
 
 ### Configuring Webstorm IDE
 
@@ -133,7 +132,6 @@ Links are to relevant overviews and tutorials.
 - [Immutable](https://facebook.github.io/immutable-js/)
 - [yarn](https://yarnpkg.com/en/), for package managment (primary)
 - [npm](https://www.npmjs.com/), for package managment (secondary)
-- [Tape](https://github.com/substack/tape), for testing
 
 ### Front-End
 
@@ -165,15 +163,21 @@ Source code for the front-end. Has directories for `app`, `images`, `test`, `typ
 
 ### src/app
 
-Contains the React app. The `app` directory splits many smaller apps by function, e.g. `builder`, `browser`, `auth`
-(for login / authorization), `common` (shared components), `util` (utility functions), etc.
+Contains the React app. The `app` directory splits many smaller apps by function, e.g. `builder`, `library`, `auth`
+(for login / authorization), `common` (shared components), `util` (utility functions)
 
-### src/app/[smaller_app]/components
+### src/app/[smaller_app]
 
 Contains one or more of:
 - `[SmallerApp]Types.tsx`: defines any interfaces, classes, enums, etc. relevant to that app
 - `components/`: contains React components and styles
 - `data/`: contains Redux data files
+
+### src/app/[smaller_app]/components
+
+Contains the following files:
+- React Components saved with `.tsx` extensions, sometimes appending "Component" to the file name, if there is a potential for filename conflicts
+- Stylesheets for each component, if needed, which are saved with the `.less` extension, and should have the word "Style" appended to the filename (note: not all files currently have this word appending, but any new files should o)
 
 ### src/app/[smaller_app]/data
 
@@ -181,12 +185,11 @@ Contains Actions and Stores for Redux.
 - `[SmallerApp]ActionTypes.tsx`: a static object of strings. Add new action types here.
 - `[SmallerApp]Actions.tsx`: an object of functions that dispatch Actions to that app's Store.
 - `[SmallerApp]Store.tsx`: the Store that defines that app's default state and its reducers
-- `[SmallerApp || CategoryOfFunctions]Reducers.tsx`: defines reducers relating to a common function in that smaller app.
-    If the smaller app doesn't have many different actions, there may be just one reducers file.
+- `[SmallerApp]Reducers.tsx`: defines reducers relating to a common function in that smaller app.
 
 ### midway
 
-Contains the code for midway, which acts as Terraformer's middlewear.
+Contains the code for midway, which acts as Terraformer's middleware.
 
 ### midway/src
 
@@ -295,19 +298,8 @@ test('GET /midway/v1/schema', (t) =>
 
 ### Front-end
 
-Testing? What testing? Here are some instructions for how to run karma/tape, for which there aren't any useful test
-cases yet...
+We do not yet have any front-end tests written.
 
-`npm run test-front` - runs tests continually in another copy of Chrome
-
-### General Testing Gotchas
-
-Sometimes your tests may trigger errors that cause your test browser to crash, and you will see karma report:
-`No captured browser.`
-When this happens, you need to quit Karma (Ctrl + C) and restart it.
-
-Note: when adding new tape tests, make sure to include `t.end()` at the end of every test (or `t.plan(x)` at the beginning),
-or else the test suite will hang.
 
 ## Useful Tutorials and Articles
 
@@ -423,5 +415,3 @@ doesntWork(); // nothing is logged
 * Importing something and it comes up as `undefined`?
   - Check to make sure you don't have a circular dependency (importing something that imports itself)
   - Make sure you are `export`ing and `export default`ing from the file
-* Tape Test suite doesn't run all tests?
-  - make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.

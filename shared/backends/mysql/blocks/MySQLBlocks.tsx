@@ -43,8 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length no-shadowed-variable
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+const Color = require('color');
+
 const { List, Map } = Immutable;
 const L = () => List([]);
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -232,7 +237,7 @@ export const MySQLBlocks =
         static: {
           language: 'mysql',
           // manualEntry: ManualConfig.cards['sfw'],
-          colors: ['#559dcf', '#b4dbf6'],
+          colors: ['#559dcf', Color('#559dcf').alpha(0.7).string()],
           title: 'Select',
           preview: '[fields.field]',
           topTql: 'SELECT\n$fields\n$cards',
@@ -315,7 +320,7 @@ export const MySQLBlocks =
       {
         language: 'mysql',
         // manualEntry: ManualConfig.cards['sfw'],
-        colors: ['#3a7dcf', '#94b9f6'],
+        colors: ['#3a7dcf', Color('#3a7dcf').alpha(0.7).string()],
         title: 'From',
         preview: '[tables.table]',
         tql: 'FROM\n$tables',
@@ -449,7 +454,7 @@ export const MySQLBlocks =
 
     where: _wrapperCard({
       title: 'Where',
-      colors: ['#86a860', '#d3e5be'],
+      colors: ['#86a860', Color('#86a860').alpha(0.7).string()],
       tql: 'WHERE\n$cards',
       // manualEntry: ManualConfig.cards.where,
       singleChild: true,
@@ -469,7 +474,7 @@ export const MySQLBlocks =
       tql: '(\n$cards\n)',
       tqlGlue: '\nAND\n',
       // manualEntry: ManualConfig.cards.and,
-      colors: ['#824ba1', '#ecc9ff'],
+      colors: ['#824ba1', Color('#824ba1').alpha(0.7).string()],
       accepts: List(['or', 'comparison', 'exists', 'not']),
       language: 'mysql',
     }),
@@ -479,7 +484,7 @@ export const MySQLBlocks =
       tql: '(\n$cards\n)',
       tqlGlue: '\nOR\n',
       // manualEntry: ManualConfig.cards.or,
-      colors: ['#b161bc', '#f8cefe'],
+      colors: ['#b161bc', Color('#b161bc').alpha(0.7).string()],
       accepts: List(['and', 'comparison', 'exists', 'not']),
       language: 'mysql',
     }),
@@ -493,7 +498,7 @@ export const MySQLBlocks =
         static: {
           language: 'mysql',
           title: 'Compare',
-          colors: ['#476aa3', '#a5c6fc'],
+          colors: ['#476aa3', Color('#476aa3').alpha(0.7).string()],
           preview: (c: Card) =>
           {
             let first = c['first'];
@@ -549,7 +554,7 @@ export const MySQLBlocks =
             }
             return sorts.size + ' Factors';
           },
-          colors: ['#39918b', '#99e4df'],
+          colors: ['#39918b', Color('#39918b').alpha(0.7).string()],
           // manualEntry: ManualConfig.cards['sort'],
           tql: 'ORDER BY $sorts',
 
@@ -608,7 +613,7 @@ export const MySQLBlocks =
     // language: 'mysql',
     //     title: "Let",
     //     preview: "[field]",
-    //     colors: ["#a4b356", "#f1fbbf"],
+    //     colors: ["#a4b356", Color("#a4b356").alpha(0.7).string()],
     //     display: letVarDisplay,
     //     // manualEntry: ManualConfig.cards['let'],
     //     tql: "let $field = $expression",
@@ -626,7 +631,7 @@ export const MySQLBlocks =
     //     title: "Var",
     //     preview: "[field]",
     //     display: letVarDisplay,
-    //     colors: ["#6ca165", "#c8f2c3"],
+    //     colors: ["#6ca165", Color("#6ca165").alpha(0.7).string()],
     //     // manualEntry: ManualConfig.cards['var'],
     //     getNeighborTerms: (card) => List([card['field']]),
     //     tql: "var $field = $expression",
@@ -640,7 +645,7 @@ export const MySQLBlocks =
       static: {
         language: 'mysql',
         title: 'As',
-        colors: ['#d24f42', '#f9cba8'],
+        colors: ['#d24f42', Color('#d24f42').alpha(0.7).string()],
         preview: '[alias]',
         tql: '$value AS $alias',
         // manualEntry: ManualConfig.cards.where,
@@ -683,7 +688,7 @@ export const MySQLBlocks =
     count: _aggregateNestedCard(
       {
         title: 'Count',
-        colors: ['#d65a44', '#fbc1b7'],
+        colors: ['#d65a44', Color('#d65a44').alpha(0.7).string()],
         // manualEntry: ManualConfig.cards['count'],
         tql: 'COUNT($value)',
         accepts: List(['distinct']),
@@ -694,7 +699,7 @@ export const MySQLBlocks =
     avg: _aggregateCard(
       {
         title: 'Average',
-        colors: ['#db6746', '#f9bcab'],
+        colors: ['#db6746', Color('#db6746').alpha(0.7).string()],
         // manualEntry: ManualConfig.cards['avg'],
         tql: 'AVG($value)',
         language: 'mysql',
@@ -703,7 +708,7 @@ export const MySQLBlocks =
     min: _aggregateCard(
       {
         title: 'Min',
-        colors: ['#dd7547', '#fdcdb8'],
+        colors: ['#dd7547', Color('#dd7547').alpha(0.7).string()],
         // manualEntry: ManualConfig.cards['min'],
         tql: 'MIN($value)',
         language: 'mysql',
@@ -712,7 +717,7 @@ export const MySQLBlocks =
     max: _aggregateCard(
       {
         title: 'Max',
-        colors: ['#dd8846', '#f9cba8'],
+        colors: ['#dd8846', Color('#dd8846').alpha(0.7).string()],
         // manualEntry: ManualConfig.cards['max'],
         language: 'mysql',
         tql: 'MAX($value)',
@@ -721,7 +726,7 @@ export const MySQLBlocks =
     sum: _aggregateCard(
       {
         title: 'Sum',
-        colors: ['#dba043', '#eedebe'],
+        colors: ['#dba043', Color('#dba043').alpha(0.7).string()],
         // manualEntry: ManualConfig.cards['sum'],
         tql: 'SUM($value)',
         language: 'mysql',
@@ -730,7 +735,7 @@ export const MySQLBlocks =
     distinct: _aggregateCard(
       {
         title: 'Distinct',
-        colors: ['#d9b540', '#f8e8b3'],
+        colors: ['#d9b540', Color('#d9b540').alpha(0.7).string()],
         // manualEntry: ManualConfig.cards['count'], // TODO
         tql: 'DISTINCT $value',
         language: 'mysql',
@@ -738,7 +743,7 @@ export const MySQLBlocks =
 
     exists: _wrapperCard(
       {
-        colors: ['#319aa9', '#bbdddc'],
+        colors: ['#319aa9', Color('#319aa9').alpha(0.7).string()],
         title: 'Exists',
         // manualEntry: ManualConfig.cards['exists'],
         tql: 'EXISTS\n$cards',
@@ -748,7 +753,7 @@ export const MySQLBlocks =
 
     not: _wrapperCard(
       {
-        colors: ['#21aab9', '#abedec'],
+        colors: ['#21aab9', Color('#21aab9').alpha(0.7).string()],
         title: 'Not',
         // manualEntry: ManualConfig.cards['exists'],
         tql: (notCard) =>
@@ -767,7 +772,7 @@ export const MySQLBlocks =
     // remove
     parentheses: _wrapperCard(
       {
-        colors: ['#6775aa', '#d2c9e4'],
+        colors: ['#6775aa', Color('#6775aa').alpha(0.7).string()],
         title: '( )',
         // manualEntry: ManualConfig.cards['parentheses'],
         tql: '\n(\n$cards)',
@@ -794,7 +799,7 @@ export const MySQLBlocks =
         static: {
           language: 'mysql',
           title: 'Score',
-          colors: ['#3a91a6', '#a1eafb'],
+          colors: ['#3a91a6', Color('#3a91a6').alpha(0.7).string()],
           preview: '[weights.length] Weights',
           // manualEntry: ManualConfig.cards['score'],
           tql: 'linear_score($weights)',
@@ -885,7 +890,7 @@ export const MySQLBlocks =
         static: {
           language: 'mysql',
           // manualEntry: ManualConfig.cards['transform'],
-          colors: ['#4b979a', '#aef3f6'],
+          colors: ['#4b979a', Color('#4b979a').alpha(0.7).string()],
           title: 'Transform',
           preview: (card: any) =>
           {
@@ -948,7 +953,7 @@ export const MySQLBlocks =
 
     take: _valueCard(
       {
-        colors: ['#2e8c9a', '#8adeea'],
+        colors: ['#2e8c9a', Color('#2e8c9a').alpha(0.7).string()],
         title: 'Limit',
         // manualEntry: ManualConfig.cards['take'],
         tql: 'LIMIT $value',
@@ -958,7 +963,7 @@ export const MySQLBlocks =
 
     skip: _valueCard(
       {
-        colors: ['#2588aa', '#a2e5fc'],
+        colors: ['#2588aa', Color('#2588aa').alpha(0.7).string()],
         title: 'Offset',
         // manualEntry: ManualConfig.cards['skip'],
         tql: 'OFFSET $value',
@@ -973,7 +978,7 @@ export const MySQLBlocks =
         static: {
           language: 'mysql',
           // manualEntry: ManualConfig.cards['sfw'], // TODO
-          colors: ['#659f72', '#c4e1ca'],
+          colors: ['#659f72', Color('#659f72').alpha(0.7).string()],
           title: 'Group By',
           preview: '[fields.field]',
           tql: 'GROUP BY\n$fields',
@@ -1003,7 +1008,7 @@ export const MySQLBlocks =
 
     having: _wrapperCard({
       title: 'Having',
-      colors: ['#4b977e', '#c4e1ca'],
+      colors: ['#4b977e', Color('#4b977e').alpha(0.7).string()],
       tql: 'HAVING\n$cards',
       // manualEntry: ManualConfig.cards.where, // TODO
 
@@ -1023,7 +1028,7 @@ export const MySQLBlocks =
         language: 'mysql',
         title: 'Expression',
         preview: '[clause]',
-        colors: ['#278172', '#aefcef'],
+        colors: ['#278172', Color('#278172').alpha(0.7).string()],
         tql: '$clause',
         // manualEntry: ManualConfig.cards.tql,
         anythingAccepts: true,
@@ -1038,25 +1043,25 @@ export const MySQLBlocks =
     add: _mathCard({
       title: '+',
       tqlGlue: ' + ',
-      colors: ['#d24f42', '#f9cba8'],
+      colors: ['#d24f42', Color('#d24f42').alpha(0.7).string()],
     }),
 
     subtract: _mathCard({
       title: '-',
       tqlGlue: ' - ',
-      colors: ['#d65a44', '#fbc1b7'],
+      colors: ['#d65a44', Color('#d65a44').alpha(0.7).string()],
     }),
 
     multiply: _mathCard({
       title: '×',
       tqlGlue: ' * ',
-      colors: ['#db6746', '#f9bcab'],
+      colors: ['#db6746', Color('#db6746').alpha(0.7).string()],
     }),
 
     divide: _mathCard({
       title: '/',
       tqlGlue: ' / ',
-      colors: ['#dd7547', '#fdcdb8'],
+      colors: ['#dd7547', Color('#dd7547').alpha(0.7).string()],
     }),
 
     spotlight: _block(
@@ -1075,7 +1080,7 @@ export const MySQLBlocks =
         inputType: InputType.NUMBER,
         static: {
           language: 'mysql',
-          tql: 'VAR $key = $value;',
+          tql: '',
         },
       }),
 
@@ -1085,7 +1090,7 @@ export const MySQLBlocks =
           language: 'mysql',
           tql: '',
           title: 'New Card',
-          colors: ['#777', '#777'],
+          colors: ['#777', Color('#777').alpha(0.7).string()],
           preview: '',
           display: null,
           // manualEntry: null,

@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import AuthActions from '../../auth/data/AuthActions';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import InfoArea from './InfoArea';
 
 export interface Props
@@ -54,7 +54,7 @@ export interface Props
   history?: any;
 }
 
-class Logout extends PureClasss<Props>
+class Logout extends TerrainComponent<Props>
 {
   public componentWillMount()
   {

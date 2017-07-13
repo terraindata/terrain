@@ -43,16 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires max-classes-per-file class-name
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';
 
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
@@ -67,7 +71,7 @@ export interface Props
   language: string;
 }
 
-class CardsDeck extends PureClasss<Props>
+class CardsDeck extends TerrainComponent<Props>
 {
   public state: {
     search: string;
@@ -94,7 +98,6 @@ class CardsDeck extends PureClasss<Props>
   {
     const ordering = AllBackendsMap[this.props.language].cardsDeck;
     const cards = AllBackendsMap[this.props.language].blocks;
-
     if (ordering === undefined)
     {
       throw new Error('Unable to find backend of type ' + this.props.language);
@@ -102,6 +105,7 @@ class CardsDeck extends PureClasss<Props>
     return (
       <div
         className='cards-deck'
+        style={backgroundColor(Colors().builder.deck.background)}
       >
         <div
           className='cards-deck-search-wrapper'
@@ -154,7 +158,7 @@ interface CardProps
   connectDragSource?: (el: El) => El;
 }
 
-class _CardDeckCard extends PureClasss<CardProps>
+class _CardDeckCard extends TerrainComponent<CardProps>
 {
   public render()
   {

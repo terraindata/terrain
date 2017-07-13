@@ -44,6 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
+import { List } from 'immutable';
+import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ESClauseType from '../ESClauseType';
 import ESStringClause from './ESStringClause';
 
@@ -58,4 +63,45 @@ export default class ESTypeClause extends ESStringClause
   }
 
   // TODO: add field validation here
+
+  public getCard()
+  {
+    return this.seedCard({
+      value: this.template || '',
+      static: {
+        preview: '[value]',
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'value',
+          getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
+          {
+            const state = BuilderStore.getState();
+            const cards = state.query.cards;
+            const isIndexCard = (card) => card['type'] === 'eqlindex';
+            const indexCard = cards.find(isIndexCard) ||
+              (
+                cards.get(0) && cards.get(0)['cards'].find(isIndexCard)
+              );
+            // TODO idea: have the selected index and type stored on the Query object
+
+            if (indexCard)
+            {
+              const index = indexCard['value'];
+              const indexId = state.db.name + '/' + index;
+              return schemaState.tables.filter(
+                (table) => table.databaseId === indexId,
+              ).map(
+                (table) => table.name,
+              ).toList();
+            }
+
+            return emptyList;
+          },
+        },
+        tql: (stringBlock) => stringBlock['value'],
+      },
+    });
+  }
 }
+
+const emptyList = List([]);

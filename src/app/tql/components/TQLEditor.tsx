@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -50,7 +53,7 @@ import * as ReactDOM from 'react-dom';
 import './TQLEditor.less';
 const { List } = Immutable;
 import * as _ from 'underscore';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 const CodeMirror = require('./Codemirror.js');
 
 // syntax highlighters
@@ -110,12 +113,12 @@ export interface Props
   hideTermDefinition?();
 }
 
-class TQLEditor extends PureClasss<Props>
+class TQLEditor extends TerrainComponent<Props>
 {
   public state: {
-    codeMirrorInstance // CodeMirror instance does not have a defined type.
+    codeMirrorInstance, // CodeMirror instance does not have a defined type.
   } = {
-    codeMirrorInstance: null
+    codeMirrorInstance: null,
   };
 
   public render()
@@ -126,7 +129,7 @@ class TQLEditor extends PureClasss<Props>
         lineNumbers: true,
         extraKeys: {
           'Ctrl-F': 'findPersistent',
-          'Ctrl-Alt-F': this.handleAutoFormatRequest
+          'Ctrl-Alt-F': this.handleAutoFormatRequest,
         },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
@@ -229,7 +232,7 @@ class TQLEditor extends PureClasss<Props>
   private registerCodeMirror(cmInstance)
   {
     this.setState({
-      codeMirrorInstance: cmInstance
+      codeMirrorInstance: cmInstance,
     });
     cmInstance.on('changes', this.handleChanges);
     if (this.props.language === 'elastic') // make this a switch if there are more languages

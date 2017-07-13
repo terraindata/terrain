@@ -44,14 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 const { List } = Immutable;
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import Classs from './../../common/components/Classs';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesStore from './../../roles/data/RolesStore';
 import * as RoleTypes from './../../roles/RoleTypes';
 import UserStore from './../../users/data/UserStore';
@@ -59,8 +62,8 @@ import * as UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import ColorManager from './../../util/ColorManager';
 import Util from './../../util/Util';
-import Actions from './../data/LibraryActions';
 import LibraryActions from './../data/LibraryActions';
+import Actions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
@@ -88,7 +91,7 @@ export interface Props
   variant: Variant;
 }
 
-class LibraryInfoColumn extends Classs<Props>
+class LibraryInfoColumn extends TerrainComponent<Props>
 {
   public state: {
     users: UserMap,
@@ -315,7 +318,10 @@ class LibraryInfoColumn extends Classs<Props>
       >
         {
           item ?
-            <div className='library-info'>
+            <div
+              className='library-info'
+              style={backgroundColor(Colors().library.infoColumn.baseUpper)}
+            >
               <div
                 className='library-info-image'
               >
@@ -350,7 +356,10 @@ class LibraryInfoColumn extends Classs<Props>
               }
             </div>
             :
-            <div className='library-info'>
+            <div
+              className='library-info'
+              style={backgroundColor(Colors().library.infoColumn.baseUpper)}
+            >
               <InfoArea
                 large='Select a Group'
               />

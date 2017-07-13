@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -54,8 +57,8 @@ import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import InfoArea from './../../common/components/InfoArea';
-import PureClasss from './../../common/components/PureClasss';
 import Scoreline from './../../common/components/Scoreline';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
@@ -77,7 +80,7 @@ export interface Props
   groupId: ID;
 }
 
-class AlgorithmsColumn extends PureClasss<Props>
+class AlgorithmsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,

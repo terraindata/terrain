@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions class-name ban-types interface-name
+
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -53,7 +56,7 @@ import './Table.less';
 import * as classNames from 'classnames';
 import { Menu, MenuOption } from '../../common/components/Menu';
 import Util from '../../util/Util';
-import PureClasss from './PureClasss';
+import TerrainComponent from './TerrainComponent';
 const Dimensions = require('react-dimensions');
 
 const LEFT_COLOR_FROM = hexToRgb('#a2af93');
@@ -89,7 +92,7 @@ const HEADER_ROW_HEIGHT = 35;
 const MAX_INIT_HEIGHT = 40;
 const MAX_INIT_WIDTH = 300;
 
-class _Table extends PureClasss<Props>
+class _Table extends TerrainComponent<Props>
 {
   public state: {
   } = {

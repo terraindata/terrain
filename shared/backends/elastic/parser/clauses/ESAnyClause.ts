@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { List } from 'immutable';
+
+import { DisplayType } from '../../../../blocks/displays/Display';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESValueInfo from '../ESValueInfo';
@@ -62,5 +65,31 @@ export default class ESAnyClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     valueInfo.clause = this;
+  }
+
+  public getCard()
+  {
+    // TODO try an inline approach
+
+    return this.seedCard({
+      cards: List([]),
+
+      static:
+      {
+        title: this.type + ' (Variant)',
+        tql: (block, tqlFn, tqlConfig) =>
+        {
+          return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+        },
+
+        display:
+        {
+          displayType: DisplayType.CARDS,
+          key: 'cards',
+          singleChild: true,
+        },
+        preview: '',
+      },
+    });
   }
 }

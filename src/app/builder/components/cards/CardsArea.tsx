@@ -43,22 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty strict-boolean-expressions no-var-requires
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+
 import { Card, Cards } from '../../../../../shared/blocks/types/Card';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import CreateCardTool from './CreateCardTool';
 const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 export interface Props
 {
@@ -75,6 +81,7 @@ export interface Props
   accepts?: List<string>;
   noCardTool?: boolean;
   singleChild?: boolean;
+  hideCreateCardTool?: boolean;
 }
 
 interface KeyState
@@ -91,7 +98,8 @@ interface State extends KeyState
   draggingCardItem: CardItem;
 }
 
-class CardsArea extends PureClasss<Props>
+@Radium
+class CardsArea extends TerrainComponent<Props>
 {
   public state: State = {
     keyPath: null,
@@ -184,6 +192,9 @@ class CardsArea extends PureClasss<Props>
             'cards-area': true,
             [this.props.className]: !!this.props.className,
           })}
+          style={
+            backgroundColor(Colors().builder.cards.cardBase)
+          }
         >
           {
             cards.map((card: Card, index: number) =>
@@ -233,6 +244,7 @@ class CardsArea extends PureClasss<Props>
           />
 
           {
+            !this.props.hideCreateCardTool &&
             renderCardTool &&
             <CreateCardTool
               language={this.props.language}

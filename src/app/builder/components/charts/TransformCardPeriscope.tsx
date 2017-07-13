@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import './TransformCardPeriscope.less';
 const { Map, List } = Immutable;
@@ -50,7 +53,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Periscope from './Periscope';
@@ -71,7 +74,7 @@ export interface Props
 
 const MAX_BARS = 100;
 
-class TransformCardPeriscope extends PureClasss<Props>
+class TransformCardPeriscope extends TerrainComponent<Props>
 {
   public state: {
     initialDomain: List<number>,

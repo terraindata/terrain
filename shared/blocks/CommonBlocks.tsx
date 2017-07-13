@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions interface-name max-line-length
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
@@ -75,14 +78,26 @@ interface IWrapperCardConfig
   singleChild?: boolean;
   isAggregate?: boolean;
   language: string;
+  init?: () => any;
+  className?: string;
 }
 
 export const _wrapperCard = (config: IWrapperCardConfig) =>
 {
+  const display = config.display || (
+    config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
+  );
+
+  if (config.className)
+  {
+    (display as Display).className += ' ' + config.className;
+  }
+
   return _card({
     cards: L(),
 
-    static: {
+    static:
+    {
       title: config.title,
       colors: config.colors,
       accepts: config.accepts,
@@ -95,11 +110,6 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
 
       preview: (c: IWrapperCard) =>
       {
-        // var prefix = config.title + ': ';
-        // if(c.type === 'parentheses')
-        // {
-        //   prefix = '';
-        // }
         if (c.cards.size)
         {
           const card = c.cards.get(0);
@@ -108,12 +118,12 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
         return 'Nothing';
       },
 
-      display: config.display || (
-        config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
-      ),
+      display,
 
       tql: config.tql,
       tqlGlue: config.tqlGlue,
+
+      init: config.init,
     },
   });
 };

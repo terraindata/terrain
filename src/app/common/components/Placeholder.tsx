@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import InfoArea from './InfoArea';
 
-class Placeholder extends PureClasss<any>
+class Placeholder extends TerrainComponent<any>
 {
   public render()
   {

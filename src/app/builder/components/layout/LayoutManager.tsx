@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable
+
 // somebody please rescue this or kill this
 
 // tslint:disable:no-invalid-this
@@ -870,10 +873,10 @@ const LayoutManager = React.createClass<any, any>({
     {
       lmClasses.unshift('lm-window-resized');
     }
-    const lmClassString = lmClasses.join(' ');
+    const lmTerrainComponenttring = lmClasses.join(' ');
 
     return (
-      <div className={lmClassString} ref='layoutManagerDiv'>
+      <div className={lmTerrainComponenttring} ref='layoutManagerDiv'>
         {this.props.layout.columns && this.props.layout.columns.map(this.renderColumn)}
         {this.props.layout.rows && this.props.layout.rows.map(this.renderRow)}
         {this.props.layout.cells && this.props.layout.cells.map(this.renderCell)}

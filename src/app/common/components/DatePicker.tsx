@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands
+
 import * as React from 'react';
 import './DatePicker.less';
 // import * as moment from 'moment';
@@ -50,7 +53,7 @@ const moment = require('moment');
 import * as Immutable from 'immutable';
 const ReactDayPicker = require('react-day-picker').default;
 const DateUtils = require('react-day-picker').DateUtils;
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import LayoutManager from './../../builder/components/layout/LayoutManager';
 import Dropdown from './Dropdown';
@@ -81,7 +84,7 @@ export interface Props
   canEdit: boolean;
 }
 
-class DatePicker extends PureClasss<Props>
+class DatePicker extends TerrainComponent<Props>
 {
   constructor(props)
   {

@@ -43,18 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions ban-types no-console
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { MenuOption } from '../../../common/components/Menu';
-import PureClasss from '../../../common/components/PureClasss';
 import { IColumn, Table } from '../../../common/components/Table';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultFields, getResultName, getResultValue } from './Result';
-import { getPrimaryKeyFor, MAX_RESULTS, Results } from './ResultsManager';
+import { MAX_RESULTS, Results } from './ResultsManager';
 
 export interface Props
 {
@@ -64,7 +67,7 @@ export interface Props
   resultsLoading: boolean;
 }
 
-export default class ResultsTable extends PureClasss<Props>
+export default class ResultsTable extends TerrainComponent<Props>
 {
   public state: {
     random: number;
@@ -253,7 +256,7 @@ export default class ResultsTable extends PureClasss<Props>
     const row = rc.split('-')[0];
     const col = rc.split('-')[1];
     const result = this.props.results && this.props.results.get(+row);
-    const id = getPrimaryKeyFor(result, this.props.resultsConfig);
+    const id = result.primaryKey;
     const spotlightColor = ColorManager.colorForKey(id);
 
     const spotlightData = _.extend({}, result);

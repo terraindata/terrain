@@ -43,19 +43,24 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
 import './Result.less';
 const { List } = Immutable;
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { spotlightAction } from '../../data/SpotlightStore';
-import Classs from './../../../common/components/Classs';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Result } from './ResultsManager';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
@@ -80,7 +85,8 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 }
 
-class ResultComponent extends Classs<Props> {
+@Radium
+class ResultComponent extends TerrainComponent<Props> {
   // state: {
   //   isSpotlit: boolean;
   //   spotlightColor: string;
@@ -106,6 +112,24 @@ class ResultComponent extends Classs<Props> {
     ]),
   ];
 
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (const key in nextProps)
+    {
+      if (key !== 'result' && this.props[key] !== nextProps[key])
+      {
+        return true;
+      }
+    }
+
+    if (!_.isEqual(this.props.result.toJS(), nextProps.result.toJS()))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
   public renderExpandedField(value, field)
   {
     return this.renderField(field, 0, null, {
@@ -125,10 +149,17 @@ class ResultComponent extends Classs<Props> {
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
-      <div className='result-field' key={field}>
+      <div
+        className='result-field'
+        key={field}
+        style={borderColor(Colors().builder.results.lines)}
+      >
         {
           showField &&
-          <div className='result-field-name'>
+          <div
+            className='result-field-name'
+            style={fontColor(Colors().text.thirdLight)}
+          >
             {
               field
             }
@@ -257,9 +288,18 @@ class ResultComponent extends Classs<Props> {
         className={classes}
         onDoubleClick={this.expand}
       >
-        <div className='result-inner'>
+        <div
+          className='result-inner'
+          style={[
+            borderColor(Colors().builder.results.lines),
+            backgroundColor(Colors().builder.results.background),
+          ]}
+        >
           <div className='result-name'>
-            <div className='result-name-inner'>
+            <div
+              className='result-name-inner'
+              style={fontColor(Colors().text.baseLight)}
+            >
               {
                 this.renderSpotlight()
               }

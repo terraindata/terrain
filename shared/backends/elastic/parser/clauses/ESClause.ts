@@ -44,6 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
+import * as _ from 'underscore';
+
+import ElasticKeyBuilderTextbox from '../../../../../src/app/common/components/ElasticKeyBuilderTextbox';
+import { Display, DisplayType } from '../../../../blocks/displays/Display';
+import { Block, TQLFn } from '../../../../blocks/types/Block';
+import { _card, Card } from '../../../../blocks/types/Card';
+
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
@@ -108,6 +117,21 @@ abstract class ESClause
 
   public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
 
+  public getCard(): any
+  {
+    return null;
+  }
+
+  public getSupplementalBlocks(): { [type: string]: Block }
+  {
+    return {};
+  }
+
+  public getCardType(): string
+  {
+    return 'eql' + this.type;
+  }
+
   protected typeCheck(interpreter: ESInterpreter,
     valueInfo: ESValueInfo,
     expected: ESJSONType): boolean
@@ -123,6 +147,90 @@ abstract class ESClause
     return true;
   }
 
+  protected seedCard(obj: {
+    [field: string]: any;
+
+    static: {
+      colors?: string[]; // optional, filled below
+      title?: string; // optional, filled below
+
+      preview: string | ((c: Card) => string);
+      display: Display | Display[];
+      tql: TQLFn;
+      accepts?: List<string>;
+
+      getChildTerms?: (card: Card, schemaState) => List<string>;
+      getNeighborTerms?: (card: Card, schemaState) => List<string>;
+      getParentTerms?: (card: Card, schemaState) => List<string>;
+
+      metaFields?: string[];
+
+      init?: () => {
+        [k: string]: any;
+      };
+    };
+  }): any
+  {
+    // hide the title for elastic
+    obj['noTitle'] = true;
+
+    // fill in simple defaults, but allow overrides
+    obj['static'] = _.extend({
+      title: this.name,
+      colors: [],
+      language: 'elastic',
+
+      anythingAccepts: true, // TODO remove after testing
+    }, obj['static']);
+
+    if (true) // switch this on for wrapper card approach
+    {
+      if (obj['key'] !== undefined)
+      {
+        throw new Error('Key method was already defined for block ' + this.type);
+      }
+      // Define a key, which will be optionally used to supply the key
+      //  for a key/val pair, if one is needed
+      obj['key'] = '';
+
+      // prepend the display with our standard key text display
+      const objStatic = obj['static'];
+      const display = objStatic['display'];
+      if (!display)
+      {
+        objStatic['display'] = KEY_DISPLAY;
+      }
+      else if (Array.isArray(display))
+      {
+        (display as Display[]).unshift(KEY_DISPLAY);
+      }
+      else
+      {
+        if (KEY_INLINE_DISPLAYS.indexOf(display.displayType) !== -1)
+        {
+          // we should inline this display
+          objStatic['display'] = {
+            displayType: DisplayType.FLEX,
+            key: null,
+            flex: [
+              KEY_DISPLAY,
+              display,
+            ],
+          };
+        }
+        else
+        {
+          objStatic['display'] = [
+            KEY_DISPLAY,
+            objStatic['display'],
+          ] as any;
+        }
+      }
+    }
+
+    return _card(obj as any);
+  }
+
   private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
   {
     if (settings[name] !== undefined)
@@ -134,7 +242,22 @@ abstract class ESClause
       this[name] = defaultValueFunction();
     }
   }
-
 }
+
+const KEY_INLINE_DISPLAYS = [
+  DisplayType.TEXT,
+  DisplayType.CARDTEXT,
+  DisplayType.NUM,
+  DisplayType.DROPDOWN,
+];
+
+const KEY_DISPLAY: Display =
+  {
+    displayType: DisplayType.TEXT,
+    key: 'key',
+    autoDisabled: true, // TODO consider autocomplete for key?
+    className: 'card-muted-input card-elastic-key-input',
+    component: ElasticKeyBuilderTextbox,
+  };
 
 export default ESClause;

@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import * as React from 'react';
@@ -55,7 +58,7 @@ import { M1QueryResponse } from '../../../util/AjaxM1';
 import AjaxM1 from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 
 import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
@@ -91,7 +94,7 @@ export type Bars = List<Bar>;
 
 import TransformCardPeriscope from './TransformCardPeriscope';
 
-class TransformCard extends PureClasss<Props>
+class TransformCard extends TerrainComponent<Props>
 {
   public state: {
     domain: List<number>;

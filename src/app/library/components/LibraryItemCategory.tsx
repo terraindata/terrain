@@ -43,13 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import './LibraryItemCategory.less';
 
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { ItemStatus } from '../../../../shared/items/types/Item';
 import * as LibraryTypes from '../LibraryTypes';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
 {
@@ -61,7 +64,7 @@ export interface Props
   dropDisabled?: boolean;
 }
 
-class LibraryItemCategory extends Classs<Props>
+class LibraryItemCategory extends TerrainComponent<Props>
 {
   public state = {
     open: true,

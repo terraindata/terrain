@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions return-undefined no-console no-empty no-unused-expression
+
 // Note: If anyone would like to take the time to clean up this file, be my guest.
 
 import * as Immutable from 'immutable';
@@ -468,7 +471,6 @@ export const Ajax =
             onLoad(null);
           }
         },
-
       );
       // }
       // TODO

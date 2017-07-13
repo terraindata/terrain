@@ -43,11 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires prefer-const strict-boolean-expressions no-unused-expression
+
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDragPreview.less';
 const classNames = require('classnames');
 import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
@@ -76,7 +79,7 @@ interface CDPProps
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
 }
 
-class CardDragPreview extends PureClasss<CDPProps>
+class CardDragPreview extends TerrainComponent<CDPProps>
 {
   public noCardColors: string[] = ['#aaa', '#aaa'];
 
@@ -119,7 +122,9 @@ class CardDragPreview extends PureClasss<CDPProps>
   public render()
   {
     const item = this.props.cardItem;
-    let colors: string[], title: string, preview: string;
+    let colors: string[];
+    let title: string;
+    let preview: string;
 
     const Blocks = AllBackendsMap[this.state.language].blocks;
 

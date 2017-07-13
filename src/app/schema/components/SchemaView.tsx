@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires restrict-plus-operands no-switch-case-fall-through strict-boolean-expressions
+
 const Radium = require('radium');
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -51,7 +53,7 @@ import FadeInOut from '../../common/components/FadeInOut';
 import Util from '../../util/Util';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaResults from './SchemaResults';
 import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
@@ -69,7 +71,7 @@ const verticalDivide = 75;
 const searchHeight = 42;
 
 @Radium
-class SchemaView extends PureClasss<Props>
+class SchemaView extends TerrainComponent<Props>
 {
   public state: {
     highlightedIndex: number;

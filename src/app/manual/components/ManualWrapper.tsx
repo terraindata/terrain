@@ -43,13 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Manual from './Manual';
 import './ManualPopup.less';
 const HTML5Backend = require('react-dnd-html5-backend');
@@ -60,7 +63,7 @@ export interface Props
   params?: any;
 }
 
-class ManualWrapper extends Classs<Props>
+class ManualWrapper extends TerrainComponent<Props>
 {
   constructor(props)
   {

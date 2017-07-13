@@ -43,13 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-unused-expression
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
 import Autocomplete from './../../common/components/Autocomplete';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './Manual.less';
 import ManualEntry from './ManualEntry';
 
@@ -73,7 +76,7 @@ export interface Props
   changeCardName?: (string) => void;
 }
 
-class Manual extends Classs<Props>
+class Manual extends TerrainComponent<Props>
 {
   public allTqlCards = Object.keys(cardList).sort();
 

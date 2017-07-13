@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:forin no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { Map, List } = Immutable;
@@ -234,7 +237,7 @@ export function getPreview(card: Card): string
 {
   if (!card)
   {
-    return;
+    return '';
   }
 
   if (!card.static)
@@ -263,7 +266,7 @@ export function getPreview(card: Card): string
       if (keys.length === 1)
       {
         const value = card[keys[0]];
-        if (value['_isCard'])
+        if (value && value['_isCard'])
         {
           return getPreview(value);
         }
@@ -375,3 +378,21 @@ export function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 
   return block;
 }
+
+// export const findBlock =
+//   (blocks: List<Block>, predicate: (block: Block) => boolean) =>
+//   {
+//     return blocks.reduce(
+//       (memo, block) =>
+//       {
+//         if (memo)
+//         {
+//           return memo;
+//         }
+
+//         if (predicate(block))
+//         {
+//           return block;
+//         }
+//       });
+//   };

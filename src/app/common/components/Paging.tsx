@@ -43,10 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Paging.less';
 
@@ -62,7 +65,7 @@ export interface Props
   onHoverEnd?: () => void;
 }
 
-class Paging extends PureClasss<Props>
+class Paging extends TerrainComponent<Props>
 {
   constructor(props: Props)
   {
@@ -255,7 +258,7 @@ class Paging extends PureClasss<Props>
                   onMouseOver={this.handlePageMouseOver}
                   onMouseOut={this.handleMouseOut}
                   key={page}
-                  rel={page + ''}
+                  data-rel={page + ''}
                 >
                   {page}
                 </div>

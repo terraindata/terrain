@@ -43,9 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
-import PureClasss from '../../common/components/PureClasss';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './InfoArea.less';
 
@@ -61,7 +66,8 @@ export interface Props
   inline?: boolean; // render inline, rather than absolutely middle
 }
 
-class InfoArea extends PureClasss<Props>
+@Radium
+class InfoArea extends TerrainComponent<Props>
 {
   constructor(props)
   {
@@ -76,9 +82,21 @@ class InfoArea extends PureClasss<Props>
       return null;
     }
 
+    let style = fontColor(thing === 'small' ? Colors().text.secondaryLight : Colors().text.baseLight);
+    if (thing === 'button')
+    {
+      style = buttonColors();
+    }
+
     return (
-      <div className={'info-area-' + thing} onClick={onClick ? this.props.onClick : null}>
-        {this.props[thing]}
+      <div
+        className={'info-area-' + thing}
+        onClick={onClick ? this.props.onClick : null}
+        style={style}
+      >
+        {
+          this.props[thing]
+        }
       </div>
     );
   }
@@ -86,10 +104,12 @@ class InfoArea extends PureClasss<Props>
   public render()
   {
     return (
-      <div className={classNames({
-        'info-area': true,
-        'info-area-inline': this.props.inline,
-      })}>
+      <div
+        className={classNames({
+          'info-area': true,
+          'info-area-inline': this.props.inline,
+        })}
+      >
         {this.renderThing('large')}
         {this.renderThing('small')}
         {this.renderThing('button', true)}
