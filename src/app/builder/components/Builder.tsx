@@ -818,7 +818,7 @@ class Builder extends TerrainComponent<Props>
   public handleSaveAsTextboxChange(newValue: string): void
   {
     this.setState({
-      saveAsTextboxValue: newValue
+      saveAsTextboxValue: newValue,
     });
   }
 
@@ -853,7 +853,7 @@ class Builder extends TerrainComponent<Props>
         }
 
         this.setState({
-          savingAs: false
+          savingAs: false,
         });
         const newConfig = configArr.join(',');
         if (newConfig !== this.props.params.config)
@@ -866,7 +866,7 @@ class Builder extends TerrainComponent<Props>
   public handleModalSaveAsCancel()
   {
     this.setState({
-      savingAs: false
+      savingAs: false,
     });
   }
 
