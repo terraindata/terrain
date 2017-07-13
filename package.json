@@ -135,7 +135,7 @@
     "@types/mysql": "0.0.31",
     "@types/node": "^7.0.22",
     "@types/passport-local": "^1.0.30",
-    "@types/react": "^15.0.1",
+    "@types/react": "^15.0.38",
     "@types/react-dnd": "^2.0.32",
     "@types/react-dom": "^15.5.0",
     "@types/react-modal": "^1.6.6",
