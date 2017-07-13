@@ -13,14 +13,14 @@ before_script:
   - yarn
 
 stages:
-  - lint
+#  - lint
   - style
   - test
 
 lint:
   script:
    - yarn run lint
-  stage: lint
+  stage: test
 
 style:
   script:
