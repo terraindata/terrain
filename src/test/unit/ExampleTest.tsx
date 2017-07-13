@@ -51,10 +51,11 @@ THE SOFTWARE.
 import * as test from 'tape';
 // import * as TestUtils from 'react-addons-test-utils';
 const TestUtils = require('react-addons-test-utils');
+import createReactClass = require('create-react-class');
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
-const CardField = React.createClass({
+const CardField = createReactClass({
   render()
   {
     return <div>test</div>;

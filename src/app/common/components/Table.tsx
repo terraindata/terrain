@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
+import ReactDataGrid from 'react-data-grid';
 import * as _ from 'underscore';
-const ReactDataGrid = require('react-data-grid');
 
 import './Table.less';
 
