@@ -89,7 +89,6 @@ export default class ESEnumClause extends ESClause
           'Unknown value for this clause. Valid values are: ' + JSON.stringify(this.values, null, 1));
       }
     }
-    valueInfo.clause = this;
   }
 
   public getCard()
@@ -106,7 +105,7 @@ export default class ESEnumClause extends ESClause
           dropdownUsesRawValues: true,
         },
         tql: (block) => block['value'],
-      }
+      },
     });
   }
 }

@@ -44,13 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression max-line-length
 
 import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as classNames from 'classnames';
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
@@ -63,22 +65,22 @@ import InfoArea from './../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
 const ReactTooltip = require('react-tooltip');
-import { Colors, backgroundColor, fontColor } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-const Tab = React.createClass<any, any>({
+const Tab = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:
   {
-    id: React.PropTypes.string.isRequired,
-    name: React.PropTypes.string.isRequired,
-    selected: React.PropTypes.bool.isRequired,
-    index: React.PropTypes.number.isRequired,
-    onClick: React.PropTypes.func.isRequired,
-    onClose: React.PropTypes.func.isRequired,
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    selected: PropTypes.bool.isRequired,
+    index: PropTypes.number.isRequired,
+    onClick: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
   },
 
   getDefaultProps(): any

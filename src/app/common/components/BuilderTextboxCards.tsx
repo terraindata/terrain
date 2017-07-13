@@ -43,16 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import { Card, CardString } from '../../../../shared/blocks/types/Card';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import Util from '../../util/Util';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
 
 export interface Props
 {

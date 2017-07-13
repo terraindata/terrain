@@ -13,19 +13,19 @@ before_script:
   - yarn
 
 stages:
-  - lint
-  - fix
+#  - lint
+  - style
   - test
 
 lint:
   script:
    - yarn run lint
-  stage: lint
+  stage: test
 
-fix:
+style:
   script:
-   - yarn run fix
-  stage: fix
+   - yarn run style
+  stage: style
 
 test-backend:
   script:

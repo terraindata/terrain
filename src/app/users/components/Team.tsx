@@ -43,15 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions no-unused-expression
+
 import * as React from 'react';
 import { Link } from 'react-router';
 import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';
 import * as UserTypes from '../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import './Team.less';

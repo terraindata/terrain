@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import './ResultsArea.less';
 const { Map, List } = Immutable;
@@ -67,11 +69,11 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
-import TerrainComponent from '../../../common/components/TerrainComponent';
 import Switch from '../../../common/components/Switch';
-import { getPrimaryKeyFor, MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
+import TerrainComponent from '../../../common/components/TerrainComponent';
+import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
 import Radium = require('radium');
-import { Colors, backgroundColor, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -166,7 +168,7 @@ class ResultsArea extends TerrainComponent<Props>
           onExpand={this.handleCollapse}
           expanded={true}
           index={-1}
-          primaryKey={getPrimaryKeyFor(result, resultsConfig)}
+          primaryKey={result.primaryKey}
         />
       </div>
     );
@@ -301,7 +303,7 @@ class ResultsArea extends TerrainComponent<Props>
                 onExpand={this.handleExpand}
                 index={index}
                 key={index}
-                primaryKey={getPrimaryKeyFor(result, resultsConfig)}
+                primaryKey={result.primaryKey}
               />
             );
           })

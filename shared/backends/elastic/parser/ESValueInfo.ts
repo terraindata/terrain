@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESClause from './clauses/ESClause';
-import ESVariantClause from './clauses/ESVariantClause';
 import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
@@ -64,17 +63,7 @@ export default class ESValueInfo
   /**
    * The parsed value
    */
-  public value: any;
-
-  /**
-   * If value is an array, a corresponding ESValueInfo[]. An empty list otherwise.
-   */
-  public arrayChildren: ESValueInfo[];
-
-  /**
-   * If value is an object, a corresponding object mapping keys. An empty object otherwise.
-   */
-  public objectChildren: { [name: string]: ESPropertyInfo };
+  public value: undefined | any;
 
   /**
    * The tokens belonging to the value, in order of appearance
@@ -82,35 +71,120 @@ export default class ESValueInfo
   public tokens: ESParserToken[];
 
   /**
-   * If errors were detected associated with this value, they will be in this list
-   * in the order in which they were detected.
+   * When this value is the result of substituting in a parameter,
+   * this is set to the name of that parameter.
    */
-  public errors: ESParserError[];
+  public parameter: undefined | string;
 
   /**
    * When interpreted, this is set to the detected ESClause for this value
    */
-  public clause: ESClause | null;
+  public clause: undefined | ESClause;
 
   /**
    * In the case of a variant clause, this is set to the variant clause
    */
-  public parentClause: ESClause | null;
+  public parentClause: undefined | ESClause;
+
+  /**
+   * If value is an object, a corresponding object mapping keys, undefined otherwise.
+   */
+  private _objectChildren: undefined | { [name: string]: ESPropertyInfo };
+
+  /**
+   * If value is an array, a corresponding ESValueInfo[], undefined otherwise.
+   */
+  private _arrayChildren: undefined | ESValueInfo[];
+
+  /**
+   * If errors were detected associated with this value, they will be in this list
+   * in the order in which they were detected, undefined otherwise.
+   */
+  private _errors: undefined | ESParserError[];
 
   public constructor()
   {
     this.jsonType = ESJSONType.unknown;
-    this.value = undefined;
     this.tokens = [];
-    this.arrayChildren = [];
-    this.objectChildren = {};
-    this.errors = [];
-    this.clause = null;
-    this.parentClause = null;
+  }
+
+  /**
+   * If value is an object, a corresponding object mapping keys, empty otherwise.
+   */
+  public get objectChildren(): { [name: string]: ESPropertyInfo }
+  {
+    return (this._objectChildren === undefined) ? {} : this._objectChildren;
+  }
+
+  public addObjectChild(name: string, info: ESPropertyInfo): void
+  {
+    this._objectChildren = this.objectChildren;
+    this._objectChildren[name] = info;
+  }
+
+  /**
+   * If value is an array, a corresponding ESValueInfo[], empty otherwise.
+   */
+  public get arrayChildren(): ESValueInfo[]
+  {
+    return (this._arrayChildren === undefined) ? [] : this._arrayChildren;
+  }
+
+  public addArrayChild(info: ESValueInfo): void
+  {
+    this._arrayChildren = this.arrayChildren;
+    this._arrayChildren.push(info);
+  }
+
+  /**
+   * If errors were detected associated with this value, they will be in this list
+   * in the order in which they were detected.
+   */
+  public get errors(): ESParserError[]
+  {
+    return (this._errors === undefined) ? [] : this._errors;
   }
 
   public attachError(error: ESParserError): void
   {
-    this.errors.push(error);
+    this._errors = this.errors;
+    this._errors.push(error);
+  }
+
+  public forEachProperty(func: (property: ESPropertyInfo) => void): void
+  {
+    Object.keys(this.objectChildren).forEach(
+      (name: string): void =>
+      {
+        func(this.objectChildren[name]);
+      });
+  }
+
+  public forEachElement(func: (element: ESValueInfo) => void): void
+  {
+    this.arrayChildren.forEach(func);
+  }
+
+  public recursivelyVisit(func: (element: ESValueInfo) => boolean): void
+  {
+    if (!func(this))
+    {
+      return;
+    }
+
+    this.forEachProperty((property: ESPropertyInfo): void =>
+    {
+      property.propertyName.recursivelyVisit(func);
+
+      if (property.propertyValue !== null)
+      {
+        property.propertyValue.recursivelyVisit(func);
+      }
+    });
+
+    this.forEachElement((element: ESValueInfo): void =>
+    {
+      element.recursivelyVisit(func);
+    });
   }
 }

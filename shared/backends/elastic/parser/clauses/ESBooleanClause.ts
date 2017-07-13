@@ -78,7 +78,7 @@ export default class ESBooleanClause extends ESTerminalClause
           ]),
         },
         tql: (boolBlock) => !!boolBlock['value'],
-      }
+      },
     });
   }
 }

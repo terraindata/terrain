@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands radix prefer-const ban-types no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
+
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import { line } from 'd3-shape';
@@ -68,6 +71,8 @@ class ResultClass extends BaseClass
 {
   // all available fields for display
   public fields: IMMap<string, string> = Map<string, string>({});
+
+  public primaryKey: any = '';
 
   public spotlight: any;
 
@@ -138,6 +143,8 @@ interface State
 }
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
+
+let RESULTS_CACHE: { [primaryKey: string]: Result };
 
 export class ResultsManager extends TerrainComponent<Props>
 {
@@ -506,6 +513,11 @@ export class ResultsManager extends TerrainComponent<Props>
           result.fields.merge(resultData),
         );
 
+        result = result.set(
+          'primaryKey',
+          getPrimaryKeyFor(result, this.props.query.resultsConfig, index),
+        );
+
         if (!isAllFields)
         {
           result = result.set('rawFields', Map(resultData));
@@ -521,12 +533,14 @@ export class ResultsManager extends TerrainComponent<Props>
       fields = results.get(0).fields.keySeq().toList();
     }
 
+    const loading = (isAllFields && !resultsState.hasLoadedResults) ||
+      (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields);
+
     const changes: any = {
       results,
       fields,
       hasError: false,
-      loading: (isAllFields && !resultsState.hasLoadedResults) ||
-      (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
+      loading,
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
       errorLine: null,
       mainErrorMessage: null,
@@ -700,16 +714,16 @@ export class ResultsManager extends TerrainComponent<Props>
   }
 }
 
-export function getPrimaryKeyFor(result: any, config: ResultsConfig): string
+function getPrimaryKeyFor(result: Result, config: ResultsConfig, index: number): string
 {
   if (config && config.primaryKeys.size)
   {
     return config.primaryKeys.map(
-      (field) => result[field],
-    ).join('and');
+      (field) => result.fields[field],
+    ).join('-and-');
   }
 
-  return 'result-' + Math.floor(Math.random() * 100000000);
+  return index + ': ' + JSON.stringify(result.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
 }
 
 export default ResultsManager;

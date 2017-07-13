@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:member-ordering
+
 // A generic type of backend, e.g. mysql or elastic
 
 import * as Immutable from 'immutable';
@@ -64,6 +67,7 @@ export interface Backend
     [type: string]: BlockConfig,
   };
   creatingType: string; // type of the block that marks where a card is being created
+  inputType: string; // type of the block for inputs
 
   rootCard: BlockConfig;
   // Cards that can go at the top/root level

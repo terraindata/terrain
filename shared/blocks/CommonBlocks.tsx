@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions interface-name max-line-length
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 

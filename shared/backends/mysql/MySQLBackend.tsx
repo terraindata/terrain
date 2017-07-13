@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:member-ordering member-access no-var-requires
+
 import * as Immutable from 'immutable';
 import { Backend, cardsDeckToList } from '../types/Backend';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
@@ -59,6 +62,7 @@ class MySQLBackend implements Backend
 
   blocks = MySQLBlocks;
   creatingType = MySQLBlocks.creating.type;
+  inputType = MySQLBlocks.input.type;
   rootCard = MySQLBlocks.sfw;
   topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
 

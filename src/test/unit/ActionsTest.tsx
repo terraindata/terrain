@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-reference
+
 /// <reference path="../../typings/tsd.d.ts" />
 
 import * as test from 'tape';

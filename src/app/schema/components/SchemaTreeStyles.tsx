@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as _ from 'underscore';
 import Styles from '../../Styles';
 const color = require('color');

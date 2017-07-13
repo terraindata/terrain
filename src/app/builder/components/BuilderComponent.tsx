@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const
+
 import './BuilderComponent.less';
 
 import * as classNames from 'classnames';

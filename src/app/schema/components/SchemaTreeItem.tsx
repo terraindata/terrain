@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions restrict-plus-operands
+
 import * as React from 'react';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';

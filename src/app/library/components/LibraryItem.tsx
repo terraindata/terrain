@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -51,8 +54,8 @@ const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Menu from './../../common/components/Menu';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -263,7 +266,8 @@ class LibraryItem extends TerrainComponent<Props>
             )
         );
 
-    let shiftedUp: boolean, shiftedDown: boolean;
+    let shiftedUp: boolean;
+    let shiftedDown: boolean;
 
     if (this.props.draggingOverIndex !== -1)
     {

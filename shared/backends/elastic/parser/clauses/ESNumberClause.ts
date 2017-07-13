@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
