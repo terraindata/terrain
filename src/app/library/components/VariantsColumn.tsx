@@ -274,7 +274,7 @@ class VariantsColumn extends TerrainComponent<Props>
     } = this.props;
 
     if (multiselect) {
-      if (selectedVariants.indexOf(id.toString()) > -1) {
+      if (selectedVariants.includes(id.toString())) {
         Actions.variants.unselect(id.toString());
       } else {
         Actions.variants.select(id.toString());
