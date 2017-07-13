@@ -58,6 +58,7 @@ import ESNumberClause from './clauses/ESNumberClause';
 import ESObjectClause from './clauses/ESObjectClause';
 import ESPropertyClause from './clauses/ESPropertyClause';
 import ESReferenceClause from './clauses/ESReferenceClause';
+import ESScriptClause from './clauses/ESScriptClause';
 import ESStringClause from './clauses/ESStringClause';
 import ESStructureClause from './clauses/ESStructureClause';
 import ESTypeClause from './clauses/ESTypeClause';
@@ -336,7 +337,7 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#geo-sorting',
         template: 'arc',
       }),
-    new ESStructureClause('script',
+    new ESScriptClause('script',
       {
         lang: 'script_language',
         params: 'script_params',
