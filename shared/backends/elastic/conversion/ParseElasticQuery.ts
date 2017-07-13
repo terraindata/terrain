@@ -45,9 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Query } from '../../../items/types/Query';
-import { default as ESInterpreter } from '../parser/ESInterpreter';
 import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
-import ESInterpreter from '../parser/ESInterpreter';
+import { default as ESInterpreter } from '../parser/ESInterpreter';
 
 export function ParseElasticQuery(tql: string)
 {
