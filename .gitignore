@@ -17,7 +17,6 @@ src/**/*.jsx
 midway/**/*.jsx
 .idea
 .vscode
-yarn.lock
 midway.db
 moviesdb.db
 *.swp
