@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESJSONType from './ESJSONType';
-import ESParameter from './ESParameter';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -171,6 +170,11 @@ export default class ESJSONParser
     this.errors.push(error);
   }
 
+  public accumulateErrorOnValueInfo(info: ESValueInfo, message: string, isWarning: boolean = false): void
+  {
+    this.accumulateError(new ESParserError(info.tokens[0], info, message, isWarning));
+  }
+
   private peek(): string
   {
     // skip whitespace
@@ -278,6 +282,7 @@ export default class ESJSONParser
         case '@':
           jsonType = ESJSONType.parameter;
           valueInfo.value = this.readParameter();
+          valueInfo.parameter = valueInfo.value.substring(1);
           break;
 
         default:
@@ -355,14 +360,13 @@ export default class ESJSONParser
   {
     const array: any[] = [];
     arrayInfo.value = array;
-    arrayInfo.arrayChildren = [];
 
     for (let elementInfo: ESValueInfo | null = this.readValue();
       elementInfo !== null;
       elementInfo = this.readValue())
     {
       array.push(elementInfo.value);
-      arrayInfo.arrayChildren.push(elementInfo);
+      arrayInfo.addArrayChild(elementInfo);
 
       // read array delimiter, ','
       const propertyDelimiter: string = this.peek();
@@ -391,7 +395,6 @@ export default class ESJSONParser
   {
     const obj: object = {};
     objInfo.value = obj;
-    objInfo.objectChildren = {};
 
     for (let nameInfo: ESValueInfo | null = this.readValue();
       nameInfo !== null;
@@ -414,7 +417,7 @@ export default class ESJSONParser
 
       // install a property info into the parent object
       const propertyInfo: ESPropertyInfo = new ESPropertyInfo(nameInfo);
-      objInfo.objectChildren[propertyName] = propertyInfo;
+      objInfo.addObjectChild(propertyName, propertyInfo);
 
       // read delimiter between property name and value
       const kvpDelimiter: string = this.peek();
@@ -508,10 +511,10 @@ export default class ESJSONParser
     return false;
   }
 
-  private readParameter(): ESParameter
+  private readParameter(): string
   {
     let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_][a-zA-Z_0-9]*)/);
-    if (match === null)
+    if (match === null || !this.allowParameters)
     {
       match = '';
       this.accumulateErrorOnCurrentToken(
@@ -519,7 +522,7 @@ export default class ESJSONParser
         'and can only contain letters, underscores, and numbers.');
     }
 
-    return new ESParameter(match);
+    return match;
   }
 
   private captureMatch(exp: RegExp): any

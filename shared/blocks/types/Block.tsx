@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions max-line-length
+
 import * as _ from 'underscore';
 
 export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);

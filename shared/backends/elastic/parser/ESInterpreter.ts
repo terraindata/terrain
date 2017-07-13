@@ -44,8 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
+import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
 
@@ -57,18 +59,28 @@ export const ESInterpreterDefaultConfig = new EQLConfig();
  */
 export default class ESInterpreter
 {
-  public parser: ESJSONParser; // source parser
   public config: EQLConfig; // query language description
+  public params: { [name: string]: ESClause }; // input parameter clause types
+  public parser: ESJSONParser; // source parser
 
   /**
    * Runs the interpreter on the given query string. Read needed data by calling the
    * public member functions below. You can also pass in an existing ESJSONParser
    * to run the interpreter on it's result.
+   *
+   * 1) parse
+   * 2) interpret
+   *
    * @param query the query string or parser to interpret
+   * @param config the spec config to use
+   * @param params parameter map to use
    */
-  public constructor(query: string | ESJSONParser, config: EQLConfig = ESInterpreterDefaultConfig)
+  public constructor(query: string | ESJSONParser,
+    params: { [name: string]: ESClause } = {},
+    config: EQLConfig = ESInterpreterDefaultConfig)
   {
     this.config = config;
+    this.params = params;
 
     if (typeof query === 'string')
     {
@@ -82,7 +94,34 @@ export default class ESInterpreter
     {
       try
       {
-        this.config.getClause('root').mark(this, this.parser.getValueInfo());
+        const root: ESValueInfo = this.parser.getValueInfo();
+        root.clause = this.config.getClause('root');
+        root.recursivelyVisit(
+          (info: ESValueInfo): boolean =>
+          {
+            if (info.parameter !== undefined)
+            {
+              const clause: ESClause = this.params[info.parameter];
+              if (clause === undefined)
+              {
+                this.accumulateError(info, 'Undefined parameter.');
+              } else if (clause !== info.clause)
+              {
+                const expectedClause: ESClause = info.clause as ESClause;
+                this.accumulateError(info, 'Mismatched clause types. Expected a ' +
+                  expectedClause.name + ' but parameter is a ' + clause.name);
+              }
+
+              return false; // don't validate parameters
+            }
+
+            if (info.clause !== undefined)
+            {
+              info.clause.mark(this, info);
+            }
+
+            return true;
+          });
       } catch (e)
       {
         this.accumulateError(this.parser.getValueInfo(), 'Failed to mark the json object ' + String(e.message));
@@ -92,7 +131,7 @@ export default class ESInterpreter
 
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
-    this.parser.accumulateError(new ESParserError(info.tokens[0], info, message, isWarning));
+    this.parser.accumulateErrorOnValueInfo(info, message, isWarning);
   }
 
   public hasError()

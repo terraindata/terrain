@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
@@ -148,7 +151,7 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     {
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
-      const tql: string = AllBackendsMap[state.query.language].queryToCode(state.query, {})
+      const tql: string = AllBackendsMap[state.query.language].queryToCode(state.query, {});
       state = state
         .setIn(['query', 'tql'], tql)
         .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(tql))

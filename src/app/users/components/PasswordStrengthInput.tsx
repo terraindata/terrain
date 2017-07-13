@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name no-shadowed-variable
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';

@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';

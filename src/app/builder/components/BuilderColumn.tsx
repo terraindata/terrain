@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires switch-default strict-boolean-expressions restrict-plus-operands no-unused-expression
 
 import * as classNames from 'classnames';
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
@@ -64,7 +66,7 @@ const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../../shared/items/types/Query';
 import Ajax from './../../util/Ajax';
 
-import { Colors, backgroundColor, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import Manual from './../../manual/components/Manual';
@@ -114,31 +116,31 @@ const menuIcons = [
 //   }[];
 // }
 
-const BuilderColumn = React.createClass<any, any>(
+const BuilderColumn = createReactClass<any, any>(
   {
     mixins: [PanelMixin],
 
     propTypes:
     {
-      query: React.PropTypes.object.isRequired,
-      resultsState: React.PropTypes.object.isRequired,
-      variant: React.PropTypes.object.isRequired,
-      className: React.PropTypes.string,
-      index: React.PropTypes.number,
-      canAddColumn: React.PropTypes.bool,
-      canCloseColumn: React.PropTypes.bool,
-      onAddColumn: React.PropTypes.func.isRequired,
-      onAddManualColumn: React.PropTypes.func.isRequired,
-      onCloseColumn: React.PropTypes.func.isRequired,
-      colKey: React.PropTypes.number.isRequired,
-      history: React.PropTypes.any,
-      columnType: React.PropTypes.number,
-      selectedCardName: React.PropTypes.string,
-      switchToManualCol: React.PropTypes.func,
-      changeSelectedCardName: React.PropTypes.func,
-      canEdit: React.PropTypes.bool.isRequired,
-      cantEditReason: React.PropTypes.string,
-      onNavigationException: React.PropTypes.func,
+      query: PropTypes.object.isRequired,
+      resultsState: PropTypes.object.isRequired,
+      variant: PropTypes.object.isRequired,
+      className: PropTypes.string,
+      index: PropTypes.number,
+      canAddColumn: PropTypes.bool,
+      canCloseColumn: PropTypes.bool,
+      onAddColumn: PropTypes.func.isRequired,
+      onAddManualColumn: PropTypes.func.isRequired,
+      onCloseColumn: PropTypes.func.isRequired,
+      colKey: PropTypes.number.isRequired,
+      history: PropTypes.any,
+      columnType: PropTypes.number,
+      selectedCardName: PropTypes.string,
+      switchToManualCol: PropTypes.func,
+      changeSelectedCardName: PropTypes.func,
+      canEdit: PropTypes.bool.isRequired,
+      cantEditReason: PropTypes.string,
+      onNavigationException: PropTypes.func,
     },
 
     getInitialState()

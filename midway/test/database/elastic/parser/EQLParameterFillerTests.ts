@@ -44,19 +44,77 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-/**
- * Represents an Elastic Search input parameter for a search template:
- * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html
- * Input parameters appear in a EQL query as an at sign followed by a variable name: @myParam
- * Input parameters are injected into the template in the form {{#toJson}}myParam{{/toJson}}
- */
-export default class ESParameter
-{
-  public name: string;
-  // public jsonType: ESJSONType; // indicates expected parameter input type
+import * as winston from 'winston';
+import ESParameterFiller from '../../../../../shared/backends/elastic/parser/EQLParameterFiller';
+import EQLTemplateGenerator from '../../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
+import ESValueInfo from '../../../../../shared/backends/elastic/parser/ESValueInfo';
 
-  constructor(name: string)
-  {
-    this.name = name;
-  }
+/* tslint:disable:no-trailing-whitespace max-line-length */
+
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  done();
+});
+
+function testGeneration(testString: string,
+  params: { [param: string]: any },
+  expectedValue: string)
+{
+  winston.info('testing \'' + testString + '\'');
+
+  const parser: ESParser = new ESParser(testString);
+  const valueInfo: ESValueInfo = parser.getValueInfo();
+  const errors: ESParserError[] = parser.getErrors();
+
+  expect(errors.length).toEqual(0);
+
+  const result = ESParameterFiller.generate(valueInfo, params);
+
+  winston.info(result);
+  expect(result).toEqual(expectedValue);
 }
+
+test('test generate template queries', () =>
+{
+  testGeneration('true', {}, 'true');
+  testGeneration('false', {}, 'false');
+  testGeneration('null', {}, 'null');
+
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : 10}`,
+    {},
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : @size}`,
+    {
+      type: 'data',
+      from: 0,
+      size: 10,
+    },
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+  testGeneration(`
+  {
+    "index" : "movies",
+    "type" : "data",
+    "size" : @size,
+    "from" : @from,
+    "body" : {
+      "query" : {
+        "bool" : {
+          "must_not" : [{"match" : {"title" : @bad_title}}]
+        }
+      }
+    }
+  }`,
+    {
+      from: 0,
+      size: 10,
+      bad_title: 'blah blah',
+    },
+    ` { "index":"movies","type":"data","size":10,"from":0,"body": { "query": { "bool": { "must_not":[ { "match": { "title":"blah blah" }  } ] }  }  }  } `);
+
+});

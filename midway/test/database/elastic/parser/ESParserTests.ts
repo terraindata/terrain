@@ -193,4 +193,24 @@ test('parse invalid json objects', () =>
   "size": "10"
 }`, JSON.parse(`{"from": 0, "index": "movies", "size": "10", "type": "data"}`), []);
 
+  testParse(`{
+  "index" : "movies",
+  "type" : "data",
+  "size" : 10,
+  "from" : 0,
+  "body" : {
+    "query" : {
+      "bool" : {
+        "must_not" : [ { "match" : { "title": "blah blah"} } ]
+      }
+    }
+  }
+}`,
+    {
+      body: { query: { bool: { must_not: [{ match: { title: 'blah blah' } }] } } },
+      from: 0,
+      index: 'movies',
+      size: 10,
+      type: 'data',
+    });
 });

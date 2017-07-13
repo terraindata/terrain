@@ -66,6 +66,25 @@
       }
     ]
   },
+  "search with space in field" : {
+    "index" : "movies",
+    "type" : "data stuff",
+    "size" : 10,
+    "from" : 0
+  },
+  "search 2" : {
+    "index" : "movies",
+    "type" : "data",
+    "size" : 10,
+    "from" : 0,
+    "body" : {
+      "query" : {
+        "bool" : {
+          "must_not" : [{"match" : {"title" : "blah blah"}}]
+        }
+      }
+    }
+  },
   "indices.getMapping" : {
     "movies" : {
       "mappings" : {

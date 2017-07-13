@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:variable-name max-classes-per-file member-access strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 

@@ -44,9 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
 
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as _ from 'underscore';
 import './InputStyle.less';
@@ -59,7 +61,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
-import { Colors, backgroundColor, fontColor, borderColor } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -68,14 +70,14 @@ const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
 import { Input, InputType } from '../../../../../shared/blocks/types/Input';
 
-const InputComponent = React.createClass<any, any>({
+const InputComponent = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:
   {
-    input: React.PropTypes.object.isRequired,
-    index: React.PropTypes.number.isRequired,
-    canEdit: React.PropTypes.bool.isRequired,
+    input: PropTypes.object.isRequired,
+    index: PropTypes.number.isRequired,
+    canEdit: PropTypes.bool.isRequired,
     // since inputs still are regular classes, instead of TerrainComponent, we construct keyPaths for Actions on execution
     //  rather than caching. This is fine since inputs aren't nested, there would be no
     //  benefit to caching keyPaths anyways.

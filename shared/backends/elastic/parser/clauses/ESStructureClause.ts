@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions restrict-plus-operands member-ordering no-console
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
@@ -89,19 +91,32 @@ export default class ESStructureClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    valueInfo.clause = this;
     this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
     const propertyClause: ESClause = interpreter.config.getClause('property');
 
-    // mark properties
-    Object.keys(children).forEach(
-      (name: string): void =>
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] !== undefined)
       {
-        const viTuple: ESPropertyInfo = children[name] as ESPropertyInfo;
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
 
-        this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string);
+    // mark properties
+    valueInfo.forEachProperty(
+      (viTuple: ESPropertyInfo): void =>
+      {
+        viTuple.propertyName.clause = propertyClause;
+
+        if (!this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string))
+        {
+          return;
+        }
+
+        const name: string = viTuple.propertyName.value as string;
 
         if (!this.structure.hasOwnProperty(name))
         {
@@ -118,24 +133,11 @@ export default class ESStructureClause extends ESClause
         }
         else
         {
-          const clause: ESClause = interpreter.config.getClause(this.structure[name]);
-
-          propertyClause.mark(interpreter, viTuple.propertyName);
-          clause.mark(interpreter, viTuple.propertyValue);
+          const valueClause: ESClause = interpreter.config.getClause(this.structure[name]);
+          viTuple.propertyValue.clause = valueClause;
         }
       });
-
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] === undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
   }
-
-
 
   public getRowsCard()
   {
@@ -150,7 +152,7 @@ export default class ESStructureClause extends ESClause
     //     //  instead of "size" rendering a Size card, "size"
     //     //  just rendering a textbox with the size properties
 
-    //     return null; 
+    //     return null;
     //     // return null so that the Record-class preserves the key,
     //     // and we can fill in a default value using init
 
@@ -169,7 +171,7 @@ export default class ESStructureClause extends ESClause
     //     //       // TODO if deep nested objects, make sure they all get init'd
     //     //       //   could be done in init by checking the config
 
-    //     //       return null; 
+    //     //       return null;
     //     //       // return null since init will fill in with a new object
     //     //       // on creation. We don't want each new Card to share the same
     //     //       // object reference. Returning null will preserve the key
@@ -207,25 +209,25 @@ export default class ESStructureClause extends ESClause
               text: key,
               type: 'eql' + type,
             };
-          }
+          },
         )));
       },
 
       childOptionClickHandler: (card: Card, option: { text: string, type: string }): Card =>
       {
         // reducer to apply the option to the card
-        return card.update('properties', properties =>
+        return card.update('properties', (properties) =>
           properties.push(
             BlockUtils.make(
               ElasticBlocks[this.getBlockType()],
               {
                 key: option.text,
                 cardValue: BlockUtils.make(
-                  ElasticBlocks[option.type]
-                )
-              }
-            )
-          )
+                  ElasticBlocks[option.type],
+                ),
+              },
+            ),
+          ),
         );
       },
 
@@ -276,7 +278,7 @@ export default class ESStructureClause extends ESClause
             (property) =>
             {
               _.extend(json, tqlTranslationFn(property, tqlConfig));
-            }
+            },
           );
           return json;
         },
@@ -285,14 +287,14 @@ export default class ESStructureClause extends ESClause
         {
           if (this.template)
           {
-            let properties = [];
+            const properties = [];
             _.mapObject(
               this.template,
               (value: any, key: string) =>
               {
                 const clauseType = this.structure[key];
                 let card = BlockUtils.make(
-                  ElasticBlocks['eql' + clauseType]
+                  ElasticBlocks['eql' + clauseType],
                 );
 
                 if (value !== null)
@@ -305,11 +307,11 @@ export default class ESStructureClause extends ESClause
                   {
                     key,
                     cardValue: card,
-                  }
+                  },
                 );
 
                 properties.push(propertyBlock);
-              }
+              },
             );
             return {
               properties: Immutable.List(properties),
@@ -317,8 +319,8 @@ export default class ESStructureClause extends ESClause
           }
           return {};
         },
-      }
-    }
+      },
+    },
     );
   }
 
@@ -349,13 +351,11 @@ export default class ESStructureClause extends ESClause
     };
   }
 
-
   public getWrapperCard()
   {
     const accepts = Immutable.List(
-      _.keys(this.structure).map(type => 'eql' + type)
+      _.keys(this.structure).map((type) => 'eql' + type),
     );
-
 
     let init: () => any;
     if (this.template)
@@ -379,27 +379,26 @@ export default class ESStructureClause extends ESClause
                     key: templateKey,
                     // value: templateValue === null ? undefined : templateValue,
                     // all base cards have a 'value' key
-                  }
+                  },
                 );
               }
               else
               {
                 console.log('No block for ' + templateKey, clauseType, templateValue);
               }
-            }
-          )
+            },
+          ),
         );
 
         return {
           cards: Immutable.List(cards),
         };
-      }
+      };
     }
 
     return this.seedCard(
       {
         cards: Immutable.List([]),
-
 
         // provide options of all possible card types
         getChildOptions: (card) =>
@@ -416,22 +415,22 @@ export default class ESStructureClause extends ESClause
                 text: key,
                 type: 'eql' + type,
               };
-            }
+            },
           )));
         },
 
         childOptionClickHandler: (card, option: { text: string, type: string }): Card =>
         {
           // reducer to apply the option to the card
-          return card.update('cards', cards =>
+          return card.update('cards', (cards) =>
             cards.push(
               BlockUtils.make(
                 ElasticBlocks[option.type],
                 {
                   key: option.text,
-                }
-              )
-            )
+                },
+              ),
+            ),
           );
         },
 
@@ -441,14 +440,14 @@ export default class ESStructureClause extends ESClause
         {
           tql: (block, tqlTranslationFn, tqlConfig) =>
           {
-            let json: object = {};
+            const json: object = {};
             block['cards'].map(
               (card) =>
               {
                 _.extend(json, {
                   [card['key']]: tqlTranslationFn(card, tqlConfig),
                 });
-              }
+              },
             );
             return json;
           },
@@ -473,7 +472,7 @@ export default class ESStructureClause extends ESClause
             },
           ],
         },
-      }
+      },
     );
   }
 

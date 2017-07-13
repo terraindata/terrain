@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
+
 import * as React from 'react';
 import * as _ from 'underscore';
 // import * as moment from 'moment';
@@ -56,9 +59,9 @@ import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
@@ -251,7 +254,8 @@ class VariantsColumn extends TerrainComponent<Props>
     const variant = this.props.variants.get(id);
     const index = this.props.variantsOrder.indexOf(id);
     const { me, roles } = this.state;
-    let canEdit: boolean, canDrag: boolean;
+    let canEdit: boolean;
+    let canDrag: boolean;
     canEdit = true;
     canDrag = true;
 

@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import Util from './../util/Util';
 import { BaseClass, New } from '../Classes';
+import Util from './../util/Util';
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
@@ -85,7 +85,7 @@ export const FILE_TYPES =
   [
     'json',
     'csv',
-  ]
+  ];
 
 export const ELASTIC_TYPES =
   [

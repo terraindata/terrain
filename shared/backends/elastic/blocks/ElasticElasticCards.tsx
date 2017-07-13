@@ -44,22 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
-import * as Immutable from 'immutable';
+// tslint:disable:restrict-plus-operands no-shadowed-variable switch-default no-console
 
-import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
+import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import { _card, Card, CardString, CardConfig } from '../../../blocks/types/Card';
+import * as CommonBlocks from '../../../blocks/CommonBlocks';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
+import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
+import { _card, Card, CardConfig, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 import * as CommonElastic from '../syntax/CommonElastic';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
-import EQLConfig from '../parser/EQLConfig';
 import ESClause from '../parser/clauses/ESClause';
 import ESEnumClause from '../parser/clauses/ESEnumClause';
 import ESStructureClause from '../parser/clauses/ESStructureClause';
+import EQLConfig from '../parser/EQLConfig';
 
 import Colors from '../../../../src/app/common/Colors';
 
@@ -131,7 +133,7 @@ referenceCards.map((clause) =>
         ],
         title: clause.name,
         // TODO add url, description, etc.
-      }
+      },
     );
     ElasticElasticCards[type] = refCardDef;
   }
@@ -156,7 +158,7 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
         {
           // TODO autocomplete
           return Immutable.List([]);
-        }
+        },
         // autoDisabled: true,
       };
 
@@ -165,12 +167,12 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
         displayType: DisplayType.DROPDOWN,
         key: 'value',
         options: Immutable.List(['false', 'true']),
-      }
+      };
 
     case valueTypes.null:
       return [];
   }
-}
+};
 
 //   const cardType = 'elasticElastic' + type;
 //   const { def, desc, url, values, template, required, name } = clause;
@@ -309,6 +311,5 @@ const getDisplayForType = (type: string, canBeCards?: boolean): Display | Displa
 //     }
 //   }
 // });
-
 
 export default ElasticElasticCards;

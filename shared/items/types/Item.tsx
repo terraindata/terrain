@@ -43,6 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:member-access no-reference
+
+/// TODO: remove when the "src" dependency is eliminated
+/// <reference path="../../../src/typings/tsd.d.ts" />
+
 import { BaseClass, New } from '../../../src/app/Classes';
 import BackendInstance from '../../backends/types/BackendInstance';
 
