@@ -411,19 +411,22 @@ export class Import
       {
         winston.info('checktypes: hash matches');
       }
-      winston.info('checktypes: hashes do not match');
-      if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
+      else
       {
-        return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
-      }
-      for (const key in obj)
-      {
-        if (obj.hasOwnProperty(key) && obj[key] !== null)
+        winston.info('checktypes: hashes do not match');
+        if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
         {
-          if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
+          return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
+        }
+        for (const key in obj)
+        {
+          if (obj.hasOwnProperty(key) && obj[key] !== null)
           {
-            return 'Field "' + key + '" of object number ' + String(ind) +
-              ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
+            if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
+            {
+              return 'Field "' + key + '" of object number ' + String(ind) +
+                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
+            }
           }
         }
       }
