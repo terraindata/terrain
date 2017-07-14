@@ -96,6 +96,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
     resultsBarOpen: boolean;
+    lastQueryMutation: number;
   } = {
     tql: this.props.query.tql,
     cardsTQL: this.props.query.tql,
@@ -110,13 +111,28 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: false,
     termDefinitionPos: {},
     resultsBarOpen: false,
+    lastQueryMutation: undefined,
   };
+
+  public debouncedSendTqlAction = _.debounce(
+    () => {
+      BuilderActions.changeTQL(this.state.tql);
+    },
+    1000,
+  );
+
+  public debouncedUpdateCardsTql = _.debounce(() =>
+    {
+      this.setState({
+        cardsTQL: this.props.query.tql,
+      });
+    },
+    1000,
+  );
 
   constructor(props: Props)
   {
     super(props);
-    this.sendTqlAction = _.debounce(this.sendTqlAction, 750);
-    this.updateCardsTQL = _.debounce(this.updateCardsTQL, 750);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -146,7 +162,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
       if (!noAction)
       {
-        this.sendTqlAction();
+        this.debouncedSendTqlAction();
       }
     } else
     {
@@ -158,7 +174,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
       });
       if (manualRequest === true && noAction === false)
       {
-        this.sendTqlAction();
+        this.debouncedSendTqlAction();
       }
     }
   }
@@ -172,16 +188,15 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   //     x.findTqlToFold();
   //   }
   // }
-  public updateCardsTQL()
+
+  public updateCardsTql()
   {
-    this.setState({
-      cardsTQL: this.props.query.tql,
-    });
+    this.debouncedUpdateCardsTql();
   }
 
   public sendTqlAction()
   {
-    BuilderActions.changeTQL(this.state.tql);
+    this.debouncedSendTqlAction();
   }
 
   public changeThemeDefault()
@@ -393,7 +408,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
     if (this.props.query.tql !== this.state.cardsTQL)
     {
-      this.updateCardsTQL();
+      this.debouncedUpdateCardsTql();
     }
     return (
       <div
