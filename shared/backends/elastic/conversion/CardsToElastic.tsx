@@ -103,7 +103,7 @@ export function toInputMap(inputs: Immutable.List<Input>): object
   return inputMap;
 }
 
-export function stringifyWithPlaceholders(
+export function stringifyWithParameters(
   obj: object | number | boolean | string | null,
   inputs?: Immutable.List<Input>): string | null
 {
@@ -126,7 +126,7 @@ export function stringifyWithPlaceholders(
     for (let i = 0; i < keys.length; i++)
     {
       str += '"' + keys[i] + '": ';
-      str += stringifyWithPlaceholders(obj[keys[i]], inputs);
+      str += stringifyWithParameters(obj[keys[i]], inputs);
       if (i < keys.length - 1)
       {
         str += ',';
@@ -172,7 +172,7 @@ class CardsToElastic
       }
     }
 
-    const text: string = stringifyWithPlaceholders(elasticObj, query.inputs);
+    const text: string = stringifyWithParameters(elasticObj, query.inputs);
     const parser: ESParser = new ESParser(text, true);
     const valueInfo: ESValueInfo = parser.getValueInfo();
     const params = toInputMap(query.inputs);
