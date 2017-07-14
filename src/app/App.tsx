@@ -79,7 +79,7 @@ import Redirect from './common/components/Redirect';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
 import FileImport from './fileImport/components/FileImport';
-import Library from './library/components/Library';
+import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';

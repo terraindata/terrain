@@ -43,45 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires no-console
-
+import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
-const Redux = require('redux');
+import * as React from 'react';
+import configureStore from 'redux-mock-store';
+import Library from '../../../app/library/components/Library';
 
-import Ajax from './../../util/Ajax';
-
-import AuthStore from './../../auth/data/AuthStore';
-import Util from './../../util/Util';
-
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-import UserReducers from './UserReducers';
-
-const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  UserReducers,
-  {}), UserTypes._UserState({})), UserTypes._UserState({}));
-
-UserStore.subscribe(() =>
+describe('Library', () =>
 {
-  const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
+  const initialState = {
+    groups: Immutable.Map({
+      id: 1,
+      name: 'Group 1',
+    }),
+  };
+
+  const mockStore = configureStore();
+  let store = null;
+  let libraryComponent = null;
+
+  beforeEach(() =>
   {
-    // currentUser object changed
-    UserStore.dispatch({
-      type: ActionTypes.updateCurrentUser,
-      payload: {},
-    });
-  }
+    store = mockStore(initialState);
+    libraryComponent = shallow(
+      <Library
+        store={store}
+        params={{ groupId: 1 }}
+      />,
+    );
+  });
+
+  it('should have 3 columns', () =>
+  {
+    // Render a checkbox with label in the document
+    expect(libraryComponent.find('GroupsColumn').length).toEqual(1);
+    expect(libraryComponent.find('AlgorithmsColumn').length).toEqual(1);
+    expect(libraryComponent.find('VariantsColumn').length).toEqual(1);
+  });
 });
-
-/*window['test'] = () =>
-{
-  const users = UserStore.getState().users;
-  console.log('users', users);
-  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};*/
-
-export default UserStore;
