@@ -58,6 +58,7 @@ import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import * as SchemaTypes from './../../schema/SchemaTypes';
+import { databaseId, tableId } from './../../schema/SchemaTypes';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
@@ -249,12 +250,13 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
-      primaryKey, oldNames, templates, transforms, loadTemplate } = fileImportState;
+      primaryKey, oldNames, templates, transforms } = fileImportState;
 
+    let content = {};
     switch (this.state.stepId)
     {
       case 0:
-        return (
+        content =
           <div>
             <h3>step 1: select a file</h3>
             <input ref='file' type='file' name='abc' onChange={this.handleChooseFile} />
@@ -263,13 +265,10 @@ class FileImport extends TerrainComponent<any>
               checked={hasCsvHeader}
               onChange={this.handleCsvHeaderChange}
             />
-            <button onClick={this.handleNextStepChange}>
-              next
-            </button>
-          </div>
-        );
+          </div>;
+        break;
       case 1:
-        return (
+        content =
           <div>
             <h3>step 2: select a server</h3>
             <Dropdown
@@ -278,16 +277,10 @@ class FileImport extends TerrainComponent<any>
               onChange={this.handleServerChange}
               canEdit={true}
             />
-            <button onClick={this.handlePrevStepChange}>
-              back
-            </button>
-            <button onClick={this.handleNextStepChange}>
-              next
-            </button>
-          </div>
-        );
+          </div>;
+        break;
       case 2:
-        return (
+        content =
           <div>
             <h3>step 3: select a database</h3>
             <Autocomplete
@@ -304,23 +297,17 @@ class FileImport extends TerrainComponent<any>
               placeholder={'database'}
               disabled={false}
             />
-            <button onClick={this.handlePrevStepChange}>
-              back
-            </button>
-            <button onClick={this.handleNextStepChange}>
-              next
-            </button>
-          </div>
-        );
+          </div>;
+        break;
       case 3:
-        return (
+        content =
           <div>
             <h3>step 4: select a table</h3>
             <Autocomplete
               value={tableText}
               options={
-                this.state.dbs && dbText && this.state.dbs.get(serverText + '/' + dbText) ?
-                  List(this.state.dbs.get(serverText + '/' + dbText).tableIds.map((value, index) =>
+                this.state.dbs && dbText && this.state.dbs.get(databaseId(serverText, dbText)) ?
+                  List(this.state.dbs.get(databaseId(serverText, dbText)).tableIds.map((value, index) =>
                     value.split('.').pop(),
                   ))
                   :
@@ -330,16 +317,10 @@ class FileImport extends TerrainComponent<any>
               placeholder={'table'}
               disabled={false}
             />
-            <button onClick={this.handlePrevStepChange}>
-              back
-            </button>
-            <button onClick={this.handleNextStepChange}>
-              next
-            </button>
-          </div>
-        );
+          </div>;
+        break;
       case 4:
-        return (
+        content =
           <div>
             <h3>step 5: choose and format columns</h3>
             <FileImportPreview
@@ -352,23 +333,37 @@ class FileImport extends TerrainComponent<any>
               oldNames={oldNames}
               templates={templates}
               transforms={transforms}
-              loadTemplate={loadTemplate}
               columnOptions={
-                this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?
-                  List(this.state.tables.get(serverText + '/' + dbText + '.' + tableText).columnIds.map((value, index) =>
+                this.state.tables && tableText && this.state.tables.get(tableId(serverText, dbText, tableText)) ?
+                  List(this.state.tables.get(tableId(serverText, dbText, tableText)).columnIds.map((value, index) =>
                     value.split('.').pop(),
                   ))
                   :
                   List([])
               }
             />
-            <button onClick={this.handlePrevStepChange}>
-              back
-            </button>
-          </div>
-        );
+          </div>;
+        break;
       default:
     }
+
+    return (
+      <div>
+        {content}
+        {
+          this.state.stepId > 0 &&
+          <button onClick={this.handlePrevStepChange}>
+            back
+        </button>
+        }
+        {
+          this.state.stepId < 4 &&
+          <button onClick={this.handleNextStepChange}>
+            next
+        </button>
+        }
+      </div>
+    );
   }
 }
 

@@ -97,6 +97,93 @@ const recToNumber = (columnType) =>
   return columnType;
 };
 
+const applyTransform = (state, transform) =>
+{
+  const transformCol = state.columnNames.indexOf(transform.colName);
+
+  if (transform.name === 'rename')
+  {
+    return state.setIn(['columnNames', state.columnNames.indexOf(transform.colName)], transform.args.newName);
+  }
+  else if (transform.name === 'append' || transform.name === 'prepend')
+  {
+    return state
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        row.map((col, j) =>
+        {
+          if (j === transformCol)
+          {
+            return transform.name === 'append' ? col + transform.args.text : transform.args.text + col;
+          }
+          return col;
+        }),
+      )),
+    );
+  }
+  else if (transform.name === 'split')
+  {
+    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    return state
+      .set('primaryKey', primaryKey)
+      .set('columnNames', state.columnNames
+        .set(transformCol, transform.args.newName[0])
+        .insert(transformCol + 1, transform.args.newName[1]))
+      .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
+      .set('columnTypes', state.columnTypes.insert(transformCol + 1, { type: 0 }))
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        [].concat(...row.map((col, j) =>
+        {
+          if (j === transformCol)
+          {
+            const index = col.indexOf(transform.args.text);
+            if (index === -1)
+            {
+              return [col, ''];
+            }
+            return [col.substring(0, index), col.substring(index + transform.args.text.length)];
+          }
+          return col;
+        },
+        )),
+      )));
+  }
+  else if (transform.name === 'merge')
+  {
+    const mergeCol = state.columnNames.indexOf(transform.args.mergeName);
+    console.log('mergeCol: ', mergeCol);
+    console.log(state.columnNames.delete(mergeCol));
+    console.log(state.columnTypes);
+    console.log(state.columnsToInclude);
+
+    let primaryKey = '';
+    if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
+    {
+      primaryKey = mergeCol < transformCol ? transformCol - 1 : transformCol;
+    }
+    else
+    {
+      primaryKey = state.primaryKey < transformCol ? state.primaryKey : state.primaryKey - 1;
+    }
+
+    return state
+      .set('primaryKey', primaryKey)
+      .set('columnNames', state.columnNames
+        .set(transformCol, transform.args.newName)
+        .delete(mergeCol))
+      .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
+      .set('columnTypes', state.columnTypes.delete(mergeCol))
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        row.map((col, j) =>
+        {
+          return j === transformCol ? col + transform.args.text + row[mergeCol] : col;
+        }).filter((col, j) =>
+          j !== mergeCol,
+        ),
+      )));
+  }
+  return state;
+};
+
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
@@ -169,94 +256,14 @@ FileImportReducers[ActionTypes.setColumnName] =
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
   {
-    console.log(action.payload.transform);
+    console.log('add transform: ', action.payload.transform);
     return state.set('transforms', state.transforms.push(action.payload.transform));
   };
 
 FileImportReducers[ActionTypes.updatePreviewRows] =
   (state, action) =>
   {
-    const transform = action.payload.transform;
-    const transformCol = state.columnNames.indexOf(transform.colName);
-
-    if (action.payload.transform.name === 'rename')
-    {
-      return state.setIn(['columnNames', state.columnNames.indexOf(transform.colName)], transform.args.newName);
-    }
-    else if (transform.name === 'append' || transform.name === 'prepend')
-    {
-      return state
-        .set('previewRows', List(state.previewRows.map((row, i) =>
-          row.map((col, j) =>
-          {
-            if (j === transformCol)
-            {
-              return transform.name === 'append' ? col + transform.args.text : transform.args.text + col;
-            }
-            return col;
-          }),
-        )),
-      );
-    }
-    else if (transform.name === 'split')
-    {
-      // TODO: adding new columns effect on colToMergeId
-      const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
-      return state
-        .set('primaryKey', primaryKey)
-        .set('columnNames', state.columnNames
-          .set(transformCol, transform.args.newName[0])
-          .insert(transformCol + 1, transform.args.newName[1]))
-        .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
-        .set('columnTypes', state.columnTypes.insert(transformCol + 1, { type: 0 }))
-        .set('previewRows', List(state.previewRows.map((row, i) =>
-          [].concat(...row.map((col, j) =>
-          {
-            if (j === transformCol)
-            {
-              const index = col.indexOf(transform.args.text);
-              if (index === -1)
-              {
-                return [col, ''];
-              }
-              return [col.substring(0, index), col.substring(index + transform.args.text.length)];
-            }
-            return col;
-          },
-          )),
-        )));
-    }
-    else if (transform.name === 'merge')
-    {
-      const mergeCol = state.columnNames.indexOf(transform.args.mergeName);
-
-      let primaryKey = '';
-      if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
-      {
-        primaryKey = mergeCol < transformCol ? transformCol - 1 : transformCol;
-      }
-      else
-      {
-        primaryKey = state.primaryKey < transformCol ? state.primaryKey : state.primaryKey - 1;
-      }
-
-      return state
-        .set('primaryKey', primaryKey)
-        .set('columnNames', state.columnNames
-          .set(transformCol, transform.args.newName)
-          .delete(mergeCol))
-        .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
-        .set('columnTypes', state.columnTypes.delete(mergeCol))
-        .set('previewRows', List(state.previewRows.map((row, i) =>
-          row.map((col, j) =>
-          {
-            return j === transformCol ? col + transform.args.text + row[mergeCol] : col;
-          }).filter((col, j) =>
-            j !== mergeCol,
-          ),
-        )));
-    }
-    return state;
+    return applyTransform(state, action.payload.transform);
   };
 
 FileImportReducers[ActionTypes.chooseFile] =
@@ -369,20 +376,21 @@ FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
     const template = state.templates.get(action.payload.templateId);
+    template.transformations.map((transform, i) =>
+    {
+      state = applyTransform(state, transform);
+    });
+    const { primaryKey, columnNames, columnTypes, columnsToInclude, previewRows } = state;
+
     return state
       .set('oldNames', List(template.originalNames))
       .set('primaryKey', _.map(template.columnTypes, (val, key) => key).indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('hasCsvHeader', template.hasCsvHeader)
-      .set('columnNames', List(_.map(template.columnTypes, (val, key) => key)))
-      .set('columnTypes', List(_.map(template.columnTypes, (val, key) => recToNumber(val))))
-      .set('columnsToInclude', List(_.map(template.columnTypes, (val, key) => true)))
-      .set('loadTemplate', true);
+      .set('columnNames', columnNames)
+      .set('columnTypes', columnTypes)
+      .set('columnsToInclude', columnsToInclude)
+      .set('previewRows', previewRows);
   };
-
-FileImportReducers[ActionTypes.clearLoadTemplate] =
-  (state, action) =>
-    state.set('loadTemplate', false)
-  ;
 
 export default FileImportReducers;

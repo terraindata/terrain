@@ -72,7 +72,6 @@ class FileImportStateC extends BaseClass
 
   public transforms: Immutable.List<Transform> = List([]);
   public templates: Immutable.List<Template> = List([]);
-  public loadTemplate: boolean = false;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -111,22 +110,6 @@ export interface ColumnType
   type: number;
   innerType?: ColumnType;
 }
-
-// class TransformC extends BaseClass
-// {
-//   public name = '',
-//   public args = {
-//     public oldName = '',
-//     public newName = '',
-//     public text = '',
-//   }
-// }
-// export type Transform = TransformC & IRecord<TransformC>;
-// export const _Transform = (config: { [key: string]: any } = {}) =>
-// {
-//   config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
-//   return New<Transform>(new TransformC(config), config);
-// };
 
 export const NUMBER_PREVIEW_ROWS = 5;
 

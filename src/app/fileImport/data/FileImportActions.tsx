@@ -119,10 +119,6 @@ const FileImportActions =
     loadTemplate:
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
-
-    clearLoadTemplate:
-    () =>
-      $(ActionTypes.clearLoadTemplate, {}),
   };
 
 export default FileImportActions;

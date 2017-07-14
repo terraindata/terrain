@@ -76,7 +76,6 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
-  loadTemplate: boolean;
 }
 
 class FileImportPreview extends TerrainComponent<Props>
@@ -86,11 +85,13 @@ class FileImportPreview extends TerrainComponent<Props>
     newName: string,
     templateId: number,
     templateText: string,
+    editColumnId: number,
   } = {
     colName: '',
     newName: '',
     templateId: -1,
     templateText: '',
+    editColumnId: -1,
   };
 
   public componentDidMount()
@@ -98,38 +99,45 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.getTemplates();
   }
 
-  public componentWillReceiveProps(nextProps: Props)
+  public handleEditColumnChange(editColumnId: number)
   {
-    if (nextProps.loadTemplate)
-    {
-      nextProps.transforms.map((transform) =>
-      {
-        console.log('load transform: ', transform);
-        Actions.updatePreviewRows(transform);
-      });
-    }
-    Actions.clearLoadTemplate();
+    this.setState({
+      editColumnId,
+    });
   }
 
   /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
    * when changing transform columns or types */
   public handleRenameTransform(colName: string, newName: string)
   {
-    if (this.state.colName && this.state.colName !== colName)
+    if (this.state.colName && this.state.newName !== colName)
     {
+      console.log('adding rename transform: ', this.state.colName + ', ' + this.state.newName);
       Actions.addTransform({
         name: 'rename',
-        colName,
+        colName: this.state.colName,
         args: {
-          newName,
+          newName: this.state.newName,
         },
       });
+      this.setState({
+        colName,
+        newName,
+      });
     }
-    console.log('setting rename transform: ', colName + ' to ' + newName);
-    this.setState({
-      colName,
-      newName,
-    });
+    else
+    {
+      if (!this.state.colName)
+      {
+        this.setState({
+          colName,
+        });
+      }
+      console.log('setting rename transform: ', this.state.colName + ' to ' + newName);
+      this.setState({
+        newName,
+      });
+    }
   }
 
   public addRenameTransform()
@@ -185,7 +193,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('templates: ', this.props.templates);
     return (
       <div>
         <button onClick={this.handleLoadTemplate}>
@@ -220,9 +227,11 @@ class FileImportPreview extends TerrainComponent<Props>
                     isPrimaryKey={this.props.primaryKey === key}
                     columnNames={this.props.columnNames}
                     datatypes={List(FileImportTypes.ELASTIC_TYPES)}
+                    columnOptions={this.props.columnOptions}
+                    editing={key === this.state.editColumnId}
                     handleRenameTransform={this.handleRenameTransform}
                     addRenameTransform={this.addRenameTransform}
-                    columnOptions={this.props.columnOptions}
+                    handleEditColumnChange={this.handleEditColumnChange}
                   />,
                 ).toArray()
               }

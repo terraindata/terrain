@@ -69,23 +69,17 @@ export interface Props
   datatypes: List<string>;
   columnNames: List<string>;
   columnOptions: List<string>;
+  editing: boolean;
   handleRenameTransform(oldName: string, newName: string);
   addRenameTransform();
+  handleEditColumnChange(editColumnId: number);
 }
 
 class FileImportPreviewColumn extends TerrainComponent<Props>
 {
-  public state: {
-    editing: boolean;
-  } = {
-    editing: false,
-  };
-
-  public handleEditingChange()
+  public handleEditClick()
   {
-    this.setState({
-      editing: !this.state.editing,
-    });
+    this.props.handleEditColumnChange(this.props.columnId);
   }
 
   public handleIncludedChange()
@@ -106,7 +100,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
-    if (this.state.editing)
+    if (this.props.editing)
     {
       return (
         <th className='column-header'>
@@ -151,7 +145,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         <div>
           {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
         </div>
-        <button onClick={this.handleEditingChange}>
+        <button onClick={this.handleEditClick}>
           Edit
         </button>
       </th>
