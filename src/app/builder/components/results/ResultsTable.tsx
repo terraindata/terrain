@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions ban-types no-console
+// tslint:disable:strict-boolean-expressions no-console
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -205,7 +205,7 @@ export default class ResultsTable extends TerrainComponent<Props>
   //   return config.fields.get(fieldIndex);
   // }
 
-  public getRow(i: number): Object
+  public getRow(i: number): object
   {
     // TODO
     return this.props.results.get(i).fields.toJS();

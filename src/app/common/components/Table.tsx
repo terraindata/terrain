@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions class-name ban-types interface-name
+// tslint:disable:no-var-requires strict-boolean-expressions class-name interface-name
 
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
@@ -75,7 +75,7 @@ export interface IColumn
 export interface Props
 {
   columns: List<IColumn>;
-  rowGetter: (index: number) => Object;
+  rowGetter: (index: number) => object;
   rowsCount: number;
   // rows: List<Map<any, any>>;
   random?: number;
