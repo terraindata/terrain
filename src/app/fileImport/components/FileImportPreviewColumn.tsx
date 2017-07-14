@@ -75,6 +75,19 @@ export interface Props
 
 class FileImportPreviewColumn extends TerrainComponent<Props>
 {
+  public state: {
+    editing: boolean;
+  } = {
+    editing: false,
+  };
+
+  public handleEditingChange()
+  {
+    this.setState({
+      editing: !this.state.editing,
+    });
+  }
+
   public handleIncludedChange()
   {
     Actions.setColumnToInclude(this.props.columnId);
@@ -93,37 +106,54 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
+    if (this.state.editing)
+    {
+      return (
+        <th className='column-header'>
+          include
+          <CheckBox
+            checked={this.props.isIncluded}
+            onChange={this.handleIncludedChange}
+          />
+          primary key
+          <CheckBox
+            checked={this.props.isPrimaryKey}
+            onChange={this.handlePrimaryKeyChange}
+          />
+          <Autocomplete
+            value={this.props.columnNames.get(this.props.columnId)}
+            options={this.props.columnOptions}
+            onChange={this.handleAutocompleteHeaderChange}
+            placeholder={''}
+            disabled={false}
+          />
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionId={0}
+            columnType={this.props.columnType}
+            datatypes={List(FileImportTypes.ELASTIC_TYPES)}
+          />
+          <TransformBox
+            datatype={this.props.datatypes.get(this.props.columnType.type)}
+            colName={this.props.columnNames.get(this.props.columnId)}
+            columnNames={this.props.columnNames}
+            addRenameTransform={this.props.addRenameTransform}
+          />
+        </th>
+      );
+    }
+
     return (
       <th className='column-header'>
-        include
-        <CheckBox
-          checked={this.props.isIncluded}
-          onChange={this.handleIncludedChange}
-        />
-        primary key
-        <CheckBox
-          checked={this.props.isPrimaryKey}
-          onChange={this.handlePrimaryKeyChange}
-        />
-        <Autocomplete
-          value={this.props.columnNames.get(this.props.columnId)}
-          options={this.props.columnOptions}
-          onChange={this.handleAutocompleteHeaderChange}
-          placeholder={''}
-          disabled={false}
-        />
-        <TypeDropdown
-          columnId={this.props.columnId}
-          recursionId={0}
-          columnType={this.props.columnType}
-          datatypes={List(FileImportTypes.ELASTIC_TYPES)}
-        />
-        <TransformBox
-          datatype={this.props.datatypes.get(this.props.columnType.type)}
-          colName={this.props.columnNames.get(this.props.columnId)}
-          columnNames={this.props.columnNames}
-          addRenameTransform={this.props.addRenameTransform}
-        />
+        <div>
+          {this.props.columnNames.get(this.props.columnId)}
+        </div>
+        <div>
+          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+        </div>
+        <button onClick={this.handleEditingChange}>
+          Edit
+        </button>
       </th>
     );
   }

@@ -105,15 +105,6 @@ class TransformBox extends TerrainComponent<Props>
     });
   }
 
-  public handleMergeIndexChange(mergeIndex: number)
-  {
-    const mergeName = this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName)).get(mergeIndex);
-    this.setState({
-      mergeIndex,
-      colToMergeId: this.props.columnNames.indexOf(mergeName),
-    });
-  }
-
   public handleSplitNameAChange(splitNameA)
   {
     const names = this.state.splitNames.slice();
@@ -129,6 +120,15 @@ class TransformBox extends TerrainComponent<Props>
     names[1] = splitNameB;
     this.setState({
       splitNames: names,
+    });
+  }
+
+  public handleMergeIndexChange(mergeIndex: number)
+  {
+    const mergeName = this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName)).get(mergeIndex);
+    this.setState({
+      mergeIndex,
+      colToMergeId: this.props.columnNames.indexOf(mergeName),
     });
   }
 
