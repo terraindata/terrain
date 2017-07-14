@@ -131,7 +131,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       if (action.payload.query.tql)
       {
         query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(action.payload.query.tql));
-      } else
+      }
+      else
       {
         query = query.set('parseTree', null);
       }

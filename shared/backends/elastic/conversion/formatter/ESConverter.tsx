@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import ESJSONParser from '../../parser/ESJSONParser';
 import ESDefaultFormatter from './ESDefaultFormatter';
 
