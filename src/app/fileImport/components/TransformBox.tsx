@@ -225,6 +225,12 @@ class TransformBox extends TerrainComponent<Props>
           newName: this.state.splitNames,
           text: this.state.transformText,
         };
+        // if (this.state.mergeIndex !== -1 && this.props.columnNames.indexOf(this.props.colName) < this.state.mergeIndex)
+        // {
+        //   this.setState({
+        //     mergeIndex: this.state.mergeIndex + 1,
+        //   });
+        // }
         break;
 
       case 'merge':

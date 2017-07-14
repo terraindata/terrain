@@ -53,6 +53,7 @@ import { server } from '../../../../midway/src/Midway';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import * as SchemaTypes from './../../schema/SchemaTypes';
+import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import FileImportInfo from './FileImportInfo';
@@ -104,9 +105,8 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
-      primaryKey, oldNames, templates, transforms } = fileImportState;
+      primaryKey, oldNames, templates, transforms, loadTemplate } = fileImportState;
 
-    // console.log('transforms: ', transforms);
     return (
       <div className='file-import'>
         <h2>File Import Page</h2>
@@ -149,6 +149,7 @@ class FileImport extends TerrainComponent<any>
             columnTypes={columnTypes}
             oldNames={oldNames}
             templates={templates}
+            loadTemplate={loadTemplate}
             transforms={transforms}
             columnOptions={
               this.state.tables && tableText && this.state.tables.get(serverText + '/' + dbText + '.' + tableText) ?

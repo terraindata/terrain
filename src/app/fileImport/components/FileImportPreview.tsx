@@ -76,6 +76,7 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
+  loadTemplate: boolean;
 }
 
 class FileImportPreview extends TerrainComponent<Props>
@@ -97,6 +98,19 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.getTemplates();
   }
 
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.loadTemplate)
+    {
+      nextProps.transforms.map((transform) =>
+      {
+        console.log('load transform: ', transform);
+        Actions.updatePreviewRows(transform);
+      });
+    }
+    Actions.clearLoadTemplate();
+  }
+
   /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
    * when changing transform columns or types */
   public handleRenameTransform(colName: string, newName: string)
@@ -112,7 +126,10 @@ class FileImportPreview extends TerrainComponent<Props>
       });
     }
     console.log('setting rename transform: ', colName + ' to ' + newName);
-    this.setRenameTransform(colName, newName);
+    this.setState({
+      colName,
+      newName,
+    });
   }
 
   public addRenameTransform()
@@ -127,23 +144,11 @@ class FileImportPreview extends TerrainComponent<Props>
           newName: this.state.newName,
         },
       });
-      this.setRenameTransform('', '');
+      this.setState({
+        colName: '',
+        newName: '',
+      });
     }
-  }
-
-  public setRenameTransform(colName: string, newName: string)
-  {
-    this.setState({
-      colName,
-      newName,
-    });
-  }
-
-  public handleUploadFile()
-  {
-    // TODO: database and table name error checking
-    this.addRenameTransform();
-    Actions.uploadFile();
   }
 
   public handleTemplateChange(templateId: number)
@@ -162,20 +167,20 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleLoadTemplate()
   {
-    // apply list of transforms to preview in a queue
     Actions.loadTemplate(this.state.templateId);
-
-    console.log('transforms: ', this.props.transforms);
-    this.props.transforms.map((transform) =>
-    {
-      Actions.updatePreviewRows(transform);
-    });
   }
 
   public handleSaveTemplate()
   {
     Actions.saveTemplate(this.state.templateText);
     Actions.getTemplates();
+  }
+
+  public handleUploadFile()
+  {
+    // TODO: database and table name error checking
+    this.addRenameTransform();
+    Actions.uploadFile();
   }
 
   public render()

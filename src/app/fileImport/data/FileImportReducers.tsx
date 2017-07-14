@@ -353,7 +353,6 @@ FileImportReducers[ActionTypes.getTemplates] =
 
       (templatesArr) =>
       {
-        console.log('templatesArr: ', templatesArr);
         const templates: Immutable.List<FileImportTypes.Template> = Immutable.List<FileImportTypes.Template>(templatesArr);
         action.payload.setTemplates(templates);
       },
@@ -370,9 +369,6 @@ FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
     const template = state.templates.get(action.payload.templateId);
-    console.log(template);
-    console.log(template.columnTypes);
-    console.log(template.transformations);
     return state
       .set('oldNames', List(template.originalNames))
       .set('primaryKey', _.map(template.columnTypes, (val, key) => key).indexOf(template.primaryKey))
@@ -380,8 +376,13 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('hasCsvHeader', template.hasCsvHeader)
       .set('columnNames', List(_.map(template.columnTypes, (val, key) => key)))
       .set('columnTypes', List(_.map(template.columnTypes, (val, key) => recToNumber(val))))
-      .set('columnsToInclude', List(_.map(template.columnTypes, (val, key) => true)));
-  }
+      .set('columnsToInclude', List(_.map(template.columnTypes, (val, key) => true)))
+      .set('loadTemplate', true);
+  };
+
+FileImportReducers[ActionTypes.clearLoadTemplate] =
+  (state, action) =>
+    state.set('loadTemplate', false)
   ;
 
 export default FileImportReducers;
