@@ -249,15 +249,87 @@ FileImportReducers[ActionTypes.deleteColumnType] =
 
 FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
-    state
-      .setIn(['columnNames', action.payload.columnId], action.payload.columnName)
-  ;
+  {
+    if (state.renameTransform.colName && state.renameTransform.args.newName !== action.payload.colName)
+    {
+      console.log('adding rename transform: ', state.renameTransform.colName + ', ' + state.renameTransform.args.newName);
+      return state
+        .set('transforms', state.transforms.push(JSON.parse(JSON.stringify(state.renameTransform))))
+        .update('renameTransform', (renameTransform) =>
+        {
+          renameTransform.colName = action.payload.colName;
+          renameTransform.args.newName = action.payload.newName;
+          return renameTransform;
+        })
+        .setIn(['columnNames', action.payload.columnId], action.payload.newName);
+    }
+
+    console.log('setting rename transform: ', state.renameTransform.colName + ' to ' + action.payload.newName);
+    if (!state.renameTransform.colName)
+    {
+      return state
+        .update('renameTransform', (renameTransform) =>
+        {
+          renameTransform.colName = action.payload.colName;
+          renameTransform.args.newName = action.payload.newName;
+          return renameTransform;
+        })
+        .setIn(['columnNames', action.payload.columnId], action.payload.newName);
+    }
+    return state
+      .update('renameTransform', (renameTransform) =>
+      {
+        renameTransform.args.newName = action.payload.newName;
+        return renameTransform;
+      })
+      .setIn(['columnNames', action.payload.columnId], action.payload.newName);
+
+    // let newState = state;
+    // if (state.renameTransform.colName && state.renameTransform.args.newName !== action.payload.colName)
+    // {
+    //   newState
+    //     .set('transforms', state.transforms.push(state.renameTransform))
+    //     .update('renameTransform', (renameTransform) =>
+    //     {
+    //       renameTransform.colName = action.payload.colName;
+    //       return renameTransform;
+    //     })
+    // }
+    // else if (!state.renameTransform.colName)
+    // {
+    //   newState
+    //     .update('renameTransform', (renameTransform) =>
+    //     {
+    //       renameTransform.colName = action.payload.colName;
+    //       return renameTransform;
+    //     });
+    // }
+    // newState
+    //   .update('renameTransform', (renameTransform) =>
+    //   {
+    //     renameTransform.args.newName = action.payload.newName;
+    //     return renameTransform;
+    //   })
+    //   .setIn(['columnNames', action.payload.columnId], action.payload.newName);
+    // return newState;
+  };
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
   {
     console.log('add transform: ', action.payload.transform);
-    return state.set('transforms', state.transforms.push(action.payload.transform));
+    if (state.renameTransform.colName)
+    {
+      return state
+        .set('transforms', state.transforms.push(JSON.parse(JSON.stringify(state.renameTransform))).push(action.payload.transform))
+        .set('renameTransform', (renameTransform) =>
+        {
+          renameTransform.colName = '';
+          renameTransform.args.newName = '';
+          return renameTransform;
+        });
+    }
+    return state.set('transforms', state.transforms.push(action.payload.transform))
   };
 
 FileImportReducers[ActionTypes.updatePreviewRows] =
@@ -310,7 +382,7 @@ FileImportReducers[ActionTypes.uploadFile] =
         [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
       state.columnNames.get(state.primaryKey),
-      state.transforms,
+      state.transforms.push(state.renameTransform),
       () =>
       {
         alert('success');
@@ -321,7 +393,12 @@ FileImportReducers[ActionTypes.uploadFile] =
       },
       state.hasCsvHeader,
     );
-    return state;
+    return state.set('renameTransform', (renameTransform) =>
+    {
+      renameTransform.colName = '';
+      renameTransform.args.newName = '';
+      return renameTransform;
+    });
   };
 
 FileImportReducers[ActionTypes.saveTemplate] =

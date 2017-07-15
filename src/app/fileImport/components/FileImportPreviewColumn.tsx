@@ -70,8 +70,6 @@ export interface Props
   columnNames: List<string>;
   columnOptions: List<string>;
   editing: boolean;
-  handleRenameTransform(oldName: string, newName: string);
-  addRenameTransform();
   handleEditColumnChange(editColumnId: number);
 }
 
@@ -94,8 +92,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public handleAutocompleteHeaderChange(value)
   {
-    this.props.handleRenameTransform(this.props.columnNames.get(this.props.columnId), value);
-    Actions.setColumnName(this.props.columnId, value);
+    // this.props.handleRenameTransform(this.props.columnNames.get(this.props.columnId), value);
+    Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), value);
   }
 
   public render()
@@ -131,7 +129,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             datatype={this.props.datatypes.get(this.props.columnType.type)}
             colName={this.props.columnNames.get(this.props.columnId)}
             columnNames={this.props.columnNames}
-            addRenameTransform={this.props.addRenameTransform}
           />
         </th>
       );

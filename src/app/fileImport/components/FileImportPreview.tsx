@@ -81,14 +81,10 @@ export interface Props
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    colName: string,
-    newName: string,
     templateId: number,
     templateText: string,
     editColumnId: number,
   } = {
-    colName: '',
-    newName: '',
     templateId: -1,
     templateText: '',
     editColumnId: -1,
@@ -104,59 +100,6 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       editColumnId,
     });
-  }
-
-  /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
-   * when changing transform columns or types */
-  public handleRenameTransform(colName: string, newName: string)
-  {
-    if (this.state.colName && this.state.newName !== colName)
-    {
-      console.log('adding rename transform: ', this.state.colName + ', ' + this.state.newName);
-      Actions.addTransform({
-        name: 'rename',
-        colName: this.state.colName,
-        args: {
-          newName: this.state.newName,
-        },
-      });
-      this.setState({
-        colName,
-        newName,
-      });
-    }
-    else
-    {
-      if (!this.state.colName)
-      {
-        this.setState({
-          colName,
-        });
-      }
-      console.log('setting rename transform: ', this.state.colName + ' to ' + newName);
-      this.setState({
-        newName,
-      });
-    }
-  }
-
-  public addRenameTransform()
-  {
-    if (this.state.colName)
-    {
-      console.log('adding rename transform: ', this.state.colName + ', ' + this.state.newName);
-      Actions.addTransform({
-        name: 'rename',
-        colName: this.state.colName,
-        args: {
-          newName: this.state.newName,
-        },
-      });
-      this.setState({
-        colName: '',
-        newName: '',
-      });
-    }
   }
 
   public handleTemplateChange(templateId: number)
@@ -187,7 +130,6 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleUploadFile()
   {
     // TODO: database and table name error checking
-    this.addRenameTransform();
     Actions.uploadFile();
   }
 
@@ -229,8 +171,6 @@ class FileImportPreview extends TerrainComponent<Props>
                     datatypes={List(FileImportTypes.ELASTIC_TYPES)}
                     columnOptions={this.props.columnOptions}
                     editing={key === this.state.editColumnId}
-                    handleRenameTransform={this.handleRenameTransform}
-                    addRenameTransform={this.addRenameTransform}
                     handleEditColumnChange={this.handleEditColumnChange}
                   />,
                 ).toArray()

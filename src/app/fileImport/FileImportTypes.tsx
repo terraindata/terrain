@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { BaseClass, New } from '../Classes';
-const { List } = Immutable;
+const { List, fromJS } = Immutable;
 import Util from './../util/Util';
 
 // This type represents the state of the FileImportStore
@@ -72,6 +72,13 @@ class FileImportStateC extends BaseClass
 
   public transforms: Immutable.List<Transform> = List([]);
   public templates: Immutable.List<Template> = List([]);
+  public renameTransform: Transform = {
+    name: 'rename',
+    colName: '',
+    args: {
+      newName: '',
+    }
+  };
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.

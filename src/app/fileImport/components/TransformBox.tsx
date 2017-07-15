@@ -65,7 +65,6 @@ export interface Props
   datatype: string;
   colName: string;
   columnNames: List<string>;
-  addRenameTransform();
 }
 
 class TransformBox extends TerrainComponent<Props>
@@ -192,8 +191,6 @@ class TransformBox extends TerrainComponent<Props>
       return;
     }
 
-    this.props.addRenameTransform();
-
     const transform = {
       name: transformName,
       colName: this.props.colName,
@@ -225,12 +222,6 @@ class TransformBox extends TerrainComponent<Props>
           newName: this.state.splitNames,
           text: this.state.transformText,
         };
-        // if (this.state.mergeIndex !== -1 && this.props.columnNames.indexOf(this.props.colName) < this.state.mergeIndex)
-        // {
-        //   this.setState({
-        //     mergeIndex: this.state.mergeIndex + 1,
-        //   });
-        // }
         break;
 
       case 'merge':
