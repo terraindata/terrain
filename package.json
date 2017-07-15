@@ -7,9 +7,9 @@
     "start": "yarn run $NODE_DEBUG_OPTION build-midway:live",
     "start-front": "yarn run commit-log && MIDWAY_HOST=localhost:3000 OLD_MIDWAY_HOST=pa-terraformer02.terrain.int webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback --compress",
     "test": "karma start karma.conf.js",
-    "test-front": "jest src/test",
+    "test-front": "./node_modules/.bin/jest src",
     "test-back-setup": "./midway/test/scripts/setup_env.sh",
-    "test-back": "./node_modules/.bin/jest midway/test --forceExit --coverage",
+    "test-back": "./node_modules/.bin/jest midway --forceExit --coverage",
     "test-back-teardown": "./midway/test/scripts/teardown_env.sh",
     "test-back-all": "yarn run test-back-setup && yarn run test-back ; yarn run test-back-teardown",
     "commit-log": "git log --pretty=format:\"%h%x09%an%x09%ad%x09%s\" | head -n 10 > src/commitlog.txt",
@@ -37,7 +37,7 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": ".+Tests\\.(ts|tsx|js)$",
+    "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
