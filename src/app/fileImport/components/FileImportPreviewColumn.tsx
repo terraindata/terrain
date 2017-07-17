@@ -92,12 +92,13 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public handleAutocompleteHeaderChange(value)
   {
-    // this.props.handleRenameTransform(this.props.columnNames.get(this.props.columnId), value);
     Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), value);
   }
 
   public render()
   {
+    // console.log('id: ', this.props.columnId);
+    // console.log('colType: ', this.props.columnType);
     if (this.props.editing)
     {
       return (
@@ -124,6 +125,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             recursionId={0}
             columnType={this.props.columnType}
             datatypes={List(FileImportTypes.ELASTIC_TYPES)}
+            editing={this.props.editing}
           />
           <TransformBox
             datatype={this.props.datatypes.get(this.props.columnType.type)}
