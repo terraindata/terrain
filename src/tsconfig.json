@@ -8,8 +8,8 @@
         "inlineSourceMap": true,
         "target": "es6",
         "typeRoots": [
-            "./src/typings",
-            "./node_modules/@types"
+            "./typings",
+            "../node_modules/@types"
         ],
         "experimentalDecorators": true,
         "allowJs": true,

@@ -43,45 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { DragDropContext } from 'react-dnd';
+import Library from './Library';
 
-// tslint:disable:no-var-requires no-console
+import HTML5Backend = require('react-dnd-html5-backend');
 
-import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
-const Redux = require('redux');
+// ReactRouter does not like the output of DragDropContext, hence the `any` cast
+const ExportLibrary = DragDropContext(HTML5Backend)(Library) as any;
 
-import Ajax from './../../util/Ajax';
-
-import AuthStore from './../../auth/data/AuthStore';
-import Util from './../../util/Util';
-
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-import UserReducers from './UserReducers';
-
-const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  UserReducers,
-  {}), UserTypes._UserState({})), UserTypes._UserState({}));
-
-UserStore.subscribe(() =>
-{
-  const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
-  {
-    // currentUser object changed
-    UserStore.dispatch({
-      type: ActionTypes.updateCurrentUser,
-      payload: {},
-    });
-  }
-});
-
-/*window['test'] = () =>
-{
-  const users = UserStore.getState().users;
-  console.log('users', users);
-  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};*/
-
-export default UserStore;
+export default ExportLibrary;
