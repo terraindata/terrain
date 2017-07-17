@@ -78,7 +78,7 @@ class ElasticIndices
    * @param params
    * @param callback
    */
-  public create(params: Elastic.IndicesCreateParams, callback: (errror: any, response: any, status: any) => void): void
+  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
   {
     return this.delegate.indices.create(params, callback);
   }
@@ -88,7 +88,7 @@ class ElasticIndices
    * @param params
    * @param callback
    */
-  public delete(params: Elastic.IndicesDeleteParams, callback: (errror: any, response: any, status: any) => void): void
+  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
   {
     return this.delegate.indices.delete(params, callback);
   }
