@@ -43,49 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Util from './../../util/Util';
+const localStorageMock = (() =>
+{
+  let store = {};
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
-
-export let LibraryActionTypes =
-  {
-    groups:
+  return {
+    getItem(key)
     {
-      create, change, move,
-      // duplicate,
+      if (store[key] != null)
+      {
+        return store[key];
+      }
+      else
+      {
+        return null;
+      }
     },
-
-    algorithms:
+    setItem(key, value)
     {
-      create, change, move,
+      store[key] = value.toString();
     },
-
-    variants:
+    clear()
     {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-      unselectAll: '',
+      store = {};
     },
-
-    loadState: '',
-    setDbs: '',
   };
+})();
 
-Util.setValuesToKeys(LibraryActionTypes, '');
-
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-  ];
-
-export default LibraryActionTypes;
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});

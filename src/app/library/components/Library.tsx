@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions
+// tslint:disable:strict-boolean-expressions
 
 import * as React from 'react';
-import { DragDropContext } from 'react-dnd';
+
+import { browserHistory } from 'react-router';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
@@ -61,9 +63,6 @@ import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
-const HTML5Backend = require('react-dnd-html5-backend');
-import { browserHistory } from 'react-router';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 
 export interface Props
 {
@@ -79,6 +78,13 @@ export interface Props
 
 class Library extends TerrainComponent<any>
 {
+  public static defaultProps: Partial<Props> = {
+    params: {},
+    location: {},
+    router: {},
+    route: {},
+  };
+
   public cancelSubscription = null;
 
   public state: {
@@ -91,16 +97,16 @@ class Library extends TerrainComponent<any>
   {
     super(props);
 
-    this.state.libraryState = Store.getState();
+    this.state.libraryState = props.store ? props.store.getState() : Store.getState();
   }
 
   public componentWillMount()
   {
-    if (!this.props.params.groupId)
+    if (!this.props.params || !this.props.params.groupId)
     {
       // no path given, redirect to last library path
       const path = localStorage.getItem('lastLibraryPath');
-      if (path)
+      if (path != null)
       {
         browserHistory.replace(path);
       }
@@ -122,11 +128,13 @@ class Library extends TerrainComponent<any>
   {
     const { libraryState } = this.state;
 
-    const { groups, algorithms, variants, groupsOrder } = libraryState;
+    const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
     const { params } = this.props;
+
     const groupId = +params.groupId;
     const algorithmId = +params.algorithmId;
     const variantId = +params.variantId;
+    const multiselect = false;
 
     let group: LibraryTypes.Group;
     let algorithm: LibraryTypes.Algorithm;
@@ -134,46 +142,24 @@ class Library extends TerrainComponent<any>
     let algorithmsOrder: List<ID>;
     let variantsOrder: List<ID>;
 
-    if (groupId)
+    group = groups.get(groupId);
+
+    if (group)
     {
-      group = groups.get(groupId);
+      algorithmsOrder = group.algorithmsOrder;
+      algorithm = algorithms.get(algorithmId);
 
-      if (group)
+      if (algorithm)
       {
-        algorithmsOrder = group.algorithmsOrder;
-
-        if (algorithmId)
-        {
-          algorithm = algorithms.get(algorithmId);
-
-          if (algorithm)
-          {
-            variantsOrder = algorithm.variantsOrder;
-
-            if (variantId)
-            {
-              variant = variants.get(variantId);
-
-              if (!variant)
-              {
-                browserHistory.replace(`/library/${groupId}/${algorithmId}`);
-              }
-            }
-          } else
-          {
-            // !algorithm
-            browserHistory.replace(`/library/${groupId}`);
-          }
-        }
-      }
-      else
-      {
-        // !group
-        browserHistory.replace('/library');
+        variantsOrder = algorithm.variantsOrder;
+        variant = variants.get(variantId);
       }
     }
 
-    localStorage.setItem('lastLibraryPath', this.props.location.pathname);
+    if (!!this.props.location.pathname)
+    {
+      localStorage.setItem('lastLibraryPath', this.props.location.pathname);
+    }
 
     return (
       <div className='library'>
@@ -181,6 +167,7 @@ class Library extends TerrainComponent<any>
           {...{
             groups,
             groupsOrder,
+            params,
           }}
         />
         <AlgorithmsColumn
@@ -189,29 +176,32 @@ class Library extends TerrainComponent<any>
             variants,
             algorithmsOrder,
             groupId,
+            params,
           }}
         />
         <VariantsColumn
           {...{
             variants,
+            selectedVariants,
             variantsOrder,
             groupId,
             algorithmId,
+            params,
+            multiselect,
           }}
         />
-        <LibraryInfoColumn
-          {...{
-            group,
-            algorithm,
-            variant,
-          }}
-        />
+        {!multiselect ?
+          <LibraryInfoColumn
+            {...{
+              group,
+              algorithm,
+              variant,
+            }}
+          /> : null
+        }
       </div>
     );
   }
 }
 
-// ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ExportLibrary = DragDropContext(HTML5Backend)(Library) as any;
-
-export default ExportLibrary;
+export default Library;

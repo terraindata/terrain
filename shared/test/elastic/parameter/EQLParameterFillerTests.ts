@@ -43,49 +43,79 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Util from './../../util/Util';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
+import * as winston from 'winston';
 
-export let LibraryActionTypes =
+import ESParameterFiller from '../../../backends/elastic/parser/EQLParameterFiller';
+import EQLTemplateGenerator from '../../../backends/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../backends/elastic/parser/ESParserError';
+import ESValueInfo from '../../../backends/elastic/parser/ESValueInfo';
+
+/* tslint:disable:no-trailing-whitespace max-line-length */
+
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  done();
+});
+
+function testGeneration(testString: string,
+  params: { [param: string]: any },
+  expectedValue: string)
+{
+  winston.info('testing \'' + testString + '\'');
+
+  const parser: ESParser = new ESParser(testString);
+  const valueInfo: ESValueInfo = parser.getValueInfo();
+  const errors: ESParserError[] = parser.getErrors();
+
+  expect(errors.length).toEqual(0);
+
+  const result = ESParameterFiller.generate(valueInfo, params);
+
+  winston.info(result);
+  expect(result).toEqual(expectedValue);
+}
+
+test('test generate template queries', () =>
+{
+  testGeneration('true', {}, 'true');
+  testGeneration('false', {}, 'false');
+  testGeneration('null', {}, 'null');
+
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : 10}`,
+    {},
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : @size}`,
+    {
+      type: 'data',
+      from: 0,
+      size: 10,
+    },
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+  testGeneration(`
   {
-    groups:
+    "index" : "movies",
+    "type" : "data",
+    "size" : @size,
+    "from" : @from,
+    "body" : {
+      "query" : {
+        "bool" : {
+          "must_not" : [{"match" : {"title" : @bad_title}}]
+        }
+      }
+    }
+  }`,
     {
-      create, change, move,
-      // duplicate,
+      from: 0,
+      size: 10,
+      bad_title: 'blah blah',
     },
+    ` { "index":"movies","type":"data","size":10,"from":0,"body": { "query": { "bool": { "must_not":[ { "match": { "title":"blah blah" }  } ] }  }  }  } `);
 
-    algorithms:
-    {
-      create, change, move,
-    },
-
-    variants:
-    {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-      unselectAll: '',
-    },
-
-    loadState: '',
-    setDbs: '',
-  };
-
-Util.setValuesToKeys(LibraryActionTypes, '');
-
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-  ];
-
-export default LibraryActionTypes;
+});

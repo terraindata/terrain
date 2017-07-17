@@ -1,24 +1,18 @@
 @import "../../common/Common.less";
 
 .library-column {
-  width: 25%;
-  position: absolute;
-  top: 0px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   height: 100%;
-  
-  &.library-column-1 {
-    left: 0px;
-  }
-  &.library-column-2 {
-    left: 25%;
-  }
+
+  &.library-column-2,
   &.library-column-3 {
-    left: 50%;
+    .library-column-content {
+      border-left: 1px solid #ddd;
+    }
   }
-  &.library-column-4 {
-    left: 75%;
-  }
-  
+
   @title-height: 35px;
   .library-column-title {
     .title-text;
@@ -29,35 +23,21 @@
     box-sizing: border-box;
     color: #fff;
     text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-    position: absolute;
-    top: 0px;
-    left: 0px;
     width: 100%;
     height: @title-height;
     border-right: 1px solid rgba(0,0,0,0.15);
   }
-  
+
   .library-column-content {
-    position: absolute;
     width: calc(~"100% - 6px");
     box-sizing: border-box;
     height: calc(~"100% - @{title-height}");
     top: @title-height;
     text-align: center;
     overflow-y: auto;
-    
+
     &.library-column-content-no-title {
       height: 100%;
-      top: 0px;
     }
-  }
-  
-  .library-column-border {
-    position: absolute;
-    border-right: 1px solid #ddd;
-    @col-top-margin: 6px;
-    height: calc(~"100% - @{title-height} - 2 * @{col-top-margin}");
-    top: @title-height + @col-top-margin;
-    right: 0;
   }
 }

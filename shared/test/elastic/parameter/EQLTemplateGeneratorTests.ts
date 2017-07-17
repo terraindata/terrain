@@ -43,49 +43,56 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Util from './../../util/Util';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
+import * as winston from 'winston';
 
-export let LibraryActionTypes =
-  {
-    groups:
-    {
-      create, change, move,
-      // duplicate,
-    },
+import EQLTemplateGenerator from '../../../backends/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../backends/elastic/parser/ESParserError';
+import ESValueInfo from '../../../backends/elastic/parser/ESValueInfo';
 
-    algorithms:
-    {
-      create, change, move,
-    },
+/* tslint:disable:no-trailing-whitespace max-line-length */
 
-    variants:
-    {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-      unselectAll: '',
-    },
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  done();
+});
 
-    loadState: '',
-    setDbs: '',
-  };
+function testGeneration(testString: string, expectedValue: string)
+{
+  winston.info('testing \'' + testString + '\'');
 
-Util.setValuesToKeys(LibraryActionTypes, '');
+  const parser: ESParser = new ESParser(testString);
+  const valueInfo: ESValueInfo = parser.getValueInfo();
+  const errors: ESParserError[] = parser.getErrors();
 
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-  ];
+  expect(errors.length).toEqual(0);
 
-export default LibraryActionTypes;
+  const result = EQLTemplateGenerator.generate(valueInfo);
+
+  winston.info(result);
+  expect(result).toEqual(expectedValue);
+}
+
+test('test generate template queries', () =>
+{
+  testGeneration('true', 'true');
+  testGeneration('false', 'false');
+  testGeneration('null', 'null');
+  testGeneration('0', '0');
+  testGeneration('1.923e-21', '1.923e-21');
+  testGeneration('123', '123');
+  testGeneration('9990000000000', '9990000000000');
+  testGeneration('0.999', '0.999');
+  testGeneration('[]', '[]');
+  testGeneration('{}', ' {  } ');
+
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
+    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
+
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
+    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
+
+});
