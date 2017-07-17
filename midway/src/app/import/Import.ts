@@ -353,7 +353,7 @@ export class Import
         {
           try
           {
-            item = await this._applyTransforms(item, imprt.transformations);
+            item = this._applyTransforms(item, imprt.transformations);
           } catch (e)
           {
             return thisReject('Failed to apply transforms: ' + String(e));
@@ -716,98 +716,95 @@ export class Import
     return structStr;
   }
 
-  private async _applyTransforms(obj: object, transforms: object[]): Promise<object>
+  private _applyTransforms(obj: object, transforms: object[]): object
   {
-    return new Promise<object>(async (resolve, reject) =>
+    for (const transform of transforms)
     {
-      for (const transform of transforms)
+      switch (transform['name'])
       {
-        switch (transform['name'])
-        {
-          case 'rename':
-            const oldName: string | undefined = transform['colName'];
-            const newName: string | undefined = transform['args']['newName'];
-            if (oldName === undefined || newName === undefined)
-            {
-              return reject('Rename transformation must supply colName and newName arguments.');
-            }
-            obj[newName] = obj[oldName];
-            delete obj[oldName];
-            break;
-          case 'split':
-            const oldCol: string | undefined = transform['colName'];
-            const newCols: string[] | undefined = transform['args']['newName'];
-            const splitText: string | undefined = transform['args']['text'];
-            if (oldCol === undefined || newCols === undefined || splitText === undefined)
-            {
-              return reject('Split transformation must supply colName, newName, and text arguments.');
-            }
-            if (newCols.length !== 2)
-            {
-              return reject('Split transformation currently only supports splitting into two columns.');
-            }
-            if (typeof obj[oldCol] !== 'string')
-            {
-              return reject('Can only split columns containing text.');
-            }
-            const ind: number = obj[oldCol].indexOf(splitText);
-            if (ind === -1)
-            {
-              obj[newCols[0]] = obj[oldCol];
-              obj[newCols[1]] = '';
-              delete obj[oldCol];
-            }
-            else
-            {
-              obj[newCols[0]] = obj[oldCol].substring(0, ind);
-              obj[newCols[1]] = obj[oldCol].substring(ind + splitText.length);
-              delete obj[oldCol];
-            }
-            break;
-          case 'merge':
-            const startCol: string | undefined = transform['colName'];
-            const mergeCol: string | undefined = transform['args']['mergeName'];
-            const newCol: string | undefined = transform['args']['newName'];
-            const mergeText: string | undefined = transform['args']['text'];
-            if (startCol === undefined || mergeCol === undefined || newCol === undefined || mergeText === undefined)
-            {
-              return reject('Merge transformation must supply colName, mergeName, newName, and text arguments.');
-            }
-            if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
-            {
-              return reject('Can only merge columns containing text.');
-            }
-            obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
-            delete obj[startCol];
-            delete obj[mergeCol];
-            break;
-          default:
-            if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
-            {
-              return reject('Invalid transform name encountered: ' + String(transform['name']));
-            }
-            const colName: string | undefined = transform['colName'];
-            const text: string | undefined = transform['args']['text'];
-            if (colName === undefined || text === undefined)
-            {
-              return reject('Prepend/append transformation must supply colName and text arguments.');
-            }
-            if (typeof obj[colName] !== 'string')
-            {
-              return reject('Can only prepend/append to columns containing text.');
-            }
-            if (transform['name'] === 'prepend')
-            {
-              obj[colName] = text + String(obj[colName]);
-            }
-            else
-            {
-              obj[colName] = String(obj[colName]) + text;
-            }
-        }
+        case 'rename':
+          const oldName: string | undefined = transform['colName'];
+          const newName: string | undefined = transform['args']['newName'];
+          if (oldName === undefined || newName === undefined)
+          {
+            throw new Error('Rename transformation must supply colName and newName arguments.');
+          }
+          obj[newName] = obj[oldName];
+          delete obj[oldName];
+          break;
+        case 'split':
+          const oldCol: string | undefined = transform['colName'];
+          const newCols: string[] | undefined = transform['args']['newName'];
+          const splitText: string | undefined = transform['args']['text'];
+          if (oldCol === undefined || newCols === undefined || splitText === undefined)
+          {
+            throw new Error('Split transformation must supply colName, newName, and text arguments.');
+          }
+          if (newCols.length !== 2)
+          {
+            throw new Error('Split transformation currently only supports splitting into two columns.');
+          }
+          if (typeof obj[oldCol] !== 'string')
+          {
+            throw new Error('Can only split columns containing text.');
+          }
+          const ind: number = obj[oldCol].indexOf(splitText);
+          if (ind === -1)
+          {
+            obj[newCols[0]] = obj[oldCol];
+            obj[newCols[1]] = '';
+            delete obj[oldCol];
+          }
+          else
+          {
+            obj[newCols[0]] = obj[oldCol].substring(0, ind);
+            obj[newCols[1]] = obj[oldCol].substring(ind + splitText.length);
+            delete obj[oldCol];
+          }
+          break;
+        case 'merge':
+          const startCol: string | undefined = transform['colName'];
+          const mergeCol: string | undefined = transform['args']['mergeName'];
+          const newCol: string | undefined = transform['args']['newName'];
+          const mergeText: string | undefined = transform['args']['text'];
+          if (startCol === undefined || mergeCol === undefined || newCol === undefined || mergeText === undefined)
+          {
+            throw new Error('Merge transformation must supply colName, mergeName, newName, and text arguments.');
+          }
+          if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
+          {
+            throw new Error('Can only merge columns containing text.');
+          }
+          obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
+          delete obj[startCol];
+          delete obj[mergeCol];
+          break;
+        default:
+          if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
+          {
+            throw new Error('Invalid transform name encountered: ' + String(transform['name']));
+          }
+          const colName: string | undefined = transform['colName'];
+          const text: string | undefined = transform['args']['text'];
+          if (colName === undefined || text === undefined)
+          {
+            throw new Error('Prepend/append transformation must supply colName and text arguments.');
+          }
+          if (typeof obj[colName] !== 'string')
+          {
+            throw new Error('Can only prepend/append to columns containing text.');
+          }
+          if (transform['name'] === 'prepend')
+          {
+            obj[colName] = text + String(obj[colName]);
+          }
+          else
+          {
+            obj[colName] = String(obj[colName]) + text;
+          }
       }
-      resolve(obj);
-    });
+    }
+    return obj;
   }
 }
 
