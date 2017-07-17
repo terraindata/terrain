@@ -162,7 +162,7 @@ const applyTransform = (state, transform) =>
     }
     else
     {
-      primaryKey = state.primaryKey < transformCol ? state.primaryKey : state.primaryKey - 1;
+      primaryKey = state.primaryKey < mergeCol ? state.primaryKey : state.primaryKey - 1;
     }
 
     return state
