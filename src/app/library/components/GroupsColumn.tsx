@@ -181,7 +181,7 @@ class GroupsColumn extends TerrainComponent<Props>
         canArchive={canEdit || canDrag}
         canDuplicate={false}
         canCreate={canCreate}
-        isSelected={ +group.id === +params.groupId }
+        isSelected={+group.id === +params.groupId}
       >
         <div className='group-library-info-wrapper'>
           {

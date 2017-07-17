@@ -237,8 +237,10 @@ class LibraryItem extends TerrainComponent<Props>
     });
   }
 
-  public handleClick(event) {
-    if (this.props.onSelect) {
+  public handleClick(event)
+  {
+    if (this.props.onSelect)
+    {
       event.preventDefault();
       event.stopPropagation();
 

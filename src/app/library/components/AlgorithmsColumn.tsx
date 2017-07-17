@@ -340,7 +340,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         canCreate={canDrag}
         canArchive={canArchive}
         canDuplicate={canDuplicate}
-        isSelected={ +algorithm.id === +params.algorithmId }
+        isSelected={+algorithm.id === +params.algorithmId}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />

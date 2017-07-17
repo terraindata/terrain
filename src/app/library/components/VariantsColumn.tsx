@@ -265,7 +265,8 @@ class VariantsColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleItemSelect(id: ID) {
+  public handleItemSelect(id: ID)
+  {
     const {
       multiselect,
       selectedVariants,
@@ -273,13 +274,17 @@ class VariantsColumn extends TerrainComponent<Props>
       algorithmId,
     } = this.props;
 
-    if (multiselect) {
-      if (selectedVariants.includes(id.toString())) {
+    if (multiselect)
+    {
+      if (selectedVariants.includes(id.toString()))
+      {
         Actions.variants.unselect(id.toString());
-      } else {
+      } else
+      {
         Actions.variants.select(id.toString());
       }
-    } else {
+    } else
+    {
       browserHistory.push(`/library/${groupId}/${algorithmId}/${id}`);
       const { variantId } = this.props.params;
       Actions.variants.unselectAll();
@@ -307,7 +312,6 @@ class VariantsColumn extends TerrainComponent<Props>
     const isSelected = multiselect ?
       selectedVariants.includes(variant.id.toString()) :
       currentVariantId === variant.id.toString();
-
 
     // if (me && roles)
     // {

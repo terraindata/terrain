@@ -247,31 +247,35 @@ LibraryReducers[ActionTypes.variants.select] =
   (
     state: LibraryState,
     action: Action<{
-      variantId: string
+      variantId: string,
     }>,
-  ) => {
+  ) =>
+  {
     const alreadySelected = state.selectedVariants.includes(action.payload.variantId);
-    if (!alreadySelected) {
+    if (!alreadySelected)
+    {
       return state.set('selectedVariants', state.selectedVariants.push(action.payload.variantId));
     }
 
     return state;
-  }
+  };
 
 LibraryReducers[ActionTypes.variants.unselect] =
   (
     state: LibraryState,
     action: Action<{
-      variantId: string
+      variantId: string,
     }>,
-  ) => {
+  ) =>
+  {
     const variantIndex = state.selectedVariants.indexOf(action.payload.variantId);
-    if (variantIndex > -1) {
+    if (variantIndex > -1)
+    {
       return state.set('selectedVariants', state.selectedVariants.remove(variantIndex));
     }
 
     return state;
-  }
+  };
 
 LibraryReducers[ActionTypes.variants.unselectAll] =
   (
