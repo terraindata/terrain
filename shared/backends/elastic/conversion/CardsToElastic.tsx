@@ -53,7 +53,7 @@ import * as CommonElastic from '../syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import { Input, InputPrefix, InputType } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
@@ -90,7 +90,8 @@ export interface ElasticObjectInterface
 
 export function isInput(name: string, inputs: Immutable.List<Input>)
 {
-  return inputs && name.charAt(0) === '@' && (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);
+  return inputs && name.charAt(0) === InputPrefix &&
+    (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);
 }
 
 export function toInputMap(inputs: Immutable.List<Input>): object
@@ -189,7 +190,7 @@ class CardsToElastic
 
     if (block && block.static.tql)
     {
-      if (typeof block['value'] === 'string' && block['value'].charAt(0) === '@')
+      if (typeof block['value'] === 'string' && block['value'].charAt(0) === InputPrefix)
       {
         return block['value'];
       }

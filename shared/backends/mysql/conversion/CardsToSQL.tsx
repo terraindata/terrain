@@ -53,7 +53,7 @@ import CommonSQL from '../syntax/CommonSQL';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLStringFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import { Input, InputPrefix, InputType } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import MySQLBlocks from '../blocks/MySQLBlocks';
 
@@ -100,8 +100,7 @@ class CardsToSQL
           value = `'${value}'`;
         }
 
-        const key = '([^a-zA-Z_.]|^)' + 'input\\.' + input.key + '([^a-zA-Z_.]|$)';
-
+        const key = '([^a-zA-Z_.]|^)' + InputPrefix + input.key + '([^a-zA-Z_.]|$)';
         cardsTql = cardsTql.replace(
           new RegExp(key, 'g'),
           (...args) => args[1] + value + args[2],
