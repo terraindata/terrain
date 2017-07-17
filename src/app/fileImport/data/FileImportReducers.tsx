@@ -383,7 +383,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
         state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
       state.columnNames.get(state.primaryKey),
-      state.transforms,
+      state.renameTransform.colName ? state.transforms.push(state.renameTransform) : state.transforms,
       action.payload.templateText,
       () =>
       {
