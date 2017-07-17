@@ -63,6 +63,7 @@ export interface Props
   recursionId: number;
   columnType: FileImportTypes.ColumnType;
   datatypes: List<string>;
+  editing: boolean;
 }
 
 class TypeDropdown extends TerrainComponent<Props>
@@ -74,7 +75,10 @@ class TypeDropdown extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    Actions.deleteColumnType(this.props.columnId, this.props.recursionId);
+    if (!this.props.editing)
+    {
+      Actions.deleteColumnType(this.props.columnId, this.props.recursionId);
+    }
   }
 
   public render()
@@ -94,6 +98,7 @@ class TypeDropdown extends TerrainComponent<Props>
             recursionId={this.props.recursionId + 1}
             columnType={this.props.columnType.innerType}
             datatypes={this.props.datatypes}
+            editing={this.props.editing}
           />
         }
       </div>

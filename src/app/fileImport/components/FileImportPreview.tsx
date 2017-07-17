@@ -135,6 +135,8 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
+    // console.log('columnTypes: ', this.props.columnTypes);
+    // console.log('columnsToInclude: ', this.props.columnsToInclude);
     return (
       <div>
         <button onClick={this.handleLoadTemplate}>

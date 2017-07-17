@@ -52,6 +52,7 @@ import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
+import { isValidFieldName, isValidIndexName, isValidTypeName } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -62,7 +63,6 @@ import { databaseId, tableId } from './../../schema/SchemaTypes';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
-import FileImportInfo from './FileImportInfo';
 import FileImportPreview from './FileImportPreview';
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
@@ -121,6 +121,51 @@ class FileImport extends TerrainComponent<any>
 
   public handleNextStepChange()
   {
+    switch (this.state.stepId)
+    {
+      case 0:
+        if (!this.state.fileSelected)
+        {
+          alert('Please select a file');
+          return;
+        }
+        break;
+      case 1:
+        if (!this.state.serverSelected)
+        {
+          alert('Please select a server');
+          return;
+        }
+        break;
+      case 2:
+        if (!this.state.dbSelected)
+        {
+          alert('Please select a database');
+          return;
+        }
+        let msg = isValidIndexName(this.state.fileImportState.dbText);
+        if (msg)
+        {
+          alert(msg);
+          return;
+        }
+        break;
+      case 3:
+        if (!this.state.tableSelected)
+        {
+          alert('Please select a table');
+          return;
+        }
+        msg = isValidTypeName(this.state.fileImportState.tableText);
+        if (msg)
+        {
+          alert(msg);
+          return;
+        }
+        break;
+      default:
+    }
+
     this.setState({
       stepId: this.state.stepId + 1,
     });
@@ -212,6 +257,7 @@ class FileImport extends TerrainComponent<any>
     );
 
     const columnNames = _.map(items[0], (value, index) =>
+      // TODO: fix hasCsvHeader
       // filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
       index,
     );

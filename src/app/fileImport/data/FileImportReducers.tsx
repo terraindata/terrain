@@ -432,12 +432,12 @@ FileImportReducers[ActionTypes.loadTemplate] =
 
     return state
       .set('oldNames', List(template.originalNames))
-      .set('primaryKey', _.map(template.columnTypes, (val, key) => key).indexOf(template.primaryKey))
+      .set('primaryKey', _.map(template.columnTypes, (colType, colName) => colName).indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('hasCsvHeader', template.hasCsvHeader)
       .set('columnNames', columnNames)
-      .set('columnTypes', columnTypes)
-      .set('columnsToInclude', columnsToInclude)
+      .set('columnTypes', List(_.map(template.columnTypes, (colType) => recToNumber(colType))))
+      .set('columnsToInclude', List(_.map(template.columnTypes, () => true)))
       .set('previewRows', previewRows);
   };
 
