@@ -96,7 +96,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
     resultsBarOpen: boolean;
-    lastQueryMutation: number;
+    queriesInFlight: number;
   } = {
     tql: this.props.query.tql,
     cardsTQL: this.props.query.tql,
@@ -111,21 +111,32 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: false,
     termDefinitionPos: {},
     resultsBarOpen: false,
-    lastQueryMutation: undefined,
+    queriesInFlight: 0,
   };
 
   public debouncedSendTqlAction = _.debounce(
-    () => {
+    () =>
+    {
       BuilderActions.changeTQL(this.state.tql);
     },
     1000,
   );
 
-  public debouncedUpdateCardsTql = _.debounce(() =>
+  public debouncedUpdateCardsTql = _.debounce(
+    () =>
     {
-      this.setState({
-        cardsTQL: this.props.query.tql,
-      });
+      if (this.state.queriesInFlight === 0)
+      {
+        this.setState({
+          cardsTQL: this.props.query.tql,
+        });
+      }
+      else
+      {
+        this.setState({
+          queriesInFlight: this.state.queriesInFlight - 1,
+        });
+      }
     },
     1000,
   );
@@ -162,7 +173,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
       if (!noAction)
       {
-        this.debouncedSendTqlAction();
+        this.sendTqlAction();
       }
     } else
     {
@@ -174,7 +185,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
       });
       if (manualRequest === true && noAction === false)
       {
-        this.debouncedSendTqlAction();
+        this.sendTqlAction();
       }
     }
   }
@@ -196,6 +207,9 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
   public sendTqlAction()
   {
+    this.setState({
+      queriesInFlight: this.state.queriesInFlight + 1,
+    });
     this.debouncedSendTqlAction();
   }
 
@@ -405,11 +419,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
     // cardList[this.state.cardName] &&
     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
-
-    if (this.props.query.tql !== this.state.cardsTQL)
-    {
-      this.debouncedUpdateCardsTql();
-    }
+    this.updateCardsTql();
     return (
       <div
         className={classNames({
