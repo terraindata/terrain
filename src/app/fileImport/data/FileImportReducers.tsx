@@ -423,6 +423,7 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
+    console.log(state.templates);
     const template = state.templates.get(action.payload.templateId);
     template.transformations.map((transform, i) =>
     {
@@ -430,14 +431,31 @@ FileImportReducers[ActionTypes.loadTemplate] =
     });
     const { primaryKey, columnNames, columnTypes, columnsToInclude, previewRows } = state;
 
+    const colTypes = [];
+    const colsToInclude = [];
+    columnNames.map((colName, i) =>
+    {
+      const colType = template.columnTypes[colName];
+      console.log('colType: ', colType);
+      if (colType)
+      {
+        colTypes.push(recToNumber(colType));
+        colsToInclude.push(true);
+      }
+      else
+      {
+        colTypes.push({ type: 0 });
+        colsToInclude.push(false);
+      }
+    });
     return state
       .set('oldNames', List(template.originalNames))
       .set('primaryKey', _.map(template.columnTypes, (colType, colName) => colName).indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('hasCsvHeader', template.hasCsvHeader)
       .set('columnNames', columnNames)
-      .set('columnTypes', List(_.map(template.columnTypes, (colType) => recToNumber(colType))))
-      .set('columnsToInclude', List(_.map(template.columnTypes, () => true)))
+      .set('columnTypes', List(colTypes))
+      .set('columnsToInclude', List(colsToInclude))
       .set('previewRows', previewRows);
   };
 
