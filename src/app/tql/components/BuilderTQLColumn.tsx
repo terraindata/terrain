@@ -200,11 +200,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   //   }
   // }
 
-  public updateCardsTql()
-  {
-    this.debouncedUpdateCardsTql();
-  }
-
   public sendTqlAction()
   {
     this.setState({
@@ -419,7 +414,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
     // cardList[this.state.cardName] &&
     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
-    this.updateCardsTql();
+    this.debouncedUpdateCardsTql();
     return (
       <div
         className={classNames({
