@@ -51,8 +51,8 @@ import './DatePicker.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
-const ReactDayPicker = require('react-day-picker').default;
-const DateUtils = require('react-day-picker').DateUtils;
+import ReactDayPicker = require('react-day-picker');
+import { DateUtils } from 'react-day-picker';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import LayoutManager from './../../builder/components/layout/LayoutManager';
@@ -86,14 +86,6 @@ export interface Props
 
 class DatePicker extends TerrainComponent<Props>
 {
-  constructor(props)
-  {
-    super(props);
-
-    Util.bind(this, ['handleDayClick', 'getDate', 'renderTimePicker',
-      'handleHourChange']);
-  }
-
   public getDate(): Date
   {
     let date = new Date(this.props.date);
@@ -107,7 +99,7 @@ class DatePicker extends TerrainComponent<Props>
     return date;
   }
 
-  public handleDayClick(e, day: Date, modifiers)
+  public handleDayClick(day: Date, modifiers, e)
   {
     const date = this.getDate();
     date.setDate(day.getDate());

@@ -43,59 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { DragDropContext } from 'react-dnd';
+import Library from './Library';
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
+import HTML5Backend = require('react-dnd-html5-backend');
 
-function getExpectedFile(): string
-{
-  return __filename.split('.')[0] + '.expected';
-}
+// ReactRouter does not like the output of DragDropContext, hence the `any` cast
+const ExportLibrary = DragDropContext(HTML5Backend)(Library) as any;
 
-let expected;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
-  {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(expectedString);
-  done();
-});
-
-function testParse(testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing \'' + testString + '\'');
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser;
-
-  winston.info(util.inspect(parser.getValueInfo(), false, 16));
-
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
-    {
-      const testValue: any = expected[testName];
-
-      // test parsing the value using a few spacing options
-      testParse(JSON.stringify(testValue), testValue);
-    });
-});
+export default ExportLibrary;
