@@ -273,6 +273,16 @@ const Actions =
       (variantId: string, variantVersion: LibraryTypes.Variant) =>
         $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
 
+      select:
+      (variantId: string) =>
+        $(ActionTypes.variants.select, { variantId }),
+
+      unselect:
+      (variantId: string) =>
+        $(ActionTypes.variants.unselect, { variantId }),
+
+      unselectAll:
+      () => $(ActionTypes.variants.unselectAll, {}),
     },
 
     loadState:
