@@ -59,6 +59,7 @@ import ESStructureClause from '../../../../shared/backends/elastic/parser/clause
 import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
 
 // other imports
+import { ESParserTokenizer, FlaggedToken } from '../../../../shared/backends/elastic/conversion/formatter/ESParserTokenizer';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
 /*
@@ -68,55 +69,6 @@ import SyntaxHighlighter from './SyntaxHighlighter';
 function assertUnreachable(param: never): never
 {
   throw new Error('Unreachable code reached');
-}
-
-interface FlaggedToken
-{
-  isKeyword: boolean;
-  parserToken: ESParserToken;
-}
-
-/*
- *  Generator that performs recursive DFS on valueInfo tree.
- *  Eventually yields all tokens in the tree, flagging properties if they are elastic keywords
- *  parentClause is not null for property name values, null for all else.
- */
-function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null = null): IterableIterator<FlaggedToken>
-{
-  if (!valueInfo)
-  {
-    return {};
-  }
-
-  for (const token of valueInfo.tokens)
-  {
-    const isKw: boolean =
-      parentClause && parentClause.hasOwnProperty('structure') &&
-      token.substring.trim().replace(/["']/g, '') in parentClause['structure'];
-    // trim & replace to turn '    "property"' into 'property'
-    const fToken: FlaggedToken = { isKeyword: isKw, parserToken: token };
-    yield fToken;
-  }
-
-  if (valueInfo.arrayChildren)
-  {
-    for (const child of valueInfo.arrayChildren)
-    {
-      yield* traverseTokens(child);
-    }
-  }
-  if (valueInfo.objectChildren)
-  {
-    const keys: string[] = Object.keys(valueInfo.objectChildren);
-    for (const key of keys)
-    {
-      const propertyInfo: ESPropertyInfo = valueInfo.objectChildren[key];
-      const valueChild: ESValueInfo = propertyInfo.propertyValue;
-      const keyChild: ESValueInfo = propertyInfo.propertyName;
-      yield* traverseTokens(keyChild, valueInfo.clause);
-      yield* traverseTokens(valueChild);
-    }
-  }
 }
 
 /*
@@ -143,21 +95,16 @@ class ElasticHighlighter extends SyntaxHighlighter
     const parser = new ESJSONParser(instance.getValue());
     const interpreter = new ESInterpreter(parser);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();
-
-    for (const fToken of traverseTokens(parser.getValueInfo()))
+    const tokens = ESParserTokenizer.getTokens(parser);
+    for (const fToken of tokens)
     {
       const token: ESParserToken = fToken.parserToken;
-      if (true)
-      {
-        const style: string = this.getStyle(fToken);
-        instance.markText(
-          { line: token.row, ch: token.col },
-          { line: token.toRow, ch: token.toCol },
-          { className: style },
-        );
-        // markText returns a TextMarker object. In the goal of being stateless though,
-        // we clear the markers by grabbing them from the code mirror instance instead
-      }
+      const style: string = this.getStyle(fToken);
+      instance.markText(
+        { line: token.row, ch: token.col },
+        { line: token.toRow, ch: token.toCol },
+        { className: style },
+      );
     }
   }
 
