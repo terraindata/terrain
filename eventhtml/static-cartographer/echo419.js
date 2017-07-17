@@ -137,6 +137,7 @@ function getEventValue(eventObjs, eventId)
   const eventObj = eventObjArr[0];
   return {
     eventId: eventObj["eventId"],
+    name: eventObj["name"] !== undefined ? eventObj["name"] : '',
     value: document.getElementById(eventObj["eventId"]).value,
   };
 }
