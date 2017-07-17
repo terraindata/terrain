@@ -436,7 +436,6 @@ FileImportReducers[ActionTypes.loadTemplate] =
     columnNames.map((colName, i) =>
     {
       const colType = template.columnTypes[colName];
-      console.log('colType: ', colType);
       if (colType)
       {
         colTypes.push(recToNumber(colType));
@@ -450,9 +449,9 @@ FileImportReducers[ActionTypes.loadTemplate] =
     });
     return state
       .set('oldNames', List(template.originalNames))
-      .set('primaryKey', _.map(template.columnTypes, (colType, colName) => colName).indexOf(template.primaryKey))
+      .set('primaryKey', columnNames.indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
-      .set('hasCsvHeader', template.hasCsvHeader)
+      .set('hasCsvHeader', !template.csvHeaderMissing)
       .set('columnNames', columnNames)
       .set('columnTypes', List(colTypes))
       .set('columnsToInclude', List(colsToInclude))

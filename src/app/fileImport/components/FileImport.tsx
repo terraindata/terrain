@@ -227,8 +227,7 @@ class FileImport extends TerrainComponent<any>
     {
       const config = {
         quoteChar: '\'',
-        // header: this.props.hasCsvHeader,
-        header: true,
+        header: this.state.fileImportState.hasCsvHeader,
         preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
         error: (err) =>
         {
@@ -257,9 +256,7 @@ class FileImport extends TerrainComponent<any>
     );
 
     const columnNames = _.map(items[0], (value, index) =>
-      // TODO: fix hasCsvHeader
-      // filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
-      index,
+      filetype === 'csv' && !this.state.fileImportState.hasCsvHeader ? 'column' + String(index) : index,
     );
 
     Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
