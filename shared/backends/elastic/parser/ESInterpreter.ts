@@ -60,7 +60,7 @@ export const ESInterpreterDefaultConfig = new EQLConfig();
 export default class ESInterpreter
 {
   public config: EQLConfig; // query language description
-  public params: { [name: string]: ESClause }; // input parameter clause types
+  public params: { [name: string]: null | ESClause }; // input parameter clause types
   public parser: ESJSONParser; // source parser
 
   /**
@@ -76,7 +76,7 @@ export default class ESInterpreter
    * @param params parameter map to use
    */
   public constructor(query: string | ESJSONParser,
-    params: { [name: string]: ESClause } = {},
+    params: { [name: string]: null | ESClause } = {},
     config: EQLConfig = ESInterpreterDefaultConfig)
   {
     this.config = config;
@@ -101,11 +101,11 @@ export default class ESInterpreter
           {
             if (info.parameter !== undefined)
             {
-              const clause: ESClause = this.params[info.parameter];
+              const clause: null | ESClause = this.params[info.parameter];
               if (clause === undefined)
               {
                 this.accumulateError(info, 'Undefined parameter.');
-              } else if (clause !== info.clause)
+              } else if (clause !== null && clause !== info.clause)
               {
                 const expectedClause: ESClause = info.clause as ESClause;
                 this.accumulateError(info, 'Mismatched clause types. Expected a ' +

@@ -129,7 +129,7 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
     if (!parentCardKeyPath.size)
     {
       // top level cards don't have keys
-      return false;
+      return true;
     }
 
     return state.getIn(parentCardKeyPath).get('childrenHaveKeys');

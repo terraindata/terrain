@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name strict-boolean-expressions member-access ban-types comment-format
+// tslint:disable:variable-name strict-boolean-expressions member-access comment-format
 
 import * as Immutable from 'immutable';
 import * as BlockUtils from '../../blocks/BlockUtils';
@@ -97,7 +97,7 @@ class QueryC
 const Query_Record = Immutable.Record(new QueryC());
 export interface Query extends QueryC, IRecord<Query> { }
 
-export const _Query = (config?: Object) =>
+export const _Query = (config?: object) =>
 {
   config = config || {};
   const Blocks = AllBackendsMap[config['language'] || 'elastic'].blocks;
@@ -111,7 +111,7 @@ export const _Query = (config?: Object) =>
   return query;
 };
 
-export function queryForSave(query: Query): Object
+export function queryForSave(query: Query): object
 {
   query = query
     .set('cards', BlockUtils.cardsForServer(query.cards))

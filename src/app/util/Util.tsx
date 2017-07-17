@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands radix strict-boolean-expressions ban-types no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
+// tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
 
 import * as $ from 'jquery';
 // import * as moment from 'moment';
@@ -336,7 +336,7 @@ const Util = {
     return Math.random();
   },
 
-  extendId(obj: Object, isString?: boolean): Object
+  extendId(obj: object, isString?: boolean): object
   {
     if (obj['id'])
     {
@@ -373,7 +373,14 @@ const Util = {
 
   rel(target): string
   {
-    return Util.attr(target, 'rel');
+    const rel = Util.attr(target, 'rel');
+
+    if (rel === undefined || rel === null)
+    {
+      return Util.attr(target, 'data-rel');
+    }
+
+    return rel;
   },
 
   attr(target, key: string): string

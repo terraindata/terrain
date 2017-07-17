@@ -54,24 +54,17 @@ import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-
-const accepts = Immutable.List(['elasticKeyValueWrap']);
+// const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 export const elasticRootCard = _card({
   index: '',
   from: 0,
   rootType: '',
-  rootSize: 100,
-
-  body: '',
-  sort: '',
-
-  cards: L(),
+  rootSize: 1000,
 
   static:
   {
-    title: 'Root',
+    title: 'Root Settings',
     colors: ['#456', '#789'],
     preview: '[index], [rootType]',
     language: 'elastic',
@@ -79,14 +72,12 @@ export const elasticRootCard = _card({
     tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
       return {
-        index: tqlTranslationFn(rootBlock['index'], tqlConfig),
+        index: rootBlock['index'],
         type: rootBlock['rootType'],
         from: rootBlock['from'],
         size: rootBlock['rootSize'],
       };
     },
-
-    accepts,
 
     display:
     [
@@ -122,7 +113,7 @@ export const elasticRootCard = _card({
       {
         displayType: DisplayType.CARDS,
         key: 'cards',
-        accepts,
+        // accepts,
       },
     ],
   },

@@ -226,7 +226,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   public handleSwitch()
   {
     const value = this.isText() ? BlockUtils.make(
-      AllBackendsMap[this.props.language].blocks[this.getCreatingType()],
+      AllBackendsMap[this.props.language].blocks, this.getCreatingType(),
     ) : '';
     this.setState({
       value,

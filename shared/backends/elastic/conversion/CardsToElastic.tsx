@@ -94,7 +94,17 @@ class CardsToElastic
     query.cards.map(
       (card: Card) =>
       {
-        _.extend(elasticObj, CardsToElastic.blockToElastic(card, options));
+        const val = CardsToElastic.blockToElastic(card, options);
+        const key = card['key'];
+
+        if (key)
+        {
+          elasticObj[key] = val;
+        }
+        else if (typeof val === 'object' && !Array.isArray(val))
+        {
+          _.extend(elasticObj, val);
+        }
       },
     );
 

@@ -58,7 +58,11 @@ import CommonSQL from '../syntax/CommonSQL';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
-const { make } = BlockUtils;
+
+const make = (blockConfig, extraConfig?: object) =>
+{
+  return BlockUtils.make(Blocks, blockConfig.type, extraConfig);
+};
 
 import Blocks from '../blocks/MySQLBlocks';
 

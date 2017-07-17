@@ -120,6 +120,7 @@ export const elasticTransform = _card(
           // help: ManualConfig.help['scorePoints'],
         },
       ],
+
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
         return {
@@ -131,14 +132,15 @@ export const elasticTransform = _card(
           outputs: block['scorePoints'].map((scorePt) => scorePt.score),
         };
       },
-      init: () => (
+
+      init: (blocksConfig) => (
         {
           scorePoints: List([
-            BlockUtils.make(scorePoint, {
+            BlockUtils.make(blocksConfig, 'scorePoint', {
               value: 2,
               score: 0.2,
             }),
-            BlockUtils.make(scorePoint, {
+            BlockUtils.make(blocksConfig, 'scorePoint', {
               value: 15,
               score: 0.5,
             }),

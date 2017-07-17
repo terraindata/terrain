@@ -125,7 +125,7 @@ class CreateCardTool extends TerrainComponent<Props>
     {
       Actions.change(
         this.props.keyPath,
-        BlockUtils.make(AllBackendsMap[this.props.language].blocks[type]),
+        BlockUtils.make(AllBackendsMap[this.props.language].blocks, type),
       );
     }
     else

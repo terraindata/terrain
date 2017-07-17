@@ -61,7 +61,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { spotlightAction } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { MAX_RESULTS, Result } from './ResultsManager';
+import { MAX_RESULTS, Result } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
