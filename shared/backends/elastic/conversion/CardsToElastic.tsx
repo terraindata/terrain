@@ -99,7 +99,16 @@ export function toInputMap(inputs: Immutable.List<Input>): object
   const inputMap: object = {};
   inputs.map((input: Input) =>
   {
-    inputMap[input.key] = JSON.parse(input.value);
+    let value: any;
+    try
+    {
+      value = JSON.parse(input.value);
+    }
+    catch (e)
+    {
+      value = input.value;
+    }
+    inputMap[input.key] = value;
   });
   return inputMap;
 }
