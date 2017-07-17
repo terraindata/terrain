@@ -139,7 +139,7 @@ class FileImportInfo extends TerrainComponent<Props>
     else if (filetype === 'csv')
     {
       const config = {
-        quoteChar: '\'',
+        quoteChar: '"',
         header: this.props.hasCsvHeader,
         preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
         error: (err) =>

@@ -95,6 +95,8 @@ export class Import
         return reject('File import currently is only supported for Elastic databases.');
       }
 
+      let time: number = Date.now();
+      winston.info('checking config and schema...');
       const configError: string = this._verifyConfig(imprt);
       if (configError !== '')
       {
@@ -107,7 +109,10 @@ export class Import
       {
         return reject(mappingForSchema);
       }
+      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
 
+      time = Date.now();
+      winston.info('parsing data...');
       let items: object[];
       try
       {
@@ -116,7 +121,9 @@ export class Import
       {
         return reject('Error parsing data: ' + String(e));
       }
-      winston.info('got parsed data!');
+      winston.info('got parsed data! (s): ' + String((Date.now() - time) / 1000));
+      time = Date.now();
+      winston.info('transforming and type-checking data...');
       if (items.length === 0)
       {
         return reject('No data provided in file to upload.');
@@ -128,8 +135,10 @@ export class Import
       {
         return reject(e);
       }
-      winston.info('transformed data!');
+      winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
 
+      time = Date.now();
+      winston.info('creating tasty table and putting mapping...');
       const columns: string[] = Object.keys(imprt.columnTypes);
       const insertTable: Tasty.Table = new Tasty.Table(
         imprt.tablename,
@@ -139,9 +148,13 @@ export class Import
         mappingForSchema,
       );
       await database.getTasty().getDB().putMapping(insertTable);
+      winston.info('created tasty table and put mapping (s): ' + String((Date.now() - time) / 1000));
 
+      time = Date.now();
       winston.info('about to upsert via tasty...');
-      resolve(await database.getTasty().upsert(insertTable, items) as ImportConfig);
+      const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
+      resolve(res);
     });
   }
 
@@ -255,8 +268,6 @@ export class Import
       {
         if (fields.hasOwnProperty(field) && fieldsToCheck.has(field))
         {
-          winston.info('...schema for field...');
-          winston.info(JSON.stringify(fields[field]));
           if (this._isCompatibleType(mapping['properties'][field], fields[field]))
           {
             fieldsToCheck.delete(field);
@@ -314,7 +325,8 @@ export class Import
           checkColumn: true,
           noheader: imprt.csvHeaderMissing,
           headers: imprt.originalNames,
-          quote: '\'',
+          quote: '"',
+          workerNum: 4,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
           resolve(jsonArrObj);
