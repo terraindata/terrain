@@ -102,6 +102,11 @@ MidwayRouter.get('/', async (ctx, next) =>
   await send(ctx, '/src/app/index.html');
 });
 
+MidwayRouter.get('/assets/echo419.js', async (ctx, next) =>
+{
+  await send(ctx, '/src/app/echo419.js');
+});
+
 MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
 {
   if (process.env.NODE_ENV === 'production')

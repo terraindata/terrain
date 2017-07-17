@@ -82,6 +82,13 @@ export interface EventConfig extends EventTemplateConfig
   type: string;
 }
 
+export interface PayloadConfig
+{
+  eventId: string;
+  meta: string;
+  payload: any;
+}
+
 export class Events
 {
   private eventTable: Tasty.Table;
@@ -162,7 +169,7 @@ export class Events
   {
     return new Promise<EventConfig>(async (resolve, reject) =>
     {
-      eventReq.payload = JSON.parse(await this.getPayload(eventReq.eventId));
+      eventReq.payload = await this.getPayload(eventReq.eventId);
       const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.eventId);
       eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
@@ -222,6 +229,7 @@ export class Events
     return new Promise<object[]>(async (resolve, reject) =>
     {
       const itemLst: ItemConfig[] = await items.get();
+      const payloadLst: object[] = [];
       const returnLst: object[] = [];
       itemLst.forEach((item) =>
       {
@@ -238,31 +246,47 @@ export class Events
           {
             itemId = item.id.toString();
           }
+
+          const payloadEvent: object =
+            {
+              eventId: 'item' + (itemId as string),
+              meta: '',
+              payload:
+                {
+                  dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
+                },
+            };
           const returnEvent: object =
             {
-              dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
               eventId: 'item' + (itemId as string),
-              name: item.name,
-              type: '',
             };
+
+          payloadLst.push(payloadEvent);
+          returnLst.push(returnEvent);
+          /*
           // for now, only use items that are ES
           if (meta.algorithmsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
           {
-            returnEvent['type'] = 'group';
+            // returnEvent['eventType'] = 'group';
+            payloadLst.push(payloadEvent);
             returnLst.push(returnEvent);
           }
           if (meta.variantsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
           {
-            returnEvent['type'] = 'algorithm';
+            // returnEvent['eventType'] = 'algorithm';
+            payloadLst.push(payloadEvent);
             returnLst.push(returnEvent);
           }
           if (meta.query !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
           {
-            returnEvent['type'] = 'variant';
+            // returnEvent['eventType'] = 'variant';
+            payloadLst.push(payloadEvent);
             returnLst.push(returnEvent);
           }
+          */
         }
       });
+      await this.elasticController.getTasty().upsert(this.payloadTable, payloadLst);
       resolve(returnLst);
     });
   }
@@ -271,16 +295,17 @@ export class Events
    * Get payload from datastore given the eventId
    *
    */
-  public async getPayload(eventId: string): Promise<string>
+  public async getPayload(eventId: string): Promise<PayloadConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<PayloadConfig>(async (resolve, reject) =>
     {
-      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, ['payload'], { eventId }) as object[];
+      const payloads: object[] = await this.elasticController.getTasty().select(
+        this.payloadTable, ['payload'], { eventId }) as PayloadConfig[];
       if (payloads.length === 0)
       {
-        return resolve('');
+        return resolve({} as PayloadConfig);
       }
-      resolve(payloads[0].toString());
+      resolve(payloads[0] as PayloadConfig);
     });
   }
 
@@ -308,22 +333,23 @@ export class Events
     {
       if (req === undefined || (Object.keys(req).length === 0 && req.constructor === Object) || req.length === 0)
       {
-        return resolve();
+        return resolve('');
       }
-
       const JSONArr: object[] = req;
       const encodedEventArr: EventTemplateConfig[] = [];
       for (const jsonObj of JSONArr)
       {
-        if (jsonObj['eventId'] === undefined || !(await this.payloadExists(jsonObj['eventId'])))
+        const payload: PayloadConfig = await this.getPayload(jsonObj['eventId']);
+        if (jsonObj['eventId'] === undefined || !(Object.keys(payload).length === 0))
         {
           continue;
         }
         const eventRequest: EventConfig =
           {
             eventId: jsonObj['eventId'],
-            variantId: jsonObj['variantId'],
+            variantId: jsonObj['variantId'] !== undefined ? jsonObj['variantId'] : '',
             ip: IPSource,
+            payload: jsonObj['payload'] !== undefined ? payload['payload'] : {},
             url: jsonObj['url'] !== undefined ? jsonObj['url'] : '',
             type: jsonObj['type'] !== undefined ? jsonObj['type'] : '',
           };
@@ -331,7 +357,7 @@ export class Events
       }
       if (encodedEventArr.length === 0)
       {
-        return resolve();
+        return resolve('');
       }
       resolve(JSON.stringify(encodedEventArr));
     });

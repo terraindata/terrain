@@ -55,12 +55,6 @@ else
   document.addEventListener('DOMContentLoaded', initialLoad);
 }
 
-let url = document.URL;
-
-url = url.split(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)/).splice(1);
-const route = '/' + url[1].split('/')[1];
-url = url[0] + url[1].split('/')[0] + '/' + 'silent-cartographer/events/';
-
 let loadTime = 0;
 let numClicks = 0;
 
@@ -82,52 +76,30 @@ function initialLoad()
   {
     numClicks += 1;
   };
-  uploadCartography(eventIdLst);
+  getHTMLIDs();
 };
 
-// test purposes only
-// var req =
-// [
-//   {
-//     eventId: "eventId0",
-//     eventType: "click",
-//     payload: {
-//       dependencies: ["eventId1"],
-//     },
-//     url: "",
-//     value: "",
-//     variantId: "2",
-//   },
-//   {
-//     eventId: "eventId1",
-//     eventType: "click",
-//     payload: {},
-//     url: "",
-//     value: "",
-//     variantId: "3",
-//   },
-//   {
-//     eventId: "eventId2",
-//     eventType: "click",
-//     payload: {},
-//     url: "",
-//     value: "",
-//     variantId: "1",
-//   }
-// ];
+// TF specific function
+function getHTMLIDs(callback)
+{
+  let url = document.URL;
 
-const EventIdLst =
-[
+  url = url.split(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)/).splice(1);
+  const route = '/' + url[1].split('/')[1];
+  url = url[0] + url[1].split('/')[0] + '/' + 'events/ids';
+
+  const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function()
   {
-    eventId: "eventId0",
-  },
-  {
-    eventId: "eventId1",
-  },
-  {
-    eventId: "eventId2",
-  },
-];
+    if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200)
+    {
+      uploadCartography(JSON.parse(xhttp.response));
+    }
+  }
+  xhttp.open("GET", url);
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhttp.send();
+}
 
 function getEventValue(eventObjs, eventId)
 {
@@ -142,18 +114,25 @@ function getEventValue(eventObjs, eventId)
   };
 }
 
-function uploadCartography(EventIdLst, resp, callback)
+function uploadCartography(EventIdLst, callback)
 {
   // It's Quiet...
   // Too Quiet
+  let url = document.URL;
+
+  url = url.split(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)/).splice(1);
+  const route = '/' + url[1].split('/')[1];
+  url = url[0] + url[1].split('/')[0] + '/' + 'events/';
   const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
-    if (xhttp.readyState === 4)
+    if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200)
     {
-      respArr = JSON.parse(JSON.parse(xhttp.response));
+      console.log('hi');
+      respArr = JSON.parse(xhttp.response);
       for (let ind = 0; ind < respArr.length; ++ind)
       {
+        const resp = respArr[ind];
         if (document.getElementById(resp["eventId"]) !== null)
         {
           document.getElementById(resp["eventId"]).addEventListener(resp["eventType"], function ()
@@ -170,7 +149,8 @@ function uploadCartography(EventIdLst, resp, callback)
               "date": getCurrentTime(),
               "dependencies": respDepValues,
             });
-            resp["value"] = document.getElementById(resp["eventId"]).value.toString();
+            const eventIdValue = document.getElementById(resp["eventId"]).value;
+            resp["value"] = eventIdValue !== null ? eventIdValue.toString() : resp["name "];
             resp["url"] = route;
             const xhttpUpdate = new XMLHttpRequest();
             xhttpUpdate.open("POST", url+'update/');
@@ -181,7 +161,9 @@ function uploadCartography(EventIdLst, resp, callback)
       }
     }
   }
+  console.log(JSON.stringify({"body": EventIdLst}));
+  console.log(url);
   xhttp.open("POST", url);
   xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xhttp.send(JSON.stringify(EventIdLst));
+  xhttp.send(JSON.stringify({"body": EventIdLst}));
 }

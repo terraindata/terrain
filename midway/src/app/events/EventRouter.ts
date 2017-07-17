@@ -71,7 +71,7 @@ Router.get('/ids', async (ctx, next) =>
 // Get an event tracker.
 Router.post('/', async (ctx, next) =>
 {
-  ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body);
+  ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body.body);
 });
 
 // Handle client response for event tracker
