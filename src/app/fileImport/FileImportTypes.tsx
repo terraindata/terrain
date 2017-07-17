@@ -77,7 +77,7 @@ class FileImportStateC extends BaseClass
     colName: '',
     args: {
       newName: '',
-    }
+    },
   };
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
