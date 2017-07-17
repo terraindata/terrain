@@ -51,7 +51,7 @@ import * as _ from 'underscore';
 import ElasticKeyBuilderTextbox from '../../../../../src/app/common/components/ElasticKeyBuilderTextbox';
 import { Display, DisplayType } from '../../../../blocks/displays/Display';
 import { Block, TQLFn } from '../../../../blocks/types/Block';
-import { _card, Card } from '../../../../blocks/types/Card';
+import { _card, Card, InitFn } from '../../../../blocks/types/Card';
 
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
@@ -155,9 +155,7 @@ abstract class ESClause
 
       metaFields?: string[];
 
-      init?: () => {
-        [k: string]: any;
-      };
+      init?: InitFn;
     };
   }): any
   {

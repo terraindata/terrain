@@ -119,9 +119,12 @@ class Builder extends TerrainComponent<Props>
 
     nonexistentVariantIds: List<ID>;
 
-    saving?: boolean;
-
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
+
+    saveAsTextboxValue: string;
+    saving?: boolean;
+    savingAs?: boolean;
+
   } = {
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
@@ -139,6 +142,8 @@ class Builder extends TerrainComponent<Props>
     nonexistentVariantIds: List([]),
 
     navigationException: false,
+
+    saveAsTextboxValue: '',
   };
 
   public initialColSizes: any;
@@ -432,6 +437,12 @@ class Builder extends TerrainComponent<Props>
         onClick: this.onSave,
         enabled: this.shouldSave(builderState),
       },
+      {
+        text: 'Save As',
+        icon: <SaveIcon />,
+        onClick: this.onSaveAs,
+        enabled: true,
+      },
       //   {
       //     text: 'Duplicate',
       //     icon: <DuplicateIcon />,
@@ -465,6 +476,14 @@ class Builder extends TerrainComponent<Props>
       }
     }
     this.save();
+  }
+
+  public onSaveAs()
+  {
+    this.setState({
+      saveAsTextboxValue: Util.duplicateNameFor(this.getVariant().name),
+      savingAs: true,
+    });
   }
 
   public onSaveSuccess(variant: Variant)
@@ -796,6 +815,61 @@ class Builder extends TerrainComponent<Props>
     browserHistory.push(this.state.nextLocation);
   }
 
+  public handleSaveAsTextboxChange(newValue: string): void
+  {
+    this.setState({
+      saveAsTextboxValue: newValue,
+    });
+  }
+
+  public handleModalSaveAs()
+  {
+    let variant = LibraryTypes.touchVariant(this.getVariant());
+    variant = variant.set('query', this.getQuery());
+    LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
+      (response, newVariant) =>
+      {
+        this.onSaveSuccess(newVariant);
+        Actions.save();
+
+        let configArr = window.location.pathname.split('/')[2].split(',');
+        let currentVariant;
+        configArr = configArr.map((tab) =>
+        {
+          if (tab.substr(0, 1) === '!')
+          {
+            currentVariant = tab.substr(1).split('@')[0];
+            return '!' + response.id.toString();
+          }
+          return tab;
+        },
+        );
+        for (let i = 0; i < configArr.length; i++)
+        {
+          if (configArr[i] === currentVariant)
+          {
+            configArr.splice(i, 1);
+          }
+        }
+
+        this.setState({
+          savingAs: false,
+        });
+        const newConfig = configArr.join(',');
+        if (newConfig !== this.props.params.config)
+        {
+          browserHistory.replace(`/builder/${newConfig}`);
+        }
+      });
+  }
+
+  public handleModalSaveAsCancel()
+  {
+    this.setState({
+      savingAs: false,
+    });
+  }
+
   public render()
   {
     const config = this.props.params.config;
@@ -845,7 +919,18 @@ class Builder extends TerrainComponent<Props>
           thirdButtonText="Don't Save"
           onThirdButton={this.handleModalDontSave}
         />
-
+        <Modal
+          open={this.state.savingAs}
+          title='Save As'
+          confirmButtonText='Save'
+          confirm={true}
+          onClose={this.handleModalSaveAsCancel}
+          onConfirm={this.handleModalSaveAs}
+          initialTextboxValue={this.state.saveAsTextboxValue}
+          textboxPlaceholderValue={'Variant Name'}
+          showTextbox={true}
+          onTextboxValueChange={this.handleSaveAsTextboxChange}
+        />
         <ResultsManager
           query={query}
           resultsState={this.state.builderState.resultsState}

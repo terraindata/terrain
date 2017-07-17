@@ -53,7 +53,7 @@ import * as _ from 'underscore';
 import { CardItem } from '../components/cards/CardComponent';
 const Redux = require('redux');
 import Util from '../../util/Util';
-import { _ResultsState, ResultsState } from '../components/results/ResultsManager';
+import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
 import { AllBackendsMap } from '../../../../shared/backends/AllBackends';

@@ -143,7 +143,7 @@ class CardsToSQL
           {
             fields = fields.filter((v) => v.field !== '*').toList();
             return fields.unshift(
-              BlockUtils.make(MySQLBlocks.field, {
+              BlockUtils.make(MySQLBlocks, 'field', {
                 field: '*',
               }),
             );
@@ -157,7 +157,7 @@ class CardsToSQL
       // add a take card if none are present
       if (options.limit && !fromCard['cards'].some((card) => card.type === 'take'))
       {
-        return fromCard.set('cards', fromCard['cards'].push(BlockUtils.make(MySQLBlocks.take, {
+        return fromCard.set('cards', fromCard['cards'].push(BlockUtils.make(MySQLBlocks, 'take', {
           value: options.limit,
         })));
       }
@@ -169,7 +169,7 @@ class CardsToSQL
         fromCard = fromCard.update('fields',
           (fields) =>
             fields.filter((v) => v.field !== '*').toList()
-              .unshift(BlockUtils.make(MySQLBlocks.field, {
+              .unshift(BlockUtils.make(MySQLBlocks, 'field', {
                 field: 'COUNT(*)',
               })),
         );
@@ -231,7 +231,7 @@ class CardsToSQL
         {
           fromCard = fromCard.update('fields',
             (fields) => fields.push(
-              BlockUtils.make(MySQLBlocks.field, {
+              BlockUtils.make(MySQLBlocks, 'field', {
                 field: transformInput.input + ' as ' + transformInput.alias,
               }),
             ),

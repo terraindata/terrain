@@ -44,44 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-ordering member-access no-var-requires
+// tslint:disable:strict-boolean-expressions restrict-plus-operands member-ordering no-console
 
-import * as Immutable from 'immutable';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
+import ESClauseType from '../ESClauseType';
+import ESInterpreter from '../ESInterpreter';
+import ESJSONType from '../ESJSONType';
+import ESValueInfo from '../ESValueInfo';
+import ESStructureClause from './ESStructureClause';
 
-class MySQLBackend implements Backend
+/**
+ * A clause that calls a script and returns the result for each hit
+ */
+export default class ESScriptClause extends ESStructureClause
 {
-  type = 'mysql';
-  name = 'MySQL';
+  public constructor(type: string,
+    structure: { [name: string]: string },
+    required: string[],
+    settings: any)
+  {
+    super(type, structure, required, settings, ESClauseType.ESScriptClause);
+  }
 
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  rootCards = [MySQLBlocks.sfw];
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    super.mark(interpreter, valueInfo);
+  }
 
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
+  /**
+   * Get the name of the stored script referenced by this clause.
+   * If the script clause does not reference a stored script,
+   * this returns null.
+   */
+  public getScriptName(valueInfo: ESValueInfo): string | null
+  {
+    if (valueInfo.jsonType !== ESJSONType.object)
+    {
+      return null;
+    }
 
-  queryToCode = CardsToSQL.toSQL;
+    const name = valueInfo.value['stored'];
+    if (typeof name !== 'string')
+    {
+      return null;
+    }
 
-  codeToQuery = SQLToCards;
-
-  parseQuery = (tql) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
+    return name;
+  }
 }
-
-export default new MySQLBackend();

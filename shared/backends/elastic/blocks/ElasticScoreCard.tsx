@@ -89,11 +89,11 @@ export const elasticScore = _card(
       },
       accepts: transformScoreInputTypes,
 
-      init: () =>
+      init: (blocksConfig) =>
       {
         return {
           weights: List([
-            BlockUtils.make(elasticWeight),
+            BlockUtils.make(blocksConfig, 'elasticWeight'),
           ]),
         };
       },
@@ -160,10 +160,10 @@ export const elasticWeight = _block(
         _.extend(obj, tqlTranslationFn(block['key'], tqlConfig));
         return obj;
       },
-      init: () =>
+      init: (blocksConfig) =>
       {
         return {
-          key: BlockUtils.make(elasticTransform),
+          key: BlockUtils.make(blocksConfig, 'elasticTransform'),
         };
       },
       removeOnCardRemove: true,

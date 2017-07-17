@@ -44,44 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-ordering member-access no-var-requires
+// tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('./syntax/SQLSyntaxConfig.json');
+import { List, Map } from 'immutable';
+import { BaseClass, New } from '../../../Classes';
 
-class MySQLBackend implements Backend
+export const MAX_RESULTS = 200;
+
+class ResultClass extends BaseClass
 {
-  type = 'mysql';
-  name = 'MySQL';
+  // all available fields for display
+  public fields: IMMap<string, string> = Map<string, string>({});
 
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  rootCards = [MySQLBlocks.sfw];
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
+  public primaryKey: any = '';
 
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
+  public spotlight: any;
 
-  queryToCode = CardsToSQL.toSQL;
-
-  codeToQuery = SQLToCards;
-
-  parseQuery = (tql) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
+  public rawFields: IMMap<string, string> = Map<string, string>({});
+  public transformFields: IMMap<string, string> = Map<string, string>({});
 }
+export type Result = ResultClass & IRecord<ResultClass>;
+export const _Result = (config: object = {}) =>
+  New<Result>(new ResultClass(config), config, true); // generates unique IDs
 
-export default new MySQLBackend();
+export type Results = List<Result>;
+
+class ResultsStateC extends BaseClass
+{
+  public results: Results = List([]);
+  public fields: List<string> = List([]);
+  public count: number = 0;
+  public rawResult: string = '';
+
+  public primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
+
+  public hasError: boolean = false;
+  public errorMessage: string = '';
+  public hasAllFieldsError: boolean = false;
+  public allFieldsErrorMessage: string = '';
+  public mainErrorMessage: string = '';
+  public subErrorMessage: string = '';
+  public errorLine: number = -1;
+
+  public valid: boolean = false; // are these results still valid for the given query?
+
+  public loading: boolean = false; // if we're still loading any fields, besides for the count
+
+  public hasLoadedResults: boolean = false;
+  public hasLoadedAllFields: boolean = false;
+  public hasLoadedCount: boolean = false;
+  public hasLoadedTransform: boolean = false;
+}
+export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
+export let _ResultsState = (config: object = {}) =>
+  New<ResultsState>(new ResultsStateC(config), config);

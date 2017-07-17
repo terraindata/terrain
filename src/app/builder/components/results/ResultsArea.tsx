@@ -71,7 +71,7 @@ import ResultsTable from '../results/ResultsTable';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultsManager';
+import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultTypes';
 import Radium = require('radium');
 import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 

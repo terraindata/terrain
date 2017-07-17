@@ -314,7 +314,7 @@ export default class ESJSONParser
 
   private readString(): string
   {
-    let result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F]+)*")/);
+    let result: any = this.captureMatch(/^("(?:\\(?:["\\\/bfnrt]|u[a-fA-F0-9]{4})|[^"\\\0-\x1F\x7F])*")/);
     if (typeof result === 'string')
     {
       return result;
@@ -331,7 +331,7 @@ export default class ESJSONParser
     }
 
     // try to capture a string that ends with some JSON control char
-    result = this.matchAndSetToken(/^"[^,:\[\]{}"]+/);
+    result = this.matchAndSetToken(/^".+[^,:\[\]{}"]/);
 
     if (result !== null)
     {

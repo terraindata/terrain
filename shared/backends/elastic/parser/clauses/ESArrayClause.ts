@@ -54,7 +54,6 @@ import { List } from 'immutable';
 import BuilderStore from '../../../../../src/app/builder/data/BuilderStore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { DisplayType } from '../../../../blocks/displays/Display';
-import ElasticBlocks from '../../blocks/ElasticBlocks';
 
 /**
  * A clause that corresponds to an array of uniform type.
@@ -98,10 +97,10 @@ export default class ESArrayClause extends ESClause
           accepts: List(['eql' + this.elementID]),
         },
 
-        init: () =>
+        init: (blocksConfig) =>
           ({
             cards: List([
-              BlockUtils.make(ElasticBlocks['eql' + this.elementID]),
+              BlockUtils.make(blocksConfig, 'eql' + this.elementID),
             ]),
           }),
 

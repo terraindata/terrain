@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands radix prefer-const ban-types no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
+// tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
@@ -57,7 +57,6 @@ import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import Query from '../../../../../shared/items/types/Query';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { BaseClass, New } from '../../../Classes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
@@ -65,55 +64,7 @@ import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/Spot
 import BackendInstance from './../../../../../shared/backends/types/BackendInstance';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
-export const MAX_RESULTS = 200;
-
-class ResultClass extends BaseClass
-{
-  // all available fields for display
-  public fields: IMMap<string, string> = Map<string, string>({});
-
-  public primaryKey: any = '';
-
-  public spotlight: any;
-
-  public rawFields: IMMap<string, string> = Map<string, string>({});
-  public transformFields: IMMap<string, string> = Map<string, string>({});
-}
-export type Result = ResultClass & IRecord<ResultClass>;
-const _Result = (config: Object = {}) =>
-  New<Result>(new ResultClass(config), config, true); // generates unique IDs
-
-export type Results = List<Result>;
-
-class ResultsStateC extends BaseClass
-{
-  public results: Results = List([]);
-  public fields: List<string> = List([]);
-  public count: number = 0;
-  public rawResult: string = '';
-
-  public primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
-
-  public hasError: boolean = false;
-  public errorMessage: string = '';
-  public hasAllFieldsError: boolean = false;
-  public allFieldsErrorMessage: string = '';
-  public mainErrorMessage: string = '';
-  public subErrorMessage: string = '';
-  public errorLine: number = -1;
-
-  public valid: boolean = false; // are these results still valid for the given query?
-
-  public loading: boolean = false; // if we're still loading any fields, besides for the count
-
-  public hasLoadedResults: boolean = false;
-  public hasLoadedAllFields: boolean = false;
-  public hasLoadedCount: boolean = false;
-  public hasLoadedTransform: boolean = false;
-}
-export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
-export let _ResultsState = (config: Object = {}) =>
-  New<ResultsState>(new ResultsStateC(config), config);
+import { _Result, _ResultsState, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
 
 export interface Props
 {
