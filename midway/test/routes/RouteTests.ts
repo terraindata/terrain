@@ -735,7 +735,8 @@ describe('File import route tests', () =>
           transformations: [
             {
               name: 'rename',
-              args: { oldName: 'column1', newName: 'col1' },
+              colName: 'column1',
+              args: { newName: 'col1' },
             },
           ],
         },

@@ -81,15 +81,13 @@ export interface Props
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    colName: string,
-    newName: string,
     templateId: number,
     templateText: string,
+    editColumnId: number,
   } = {
-    colName: '',
-    newName: '',
     templateId: -1,
     templateText: '',
+    editColumnId: -1,
   };
 
   public componentDidMount()
@@ -97,53 +95,11 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.getTemplates();
   }
 
-  /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
-   * when changing transform columns or types */
-  public handleRenameTransform(colName: string, newName: string)
-  {
-    if (this.state.colName && this.state.colName !== colName)
-    {
-      Actions.addTransform({
-        name: 'rename',
-        colName,
-        args: {
-          newName,
-        },
-      });
-    }
-    console.log('setting rename transform: ', colName + ' to ' + newName);
-    this.setRenameTransform(colName, newName);
-  }
-
-  public addRenameTransform()
-  {
-    if (this.state.colName)
-    {
-      console.log('adding rename transform: ', this.state.colName + ', ' + this.state.newName);
-      Actions.addTransform({
-        name: 'rename',
-        colName: this.state.colName,
-        args: {
-          newName: this.state.newName,
-        },
-      });
-      this.setRenameTransform('', '');
-    }
-  }
-
-  public setRenameTransform(colName: string, newName: string)
+  public handleEditColumnChange(editColumnId: number)
   {
     this.setState({
-      colName,
-      newName,
+      editColumnId,
     });
-  }
-
-  public handleUploadFile()
-  {
-    // TODO: database and table name error checking
-    this.addRenameTransform();
-    Actions.uploadFile();
   }
 
   public handleTemplateChange(templateId: number)
@@ -162,14 +118,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleLoadTemplate()
   {
-    // apply list of transforms to preview in a queue
     Actions.loadTemplate(this.state.templateId);
-
-    console.log('transforms: ', this.props.transforms);
-    this.props.transforms.map((transform) =>
-    {
-      Actions.updatePreviewRows(transform);
-    });
   }
 
   public handleSaveTemplate()
@@ -178,9 +127,14 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.getTemplates();
   }
 
+  public handleUploadFile()
+  {
+    // TODO: database and table name error checking
+    Actions.uploadFile();
+  }
+
   public render()
   {
-    console.log('templates: ', this.props.templates);
     return (
       <div>
         <button onClick={this.handleLoadTemplate}>
@@ -215,9 +169,9 @@ class FileImportPreview extends TerrainComponent<Props>
                     isPrimaryKey={this.props.primaryKey === key}
                     columnNames={this.props.columnNames}
                     datatypes={List(FileImportTypes.ELASTIC_TYPES)}
-                    handleRenameTransform={this.handleRenameTransform}
-                    addRenameTransform={this.addRenameTransform}
                     columnOptions={this.props.columnOptions}
+                    editing={key === this.state.editColumnId}
+                    handleEditColumnChange={this.handleEditColumnChange}
                   />,
                 ).toArray()
               }
