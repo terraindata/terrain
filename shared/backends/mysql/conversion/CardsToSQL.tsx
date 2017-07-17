@@ -177,7 +177,6 @@ class CardsToSQL
       if (options.transformAliases)
       {
         // TODO find score fields. Score fields!
-
         let transformInputs: Array<{ input: string, alias: string }> = [];
         BlockUtils.forAllCards(fromCard, (card) =>
         {

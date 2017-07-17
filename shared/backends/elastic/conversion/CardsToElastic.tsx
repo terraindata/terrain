@@ -175,10 +175,19 @@ class CardsToElastic
 
     const text: string = stringifyWithParameters(elasticObj, query.inputs);
     const parser: ESParser = new ESParser(text, true);
-    const valueInfo: ESValueInfo = parser.getValueInfo();
-    const params = toInputMap(query.inputs);
-    const result = ESParameterFiller.generate(valueInfo, params);
-    return ESConverter.formatES(new ESParser(result));
+    if (options.replaceInputs)
+    {
+      const valueInfo: ESValueInfo = parser.getValueInfo();
+      const params = toInputMap(query.inputs);
+      const result = ESParameterFiller.generate(valueInfo, params);
+      return ESConverter.formatES(new ESParser(result));
+    }
+    else
+    {
+      // TODO: pipe this through the formatter once it can handle parameters
+      // return ESConverter.formatES(new ESParser(text));
+      return text;
+    }
   }
 
   public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
