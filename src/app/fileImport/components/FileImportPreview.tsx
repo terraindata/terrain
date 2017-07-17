@@ -118,23 +118,34 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleLoadTemplate()
   {
+    if (this.state.templateId === -1)
+    {
+      alert('Please select a template to load');
+      return;
+    }
     Actions.loadTemplate(this.state.templateId);
   }
 
   public handleSaveTemplate()
   {
+    if (!this.state.templateText)
+    {
+      alert('Please enter a template name');
+      return;
+    }
     Actions.saveTemplate(this.state.templateText);
     Actions.getTemplates();
   }
 
   public handleUploadFile()
   {
-    // TODO: database and table name error checking
     Actions.uploadFile();
   }
 
   public render()
   {
+    // console.log('columnTypes: ', this.props.columnTypes);
+    // console.log('columnsToInclude: ', this.props.columnsToInclude);
     return (
       <div>
         <button onClick={this.handleLoadTemplate}>

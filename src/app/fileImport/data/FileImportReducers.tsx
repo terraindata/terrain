@@ -162,7 +162,7 @@ const applyTransform = (state, transform) =>
     }
     else
     {
-      primaryKey = state.primaryKey < transformCol ? state.primaryKey : state.primaryKey - 1;
+      primaryKey = state.primaryKey < mergeCol ? state.primaryKey : state.primaryKey - 1;
     }
 
     return state
@@ -383,7 +383,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
         state.columnsToInclude.get(colId) && [colName, recToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
       state.columnNames.get(state.primaryKey),
-      state.transforms,
+      state.renameTransform.colName ? state.transforms.push(state.renameTransform) : state.transforms,
       action.payload.templateText,
       () =>
       {
@@ -423,6 +423,7 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
+    console.log(state.templates);
     const template = state.templates.get(action.payload.templateId);
     template.transformations.map((transform, i) =>
     {
@@ -430,14 +431,30 @@ FileImportReducers[ActionTypes.loadTemplate] =
     });
     const { primaryKey, columnNames, columnTypes, columnsToInclude, previewRows } = state;
 
+    const colTypes = [];
+    const colsToInclude = [];
+    columnNames.map((colName, i) =>
+    {
+      const colType = template.columnTypes[colName];
+      if (colType)
+      {
+        colTypes.push(recToNumber(colType));
+        colsToInclude.push(true);
+      }
+      else
+      {
+        colTypes.push({ type: 0 });
+        colsToInclude.push(false);
+      }
+    });
     return state
       .set('oldNames', List(template.originalNames))
-      .set('primaryKey', _.map(template.columnTypes, (val, key) => key).indexOf(template.primaryKey))
+      .set('primaryKey', columnNames.indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
-      .set('hasCsvHeader', template.hasCsvHeader)
+      .set('hasCsvHeader', !template.csvHeaderMissing)
       .set('columnNames', columnNames)
-      .set('columnTypes', columnTypes)
-      .set('columnsToInclude', columnsToInclude)
+      .set('columnTypes', List(colTypes))
+      .set('columnsToInclude', List(colsToInclude))
       .set('previewRows', previewRows);
   };
 
