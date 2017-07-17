@@ -43,49 +43,130 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Util from './../../util/Util';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
+import ESConverter from '../../../backends/elastic/conversion/formatter/ESConverter';
+import ESJSONParser from '../../../backends/elastic/parser/ESJSONParser';
 
-export let LibraryActionTypes =
+// tslint:disable:object-literal-key-quotes
+
+function testConverter(testName: string,
+  testObj: any)
+{
+  test(testName, () =>
   {
-    groups:
-    {
-      create, change, move,
-      // duplicate,
+    const obj = new ESJSONParser(JSON.stringify(testObj));
+    expect(obj.getValue()).toEqual(JSON.parse(ESConverter.formatES(obj)));
+  });
+}
+
+testConverter('generic',
+  {
+    'index': 'movies',
+    'type': 'data',
+    'size': 10,
+    'body': {
+      'query': {
+        'bool': {
+          'must_not': [
+            {
+              'match': {
+                'title': 'Toy Story (1995)',
+              },
+            },
+          ],
+          'must': [
+            {
+              'range': {
+                'releasedate': {
+                  'gte': '2007-03-24',
+                },
+              },
+            },
+          ],
+        },
+      },
     },
+  });
 
-    algorithms:
+testConverter('some topologies',
+  {
+    '1':
+    [
+      { '1': [1, 2] },
+      [{ '1': 1 }, [1, 2]],
+    ],
+    '2':
     {
-      create, change, move,
+      '1': [[1, 2], [1, 2]],
+      '2': [{ '1': '1', '2': '2' }, { '1': '1', '2': '2' }],
     },
+  });
 
-    variants:
-    {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-      unselectAll: '',
-    },
+testConverter('uncommon data types',
+  {
+    'foo': null,
+    'baz': [null],
+    'oof': true,
+    'rab': '',
+  });
 
-    loadState: '',
-    setDbs: '',
-  };
+testConverter('newlines',
+  {
+    'normal': 'string',
+    '\nHel\rlo': 'Good\n\nBye',
+    'How\n': 'A\rre\r\nYou?',
+  });
 
-Util.setValuesToKeys(LibraryActionTypes, '');
+testConverter('unusual characters and escapes',
+  {
+    '\\': 'hi\\\\',
+    '\0': ['\"hey\"'],
+    '': '\twell',
+  });
 
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-  ];
+testConverter('unicode values',
+  ['\u0000', '\u0001', '\u0008', '\u0030'],
+);
 
-export default LibraryActionTypes;
+testConverter('scientific notation',
+  {
+    'foo': 1e6,
+    'bar': '1e6',
+  });
+
+testConverter('root value string',
+  'string',
+);
+
+testConverter('root value number',
+  1,
+);
+
+testConverter('root value boolean',
+  false,
+);
+
+testConverter('root value null',
+  null,
+);
+
+testConverter('root value empty string',
+  '',
+);
+
+testConverter('root value unicode',
+  '\u0030',
+);
+
+const deepArr = [];
+let curr = deepArr;
+for (let i = 0; i < 64; i++)
+{
+  curr.push(i);
+  curr.push([]);
+  curr = curr[1];
+}
+
+testConverter('deep nested array',
+  deepArr,
+);

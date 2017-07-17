@@ -96,6 +96,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
     resultsBarOpen: boolean;
+    queriesInFlight: number;
   } = {
     tql: this.props.query.tql,
     cardsTQL: this.props.query.tql,
@@ -110,13 +111,39 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: false,
     termDefinitionPos: {},
     resultsBarOpen: false,
+    queriesInFlight: 0,
   };
+
+  public debouncedSendTqlAction = _.debounce(
+    () =>
+    {
+      BuilderActions.changeTQL(this.state.tql);
+    },
+    1000,
+  );
+
+  public debouncedUpdateCardsTql = _.debounce(
+    () =>
+    {
+      if (this.state.queriesInFlight === 0)
+      {
+        this.setState({
+          cardsTQL: this.props.query.tql,
+        });
+      }
+      else
+      {
+        this.setState({
+          queriesInFlight: this.state.queriesInFlight - 1,
+        });
+      }
+    },
+    1000,
+  );
 
   constructor(props: Props)
   {
     super(props);
-    this.sendTqlAction = _.debounce(this.sendTqlAction, 750);
-    this.updateCardsTQL = _.debounce(this.updateCardsTQL, 750);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -172,16 +199,13 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   //     x.findTqlToFold();
   //   }
   // }
-  public updateCardsTQL()
-  {
-    this.setState({
-      cardsTQL: this.props.query.tql,
-    });
-  }
 
   public sendTqlAction()
   {
-    BuilderActions.changeTQL(this.state.tql);
+    this.setState({
+      queriesInFlight: this.state.queriesInFlight + 1,
+    });
+    this.debouncedSendTqlAction();
   }
 
   public changeThemeDefault()
@@ -390,11 +414,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
     // cardList[this.state.cardName] &&
     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
-
-    if (this.props.query.tql !== this.state.cardsTQL)
-    {
-      this.updateCardsTQL();
-    }
+    this.debouncedUpdateCardsTql();
     return (
       <div
         className={classNames({

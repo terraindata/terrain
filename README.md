@@ -214,27 +214,26 @@ Contains unit tests for Midway. test's directory structure mirrors that of midwa
 
 ## Packages and Imports
 
-### To install a package from npm (This is obsolete, use yarn instead)
+### To install a package from yarn
 
-`npm install [package-name] --save`
+`yarn add [package-name]`
 
 This will install the package and also add a reference to it in your `package.json` file. You should commit the change
-to the `package.json` file and advise other developers to run `npm install` once they pull in your commit.
-
-If you forget to add `--save`, no line will be added to `package.json`
+to the `package.json` file and advise other developers to run `yarn` once they pull in your commit.
 
 You will then need to try to install any Typescript types that are available for the package:
 `yarn add @types/[package-name] --dev` (`--dev` marks that this is a development dependency, not a production one).
-If this succeeds, Typescript types are available and you can import this
-package with the `import * as Package from 'package-name';` syntax. If this does not succeed, then there are no publicly
-available types, and you have to use `const Package = require('package');`.
 
-You can also combine these two installs into one line. You can also use `npm i` as a shortcut for `npm install`
+If this succeeds, Typescript types are available and you can import this
+package with `import * as PackageName from 'package-name';` or `import { ThingOne, ThingTwo } from 'package-name';` syntax. 
+
+If this does not succeed, then there are no publicly
+available types, and you have to use `import Package = require('package');`.
 
 For example, to add `truffle-oil` to my app, I would:
 * `cd ~/git/Search`
-* `npm install truffle-oil --save`
-* `npm i @types/truffle-oil --save-dev`
+* `yarn add truffle-oil`
+* `yarn add @types/truffle-oil --dev`
 * `git add package.json`
 * Commit the changes
 
@@ -250,13 +249,13 @@ To include any file that's not a `.tsx` from within the Terraformer codebase, us
 `const [ClassName] = require('[relative path]')` 
 e.g.  
 `require('./Pay.less');`  
-`const FreddyAnd = require('../../data/FreddyAnd.json');`  
-`const CarrieMathison = require('./CarrieMathison.js');` (again, don't forget `./`)  
+`import FreddyAnd = require('../../data/FreddyAnd.json');`  
+`import CarrieMathison = require('./CarrieMathison.js');` (again, don't forget `./`)  
 
-To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings
-available, and `const [ClassName] = require('[package_name]');` if not. e.g.
+To include a package from `node_modules`, use `import * as [ClassName] from '[package_name]';` if there are typings
+available, and `import [ClassName] = require('[package_name]');` if not. e.g.
 `import * as TheForce from 'the-force';`  
-`const UnpopularLibrary = require('unpopular-library');`  
+`import UnpopularLibrary = require('unpopular-library');`  
 
 ## Testing
 
@@ -264,7 +263,7 @@ available, and `const [ClassName] = require('[package_name]');` if not. e.g.
 
 Included in the `midway/test` folder.
 
-Run the `npm run jest-test` command to run the back-end tests.
+Run the `yarn run jest-test` command to run the back-end tests.
 
 #### API Tests in Back-end test files
 

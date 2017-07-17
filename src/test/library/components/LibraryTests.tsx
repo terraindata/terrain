@@ -43,49 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Util from './../../util/Util';
+import * as React from 'react';
+import configureStore from 'redux-mock-store';
+import Library from '../../../app/library/components/Library';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
-
-export let LibraryActionTypes =
-  {
-    groups:
-    {
-      create, change, move,
-      // duplicate,
-    },
-
-    algorithms:
-    {
-      create, change, move,
-    },
-
-    variants:
-    {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-      unselectAll: '',
-    },
-
-    loadState: '',
-    setDbs: '',
+describe('Library', () =>
+{
+  const initialState = {
+    groups: Immutable.Map({
+      id: 1,
+      name: 'Group 1',
+    }),
   };
 
-Util.setValuesToKeys(LibraryActionTypes, '');
+  const mockStore = configureStore();
+  let store = null;
+  let libraryComponent = null;
 
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-  ];
+  beforeEach(() =>
+  {
+    store = mockStore(initialState);
+    libraryComponent = shallow(
+      <Library
+        store={store}
+        params={{ groupId: 1 }}
+      />,
+    );
+  });
 
-export default LibraryActionTypes;
+  it('should have 3 columns', () =>
+  {
+    // Render a checkbox with label in the document
+    expect(libraryComponent.find('GroupsColumn').length).toEqual(1);
+    expect(libraryComponent.find('AlgorithmsColumn').length).toEqual(1);
+    expect(libraryComponent.find('VariantsColumn').length).toEqual(1);
+  });
+});
