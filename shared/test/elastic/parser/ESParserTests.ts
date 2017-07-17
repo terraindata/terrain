@@ -47,11 +47,10 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as util from 'util';
 import * as winston from 'winston';
-import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
+
+import ESParser from '../../../backends/elastic/parser/ESJSONParser';
+import ESParserError from '../../../backends/elastic/parser/ESParserError';
+import { makePromiseCallback } from '../../Utils';
 
 function getExpectedFile(): string
 {
@@ -65,27 +64,37 @@ beforeAll(async (done) =>
   // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
 
-  const expectedString: any = await new Promise((resolve, reject) =>
+  const contents: any = await new Promise((resolve, reject) =>
   {
     fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
   });
 
-  expected = JSON.parse(expectedString);
+  expected = JSON.parse(contents);
   done();
 });
 
 function testParse(testString: string,
   expectedValue: any,
-  expectedErrors: ESParserError[] = [])
+  expectedErrors: any[] = [])
 {
   winston.info('testing \'' + testString + '\'');
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser;
+  const parser: ESParser = new ESParser(testString);
+  const value = parser.getValue();
+  const errors = parser.getErrors();
 
-  winston.info(util.inspect(parser.getValueInfo(), false, 16));
+  winston.info(util.inspect(parser.getValueInfo()));
+  winston.info(util.inspect(parser.getTokens()));
+  winston.info(util.inspect(parser.getValueInfos()));
 
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
+  winston.info(util.inspect(errors));
+
+  expect(value).toEqual(expectedValue);
+
+  expect(errors.length).toEqual(expectedErrors.length);
+  for (let i = 0; i < errors.length; ++i)
+  {
+    expect(errors[i]).toMatchObject(expectedErrors[i]);
+  }
 }
 
 test('parse valid json objects', () =>
@@ -97,5 +106,112 @@ test('parse valid json objects', () =>
 
       // test parsing the value using a few spacing options
       testParse(JSON.stringify(testValue), testValue);
+      testParse(JSON.stringify(testValue, null, 1), testValue);
+      testParse(JSON.stringify(testValue, null, 2), testValue);
+      testParse(JSON.stringify(testValue, null, 3), testValue);
+      testParse(JSON.stringify(testValue, null, 4), testValue);
+    });
+});
+
+test('parse invalid json objects', () =>
+{
+  testParse('string', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('fulse', false,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('falsey', false,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('tru', true,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('trueee', true,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('n', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('nil', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('nullllleray', null,
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 0, row: 0, col: 0 },
+      },
+    ]);
+
+  testParse('["string]', ['string'],
+    [
+      {
+        isWarning: false,
+        token: { charNumber: 1, row: 0, col: 1 },
+      },
+    ]);
+
+  testParse(`{
+  "index": "movies",
+  "type": "data",
+  "from": 0,
+  "size": "10"
+}`, JSON.parse(`{"from": 0, "index": "movies", "size": "10", "type": "data"}`), []);
+
+  testParse(`{
+  "index" : "movies",
+  "type" : "data",
+  "size" : 10,
+  "from" : 0,
+  "body" : {
+    "query" : {
+      "bool" : {
+        "must_not" : [ { "match" : { "title": "blah blah"} } ]
+      }
+    }
+  }
+}`,
+    {
+      body: { query: { bool: { must_not: [{ match: { title: 'blah blah' } }] } } },
+      from: 0,
+      index: 'movies',
+      size: 10,
+      type: 'data',
     });
 });
