@@ -70,6 +70,8 @@ export interface Props
   location?: any;
   router?: any;
   route?: any;
+  variantsMultiselect?: boolean;
+  basePath: string;
   // params?: any;
   // location?: {
   //   pathname: string;
@@ -83,6 +85,7 @@ class Library extends TerrainComponent<any>
     location: {},
     router: {},
     route: {},
+    variantsMultiselect: false,
   };
 
   public cancelSubscription = null;
@@ -102,7 +105,8 @@ class Library extends TerrainComponent<any>
 
   public componentWillMount()
   {
-    if (!this.props.params || !this.props.params.groupId)
+    const { basePath } = this.props;
+    if ((!this.props.params || !this.props.params.groupId) && basePath === 'library')
     {
       // no path given, redirect to last library path
       const path = localStorage.getItem('lastLibraryPath');
@@ -129,11 +133,11 @@ class Library extends TerrainComponent<any>
     const { libraryState } = this.state;
 
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
-    const { params } = this.props;
+    const { params, basePath, variantsMultiselect } = this.props;
 
     const groupId = params.groupId ? +params.groupId : null;
     const algorithmId = params.algorithmId ? +params.algorithmId : null;
-    const variantId = params.variantId ? +params.variantId : null;
+    const variantIds = params.variantId ? params.variantId.split(',') : null;
     const multiselect = false;
 
     let group: LibraryTypes.Group;
@@ -158,26 +162,26 @@ class Library extends TerrainComponent<any>
           {
             variantsOrder = algorithm.variantsOrder;
 
-            if (variantId !== null)
+            if (variantIds !== null && variantIds.length === 0)
             {
               variant = variants.get(variantId);
 
               if (variant === undefined)
               {
-                browserHistory.replace(`/library/${groupId}/${algorithmId}`);
+                browserHistory.replace(`/${basePath}/${groupId}/${algorithmId}`);
               }
             }
           } else
           {
             // !algorithm
-            browserHistory.replace(`/library/${groupId}`);
+            browserHistory.replace(`/${basePath}/${groupId}`);
           }
         }
       }
       else
       {
         // !group
-        browserHistory.replace('/library');
+        browserHistory.replace(`/${basePath}`);
       }
     }
 
@@ -193,6 +197,7 @@ class Library extends TerrainComponent<any>
             groups,
             groupsOrder,
             params,
+            basePath,
           }}
           isFocused={algorithm === undefined}
         />
@@ -203,6 +208,7 @@ class Library extends TerrainComponent<any>
             algorithmsOrder,
             groupId,
             params,
+            basePath,
           }}
           isFocused={variant === undefined}
         />
@@ -214,10 +220,11 @@ class Library extends TerrainComponent<any>
             groupId,
             algorithmId,
             params,
-            multiselect,
+            multiselect: variantsMultiselect,
+            basePath,
           }}
         />
-        {!multiselect ?
+        {!variantsMultiselect ?
           <LibraryInfoColumn
             {...{
               group,
