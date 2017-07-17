@@ -70,7 +70,7 @@ export interface Props
   canDuplicate: boolean;
   icon: any;
   color: string;
-  to: string;
+  to?: string;
   type: string;
   onNameChange: (id: ID, name: string) => void;
   id: ID;
@@ -94,6 +94,7 @@ export interface Props
 
   // optional
   className?: string;
+  onSelect?: (id: ID) => void;
   onDoubleClick?: (id: ID) => void;
   isStarred?: boolean;
 
@@ -104,6 +105,7 @@ export interface Props
   isOver?: boolean;
   dragItemType?: string;
   isDragging?: boolean;
+  isSelected: boolean;
 }
 
 class LibraryItem extends TerrainComponent<Props>
@@ -235,6 +237,19 @@ class LibraryItem extends TerrainComponent<Props>
     });
   }
 
+  public handleClick(event)
+  {
+    if (this.props.onSelect)
+    {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const { id } = this.props;
+
+      this.props.onSelect(id);
+    }
+  }
+
   public handleDoubleClick(event)
   {
     event.preventDefault();
@@ -253,7 +268,7 @@ class LibraryItem extends TerrainComponent<Props>
 
   public render()
   {
-    const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
+    const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
     const { canArchive, canDuplicate } = this.props;
@@ -296,6 +311,7 @@ class LibraryItem extends TerrainComponent<Props>
           className='library-item-link'
           activeClassName='library-item-active'
           onDoubleClick={this.handleDoubleClick}
+          onClick={this.handleClick}
         >
           <div
             className={classNames({
@@ -306,15 +322,13 @@ class LibraryItem extends TerrainComponent<Props>
               'library-item-wrapper-drag-over': draggingOver,
             })}
             style={{
-              borderColor: this.props.color,
+              borderColor: isSelected ? this.props.color : '',
             }}
           >
             {connectDragSource(
               <div
                 className={'library-item ' + this.props.className}
-                style={{
-                  background: this.props.color,
-                }}
+                style={{ background: this.props.color }}
               >
                 <div
                   className={classNames({
