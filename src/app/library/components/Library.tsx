@@ -44,10 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
-
 import * as React from 'react';
 
+import { Line } from 'react-chartjs';
 import { browserHistory } from 'react-router';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from './../../common/components/InfoArea';
@@ -55,8 +54,8 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import UserActions from './../../users/data/UserActions';
 import Actions from './../data/LibraryActions';
-import { LibraryState } from './../data/LibraryStore';
 import Store from './../data/LibraryStore';
+import { LibraryState } from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import GroupsColumn from './GroupsColumn';
@@ -112,7 +111,7 @@ class Library extends TerrainComponent<any>
       const path = localStorage.getItem('lastLibraryPath');
       if (path != null)
       {
-        browserHistory.replace(path);
+        // browserHistory.replace(path);
       }
     }
   }
@@ -162,13 +161,14 @@ class Library extends TerrainComponent<any>
           {
             variantsOrder = algorithm.variantsOrder;
 
-            if (variantIds !== null && variantIds.length === 0)
+            if (variantIds != null)
             {
-              variant = variants.get(variantId);
-
-              if (variant === undefined)
+              if (variantIds.length === 0)
               {
                 browserHistory.replace(`/${basePath}/${groupId}/${algorithmId}`);
+              } else if (variantIds.length === 1)
+              {
+                variant = variants.get(+variantIds[0]);
               }
             }
           } else
@@ -192,6 +192,7 @@ class Library extends TerrainComponent<any>
 
     return (
       <div className='library'>
+<<<<<<< HEAD
         <GroupsColumn
           {...{
             groups,
@@ -226,13 +227,67 @@ class Library extends TerrainComponent<any>
         />
         {!variantsMultiselect ?
           <LibraryInfoColumn
+=======
+        <div className='library-top'>
+          <GroupsColumn
+>>>>>>> Added react-chartjs and added an example chart to the analytics page.
             {...{
-              group,
-              algorithm,
-              variant,
+              groups,
+              groupsOrder,
+              params,
+              basePath,
             }}
-          /> : null
-        }
+          />
+          <AlgorithmsColumn
+            {...{
+              algorithms,
+              variants,
+              algorithmsOrder,
+              groupId,
+              params,
+              basePath,
+            }}
+          />
+          <VariantsColumn
+            {...{
+              variants,
+              selectedVariants,
+              variantsOrder,
+              groupId,
+              algorithmId,
+              params,
+              multiselect: variantsMultiselect,
+              basePath,
+            }}
+          />
+          {!variantsMultiselect ?
+            <LibraryInfoColumn
+              {...{
+                group,
+                algorithm,
+                variant,
+              }}
+            /> : null}
+        </div>
+        {variantsMultiselect ?
+          <div className='library-bottom'>
+            <div style={{ width: '100%', padding: '30px' }}>
+              <Line
+                data={{
+                  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                  datasets: [{
+                    label: 'My First dataset',
+                    data: [1, 3, 2, 4, 5, 6, 7],
+                    fill: false,
+                  }, {
+                    label: 'My Second dataset',
+                    data: [1, 3, 2, 4, 5, 6, 7].reverse(),
+                    fill: false,
+                  }],
+                }} options={{ responsive: true, maintainAspectRatio: false, layout: { padding: 10 } }}
+              />
+            </div>
+          </div> : null}
       </div>
     );
   }
