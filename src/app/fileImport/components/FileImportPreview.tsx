@@ -177,7 +177,6 @@ class FileImportPreview extends TerrainComponent<Props>
                     columnType={this.props.columnTypes.get(key)}
                     isPrimaryKey={this.props.primaryKey === key}
                     columnNames={this.props.columnNames}
-                    datatypes={List(FileImportTypes.ELASTIC_TYPES)}
                     columnOptions={this.props.columnOptions}
                     editing={key === this.state.editColumnId}
                     handleEditColumnChange={this.handleEditColumnChange}

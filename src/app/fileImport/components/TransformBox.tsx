@@ -60,6 +60,8 @@ import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 const { List } = Immutable;
 
+const TRANSFORMTYPES = List(FileImportTypes.TRANSFORM_TYPES);
+
 export interface Props
 {
   datatype: string;
@@ -73,14 +75,14 @@ class TransformBox extends TerrainComponent<Props>
     transformTypeIndex: number;
     mergeIndex: number;
     transformText: string;
-    splitNames: string[];
+    splitNames: List<string>;
     colToMergeId: number;
     mergeNewName: string;
   } = {
     transformTypeIndex: -1,
     mergeIndex: -1,
     transformText: '',
-    splitNames: ['', ''],
+    splitNames: List(['', '']),
     colToMergeId: -1,
     mergeNewName: '',
   };
@@ -98,7 +100,7 @@ class TransformBox extends TerrainComponent<Props>
       transformTypeIndex,
       mergeIndex: -1,
       transformText: '',
-      splitNames: ['', ''],
+      splitNames: List(['', '']),
       colToMergeId: -1,
       mergeNewName: '',
     });
@@ -106,19 +108,15 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleSplitNameAChange(splitNameA)
   {
-    const names = this.state.splitNames.slice();
-    names[0] = splitNameA;
     this.setState({
-      splitNames: names,
+      splitNames: this.state.splitNames.set(0, splitNameA),
     });
   }
 
   public handleSplitNameBChange(splitNameB)
   {
-    const names = this.state.splitNames.slice();
-    names[1] = splitNameB;
     this.setState({
-      splitNames: names,
+      splitNames: this.state.splitNames.set(1, splitNameB),
     });
   }
 
@@ -158,11 +156,11 @@ class TransformBox extends TerrainComponent<Props>
       {
         return 'Enter split text';
       }
-      if (!this.state.splitNames[0])
+      if (!this.state.splitNames.get(0))
       {
         return 'Enter new column 1 name';
       }
-      if (!this.state.splitNames[1])
+      if (!this.state.splitNames.get(1))
       {
         return 'Enter new column 2 name';
       }
@@ -219,7 +217,7 @@ class TransformBox extends TerrainComponent<Props>
 
       case 'split':
         transform.args = {
-          newName: this.state.splitNames,
+          newName: this.state.splitNames.toArray(),
           text: this.state.transformText,
         };
         break;
@@ -241,7 +239,7 @@ class TransformBox extends TerrainComponent<Props>
       transformTypeIndex: -1,
       mergeIndex: -1,
       transformText: '',
-      splitNames: ['', ''],
+      splitNames: List(['', '']),
       colToMergeId: -1,
       mergeNewName: '',
     });
@@ -268,14 +266,14 @@ class TransformBox extends TerrainComponent<Props>
               FileImportTypes.TRANSFORM_TYPES[this.state.transformTypeIndex] === 'split' &&
               <div>
                 <Autocomplete
-                  value={this.state.splitNames[0]}
+                  value={this.state.splitNames.get(0)}
                   options={null}
                   onChange={this.handleSplitNameAChange}
                   placeholder={'new column 1'}
                   disabled={false}
                 />
                 <Autocomplete
-                  value={this.state.splitNames[1]}
+                  value={this.state.splitNames.get(1)}
                   options={null}
                   onChange={this.handleSplitNameBChange}
                   placeholder={'new column 2'}
