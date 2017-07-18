@@ -185,7 +185,7 @@ class Library extends TerrainComponent<any>
 
     if (!!this.props.location.pathname)
     {
-      //localStorage.setItem('lastLibraryPath', this.props.location.pathname);
+      localStorage.setItem('lastLibraryPath', this.props.location.pathname);
     }
 
     return (
