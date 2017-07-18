@@ -129,6 +129,20 @@ export function stringifyWithParameters(
     }
     return '"' + obj + '"';
   }
+  else if (Array.isArray(obj))
+  {
+    let str = '[';
+    for (let i = 0; i < obj.length; i++)
+    {
+      str += stringifyWithParameters(obj[i], inputs);
+      if (i < obj.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += ']';
+    return str;
+  }
   else if (typeof obj === 'object')
   {
     let str = '{';
@@ -193,9 +207,7 @@ class CardsToElastic
     }
     else
     {
-      // TODO: pipe this through the formatter once it can handle parameters
-      // return ESConverter.formatES(new ESParser(text));
-      return text;
+      return ESConverter.formatES(new ESParser(text));
     }
   }
 

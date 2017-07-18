@@ -70,7 +70,7 @@ export interface FlaggedToken
  */
 function* traverseTokens(valueInfo: ESValueInfo, tokenDepth = 0, parentClause?: ESClause): IterableIterator<FlaggedToken>
 {
-  if (valueInfo !== undefined)
+  if (valueInfo !== undefined && valueInfo !== null)
   {
     for (const token of valueInfo.tokens)
     {
@@ -82,14 +82,14 @@ function* traverseTokens(valueInfo: ESValueInfo, tokenDepth = 0, parentClause?: 
       yield fToken;
     }
 
-    if (valueInfo.arrayChildren !== undefined)
+    if (valueInfo.arrayChildren !== undefined && valueInfo.arrayChildren !== null)
     {
       for (const child of valueInfo.arrayChildren)
       {
         yield* traverseTokens(child, tokenDepth + 1);
       }
     }
-    if (valueInfo.objectChildren !== undefined)
+    if (valueInfo.objectChildren !== undefined && valueInfo.objectChildren !== null)
     {
       const keys: string[] = Object.keys(valueInfo.objectChildren);
       for (const key of keys)

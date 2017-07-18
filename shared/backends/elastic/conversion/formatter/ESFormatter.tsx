@@ -49,8 +49,6 @@ import ESParserToken from '../../parser/ESParserToken';
 import ESParserValueInfo from '../../parser/ESValueInfo';
 import { ESParserTokenizer, FlaggedToken } from './ESParserTokenizer';
 
-import ElementInfo from './ElementInfo';
-
 function assertUnreachable(param: never): never
 {
   throw new Error('Unreachable code reached');
@@ -94,19 +92,19 @@ class ESFormatter
   {
     if (value.isKeyword)
     {
-      return { head: '', str: value.parserToken.substring, tail: '', depth: value.depth };
+      return { head: '', str: value.parserToken.substring.trim(), tail: '', depth: value.depth };
     }
     switch (value.parserToken.jsonType)
     {
       case ESJSONType.unknown:
       case ESJSONType.invalid:
-        return { head: '', str: value.parserToken.substring, tail: '', depth: value.depth };
+        return { head: '', str: value.parserToken.substring.trim(), tail: '', depth: value.depth };
       case ESJSONType.null:
       case ESJSONType.boolean:
       case ESJSONType.number:
       case ESJSONType.string:
       case ESJSONType.parameter:
-        return { head: '', str: value.parserToken.substring, tail: '', depth: value.depth };
+        return { head: '', str: value.parserToken.substring.trim(), tail: '', depth: value.depth };
       case ESJSONType.array:
         return { head: '', str: '[', tail: '\n', depth: value.depth };
       case ESJSONType.object:
