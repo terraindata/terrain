@@ -52,7 +52,7 @@ import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
-import { isValidFieldName, isValidIndexName, isValidTypeName } from './../../../../shared/fileImport/Util';
+import { isValidIndexName, isValidTypeName } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -64,6 +64,7 @@ import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import FileImportPreview from './FileImportPreview';
+
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
@@ -88,6 +89,9 @@ class FileImport extends TerrainComponent<any>
     dbSelected: boolean;
     tableSelected: boolean;
     fileSelected: boolean;
+    file: string;
+    filetype: string;
+    filename: string;
   } = {
     fileImportState: FileImportStore.getState(),
     stepId: 0,
@@ -96,6 +100,9 @@ class FileImport extends TerrainComponent<any>
     dbSelected: false,
     tableSelected: false,
     fileSelected: false,
+    file: '',
+    filetype: '',
+    filename: '',
   };
 
   constructor(props)
@@ -129,6 +136,7 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
+        this.parseAndChooseFile(this.state.file, this.state.filetype);
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -209,14 +217,48 @@ class FileImport extends TerrainComponent<any>
     Actions.changeTableText(value);
   }
 
+  public parseJsonByLine(file: string, numLines: number): object[]
+  {
+    let lineCount = 0;
+    let openBracketCount = 0;
+    let closeBracketCount = 0;
+    let charIndex = 0;
+
+    while (lineCount < numLines)
+    {
+      if (charIndex >= file.length - 1)
+      {
+        charIndex--;    // end square bracket
+        break;
+      }
+
+      if (file.charAt(charIndex) === '{')
+      {
+        openBracketCount++;
+      }
+      else if (file.charAt(charIndex) === '}')
+      {
+        closeBracketCount++;
+      }
+      charIndex++;
+
+      if (openBracketCount === closeBracketCount && openBracketCount !== 0)
+      {
+        lineCount++;
+        openBracketCount = 0;
+        closeBracketCount = 0;
+      }
+    }
+    return JSON.parse(file.substring(0, charIndex) + ']');
+  }
+
   public parseAndChooseFile(file: string, filetype: string)
   {
-    // TODO: read JSON line by line and return items
     let items = [];
 
     if (filetype === 'json')
     {
-      items = JSON.parse(file);
+      items = this.parseJsonByLine(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       if (!Array.isArray(items))
       {
         alert('Input JSON file must parse to an array of objects.');
@@ -262,11 +304,12 @@ class FileImport extends TerrainComponent<any>
     Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
   }
 
-  public handleChooseFile(file)
+  public handleSelectFile(file)
   {
     const fileSelected = !!file.target.files[0];
     this.setState({
       fileSelected,
+      filename: file.target.files[0].name,
     });
     if (!fileSelected)
     {
@@ -284,7 +327,10 @@ class FileImport extends TerrainComponent<any>
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      this.parseAndChooseFile(fr.result, filetype);
+      this.setState({
+        file: fr.result,
+        filetype,
+      });
       this.refs['file']['value'] = null;                 // prevent file-caching
     };
   }
@@ -302,12 +348,13 @@ class FileImport extends TerrainComponent<any>
         content =
           <div>
             <h3>step 1: select a file</h3>
-            <input ref='file' type='file' name='abc' onChange={this.handleChooseFile} />
+            <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
             has header row (csv only)
             <CheckBox
               checked={hasCsvHeader}
               onChange={this.handleCsvHeaderChange}
             />
+            {this.state.filename ? this.state.filename + ' selected' : 'no file selected'}
           </div>;
         break;
       case 1:

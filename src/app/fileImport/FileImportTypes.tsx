@@ -105,10 +105,10 @@ export interface Transform
 export interface Template
 {
   name: string;
-  oldNames: List<string>;
+  originalNames: List<string>;
   columnTypes: Immutable.Map<string, object>;
-  transforms: List<object>;
-  hasCsvHeader: boolean;
+  transformations: List<object>;
+  csvHeaderMissing: boolean;
   primaryKey: number;
 }
 

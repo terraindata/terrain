@@ -97,8 +97,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
-    // console.log('id: ', this.props.columnId);
-    // console.log('colType: ', this.props.columnType);
     if (this.props.editing)
     {
       return (
