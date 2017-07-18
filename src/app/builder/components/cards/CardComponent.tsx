@@ -667,8 +667,7 @@ const cardSource =
     endDrag: () =>
     {
       $('body').removeClass('body-card-is-dragging');
-
-      Actions.dragCard(false);
+      Actions.dragCard(null);
     },
   };
 

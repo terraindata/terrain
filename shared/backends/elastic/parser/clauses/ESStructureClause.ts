@@ -99,7 +99,7 @@ export default class ESStructureClause extends ESClause
     // check required members
     this.required.forEach((name: string): void =>
     {
-      if (children[name] !== undefined)
+      if (children[name] === undefined)
       {
         interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
       }
