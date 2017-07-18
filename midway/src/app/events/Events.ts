@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as srs from 'secure-random-string';
+import * as sha1 from 'sha1';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
@@ -136,7 +137,7 @@ export class Events
         const newTime: number = checkTime - tp * timeInterval * 60;
         const privateKey: string = await this.getUniqueId(event.ip as string, event.eventId, newTime);
         const decodedMsg: string = await EventEncryption.decrypt(message, privateKey);
-        if (this.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
+        if (Util.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
         {
 
           await this.storeEvent(event);
@@ -161,23 +162,6 @@ export class Events
       delete eventReq['ip'];
       resolve(eventReq);
     });
-  }
-
-  /*
-   * Validate that the string is valid JSON
-   *
-   */
-  public isJSON(str: string): boolean
-  {
-    try
-    {
-      JSON.parse(str);
-    }
-    catch (e)
-    {
-      return false;
-    }
-    return true;
   }
 
   /*

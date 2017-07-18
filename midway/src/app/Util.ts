@@ -44,9 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import sha1 = require('sha1');
-
 import * as request from 'request';
+import * as sha1 from 'sha1';
+
+export function isJSON(str: string): boolean
+{
+  try
+  {
+    JSON.parse(str);
+  }
+  catch (e)
+  {
+    return false;
+  }
+  return true;
+}
 
 export function buildDesiredHash(nameToType: object): string
 {
