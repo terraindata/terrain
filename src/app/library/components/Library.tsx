@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as React from 'react';
 
 import { browserHistory } from 'react-router';
@@ -126,11 +128,13 @@ class Library extends TerrainComponent<any>
   {
     const { libraryState } = this.state;
 
-    const { groups, algorithms, variants, groupsOrder } = libraryState;
+    const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
     const { params } = this.props;
+
     const groupId = +params.groupId;
     const algorithmId = +params.algorithmId;
     const variantId = +params.variantId;
+    const multiselect = false;
 
     let group: LibraryTypes.Group;
     let algorithm: LibraryTypes.Algorithm;
@@ -138,42 +142,17 @@ class Library extends TerrainComponent<any>
     let algorithmsOrder: List<ID>;
     let variantsOrder: List<ID>;
 
-    if (groupId != null)
+    group = groups.get(groupId);
+
+    if (group)
     {
-      group = groups.get(groupId);
+      algorithmsOrder = group.algorithmsOrder;
+      algorithm = algorithms.get(algorithmId);
 
-      if (group != null)
+      if (algorithm)
       {
-        algorithmsOrder = group.algorithmsOrder;
-
-        if (algorithmId != null)
-        {
-          algorithm = algorithms.get(algorithmId);
-
-          if (algorithm != null)
-          {
-            variantsOrder = algorithm.variantsOrder;
-
-            if (variantId != null)
-            {
-              variant = variants.get(variantId);
-
-              if (variant == null)
-              {
-                browserHistory.replace(`/library/${groupId}/${algorithmId}`);
-              }
-            }
-          } else
-          {
-            // !algorithm
-            browserHistory.replace(`/library/${groupId}`);
-          }
-        }
-      }
-      else
-      {
-        // !group
-        browserHistory.replace('/library');
+        variantsOrder = algorithm.variantsOrder;
+        variant = variants.get(variantId);
       }
     }
 
@@ -188,6 +167,7 @@ class Library extends TerrainComponent<any>
           {...{
             groups,
             groupsOrder,
+            params,
           }}
         />
         <AlgorithmsColumn
@@ -196,23 +176,29 @@ class Library extends TerrainComponent<any>
             variants,
             algorithmsOrder,
             groupId,
+            params,
           }}
         />
         <VariantsColumn
           {...{
             variants,
+            selectedVariants,
             variantsOrder,
             groupId,
             algorithmId,
+            params,
+            multiselect,
           }}
         />
-        <LibraryInfoColumn
-          {...{
-            group,
-            algorithm,
-            variant,
-          }}
-        />
+        {!multiselect ?
+          <LibraryInfoColumn
+            {...{
+              group,
+              algorithm,
+              variant,
+            }}
+          /> : null
+        }
       </div>
     );
   }

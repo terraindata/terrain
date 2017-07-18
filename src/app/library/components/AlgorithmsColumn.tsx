@@ -78,6 +78,7 @@ export interface Props
   variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
   groupId: ID;
+  params: any;
 }
 
 class AlgorithmsColumn extends TerrainComponent<Props>
@@ -223,6 +224,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderAlgorithm(id: ID, fadeIndex: number)
   {
+    const { params } = this.props;
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
     const scores = {
@@ -338,6 +340,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         canCreate={canDrag}
         canArchive={canArchive}
         canDuplicate={canDuplicate}
+        isSelected={+algorithm.id === +params.algorithmId}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />
