@@ -44,12 +44,33 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
+import * as aesjs from 'aes-js';
+import * as sha1 from 'sha1';
 
-import EventRouter from './events/EventRouter';
-import * as Util from './Util';
+/*
+* Decrypt a message with the private key using AES128
+*/
+export async function decrypt(msg: string, privateKey: string): Promise<string>
+{
+  return new Promise<string>((resolve, reject) =>
+  {
+    const key = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
+    const msgBytes = aesjs.utils.hex.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
+  });
+}
 
-export const AnalyticsRouter = new KoaRouter();
-AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
-
-export default AnalyticsRouter;
+/*
+* Encrypt a message with the private key using AES128
+*/
+export async function encrypt(msg: string, privateKey: string): Promise<string>
+{
+  return new Promise<string>((resolve, reject) =>
+  {
+    const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
+    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+  });
+}

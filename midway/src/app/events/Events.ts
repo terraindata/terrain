@@ -44,12 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// Part of events PoC
-
-import aesjs = require('aes-js');
-import hashObj = require('hash-object');
-import srs = require('secure-random-string');
-import sha1 = require('sha1');
+import * as srs from 'secure-random-string';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
@@ -58,6 +53,7 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { ItemConfig, Items } from '../items/Items';
 import * as Util from '../Util';
+import * as EventEncryption from './Encryption';
 
 const items: Items = new Items();
 
@@ -139,7 +135,7 @@ export class Events
       {
         const newTime: number = checkTime - tp * timeInterval * 60;
         const privateKey: string = await this.getUniqueId(event.ip as string, event.eventId, newTime);
-        const decodedMsg: string = this.decrypt(message, privateKey);
+        const decodedMsg: string = await EventEncryption.decrypt(message, privateKey);
         if (this.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
         {
 
@@ -152,18 +148,6 @@ export class Events
   }
 
   /*
-   * Decrypt a message with the private key using AES128
-   *
-   */
-  public decrypt(msg: string, privateKey: string): string
-  {
-    const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
-    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
-  }
-
-  /*
    * Prep an empty payload with the encoded message
    *
    */
@@ -173,24 +157,9 @@ export class Events
     {
       eventReq.payload = await this.getPayload(eventReq.eventId);
       const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.eventId);
-      eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
+      eventReq.message = await EventEncryption.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
       resolve(eventReq);
-    });
-  }
-
-  /*
-   * Encrypt a message with the private key using AES128
-   *
-   */
-  public encrypt(msg: string, privateKey: string): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
-      const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-      const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
     });
   }
 
