@@ -299,7 +299,7 @@ export class Events
   {
     return new Promise<PayloadConfig>(async (resolve, reject) =>
     {
-      const payloads: object[] = await this.elasticController.getTasty().select(
+      const payloads: PayloadConfig[] = await this.elasticController.getTasty().select(
         this.payloadTable, ['payload'], { eventId }) as PayloadConfig[];
       if (payloads.length === 0)
       {
