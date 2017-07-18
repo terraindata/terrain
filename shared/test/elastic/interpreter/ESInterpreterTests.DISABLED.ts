@@ -44,54 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
+import * as util from 'util';
 import * as winston from 'winston';
-import EQLTemplateGenerator from '../../../../../shared/database/elastic/parser/EQLTemplateGenerator';
-import ESParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
-import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
+import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../database/elastic/parser/ESParserError';
+import { makePromiseCallback } from '../../Utils';
 
-/* tslint:disable:no-trailing-whitespace max-line-length */
+function getExpectedFile(): string
+{
+  return __filename.split('.')[0] + '.expected';
+}
+
+let expected;
 
 beforeAll(async (done) =>
 {
   // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
+
+  const expectedString: any = await new Promise((resolve, reject) =>
+  {
+    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+  });
+
+  expected = JSON.parse(expectedString);
   done();
 });
 
-function testGeneration(testString: string, expectedValue: string)
+function testParse(testString: string,
+  expectedValue: any,
+  expectedErrors: ESParserError[] = [])
 {
   winston.info('testing \'' + testString + '\'');
+  const interpreter: ESInterpreter = new ESInterpreter(testString);
+  const parser: ESJSONParser = interpreter.parser;
 
-  const parser: ESParser = new ESParser(testString);
-  const valueInfo: ESValueInfo = parser.getValueInfo();
-  const errors: ESParserError[] = parser.getErrors();
+  winston.info(util.inspect(parser.getValueInfo(), false, 16));
 
-  expect(errors.length).toEqual(0);
-
-  const result = EQLTemplateGenerator.generate(valueInfo);
-
-  winston.info(result);
-  expect(result).toEqual(expectedValue);
+  expect(parser.getValue()).toEqual(expectedValue);
+  expect(parser.getErrors()).toEqual(expectedErrors);
 }
 
-test('test generate template queries', () =>
+test('parse valid json objects', () =>
 {
-  testGeneration('true', 'true');
-  testGeneration('false', 'false');
-  testGeneration('null', 'null');
-  testGeneration('0', '0');
-  testGeneration('1.923e-21', '1.923e-21');
-  testGeneration('123', '123');
-  testGeneration('9990000000000', '9990000000000');
-  testGeneration('0.999', '0.999');
-  testGeneration('[]', '[]');
-  testGeneration('{}', ' {  } ');
+  Object.getOwnPropertyNames(expected).forEach(
+    (testName: string) =>
+    {
+      const testValue: any = expected[testName];
 
-  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
-    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
-
-  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
-    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
-
+      // test parsing the value using a few spacing options
+      testParse(JSON.stringify(testValue), testValue);
+    });
 });

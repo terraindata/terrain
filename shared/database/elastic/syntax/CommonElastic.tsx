@@ -48,7 +48,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import ESParser from '../parser/ESJSONParser';
+import ESJSONParser from '../parser/ESJSONParser';
 
 export const valueTypes =
   {
@@ -141,7 +141,7 @@ export function parseESValue(value: any): any
     value = JSON.stringify(value);
   }
 
-  const parser: ESParser = new ESParser(value);
+  const parser: ESJSONParser = new ESJSONParser(value);
   if (parser.getErrors().length > 0)
   {
     v = value;

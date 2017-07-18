@@ -45,11 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
-import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
-import EQLTemplateGenerator from '../../../../../shared/database/elastic/parser/EQLTemplateGenerator';
-import ESParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
-import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
+import EQLTemplateGenerator from '../../../database/elastic/parser/EQLTemplateGenerator';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../database/elastic/parser/ESParserError';
+import ESValueInfo from '../../../database/elastic/parser/ESValueInfo';
 
 /* tslint:disable:no-trailing-whitespace max-line-length */
 
@@ -60,19 +59,17 @@ beforeAll(async (done) =>
   done();
 });
 
-function testGeneration(testString: string,
-  params: { [param: string]: any },
-  expectedValue: string)
+function testGeneration(testString: string, expectedValue: string)
 {
   winston.info('testing \'' + testString + '\'');
 
-  const parser: ESParser = new ESParser(testString);
+  const parser: ESJSONParser = new ESJSONParser(testString);
   const valueInfo: ESValueInfo = parser.getValueInfo();
   const errors: ESParserError[] = parser.getErrors();
 
   expect(errors.length).toEqual(0);
 
-  const result = ESParameterFiller.generate(valueInfo, params);
+  const result = EQLTemplateGenerator.generate(valueInfo);
 
   winston.info(result);
   expect(result).toEqual(expectedValue);
@@ -80,41 +77,21 @@ function testGeneration(testString: string,
 
 test('test generate template queries', () =>
 {
-  testGeneration('true', {}, 'true');
-  testGeneration('false', {}, 'false');
-  testGeneration('null', {}, 'null');
+  testGeneration('true', 'true');
+  testGeneration('false', 'false');
+  testGeneration('null', 'null');
+  testGeneration('0', '0');
+  testGeneration('1.923e-21', '1.923e-21');
+  testGeneration('123', '123');
+  testGeneration('9990000000000', '9990000000000');
+  testGeneration('0.999', '0.999');
+  testGeneration('[]', '[]');
+  testGeneration('{}', ' {  } ');
 
-  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : 10}`,
-    {},
-    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : "10"}`,
+    ` { "index":"movies","type":"data","from":0,"size":"10" } `);
 
-  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : @size}`,
-    {
-      type: 'data',
-      from: 0,
-      size: 10,
-    },
-    ` { "index":"movies","type":"data","from":0,"size":10 } `);
-
-  testGeneration(`
-  {
-    "index" : "movies",
-    "type" : "data",
-    "size" : @size,
-    "from" : @from,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must_not" : [{"match" : {"title" : @bad_title}}]
-        }
-      }
-    }
-  }`,
-    {
-      from: 0,
-      size: 10,
-      bad_title: 'blah blah',
-    },
-    ` { "index":"movies","type":"data","size":10,"from":0,"body": { "query": { "bool": { "must_not":[ { "match": { "title":"blah blah" }  } ] }  }  }  } `);
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
+    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
 
 });

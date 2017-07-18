@@ -44,48 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-ordering member-access no-var-requires
+import * as winston from 'winston';
+import ESParameterFiller from '../../../database/elastic/parser/EQLParameterFiller';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../database/elastic/parser/ESParserError';
+import ESValueInfo from '../../../database/elastic/parser/ESValueInfo';
 
-import * as Immutable from 'immutable';
-import { make } from '../../blocks/BlockUtils';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
+/* tslint:disable:no-trailing-whitespace max-line-length */
 
-class MySQLBackend implements Backend
+beforeAll(async (done) =>
 {
-  type = 'mysql';
-  name = 'MySQL';
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  done();
+});
 
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  getRootCards = () =>
-  {
-    return Immutable.List([make(MySQLBlocks, 'sfw')]);
-  }
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
+function testGeneration(testString: string,
+  params: { [param: string]: any },
+  expectedValue: string)
+{
+  winston.info('testing \'' + testString + '\'');
 
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
+  const parser: ESJSONParser = new ESJSONParser(testString);
+  const valueInfo: ESValueInfo = parser.getValueInfo();
+  const errors: ESParserError[] = parser.getErrors();
 
-  queryToCode = CardsToSQL.toSQL;
+  expect(errors.length).toEqual(0);
 
-  codeToQuery = SQLToCards;
+  const result = ESParameterFiller.generate(valueInfo, params);
 
-  parseQuery = (tql) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
+  winston.info(result);
+  expect(result).toEqual(expectedValue);
 }
 
-export default new MySQLBackend();
+test('test generate template queries', () =>
+{
+  testGeneration('true', {}, 'true');
+  testGeneration('false', {}, 'false');
+  testGeneration('null', {}, 'null');
+
+  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : 10}`,
+    {},
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : @size}`,
+    {
+      type: 'data',
+      from: 0,
+      size: 10,
+    },
+    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+  testGeneration(`
+  {
+    "index" : "movies",
+    "type" : "data",
+    "size" : @size,
+    "from" : @from,
+    "body" : {
+      "query" : {
+        "bool" : {
+          "must_not" : [{"match" : {"title" : @bad_title}}]
+        }
+      }
+    }
+  }`,
+    {
+      from: 0,
+      size: 10,
+      bad_title: 'blah blah',
+    },
+    ` { "index":"movies","type":"data","size":10,"from":0,"body": { "query": { "bool": { "must_not":[ { "match": { "title":"blah blah" }  } ] }  }  }  } `);
+
+});

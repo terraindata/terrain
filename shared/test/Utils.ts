@@ -44,48 +44,35 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-ordering member-access no-var-requires
+import * as fs from 'fs';
+import * as winston from 'winston';
 
-import * as Immutable from 'immutable';
-import { make } from '../../blocks/BlockUtils';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
-
-class MySQLBackend implements Backend
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
-  type = 'mysql';
-  name = 'MySQL';
-
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  getRootCards = () =>
+  return (error: Error, response: T) =>
   {
-    return Immutable.List([make(MySQLBlocks, 'sfw')]);
-  }
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
-
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
-
-  queryToCode = CardsToSQL.toSQL;
-
-  codeToQuery = SQLToCards;
-
-  parseQuery = (tql) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
+    if (error !== null && error !== undefined)
+    {
+      reject(error);
+    }
+    else
+    {
+      resolve(response);
+    }
+  };
 }
 
-export default new MySQLBackend();
+export async function readFile(fileName: string)
+{
+  return new Promise((resolve, reject) =>
+  {
+    fs.readFile(fileName, makePromiseCallback(resolve, reject));
+  });
+}
+
+export async function checkResults(fileName: string, testName: string, results: any)
+{
+  const contents: any = await readFile(fileName);
+  const expected = JSON.parse(contents);
+  expect(results).toMatchObject(expected[testName]);
+}

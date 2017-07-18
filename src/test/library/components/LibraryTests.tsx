@@ -43,49 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:member-ordering member-access no-var-requires
-
+import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import { make } from '../../blocks/BlockUtils';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
+import * as React from 'react';
+import configureStore from 'redux-mock-store';
+import Library from '../../../app/library/components/Library';
 
-class MySQLBackend implements Backend
+describe('Library', () =>
 {
-  type = 'mysql';
-  name = 'MySQL';
+  const initialState = {
+    groups: Immutable.Map({
+      id: 1,
+      name: 'Group 1',
+    }),
+  };
 
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  getRootCards = () =>
+  const mockStore = configureStore();
+  let store = null;
+  let libraryComponent = null;
+
+  beforeEach(() =>
   {
-    return Immutable.List([make(MySQLBlocks, 'sfw')]);
-  }
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
+    store = mockStore(initialState);
+    libraryComponent = shallow(
+      <Library
+        store={store}
+        params={{ groupId: 1 }}
+      />,
+    );
+  });
 
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
-
-  queryToCode = CardsToSQL.toSQL;
-
-  codeToQuery = SQLToCards;
-
-  parseQuery = (tql) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
-}
-
-export default new MySQLBackend();
+  it('should have 3 columns', () =>
+  {
+    // Render a checkbox with label in the document
+    expect(libraryComponent.find('GroupsColumn').length).toEqual(1);
+    expect(libraryComponent.find('AlgorithmsColumn').length).toEqual(1);
+    expect(libraryComponent.find('VariantsColumn').length).toEqual(1);
+  });
+});

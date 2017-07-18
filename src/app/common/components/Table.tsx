@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions class-name ban-types interface-name
+// tslint:disable:no-var-requires strict-boolean-expressions interface-name
 
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
@@ -75,7 +75,7 @@ export interface IColumn
 export interface Props
 {
   columns: List<IColumn>;
-  rowGetter: (index: number) => Object;
+  rowGetter: (index: number) => object;
   rowsCount: number;
   // rows: List<Map<any, any>>;
   random?: number;
@@ -92,7 +92,7 @@ const HEADER_ROW_HEIGHT = 35;
 const MAX_INIT_HEIGHT = 40;
 const MAX_INIT_WIDTH = 300;
 
-class _Table extends TerrainComponent<Props>
+class TableComponent extends TerrainComponent<Props>
 {
   public state: {
   } = {
@@ -121,7 +121,7 @@ export const Table = Dimensions({
   containerStyle: {
     height: '100%',
   },
-})(_Table);
+})(TableComponent);
 
 function hexToRgb(hex)
 {

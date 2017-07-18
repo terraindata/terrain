@@ -95,7 +95,7 @@ interface State extends KeyState
   cardToolOpen: boolean;
   isDraggingCardOver: boolean;
   draggingOverIndex: number;
-  draggingCardItem: CardItem;
+  draggingCardItem: CardItem | null;
 }
 
 @Radium
@@ -118,7 +118,7 @@ class CardsArea extends TerrainComponent<Props>
     this._subscribe(BuilderStore, {
       updater: (state: BuilderState) =>
       {
-        if (state.draggingCardItem && state.draggingOverKeyPath === this.props.keyPath)
+        if (state.draggingCardItem !== null && state.draggingOverKeyPath === this.props.keyPath)
         {
           // dragging over
           if (state.draggingOverIndex !== this.state.draggingOverIndex)

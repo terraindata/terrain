@@ -125,6 +125,10 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
       this.props.keyPath,
       card,
     );
+
+    this.setState({
+      open: false,
+    });
   }
 
   public render()

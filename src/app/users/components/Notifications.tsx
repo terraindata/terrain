@@ -199,7 +199,7 @@ class Notifications extends TerrainComponent<Props>
     this.changeUserField('sound', value);
   }
 
-  public playSound()
+  public async playSound()
   {
     if (this.state.istate.currentUser)
     {
@@ -209,7 +209,7 @@ class Notifications extends TerrainComponent<Props>
         const sound = new Audio();
         sound.src = this.sounds[soundName];
         sound.load();
-        sound.play();
+        await sound.play();
       }
     }
   }

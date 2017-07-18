@@ -46,8 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires member-access
 
+import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import ElasticBlocks from './blocks/ElasticBlocks';
@@ -66,21 +68,8 @@ class ElasticBackend implements Backend
   creatingType = ElasticBlocks.elasticCreating.type;
   inputType = ElasticBlocks.elasticInput.type;
 
-  rootCards = [
-    ElasticBlocks.eqlindex,
-    ElasticBlocks.eqltype,
-    ElasticBlocks.eqlfrom,
-    ElasticBlocks.eqltype,
-    ElasticBlocks.eqlbody,
-  ];
   topLevelCards =
-  Immutable.List(_.keys(ElasticBlocks)); // TODO change this to true top level cards
-  //  Immutable.List<string>([
-  //   ElasticBlocks.elasticRootCard.type,
-  //   ElasticBlocks.elasticKeyValueWrap.type,
-  //   ElasticBlocks.elasticMagicCard.type,
-  //   ElasticBlocks.elasticRootCard.type,
-  // ]);
+  List(_.keys(ElasticBlocks)); // TODO change this to true top level cards
 
   // Ordering of the cards deck
   cardsDeck = ElasticCardsDeck;
@@ -95,6 +84,17 @@ class ElasticBackend implements Backend
   parseTreeToQueryString = ElasticParseTreeToQuery;
 
   syntaxConfig = syntaxConfig;
+
+  getRootCards = () =>
+  {
+    return List([
+      make(ElasticBlocks, 'eqlindex', { key: 'index' }),
+      make(ElasticBlocks, 'eqltype', { key: 'type' }),
+      make(ElasticBlocks, 'eqlfrom', { key: 'from' }),
+      make(ElasticBlocks, 'eqlsize', { key: 'size' }),
+      make(ElasticBlocks, 'eqlbody', { key: 'body' }),
+    ]);
+  }
 
   // function to get transform bars?
   // autocomplete?

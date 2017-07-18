@@ -43,49 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:member-ordering member-access no-var-requires
-
-import * as Immutable from 'immutable';
-import { make } from '../../blocks/BlockUtils';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
-
-class MySQLBackend implements Backend
+const localStorageMock = (() =>
 {
-  type = 'mysql';
-  name = 'MySQL';
+  let store = {};
 
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  getRootCards = () =>
-  {
-    return Immutable.List([make(MySQLBlocks, 'sfw')]);
-  }
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
+  return {
+    getItem(key)
+    {
+      if (store[key] != null)
+      {
+        return store[key];
+      }
+      else
+      {
+        return null;
+      }
+    },
+    setItem(key, value)
+    {
+      store[key] = value.toString();
+    },
+    clear()
+    {
+      store = {};
+    },
+  };
+})();
 
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
-
-  queryToCode = CardsToSQL.toSQL;
-
-  codeToQuery = SQLToCards;
-
-  parseQuery = (tql) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
-}
-
-export default new MySQLBackend();
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});

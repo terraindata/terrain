@@ -44,48 +44,129 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-ordering member-access no-var-requires
+// tslint:disable:object-literal-key-quotes
 
-import * as Immutable from 'immutable';
-import { make } from '../../blocks/BlockUtils';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
+import ESConverter from '../../../../src/database/elastic/conversion/formatter/ESConverter';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 
-class MySQLBackend implements Backend
+function testConverter(testName: string,
+  testObj: any)
 {
-  type = 'mysql';
-  name = 'MySQL';
-
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  getRootCards = () =>
+  test(testName, () =>
   {
-    return Immutable.List([make(MySQLBlocks, 'sfw')]);
-  }
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
-
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
-
-  queryToCode = CardsToSQL.toSQL;
-
-  codeToQuery = SQLToCards;
-
-  parseQuery = (tql) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
+    const obj = new ESJSONParser(JSON.stringify(testObj));
+    expect(obj.getValue()).toEqual(JSON.parse(ESConverter.formatES(obj)));
+  });
 }
 
-export default new MySQLBackend();
+testConverter('generic',
+  {
+    'index': 'movies',
+    'type': 'data',
+    'size': 10,
+    'body': {
+      'query': {
+        'bool': {
+          'must_not': [
+            {
+              'match': {
+                'title': 'Toy Story (1995)',
+              },
+            },
+          ],
+          'must': [
+            {
+              'range': {
+                'releasedate': {
+                  'gte': '2007-03-24',
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  });
+
+testConverter('some topologies',
+  {
+    '1':
+    [
+      { '1': [1, 2] },
+      [{ '1': 1 }, [1, 2]],
+    ],
+    '2':
+    {
+      '1': [[1, 2], [1, 2]],
+      '2': [{ '1': '1', '2': '2' }, { '1': '1', '2': '2' }],
+    },
+  });
+
+testConverter('uncommon data types',
+  {
+    'foo': null,
+    'baz': [null],
+    'oof': true,
+    'rab': '',
+  });
+
+testConverter('newlines',
+  {
+    'normal': 'string',
+    '\nHel\rlo': 'Good\n\nBye',
+    'How\n': 'A\rre\r\nYou?',
+  });
+
+testConverter('unusual characters and escapes',
+  {
+    '\\': 'hi\\\\',
+    '\0': ['\"hey\"'],
+    '': '\twell',
+  });
+
+testConverter('unicode values',
+  ['\u0000', '\u0001', '\u0008', '\u0030'],
+);
+
+testConverter('scientific notation',
+  {
+    'foo': 1e6,
+    'bar': '1e6',
+  });
+
+testConverter('root value string',
+  'string',
+);
+
+testConverter('root value number',
+  1,
+);
+
+testConverter('root value boolean',
+  false,
+);
+
+testConverter('root value null',
+  null,
+);
+
+testConverter('root value empty string',
+  '',
+);
+
+testConverter('root value unicode',
+  '\u0030',
+);
+
+const deepArr = [];
+let curr = deepArr;
+for (let i = 0; i < 64; i++)
+{
+  curr.push(i);
+  curr.push([]);
+  curr = curr[1];
+}
+
+testConverter('deep nested array',
+  deepArr,
+);

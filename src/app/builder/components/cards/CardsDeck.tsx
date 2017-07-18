@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires max-classes-per-file class-name
+// tslint:disable:no-var-requires max-classes-per-file
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -158,7 +158,7 @@ interface CardProps
   connectDragSource?: (el: El) => El;
 }
 
-class _CardDeckCard extends TerrainComponent<CardProps>
+class CardDeckCardComponent extends TerrainComponent<CardProps>
 {
   public render()
   {
@@ -215,7 +215,7 @@ const cardSource =
     endDrag: () =>
     {
       $('body').removeClass('body-card-is-dragging');
-      Actions.dragCard(false);
+      Actions.dragCard(null);
     },
   };
 
@@ -226,6 +226,6 @@ const dragCollect = (connect, monitor) =>
     connectDragPreview: connect.dragPreview(),
   });
 
-const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(_CardDeckCard);
+const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(CardDeckCardComponent);
 
 export default CardsDeck;

@@ -78,6 +78,7 @@ class LibraryStateC
   public groups: IMMap<ID, Group> = null;
   public algorithms: IMMap<ID, Algorithm> = null;
   public variants: IMMap<ID, Variant> = null;
+  public selectedVariants: List<ID> = Immutable.List([]);
 
   // these are set these on initial load
   public prevGroups: IMMap<ID, Group> = null;

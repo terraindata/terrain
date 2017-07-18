@@ -63,7 +63,7 @@ import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
 
 import EQLTemplateGenerator from '../../../../shared/database/elastic/parser/EQLTemplateGenerator';
-import ESParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 export interface Props
@@ -125,7 +125,7 @@ class DeployModal extends TerrainComponent<Props>
     if (this.state.changingStatusTo === ItemStatus.Live && variant.status !== 'LIVE')
     {
       const tql = variant ? variant.query.tql : '';
-      const parser: ESParser = new ESParser(tql);
+      const parser: ESJSONParser = new ESJSONParser(tql);
       const valueInfo: ESValueInfo = parser.getValueInfo();
       if (parser.getErrors().length > 0)
       {

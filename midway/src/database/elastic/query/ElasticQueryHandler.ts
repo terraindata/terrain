@@ -136,7 +136,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          client.search(body, this.makeQueryCallback(resolve, reject));
+          client.search(body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
       case 'deleteTemplate':

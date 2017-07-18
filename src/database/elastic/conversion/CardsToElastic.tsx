@@ -53,11 +53,13 @@ import * as CommonElastic from '../../../../shared/database/elastic/syntax/Commo
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import { Input, InputPrefix, InputType } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
+import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import ESConverter from './formatter/ESConverter';
 
 const join = (j, index) => (index === 0 ? '' : j);
@@ -83,6 +85,69 @@ export interface ElasticObjectInterface
   };
 
   [key: string]: any;
+}
+
+export function isInput(name: string, inputs: Immutable.List<Input>)
+{
+  return inputs && name.charAt(0) === InputPrefix &&
+    (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);
+}
+
+export function toInputMap(inputs: Immutable.List<Input>): object
+{
+  const inputMap: object = {};
+  inputs.map((input: Input) =>
+  {
+    let value: any;
+    try
+    {
+      value = JSON.parse(input.value);
+    }
+    catch (e)
+    {
+      value = input.value;
+    }
+    inputMap[input.key] = value;
+  });
+  return inputMap;
+}
+
+export function stringifyWithParameters(
+  obj: object | number | boolean | string | null,
+  inputs?: Immutable.List<Input>): string | null
+{
+  if (typeof obj === 'number' || typeof obj === 'boolean' || obj === null)
+  {
+    return '' + obj;
+  }
+  else if (typeof obj === 'string')
+  {
+    if (isInput(obj, inputs))
+    {
+      return obj;
+    }
+    return '"' + obj + '"';
+  }
+  else if (typeof obj === 'object')
+  {
+    let str = '{';
+    const keys = Object.keys(obj);
+    for (let i = 0; i < keys.length; i++)
+    {
+      str += '"' + keys[i] + '": ';
+      str += stringifyWithParameters(obj[keys[i]], inputs);
+      if (i < keys.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += '}';
+    return str;
+  }
+  else
+  {
+    return '';
+  }
 }
 
 class CardsToElastic
@@ -116,8 +181,21 @@ class CardsToElastic
       }
     }
 
-    const text: string = JSON.stringify(elasticObj);
-    return ESConverter.formatES(new ESJSONParser(text));
+    const text: string = stringifyWithParameters(elasticObj, query.inputs);
+    const parser: ESJSONParser = new ESJSONParser(text, true);
+    if (options.replaceInputs)
+    {
+      const valueInfo: ESValueInfo = parser.getValueInfo();
+      const params = toInputMap(query.inputs);
+      const result = ESParameterFiller.generate(valueInfo, params);
+      return ESConverter.formatES(new ESJSONParser(result));
+    }
+    else
+    {
+      // TODO: pipe this through the formatter once it can handle parameters
+      // return ESConverter.formatES(new ESJSONParser(text));
+      return text;
+    }
   }
 
   public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
@@ -129,6 +207,10 @@ class CardsToElastic
 
     if (block && block.static.tql)
     {
+      if (typeof block['value'] === 'string' && block['value'].charAt(0) === InputPrefix)
+      {
+        return block['value'];
+      }
       const tql = block.static.tql as TQLRecursiveObjectFn;
       return tql(block, CardsToElastic.blockToElastic, options);
     }

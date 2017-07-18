@@ -216,6 +216,7 @@ class TQLEditor extends TerrainComponent<Props>
       if (formatted)
       {
         this.state.codeMirrorInstance.setValue(formatted);
+        this.props.onChange(cmInstance.getValue());
       }
     }
   }

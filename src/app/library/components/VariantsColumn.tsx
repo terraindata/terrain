@@ -78,9 +78,12 @@ type Variant = LibraryTypes.Variant;
 export interface Props
 {
   variants: Immutable.Map<ID, Variant>;
+  selectedVariants: Immutable.List<ID>;
   variantsOrder: Immutable.List<ID>;
   groupId: ID;
   algorithmId: ID;
+  multiselect?: boolean;
+  params?: any;
 }
 
 class VariantsColumn extends TerrainComponent<Props>
@@ -103,6 +106,14 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
+    const { multiselect, params } = this.props;
+
+    if (multiselect && params && params.variantId)
+    {
+      const variantIds = params.variantId.split(',');
+      variantIds.forEach((id) => Actions.variants.select(id));
+    }
+
     this._subscribe(UserStore, {
       stateKey: 'me',
       storeKeyPath: ['currentUser'],
@@ -134,6 +145,16 @@ class VariantsColumn extends TerrainComponent<Props>
       this.setState({
         rendered: false,
       });
+    }
+
+    const { multiselect, selectedVariants } = this.props;
+    const { params } = nextProps;
+    const { groupId, algorithmId } = params;
+    const nextSelectedVariants = nextProps.selectedVariants;
+    if (multiselect && !selectedVariants.equals(nextSelectedVariants))
+    {
+      browserHistory
+        .replace(`/library/${groupId}/${algorithmId}/${nextSelectedVariants.join(',')}`);
     }
   }
 
@@ -244,6 +265,33 @@ class VariantsColumn extends TerrainComponent<Props>
     });
   }
 
+  public handleItemSelect(id: ID)
+  {
+    const {
+      multiselect,
+      selectedVariants,
+      groupId,
+      algorithmId,
+    } = this.props;
+
+    if (multiselect)
+    {
+      if (selectedVariants.includes(id.toString()))
+      {
+        Actions.variants.unselect(id.toString());
+      } else
+      {
+        Actions.variants.select(id.toString());
+      }
+    } else
+    {
+      browserHistory.push(`/library/${groupId}/${algorithmId}/${id}`);
+      const { variantId } = this.props.params;
+      Actions.variants.unselectAll();
+      Actions.variants.select(variantId);
+    }
+  }
+
   public handleDoubleClick(id: ID)
   {
     browserHistory.push(`/builder/?o=${id}`);
@@ -251,13 +299,19 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public renderVariant(id: ID, fadeIndex: number)
   {
+    const { multiselect, params } = this.props;
+    const currentVariantId = params.variantId;
     const variant = this.props.variants.get(id);
+    const { selectedVariants } = this.props;
     const index = this.props.variantsOrder.indexOf(id);
     const { me, roles } = this.state;
     let canEdit: boolean;
     let canDrag: boolean;
     canEdit = true;
     canDrag = true;
+    const isSelected = multiselect ?
+      selectedVariants.includes(variant.id.toString()) :
+      currentVariantId === variant.id.toString();
 
     // if (me && roles)
     // {
@@ -309,6 +363,8 @@ class VariantsColumn extends TerrainComponent<Props>
         canDrag={canDrag}
         canCreate={canDrag}
         isStarred={variant.status === 'DEFAULT'}
+        onSelect={this.handleItemSelect}
+        isSelected={isSelected}
       >
         <div className='flex-container'>
           <UserThumbnail

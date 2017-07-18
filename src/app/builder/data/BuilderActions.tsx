@@ -82,7 +82,7 @@ const BuilderActions =
       $(ActionTypes.remove, { keyPath, index }),
 
     dragCard:
-    (cardItem: CardItem) =>
+    (cardItem: CardItem | null) =>
       $(ActionTypes.dragCard, { cardItem }),
 
     dragCardOver:
