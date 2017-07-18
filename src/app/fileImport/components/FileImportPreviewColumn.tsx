@@ -60,13 +60,14 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreviewColumn.less';
 const { List } = Immutable;
 
+const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
+
 export interface Props
 {
   columnId: number;
   isIncluded: boolean;
   columnType: FileImportTypes.ColumnType;
   isPrimaryKey: boolean;
-  datatypes: List<string>;
   columnNames: List<string>;
   columnOptions: List<string>;
   editing: boolean;
@@ -120,13 +121,12 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           />
           <TypeDropdown
             columnId={this.props.columnId}
-            recursionId={0}
+            recursionDepth={0}
             columnType={this.props.columnType}
-            datatypes={List(FileImportTypes.ELASTIC_TYPES)}
             editing={this.props.editing}
           />
           <TransformBox
-            datatype={this.props.datatypes.get(this.props.columnType.type)}
+            datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
             colName={this.props.columnNames.get(this.props.columnId)}
             columnNames={this.props.columnNames}
           />
