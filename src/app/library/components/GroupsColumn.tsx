@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
 
 import * as React from 'react';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';

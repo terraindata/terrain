@@ -53,8 +53,8 @@ import * as ReactDOM from 'react-dom';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DeployModal.less';
 
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import BackendInstance from '../../../database/types/BackendInstance';
+import { ItemStatus } from '../../../items/types/Item';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
 import LibraryStore from '../../library/data/LibraryStore';
@@ -62,9 +62,9 @@ import * as LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
 
-import EQLTemplateGenerator from '../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
-import ESParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
+import EQLTemplateGenerator from '../../../../shared/database/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 export interface Props
 {

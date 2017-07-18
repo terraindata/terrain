@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
-import EQLTemplateGenerator from '../../../../../shared/backends/elastic/parser/EQLTemplateGenerator';
-import ESParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
-import ESValueInfo from '../../../../../shared/backends/elastic/parser/ESValueInfo';
+import EQLTemplateGenerator from '../../../../../shared/database/elastic/parser/EQLTemplateGenerator';
+import ESParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 
 /* tslint:disable:no-trailing-whitespace max-line-length */
 

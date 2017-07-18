@@ -52,10 +52,10 @@ import * as RoleTypes from './../roles/RoleTypes';
 import * as UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
-import BackendInstance from '../../../shared/backends/types/BackendInstance';
-import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
-import { _Query, Query, queryForSave } from '../../../shared/items/types/Query';
 import { _ResultsConfig, ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import BackendInstance from '../../database/types/BackendInstance';
+import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
+import { _Query, Query, queryForSave } from '../../items/types/Query';
 import { BaseClass, New } from '../Classes';
 
 // TODO MOD refactor

@@ -47,10 +47,10 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as util from 'util';
 import * as winston from 'winston';
-import EQLConfig from '../../../../../shared/backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../../shared/backends/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../../../shared/backends/elastic/parser/ESParserError';
+import EQLConfig from '../../../../../shared/database/elastic/parser/EQLConfig';
+import ESInterpreter from '../../../../../shared/database/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
 import { makePromiseCallback } from '../../../../src/tasty/Utils';
 
 function getExpectedFile(): string
