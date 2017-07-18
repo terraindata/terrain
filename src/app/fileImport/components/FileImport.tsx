@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
+require('./FileImport.less');
+
 import * as Immutable from 'immutable';
 import * as Papa from 'papaparse';
 import * as React from 'react';
@@ -64,6 +66,8 @@ import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import FileImportPreview from './FileImportPreview';
+import * as Radium from 'radium';
+import { backgroundColor, Colors, fontColor, link, buttonColors } from '../../common/Colors';
 
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
@@ -76,6 +80,7 @@ export interface Props
   route?: any;
 }
 
+@Radium
 class FileImport extends TerrainComponent<any>
 {
   public state: {
@@ -412,7 +417,12 @@ class FileImport extends TerrainComponent<any>
       case 4:
         content =
           <div>
-            <h3>step 5: choose and format columns</h3>
+            <div className='fi-step-name'>
+              Step 5
+            </div>
+            <div className='fi-step-title'>
+              Choose and format columns
+            </div>
             <FileImportPreview
               previewRows={previewRows}
               columnsCount={columnsCount}
@@ -438,19 +448,36 @@ class FileImport extends TerrainComponent<any>
     }
 
     return (
-      <div>
-        {content}
+      <div
+        className='file-import'
+      >
+        <div
+          className='file-import-inner'
+        >
+          {
+            content
+          }
+        </div>
+
         {
           this.state.stepId > 0 &&
-          <button onClick={this.handlePrevStepChange}>
-            back
-        </button>
+          <div
+            className='fi-nav-button fi-back-button'
+            onClick={this.handlePrevStepChange}
+            style={buttonColors()}
+          >
+            &lt; back
+            </div>
         }
         {
           this.state.stepId < 4 &&
-          <button onClick={this.handleNextStepChange}>
-            next
-        </button>
+          <div
+            className='fi-nav-button fi-next-button'
+            onClick={this.handleNextStepChange}
+            style={buttonColors()}
+          >
+            next &gt;
+            </div>
         }
       </div>
     );
