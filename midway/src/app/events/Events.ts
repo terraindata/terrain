@@ -52,11 +52,9 @@ import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import { ItemConfig, Items } from '../items/Items';
+import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
 import * as EventEncryption from './Encryption';
-
-const items: Items = new Items();
 
 const timeInterval: number = 5; // minutes before refreshing
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
@@ -183,7 +181,7 @@ export class Events
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
-      const itemLst: ItemConfig[] = await items.get();
+      const itemLst = await items.get();
       const payloadLst: object[] = [];
       const returnLst: object[] = [];
       itemLst.forEach((item) =>
