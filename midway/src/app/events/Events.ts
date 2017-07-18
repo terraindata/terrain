@@ -252,9 +252,9 @@ export class Events
               eventId: 'item' + (itemId as string),
               meta: '',
               payload:
-                {
-                  dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
-                },
+              {
+                dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
+              },
             };
           const returnEvent: object =
             {
