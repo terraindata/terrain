@@ -131,9 +131,9 @@ class Library extends TerrainComponent<any>
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
     const { params } = this.props;
 
-    const groupId = params.groupId ? +params.groupId : params.groupId;
-    const algorithmId = params.algorithmId ? +params.algorithmId : params.algorithmId;
-    const variantId = params.variantId ? +params.variantId : params.variantId;
+    const groupId = params.groupId ? +params.groupId : null;
+    const algorithmId = params.algorithmId ? +params.algorithmId : null;
+    const variantId = params.variantId ? +params.variantId : null;
     const multiselect = false;
 
     let group: LibraryTypes.Group;
@@ -144,27 +144,27 @@ class Library extends TerrainComponent<any>
 
     group = groups.get(groupId);
 
-    if (groupId != null)
+    if (groupId !== null)
     {
       group = groups.get(groupId);
 
-      if (group != null)
+      if (group !== null)
       {
         algorithmsOrder = group.algorithmsOrder;
 
-        if (algorithmId != null)
+        if (algorithmId !== null)
         {
           algorithm = algorithms.get(algorithmId);
 
-          if (algorithm != null)
+          if (algorithm !== null)
           {
             variantsOrder = algorithm.variantsOrder;
 
-            if (variantId != null)
+            if (variantId !== null)
             {
               variant = variants.get(variantId);
 
-              if (variant == null)
+              if (variant === null)
               {
                 browserHistory.replace(`/library/${groupId}/${algorithmId}`);
               }
