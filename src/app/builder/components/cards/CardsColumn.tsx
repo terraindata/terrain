@@ -122,23 +122,14 @@ class CardsColumn extends TerrainComponent<Props>
     }
   }
 
-  public getPossibleCards()
-  {
-    return AllBackendsMap[this.props.language].topLevelCards;
-  }
-
-  public getFirstCards(): object[]
-  {
-    return AllBackendsMap[this.props.language].rootCards;
-  }
-
   public createCards()
   {
-    _.map(this.getFirstCards(),
-      (blockConfig: object, index: number) =>
-      {
-        Actions.create(this.state.keyPath, index, blockConfig['type']);
-      });
+    Actions.change(this.state.keyPath, this.getFirstCards());
+    // _.map(this.getFirstCards(),
+    //   (blockConfig: object, index: number) =>
+    //   {
+    //     Actions.create(this.state.keyPath, index, blockConfig['type']);
+    //   });
   }
 
   public toggleLearningMode()
@@ -284,6 +275,17 @@ class CardsColumn extends TerrainComponent<Props>
       </div>
     );
   }
+
+  private getPossibleCards()
+  {
+    return AllBackendsMap[this.props.language].topLevelCards;
+  }
+
+  private getFirstCards(): Cards
+  {
+    return AllBackendsMap[this.props.language].getRootCards();
+  }
+
 }
 // <CardDropArea
 //   half={true}
