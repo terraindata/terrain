@@ -50,6 +50,8 @@ export enum InputType
   NUMBER,
 }
 
+export const InputPrefix: string = '@';
+
 export interface Input extends IRecord<Input>
 {
   type: string;
