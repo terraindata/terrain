@@ -52,20 +52,20 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 
-import { Item, ItemType } from '../../../shared/items/types/Item';
-import Query from '../../../shared/items/types/Query';
+import BackendInstance from '../../database/types/BackendInstance';
+import { Item, ItemType } from '../../items/types/Item';
+import Query from '../../items/types/Query';
 import LibraryStore from '../library/data/LibraryStore';
-import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import * as LibraryTypes from './../library/LibraryTypes';
 import * as UserTypes from './../users/UserTypes';
 
-import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
+import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 
 import { routerShape } from 'react-router';
-import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
+import { QueryRequest } from '../../database/types/QueryRequest';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
 // const { List, Map } = Immutable;

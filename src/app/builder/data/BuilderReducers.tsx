@@ -48,10 +48,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
-import Query from '../../../../shared/items/types/Query';
+import * as BlockUtils from '../../../blocks/BlockUtils';
+import { AllBackendsMap } from '../../../database/AllBackends';
+import BackendInstance from '../../../database/types/BackendInstance';
+import Query from '../../../items/types/Query';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
@@ -131,7 +131,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       if (action.payload.query.tql)
       {
         query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(action.payload.query.tql));
-      } else
+      }
+      else
       {
         query = query.set('parseTree', null);
       }

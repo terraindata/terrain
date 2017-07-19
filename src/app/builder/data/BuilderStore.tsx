@@ -56,10 +56,10 @@ import Util from '../../util/Util';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import { Card, Cards } from '../../../../shared/blocks/types/Card';
-import Query from '../../../../shared/items/types/Query';
+import { Card, Cards } from '../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../database/AllBackends';
+import BackendInstance from '../../../database/types/BackendInstance';
+import Query from '../../../items/types/Query';
 
 export class BuilderStateClass
 {
@@ -151,7 +151,7 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     {
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
-      const tql: string = AllBackendsMap[state.query.language].queryToCode(state.query, {});
+      const tql: string = AllBackendsMap[state.query.language].queryToCode(state.query, { replaceInputs: true });
       state = state
         .setIn(['query', 'tql'], tql)
         .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(tql))

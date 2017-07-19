@@ -45,12 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
-
-import ESParameterFiller from '../../../backends/elastic/parser/EQLParameterFiller';
-import EQLTemplateGenerator from '../../../backends/elastic/parser/EQLTemplateGenerator';
-import ESParser from '../../../backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../backends/elastic/parser/ESParserError';
-import ESValueInfo from '../../../backends/elastic/parser/ESValueInfo';
+import ESParameterFiller from '../../../database/elastic/parser/EQLParameterFiller';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../database/elastic/parser/ESParserError';
+import ESValueInfo from '../../../database/elastic/parser/ESValueInfo';
 
 /* tslint:disable:no-trailing-whitespace max-line-length */
 
@@ -67,7 +65,7 @@ function testGeneration(testString: string,
 {
   winston.info('testing \'' + testString + '\'');
 
-  const parser: ESParser = new ESParser(testString);
+  const parser: ESJSONParser = new ESJSONParser(testString);
   const valueInfo: ESValueInfo = parser.getValueInfo();
   const errors: ESParserError[] = parser.getErrors();
 

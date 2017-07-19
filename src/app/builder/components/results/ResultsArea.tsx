@@ -55,10 +55,10 @@ import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import BackendInstance from '../../../../../shared/backends/types/BackendInstance';
-import Query from '../../../../../shared/items/types/Query';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { AllBackendsMap } from '../../../../database/AllBackends';
+import BackendInstance from '../../../../database/types/BackendInstance';
+import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';

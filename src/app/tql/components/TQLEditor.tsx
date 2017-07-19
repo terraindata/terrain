@@ -61,8 +61,8 @@ import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
 // Formatting and Parsing
-import ESConverter from '../../../../shared/backends/elastic/conversion/formatter/ESConverter';
-import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
 // Style sheets and addons for CodeMirror
 require('./elastic.js');
