@@ -51,7 +51,7 @@ import './BuilderComponent.less';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';

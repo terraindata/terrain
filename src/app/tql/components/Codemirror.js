@@ -54,6 +54,7 @@ const CM = require('codemirror');
 const diff_match_patch = require('diff-match-patch');
 require('./merge.js');
 const Dimensions = require('react-dimensions');
+import ElasticHighlighter from '../highlighters/ElasticHighlighter.tsx'
 
 var CodeMirror = createReactClass({
   displayName: 'CodeMirror',
@@ -113,7 +114,6 @@ var CodeMirror = createReactClass({
     else
     {
       this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
-      this.codeMirror.on('change', this.codemirrorValueChanged);
       this.codeMirror.addKeyMap({
         'Ctrl-Enter': this.codemirrorIssueQuery,
       });
@@ -418,13 +418,6 @@ var CodeMirror = createReactClass({
         isFocused: focused
       });
       this.props.onFocusChange && this.props.onFocusChange(focused);
-    }
-  },
-  codemirrorValueChanged: function codemirrorValueChanged(doc, change)
-  {
-    if (this.props.onChange && change.origin != 'setValue')
-    {
-      this.props.onChange(doc.getValue());
     }
   },
   codemirrorIssueQuery: function codemirrorIssueQuery(cm)

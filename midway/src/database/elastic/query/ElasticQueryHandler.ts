@@ -54,9 +54,9 @@ import * as winston from 'winston';
 
 import * as Elastic from 'elasticsearch';
 
-import QueryRequest from '../../../../../shared/backends/types/QueryRequest';
-import QueryResponse from '../../../../../shared/backends/types/QueryResponse';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
+import QueryRequest from '../../../../../src/database/types/QueryRequest';
+import QueryResponse from '../../../../../src/database/types/QueryResponse';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { ElasticQueryError, QueryError } from '../../../error/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
@@ -136,7 +136,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          client.search(body, this.makeQueryCallback(resolve, reject));
+          client.search(body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
       case 'deleteTemplate':

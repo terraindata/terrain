@@ -77,11 +77,11 @@ UserStore.subscribe(() =>
   }
 });
 
-window['test'] = () =>
+/*window['test'] = () =>
 {
   const users = UserStore.getState().users;
   console.log('users', users);
   Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};
+};*/
 
 export default UserStore;

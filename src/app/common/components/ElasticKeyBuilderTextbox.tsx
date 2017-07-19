@@ -51,10 +51,10 @@ import './BuilderTextbox.less';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { Display } from '../../../../shared/blocks/displays/Display';
-import { Card, CardString } from '../../../../shared/blocks/types/Card';
+import { Display } from '../../../blocks/displays/Display';
+import { Card, CardString } from '../../../blocks/types/Card';
 import BuilderStore from '../../builder/data/BuilderStore';
-// import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
+// import { AllBackendsMap } from '../../../../shared/database/AllBackends';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import BuilderTextbox from './BuilderTextbox';
@@ -129,7 +129,7 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
     if (!parentCardKeyPath.size)
     {
       // top level cards don't have keys
-      return false;
+      return true;
     }
 
     return state.getIn(parentCardKeyPath).get('childrenHaveKeys');

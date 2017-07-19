@@ -51,9 +51,9 @@ const { Map, List } = Immutable;
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
-import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import Block from '../../../../../shared/blocks/types/Block';
-import { Card, CardString } from '../../../../../shared/blocks/types/Card';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import Block from '../../../../blocks/types/Block';
+import { Card, CardString } from '../../../../blocks/types/Card';
 import { M1QueryResponse } from '../../../util/AjaxM1';
 import AjaxM1 from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
@@ -61,7 +61,7 @@ import SpotlightStore from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 
-import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
+import CardsToSQL from '../../../../database/mysql/conversion/CardsToSQL';
 
 const NUM_BARS = 1000;
 

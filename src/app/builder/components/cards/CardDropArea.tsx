@@ -53,7 +53,7 @@ import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDropArea.less';
 const classNames = require('classnames');
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';
@@ -166,7 +166,7 @@ export interface Props
 class CardDropArea extends TerrainComponent<Props>
 {
   public state: {
-    draggingCardItem: CardItem;
+    draggingCardItem: CardItem | null;
     language: string;
   } = {
     draggingCardItem: null,
@@ -218,7 +218,7 @@ class CardDropArea extends TerrainComponent<Props>
   {
 
     let color = 'rgba(0,0,0,0)';
-    if (this.state.draggingCardItem)
+    if (this.state.draggingCardItem !== null)
     {
       color = AllBackendsMap[this.state.language].blocks[this.state.draggingCardItem.type].static.colors[0];
     }
@@ -236,7 +236,7 @@ class CardDropArea extends TerrainComponent<Props>
 
   public render()
   {
-    if (!this.state.draggingCardItem)
+    if (this.state.draggingCardItem === null)
     {
       return null;
     }
