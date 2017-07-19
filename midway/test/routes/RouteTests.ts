@@ -958,7 +958,7 @@ describe('File import templates route tests', () =>
         id: 1,
         accessToken: 'AccessToken',
         body: {
-          // dbid: 1,
+          dbid: 1,
           dbname: 'badname',
         },
       })
