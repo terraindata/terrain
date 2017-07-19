@@ -63,17 +63,22 @@ class FileImportPreviewRow extends TerrainComponent<Props>
   public render()
   {
     return (
-      <tr>
+      <div
+        className='fi-preview-row'
+      >
         {
           this.props.items.map((value, key) =>
-            <td key={key} className='row-element'>
+            <div
+              key={key}
+              className='fi-preview-row-cell'
+            >
               {
                 value
               }
-            </td>,
+            </div>,
           )
         }
-      </tr>
+      </div>
     );
   }
 }

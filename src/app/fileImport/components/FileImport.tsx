@@ -46,20 +46,24 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
+require('./FileImport.less');
+
 import * as Immutable from 'immutable';
 import * as Papa from 'papaparse';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
-import { isValidFieldName, isValidIndexName, isValidTypeName } from './../../../../shared/fileImport/Util';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
+import { isValidIndexName, isValidTypeName } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
-import * as SchemaTypes from './../../schema/SchemaTypes';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
+import * as SchemaTypes from './../../schema/SchemaTypes';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
@@ -75,6 +79,7 @@ export interface Props
   route?: any;
 }
 
+@Radium
 class FileImport extends TerrainComponent<any>
 {
   public state: {
@@ -88,6 +93,9 @@ class FileImport extends TerrainComponent<any>
     dbSelected: boolean;
     tableSelected: boolean;
     fileSelected: boolean;
+    file: string;
+    filetype: string;
+    filename: string;
   } = {
     fileImportState: FileImportStore.getState(),
     stepId: 0,
@@ -96,6 +104,9 @@ class FileImport extends TerrainComponent<any>
     dbSelected: false,
     tableSelected: false,
     fileSelected: false,
+    file: '',
+    filetype: '',
+    filename: '',
   };
 
   constructor(props)
@@ -129,6 +140,7 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
+        this.parseAndChooseFile(this.state.file, this.state.filetype);
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -209,14 +221,48 @@ class FileImport extends TerrainComponent<any>
     Actions.changeTableText(value);
   }
 
+  public parseJsonByLine(file: string, numLines: number): object[]
+  {
+    let lineCount = 0;
+    let openBracketCount = 0;
+    let closeBracketCount = 0;
+    let charIndex = 0;
+
+    while (lineCount < numLines)
+    {
+      if (charIndex >= file.length - 1)
+      {
+        charIndex--;    // end square bracket
+        break;
+      }
+
+      if (file.charAt(charIndex) === '{')
+      {
+        openBracketCount++;
+      }
+      else if (file.charAt(charIndex) === '}')
+      {
+        closeBracketCount++;
+      }
+      charIndex++;
+
+      if (openBracketCount === closeBracketCount && openBracketCount !== 0)
+      {
+        lineCount++;
+        openBracketCount = 0;
+        closeBracketCount = 0;
+      }
+    }
+    return JSON.parse(file.substring(0, charIndex) + ']');
+  }
+
   public parseAndChooseFile(file: string, filetype: string)
   {
-    // TODO: read JSON line by line and return items
     let items = [];
 
     if (filetype === 'json')
     {
-      items = JSON.parse(file);
+      items = this.parseJsonByLine(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       if (!Array.isArray(items))
       {
         alert('Input JSON file must parse to an array of objects.');
@@ -262,11 +308,12 @@ class FileImport extends TerrainComponent<any>
     Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
   }
 
-  public handleChooseFile(file)
+  public handleSelectFile(file)
   {
     const fileSelected = !!file.target.files[0];
     this.setState({
       fileSelected,
+      filename: file.target.files[0].name,
     });
     if (!fileSelected)
     {
@@ -284,7 +331,10 @@ class FileImport extends TerrainComponent<any>
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      this.parseAndChooseFile(fr.result, filetype);
+      this.setState({
+        file: fr.result,
+        filetype,
+      });
       this.refs['file']['value'] = null;                 // prevent file-caching
     };
   }
@@ -301,110 +351,134 @@ class FileImport extends TerrainComponent<any>
       case 0:
         content =
           <div>
-            <h3>step 1: select a file</h3>
-            <input ref='file' type='file' name='abc' onChange={this.handleChooseFile} />
+            <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
             has header row (csv only)
             <CheckBox
               checked={hasCsvHeader}
               onChange={this.handleCsvHeaderChange}
             />
+            {this.state.filename ? this.state.filename + ' selected' : 'no file selected'}
           </div>;
         break;
       case 1:
         content =
-          <div>
-            <h3>step 2: select a server</h3>
-            <Dropdown
-              selectedIndex={this.state.serverIndex}
-              options={this.state.servers ? this.state.servers.keySeq().toList() : List<string>()}
-              onChange={this.handleServerChange}
-              canEdit={true}
-            />
-          </div>;
+          <Dropdown
+            selectedIndex={this.state.serverIndex}
+            options={this.state.servers ? this.state.servers.keySeq().toList() : List<string>()}
+            onChange={this.handleServerChange}
+            canEdit={true}
+          />;
         break;
       case 2:
         content =
-          <div>
-            <h3>step 3: select a database</h3>
-            <Autocomplete
-              value={dbText}
-              options={
-                this.state.servers && serverText && this.state.servers.get(serverText) ?
-                  List(this.state.servers.get(serverText).databaseIds.map((value, index) =>
-                    value.split('/').pop(),
-                  ))
-                  :
-                  List([])
-              }
-              onChange={this.handleAutocompleteDbChange}
-              placeholder={'database'}
-              disabled={false}
-            />
-          </div>;
+          <Autocomplete
+            value={dbText}
+            options={
+              this.state.servers && serverText && this.state.servers.get(serverText) ?
+                List(this.state.servers.get(serverText).databaseIds.map((value, index) =>
+                  value.split('/').pop(),
+                ))
+                :
+                List([])
+            }
+            onChange={this.handleAutocompleteDbChange}
+            placeholder={'database'}
+            disabled={false}
+          />;
         break;
       case 3:
         content =
-          <div>
-            <h3>step 4: select a table</h3>
-            <Autocomplete
-              value={tableText}
-              options={
-                this.state.dbs && dbText && this.state.dbs.get(databaseId(serverText, dbText)) ?
-                  List(this.state.dbs.get(databaseId(serverText, dbText)).tableIds.map((value, index) =>
-                    value.split('.').pop(),
-                  ))
-                  :
-                  List([])
-              }
-              onChange={this.handleAutocompleteTableChange}
-              placeholder={'table'}
-              disabled={false}
-            />
-          </div>;
+          <Autocomplete
+            value={tableText}
+            options={
+              this.state.dbs && dbText && this.state.dbs.get(databaseId(serverText, dbText)) ?
+                List(this.state.dbs.get(databaseId(serverText, dbText)).tableIds.map((value, index) =>
+                  value.split('.').pop(),
+                ))
+                :
+                List([])
+            }
+            onChange={this.handleAutocompleteTableChange}
+            placeholder={'table'}
+            disabled={false}
+          />;
         break;
       case 4:
         content =
-          <div>
-            <h3>step 5: choose and format columns</h3>
-            <FileImportPreview
-              previewRows={previewRows}
-              columnsCount={columnsCount}
-              primaryKey={primaryKey}
-              columnNames={columnNames}
-              columnsToInclude={columnsToInclude}
-              columnTypes={columnTypes}
-              oldNames={oldNames}
-              templates={templates}
-              transforms={transforms}
-              columnOptions={
-                this.state.tables && tableText && this.state.tables.get(tableId(serverText, dbText, tableText)) ?
-                  List(this.state.tables.get(tableId(serverText, dbText, tableText)).columnIds.map((value, index) =>
-                    value.split('.').pop(),
-                  ))
-                  :
-                  List([])
-              }
-            />
-          </div>;
+          <FileImportPreview
+            previewRows={previewRows}
+            columnsCount={columnsCount}
+            primaryKey={primaryKey}
+            columnNames={columnNames}
+            columnsToInclude={columnsToInclude}
+            columnTypes={columnTypes}
+            oldNames={oldNames}
+            templates={templates}
+            transforms={transforms}
+            columnOptions={
+              this.state.tables && tableText && this.state.tables.get(tableId(serverText, dbText, tableText)) ?
+                List(this.state.tables.get(tableId(serverText, dbText, tableText)).columnIds.map((value, index) =>
+                  value.split('.').pop(),
+                ))
+                :
+                List([])
+            }
+          />;
         break;
       default:
     }
 
     return (
-      <div>
-        {content}
-        {
-          this.state.stepId > 0 &&
-          <button onClick={this.handlePrevStepChange}>
-            back
-        </button>
-        }
-        {
-          this.state.stepId < 4 &&
-          <button onClick={this.handleNextStepChange}>
-            next
-        </button>
-        }
+      <div
+        className='file-import'
+      >
+        <div
+          className='file-import-inner'
+        >
+          <div className='fi-step-name'>
+            {
+              FileImportTypes.STEP_NAMES[this.state.stepId]
+            }
+          </div>
+
+          <div className='fi-step-title'>
+            {
+              FileImportTypes.STEP_TITLES[this.state.stepId]
+            }
+          </div>
+
+          <div
+            className='fi-content'
+          >
+            {
+              content
+            }
+          </div>
+
+          {
+            this.state.stepId > 0 &&
+            <div
+              className='fi-nav-button fi-back-button'
+              onClick={this.handlePrevStepChange}
+              style={buttonColors()}
+              ref='fi-back-button'
+            >
+              &lt; back
+            </div>
+          }
+
+          {
+            this.state.stepId < 4 &&
+            <div
+              className='fi-nav-button fi-next-button'
+              onClick={this.handleNextStepChange}
+              style={buttonColors()}
+              ref='fi-next-button'
+            >
+              next &gt;
+            </div>
+          }
+        </div>
       </div>
     );
   }
