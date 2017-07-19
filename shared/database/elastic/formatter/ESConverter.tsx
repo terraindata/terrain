@@ -44,47 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-/*
- *  Data container with immutable members
+import ESJSONParser from '../parser/ESJSONParser';
+import ESFormatter from './ESFormatter';
+
+/**
+ * WIP - currently nothing happens with previousQuery
  */
-class ElementInfo
+class ESConverter
 {
-  constructor(
-    public readonly index: number, // index is element's position underneath its parent (so 0 if it's root level)
-    public readonly depth: number,
-    public readonly container?: any[] | object, // parent of element: undefined for values under root
-    public readonly keys?: string[], // undefined for values inside arrays or under root
-  ) { }
-
-  public containerSize(): number
+  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
   {
-    if (this.container === undefined)
-    {
-      return 1;
-    }
-    else if (this.container instanceof Array)
-    {
-      return this.container.length;
-    }
-    else
-    {
-      return this.keys.length;
-    }
-  }
-
-  public isLastElement(): boolean
-  {
-    return this.index + 1 === this.containerSize();
-  }
-
-  public isFirstElement(): boolean
-  {
-    return this.index === 0;
-  }
-
-  public isOnlyElement(): boolean
-  {
-    return this.containerSize() === 1;
+    const formatter = new ESFormatter();
+    return formatter.formatQuery(query);
   }
 }
-export default ElementInfo;
+export default ESConverter;
