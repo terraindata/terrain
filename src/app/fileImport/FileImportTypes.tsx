@@ -141,12 +141,53 @@ export const ELASTIC_TYPES =
     'float',
   ];
 
+// enum ElasticTypes {
+//   Text = 1,
+//   Boolean,
+//   Date,
+//   Array,
+//   Long,
+//   Double,
+//   Short,
+//   Byte,
+//   Integer,
+//   Half_float,
+//   Float,
+// }
+
+enum ElasticTypes
+{
+  'text' = 1,
+  'long',
+  'boolean',
+  'date',
+  'array',
+  'double',
+  'short',
+  'byte',
+  'integer',
+  'half_float',
+  'float',
+}
+
 export const TRANSFORM_TYPES =
   [
-    'append',
-    'prepend',
-    'split',
-    'merge',
+    [
+      'duplicate',
+      'append',
+      'prepend',
+      'split',
+      'merge',
+    ],
+    ['duplicate'],
+    ['duplicate'],
+    ['duplicate'],
+    ['duplicate'],
+    ['duplicate'],
+    ['duplicate'],
+    ['duplicate'],
+    ['duplicate'],
+    ['duplicate'],
   ];
 
 export const STEP_NAMES =
@@ -159,7 +200,8 @@ export const STEP_NAMES =
   ];
 
 export const STEP_TITLES =
-  ['Select a File',
+  [
+    'Select a File',
     'Select a Server',
     'Select a Database',
     'Select a Table',

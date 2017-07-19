@@ -138,6 +138,27 @@ const applyTransform = (state, transform) =>
       )),
     );
   }
+  else if (transform.name === 'duplicate')
+  {
+    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    return state
+      .set('primaryKey', primaryKey)
+      .set('columnNames', state.columnNames
+        .insert(transformCol + 1, transform.args.newName))
+      .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
+      .set('columnTypes', state.columnTypes.insert(transformCol + 1, state.columnTypes.get(transformCol)))
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        [].concat(...row.map((col, j) =>
+        {
+          if (j === transformCol)
+          {
+            return [col, col];
+          }
+          return col;
+        },
+        )),
+      )));
+  }
   else if (transform.name === 'split')
   {
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
