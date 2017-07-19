@@ -181,7 +181,7 @@ export class ElasticDB implements TastyDB
   }
 
   /*
-   * Deletes the given index
+   * Creates the given index
    */
   public async createIndex(indexName)
   {
