@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+import BackendInstance from '../../../database/types/BackendInstance';
 import { CardItem } from '../components/cards/CardComponent';
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
 import ActionTypes from './BuilderActionTypes';
 import Store from './BuilderStore';
 import List = Immutable.List;
 import Map = Immutable.Map;
-import Query from '../../../../shared/items/types/Query';
+import Query from '../../../items/types/Query';
 
 const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 

@@ -62,9 +62,9 @@ import CardsArea from './CardsArea';
 import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import { Card, Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 

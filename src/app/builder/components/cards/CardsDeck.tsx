@@ -51,7 +51,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import { Card, Cards } from '../../../../blocks/types/Card';
 import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -59,7 +59,7 @@ import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';
 
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');

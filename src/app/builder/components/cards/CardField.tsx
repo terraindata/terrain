@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { Display, DisplayType, RowDisplay } from '../../../../../shared/blocks/displays/Display';
+import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';

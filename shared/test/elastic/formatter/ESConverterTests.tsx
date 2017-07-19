@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESConverter from '../../../backends/elastic/conversion/formatter/ESConverter';
-import ESJSONParser from '../../../backends/elastic/parser/ESJSONParser';
-
 // tslint:disable:object-literal-key-quotes
+
+import ESConverter from '../../../../src/database/elastic/conversion/formatter/ESConverter';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 
 function testConverter(testName: string,
   testObj: any)
