@@ -65,7 +65,7 @@ export function getTermsForKeyPath(keyPath: KeyPath): List<string>
   if (inputs && inputs.size)
   {
     const inputTerms = inputs.map(
-      (input: Input) => 'input.' + input.key,
+      (input: Input) => '@' + input.key,
     ).toList();
     if (terms)
     {

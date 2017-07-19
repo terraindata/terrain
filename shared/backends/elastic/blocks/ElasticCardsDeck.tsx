@@ -56,16 +56,16 @@ export const ElasticCardsDeck =
       //   Blocks.elasticRootCard.type,
       // ],
 
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
+      // [
+      //   // JSON key wraps
+      //   Blocks.elasticKeyValueWrap.type,
+      // ],
 
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
+      // [
+      //   // JSON wrapper cards
+      //   Blocks.elasticObject.type,
+      //   Blocks.elasticArray.type,
+      // ],
 
       // [
       //   // JSON individual value cards
@@ -75,10 +75,10 @@ export const ElasticCardsDeck =
       //   Blocks.elasticNull.type,
       // ],
 
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
+      // [
+      //   Blocks.elasticMagicCard.type,
+      //   Blocks.elasticMagicList.type,
+      // ],
 
       [
         // Score and transform cards

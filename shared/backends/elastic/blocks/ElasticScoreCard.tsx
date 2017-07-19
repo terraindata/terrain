@@ -88,6 +88,8 @@ export const elasticScore = _card(
         };
       },
       accepts: transformScoreInputTypes,
+      
+      anythingAccepts: true, // TODO change
 
       init: (blocksConfig) =>
       {

@@ -61,6 +61,7 @@ import Result from '../results/Result';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Results } from './ResultTypes';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
@@ -471,15 +472,18 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const image = format && format.type === 'image';
 
     return this.props.connectDropTarget(this.props.connectDragSource(
-      <div className={classNames({
-        'results-config-field': true,
-        'results-config-field-dragging': this.props.isDragging ||
-        (this.props.draggingField && this.props.draggingField === this.props.field),
-        'results-config-field-name': this.props.is === 'name',
-        'results-config-field-score': this.props.is === 'score',
-        'results-config-field-field': this.props.is === 'field',
-        'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
-      })}>
+      <div 
+        style={fontColor(Colors().text.baseDark)}
+        className={classNames({
+          'results-config-field': true,
+          'results-config-field-dragging': this.props.isDragging ||
+          (this.props.draggingField && this.props.draggingField === this.props.field),
+          'results-config-field-name': this.props.is === 'name',
+          'results-config-field-score': this.props.is === 'score',
+          'results-config-field-field': this.props.is === 'field',
+          'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
+        })}
+      >
         <div className='results-config-field-body'>
           <span className='results-config-handle'>
             <HandleIcon />
