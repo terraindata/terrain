@@ -718,6 +718,7 @@ export class Import
 
   private _applyTransforms(obj: object, transforms: object[]): object
   {
+    let colName: string | undefined;
     for (const transform of transforms)
     {
       switch (transform['name'])
@@ -779,12 +780,21 @@ export class Import
           delete obj[startCol];
           delete obj[mergeCol];
           break;
+        case 'duplicate':
+          colName = transform['colName'];
+          const copyName: string | undefined = transform['args']['newName'];
+          if (colName === undefined || copyName === undefined)
+          {
+            throw new Error('Duplicate transformation must supply colName and newName arguments.');
+          }
+          obj[copyName] = obj[colName];
+          break;
         default:
           if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
           {
             throw new Error('Invalid transform name encountered: ' + String(transform['name']));
           }
-          const colName: string | undefined = transform['colName'];
+          colName = transform['colName'];
           const text: string | undefined = transform['args']['text'];
           if (colName === undefined || text === undefined)
           {
