@@ -62,8 +62,6 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreviewColumn.less';
 const { List } = Immutable;
 
-const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
-
 export interface Props
 {
   columnId: number;
@@ -104,7 +102,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     if (this.props.editing)
     {
       return (
-        <div className='fi-preview-column'>
+        <div
+          className='fi-preview-column'
+        >
           include
           <CheckBox
             checked={this.props.isIncluded}
@@ -148,7 +148,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         <div
           className='fi-preview-edit-button'
           onClick={this.handleEditClick}
-          style={buttonColors()}
         >
           Edit
         </div>

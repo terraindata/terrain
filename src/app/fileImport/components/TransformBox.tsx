@@ -258,7 +258,7 @@ class TransformBox extends TerrainComponent<Props>
             }
             <Dropdown
               selectedIndex={this.state.transformTypeIndex}
-              options={List(FileImportTypes.TRANSFORM_TYPES)}
+              options={TRANSFORMTYPES}
               onChange={this.handleTransformTypeChange}
               canEdit={true}
             />
