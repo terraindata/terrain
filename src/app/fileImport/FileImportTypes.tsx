@@ -46,8 +46,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { BaseClass, New } from '../Classes';
-const { List } = Immutable;
 import Util from './../util/Util';
+const { List } = Immutable;
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
@@ -59,18 +59,18 @@ class FileImportStateC extends BaseClass
   public file: string = '';
   public filetype: string = '';
 
-  public previewRows: List<List<string>> = null;
+  public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
 
   public hasCsvHeader: boolean = true;
   public primaryKey: number = -1;
 
-  public oldNames: Immutable.List<string> = null;
-  public columnNames: Immutable.List<string> = null;
-  public columnsToInclude: Immutable.List<boolean> = null;
-  public columnTypes: List<object> = null;
+  public oldNames: List<string> = List([]);
+  public columnNames: List<string> = List([]);
+  public columnsToInclude: List<boolean> = List([]);
+  public columnTypes: List<object> = List([]);
 
-  public transforms: Immutable.List<object> = List([]);
+  public transforms: List<object> = List([]);
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.

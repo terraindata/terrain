@@ -60,6 +60,8 @@ import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 const { List } = Immutable;
 
+const TRANSFORM_TYPES = List(FileImportTypes.TRANSFORM_TYPES);
+
 export interface Props
 {
   datatype: string;
@@ -74,14 +76,14 @@ class TransformBox extends TerrainComponent<Props>
     transformTypeIndex: number;
     mergeIndex: number;
     transformText: string;
-    splitNames: string[];
+    splitNames: List<string>;
     colToMergeId: number;
     mergeNewName: string;
   } = {
     transformTypeIndex: -1,
     mergeIndex: -1,
     transformText: '',
-    splitNames: ['', ''],
+    splitNames: List([]),
     colToMergeId: -1,
     mergeNewName: '',
   };
@@ -99,7 +101,7 @@ class TransformBox extends TerrainComponent<Props>
       transformTypeIndex,
       mergeIndex: -1,
       transformText: '',
-      splitNames: ['', ''],
+      splitNames: List([]),
       colToMergeId: -1,
       mergeNewName: '',
     });
@@ -116,10 +118,8 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleSplitNameAChange(splitNameA)
   {
-    const names = this.state.splitNames.slice();
-    names[0] = splitNameA;
     this.setState({
-      splitNames: names,
+      splitNames: this.state.splitNames.set(0, splitNameA),
     });
   }
 
@@ -128,7 +128,7 @@ class TransformBox extends TerrainComponent<Props>
     const names = this.state.splitNames.slice();
     names[1] = splitNameB;
     this.setState({
-      splitNames: names,
+      splitNames: this.state.splitNames.set(1, splitNameB),
     });
   }
 
@@ -199,7 +199,7 @@ class TransformBox extends TerrainComponent<Props>
       args: {
         transformCol: this.props.colName,
         text: this.state.transformText,
-        splitNames: this.state.splitNames,
+        splitNames: this.state.splitNames.toArray(),
         colToMergeId: this.state.colToMergeId,
         mergeNewName: this.state.mergeNewName,
       },
@@ -225,7 +225,7 @@ class TransformBox extends TerrainComponent<Props>
           name: transformName,
           args: {
             oldName: this.props.colName,
-            newName: this.state.splitNames,
+            newName: this.state.splitNames.toArray(),
             text: this.state.transformText,
           },
         },
@@ -249,7 +249,7 @@ class TransformBox extends TerrainComponent<Props>
       transformTypeIndex: -1,
       mergeIndex: -1,
       transformText: '',
-      splitNames: ['', ''],
+      splitNames: List([]),
       colToMergeId: -1,
       mergeNewName: '',
     });
@@ -268,7 +268,7 @@ class TransformBox extends TerrainComponent<Props>
             }
             <Dropdown
               selectedIndex={this.state.transformTypeIndex}
-              options={List(FileImportTypes.TRANSFORM_TYPES)}
+              options={TRANSFORM_TYPES}
               onChange={this.handleTransformTypeChange}
               canEdit={true}
             />

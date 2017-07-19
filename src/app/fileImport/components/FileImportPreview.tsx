@@ -58,9 +58,9 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
-
-import './FileImportPreview.less';
 const { List } = Immutable;
+
+const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
 
 export interface Props
 {
@@ -165,7 +165,7 @@ class FileImportPreview extends TerrainComponent<Props>
                     columnType={this.props.columnTypes.get(key)}
                     isPrimaryKey={this.props.primaryKey === key}
                     columnNames={this.props.columnNames}
-                    datatypes={List(FileImportTypes.ELASTIC_TYPES)}
+                    datatypes={DATATYPES}
                     handleRenameTransform={this.handleRenameTransform}
                     addRenameTransform={this.addRenameTransform}
                     columnOptions={this.props.columnOptions}

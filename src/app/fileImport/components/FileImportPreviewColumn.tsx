@@ -58,7 +58,6 @@ import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreviewColumn.less';
-const { List } = Immutable;
 
 export interface Props
 {
@@ -107,16 +106,15 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         />
         <Autocomplete
           value={this.props.columnNames.get(this.props.columnId)}
-          options={this.props.columnOptions}
+          options={this.props.columnOptions.toList()}
           onChange={this.handleAutocompleteHeaderChange}
           placeholder={''}
           disabled={false}
         />
         <TypeDropdown
           columnId={this.props.columnId}
-          recursionId={0}
+          recursionDepth={0}
           columnType={this.props.columnType}
-          datatypes={List(FileImportTypes.ELASTIC_TYPES)}
         />
         <TransformBox
           datatype={this.props.datatypes.get(this.props.columnType.type)}

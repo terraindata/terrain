@@ -235,7 +235,7 @@ class FileImportInfo extends TerrainComponent<Props>
         <div>
           <Autocomplete
             value={this.props.dbText}
-            options={this.props.dbs || List([])}
+            options={this.props.dbs || List<string>()}
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={!canSelectDb}
@@ -247,7 +247,7 @@ class FileImportInfo extends TerrainComponent<Props>
         <div>
           <Autocomplete
             value={this.props.tableText}
-            options={this.props.tables || List([])}
+            options={this.props.tables || List<string>()}
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={!canSelectTable}
