@@ -325,7 +325,7 @@ export class Import
           checkColumn: true,
           noheader: imprt.csvHeaderMissing,
           headers: imprt.originalNames,
-          quote: '"',
+          quote: '\'',
           workerNum: 4,
         }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
         {
