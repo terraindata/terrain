@@ -44,23 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// Part of events PoC
+
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import { EventConfig, Events, EventTemplateConfig } from './Events';
+import { EventConfig, EventRequestConfig, Events } from './Events';
+// export * from './Events';
 
 export const events: Events = new Events();
 
 const Router = new KoaRouter();
 
-// Get HTML IDs for event tracking
-Router.get('/ids', async (ctx, next) =>
+/*
+ * Get an event tracker.
+ *
+ */
+Router.post('/', async (ctx, next) =>
 {
   try
   {
-    ctx.body = JSON.stringify(await events.getHTMLIDs());
+    ctx.body = JSON.stringify(await events.JSONHandler(ctx.request.ip, ctx.request.body));
   }
   catch (e)
   {
@@ -68,13 +74,10 @@ Router.get('/ids', async (ctx, next) =>
   }
 });
 
-// Get an event tracker.
-Router.post('/', async (ctx, next) =>
-{
-  ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body.body);
-});
-
-// Handle client response for event tracker
+/*
+ * Handle client response for event tracker
+ *
+ */
 Router.post('/update/', async (ctx, next) =>
 {
   try
@@ -86,7 +89,6 @@ Router.post('/update/', async (ctx, next) =>
         message: ctx.request.body['message'],
         payload: ctx.request.body['payload'],
         type: ctx.request.body['type'],
-        url: ctx.request.body['url'],
       };
     // TODO in production, use this instead
     // await events.decodeMessage(event);

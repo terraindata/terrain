@@ -44,22 +44,67 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import sha1 = require('sha1');
-
 import * as request from 'request';
 
-export function buildDesiredHash(nameToType: object): string
+export function getRequest(url)
 {
-  let strToHash: string = 'object';   // TODO: check
-  const nameToTypeArr: any[] = Object.keys(nameToType).sort();
-  for (const name in nameToTypeArr)
+  return new Promise((resolve, reject) =>
   {
-    if (nameToType.hasOwnProperty(name))
+    request(url, (error, res, body) =>
     {
-      strToHash += '|' + name + ':' + (nameToType[name] as string) + '|';
+      if ((error === null || error === undefined) && res.statusCode === 200)
+      {
+        resolve(body);
+      }
+      else
+      {
+        reject(error);
+      }
+    });
+  });
+}
+
+export function verifyParameters(parameters: any, required: string[]): void
+{
+  if (parameters === undefined)
+  {
+    throw new Error('No parameters found.');
+  }
+
+  for (const key of required)
+  {
+    if (parameters.hasOwnProperty(key) === false)
+    {
+      throw new Error('Parameter "' + key + '" not found in request object.');
     }
   }
-  return sha1(strToHash);
+}
+
+export function updateObject<T>(obj: T, newObj: T): T
+{
+  for (const key in newObj)
+  {
+    if (newObj.hasOwnProperty(key))
+    {
+      obj[key] = newObj[key];
+    }
+  }
+  return obj;
+}
+
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+{
+  return (error: Error, response: T) =>
+  {
+    if (error !== null && error !== undefined)
+    {
+      reject(error);
+    }
+    else
+    {
+      resolve(response);
+    }
+  };
 }
 
 export function getEmptyObject(payload: object): object
@@ -97,65 +142,4 @@ export function getEmptyObject(payload: object): object
     return res;
   },
     emptyObj);
-}
-
-export function getRequest(url)
-{
-  return new Promise((resolve, reject) =>
-  {
-    request(url, (error, res, body) =>
-    {
-      if ((error === null || error === undefined) && res.statusCode === 200)
-      {
-        resolve(body);
-      }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
-}
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
-
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
-    }
-  }
-  return obj;
-}
-
-export function verifyParameters(parameters: any, required: string[]): void
-{
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
-  }
-
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
 }
