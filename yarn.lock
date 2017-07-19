@@ -7984,8 +7984,8 @@ ts-jest@^20.0.2:
     yargs "^8.0.1"
 
 ts-loader@^2.1.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-2.3.0.tgz#99ff0615ecaea7d554dd0cba733caedf9a2715a0"
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-2.3.1.tgz#6edc603393c2775c40ad84e3420007f1c097eab0"
   dependencies:
     chalk "^2.0.1"
     enhanced-resolve "^3.0.0"
