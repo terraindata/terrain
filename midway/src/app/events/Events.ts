@@ -215,12 +215,12 @@ export class Events
               eventId: 'item' + (itemId as string),
               meta: otherFields,
               payload:
-                {
-                  date: '',
-                  dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
-                  numClicks: 0,
-                  loadTime: 0,
-                },
+              {
+                date: '',
+                dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
+                numClicks: 0,
+                loadTime: 0,
+              },
             };
           const returnEvent: object =
             {
