@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires max-classes-per-file class-name
+// tslint:disable:no-var-requires max-classes-per-file
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import { Card, Cards } from '../../../../blocks/types/Card';
 import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -59,7 +59,7 @@ import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';
 
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
@@ -158,7 +158,7 @@ interface CardProps
   connectDragSource?: (el: El) => El;
 }
 
-class _CardDeckCard extends TerrainComponent<CardProps>
+class CardDeckCardComponent extends TerrainComponent<CardProps>
 {
   public render()
   {
@@ -215,7 +215,7 @@ const cardSource =
     endDrag: () =>
     {
       $('body').removeClass('body-card-is-dragging');
-      Actions.dragCard(false);
+      Actions.dragCard(null);
     },
   };
 
@@ -226,6 +226,6 @@ const dragCollect = (connect, monitor) =>
     connectDragPreview: connect.dragPreview(),
   });
 
-const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(_CardDeckCard);
+const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(CardDeckCardComponent);
 
 export default CardsDeck;

@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
 
 import * as React from 'react';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
@@ -71,6 +71,7 @@ export interface Props
 {
   groups: Immutable.Map<ID, Group>;
   groupsOrder: Immutable.List<ID>;
+  params: any;
 }
 
 class GroupsColumn extends TerrainComponent<Props>
@@ -150,6 +151,7 @@ class GroupsColumn extends TerrainComponent<Props>
   public renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
+    const { params } = this.props;
     const { me, roles } = this.state;
     const groupRoles = roles && roles.get(id);
     const canCreate = (me && groupRoles && groupRoles.getIn([me.id, 'admin']));
@@ -179,6 +181,7 @@ class GroupsColumn extends TerrainComponent<Props>
         canArchive={canEdit || canDrag}
         canDuplicate={false}
         canCreate={canCreate}
+        isSelected={+group.id === +params.groupId}
       >
         <div className='group-library-info-wrapper'>
           {

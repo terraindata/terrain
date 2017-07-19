@@ -56,7 +56,7 @@ import './ManualEntry.less';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 import * as Immutable from 'immutable';
-import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import Card from './../../builder/components/cards/CardComponent';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');
@@ -66,7 +66,7 @@ import './../../tql/components/monokai.less';
 
 const reactStringReplace = require('react-string-replace');
 
-import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
+import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {

@@ -47,19 +47,19 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 // parser imports
-import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESJSONType from '../../../../shared/backends/elastic/parser/ESJSONType';
-import ESParserToken from '../../../../shared/backends/elastic/parser/ESParserToken';
-import ESPropertyInfo from '../../../../shared/backends/elastic/parser/ESPropertyInfo';
-import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import ESParserToken from '../../../../shared/database/elastic/parser/ESParserToken';
+import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 // interpreter and clause imports
-import ESClause from '../../../../shared/backends/elastic/parser/clauses/ESClause';
-import ESStructureClause from '../../../../shared/backends/elastic/parser/clauses/ESStructureClause';
-import EQLConfig from '../../../../shared/backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import ESClause from '../../../../shared/database/elastic/parser/clauses/ESClause';
+import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 // other imports
+import { ESParserTokenizer, FlaggedToken } from '../../../../shared/database/elastic/formatter/ESParserTokenizer';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
 /*
@@ -71,55 +71,6 @@ function assertUnreachable(param: never): never
   throw new Error('Unreachable code reached');
 }
 
-interface FlaggedToken
-{
-  isKeyword: boolean;
-  parserToken: ESParserToken;
-}
-
-/*
- *  Generator that performs recursive DFS on valueInfo tree.
- *  Eventually yields all tokens in the tree, flagging properties if they are elastic keywords
- *  parentClause is not null for property name values, null for all else.
- */
-function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null = null): IterableIterator<FlaggedToken>
-{
-  if (!valueInfo)
-  {
-    return {};
-  }
-
-  for (const token of valueInfo.tokens)
-  {
-    const isKw: boolean =
-      parentClause && parentClause.hasOwnProperty('structure') &&
-      token.substring.trim().replace(/["']/g, '') in parentClause['structure'];
-    // trim & replace to turn '    "property"' into 'property'
-    const fToken: FlaggedToken = { isKeyword: isKw, parserToken: token };
-    yield fToken;
-  }
-
-  if (valueInfo.arrayChildren)
-  {
-    for (const child of valueInfo.arrayChildren)
-    {
-      yield* traverseTokens(child);
-    }
-  }
-  if (valueInfo.objectChildren)
-  {
-    const keys: string[] = Object.keys(valueInfo.objectChildren);
-    for (const key of keys)
-    {
-      const propertyInfo: ESPropertyInfo = valueInfo.objectChildren[key];
-      const valueChild: ESValueInfo = propertyInfo.propertyValue;
-      const keyChild: ESValueInfo = propertyInfo.propertyName;
-      yield* traverseTokens(keyChild, valueInfo.clause);
-      yield* traverseTokens(valueChild);
-    }
-  }
-}
-
 /*
  * Elastic highlighter - should not maintain state across highlight calls.
  * Constructed once per highlight. If extending this, can add configuration to the
@@ -127,6 +78,12 @@ function* traverseTokens(valueInfo: ESValueInfo, parentClause: ESClause | null =
  */
 class ElasticHighlighter extends SyntaxHighlighter
 {
+  public static highlightES(instance)
+  {
+    const highlighter = new ElasticHighlighter();
+    highlighter.handleChanges(instance, []);
+  }
+
   public initialHighlight(instance): void
   {
     this.handleChanges(instance, []);
@@ -138,21 +95,16 @@ class ElasticHighlighter extends SyntaxHighlighter
     const parser = new ESJSONParser(instance.getValue());
     const interpreter = new ESInterpreter(parser);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();
-
-    for (const fToken of traverseTokens(parser.getValueInfo()))
+    const tokens = ESParserTokenizer.getTokens(parser);
+    for (const fToken of tokens)
     {
       const token: ESParserToken = fToken.parserToken;
-      if (true)
-      {
-        const style: string = this.getStyle(fToken);
-        instance.markText(
-          { line: token.row, ch: token.col },
-          { line: token.toRow, ch: token.toCol },
-          { className: style },
-        );
-        // markText returns a TextMarker object. In the goal of being stateless though,
-        // we clear the markers by grabbing them from the code mirror instance instead
-      }
+      const style: string = this.getStyle(fToken);
+      instance.markText(
+        { line: token.row, ch: token.col },
+        { line: token.toRow, ch: token.toCol },
+        { className: style },
+      );
     }
   }
 

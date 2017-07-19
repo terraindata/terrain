@@ -51,8 +51,8 @@ const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 
@@ -261,7 +261,7 @@ class TransformCardChart extends TerrainComponent<Props>
     this.updatePoints(
       points.splice(index, 0,
         BlockUtils.make(
-          AllBackendsMap[this.props.language].blocks.scorePoint, {
+          AllBackendsMap[this.props.language].blocks, 'scorePoint', {
             value,
             score,
           },

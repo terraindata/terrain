@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import Util from './../../util/Util';
 import * as LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
@@ -242,5 +242,45 @@ LibraryReducers[ActionTypes.variants.loadVersion] =
     }>,
   ) =>
     state.setIn(['variants', action.payload.variantId], action.payload.variantVersion);
+
+LibraryReducers[ActionTypes.variants.select] =
+  (
+    state: LibraryState,
+    action: Action<{
+      variantId: string,
+    }>,
+  ) =>
+  {
+    const alreadySelected = state.selectedVariants.includes(action.payload.variantId);
+    if (!alreadySelected)
+    {
+      return state.set('selectedVariants', state.selectedVariants.push(action.payload.variantId));
+    }
+
+    return state;
+  };
+
+LibraryReducers[ActionTypes.variants.unselect] =
+  (
+    state: LibraryState,
+    action: Action<{
+      variantId: string,
+    }>,
+  ) =>
+  {
+    const variantIndex = state.selectedVariants.indexOf(action.payload.variantId);
+    if (variantIndex > -1)
+    {
+      return state.set('selectedVariants', state.selectedVariants.remove(variantIndex));
+    }
+
+    return state;
+  };
+
+LibraryReducers[ActionTypes.variants.unselectAll] =
+  (
+    state: LibraryState,
+    action: Action<{}>,
+  ) => state.set('selectedVariants', state.selectedVariants.clear());
 
 export default LibraryReducers;
