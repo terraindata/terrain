@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:member-ordering member-access no-var-requires
 
 import * as Immutable from 'immutable';
+import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
 import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import MySQLBlocks from './blocks/MySQLBlocks';
@@ -63,7 +64,10 @@ class MySQLBackend implements Backend
   blocks = MySQLBlocks;
   creatingType = MySQLBlocks.creating.type;
   inputType = MySQLBlocks.input.type;
-  rootCards = [MySQLBlocks.sfw];
+  getRootCards = () =>
+  {
+    return Immutable.List([make(MySQLBlocks, 'sfw')]);
+  }
   topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
 
   // Ordering of the cards deck

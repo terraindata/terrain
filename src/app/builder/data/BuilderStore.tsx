@@ -87,7 +87,7 @@ export class BuilderStateClass
   public manual = Map<ID, Cards>({});
   // Card examples used in the manual are stored here.
 
-  public draggingCardItem: CardItem = false;
+  public draggingCardItem: CardItem | null = null;
   public draggingOverKeyPath: KeyPath = Immutable.List([]);
   public draggingOverIndex: number = -1;
 

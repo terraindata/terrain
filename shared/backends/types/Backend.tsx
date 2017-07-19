@@ -50,6 +50,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import { BlockConfig } from '../../blocks/types/Block';
+import { Card } from '../../blocks/types/Card';
 import Query from '../../items/types/Query';
 import CardsToCodeOptions from './CardsToCodeOptions';
 import ParseTreeToQueryOptions from './ParseTreeToQueryOptions';
@@ -69,7 +70,7 @@ export interface Backend
   creatingType: string; // type of the block that marks where a card is being created
   inputType: string; // type of the block for inputs
 
-  rootCards: BlockConfig[];
+  getRootCards: () => List<Card>;
   // Cards that can go at the top/root level
   topLevelCards: List<string>;
 
