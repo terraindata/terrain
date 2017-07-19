@@ -209,6 +209,15 @@ interface Theme
       background: string,
     },
   };
+
+  // File Import -----------------------------
+
+  fileimport: {
+    preview: {
+      column: string;
+      cell: string;
+    },
+  };
 }
 
 const DARK: Theme =
@@ -372,6 +381,15 @@ const DARK: Theme =
       inputs:
       {
         background: '#626262',
+      },
+    },
+
+    // File import -----------------------------
+
+    fileimport: {
+      preview: {
+        column: '#9d6b6b',
+        cell: '#f1d7d7',
       },
     },
   };

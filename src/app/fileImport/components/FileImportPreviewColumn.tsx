@@ -104,6 +104,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       return (
         <div
           className='fi-preview-column'
+          style={backgroundColor(Colors().fileimport.preview.column)}
         >
           include
           <CheckBox
@@ -138,15 +139,18 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     }
 
     return (
-      <div className='fi-preview-column'>
-        <div>
+      <div
+        className='fi-preview-column'
+        style={backgroundColor(Colors().fileimport.preview.column)}
+      >
+        <div className='fi-preview-column-title-name'>
           {this.props.columnNames.get(this.props.columnId)}
         </div>
-        <div>
+        <div className='fi-preview-column-title-type'>
           {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
         </div>
         <div
-          className='fi-preview-edit-button'
+          className='fi-preview-column-edit-button'
           onClick={this.handleEditClick}
         >
           Edit
