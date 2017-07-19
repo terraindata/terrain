@@ -56,10 +56,10 @@ import Util from '../../util/Util';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import { Card, Cards } from '../../../../shared/blocks/types/Card';
-import Query from '../../../../shared/items/types/Query';
+import { Card, Cards } from '../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../database/AllBackends';
+import BackendInstance from '../../../database/types/BackendInstance';
+import Query from '../../../items/types/Query';
 
 export class BuilderStateClass
 {

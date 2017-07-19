@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';

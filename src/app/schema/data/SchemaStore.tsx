@@ -52,7 +52,7 @@ import { Store } from 'redux';
 import * as ReduxActions from 'redux-actions';
 import * as SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import BackendInstance from '../../../database/types/BackendInstance';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
 import ExampleSchemaData from './ExampleSchemaData';

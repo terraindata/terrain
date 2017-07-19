@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import { Block } from '../../../shared/blocks/types/Block';
-import { Card } from '../../../shared/blocks/types/Card';
-import { Input, InputPrefix } from '../../../shared/blocks/types/Input';
+import { Block } from '../../blocks/types/Block';
+import { Card } from '../../blocks/types/Card';
+import { Input, InputPrefix } from '../../blocks/types/Input';
 
 import * as Immutable from 'immutable';
 import SchemaStore from '../schema/data/SchemaStore';

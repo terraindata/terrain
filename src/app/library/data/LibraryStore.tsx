@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Redux = require('redux');
 
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from './../../auth/data/AuthStore';
 import RoleStore from './../../roles/data/RolesStore';
 import UserStore from './../../users/data/UserStore';
@@ -58,7 +58,7 @@ import * as LibraryTypes from './../LibraryTypes';
 import Actions from './LibraryActions';
 import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
 
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import BuilderActions from '../../builder/data/BuilderActions';
 import Util from './../../util/Util';
 

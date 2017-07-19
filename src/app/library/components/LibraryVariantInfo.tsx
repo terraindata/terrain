@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import './LibraryVariantInfo.less';
 const { List } = Immutable;
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import BackendInstance from '../../../database/types/BackendInstance';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';

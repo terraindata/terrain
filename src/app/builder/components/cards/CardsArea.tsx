@@ -54,7 +54,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import { Card, Cards } from '../../../../blocks/types/Card';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';

@@ -47,11 +47,9 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as util from 'util';
 import * as winston from 'winston';
-
-import EQLConfig from '../../../backends/elastic/parser/EQLConfig';
-import ESInterpreter from '../../../backends/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../backends/elastic/parser/ESParserError';
+import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import ESParserError from '../../../database/elastic/parser/ESParserError';
 import { makePromiseCallback } from '../../Utils';
 
 function getExpectedFile(): string

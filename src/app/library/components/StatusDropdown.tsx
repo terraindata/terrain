@@ -52,7 +52,7 @@ import * as _ from 'underscore';
 import './StatusDropdown.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
-import { ItemStatus as Status } from '../../../../shared/items/types/Item';
+import { ItemStatus as Status } from '../../../items/types/Item';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';

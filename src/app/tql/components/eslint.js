@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 (function(mod) {
   if (typeof exports == "object" && typeof module == "object") // CommonJS

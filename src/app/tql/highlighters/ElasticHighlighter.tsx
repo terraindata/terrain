@@ -47,16 +47,16 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 // parser imports
-import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
-import ESJSONType from '../../../../shared/backends/elastic/parser/ESJSONType';
-import ESParserToken from '../../../../shared/backends/elastic/parser/ESParserToken';
-import ESPropertyInfo from '../../../../shared/backends/elastic/parser/ESPropertyInfo';
-import ESValueInfo from '../../../../shared/backends/elastic/parser/ESValueInfo';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import ESParserToken from '../../../../shared/database/elastic/parser/ESParserToken';
+import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 // interpreter and clause imports
-import ESClause from '../../../../shared/backends/elastic/parser/clauses/ESClause';
-import ESStructureClause from '../../../../shared/backends/elastic/parser/clauses/ESStructureClause';
-import ESInterpreter from '../../../../shared/backends/elastic/parser/ESInterpreter';
+import ESClause from '../../../../shared/database/elastic/parser/clauses/ESClause';
+import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 // other imports
 import SyntaxHighlighter from './SyntaxHighlighter';
