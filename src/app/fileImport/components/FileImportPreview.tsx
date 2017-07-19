@@ -74,7 +74,7 @@ export interface Props
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<FileImportTypes.ColumnType>;
+  columnTypes: List<FileImportTypes.ColumnTypesTree>;
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;

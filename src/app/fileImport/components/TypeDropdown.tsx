@@ -64,7 +64,7 @@ export interface Props
 {
   columnId: number;
   recursionDepth: number;
-  columnType: FileImportTypes.ColumnType;
+  columnType: FileImportTypes.ColumnTypesTree;
   editing: boolean;
 }
 
@@ -93,7 +93,7 @@ class TypeDropdown extends TerrainComponent<Props>
     return (
       <div>
         <Dropdown
-          selectedIndex={this.props.columnType.type}
+          selectedIndex={Number(this.props.columnType.type)}
           options={DATATYPES}
           onChange={this.handleTypeChange}
           canEdit={true}

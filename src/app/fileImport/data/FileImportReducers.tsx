@@ -56,7 +56,7 @@ const { List, Map } = Immutable;
 
 const FileImportReducers = {};
 
-const deeplySetColumnType = (columnTypesTree, count, recursionDepth, typeIndex) =>
+const deeplySetColumnType = (columnTypesTree: FileImportTypes.ColumnTypesTree, count: number, recursionDepth: number, typeIndex: number) =>
 {
   if (count < recursionDepth)
   {
@@ -69,7 +69,7 @@ const deeplySetColumnType = (columnTypesTree, count, recursionDepth, typeIndex) 
   return columnTypesTree;
 };
 
-const deeplyAddColumnType = (columnTypesTree) =>
+const deeplyAddColumnType = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
 {
   if (columnTypesTree.innerType)
   {
@@ -82,7 +82,7 @@ const deeplyAddColumnType = (columnTypesTree) =>
   return columnTypesTree;
 };
 
-const deeplyDeleteColumnType = (columnTypesTree, count, recursionDepth) =>
+const deeplyDeleteColumnType = (columnTypesTree: FileImportTypes.ColumnTypesTree, count: number, recursionDepth: number) =>
 {
   if (count < recursionDepth - 1 && columnTypesTree.innerType)
   {
@@ -95,7 +95,7 @@ const deeplyDeleteColumnType = (columnTypesTree, count, recursionDepth) =>
   return columnTypesTree;
 };
 
-const deeplyColumnTypeToString = (columnTypesTree) =>
+const deeplyColumnTypeToString = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
 {
   columnTypesTree.type = FileImportTypes.ELASTIC_TYPES[columnTypesTree.type];
   if (columnTypesTree.innerType)
@@ -105,9 +105,9 @@ const deeplyColumnTypeToString = (columnTypesTree) =>
   return columnTypesTree;
 };
 
-const deeplyColumnTypeToNumber = (columnTypesTree) =>
+const deeplyColumnTypeToNumber = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
 {
-  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES.indexOf(columnTypesTree.type);
+  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES.indexOf(String(columnTypesTree.type));
   if (columnTypesTree.innerType)
   {
     deeplyColumnTypeToNumber(columnTypesTree.innerType);
@@ -140,6 +140,7 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'duplicate')
   {
+    console.log('duplicate name: ', transform.args.newName);
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
       .set('primaryKey', primaryKey)
@@ -418,7 +419,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.tableText,
       state.connectionId,
       state.oldNames,
-      Map<string, FileImportTypes.ColumnType>(state.columnNames.map((colName, colId) =>
+      Map<string, FileImportTypes.ColumnTypesTree>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) && [colName, deeplyColumnTypeToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
       state.columnNames.get(state.primaryKey),

@@ -266,7 +266,7 @@ class TransformBox extends TerrainComponent<Props>
   public render()
   {
     const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
-    let transformContent = {};
+    let transformContent;
     if (this.props.datatype === 'text')
     {
       transformContent =
@@ -313,7 +313,7 @@ class TransformBox extends TerrainComponent<Props>
             </div>
           }
           {
-            this.state.transformTypeIndex !== -1 &&
+            this.state.transformTypeIndex > 0 &&
             <Autocomplete
               value={this.state.transformText}
               options={null}

@@ -68,7 +68,7 @@ class FileImportStateC extends BaseClass
   public oldNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<ColumnType> = List([]);
+  public columnTypes: List<ColumnTypesTree> = List([]);
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
@@ -112,10 +112,10 @@ export interface Template
   primaryKey: number;
 }
 
-export interface ColumnType
+export interface ColumnTypesTree
 {
-  type: number;
-  innerType?: ColumnType;
+  type: string | number;
+  innerType?: ColumnTypesTree;
 }
 
 export const NUMBER_PREVIEW_ROWS = 3;
