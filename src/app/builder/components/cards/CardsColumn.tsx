@@ -62,9 +62,9 @@ import CardsArea from './CardsArea';
 import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 
-import { Card, Cards } from '../../../../../shared/blocks/types/Card';
+import { Card, Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
@@ -122,19 +122,14 @@ class CardsColumn extends TerrainComponent<Props>
     }
   }
 
-  public getPossibleCards()
+  public createCards()
   {
-    return AllBackendsMap[this.props.language].topLevelCards;
-  }
-
-  public getFirstCard()
-  {
-    return AllBackendsMap[this.props.language].rootCard;
-  }
-
-  public createCard()
-  {
-    Actions.create(this.state.keyPath, 0, this.getFirstCard().type);
+    Actions.change(this.state.keyPath, this.getFirstCards());
+    // _.map(this.getFirstCards(),
+    //   (blockConfig: object, index: number) =>
+    //   {
+    //     Actions.create(this.state.keyPath, index, blockConfig['type']);
+    //   });
   }
 
   public toggleLearningMode()
@@ -247,8 +242,8 @@ class CardsColumn extends TerrainComponent<Props>
               !cards.size ? /* "Create your first card." */
                 <InfoArea
                   large={"There aren't any cards in this query."}
-                  button={canEdit && 'Create a ' + this.getFirstCard().static.title + ' Card'}
-                  onClick={this.createCard}
+                  button={canEdit && 'Create a starter set of cards'}
+                  onClick={this.createCards}
                   inline={false}
                 />
                 : null
@@ -280,6 +275,17 @@ class CardsColumn extends TerrainComponent<Props>
       </div>
     );
   }
+
+  private getPossibleCards()
+  {
+    return AllBackendsMap[this.props.language].topLevelCards;
+  }
+
+  private getFirstCards(): Cards
+  {
+    return AllBackendsMap[this.props.language].getRootCards();
+  }
+
 }
 // <CardDropArea
 //   half={true}

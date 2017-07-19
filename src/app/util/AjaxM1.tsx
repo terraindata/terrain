@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as $ from 'jquery';
 import * as _ from 'underscore';
-import BackendInstance from '../../../shared/backends/types/BackendInstance';
+import BackendInstance from '../../database/types/BackendInstance';
 
 /**
  * Note: This is the old query response type.

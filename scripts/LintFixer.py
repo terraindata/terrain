@@ -4,11 +4,14 @@ import sys
 import re
 import subprocess
 import json
+import os
 import collections
 from pprint import pprint
 
-p = subprocess.Popen(['node', '../node_modules/.bin/tslint',
-                      '-c', '../tslint.json', '--fix', '--type-check', '--project',  '../tsconfig.json',  '-t', 'json'],
+dir = os.path.dirname(os.path.realpath(__file__)) + '/'
+
+p = subprocess.Popen(['node', dir + '../node_modules/.bin/tslint',
+                      '-c', dir + '../tslint.json', '--fix', '--type-check', '--project',  dir + '../tsconfig.json',  '-t', 'json'],
                      stdout=subprocess.PIPE)
 out, err = p.communicate()
 if err:

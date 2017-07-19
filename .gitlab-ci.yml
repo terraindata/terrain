@@ -33,6 +33,7 @@ test-backend:
    - yarn run test-back
    - yarn run test-back-teardown
   stage: test
+  when: always
   artifacts:
     paths:
       - coverage
@@ -41,6 +42,7 @@ test-frontend:
   script:
    - yarn run build
   stage: test
+  when: always
 
 test-frontend-prod:
   script:

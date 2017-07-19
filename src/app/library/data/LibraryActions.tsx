@@ -49,8 +49,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import BackendInstance from '../../../database/types/BackendInstance';
+import { ItemStatus } from '../../../items/types/Item';
 import Util from '../../util/Util';
 import * as LibraryTypes from '../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
@@ -273,6 +273,16 @@ const Actions =
       (variantId: string, variantVersion: LibraryTypes.Variant) =>
         $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
 
+      select:
+      (variantId: string) =>
+        $(ActionTypes.variants.select, { variantId }),
+
+      unselect:
+      (variantId: string) =>
+        $(ActionTypes.variants.unselect, { variantId }),
+
+      unselectAll:
+      () => $(ActionTypes.variants.unselectAll, {}),
     },
 
     loadState:

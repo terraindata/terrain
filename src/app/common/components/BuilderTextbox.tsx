@@ -54,11 +54,11 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
-import { Display } from '../../../../shared/blocks/displays/Display';
-import { Block } from '../../../../shared/blocks/types/Block';
-import { Card, CardString } from '../../../../shared/blocks/types/Card';
+import * as BlockUtils from '../../../blocks/BlockUtils';
+import { Display } from '../../../blocks/displays/Display';
+import { Block } from '../../../blocks/types/Block';
+import { Card, CardString } from '../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
@@ -226,7 +226,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   public handleSwitch()
   {
     const value = this.isText() ? BlockUtils.make(
-      AllBackendsMap[this.props.language].blocks[this.getCreatingType()],
+      AllBackendsMap[this.props.language].blocks, this.getCreatingType(),
     ) : '';
     this.setState({
       value,

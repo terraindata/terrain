@@ -56,20 +56,20 @@ import { DragSource } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 const { createDragPreview } = require('react-dnd-text-dragpreview');
-import { Card } from '../../../../../shared/blocks/types/Card';
+import { Display } from '../../../../blocks/displays/Display';
+import { Card } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import LayoutManager from '../layout/LayoutManager';
-import { Display } from './../../../../../shared/blocks/displays/Display';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import ManualPopup from './../../../manual/components/ManualPopup';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
@@ -667,8 +667,7 @@ const cardSource =
     endDrag: () =>
     {
       $('body').removeClass('body-card-is-dragging');
-
-      Actions.dragCard(false);
+      Actions.dragCard(null);
     },
   };
 

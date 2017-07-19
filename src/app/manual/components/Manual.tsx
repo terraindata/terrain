@@ -65,7 +65,7 @@ const HomeIcon = require('./../../../images/icon_home.svg');
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 
-import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
+import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {

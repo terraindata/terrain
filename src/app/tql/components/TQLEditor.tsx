@@ -61,8 +61,8 @@ import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
 // Formatting and Parsing
-import ESConverter from '../../../../shared/backends/elastic/conversion/formatter/ESConverter';
-import ESJSONParser from '../../../../shared/backends/elastic/parser/ESJSONParser';
+import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
 // Style sheets and addons for CodeMirror
 require('./elastic.js');
@@ -216,16 +216,20 @@ class TQLEditor extends TerrainComponent<Props>
       if (formatted)
       {
         this.state.codeMirrorInstance.setValue(formatted);
+        this.props.onChange(cmInstance.getValue());
       }
     }
   }
 
-  private handleChanges(cmInstance, changes: object[])
+  private handleChange(cmInstance, change)
   {
+    if (change.origin !== 'setValue')
+    {
+      this.props.onChange(cmInstance.getValue());
+    }
     if (this.props.language === 'elastic')
     {
-      const highlighter = new ElasticHighlighter();
-      highlighter.handleChanges(cmInstance, changes);
+      ElasticHighlighter.highlightES(cmInstance);
     }
   }
 
@@ -234,11 +238,10 @@ class TQLEditor extends TerrainComponent<Props>
     this.setState({
       codeMirrorInstance: cmInstance,
     });
-    cmInstance.on('changes', this.handleChanges);
+    cmInstance.on('change', this.handleChange);
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
-      const highlighter = new ElasticHighlighter();
-      highlighter.initialHighlight(cmInstance);
+      ElasticHighlighter.highlightES(cmInstance);
     }
   }
 

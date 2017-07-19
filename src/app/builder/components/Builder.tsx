@@ -59,8 +59,8 @@ import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
 
 // Data
-import { ItemStatus } from '../../../../shared/items/types/Item';
-import Query from '../../../../shared/items/types/Query';
+import { ItemStatus } from '../../../items/types/Item';
+import Query from '../../../items/types/Query';
 import LibraryActions from '../../library/data/LibraryActions';
 import { LibraryState, LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
