@@ -115,8 +115,8 @@ class App
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
-    this.app.use(Middleware.bodyParser());
-    // this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
+    // this.app.use(Middleware.bodyParser());
+    this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
     this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
