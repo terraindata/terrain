@@ -56,38 +56,45 @@ import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { ItemConfig, Items } from '../items/Items';
 import * as Util from '../Util';
+
+const items: Items = new Items();
 
 const timeInterval: number = 5; // minutes before refreshing
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
 const timeSalt: string = srs({ length: 256 }); // time salt
-const payloadSkeleton: object = {}; // payload object where key is the eventId and the value is the empty payload
 
-export interface EventConfig
+export interface EventTemplateConfig
 {
-  date?: number;
   eventId: string;
   id?: number;
-  ip?: string;
-  message: string;
-  payload: any;
+  ip: string;
+  url?: string;
+  variantId?: string;
+}
+
+export interface EventConfig extends EventTemplateConfig
+{
+  eventType?: string;
+  date?: string;
+  message?: string;
+  name?: string;
+  payload?: any;
   type: string;
 }
 
-export interface EventRequestConfig
+export interface PayloadConfig
 {
-  id?: number;
-  ip: string;
-  date?: number;
-  message?: string;
-  payload?: object;
   eventId: string;
-  variantId?: string;
+  meta: any;
+  payload: any;
 }
 
 export class Events
 {
   private eventTable: Tasty.Table;
+  private payloadTable: Tasty.Table;
   private elasticController: ElasticController;
 
   constructor()
@@ -100,11 +107,20 @@ export class Events
       [
         'date',
         'ip',
-        'message',
         'payload',
         'type',
       ],
       'events',
+    );
+
+    this.payloadTable = new Tasty.Table(
+      'data',
+      ['eventId'],
+      [
+        'meta',
+        'payload',
+      ],
+      'payload',
     );
   }
 
@@ -114,22 +130,25 @@ export class Events
    */
   public async decodeMessage(event: EventConfig): Promise<boolean>
   {
-    const checkTime = this.getClosestTime();
-    const message = event['message'];
-    const emptyPayloadHash: string = hashObj(this.getEmptyObject(event.payload));
-    for (let tp = 0; tp < timePeriods; ++tp)
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      const newTime: number = checkTime - tp * timeInterval * 60;
-      const privateKey: string = this.getUniqueId(event.ip as string, event.eventId, newTime);
-      const decodedMsg: string = this.decrypt(message, privateKey);
-      if (this.isJSON(decodedMsg) && emptyPayloadHash === hashObj(JSON.parse(decodedMsg)))
+      const checkTime = this.getClosestTime();
+      const message = event['message'] as string;
+      const emptyPayloadHash: string = Util.buildDesiredHash(event.payload);
+      for (let tp = 0; tp < timePeriods; ++tp)
       {
+        const newTime: number = checkTime - tp * timeInterval * 60;
+        const privateKey: string = await this.getUniqueId(event.ip as string, event.eventId, newTime);
+        const decodedMsg: string = this.decrypt(message, privateKey);
+        if (this.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
+        {
 
-        await this.storeEvent(event);
-        return true;
+          await this.storeEvent(event);
+          return resolve(true);
+        }
       }
-    }
-    return false;
+      return resolve(false);
+    });
   }
 
   /*
@@ -148,12 +167,12 @@ export class Events
    * Prep an empty payload with the encoded message
    *
    */
-  public async encodeMessage(eventReq: EventRequestConfig): Promise<EventRequestConfig>
+  public async encodeMessage(eventReq: EventConfig): Promise<EventConfig>
   {
-    return new Promise<EventRequestConfig>(async (resolve, reject) =>
+    return new Promise<EventConfig>(async (resolve, reject) =>
     {
-      eventReq.payload = payloadSkeleton[eventReq.eventId];
-      const privateKey: string = this.getUniqueId(eventReq.ip, eventReq.eventId);
+      eventReq.payload = await this.getPayload(eventReq.eventId);
+      const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.eventId);
       eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
       resolve(eventReq);
@@ -181,16 +200,15 @@ export class Events
    */
   public isJSON(str: string): boolean
   {
-    let res: any = false;
     try
     {
-      res = JSON.parse(str);
+      JSON.parse(str);
     }
     catch (e)
     {
       return false;
     }
-    return res;
+    return true;
   }
 
   /*
@@ -205,43 +223,115 @@ export class Events
   }
 
   /*
-   * Create an object with the same keys but empty values
+  * Return a list of HTML IDs and relevant info for event tracking purposes
+  *
+  */
+  public async getHTMLIDs(): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      const itemLst: ItemConfig[] = await items.get();
+      const payloadLst: object[] = [];
+      const returnLst: object[] = [];
+      itemLst.forEach((item) =>
+      {
+        if (item.status !== 'ARCHIVE' && item.meta !== undefined)
+        {
+          const meta = JSON.parse(item.meta);
+          let itemParent: any;
+          let itemId: any;
+          if (item.parent !== undefined)
+          {
+            itemParent = item.parent.toString();
+          }
+          if (item.id !== undefined)
+          {
+            itemId = item.id.toString();
+          }
+          const otherFields: object =
+            {
+              eventType: 'group',
+              ip: '',
+              language: 'elastic',
+              name: '',
+              type: 'click',
+              url: '',
+              variantId: '',
+            };
+
+          const payloadEvent: object =
+            {
+              eventId: 'item' + (itemId as string),
+              meta: otherFields,
+              payload:
+                {
+                  date: '',
+                  dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
+                  numClicks: 0,
+                  loadTime: 0,
+                },
+            };
+          const returnEvent: object =
+            {
+              eventId: 'item' + (itemId as string),
+            };
+
+          // for now, only use items that are ES
+          if (meta.algorithmsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['eventType'] = 'group';
+            payloadLst.push(payloadEvent);
+            returnLst.push(returnEvent);
+          }
+          if (meta.variantsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['eventType'] = 'algorithm';
+            payloadLst.push(payloadEvent);
+            returnLst.push(returnEvent);
+          }
+          if (meta.query !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['eventType'] = 'variant';
+            payloadLst.push(payloadEvent);
+            returnLst.push(returnEvent);
+          }
+        }
+      });
+      await this.elasticController.getTasty().upsert(this.payloadTable, payloadLst);
+      resolve(returnLst);
+    });
+  }
+
+  /*
+   * Get payload from datastore given the eventId
    *
    */
-  public getEmptyObject(payload: object): object
+  public async getPayload(eventId: string): Promise<PayloadConfig>
   {
-    return Object.keys(payload).reduce((res, item) =>
+    return new Promise<PayloadConfig>(async (resolve, reject) =>
     {
-      switch (typeof (payload[item]))
+      const payloads: PayloadConfig[] = await this.elasticController.getTasty().select(
+        this.payloadTable, [], { eventId }) as PayloadConfig[];
+      if (payloads.length === 0)
       {
-        case 'boolean':
-          res[item] = false;
-          break;
-
-        case 'number':
-          res[item] = 0;
-          break;
-
-        default:
-          res[item] = '';
+        return resolve({} as PayloadConfig);
       }
-      return res;
-    },
-      {});
+      resolve(payloads[0] as PayloadConfig);
+    });
   }
 
   /*
    * Generate a random string that will be used as a private key for encryption/decryption
    *
    */
-  public getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): string
+  public async getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): Promise<string>
   {
-    currTime = currTime !== undefined ? currTime : this.getClosestTime();
-    if (uniqueId === undefined)
+    return new Promise<string>(async (resolve, reject) =>
     {
-      uniqueId = '';
-    }
-    return sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16);
+      currTime = currTime !== undefined ? currTime : this.getClosestTime();
+      uniqueId = uniqueId !== undefined ? uniqueId : '';
+      resolve(sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16));
+    });
   }
 
   /*
@@ -254,32 +344,51 @@ export class Events
     {
       if (req === undefined || (Object.keys(req).length === 0 && req.constructor === Object) || req.length === 0)
       {
-        resolve();
-        return;
+        return resolve('');
       }
-
       const JSONArr: object[] = req;
-      const encodedEventArr: EventRequestConfig[] = [];
+      const encodedEventArr: EventTemplateConfig[] = [];
       for (const jsonObj of JSONArr)
       {
-        if (jsonObj['eventId'] === undefined || !(jsonObj['eventId'] in payloadSkeleton))
+        const payload: PayloadConfig = await this.getPayload(jsonObj['eventId']);
+        const meta: object = payload.meta;
+        delete payload.meta;
+        const fullPayload: object = Object.assign(payload, meta);
+        if (jsonObj['eventId'] === undefined || !(Object.keys(payload).length === 0))
         {
           continue;
         }
-        const eventRequest: EventRequestConfig =
+        const eventRequest: EventConfig =
           {
-            eventId: jsonObj['eventId'],
-            variantId: jsonObj['variantId'],
+            eventId: fullPayload['eventId'],
+            eventType: fullPayload['eventType'],
             ip: IPSource,
+            name: fullPayload['name'],
+            payload: fullPayload['payload'],
+            type: fullPayload['type'],
+            url: jsonObj['url'] !== undefined ? jsonObj['url'] : fullPayload['url'],
+            variantId: jsonObj['variantId'] !== undefined ? jsonObj['variantId'] : fullPayload['variantId'],
           };
         encodedEventArr.push(await this.encodeMessage(eventRequest));
       }
       if (encodedEventArr.length === 0)
       {
-        resolve();
-        return;
+        return resolve('');
       }
       resolve(JSON.stringify(encodedEventArr));
+    });
+  }
+
+  /*
+   * Check if eventId exists in payload table
+   *
+   */
+  public async payloadExists(eventId: string): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, [], { eventId }) as object[];
+      return resolve(payloads.length === 0 ? false : true);
     });
   }
 
@@ -287,11 +396,10 @@ export class Events
    * Store the validated event in the datastore
    *
    */
-  public async storeEvent(event: EventConfig): Promise<any>
+  public async storeEvent(event: EventConfig): Promise<EventConfig>
   {
     event.payload = JSON.stringify(event.payload);
-    const events: object[] = [event as object];
-    return await this.elasticController.getTasty().upsert(this.eventTable, events);
+    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 }
 
