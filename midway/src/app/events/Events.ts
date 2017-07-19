@@ -276,29 +276,25 @@ export class Events
               eventId: 'item' + (itemId as string),
             };
 
-          payloadLst.push(payloadEvent);
-          returnLst.push(returnEvent);
-          /*
           // for now, only use items that are ES
           if (meta.algorithmsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
           {
-            // returnEvent['eventType'] = 'group';
+            returnEvent['eventType'] = 'group';
             payloadLst.push(payloadEvent);
             returnLst.push(returnEvent);
           }
           if (meta.variantsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
           {
-            // returnEvent['eventType'] = 'algorithm';
+            returnEvent['eventType'] = 'algorithm';
             payloadLst.push(payloadEvent);
             returnLst.push(returnEvent);
           }
           if (meta.query !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
           {
-            // returnEvent['eventType'] = 'variant';
+            returnEvent['eventType'] = 'variant';
             payloadLst.push(payloadEvent);
             returnLst.push(returnEvent);
           }
-          */
         }
       });
       await this.elasticController.getTasty().upsert(this.payloadTable, payloadLst);
