@@ -43,10 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ESJSONParser from '../../parser/ESJSONParser';
-import ESJSONType from '../../parser/ESJSONType';
-import ESParserToken from '../../parser/ESParserToken';
-import ESParserValueInfo from '../../parser/ESValueInfo';
+
+import ESJSONParser from '../parser/ESJSONParser';
+import ESJSONType from '../parser/ESJSONType';
+import ESParserToken from '../parser/ESParserToken';
+import ESParserValueInfo from '../parser/ESValueInfo';
 import { ESParserTokenizer, FlaggedToken } from './ESParserTokenizer';
 
 function assertUnreachable(param: never): never

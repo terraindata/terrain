@@ -45,16 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // parser imports
-import ESJSONParser from '../../parser/ESJSONParser';
-import ESJSONType from '../../parser/ESJSONType';
-import ESParserToken from '../../parser/ESParserToken';
-import ESPropertyInfo from '../../parser/ESPropertyInfo';
-import ESValueInfo from '../../parser/ESValueInfo';
+import ESJSONParser from '../parser/ESJSONParser';
+import ESJSONType from '../parser/ESJSONType';
+import ESParserToken from '../parser/ESParserToken';
+import ESPropertyInfo from '../parser/ESPropertyInfo';
+import ESValueInfo from '../parser/ESValueInfo';
 
 // interpreter and clause imports
-import ESClause from '../../parser/clauses/ESClause';
-import ESStructureClause from '../../parser/clauses/ESStructureClause';
-import ESInterpreter from '../../parser/ESInterpreter';
+import ESClause from '../parser/clauses/ESClause';
+import ESStructureClause from '../parser/clauses/ESStructureClause';
+import ESInterpreter from '../parser/ESInterpreter';
 
 export interface FlaggedToken
 {

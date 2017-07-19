@@ -59,7 +59,7 @@ import ESStructureClause from '../../../../shared/database/elastic/parser/clause
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 // other imports
-import { ESParserTokenizer, FlaggedToken } from '../../../../shared/backends/elastic/conversion/formatter/ESParserTokenizer';
+import { ESParserTokenizer, FlaggedToken } from '../../../../shared/database/elastic/formatter/ESParserTokenizer';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
 /*

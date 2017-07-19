@@ -57,10 +57,10 @@ import { Input, InputPrefix, InputType } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
+import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import ESConverter from './formatter/ESConverter';
 
 const join = (j, index) => (index === 0 ? '' : j);
 const addTabs = (str) => ' ' + str.replace(/\n/g, '\n ');
@@ -206,7 +206,7 @@ class CardsToElastic
     }
     else
     {
-      return ESConverter.formatES(new ESParser(text));
+      return ESConverter.formatES(new ESJSONParser(text));
     }
   }
 
