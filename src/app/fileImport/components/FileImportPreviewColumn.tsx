@@ -46,8 +46,10 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -74,6 +76,7 @@ export interface Props
   handleEditColumnChange(editColumnId: number);
 }
 
+@Radium
 class FileImportPreviewColumn extends TerrainComponent<Props>
 {
   public handleEditClick()
@@ -101,7 +104,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     if (this.props.editing)
     {
       return (
-        <th className='column-header'>
+        <div className='fi-preview-column'>
           include
           <CheckBox
             checked={this.props.isIncluded}
@@ -130,22 +133,26 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             colName={this.props.columnNames.get(this.props.columnId)}
             columnNames={this.props.columnNames}
           />
-        </th>
+        </div>
       );
     }
 
     return (
-      <th className='column-header'>
+      <div className='fi-preview-column'>
         <div>
           {this.props.columnNames.get(this.props.columnId)}
         </div>
         <div>
           {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
         </div>
-        <button onClick={this.handleEditClick}>
+        <div
+          className='fi-preview-edit-button'
+          onClick={this.handleEditClick}
+          style={buttonColors()}
+        >
           Edit
-        </button>
-      </th>
+        </div>
+      </div>
     );
   }
 }

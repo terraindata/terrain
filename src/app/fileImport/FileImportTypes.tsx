@@ -59,19 +59,19 @@ class FileImportStateC extends BaseClass
   public file: string = '';
   public filetype: string = '';
 
-  public previewRows: List<List<string>> = null;
+  public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
 
   public hasCsvHeader: boolean = true;
   public primaryKey: number = -1;
 
-  public oldNames: Immutable.List<string> = null;
-  public columnNames: Immutable.List<string> = null;
-  public columnsToInclude: Immutable.List<boolean> = null;
-  public columnTypes: List<ColumnType> = null;
+  public oldNames: List<string> = List([]);
+  public columnNames: List<string> = List([]);
+  public columnsToInclude: List<boolean> = List([]);
+  public columnTypes: List<ColumnType> = List([]);
 
-  public transforms: Immutable.List<Transform> = List([]);
-  public templates: Immutable.List<Template> = List([]);
+  public transforms: List<Transform> = List([]);
+  public templates: List<Template> = List([]);
   public renameTransform: Transform = {
     name: 'rename',
     colName: '',
@@ -118,7 +118,7 @@ export interface ColumnType
   innerType?: ColumnType;
 }
 
-export const NUMBER_PREVIEW_ROWS = 5;
+export const NUMBER_PREVIEW_ROWS = 3;
 
 export const FILE_TYPES =
   [
@@ -147,4 +147,21 @@ export const TRANSFORM_TYPES =
     'prepend',
     'split',
     'merge',
+  ];
+
+export const STEP_NAMES =
+  [
+    'Step 1',
+    'Step 2',
+    'Step 3',
+    'Step 4',
+    'Step 5',
+  ];
+
+export const STEP_TITLES =
+  ['Select a File',
+    'Select a Server',
+    'Select a Database',
+    'Select a Table',
+    'Select and Rename Columns you\'d like to Import',
   ];

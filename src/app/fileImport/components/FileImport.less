@@ -3,26 +3,35 @@
 .file-import {
 	height: 100%;
 	position: relative;
-	
+  overflow-x: scroll;
+
 	.file-import-inner {
 		.dead-center;
-	}
-	
-	.fi-step-name {
-		.title-text;
-		text-align: center;
-	}
-	
-	.fi-step-title {
-		.normal-text;
-		text-align: center;
-	}
-	
-	.fi-nav-button {
-		font-size: 16px;
-		padding: 6px 12px;
-		border-radius: 3px;
-		cursor: pointer;
-	}
+    min-width: 600px;
 
+    .fi-step-name {
+      .title-text;
+      text-align: center;
+    }
+
+    .fi-step-title {
+      .big-text;
+      text-align: center;
+    }
+
+    .fi-content {
+      margin-top: 24px;
+    }
+
+    .fi-nav-button {
+      .fi-button;
+      display: inline-block;
+
+      .fi-back-button {
+      }
+
+      .fi-next-button {
+      }
+    }
+	}
 }
