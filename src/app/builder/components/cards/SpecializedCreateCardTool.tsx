@@ -73,6 +73,12 @@ export interface Props
 
 const emptyList = Immutable.List([]);
 
+const STYLE = {
+  marginTop: -2,
+  width: 'calc(100% + 59px)',
+  marginLeft: -55,
+};
+
 class SpecializedCreateCardTool extends TerrainComponent<Props>
 {
   state: {
@@ -134,20 +140,22 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
   public render()
   {
     return (
-      <CreateCardTool
-        index={null}
-        keyPath={this.props.keyPath}
-        canEdit={this.props.canEdit}
-        language={this.props.language}
-        className={this.props.className}
-        accepts={emptyList}
+      <div style={STYLE} >
+        <CreateCardTool
+          index={null}
+          keyPath={this.props.keyPath}
+          canEdit={this.props.canEdit}
+          language={this.props.language}
+          className={this.props.className}
+          accepts={emptyList}
 
-        open={this.state.open}
-        onToggle={this._toggle('open')}
+          open={this.state.open}
+          onToggle={this._toggle('open')}
 
-        overrideText={this.state.options}
-        overrideClick={this.onClick}
-      />
+          overrideText={this.state.options}
+          overrideClick={this.onClick}
+        />
+      </div>
     );
   }
 }

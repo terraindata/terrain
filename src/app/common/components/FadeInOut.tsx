@@ -64,7 +64,7 @@ class FadeInOut extends TerrainComponent<Props>
       <VelocityComponent
         animation={{
           opacity: this.props.open ? 1 : 0,
-          translateY: this.props.open ? 0 : 20,
+          // translateY: this.props.open ? 0 : 20,
         }}
         duration={250}
       >
