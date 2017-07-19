@@ -76,8 +76,10 @@ export interface EventTemplateConfig
 
 export interface EventConfig extends EventTemplateConfig
 {
+  eventType?: string;
   date?: string;
   message?: string;
+  name?: string;
   payload?: any;
   type: string;
 }
@@ -85,7 +87,7 @@ export interface EventConfig extends EventTemplateConfig
 export interface PayloadConfig
 {
   eventId: string;
-  meta: string;
+  meta: any;
   payload: any;
 }
 
@@ -246,14 +248,27 @@ export class Events
           {
             itemId = item.id.toString();
           }
+          const otherFields: object =
+            {
+              eventType: 'group',
+              ip: '',
+              language: 'elastic',
+              name: '',
+              type: 'click',
+              url: '',
+              variantId: '',
+            };
 
           const payloadEvent: object =
             {
               eventId: 'item' + (itemId as string),
-              meta: '',
+              meta: otherFields,
               payload:
                 {
+                  date: '',
                   dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
+                  numClicks: 0,
+                  loadTime: 0,
                 },
             };
           const returnEvent: object =
@@ -300,7 +315,7 @@ export class Events
     return new Promise<PayloadConfig>(async (resolve, reject) =>
     {
       const payloads: PayloadConfig[] = await this.elasticController.getTasty().select(
-        this.payloadTable, ['payload'], { eventId }) as PayloadConfig[];
+        this.payloadTable, [], { eventId }) as PayloadConfig[];
       if (payloads.length === 0)
       {
         return resolve({} as PayloadConfig);
@@ -340,18 +355,23 @@ export class Events
       for (const jsonObj of JSONArr)
       {
         const payload: PayloadConfig = await this.getPayload(jsonObj['eventId']);
+        const meta: object = payload.meta;
+        delete payload.meta;
+        const fullPayload: object = Object.assign(payload, meta);
         if (jsonObj['eventId'] === undefined || !(Object.keys(payload).length === 0))
         {
           continue;
         }
         const eventRequest: EventConfig =
           {
-            eventId: jsonObj['eventId'],
-            variantId: jsonObj['variantId'] !== undefined ? jsonObj['variantId'] : '',
+            eventId: fullPayload['eventId'],
+            eventType: fullPayload['eventType'],
             ip: IPSource,
-            payload: jsonObj['payload'] !== undefined ? payload['payload'] : {},
-            url: jsonObj['url'] !== undefined ? jsonObj['url'] : '',
-            type: jsonObj['type'] !== undefined ? jsonObj['type'] : '',
+            name: fullPayload['name'],
+            payload: fullPayload['payload'],
+            type: fullPayload['type'],
+            url: jsonObj['url'] !== undefined ? jsonObj['url'] : fullPayload['url'],
+            variantId: jsonObj['variantId'] !== undefined ? jsonObj['variantId'] : fullPayload['variantId'],
           };
         encodedEventArr.push(await this.encodeMessage(eventRequest));
       }
