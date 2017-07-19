@@ -128,7 +128,6 @@ function uploadCartography(EventIdLst, callback)
   {
     if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200)
     {
-      console.log('hi');
       respArr = JSON.parse(xhttp.response);
       for (let ind = 0; ind < respArr.length; ++ind)
       {
@@ -161,8 +160,6 @@ function uploadCartography(EventIdLst, callback)
       }
     }
   }
-  console.log(JSON.stringify({"body": EventIdLst}));
-  console.log(url);
   xhttp.open("POST", url);
   xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   xhttp.send(JSON.stringify({"body": EventIdLst}));
