@@ -88,7 +88,7 @@ export const elasticTransform = _card(
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: ['#4b979a', '#aef3f6'],
+      colors: ['#4b979a', 'rgba(75, 153, 154, 0.7)'],
       title: 'Transform',
       preview: (card: any) =>
       {

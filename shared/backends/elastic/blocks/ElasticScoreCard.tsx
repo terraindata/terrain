@@ -69,16 +69,20 @@ export const elasticScore = _card(
   {
     weights: L(),
     method: '',
+    
+    key: '_script',
 
     static: {
       language: 'elastic',
       title: 'Score',
-      colors: ['#3a91a6', '#a1eafb'],
+      colors: ['#3a91a6', 'rgba(58, 145, 166, 0.7)'],
       preview: '[weights.length] Factors',
       // manualEntry: ManualConfig.cards['score'],
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
         return {
+          "type" : "number",
+          "order" : "desc",
           script: {
             stored: 'terrain_PWLScore',
             params: {

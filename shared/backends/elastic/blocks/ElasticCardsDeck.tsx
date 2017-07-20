@@ -83,7 +83,7 @@ export const ElasticCardsDeck =
       [
         // Score and transform cards
         Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
+        // Blocks.elasticTransform.type,
       ],
 
       ElasticElasticCardDeckTypes,
