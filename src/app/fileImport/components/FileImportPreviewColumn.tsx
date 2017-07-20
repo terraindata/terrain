@@ -59,7 +59,9 @@ import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
+import shallowCompare = require('react-addons-shallow-compare');
 import './FileImportPreviewColumn.less';
+const { Map } = Immutable;
 
 export interface Props
 {
@@ -98,7 +100,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public shouldComponentUpdate(nextProps: Props)
   {
-    return JSON.stringify(this.props.columnType) === JSON.stringify(nextProps.columnType);
+    const shouldUpdateShallow = shallowCompare(this, nextProps);
+    return shouldUpdateShallow || JSON.stringify(this.props.columnType) !== JSON.stringify(nextProps.columnType);
   }
 
   public render()

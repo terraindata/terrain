@@ -206,7 +206,7 @@ class FileImportPreview extends TerrainComponent<Props>
                   key={key}
                   columnId={key}
                   isIncluded={this.props.columnsToInclude.get(key)}
-                  columnType={this.props.columnTypes.get(key)}
+                  columnType={JSON.parse(JSON.stringify(this.props.columnTypes.get(key)))}
                   isPrimaryKey={this.props.primaryKey === key}
                   columnNames={this.props.columnNames}
                   columnOptions={this.props.columnOptions}

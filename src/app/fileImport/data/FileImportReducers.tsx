@@ -141,6 +141,7 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'duplicate')
   {
+    console.log('duplicate');
     console.log('duplicate name: ', transform.args.newName);
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
@@ -163,6 +164,7 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'split')
   {
+    console.log('split');
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
       .set('primaryKey', primaryKey)
@@ -275,7 +277,6 @@ FileImportReducers[ActionTypes.setColumnType] =
     {
       columnTypes[action.payload.columnId] = deeplyAddColumnType(columnTypes[action.payload.columnId]);
     }
-    console.log('reducer coltypes: ', columnTypes);
 
     return state.set('columnTypes', List(columnTypes));
   };

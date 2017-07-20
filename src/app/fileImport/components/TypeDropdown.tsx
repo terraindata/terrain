@@ -56,6 +56,7 @@ import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
+import shallowCompare = require('react-addons-shallow-compare');
 const { List } = Immutable;
 
 const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
@@ -85,7 +86,8 @@ class TypeDropdown extends TerrainComponent<Props>
 
   public shouldComponentUpdate(nextProps: Props)
   {
-    return JSON.stringify(this.props.columnType) === JSON.stringify(nextProps.columnType);
+    const shouldUpdateShallow = shallowCompare(this, nextProps);
+    return shouldUpdateShallow || JSON.stringify(this.props.columnType) !== JSON.stringify(nextProps.columnType);
   }
 
   public render()
