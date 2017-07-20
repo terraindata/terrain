@@ -43,17 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions interface-name
+
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
+import ReactDataGrid from 'react-data-grid';
 import * as _ from 'underscore';
-const ReactDataGrid = require('react-data-grid');
 
 import './Table.less';
 
 import * as classNames from 'classnames';
 import { Menu, MenuOption } from '../../common/components/Menu';
 import Util from '../../util/Util';
-import PureClasss from './PureClasss';
+import TerrainComponent from './TerrainComponent';
 const Dimensions = require('react-dimensions');
 
 const LEFT_COLOR_FROM = hexToRgb('#a2af93');
@@ -72,7 +75,7 @@ export interface IColumn
 export interface Props
 {
   columns: List<IColumn>;
-  rowGetter: (index: number) => Object;
+  rowGetter: (index: number) => object;
   rowsCount: number;
   // rows: List<Map<any, any>>;
   random?: number;
@@ -89,7 +92,7 @@ const HEADER_ROW_HEIGHT = 35;
 const MAX_INIT_HEIGHT = 40;
 const MAX_INIT_WIDTH = 300;
 
-class _Table extends PureClasss<Props>
+class TableComponent extends TerrainComponent<Props>
 {
   public state: {
   } = {
@@ -118,7 +121,7 @@ export const Table = Dimensions({
   containerStyle: {
     height: '100%',
   },
-})(_Table);
+})(TableComponent);
 
 function hexToRgb(hex)
 {

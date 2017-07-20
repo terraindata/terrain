@@ -43,11 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Redux = require('redux');
 
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from './../../auth/data/AuthStore';
 import RoleStore from './../../roles/data/RolesStore';
 import UserStore from './../../users/data/UserStore';
@@ -55,7 +58,7 @@ import * as LibraryTypes from './../LibraryTypes';
 import Actions from './LibraryActions';
 import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
 
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import BuilderActions from '../../builder/data/BuilderActions';
 import Util from './../../util/Util';
 
@@ -75,6 +78,7 @@ class LibraryStateC
   public groups: IMMap<ID, Group> = null;
   public algorithms: IMMap<ID, Algorithm> = null;
   public variants: IMMap<ID, Variant> = null;
+  public selectedVariants: List<ID> = Immutable.List([]);
 
   // these are set these on initial load
   public prevGroups: IMMap<ID, Group> = null;

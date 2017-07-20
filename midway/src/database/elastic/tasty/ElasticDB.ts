@@ -181,7 +181,7 @@ export class ElasticDB implements TastyDB
   }
 
   /*
-   * Deletes the given index
+   * Creates the given index
    */
   public async createIndex(indexName)
   {
@@ -223,7 +223,6 @@ export class ElasticDB implements TastyDB
     }
 
     const payload: object = table.getMapping();
-    winston.info('putMapping payload: ' + JSON.stringify(payload));
     return new Promise((resolve, reject) =>
     {
       this.client.indices.putMapping(

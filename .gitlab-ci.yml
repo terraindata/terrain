@@ -14,7 +14,7 @@ before_script:
 
 stages:
   - lint
-  - fix
+  - style
   - test
 
 lint:
@@ -22,10 +22,10 @@ lint:
    - yarn run lint
   stage: lint
 
-fix:
+style:
   script:
-   - yarn run fix
-  stage: fix
+   - yarn run style
+  stage: style
 
 test-backend:
   script:
@@ -33,6 +33,7 @@ test-backend:
    - yarn run test-back
    - yarn run test-back-teardown
   stage: test
+  when: always
   artifacts:
     paths:
       - coverage
@@ -41,6 +42,7 @@ test-frontend:
   script:
    - yarn run build
   stage: test
+  when: always
 
 test-frontend-prod:
   script:

@@ -44,13 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression max-line-length
 
 import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as classNames from 'classnames';
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
@@ -59,44 +61,26 @@ import Util from '../../../util/Util';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import BuilderStore from './../../../builder/data/BuilderStore';
-import Classs from './../../../common/components/Classs';
 import InfoArea from './../../../common/components/InfoArea';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
 const ReactTooltip = require('react-tooltip');
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
-const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
+// const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-const Tab = React.createClass<any, any>({
+const Tab = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:
   {
-    id: React.PropTypes.string.isRequired,
-    name: React.PropTypes.string.isRequired,
-    selected: React.PropTypes.bool.isRequired,
-    index: React.PropTypes.number.isRequired,
-    onClick: React.PropTypes.func.isRequired,
-    onClose: React.PropTypes.func.isRequired,
-  },
-
-  handleResize(e)
-  {
-    this.setState({
-      zoom: (window.outerWidth - 8) / window.innerWidth,
-    });
-  },
-
-  componentDidMount()
-  {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  },
-
-  componentWillUnmount()
-  {
-    window.removeEventListener('resize', this.handleResize);
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    selected: PropTypes.bool.isRequired,
+    index: PropTypes.number.isRequired,
+    onClick: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
   },
 
   getDefaultProps(): any
@@ -110,16 +94,14 @@ const Tab = React.createClass<any, any>({
   },
 
   // Returns z-index so that tabs are layered in a nice fashion
-  zIndexStyle(): ({ zIndex?: number })
+  zIndexStyle(): number
   {
     if (!this.props.selected)
     {
-      return {
-        zIndex: this.props.index,
-      };
+      return this.props.index;
     }
 
-    return {};
+    return undefined;
   },
 
   handleClick()
@@ -155,20 +137,6 @@ const Tab = React.createClass<any, any>({
 
   render()
   {
-    let topStyle = '-17px';
-    if (this.state.zoom < 0.8)
-    {
-      topStyle = '-15px';
-    }
-    if (this.state.zoom < 0.7)
-    {
-      topStyle = '-13px';
-    }
-    if (this.state.zoom < 0.6)
-    {
-      topStyle = '-8px';
-    }
-
     return this.renderPanel(
       <div
         className={classNames({
@@ -178,17 +146,15 @@ const Tab = React.createClass<any, any>({
         })}
         key={this.props.id}
         onClick={this.handleClick}
-        style={this.zIndexStyle()}
+        style={{
+          backgroundColor: this.props.selected ? Colors().builder.tabs.tabTopRibbon : Colors().builder.tabs.tabTopRibbonInactive,
+          color: this.props.selected ? Colors().text.baseLight : Colors().text.secondaryLight,
+          zIndex: this.zIndexStyle(),
+        }}
       >
-        {
-          !this.props.fixed &&
-          <TabIcon
-            className='tab-icon tab-icon-left'
-          />
-        }
         <div
           className='tab-inner'
-          style={{ top: topStyle }}
+          style={backgroundColor(this.props.selected ? Colors().builder.tabs.tabActive : Colors().builder.tabs.tabInactive)}
         >
           {
             this.props.name
@@ -197,12 +163,6 @@ const Tab = React.createClass<any, any>({
             this.renderClose()
           }
         </div>
-        {
-          !this.props.fixed &&
-          <TabIcon
-            className='tab-icon tab-icon-right'
-          />
-        }
       </div>,
     );
   },
@@ -223,7 +183,7 @@ interface TabsProps
   onNoVariant(variantId: string);
 }
 
-export class Tabs extends PureClasss<TabsProps> {
+export class Tabs extends TerrainComponent<TabsProps> {
   public state = {
     variants: LibraryStore.getState().variants,
     tabs: null,
@@ -410,9 +370,17 @@ export class Tabs extends PureClasss<TabsProps> {
       };
 
     return (
-      <div className='tabs-container'>
-        <div className='tabs-row-wrapper'>
-          <div className='tabs-row'>
+      <div
+        className='tabs-container'
+      >
+        <div
+          className='tabs-row-wrapper'
+          style={backgroundColor(Colors().builder.tabs.background)}
+        >
+          <div
+            className='tabs-row'
+            style={backgroundColor(Colors().builder.tabs.background)}
+          >
             <div className='tabs-inner-wrapper'>
               <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
             </div>

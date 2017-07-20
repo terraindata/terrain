@@ -43,35 +43,49 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import Actions from './../data/FileImportActions';
-import PureClasss from './../../common/components/PureClasss';
 import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
+const { List } = Immutable;
+
+const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
 
 export interface Props
 {
-  columnId: number,
-  recursionId: number;
-  columnType: any;
-  datatypes: List<string>;
+  columnId: number;
+  recursionDepth: number;
+  columnType: FileImportTypes.ColumnTypesTree;
+  editing: boolean;
 }
 
-class TypeDropdown extends PureClasss<Props>
+class TypeDropdown extends TerrainComponent<Props>
 {
-  public handleTypeChange(typeIndex)
+  public handleTypeChange(typeIndex: number)
   {
-    Actions.setColumnType(this.props.columnId, this.props.recursionId, typeIndex);
+    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
   }
 
   public componentWillUnmount()
   {
-    Actions.deleteColumnType(this.props.columnId, this.props.recursionId);
+    if (!this.props.editing)
+    {
+      Actions.deleteColumnType(this.props.columnId, this.props.recursionDepth);
+    }
+  }
+
+  public shouldComponentUpdate(nextProps: Props)
+  {
+    return JSON.stringify(this.props.columnType) === JSON.stringify(nextProps.columnType);
   }
 
   public render()
@@ -79,8 +93,8 @@ class TypeDropdown extends PureClasss<Props>
     return (
       <div>
         <Dropdown
-          selectedIndex={this.props.columnType.type}
-          options={this.props.datatypes}
+          selectedIndex={Number(this.props.columnType.type)}
+          options={DATATYPES}
           onChange={this.handleTypeChange}
           canEdit={true}
         />
@@ -88,9 +102,9 @@ class TypeDropdown extends PureClasss<Props>
           FileImportTypes.ELASTIC_TYPES[this.props.columnType.type] === 'array' &&
           <TypeDropdown
             columnId={this.props.columnId}
-            recursionId={this.props.recursionId + 1}
+            recursionDepth={this.props.recursionDepth + 1}
             columnType={this.props.columnType.innerType}
-            datatypes={this.props.datatypes}
+            editing={this.props.editing}
           />
         }
       </div>

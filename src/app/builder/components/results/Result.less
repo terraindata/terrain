@@ -14,19 +14,19 @@
   min-width: 125px;
   flex-grow: 1;
   flex-basis: 125px;
-  padding: 0px (@standard-margin / 2);
+  // padding: 0px (@standard-margin / 2);
   margin: 3px;
   cursor: pointer;
 }
 
 .result {
-  margin-top: @standard-margin;
+  // margin-top: @standard-margin;
   
   position: relative;
   
   &:hover {
     .result-inner .result-name {
-      background: darken(@result-name-bg, 10%);
+      // background: darken(@result-name-bg, 10%);
     }
   }
   
@@ -63,11 +63,10 @@
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
     padding: 10px 13px;
-    background: @result-name-bg;
+    // background: @result-name-bg;
     box-sizing: border-box;
     position: relative;
     
-    .trans-black;
     .transition;
     
     .result-name-inner {
@@ -86,9 +85,11 @@
   }
   
   .result-inner {
-    border: 2px solid @builder-bg;
-    background: @white;
-    border-radius: 5px;
+    border-radius: 3px;
+    border: 1px solid #fff;
+    // border: @result-border;
+    // background: @white;
+    // border-radius: 5px;
     .transition;
 
     // height: calc(~"100% - 2 * @{standard-margin}");
@@ -98,7 +99,7 @@
       // height: @result-score-height;
       .trans-black;
       
-      background: @result-score-bg;
+      // background: @result-score-bg;
       padding: 3px;
       box-sizing: border-box;
       // font-weight: 700;
@@ -165,21 +166,14 @@
     }
     
     .result-bottom {
-      // position: absolute;
-      // bottom: 0px;
-      // width: 100%;
       text-align: center;
       padding: 3px;
       font-size: 12px;
-      color: #aaa;
-      background: #fff;
+      // color: #aaa;
       .transition;
-      &:hover {
-        color: #777;
-      }
-      // border-bottom-left-radius: 10px;
-      // border-bottom-right-radius: 10px;
-      // box-sizing: border-box;
+      // &:hover {
+      //   color: #777;
+      // }
     }
   }
   
@@ -218,7 +212,7 @@
     opacity: 0;
     width: auto;
     height: auto;
-    border-radius: 5px;
+    // border-radius: 5px;
   }
 }
 
@@ -234,7 +228,7 @@
     background-position: center center;
     background-repeat: no-repeat;
     
-    border-radius: 4px;
+    // border-radius: 4px;
     
     img {
       width: 100%;

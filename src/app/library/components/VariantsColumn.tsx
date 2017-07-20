@@ -43,22 +43,25 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
+
 import * as React from 'react';
 import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
 import { browserHistory } from 'react-router';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
 import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
@@ -75,12 +78,15 @@ type Variant = LibraryTypes.Variant;
 export interface Props
 {
   variants: Immutable.Map<ID, Variant>;
+  selectedVariants: Immutable.List<ID>;
   variantsOrder: Immutable.List<ID>;
   groupId: ID;
   algorithmId: ID;
+  multiselect?: boolean;
+  params?: any;
 }
 
-class VariantsColumn extends Classs<Props>
+class VariantsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,
@@ -100,6 +106,14 @@ class VariantsColumn extends Classs<Props>
 
   public componentWillMount()
   {
+    const { multiselect, params } = this.props;
+
+    if (multiselect && params && params.variantId)
+    {
+      const variantIds = params.variantId.split(',');
+      variantIds.forEach((id) => Actions.variants.select(id));
+    }
+
     this._subscribe(UserStore, {
       stateKey: 'me',
       storeKeyPath: ['currentUser'],
@@ -131,6 +145,16 @@ class VariantsColumn extends Classs<Props>
       this.setState({
         rendered: false,
       });
+    }
+
+    const { multiselect, selectedVariants } = this.props;
+    const { params } = nextProps;
+    const { groupId, algorithmId } = params;
+    const nextSelectedVariants = nextProps.selectedVariants;
+    if (multiselect && !selectedVariants.equals(nextSelectedVariants))
+    {
+      browserHistory
+        .replace(`/library/${groupId}/${algorithmId}/${nextSelectedVariants.join(',')}`);
     }
   }
 
@@ -241,6 +265,33 @@ class VariantsColumn extends Classs<Props>
     });
   }
 
+  public handleItemSelect(id: ID)
+  {
+    const {
+      multiselect,
+      selectedVariants,
+      groupId,
+      algorithmId,
+    } = this.props;
+
+    if (multiselect)
+    {
+      if (selectedVariants.includes(id.toString()))
+      {
+        Actions.variants.unselect(id.toString());
+      } else
+      {
+        Actions.variants.select(id.toString());
+      }
+    } else
+    {
+      browserHistory.push(`/library/${groupId}/${algorithmId}/${id}`);
+      const { variantId } = this.props.params;
+      Actions.variants.unselectAll();
+      Actions.variants.select(variantId);
+    }
+  }
+
   public handleDoubleClick(id: ID)
   {
     browserHistory.push(`/builder/?o=${id}`);
@@ -248,12 +299,19 @@ class VariantsColumn extends Classs<Props>
 
   public renderVariant(id: ID, fadeIndex: number)
   {
+    const { multiselect, params } = this.props;
+    const currentVariantId = params.variantId;
     const variant = this.props.variants.get(id);
+    const { selectedVariants } = this.props;
     const index = this.props.variantsOrder.indexOf(id);
     const { me, roles } = this.state;
-    let canEdit: boolean, canDrag: boolean;
+    let canEdit: boolean;
+    let canDrag: boolean;
     canEdit = true;
     canDrag = true;
+    const isSelected = multiselect ?
+      selectedVariants.includes(variant.id.toString()) :
+      currentVariantId === variant.id.toString();
 
     // if (me && roles)
     // {
@@ -305,6 +363,8 @@ class VariantsColumn extends Classs<Props>
         canDrag={canDrag}
         canCreate={canDrag}
         isStarred={variant.status === 'DEFAULT'}
+        onSelect={this.handleItemSelect}
+        isSelected={isSelected}
       >
         <div className='flex-container'>
           <UserThumbnail

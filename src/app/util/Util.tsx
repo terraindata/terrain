@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
+
 import * as $ from 'jquery';
 // import * as moment from 'moment';
 const moment = require('moment');
@@ -84,7 +87,8 @@ const Util = {
   // assumes min of 0 if not passed.
   randInt(...args: number[]): number
   {
-    let min: number = arguments[0], max: number = arguments[1];
+    let min: number = arguments[0];
+    let max: number = arguments[1];
     if (arguments.length === 1)
     {
       min = 0;
@@ -332,7 +336,7 @@ const Util = {
     return Math.random();
   },
 
-  extendId(obj: Object, isString?: boolean): Object
+  extendId(obj: object, isString?: boolean): object
   {
     if (obj['id'])
     {
@@ -369,7 +373,14 @@ const Util = {
 
   rel(target): string
   {
-    return Util.attr(target, 'rel');
+    const rel = Util.attr(target, 'rel');
+
+    if (rel === undefined || rel === null)
+    {
+      return Util.attr(target, 'data-rel');
+    }
+
+    return rel;
   },
 
   attr(target, key: string): string

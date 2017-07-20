@@ -43,16 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as RoleTypes from './../roles/RoleTypes';
 import * as UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 const { List, Map } = Immutable;
-import BackendInstance from '../../../shared/backends/types/BackendInstance';
-import { Item, ItemC, ItemStatus, ItemType } from '../../../shared/items/types/Item';
-import { _Query, Query, queryForSave } from '../../../shared/items/types/Query';
 import { _ResultsConfig, ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import BackendInstance from '../../database/types/BackendInstance';
+import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
+import { _Query, Query, queryForSave } from '../../items/types/Query';
 import { BaseClass, New } from '../Classes';
 
 // TODO MOD refactor

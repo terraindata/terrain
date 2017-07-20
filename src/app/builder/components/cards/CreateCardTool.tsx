@@ -43,14 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-console no-unused-expression member-access max-line-length
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import { Card } from '../../../../../shared/blocks/types/Card';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { Card } from '../../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
-import PureClasss from '../../../common/components/PureClasss';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
@@ -84,7 +87,7 @@ export interface Props
   overrideClick?: (index: number) => void; // override the click handler
 }
 
-class CreateCardTool extends PureClasss<Props>
+class CreateCardTool extends TerrainComponent<Props>
 {
   public state: {
     closed: boolean;
@@ -106,7 +109,7 @@ class CreateCardTool extends PureClasss<Props>
     }
     else
     {
-      const type = this.props.accepts.get(index);
+      const type = this.getCardTypeList().get(index);
       this.createCard(type);
     }
   }
@@ -122,7 +125,7 @@ class CreateCardTool extends PureClasss<Props>
     {
       Actions.change(
         this.props.keyPath,
-        BlockUtils.make(AllBackendsMap[this.props.language].blocks[type]),
+        BlockUtils.make(AllBackendsMap[this.props.language].blocks, type),
       );
     }
     else
@@ -193,13 +196,23 @@ class CreateCardTool extends PureClasss<Props>
           backgroundColor: block.static.colors[0],
         }}
       >
-        <div className='create-card-button-inner' rel={'' + index}>
+        <div className='create-card-button-inner' data-rel={'' + index}>
           {
             text
           }
         </div>
       </a>
     );
+  }
+
+  getCardTypeList(): List<string>
+  {
+    if (this.props.overrideText)
+    {
+      // TODO consider memoizing this.
+      return this.props.overrideText.map((t) => t.type).toList();
+    }
+    return this.props.accepts || AllBackendsMap[this.props.language].cardsList;
   }
 
   public renderCardSelector()
@@ -220,7 +233,7 @@ class CreateCardTool extends PureClasss<Props>
 
     //               curIndex++;
 
-    const cardTypeList = this.props.overrideText || this.props.accepts;
+    const cardTypeList = this.getCardTypeList();
     const isEmpty = cardTypeList.size === 0;
 
     return (
@@ -239,11 +252,7 @@ class CreateCardTool extends PureClasss<Props>
               </div>
           }
           {
-            this.props.overrideText
-              ?
-              this.props.overrideText.map((v, index) => this.renderCardOption(v.type, index))
-              :
-              this.props.accepts.map(this.renderCardOption)
+            cardTypeList.map(this.renderCardOption)
           }
           {
             _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
@@ -314,7 +323,7 @@ class CreateCardTool extends PureClasss<Props>
 
   handleKeyboardSelect(index: number)
   {
-    const type = this.props.accepts.get(index);
+    const type = this.getCardTypeList().get(index);
     this.createCard(type);
   }
 
@@ -344,6 +353,8 @@ class CreateCardTool extends PureClasss<Props>
         };
     }
 
+    const cardTypeList = this.getCardTypeList();
+
     return (
       <div
         className={classes}
@@ -367,7 +378,7 @@ class CreateCardTool extends PureClasss<Props>
           onFocusLost={this.handleFocusLost}
           index={this.state.focusedIndex}
           onIndexChange={this.handleFocusedIndexChange}
-          length={this.props.accepts && this.props.accepts.size}
+          length={cardTypeList.size}
           onSelect={this.handleKeyboardSelect}
         />
       </div>

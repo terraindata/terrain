@@ -71,6 +71,9 @@ export let LibraryActionTypes =
       status: '',
       fetchVersion: '',
       loadVersion: '',
+      select: '',
+      unselect: '',
+      unselectAll: '',
     },
 
     loadState: '',

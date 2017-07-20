@@ -44,11 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
-import BackendInstance from '../../../../shared/backends/types/BackendInstance';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import BackendInstance from '../../../database/types/BackendInstance';
+import { ItemStatus } from '../../../items/types/Item';
 import Util from '../../util/Util';
 import * as LibraryTypes from '../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
@@ -169,7 +171,7 @@ const Actions =
     variants:
     {
       create:
-      (groupId: ID, algorithmId: ID, variant = LibraryTypes._Variant()) =>
+      (groupId: ID, algorithmId: ID, variant = LibraryTypes._Variant(), responseHandler?: (response, variant) => any) =>
       {
         variant = variant
           .set('parent', algorithmId)
@@ -185,6 +187,7 @@ const Actions =
             $(ActionTypes.variants.create, {
               variant: variant.set('id', id),
             });
+            responseHandler && responseHandler(response, variant);
           },
         );
       },
@@ -202,7 +205,6 @@ const Actions =
       {
         groupId = groupId || variant.groupId;
         algorithmId = algorithmId || variant.algorithmId;
-
         let newVariant = variant
           .set('id', -1)
           .set('parent', algorithmId)
@@ -213,6 +215,22 @@ const Actions =
         newVariant = LibraryTypes.touchVariant(newVariant);
 
         Actions.variants.create(groupId, algorithmId, newVariant);
+      },
+
+      duplicateAs:
+      (variant: Variant, index: number, algorithmName?: string, responseHandler?: (response, variant) => any) =>
+      {
+        algorithmName = algorithmName || Util.duplicateNameFor(variant.name);
+        let newVariant = variant
+          .set('id', -1)
+          .set('parent', variant.algorithmId)
+          .set('algorithmId', variant.algorithmId)
+          .set('groupId', variant.groupId)
+          .set('name', algorithmName)
+          .set('status', ItemStatus.Build);
+        newVariant = LibraryTypes.touchVariant(newVariant);
+
+        Actions.variants.create(variant.groupId, variant.algorithmId, newVariant, responseHandler);
       },
 
       deploy:
@@ -255,6 +273,16 @@ const Actions =
       (variantId: string, variantVersion: LibraryTypes.Variant) =>
         $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
 
+      select:
+      (variantId: string) =>
+        $(ActionTypes.variants.select, { variantId }),
+
+      unselect:
+      (variantId: string) =>
+        $(ActionTypes.variants.unselect, { variantId }),
+
+      unselectAll:
+      () => $(ActionTypes.variants.unselectAll, {}),
     },
 
     loadState:

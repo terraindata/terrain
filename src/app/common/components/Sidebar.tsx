@@ -43,10 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands interface-name
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import PureClasss from '../../common/components/PureClasss';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
 
@@ -69,7 +73,7 @@ export interface Props
   onExpand?: () => void;
 }
 
-export class Sidebar extends PureClasss<Props>
+export class Sidebar extends TerrainComponent<Props>
 {
   public render()
   {
@@ -79,11 +83,13 @@ export class Sidebar extends PureClasss<Props>
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
+        style={backgroundColor(Colors().sideBar.base)}
       >
         <div
           className='sidebar-selected-square'
           style={{
             top: (this.props.selectedIndex * linkHeight) + 'px',
+            backgroundColor: Colors().sideBar.selectedSquare,
           }}
         />
         {

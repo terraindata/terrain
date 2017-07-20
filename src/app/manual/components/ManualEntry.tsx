@@ -43,17 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires restrict-plus-operands max-line-length
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './ManualEntry.less';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
 import * as Immutable from 'immutable';
-import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import Card from './../../builder/components/cards/CardComponent';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');
@@ -63,7 +66,7 @@ import './../../tql/components/monokai.less';
 
 const reactStringReplace = require('react-string-replace');
 
-import { cardList } from '../../../../shared/backends/mysql/blocks/MySQLBlocks';
+import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
 
 export interface Props
 {
@@ -77,7 +80,7 @@ export interface Props
   bottomLine?: boolean;
 }
 
-class ManualEntry extends Classs<Props>
+class ManualEntry extends TerrainComponent<Props>
 {
 
   public allTqlCards = cardList;
@@ -129,7 +132,7 @@ class ManualEntry extends Classs<Props>
   {
     if (!text)
     {
-      return;
+      return (null);
     }
     let keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
     // Remove ( ) card

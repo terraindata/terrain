@@ -44,15 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
+
 import * as React from 'react';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
-import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
@@ -69,9 +71,10 @@ export interface Props
 {
   groups: Immutable.Map<ID, Group>;
   groupsOrder: Immutable.List<ID>;
+  params: any;
 }
 
-class GroupsColumn extends Classs<Props>
+class GroupsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,
@@ -148,6 +151,7 @@ class GroupsColumn extends Classs<Props>
   public renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
+    const { params } = this.props;
     const { me, roles } = this.state;
     const groupRoles = roles && roles.get(id);
     const canCreate = (me && groupRoles && groupRoles.getIn([me.id, 'admin']));
@@ -177,6 +181,7 @@ class GroupsColumn extends Classs<Props>
         canArchive={canEdit || canDrag}
         canDuplicate={false}
         canCreate={canCreate}
+        isSelected={+group.id === +params.groupId}
       >
         <div className='group-library-info-wrapper'>
           {

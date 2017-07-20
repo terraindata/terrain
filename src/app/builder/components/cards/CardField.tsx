@@ -43,11 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions interface-name no-var-requires
+
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { Display, DisplayType, RowDisplay } from '../../../../../shared/blocks/displays/Display';
-import PureClasss from '../../../common/components/PureClasss';
+import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
 import BuilderComponent from '../BuilderComponent';
@@ -111,7 +114,7 @@ const DefaultMoveState: IMoveState =
 
 const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
-class CardField extends PureClasss<Props>
+class CardField extends TerrainComponent<Props>
 {
   public state: IMoveState = DefaultMoveState;
 

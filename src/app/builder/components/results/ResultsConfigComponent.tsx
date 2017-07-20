@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty max-classes-per-file strict-boolean-expressions max-line-length no-var-requires
+
 import * as Immutable from 'immutable';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
@@ -55,9 +58,9 @@ import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Result from '../results/Result';
-import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import { MAX_RESULTS, Results } from './ResultsManager';
+import TerrainComponent from './../../../common/components/TerrainComponent';
+import { MAX_RESULTS, Results } from './ResultTypes';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
@@ -73,7 +76,7 @@ export interface Props
   onClose: () => void;
 }
 
-export class ResultsConfigComponent extends PureClasss<Props>
+export class ResultsConfigComponent extends TerrainComponent<Props>
 {
   public state: {
     lastHover: { index: number, field: string },
@@ -389,7 +392,7 @@ interface ResultsConfigResultProps
   primaryKeys: List<string>;
   onPrimaryKeysChange: (primaryKeys: List<string>) => void;
 }
-class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
+class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 {
   public state: {
     showFormat: boolean;
@@ -644,7 +647,7 @@ interface CRTargetProps
   children?: any;
   isOver?: boolean;
 }
-class CRTargetC extends PureClasss<CRTargetProps>
+class CRTargetC extends TerrainComponent<CRTargetProps>
 {
   public render()
   {

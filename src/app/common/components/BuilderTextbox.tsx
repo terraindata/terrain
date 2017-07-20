@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
@@ -51,17 +54,17 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
-import { Display } from '../../../../shared/blocks/displays/Display';
-import { Block } from '../../../../shared/blocks/types/Block';
-import { Card, CardString } from '../../../../shared/blocks/types/Card';
+import * as BlockUtils from '../../../blocks/BlockUtils';
+import { Display } from '../../../blocks/displays/Display';
+import { Block } from '../../../blocks/types/Block';
+import { Card, CardString } from '../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
@@ -110,7 +113,7 @@ export interface Props
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
 }
 
-class BuilderTextbox extends PureClasss<Props>
+class BuilderTextbox extends TerrainComponent<Props>
 {
   public state: {
     wrongType: boolean;
@@ -223,7 +226,7 @@ class BuilderTextbox extends PureClasss<Props>
   public handleSwitch()
   {
     const value = this.isText() ? BlockUtils.make(
-      AllBackendsMap[this.props.language].blocks[this.getCreatingType()],
+      AllBackendsMap[this.props.language].blocks, this.getCreatingType(),
     ) : '';
     this.setState({
       value,
@@ -332,7 +335,6 @@ class BuilderTextbox extends PureClasss<Props>
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
-                rel={this.props.rel}
               />
               :
               <Autocomplete

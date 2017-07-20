@@ -43,26 +43,29 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions return-undefined no-console no-empty no-unused-expression
+
 // Note: If anyone would like to take the time to clean up this file, be my guest.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 
-import { Item, ItemType } from '../../../shared/items/types/Item';
-import Query from '../../../shared/items/types/Query';
+import BackendInstance from '../../database/types/BackendInstance';
+import { Item, ItemType } from '../../items/types/Item';
+import Query from '../../items/types/Query';
 import LibraryStore from '../library/data/LibraryStore';
-import BackendInstance from './../../../shared/backends/types/BackendInstance';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import * as LibraryTypes from './../library/LibraryTypes';
 import * as UserTypes from './../users/UserTypes';
 
-import MidwayQueryResponse from '../../../shared/backends/types/MidwayQueryResponse';
+import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 
 import { routerShape } from 'react-router';
-import { QueryRequest } from '../../../shared/backends/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
+import { QueryRequest } from '../../database/types/QueryRequest';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
 // const { List, Map } = Immutable;
@@ -468,7 +471,6 @@ export const Ajax =
             onLoad(null);
           }
         },
-
       );
       // }
       // TODO
@@ -685,36 +687,36 @@ export const Ajax =
 
     importFile(file: string,
       filetype: string,
-      db: string,
-      table: string,
+      dbname: string,
+      tablename: string,
       connectionId: number,
-      oldNames: List<string>,
+      originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
       primaryKey: string,
-      transformations: List<object>,
+      transformations: Immutable.List<object>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
-    ): { xhr: XMLHttpRequest, queryId: string }
+    )
     {
       const payload: object = {
         dbid: connectionId,
-        db,
-        table,
+        dbname,
+        tablename,
         contents: file,
         filetype,
-        originalNames: oldNames,
+        originalNames,
         columnTypes,
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
         transformations,
       };
-      console.log('payload: ', payload);
+      console.log('import payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
       };
-      const xhr = Ajax.req(
+      Ajax.req(
         'post',
         'import/',
         payload,
@@ -725,6 +727,72 @@ export const Ajax =
       );
 
       return;
+    },
+
+    saveTemplate(dbname: string,
+      tablename: string,
+      connectionId: number,
+      originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKey: string,
+      transformations: List<object>,
+      name: string,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+      hasCsvHeader?: boolean,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+        originalNames,
+        columnTypes,
+        primaryKey,
+        csvHeaderMissing: !hasCsvHeader,
+        transformations,
+        name,
+      };
+      console.log('saveTemplate payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/create',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
+    getTemplates(
+      connectionId: number,
+      dbname: string,
+      tablename: string,
+
+      onLoad: (templates: object[]) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+      };
+      console.log('getTemplates payload: ', payload);
+      Ajax.req(
+        'post',
+        'templates/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)

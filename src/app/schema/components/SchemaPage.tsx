@@ -43,8 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { DragDropContext } from 'react-dnd';
 const { browserHistory } = require('react-router');
@@ -59,7 +62,7 @@ export interface Props
   };
 }
 
-class SchemaPage extends PureClasss<Props>
+class SchemaPage extends TerrainComponent<Props>
 {
   public state: {
     on: boolean;

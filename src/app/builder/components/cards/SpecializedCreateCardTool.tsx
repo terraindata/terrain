@@ -43,14 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions member-access
+
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import { Card } from '../../../../../shared/blocks/types/Card';
-import PureClasss from '../../../common/components/PureClasss';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { Card } from '../../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../../database/AllBackends';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 
@@ -70,7 +73,7 @@ export interface Props
 
 const emptyList = Immutable.List([]);
 
-class SpecializedCreateCardTool extends PureClasss<Props>
+class SpecializedCreateCardTool extends TerrainComponent<Props>
 {
   state: {
     options?: List<{
@@ -115,20 +118,24 @@ class SpecializedCreateCardTool extends PureClasss<Props>
   {
     const option = this.state.options.get(index);
     const card = this.props.data['childOptionClickHandler'](
-      this.props.data, option
+      this.props.data, option,
     );
 
     Actions.change(
       this.props.keyPath,
       card,
     );
+
+    this.setState({
+      open: false,
+    });
   }
 
   public render()
   {
     return (
       <CreateCardTool
-        index={0}
+        index={null}
         keyPath={this.props.keyPath}
         canEdit={this.props.canEdit}
         language={this.props.language}

@@ -5,18 +5,18 @@
 @top-height: 24px;
 @title-width: 110px;
 @stroke-height: 5px;
-@card-border-radius: 6px;
+@card-border-radius: 0px;
 @card-padding-horizontal: 15px;
 @card-padding-vertical: 7px;
   
 .card {
-  // min-width: 400px;
-  // width: 600px;
- // .standard-margin;
-  // height: 0px;
   position: relative;
- 
- border-radius: @card-border-radius;
+  border-radius: @card-border-radius;
+  padding: 6px;
+  padding-right: 0px;
+  padding-top: 0px;
+  
+  min-width: 400px;
  
   .card-inner {
     border: 1px solid @medium-dark-green;
@@ -44,19 +44,12 @@
   
   .menu-wrapper {
     top: 5px;
-    left: 84px;
+    left: 34px;
     z-index: 2;
     &.menu-open {
       z-index: 99;
     }
   }
-  
-  &.card-closed {
-    .menu-wrapper {
-      left: calc(~"100% - 27px");
-    }
-  }
-
   
   .card-title-card-hovering {
     .manual-popup-wrapper {
@@ -80,7 +73,7 @@
       box-shadow: inset 0px 0px 10000px rgba(0,0,0,0.5);
       pointer-events: none;
       z-index: 999999;
-      border-radius: 6px;
+      border-radius: @card-border-radius;
       overflow: hidden;
     }
     
@@ -154,15 +147,23 @@
   
   .card-title-inner {
     white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 6px;
+    
+    position: absolute;
+    top: 7px;
+    left: 37px;
+    
+    margin-left: 27px;
   }
 
-  .card-arrow-icon {
+  .card-minimize-icon {
     display: inline-block;
     fill: rgba(255,255,255,0.5);
     width: 10px;
     position: absolute;
-    top: 8px;
-    left: 5px;
+    top: 11px;
+    left: 21px;
     .transition;
     opacity: 0;
     
@@ -171,20 +172,37 @@
     }
   }
   
+  .card-handle-icon {
+    .transition;
+    .rotate90;
+    width: 20px;
+    fill: rgba(255,255,255,0.5);
+    &:hover {
+      fill: rgba(255,255,255,0.75);
+    }
+    &:active {
+      fill: #fff;
+    }
+    
+    position: absolute;
+    top: 8px;
+    left: 2px;
+  }
+  
   &.card-title-closed {
     width: calc(~"100% - 1px");
     padding-right: 20px;
     border-radius: calc(@card-border-radius - 1px);
-    .card-arrow-icon {
+    .card-minimize-icon {
       .rotate(-90deg);
-      top: 11px;
+      top: 13px;
       opacity: 1;
-      left: 2px;
+      left: 18px;
     }
   }
   
   &.card-title-card-hovering {
-    .card-arrow-icon {
+    .card-minimize-icon {
       opacity: 1;
     }
   }
@@ -193,8 +211,7 @@
 .cards-area {
   .transition;
 
-  border-top-left-radius: 9px;
-  border-bottom-left-radius: 9px;
+  padding-top: 6px;
   
   .cards-area {
     // for nested cards
@@ -368,7 +385,13 @@
 
 .card .cards-area, .builder-tb-cards-area {
   margin-right: -4px !important;
-    margin-left: -108px;
+  margin-left: -108px;
+}
+
+.card-no-title {
+  .cards-area, .builder-tb-cards-area {
+    margin-left: -55px;
+  }
 }
 
 .builder-comp-list-item.card-fields {
@@ -429,9 +452,12 @@
   opacity: 1;
   margin: 0px 10px;
   text-transform: none;
-  display: inline-block;
+  display: block;
+  position: absolute;
+  top: 8px;
+  left: 120px;
   padding: 2px 10px;
-  border-radius: 4px;
+  border-radius: @card-border-radius;
   background: rgba(255,255,255,0.5);
   background-blend-mode: multiply;
   
@@ -447,6 +473,25 @@
 }
 
 .card-placeholder {
-  border-radius: 6px;
+  border-radius: @card-border-radius;
   opacity: 0.7;
+}
+
+.card-muted-input input {
+  background: rgba(255,255,255,0);
+  color: #fff;
+  .transition;
+  
+  &:hover, &[value=""] {
+    background: rgba(255,255,255,0.25);
+  }
+  
+  &:focus {
+    background: #fff;
+    color: #242424;
+  }
+  
+  &::placeholder {
+    color: rgba(255,255,255,0.75);
+  }
 }

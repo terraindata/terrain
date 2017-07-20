@@ -51,6 +51,7 @@ import * as App from '../App';
 import DatabaseController from '../../database/DatabaseController';
 import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Scripts from '../../scripts/Scripts';
 import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
 
@@ -115,45 +116,43 @@ export class Databases
 
   public async upsert(user: UserConfig, db: DatabaseConfig): Promise<DatabaseConfig>
   {
-    return new Promise<DatabaseConfig>(async (resolve, reject) =>
+    if (db.id !== undefined)
     {
-      if (db.id !== undefined)
+      const results: DatabaseConfig[] = await this.get(db.id);
+      // database id specified but database not found
+      if (results.length === 0)
       {
-        const results: DatabaseConfig[] = await this.get(db.id);
-        // database id specified but database not found
-        if (results.length === 0)
-        {
-          return reject('Invalid db id passed');
-        }
-
-        db = Util.updateObject(results[0], db);
+        throw new Error('Invalid db id passed');
       }
 
-      resolve(await App.DB.upsert(this.databaseTable, db) as DatabaseConfig);
-    });
+      db = Util.updateObject(results[0], db);
+    }
+
+    return App.DB.upsert(this.databaseTable, db) as Promise<DatabaseConfig>;
   }
 
   public async connect(user: UserConfig, id: number): Promise<DatabaseConfig>
   {
-    return new Promise<DatabaseConfig>(async (resolve, reject) =>
+    const results: DatabaseConfig[] = await this.get(id);
+    if (results.length === 0)
     {
-      const results: DatabaseConfig[] = await this.get(id);
-      if (results.length === 0)
-      {
-        return reject('Invalid db id passed');
-      }
+      throw new Error('Invalid db id passed');
+    }
 
-      const db: DatabaseConfig = results[0];
-      if (db.id === undefined)
-      {
-        return reject('Database does not have an ID');
-      }
+    const db: DatabaseConfig = results[0];
+    if (db.id === undefined)
+    {
+      throw new Error('Database does not have an ID');
+    }
 
-      const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
-      DatabaseRegistry.set(db.id, controller);
-      db.status = 'CONNECTED';
-      resolve(await this.upsert(user, db));
-    });
+    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
+    DatabaseRegistry.set(db.id, controller);
+    db.status = 'CONNECTED';
+
+    // try to provision built-in scripts to the connected database
+    await Scripts.provisionScripts(controller);
+
+    return this.upsert(user, db);
   }
 
   public async disconnect(user: UserConfig, id: number): Promise<DatabaseConfig>
@@ -168,7 +167,7 @@ export class Databases
     const controller = DatabaseRegistry.get(id);
     if (controller === undefined)
     {
-      return Promise.reject('Invalid db id passed (schema)');
+      throw new Error('Invalid db id passed (schema)');
     }
 
     const schema: Tasty.Schema = await controller.getTasty().schema();

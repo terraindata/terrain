@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions no-var-requires class-name no-empty max-line-length no-unused-expression
+
 import './CardStyle.less';
 
 import * as classNames from 'classnames';
@@ -53,28 +56,32 @@ import { DragSource } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 const { createDragPreview } = require('react-dnd-text-dragpreview');
-import { Card } from '../../../../../shared/blocks/types/Card';
+import { Display } from '../../../../blocks/displays/Display';
+import { Card } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import LayoutManager from '../layout/LayoutManager';
-import { Display } from './../../../../../shared/blocks/displays/Display';
-import PureClasss from './../../../common/components/PureClasss';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 import ManualPopup from './../../../manual/components/ManualPopup';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { AllBackendsMap } from '../../../../database/AllBackends';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
-
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
+const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
+
+// title width when we don't show a title
+const NO_TITLE_WIDTH = 58;
 
 export interface Props
 {
@@ -98,7 +105,7 @@ export interface Props
   display?: Display;
 }
 
-class _CardComponent extends PureClasss<Props>
+class _CardComponent extends TerrainComponent<Props>
 {
   public state: {
     selected: boolean;
@@ -116,9 +123,6 @@ class _CardComponent extends PureClasss<Props>
     cardInner: Ref;
     cardBody: Ref;
   };
-
-  // _debugUpdates = true;
-  public _debugName = 'Card';
 
   public dragPreview: any;
 
@@ -428,6 +432,9 @@ class _CardComponent extends PureClasss<Props>
 
         if (cardEnd < visibleStart || cardStart > visibleEnd)
         {
+          // TODO fix bug here where you have the CreateCardTool open
+          //  and scroll to the bottom of the column and it expands
+          //  cardHeight ad infinitum
           return (
             <div
               className='card card-placeholder'
@@ -511,11 +518,13 @@ class _CardComponent extends PureClasss<Props>
           'card-hovering': this.state.hovering,
           'card-closing': this.state.closing,
           'card-opening': this.state.opening,
+          'card-no-title': card['noTitle'],
           [card.type + '-card']: true,
         })}
         ref='card'
         id={id}
         onMouseMove={this.handleMouseMove}
+        style={backgroundColor(Colors().builder.cards.cardBase)}
       >
         <CDA
           half={true}
@@ -543,17 +552,41 @@ class _CardComponent extends PureClasss<Props>
                   'card-title-card-hovering': this.state.hovering,
                 })}
                 style={{
-                  background: card.static.colors[0],
+                  // shrink the width if the card does not have a title
+                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
                 }}
                 onClick={this.handleTitleClick}
               >
                 {
-                  this.state.hovering &&
-                  <ArrowIcon className='card-arrow-icon' onClick={this.toggleClose} />
+                  this.props.canEdit &&
+                  <HandleIcon
+                    className='card-handle-icon'
+                  />
                 }
-                <div className='card-title-inner'>
-                  {title}
-                </div>
+                {
+                  this.state.hovering &&
+                  <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
+                }
+                {
+                  this.props.canEdit &&
+                  this.state.hovering &&
+                  <Menu
+                    options={this.state.menuOptions}
+                  />
+                }
+                {
+                  !(this.props.card && this.props.card['noTitle']) &&
+                  <div
+                    className='card-title-inner'
+                    style={{
+                      background: card.static.colors[0],
+                    }}
+                  >
+                    {
+                      title
+                    }
+                  </div>
+                }
 
                 {
                   !this.props.card.closed ? null :
@@ -564,11 +597,6 @@ class _CardComponent extends PureClasss<Props>
                       {BlockUtils.getPreview(card)}
                     </div>
                 }
-                {
-                  this.props.canEdit &&
-                  this.state.hovering &&
-                  <Menu options={this.state.menuOptions} />
-                }
               </div>,
             )
           }
@@ -576,7 +604,13 @@ class _CardComponent extends PureClasss<Props>
           {
             (!this.props.card.closed || this.state.opening) &&
             <div className='card-body-wrapper' ref='cardBody'>
-              <div className='card-body'>
+              <div
+                className='card-body'
+                style={{
+                  // shrink the width if the card does not have a title
+                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+                }}
+              >
                 {
                   content
                 }
@@ -633,8 +667,7 @@ const cardSource =
     endDrag: () =>
     {
       $('body').removeClass('body-card-is-dragging');
-
-      Actions.dragCard(false);
+      Actions.dragCard(null);
     },
   };
 

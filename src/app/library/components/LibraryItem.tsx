@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -51,8 +54,8 @@ const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
-import Classs from './../../common/components/Classs';
 import Menu from './../../common/components/Menu';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -67,7 +70,7 @@ export interface Props
   canDuplicate: boolean;
   icon: any;
   color: string;
-  to: string;
+  to?: string;
   type: string;
   onNameChange: (id: ID, name: string) => void;
   id: ID;
@@ -91,6 +94,7 @@ export interface Props
 
   // optional
   className?: string;
+  onSelect?: (id: ID) => void;
   onDoubleClick?: (id: ID) => void;
   isStarred?: boolean;
 
@@ -101,9 +105,10 @@ export interface Props
   isOver?: boolean;
   dragItemType?: string;
   isDragging?: boolean;
+  isSelected: boolean;
 }
 
-class LibraryItem extends Classs<Props>
+class LibraryItem extends TerrainComponent<Props>
 {
   public state = {
     nameEditing: false,
@@ -232,6 +237,19 @@ class LibraryItem extends Classs<Props>
     });
   }
 
+  public handleClick(event)
+  {
+    if (this.props.onSelect)
+    {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const { id } = this.props;
+
+      this.props.onSelect(id);
+    }
+  }
+
   public handleDoubleClick(event)
   {
     event.preventDefault();
@@ -250,7 +268,7 @@ class LibraryItem extends Classs<Props>
 
   public render()
   {
-    const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
+    const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
     const { canArchive, canDuplicate } = this.props;
@@ -263,7 +281,8 @@ class LibraryItem extends Classs<Props>
             )
         );
 
-    let shiftedUp: boolean, shiftedDown: boolean;
+    let shiftedUp: boolean;
+    let shiftedDown: boolean;
 
     if (this.props.draggingOverIndex !== -1)
     {
@@ -292,6 +311,7 @@ class LibraryItem extends Classs<Props>
           className='library-item-link'
           activeClassName='library-item-active'
           onDoubleClick={this.handleDoubleClick}
+          onClick={this.handleClick}
         >
           <div
             className={classNames({
@@ -302,15 +322,13 @@ class LibraryItem extends Classs<Props>
               'library-item-wrapper-drag-over': draggingOver,
             })}
             style={{
-              borderColor: this.props.color,
+              borderColor: isSelected ? this.props.color : '',
             }}
           >
             {connectDragSource(
               <div
                 className={'library-item ' + this.props.className}
-                style={{
-                  background: this.props.color,
-                }}
+                style={{ background: this.props.color }}
               >
                 <div
                   className={classNames({

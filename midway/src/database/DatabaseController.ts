@@ -88,6 +88,11 @@ abstract class DatabaseController
     return this.type;
   }
 
+  public getName(): string
+  {
+    return this.name;
+  }
+
   public abstract getClient(): object;
 
   public abstract getTasty(): Tasty.Tasty;

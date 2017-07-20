@@ -43,10 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
@@ -54,8 +57,8 @@ import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import InfoArea from './../../common/components/InfoArea';
-import PureClasss from './../../common/components/PureClasss';
 import Scoreline from './../../common/components/Scoreline';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
@@ -75,9 +78,10 @@ export interface Props
   variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
   groupId: ID;
+  params: any;
 }
 
-class AlgorithmsColumn extends PureClasss<Props>
+class AlgorithmsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,
@@ -220,6 +224,7 @@ class AlgorithmsColumn extends PureClasss<Props>
 
   public renderAlgorithm(id: ID, fadeIndex: number)
   {
+    const { params } = this.props;
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
     const scores = {
@@ -335,6 +340,7 @@ class AlgorithmsColumn extends PureClasss<Props>
         canCreate={canDrag}
         canArchive={canArchive}
         canDuplicate={canDuplicate}
+        isSelected={+algorithm.id === +params.algorithmId}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />

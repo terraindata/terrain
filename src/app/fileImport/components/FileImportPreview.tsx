@@ -43,147 +43,200 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty strict-boolean-expressions no-console
+
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
-import * as FileImportTypes from './../FileImportTypes';
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import Autocomplete from './../../common/components/Autocomplete';
+import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import Actions from './../data/FileImportActions';
-
-import './FileImportPreview.less';
 const { List } = Immutable;
+
+const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
 
 export interface Props
 {
   previewRows: List<List<string>>;
   columnsCount: number;
   primaryKey: number;
-  oldNames: List<string>;
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<object>;
+  columnTypes: List<FileImportTypes.ColumnTypesTree>;
   columnOptions: List<string>;
+  templates: List<FileImportTypes.Template>;
+  transforms: List<FileImportTypes.Transform>;
 }
 
-class FileImportPreview extends PureClasss<Props>
+@Radium
+class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    oldName: string,
-    newName: string,
+    templateId: number,
+    templateText: string,
+    editColumnId: number,
   } = {
-    oldName: '',
-    newName: '',
+    templateId: -1,
+    templateText: '',
+    editColumnId: -1,
   };
 
-  /* To prevent redundancy of renames in list of transforms, save the current rename transform and only add to list
-   * when changing transform columns or types */
-  public handleRenameTransform(oldName: string, newName: string)
+  public componentDidMount()
   {
-    if (this.state.oldName && this.state.oldName !== oldName)
-    {
-      Actions.addTransform({
-        name: 'rename',
-        args: {
-          oldName,
-          newName,
-        },
-      });
-    }
-    console.log('setting rename transform: ', oldName + ' to ' + newName);
-    this.setRenameTransform(oldName, newName);
+    Actions.getTemplates();
   }
 
-  public addRenameTransform()
-  {
-    if (this.state.oldName)
-    {
-      console.log('adding rename transform: ', this.state.oldName + ', ' + this.state.newName);
-      Actions.addTransform({
-        name: 'rename',
-        args: {
-          oldName: this.state.oldName,
-          newName: this.state.newName,
-        },
-      });
-      this.setRenameTransform('', '');
-    }
-  }
-
-  public setRenameTransform(oldName: string, newName: string)
+  public handleEditColumnChange(editColumnId: number)
   {
     this.setState({
-      oldName,
-      newName,
+      editColumnId,
     });
   }
 
-  public handleUploadFile()
+  public handleTemplateChange(templateId: number)
   {
-    // TODO: database and table name error checking
-    this.addRenameTransform();
-    Actions.uploadFile();
+    this.setState({
+      templateId,
+    });
   }
 
-  // TODO: implement Templates
+  public handleAutocompleteTemplateChange(templateText: string)
+  {
+    this.setState({
+      templateText,
+    });
+  }
+
   public handleLoadTemplate()
   {
+    if (this.state.templateId === -1)
+    {
+      alert('Please select a template to load');
+      return;
+    }
+    Actions.loadTemplate(this.state.templateId);
   }
 
   public handleSaveTemplate()
   {
+    if (!this.state.templateText)
+    {
+      alert('Please enter a template name');
+      return;
+    }
+    Actions.saveTemplate(this.state.templateText);
+    Actions.getTemplates();
+  }
+
+  public handleUploadFile()
+  {
+    Actions.uploadFile();
   }
 
   public render()
   {
     return (
-      <div>
-        <button onClick={this.handleLoadTemplate}>
-          Load Template
-        </button>
-        <button onClick={this.handleSaveTemplate}>
-          Save as Template
-        </button>
-        <table>
-          <thead>
-            <tr>
-              {
-                this.props.columnNames.map((value, key) =>
-                  <FileImportPreviewColumn
-                    key={key}
-                    columnId={key}
-                    isIncluded={this.props.columnsToInclude.get(key)}
-                    columnType={this.props.columnTypes.get(key)}
-                    isPrimaryKey={this.props.primaryKey === key}
-                    columnNames={this.props.columnNames}
-                    datatypes={List(FileImportTypes.ELASTIC_TYPES)}
-                    handleRenameTransform={this.handleRenameTransform}
-                    addRenameTransform={this.addRenameTransform}
-                    columnOptions={this.props.columnOptions}
-                  />
-                ).toArray()
-              }
-            </tr>
-          </thead>
-          <tbody>
+      <div
+        className='fi-preview'
+      >
+        <div
+          className='fi-preview-template'
+        >
+          <div
+            className='fi-preview-load'
+          >
+            <div
+              className='fi-load-button'
+              onClick={this.handleLoadTemplate}
+              style={buttonColors()}
+              ref='fi-load-button'
+            >
+              Load Template
+            </div>
+            <Dropdown
+              selectedIndex={this.state.templateId}
+              options={List<string>(this.props.templates.map((template, i) => template.name))}
+              onChange={this.handleTemplateChange}
+              className={'fi-load-dropdown'}
+              canEdit={true}
+            />
+          </div>
+
+          <div
+            className='fi-preview-save'
+          >
+            <div
+              className='fi-save-button'
+              onClick={this.handleSaveTemplate}
+              style={buttonColors()}
+              ref='fi-save-button'
+            >
+              Save Template
+            </div>
+            <Autocomplete
+              value={this.state.templateText}
+              options={null}
+              onChange={this.handleAutocompleteTemplateChange}
+              placeholder={'template name'}
+              className={'fi-save-autocomplete'}
+              disabled={false}
+            />
+          </div>
+        </div>
+
+        <div
+          className='fi-preview-table-container'
+        >
+          <div
+            className='fi-preview-columns-container'
+          >
+            {
+              this.props.columnNames.map((value, key) =>
+                <FileImportPreviewColumn
+                  key={key}
+                  columnId={key}
+                  isIncluded={this.props.columnsToInclude.get(key)}
+                  columnType={this.props.columnTypes.get(key)}
+                  isPrimaryKey={this.props.primaryKey === key}
+                  columnNames={this.props.columnNames}
+                  columnOptions={this.props.columnOptions}
+                  editing={key === this.state.editColumnId}
+                  handleEditColumnChange={this.handleEditColumnChange}
+                />,
+              ).toArray()
+            }
+          </div>
+          <div
+            className='fi-preview-rows-container'
+          >
             {
               this.props.previewRows.map((items, key) =>
                 <FileImportPreviewRow
                   key={key}
                   items={items}
-                />
+                />,
               )
             }
-          </tbody>
-        </table>
-        <button onClick={this.handleUploadFile}>
+          </div>
+        </div>
+        <div
+          className='fi-preview-import-button'
+          onClick={this.handleUploadFile}
+          style={buttonColors()}
+        >
           Import
-        </button>
+        </div>
       </div>
     );
   }

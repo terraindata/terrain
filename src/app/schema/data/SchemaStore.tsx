@@ -44,13 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as _ from 'underscore';
 import Redux = require('redux');
 import { Store } from 'redux';
 import * as ReduxActions from 'redux-actions';
 import * as SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
+import BackendInstance from '../../../database/types/BackendInstance';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
 import ExampleSchemaData from './ExampleSchemaData';

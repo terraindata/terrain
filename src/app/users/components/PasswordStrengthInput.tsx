@@ -43,12 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name no-shadowed-variable
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import PasswordMeter from './PasswordMeter';
 import './Settings.less';
 const zxcvbn = require('zxcvbn');
@@ -60,7 +63,7 @@ export interface Props
   type: string;
 }
 
-class PasswordStrengthInput extends Classs<Props>
+class PasswordStrengthInput extends TerrainComponent<Props>
 {
   constructor(Props)
   {

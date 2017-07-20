@@ -43,12 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './TQLPopup.less';
 
 const OpenIcon = require('./../../../images/icon_open.svg');
@@ -63,7 +66,7 @@ export interface Props
   onClick?: () => void;
 }
 
-class TQLPopup extends Classs<Props>
+class TQLPopup extends TerrainComponent<Props>
 {
   public openManual()
   {

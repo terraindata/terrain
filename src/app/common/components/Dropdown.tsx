@@ -44,14 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions member-access
+
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
+import { Colors, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
 
 export interface Props
@@ -67,7 +70,7 @@ export interface Props
   optionsDisplayName?: Map<any, string>; // maps value to display name
 }
 
-class Dropdown extends PureClasss<Props>
+class Dropdown extends TerrainComponent<Props>
 {
   public _clickHandlers: { [index: number]: () => void } = {};
 
@@ -168,7 +171,7 @@ class Dropdown extends PureClasss<Props>
   handleFocus()
   {
     this.setState({
-      focusedIndex: 0,
+      focusedIndex: -1,
     });
   }
 
@@ -221,6 +224,7 @@ class Dropdown extends PureClasss<Props>
           'dropdown-center': this.props.centerAlign,
           [this.props.className]: !!this.props.className,
         })}
+        style={fontColor(Colors().text.baseDark)}
       >
         {
           this.state.up && this.state.open

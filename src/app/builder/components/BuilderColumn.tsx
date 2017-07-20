@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this
+// tslint:disable:no-invalid-this no-var-requires switch-default strict-boolean-expressions restrict-plus-operands no-unused-expression
 
 import * as classNames from 'classnames';
+import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
@@ -61,9 +63,10 @@ import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
-import Query from '../../../../shared/items/types/Query';
+import Query from '../../../items/types/Query';
 import Ajax from './../../util/Ajax';
 
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import Manual from './../../manual/components/Manual';
@@ -85,7 +88,7 @@ enum COLUMNS
 {
   Builder,
   Results,
-  TQL,
+  Editor,
   Inputs,
   Schema,
 }
@@ -113,31 +116,31 @@ const menuIcons = [
 //   }[];
 // }
 
-const BuilderColumn = React.createClass<any, any>(
+const BuilderColumn = createReactClass<any, any>(
   {
     mixins: [PanelMixin],
 
     propTypes:
     {
-      query: React.PropTypes.object.isRequired,
-      resultsState: React.PropTypes.object.isRequired,
-      variant: React.PropTypes.object.isRequired,
-      className: React.PropTypes.string,
-      index: React.PropTypes.number,
-      canAddColumn: React.PropTypes.bool,
-      canCloseColumn: React.PropTypes.bool,
-      onAddColumn: React.PropTypes.func.isRequired,
-      onAddManualColumn: React.PropTypes.func.isRequired,
-      onCloseColumn: React.PropTypes.func.isRequired,
-      colKey: React.PropTypes.number.isRequired,
-      history: React.PropTypes.any,
-      columnType: React.PropTypes.number,
-      selectedCardName: React.PropTypes.string,
-      switchToManualCol: React.PropTypes.func,
-      changeSelectedCardName: React.PropTypes.func,
-      canEdit: React.PropTypes.bool.isRequired,
-      cantEditReason: React.PropTypes.string,
-      onNavigationException: React.PropTypes.func,
+      query: PropTypes.object.isRequired,
+      resultsState: PropTypes.object.isRequired,
+      variant: PropTypes.object.isRequired,
+      className: PropTypes.string,
+      index: PropTypes.number,
+      canAddColumn: PropTypes.bool,
+      canCloseColumn: PropTypes.bool,
+      onAddColumn: PropTypes.func.isRequired,
+      onAddManualColumn: PropTypes.func.isRequired,
+      onCloseColumn: PropTypes.func.isRequired,
+      colKey: PropTypes.number.isRequired,
+      history: PropTypes.any,
+      columnType: PropTypes.number,
+      selectedCardName: PropTypes.string,
+      switchToManualCol: PropTypes.func,
+      changeSelectedCardName: PropTypes.func,
+      canEdit: PropTypes.bool.isRequired,
+      cantEditReason: PropTypes.string,
+      onNavigationException: PropTypes.func,
     },
 
     getInitialState()
@@ -212,7 +215,6 @@ const BuilderColumn = React.createClass<any, any>(
       {
         case COLUMNS.Builder:
           return <CardsColumn
-            queryType={query.language}
             cards={query.cards}
             deckOpen={query.deckOpen}
             canEdit={canEdit}
@@ -227,6 +229,7 @@ const BuilderColumn = React.createClass<any, any>(
           return <InputsArea
             inputs={query.inputs}
             canEdit={canEdit}
+            language={query.language}
           />;
 
         case COLUMNS.Results:
@@ -239,7 +242,7 @@ const BuilderColumn = React.createClass<any, any>(
             resultsState={this.props.resultsState}
           />;
 
-        case COLUMNS.TQL:
+        case COLUMNS.Editor:
           return <BuilderTQLColumn
             canEdit={canEdit}
             addColumn={this.props.onAddManualColumn}
@@ -316,8 +319,14 @@ const BuilderColumn = React.createClass<any, any>(
       const { query, canEdit, cantEditReason } = this.props;
 
       return this.renderPanel((
-        <div className={'builder-column builder-column-' + this.props.index}>
-          <div className='builder-title-bar'>
+        <div
+          className={'builder-column builder-column-' + this.props.index}
+          style={backgroundColor(Colors().base)}
+        >
+          <div
+            className='builder-title-bar'
+            style={backgroundColor(Colors().builder.builderColumn.background)}
+          >
             {
               this.props.index === 0 ? null : (
                 <div className='builder-resize-handle' ref='resize-handle'>
@@ -368,8 +377,9 @@ const BuilderColumn = React.createClass<any, any>(
               'builder-column-content-scroll':
               this.state.column === COLUMNS.Builder ||
               this.state.column === COLUMNS.Inputs,
-            })
-            }>
+            })}
+            style={backgroundColor(Colors().builder.builderColumn.background)}
+          >
             {
               this.renderContent(canEdit)
             }

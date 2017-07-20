@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires no-console
+
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 import * as _ from 'underscore';
@@ -74,11 +77,11 @@ UserStore.subscribe(() =>
   }
 });
 
-window['test'] = () =>
+/*window['test'] = () =>
 {
   const users = UserStore.getState().users;
   console.log('users', users);
   Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};
+};*/
 
 export default UserStore;

@@ -43,18 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
+
 import * as Immutable from 'immutable';
-import * as React from 'react';
 import * as Papa from 'papaparse';
+import * as React from 'react';
 import * as _ from 'underscore';
 import * as SchemaTypes from '../../schema/SchemaTypes';
-import * as FileImportTypes from './../FileImportTypes';
-import PureClasss from './../../common/components/PureClasss';
 import Autocomplete from './../../common/components/Autocomplete';
-import Dropdown from './../../common/components/Dropdown';
 import CheckBox from './../../common/components/CheckBox';
-import Actions from './../data/FileImportActions';
+import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Util from './../../util/Util';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
 const { List } = Immutable;
 
 export interface Props
@@ -71,7 +74,7 @@ export interface Props
   hasCsvHeader: boolean;
 }
 
-class FileImportInfo extends PureClasss<Props>
+class FileImportInfo extends TerrainComponent<Props>
 {
   public state: {
     serverIndex: number,
@@ -131,7 +134,7 @@ class FileImportInfo extends PureClasss<Props>
         alert('Input JSON file must parse to an array of objects.');
         return;
       }
-      console.log("Parsed json: ", items);
+      console.log('Parsed json: ', items);
     }
     else if (filetype === 'csv')
     {
@@ -147,7 +150,7 @@ class FileImportInfo extends PureClasss<Props>
         skipEmptyLines: true,
       };
       items = Papa.parse(file, config).data;
-      console.log("Parsed csv: ", items);
+      console.log('Parsed csv: ', items);
 
       items.map((item) =>
       {
@@ -162,12 +165,12 @@ class FileImportInfo extends PureClasss<Props>
     items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
-        typeof value === 'string' ? value : JSON.stringify(value)
-      )
+        typeof value === 'string' ? value : JSON.stringify(value),
+      ),
     );
 
     const columnNames = _.map(items[0], (value, index) =>
-      filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index
+      filetype === 'csv' && !this.props.hasCsvHeader ? 'column' + index : index,
     );
 
     Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
@@ -187,7 +190,7 @@ class FileImportInfo extends PureClasss<Props>
     const filetype = file.target.files[0].name.split('.').pop();
     if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)
     {
-      alert("Invalid filetype: " + filetype + ", please select another file");
+      alert('Invalid filetype: ' + filetype + ', please select another file');
       return;
     }
 
@@ -195,10 +198,10 @@ class FileImportInfo extends PureClasss<Props>
     fr.readAsText(file.target.files[0]);
     fr.onloadend = () =>
     {
-      console.log("File chosen contents: ", fr.result);
+      console.log('File chosen contents: ', fr.result);
       this.parseAndChooseFile(fr.result, filetype);
       this.refs['file']['value'] = null;                 // prevent file-caching
-    }
+    };
   }
 
   public render()
@@ -208,7 +211,7 @@ class FileImportInfo extends PureClasss<Props>
     return (
       <div>
         <div>
-          <input ref="file" type="file" name="abc" onChange={this.handleChooseFile} />
+          <input ref='file' type='file' name='abc' onChange={this.handleChooseFile} />
           has header row (csv only)
           <CheckBox
             checked={this.props.hasCsvHeader}
@@ -232,7 +235,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Autocomplete
             value={this.props.dbText}
-            options={this.props.dbs || List([])}
+            options={this.props.dbs || List<string>()}
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={!canSelectDb}
@@ -244,7 +247,7 @@ class FileImportInfo extends PureClasss<Props>
         <div>
           <Autocomplete
             value={this.props.tableText}
-            options={this.props.tables || List([])}
+            options={this.props.tables || List<string>()}
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={!canSelectTable}

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
 
@@ -72,15 +73,15 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>, oldNames: List<string>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview, oldNames }),
+    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
 
     uploadFile:
     () =>
       $(ActionTypes.uploadFile, {}),
 
     addTransform:
-    (transform: object) =>
+    (transform: FileImportTypes.Transform) =>
       $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
@@ -88,20 +89,36 @@ const FileImportActions =
       $(ActionTypes.setColumnToInclude, { columnId }),
 
     setColumnName:
-    (columnId: number, columnName: string) =>
-      $(ActionTypes.setColumnName, { columnId, columnName }),
+    (columnId: number, colName: string, newName: string) =>
+      $(ActionTypes.setColumnName, { columnId, colName, newName }),
 
     setColumnType:
-    (columnId: number, recursionId: number, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { columnId, recursionId, typeIndex }),
+    (columnId: number, recursionDepth: number, typeIndex: number) =>
+      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
 
     deleteColumnType:
-    (columnId: number, recursionId: number) =>
-      $(ActionTypes.deleteColumnType, { columnId, recursionId }),
+    (columnId: number, recursionDepth: number) =>
+      $(ActionTypes.deleteColumnType, { columnId, recursionDepth }),
 
     updatePreviewRows:
-    (transform: any) =>
+    (transform: FileImportTypes.Transform) =>
       $(ActionTypes.updatePreviewRows, { transform }),
+
+    saveTemplate:
+    (templateText: string) =>
+      $(ActionTypes.saveTemplate, { templateText }),
+
+    getTemplates:
+    () =>
+      $(ActionTypes.getTemplates, { setTemplates: FileImportActions.setTemplates }),
+
+    setTemplates:
+    (templates: List<FileImportTypes.Template>) =>
+      $(ActionTypes.setTemplates, { templates }),
+
+    loadTemplate:
+    (templateId: number) =>
+      $(ActionTypes.loadTemplate, { templateId }),
   };
 
 export default FileImportActions;

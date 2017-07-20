@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
 import Menu from './../../common/components/Menu';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import * as RoleTypes from './../../roles/RoleTypes';
 import UserThumbnail from './../../users/components/UserThumbnail';
@@ -64,7 +66,7 @@ interface LibraryInfoUserProps
   groupId: ID;
 }
 
-class LibraryInfoUser extends Classs<LibraryInfoUserProps>
+class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
 {
   public changeRole(newRole: string)
   {

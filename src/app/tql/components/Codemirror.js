@@ -45,6 +45,8 @@ THE SOFTWARE.
 //Adapted from https://github.com/JedWatson/react-codemirror
 'use strict';
 
+var PropTypes = require('prop-types');
+var createReactClass = require('create-react-class');
 var React = require('react');
 var className = require('classnames');
 
@@ -52,31 +54,32 @@ const CM = require('codemirror');
 const diff_match_patch = require('diff-match-patch');
 require('./merge.js');
 const Dimensions = require('react-dimensions');
+import ElasticHighlighter from '../highlighters/ElasticHighlighter.tsx'
 
-var CodeMirror = React.createClass({
+var CodeMirror = createReactClass({
   displayName: 'CodeMirror',
 
   propTypes:
   {
-    onChange: React.PropTypes.func,
-    onFocusChange: React.PropTypes.func,
-    options: React.PropTypes.object,
-    path: React.PropTypes.string,
-    value: React.PropTypes.string,
-    className: React.PropTypes.any,
-    codeMirrorInstance: React.PropTypes.object,
-    toggleSyntaxPopup: React.PropTypes.func,
-    defineTerm: React.PropTypes.func,
-    turnSyntaxPopupOff: React.PropTypes.func,
-    hideTermDefinition: React.PropTypes.func,
-    highlightedLine: React.PropTypes.number,
+    onChange: PropTypes.func,
+    onFocusChange: PropTypes.func,
+    options: PropTypes.object,
+    path: PropTypes.string,
+    value: PropTypes.string,
+    className: PropTypes.any,
+    codeMirrorInstance: PropTypes.object,
+    toggleSyntaxPopup: PropTypes.func,
+    defineTerm: PropTypes.func,
+    turnSyntaxPopupOff: PropTypes.func,
+    hideTermDefinition: PropTypes.func,
+    highlightedLine: PropTypes.number,
 
-    onCodeMirrorMount: React.PropTypes.func,
+    onCodeMirrorMount: PropTypes.func,
 
-    isDiff: React.PropTypes.bool,
-    diff: React.PropTypes.string,
+    isDiff: PropTypes.bool,
+    diff: PropTypes.string,
 
-    containerHeight: React.PropTypes.number,
+    containerHeight: PropTypes.number,
   },
   foldClass: {
     open: "CodeMirror-foldgutter-open",
@@ -111,7 +114,6 @@ var CodeMirror = React.createClass({
     else
     {
       this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
-      this.codeMirror.on('change', this.codemirrorValueChanged);
       this.codeMirror.addKeyMap({
         'Ctrl-Enter': this.codemirrorIssueQuery,
       });
@@ -416,13 +418,6 @@ var CodeMirror = React.createClass({
         isFocused: focused
       });
       this.props.onFocusChange && this.props.onFocusChange(focused);
-    }
-  },
-  codemirrorValueChanged: function codemirrorValueChanged(doc, change)
-  {
-    if (this.props.onChange && change.origin != 'setValue')
-    {
-      this.props.onChange(doc.getValue());
     }
   },
   codemirrorIssueQuery: function codemirrorIssueQuery(cm)

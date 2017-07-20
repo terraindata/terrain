@@ -43,20 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import './StatusDropdown.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
-import { ItemStatus as Status } from '../../../../shared/items/types/Item';
+import { ItemStatus as Status } from '../../../items/types/Item';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import LibraryActions from '../data/LibraryActions';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -66,7 +69,7 @@ export interface Props
   noBorder?: boolean;
 }
 
-class StatusDropdown extends PureClasss<Props>
+class StatusDropdown extends TerrainComponent<Props>
 {
   public state = {
     isSuperUser: false,

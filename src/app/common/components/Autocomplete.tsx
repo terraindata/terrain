@@ -43,14 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
+
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
 {
@@ -68,7 +72,7 @@ export interface Props
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
 }
 
-class Autocomplete extends PureClasss<Props>
+class Autocomplete extends TerrainComponent<Props>
 {
   public value: string;
 
@@ -260,7 +264,7 @@ class Autocomplete extends PureClasss<Props>
           'ac-option-selected': index === this.state.selectedIndex,
         })}
         onMouseDown={this._fn(this.handleSelect, option)}
-        value={option}
+        data-value={option}
         key={option}
         ref={'opt' + index}
       >
@@ -296,6 +300,7 @@ class Autocomplete extends PureClasss<Props>
               'ac-options-open': this.state.open,
             })}
             ref='ac'
+            style={fontColor(Colors().text.baseDark)}
           >
             {
               options.map(this.renderOption)

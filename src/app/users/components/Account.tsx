@@ -43,11 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires switch-default
+
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import './Account.less';
@@ -60,7 +63,7 @@ export interface Props
   children?: any;
 }
 
-class Account extends Classs<Props>
+class Account extends TerrainComponent<Props>
 {
   public render()
   {
@@ -68,7 +71,10 @@ class Account extends Classs<Props>
     let title = 'Account';
     let selected = '298px';
     const linkWidth = -144;
-    let profileActive: boolean, notificationsActive: boolean, teamActive: boolean, settingsActive: boolean;
+    let profileActive: boolean;
+    let notificationsActive: boolean;
+    let teamActive: boolean;
+    let settingsActive: boolean;
 
     switch (this.props.location.pathname)
     {

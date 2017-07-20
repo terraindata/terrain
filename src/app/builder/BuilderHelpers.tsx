@@ -43,9 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { Block } from '../../../shared/blocks/types/Block';
-import { Card } from '../../../shared/blocks/types/Card';
-import { Input } from '../../../shared/blocks/types/Input';
+
+// tslint:disable:strict-boolean-expressions
+
+import { Block } from '../../blocks/types/Block';
+import { Card } from '../../blocks/types/Card';
+import { Input, InputPrefix } from '../../blocks/types/Input';
 
 import * as Immutable from 'immutable';
 import SchemaStore from '../schema/data/SchemaStore';
@@ -62,7 +65,7 @@ export function getTermsForKeyPath(keyPath: KeyPath): List<string>
   if (inputs && inputs.size)
   {
     const inputTerms = inputs.map(
-      (input: Input) => 'input.' + input.key,
+      (input: Input) => InputPrefix + input.key,
     ).toList();
     if (terms)
     {

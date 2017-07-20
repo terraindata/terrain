@@ -43,51 +43,64 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as FileImportTypes from './../FileImportTypes';
 import Util from '../../util/Util';
-import Classs from './../../common/components/Classs';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
 const { List } = Immutable;
+
+const TRANSFORM_TYPES = List(FileImportTypes.TRANSFORM_TYPES);
 
 export interface Props
 {
   datatype: string;
   colName: string;
   columnNames: List<string>;
-  addRenameTransform();
 }
 
-class TransformBox extends Classs<Props>
+class TransformBox extends TerrainComponent<Props>
 {
   public state: {
     transformTypeIndex: number;
     mergeIndex: number;
     transformText: string;
-    splitNames: string[];
+    splitNames: List<string>;
     colToMergeId: number;
     mergeNewName: string;
+    duplicateNewName: string;
   } = {
     transformTypeIndex: -1,
     mergeIndex: -1,
     transformText: '',
-    splitNames: ['', ''],
+    splitNames: List(['', '']),
     colToMergeId: -1,
     mergeNewName: '',
+    duplicateNewName: '',
   };
 
-  public handleAutocompleteTransformTextChange(transformText)
+  public handleDuplicateNewNameChange(duplicateNewName: string)
+  {
+    this.setState({
+      duplicateNewName,
+    });
+  }
+
+  public handleAutocompleteTransformTextChange(transformText: string)
   {
     this.setState({
       transformText,
-    })
+    });
   }
 
   public handleTransformTypeChange(transformTypeIndex: number)
@@ -96,10 +109,25 @@ class TransformBox extends Classs<Props>
       transformTypeIndex,
       mergeIndex: -1,
       transformText: '',
-      splitNames: ['', ''],
+      splitNames: List(['', '']),
       colToMergeId: -1,
       mergeNewName: '',
-    })
+      duplicateNewName: '',
+    });
+  }
+
+  public handleSplitNameAChange(splitNameA: string)
+  {
+    this.setState({
+      splitNames: this.state.splitNames.set(0, splitNameA),
+    });
+  }
+
+  public handleSplitNameBChange(splitNameB: string)
+  {
+    this.setState({
+      splitNames: this.state.splitNames.set(1, splitNameB),
+    });
   }
 
   public handleMergeIndexChange(mergeIndex: number)
@@ -108,32 +136,14 @@ class TransformBox extends Classs<Props>
     this.setState({
       mergeIndex,
       colToMergeId: this.props.columnNames.indexOf(mergeName),
-    })
-  }
-
-  public handleSplitNameAChange(splitNameA)
-  {
-    const names = this.state.splitNames.slice();
-    names[0] = splitNameA;
-    this.setState({
-      splitNames: names,
     });
   }
 
-  public handleSplitNameBChange(splitNameB)
-  {
-    const names = this.state.splitNames.slice();
-    names[1] = splitNameB;
-    this.setState({
-      splitNames: names,
-    });
-  }
-
-  public handleMergeNewNameChange(mergeNewName)
+  public handleMergeNewNameChange(mergeNewName: string)
   {
     this.setState({
       mergeNewName,
-    })
+    });
   }
 
   public transformErrorCheck(transformName: string)
@@ -141,6 +151,10 @@ class TransformBox extends Classs<Props>
     if (!transformName)
     {
       return 'Select a transformation';
+    }
+    if (transformName === 'duplicate' && !this.state.duplicateNewName)
+    {
+      return 'Enter duplicate column name';
     }
     if (transformName === 'append' && !this.state.transformText)
     {
@@ -156,24 +170,24 @@ class TransformBox extends Classs<Props>
       {
         return 'Enter split text';
       }
-      if (!this.state.splitNames[0])
+      if (!this.state.splitNames.get(0))
       {
-        return 'Enter new column 1 name'
+        return 'Enter new column 1 name';
       }
-      if (!this.state.splitNames[1])
+      if (!this.state.splitNames.get(1))
       {
-        return 'Enter new column 2 name'
+        return 'Enter new column 2 name';
       }
     }
     if (transformName === 'merge')
     {
       if (!this.props.columnNames.get(this.state.colToMergeId))
       {
-        return 'Select column to merge'
+        return 'Select column to merge';
       }
       if (!this.state.mergeNewName)
       {
-        return 'Enter new column name'
+        return 'Enter new column name';
       }
     }
     return '';
@@ -181,7 +195,8 @@ class TransformBox extends Classs<Props>
 
   public handleTransformClick()
   {
-    const transformName = FileImportTypes.TRANSFORM_TYPES[this.state.transformTypeIndex];
+    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const transformName = FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex];
     const msg = this.transformErrorCheck(transformName);
     if (msg)
     {
@@ -189,144 +204,163 @@ class TransformBox extends Classs<Props>
       return;
     }
 
-    this.props.addRenameTransform();
-
-    Actions.updatePreviewRows({
+    const transform = {
       name: transformName,
-      args: {
-        transformCol: this.props.colName,
-        text: this.state.transformText,
-        splitNames: this.state.splitNames,
-        colToMergeId: this.state.colToMergeId,
-        mergeNewName: this.state.mergeNewName,
-      }
-    });
-    console.log('adding transform: ' + transformName + ' / colName: ' + this.props.colName + ' / text: ' + this.state.transformText);
+      colName: this.props.colName,
+      args: {},
+    };
 
-    if (transformName === 'append' || transformName === 'prepend')
+    switch (transformName)
     {
-      Actions.addTransform(
-        {
-          name: transformName,
-          args: {
-            colName: this.props.colName,
-            text: this.state.transformText,
-          }
-        }
-      );
+      case 'rename':
+        transform.args = {
+          newName: this.props.colName,
+        };
+        break;
+
+      case 'append':
+        transform.args = {
+          text: this.state.transformText,
+        };
+        break;
+
+      case 'prepend':
+        transform.args = {
+          text: this.state.transformText,
+        };
+        break;
+
+      case 'split':
+        transform.args = {
+          newName: this.state.splitNames.toArray(),
+          text: this.state.transformText,
+        };
+        break;
+
+      case 'merge':
+        transform.args = {
+          mergeName: this.props.columnNames.get(this.state.colToMergeId),
+          newName: this.state.mergeNewName,
+          text: this.state.transformText,
+        };
+        break;
+
+      case 'duplicate':
+        transform.args = {
+          newName: this.state.duplicateNewName,
+        };
+        break;
+      default:
     }
-    else if (transformName === 'split')
-    {
-      Actions.addTransform(
-        {
-          name: transformName,
-          args: {
-            oldName: this.props.colName,
-            newName: this.state.splitNames,
-            text: this.state.transformText,
-          }
-        }
-      );
-    }
-    else if (transformName === 'merge')
-    {
-      Actions.addTransform(
-        {
-          name: transformName,
-          args: {
-            oldName: [this.props.colName, this.props.columnNames.get(this.state.colToMergeId)],
-            newName: this.state.mergeNewName,
-            text: this.state.transformText,
-          }
-        }
-      );
-    }
+
+    Actions.updatePreviewRows(transform);
+    Actions.addTransform(transform);
 
     this.setState({
       transformTypeIndex: -1,
       mergeIndex: -1,
       transformText: '',
-      splitNames: ['', ''],
+      splitNames: List(['', '']),
       colToMergeId: -1,
       mergeNewName: '',
-    })
+      duplicateNewName: '',
+    });
   }
 
   public render()
   {
+    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    let transformContent;
+    if (this.props.datatype === 'text')
+    {
+      transformContent =
+        <div>
+          {
+            FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex] === 'split' &&
+            <div>
+              <Autocomplete
+                value={this.state.splitNames.get(0)}
+                options={null}
+                onChange={this.handleSplitNameAChange}
+                placeholder={'new column 1'}
+                disabled={false}
+              />
+              <Autocomplete
+                value={this.state.splitNames.get(1)}
+                options={null}
+                onChange={this.handleSplitNameBChange}
+                placeholder={'new column 2'}
+                disabled={false}
+              />
+            </div>
+          }
+          {
+            FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex] === 'merge' &&
+            <div>
+              {
+                this.state.mergeIndex === -1 &&
+                <p>select column to merge</p>
+              }
+              <Dropdown
+                selectedIndex={this.state.mergeIndex}
+                options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
+                onChange={this.handleMergeIndexChange}
+                canEdit={true}
+              />
+              <Autocomplete
+                value={this.state.mergeNewName}
+                options={null}
+                onChange={this.handleMergeNewNameChange}
+                placeholder={'new column name'}
+                disabled={false}
+              />
+            </div>
+          }
+          {
+            this.state.transformTypeIndex > 0 &&
+            <Autocomplete
+              value={this.state.transformText}
+              options={null}
+              onChange={this.handleAutocompleteTransformTextChange}
+              placeholder={'text'}
+              disabled={false}
+            />
+          }
+        </div>;
+    }
+
     return (
       <div>
         {
-          this.props.datatype === 'text' &&
+          this.state.transformTypeIndex === -1 &&
+          <p>select transformation</p>
+        }
+        <Dropdown
+          selectedIndex={this.state.transformTypeIndex}
+          options={List(FileImportTypes.TRANSFORM_TYPES[datatype])}
+          onChange={this.handleTransformTypeChange}
+          canEdit={true}
+        />
+        {
+          transformContent
+        }
+        {
+          FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex] === 'duplicate' &&
           <div>
-            {
-              this.state.transformTypeIndex === -1 &&
-              <p>select transformation</p>
-            }
-            <Dropdown
-              selectedIndex={this.state.transformTypeIndex}
-              options={List(FileImportTypes.TRANSFORM_TYPES)}
-              onChange={this.handleTransformTypeChange}
-              canEdit={true}
+            <Autocomplete
+              value={this.state.duplicateNewName}
+              options={null}
+              onChange={this.handleDuplicateNewNameChange}
+              placeholder={'duplicate column name'}
+              disabled={false}
             />
-            {
-              FileImportTypes.TRANSFORM_TYPES[this.state.transformTypeIndex] === 'split' &&
-              <div>
-                <Autocomplete
-                  value={this.state.splitNames[0]}
-                  options={null}
-                  onChange={this.handleSplitNameAChange}
-                  placeholder={'new column 1'}
-                  disabled={false}
-                />
-                <Autocomplete
-                  value={this.state.splitNames[1]}
-                  options={null}
-                  onChange={this.handleSplitNameBChange}
-                  placeholder={'new column 2'}
-                  disabled={false}
-                />
-              </div>
-            }
-            {
-              FileImportTypes.TRANSFORM_TYPES[this.state.transformTypeIndex] === 'merge' &&
-              <div>
-                {
-                  this.state.mergeIndex === -1 &&
-                  <p>select column to merge</p>
-                }
-                <Dropdown
-                  selectedIndex={this.state.mergeIndex}
-                  options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
-                  onChange={this.handleMergeIndexChange}
-                  canEdit={true}
-                />
-                <Autocomplete
-                  value={this.state.mergeNewName}
-                  options={null}
-                  onChange={this.handleMergeNewNameChange}
-                  placeholder={'new column name'}
-                  disabled={false}
-                />
-              </div>
-            }
-            {
-              this.state.transformTypeIndex !== -1 &&
-              <Autocomplete
-                value={this.state.transformText}
-                options={null}
-                onChange={this.handleAutocompleteTransformTextChange}
-                placeholder={'text'}
-                disabled={false}
-              />
-            }
-            <button onClick={this.handleTransformClick}>
-              Transform
-            </button>
           </div>
         }
+        <button onClick={this.handleTransformClick}>
+          Transform
+        </button>
       </div>
-    )
+    );
   }
 }
 

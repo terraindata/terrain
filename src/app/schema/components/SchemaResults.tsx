@@ -43,25 +43,29 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:switch-default strict-boolean-expressions restrict-plus-operands no-console
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const { List, Map } = Immutable;
 import Radium = require('radium');
 import * as React from 'react';
+import BackendInstance from '../../../database/types/BackendInstance';
 import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
-import BackendInstance from './../../../../shared/backends/types/BackendInstance';
-import PureClasss from './../../common/components/PureClasss';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
-import * as BlockUtils from '../../../../shared/blocks/BlockUtils';
-import { _Query, Query } from '../../../../shared/items/types/Query';
-import { _ResultsState, ResultsManager, ResultsState } from '../../builder/components/results/ResultsManager';
+import * as BlockUtils from '../../../blocks/BlockUtils';
+import { _Query, Query } from '../../../items/types/Query';
+import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
+import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
 
-import { AllBackendsMap } from '../../../../shared/backends/AllBackends';
+import { AllBackendsMap } from '../../../database/AllBackends';
 
 const NUM_ROWS = 200;
 
@@ -71,7 +75,7 @@ export interface Props
 }
 
 @Radium
-class SchemaResults extends PureClasss<Props>
+class SchemaResults extends TerrainComponent<Props>
 {
   public state: {
     selectedId?: ID,
@@ -114,7 +118,9 @@ class SchemaResults extends PureClasss<Props>
                 this.props.databases
                 && this.props.databases.get(selectedItem['databaseId']);
             console.log('schema resultsDb', resultsDb);
-            let field: string, table: string, where: string;
+            let field: string;
+            let table: string;
+            let where: string;
 
             switch (selectedItem.type)
             {
@@ -184,7 +190,7 @@ class SchemaResults extends PureClasss<Props>
     ].map(
       (inputConfig) =>
         BlockUtils.make(
-          AllBackendsMap.mysql.blocks.input,
+          AllBackendsMap.mysql.blocks, 'input',
           inputConfig,
         ),
     );
@@ -194,11 +200,11 @@ class SchemaResults extends PureClasss<Props>
 
       cards: List([
         BlockUtils.make(
-          AllBackendsMap.mysql.blocks.sfw,
+          AllBackendsMap.mysql.blocks, 'sfw',
           {
             fields: List([
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.field,
+                AllBackendsMap.mysql.blocks, 'field',
                 {
                   field: 'input.field',
                 },
@@ -207,11 +213,11 @@ class SchemaResults extends PureClasss<Props>
 
             cards: List([
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.from,
+                AllBackendsMap.mysql.blocks, 'from',
                 {
                   tables: List([
                     BlockUtils.make(
-                      AllBackendsMap.mysql.blocks.table,
+                      AllBackendsMap.mysql.blocks, 'table',
                       {
                         table: 'input.table',
                       },
@@ -221,11 +227,11 @@ class SchemaResults extends PureClasss<Props>
               ),
 
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.where,
+                AllBackendsMap.mysql.blocks, 'where',
                 {
                   cards: List([
                     BlockUtils.make(
-                      AllBackendsMap.mysql.blocks.tql,
+                      AllBackendsMap.mysql.blocks, 'tql',
                       {
                         clause: where,
                       },
@@ -235,7 +241,7 @@ class SchemaResults extends PureClasss<Props>
               ),
 
               BlockUtils.make(
-                AllBackendsMap.mysql.blocks.take,
+                AllBackendsMap.mysql.blocks, 'take',
                 {
                   value: 'input.numRows',
                 },

@@ -43,16 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const
+
 import './BuilderComponent.less';
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import { Display, DisplayType } from '../../../../shared/blocks/displays/Display';
+import { Display, DisplayType } from '../../../blocks/displays/Display';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
-import PureClasss from '../../common/components/PureClasss';
+import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
 import BuilderActions from '../data/BuilderActions';
@@ -78,7 +81,7 @@ export interface Props
   // as it will cause re-renders
 }
 
-class BuilderComponent extends PureClasss<Props>
+class BuilderComponent extends TerrainComponent<Props>
 {
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
@@ -185,6 +188,7 @@ class BuilderComponent extends PureClasss<Props>
           accepts={st && st.accepts}
           singleChild={d.singleChild}
           language={this.props.language}
+          hideCreateCardTool={d.hideCreateCardTool}
         />;
         break;
       case DisplayType.CARDTEXT:
@@ -379,12 +383,13 @@ class BuilderComponent extends PureClasss<Props>
 
     if (isTextbox)
     {
+      const Comp = d.component || BuilderTextbox;
       content = (
         <div
           key={key}
           className='builder-component-wrapper builder-component-wrapper-wide'
         >
-          <BuilderTextbox
+          <Comp
             canEdit={this.props.canEdit}
             top={d.top}
             placeholder={d.placeholder || d.key}

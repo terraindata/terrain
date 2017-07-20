@@ -44,35 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
-import PureClasss from './../../common/components/PureClasss';
-import Actions from './../data/FileImportActions';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import './FileImportPreviewRow.less';
 
 export interface Props
 {
   items: List<string>;
 }
 
-class FileImportPreviewRow extends PureClasss<Props>
+@Radium
+class FileImportPreviewRow extends TerrainComponent<Props>
 {
   public render()
   {
     return (
-      <tr>
+      <div
+        className='fi-preview-row'
+      >
         {
           this.props.items.map((value, key) =>
-            <td key={key}>
-              {
-                value
-              }
-            </td>
+            <div
+              key={key}
+              className='fi-preview-row-cell'
+              style={backgroundColor(Colors().fileimport.preview.cell)}
+            >
+              <div
+                className='fi-preview-row-cell-text'
+              >
+                {
+                  value
+                }
+              </div>
+            </div>,
           )
         }
-      </tr>
+      </div>
     );
   }
 }
