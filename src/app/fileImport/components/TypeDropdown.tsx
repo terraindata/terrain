@@ -70,7 +70,7 @@ export interface Props
 
 class TypeDropdown extends TerrainComponent<Props>
 {
-  public handleTypeChange(typeIndex)
+  public handleTypeChange(typeIndex: number)
   {
     Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
   }

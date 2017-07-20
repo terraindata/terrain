@@ -96,6 +96,10 @@ class FileImport extends TerrainComponent<any>
     file: string;
     filetype: string;
     filename: string;
+    serverNames: List<string>;
+    dbNames: List<string>;
+    tableNames: List<string>;
+    columnOptionNames: List<string>;
   } = {
     fileImportState: FileImportStore.getState(),
     stepId: 0,
@@ -107,6 +111,10 @@ class FileImport extends TerrainComponent<any>
     file: '',
     filetype: '',
     filename: '',
+    serverNames: List([]),
+    dbNames: List([]),
+    tableNames: List([]),
+    columnOptionNames: List([]),
   };
 
   constructor(props)
@@ -124,6 +132,7 @@ class FileImport extends TerrainComponent<any>
           servers: schemaState.servers,
           dbs: schemaState.databases,
           tables: schemaState.tables,
+          serverNames: schemaState.servers.keySeq().toList(),
         });
       }
       ,
@@ -197,28 +206,51 @@ class FileImport extends TerrainComponent<any>
 
   public handleServerChange(serverIndex: number)
   {
+    const serverName = this.state.serverNames.get(serverIndex);
     this.setState({
       serverIndex,
       serverSelected: true,
+      dbNames: this.state.servers && serverName && this.state.servers.get(serverName) ?
+        List(this.state.servers.get(serverName).databaseIds.map((db) =>
+          db.split('/').pop(),
+        ))
+        :
+        List([]),
     });
-    const serverName = this.state.servers.keySeq().toList().get(serverIndex);
+
     Actions.changeServer(this.state.servers.get(serverName).connectionId, serverName);
   }
 
-  public handleAutocompleteDbChange(value)
+  public handleAutocompleteDbChange(dbText: string)
   {
+    const { serverText } = this.state.fileImportState;
     this.setState({
-      dbSelected: !!value,
+      dbSelected: !!dbText,
+      tableNames: this.state.dbs && dbText && this.state.dbs.get(databaseId(serverText, dbText)) ?
+        List(this.state.dbs.get(databaseId(this.state.fileImportState.serverText, dbText)).tableIds.map((table) =>
+          table.split('.').pop(),
+        ))
+        :
+        List([]),
     });
-    Actions.changeDbText(value);
+
+    Actions.changeDbText(dbText);
   }
 
-  public handleAutocompleteTableChange(value)
+  public handleAutocompleteTableChange(tableText: string)
   {
+    const { serverText, dbText } = this.state.fileImportState;
     this.setState({
-      tableSelected: !!value,
+      tableSelected: !!tableText,
+      columnOptionNames: this.state.tables && tableText && this.state.tables.get(tableId(serverText, dbText, tableText)) ?
+        List(this.state.tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
+          column.split('.').pop(),
+        ))
+        :
+        List([]),
     });
-    Actions.changeTableText(value);
+
+    Actions.changeTableText(tableText);
   }
 
   public parseJsonByLine(file: string, numLines: number): object[]
@@ -232,7 +264,7 @@ class FileImport extends TerrainComponent<any>
     {
       if (charIndex >= file.length - 1)
       {
-        charIndex--;    // end square bracket
+        charIndex--;    // account for end square bracket
         break;
       }
 
@@ -342,8 +374,8 @@ class FileImport extends TerrainComponent<any>
   public render()
   {
     const { fileImportState } = this.state;
-    const { serverText, dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
-      primaryKey, oldNames, templates, transforms } = fileImportState;
+    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
+      hasCsvHeader, primaryKey, templates, transforms } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -357,14 +389,16 @@ class FileImport extends TerrainComponent<any>
               checked={hasCsvHeader}
               onChange={this.handleCsvHeaderChange}
             />
-            {this.state.filename ? this.state.filename + ' selected' : 'no file selected'}
+            {
+              this.state.filename ? this.state.filename + ' selected' : 'no file selected'
+            }
           </div>;
         break;
       case 1:
         content =
           <Dropdown
             selectedIndex={this.state.serverIndex}
-            options={this.state.servers ? this.state.servers.keySeq().toList() : List<string>()}
+            options={this.state.serverNames}
             onChange={this.handleServerChange}
             canEdit={true}
           />;
@@ -373,14 +407,7 @@ class FileImport extends TerrainComponent<any>
         content =
           <Autocomplete
             value={dbText}
-            options={
-              this.state.servers && serverText && this.state.servers.get(serverText) ?
-                List(this.state.servers.get(serverText).databaseIds.map((value, index) =>
-                  value.split('/').pop(),
-                ))
-                :
-                List([])
-            }
+            options={this.state.dbNames}
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={false}
@@ -390,14 +417,7 @@ class FileImport extends TerrainComponent<any>
         content =
           <Autocomplete
             value={tableText}
-            options={
-              this.state.dbs && dbText && this.state.dbs.get(databaseId(serverText, dbText)) ?
-                List(this.state.dbs.get(databaseId(serverText, dbText)).tableIds.map((value, index) =>
-                  value.split('.').pop(),
-                ))
-                :
-                List([])
-            }
+            options={this.state.tableNames}
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={false}
@@ -412,17 +432,9 @@ class FileImport extends TerrainComponent<any>
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
-            oldNames={oldNames}
             templates={templates}
             transforms={transforms}
-            columnOptions={
-              this.state.tables && tableText && this.state.tables.get(tableId(serverText, dbText, tableText)) ?
-                List(this.state.tables.get(tableId(serverText, dbText, tableText)).columnIds.map((value, index) =>
-                  value.split('.').pop(),
-                ))
-                :
-                List([])
-            }
+            columnOptions={this.state.columnOptionNames}
           />;
         break;
       default:

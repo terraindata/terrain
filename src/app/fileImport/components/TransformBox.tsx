@@ -89,14 +89,14 @@ class TransformBox extends TerrainComponent<Props>
     duplicateNewName: '',
   };
 
-  public handleDuplicateNewNameChange(duplicateNewName)
+  public handleDuplicateNewNameChange(duplicateNewName: string)
   {
     this.setState({
       duplicateNewName,
     });
   }
 
-  public handleAutocompleteTransformTextChange(transformText)
+  public handleAutocompleteTransformTextChange(transformText: string)
   {
     this.setState({
       transformText,
@@ -116,14 +116,14 @@ class TransformBox extends TerrainComponent<Props>
     });
   }
 
-  public handleSplitNameAChange(splitNameA)
+  public handleSplitNameAChange(splitNameA: string)
   {
     this.setState({
       splitNames: this.state.splitNames.set(0, splitNameA),
     });
   }
 
-  public handleSplitNameBChange(splitNameB)
+  public handleSplitNameBChange(splitNameB: string)
   {
     this.setState({
       splitNames: this.state.splitNames.set(1, splitNameB),
@@ -139,7 +139,7 @@ class TransformBox extends TerrainComponent<Props>
     });
   }
 
-  public handleMergeNewNameChange(mergeNewName)
+  public handleMergeNewNameChange(mergeNewName: string)
   {
     this.setState({
       mergeNewName,
@@ -151,6 +151,10 @@ class TransformBox extends TerrainComponent<Props>
     if (!transformName)
     {
       return 'Select a transformation';
+    }
+    if (transformName === 'duplicate' && !this.state.duplicateNewName)
+    {
+      return 'Enter duplicate column name';
     }
     if (transformName === 'append' && !this.state.transformText)
     {
@@ -322,9 +326,6 @@ class TransformBox extends TerrainComponent<Props>
               disabled={false}
             />
           }
-          <button onClick={this.handleTransformClick}>
-            Transform
-          </button>
         </div>;
     }
 
@@ -355,6 +356,9 @@ class TransformBox extends TerrainComponent<Props>
             />
           </div>
         }
+        <button onClick={this.handleTransformClick}>
+          Transform
+        </button>
       </div>
     );
   }

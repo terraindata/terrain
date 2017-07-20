@@ -92,9 +92,14 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     Actions.changePrimaryKey(this.props.columnId);
   }
 
-  public handleAutocompleteHeaderChange(value)
+  public handleAutocompleteHeaderChange(newColumnName: string)
   {
-    Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), value);
+    Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), newColumnName);
+  }
+
+  public shouldComponentUpdate(nextProps: Props)
+  {
+    return JSON.stringify(this.props.columnType) === JSON.stringify(nextProps.columnType);
   }
 
   public render()
@@ -143,17 +148,21 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         className='fi-preview-column'
         style={backgroundColor(Colors().fileimport.preview.column)}
       >
-        <div className='fi-preview-column-title-name'>
-          {this.props.columnNames.get(this.props.columnId)}
-        </div>
-        <div className='fi-preview-column-title-type'>
-          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
-        </div>
         <div
-          className='fi-preview-column-edit-button'
-          onClick={this.handleEditClick}
+          className='fi-preview-column-title'
         >
-          Edit
+          <div className='fi-preview-column-title-name'>
+            {this.props.columnNames.get(this.props.columnId)}
+          </div>
+          <div className='fi-preview-column-title-type'>
+            {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+          </div>
+          <div
+            className='fi-preview-column-edit-button'
+            onClick={this.handleEditClick}
+          >
+            Edit
+          </div>
         </div>
       </div>
     );

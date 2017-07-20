@@ -70,7 +70,6 @@ export interface Props
   previewRows: List<List<string>>;
   columnsCount: number;
   primaryKey: number;
-  oldNames: List<string>;
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;

@@ -73,8 +73,8 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>, oldNames: List<string>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview, oldNames }),
+    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
 
     uploadFile:
     () =>

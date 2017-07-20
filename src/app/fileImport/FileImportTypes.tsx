@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { BaseClass, New } from '../Classes';
-const { List, fromJS } = Immutable;
+const { List } = Immutable;
 import Util from './../util/Util';
 
 // This type represents the state of the FileImportStore
@@ -65,7 +65,7 @@ class FileImportStateC extends BaseClass
   public hasCsvHeader: boolean = true;
   public primaryKey: number = -1;
 
-  public oldNames: List<string> = List([]);
+  public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
@@ -93,12 +93,12 @@ export const _FileImportState = (config?: { [key: string]: any }) =>
 
 export interface Transform
 {
-  name: string;
-  colName: string;
+  name: string;                         // transform name
+  colName: string;                      // name of column to be transformed
   args: {
-    mergeName?: string;
-    newName?: string | string[];
-    text?: string;
+    mergeName?: string;                 // name of column to be merged
+    newName?: string | string[];        // rename name, duplicate name, split names
+    text?: string;                      // text to append/prepend, text to split/merge on
   };
 }
 
@@ -112,6 +112,7 @@ export interface Template
   primaryKey: number;
 }
 
+// supports nested types, i.e. an array of array of dates
 export interface ColumnTypesTree
 {
   type: string | number;
@@ -141,53 +142,26 @@ export const ELASTIC_TYPES =
     'float',
   ];
 
-// enum ElasticTypes {
-//   Text = 1,
-//   Boolean,
-//   Date,
-//   Array,
-//   Long,
-//   Double,
-//   Short,
-//   Byte,
-//   Integer,
-//   Half_float,
-//   Float,
-// }
-
-enum ElasticTypes
-{
-  'text' = 1,
-  'long',
-  'boolean',
-  'date',
-  'array',
-  'double',
-  'short',
-  'byte',
-  'integer',
-  'half_float',
-  'float',
-}
-
+// contains set of transforms applicable to each elastic type
 export const TRANSFORM_TYPES =
   [
-    [
+    [                 // text
       'duplicate',
       'append',
       'prepend',
       'split',
       'merge',
     ],
-    ['duplicate'],
-    ['duplicate'],
-    ['duplicate'],
-    ['duplicate'],
-    ['duplicate'],
-    ['duplicate'],
-    ['duplicate'],
-    ['duplicate'],
-    ['duplicate'],
+    ['duplicate'],    // long
+    ['duplicate'],    // boolean
+    ['duplicate'],    // date
+    ['duplicate'],    // array
+    ['duplicate'],    // double
+    ['duplicate'],    // short
+    ['duplicate'],    // byte
+    ['duplicate'],    // integer
+    ['duplicate'],    // half_float
+    ['duplicate'],    // float
   ];
 
 export const STEP_NAMES =
