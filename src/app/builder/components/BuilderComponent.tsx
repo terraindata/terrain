@@ -217,7 +217,7 @@ class BuilderComponent extends TerrainComponent<Props>
         }
 
         content = (
-          <div key={key} className='builder-component-wrapper'>
+          <div key={key} className='builder-component-wrapper  builder-component-wrapper-wide'>
             <Dropdown
               canEdit={this.props.canEdit}
               className={className}

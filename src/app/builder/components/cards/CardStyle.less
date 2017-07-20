@@ -241,6 +241,9 @@
     .card {
       margin-right: 0px;
     }
+    
+    // add margin so that textboxes don't edge up on cards area
+    margin-top: 6px; 
   } 
   
   .card .card {
@@ -496,20 +499,20 @@
 }
 
 .card-muted-input input {
-  background: rgba(255,255,255,0);
+  background: rgba(255,255,255,0) !important;
   color: #fff;
   .transition;
   
   &:hover, &[value=""] {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.25) !important;
   }
   
   &:focus {
-    background: #fff;
+    background: #fff !important;
     color: #242424;
   }
   
   &::placeholder {
-    color: rgba(255,255,255,0.75);
+    color: rgba(255,255,255,0.75) !important;
   }
 }

@@ -83,6 +83,7 @@ interface Theme
   {
     base: string,
     selectedSquare: string,
+    arrowBg: string,
   };
 
   // Library ------
@@ -246,8 +247,9 @@ const DARK: Theme =
     // side bar
     sideBar:
     {
-      base: '#303030',
+      base: '#646464',
       selectedSquare: '#CAD847',
+      arrowBg: '#474747',
     },
 
     // Library ------

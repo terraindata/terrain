@@ -76,6 +76,9 @@
     text-align: center;
     cursor: pointer;
     
+      opacity: 0.35;
+    
+    
     svg {
       @sh: @h * 2 / 3;
       height: @sh;
@@ -85,6 +88,7 @@
     
     &:hover {
       background: #47a7ff;
+      opacity: 1;
       svg {
         fill: #fff;
       }
@@ -96,7 +100,7 @@
   &.create-card-open {
     .create-card-placeholder {
       // margin-bottom: 0px;
-      
+            
       svg {
         fill: #f00;
       }
@@ -118,6 +122,21 @@
   }
 }
 
+
+.card-hovering {
+  .create-card-wrapper {
+    .create-card-placeholder {
+      opacity: 1;
+    }
+  }
+  .card {
+    .create-card-wrapper {
+      .create-card-placeholder {
+        opacity: 0.35;
+      }
+    } 
+  }
+}
 
 // a little experiment to make the placeholders only appear on card hover
 // .create-card-wrapper {

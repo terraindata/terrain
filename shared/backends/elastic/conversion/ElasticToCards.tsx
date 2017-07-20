@@ -78,7 +78,7 @@ export default function ElasticToCards(
     {
       // let cards = parseMagicObject(query.parseTree.parser.getValue());
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      let cards = List([parseCardFromValueInfo(rootValueInfo)]);
+      let cards = parseCardFromValueInfo(rootValueInfo)['cards'];
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
