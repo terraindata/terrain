@@ -369,7 +369,7 @@ export const MySQLBlocks =
                 // help: ManualConfig.help['table'],
                 accepts: List(['sfw']),
                 showWhenCards: true,
-                getAutoTerms: (comp: React.Component<any, any>, schemaState) =>
+                getAutoTerms: (schemaState) =>
                 {
                   const db = Store.getState().db.name; // TODO correct?
                   const tableNames = schemaState.tableNamesByDb.get(db);

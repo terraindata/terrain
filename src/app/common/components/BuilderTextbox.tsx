@@ -68,6 +68,7 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
+import SchemaStore from '../../schema/data/SchemaStore';
 
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
@@ -97,7 +98,7 @@ export interface Props
   parentId?: string;
 
   autoDisabled?: boolean;
-  autoTerms?: List<string>;
+  getAutoTerms?: (schemaState) => List<string>;
 
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
@@ -238,8 +239,10 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public handleFocus(event: React.FocusEvent<any>)
   {
+    console.log('focus');
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
+    console.log('focused');
   }
 
   public handleBlur(event: React.FocusEvent<any>, value: string)
@@ -285,12 +288,21 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public computeOptions()
   {
-    if (this.props.autoTerms || this.props.autoDisabled)
+    if (this.props.autoDisabled)
     {
       return;
     }
-
-    const options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+    
+    let options: List<string>;
+    
+    if (this.props.getAutoTerms)
+    {
+      options = this.props.getAutoTerms(SchemaStore.getState());
+    }
+    else
+    {
+      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+    }
 
     if (!options.equals(this.state.options))
     {
@@ -307,14 +319,6 @@ class BuilderTextbox extends TerrainComponent<Props>
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
 
       let { options } = this.state;
-      if (this.props.autoTerms)
-      {
-        options = this.props.autoTerms;
-      }
-      if (this.props.autoDisabled)
-      {
-        options = null;
-      }
 
       return (
         <div

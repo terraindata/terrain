@@ -57,7 +57,6 @@ import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
-import SchemaStore from '../../schema/data/SchemaStore';
 import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
 import CardField from './cards/CardField';
@@ -399,7 +398,7 @@ class BuilderComponent extends TerrainComponent<Props>
             options={d.options}
             display={d}
             autoDisabled={d.autoDisabled}
-            autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}
+            getAutoTerms={d.getAutoTerms}
             language={this.props.language}
             {...{
               keyPath,

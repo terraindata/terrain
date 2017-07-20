@@ -73,10 +73,11 @@ export default class ESIndexClause extends ESStringClause
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
+          getAutoTerms: (schemaState): List<string> =>
           {
             // TODO cache list in schema state
             const server = BuilderStore.getState().db.name;
+            console.log(server, schemaState.databases.toList());
             return schemaState.databases.toList().filter(
               (db) => db.serverId === server,
             ).map(

@@ -82,7 +82,7 @@ export interface Props
   parentId?: string;
 
   autoDisabled?: boolean;
-  autoTerms?: List<string>;
+  getAutoTerms?: (schemaState) => List<string>;
 
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;

@@ -73,7 +73,7 @@ export default class ESFieldClause extends ESStringClause
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
+          getAutoTerms: (schemaState): List<string> =>
           {
             return List(['movieId', 'title', 'budget', 'released', 'revenue']);
             // TODO change from tables to dbs?

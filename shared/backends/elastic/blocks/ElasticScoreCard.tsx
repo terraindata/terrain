@@ -80,13 +80,28 @@ export const elasticScore = _card(
       // manualEntry: ManualConfig.cards['score'],
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
+        let factors = block['weights'].map((weightBlock) => tqlTranslationFn(weightBlock, tqlConfig)).toArray();
+        
+        // add elastic weight
+        factors.unshift({
+          "weight" : 0,
+          "ranges" : [
+            -100.0,
+            100.0
+          ],
+          "outputs" : [
+            0.0,
+            1.0
+          ]
+        });
+        
         return {
           "type" : "number",
           "order" : "desc",
           script: {
-            stored: 'terrain_PWLScore',
+            stored: 'Terrain.Score.PWL',
             params: {
-              factors: block['weights'].map((weightBlock) => tqlTranslationFn(weightBlock, tqlConfig)).toArray(),
+              factors,
             },
           },
         };

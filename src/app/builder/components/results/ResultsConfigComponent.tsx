@@ -241,7 +241,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         })}>
           <div className='results-config-bar'>
             <div className='results-config-title'>
-              Configure Results View
+              Customize Results
             </div>
             <div className='results-config-switch'>
               <Switch
