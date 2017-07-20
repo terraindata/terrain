@@ -119,7 +119,7 @@ export interface ColumnTypesTree
   innerType?: ColumnTypesTree;
 }
 
-export const NUMBER_PREVIEW_ROWS = 3;
+export const NUMBER_PREVIEW_ROWS = 5;
 
 export const FILE_TYPES =
   [

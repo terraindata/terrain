@@ -60,8 +60,6 @@ import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 const { List } = Immutable;
 
-const TRANSFORM_TYPES = List(FileImportTypes.TRANSFORM_TYPES);
-
 export interface Props
 {
   datatype: string;

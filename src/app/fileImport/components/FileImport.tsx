@@ -46,8 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
-require('./FileImport.less');
-
 import * as Immutable from 'immutable';
 import * as Papa from 'papaparse';
 import * as Radium from 'radium';
@@ -67,6 +65,7 @@ import * as SchemaTypes from './../../schema/SchemaTypes';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
+import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
@@ -87,6 +86,10 @@ class FileImport extends TerrainComponent<any>
     servers?: SchemaTypes.ServerMap;
     dbs?: SchemaTypes.DatabaseMap;
     tables?: SchemaTypes.TableMap;
+    serverNames: List<string>;
+    dbNames: List<string>;
+    tableNames: List<string>;
+    columnOptionNames: List<string>;
     stepId: number;
     serverIndex: number;
     serverSelected: boolean;
@@ -96,12 +99,12 @@ class FileImport extends TerrainComponent<any>
     file: string;
     filetype: string;
     filename: string;
-    serverNames: List<string>;
-    dbNames: List<string>;
-    tableNames: List<string>;
-    columnOptionNames: List<string>;
   } = {
     fileImportState: FileImportStore.getState(),
+    serverNames: List([]),
+    dbNames: List([]),
+    tableNames: List([]),
+    columnOptionNames: List([]),
     stepId: 0,
     serverIndex: -1,
     serverSelected: false,
@@ -111,10 +114,6 @@ class FileImport extends TerrainComponent<any>
     file: '',
     filetype: '',
     filename: '',
-    serverNames: List([]),
-    dbNames: List([]),
-    tableNames: List([]),
-    columnOptionNames: List([]),
   };
 
   constructor(props)
