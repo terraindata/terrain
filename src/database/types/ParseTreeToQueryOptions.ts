@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// Copyright 2017 Terrain Data, Inc.
+
 interface ParseTreeToQueryOptions
 {
   allFields?: boolean; // amend the final Select card to include all possible fields.
