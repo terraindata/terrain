@@ -77,10 +77,10 @@ import 'codemirror/mode/javascript/javascript.js';
 
 import './eslint.js';
 
-import './cobalt.less';
 import './codemirror.less';
-import './monokai.less';
-import './neo.less';
+import './themes/cobalt.less';
+import './themes/monokai.less';
+import './themes/neo.less';
 
 import 'codemirror/addon/dialog/dialog.js';
 import 'codemirror/addon/scroll/annotatescrollbar.js';
