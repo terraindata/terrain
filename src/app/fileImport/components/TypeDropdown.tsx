@@ -64,19 +64,23 @@ export interface Props
 {
   columnId: number;
   recursionDepth: number;
-  columnType: any;
+  columnType: FileImportTypes.ColumnTypesTree;
+  editing: boolean;
 }
 
 class TypeDropdown extends TerrainComponent<Props>
 {
-  public handleTypeChange(typeIndex)
+  public handleTypeChange(typeIndex: number)
   {
     Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
   }
 
   public componentWillUnmount()
   {
-    Actions.deleteColumnType(this.props.columnId, this.props.recursionDepth);
+    if (!this.props.editing)
+    {
+      Actions.deleteColumnType(this.props.columnId, this.props.recursionDepth);
+    }
   }
 
   public shouldComponentUpdate(nextProps: Props)
@@ -89,7 +93,7 @@ class TypeDropdown extends TerrainComponent<Props>
     return (
       <div>
         <Dropdown
-          selectedIndex={this.props.columnType.type}
+          selectedIndex={Number(this.props.columnType.type)}
           options={DATATYPES}
           onChange={this.handleTypeChange}
           canEdit={true}
@@ -100,6 +104,7 @@ class TypeDropdown extends TerrainComponent<Props>
             columnId={this.props.columnId}
             recursionDepth={this.props.recursionDepth + 1}
             columnType={this.props.columnType.innerType}
+            editing={this.props.editing}
           />
         }
       </div>

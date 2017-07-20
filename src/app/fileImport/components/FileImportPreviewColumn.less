@@ -1,5 +1,32 @@
 @import "../../common/Common.less";
 
-.column-header {
+.fi-preview-column {
+  display: inline-block;
+  width: 300px;
+  height: 200px;
   color: rgba(255, 255, 255, 1);
+  text-align: center;
+  vertical-align: middle;
+  margin-top: 6px;
+  margin-right: 6px;
+  margin-left: 6px;
+  margin-bottom: 0px;
+
+  .fi-preview-column-title {
+    margin-top: 50px;
+
+    .fi-preview-column-title-name {
+      .title-text;
+    }
+
+    .fi-preview-column-title-type {
+      .big-text;
+    }
+
+    .fi-preview-column-edit-button {
+      .big-text;
+      cursor: pointer;
+    }
+  }
 }
+

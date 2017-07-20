@@ -58,7 +58,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   winston.info('importing to database');
   const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'table', 'filetype', 'db']);
+  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype']);
   Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
 
   ctx.body = await imprt.upsert(imprtConf);

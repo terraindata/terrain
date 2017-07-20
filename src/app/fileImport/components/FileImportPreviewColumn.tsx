@@ -46,8 +46,10 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -63,17 +65,22 @@ export interface Props
 {
   columnId: number;
   isIncluded: boolean;
-  columnType: any;
+  columnType: FileImportTypes.ColumnTypesTree;
   isPrimaryKey: boolean;
-  datatypes: List<string>;
   columnNames: List<string>;
   columnOptions: List<string>;
-  handleRenameTransform(oldName: string, newName: string);
-  addRenameTransform();
+  editing: boolean;
+  handleEditColumnChange(editColumnId: number);
 }
 
+@Radium
 class FileImportPreviewColumn extends TerrainComponent<Props>
 {
+  public handleEditClick()
+  {
+    this.props.handleEditColumnChange(this.props.columnId);
+  }
+
   public handleIncludedChange()
   {
     Actions.setColumnToInclude(this.props.columnId);
@@ -84,45 +91,79 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     Actions.changePrimaryKey(this.props.columnId);
   }
 
-  public handleAutocompleteHeaderChange(value)
+  public handleAutocompleteHeaderChange(newColumnName: string)
   {
-    this.props.handleRenameTransform(this.props.columnNames.get(this.props.columnId), value);
-    Actions.setColumnName(this.props.columnId, value);
+    Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), newColumnName);
+  }
+
+  public shouldComponentUpdate(nextProps: Props)
+  {
+    return JSON.stringify(this.props.columnType) === JSON.stringify(nextProps.columnType);
   }
 
   public render()
   {
+    if (this.props.editing)
+    {
+      return (
+        <div
+          className='fi-preview-column'
+          style={backgroundColor(Colors().fileimport.preview.column)}
+        >
+          include
+          <CheckBox
+            checked={this.props.isIncluded}
+            onChange={this.handleIncludedChange}
+          />
+          primary key
+          <CheckBox
+            checked={this.props.isPrimaryKey}
+            onChange={this.handlePrimaryKeyChange}
+          />
+          <Autocomplete
+            value={this.props.columnNames.get(this.props.columnId)}
+            options={this.props.columnOptions}
+            onChange={this.handleAutocompleteHeaderChange}
+            placeholder={''}
+            disabled={false}
+          />
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionDepth={0}
+            columnType={this.props.columnType}
+            editing={this.props.editing}
+          />
+          <TransformBox
+            datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+            colName={this.props.columnNames.get(this.props.columnId)}
+            columnNames={this.props.columnNames}
+          />
+        </div>
+      );
+    }
+
     return (
-      <th className='column-header'>
-        include
-        <CheckBox
-          checked={this.props.isIncluded}
-          onChange={this.handleIncludedChange}
-        />
-        primary key
-        <CheckBox
-          checked={this.props.isPrimaryKey}
-          onChange={this.handlePrimaryKeyChange}
-        />
-        <Autocomplete
-          value={this.props.columnNames.get(this.props.columnId)}
-          options={this.props.columnOptions.toList()}
-          onChange={this.handleAutocompleteHeaderChange}
-          placeholder={''}
-          disabled={false}
-        />
-        <TypeDropdown
-          columnId={this.props.columnId}
-          recursionDepth={0}
-          columnType={this.props.columnType}
-        />
-        <TransformBox
-          datatype={this.props.datatypes.get(this.props.columnType.type)}
-          colName={this.props.columnNames.get(this.props.columnId)}
-          columnNames={this.props.columnNames}
-          addRenameTransform={this.props.addRenameTransform}
-        />
-      </th>
+      <div
+        className='fi-preview-column'
+        style={backgroundColor(Colors().fileimport.preview.column)}
+      >
+        <div
+          className='fi-preview-column-title'
+        >
+          <div className='fi-preview-column-title-name'>
+            {this.props.columnNames.get(this.props.columnId)}
+          </div>
+          <div className='fi-preview-column-title-type'>
+            {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+          </div>
+          <div
+            className='fi-preview-column-edit-button'
+            onClick={this.handleEditClick}
+          >
+            Edit
+          </div>
+        </div>
+      </div>
     );
   }
 }

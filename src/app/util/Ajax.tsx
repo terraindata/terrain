@@ -687,36 +687,36 @@ export const Ajax =
 
     importFile(file: string,
       filetype: string,
-      db: string,
-      table: string,
+      dbname: string,
+      tablename: string,
       connectionId: number,
-      oldNames: Immutable.List<string>,
+      originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
       primaryKey: string,
       transformations: Immutable.List<object>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
-    ): { xhr: XMLHttpRequest, queryId: string }
+    )
     {
       const payload: object = {
         dbid: connectionId,
-        db,
-        table,
+        dbname,
+        tablename,
         contents: file,
         filetype,
-        originalNames: oldNames,
+        originalNames,
         columnTypes,
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
         transformations,
       };
-      console.log('payload: ', payload);
+      console.log('import payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
       };
-      const xhr = Ajax.req(
+      Ajax.req(
         'post',
         'import/',
         payload,
@@ -727,6 +727,72 @@ export const Ajax =
       );
 
       return;
+    },
+
+    saveTemplate(dbname: string,
+      tablename: string,
+      connectionId: number,
+      originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKey: string,
+      transformations: List<object>,
+      name: string,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+      hasCsvHeader?: boolean,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+        originalNames,
+        columnTypes,
+        primaryKey,
+        csvHeaderMissing: !hasCsvHeader,
+        transformations,
+        name,
+      };
+      console.log('saveTemplate payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/create',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
+    getTemplates(
+      connectionId: number,
+      dbname: string,
+      tablename: string,
+
+      onLoad: (templates: object[]) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+      };
+      console.log('getTemplates payload: ', payload);
+      Ajax.req(
+        'post',
+        'templates/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
