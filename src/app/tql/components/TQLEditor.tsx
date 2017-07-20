@@ -44,17 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+
+import CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
-const { List } = Immutable;
-import * as _ from 'underscore';
+
 import TerrainComponent from './../../common/components/TerrainComponent';
-const CodeMirror = require('./Codemirror.js');
 
 // syntax highlighters
 import ElasticHighlighter from '../highlighters/ElasticHighlighter';
@@ -64,9 +63,10 @@ import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
+import './ElasticMode';
+import './TQLMode.js';
+
 // Style sheets and addons for CodeMirror
-require('./elastic.js');
-require('./tql.js');
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/edit/matchbrackets.js';
@@ -74,8 +74,6 @@ import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/lint/lint.js';
 import 'codemirror/mode/javascript/javascript.js';
-
-import './eslint.js';
 
 import './codemirror.less';
 import './themes/cobalt.less';
