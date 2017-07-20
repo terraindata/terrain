@@ -44,21 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as koaBodyParser from 'koa-bodyparser';
-import * as koaFavicon from 'koa-favicon';
-import * as koaLogger from 'koa-logger-winston';
-import * as koaPassport from 'koa-passport';
-import koaResponseTime = require('koa-response-time');
-import * as nodeScheduler from 'node-schedule';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-const Middleware =
-  {
-    bodyParser: koaBodyParser,
-    favicon: koaFavicon,
-    logger: koaLogger,
-    passport: koaPassport,
-    responseTime: koaResponseTime,
-    scheduler: nodeScheduler,
-  };
+import * as Util from '../Util';
+import { Scheduler, SchedulerConfig } from './Scheduler';
 
-export default Middleware;
+export const scheduler: Scheduler = new Scheduler();
+
+const Router = new KoaRouter();
+
+// Get job by search parameter, or all if none provided
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const schedule: SchedulerConfig = ctx.query;
+  ctx.body = await scheduler.getSchedule(schedule);
+});
+
+// Post new scheduled job
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const schedule: SchedulerConfig = ctx.request.body;
+  Util.verifyParameters(schedule, ['id', 'name', 'schedule']);
+  ctx.body = await scheduler.createSchedule(schedule);
+});
+
+// Delete scheduled jobs by parameter
+Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const schedule: SchedulerConfig = ctx.request.body;
+  Util.verifyParameters(schedule, ['name']);
+  ctx.body = await scheduler.deleteSchedule(schedule);
+});
+
+// Update job
+Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const schedule: SchedulerConfig = ctx.request.body;
+  Util.verifyParameters(schedule, ['id', 'name', 'schedule']);
+  ctx.body = await scheduler.updateSchedule(schedule);
+});
+
+export default Router;

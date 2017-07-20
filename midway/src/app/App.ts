@@ -69,6 +69,7 @@ import Users from './users/Users';
 
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
+export let scheduler: any;
 
 class App
 {
@@ -94,6 +95,7 @@ class App
   private DB: Tasty.Tasty;
   private app: Koa;
   private config: Config.Config;
+  private scheduler: any;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
@@ -108,6 +110,8 @@ class App
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+    scheduler = Middleware.scheduler;
+    this.scheduler = scheduler;
 
     this.app = new Koa();
     this.app.proxy = true;
