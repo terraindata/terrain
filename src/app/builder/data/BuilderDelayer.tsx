@@ -43,12 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-
 import * as Immutable from 'immutable';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
-export default class Delayer<T>
+export default class BuilderDelayer<T>
 {
   protected resource: T;
   protected cachedResource: T;
@@ -56,19 +54,23 @@ export default class Delayer<T>
   protected lastTimer;
   protected onUpdate: () => void;
 
-  constructor(initialValue: T, onUpdate: () => void, delay: number = 500)
+  constructor(initialValue: T, onUpdate: () => void, delay: number = 2000)
   {
     this.resource = initialValue;
     this.cachedResource = initialValue;
-    this.onUpdate = onUpdate;
     this.delay = delay;
+    this.onUpdate = onUpdate;
   }
 
-  public set(newValue: T)
+  public set(newValue: T): BuilderDelayer<T>
   {
-    this.clearTimer();
-    this.resource = newValue;
-    this.lastTimer = setTimeout(this.cacheUpdateTimeout.bind(this), this.delay);
+    if (newValue !== this.resource)
+    {
+      this.clearTimer();
+      this.resource = newValue;
+      this.lastTimer = setTimeout(this.cacheUpdateTimeout.bind(this), this.delay);
+    }
+    return this;
   }
 
   public isDirty(): boolean
@@ -83,8 +85,11 @@ export default class Delayer<T>
 
   public flush(): T
   {
-    this.clearTimer();
-    this.cacheUpdateTimeout();
+    if (this.isDirty())
+    {
+      this.clearTimer();
+      this.cacheUpdateTimeout();
+    }
     return this.resource;
   }
 
@@ -103,58 +108,3 @@ export default class Delayer<T>
     }
   }
 }
-/*
-export interface Props
-{
-  resource: Imap;
-  delay: number;
-}
-
-export default class Delayer extends TerrainComponent<Props>
-{
-  public state:
-  {
-    lastTimer: number;
-    cachedResource: Imap;
-  }
-
-  constructor(props: Props)
-  {
-    super(props)
-  }
-
-  public get()
-  {
-    return this.state.cachedResource;
-  }
-
-  public flush()
-  {
-    clearTimeout(this.state.lastTimer);
-    this.setState({
-      cachedResource: this.props.resource,
-    })
-  }
-
-  public render()
-  {
-    if (this.state.cachedResource !== this.props.resource)
-    {
-      clearTimeout(this.state.lastTimer);
-      this.setState({
-        lastTimer: setTimeout(this.handler, this.props.delay),
-      });
-    }
-    return (
-      <div />
-    );
-  }
-
-  private handler()
-  {
-    this.setState({
-      cachedResource: this.props.resource,
-    });
-  }
-}
-*/

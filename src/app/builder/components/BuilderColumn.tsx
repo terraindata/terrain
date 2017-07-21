@@ -69,7 +69,7 @@ import Ajax from './../../util/Ajax';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
-import Delayer from '../data/Delayer';
+import BuilderDelayer from '../data/BuilderDelayer';
 import Manual from './../../manual/components/Manual';
 import CardsColumn from './cards/CardsColumn';
 import InputsArea from './inputs/InputsArea';
@@ -157,10 +157,7 @@ const BuilderColumn = createReactClass<any, any>(
 
       return {
         column: this.props.columnType ? this.props.columnType : column,
-        queryDelayer: new Delayer<Query>(
-          this.props.query,
-          () => { this.forceUpdate(); } // is there a better pattern to force update?
-        ),
+        queryDelayer: new BuilderDelayer<Query>(this.props.query, () => { this.forceUpdate(); }),
       };
     },
 
@@ -218,16 +215,19 @@ const BuilderColumn = createReactClass<any, any>(
       switch (this.state.column)
       {
         case COLUMNS.Builder:
-          return <CardsColumn
-            cards={query.cards}
-            deckOpen={query.deckOpen}
-            canEdit={canEdit}
-            addColumn={this.props.onAddManualColumn}
-            columnIndex={this.props.index}
-            cardsAndCodeInSync={query.cardsAndCodeInSync}
-            parseError={query.parseError}
-            language={query.language}
-          />;
+          return <span onFocus={this.state.queryDelayer.flush.bind(this.state.queryDelayer)}>
+            <CardsColumn
+              cards={this.state.queryDelayer.set(query).get().cards}
+              onFocus={this.state.queryDelayer.flush}
+              deckOpen={query.deckOpen}
+              canEdit={canEdit}
+              addColumn={this.props.onAddManualColumn}
+              columnIndex={this.props.index}
+              cardsAndCodeInSync={query.cardsAndCodeInSync}
+              parseError={query.parseError}
+              language={query.language}
+            />
+          </span>;
 
         case COLUMNS.Inputs:
           return <InputsArea
@@ -247,17 +247,17 @@ const BuilderColumn = createReactClass<any, any>(
           />;
 
         case COLUMNS.Editor:
-          this.state.queryDelayer.set(query);
-          console.log(this.state.queryDelayer.get().tql);
-          return <BuilderTQLColumn
-            canEdit={canEdit}
-            addColumn={this.props.onAddManualColumn}
-            columnIndex={this.props.index}
-            query={this.state.queryDelayer.get()}
-            variant={this.props.variant}
-            resultsState={this.props.resultsState}
-            language={query.language}
-          />;
+          return <span onFocus={this.state.queryDelayer.flush.bind(this.state.queryDelayer)}>
+            <BuilderTQLColumn
+              canEdit={canEdit}
+              addColumn={this.props.onAddManualColumn}
+              columnIndex={this.props.index}
+              query={this.state.queryDelayer.set(query).get()}
+              variant={this.props.variant}
+              resultsState={this.props.resultsState}
+              language={query.language}
+            />
+          </span>;
 
         case COLUMNS.Schema:
           return <SchemaView
