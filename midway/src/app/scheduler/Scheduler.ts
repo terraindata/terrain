@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as nodeScheduler from 'node-schedule';
 import * as winston from 'winston';
 import * as Util from '../Util';
-import * as nodeScheduler from 'node-schedule';
 
 export interface SchedulerConfig
 {
@@ -92,9 +92,13 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
+      if (req.schedule === undefined)
+      {
+        req.schedule = '0 0 0 * * *'; // every day at midnight
+      }
       if (req.jobId === undefined || Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
       {
-        return reject('ID does not exist in jobs');
+        return reject('Job ID does not exist in jobs');
       }
       let lastKey: number = Number(Object.keys(this.scheduleMap).sort().reverse()[0]);
       if (lastKey === undefined || isNaN(lastKey))
@@ -104,7 +108,7 @@ export class Scheduler
       lastKey += 1;
       const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[req.jobId]);
       this.scheduleMap[lastKey] = { id: lastKey, job, jobId: req.jobId, schedule: req.schedule };
-      resolve(lastKey.toString());
+      resolve(JSON.stringify(this.scheduleMap[lastKey]));
     });
   }
 
@@ -142,6 +146,10 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
+      if (req.schedule === undefined)
+      {
+        req.schedule = '0 0 0 * * *'; // every day at midnight
+      }
       if (req.id === undefined || Object.keys(this.scheduleMap).indexOf(req.id.toString()) === -1)
       {
         return reject('ID does not exist in schedules');
@@ -149,6 +157,10 @@ export class Scheduler
       if (req.id === undefined)
       {
         return reject('ID must be a parameter');
+      }
+      if (req.jobId === undefined || Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
+      {
+        return reject('Job ID does not exist in jobs');
       }
       this.scheduleMap[req.id]['job'].cancel();
       delete this.scheduleMap[req.id];
