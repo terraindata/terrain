@@ -56,17 +56,9 @@ export const scheduler: Scheduler = new Scheduler();
 const Router = new KoaRouter();
 
 // Get job by search parameter, or all if none provided
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const queryObj: object = ctx.query;
-  delete queryObj['id'];
-  delete queryObj['accessToken'];
-  const schedule: SchedulerConfig = queryObj;
-  if (ctx.params.id !== undefined)
-  {
-    schedule.id = ctx.params.id;
-  }
-  ctx.body = await scheduler.getSchedule(schedule);
+  ctx.body = await scheduler.getSchedule(ctx.params.id);
 });
 
 // Post new scheduled job
@@ -80,30 +72,16 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 // Delete scheduled jobs by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  if (ctx.params.id !== undefined)
-  {
-    ctx.body = await scheduler.deleteSchedule(ctx.params.id);
-  }
-  else
-  {
-    ctx.body = 'Must provide an ID';
-  }
+  ctx.body = await scheduler.deleteSchedule(ctx.params.id);
 });
 
 // Update job
 Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
-  Util.verifyParameters(schedule, ['jobId', 'schedule']);
-  if (ctx.params.id !== undefined)
-  {
-    schedule.id = ctx.params.id;
-    ctx.body = await scheduler.updateSchedule(schedule);
-  }
-  else
-  {
-    ctx.body = 'Must provide an ID';
-  }
+  schedule.id = ctx.params.id;
+  Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
+  ctx.body = await scheduler.updateSchedule(schedule);
 });
 
 export default Router;

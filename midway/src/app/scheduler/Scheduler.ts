@@ -51,8 +51,8 @@ import * as Util from '../Util';
 export interface SchedulerConfig
 {
   id?: number;
-  jobId?: number;
-  schedule?: string;
+  jobId: number;
+  schedule: string;
   job?: any;
 }
 
@@ -92,11 +92,7 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req.schedule === undefined)
-      {
-        req.schedule = '0 0 0 * * *'; // every day at midnight
-      }
-      if (req.jobId === undefined || Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
+      if (Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
       {
         return reject('Job ID does not exist in jobs');
       }
@@ -126,15 +122,15 @@ export class Scheduler
     });
   }
 
-  public async getSchedule(req: SchedulerConfig): Promise<string>
+  public async getSchedule(id: number): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req.id !== undefined && Object.keys(this.scheduleMap).indexOf(req.id.toString()) !== -1)
+      if (id !== undefined && Object.keys(this.scheduleMap).indexOf(id.toString()) !== -1)
       {
-        return resolve(JSON.stringify(this.scheduleMap[req.id]));
+        return resolve(JSON.stringify(this.scheduleMap[id]));
       }
-      if (req.id === undefined || Object.keys(this.scheduleMap).indexOf(req.id.toString()) === -1)
+      if (id !== undefined && Object.keys(this.scheduleMap).indexOf(id.toString()) === -1)
       {
         return resolve('ID does not exist in schedules');
       }
@@ -146,10 +142,6 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req.schedule === undefined)
-      {
-        req.schedule = '0 0 0 * * *'; // every day at midnight
-      }
       if (req.id === undefined || Object.keys(this.scheduleMap).indexOf(req.id.toString()) === -1)
       {
         return reject('ID does not exist in schedules');
@@ -158,7 +150,7 @@ export class Scheduler
       {
         return reject('ID must be a parameter');
       }
-      if (req.jobId === undefined || Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
+      if (Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
       {
         return reject('Job ID does not exist in jobs');
       }
