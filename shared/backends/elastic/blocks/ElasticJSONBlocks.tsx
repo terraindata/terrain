@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 /**
-  * I think we can delete this file
-*/
+ * I think we can delete this file
+ */
 
 // tslint:disable:restrict-plus-operands
 

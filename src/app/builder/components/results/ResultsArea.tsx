@@ -213,11 +213,11 @@ class ResultsArea extends TerrainComponent<Props>
     const { resultsState } = this.props;
     const { results } = resultsState;
     const { resultsConfig } = this.props.query;
-    
+
     let infoAreaContent: any = null;
     let resultsContent: any = null;
     let resultsAreOutdated: boolean = false;
-    
+
     if (this.isDatabaseEmpty())
     {
       resultsAreOutdated = true;
@@ -332,7 +332,7 @@ class ResultsArea extends TerrainComponent<Props>
         </InfiniteScroll>
       );
     }
-    
+
     return (
       <div
         className='results-area-results-wrapper'

@@ -83,16 +83,11 @@ export default class ESTypeClause extends ESStringClause
                 cards.get(0) && cards.get(0)['cards'].find(isIndexCard)
               );
             // TODO idea: have the selected index and type stored on the Query object
-            console.log(indexCard);
             if (indexCard)
             {
               const index = indexCard['value'];
               const indexId = state.db.name + '/' + index;
-              console.log(schemaState.tables.filter(
-                (table) => table.databaseId === indexId,
-              ).map(
-                (table) => table.name,
-              ).toList());
+
               return schemaState.tables.filter(
                 (table) => table.databaseId === indexId,
               ).map(

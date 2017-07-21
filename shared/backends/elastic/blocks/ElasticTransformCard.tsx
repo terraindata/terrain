@@ -84,7 +84,7 @@ export const elasticTransform = _card(
 
     domain: List([0, 100]),
     hasCustomDomain: false, // has the user set a custom domain
-    
+
     noTitle: true,
 
     static: {

@@ -66,9 +66,9 @@ import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
+import SchemaStore from '../../schema/data/SchemaStore';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
-import SchemaStore from '../../schema/data/SchemaStore';
 
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
@@ -239,10 +239,8 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public handleFocus(event: React.FocusEvent<any>)
   {
-    console.log('focus');
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
-    console.log('focused');
   }
 
   public handleBlur(event: React.FocusEvent<any>, value: string)
@@ -292,9 +290,9 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       return;
     }
-    
+
     let options: List<string>;
-    
+
     if (this.props.getAutoTerms)
     {
       options = this.props.getAutoTerms(SchemaStore.getState());
@@ -318,7 +316,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
 
-      let { options } = this.state;
+      const { options } = this.state;
 
       return (
         <div

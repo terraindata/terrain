@@ -73,7 +73,7 @@ export function getTermsForKeyPath(keyPath: KeyPath): List<string>
     }
     return inputTerms;
   }
-  
+
   return terms;
 }
 

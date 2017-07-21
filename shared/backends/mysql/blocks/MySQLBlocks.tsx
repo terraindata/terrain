@@ -72,7 +72,6 @@ import Actions from '../../../../src/app/builder/data/BuilderActions';
 import Store from '../../../../src/app/builder/data/BuilderStore';
 
 import TransformCard from '../../../../src/app/builder/components/charts/TransformCard';
-console.log(TransformCard);
 
 const _acceptsMath = (list: List<string>) =>
   list.concat(

@@ -54,6 +54,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as _ from 'underscore';
 import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
@@ -61,7 +62,6 @@ import Result from '../results/Result';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Results } from './ResultTypes';
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
@@ -472,7 +472,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const image = format && format.type === 'image';
 
     return this.props.connectDropTarget(this.props.connectDragSource(
-      <div 
+      <div
         style={fontColor(Colors().text.baseDark)}
         className={classNames({
           'results-config-field': true,
