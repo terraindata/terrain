@@ -45,7 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as CodeMirror from 'codemirror';
+
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+import { toInputMap } from '../../../blocks/types/Input';
+import { BuilderState, BuilderStore } from '../../builder/data/BuilderStore';
 
 CodeMirror.defineMode("elastic", (config, parserConfig) =>
 {
@@ -68,8 +71,11 @@ CodeMirror.registerHelper("lint", "elastic", (text) =>
   const found = [];
   try
   {
-    const t = new ESInterpreter(text);
-    for (const e of t.parser.getErrors())
+    const state = BuilderStore.getState();
+    const inputs = state.query && state.query.inputs;
+    const params: { [name: string]: any; } = toInputMap(inputs);
+    const interpreter = new ESInterpreter(text, params);
+    for (const e of interpreter.parser.getErrors())
     {
       const token = e.token;
       found.push({

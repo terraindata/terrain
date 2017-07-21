@@ -53,7 +53,7 @@ import * as CommonElastic from '../../../../shared/database/elastic/syntax/Commo
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
-import { Input, InputPrefix, InputType } from '../../../blocks/types/Input';
+import { Input, InputPrefix, InputType, isInput, toInputMap } from '../../../blocks/types/Input';
 import Query from '../../../items/types/Query';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
@@ -85,31 +85,6 @@ export interface ElasticObjectInterface
   };
 
   [key: string]: any;
-}
-
-export function isInput(name: string, inputs: Immutable.List<Input>)
-{
-  return inputs && name.charAt(0) === InputPrefix &&
-    (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);
-}
-
-export function toInputMap(inputs: Immutable.List<Input>): object
-{
-  const inputMap: object = {};
-  inputs.map((input: Input) =>
-  {
-    let value: any;
-    try
-    {
-      value = JSON.parse(input.value);
-    }
-    catch (e)
-    {
-      value = input.value;
-    }
-    inputMap[input.key] = value;
-  });
-  return inputMap;
 }
 
 export function stringifyWithParameters(

@@ -383,7 +383,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       const eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
-        {},
+        { replaceInputs: true },
       );
 
       this.setState({

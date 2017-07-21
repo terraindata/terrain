@@ -49,6 +49,7 @@ interface ParseTreeToQueryOptions
   allFields?: boolean; // amend the final Select card to include all possible fields.
   limit?: number;
   count?: boolean;
+  replaceInputs?: boolean;
 }
 
 export default ParseTreeToQueryOptions;

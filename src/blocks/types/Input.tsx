@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 export enum InputType
 {
   TEXT,
@@ -58,6 +59,31 @@ export interface Input extends IRecord<Input>
   key: string;
   value: string;
   inputType: InputType;
+}
+
+export function isInput(name: string, inputs: Immutable.List<Input>)
+{
+  return inputs && name.charAt(0) === InputPrefix &&
+    (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);
+}
+
+export function toInputMap(inputs: Immutable.List<Input>): object
+{
+  const inputMap: object = {};
+  inputs.map((input: Input) =>
+  {
+    let value: any;
+    try
+    {
+      value = JSON.parse(input.value);
+    }
+    catch (e)
+    {
+      value = input.value;
+    }
+    inputMap[input.key] = value;
+  });
+  return inputMap;
 }
 
 export default Input;
