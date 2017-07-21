@@ -69,6 +69,7 @@ import Ajax from './../../util/Ajax';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
+import Delayer from '../data/Delayer';
 import Manual from './../../manual/components/Manual';
 import CardsColumn from './cards/CardsColumn';
 import InputsArea from './inputs/InputsArea';
@@ -156,6 +157,10 @@ const BuilderColumn = createReactClass<any, any>(
 
       return {
         column: this.props.columnType ? this.props.columnType : column,
+        queryDelayer: new Delayer<Query>(
+          this.props.query,
+          () => { this.forceUpdate(); } // is there a better pattern to force update?
+        ),
       };
     },
 
@@ -208,7 +213,6 @@ const BuilderColumn = createReactClass<any, any>(
         </div>
         );
       }
-
       const query: Query = this.props.query;
       const { canEdit } = this.props;
       switch (this.state.column)
@@ -243,11 +247,13 @@ const BuilderColumn = createReactClass<any, any>(
           />;
 
         case COLUMNS.Editor:
+          this.state.queryDelayer.set(query);
+          console.log(this.state.queryDelayer.get().tql);
           return <BuilderTQLColumn
             canEdit={canEdit}
             addColumn={this.props.onAddManualColumn}
             columnIndex={this.props.index}
-            query={query}
+            query={this.state.queryDelayer.get()}
             variant={this.props.variant}
             resultsState={this.props.resultsState}
             language={query.language}
