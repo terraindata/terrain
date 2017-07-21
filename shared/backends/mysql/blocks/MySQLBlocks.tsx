@@ -68,9 +68,11 @@ const { make } = BlockUtils;
 
 // TODO is there a better way to do these things?
 import ScoreBar from '../../../../src/app/builder/components/charts/ScoreBar';
-import TransformCard from '../../../../src/app/builder/components/charts/TransformCard';
 import Actions from '../../../../src/app/builder/data/BuilderActions';
 import Store from '../../../../src/app/builder/data/BuilderStore';
+
+import TransformCard from '../../../../src/app/builder/components/charts/TransformCard';
+console.log(TransformCard);
 
 const _acceptsMath = (list: List<string>) =>
   list.concat(
