@@ -56,34 +56,54 @@ export const scheduler: Scheduler = new Scheduler();
 const Router = new KoaRouter();
 
 // Get job by search parameter, or all if none provided
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.query;
+  const queryObj: object = ctx.query;
+  delete queryObj['id'];
+  delete queryObj['accessToken'];
+  const schedule: SchedulerConfig = queryObj;
+  if (ctx.params.id !== undefined)
+  {
+    schedule.id = ctx.params.id;
+  }
   ctx.body = await scheduler.getSchedule(schedule);
 });
 
 // Post new scheduled job
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.request.body;
-  Util.verifyParameters(schedule, ['id', 'name', 'schedule']);
+  const schedule: SchedulerConfig = ctx.request.body.body;
+  Util.verifyParameters(schedule, ['jobId', 'schedule']);
   ctx.body = await scheduler.createSchedule(schedule);
 });
 
 // Delete scheduled jobs by parameter
-Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.request.body;
-  Util.verifyParameters(schedule, ['name']);
-  ctx.body = await scheduler.deleteSchedule(schedule);
+  if (ctx.params.id !== undefined)
+  {
+    ctx.body = await scheduler.deleteSchedule(ctx.params.id);
+  }
+  else
+  {
+    ctx.body = 'Must provide an ID';
+  }
 });
 
 // Update job
-Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.request.body;
-  Util.verifyParameters(schedule, ['id', 'name', 'schedule']);
-  ctx.body = await scheduler.updateSchedule(schedule);
+  const schedule: SchedulerConfig = ctx.request.body.body;
+  Util.verifyParameters(schedule, ['jobId', 'schedule']);
+  if (ctx.params.id !== undefined)
+  {
+    schedule.id = ctx.params.id;
+    ctx.body = await scheduler.updateSchedule(schedule);
+  }
+  else
+  {
+    ctx.body = 'Must provide an ID';
+  }
 });
 
 export default Router;

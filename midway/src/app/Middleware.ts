@@ -49,7 +49,6 @@ import * as koaFavicon from 'koa-favicon';
 import * as koaLogger from 'koa-logger-winston';
 import * as koaPassport from 'koa-passport';
 import koaResponseTime = require('koa-response-time');
-import * as nodeScheduler from 'node-schedule';
 
 const Middleware =
   {
@@ -58,7 +57,6 @@ const Middleware =
     logger: koaLogger,
     passport: koaPassport,
     responseTime: koaResponseTime,
-    scheduler: nodeScheduler,
   };
 
 export default Middleware;

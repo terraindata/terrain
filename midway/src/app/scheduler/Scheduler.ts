@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
-import * as App from '../App';
 import * as Util from '../Util';
+import * as nodeScheduler from 'node-schedule';
 
 export interface SchedulerConfig
 {
   id?: number;
-  name?: string;
+  jobId?: number;
   schedule?: string;
   job?: any;
 }
@@ -78,7 +78,7 @@ export class Scheduler
 
   public createJob(job: () => void): number
   {
-    let lastKey: number = Number(Object.keys(this.scheduleMap).sort().reverse()[0]);
+    let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
     if (lastKey === undefined || isNaN(lastKey))
     {
       lastKey = -1;
@@ -92,30 +92,32 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req.name === undefined || Object.keys(this.scheduleMap).indexOf(req.name) !== -1)
-      {
-        return reject('Name already exists in schedule');
-      }
-      if (req.id === undefined || Object.keys(this.jobMap).indexOf(req.id.toString()) === -1)
+      if (req.jobId === undefined || Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
       {
         return reject('ID does not exist in jobs');
       }
-      const job: any = App.scheduler.scheduleJob(req.schedule, this.jobMap[req.id]);
-      this.scheduleMap[req.name] = { id: req.id, schedule: req.schedule, job };
-      resolve('Success');
+      let lastKey: number = Number(Object.keys(this.scheduleMap).sort().reverse()[0]);
+      if (lastKey === undefined || isNaN(lastKey))
+      {
+        lastKey = -1;
+      }
+      lastKey += 1;
+      const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[req.jobId]);
+      this.scheduleMap[lastKey] = { id: lastKey, job, jobId: req.jobId, schedule: req.schedule };
+      resolve(lastKey.toString());
     });
   }
 
-  public async deleteSchedule(req: SchedulerConfig): Promise<string> // TODO
+  public async deleteSchedule(id: number): Promise<string> // TODO
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req.name === undefined || Object.keys(this.scheduleMap).indexOf(req.name) === -1)
+      if (id === undefined || Object.keys(this.scheduleMap).indexOf(id.toString()) === -1)
       {
-        return reject('Name does not exist in schedule');
+        return reject('ID does not exist in schedules');
       }
-      this.scheduleMap[req.name]['job'].cancel();
-      delete this.scheduleMap[req.name];
+      this.scheduleMap[id]['job'].cancel();
+      delete this.scheduleMap[id];
       resolve('Success');
     });
   }
@@ -124,13 +126,13 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req.name !== undefined && Object.keys(this.scheduleMap).indexOf(req.name.toString()) !== -1)
+      if (req.id !== undefined && Object.keys(this.scheduleMap).indexOf(req.id.toString()) !== -1)
       {
-        return resolve(JSON.stringify(this.scheduleMap[req.name]));
+        return resolve(JSON.stringify(this.scheduleMap[req.id]));
       }
-      if (req.name === undefined || Object.keys(this.scheduleMap).indexOf(req.name.toString()) === -1)
+      if (req.id === undefined || Object.keys(this.scheduleMap).indexOf(req.id.toString()) === -1)
       {
-        return resolve('Name does not exist in schedule');
+        return resolve('ID does not exist in schedules');
       }
       resolve(JSON.stringify(this.scheduleMap));
     });
@@ -140,19 +142,19 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req.name === undefined || Object.keys(this.scheduleMap).indexOf(req.name) === -1)
+      if (req.id === undefined || Object.keys(this.scheduleMap).indexOf(req.id.toString()) === -1)
       {
-        return reject('Name does not exist in schedule');
+        return reject('ID does not exist in schedules');
       }
       if (req.id === undefined)
       {
         return reject('ID must be a parameter');
       }
-      this.scheduleMap[req.name]['job'].cancel();
-      delete this.scheduleMap[req.name];
-      const job: any = App.scheduler.scheduleJob(req.schedule, this.jobMap[req.id]);
-      this.scheduleMap[req.name] = { id: req.id, schedule: req.schedule, job };
-      resolve('Success');
+      this.scheduleMap[req.id]['job'].cancel();
+      delete this.scheduleMap[req.id];
+      const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[req.jobId]);
+      this.scheduleMap[req.id] = { id: req.id, job, jobId: req.jobId, schedule: req.schedule };
+      resolve(JSON.stringify(this.scheduleMap[req.id]));
     });
   }
 }
