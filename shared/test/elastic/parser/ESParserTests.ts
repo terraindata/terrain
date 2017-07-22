@@ -47,9 +47,7 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as util from 'util';
 import * as winston from 'winston';
-
-import ESParser from '../../../backends/elastic/parser/ESJSONParser';
-import ESParserError from '../../../backends/elastic/parser/ESParserError';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 import { makePromiseCallback } from '../../Utils';
 
 function getExpectedFile(): string
@@ -78,7 +76,7 @@ function testParse(testString: string,
   expectedErrors: any[] = [])
 {
   winston.info('testing \'' + testString + '\'');
-  const parser: ESParser = new ESParser(testString);
+  const parser: ESJSONParser = new ESJSONParser(testString);
   const value = parser.getValue();
   const errors = parser.getErrors();
 

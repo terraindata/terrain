@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';

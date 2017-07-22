@@ -68,7 +68,7 @@ const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-import { Input, InputType } from '../../../../../shared/blocks/types/Input';
+import { Input, InputType } from '../../../../blocks/types/Input';
 
 const InputComponent = createReactClass<any, any>({
   mixins: [PanelMixin],

@@ -52,7 +52,7 @@ import * as _ from 'underscore';
 const moment = require('moment');
 
 import { browserHistory } from 'react-router';
-import { ItemStatus } from '../../../../shared/items/types/Item';
+import { ItemStatus } from '../../../items/types/Item';
 import CreateItem from '../../common/components/CreateItem';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';

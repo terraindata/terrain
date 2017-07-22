@@ -131,9 +131,9 @@ class Library extends TerrainComponent<any>
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
     const { params } = this.props;
 
-    const groupId = +params.groupId;
-    const algorithmId = +params.algorithmId;
-    const variantId = +params.variantId;
+    const groupId = params.groupId ? +params.groupId : null;
+    const algorithmId = params.algorithmId ? +params.algorithmId : null;
+    const variantId = params.variantId ? +params.variantId : null;
     const multiselect = false;
 
     let group: LibraryTypes.Group;
@@ -144,15 +144,42 @@ class Library extends TerrainComponent<any>
 
     group = groups.get(groupId);
 
-    if (group)
+    if (groupId !== null)
     {
-      algorithmsOrder = group.algorithmsOrder;
-      algorithm = algorithms.get(algorithmId);
+      group = groups.get(groupId);
 
-      if (algorithm)
+      if (group !== null)
       {
-        variantsOrder = algorithm.variantsOrder;
-        variant = variants.get(variantId);
+        algorithmsOrder = group.algorithmsOrder;
+
+        if (algorithmId !== null)
+        {
+          algorithm = algorithms.get(algorithmId);
+
+          if (algorithm !== null)
+          {
+            variantsOrder = algorithm.variantsOrder;
+
+            if (variantId !== null)
+            {
+              variant = variants.get(variantId);
+
+              if (variant === null)
+              {
+                browserHistory.replace(`/library/${groupId}/${algorithmId}`);
+              }
+            }
+          } else
+          {
+            // !algorithm
+            browserHistory.replace(`/library/${groupId}`);
+          }
+        }
+      }
+      else
+      {
+        // !group
+        browserHistory.replace('/library');
       }
     }
 

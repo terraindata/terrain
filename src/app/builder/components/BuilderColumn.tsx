@@ -63,7 +63,7 @@ import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
-import Query from '../../../../shared/items/types/Query';
+import Query from '../../../items/types/Query';
 import Ajax from './../../util/Ajax';
 
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';

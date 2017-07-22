@@ -48,7 +48,7 @@ THE SOFTWARE.
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
-var TqlConfig = require('../../../../shared/backends/mysql/syntax/SQLSyntaxConfig.json');
+var TqlConfig = require('../../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
 
 (function(mod)
 {
