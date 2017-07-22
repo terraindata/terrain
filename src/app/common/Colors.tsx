@@ -54,6 +54,14 @@ interface Theme
 
   // main background color
   base: string;
+  
+  altColor1: string;
+  altColor2: string;
+  
+  altBg1: string;
+  altBg2: string;
+  
+  fadedOutBg: string;
 
   // text
   text: {
@@ -218,6 +226,14 @@ const DARK: Theme =
 
     // main background color
     base: '#2F2F2F',
+    
+    altColor1: '#242424',
+    altColor2: '#424242',
+    
+    altBg1: '#fff',
+    altBg2: '#EDEFF3',
+    
+    fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
     // text
     text:

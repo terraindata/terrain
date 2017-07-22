@@ -116,7 +116,8 @@ textarea, input {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
-input[type=text], input[type=email], input[type=tel], input[type=num]
+input[type=text], input[type=email], input[type=tel], 
+input[type=num], input[type=password]
 {
   .transition;
   border: 1px solid rgba(0,0,0,0);
@@ -128,12 +129,28 @@ input[type=text], input[type=email], input[type=tel], input[type=num]
   &:focus:not(:disabled) {
    border-color: #fff;
   }
+  
+  &.standard-input { // TODO make this the default
+    background: #fff;
+    padding: @spacing;
+    margin: @spacing;
+    width: calc(~"100% - @{spacing} * 2");
+    font-size: @font-size;
+    border: 1px solid #dddff3;
+    border-radius: 3px;
+    
+    &:hover,
+    &:focus {
+      border: 1px solid #ccd1d7;
+    }
+  }
 }
 
 input[type=password]
 {
-  color: #617214;
+  color: #617214 !important;
 }
+
 
 .button {
   display: inline-block;

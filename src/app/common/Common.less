@@ -1,4 +1,29 @@
 
+/* Fonts */
+
+@tiny-font-size: 12px;
+@small-font-size: 14px;
+@font-size: 16px;
+@medium-font-size: @font-size;
+@large-font-size: 24px;
+@bold-font-weight: 500;
+
+
+/* Margin and Padding */
+
+@spacing: 12px;
+@half-spacing: @spacing / 2;
+@quarter-spacing: @spacing / 4;
+@double-spacing: @spacing * 2;
+
+
+/* Colors -- Important: Coordinate with Colors.tsx */
+
+@fadedOutBg: rgba(0,0,0,0.75);
+
+
+
+/**** OLD REMOVE ***/
 @light-foam: #dceec7;
 @fresh-moss: #a2af93;
 @aged-moss: #828c76;
@@ -48,13 +73,6 @@
 
 // borders
 @dark-green-border: #7d8f77;
-
-/* Fonts */
-
-@small-font-size: 11px;
-@medium-font-size: 14px;
-@large-font-size: 17px;
-@bold-font-weight: 500;
 
 
 // margins
@@ -170,6 +188,23 @@ input {
   animation: slide-down 0.25s linear 0.15s forwards;
 }
 
+@keyframes bump-down {
+  0% {
+    -webkit-transform: translateY(-25%);
+    transform: translateY(-25%);
+  }
+  100% {
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+}
+.bump-down {
+  -webkit-transform: translateY(-25%);
+  animation: bump-down 0.25s linear 0.15s forwards;
+  -webkit-animation-timing-function: ease-out;
+  animation-timing-function: ease-out;
+}
+
 @keyframes slide-right {
   0% {
     -webkit-transform: translateX(-100%);
@@ -197,6 +232,10 @@ input {
 .fade-in {
   opacity: 0;
   animation: fade-in 0.25s linear 0.15s forwards;
+}
+.fade-in-slow {
+  opacity: 0;
+  animation: fade-in 1s linear 0.15s forwards;
 }
 
 .animation-delay(@s) {
