@@ -383,7 +383,9 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       const eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
-        { replaceInputs: true },
+        {
+          replaceInputs: true,
+        },
       );
 
       this.setState({
@@ -402,12 +404,16 @@ export class ResultsManager extends TerrainComponent<Props>
           },
         ),
       });
+
       let allFieldsQueryCode;
       try
       {
         allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
           query,
-          { allFields: true },
+          {
+            allFields: true,
+            replaceInputs: true,
+          },
         );
       }
       catch (err)

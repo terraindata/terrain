@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import CodeMirror = require('./Codemirror.js');
+const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
 import TerrainComponent from './../../common/components/TerrainComponent';

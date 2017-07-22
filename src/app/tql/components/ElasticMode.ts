@@ -44,29 +44,31 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
 import * as CodeMirror from 'codemirror';
 
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import { toInputMap } from '../../../blocks/types/Input';
 import { BuilderState, BuilderStore } from '../../builder/data/BuilderStore';
 
-CodeMirror.defineMode("elastic", (config, parserConfig) =>
+CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {
   return {
     startState: () =>
     {
-      return {}
+      return {};
     },
     token: (stream, state) =>
     {
       stream.skipToEnd();
       return null;
     },
-    helperType: "elastic"
+    helperType: 'elastic',
   };
 });
 
-CodeMirror.registerHelper("lint", "elastic", (text) =>
+CodeMirror.registerHelper('lint', 'elastic', (text) =>
 {
   const found = [];
   try
@@ -81,13 +83,13 @@ CodeMirror.registerHelper("lint", "elastic", (text) =>
       found.push({
         from: CodeMirror.Pos(token.row, token.col),
         to: CodeMirror.Pos(token.toRow, token.toCol),
-        message: e.message
+        message: e.message,
       });
     }
   }
   catch (e)
   {
-    throw new Error('Exception when parsing ' + text + " error: " + e);
+    throw new Error('Exception when parsing ' + text + ' error: ' + e);
   }
   return found;
 });
