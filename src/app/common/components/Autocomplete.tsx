@@ -90,7 +90,8 @@ class Autocomplete extends TerrainComponent<Props>
     this.value = props.value;
     this.state =
       {
-        value: props.value,
+        value: props.value === null || props.value === undefined
+          ? '' : props.value,
         open: false,
         selectedIndex: -1,
       };

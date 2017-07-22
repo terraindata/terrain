@@ -49,9 +49,9 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { AllBackendsMap } from '../../../../../shared/backends/AllBackends';
-import * as BlockUtils from '../../../../../shared/blocks/BlockUtils';
-import { Card } from '../../../../../shared/blocks/types/Card';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { Card } from '../../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 import FadeInOut from '../../../common/components/FadeInOut';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
