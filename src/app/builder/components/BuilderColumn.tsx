@@ -219,7 +219,7 @@ const BuilderColumn = createReactClass<any, any>(
         case COLUMNS.Builder:
           return <span onFocus={queryDelayer.flushAndGet.bind(queryDelayer)}>
             <CardsColumn
-              cards={this.state.queryDelayer.setValue(query).getCached().cards}
+              cards={queryDelayer.setValue(query).getCached().cards}
               deckOpen={query.deckOpen}
               canEdit={canEdit}
               addColumn={this.props.onAddManualColumn}
@@ -253,7 +253,7 @@ const BuilderColumn = createReactClass<any, any>(
               canEdit={canEdit}
               addColumn={this.props.onAddManualColumn}
               columnIndex={this.props.index}
-              query={this.state.queryDelayer.setValue(query).getCached()}
+              query={queryDelayer.setValue(query).getCached()}
               variant={this.props.variant}
               resultsState={this.props.resultsState}
               language={query.language}
