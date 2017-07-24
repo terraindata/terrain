@@ -220,7 +220,6 @@ const BuilderColumn = createReactClass<any, any>(
           return <span onFocus={queryDelayer.flushAndGet.bind(queryDelayer)}>
             <CardsColumn
               cards={this.state.queryDelayer.setValue(query).getCached().cards}
-              onFocus={this.state.queryDelayer.flush}
               deckOpen={query.deckOpen}
               canEdit={canEdit}
               addColumn={this.props.onAddManualColumn}
