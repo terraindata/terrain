@@ -69,7 +69,7 @@ import Ajax from './../../util/Ajax';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
-import BuilderDelayer from '../data/BuilderDelayer';
+import ValueDelayer from '../data/ValueDelayer';
 import Manual from './../../manual/components/Manual';
 import CardsColumn from './cards/CardsColumn';
 import InputsArea from './inputs/InputsArea';
@@ -157,7 +157,7 @@ const BuilderColumn = createReactClass<any, any>(
 
       return {
         column: this.props.columnType ? this.props.columnType : column,
-        queryDelayer: new BuilderDelayer<Query>(this.props.query, () => { this.forceUpdate(); }),
+        queryDelayer: new ValueDelayer<Query>(this.props.query, () => { this.forceUpdate(); }),
       };
     },
 
@@ -212,12 +212,14 @@ const BuilderColumn = createReactClass<any, any>(
       }
       const query: Query = this.props.query;
       const { canEdit } = this.props;
+      const queryDelayer: ValueDelayer<Query> = this.state.queryDelayer;
+
       switch (this.state.column)
       {
         case COLUMNS.Builder:
-          return <span onFocus={this.state.queryDelayer.flush.bind(this.state.queryDelayer)}>
+          return <span onFocus={queryDelayer.flushAndGet.bind(queryDelayer)}>
             <CardsColumn
-              cards={this.state.queryDelayer.set(query).get().cards}
+              cards={this.state.queryDelayer.setValue(query).getCached().cards}
               onFocus={this.state.queryDelayer.flush}
               deckOpen={query.deckOpen}
               canEdit={canEdit}
@@ -226,7 +228,7 @@ const BuilderColumn = createReactClass<any, any>(
               cardsAndCodeInSync={query.cardsAndCodeInSync}
               parseError={query.parseError}
               language={query.language}
-            />
+            />,
           </span>;
 
         case COLUMNS.Inputs:
@@ -247,12 +249,12 @@ const BuilderColumn = createReactClass<any, any>(
           />;
 
         case COLUMNS.Editor:
-          return <span onFocus={this.state.queryDelayer.flush.bind(this.state.queryDelayer)}>
+          return <span onFocus={queryDelayer.flushAndGet.bind(queryDelayer)}>
             <BuilderTQLColumn
               canEdit={canEdit}
               addColumn={this.props.onAddManualColumn}
               columnIndex={this.props.index}
-              query={this.state.queryDelayer.set(query).get()}
+              query={this.state.queryDelayer.setValue(query).getCached()}
               variant={this.props.variant}
               resultsState={this.props.resultsState}
               language={query.language}

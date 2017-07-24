@@ -46,7 +46,12 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
-export default class BuilderDelayer<T>
+/*
+ *  Data type that represents a cached value.
+ *  Value gets updated after a configurable amount of time each time it is set,
+ *  with the timer resetting each time the value is set (Much like lodash debounced).
+ */
+export default class ValueDelayer<T>
 {
   protected resource: T;
   protected cachedResource: T;
@@ -54,7 +59,8 @@ export default class BuilderDelayer<T>
   protected lastTimer;
   protected onUpdate: () => void;
 
-  constructor(initialValue: T, onUpdate: () => void, delay: number = 2000)
+  // onUpdate gets called whenever the cached value is updated
+  constructor(initialValue: T, onUpdate: () => void, delay: number = 500)
   {
     this.resource = initialValue;
     this.cachedResource = initialValue;
@@ -62,7 +68,27 @@ export default class BuilderDelayer<T>
     this.onUpdate = onUpdate;
   }
 
-  public set(newValue: T): BuilderDelayer<T>
+  public isDirty(): boolean
+  {
+    return this.lastTimer !== undefined;
+  }
+
+  public getCached(): T
+  {
+    return this.cachedResource;
+  }
+
+  public flushAndGet(): T
+  {
+    if (this.isDirty())
+    {
+      this.clearTimer();
+      this.cacheUpdateTimeout();
+    }
+    return this.resource;
+  }
+
+  public setValue(newValue: T): ValueDelayer<T>
   {
     if (newValue !== this.resource)
     {
@@ -73,29 +99,10 @@ export default class BuilderDelayer<T>
     return this;
   }
 
-  public isDirty(): boolean
-  {
-    return this.lastTimer !== undefined;
-  }
-
-  public get(): T
-  {
-    return this.cachedResource;
-  }
-
-  public flush(): T
-  {
-    if (this.isDirty())
-    {
-      this.clearTimer();
-      this.cacheUpdateTimeout();
-    }
-    return this.resource;
-  }
-
   protected cacheUpdateTimeout()
   {
     this.cachedResource = this.resource;
+    this.lastTimer = undefined;
     this.onUpdate();
   }
 
