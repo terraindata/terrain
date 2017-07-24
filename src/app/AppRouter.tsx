@@ -78,7 +78,7 @@ class AppRouter extends TerrainComponent<{}> {
 
     return (
       <Router history={browserHistory}>
-        <Route path='/' component={App}>rsv E`
+        <Route path='/' component={App}>
           <IndexRoute component={Redirect} />
 
           <Route path='/builder' component={Builder} />
