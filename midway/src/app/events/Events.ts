@@ -62,8 +62,7 @@ const timeSalt: string = srs({ length: 256 }); // time salt
 
 export interface EventTemplateConfig
 {
-  eventId: string;
-  id?: number;
+  id: string;
   ip: string;
   url?: string;
   variantId?: string;
@@ -81,7 +80,7 @@ export interface EventConfig extends EventTemplateConfig
 
 export interface PayloadConfig
 {
-  eventId: string;
+  id: string;
   meta: any;
   payload: any;
 }
@@ -98,7 +97,7 @@ export class Events
     this.elasticController = new ElasticController(elasticConfig, 0, 'Events');
     this.eventTable = new Tasty.Table(
       'data',
-      ['eventId'],
+      ['id'],
       [
         'date',
         'ip',
@@ -110,7 +109,7 @@ export class Events
 
     this.payloadTable = new Tasty.Table(
       'data',
-      ['eventId'],
+      ['id'],
       [
         'meta',
         'payload',
@@ -133,7 +132,7 @@ export class Events
       for (let tp = 0; tp < timePeriods; ++tp)
       {
         const newTime: number = checkTime - tp * timeInterval * 60;
-        const privateKey: string = await this.getUniqueId(event.ip as string, event.eventId, newTime);
+        const privateKey: string = await this.getUniqueId(event.ip as string, event.id, newTime);
         const decodedMsg: string = await EventEncryption.decrypt(message, privateKey);
         if (Util.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
         {
@@ -154,8 +153,8 @@ export class Events
   {
     return new Promise<EventConfig>(async (resolve, reject) =>
     {
-      eventReq.payload = await this.getPayload(eventReq.eventId);
-      const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.eventId);
+      eventReq.payload = await this.getPayload(eventReq.id);
+      const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.id);
       eventReq.message = await EventEncryption.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
       resolve(eventReq);
@@ -212,7 +211,7 @@ export class Events
 
           const payloadEvent: object =
             {
-              eventId: 'item' + (itemId as string),
+              id: 'item' + (itemId as string),
               meta: otherFields,
               payload:
               {
@@ -224,7 +223,7 @@ export class Events
             };
           const returnEvent: object =
             {
-              eventId: 'item' + (itemId as string),
+              id: 'item' + (itemId as string),
             };
 
           // for now, only use items that are ES
@@ -254,15 +253,15 @@ export class Events
   }
 
   /*
-   * Get payload from datastore given the eventId
+   * Get payload from datastore given the id
    *
    */
-  public async getPayload(eventId: string): Promise<PayloadConfig>
+  public async getPayload(id: string): Promise<PayloadConfig>
   {
     return new Promise<PayloadConfig>(async (resolve, reject) =>
     {
       const payloads: PayloadConfig[] = await this.elasticController.getTasty().select(
-        this.payloadTable, [], { eventId }) as PayloadConfig[];
+        this.payloadTable, [], { id }) as PayloadConfig[];
       if (payloads.length === 0)
       {
         return resolve({} as PayloadConfig);
@@ -301,17 +300,17 @@ export class Events
       const encodedEventArr: EventTemplateConfig[] = [];
       for (const jsonObj of JSONArr)
       {
-        const payload: PayloadConfig = await this.getPayload(jsonObj['eventId']);
+        const payload: PayloadConfig = await this.getPayload(jsonObj['id']);
         const meta: object = payload.meta;
         delete payload.meta;
         const fullPayload: object = Object.assign(payload, meta);
-        if (jsonObj['eventId'] === undefined || !(Object.keys(payload).length === 0))
+        if (jsonObj['id'] === undefined || !(Object.keys(payload).length === 0))
         {
           continue;
         }
         const eventRequest: EventConfig =
           {
-            eventId: fullPayload['eventId'],
+            id: fullPayload['id'],
             eventType: fullPayload['eventType'],
             ip: IPSource,
             name: fullPayload['name'],
@@ -331,14 +330,14 @@ export class Events
   }
 
   /*
-   * Check if eventId exists in payload table
+   * Check if id exists in payload table
    *
    */
-  public async payloadExists(eventId: string): Promise<boolean>
+  public async payloadExists(id: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
-      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, [], { eventId }) as object[];
+      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, [], { id }) as object[];
       return resolve(payloads.length === 0 ? false : true);
     });
   }

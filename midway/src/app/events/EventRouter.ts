@@ -80,7 +80,7 @@ Router.post('/update/', async (ctx, next) =>
   {
     const event: EventConfig =
       {
-        eventId: ctx.request.body['eventId'],
+        id: ctx.request.body['id'],
         ip: ctx.request.ip,
         message: ctx.request.body['message'],
         payload: ctx.request.body['payload'],
