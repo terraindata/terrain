@@ -78,7 +78,8 @@ export default class ValueDelayer<T>
     return this.cachedResource;
   }
 
-  public flushAndGet(): T
+  // pre-emptively calls the update timeout function and returns the new value
+  public flush(): T
   {
     if (this.isDirty())
     {
