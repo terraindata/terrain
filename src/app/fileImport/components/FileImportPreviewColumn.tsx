@@ -78,6 +78,12 @@ export interface Props
 @Radium
 class FileImportPreviewColumn extends TerrainComponent<Props>
 {
+  public state: {
+    localColumnName: string;
+  } = {
+    localColumnName: this.props.columnNames.get(this.props.columnId),
+  };
+
   public handleEditClick()
   {
     this.props.handleEditColumnChange(this.props.columnId);
@@ -93,9 +99,34 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     Actions.changePrimaryKey(this.props.columnId);
   }
 
-  public handleAutocompleteHeaderChange(newColumnName: string)
+  public handleLocalColumnNameChange(localColumnName: string)
   {
-    Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), newColumnName);
+    this.setState({
+      localColumnName,
+    });
+  }
+
+  public handleBlur()
+  {
+    if (this.props.columnNames.delete(this.props.columnId).contains(this.state.localColumnName))
+    {
+      alert('column name: ' + this.state.localColumnName + ' already exists, duplicate column names are not allowed');
+      return;
+    }
+
+    if (this.props.columnNames.get(this.props.columnId) !== this.state.localColumnName)
+    {
+      Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), this.state.localColumnName);
+      Actions.addTransform(
+        {
+          name: 'rename',
+          colName: this.props.columnNames.get(this.props.columnId),
+          args: {
+            newName: this.state.localColumnName,
+          },
+        },
+      );
+    }
   }
 
   public shouldComponentUpdate(nextProps: Props)
@@ -106,6 +137,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
+    // console.log(this.state.localColumnName);
     if (this.props.editing)
     {
       return (
@@ -124,11 +156,13 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             onChange={this.handlePrimaryKeyChange}
           />
           <Autocomplete
-            value={this.props.columnNames.get(this.props.columnId)}
+            value={this.state.localColumnName}
             options={this.props.columnOptions}
-            onChange={this.handleAutocompleteHeaderChange}
+            onChange={this.handleLocalColumnNameChange}
             placeholder={''}
             disabled={false}
+            onBlur={this.handleBlur}
+            ref='colAutocomplete'
           />
           <TypeDropdown
             columnId={this.props.columnId}
@@ -140,6 +174,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
             colName={this.props.columnNames.get(this.props.columnId)}
             columnNames={this.props.columnNames}
+            setLocalColumnName={this.handleLocalColumnNameChange}
           />
         </div>
       );

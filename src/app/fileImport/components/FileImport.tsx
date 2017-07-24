@@ -133,7 +133,7 @@ class FileImport extends TerrainComponent<any>
           tables: schemaState.tables,
           serverNames: schemaState.servers.keySeq().toList(),
         });
-      }
+      },
     });
   }
 
@@ -261,7 +261,10 @@ class FileImport extends TerrainComponent<any>
     {
       if (charIndex >= file.length - 1)
       {
-        charIndex--;    // account for end square bracket
+        if (file.charAt(charIndex) === '\n')
+        {
+          charIndex--;
+        }
         break;
       }
 

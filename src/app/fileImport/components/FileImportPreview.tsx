@@ -145,6 +145,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
+    console.log(this.props.columnNames);
     return (
       <div
         className='fi-preview'

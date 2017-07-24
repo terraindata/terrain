@@ -65,6 +65,7 @@ export interface Props
   datatype: string;
   colName: string;
   columnNames: List<string>;
+  setLocalColumnName(columnName: string);
 }
 
 class TransformBox extends TerrainComponent<Props>
@@ -202,7 +203,7 @@ class TransformBox extends TerrainComponent<Props>
       return;
     }
 
-    const transform = {
+    const transform: FileImportTypes.Transform = {
       name: transformName,
       colName: this.props.colName,
       args: {},
@@ -210,12 +211,6 @@ class TransformBox extends TerrainComponent<Props>
 
     switch (transformName)
     {
-      case 'rename':
-        transform.args = {
-          newName: this.props.colName,
-        };
-        break;
-
       case 'append':
         transform.args = {
           text: this.state.transformText,
@@ -233,6 +228,7 @@ class TransformBox extends TerrainComponent<Props>
           newName: this.state.splitNames.toArray(),
           text: this.state.transformText,
         };
+        this.props.setLocalColumnName(this.state.splitNames.toArray()[0]);
         break;
 
       case 'merge':
@@ -241,6 +237,7 @@ class TransformBox extends TerrainComponent<Props>
           newName: this.state.mergeNewName,
           text: this.state.transformText,
         };
+        this.props.setLocalColumnName(this.state.mergeNewName);
         break;
 
       case 'duplicate':
