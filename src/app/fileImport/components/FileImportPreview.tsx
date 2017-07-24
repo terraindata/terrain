@@ -85,15 +85,25 @@ class FileImportPreview extends TerrainComponent<Props>
     templateId: number,
     templateText: string,
     editColumnId: number,
+    resetLocalColumnNames: boolean,
   } = {
     templateId: -1,
     templateText: '',
     editColumnId: -1,
+    resetLocalColumnNames: false,
   };
 
   public componentDidMount()
   {
     Actions.getTemplates();
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    this.setState({
+      resetLocalColumnNames: this.props.columnNames.size !== nextProps.columnNames.size,
+      // resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
+    });
   }
 
   public handleEditColumnChange(editColumnId: number)
@@ -124,6 +134,12 @@ class FileImportPreview extends TerrainComponent<Props>
       alert('Please select a template to load');
       return;
     }
+    if (!this.props.columnNames.equals(List(this.props.templates.get(this.state.templateId).originalNames)))
+    {
+      console.log(this.props.templates.get(this.state.templateId).originalNames);
+      alert('Incompatible column names with template');
+      return;
+    }
     Actions.loadTemplate(this.state.templateId);
   }
 
@@ -146,6 +162,7 @@ class FileImportPreview extends TerrainComponent<Props>
   public render()
   {
     console.log(this.props.columnNames);
+    console.log('reset: ', this.state.resetLocalColumnNames);
     return (
       <div
         className='fi-preview'
@@ -212,6 +229,7 @@ class FileImportPreview extends TerrainComponent<Props>
                   columnNames={this.props.columnNames}
                   columnOptions={this.props.columnOptions}
                   editing={key === this.state.editColumnId}
+                  resetLocalColumnNames={this.state.resetLocalColumnNames}
                   handleEditColumnChange={this.handleEditColumnChange}
                 />,
               ).toArray()

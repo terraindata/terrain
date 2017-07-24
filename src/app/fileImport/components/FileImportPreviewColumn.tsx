@@ -72,6 +72,7 @@ export interface Props
   columnNames: List<string>;
   columnOptions: List<string>;
   editing: boolean;
+  resetLocalColumnNames: boolean;
   handleEditColumnChange(editColumnId: number);
 }
 
@@ -111,6 +112,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     if (this.props.columnNames.delete(this.props.columnId).contains(this.state.localColumnName))
     {
       alert('column name: ' + this.state.localColumnName + ' already exists, duplicate column names are not allowed');
+      this.setState({
+        localColumnName: this.props.columnNames.get(this.props.columnId),
+      });
       return;
     }
 
@@ -133,6 +137,16 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
   {
     const shouldUpdateShallow = shallowCompare(this, nextProps);
     return shouldUpdateShallow || JSON.stringify(this.props.columnType) !== JSON.stringify(nextProps.columnType);
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.resetLocalColumnNames)
+    {
+      this.setState({
+        localColumnName: this.props.columnNames.get(this.props.columnId),
+      });
+    }
   }
 
   public render()
