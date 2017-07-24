@@ -49,10 +49,10 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './Modal.less';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
+import './Modal.less';
 
 export interface Props
 {
@@ -233,7 +233,7 @@ const MODAL_HEADER_FOOTER_STYLE = {
   backgroundColor: Colors().altBg2,
 };
 
-const MODAL_OVERLAY_STYLE ={
+const MODAL_OVERLAY_STYLE = {
   backgroundColor: Colors().fadedOutBg,
 };
 
