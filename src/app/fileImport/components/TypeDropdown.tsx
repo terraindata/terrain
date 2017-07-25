@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../util/Util';
@@ -56,6 +57,9 @@ import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
+import './TypeDropdown.less';
+import shallowCompare = require('react-addons-shallow-compare');
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 const { List } = Immutable;
 
 const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
@@ -68,6 +72,7 @@ export interface Props
   editing: boolean;
 }
 
+@Radium
 class TypeDropdown extends TerrainComponent<Props>
 {
   public handleTypeChange(typeIndex: number)
@@ -75,29 +80,29 @@ class TypeDropdown extends TerrainComponent<Props>
     Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
   }
 
-  public componentWillUnmount()
-  {
-    if (!this.props.editing)
-    {
-      Actions.deleteColumnType(this.props.columnId, this.props.recursionDepth);
-    }
-  }
-
   public shouldComponentUpdate(nextProps: Props)
   {
-    return JSON.stringify(this.props.columnType) === JSON.stringify(nextProps.columnType);
+    const shouldUpdateShallow = shallowCompare(this, nextProps);
+    return shouldUpdateShallow || JSON.stringify(this.props.columnType) !== JSON.stringify(nextProps.columnType);
   }
 
   public render()
   {
     return (
-      <div>
-        <Dropdown
-          selectedIndex={Number(this.props.columnType.type)}
-          options={DATATYPES}
-          onChange={this.handleTypeChange}
-          canEdit={true}
-        />
+      <div
+        className='fi-type-dropdown'
+        style={backgroundColor(Colors().fileimport.preview.column.typeDropdown)}
+      >
+        <div
+          className='fi-type-dropdown-dropdown'
+        >
+          <Dropdown
+            selectedIndex={Number(this.props.columnType.type)}
+            options={DATATYPES}
+            onChange={this.handleTypeChange}
+            canEdit={true}
+          />
+        </div>
         {
           FileImportTypes.ELASTIC_TYPES[this.props.columnType.type] === 'array' &&
           <TypeDropdown

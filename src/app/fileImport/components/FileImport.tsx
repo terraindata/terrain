@@ -99,6 +99,7 @@ class FileImport extends TerrainComponent<any>
     file: string;
     filetype: string;
     filename: string;
+    filesize: number;
   } = {
     fileImportState: FileImportStore.getState(),
     serverNames: List([]),
@@ -114,6 +115,7 @@ class FileImport extends TerrainComponent<any>
     file: '',
     filetype: '',
     filename: '',
+    filesize: 0,
   };
 
   constructor(props)
@@ -133,8 +135,7 @@ class FileImport extends TerrainComponent<any>
           tables: schemaState.tables,
           serverNames: schemaState.servers.keySeq().toList(),
         });
-      }
-      ,
+      },
     });
   }
 
@@ -185,7 +186,6 @@ class FileImport extends TerrainComponent<any>
         break;
       default:
     }
-
     this.setState({
       stepId: this.state.stepId + 1,
     });
@@ -263,7 +263,10 @@ class FileImport extends TerrainComponent<any>
     {
       if (charIndex >= file.length - 1)
       {
-        charIndex--;    // account for end square bracket
+        if (file.charAt(charIndex) === '\n')
+        {
+          charIndex--;
+        }
         break;
       }
 
@@ -349,6 +352,7 @@ class FileImport extends TerrainComponent<any>
     this.setState({
       fileSelected,
       filename: file.target.files[0].name,
+      filesize: file.target.files[0].size,
     });
 
     const filetype = file.target.files[0].name.split('.').pop();
@@ -357,24 +361,30 @@ class FileImport extends TerrainComponent<any>
       alert('Invalid filetype: ' + String(filetype));
       return;
     }
+    Actions.setFile(file.target.files[0]);
+
+    /*
+    const chunk = file.target.files[0].slice(0, 1000);
 
     const fr = new FileReader();
-    fr.readAsText(file.target.files[0]);
+    fr.readAsText(chunk);
+
     fr.onloadend = () =>
     {
+      console.log('finished reading: ', fr.result);
       this.setState({
         file: fr.result,
         filetype,
       });
       this.refs['file']['value'] = null;                 // prevent file-caching
-    };
+    };*/
   }
 
   public render()
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      hasCsvHeader, primaryKey, templates, transforms } = fileImportState;
+      hasCsvHeader, primaryKey, templates, transforms, blob } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -434,6 +444,7 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
+            blob={blob}
           />;
         break;
       default:
@@ -465,30 +476,32 @@ class FileImport extends TerrainComponent<any>
               content
             }
           </div>
-
-          {
-            this.state.stepId > 0 &&
-            <div
-              className='fi-nav-button fi-back-button'
-              onClick={this.handlePrevStepChange}
-              style={buttonColors()}
-              ref='fi-back-button'
-            >
-              &lt; back
-            </div>
-          }
-
-          {
-            this.state.stepId < 4 &&
-            <div
-              className='fi-nav-button fi-next-button'
-              onClick={this.handleNextStepChange}
-              style={buttonColors()}
-              ref='fi-next-button'
-            >
-              next &gt;
-            </div>
-          }
+          <div
+            className='fi-nav-button'
+          >
+            {
+              this.state.stepId > 0 &&
+              <div
+                className='fi-back-button'
+                onClick={this.handlePrevStepChange}
+                style={buttonColors()}
+                ref='fi-back-button'
+              >
+                &lt; back
+              </div>
+            }
+            {
+              this.state.stepId < 4 &&
+              <div
+                className='fi-next-button'
+                onClick={this.handleNextStepChange}
+                style={buttonColors()}
+                ref='fi-next-button'
+              >
+                next &gt;
+              </div>
+            }
+          </div>
         </div>
       </div>
     );

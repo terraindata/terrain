@@ -60,12 +60,12 @@ const FileImportActionTypes =
     setColumnToInclude: '',
     setColumnName: '',
     setColumnType: '',
-    deleteColumnType: '',
     updatePreviewRows: '',
     saveTemplate: '',
     getTemplates: '',
     setTemplates: '',
     loadTemplate: '',
+    setFile: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

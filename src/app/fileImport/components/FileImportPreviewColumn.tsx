@@ -59,7 +59,9 @@ import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
+import shallowCompare = require('react-addons-shallow-compare');
 import './FileImportPreviewColumn.less';
+const { Map } = Immutable;
 
 export interface Props
 {
@@ -70,12 +72,19 @@ export interface Props
   columnNames: List<string>;
   columnOptions: List<string>;
   editing: boolean;
+  resetLocalColumnNames: boolean;
   handleEditColumnChange(editColumnId: number);
 }
 
 @Radium
 class FileImportPreviewColumn extends TerrainComponent<Props>
 {
+  public state: {
+    localColumnName: string;
+  } = {
+    localColumnName: this.props.columnNames.get(this.props.columnId),
+  };
+
   public handleEditClick()
   {
     this.props.handleEditColumnChange(this.props.columnId);
@@ -91,14 +100,53 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     Actions.changePrimaryKey(this.props.columnId);
   }
 
-  public handleAutocompleteHeaderChange(newColumnName: string)
+  public handleLocalColumnNameChange(localColumnName: string)
   {
-    Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), newColumnName);
+    this.setState({
+      localColumnName,
+    });
+  }
+
+  public handleBlur()
+  {
+    if (this.props.columnNames.delete(this.props.columnId).contains(this.state.localColumnName))
+    {
+      alert('column name: ' + this.state.localColumnName + ' already exists, duplicate column names are not allowed');
+      this.setState({
+        localColumnName: this.props.columnNames.get(this.props.columnId),
+      });
+      return;
+    }
+
+    if (this.props.columnNames.get(this.props.columnId) !== this.state.localColumnName)
+    {
+      Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), this.state.localColumnName);
+      Actions.addTransform(
+        {
+          name: 'rename',
+          colName: this.props.columnNames.get(this.props.columnId),
+          args: {
+            newName: this.state.localColumnName,
+          },
+        },
+      );
+    }
   }
 
   public shouldComponentUpdate(nextProps: Props)
   {
-    return JSON.stringify(this.props.columnType) === JSON.stringify(nextProps.columnType);
+    const shouldUpdateShallow = shallowCompare(this, nextProps);
+    return shouldUpdateShallow || JSON.stringify(this.props.columnType) !== JSON.stringify(nextProps.columnType);
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.resetLocalColumnNames)
+    {
+      this.setState({
+        localColumnName: nextProps.columnNames.get(this.props.columnId),
+      });
+    }
   }
 
   public render()
@@ -108,7 +156,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       return (
         <div
           className='fi-preview-column'
-          style={backgroundColor(Colors().fileimport.preview.column)}
+          style={backgroundColor(Colors().fileimport.preview.column.base)}
         >
           include
           <CheckBox
@@ -120,23 +168,33 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             checked={this.props.isPrimaryKey}
             onChange={this.handlePrimaryKeyChange}
           />
-          <Autocomplete
-            value={this.props.columnNames.get(this.props.columnId)}
-            options={this.props.columnOptions}
-            onChange={this.handleAutocompleteHeaderChange}
-            placeholder={''}
-            disabled={false}
-          />
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={0}
-            columnType={this.props.columnType}
-            editing={this.props.editing}
-          />
+          <div
+            className='fi-preview-column-name'
+          >
+            <Autocomplete
+              value={this.state.localColumnName}
+              options={this.props.columnOptions}
+              onChange={this.handleLocalColumnNameChange}
+              placeholder={''}
+              disabled={false}
+              onBlur={this.handleBlur}
+            />
+          </div>
+          <div
+            className='fi-preview-type-dropdown-container'
+          >
+            <TypeDropdown
+              columnId={this.props.columnId}
+              recursionDepth={0}
+              columnType={this.props.columnType}
+              editing={this.props.editing}
+            />
+          </div>
           <TransformBox
             datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
             colName={this.props.columnNames.get(this.props.columnId)}
             columnNames={this.props.columnNames}
+            setLocalColumnName={this.handleLocalColumnNameChange}
           />
         </div>
       );
@@ -144,24 +202,20 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
     return (
       <div
-        className='fi-preview-column'
-        style={backgroundColor(Colors().fileimport.preview.column)}
+        className='fi-preview-column-title'
+        style={backgroundColor(Colors().fileimport.preview.column.base)}
       >
+        <div className='fi-preview-column-title-name'>
+          {this.props.columnNames.get(this.props.columnId)}
+        </div>
+        <div className='fi-preview-column-title-type'>
+          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+        </div>
         <div
-          className='fi-preview-column-title'
+          className='fi-preview-column-edit-button'
+          onClick={this.handleEditClick}
         >
-          <div className='fi-preview-column-title-name'>
-            {this.props.columnNames.get(this.props.columnId)}
-          </div>
-          <div className='fi-preview-column-title-type'>
-            {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
-          </div>
-          <div
-            className='fi-preview-column-edit-button'
-            onClick={this.handleEditClick}
-          >
-            Edit
-          </div>
+          Edit
         </div>
       </div>
     );

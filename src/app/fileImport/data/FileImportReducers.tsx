@@ -52,7 +52,6 @@ import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
-// import { List, Map } from 'Immutable';
 const { List, Map } = Immutable;
 
 const FileImportReducers = {};
@@ -141,6 +140,7 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'duplicate')
   {
+    console.log('duplicate');
     console.log('duplicate name: ', transform.args.newName);
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
@@ -163,6 +163,7 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'split')
   {
+    console.log('split');
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
       .set('primaryKey', primaryKey)
@@ -264,6 +265,13 @@ FileImportReducers[ActionTypes.setColumnToInclude] =
       .updateIn(['columnsToInclude', action.payload.columnId], (isColIncluded: boolean) => !isColIncluded)
   ;
 
+FileImportReducers[ActionTypes.setColumnName] =
+  (state, action) =>
+  {
+    return state
+      .setIn(['columnNames', action.payload.columnId], action.payload.newName);
+  };
+
 FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
   {
@@ -275,85 +283,19 @@ FileImportReducers[ActionTypes.setColumnType] =
     {
       columnTypes[action.payload.columnId] = deeplyAddColumnType(columnTypes[action.payload.columnId]);
     }
-    console.log('reducer coltypes: ', columnTypes);
+    else
+    {
+      columnTypes[action.payload.columnId] = deeplyDeleteColumnType(columnTypes[action.payload.columnId], 0,
+        action.payload.recursionDepth + 1);
+    }
 
     return state.set('columnTypes', List(columnTypes));
-  };
-
-FileImportReducers[ActionTypes.deleteColumnType] =
-  (state, action) =>
-  {
-    if (state.columnTypes.get(action.payload.columnId))
-    {
-      const columnTypes = state.columnTypes.toArray();
-      columnTypes[action.payload.columnId] = deeplyDeleteColumnType(columnTypes[action.payload.columnId], 0,
-        action.payload.recursionDepth);
-      return state.set('columnTypes', List(columnTypes));
-    }
-    return state;
-  };
-
-/* Renames need to be transforms because column names can be modified after applying a transform, therefore we must
-   maintain a history of renames in the transform list. To avoid pushing each individual letter rename to the list of
-   transforms, we save the current rename 'state.renameTransform' and only push it when
-   (1) A current rename exists and a different column is renamed
-   (2) A non-rename transform is added
-   (3) A file is uploaded
-   Another way to do this might be with focus - adding the rename transform when the columnName autocomplete goes out
-   of focus. */
-FileImportReducers[ActionTypes.setColumnName] =
-  (state, action) =>
-  {
-    // if current rename exists and a different column is renamed add current rename to transform list and set new rename
-    if (state.renameTransform.colName && state.renameTransform.args.newName !== action.payload.colName)
-    {
-      console.log('adding rename transform: ', state.renameTransform.colName + ', ' + state.renameTransform.args.newName);
-      return state
-        .set('transforms', state.transforms.push(JSON.parse(JSON.stringify(state.renameTransform))))
-        .update('renameTransform', (renameTransform) =>
-        {
-          renameTransform.colName = action.payload.colName;
-          renameTransform.args.newName = action.payload.newName;
-          return renameTransform;
-        })
-        .setIn(['columnNames', action.payload.columnId], action.payload.newName);
-    }
-
-    console.log('setting rename transform: ', state.renameTransform.colName + ' to ' + action.payload.newName);
-    // set current rename if none exists
-    if (!state.renameTransform.colName)
-    {
-      return state
-        .update('renameTransform', (renameTransform) =>
-        {
-          renameTransform.colName = action.payload.colName;
-          renameTransform.args.newName = action.payload.newName;
-          return renameTransform;
-        })
-        .setIn(['columnNames', action.payload.columnId], action.payload.newName);
-    }
-    // update current rename newName
-    return state
-      .update('renameTransform', (renameTransform) =>
-      {
-        renameTransform.args.newName = action.payload.newName;
-        return renameTransform;
-      })
-      .setIn(['columnNames', action.payload.columnId], action.payload.newName);
   };
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
   {
     console.log('add transform: ', action.payload.transform);
-
-    if (state.renameTransform.colName)
-    {
-      console.log('add Rename: ', state.renameTransform.colName);
-      return state
-        .set('transforms', state.transforms.push(JSON.parse(JSON.stringify(state.renameTransform))).push(action.payload.transform))
-        .set('renameTransform', { name: 'rename', colName: '', args: { newName: '' } });
-    }
     return state.set('transforms', state.transforms.push(action.payload.transform));
   };
 
@@ -389,8 +331,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('columnNames', List(columnNames))
       .set('columnsToInclude', List(columnsToInclude))
       .set('columnTypes', List(columnTypes))
-      .set('transforms', List([]))
-      .set('renameTransform', { name: 'rename', colName: '', args: { newName: '' } });
+      .set('transforms', List([]));
   };
 
 FileImportReducers[ActionTypes.uploadFile] =
@@ -407,12 +348,13 @@ FileImportReducers[ActionTypes.uploadFile] =
         state.columnsToInclude.get(colId) &&                          // backend requires type as string
         [colName, deeplyColumnTypeToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
-      state.columnNames.get(state.primaryKey),
-      state.renameTransform.colName ? state.transforms.push(state.renameTransform) : state.transforms,
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
       () =>
       {
         alert('success');
       },
+      state.streaming,
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
@@ -420,12 +362,6 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.hasCsvHeader,
     );
 
-    if (state.renameTransform.colName)
-    {
-      return state
-        .set('transforms', state.transforms.push(JSON.parse(JSON.stringify(state.renameTransform))))
-        .set('renameTransform', { name: 'rename', colName: '', args: { newName: '' } });
-    }
     return state;
   };
 
@@ -439,8 +375,8 @@ FileImportReducers[ActionTypes.saveTemplate] =
       Map<string, FileImportTypes.ColumnTypesTree>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) && [colName, deeplyColumnTypeToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
       )),
-      state.columnNames.get(state.primaryKey),
-      state.renameTransform.colName ? state.transforms.push(state.renameTransform) : state.transforms,
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
       action.payload.templateText,
       () =>
       {
@@ -514,5 +450,13 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('columnsToInclude', List(colsToInclude))
       .set('previewRows', previewRows);
   };
+
+FileImportReducers[ActionTypes.setFile] =
+  (state, action) =>
+  {
+    console.log(action.payload.file);
+    return state.set('blob', action.payload.file);
+  }
+  ;
 
 export default FileImportReducers;
