@@ -138,7 +138,7 @@ class TQLEditor extends TerrainComponent<Props>
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
         revertButtons: false,
         connect: 'align',
-
+        tabSize: ESConverter.defaultIndentSize,
         origLeft: this.props.diffTql,
       };
 
@@ -169,7 +169,6 @@ class TQLEditor extends TerrainComponent<Props>
         />
       );
     }
-
     return (
       <CodeMirror
         ref='cm'
@@ -213,8 +212,10 @@ class TQLEditor extends TerrainComponent<Props>
       const formatted = this.autoFormatQuery(cmInstance.getValue());
       if (formatted)
       {
+        const cursor = cmInstance.getCursor();
         this.state.codeMirrorInstance.setValue(formatted);
         this.props.onChange(cmInstance.getValue());
+        cmInstance.setCursor(cursor);
       }
     }
   }
