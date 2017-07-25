@@ -47,6 +47,8 @@ THE SOFTWARE.
 import sha1 = require('sha1');
 
 import * as csv from 'csvtojson';
+import * as http from 'http';
+import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
 import * as SharedUtil from '../../../../shared/fileImport/Util';
@@ -59,6 +61,8 @@ export interface ImportConfig extends ImportTemplateBase
 {
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
+
+  streaming: boolean;   // if true, contents is an address to read contents from (?)
 }
 
 export class Import
@@ -111,31 +115,40 @@ export class Import
       }
       winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
 
-      time = Date.now();
-      winston.info('parsing data...');
-      let items: object[];
+      const items: object[] = [];
       try
       {
-        items = await this._parseData(imprt);
-      } catch (e)
-      {
-        return reject('Error parsing data: ' + String(e));
-      }
-      winston.info('got parsed data! (s): ' + String((Date.now() - time) / 1000));
-      time = Date.now();
-      winston.info('transforming and type-checking data...');
-      if (items.length === 0)
-      {
-        return reject('No data provided in file to upload.');
-      }
-      try
-      {
-        items = await this._transformAndCheck(items, imprt);
+        // TODO: what's the point of creating a server, versus just using the standalone option?
+        // TODO: set up a buffer?
+        // TODO: write the items to a file
+        if (imprt.streaming)
+        {
+          const server = http.createServer();   // TODO: what url is this going to??
+          const io = socketio(server);
+          io.on('connection', (socket) =>
+          {
+            // console.log('someone connected!!!');
+            socket.emit('ready');
+            socket.on('message', async (data) =>
+            {
+              // items.push(...await this._getItems(imprt, data));
+              // console.log('got data!!!');
+            });
+            socket.on('finished', () =>
+            {
+              server.close();
+            });
+          });
+          server.listen(3300);   // TODO: which port?
+        }
+        else
+        {
+          items.push(...await this._getItems(imprt, imprt.contents));
+        }
       } catch (e)
       {
         return reject(e);
       }
-      winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
 
       time = Date.now();
       winston.info('creating tasty table and putting mapping...');
@@ -155,6 +168,38 @@ export class Import
       const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
       winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
       resolve(res);
+    });
+  }
+  private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      let time: number = Date.now();
+      winston.info('parsing data...');
+      let items: object[];
+      try
+      {
+        items = await this._parseData(imprt, imprt.contents);
+      } catch (e)
+      {
+        return reject('Error parsing data: ' + String(e));
+      }
+      winston.info('got parsed data! (s): ' + String((Date.now() - time) / 1000));
+      time = Date.now();
+      winston.info('transforming and type-checking data...');
+      if (items.length === 0)
+      {
+        return reject('No data provided in file to upload.');
+      }
+      try
+      {
+        items = await this._transformAndCheck(items, imprt);
+      } catch (e)
+      {
+        return reject(e);
+      }
+      winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
+      resolve(items);
     });
   }
 
@@ -291,7 +336,7 @@ export class Import
     return this.compatibleTypes[proposedType] !== undefined && this.compatibleTypes[proposedType].has(existing['type']);
   }
 
-  private async _parseData(imprt: ImportConfig): Promise<object[]>
+  private async _parseData(imprt: ImportConfig, contents: string): Promise<object[]>
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
@@ -299,7 +344,7 @@ export class Import
       {
         try
         {
-          const items: object[] = JSON.parse(imprt.contents);
+          const items: object[] = JSON.parse(contents);
           if (!Array.isArray(items))
           {
             return reject('Input JSON file must parse to an array of objects.');
@@ -327,7 +372,8 @@ export class Import
           headers: imprt.originalNames,
           quote: '\'',
           // workerNum: 4,
-        }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
+        }).fromString(contents).on('end_parsed', (jsonArrObj) =>
+        // }).fromFile(contents).on('end_parsed', (jsonArrObj) =>
         {
           resolve(jsonArrObj);
         }).on('error', (e) =>
