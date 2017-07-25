@@ -53,7 +53,6 @@ import { BlockConfig } from '../../blocks/types/Block';
 import { Card } from '../../blocks/types/Card';
 import Query from '../../items/types/Query';
 import CardsToCodeOptions from './CardsToCodeOptions';
-import ParseTreeToQueryOptions from './ParseTreeToQueryOptions';
 
 export interface Backend
 {
@@ -89,12 +88,12 @@ export interface Backend
   ): Query;
 
   parseQuery(
-    tql: string,
+    query: Query,
   ): any;
 
   parseTreeToQueryString(
     query: Query,
-    options: ParseTreeToQueryOptions,
+    options: CardsToCodeOptions,
   ): string;
 
   syntaxConfig: object;
