@@ -132,6 +132,7 @@
     "@types/bcrypt": "^1.0.0",
     "@types/chai": "^3.4.35",
     "@types/classnames": "0.0.32",
+    "@types/codemirror": "^0.0.42",
     "@types/d3": "^4.7.0",
     "@types/elasticsearch": "^5.0.13",
     "@types/jest": "^19.2.2",
