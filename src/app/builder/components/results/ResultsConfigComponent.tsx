@@ -54,6 +54,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as _ from 'underscore';
 import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
@@ -240,7 +241,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         })}>
           <div className='results-config-bar'>
             <div className='results-config-title'>
-              Configure Results View
+              Customize Results
             </div>
             <div className='results-config-switch'>
               <Switch
@@ -471,15 +472,18 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const image = format && format.type === 'image';
 
     return this.props.connectDropTarget(this.props.connectDragSource(
-      <div className={classNames({
-        'results-config-field': true,
-        'results-config-field-dragging': this.props.isDragging ||
-        (this.props.draggingField && this.props.draggingField === this.props.field),
-        'results-config-field-name': this.props.is === 'name',
-        'results-config-field-score': this.props.is === 'score',
-        'results-config-field-field': this.props.is === 'field',
-        'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
-      })}>
+      <div
+        style={fontColor(Colors().text.baseDark)}
+        className={classNames({
+          'results-config-field': true,
+          'results-config-field-dragging': this.props.isDragging ||
+          (this.props.draggingField && this.props.draggingField === this.props.field),
+          'results-config-field-name': this.props.is === 'name',
+          'results-config-field-score': this.props.is === 'score',
+          'results-config-field-field': this.props.is === 'field',
+          'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
+        })}
+      >
         <div className='results-config-field-body'>
           <span className='results-config-handle'>
             <HandleIcon />

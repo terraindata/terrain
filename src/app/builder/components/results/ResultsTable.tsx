@@ -105,7 +105,6 @@ export default class ResultsTable extends TerrainComponent<Props>
 
     if (resultsConfig.enabled)
     {
-
       if (resultsConfig.name)
       {
         cols.push({
@@ -114,6 +113,7 @@ export default class ResultsTable extends TerrainComponent<Props>
           resizable: true,
         });
       }
+
       if (resultsConfig.score)
       {
         cols.push({
@@ -122,7 +122,10 @@ export default class ResultsTable extends TerrainComponent<Props>
           resizable: true,
         });
       }
+    }
 
+    if (resultsConfig.enabled && resultsConfig.fields && resultsConfig.fields.size)
+    {
       resultsConfig.fields.map(
         (field) =>
           cols.push({
@@ -131,7 +134,6 @@ export default class ResultsTable extends TerrainComponent<Props>
             resizable: true,
           }),
       );
-
     }
     else
     {

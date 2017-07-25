@@ -85,10 +85,12 @@ export const elasticTransform = _card(
     domain: List([0, 100]),
     hasCustomDomain: false, // has the user set a custom domain
 
+    noTitle: true,
+
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: ['#4b979a', '#aef3f6'],
+      colors: ['#4b979a', 'rgba(75, 153, 154, 0.7)'],
       title: 'Transform',
       preview: (card: any) =>
       {
