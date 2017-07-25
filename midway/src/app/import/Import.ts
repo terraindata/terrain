@@ -85,6 +85,30 @@ export class Import
   private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
   private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
 
+  private server;
+  private io;
+  constructor()
+  {
+    this.server = http.createServer();   // TODO: what url is this going to??
+    this.io = socketio(this.server);
+    // console.log('set up server');
+    this.io.on('connection', (socket) =>
+    {
+      // console.log('someone connected!!!');
+      socket.emit('ready');
+      socket.on('message', (data) =>
+      {
+        // items.push(...await this._getItems(imprt, data));
+        // console.log('got data!!!');
+      });
+      socket.on('finished', () =>
+      {
+        this.server.close();   // TODO: fix
+      });
+    });
+    this.server.listen(3300);   // TODO: which port?
+  }
+
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
@@ -101,18 +125,18 @@ export class Import
 
       let time: number = Date.now();
       winston.info('checking config and schema...');
-      const configError: string = this._verifyConfig(imprt);
-      if (configError !== '')
-      {
-        return reject(configError);
-      }
-      const expectedMapping: object = this._getMappingForSchema(imprt);
-      const mappingForSchema: object | string =
-        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
-      if (typeof mappingForSchema === 'string')
-      {
-        return reject(mappingForSchema);
-      }
+      // const configError: string = this._verifyConfig(imprt);
+      // if (configError !== '')
+      // {
+      //   return reject(configError);
+      // }
+      // const expectedMapping: object = this._getMappingForSchema(imprt);
+      // const mappingForSchema: object | string =
+      //   this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
+      // if (typeof mappingForSchema === 'string')
+      // {
+      //   return reject(mappingForSchema);
+      // }
       winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
 
       const items: object[] = [];
@@ -123,23 +147,7 @@ export class Import
         // TODO: write the items to a file
         if (imprt.streaming)
         {
-          const server = http.createServer();   // TODO: what url is this going to??
-          const io = socketio(server);
-          io.on('connection', (socket) =>
-          {
-            // console.log('someone connected!!!');
-            socket.emit('ready');
-            socket.on('message', async (data) =>
-            {
-              // items.push(...await this._getItems(imprt, data));
-              // console.log('got data!!!');
-            });
-            socket.on('finished', () =>
-            {
-              server.close();
-            });
-          });
-          server.listen(3300);   // TODO: which port?
+          // TODO: something
         }
         else
         {
@@ -158,16 +166,16 @@ export class Import
         [imprt.primaryKey],
         columns,
         imprt.dbname,
-        mappingForSchema,
+        // mappingForSchema,
       );
-      await database.getTasty().getDB().putMapping(insertTable);
+      // await database.getTasty().getDB().putMapping(insertTable);
       winston.info('created tasty table and put mapping (s): ' + String((Date.now() - time) / 1000));
 
       time = Date.now();
       winston.info('about to upsert via tasty...');
-      const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      // const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
       winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
-      resolve(res);
+      // resolve(res);
     });
   }
   private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>

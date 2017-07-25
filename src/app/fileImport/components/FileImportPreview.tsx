@@ -169,7 +169,7 @@ class FileImportPreview extends TerrainComponent<Props>
     };
     Actions.uploadFile();
 
-    const socket = io('http://localhost:3300');
+    const socket = io('http://localhost:3300/');
     socket.on('connect', () =>
     {
       //
@@ -177,10 +177,12 @@ class FileImportPreview extends TerrainComponent<Props>
     socket.on('ready', (data) =>
     {
       // TODO: stream data
+      console.log('sending data!!!!');
       socket.send('test');
+
+      socket.emit('finished');
+      socket.close();   // TODO: fix
     });
-    socket.emit('finished');
-    socket.close();   // TODO: fix
   }
 
   public render()
