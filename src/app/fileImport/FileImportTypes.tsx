@@ -72,6 +72,8 @@ class FileImportStateC extends BaseClass
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
+  public blob: File = null;
+  public streaming: boolean = true;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -113,6 +115,8 @@ export interface ColumnTypesTree
 }
 
 export const NUMBER_PREVIEW_ROWS = 5;
+
+export const FILESIZE_THRESHOLD = 1000;
 
 export const FILE_TYPES =
   [

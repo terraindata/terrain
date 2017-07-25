@@ -354,6 +354,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       {
         alert('success');
       },
+      state.streaming,
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
@@ -449,5 +450,13 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('columnsToInclude', List(colsToInclude))
       .set('previewRows', previewRows);
   };
+
+FileImportReducers[ActionTypes.setFile] =
+  (state, action) =>
+  {
+    console.log(action.payload.file);
+    return state.set('blob', action.payload.file);
+  }
+  ;
 
 export default FileImportReducers;

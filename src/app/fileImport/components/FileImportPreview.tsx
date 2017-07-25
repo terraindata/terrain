@@ -51,6 +51,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as io from 'socket.io-client';
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
@@ -76,6 +77,7 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
+  blob: File;
 }
 
 @Radium
@@ -156,11 +158,34 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleUploadFile()
   {
+    const chunk = this.props.blob.slice(0, 1000);
+
+    const fr = new FileReader();
+    fr.readAsText(chunk);
+
+    fr.onloadend = () =>
+    {
+      console.log('finished reading: ', fr.result);
+    };
     Actions.uploadFile();
+
+    const socket = io('http://localhost:3300');
+    socket.on('connect', () =>
+    {
+      //
+    });
+    socket.on('ready', (data) =>
+    {
+      // TODO: stream data
+      socket.send('test');
+    });
+    socket.emit('finished');
+    socket.close();   // TODO: fix
   }
 
   public render()
   {
+    console.log(this.props.blob);
     return (
       <div
         className='fi-preview'

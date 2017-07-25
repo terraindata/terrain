@@ -695,6 +695,7 @@ export const Ajax =
       primaryKey: string,
       transformations: Immutable.List<object>,
       onLoad: (resp: object[]) => void,
+      streaming: boolean,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
     )
@@ -710,6 +711,7 @@ export const Ajax =
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
         transformations,
+        streaming,
       };
       console.log('import payload: ', payload);
       const onLoadHandler = (resp) =>
