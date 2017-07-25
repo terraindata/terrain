@@ -283,21 +283,13 @@ FileImportReducers[ActionTypes.setColumnType] =
     {
       columnTypes[action.payload.columnId] = deeplyAddColumnType(columnTypes[action.payload.columnId]);
     }
+    else
+    {
+      columnTypes[action.payload.columnId] = deeplyDeleteColumnType(columnTypes[action.payload.columnId], 0,
+        action.payload.recursionDepth + 1);
+    }
 
     return state.set('columnTypes', List(columnTypes));
-  };
-
-FileImportReducers[ActionTypes.deleteColumnType] =
-  (state, action) =>
-  {
-    if (state.columnTypes.get(action.payload.columnId))
-    {
-      const columnTypes = state.columnTypes.toArray();
-      columnTypes[action.payload.columnId] = deeplyDeleteColumnType(columnTypes[action.payload.columnId], 0,
-        action.payload.recursionDepth);
-      return state.set('columnTypes', List(columnTypes));
-    }
-    return state;
   };
 
 FileImportReducers[ActionTypes.addTransform] =

@@ -214,7 +214,11 @@ interface Theme
 
   fileimport: {
     preview: {
-      column: string;
+      column: {
+        base: string,
+        typeDropdown: string,
+        transform: string,
+      };
       cell: string;
     },
   };
@@ -388,7 +392,11 @@ const DARK: Theme =
 
     fileimport: {
       preview: {
-        column: '#9d6b6b',
+        column: {
+          base: '#9d6b6b',
+          typeDropdown: '#005d69',
+          transform: '#70b9e7',
+        },
         cell: '#f1d7d7',
       },
     },

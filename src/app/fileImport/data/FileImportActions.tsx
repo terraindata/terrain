@@ -96,10 +96,6 @@ const FileImportActions =
     (columnId: number, recursionDepth: number, typeIndex: number) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
 
-    deleteColumnType:
-    (columnId: number, recursionDepth: number) =>
-      $(ActionTypes.deleteColumnType, { columnId, recursionDepth }),
-
     updatePreviewRows:
     (transform: FileImportTypes.Transform) =>
       $(ActionTypes.updatePreviewRows, { transform }),

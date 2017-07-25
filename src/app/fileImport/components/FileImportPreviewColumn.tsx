@@ -144,20 +144,19 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     if (this.props.resetLocalColumnNames)
     {
       this.setState({
-        localColumnName: this.props.columnNames.get(this.props.columnId),
+        localColumnName: nextProps.columnNames.get(this.props.columnId),
       });
     }
   }
 
   public render()
   {
-    // console.log(this.state.localColumnName);
     if (this.props.editing)
     {
       return (
         <div
           className='fi-preview-column'
-          style={backgroundColor(Colors().fileimport.preview.column)}
+          style={backgroundColor(Colors().fileimport.preview.column.base)}
         >
           include
           <CheckBox
@@ -169,21 +168,28 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             checked={this.props.isPrimaryKey}
             onChange={this.handlePrimaryKeyChange}
           />
-          <Autocomplete
-            value={this.state.localColumnName}
-            options={this.props.columnOptions}
-            onChange={this.handleLocalColumnNameChange}
-            placeholder={''}
-            disabled={false}
-            onBlur={this.handleBlur}
-            ref='colAutocomplete'
-          />
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={0}
-            columnType={this.props.columnType}
-            editing={this.props.editing}
-          />
+          <div
+            className='fi-preview-column-name'
+          >
+            <Autocomplete
+              value={this.state.localColumnName}
+              options={this.props.columnOptions}
+              onChange={this.handleLocalColumnNameChange}
+              placeholder={''}
+              disabled={false}
+              onBlur={this.handleBlur}
+            />
+          </div>
+          <div
+            className='fi-preview-type-dropdown-container'
+          >
+            <TypeDropdown
+              columnId={this.props.columnId}
+              recursionDepth={0}
+              columnType={this.props.columnType}
+              editing={this.props.editing}
+            />
+          </div>
           <TransformBox
             datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
             colName={this.props.columnNames.get(this.props.columnId)}
@@ -196,24 +202,20 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
     return (
       <div
-        className='fi-preview-column'
-        style={backgroundColor(Colors().fileimport.preview.column)}
+        className='fi-preview-column-title'
+        style={backgroundColor(Colors().fileimport.preview.column.base)}
       >
+        <div className='fi-preview-column-title-name'>
+          {this.props.columnNames.get(this.props.columnId)}
+        </div>
+        <div className='fi-preview-column-title-type'>
+          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+        </div>
         <div
-          className='fi-preview-column-title'
+          className='fi-preview-column-edit-button'
+          onClick={this.handleEditClick}
         >
-          <div className='fi-preview-column-title-name'>
-            {this.props.columnNames.get(this.props.columnId)}
-          </div>
-          <div className='fi-preview-column-title-type'>
-            {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
-          </div>
-          <div
-            className='fi-preview-column-edit-button'
-            onClick={this.handleEditClick}
-          >
-            Edit
-          </div>
+          Edit
         </div>
       </div>
     );

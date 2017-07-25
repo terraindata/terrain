@@ -466,30 +466,32 @@ class FileImport extends TerrainComponent<any>
               content
             }
           </div>
-
-          {
-            this.state.stepId > 0 &&
-            <div
-              className='fi-nav-button fi-back-button'
-              onClick={this.handlePrevStepChange}
-              style={buttonColors()}
-              ref='fi-back-button'
-            >
-              &lt; back
-            </div>
-          }
-
-          {
-            this.state.stepId < 4 &&
-            <div
-              className='fi-nav-button fi-next-button'
-              onClick={this.handleNextStepChange}
-              style={buttonColors()}
-              ref='fi-next-button'
-            >
-              next &gt;
-            </div>
-          }
+          <div
+            className='fi-nav-button'
+          >
+            {
+              this.state.stepId > 0 &&
+              <div
+                className='fi-back-button'
+                onClick={this.handlePrevStepChange}
+                style={buttonColors()}
+                ref='fi-back-button'
+              >
+                &lt; back
+              </div>
+            }
+            {
+              this.state.stepId < 4 &&
+              <div
+                className='fi-next-button'
+                onClick={this.handleNextStepChange}
+                style={buttonColors()}
+                ref='fi-next-button'
+              >
+                next &gt;
+              </div>
+            }
+          </div>
         </div>
       </div>
     );

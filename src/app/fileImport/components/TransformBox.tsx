@@ -49,8 +49,10 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -58,6 +60,7 @@ import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
+import './TransformBox.less';
 const { List } = Immutable;
 
 export interface Props
@@ -68,6 +71,7 @@ export interface Props
   setLocalColumnName(columnName: string);
 }
 
+@Radium
 class TransformBox extends TerrainComponent<Props>
 {
   public state: {
@@ -294,7 +298,7 @@ class TransformBox extends TerrainComponent<Props>
             <div>
               {
                 this.state.mergeIndex === -1 &&
-                <p>select column to merge</p>
+                <p>column to merge</p>
               }
               <Dropdown
                 selectedIndex={this.state.mergeIndex}
@@ -325,11 +329,10 @@ class TransformBox extends TerrainComponent<Props>
     }
 
     return (
-      <div>
-        {
-          this.state.transformTypeIndex === -1 &&
-          <p>select transformation</p>
-        }
+      <div
+        className='fi-transform-box'
+        style={backgroundColor(Colors().fileimport.preview.column.transform)}
+      >
         <Dropdown
           selectedIndex={this.state.transformTypeIndex}
           options={List(FileImportTypes.TRANSFORM_TYPES[datatype])}
@@ -351,9 +354,12 @@ class TransformBox extends TerrainComponent<Props>
             />
           </div>
         }
-        <button onClick={this.handleTransformClick}>
+        <div
+          className='fi-transform-button'
+          onClick={this.handleTransformClick}
+        >
           Transform
-        </button>
+        </div>
       </div>
     );
   }

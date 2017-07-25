@@ -101,8 +101,8 @@ class FileImportPreview extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     this.setState({
-      resetLocalColumnNames: this.props.columnNames.size !== nextProps.columnNames.size,
-      // resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
+      // resetLocalColumnNames: this.props.columnNames.size !== nextProps.columnNames.size,
+      resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
     });
   }
 
@@ -161,8 +161,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props.columnNames);
-    console.log('reset: ', this.state.resetLocalColumnNames);
     return (
       <div
         className='fi-preview'

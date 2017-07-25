@@ -60,7 +60,6 @@ const FileImportActionTypes =
     setColumnToInclude: '',
     setColumnName: '',
     setColumnType: '',
-    deleteColumnType: '',
     updatePreviewRows: '',
     saveTemplate: '',
     getTemplates: '',
