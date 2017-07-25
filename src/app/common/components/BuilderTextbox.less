@@ -228,3 +228,29 @@
     opacity: 1.0;
   }
 }
+
+.card {
+  .builder-tb {
+    input {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      &::placeholder {
+        color: rgba(255,255,255,0.5) !important;
+      }
+    }
+    &:hover {
+      input {
+        background: rgba(255,255,255,0.25);
+      }
+    }
+    input {
+      &:focus {
+        color: #242424;
+        background: rgba(255,255,255,1);
+        &::placeholder {
+          color: rgba(0,0,0,0.5) !important;
+        }
+      }
+    }
+  }
+}

@@ -6,8 +6,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.20);
   z-index: 999999999;
+  background-color: @fadedOutBg;
+  
+  .fade-in;
 }
 
 .modal-dialog{
@@ -16,15 +18,12 @@
 			width: 100px;
 		}
 	}
-
+  
   .modal-title {
-  	padding: 10px;
-  	padding-bottom: 8px;
-  	font-size: 16px;
-  	background-color: #EDEDED;
+  	padding: @spacing;
+  	font-size: @font-size;
   	color: #636363;
-  	font-weight: 500;
-  	line-height: 18px;
+    
     position: relative;
     display: flex;
     align-items: center;
@@ -47,17 +46,15 @@
 
 .modal-content {
   position: absolute;
-  background: white;
   overflow: auto;
   WebkitOverflowScrolling: touch;
-  borderRadius: 4px;
+  border-radius: 3px;
   outline: none;
   width: 400px;
   max-height: 100%;
   left: 50%;
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
-  border-radius: 6px;
   box-shadow: rgba(0, 0, 0, 0.20) 0px 0px 5px 2px;
   
   &.modal-content-fill {
@@ -73,7 +70,7 @@
 
 .modal-message{
 	text-align: left;
-	font-size: 12px;
+	font-size: @small-font-size;
 	color: rgba(0, 0, 0, 0.6);
 	padding: 14px 24px;
 }
@@ -81,11 +78,10 @@
 .modal-message-error {
 	background-color: #d9817b;
 	color: #ffffff;
-	border-radius: 6px;
+	border-radius: 4px;
 	margin: 12px;
 	margin-bottom: 4px;
 	margin-top: 8px;
-	border-top: 1px #ccc solid;
 	padding: 8px 12px;
 	border: none;
 }
@@ -93,7 +89,6 @@
 .modal-buttons {
 	max-width: 100%;
 	height: 28px;
-	border-top: 1px solid #ccc;
 	padding: 12px;
 	.bold-normal-text;
 }

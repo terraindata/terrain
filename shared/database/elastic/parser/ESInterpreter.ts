@@ -74,7 +74,7 @@ export default class ESInterpreter
    * @param params parameter map to use
    */
   public constructor(query: string | ESJSONParser,
-    params: { [name: string]: null | ESClause } = {},
+    params: { [name: string]: any } = {},
     config: EQLConfig = ESInterpreterDefaultConfig)
   {
     this.config = config;
@@ -99,15 +99,10 @@ export default class ESInterpreter
           {
             if (info.parameter !== undefined)
             {
-              const clause: null | ESClause = this.params[info.parameter];
-              if (clause === undefined)
+              const value: null | any = this.params[info.parameter];
+              if (value === undefined)
               {
-                this.accumulateError(info, 'Undefined parameter.');
-              } else if (clause !== null && clause !== info.clause)
-              {
-                const expectedClause: ESClause = info.clause as ESClause;
-                this.accumulateError(info, 'Mismatched clause types. Expected a ' +
-                  expectedClause.name + ' but parameter is a ' + clause.name);
+                this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
               }
 
               return false; // don't validate parameters
