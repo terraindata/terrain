@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions interface-name
 
-// import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
 import * as _ from 'underscore';

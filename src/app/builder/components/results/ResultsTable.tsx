@@ -282,7 +282,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     // {
     //   fieldCount = this.props.results.get(0).fields.size;
     // }
-    console.log(this.state.columns);
+    // console.log(this.state.columns);
     return (
       <Table
         columns={this.state.columns}

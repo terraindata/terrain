@@ -6578,9 +6578,9 @@ react-addons-test-utils@^15.5.1:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.6.0.tgz#062d36117fe8d18f3ba5e06eb33383b0b85ea5b9"
 
-react-data-grid@^2.0.53:
-  version "2.0.53"
-  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.53.tgz#ce0bece759ca8d6218244a701dd33f549a6c958b"
+react-data-grid@^2.0.54:
+  version "2.0.54"
+  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.54.tgz#c953cafa1e9da5cd97eb04564d86e3d93e2ca0bf"
 
 react-day-picker@^6.1.0:
   version "6.1.0"

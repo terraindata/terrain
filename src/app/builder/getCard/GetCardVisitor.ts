@@ -571,7 +571,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
                 String(templateValue === null ? clause.structure[templateKey] : templateValue);
               if (blocksConfig[clauseType])
               {
-                console.log(clauseType, templateKey);
+                // console.log(clauseType, templateKey);
                 return BlockUtils.make(
                   blocksConfig, clauseType,
                   {
