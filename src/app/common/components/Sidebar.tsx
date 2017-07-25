@@ -121,7 +121,10 @@ export class Sidebar extends TerrainComponent<Props>
         {
           this.props.expandable ?
             (
-              <div className='sidebar-expand' onClick={this.props.onExpand}>
+              <div
+                className='sidebar-expand' onClick={this.props.onExpand}
+                style={backgroundColor(Colors().sideBar.arrowBg)}
+              >
                 <div className='dead-center'>
                   <ExpandIcon />
                 </div>

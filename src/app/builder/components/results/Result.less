@@ -57,7 +57,7 @@
   }
   
   .result-name {
-    .semi-bold-big-text;
+    .big-text;
     
     height: @result-name-height;
     border-top-right-radius: 5px;
@@ -85,43 +85,19 @@
   }
   
   .result-inner {
+    position: relative;
     border-radius: 3px;
     border: 1px solid #fff;
-    // border: @result-border;
-    // background: @white;
-    // border-radius: 5px;
+
     .transition;
 
-    // height: calc(~"100% - 2 * @{standard-margin}");
-    // box-sizing: border-box;
-    position: relative;
     .result-score {
-      // height: @result-score-height;
-      .trans-black;
-      
-      // background: @result-score-bg;
       padding: 3px;
       box-sizing: border-box;
-      // font-weight: 700;
-      // font-size: 14px;
-      
-      // .result-score-score {
-      //   float: right;
-      // }
-      
-      // .result-score-icon {
-      //   fill : @trans-black;
-      //   mix-blend-mode: multiply;
-      //   width: 27px;
-      //   margin-top: -3px;
-      //   margin-bottom: -10px;
-      //   margin-right: 5px;
-      // }
     }
     
     .result-fields-wrapper {
 		  overflow-y: hidden;
-      // height: calc(@result-fields-wrapper-height);
       padding: 3px;
     }
       
@@ -169,11 +145,7 @@
       text-align: center;
       padding: 3px;
       font-size: 12px;
-      // color: #aaa;
       .transition;
-      // &:hover {
-      //   color: #777;
-      // }
     }
   }
   

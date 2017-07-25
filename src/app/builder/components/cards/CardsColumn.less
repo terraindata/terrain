@@ -23,7 +23,6 @@
   
   .cards-deck {
     background: #4e4f4d;
-    border-right: 1px solid #ccc;
     width: 0px;
   }
   
@@ -46,6 +45,14 @@
     }
     .cards-deck-knob {
       width: @deck-width - 1px;
+    }
+  }
+  
+  &:not(.cards-column-deck-open) {
+    .cards-column-cards-area {
+      @knob-width: 24px;
+      width: calc(~"100% - @{knob-width}");
+      left: @knob-width;
     }
   }
   

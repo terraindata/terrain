@@ -210,23 +210,32 @@ class ResultsArea extends TerrainComponent<Props>
 
   public renderResults()
   {
+    const { resultsState } = this.props;
+    const { results } = resultsState;
+    const { resultsConfig } = this.props.query;
+
+    let infoAreaContent: any = null;
+    let resultsContent: any = null;
+    let resultsAreOutdated: boolean = false;
+
     if (this.isDatabaseEmpty())
     {
-      return <InfoArea
+      resultsAreOutdated = true;
+      infoAreaContent = <InfoArea
         large='The database is empty, please select the database.'
       />;
-    } else if (this.isQueryEmpty())
+    }
+    else if (this.isQueryEmpty())
     {
-      return <InfoArea
+      resultsAreOutdated = true;
+      infoAreaContent = <InfoArea
         large='Results will display here as you build your query.'
       />;
     }
-
-    const { resultsState } = this.props;
-
-    if (resultsState.hasError)
+    else if (resultsState.hasError)
     {
-      return <InfoArea
+      resultsAreOutdated = true;
+      infoAreaContent = <InfoArea
         large='There was an error with your query.'
         small={resultsState.errorMessage}
       />;
@@ -236,7 +245,7 @@ class ResultsArea extends TerrainComponent<Props>
     {
       if (resultsState.rawResult)
       {
-        return (
+        resultsContent = (
           <div className='result-text'>
             {
               resultsState.rawResult
@@ -247,74 +256,94 @@ class ResultsArea extends TerrainComponent<Props>
 
       if (resultsState.loading)
       {
-        return <InfoArea
+        resultsAreOutdated = true;
+        infoAreaContent = <InfoArea
           large='Querying results...'
         />;
       }
-
-      return <InfoArea
-        large='Compose a query to view results here.'
-      />;
+      else
+      {
+        infoAreaContent = <InfoArea
+          large='Compose a query to view results here.'
+        />;
+      }
     }
-
-    const { results } = resultsState;
-
-    if (!results.size)
+    else if (!results.size)
     {
-      return <InfoArea
+      resultsContent = <InfoArea
         large='There are no results for your query.'
         small='The query was successful, but there were no matches.'
       />;
     }
-
-    if (this.state.resultFormat === 'table')
+    else if (this.state.resultFormat === 'table')
     {
-      return (
-        <div className='results-table-wrapper'>
+      resultsContent = (
+        <div
+          className={classNames({
+            'results-table-wrapper': true,
+            'results-table-wrapper-outdated': resultsAreOutdated,
+          })}
+        >
           <ResultsTable
             results={results}
-            resultsConfig={this.props.query.resultsConfig}
+            resultsConfig={resultsConfig}
             onExpand={this.handleExpand}
             resultsLoading={resultsState.loading}
           />
         </div>
       );
     }
+    else
+    {
+      resultsContent = (
+        <InfiniteScroll
+          className={classNames({
+            'results-area-results': true,
+            'results-area-results-outdated': resultsAreOutdated,
+          })}
+          onRequestMoreItems={this.handleRequestMoreResults}
+        >
+          {
+            results.map((result, index) =>
+            {
+              if (index > this.state.resultsPages * RESULTS_PAGE_SIZE)
+              {
+                return null;
+              }
 
-    const { resultsConfig } = this.props.query;
+              return (
+                <Result
+                  result={result}
+                  resultsConfig={resultsConfig}
+                  onExpand={this.handleExpand}
+                  index={index}
+                  key={index}
+                  primaryKey={result.primaryKey}
+                />
+              );
+            })
+          }
+          {
+            this.resultsFodderRange.map(
+              (i) =>
+                <div className='results-area-fodder' key={i} />,
+            )
+          }
+        </InfiniteScroll>
+      );
+    }
 
     return (
-      <InfiniteScroll
-        className='results-area-results'
-        onRequestMoreItems={this.handleRequestMoreResults}
+      <div
+        className='results-area-results-wrapper'
       >
         {
-          results.map((result, index) =>
-          {
-            if (index > this.state.resultsPages * RESULTS_PAGE_SIZE)
-            {
-              return null;
-            }
-
-            return (
-              <Result
-                result={result}
-                resultsConfig={resultsConfig}
-                onExpand={this.handleExpand}
-                index={index}
-                key={index}
-                primaryKey={result.primaryKey}
-              />
-            );
-          })
+          resultsContent
         }
         {
-          this.resultsFodderRange.map(
-            (i) =>
-              <div className='results-area-fodder' key={i} />,
-          )
+          infoAreaContent
         }
-      </InfiniteScroll>
+      </div>
     );
   }
 
