@@ -614,5 +614,58 @@
         }
       }
     }
+  },
+  "search-11" : {
+    "index" : "movies",
+    "type" : "movies",
+    "from" : 0,
+    "size" : 1000,
+    "body" : {
+      "query" : {
+        "bool" : {
+          "should" : {
+            "range" : {
+              "budget" : {
+                "gte" : 100000000
+              }
+            }
+          }
+        }
+      },
+      "sort" : {
+        "_script" : {
+          "type" : "number",
+          "order" : "desc",
+          "script" : {
+            "stored" : "terrain_PWLScore",
+            "params" : {
+              "factors" : [
+                {
+                  "weight" : 1,
+                  "a" : 0,
+                  "b" : 1,
+                  "numerators" : [
+                    [
+                      "budget",
+                      1
+                    ]
+                  ],
+                  "denominators" : [
+                  ],
+                  "ranges" : [
+                    2,
+                    15
+                  ],
+                  "outputs" : [
+                    0.2,
+                    0.5
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
   }
 }
