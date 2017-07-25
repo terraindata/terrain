@@ -119,7 +119,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     {
       BuilderActions.changeTQL(this.state.tql);
     },
-    1000,
+    500,
   );
 
   public debouncedUpdateCardsTql = _.debounce(
@@ -138,7 +138,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
         });
       }
     },
-    1000,
+    500,
   );
 
   constructor(props: Props)

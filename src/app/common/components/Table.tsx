@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 // import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
-import ReactDataGrid from 'react-data-grid';
+import * as ReactDataGrid from 'react-data-grid';
 import * as _ from 'underscore';
 
 import './Table.less';

@@ -61,8 +61,6 @@ import SpotlightStore from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 
-import CardsToSQL from '../../../../database/mysql/conversion/CardsToSQL';
-
 const NUM_BARS = 1000;
 
 export interface Props
@@ -289,14 +287,14 @@ class TransformCard extends TerrainComponent<Props>
         if (finalTable)
         {
           // convert the score to TQL, do the query
-          this.setState(
-            AjaxM1.queryM1(
-              `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
-              db,
-              this.handleQueryResponse,
-              this.handleQueryError,
-            ),
-          );
+          // this.setState(
+          //   AjaxM1.queryM1(
+          //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+          //     db,
+          //     this.handleQueryResponse,
+          //     this.handleQueryError,
+          //   ),
+          // );
           return;
         }
       }
@@ -460,6 +458,9 @@ class TransformCard extends TerrainComponent<Props>
     );
   }
 }
+
+// import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
+
 export default Dimensions({
   elementResize: true,
   containerStyle: {
