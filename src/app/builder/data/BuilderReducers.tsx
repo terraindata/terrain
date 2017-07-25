@@ -130,7 +130,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
       if (action.payload.query.tql)
       {
-        query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(action.payload.query.tql));
+        query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(action.payload.query));
       }
       else
       {
@@ -341,8 +341,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       // TODO MOD convert
       let { query } = state;
       const tql: string = action.payload.tql;
-      query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql)
-        .set('parseTree', AllBackendsMap[query.language].parseQuery(tql));
+      query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
+      query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       query = AllBackendsMap[query.language].codeToQuery(
         query,
         Actions.changeQuery,
