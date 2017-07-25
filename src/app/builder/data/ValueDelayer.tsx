@@ -43,77 +43,76 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:strict-boolean-expressions
-
-import { Block } from '../../blocks/types/Block';
-import { Card } from '../../blocks/types/Card';
-import { Input, InputPrefix } from '../../blocks/types/Input';
-
 import * as Immutable from 'immutable';
-import SchemaStore from '../schema/data/SchemaStore';
-import { BuilderState, BuilderStore } from './data/BuilderStore';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
-export function getTermsForKeyPath(keyPath: KeyPath): List<string>
+/*
+ *  Data type that represents a cached value.
+ *  Value gets updated after a configurable amount of time each time it is set,
+ *  with the timer resetting each time the value is set (Much like lodash debounced).
+ */
+export default class ValueDelayer<T>
 {
-  const state = BuilderStore.getState();
-  const terms = getTermsForKeyPathHelper(keyPath, state);
+  protected resource: T;
+  protected cachedResource: T;
+  protected delay: number; // milliseconds
+  protected lastTimer;
+  protected onUpdate: () => void;
 
-  // TODO migrate inputs reduction to the Query class if we get a query class
-  const inputs = state.query && state.query.inputs;
-  if (inputs && inputs.size)
+  // onUpdate gets called whenever the cached value is updated
+  constructor(initialValue: T, onUpdate: () => void, delay: number = 500)
   {
-    const inputTerms = inputs.map(
-      (input: Input) => InputPrefix + input.key,
-    ).toList();
-    if (terms)
-    {
-      return inputTerms.concat(terms).toList();
-    }
-    return inputTerms;
+    this.resource = initialValue;
+    this.cachedResource = initialValue;
+    this.delay = delay;
+    this.onUpdate = onUpdate;
   }
 
-  return terms;
-}
-
-function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
-{
-  if (!keyPath.size)
+  public isDirty(): boolean
   {
-    return Immutable.List([]);
+    return this.lastTimer !== undefined;
   }
 
-  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
-
-  const block = BuilderStore.getState().getIn(keyPath);
-
-  if (block._isCard)
+  public getCached(): T
   {
-    const card = block as Card;
-
-    if (card.static.getChildTerms)
-    {
-      terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
-    }
-
-    if (card.static.getNeighborTerms)
-    {
-      terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
-    }
-
-    if (card['cards'])
-    {
-      card['cards'].map(
-        (childCard: Card) =>
-        {
-          if (childCard.static.getParentTerms)
-          {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
-          }
-        },
-      );
-    }
+    return this.cachedResource;
   }
 
-  return terms;
+  // pre-emptively calls the update timeout function and returns the new value
+  public flush(): T
+  {
+    if (this.isDirty())
+    {
+      this.clearTimer();
+      this.cacheUpdateTimeout();
+    }
+    return this.resource;
+  }
+
+  public setValue(newValue: T): ValueDelayer<T>
+  {
+    if (newValue !== this.resource)
+    {
+      this.clearTimer();
+      this.resource = newValue;
+      this.lastTimer = setTimeout(this.cacheUpdateTimeout.bind(this), this.delay);
+    }
+    return this;
+  }
+
+  protected cacheUpdateTimeout()
+  {
+    this.cachedResource = this.resource;
+    this.lastTimer = undefined;
+    this.onUpdate();
+  }
+
+  protected clearTimer()
+  {
+    if (this.lastTimer)
+    {
+      clearTimeout(this.lastTimer);
+      this.lastTimer = undefined;
+    }
+  }
 }

@@ -152,8 +152,8 @@ export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inp
 export function ParseElasticQuery(query: Query)
 {
   const parser = new ESJSONParser(query.tql, true);
-  const foo = new ESInterpreter(parser, query.inputs);
-  return foo;
+  const params = toInputMap(query.inputs);
+  return new ESInterpreter(parser, params);
 }
 
 export function ElasticParseTreeToQuery(query: Query, options: Options): string
