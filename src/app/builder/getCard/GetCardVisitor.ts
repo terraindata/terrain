@@ -451,7 +451,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESNumberClause(clause: ESNumberClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template == null || clause.template === undefined 
+      value: clause.template == null || clause.template === undefined
         ? 0 : clause.template,
       static: {
         preview: '[value]',
