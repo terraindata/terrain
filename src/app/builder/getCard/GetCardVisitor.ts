@@ -140,8 +140,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       title: clause.name,
       colors: [],
       language: 'elastic',
-
-      anythingAccepts: true, // TODO remove after testing
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach
@@ -453,7 +451,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESNumberClause(clause: ESNumberClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? 0 : clause.template,
+      value: clause.template == null || clause.template === undefined 
+        ? 0 : clause.template,
       static: {
         preview: '[value]',
         display: {
@@ -569,9 +568,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             (templateValue, templateKey) =>
             {
               const clauseType = 'eql' +
-                String(templateValue === undefined ? clause.structure[templateKey] : templateValue);
+                String(templateValue === null ? clause.structure[templateKey] : templateValue);
               if (blocksConfig[clauseType])
               {
+                console.log(clauseType, templateKey);
                 return BlockUtils.make(
                   blocksConfig, clauseType,
                   {
@@ -665,7 +665,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESTypeClause(clause: ESTypeClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? '' : clause.template,
+      value: typeof clause.template === 'string' ? clause.template : '',
       static: {
         preview: '[value]',
         display: {
