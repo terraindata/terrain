@@ -783,7 +783,7 @@ export const Ajax =
         dbname,
         tablename,
       };
-      console.log('getTemplates payload: ', payload);
+
       Ajax.req(
         'post',
         'templates/',

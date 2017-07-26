@@ -348,6 +348,7 @@ class FileImport extends TerrainComponent<any>
 
     const fr = new FileReader();
     fr.readAsText(file.target.files[0]);
+
     fr.onloadend = () =>
     {
       this.setState({
