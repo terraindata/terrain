@@ -65,7 +65,7 @@ interface TokenParts
 
 class ESFormatter
 {
-  public tab;
+  public tab: string;
 
   constructor(indentSize: number = 2)
   {
