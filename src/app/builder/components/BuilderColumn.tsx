@@ -69,6 +69,7 @@ import Ajax from './../../util/Ajax';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
+import ValueDelayer from '../data/ValueDelayer';
 import Manual from './../../manual/components/Manual';
 import CardsColumn from './cards/CardsColumn';
 import InputsArea from './inputs/InputsArea';
@@ -156,6 +157,7 @@ const BuilderColumn = createReactClass<any, any>(
 
       return {
         column: this.props.columnType ? this.props.columnType : column,
+        queryDelayer: new ValueDelayer<Query>(this.props.query, () => { this.forceUpdate(); }),
       };
     },
 
@@ -184,6 +186,7 @@ const BuilderColumn = createReactClass<any, any>(
     {
       this.unsubUser && this.unsubUser();
       this.unsubRoles && this.unsubRoles();
+      this.state.queryDelayer.flush();
     },
 
     getDefaultProps()
@@ -194,6 +197,19 @@ const BuilderColumn = createReactClass<any, any>(
         reorderOnDrag: true,
         handleRef: 'handle',
       };
+    },
+
+    setAndGetDelayedQuery()
+    {
+      const queryDelayer: ValueDelayer<Query> = this.state.queryDelayer;
+      if (queryDelayer.getCached().variantId !== this.props.query.variantId) // this doesn't work right now since the variantID is always -1
+      {
+        return queryDelayer.setValue(this.props.query).flush();
+      }
+      else
+      {
+        return queryDelayer.setValue(this.props.query).getCached();
+      }
     },
 
     renderContent()
@@ -208,22 +224,25 @@ const BuilderColumn = createReactClass<any, any>(
         </div>
         );
       }
-
       const query: Query = this.props.query;
       const { canEdit } = this.props;
+      const queryDelayer: ValueDelayer<Query> = this.state.queryDelayer;
+
       switch (this.state.column)
       {
         case COLUMNS.Builder:
-          return <CardsColumn
-            cards={query.cards}
-            deckOpen={query.deckOpen}
-            canEdit={canEdit}
-            addColumn={this.props.onAddManualColumn}
-            columnIndex={this.props.index}
-            cardsAndCodeInSync={query.cardsAndCodeInSync}
-            parseError={query.parseError}
-            language={query.language}
-          />;
+          return <span onFocus={queryDelayer.flush.bind(queryDelayer)}>
+            <CardsColumn
+              cards={this.setAndGetDelayedQuery().cards}
+              deckOpen={query.deckOpen}
+              canEdit={canEdit}
+              addColumn={this.props.onAddManualColumn}
+              columnIndex={this.props.index}
+              cardsAndCodeInSync={query.cardsAndCodeInSync}
+              parseError={query.parseError}
+              language={query.language}
+            />,
+          </span>;
 
         case COLUMNS.Inputs:
           return <InputsArea
@@ -243,15 +262,17 @@ const BuilderColumn = createReactClass<any, any>(
           />;
 
         case COLUMNS.Editor:
-          return <BuilderTQLColumn
-            canEdit={canEdit}
-            addColumn={this.props.onAddManualColumn}
-            columnIndex={this.props.index}
-            query={query}
-            variant={this.props.variant}
-            resultsState={this.props.resultsState}
-            language={query.language}
-          />;
+          return <span onFocus={queryDelayer.flush.bind(queryDelayer)}>
+            <BuilderTQLColumn
+              canEdit={canEdit}
+              addColumn={this.props.onAddManualColumn}
+              columnIndex={this.props.index}
+              query={this.setAndGetDelayedQuery()}
+              variant={this.props.variant}
+              resultsState={this.props.resultsState}
+              language={query.language}
+            />
+          </span>;
 
         case COLUMNS.Schema:
           return <SchemaView

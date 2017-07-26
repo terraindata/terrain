@@ -43,61 +43,76 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../database/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../Utils';
-
-function getExpectedFile(): string
+/*
+ *  Data type that represents a cached value.
+ *  Value gets updated after a configurable amount of time each time it is set,
+ *  with the timer resetting each time the value is set (Much like lodash debounced).
+ */
+export default class ValueDelayer<T>
 {
-  return __filename.split('.')[0] + '.expected';
-}
+  protected resource: T;
+  protected cachedResource: T;
+  protected delay: number; // milliseconds
+  protected lastTimer;
+  protected onUpdate: () => void;
 
-let expected;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
+  // onUpdate gets called whenever the cached value is updated
+  constructor(initialValue: T, onUpdate: () => void, delay: number = 500)
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(expectedString);
-  done();
-});
-
-function testParse(testName: string,
-  testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing "' + testName + '": "' + testString + '"');
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser;
-
-  if (parser.getErrors().length > 0)
-  {
-    winston.info(util.inspect(parser.getErrors(), false, 16));
-    winston.info(util.inspect(parser.getValueInfo(), false, 16));
+    this.resource = initialValue;
+    this.cachedResource = initialValue;
+    this.delay = delay;
+    this.onUpdate = onUpdate;
   }
 
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
+  public isDirty(): boolean
+  {
+    return this.lastTimer !== undefined;
+  }
 
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
+  public getCached(): T
+  {
+    return this.cachedResource;
+  }
+
+  // pre-emptively calls the update timeout function and returns the new value
+  public flush(): T
+  {
+    if (this.isDirty())
     {
-      const testValue: any = expected[testName];
-      testParse(testName, JSON.stringify(testValue), testValue);
-    });
-});
+      this.clearTimer();
+      this.cacheUpdateTimeout();
+    }
+    return this.resource;
+  }
+
+  public setValue(newValue: T): ValueDelayer<T>
+  {
+    if (newValue !== this.resource)
+    {
+      this.clearTimer();
+      this.resource = newValue;
+      this.lastTimer = setTimeout(this.cacheUpdateTimeout.bind(this), this.delay);
+    }
+    return this;
+  }
+
+  protected cacheUpdateTimeout()
+  {
+    this.cachedResource = this.resource;
+    this.lastTimer = undefined;
+    this.onUpdate();
+  }
+
+  protected clearTimer()
+  {
+    if (this.lastTimer)
+    {
+      clearTimeout(this.lastTimer);
+      this.lastTimer = undefined;
+    }
+  }
+}
