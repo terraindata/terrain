@@ -381,7 +381,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
-      primaryKey, templates, transforms } = fileImportState;
+      primaryKey, templates, transforms, update } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -441,6 +441,7 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
+            update={update}
           />;
         break;
       default:

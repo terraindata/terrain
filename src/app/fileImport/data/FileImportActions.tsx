@@ -115,6 +115,10 @@ const FileImportActions =
     loadTemplate:
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
+
+    toggleUpdate:
+    () =>
+      $(ActionTypes.toggleUpdate, {}),
   };
 
 export default FileImportActions;

@@ -55,6 +55,7 @@ import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
@@ -76,6 +77,7 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
+  update: boolean;
 }
 
 @Radium
@@ -151,6 +153,11 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     Actions.saveTemplate(this.state.templateText);
     Actions.getTemplates();
+  }
+
+  public handleUpdateChange()
+  {
+    Actions.toggleUpdate();
   }
 
   public handleUploadFile()
@@ -258,6 +265,15 @@ class FileImportPreview extends TerrainComponent<Props>
       >
         {this.renderTemplate()}
         {this.renderTable()}
+        <div
+          className='fi-preview-update'
+        >
+          update
+          <CheckBox
+            checked={this.props.update}
+            onChange={this.handleUpdateChange}
+          />
+        </div>
         <div
           className='fi-preview-import-button'
           onClick={this.handleUploadFile}

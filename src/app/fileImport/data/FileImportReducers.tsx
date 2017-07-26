@@ -246,6 +246,12 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
       .set('hasCsvHeader', !state.hasCsvHeader)
   ;
 
+FileImportReducers[ActionTypes.toggleUpdate] =
+  (state, action) =>
+    state
+      .set('update', !state.update)
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
@@ -343,6 +349,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
+      state.update,
       () =>
       {
         alert('success');
