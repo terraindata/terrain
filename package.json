@@ -59,6 +59,7 @@
   },
   "private": true,
   "dependencies": {
+    "@types/node-schedule": "^1.2.0",
     "aes-js": "^3.1.0",
     "bcrypt": "^1.0.2",
     "bodybuilder": "^2.1.0",
@@ -95,6 +96,7 @@
     "moment": "^2.13.0",
     "mysql": "^2.13.0",
     "node-libs-browser": "0.6.0",
+    "node-schedule": "^1.2.3",
     "object-assign": "^4.1.1",
     "papaparse": "4.3.3",
     "passport-local": "^1.0.0",
