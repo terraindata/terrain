@@ -47,6 +47,7 @@ THE SOFTWARE.
 import sha1 = require('sha1');
 
 import * as csv from 'csvtojson';
+import * as fs from 'fs';
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import * as winston from 'winston';
@@ -87,6 +88,8 @@ export class Import
 
   private server;
   private io;
+  private imprt;
+  private buffer: string[];
   constructor()
   {
     this.server = http.createServer();   // TODO: what url is this going to??
@@ -96,10 +99,29 @@ export class Import
     {
       // console.log('someone connected!!!');
       socket.emit('ready');
-      socket.on('message', (data) =>
+      socket.on('message', async (data) =>
       {
-        // items.push(...await this._getItems(imprt, data));
+        const items: object[] = await this._getItems(this.imprt, data);
         // console.log('got data!!!');
+        fs.open('test/testout.txt', 'wx', (err, fd) =>
+        {
+          if (err !== undefined && err !== null)
+          {
+            if (err.code === 'EEXIST')
+            {
+              // TODO: try writing to a different file
+            }
+            throw err;
+          }
+          fs.write(fd, JSON.stringify(items));
+          // console.log('opened file.');
+        });
+        // fs.unlink('test/testout.txt', (err) => {
+        //     if (err)
+        //     {
+        //         throw err;
+        //     }
+        // });
       });
       socket.on('finished', () =>
       {
