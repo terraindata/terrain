@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import sha1 = require('sha1');
 
-import * as csv from 'csvtojson';
+import * as csvjson from 'csvjson';
 import * as winston from 'winston';
 
 import * as SharedUtil from '../../../../shared/fileImport/Util';
@@ -320,20 +320,27 @@ export class Import
         }
       } else if (imprt.filetype === 'csv')
       {
-        csv({
-          flatKeys: true,
-          checkColumn: true,
-          noheader: imprt.csvHeaderMissing,
-          headers: imprt.originalNames,
-          quote: '\'',
-          // workerNum: 4,
-        }).fromString(imprt.contents).on('end_parsed', (jsonArrObj) =>
+        try
         {
-          resolve(jsonArrObj);
-        }).on('error', (e) =>
+          const quoteChar: string = '\'';
+          const options: object = {
+            delimiter: ',',
+            quote: quoteChar,
+            // TODO: handle case where field name contains quoteChar
+            headers: imprt.originalNames.map((val) => quoteChar + val + quoteChar).join(','),
+          };
+          const items: object[] = csvjson.toObject(imprt.contents, options);
+          if (imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
+          {
+            items.shift();
+          }
+          resolve(items);
+        }
+        catch (e)
         {
+          // NOTE: csvjson parser will not throw errors for rows that contain the wrong number of entries
           return reject('CSV format incorrect: ' + String(e));
-        });
+        }
       } else
       {
         return reject('Invalid file-type provided.');
