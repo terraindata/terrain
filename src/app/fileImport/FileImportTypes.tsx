@@ -116,7 +116,9 @@ export interface ColumnTypesTree
 
 export const NUMBER_PREVIEW_ROWS = 5;
 
-export const FILESIZE_THRESHOLD = 1000;
+export const MAX_CHUNK_SIZE = 1000;
+
+export const SLICE_SIZE = 1000;
 
 export const FILE_TYPES =
   [

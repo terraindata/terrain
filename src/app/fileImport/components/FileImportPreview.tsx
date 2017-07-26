@@ -88,11 +88,15 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     editColumnId: number,
     resetLocalColumnNames: boolean,
+    blobCount: number,
+    chunkQueue: List<string>,
   } = {
     templateId: -1,
     templateText: '',
     editColumnId: -1,
     resetLocalColumnNames: false,
+    blobCount: 0,
+    chunkQueue: List([]),
   };
 
   public componentDidMount()
@@ -156,18 +160,72 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.getTemplates();
   }
 
+  public checkChunk(chunk: string)
+  {
+    this.setState({
+      chunkQueue: this.state.chunkQueue.push(chunk),
+    });
+  }
+
+  public readFile(file: Blob)
+  {
+    const fr = new FileReader();
+    fr.readAsText(file);
+    const self = this;
+    fr.onloadend = (target) =>
+    {
+      console.log('fr.result: ', fr.result);
+      this.checkChunk(fr.result);
+    };
+  }
+
   public handleUploadFile()
   {
-    const chunk = this.props.blob.slice(0, 1000);
-
-    const fr = new FileReader();
-    fr.readAsText(chunk);
-
-    fr.onloadend = () =>
-    {
-      console.log('finished reading: ', fr.result);
-    };
     Actions.uploadFile();
+
+    let blobStart = 0;
+    console.log('filesize: ', this.props.blob.size);
+    while (blobStart < 10000)
+    {
+      console.log('blobStart: ', blobStart);
+      const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.SLICE_SIZE);
+      this.readFile(chunk);
+      blobStart += 1000;
+    }
+
+    console.log('setting up socket...');
+    const socket = io('http://localhost:3300/');
+    socket.on('connect', () =>
+    {
+      //
+    });
+    socket.on('ready', () =>
+    {
+      socket.send(this.state.chunkQueue.shift());
+      this.setState({
+        chunkQueue: this.state.chunkQueue.shift(),
+      });
+    });
+    socket.on('finished', () =>
+    {
+      socket.emit('finished');
+      socket.close();
+    });
+
+    /*
+    let blobStart = 0;
+    let blobEnd = 0;
+    let count = 0;
+
+    console.log('filesize: ', this.props.blob.size);
+    while (blobStart < 10000)
+    {
+      console.log('blobStart: ', blobStart);
+      const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.SLICE_SIZE);
+      const result = this.readFile(chunk);
+      console.log(result);
+      blobStart += 1000;
+    }
 
     const socket = io('http://localhost:3300/');
     socket.on('connect', () =>
@@ -178,16 +236,45 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       // TODO: stream data
       console.log('sending data!!!!');
-      socket.send('test');
+
+      const fr = new FileReader();
+      let blobStart = 0;
+      let blobEnd = 0;
+      let count = 0;
+
+      while (blobStart < this.props.blob.size)
+      {
+        const chunk = this.props.blob.slice(blobStart, FileImportTypes.SLICE_SIZE);
+        fr.readAsText(chunk);
+        fr.onloadend = () =>
+        {
+          while (count < FileImportTypes.MAX_CHUNK_SIZE)
+          {
+            if (blobStart + count > this.props.blob.size)
+            {
+              break;
+            }
+            else if (fr.result.charAt(count) === '\n')
+            {
+              blobEnd = count;
+            }
+            count++;
+          }
+          blobStart += blobEnd;
+        };
+
+        socket.send(this.props.blob.slice(blobStart, blobStart + blobEnd));
+      }
 
       socket.emit('finished');
       socket.close();   // TODO: fix
-    });
+    }); */
   }
 
   public render()
   {
     console.log(this.props.blob);
+    console.log(this.state.chunkQueue);
     return (
       <div
         className='fi-preview'
