@@ -131,7 +131,7 @@ export default class ElasticQueryHandler extends QueryHandler
       case 'search':
         if (request.streaming === true)
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), request.body);
+          return new ElasticsearchScrollStream(client.getDelegate(), body);
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>

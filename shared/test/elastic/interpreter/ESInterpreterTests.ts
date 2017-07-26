@@ -73,15 +73,20 @@ beforeAll(async (done) =>
   done();
 });
 
-function testParse(testString: string,
+function testParse(testName: string,
+  testString: string,
   expectedValue: any,
   expectedErrors: ESParserError[] = [])
 {
-  winston.info('testing \'' + testString + '\'');
+  winston.info('testing "' + testName + '": "' + testString + '"');
   const interpreter: ESInterpreter = new ESInterpreter(testString);
   const parser: ESJSONParser = interpreter.parser;
 
-  winston.info(util.inspect(parser.getValueInfo(), false, 16));
+  if (parser.getErrors().length > 0)
+  {
+    winston.info(util.inspect(parser.getErrors(), false, 16));
+    winston.info(util.inspect(parser.getValueInfo(), false, 16));
+  }
 
   expect(parser.getValue()).toEqual(expectedValue);
   expect(parser.getErrors()).toEqual(expectedErrors);
@@ -93,8 +98,6 @@ test('parse valid json objects', () =>
     (testName: string) =>
     {
       const testValue: any = expected[testName];
-
-      // test parsing the value using a few spacing options
-      testParse(JSON.stringify(testValue), testValue);
+      testParse(testName, JSON.stringify(testValue), testValue);
     });
 });

@@ -84,7 +84,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 {
   public state: {
     tql: string;
-    cardsTQL: string;
     theme: string;
     runMode: string;
     focused: boolean;
@@ -96,10 +95,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
     resultsBarOpen: boolean;
-    queriesInFlight: number;
   } = {
     tql: this.props.query.tql,
-    cardsTQL: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
     runMode: 'auto',
     focused: false,
@@ -111,35 +108,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: false,
     termDefinitionPos: {},
     resultsBarOpen: false,
-    queriesInFlight: 0,
   };
-
-  public debouncedSendTqlAction = _.debounce(
-    () =>
-    {
-      BuilderActions.changeTQL(this.state.tql);
-    },
-    1000,
-  );
-
-  public debouncedUpdateCardsTql = _.debounce(
-    () =>
-    {
-      if (this.state.queriesInFlight === 0)
-      {
-        this.setState({
-          cardsTQL: this.props.query.tql,
-        });
-      }
-      else
-      {
-        this.setState({
-          queriesInFlight: this.state.queriesInFlight - 1,
-        });
-      }
-    },
-    1000,
-  );
 
   constructor(props: Props)
   {
@@ -202,10 +171,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
   public sendTqlAction()
   {
-    this.setState({
-      queriesInFlight: this.state.queriesInFlight + 1,
-    });
-    this.debouncedSendTqlAction();
+    BuilderActions.changeTQL(this.state.tql);
   }
 
   public changeThemeDefault()
@@ -414,7 +380,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
     // cardList[this.state.cardName] &&
     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
-    this.debouncedUpdateCardsTql();
     return (
       <div
         className={classNames({
@@ -432,7 +397,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
           className='tql-section'
         >
           <TQLEditor
-            tql={this.state.cardsTQL}
+            tql={this.props.query.tql}
             language={this.props.language}
             canEdit={this.props.canEdit}
             theme={this.state.theme}
