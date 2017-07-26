@@ -183,6 +183,7 @@ export const Ajax =
       }
 
       const xhr = new XMLHttpRequest();
+      xhr.timeout = 180000;
       xhr.onerror = (err: any) =>
       {
         const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
