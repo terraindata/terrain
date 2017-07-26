@@ -101,7 +101,6 @@ class FileImportPreview extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     this.setState({
-      // resetLocalColumnNames: this.props.columnNames.size !== nextProps.columnNames.size,
       resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
     });
   }
@@ -159,93 +158,106 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.uploadFile();
   }
 
+  public renderTemplate()
+  {
+    return (
+      <div
+        className='fi-preview-template'
+      >
+        <div
+          className='fi-preview-load'
+        >
+          <div
+            className='fi-load-button'
+            onClick={this.handleLoadTemplate}
+            style={buttonColors()}
+            ref='fi-load-button'
+          >
+            Load Template
+          </div>
+          <Dropdown
+            selectedIndex={this.state.templateId}
+            options={List<string>(this.props.templates.map((template, i) => template.name))}
+            onChange={this.handleTemplateChange}
+            className={'fi-load-dropdown'}
+            canEdit={true}
+          />
+        </div>
+
+        <div
+          className='fi-preview-save'
+        >
+          <div
+            className='fi-save-button'
+            onClick={this.handleSaveTemplate}
+            style={buttonColors()}
+            ref='fi-save-button'
+          >
+            Save Template
+          </div>
+          <Autocomplete
+            value={this.state.templateText}
+            options={null}
+            onChange={this.handleAutocompleteTemplateChange}
+            placeholder={'template name'}
+            className={'fi-save-autocomplete'}
+            disabled={false}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderTable()
+  {
+    return (
+      <div
+        className='fi-preview-table-container'
+      >
+        <div
+          className='fi-preview-columns-container'
+        >
+          {
+            this.props.columnNames.map((value, key) =>
+              <FileImportPreviewColumn
+                key={key}
+                columnId={key}
+                isIncluded={this.props.columnsToInclude.get(key)}
+                columnType={JSON.parse(JSON.stringify(this.props.columnTypes.get(key)))}
+                isPrimaryKey={this.props.primaryKey === key}
+                columnNames={this.props.columnNames}
+                columnOptions={this.props.columnOptions}
+                editing={key === this.state.editColumnId}
+                resetLocalColumnNames={this.state.resetLocalColumnNames}
+                handleEditColumnChange={this.handleEditColumnChange}
+              />,
+            ).toArray()
+          }
+        </div>
+        <div
+          className='fi-preview-rows-container'
+        >
+          {
+            this.props.previewRows.map((items, key) =>
+              <FileImportPreviewRow
+                key={key}
+                items={items}
+              />,
+            )
+          }
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
     return (
       <div
         className='fi-preview'
       >
-        <div
-          className='fi-preview-template'
-        >
-          <div
-            className='fi-preview-load'
-          >
-            <div
-              className='fi-load-button'
-              onClick={this.handleLoadTemplate}
-              style={buttonColors()}
-              ref='fi-load-button'
-            >
-              Load Template
-            </div>
-            <Dropdown
-              selectedIndex={this.state.templateId}
-              options={List<string>(this.props.templates.map((template, i) => template.name))}
-              onChange={this.handleTemplateChange}
-              className={'fi-load-dropdown'}
-              canEdit={true}
-            />
-          </div>
-
-          <div
-            className='fi-preview-save'
-          >
-            <div
-              className='fi-save-button'
-              onClick={this.handleSaveTemplate}
-              style={buttonColors()}
-              ref='fi-save-button'
-            >
-              Save Template
-            </div>
-            <Autocomplete
-              value={this.state.templateText}
-              options={null}
-              onChange={this.handleAutocompleteTemplateChange}
-              placeholder={'template name'}
-              className={'fi-save-autocomplete'}
-              disabled={false}
-            />
-          </div>
-        </div>
-
-        <div
-          className='fi-preview-table-container'
-        >
-          <div
-            className='fi-preview-columns-container'
-          >
-            {
-              this.props.columnNames.map((value, key) =>
-                <FileImportPreviewColumn
-                  key={key}
-                  columnId={key}
-                  isIncluded={this.props.columnsToInclude.get(key)}
-                  columnType={JSON.parse(JSON.stringify(this.props.columnTypes.get(key)))}
-                  isPrimaryKey={this.props.primaryKey === key}
-                  columnNames={this.props.columnNames}
-                  columnOptions={this.props.columnOptions}
-                  editing={key === this.state.editColumnId}
-                  resetLocalColumnNames={this.state.resetLocalColumnNames}
-                  handleEditColumnChange={this.handleEditColumnChange}
-                />,
-              ).toArray()
-            }
-          </div>
-          <div
-            className='fi-preview-rows-container'
-          >
-            {
-              this.props.previewRows.map((items, key) =>
-                <FileImportPreviewRow
-                  key={key}
-                  items={items}
-                />,
-              )
-            }
-          </div>
-        </div>
+        {this.renderTemplate()}
+        {this.renderTable()}
         <div
           className='fi-preview-import-button'
           onClick={this.handleUploadFile}
