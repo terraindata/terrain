@@ -59,6 +59,8 @@ export interface ImportConfig extends ImportTemplateBase
 {
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
+
+  update: boolean;    // false means replace (instead of update) ; default should be true
 }
 
 export class Import
@@ -152,7 +154,15 @@ export class Import
 
       time = Date.now();
       winston.info('about to upsert via tasty...');
-      const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      let res: ImportConfig;
+      if (imprt.update)
+      {
+        res = await database.getTasty().update(insertTable, items) as ImportConfig;
+      }
+      else
+      {
+        res = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      }
       winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
       resolve(res);
     });
