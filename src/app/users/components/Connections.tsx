@@ -80,12 +80,14 @@ class Connections extends TerrainComponent<Props>
   public state: {
     loading: boolean,
     servers: Server[],
+    expanded: boolean,
     addingUser: boolean,
     errorModalOpen: boolean,
     errorModalMessage: string,
   } = {
-    servers: null,
     loading: true,
+    servers: null,
+    expanded: false,
     addingUser: false,
     errorModalOpen: false,
     errorModalMessage: '',
@@ -139,10 +141,44 @@ class Connections extends TerrainComponent<Props>
     });
   }
 
+  public expandConnection()
+  {
+    this.setState({
+      expanded: true
+    });
+  }
+
+  public renderConnectionInfo(server: Server)
+  {
+    if (this.state.expanded) {
+      return (
+        <div className='connections-item-info'>
+          <div className='connections-item-info-row'>
+          {
+            server.name
+          }
+          </div>
+          <div className='connections-item-info-row'>
+          {
+            server.type
+          }
+          </div>
+          <div className='connections-item-info-row'>
+          {
+            server.host
+          }
+          </div>
+        </div>
+      );
+    }
+  }
+
   public renderServer(server: Server)
   {
+
+    const connInfo = this.renderConnectionInfo(server);
     return (
-      <Link to={`/connections/${server.id}`} className='connections-link' key={server.id}>
+      <a className='connections-link' onClick={this.expandConnection}>
         <div className='connections-row'>
           <div className='connections-item-names'>
             <div className='connections-id'>
@@ -159,34 +195,7 @@ class Connections extends TerrainComponent<Props>
           <div className='connections-item-info'>
             {
               <div className='connections-item-info-row'>
-                <div className='team-item-info-label'>
-                  Type
-                </div>
-                <div className='connections-item-info-value'>
-                  {
-                    server.type
-                  }
-                </div>
-              </div>
-            }
-            {
-              <div className='connections-item-info-row'>
-                <div className='team-item-info-label'>
-                  Host
-                </div>
-                <div className='connections-item-info-value'>
-                  {
-                    server.host
-                  }
-                </div>
-              </div>
-            }
-            {
-              <div className='connections-item-info-row'>
-                <div className='team-item-info-label'>
-                  Status
-                </div>
-                <div className='connections-item-info-value'>
+                <div className='connections-item-info-value connections-status'>
                   {
                     server.status
                   }
@@ -194,8 +203,9 @@ class Connections extends TerrainComponent<Props>
               </div>
             }
           </div>
+        { connInfo }
         </div>
-      </Link>
+      </a>
     );
   }
 
