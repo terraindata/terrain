@@ -269,7 +269,7 @@ class CardsColumn extends TerrainComponent<Props>
           className='cards-column-tql-parse-error'
         >
           {
-            'There is a parsing error with your TQL.' || 'All good!'
+            'There is a parsing error with your code.' || 'All good!'
           }
         </div>
       </div>
