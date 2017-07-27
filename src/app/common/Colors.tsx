@@ -156,7 +156,7 @@ interface Theme
     // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
     cards: {
       cardBase: string,
-      
+
       // card theme colors
       atom: string,
       number: string,
@@ -171,7 +171,7 @@ interface Theme
       variable3: string,
       def: string,
       bracket: string,
-      
+
       atomBG: string,
       numberBG: string,
 
@@ -185,8 +185,7 @@ interface Theme
       variable3BG: string,
       defBG: string,
       bracketBG: string,
-      
-      
+
       // DO NOT USE -- Saving for reference, remove soon
       card1: string,
       card2: string,
@@ -362,7 +361,6 @@ const DARK: Theme =
       cards: {
         cardBase: '#2F2F2F', // '#424242', // TODO
 
-        
         // card theme colors
         atom: '#ae81ff',
         number: '#ae81ff',
@@ -377,7 +375,7 @@ const DARK: Theme =
         variable3: '#66d9ef',
         def: '#fd971f',
         bracket: '#f8f8f2',
-        
+
         atomBG: Color('#ae81ff').alpha(0.7).string(),
         numberBG: Color('#ae81ff').alpha(0.7).string(),
 
@@ -391,7 +389,6 @@ const DARK: Theme =
         variable3BG: Color('#66d9ef').alpha(0.7).string(),
         defBG: Color('#fd971f').alpha(0.7).string(),
         bracketBG: Color('#f8f8f2').alpha(0.7).string(),
-        
 
         card1: '#559DCE',
         card2: '#397DD0',

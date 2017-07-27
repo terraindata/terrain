@@ -519,7 +519,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         preview: '[value]',
         colors: [Colors().builder.cards.string, Colors().builder.cards.stringBG],
-        
+
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
