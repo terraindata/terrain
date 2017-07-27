@@ -90,6 +90,7 @@ class FileImportPreview extends TerrainComponent<Props>
     resetLocalColumnNames: boolean,
     blobCount: number,
     chunkQueue: List<string>,
+    nextChunk: string,
   } = {
     templateId: -1,
     templateText: '',
@@ -97,6 +98,7 @@ class FileImportPreview extends TerrainComponent<Props>
     resetLocalColumnNames: false,
     blobCount: 0,
     chunkQueue: List([]),
+    nextChunk: '',
   };
 
   public componentDidMount()
@@ -160,39 +162,55 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.getTemplates();
   }
 
-  public checkChunk(chunk: string)
+  /* parse the chunk to last new line character and add it to queue of chunks to be streamed
+   * save the leftover chunk and append it to the front of the next chunk */
+  public parseChunk(chunk: string, isLast: boolean)
   {
-    this.setState({
-      chunkQueue: this.state.chunkQueue.push(chunk),
-    });
+    if (isLast)
+    {
+      console.log('final chunk: ', chunk);
+      this.setState({
+        chunkQueue: this.state.nextChunk + chunk,
+        nextChunk: '',
+      });
+      this.stream();
+    }
+    else
+    {
+      let index = 0;
+      let end = 0;
+      while (index < chunk.length)
+      {
+        if (chunk.charAt(index) === '\n')
+        {
+          end = index;
+        }
+        index++;
+      }
+      console.log('chunk size: ', chunk.length);
+      console.log('chunk: ', chunk);
+      console.log('parsed chunk: ', this.state.nextChunk + chunk.substring(0, end));
+      console.log('nextChunk: ', chunk.substring(end, chunk.length));
+
+      this.setState({
+        chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk.substring(0, end)),
+        nextChunk: chunk.substring(end, chunk.length),
+      });
+    }
   }
 
-  public readFile(file: Blob)
+  public readFile(file: Blob, isLast: boolean)
   {
     const fr = new FileReader();
     fr.readAsText(file);
-    const self = this;
-    fr.onloadend = (target) =>
+    fr.onloadend = () =>
     {
-      console.log('fr.result: ', fr.result);
-      this.checkChunk(fr.result);
+      this.parseChunk(fr.result, isLast);
     };
   }
 
-  public handleUploadFile()
+  public stream()
   {
-    Actions.uploadFile();
-
-    let blobStart = 0;
-    console.log('filesize: ', this.props.blob.size);
-    while (blobStart < 10000)
-    {
-      console.log('blobStart: ', blobStart);
-      const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.SLICE_SIZE);
-      this.readFile(chunk);
-      blobStart += 1000;
-    }
-
     console.log('setting up socket...');
     const socket = io('http://localhost:3300/');
     socket.on('connect', () =>
@@ -201,79 +219,40 @@ class FileImportPreview extends TerrainComponent<Props>
     });
     socket.on('ready', () =>
     {
-      socket.send(this.state.chunkQueue.shift());
-      this.setState({
-        chunkQueue: this.state.chunkQueue.shift(),
-      });
+      console.log('queue to be streamed: ', this.state.chunkQueue);
+      while (!this.state.chunkQueue.isEmpty())
+      {
+        socket.send(this.state.chunkQueue.first());
+        this.setState({
+          chunkQueue: this.state.chunkQueue.shift(),
+        });
+      }
     });
     socket.on('finished', () =>
     {
       socket.emit('finished');
       socket.close();
     });
+  }
 
-    /*
-    let blobStart = 0;
-    let blobEnd = 0;
-    let count = 0;
+  public handleUploadFile()
+  {
+    Actions.uploadFile();
 
     console.log('filesize: ', this.props.blob.size);
+    let blobStart = 0;
     while (blobStart < 10000)
     {
       console.log('blobStart: ', blobStart);
       const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.SLICE_SIZE);
-      const result = this.readFile(chunk);
-      console.log(result);
-      blobStart += 1000;
+      // console.log(blobStart + FileImportTypes.SLICE_SIZE >= 10000);
+      this.readFile(chunk, blobStart + FileImportTypes.SLICE_SIZE >= 10000);
+      blobStart += FileImportTypes.SLICE_SIZE;
     }
-
-    const socket = io('http://localhost:3300/');
-    socket.on('connect', () =>
-    {
-      //
-    });
-    socket.on('ready', (data) =>
-    {
-      // TODO: stream data
-      console.log('sending data!!!!');
-
-      const fr = new FileReader();
-      let blobStart = 0;
-      let blobEnd = 0;
-      let count = 0;
-
-      while (blobStart < this.props.blob.size)
-      {
-        const chunk = this.props.blob.slice(blobStart, FileImportTypes.SLICE_SIZE);
-        fr.readAsText(chunk);
-        fr.onloadend = () =>
-        {
-          while (count < FileImportTypes.MAX_CHUNK_SIZE)
-          {
-            if (blobStart + count > this.props.blob.size)
-            {
-              break;
-            }
-            else if (fr.result.charAt(count) === '\n')
-            {
-              blobEnd = count;
-            }
-            count++;
-          }
-          blobStart += blobEnd;
-        };
-
-        socket.send(this.props.blob.slice(blobStart, blobStart + blobEnd));
-      }
-
-      socket.emit('finished');
-      socket.close();   // TODO: fix
-    }); */
   }
 
   public render()
   {
-    console.log(this.props.blob);
     console.log(this.state.chunkQueue);
     return (
       <div
