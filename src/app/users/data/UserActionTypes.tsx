@@ -55,6 +55,7 @@ const UserActionTypes =
     create,
     change,
 
+    changeType: '',
     fetch: '',
     setUsers: '',
     updateCurrentUser: '',

@@ -46,13 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import { Link } from 'react-router';
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from '../../auth/data/AuthStore';
 import CreateItem from '../../common/components/CreateItem';
+import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -60,6 +61,10 @@ import SchemaActionTypes from '../../schema/data/SchemaActionTypes';
 import { SchemaActions, SchemaStore } from '../../schema/data/SchemaStore';
 import * as SchemaTypes from '../../schema/SchemaTypes';
 import Ajax from '../../util/Ajax';
+import UserActions from '../data/UserActions';
+import UserStore from '../data/UserStore';
+import * as UserTypes from '../UserTypes';
+
 import './Connections.less';
 
 interface Server extends BackendInstance
@@ -78,22 +83,31 @@ export interface Props
 class Connections extends TerrainComponent<Props>
 {
   public state: {
+    typeIndex: number,
     loading: boolean,
     servers: Server[],
-    expanded: boolean,
-    addingUser: boolean,
+    expanded: Map<number, boolean>,
+    addingServer: boolean,
     errorModalOpen: boolean,
     errorModalMessage: string,
   } = {
+    typeIndex: 0,
     loading: true,
     servers: null,
-    expanded: false,
-    addingUser: false,
+    expanded: Map(),
+    addingServer: false,
     errorModalOpen: false,
     errorModalMessage: '',
   };
 
   public xhr: XMLHttpRequest = null;
+
+  public ConnectionTypes = List(
+    [
+      'elastic',
+      'mysql',
+    ]
+  );
 
   constructor(props)
   {
@@ -141,16 +155,18 @@ class Connections extends TerrainComponent<Props>
     });
   }
 
-  public expandConnection()
+  public expandConnection(e, id: number)
   {
+    const newExpanded: Map<number, boolean> = this.state.expanded;
     this.setState({
-      expanded: true
+      expanded: newExpanded.set(id, !!!newExpanded.get(id)),
     });
   }
 
   public renderConnectionInfo(server: Server)
   {
-    if (this.state.expanded) {
+    // console.log(this.state.expanded);
+    if (this.state.expanded.get(server.id as number)) {
       return (
         <div className='connections-item-info'>
           <div className='connections-item-info-row'>
@@ -175,152 +191,155 @@ class Connections extends TerrainComponent<Props>
 
   public renderServer(server: Server)
   {
-
     const connInfo = this.renderConnectionInfo(server);
+    const id: number = server.id as number;
     return (
-      <a className='connections-link' onClick={this.expandConnection}>
-        <div className='connections-row'>
-          <div className='connections-item-names'>
-            <div className='connections-id'>
-              {
-                server.id
-              }
-            </div>
-            <div className='connections-name'>
-              {
-                server.name
-              }
-            </div>
-          </div>
-          <div className='connections-item-info'>
+      <div className='connections-row' onClick={(e) => this.expandConnection(e, id)} key={server.id}>
+        <div className='connections-item-names'>
+          <div className='connections-id'>
             {
-              <div className='connections-item-info-row'>
-                <div className='connections-item-info-value connections-status'>
-                  {
-                    server.status
-                  }
-                </div>
-              </div>
+              server.id
             }
           </div>
-        { connInfo }
+          <div className='connections-name'>
+            {
+              server.name
+            }
+          </div>
         </div>
-      </a>
+        <div className='connections-item-info'>
+          {
+            <div className='connections-item-info-row'>
+              <div className='connections-item-info-value connections-status'>
+                {
+                  server.status
+                }
+              </div>
+            </div>
+          }
+        </div>
+      { connInfo }
+      </div>
     );
   }
 
-  // public toggleAddingUser()
-  // {
-  //   this.setState({
-  //     addingUser: !this.state.addingUser,
-  //   });
-  // }
+  public toggleAddingServer()
+  {
+    this.setState({
+      addingServer: !this.state.addingServer,
+    });
+  }
 
-  // public createNewUser()
-  // {
-  //   const email: string = this.refs['newEmail']['value'];
-  //   const password: string = this.refs['newPassword']['value'];
-  //   const confirmPassword: string = this.refs['confirmPassword']['value'];
+  public createNewServer()
+  {
+    const name: string = this.refs['name']['value'];
+    const address: string = this.refs['address']['value'];
+    const type = this.ConnectionTypes.get(this.state.typeIndex);
 
-  //   const emailCheck = email.length >= 5 && email.indexOf('@') > 0;
-  //   if (!emailCheck)
-  //   {
-  //     this.setState({
-  //       errorModalMessage: 'Not a valid email address.',
-  //     });
-  //     this.toggleErrorModal();
-  //     return;
-  //   }
+    if (!name.length)
+    {
+      this.setState({
+        errorModalMessage: 'Connection name is required.',
+      });
+      this.toggleErrorModal();
+      return;
+    }
 
-  //   if (password.length < 6)
-  //   {
-  //     this.setState({
-  //       errorModalMessage: 'Passwords should be at least six characters long',
-  //     });
-  //     this.toggleErrorModal();
-  //     return;
-  //   }
+    if (!address.length)
+    {
+      this.setState({
+        errorModalMessage: 'Server address is required.',
+      });
+      this.toggleErrorModal();
+      return;
+    }
 
-  //   if (password !== confirmPassword)
-  //   {
-  //     this.setState({
-  //       errorModalMessage: 'Passwords do not match',
-  //     });
-  //     this.toggleErrorModal();
-  //     return;
-  //   }
+    this.refs['name']['value'] = '';
+    this.refs['address']['value'] = '';
+    this.setState({
+      addingServer: false,
+    });
 
-  //   this.refs['newEmail']['value'] = '';
-  //   this.refs['newPassword']['value'] = '';
-  //   this.refs['confirmPassword']['value'] = '';
-  //   this.setState({
-  //     addingUser: false,
-  //   });
+    Ajax.createDb(name, address, type, () =>
+    {
+      SchemaActions.fetch();
+      // change the status to connected
+    }, (error) =>
+      {
+        this.setState({
+          errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
+        });
+        this.toggleErrorModal();
+      });
+  }
 
-  //   Ajax.createUser(email, password, () =>
-  //   {
-  //     Actions.fetch();
-  //   }, (error) =>
-  //     {
-  //       this.setState({
-  //         errorModalMessage: 'Error creating user: ' + JSON.stringify(error),
-  //       });
-  //       this.toggleErrorModal();
-  //     });
-  // }
+  public handleTypeChange(index: number)
+  {
+    this.setState({
+      typeIndex: index,
+    });
 
-  // public renderAddUser()
-  // {
-  //   const userId = AuthStore.getState().id;
-  //   const user = Store.getState().getIn(['users', userId]) as User;
+    const type = this.ConnectionTypes.get(index);
+    UserActions.changeType(type);
+  }
 
-  //   if (user && user.isSuperUser)
-  //   {
-  //     if (this.state.addingUser)
-  //     {
-  //       return (
-  //         <div className='create-user'>
-  //           <div className='create-user-cancel' onClick={this.toggleAddingUser} data-tip='Cancel'>
-  //             x
-  //           </div>
-  //           <h3>Create a new user</h3>
+  public renderAddServer()
+  {
+    const userId = AuthStore.getState().id;
+    const user = UserStore.getState().getIn(['users', userId]) as UserTypes.User;
 
-  //           <div className='flex-container'>
-  //             <div className='flex-grow'>
-  //               <b>Email</b>
-  //               <div>
-  //                 <input ref='newEmail' placeholder='Email' />
-  //               </div>
-  //             </div>
-  //             <div className='flex-grow'>
-  //               <b>Temporary Password</b>
-  //               <div>
-  //                 <input ref='newPassword' placeholder='Password' type='password' />
-  //               </div>
-  //             </div>
-  //             <div className='flex-grow'>
-  //               <b>Confirm Password</b>
-  //               <div>
-  //                 <input ref='confirmPassword' placeholder='Confirm password' type='password' />
-  //               </div>
-  //             </div>
-  //           </div>
-  //           <div className='button' onClick={this.createNewUser}>
-  //             Create
-  //           </div>
-  //         </div>
-  //       );
-  //     }
+    if (user && user.isSuperUser)
+    {
+      if (this.state.addingServer)
+      {
+        return (
+          <div className='create-server'>
+            <h3>Add a new connection</h3>
+            <div className='flex-container'>
+              <div className='flex-grow'>
+                <b>Connection Type</b>
+                <div>
+                  <Dropdown
+                    selectedIndex={this.state.typeIndex}
+                    options={this.ConnectionTypes}
+                    onChange={this.handleTypeChange}
+                    canEdit={true}
+                    className='create-server-dropdown'
+                  />
+                </div>
+              </div>
+              <div className='flex-grow'>
+                <b>Connection Name</b>
+                <div>
+                  <input ref='name' placeholder='Name' />
+                </div>
+              </div>
+              <div className='flex-grow'>
+                <b>Server Address</b>
+                <div>
+                  <input ref='address' placeholder='Address' />
+                </div>
+              </div>
+            </div>
+            <div className='button' onClick={this.createNewServer}>
+              Create
+            </div>
+            <div className='button' onClick={this.toggleAddingServer}>
+              Cancel
+            </div>
+          </div>
+        );
+      }
 
-  //     return (
-  //       <CreateItem
-  //         name='New User'
-  //         onCreate={this.toggleAddingUser}
-  //       />
-  //     );
-  //   }
-  //   return null;
-  // }
+      return (
+        <CreateItem
+          name='New Server'
+          onCreate={this.toggleAddingServer}
+        />
+      );
+    }
+    return null;
+  }
 
   public toggleErrorModal()
   {
@@ -344,7 +363,7 @@ class Connections extends TerrainComponent<Props>
             <InfoArea large='Loading...' />
           }
           {servers && servers.map(this.renderServer)}
-          {/* {this.renderAddUser()} */}
+          {this.renderAddServer()}
         </div>
         <Modal
           message={this.state.errorModalMessage}

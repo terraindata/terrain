@@ -74,7 +74,12 @@ const Actions =
     copmleteTutorial:
     (stepId: string, complete: boolean = true) =>
       $(ActionTypes.completeTutorial, { stepId, complete }),
-  };
+
+    changeType:
+    (type: string) =>
+      $(ActionTypes.changeType, { type }),
+
+};
 
 import AuthStore from './../../auth/data/AuthStore';
 AuthStore.subscribe(Actions.updateCurrentUser);
