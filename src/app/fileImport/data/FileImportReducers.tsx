@@ -246,6 +246,12 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
       .set('hasCsvHeader', !state.hasCsvHeader)
   ;
 
+FileImportReducers[ActionTypes.toggleLoading] =
+  (state, action) =>
+    state
+      .set('loading', !state.loading)
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
@@ -346,6 +352,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       () =>
       {
         alert('success');
+        action.payload.toggleLoading();
       },
       (err: string) =>
       {
@@ -354,7 +361,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.hasCsvHeader,
     );
 
-    return state;
+    return state.set('loading', true);
   };
 
 FileImportReducers[ActionTypes.saveTemplate] =

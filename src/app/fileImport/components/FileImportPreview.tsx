@@ -56,6 +56,7 @@ import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../co
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
+import Loading from './../../common/components/Loading';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -76,6 +77,7 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
+  loading: boolean;
 }
 
 @Radium
@@ -86,11 +88,13 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     editColumnId: number,
     resetLocalColumnNames: boolean,
+    showLoading: boolean,
   } = {
     templateId: -1,
     templateText: '',
     editColumnId: -1,
     resetLocalColumnNames: false,
+    showLoading: false,
   };
 
   public componentDidMount()
@@ -256,6 +260,17 @@ class FileImportPreview extends TerrainComponent<Props>
       <div
         className='fi-preview'
       >
+        <div className='login-logo-container'>
+          {
+            <Loading
+              width={150}
+              height={150}
+              loading={this.props.loading}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          }
+        </div>
         {this.renderTemplate()}
         {this.renderTable()}
         <div
