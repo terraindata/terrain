@@ -184,7 +184,7 @@ export class Import
       return typeError;
     }
 
-    if (imprt.csvHeaderMissing === undefined)
+    if (imprt.csvHeaderMissing === undefined || imprt.csvHeaderMissing === null)
     {
       imprt.csvHeaderMissing = false;
     }

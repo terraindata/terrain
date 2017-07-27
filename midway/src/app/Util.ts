@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'request';
+import * as stream from 'stream';
 
 export function getRequest(url)
 {
@@ -142,4 +143,24 @@ export function getEmptyObject(payload: object): object
     return res;
   },
     emptyObj);
+}
+
+export async function getStreamContents(readStream: stream.Readable): Promise<string>
+{
+  return new Promise<string>((resolve, reject) =>
+  {
+    let contents: string = '';
+    readStream.on('data', (chunk) =>
+    {
+      contents += chunk.toString();
+    });
+    readStream.on('error', (e) =>
+    {
+      reject(e);
+    });
+    readStream.on('end', async () =>
+    {
+      resolve(contents);
+    });
+  });
 }
