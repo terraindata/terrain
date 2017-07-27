@@ -83,6 +83,7 @@ import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
+import Connections from './users/components/Connections';
 import EditProfile from './users/components/EditProfile';
 import Notifications from './users/components/Notifications';
 import Profile from './users/components/Profile';
@@ -429,6 +430,7 @@ const router = (
         <Route path='/account/profile/edit' component={EditProfile} />
         <Route path='/account/settings' component={Settings} />
         <Route path='/account/notifications' component={Notifications} />
+        <Route path='/account/connections' component={Connections} />
         <Route path='/account/team' component={Team} />
       </Route>
 
