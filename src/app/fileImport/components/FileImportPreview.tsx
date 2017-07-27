@@ -184,7 +184,7 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
           <Dropdown
             selectedIndex={this.state.templateId}
-            options={List<string>(this.props.templates.map((template, i) => template.name))}
+            options={List<string>(this.props.templates.map((template, i) => String(template.id) + ': ' + template.name))}
             onChange={this.handleTemplateChange}
             className={'fi-load-dropdown'}
             canEdit={true}

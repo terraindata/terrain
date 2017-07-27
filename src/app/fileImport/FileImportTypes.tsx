@@ -98,6 +98,7 @@ export interface Transform
 
 export interface Template
 {
+  id: number;
   name: string;
   originalNames: List<string>;
   columnTypes: Immutable.Map<string, object>;
