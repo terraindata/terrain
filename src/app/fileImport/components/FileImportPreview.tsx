@@ -256,21 +256,11 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
+    console.log('loading: ', this.props.loading);
     return (
       <div
         className='fi-preview'
       >
-        <div className='login-logo-container'>
-          {
-            <Loading
-              width={150}
-              height={150}
-              loading={this.props.loading}
-              loaded={false}
-              onLoadedEnd={null}
-            />
-          }
-        </div>
         {this.renderTemplate()}
         {this.renderTable()}
         <div
@@ -280,6 +270,18 @@ class FileImportPreview extends TerrainComponent<Props>
         >
           Import
         </div>
+        {
+          this.props.loading &&
+          <div className='fi-preview-loading-container'>
+            <Loading
+              width={100}
+              height={100}
+              loading={this.props.loading}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          </div>
+        }
       </div>
     );
   }

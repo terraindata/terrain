@@ -248,8 +248,11 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
 
 FileImportReducers[ActionTypes.toggleLoading] =
   (state, action) =>
-    state
-      .set('loading', !state.loading)
+  {
+    console.log(!state.loading);
+    return state
+      .set('loading', !state.loading);
+  }
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -357,6 +360,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        action.payload.toggleLoading();
       },
       state.hasCsvHeader,
     );
