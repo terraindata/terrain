@@ -374,7 +374,9 @@ var CodeMirror = createReactClass({
 
     if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value)
     {
+      const cursor = this.codeMirror.getCursor();
       this.codeMirror.setValue(nextProps.value);
+      this.codeMirror.setCursor(cursor);
     }
     if (typeof nextProps.options === 'object' && this.codeMirror && this.codeMirror.setOption)
     {

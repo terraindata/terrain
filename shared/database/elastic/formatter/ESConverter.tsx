@@ -52,9 +52,11 @@ import ESFormatter from './ESFormatter';
  */
 class ESConverter
 {
+  public static defaultIndentSize = 2;
+
   public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
   {
-    const formatter = new ESFormatter();
+    const formatter = new ESFormatter(ESConverter.defaultIndentSize);
     return formatter.formatQuery(query);
   }
 }

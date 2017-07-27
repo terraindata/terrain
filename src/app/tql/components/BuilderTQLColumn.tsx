@@ -86,7 +86,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     tql: string;
     theme: string;
     runMode: string;
-    focused: boolean;
     highlightedLine: number;
     theme_index: number;
     syntaxHelpOpen: boolean;
@@ -99,7 +98,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     tql: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
     runMode: 'auto',
-    focused: false,
     highlightedLine: null,
     theme_index: 0,
     syntaxHelpOpen: false,
@@ -367,13 +365,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleFocusChange(focused)
-  {
-    this.setState({
-      focused,
-    });
-  }
-
   public render()
   {
     const manualEntry = null;
@@ -403,7 +394,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
             theme={this.state.theme}
 
             onChange={this.updateTql}
-            onFocusChange={this.handleFocusChange}
 
             highlightedLine={this.state.highlightedLine}
             toggleSyntaxPopup={this.toggleSyntaxPopup}
