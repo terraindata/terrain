@@ -138,7 +138,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: clause.name,
-      colors: [],
+      colors: ['#f00', '#f00'],
       language: 'elastic',
     }, obj['static']);
 
@@ -194,18 +194,15 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public elasticElasticCardDeckTypes: string[];
 
   private config: EQLConfig;
-  private numColors: number;
   private colorIndex: number;
 
-  public constructor(config: EQLConfig, numColors: number)
+  public constructor(config: EQLConfig)
   {
     super();
     this.elasticElasticCards = {};
     this.elasticElasticCardDeckTypes = [];
 
     this.config = config;
-    this.numColors = 21;
-    this.colorIndex = 0;
 
     const clauses: { [name: string]: ESClause } =
       this.config.getClauses();
@@ -228,11 +225,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     }
 
     card = clause.accept(this);
-    const colorKey = ((++this.colorIndex) % this.numColors) + 1;
-    card['static']['colors'] = [
-      Colors().builder.cards['card' + String(colorKey)],
-      Colors().builder.cards['card' + String(colorKey) + 'BG'],
-    ];
 
     this.elasticElasticCardDeckTypes.push(GetCardVisitor.getCardType(clause));
     this.elasticElasticCards[cardType] = card;
@@ -381,6 +373,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       value: clause.template === undefined ? '' : clause.template,
       static: {
         preview: '[value]',
+        colors: [Colors().builder.cards.string, Colors().builder.cards.stringBG],
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -407,6 +400,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
       childrenHaveKeys: true,
+      colors: [Colors().builder.cards.property, Colors().builder.cards.propertyBG],
 
       // TODO incorporate nameType into the keys
 
@@ -455,6 +449,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         ? 0 : clause.template,
       static: {
         preview: '[value]',
+        colors: [Colors().builder.cards.number, Colors().builder.cards.numberBG],
         display: {
           displayType: DisplayType.NUM,
           key: 'value',
@@ -474,6 +469,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static:
       {
         preview: '[cards.size] properties',
+        colors: [Colors().builder.cards.property, Colors().builder.cards.propertyBG],
 
         display:
         {
@@ -522,6 +518,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       value: clause.template === undefined ? '' : clause.template,
       static: {
         preview: '[value]',
+        colors: [Colors().builder.cards.string, Colors().builder.cards.stringBG],
+        
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -639,6 +637,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           },
 
           preview: '[cards.size] Properties',
+          colors: [Colors().builder.cards.property, Colors().builder.cards.propertyBG],
 
           accepts,
           init,
@@ -668,6 +667,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       value: typeof clause.template === 'string' ? clause.template : '',
       static: {
         preview: '[value]',
+        colors: [Colors().builder.cards.string, Colors().builder.cards.stringBG],
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',

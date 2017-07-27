@@ -48,7 +48,7 @@ import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/
 import GetCardVisitor from '../../../app/builder/getCard/GetCardVisitor';
 
 const getCardVisitor: GetCardVisitor =
-  new GetCardVisitor(ESInterpreterDefaultConfig, 21);
+  new GetCardVisitor(ESInterpreterDefaultConfig);
 
 export const ElasticElasticCards: { [type: string]: any } =
   getCardVisitor.elasticElasticCards;

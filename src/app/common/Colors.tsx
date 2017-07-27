@@ -156,7 +156,38 @@ interface Theme
     // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
     cards: {
       cardBase: string,
+      
+      // card theme colors
+      atom: string,
+      number: string,
 
+      property: string,
+      keyword: string,
+      builtin: string,
+      string: string,
+
+      variable: string,
+      variable2: string,
+      variable3: string,
+      def: string,
+      bracket: string,
+      
+      atomBG: string,
+      numberBG: string,
+
+      propertyBG: string,
+      keywordBG: string,
+      builtinBG: string,
+      stringBG: string,
+
+      variableBG: string,
+      variable2BG: string,
+      variable3BG: string,
+      defBG: string,
+      bracketBG: string,
+      
+      
+      // DO NOT USE -- Saving for reference, remove soon
       card1: string,
       card2: string,
       card3: string,
@@ -330,6 +361,37 @@ const DARK: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
         cardBase: '#2F2F2F', // '#424242', // TODO
+
+        
+        // card theme colors
+        atom: '#ae81ff',
+        number: '#ae81ff',
+
+        property: '#a6e22e',
+        keyword: '#f92672',
+        builtin: '#66d9ef',
+        string: '#e6db74',
+
+        variable: '#f8f8f2',
+        variable2: '#9effff',
+        variable3: '#66d9ef',
+        def: '#fd971f',
+        bracket: '#f8f8f2',
+        
+        atomBG: Color('#ae81ff').alpha(0.7).string(),
+        numberBG: Color('#ae81ff').alpha(0.7).string(),
+
+        propertyBG: Color('#a6e22e').alpha(0.7).string(),
+        keywordBG: Color('#f92672').alpha(0.7).string(),
+        builtinBG: Color('#66d9ef').alpha(0.7).string(),
+        stringBG: Color('#e6db74').alpha(0.7).string(),
+
+        variableBG: Color('#f8f8f2').alpha(0.7).string(),
+        variable2BG: Color('#9effff').alpha(0.7).string(),
+        variable3BG: Color('#66d9ef').alpha(0.7).string(),
+        defBG: Color('#fd971f').alpha(0.7).string(),
+        bracketBG: Color('#f8f8f2').alpha(0.7).string(),
+        
 
         card1: '#559DCE',
         card2: '#397DD0',
