@@ -130,8 +130,8 @@ export const elasticTransform = _card(
           b: 1,
           numerators: [[block['input'], 1]],
           denominators: [],
-          ranges: block['scorePoints'].map((scorePt) => scorePt.value),
-          outputs: block['scorePoints'].map((scorePt) => scorePt.score),
+          ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
+          outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
         };
       },
 

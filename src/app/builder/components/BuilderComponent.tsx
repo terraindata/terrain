@@ -322,7 +322,6 @@ class BuilderComponent extends TerrainComponent<Props>
         break;
       case DisplayType.COMPONENT:
         const Comp = d.component as any;
-        const isTransformCard = d.key === 'scorePoints';
         content = (
           <div
             key={key}
@@ -346,26 +345,10 @@ class BuilderComponent extends TerrainComponent<Props>
             }
             {this.props.helpOn && d.help ?
               (
-                isTransformCard ?
-                  (d.help as string[]).map((info, index) =>
-                  {
-                    return <ManualInfo
-                      information={info as string}
-                      wide={index === 0}
-                      key={'info' + index}
-                      leftSide={index === 2}
-                      className={classNames({
-                        'builder-component-help-transform-center': index === 0,
-                        'builder-component-help-transform-left': index === 1,
-                        'builder-component-help-transform-bottom': index === 2,
-                      })}
-                    />;
-                  })
-                  :
-                  <ManualInfo
-                    information={d.help as string}
-                    className='builder-component-help-right'
-                  />
+                <ManualInfo
+                  information={d.help as string}
+                  className='builder-component-help-right'
+                />
               )
               : null
             }
