@@ -91,7 +91,6 @@ import './dialog.less';
 
 export interface Props
 {
-
   tql: string;
   language?: string;
   canEdit: boolean;
