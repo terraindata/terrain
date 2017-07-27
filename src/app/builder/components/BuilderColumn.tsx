@@ -214,15 +214,15 @@ const BuilderColumn = createReactClass<any, any>(
       {
         case COLUMNS.Builder:
           return <CardsColumn
-              cards={query.cards}
-              deckOpen={query.deckOpen}
-              canEdit={canEdit}
-              addColumn={this.props.onAddManualColumn}
-              columnIndex={this.props.index}
-              cardsAndCodeInSync={query.cardsAndCodeInSync}
-              parseError={query.parseError}
-              language={query.language}
-            />;
+            cards={query.cards}
+            deckOpen={query.deckOpen}
+            canEdit={canEdit}
+            addColumn={this.props.onAddManualColumn}
+            columnIndex={this.props.index}
+            cardsAndCodeInSync={query.cardsAndCodeInSync}
+            parseError={query.parseError}
+            language={query.language}
+          />;
 
         case COLUMNS.Inputs:
           return <InputsArea
@@ -243,14 +243,14 @@ const BuilderColumn = createReactClass<any, any>(
 
         case COLUMNS.Editor:
           return <BuilderTQLColumn
-              canEdit={canEdit}
-              addColumn={this.props.onAddManualColumn}
-              columnIndex={this.props.index}
-              query={query}
-              variant={this.props.variant}
-              resultsState={this.props.resultsState}
-              language={query.language}
-            />;
+            canEdit={canEdit}
+            addColumn={this.props.onAddManualColumn}
+            columnIndex={this.props.index}
+            query={query}
+            variant={this.props.variant}
+            resultsState={this.props.resultsState}
+            language={query.language}
+          />;
 
         case COLUMNS.Schema:
           return <SchemaView
