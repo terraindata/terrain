@@ -103,7 +103,6 @@ export interface Props
   diffTql?: string;
 
   onChange?(tql: string);
-  onFocusChange?(focused: boolean);
 
   toggleSyntaxPopup?(event, line);
   defineTerm?(value, event);
@@ -116,7 +115,7 @@ class TQLEditor extends TerrainComponent<Props>
   public state: {
     codeMirrorInstance, // CodeMirror instance does not have a defined type.
   } = {
-    codeMirrorInstance: null,
+    codeMirrorInstance: undefined,
   };
 
   public render()
@@ -138,10 +137,9 @@ class TQLEditor extends TerrainComponent<Props>
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
         revertButtons: false,
         connect: 'align',
-
+        tabSize: ESConverter.defaultIndentSize,
         origLeft: this.props.diffTql,
       };
-
     if (this.props.language === 'elastic')
     {
       options['mode'] = 'elastic';
@@ -169,7 +167,6 @@ class TQLEditor extends TerrainComponent<Props>
         />
       );
     }
-
     return (
       <CodeMirror
         ref='cm'
@@ -183,7 +180,6 @@ class TQLEditor extends TerrainComponent<Props>
         defineTerm={this.props.defineTerm}
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
-        onFocusChange={this.props.onFocusChange}
         onCodeMirrorMount={this.registerCodeMirror}
       />
     );
@@ -213,8 +209,10 @@ class TQLEditor extends TerrainComponent<Props>
       const formatted = this.autoFormatQuery(cmInstance.getValue());
       if (formatted)
       {
+        const cursor = cmInstance.getCursor();
         this.state.codeMirrorInstance.setValue(formatted);
         this.props.onChange(cmInstance.getValue());
+        cmInstance.setCursor(cursor);
       }
     }
   }
@@ -237,6 +235,7 @@ class TQLEditor extends TerrainComponent<Props>
       codeMirrorInstance: cmInstance,
     });
     cmInstance.on('change', this.handleChange);
+
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
       ElasticHighlighter.highlightES(cmInstance);

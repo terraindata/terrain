@@ -80,13 +80,6 @@ const appSchemaSQL: string[] = [
      password text NOT NULL,
      timezone string,
      meta text);`,
-  `CREATE TABLE IF NOT EXISTS events
-    (id integer PRIMARY KEY,
-    date date NOT NULL,
-    eventId text NOT NULL,
-    ip text NOT NULL,
-    payload text NOT NULL,
-    type text NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS importTemplates
     (id integer PRIMARY KEY,
      name text NOT NULL,
