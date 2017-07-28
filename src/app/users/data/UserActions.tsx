@@ -79,7 +79,7 @@ const Actions =
     (type: string) =>
       $(ActionTypes.changeType, { type }),
 
-};
+  };
 
 import AuthStore from './../../auth/data/AuthStore';
 AuthStore.subscribe(Actions.updateCurrentUser);

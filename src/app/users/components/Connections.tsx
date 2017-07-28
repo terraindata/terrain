@@ -106,7 +106,7 @@ class Connections extends TerrainComponent<Props>
     [
       'elastic',
       'mysql',
-    ]
+    ],
   );
 
   constructor(props)
@@ -166,23 +166,24 @@ class Connections extends TerrainComponent<Props>
   public renderConnectionInfo(server: Server)
   {
     // console.log(this.state.expanded);
-    if (this.state.expanded.get(server.id as number)) {
+    if (this.state.expanded.get(server.id as number))
+    {
       return (
         <div className='connections-item-info'>
           <div className='connections-item-info-row'>
-          {
-            server.name
-          }
+            {
+              server.name
+            }
           </div>
           <div className='connections-item-info-row'>
-          {
-            server.type
-          }
+            {
+              server.type
+            }
           </div>
           <div className='connections-item-info-row'>
-          {
-            server.host
-          }
+            {
+              server.host
+            }
           </div>
         </div>
       );
@@ -218,7 +219,7 @@ class Connections extends TerrainComponent<Props>
             </div>
           }
         </div>
-      { connInfo }
+        {connInfo}
       </div>
     );
   }
