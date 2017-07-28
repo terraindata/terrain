@@ -52,7 +52,7 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 export interface Props
 {
   style: {
-    [selector: string]: CSSRuleList
+    [selector: string]: React.CSSProperties
   }
 }
 

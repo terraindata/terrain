@@ -106,6 +106,12 @@ export class Sidebar extends TerrainComponent<Props>
                   'sidebar-link': true,
                   'sidebar-link-selected': index === this.props.selectedIndex,
                 })}
+                key={'sidebar-link-' + index}
+                style={{
+                  ':hover': {
+                    background: Colors().inactiveHover,
+                  }
+                }}
               >
                 <div
                   className='sidebar-link-inner'
@@ -134,7 +140,7 @@ export class Sidebar extends TerrainComponent<Props>
               >
                 <div className='dead-center'>
                   <ExpandIcon
-                    id='sidebar-expand-icon'
+                    className='sidebar-expand-icon'
                     style={{
                       fill: Colors().text2,
                       ':active': {
@@ -156,10 +162,10 @@ export class Sidebar extends TerrainComponent<Props>
 }
 
 const SVG_STYLE = {
-  '#sidebar-expand-icon': {
+  '.sidebar-expand-icon': {
     fill: Colors().text2,
   },
-  '#sidebar-expand-icon:active': {
+  '.sidebar-expand:hover .sidebar-expand-icon': {
     fill: Colors().text1,
   },
 };

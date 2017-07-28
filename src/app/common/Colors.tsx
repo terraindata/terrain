@@ -70,6 +70,8 @@ interface Theme
   altBg2: string;
   
   active: string; // active color
+  inactiveHover: string; // when something isn't active but could be
+  activeHover: string; // when an active thing is hovered
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
@@ -253,6 +255,8 @@ interface Theme
   };
 }
 
+const dark_active = '#00aee3';
+
 const DARK: Theme =
   {
     // Universal Elements------------------------------
@@ -276,7 +280,9 @@ const DARK: Theme =
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
-    active: '#00aee3',
+    active: dark_active,
+    inactiveHover: Color(dark_active).fade(0.25).string(),
+    activeHover: Color(dark_active).fade(0.75).string(),
 
     // text
     text:
