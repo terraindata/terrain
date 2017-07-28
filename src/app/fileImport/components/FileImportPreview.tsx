@@ -224,7 +224,7 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('ready');
       console.log('queue isEmpty: ', this.state.chunkQueue.isEmpty());
-      while (!this.state.chunkQueue.isEmpty() && !this.state.streamed)
+      if (!this.state.chunkQueue.isEmpty() && !this.state.streamed)
       {
         console.log('queue to be streamed: ', this.state.chunkQueue);
         socket.send(this.state.chunkQueue.first());
@@ -232,11 +232,16 @@ class FileImportPreview extends TerrainComponent<Props>
           chunkQueue: this.state.chunkQueue.shift(),
         });
       }
-      socket.emit('finished');
-    });
-    socket.on('finished', () =>
-    {
-      socket.close();
+
+      if (this.state.streamed)
+      {
+        socket.emit('finished');
+        socket.close();
+      }
+      else
+      {
+        socket.emit('sent');
+      }
     });
   }
 
