@@ -233,9 +233,7 @@ class FileImportPreview extends TerrainComponent<Props>
         });
       }
       socket.emit('finished');
-    });
-    socket.on('finished', () =>
-    {
+      console.log('finished');
       socket.close();
     });
   }
