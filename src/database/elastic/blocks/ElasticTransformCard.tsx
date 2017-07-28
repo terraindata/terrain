@@ -102,18 +102,20 @@ export const elasticTransform = _card(
       },
       display: [
         {
-          displayType: DisplayType.CARDTEXT,
+          displayType: DisplayType.TEXT,
           // help: ManualConfig.help['input'],
           key: 'input',
           placeholder: 'Input field',
           accepts: transformScoreInputTypes,
           showWhenCards: true,
         },
-        {
-          displayType: DisplayType.CARDSFORTEXT,
-          key: 'input',
-          accepts: transformScoreInputTypes,
-        },
+        // TODO, in the future, if we allow complicated formulas inside
+        //  transforms, then we can change this back to a cards view
+        // {
+        //   displayType: DisplayType.CARDSFORTEXT,
+        //   key: 'input',
+        //   accepts: transformScoreInputTypes,
+        // },
         {
           displayType: DisplayType.COMPONENT,
           component: TransformCard,

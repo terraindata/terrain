@@ -54,14 +54,24 @@ interface Theme
 
   // main background color
   base: string;
+  
+  bg1: string; // most contrast
+  bg2: string;
+  bg3: string; // least contrast
+  
+  text1: string; // most contrast
+  text2: string;
+  text3: string; // least contrast
 
   altColor1: string;
   altColor2: string;
 
   altBg1: string;
   altBg2: string;
+  
+  active: string; // active color
 
-  fadedOutBg: string;
+  fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   // text
   text: {
@@ -85,13 +95,6 @@ interface Theme
   titleBar:
   {
     base: string,
-  };
-  // side bar
-  sideBar:
-  {
-    base: string,
-    selectedSquare: string,
-    arrowBg: string,
   };
 
   // Library ------
@@ -256,6 +259,14 @@ const DARK: Theme =
 
     // main background color
     base: '#2F2F2F',
+    
+    bg1: 'rgb(21, 21, 21)',
+    bg2: 'rgb(39, 39, 39)',
+    bg3: 'rgb(62, 60, 60)',
+    
+    text1: '#fff',
+    text2: 'rgba(255,255,255,0.7)',
+    text3: 'rgba(255,255,255,0.3)',
 
     altColor1: '#242424',
     altColor2: '#424242',
@@ -264,6 +275,8 @@ const DARK: Theme =
     altBg2: '#EDEFF3',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+    active: '#00aee3',
 
     // text
     text:
@@ -289,13 +302,6 @@ const DARK: Theme =
     titleBar:
     {
       base: '#3E3C3C',
-    },
-    // side bar
-    sideBar:
-    {
-      base: '#646464',
-      selectedSquare: '#CAD847',
-      arrowBg: '#474747',
     },
 
     // Library ------
