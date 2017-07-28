@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
+import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -194,6 +195,7 @@ class Connections extends TerrainComponent<Props>
   {
     const connInfo = this.renderConnectionInfo(server);
     const id: number = server.id as number;
+    const connected: boolean = server.status === 'CONNECTED';
     return (
       <div className='connections-row' onClick={(e) => this.expandConnection(e, id)} key={server.id}>
         <div className='connections-item-names'>
@@ -212,9 +214,14 @@ class Connections extends TerrainComponent<Props>
           {
             <div className='connections-item-info-row'>
               <div className='connections-item-info-value connections-status'>
-                {
-                  server.status
-                }
+                <div className={classNames({
+                  connected,
+                  disconnected: !connected,
+                })}>
+                  {
+                    connected ? 'CONNECTED' : 'DISCONNECTED'
+                  }
+                </div>
               </div>
             </div>
           }
