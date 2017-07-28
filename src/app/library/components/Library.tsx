@@ -45,23 +45,23 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as React from 'react';
-
-import { Line } from 'react-chartjs';
 import { browserHistory } from 'react-router';
+import TerrainAreaChart from '../../charts/TerrainAreaChart';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import UserActions from './../../users/data/UserActions';
 import Actions from './../data/LibraryActions';
-import Store from './../data/LibraryStore';
 import { LibraryState } from './../data/LibraryStore';
+import Store from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
+import * as _ from 'lodash';
 
 export interface Props
 {
@@ -91,8 +91,12 @@ class Library extends TerrainComponent<any>
 
   public state: {
     libraryState: LibraryState;
+    selectedDomain: any;
+    zoomDomain: any;
   } = {
     libraryState: null,
+    selectedDomain: {},
+    zoomDomain: {},
   };
 
   constructor(props)
@@ -127,6 +131,27 @@ class Library extends TerrainComponent<any>
     UserActions.fetch();
   }
 
+  getData()
+  {
+    return [...Array(20).keys()].map(i => {
+      return { x: i, y: _.random(1, 100) }
+    });
+  }
+
+  getDatasets()
+  {
+    const { libraryState } = this.state;
+    const { variants, selectedVariants } = libraryState;
+
+    const datasets = variants
+      .filter(variant => selectedVariants.includes(variant.id.toString()))
+      .map(variant => {
+        return { id: +variant.id, name: variant.name, data: this.getData() };
+      });
+
+    return datasets.toList();
+  }
+
   public render()
   {
     const { libraryState } = this.state;
@@ -134,10 +159,11 @@ class Library extends TerrainComponent<any>
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
     const { params, basePath, variantsMultiselect } = this.props;
 
+    const datasets = this.getDatasets();
+
     const groupId = params.groupId ? +params.groupId : null;
     const algorithmId = params.algorithmId ? +params.algorithmId : null;
     const variantIds = params.variantId ? params.variantId.split(',') : null;
-    const multiselect = false;
 
     let group: LibraryTypes.Group;
     let algorithm: LibraryTypes.Algorithm;
@@ -161,7 +187,7 @@ class Library extends TerrainComponent<any>
           {
             variantsOrder = algorithm.variantsOrder;
 
-            if (variantIds != null)
+            if (variantIds !== null)
             {
               if (variantIds.length === 0)
               {
@@ -269,25 +295,11 @@ class Library extends TerrainComponent<any>
               }}
             /> : null}
         </div>
-        {variantsMultiselect ?
+        {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <div style={{ width: '100%', padding: '30px' }}>
-              <Line
-                data={{
-                  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                  datasets: [{
-                    label: 'My First dataset',
-                    data: [1, 3, 2, 4, 5, 6, 7],
-                    fill: false,
-                  }, {
-                    label: 'My Second dataset',
-                    data: [1, 3, 2, 4, 5, 6, 7].reverse(),
-                    fill: false,
-                  }],
-                }} options={{ responsive: true, maintainAspectRatio: false, layout: { padding: 10 } }}
-              />
-            </div>
-          </div> : null}
+            <TerrainAreaChart datasets={datasets} />
+          </div> : null
+        }
       </div>
     );
   }
