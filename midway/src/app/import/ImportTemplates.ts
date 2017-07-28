@@ -53,18 +53,19 @@ import * as Util from '../Util';
 
 export interface ImportTemplateBase
 {
-  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
-  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
-  columnTypes: object;
+  dbid: number;           // instance id
+  dbname: string;         // for elastic, index name
+  tablename: string;      // for elastic, type name
+
   // if filetype is 'csv', default is to assume the first line contains headers
   // set this to true if this is not the case
   csvHeaderMissing?: boolean;
-  dbid: number;               // instance id
-  dbname: string;             // for elastic, index name
-  export?: boolean;            // if true, exporting data from elastic ; default is false
-  originalNames: string[];    // array of strings (oldName)
-  primaryKey: string;         // newName of primary key
-  tablename: string;          // for elastic, type name
+  // array of strings (oldName)
+  originalNames: string[];
+  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
+  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
+  columnTypes: object;
+  primaryKey: string;  // newName of primary key
   transformations: object[];  // list of in-order data transformations
 }
 
@@ -75,15 +76,16 @@ export interface ImportTemplateConfig extends ImportTemplateBase
 }
 interface ImportTemplateConfigStringified
 {
-  columnTypes: string;
-  csvHeaderMissing?: boolean;
-  dbid: number;
-  dbname: string;
   id?: number;
   name: string;
-  originalNames: string;
-  primaryKey: string;
+
+  dbid: number;
+  dbname: string;
   tablename: string;
+  csvHeaderMissing?: boolean;
+  originalNames: string;
+  columnTypes: string;
+  primaryKey: string;
   transformations: string;
 }
 
@@ -97,23 +99,17 @@ export class ImportTemplates
       'importTemplates',
       ['id'],
       [
-        'columnTypes',
-        'csvHeaderMissing',
+        'name',
         'dbid',
         'dbname',
-        'name',
-        'originalNames',
-        'primaryKey',
         'tablename',
+        'csvHeaderMissing',
+        'originalNames',
+        'columnTypes',
+        'primaryKey',
         'transformations',
       ],
     );
-  }
-
-  public async getImport(id?: number): Promise<ImportTemplateConfig[]>
-  {
-    const filter: object = (id !== undefined) ? { id } : {};
-    return this.select([], filter);
   }
 
   public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>
@@ -126,13 +122,19 @@ export class ImportTemplates
     });
   }
 
+  public async get(id?: number): Promise<ImportTemplateConfig[]>
+  {
+    const filter: object = (id !== undefined) ? { id } : {};
+    return this.select([], filter);
+  }
+
   public async upsert(user: UserConfig, template: ImportTemplateConfig): Promise<ImportTemplateConfig>
   {
     return new Promise<ImportTemplateConfig>(async (resolve, reject) =>
     {
       if (template.id !== undefined)
       {
-        const results: ImportTemplateConfig[] = await this.getImport(template.id);
+        const results: ImportTemplateConfig[] = await this.get(template.id);
         // template id specified but template not found
         if (results.length === 0)
         {
@@ -147,6 +149,24 @@ export class ImportTemplates
     });
   }
 
+  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateConfigStringified
+  {
+    const stringified: ImportTemplateConfigStringified =
+      {
+        id: template['id'],
+        name: template['name'],
+        dbid: template['dbid'],
+        dbname: template['dbname'],
+        tablename: template['tablename'],
+        csvHeaderMissing: template['csvHeaderMissing'],
+        originalNames: JSON.stringify(template['originalNames']),
+        columnTypes: JSON.stringify(template['columnTypes']),
+        primaryKey: template['primaryKey'],
+        transformations: JSON.stringify(template['transformations']),
+      };
+    return stringified;
+  }
+
   private _parseConfig(stringified: ImportTemplateConfigStringified | ImportTemplateConfigStringified[]):
     ImportTemplateConfig | ImportTemplateConfig[]
   {
@@ -156,41 +176,22 @@ export class ImportTemplates
     }
     return this._parseConfigHelper(stringified);
   }
-
   private _parseConfigHelper(stringified: ImportTemplateConfigStringified): ImportTemplateConfig
   {
     const template: ImportTemplateConfig =
       {
-        columnTypes: JSON.parse(stringified['columnTypes']),
-        csvHeaderMissing: stringified['csvHeaderMissing'],
-        dbid: stringified['dbid'],
-        dbname: stringified['dbname'],
         id: stringified['id'],
         name: stringified['name'],
-        originalNames: JSON.parse(stringified['originalNames']),
-        primaryKey: stringified['primaryKey'],
+        dbid: stringified['dbid'],
+        dbname: stringified['dbname'],
         tablename: stringified['tablename'],
+        csvHeaderMissing: stringified['csvHeaderMissing'],
+        originalNames: JSON.parse(stringified['originalNames']),
+        columnTypes: JSON.parse(stringified['columnTypes']),
+        primaryKey: stringified['primaryKey'],
         transformations: JSON.parse(stringified['transformations']),
       };
     return template;
-  }
-
-  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateConfigStringified
-  {
-    const stringified: ImportTemplateConfigStringified =
-      {
-        columnTypes: JSON.stringify(template['columnTypes']),
-        csvHeaderMissing: template['csvHeaderMissing'],
-        dbid: template['dbid'],
-        dbname: template['dbname'],
-        id: template['id'],
-        name: template['name'],
-        originalNames: JSON.stringify(template['originalNames']),
-        primaryKey: template['primaryKey'],
-        tablename: template['tablename'],
-        transformations: JSON.stringify(template['transformations']),
-      };
-    return stringified;
   }
 }
 
