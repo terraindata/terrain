@@ -98,13 +98,18 @@ export class Import
     this.io.on('connection', (socket) =>
     {
       // console.log('someone connected!!!');
+      let count: number = 0;
       socket.emit('ready');
       socket.on('message', async (data) =>
       {
+        // console.log('just got data!');
         const items: object[] = await this._getItems(this.imprt, data);
         // console.log('got data!!!');
-        fs.open('test/testout.txt', 'wx', (err, fd) =>
+        const num: number = count;
+        count++;
+        fs.open('test/testout' + String(num) + '.txt', 'wx', (err, fd) =>
         {
+          // console.log('opened file.');
           if (err !== undefined && err !== null)
           {
             if (err.code === 'EEXIST')
@@ -113,9 +118,13 @@ export class Import
             }
             throw err;
           }
-          fs.write(fd, JSON.stringify(items));
-          // console.log('opened file.');
+          fs.write(fd, JSON.stringify(items), (writeErr) =>
+          {
+            throw writeErr;
+          });
+          // console.log('wrote to file.');
         });
+        socket.emit('done');
         // fs.unlink('test/testout.txt', (err) => {
         //     if (err)
         //     {
@@ -125,7 +134,8 @@ export class Import
       });
       socket.on('finished', () =>
       {
-        this.server.close();   // TODO: fix
+        // console.log('client finished!');
+        // this.server.close();   // TODO: fix
       });
     });
     this.server.listen(3300);   // TODO: which port?

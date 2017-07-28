@@ -232,9 +232,9 @@ class FileImportPreview extends TerrainComponent<Props>
           chunkQueue: this.state.chunkQueue.shift(),
         });
       }
-
       if (this.state.streamed)
       {
+        console.log('finished');
         socket.emit('finished');
         socket.close();
       }
