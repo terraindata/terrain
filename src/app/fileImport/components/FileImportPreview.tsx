@@ -91,6 +91,7 @@ class FileImportPreview extends TerrainComponent<Props>
     blobCount: number,
     chunkQueue: List<string>,
     nextChunk: string,
+    streamed: boolean,
   } = {
     templateId: -1,
     templateText: '',
@@ -99,6 +100,7 @@ class FileImportPreview extends TerrainComponent<Props>
     blobCount: 0,
     chunkQueue: List([]),
     nextChunk: '',
+    streamed: false,
   };
 
   public componentDidMount()
@@ -170,10 +172,11 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('final chunk: ', chunk);
       this.setState({
-        chunkQueue: this.state.nextChunk + chunk,
+        chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk),
         nextChunk: '',
+        streamed: true,
       });
-      this.stream();
+      // this.stream();
     }
     else
     {
@@ -187,10 +190,10 @@ class FileImportPreview extends TerrainComponent<Props>
         }
         index++;
       }
-      console.log('chunk size: ', chunk.length);
-      console.log('chunk: ', chunk);
-      console.log('parsed chunk: ', this.state.nextChunk + chunk.substring(0, end));
-      console.log('nextChunk: ', chunk.substring(end, chunk.length));
+      // console.log('chunk size: ', chunk.length);
+      // console.log('chunk: ', chunk);
+      // console.log('parsed chunk: ', this.state.nextChunk + chunk.substring(0, end));
+      // console.log('nextChunk: ', chunk.substring(end, chunk.length));
 
       this.setState({
         chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk.substring(0, end)),
@@ -215,22 +218,24 @@ class FileImportPreview extends TerrainComponent<Props>
     const socket = io('http://localhost:3300/');
     socket.on('connect', () =>
     {
-      //
+      console.log('connected');
     });
     socket.on('ready', () =>
     {
-      console.log('queue to be streamed: ', this.state.chunkQueue);
-      while (!this.state.chunkQueue.isEmpty())
+      console.log('ready');
+      console.log('queue isEmpty: ', this.state.chunkQueue.isEmpty());
+      while (!this.state.chunkQueue.isEmpty() && !this.state.streamed)
       {
+        console.log('queue to be streamed: ', this.state.chunkQueue);
         socket.send(this.state.chunkQueue.first());
         this.setState({
           chunkQueue: this.state.chunkQueue.shift(),
         });
       }
+      socket.emit('finished');
     });
     socket.on('finished', () =>
     {
-      socket.emit('finished');
       socket.close();
     });
   }
@@ -240,20 +245,22 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.uploadFile();
 
     console.log('filesize: ', this.props.blob.size);
+
     let blobStart = 0;
     while (blobStart < 10000)
     {
       console.log('blobStart: ', blobStart);
       const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.SLICE_SIZE);
-      // console.log(blobStart + FileImportTypes.SLICE_SIZE >= 10000);
       this.readFile(chunk, blobStart + FileImportTypes.SLICE_SIZE >= 10000);
       blobStart += FileImportTypes.SLICE_SIZE;
     }
+
+    this.stream();
   }
 
   public render()
   {
-    console.log(this.state.chunkQueue);
+    // console.log(this.state.chunkQueue);
     return (
       <div
         className='fi-preview'
