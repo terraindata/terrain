@@ -832,6 +832,19 @@ export const Ajax =
       );
     },
 
+    deleteDb(id: number,
+      onSave: (response: any) => void,
+      onError: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        `database/` + id + `/delete`,
+        {},
+        onSave,
+        onError,
+      );
+    },
+
     login(email: string,
       password: string,
       onLoad: (data: {

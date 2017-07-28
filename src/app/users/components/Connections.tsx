@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions no-unused-expression
+// tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
@@ -65,6 +65,8 @@ import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
+
+const CloseIcon = require('../../../images/icon_close_8x8_gray.svg');
 
 import './Connections.less';
 
@@ -88,7 +90,7 @@ class Connections extends TerrainComponent<Props>
     loading: boolean,
     servers: Server[],
     expanded: Map<number, boolean>,
-    addingServer: boolean,
+    addingConnection: boolean,
     errorModalOpen: boolean,
     errorModalMessage: string,
   } = {
@@ -96,7 +98,7 @@ class Connections extends TerrainComponent<Props>
     loading: true,
     servers: null,
     expanded: Map(),
-    addingServer: false,
+    addingConnection: false,
     errorModalOpen: false,
     errorModalMessage: '',
   };
@@ -164,27 +166,41 @@ class Connections extends TerrainComponent<Props>
     });
   }
 
+  public removeConnection(e, id: number)
+  {
+    Ajax.deleteDb(id, () =>
+    {
+      this.fetchConnections(this.props);
+    }, (error) =>
+      {
+        this.setState({
+          errorModalMessage: 'Error deleting connection: ' + JSON.stringify(error),
+        });
+        this.toggleErrorModal();
+      });
+  }
+
   public renderConnectionInfo(server: Server)
   {
-    // console.log(this.state.expanded);
     if (this.state.expanded.get(server.id as number))
     {
       return (
         <div className='connections-item-info'>
           <div className='connections-item-info-row'>
-            {
-              server.name
-            }
+            Type:
+            <div className='connections-item-info-value'>
+              {
+                server.type
+              }
+            </div>
           </div>
           <div className='connections-item-info-row'>
-            {
-              server.type
-            }
-          </div>
-          <div className='connections-item-info-row'>
-            {
-              server.host
-            }
+            Address:
+            <div className='connections-item-info-value'>
+              {
+                server.host
+              }
+            </div>
           </div>
         </div>
       );
@@ -197,48 +213,47 @@ class Connections extends TerrainComponent<Props>
     const id: number = server.id as number;
     const connected: boolean = server.status === 'CONNECTED';
     return (
-      <div className='connections-row' onClick={(e) => this.expandConnection(e, id)} key={server.id}>
-        <div className='connections-item-names'>
-          <div className='connections-id'>
-            {
-              server.id
-            }
-          </div>
-          <div className='connections-name'>
-            {
-              server.name
-            }
-          </div>
-        </div>
-        <div className='connections-item-info'>
-          {
-            <div className='connections-item-info-row'>
-              <div className='connections-item-info-value connections-status'>
-                <div className={classNames({
-                  connected,
-                  disconnected: !connected,
-                })}>
-                  {
-                    connected ? 'CONNECTED' : 'DISCONNECTED'
-                  }
-                </div>
+      <div key={server.id}>
+        <div className='connections-row'>
+          <div className='connections-items' onClick={(e) => this.expandConnection(e, id)}>
+            <div className='connections-id'>
+              {
+                server.id
+              }
+            </div>
+            <div className='connections-name'>
+              {
+                server.name
+              }
+            </div>
+            <div className='connections-status'>
+              <div className={classNames({
+                connected,
+                disconnected: !connected,
+              })}>
+                {
+                  connected ? 'CONNECTED' : 'DISCONNECTED'
+                }
               </div>
             </div>
-          }
+          </div>
+          <div className='connections-remove' onClick={(e) => this.removeConnection(e, id)} data-tip='Remove'>
+            <CloseIcon />
+          </div>
         </div>
         {connInfo}
       </div>
     );
   }
 
-  public toggleAddingServer()
+  public toggleAddingConnection()
   {
     this.setState({
-      addingServer: !this.state.addingServer,
+      addingConnection: !this.state.addingConnection,
     });
   }
 
-  public createNewServer()
+  public createConnection()
   {
     const name: string = this.refs['name']['value'];
     const address: string = this.refs['address']['value'];
@@ -265,13 +280,12 @@ class Connections extends TerrainComponent<Props>
     this.refs['name']['value'] = '';
     this.refs['address']['value'] = '';
     this.setState({
-      addingServer: false,
+      addingConnection: false,
     });
 
     Ajax.createDb(name, address, type, () =>
     {
-      SchemaActions.fetch();
-      // change the status to connected
+      this.fetchConnections(this.props);
     }, (error) =>
       {
         this.setState({
@@ -291,14 +305,14 @@ class Connections extends TerrainComponent<Props>
     UserActions.changeType(type);
   }
 
-  public renderAddServer()
+  public renderAddConnection()
   {
     const userId = AuthStore.getState().id;
     const user = UserStore.getState().getIn(['users', userId]) as UserTypes.User;
 
     if (user && user.isSuperUser)
     {
-      if (this.state.addingServer)
+      if (this.state.addingConnection)
       {
         return (
           <div className='create-server'>
@@ -329,10 +343,10 @@ class Connections extends TerrainComponent<Props>
                 </div>
               </div>
             </div>
-            <div className='button' onClick={this.createNewServer}>
+            <div className='button' onClick={this.createConnection}>
               Create
             </div>
-            <div className='button' onClick={this.toggleAddingServer}>
+            <div className='button' onClick={this.toggleAddingConnection}>
               Cancel
             </div>
           </div>
@@ -341,8 +355,8 @@ class Connections extends TerrainComponent<Props>
 
       return (
         <CreateItem
-          name='New Server'
-          onCreate={this.toggleAddingServer}
+          name='New Connection'
+          onCreate={this.toggleAddingConnection}
         />
       );
     }
@@ -359,7 +373,6 @@ class Connections extends TerrainComponent<Props>
   public render()
   {
     const { servers, loading } = this.state;
-
     return (
       <div>
         <div className='connections'>
@@ -371,7 +384,7 @@ class Connections extends TerrainComponent<Props>
             <InfoArea large='Loading...' />
           }
           {servers && servers.map(this.renderServer)}
-          {this.renderAddServer()}
+          {this.renderAddConnection()}
         </div>
         <Modal
           message={this.state.errorModalMessage}

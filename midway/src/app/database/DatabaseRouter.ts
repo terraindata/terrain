@@ -76,7 +76,10 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     throw Error('Invalid parameter database ID');
   }
 
+  db.status = 'DISCONNECTED';
   ctx.body = await databases.upsert(ctx.state.user, db);
+  const id = Number(ctx.body[0].id);
+  await databases.connect(ctx.state.user, id);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -108,6 +111,12 @@ Router.post('/:id/disconnect', passport.authenticate('access-token-local'), asyn
 {
   winston.info('disconnect from database');
   ctx.body = await databases.disconnect(ctx.state.user, Number(ctx.params.id));
+});
+
+Router.post('/:id/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('delete a database entry');
+  ctx.body = await databases.delete(ctx.state.user, Number(ctx.params.id));
 });
 
 Router.get('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
