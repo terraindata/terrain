@@ -83,7 +83,7 @@ Router.post('/headless', async (ctx, next) =>
 
   Util.verifyParameters(fields, ['templateID', 'filetype']);
 
-  const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
+  const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateID']));
   if (templates.length === 0)
   {
     throw new Error('Invalid template ID provided: ' + String(fields['templateID']));
@@ -114,17 +114,16 @@ Router.post('/headless', async (ctx, next) =>
   }
 
   const imprtConf: ImportConfig = {
+    columnTypes: template['columnTypes'],
+    contents: await Util.getStreamContents(file),
+    csvHeaderMissing: template['csvHeaderMissing'],
     dbid: template['dbid'],
     dbname: template['dbname'],
-    tablename: template['tablename'],
-    csvHeaderMissing: template['csvHeaderMissing'],
-    originalNames: template['originalNames'],
-    columnTypes: template['columnTypes'],
-    primaryKey: template['primaryKey'],
-    transformations: template['transformations'],
-
-    contents: await Util.getStreamContents(file),
     filetype: fields['filetype'],
+    originalNames: template['originalNames'],
+    primaryKey: template['primaryKey'],
+    tablename: template['tablename'],
+    transformations: template['transformations'],
     update,
   };
   ctx.body = await imprt.upsert(imprtConf);

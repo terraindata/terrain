@@ -59,7 +59,6 @@ export interface ImportConfig extends ImportTemplateBase
 {
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
-
   update: boolean;    // false means replace (instead of update) ; default should be true
 }
 
@@ -170,579 +169,6 @@ export class Import
     });
   }
 
-  /* returns an error message if there are any; else returns empty string */
-  private _verifyConfig(imprt: ImportConfig): string
-  {
-    const indexError: string = SharedUtil.isValidIndexName(imprt.dbname);
-    if (indexError !== '')
-    {
-      return indexError;
-    }
-    const typeError: string = SharedUtil.isValidTypeName(imprt.tablename);
-    if (typeError !== '')
-    {
-      return typeError;
-    }
-
-    if (imprt.csvHeaderMissing === undefined || imprt.csvHeaderMissing === null)
-    {
-      imprt.csvHeaderMissing = false;
-    }
-
-    const columnList: string[] = Object.keys(imprt.columnTypes);
-    const columns: Set<string> = new Set(columnList);
-    if (columns.size !== columnList.length)
-    {
-      return 'Provided column names must be distinct.';
-    }
-    if (!columns.has(imprt.primaryKey))
-    {
-      return 'A column to be included in the uploaded must be specified as the primary key.';
-    }
-    let fieldError: string;
-    for (const colName of columnList)
-    {
-      fieldError = SharedUtil.isValidFieldName(colName);
-      if (fieldError !== '')
-      {
-        return fieldError;
-      }
-    }
-    const columnTypes: string[] = columnList.map((val) => imprt.columnTypes[val]['type']);
-    if (columnTypes.some((val, ind, arr) =>
-    {
-      return !(this.supportedColumnTypes.has(val));
-    }))
-    {
-      return 'Invalid data type encountered.';
-    }
-    return '';
-  }
-
-  /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
-  private _getMappingForSchema(imprt: ImportConfig): object
-  {
-    // create mapping containing new fields
-    const mapping: object = {};
-    Object.keys(imprt.columnTypes).forEach((val) =>
-    {
-      mapping[val] = this._getESType(imprt.columnTypes[val]);
-    });
-    return this._getMappingForSchemaHelper(mapping);
-  }
-  /* recursive helper function for _getMappingForSchema(...)
-   * mapping: maps field name (string) to type (string or object (in the case of "object"/"nested" type))
-   * NOTE: contains functionality to handle "object"/"nested" types, though they are not yet supported by Import */
-  private _getMappingForSchemaHelper(mapping: object): object
-  {
-    const body: object = {};
-    for (const key in mapping)
-    {
-      if (mapping.hasOwnProperty(key) && key !== '__isNested__')
-      {
-        if (typeof mapping[key] === 'string')
-        {
-          body[key] = { type: mapping[key] };
-          if (mapping[key] === 'text')
-          {
-            body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
-          }
-        }
-        else if (typeof mapping[key] === 'object')
-        {
-          body[key] = this._getMappingForSchemaHelper(mapping[key]);
-        }
-      }
-    }
-    const payload: object = { properties: body };
-    if (mapping['__isNested__'] !== undefined)
-    {
-      payload['type'] = 'nested';
-    }
-    return payload;
-  }
-
-  /* check for conflicts with existing schema, return error (string) if there is one
-   * filters out fields already present in the existing mapping (since they don't need to be inserted)
-   * mapping: ES mapping
-   * returns: filtered mapping (object) or error message (string) */
-  private _checkMappingAgainstSchema(mapping: object, schema: Tasty.Schema, database: string): object | string
-  {
-    if (schema.databaseNames().indexOf(database) === -1)
-    {
-      return mapping;
-    }
-    const fieldsToCheck: Set<string> = new Set(Object.keys(mapping['properties']));
-    for (const table of schema.tableNames(database))
-    {
-      const fields: object = schema.fields(database, table);
-      for (const field in fields)
-      {
-        if (fields.hasOwnProperty(field) && fieldsToCheck.has(field))
-        {
-          if (this._isCompatibleType(mapping['properties'][field], fields[field]))
-          {
-            fieldsToCheck.delete(field);
-            delete mapping['properties'][field];
-          }
-          else
-          {
-            return 'Type mismatch for field ' + field + '. Cannot cast "' +
-              String(mapping['properties'][field]['type']) + '" to "' + String(fields[field]['type']) + '".';
-          }
-        }
-      }
-    }
-    return mapping;
-  }
-  /* proposed: ES mapping
-   * existing: ES mapping */
-  private _isCompatibleType(proposed: object, existing: object): boolean
-  {
-    const proposedType: string = proposed['type'];
-    return this.compatibleTypes[proposedType] !== undefined && this.compatibleTypes[proposedType].has(existing['type']);
-  }
-
-  private async _parseData(imprt: ImportConfig): Promise<object[]>
-  {
-    return new Promise<object[]>(async (resolve, reject) =>
-    {
-      if (imprt.filetype === 'json')
-      {
-        try
-        {
-          const items: object[] = JSON.parse(imprt.contents);
-          if (!Array.isArray(items))
-          {
-            return reject('Input JSON file must parse to an array of objects.');
-          }
-
-          const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
-          for (const obj of items)
-          {
-            if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
-            {
-              return reject('JSON file contains an object that does not contain the expected fields.');
-            }
-          }
-          resolve(items);
-        } catch (e)
-        {
-          return reject('JSON format incorrect: ' + String(e));
-        }
-      } else if (imprt.filetype === 'csv')
-      {
-        try
-        {
-          const options: object = {
-            delimiter: ',',
-            quote: this.quoteChar,
-            // TODO: handle case where field name contains quoteChar
-            headers: imprt.originalNames.map((val) => this.quoteChar + val + this.quoteChar).join(','),
-          };
-          const items: object[] = csvjson.toObject(imprt.contents, options);
-          if (imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
-          {
-            items.shift();
-          }
-          resolve(items);
-        }
-        catch (e)
-        {
-          // NOTE: csvjson parser will not throw errors for rows that contain the wrong number of entries
-          return reject('CSV format incorrect: ' + String(e));
-        }
-      } else
-      {
-        return reject('Invalid file-type provided.');
-      }
-    });
-  }
-
-  /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(allItems: object[], imprt: ImportConfig): Promise<object[][]>
-  {
-    const promises: Array<Promise<object[]>> = [];
-    let baseInd: number = 0;
-    let items: object[];
-    while (allItems.length > 0)
-    {
-      items = allItems.splice(0, this.batchSize);
-      promises.push(
-        new Promise<object[]>(async (thisResolve, thisReject) =>
-        {
-          const transformedItems: object[] = [];
-          let ind: number = 0;
-          for (let item of items)
-          {
-            try
-            {
-              item = this._applyTransforms(item, imprt.transformations);
-            } catch (e)
-            {
-              return thisReject('Failed to apply transforms: ' + String(e));
-            }
-            // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
-            const trimmedItem: object = {};
-            for (const name in imprt.columnTypes)
-            {
-              if (imprt.columnTypes.hasOwnProperty(name))
-              {
-                trimmedItem[name] = item[name];
-              }
-            }
-            const typeError: string = this._checkTypes(trimmedItem, imprt, baseInd + ind);
-            if (typeError !== '')
-            {
-              return thisReject(typeError);
-            }
-            transformedItems.push(trimmedItem);
-            ind++;
-          }
-          thisResolve(transformedItems);
-        }));
-      baseInd++;
-    }
-    return Promise.all(promises);
-  }
-
-  /* checks whether all objects in "items" have the fields and types specified by nameToType
-   * returns an error message if there is one; else returns empty string
-   * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(obj: object, imprt: ImportConfig, ind: number): string
-  {
-    if (imprt.filetype === 'json')
-    {
-      const targetHash: string = this._buildDesiredHash(imprt.columnTypes);
-      const targetKeys: string = JSON.stringify(Object.keys(imprt.columnTypes).sort());
-
-      // parse dates
-      const dateColumns: string[] = [];
-      for (const colName in imprt.columnTypes)
-      {
-        if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName]) === 'date')
-        {
-          dateColumns.push(colName);
-        }
-      }
-      if (dateColumns.length > 0)
-      {
-        dateColumns.forEach((colName) =>
-        {
-          this._parseDatesHelper(obj, colName);
-        });
-      }
-
-      if (this._hashObjectStructure(obj) === targetHash)
-      {
-        winston.info('checktypes: hash matches');
-      }
-      else
-      {
-        winston.info('checktypes: hashes do not match');
-        if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
-        {
-          return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
-        }
-        for (const key in obj)
-        {
-          if (obj.hasOwnProperty(key) && obj[key] !== null)
-          {
-            if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
-            {
-              return 'Field "' + key + '" of object number ' + String(ind) +
-                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
-            }
-          }
-        }
-      }
-    }
-    else if (imprt.filetype === 'csv')
-    {
-      for (const name in imprt.columnTypes)
-      {
-        if (imprt.columnTypes.hasOwnProperty(name))
-        {
-          if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
-          {
-            return 'Field "' + name + '" of object number ' + String(ind) +
-              ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[name]);
-          }
-        }
-      }
-    }
-
-    // check that all elements of arrays are of the same type
-    for (const field of Object.keys(imprt.columnTypes))
-    {
-      if (imprt.columnTypes[field]['type'] === 'array')
-      {
-        if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
-        {
-          return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
-        }
-      }
-    }
-
-    return '';
-  }
-  /* manually checks types (rather than checking hashes) ; handles arrays recursively */
-  private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
-  {
-    const thisType: string = this._getType(item);
-    if (thisType === 'number' && this.numericTypes.has(typeObj['type']))
-    {
-      return true;
-    }
-    if (typeObj['type'] !== thisType)
-    {
-      return false;
-    }
-    if (thisType === 'array')
-    {
-      return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
-    }
-    return true;
-  }
-  /* parses string input from CSV and checks against expected types ; handles arrays recursively */
-  private _csvCheckTypesHelper(item: object, typeObj: object, field: string): boolean
-  {
-    switch (this.numericTypes.has(typeObj['type']) ? 'number' : typeObj['type'])
-    {
-      case 'number':
-        const num: number = Number(item[field]);
-        if (!isNaN(num))
-        {
-          item[field] = num;
-        }
-        else if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          return false;
-        }
-        break;
-      case 'boolean':
-        if (item[field] === 'true')
-        {
-          item[field] = true;
-        }
-        else if (item[field] === 'false')
-        {
-          item[field] = false;
-        }
-        else if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          return false;
-        }
-        break;
-      case 'date':
-        const date: number = Date.parse(item[field]);
-        if (!isNaN(date))
-        {
-          item[field] = new Date(date);
-        }
-        else if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          return false;
-        }
-        break;
-      case 'array':
-        if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          try
-          {
-            if (typeof item[field] === 'string')
-            {
-              item[field] = JSON.parse(item[field]);
-            }
-          } catch (e)
-          {
-            return false;
-          }
-          if (!Array.isArray(item[field]))
-          {
-            return false;
-          }
-          let i: number = 0;
-          while (i < Object.keys(item[field]).length)    // lint hack to get around not recognizing item[field] as an array
-          {
-            if (!this._csvCheckTypesHelper(item[field], typeObj['innerType'], String(i)))
-            {
-              return false;
-            }
-            i++;
-          }
-        }
-        break;
-      default:  // "text" case, leave as string
-    }
-    return true;
-  }
-  /* recursively attempts to parse strings to dates */
-  private _parseDatesHelper(item: string | object, field: string)
-  {
-    if (Array.isArray(item[field]))
-    {
-      let i: number = 0;
-      while (i < Object.keys(item[field]).length)   // lint hack to get around not recognizing item[field] as an array
-      {
-        this._parseDatesHelper(item[field], String(i));
-        i++;
-      }
-    }
-    else
-    {
-      const date: number = Date.parse(item[field]);
-      if (!isNaN(date))
-      {
-        item[field] = new Date(date);
-      }
-    }
-  }
-  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
-  private _isTypeConsistent(arr: object[]): boolean
-  {
-    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
-  }
-  private _isTypeConsistentHelper(arr: object[]): string
-  {
-    const types: Set<string> = new Set();
-    arr.forEach((obj) =>
-    {
-      types.add(this._getType(obj));
-    });
-    if (types.size !== 1)
-    {
-      return 'inconsistent';
-    }
-    const type: string = types.entries().next().value[0];
-    if (type === 'array')
-    {
-      const innerTypes: Set<string> = new Set();
-      arr.forEach((obj) =>
-      {
-        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
-      });
-      if (innerTypes.size !== 1)
-      {
-        return 'inconsistent';
-      }
-      return innerTypes.entries().next().value[0];
-    }
-    return type;
-  }
-  private _getType(obj: object): string
-  {
-    if (typeof obj === 'object')
-    {
-      if (obj === null)
-      {
-        return 'null';
-      }
-      if (obj instanceof Date)
-      {
-        return 'date';
-      }
-      if (Array.isArray(obj))
-      {
-        return 'array';
-      }
-    }
-    if (typeof obj === 'string')
-    {
-      return 'text';
-    }
-    // handles "number", "boolean", "object", and "undefined" cases
-    return typeof obj;
-  }
-  /* return ES type from type specification format of ImportConfig
-   * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
-  private _getESType(typeObject: object, withinArray: boolean = false): string
-  {
-    switch (typeObject['type'])
-    {
-      case 'array':
-        return this._getESType(typeObject['innerType'], true);
-      case 'object':
-        return withinArray ? 'nested' : 'object';
-      default:
-        return typeObject['type'];
-    }
-  }
-
-  /* return the target hash an object with the specified field names and types should have
-   * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _buildDesiredHash(nameToType: object): string
-  {
-    let strToHash: string = 'object';
-    const nameToTypeArr: string[] = Object.keys(nameToType).sort();
-    nameToTypeArr.forEach((name) =>
-    {
-      strToHash += '|' + name + ':' + this._buildDesiredHashHelper(nameToType[name]) + '|';
-    });
-    return sha1(strToHash);
-  }
-  /* recursive helper to handle arrays */
-  private _buildDesiredHashHelper(typeObj: object): string
-  {
-    if (this.numericTypes.has(typeObj['type']))
-    {
-      return 'number';
-    }
-    if (typeObj['type'] === 'array')
-    {
-      return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
-    }
-    return typeObj['type'];
-  }
-  // TODO: merge with jason's copy in shared util
-  /* returns a hash based on the object's field names and data types
-   * handles object fields recursively ; only checks the type of the first element of arrays */
-  private _hashObjectStructure(payload: object): string
-  {
-    return sha1(this._getObjectStructureStr(payload));
-  }
-  private _getObjectStructureStr(payload: object): string
-  {
-    let structStr: string = this._getType(payload);
-    if (structStr === 'object')
-    {
-      structStr = Object.keys(payload).sort().reduce((res, item) =>
-      {
-        res += '|' + item + ':' + this._getObjectStructureStr(payload[item]) + '|';
-        return res;
-      },
-        structStr);
-    }
-    else if (structStr === 'array')
-    {
-      if (Object.keys(structStr).length > 0)
-      {
-        structStr += '-' + this._getObjectStructureStr(payload[0]);
-      }
-      else
-      {
-        structStr += '-empty';
-      }
-    }
-    return structStr;
-  }
-
   private _applyTransforms(obj: object, transforms: object[]): object
   {
     let colName: string | undefined;
@@ -842,6 +268,591 @@ export class Import
       }
     }
     return obj;
+  }
+
+  /* return the target hash an object with the specified field names and types should have
+   * nameToType: maps field name (string) to object (contains "type" field (string)) */
+  private _buildDesiredHash(nameToType: object): string
+  {
+    let strToHash: string = 'object';
+    const nameToTypeArr: string[] = Object.keys(nameToType).sort();
+    nameToTypeArr.forEach((name) =>
+    {
+      strToHash += '|' + name + ':' + this._buildDesiredHashHelper(nameToType[name]) + '|';
+    });
+    return sha1(strToHash);
+  }
+
+  /* recursive helper to handle arrays */
+  private _buildDesiredHashHelper(typeObj: object): string
+  {
+    if (this.numericTypes.has(typeObj['type']))
+    {
+      return 'number';
+    }
+    if (typeObj['type'] === 'array')
+    {
+      return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
+    }
+    return typeObj['type'];
+  }
+
+  /* check for conflicts with existing schema, return error (string) if there is one
+   * filters out fields already present in the existing mapping (since they don't need to be inserted)
+   * mapping: ES mapping
+   * returns: filtered mapping (object) or error message (string) */
+  private _checkMappingAgainstSchema(mapping: object, schema: Tasty.Schema, database: string): object | string
+  {
+    if (schema.databaseNames().indexOf(database) === -1)
+    {
+      return mapping;
+    }
+    const fieldsToCheck: Set<string> = new Set(Object.keys(mapping['properties']));
+    for (const table of schema.tableNames(database))
+    {
+      const fields: object = schema.fields(database, table);
+      for (const field in fields)
+      {
+        if (fields.hasOwnProperty(field) && fieldsToCheck.has(field))
+        {
+          if (this._isCompatibleType(mapping['properties'][field], fields[field]))
+          {
+            fieldsToCheck.delete(field);
+            delete mapping['properties'][field];
+          }
+          else
+          {
+            return 'Type mismatch for field ' + field + '. Cannot cast "' +
+              String(mapping['properties'][field]['type']) + '" to "' + String(fields[field]['type']) + '".';
+          }
+        }
+      }
+    }
+    return mapping;
+  }
+
+  /* checks whether all objects in "items" have the fields and types specified by nameToType
+   * returns an error message if there is one; else returns empty string
+   * nameToType: maps field name (string) to object (contains "type" field (string)) */
+  private _checkTypes(obj: object, imprt: ImportConfig, ind: number): string
+  {
+    if (imprt.filetype === 'json')
+    {
+      const targetHash: string = this._buildDesiredHash(imprt.columnTypes);
+      const targetKeys: string = JSON.stringify(Object.keys(imprt.columnTypes).sort());
+
+      // parse dates
+      const dateColumns: string[] = [];
+      for (const colName in imprt.columnTypes)
+      {
+        if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName]) === 'date')
+        {
+          dateColumns.push(colName);
+        }
+      }
+      if (dateColumns.length > 0)
+      {
+        dateColumns.forEach((colName) =>
+        {
+          this._parseDatesHelper(obj, colName);
+        });
+      }
+
+      if (this._hashObjectStructure(obj) === targetHash)
+      {
+        winston.info('checktypes: hash matches');
+      }
+      else
+      {
+        winston.info('checktypes: hashes do not match');
+        if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
+        {
+          return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
+        }
+        for (const key in obj)
+        {
+          if (obj.hasOwnProperty(key) && obj[key] !== null)
+          {
+            if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
+            {
+              return 'Field "' + key + '" of object number ' + String(ind) +
+                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
+            }
+          }
+        }
+      }
+    }
+    else if (imprt.filetype === 'csv')
+    {
+      for (const name in imprt.columnTypes)
+      {
+        if (imprt.columnTypes.hasOwnProperty(name))
+        {
+          if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
+          {
+            return 'Field "' + name + '" of object number ' + String(ind) +
+              ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[name]);
+          }
+        }
+      }
+    }
+
+    // check that all elements of arrays are of the same type
+    for (const field of Object.keys(imprt.columnTypes))
+    {
+      if (imprt.columnTypes[field]['type'] === 'array')
+      {
+        if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
+        {
+          return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
+        }
+      }
+    }
+
+    return '';
+  }
+
+  /* parses string input from CSV and checks against expected types ; handles arrays recursively */
+  private _csvCheckTypesHelper(item: object, typeObj: object, field: string): boolean
+  {
+    switch (this.numericTypes.has(typeObj['type']) ? 'number' : typeObj['type'])
+    {
+      case 'number':
+        const num: number = Number(item[field]);
+        if (!isNaN(num))
+        {
+          item[field] = num;
+        }
+        else if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          return false;
+        }
+        break;
+      case 'boolean':
+        if (item[field] === 'true')
+        {
+          item[field] = true;
+        }
+        else if (item[field] === 'false')
+        {
+          item[field] = false;
+        }
+        else if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          return false;
+        }
+        break;
+      case 'date':
+        const date: number = Date.parse(item[field]);
+        if (!isNaN(date))
+        {
+          item[field] = new Date(date);
+        }
+        else if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          return false;
+        }
+        break;
+      case 'array':
+        if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          try
+          {
+            if (typeof item[field] === 'string')
+            {
+              item[field] = JSON.parse(item[field]);
+            }
+          } catch (e)
+          {
+            return false;
+          }
+          if (!Array.isArray(item[field]))
+          {
+            return false;
+          }
+          let i: number = 0;
+          while (i < Object.keys(item[field]).length)    // lint hack to get around not recognizing item[field] as an array
+          {
+            if (!this._csvCheckTypesHelper(item[field], typeObj['innerType'], String(i)))
+            {
+              return false;
+            }
+            i++;
+          }
+        }
+        break;
+      default:  // "text" case, leave as string
+    }
+    return true;
+  }
+
+  /* return ES type from type specification format of ImportConfig
+   * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
+  private _getESType(typeObject: object, withinArray: boolean = false): string
+  {
+    switch (typeObject['type'])
+    {
+      case 'array':
+        return this._getESType(typeObject['innerType'], true);
+      case 'object':
+        return withinArray ? 'nested' : 'object';
+      default:
+        return typeObject['type'];
+    }
+  }
+
+  /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
+  private _getMappingForSchema(imprt: ImportConfig): object
+  {
+    // create mapping containing new fields
+    const mapping: object = {};
+    Object.keys(imprt.columnTypes).forEach((val) =>
+    {
+      mapping[val] = this._getESType(imprt.columnTypes[val]);
+    });
+    return this._getMappingForSchemaHelper(mapping);
+  }
+
+  /* recursive helper function for _getMappingForSchema(...)
+   * mapping: maps field name (string) to type (string or object (in the case of "object"/"nested" type))
+   * NOTE: contains functionality to handle "object"/"nested" types, though they are not yet supported by Import */
+  private _getMappingForSchemaHelper(mapping: object): object
+  {
+    const body: object = {};
+    for (const key in mapping)
+    {
+      if (mapping.hasOwnProperty(key) && key !== '__isNested__')
+      {
+        if (typeof mapping[key] === 'string')
+        {
+          body[key] = { type: mapping[key] };
+          if (mapping[key] === 'text')
+          {
+            body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
+          }
+        }
+        else if (typeof mapping[key] === 'object')
+        {
+          body[key] = this._getMappingForSchemaHelper(mapping[key]);
+        }
+      }
+    }
+    const payload: object = { properties: body };
+    if (mapping['__isNested__'] !== undefined)
+    {
+      payload['type'] = 'nested';
+    }
+    return payload;
+  }
+
+  private _getObjectStructureStr(payload: object): string
+  {
+    let structStr: string = this._getType(payload);
+    if (structStr === 'object')
+    {
+      structStr = Object.keys(payload).sort().reduce((res, item) =>
+      {
+        res += '|' + item + ':' + this._getObjectStructureStr(payload[item]) + '|';
+        return res;
+      },
+        structStr);
+    }
+    else if (structStr === 'array')
+    {
+      if (Object.keys(structStr).length > 0)
+      {
+        structStr += '-' + this._getObjectStructureStr(payload[0]);
+      }
+      else
+      {
+        structStr += '-empty';
+      }
+    }
+    return structStr;
+  }
+
+  private _getType(obj: object): string
+  {
+    if (typeof obj === 'object')
+    {
+      if (obj === null)
+      {
+        return 'null';
+      }
+      if (obj instanceof Date)
+      {
+        return 'date';
+      }
+      if (Array.isArray(obj))
+      {
+        return 'array';
+      }
+    }
+    if (typeof obj === 'string')
+    {
+      return 'text';
+    }
+    // handles "number", "boolean", "object", and "undefined" cases
+    return typeof obj;
+  }
+
+  // TODO: merge with jason's copy in shared util
+  /* returns a hash based on the object's field names and data types
+   * handles object fields recursively ; only checks the type of the first element of arrays */
+  private _hashObjectStructure(payload: object): string
+  {
+    return sha1(this._getObjectStructureStr(payload));
+  }
+
+  /* proposed: ES mapping
+   * existing: ES mapping */
+  private _isCompatibleType(proposed: object, existing: object): boolean
+  {
+    const proposedType: string = proposed['type'];
+    return this.compatibleTypes[proposedType] !== undefined && this.compatibleTypes[proposedType].has(existing['type']);
+  }
+
+  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
+  private _isTypeConsistent(arr: object[]): boolean
+  {
+    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
+  }
+
+  private _isTypeConsistentHelper(arr: object[]): string
+  {
+    const types: Set<string> = new Set();
+    arr.forEach((obj) =>
+    {
+      types.add(this._getType(obj));
+    });
+    if (types.size !== 1)
+    {
+      return 'inconsistent';
+    }
+    const type: string = types.entries().next().value[0];
+    if (type === 'array')
+    {
+      const innerTypes: Set<string> = new Set();
+      arr.forEach((obj) =>
+      {
+        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
+      });
+      if (innerTypes.size !== 1)
+      {
+        return 'inconsistent';
+      }
+      return innerTypes.entries().next().value[0];
+    }
+    return type;
+  }
+
+  /* manually checks types (rather than checking hashes) ; handles arrays recursively */
+  private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
+  {
+    const thisType: string = this._getType(item);
+    if (thisType === 'number' && this.numericTypes.has(typeObj['type']))
+    {
+      return true;
+    }
+    if (typeObj['type'] !== thisType)
+    {
+      return false;
+    }
+    if (thisType === 'array')
+    {
+      return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
+    }
+    return true;
+  }
+
+  private async _parseData(imprt: ImportConfig): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      if (imprt.filetype === 'json')
+      {
+        try
+        {
+          const items: object[] = JSON.parse(imprt.contents);
+          if (!Array.isArray(items))
+          {
+            return reject('Input JSON file must parse to an array of objects.');
+          }
+
+          const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
+          for (const obj of items)
+          {
+            if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
+            {
+              return reject('JSON file contains an object that does not contain the expected fields.');
+            }
+          }
+          resolve(items);
+        } catch (e)
+        {
+          return reject('JSON format incorrect: ' + String(e));
+        }
+      } else if (imprt.filetype === 'csv')
+      {
+        try
+        {
+          const options: object = {
+            delimiter: ',',
+            quote: this.quoteChar,
+            // TODO: handle case where field name contains quoteChar
+            headers: imprt.originalNames.map((val) => this.quoteChar + val + this.quoteChar).join(','),
+          };
+          const items: object[] = csvjson.toObject(imprt.contents, options);
+          if (imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
+          {
+            items.shift();
+          }
+          resolve(items);
+        }
+        catch (e)
+        {
+          // NOTE: csvjson parser will not throw errors for rows that contain the wrong number of entries
+          return reject('CSV format incorrect: ' + String(e));
+        }
+      } else
+      {
+        return reject('Invalid file-type provided.');
+      }
+    });
+  }
+
+  /* recursively attempts to parse strings to dates */
+  private _parseDatesHelper(item: string | object, field: string)
+  {
+    if (Array.isArray(item[field]))
+    {
+      let i: number = 0;
+      while (i < Object.keys(item[field]).length)   // lint hack to get around not recognizing item[field] as an array
+      {
+        this._parseDatesHelper(item[field], String(i));
+        i++;
+      }
+    }
+    else
+    {
+      const date: number = Date.parse(item[field]);
+      if (!isNaN(date))
+      {
+        item[field] = new Date(date);
+      }
+    }
+  }
+
+  /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig): Promise<object[][]>
+  {
+    const promises: Array<Promise<object[]>> = [];
+    let baseInd: number = 0;
+    let items: object[];
+    while (allItems.length > 0)
+    {
+      items = allItems.splice(0, this.batchSize);
+      promises.push(
+        new Promise<object[]>(async (thisResolve, thisReject) =>
+        {
+          const transformedItems: object[] = [];
+          let ind: number = 0;
+          for (let item of items)
+          {
+            try
+            {
+              item = this._applyTransforms(item, imprt.transformations);
+            } catch (e)
+            {
+              return thisReject('Failed to apply transforms: ' + String(e));
+            }
+            // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
+            const trimmedItem: object = {};
+            for (const name in imprt.columnTypes)
+            {
+              if (imprt.columnTypes.hasOwnProperty(name))
+              {
+                trimmedItem[name] = item[name];
+              }
+            }
+            const typeError: string = this._checkTypes(trimmedItem, imprt, baseInd + ind);
+            if (typeError !== '')
+            {
+              return thisReject(typeError);
+            }
+            transformedItems.push(trimmedItem);
+            ind++;
+          }
+          thisResolve(transformedItems);
+        }));
+      baseInd++;
+    }
+    return Promise.all(promises);
+  }
+
+  /* returns an error message if there are any; else returns empty string */
+  private _verifyConfig(imprt: ImportConfig): string
+  {
+    const indexError: string = SharedUtil.isValidIndexName(imprt.dbname);
+    if (indexError !== '')
+    {
+      return indexError;
+    }
+    const typeError: string = SharedUtil.isValidTypeName(imprt.tablename);
+    if (typeError !== '')
+    {
+      return typeError;
+    }
+
+    if (imprt.csvHeaderMissing === undefined || imprt.csvHeaderMissing === null)
+    {
+      imprt.csvHeaderMissing = false;
+    }
+
+    const columnList: string[] = Object.keys(imprt.columnTypes);
+    const columns: Set<string> = new Set(columnList);
+    if (columns.size !== columnList.length)
+    {
+      return 'Provided column names must be distinct.';
+    }
+    if (!columns.has(imprt.primaryKey))
+    {
+      return 'A column to be included in the uploaded must be specified as the primary key.';
+    }
+    let fieldError: string;
+    for (const colName of columnList)
+    {
+      fieldError = SharedUtil.isValidFieldName(colName);
+      if (fieldError !== '')
+      {
+        return fieldError;
+      }
+    }
+    const columnTypes: string[] = columnList.map((val) => imprt.columnTypes[val]['type']);
+    if (columnTypes.some((val, ind, arr) =>
+    {
+      return !(this.supportedColumnTypes.has(val));
+    }))
+    {
+      return 'Invalid data type encountered.';
+    }
+    return '';
   }
 }
 
