@@ -65,8 +65,13 @@ import Profile from './users/components/Profile';
 import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
+import LibraryActions from './library/data/LibraryActions';
 
 class AppRouter extends TerrainComponent<{}> {
+  public libraryOnEnter() {
+    LibraryActions.variants.unselectAll();
+  }
+
   public render()
   {
     const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
@@ -85,7 +90,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/builder/:config' component={Builder} />
           <Route path='/builder/:config/:splitConfig' component={Builder} />
 
-          <Route path='/library'>
+          <Route path='/library' onEnter={this.libraryOnEnter.bind(this)}>
             <IndexRoute component={libraryLibrary} />
             <Route path=':groupId' component={libraryLibrary}>
               <IndexRoute component={libraryLibrary} />
@@ -128,7 +133,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/schema' component={SchemaPage} />
 
           <Route path='/import' component={FileImport} />
-          <Route path='/analytics'>
+          <Route path='/analytics' onEnter={this.libraryOnEnter.bind(this)}>
             <IndexRoute component={analyticsLibrary} />
             <Route path=':groupId' component={analyticsLibrary}>
               <IndexRoute component={analyticsLibrary} />
