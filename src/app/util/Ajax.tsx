@@ -813,6 +813,38 @@ export const Ajax =
         },
       );
     },
+
+    createDb(name: string, dsn: string, type: string,
+      onSave: (response: any) => void,
+      onError: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        `database`,
+        {
+          name,
+          dsn,
+          host: dsn,
+          type,
+        },
+        onSave,
+        onError,
+      );
+    },
+
+    deleteDb(id: number,
+      onSave: (response: any) => void,
+      onError: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        `database/` + id + `/delete`,
+        {},
+        onSave,
+        onError,
+      );
+    },
+
     login(email: string,
       password: string,
       onLoad: (data: {

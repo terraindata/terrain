@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
+
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/UserActions';
@@ -75,6 +76,7 @@ class Account extends TerrainComponent<Props>
     let notificationsActive: boolean;
     let teamActive: boolean;
     let settingsActive: boolean;
+    let connectionsActive: boolean;
 
     switch (this.props.location.pathname)
     {
@@ -89,6 +91,11 @@ class Account extends TerrainComponent<Props>
         notificationsActive = true;
         title = 'Notifications';
         selected = '154px';
+        break;
+      case '/account/connections':
+        connectionsActive = true;
+        title = 'Connections';
+        selected = '298px';
         break;
       case '/account/team':
         teamActive = true;
@@ -143,6 +150,15 @@ class Account extends TerrainComponent<Props>
                 'active': profileActive,
               })}  >
               Profile
+            </Link>
+            <Link
+              to={'/account/connections'}
+              className={classNames({
+                'account-link': true,
+                'active': connectionsActive,
+              })}
+            >
+              Connections
             </Link>
             <Link
               to={'/account/team'}
