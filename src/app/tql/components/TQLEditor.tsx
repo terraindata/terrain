@@ -216,16 +216,17 @@ class TQLEditor extends TerrainComponent<Props>
     }
   }
 
-  private handleChange(cmInstance, change)
+  private handleCMHighlighting(cmInstance, change)
   {
-    if (change.origin !== 'setValue')
-    {
-      this.props.onChange(cmInstance.getValue());
-    }
     if (this.props.language === 'elastic')
     {
       ElasticHighlighter.highlightES(cmInstance);
     }
+  }
+
+  private handleTQLChange(cmInstance, changes)
+  {
+    this.props.onChange(cmInstance.getValue());
   }
 
   private registerCodeMirror(cmInstance)
@@ -233,7 +234,17 @@ class TQLEditor extends TerrainComponent<Props>
     this.setState({
       codeMirrorInstance: cmInstance,
     });
-    cmInstance.on('change', this.handleChange);
+    /*
+     * change event (https://codemirror.net/doc/manual.html#events) is fired before CodeMirror updates the DOM.
+     * Because highlightES changes how codemirror renders the content, we have to call it in the chagne callback.
+     */
+    cmInstance.on('change', this.handleCMHighlighting);
+    /*
+     * changes event is fired after CodeMirror updates the DOM.
+     * Because handleTQLChange may change the react state and the change could be expensieve, we call this after
+     * CodeMirror updates the DOM.
+     */
+    cmInstance.on('changes', this.handleTQLChange);
 
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
