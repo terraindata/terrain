@@ -112,12 +112,12 @@ class Connections extends TerrainComponent<Props>
     ],
   );
 
-  constructor(props)
+  constructor(props: Props)
   {
     super(props);
   }
 
-  public fetchConnections(props)
+  public fetchConnections()
   {
     this.xhr = Ajax.req(
       'get',
@@ -136,7 +136,7 @@ class Connections extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.fetchConnections(this.props);
+    this.fetchConnections();
   }
 
   public componentWillUnmount()
@@ -147,37 +147,36 @@ class Connections extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    this.fetchConnections(nextProps);
+    this.fetchConnections();
   }
 
   public updateState()
   {
+    const state = SchemaStore.getState();
     this.setState({
-      servers: SchemaStore.getState().get('servers'),
-      loading: SchemaStore.getState().get('loading'),
+      servers: state.servers,
+      loading: state.loading,
     });
   }
 
-  public expandConnection(e, id: number)
+  public expandConnection(id: number)
   {
-    const newExpanded: Map<number, boolean> = this.state.expanded;
+    const { expanded } = this.state;
     this.setState({
-      expanded: newExpanded.set(id, !!!newExpanded.get(id)),
+      expanded: expanded.set(id, !expanded.get(id)),
     });
   }
 
-  public removeConnection(e, id: number)
+  public removeConnection(id: number)
   {
-    Ajax.deleteDb(id, () =>
+    Ajax.deleteDb(id, this.fetchConnections, (error) =>
     {
-      this.fetchConnections(this.props);
-    }, (error) =>
-      {
-        this.setState({
-          errorModalMessage: 'Error deleting connection: ' + JSON.stringify(error),
-        });
-        this.toggleErrorModal();
+      this.setState({
+        errorModalMessage: 'Error deleting connection: ' + JSON.stringify(error),
+        errorModalOpen: true,
       });
+    },
+    );
   }
 
   public renderConnectionInfo(server: Server)
@@ -215,7 +214,9 @@ class Connections extends TerrainComponent<Props>
     return (
       <div key={server.id}>
         <div className='connections-row'>
-          <div className='connections-items' onClick={(e) => this.expandConnection(e, id)}>
+          <div
+            className='connections-items'
+            onClick={this._fn(this.expandConnection, id)}>
             <div className='connections-id'>
               {
                 server.id
@@ -237,20 +238,18 @@ class Connections extends TerrainComponent<Props>
               </div>
             </div>
           </div>
-          <div className='connections-remove' onClick={(e) => this.removeConnection(e, id)} data-tip='Remove'>
+          <div
+            className='connections-remove'
+            onClick={this._fn(this.removeConnection, id)}
+            data-tip='Remove'>
             <CloseIcon />
           </div>
         </div>
-        {connInfo}
+        {
+          connInfo
+        }
       </div>
     );
-  }
-
-  public toggleAddingConnection()
-  {
-    this.setState({
-      addingConnection: !this.state.addingConnection,
-    });
   }
 
   public createConnection()
@@ -263,8 +262,8 @@ class Connections extends TerrainComponent<Props>
     {
       this.setState({
         errorModalMessage: 'Connection name is required.',
+        errorModalOpen: true,
       });
-      this.toggleErrorModal();
       return;
     }
 
@@ -272,8 +271,8 @@ class Connections extends TerrainComponent<Props>
     {
       this.setState({
         errorModalMessage: 'Server address is required.',
+        errorModalOpen: true,
       });
-      this.toggleErrorModal();
       return;
     }
 
@@ -283,16 +282,14 @@ class Connections extends TerrainComponent<Props>
       addingConnection: false,
     });
 
-    Ajax.createDb(name, address, type, () =>
+    Ajax.createDb(name, address, type, this.fetchConnections, (error) =>
     {
-      this.fetchConnections(this.props);
-    }, (error) =>
-      {
-        this.setState({
-          errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
-        });
-        this.toggleErrorModal();
+      this.setState({
+        errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
+        errorModalOpen: true,
       });
+    },
+    );
   }
 
   public handleTypeChange(index: number)
@@ -333,20 +330,26 @@ class Connections extends TerrainComponent<Props>
               <div className='flex-grow'>
                 <b>Connection Name</b>
                 <div>
-                  <input ref='name' placeholder='Name' />
+                  <input
+                    ref='name'
+                    placeholder='Connection Name'
+                  />
                 </div>
               </div>
               <div className='flex-grow'>
                 <b>Server Address</b>
                 <div>
-                  <input ref='address' placeholder='Address' />
+                  <input
+                    ref='address'
+                    placeholder='Connection Address (DSN)'
+                  />
                 </div>
               </div>
             </div>
             <div className='button' onClick={this.createConnection}>
               Create
             </div>
-            <div className='button' onClick={this.toggleAddingConnection}>
+            <div className='button' onClick={this._toggle('addingConnection')}>
               Cancel
             </div>
           </div>
@@ -356,7 +359,7 @@ class Connections extends TerrainComponent<Props>
       return (
         <CreateItem
           name='New Connection'
-          onCreate={this.toggleAddingConnection}
+          onCreate={this._toggle('addingConnection')}
         />
       );
     }
