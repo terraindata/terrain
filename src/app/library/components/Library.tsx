@@ -142,13 +142,11 @@ class Library extends TerrainComponent<any>
     let algorithmsOrder: List<ID>;
     let variantsOrder: List<ID>;
 
-    group = groups.get(groupId);
-
     if (groupId !== null)
     {
       group = groups.get(groupId);
 
-      if (group !== null)
+      if (group !== undefined)
       {
         algorithmsOrder = group.algorithmsOrder;
 
@@ -156,7 +154,7 @@ class Library extends TerrainComponent<any>
         {
           algorithm = algorithms.get(algorithmId);
 
-          if (algorithm !== null)
+          if (algorithm !== undefined)
           {
             variantsOrder = algorithm.variantsOrder;
 
@@ -164,7 +162,7 @@ class Library extends TerrainComponent<any>
             {
               variant = variants.get(variantId);
 
-              if (variant === null)
+              if (variant === undefined)
               {
                 browserHistory.replace(`/library/${groupId}/${algorithmId}`);
               }
