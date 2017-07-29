@@ -106,6 +106,7 @@ export interface Card extends IRecord<Card>
 
     // TODO bring back manualEntry
     // manualEntry: IManualEntry;
+    description?: string;
 
     // a list of which fields on this card are just metadata, e.g. 'closed'
     metaFields: string[];
@@ -134,6 +135,8 @@ export interface CardConfig
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
     getParentTerms?: (card: Card, schemaState) => List<string>;
+
+    description?: string;
 
     metaFields?: string[];
 
