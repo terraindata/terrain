@@ -50,15 +50,16 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { Card } from '../../../../blocks/types/Card';
+import { Card, CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import FadeInOut from '../../../common/components/FadeInOut';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
+import CreateCardOption from './CreateCardOption';
 import './CreateCardTool.less';
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -99,10 +100,8 @@ class CreateCardTool extends TerrainComponent<Props>
     focusedIndex: -1,
   };
 
-  handleCardClick(event)
+  public handleCardClick(block, index)
   {
-    const index = +Util.rel(event.target);
-
     if (this.props.overrideClick)
     {
       this.props.overrideClick(index);
@@ -144,41 +143,27 @@ class CreateCardTool extends TerrainComponent<Props>
     }
   }
 
-  private renderCardOption(type: string, index: number)
+  public renderCardOption(type: string, index: number)
   {
-    const block = AllBackendsMap[this.props.language].blocks[type];
-    if (!block)
-    {
-      console.log('Missing block type: ', block);
-      // TODO throw error instead
-      return null;
-    }
-    const text = this.props.overrideText ? this.props.overrideText.get(index).text : block.static.title;
-    // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
+    const { overrideText } = this.props;
+    console.log(type, index, AllBackendsMap[this.props.language].blocks[type]);
     return (
-      <a
-        className={classNames({
-          'create-card-button': true,
-          'create-card-button-focused': this.state.focusedIndex === index,
-        })}
-        key={'' + index}
-        rel={'' + index}
+      <CreateCardOption
+        card={AllBackendsMap[this.props.language].blocks[type] as CardConfig}
+        index={index}
         onClick={this.handleCardClick}
-        style={{
-          backgroundColor: block.static.colors[0],
-        }}
-        data-tip={'test'}
-      >
-        <div className='create-card-button-inner' data-rel={'' + index}>
-          {
-            text
-          }
-        </div>
-      </a>
+        overrideTitle={
+          overrideText &&
+          overrideText.get(index) &&
+          overrideText.get(index).text
+        }
+        isFocused={this.state.focusedIndex === index}
+        key={'' + index}
+      />
     );
   }
 
-  getCardTypeList(): List<string>
+  public getCardTypeList(): List<string>
   {
     if (this.props.overrideText)
     {
@@ -203,6 +188,9 @@ class CreateCardTool extends TerrainComponent<Props>
             'create-card-selector-focused': this.state.focusedIndex !== -1,
           })}
           ref='selector'
+          style={
+            backgroundColor(Colors().bg2)
+          }
         >
           <div className='create-card-selector-inner'>
             {
