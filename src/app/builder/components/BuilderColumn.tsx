@@ -320,11 +320,11 @@ const BuilderColumn = createReactClass<any, any>(
       return this.renderPanel((
         <div
           className={'builder-column builder-column-' + this.props.index}
-          style={backgroundColor(Colors().builder.builderColumn.background)}
+          style={backgroundColor(Colors().bg1)}
         >
           <div
             className='builder-title-bar'
-            style={backgroundColor(Colors().builder.titleBar.base)}
+            style={backgroundColor(Colors().bg2)}
           >
             {
               this.props.index === 0 ? null : (

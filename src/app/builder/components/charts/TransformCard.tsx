@@ -425,7 +425,7 @@ class TransformCard extends TerrainComponent<Props>
   {
     const spotlights = this.state.spotlights;
     const { data } = this.props;
-    const width = this.props.containerWidth ? this.props.containerWidth + 110 : 300;
+    const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
 
     return (
       <div

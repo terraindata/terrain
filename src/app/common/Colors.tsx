@@ -52,8 +52,16 @@ const Color = require('color');
 interface Theme
 {
 
-  // main background color
-  base: string;
+  // main background colors
+  bg1: string; // most contrast
+  bg2: string;
+  bg3: string; // least contrast
+
+  emptyBg: string; // special BG to denote "empty nothingness"
+
+  text1: string; // most contrast
+  text2: string;
+  text3: string; // least contrast
 
   altColor1: string;
   altColor2: string;
@@ -61,7 +69,11 @@ interface Theme
   altBg1: string;
   altBg2: string;
 
-  fadedOutBg: string;
+  active: string; // active color
+  inactiveHover: string; // when something isn't active but could be
+  activeHover: string; // when an active thing is hovered
+
+  fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   // text
   text: {
@@ -81,39 +93,15 @@ interface Theme
     backgroundHover: string,
   };
 
-  // main title bar
-  titleBar:
-  {
-    base: string,
-  };
-  // side bar
-  sideBar:
-  {
-    base: string,
-    selectedSquare: string,
-    arrowBg: string,
-  };
-
   // Library ------
 
   library:
   {
-    // title bar
-    titleBar: {
-      base: string,
-    },
-
     // item
     item: {
       title: string,
       body: string,
       activeBody: string,
-    },
-
-    // info panel
-    infoColumn: {
-      baseUpper: string,
-      baseLower: string,
     },
 
     // info graph selection btn
@@ -142,11 +130,6 @@ interface Theme
       tabInactive: string,
       tabTopRibbonInactive: string,
     },
-
-    // title bar
-    titleBar: {
-      base: string,
-    }
 
     // deck
     deck: {
@@ -250,12 +233,23 @@ interface Theme
   };
 }
 
+const darkActive = '#00aee3';
+
 const DARK: Theme =
   {
     // Universal Elements------------------------------
 
     // main background color
-    base: '#2F2F2F',
+
+    bg1: 'rgb(39, 39, 39)',
+    bg2: 'rgb(47, 47, 47)',
+    bg3: 'rgb(62, 60, 60)',
+
+    emptyBg: 'rgb(21, 21, 21)',
+
+    text1: '#fff',
+    text2: 'rgba(255,255,255,0.7)',
+    text3: 'rgba(255,255,255,0.3)',
 
     altColor1: '#242424',
     altColor2: '#424242',
@@ -264,6 +258,10 @@ const DARK: Theme =
     altBg2: '#EDEFF3',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+    active: darkActive,
+    inactiveHover: Color(darkActive).fade(0.25).string(),
+    activeHover: Color(darkActive).fade(0.75).string(),
 
     // text
     text:
@@ -285,39 +283,15 @@ const DARK: Theme =
       backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
     },
 
-    // main title bar
-    titleBar:
-    {
-      base: '#3E3C3C',
-    },
-    // side bar
-    sideBar:
-    {
-      base: '#646464',
-      selectedSquare: '#CAD847',
-      arrowBg: '#474747',
-    },
-
     // Library ------
 
     library:
     {
-      // title bar
-      titleBar: {
-        base: '#272727',
-      },
-
       // item
       item: {
         title: '#424242',
         body: '#4B4B4B',
         activeBody: '#4C7C9C',
-      },
-
-      // info panel
-      infoColumn: {
-        baseUpper: '#656363',
-        baseLower: '#545252',
       },
 
       // info graph selection btn
@@ -345,11 +319,6 @@ const DARK: Theme =
         tabTopRibbon: '#4C7C9C',
         tabInactive: 'rgba(39,39,39,50)',
         tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
-      },
-
-      // title bar
-      titleBar: {
-        base: '#272727',
       },
 
       // deck

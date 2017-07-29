@@ -381,7 +381,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // var card = cards.get(0);
     const color = card.static.colors[0] as string;
     const title: string = card.closed ? card.static.title : '';
-    const preview = BlockUtils.getPreview(card);
+    const preview = card.closed ? null : BlockUtils.getPreview(card);
     // }
     // else
     // {
@@ -403,14 +403,20 @@ class BuilderTextbox extends TerrainComponent<Props>
       };
 
     return (
-      <div className={classNames({
-        'builder-tb': true,
-        'builder-tb-cards': true,
-        'builder-tb-cards-top': this.props.top,
-        'builder-tb-cards-closed': card.closed,
-      })} ref='cards'>
+      <div
+        className={classNames({
+          'builder-tb': true,
+          'builder-tb-cards': true,
+          'builder-tb-cards-top': this.props.top,
+          'builder-tb-cards-closed': card.closed,
+        })}
+        ref='cards'
+      >
         <div className='builder-tb-cards-input'>
-          <div className='builder-tb-cards-input-value' style={chipStyle}>
+          <div
+            className='builder-tb-cards-input-value'
+            style={chipStyle}
+          >
             <div
               className='builder-tb-cards-toggle'
               onClick={this.toggleClosed}
@@ -418,14 +424,21 @@ class BuilderTextbox extends TerrainComponent<Props>
               <ArrowIcon />
             </div>
             <div className='builder-tb-cards-input-value-text'>
-              {title}
+              {
+                title
+              }
             </div>
-            {!preview ? null :
+            {
+              preview &&
               <div className='card-preview'>
-                {preview}
+                {
+                  preview
+                }
               </div>
             }
-            {this.renderSwitch()}
+            {
+              this.renderSwitch()
+            }
           </div>
           <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
             <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />

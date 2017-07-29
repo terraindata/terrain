@@ -44,54 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions
-
-import './LibraryColumn.less';
-
-import * as classNames from 'classnames';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
+import * as _ from 'underscore';
+import TerrainComponent from '../../common/components/TerrainComponent';
 
 export interface Props
 {
-  index: number;
-  title: string;
+  style: {
+    [selector: string]: React.CSSProperties,
+  };
 }
 
-class LibraryColumn extends TerrainComponent<Props>
+export class StyleTag extends TerrainComponent<Props>
 {
   public render()
   {
+    let str = '';
+
+    _.mapObject(this.props.style, (styles: object, selector: string) =>
+    {
+      let innerStr = '';
+      _.mapObject(styles, (value: string, styleName: string) =>
+      {
+        innerStr += styleName + ':' + value + '; ';
+      });
+
+      str += selector + ' { ' + innerStr + ' } ';
+    });
+
     return (
-      <div
-        className={'library-column library-column-' + this.props.index}
-      >
-        {
-          this.props.title &&
-          <div
-            className='library-column-title'
-            style={backgroundColor(Colors().bg3)}
-          >
-            {
-              this.props.title
-            }
-          </div>
-        }
-        <div
-          className={classNames({
-            'library-column-content': true,
-            'library-column-content-no-title': !this.props.title,
-          })}
-          style={backgroundColor(Colors().bg1)}
-        >
-          {
-            this.props['children']
-          }
-        </div>
-      </div>
+      <style
+        dangerouslySetInnerHTML={{ __html: str }}
+      />
     );
   }
 }
-
-export default LibraryColumn;
+export default StyleTag;

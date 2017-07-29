@@ -362,14 +362,14 @@ class App extends TerrainComponent<Props>
         key='app'
         style={[
           fontColor(Colors().text.baseLight),
-          backgroundColor(Colors().base),
+          backgroundColor(Colors().bg2),
         ]}
       >
         {
           this.state.loggedInAndLoaded &&
           <div
             className='app-top-bar'
-            style={backgroundColor(Colors().titleBar.base)}
+            style={backgroundColor(Colors().bg2)}
           >
             <TerrainIcon
               className='app-top-bar-icon'

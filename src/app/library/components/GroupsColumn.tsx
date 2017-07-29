@@ -56,7 +56,6 @@ import * as UserTypes from '../../users/UserTypes';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
@@ -167,7 +166,6 @@ class GroupsColumn extends TerrainComponent<Props>
         id={id}
         icon={<GroupIcon />}
         onArchive={this.handleArchive}
-        color={ColorManager.colorForKey(group.id)}
         key={group.id}
         to={'/library/' + group.id}
         onNameChange={this.handleNameChange}

@@ -60,7 +60,6 @@ import InfoArea from './../../common/components/InfoArea';
 import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
@@ -324,7 +323,6 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         icon={<AlgorithmIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
-        color={ColorManager.colorForKey(this.props.groupId)}
         key={algorithm.id}
         to={`/library/${this.props.groupId}/${algorithm.id}`}
         className='library-item-lighter'
