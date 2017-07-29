@@ -363,6 +363,7 @@ class VariantsColumn extends TerrainComponent<Props>
         isStarred={variant.status === 'DEFAULT'}
         onSelect={this.handleItemSelect}
         isSelected={isSelected}
+        isFocused={true}
       >
         <div className='flex-container'>
           <UserThumbnail
