@@ -47,14 +47,14 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands interface-name
 
 import * as classNames from 'classnames';
-import * as React from 'react';
 import * as Radium from 'radium';
+import * as React from 'react';
 import { Link } from 'react-router';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
-import StyleTag from './StyleTag';
 import './Sidebar.less';
+import StyleTag from './StyleTag';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -86,7 +86,7 @@ export class Sidebar extends TerrainComponent<Props>
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
-        style={backgroundColor(Colors().bg3)}
+        style={backgroundColor(Colors().bg2)}
       >
         <div
           className='sidebar-selected-square'
@@ -110,7 +110,7 @@ export class Sidebar extends TerrainComponent<Props>
                 style={{
                   ':hover': {
                     background: Colors().inactiveHover,
-                  }
+                  },
                 }}
               >
                 <div
@@ -136,16 +136,16 @@ export class Sidebar extends TerrainComponent<Props>
             (
               <div
                 className='sidebar-expand' onClick={this.props.onExpand}
-                style={backgroundColor(Colors().bg2, Colors().bg1)}
+                style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
               >
                 <div className='dead-center'>
                   <ExpandIcon
                     className='sidebar-expand-icon'
                     style={{
-                      fill: Colors().text2,
+                      'fill': Colors().text2,
                       ':active': {
                         fill: Colors().text1,
-                      }
+                      },
                     }}
                   />
                   <StyleTag

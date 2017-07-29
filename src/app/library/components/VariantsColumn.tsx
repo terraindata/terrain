@@ -63,7 +63,6 @@ import { notificationManager } from './../../common/components/InAppNotification
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
@@ -347,7 +346,6 @@ class VariantsColumn extends TerrainComponent<Props>
         onArchive={this.handleArchive}
         canArchive={canDrag}
         canDuplicate={canEdit}
-        color={ColorManager.colorForKey(this.props.groupId)}
         key={variant.id}
         to={`/library/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'

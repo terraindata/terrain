@@ -54,6 +54,7 @@ const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -69,7 +70,6 @@ export interface Props
   canArchive: boolean;
   canDuplicate: boolean;
   icon: any;
-  color: string;
   to?: string;
   type: string;
   onNameChange: (id: ID, name: string) => void;
@@ -321,14 +321,14 @@ class LibraryItem extends TerrainComponent<Props>
               'library-item-wrapper-dragging': draggingItemId === this.props.id,
               'library-item-wrapper-drag-over': draggingOver,
             })}
-            style={{
-              borderColor: isSelected ? this.props.color : '',
-            }}
           >
             {connectDragSource(
               <div
                 className={'library-item ' + this.props.className}
-                style={{ background: this.props.color }}
+                style={
+                  isSelected ? backgroundColor(Colors().active) :
+                    backgroundColor(Colors().bg3, Colors().inactiveHover)
+                }
               >
                 <div
                   className={classNames({

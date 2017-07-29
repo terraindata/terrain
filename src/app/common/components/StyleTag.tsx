@@ -48,12 +48,11 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import TerrainComponent from '../../common/components/TerrainComponent';
 
-
 export interface Props
 {
   style: {
-    [selector: string]: React.CSSProperties
-  }
+    [selector: string]: React.CSSProperties,
+  };
 }
 
 export class StyleTag extends TerrainComponent<Props>
@@ -61,23 +60,21 @@ export class StyleTag extends TerrainComponent<Props>
   public render()
   {
     let str = '';
-    
-    _.mapObject(this.props.style, (styles, selector) =>
+
+    _.mapObject(this.props.style, (styles: object, selector: string) =>
     {
       let innerStr = '';
-      _.mapObject(styles, (value, styleName) =>
+      _.mapObject(styles, (value: string, styleName: string) =>
       {
         innerStr += styleName + ':' + value + '; ';
       });
-      
+
       str += selector + ' { ' + innerStr + ' } ';
     });
-    
-    console.log(str);
-    
+
     return (
       <style
-        dangerouslySetInnerHTML={{__html: str}}
+        dangerouslySetInnerHTML={{ __html: str }}
       />
     );
   }
