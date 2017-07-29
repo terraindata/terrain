@@ -62,7 +62,7 @@ class FileImportStateC extends BaseClass
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
 
-  public hasCsvHeader: boolean = true;
+  public hasCsvHeader: boolean = true;   // TODO: change to csvHeaderMissing to be consistent with backend
   public primaryKey: number = -1;
 
   public originalNames: List<string> = List([]);
@@ -74,6 +74,9 @@ class FileImportStateC extends BaseClass
   public templates: List<Template> = List([]);
   public blob: File = null;
   public streaming: boolean = true;
+
+  public chunkQueue: List<string> = List([]);
+  public nextChunk: string = '';
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -117,6 +120,8 @@ export interface ColumnTypesTree
 export const NUMBER_PREVIEW_ROWS = 5;
 
 export const SLICE_SIZE = 1000;
+
+export const CHUNK_SIZE = 10000000;    // assume this chunk size contains number of preview rows
 
 export const FILE_TYPES =
   [

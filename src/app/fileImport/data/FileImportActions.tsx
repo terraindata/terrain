@@ -119,6 +119,14 @@ const FileImportActions =
     setFile:
     (file: File) =>
       $(ActionTypes.setFile, { file }),
+
+    updateQueue:
+    (chunk: string, lastNewLine: number) =>
+      $(ActionTypes.updateQueue, { chunk, lastNewLine }),
+
+    shiftQueue:
+    () =>
+      $(ActionTypes.shiftQueue, {}),
   };
 
 export default FileImportActions;

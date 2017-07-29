@@ -149,7 +149,7 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
-        this.parseAndChooseFile(this.state.file, this.state.filetype);
+        // this.parseAndChooseFile(this.state.file, this.state.filetype);
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -328,7 +328,7 @@ class FileImport extends TerrainComponent<any>
       });
     }
 
-    items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
+    // items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
         typeof value === 'string' ? value : JSON.stringify(value),
@@ -361,30 +361,81 @@ class FileImport extends TerrainComponent<any>
       alert('Invalid filetype: ' + String(filetype));
       return;
     }
+    // TODO: import as normal if below some file size threshold
+    /*
+     const fr = new FileReader();
+     fr.readAsText(file.target.files[0]);
+
+     fr.onloadend = () =>
+     {
+     console.log('finished reading: ', fr.result);
+     this.setState({
+     file: fr.result,
+     filetype,
+     });
+     this.refs['file']['value'] = null;                 // prevent file-caching
+     };*/
+
     Actions.setFile(file.target.files[0]);
 
-    /*
-    const chunk = file.target.files[0].slice(0, 1000);
-
+    // first chunk to extract preview rows
+    const chunk = file.target.files[0].slice(0, FileImportTypes.CHUNK_SIZE);
     const fr = new FileReader();
     fr.readAsText(chunk);
-
     fr.onloadend = () =>
     {
-      console.log('finished reading: ', fr.result);
-      this.setState({
-        file: fr.result,
-        filetype,
-      });
-      this.refs['file']['value'] = null;                 // prevent file-caching
-    };*/
+      let index = 0;
+      let end = 0;
+      while (index < fr.result.length)
+      {
+        if (fr.result.charAt(index) === '\n')
+        {
+          end = index;
+        }
+        index++;
+      }
+      // console.log('chunk size: ', chunk.length);
+      // console.log('chunk: ', chunk);
+      // console.log('parsed chunk: ', this.state.nextChunk + chunk.substring(0, end));
+      // console.log('nextChunk: ', chunk.substring(end, chunk.length));
+      Actions.updateQueue(fr.result, end);
+
+      // set preview
+      const config = {
+        quoteChar: '\'',
+        header: this.state.fileImportState.hasCsvHeader,
+        preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
+        error: (err) =>
+        {
+          alert('CSV format incorrect: ' + String(err));
+          return;
+        },
+        skipEmptyLines: true,
+      };
+      const items = Papa.parse(fr.result, config).data;
+      // console.log(items);
+
+      const previewRows = items.map((item, i) =>
+        _.map(item, (value, key) =>
+          typeof value === 'string' ? value : JSON.stringify(value),
+        ),
+      );
+      // console.log(previewRows);
+
+      const columnNames = _.map(items[0], (value, i) =>
+        filetype === 'csv' && !this.state.fileImportState.hasCsvHeader ? 'column' + String(i) : i,
+      );
+      // console.log(columnNames);
+
+      Actions.chooseFile(null, filetype, List<List<string>>(previewRows), List<string>(columnNames));
+    };
   }
 
   public render()
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      hasCsvHeader, primaryKey, templates, transforms, blob } = fileImportState;
+      hasCsvHeader, primaryKey, templates, transforms, blob, chunkQueue, nextChunk } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -444,6 +495,8 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
+            chunkQueue={chunkQueue}
+            nextChunk={nextChunk}
             blob={blob}
           />;
         break;

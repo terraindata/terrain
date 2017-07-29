@@ -78,6 +78,8 @@ export interface Props
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
   blob: File;
+  chunkQueue: List<string>;
+  nextChunk: string;
 }
 
 @Radium
@@ -89,8 +91,8 @@ class FileImportPreview extends TerrainComponent<Props>
     editColumnId: number,
     resetLocalColumnNames: boolean,
     blobCount: number,
-    chunkQueue: List<string>,
-    nextChunk: string,
+    // chunkQueue: List<string>,
+    // nextChunk: string,
     streamed: boolean,
   } = {
     templateId: -1,
@@ -98,8 +100,8 @@ class FileImportPreview extends TerrainComponent<Props>
     editColumnId: -1,
     resetLocalColumnNames: false,
     blobCount: 0,
-    chunkQueue: List([]),
-    nextChunk: '',
+    // chunkQueue: List([]),
+    // nextChunk: '',
     streamed: false,
   };
 
@@ -172,10 +174,11 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('final chunk: ', chunk);
       this.setState({
-        chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk),
-        nextChunk: '',
+        // chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk),
+        // nextChunk: '',
         streamed: true,
       });
+      Actions.updateQueue(chunk, chunk.length);
       // this.stream();
     }
     else
@@ -192,13 +195,14 @@ class FileImportPreview extends TerrainComponent<Props>
       }
       // console.log('chunk size: ', chunk.length);
       // console.log('chunk: ', chunk);
-      // console.log('parsed chunk: ', this.state.nextChunk + chunk.substring(0, end));
-      // console.log('nextChunk: ', chunk.substring(end, chunk.length));
+      console.log('parsed chunk: ', chunk.substring(0, end));
+      console.log('nextChunk: ', chunk.substring(end, chunk.length));
 
-      this.setState({
-        chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk.substring(0, end)),
-        nextChunk: chunk.substring(end, chunk.length),
-      });
+      Actions.updateQueue(chunk, end);
+      // this.setState({
+      //   chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk.substring(0, end)),
+      //   nextChunk: chunk.substring(end, chunk.length),
+      // });
     }
   }
 
@@ -223,24 +227,22 @@ class FileImportPreview extends TerrainComponent<Props>
     socket.on('ready', () =>
     {
       console.log('ready');
-      console.log('queue isEmpty: ', this.state.chunkQueue.isEmpty());
-      if (!this.state.chunkQueue.isEmpty() && !this.state.streamed)
+      console.log('queue isEmpty: ', this.props.chunkQueue.isEmpty());
+      if (!this.props.chunkQueue.isEmpty() && !this.state.streamed)
       {
-        console.log('queue to be streamed: ', this.state.chunkQueue);
-        socket.send(this.state.chunkQueue.first());
-        this.setState({
-          chunkQueue: this.state.chunkQueue.shift(),
-        });
+        console.log('queue to be streamed: ', this.props.chunkQueue);
+        socket.send(this.props.chunkQueue.first());
+
+        Actions.shiftQueue();
+        // this.setState({
+        //   chunkQueue: this.props.chunkQueue.shift(),
+        // });
       }
-      if (this.state.streamed)
+      else
       {
         console.log('finished');
         socket.emit('finished');
         socket.close();
-      }
-      else
-      {
-        socket.emit('sent');
       }
     });
   }
@@ -250,14 +252,15 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.uploadFile();
 
     console.log('filesize: ', this.props.blob.size);
+    const test = 50000000;
 
-    let blobStart = 0;
-    while (blobStart < 10000)
+    let blobStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
+    while (blobStart < test)
     {
       console.log('blobStart: ', blobStart);
-      const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.SLICE_SIZE);
-      this.readFile(chunk, blobStart + FileImportTypes.SLICE_SIZE >= 10000);
-      blobStart += FileImportTypes.SLICE_SIZE;
+      const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.CHUNK_SIZE);
+      this.readFile(chunk, blobStart + FileImportTypes.CHUNK_SIZE >= test);
+      blobStart += FileImportTypes.CHUNK_SIZE;
     }
 
     this.stream();
@@ -265,7 +268,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    // console.log(this.state.chunkQueue);
+    console.log('done streaming: ', this.state.streamed);
     return (
       <div
         className='fi-preview'

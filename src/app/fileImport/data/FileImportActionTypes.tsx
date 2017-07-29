@@ -66,6 +66,8 @@ const FileImportActionTypes =
     setTemplates: '',
     loadTemplate: '',
     setFile: '',
+    updateQueue: '',
+    shiftQueue: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

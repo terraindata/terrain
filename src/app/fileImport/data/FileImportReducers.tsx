@@ -459,4 +459,18 @@ FileImportReducers[ActionTypes.setFile] =
   }
   ;
 
+FileImportReducers[ActionTypes.updateQueue] =
+  (state, action) =>
+  {
+    return state.set('chunkQueue', state.chunkQueue.push(action.payload.chunk.substring(0, action.payload.cutoff)))
+      .set('nextChunk', action.payload.chunk.substring(action.payload.cutoff, action.payload.chunk.length));
+  }
+  ;
+FileImportReducers[ActionTypes.shiftQueue] =
+  (state, action) =>
+  {
+    return state.set('chunkQueue', state.chunkQueue.shift());
+  }
+  ;
+
 export default FileImportReducers;
