@@ -71,6 +71,7 @@ export interface Props
   groups: Immutable.Map<ID, Group>;
   groupsOrder: Immutable.List<ID>;
   params: any;
+  isFocused: boolean; // is this the last thing focused / selected?
 }
 
 class GroupsColumn extends TerrainComponent<Props>
@@ -180,6 +181,7 @@ class GroupsColumn extends TerrainComponent<Props>
         canDuplicate={false}
         canCreate={canCreate}
         isSelected={+group.id === +params.groupId}
+        isFocused={this.props.isFocused}
       >
         <div className='group-library-info-wrapper'>
           {
@@ -232,7 +234,7 @@ class GroupsColumn extends TerrainComponent<Props>
 
     return (
       <LibraryItemCategory
-        status={ItemStatus[status]}
+        status={status}
         key={status}
         onHover={this.handleCategoryHover}
         type='group'

@@ -194,6 +194,7 @@ class Library extends TerrainComponent<any>
             groupsOrder,
             params,
           }}
+          isFocused={algorithm === undefined}
         />
         <AlgorithmsColumn
           {...{
@@ -203,6 +204,7 @@ class Library extends TerrainComponent<any>
             groupId,
             params,
           }}
+          isFocused={variant === undefined}
         />
         <VariantsColumn
           {...{

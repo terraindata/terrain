@@ -233,7 +233,7 @@ interface Theme
   };
 }
 
-const darkActive = '#00aee3';
+const darkActive = '#1eb4fa';
 
 const DARK: Theme =
   {

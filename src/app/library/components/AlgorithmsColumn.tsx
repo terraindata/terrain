@@ -78,6 +78,7 @@ export interface Props
   algorithmsOrder: Immutable.List<ID>;
   groupId: ID;
   params: any;
+  isFocused: boolean; // is this the last thing focused / selected?
 }
 
 class AlgorithmsColumn extends TerrainComponent<Props>
@@ -339,6 +340,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         canArchive={canArchive}
         canDuplicate={canDuplicate}
         isSelected={+algorithm.id === +params.algorithmId}
+        isFocused={this.props.isFocused}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />

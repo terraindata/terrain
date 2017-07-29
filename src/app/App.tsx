@@ -115,7 +115,7 @@ import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
 
 // Icons
-const TerrainIcon = require('./../images/icon_terrain_108x17.svg?name=TerrainIcon');
+const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
@@ -362,7 +362,7 @@ class App extends TerrainComponent<Props>
         key='app'
         style={[
           fontColor(Colors().text.baseLight),
-          backgroundColor(Colors().bg2),
+          backgroundColor(Colors().bg1),
         ]}
       >
         {
@@ -371,7 +371,8 @@ class App extends TerrainComponent<Props>
             className='app-top-bar'
             style={backgroundColor(Colors().bg2)}
           >
-            <TerrainIcon
+            <img
+              src={TerrainIcon}
               className='app-top-bar-icon'
             />
             <AccountDropdown />

@@ -106,6 +106,7 @@ export interface Props
   dragItemType?: string;
   isDragging?: boolean;
   isSelected: boolean;
+  isFocused: boolean; // is this the last thing focused / selected?
 }
 
 class LibraryItem extends TerrainComponent<Props>
@@ -321,6 +322,13 @@ class LibraryItem extends TerrainComponent<Props>
               'library-item-wrapper-dragging': draggingItemId === this.props.id,
               'library-item-wrapper-drag-over': draggingOver,
             })}
+            style={
+              isSelected && this.props.isFocused ?
+                {
+                  borderColor: Colors().active,
+                }
+                : {}
+            }
           >
             {connectDragSource(
               <div
