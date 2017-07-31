@@ -65,7 +65,7 @@ const FileImportActionTypes =
     getTemplates: '',
     setTemplates: '',
     loadTemplate: '',
-    setFile: '',
+    saveFile: '',
     updateQueue: '',
     shiftQueue: '',
     toggleUpdate: '',

@@ -78,10 +78,11 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
-  blob: File;
+  file: File;
   chunkQueue: List<string>;
   nextChunk: string;
   update: boolean;
+  streaming: boolean;
 }
 
 @Radium
@@ -237,19 +238,21 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     Actions.uploadFile();
 
-    console.log('filesize: ', this.props.blob.size);
-    const test = 50000000;
-
-    let blobStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
-    while (blobStart < test)
+    if (this.props.streaming)
     {
-      console.log('blobStart: ', blobStart);
-      const chunk = this.props.blob.slice(blobStart, blobStart + FileImportTypes.CHUNK_SIZE);
-      this.readFile(chunk, blobStart + FileImportTypes.CHUNK_SIZE >= test);
-      blobStart += FileImportTypes.CHUNK_SIZE;
-    }
+      console.log('filesize: ', this.props.file.size);
+      const test = 50000000;
 
-    this.stream();
+      let blobStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
+      while (blobStart < test)
+      {
+        console.log('blobStart: ', blobStart);
+        const chunk = this.props.file.slice(blobStart, blobStart + FileImportTypes.CHUNK_SIZE);
+        this.readFile(chunk, blobStart + FileImportTypes.CHUNK_SIZE >= test);
+        blobStart += FileImportTypes.CHUNK_SIZE;
+      }
+      this.stream();
+    }
   }
 
   public handleUpdateChange()

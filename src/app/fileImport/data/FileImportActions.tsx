@@ -73,8 +73,8 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
+    (fileContents: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { fileContents, filetype, preview, originalNames }),
 
     uploadFile:
     () =>
@@ -116,9 +116,9 @@ const FileImportActions =
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
 
-    setFile:
+    saveFile:
     (file: File) =>
-      $(ActionTypes.setFile, { file }),
+      $(ActionTypes.saveFile, { file }),
 
     updateQueue:
     (chunk: string, lastNewLine: number) =>

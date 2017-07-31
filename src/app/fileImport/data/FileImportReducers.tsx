@@ -321,7 +321,7 @@ FileImportReducers[ActionTypes.chooseFile] =
     });
 
     return state
-      .set('file', action.payload.file)
+      .set('fileContents', action.payload.fileContents)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
@@ -337,7 +337,7 @@ FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
     Ajax.importFile(
-      state.file,
+      state.fileContents,
       state.filetype,
       state.dbText,
       state.tableText,
@@ -450,12 +450,10 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('previewRows', previewRows);
   };
 
-FileImportReducers[ActionTypes.setFile] =
+FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
-  {
-    console.log(action.payload.file);
-    return state.set('blob', action.payload.file);
-  }
+    state.set('file', action.payload.file)
+      .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD)
   ;
 
 FileImportReducers[ActionTypes.updateQueue] =

@@ -686,7 +686,7 @@ export const Ajax =
       );
     },
 
-    importFile(file: string,
+    importFile(fileContents: string,
       filetype: string,
       dbname: string,
       tablename: string,
@@ -706,7 +706,7 @@ export const Ajax =
         dbid: connectionId,
         dbname,
         tablename,
-        contents: file,
+        contents: fileContents,
         filetype,
         originalNames,
         columnTypes,

@@ -100,9 +100,8 @@ class FileImport extends TerrainComponent<any>
     tableSelected: boolean;
 
     fileSelected: boolean;
-    file: string;
-    filetype: string;
-    filename: string;
+    filetype: string,
+    filename: string,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
@@ -119,7 +118,6 @@ class FileImport extends TerrainComponent<any>
     tableSelected: false,
 
     fileSelected: false,
-    file: '',
     filetype: '',
     filename: '',
   };
@@ -155,7 +153,7 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
-        // this.parseAndChooseFile(this.state.file, this.state.filetype);
+        this.parseAndChooseFile();
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -295,36 +293,61 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseAndChooseFile(file: string, filetype: string)
+  public parseAndChooseFile()
   {
-    let items = [];
-    switch (filetype)
+    const { file, streaming, hasCsvHeader } = this.state.fileImportState;
+    const fileToRead = streaming ? file.slice(0, FileImportTypes.CHUNK_SIZE) : file;
+    const fr = new FileReader();
+    fr.readAsText(fileToRead);
+    fr.onloadend = () =>
     {
-      case 'json':
-        items = this.parseJson(file);
-        break;
-      case 'csv':
-        items = this.parseCsv(file);
-        break;
-      default:
-    }
-    if (!items)
-    {
-      return;
-    }
+      let parsedFile;
+      if (streaming)
+      {
+        let index = 0;
+        let end = 0;
+        while (index < fr.result.length)
+        {
+          if (fr.result.charAt(index) === '\n')
+          {
+            end = index;
+          }
+          index++;
+        }
+        Actions.updateQueue(fr.result, end);
+        parsedFile = fr.result.substring(0, end);
+      }
+      else
+      {
+        parsedFile = fr.result;
+      }
 
-    // items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
-    const previewRows = items.map((item, i) =>
-      _.map(item, (value, key) =>
-        typeof value === 'string' ? value : JSON.stringify(value),
-      ),
-    );
+      let items = [];
+      switch (this.state.filetype)
+      {
+        case 'json':
+          items = this.parseJson(parsedFile);
+          break;
+        case 'csv':
+          items = this.parseCsv(parsedFile);
+          break;
+        default:
+      }
+      if (!items)
+      {
+        return;
+      }
+      const previewRows = items.map((item, i) =>
+        _.map(item, (value, key) =>
+          typeof value === 'string' ? value : JSON.stringify(value),
+        ),
+      );
+      const columnNames = _.map(items[0], (value, i) =>
+        this.state.filetype === 'csv' && !hasCsvHeader ? 'column' + String(i) : i,
+      );
 
-    const columnNames = _.map(items[0], (value, index) =>
-      filetype === 'csv' && !this.state.fileImportState.hasCsvHeader ? 'column' + String(index) : index,
-    );
-
-    Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      Actions.chooseFile(streaming ? parsedFile : '', this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
+    };
   }
 
   public handleSelectFile(file)
@@ -334,10 +357,6 @@ class FileImport extends TerrainComponent<any>
     {
       return;
     }
-    this.setState({
-      fileSelected,
-      filename: file.target.files[0].name,
-    });
 
     const filetype = file.target.files[0].name.split('.').pop();
     if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)
@@ -345,67 +364,13 @@ class FileImport extends TerrainComponent<any>
       alert('Invalid filetype: ' + String(filetype));
       return;
     }
-    // TODO: import as normal if below some file size threshold
-    /*
-     const fr = new FileReader();
-     fr.readAsText(file.target.files[0]);
-
-     fr.onloadend = () =>
-     {
-     console.log('finished reading: ', fr.result);
-     this.setState({
-     file: fr.result,
-     filetype,
-     });
-     this.refs['file']['value'] = null;                 // prevent file-caching
-     };*/
-
-    Actions.setFile(file.target.files[0]);
-
-    // first chunk to extract preview rows
-    const chunk = file.target.files[0].slice(0, FileImportTypes.CHUNK_SIZE);
-    const fr = new FileReader();
-    fr.readAsText(chunk);
-    fr.onloadend = () =>
-    {
-      let index = 0;
-      let end = 0;
-      while (index < fr.result.length)
-      {
-        if (fr.result.charAt(index) === '\n')
-        {
-          end = index;
-        }
-        index++;
-      }
-      Actions.updateQueue(fr.result, end);
-
-      // set preview
-      const config = {
-        quoteChar: '\'',
-        header: this.state.fileImportState.hasCsvHeader,
-        preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
-        error: (err) =>
-        {
-          alert('CSV format incorrect: ' + String(err));
-          return;
-        },
-        skipEmptyLines: true,
-      };
-      const items = Papa.parse(fr.result, config).data;
-
-      const previewRows = items.map((item, i) =>
-        _.map(item, (value, key) =>
-          typeof value === 'string' ? value : JSON.stringify(value),
-        ),
-      );
-
-      const columnNames = _.map(items[0], (value, i) =>
-        filetype === 'csv' && !this.state.fileImportState.hasCsvHeader ? 'column' + String(i) : i,
-      );
-
-      Actions.chooseFile(null, filetype, List<List<string>>(previewRows), List<string>(columnNames));
-    };
+    this.setState({
+      fileSelected,
+      filetype,
+      filename: file.target.files[0].name,
+    });
+    Actions.saveFile(file.target.files[0]);
+    // this.refs['file']['value'] = null;                 // prevent file-caching
   }
 
   public renderSteps()
@@ -430,7 +395,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      hasCsvHeader, primaryKey, templates, transforms, blob, chunkQueue, nextChunk, update } = fileImportState;
+      hasCsvHeader, primaryKey, templates, transforms, file, chunkQueue, nextChunk, update, streaming } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -492,8 +457,9 @@ class FileImport extends TerrainComponent<any>
             columnOptions={this.state.columnOptionNames}
             chunkQueue={chunkQueue}
             nextChunk={nextChunk}
-            blob={blob}
+            file={file}
             update={update}
+            streaming={streaming}
           />;
         break;
       default:
