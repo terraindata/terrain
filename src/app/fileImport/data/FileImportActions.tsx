@@ -119,6 +119,10 @@ const FileImportActions =
     toggleLoading:
     () =>
       $(ActionTypes.toggleLoading, {}),
+
+    toggleUpdate:
+    () =>
+      $(ActionTypes.toggleUpdate, {}),
   };
 
 export default FileImportActions;

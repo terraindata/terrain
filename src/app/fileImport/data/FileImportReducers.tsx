@@ -252,7 +252,12 @@ FileImportReducers[ActionTypes.toggleLoading] =
     console.log(!state.loading);
     return state
       .set('loading', !state.loading);
-  }
+  };
+
+FileImportReducers[ActionTypes.toggleUpdate] =
+  (state, action) =>
+    state
+      .set('update', !state.update)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -352,6 +357,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
+      state.update,
       () =>
       {
         alert('success');

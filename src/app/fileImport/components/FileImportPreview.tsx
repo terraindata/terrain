@@ -55,6 +55,7 @@ import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -78,6 +79,7 @@ export interface Props
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
   loading: boolean;
+  update: boolean;
 }
 
 @Radium
@@ -157,6 +159,11 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.getTemplates();
   }
 
+  public handleUpdateChange()
+  {
+    Actions.toggleUpdate();
+  }
+
   public handleUploadFile()
   {
     Actions.uploadFile();
@@ -181,7 +188,7 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
           <Dropdown
             selectedIndex={this.state.templateId}
-            options={List<string>(this.props.templates.map((template, i) => template.name))}
+            options={List<string>(this.props.templates.map((template, i) => String(template.id) + ': ' + template.name))}
             onChange={this.handleTemplateChange}
             className={'fi-load-dropdown'}
             canEdit={true}
@@ -263,6 +270,15 @@ class FileImportPreview extends TerrainComponent<Props>
       >
         {this.renderTemplate()}
         {this.renderTable()}
+        <div
+          className='fi-preview-update'
+        >
+          update
+          <CheckBox
+            checked={this.props.update}
+            onChange={this.handleUpdateChange}
+          />
+        </div>
         <div
           className='fi-preview-import-button'
           onClick={this.handleUploadFile}

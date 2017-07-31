@@ -176,6 +176,24 @@ export class Tasty
   }
 
   /**
+   * Update an object or a list of objects.
+   * @param {TastyTable} table The table to update the objects in.
+   * @param {object | object[]} objs An object or an array of objects to update.
+   */
+  public async update(table: TastyTable, objs: object | object[]): Promise<object | object[]>
+  {
+    if (objs instanceof Array)
+    {
+      return this.db.update(table, objs);
+    }
+    else if (typeof objs === 'object')
+    {
+      return this.db.update(table, [objs]);
+    }
+    throw new Error('Invalid object type');
+  }
+
+  /**
    * Delete an object or a list of objects based on their primary keys.
    *
    * To delete all of the rows in a table, use '*'.
