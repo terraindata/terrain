@@ -107,34 +107,35 @@ export class Import
         // console.log('got data!!!');
         const num: number = count;
         count++;
-        fs.open('test/testout' + String(num) + '.txt', 'wx', (err, fd) =>
-        {
-          // console.log('opened file.');
-          if (err !== undefined && err !== null)
-          {
-            if (err.code === 'EEXIST')
-            {
-              // TODO: try writing to a different file
-            }
-            throw err;
-          }
-          fs.write(fd, JSON.stringify(items), (writeErr) =>
-          {
-            throw writeErr;
-          });
-          // console.log('wrote to file.');
-        });
+        // fs.open('test/testout' + String(num) + '.txt', 'wx', (err, fd) =>
+        // {
+        //   // console.log('opened file.');
+        //   if (err !== undefined && err !== null)
+        //   {
+        //     if (err.code === 'EEXIST')
+        //     {
+        //       // TODO: try writing to a different file
+        //     }
+        //     throw err;
+        //   }
+        //   fs.write(fd, JSON.stringify(items), (writeErr) =>
+        //   {
+        //     throw writeErr;
+        //   });
+        //   // console.log('wrote to file.');
+        // });
         // fs.unlink('test/testout.txt', (err) => {
         //     if (err)
         //     {
         //         throw err;
         //     }
         // });
-      });
-      socket.on('done', () =>
-      {
         socket.emit('ready');
       });
+      // socket.on('done', () =>
+      // {
+      //   socket.emit('ready');
+      // });
       socket.on('finished', () =>
       {
         // console.log('client finished!');
@@ -146,6 +147,7 @@ export class Import
 
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
+    this.imprt = imprt;
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
       const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
@@ -160,18 +162,18 @@ export class Import
 
       let time: number = Date.now();
       winston.info('checking config and schema...');
-      // const configError: string = this._verifyConfig(imprt);
-      // if (configError !== '')
-      // {
-      //   return reject(configError);
-      // }
-      // const expectedMapping: object = this._getMappingForSchema(imprt);
-      // const mappingForSchema: object | string =
-      //   this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
-      // if (typeof mappingForSchema === 'string')
-      // {
-      //   return reject(mappingForSchema);
-      // }
+      const configError: string = this._verifyConfig(imprt);
+      if (configError !== '')
+      {
+        return reject(configError);
+      }
+      const expectedMapping: object = this._getMappingForSchema(imprt);
+      const mappingForSchema: object | string =
+        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
+      if (typeof mappingForSchema === 'string')
+      {
+        return reject(mappingForSchema);
+      }
       winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
 
       const items: object[] = [];
@@ -201,16 +203,16 @@ export class Import
         [imprt.primaryKey],
         columns,
         imprt.dbname,
-        // mappingForSchema,
+        mappingForSchema,
       );
-      // await database.getTasty().getDB().putMapping(insertTable);
+      await database.getTasty().getDB().putMapping(insertTable);
       winston.info('created tasty table and put mapping (s): ' + String((Date.now() - time) / 1000));
 
       time = Date.now();
       winston.info('about to upsert via tasty...');
-      // const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
       winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
-      // resolve(res);
+      resolve(res);
     });
   }
   private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
@@ -222,7 +224,7 @@ export class Import
       let items: object[];
       try
       {
-        items = await this._parseData(imprt, imprt.contents);
+        items = await this._parseData(imprt, contents);
       } catch (e)
       {
         return reject('Error parsing data: ' + String(e));
