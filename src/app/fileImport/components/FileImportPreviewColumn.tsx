@@ -61,7 +61,6 @@ import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import shallowCompare = require('react-addons-shallow-compare');
 import './FileImportPreviewColumn.less';
-const { Map } = Immutable;
 
 export interface Props
 {
@@ -109,6 +108,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public handleBlur()
   {
+    // If column name entered already exists when autocomplete box goes out of focus, throw an error and roll back change
+    // otherwise, if the name has actually changed - set the new name and add the rename transform
     if (this.props.columnNames.delete(this.props.columnId).contains(this.state.localColumnName))
     {
       alert('column name: ' + this.state.localColumnName + ' already exists, duplicate column names are not allowed');
@@ -149,14 +150,15 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     }
   }
 
-  public render()
+  public renderColumn()
   {
-    if (this.props.editing)
-    {
-      return (
+    return (
+      <div
+        className='fi-preview-column'
+        style={backgroundColor(Colors().fileimport.preview.column.base)}
+      >
         <div
-          className='fi-preview-column'
-          style={backgroundColor(Colors().fileimport.preview.column.base)}
+          className='fi-preview-misc'
         >
           include
           <CheckBox
@@ -168,38 +170,41 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             checked={this.props.isPrimaryKey}
             onChange={this.handlePrimaryKeyChange}
           />
-          <div
-            className='fi-preview-column-name'
-          >
-            <Autocomplete
-              value={this.state.localColumnName}
-              options={this.props.columnOptions}
-              onChange={this.handleLocalColumnNameChange}
-              placeholder={''}
-              disabled={false}
-              onBlur={this.handleBlur}
-            />
-          </div>
-          <div
-            className='fi-preview-type-dropdown-container'
-          >
-            <TypeDropdown
-              columnId={this.props.columnId}
-              recursionDepth={0}
-              columnType={this.props.columnType}
-              editing={this.props.editing}
-            />
-          </div>
-          <TransformBox
-            datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
-            colName={this.props.columnNames.get(this.props.columnId)}
-            columnNames={this.props.columnNames}
-            setLocalColumnName={this.handleLocalColumnNameChange}
+        </div>
+        <div
+          className='fi-preview-column-name'
+        >
+          <Autocomplete
+            value={this.state.localColumnName}
+            options={this.props.columnOptions}
+            onChange={this.handleLocalColumnNameChange}
+            placeholder={''}
+            disabled={false}
+            onBlur={this.handleBlur}
           />
         </div>
-      );
-    }
+        <div
+          className='fi-preview-type-dropdown-container'
+        >
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionDepth={0}
+            columnType={this.props.columnType}
+            editing={this.props.editing}
+          />
+        </div>
+        <TransformBox
+          datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+          colName={this.props.columnNames.get(this.props.columnId)}
+          columnNames={this.props.columnNames}
+          setLocalColumnName={this.handleLocalColumnNameChange}
+        />
+      </div>
+    );
+  }
 
+  public renderColumnTitle()
+  {
     return (
       <div
         className='fi-preview-column-title'
@@ -219,6 +224,11 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  public render()
+  {
+    return this.props.editing ? this.renderColumn() : this.renderColumnTitle();
   }
 }
 

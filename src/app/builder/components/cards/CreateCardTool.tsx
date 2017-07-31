@@ -52,6 +52,8 @@ import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { Card } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
+import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import FadeInOut from '../../../common/components/FadeInOut';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
@@ -90,11 +92,9 @@ export interface Props
 class CreateCardTool extends TerrainComponent<Props>
 {
   public state: {
-    closed: boolean;
     opening: boolean;
     focusedIndex: number;
   } = {
-    closed: !this.props.open,
     opening: false,
     focusedIndex: -1,
   };
@@ -136,34 +136,6 @@ class CreateCardTool extends TerrainComponent<Props>
     this.props.onToggle && this.props.onToggle();
   }
 
-  public componentWillReceiveProps(newProps)
-  {
-    if (newProps.open !== this.props.open)
-    {
-      if (newProps.open)
-      {
-        // first set state as not closed, so that the element renders
-        // after render, animate element
-        this.setState({
-          closed: false,
-        });
-      }
-      else
-      {
-        this.setState({
-          opening: true,
-        });
-        // first animate closed, then set state closed so it doesn't render
-        Util.animateToHeight(this.refs['selector'], 0, () =>
-          this.setState({
-            closed: true,
-            opening: false,
-          }),
-        );
-      }
-    }
-  }
-
   public componentDidUpdate(prevProps, prevState)
   {
     if (!prevState.opening && this.state.opening)
@@ -195,6 +167,7 @@ class CreateCardTool extends TerrainComponent<Props>
         style={{
           backgroundColor: block.static.colors[0],
         }}
+        data-tip={'test'}
       >
         <div className='create-card-button-inner' data-rel={'' + index}>
           {
@@ -217,58 +190,46 @@ class CreateCardTool extends TerrainComponent<Props>
 
   public renderCardSelector()
   {
-    if (this.state.closed)
-    {
-      return null;
-    }
-
-    // This used to use the following code. Keeping around in case I realize the need for it
-    //     let curIndex = -1; // tracks the index of the cards we are actually showing
-    // AllBackendsMap[this.props.language].cardsList.map((type: string, index: number) =>
-    //             {
-    //               if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
-    //               {
-    //                 return null;
-    //               }
-
-    //               curIndex++;
-
     const cardTypeList = this.getCardTypeList();
     const isEmpty = cardTypeList.size === 0;
 
     return (
-      <div
-        className={classNames({
-          'create-card-selector': true,
-          'create-card-selector-focused': this.state.focusedIndex !== -1,
-        })}
-        ref='selector'
+      <FadeInOut
+        open={this.props.open}
       >
-        <div className='create-card-selector-inner'>
-          {
-            isEmpty &&
-            <div className='create-card-empty'>
-              There are no remaining cards that can be created here.
-              </div>
-          }
-          {
-            cardTypeList.map(this.renderCardOption)
-          }
-          {
-            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
-          }
-        </div>
-        {
-          !this.props.cannotClose &&
-          <div
-            className='close create-card-close'
-            onClick={this.handleCloseClick}
-          >
-            <CloseIcon />
+        <div
+          className={classNames({
+            'create-card-selector': true,
+            'create-card-selector-focused': this.state.focusedIndex !== -1,
+          })}
+          ref='selector'
+        >
+          <div className='create-card-selector-inner'>
+            {
+              isEmpty &&
+              <div className='create-card-empty'>
+                There are no remaining cards that can be created here.
+                </div>
+            }
+            {
+              cardTypeList.map(this.renderCardOption)
+            }
+            {
+              _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
+            }
           </div>
-        }
-      </div>
+        </div>
+      </FadeInOut>
     );
+    // {
+    //   !this.props.cannotClose &&
+    //   <div
+    //     className='close create-card-close'
+    //     onClick={this.handleCloseClick}
+    //   >
+    //     <CloseIcon />
+    //   </div>
+    // }
   }
 
   public handleCloseClick()
@@ -285,7 +246,7 @@ class CreateCardTool extends TerrainComponent<Props>
 
   public renderPlaceholder()
   {
-    if (this.props.hidePlaceholder || this.props.open)
+    if (this.props.hidePlaceholder || this.props.cannotClose) // || this.props.open)
     {
       return null;
     }
@@ -295,7 +256,9 @@ class CreateCardTool extends TerrainComponent<Props>
         onClick={this.props.onToggle}
         className='create-card-placeholder'
       >
-        <AddIcon />
+        {
+          this.props.open ? <CloseIcon /> : <AddIcon />
+        }
       </div>
     );
   }
@@ -342,7 +305,7 @@ class CreateCardTool extends TerrainComponent<Props>
     });
     classes += ' ' + this.props.className;
 
-    let style: React.CSSProperties;
+    let style: React.CSSProperties = {};
 
     if (this.props.dy)
     {
@@ -358,7 +321,10 @@ class CreateCardTool extends TerrainComponent<Props>
     return (
       <div
         className={classes}
-        style={style}
+        style={_.extend(
+          style,
+          backgroundColor(Colors().builder.builderColumn.background),
+        )}
       >
         {
           this.renderPlaceholder()

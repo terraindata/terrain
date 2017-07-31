@@ -13,6 +13,7 @@
   position: relative;
   border-radius: @card-border-radius;
   padding: 6px;
+  box-sizing: border-box;
   padding-right: 0px;
   padding-top: 0px;
   
@@ -24,6 +25,10 @@
     box-sizing: border-box;
     
     min-height: 35px;
+    
+    padding: 3px;
+    padding-right: 0px;
+    transition: all 0.25s;
   }
   
   .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
@@ -39,6 +44,19 @@
       .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
         opacity: 0;
       }
+    }
+    
+    .card-inner {
+      border-width: 3px;
+      border-right-width: 1px;
+      padding: 1px;
+      padding-right: 0px;
+    }
+    
+    .card .card-inner {
+      border-width: 1px;
+      padding: 3px;
+      padding-right: 0px;
     }
   }
   
@@ -223,6 +241,9 @@
     .card {
       margin-right: 0px;
     }
+    
+    // add margin so that textboxes don't edge up on cards area
+    margin-top: 6px; 
   } 
   
   .card .card {
@@ -389,8 +410,11 @@
 }
 
 .card-no-title {
-  .cards-area, .builder-tb-cards-area {
+  .cards-area,
+  .builder-tb-cards-area,
+  .transform-card-inner {
     margin-left: -55px;
+    // width: calc(~"100% + 110px");
   }
 }
 
@@ -478,20 +502,20 @@
 }
 
 .card-muted-input input {
-  background: rgba(255,255,255,0);
+  background: rgba(255,255,255,0) !important;
   color: #fff;
   .transition;
   
   &:hover, &[value=""] {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.25) !important;
   }
   
   &:focus {
-    background: #fff;
+    background: #fff !important;
     color: #242424;
   }
   
   &::placeholder {
-    color: rgba(255,255,255,0.75);
+    color: rgba(255,255,255,0.75) !important;
   }
 }

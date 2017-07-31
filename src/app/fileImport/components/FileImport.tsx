@@ -54,7 +54,7 @@ import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import { isValidIndexName, isValidTypeName } from './../../../../shared/fileImport/Util';
+import { isValidIndexName, isValidTypeName, parseJsonByLine } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -83,39 +83,45 @@ class FileImport extends TerrainComponent<any>
 {
   public state: {
     fileImportState: FileImportTypes.FileImportState;
-    servers?: SchemaTypes.ServerMap;
-    dbs?: SchemaTypes.DatabaseMap;
-    tables?: SchemaTypes.TableMap;
-    serverNames: List<string>;
-    dbNames: List<string>;
-    tableNames: List<string>;
     columnOptionNames: List<string>;
     stepId: number;
+
+    servers?: SchemaTypes.ServerMap;
+    serverNames: List<string>;
     serverIndex: number;
     serverSelected: boolean;
+
+    dbs?: SchemaTypes.DatabaseMap;
+    dbNames: List<string>;
     dbSelected: boolean;
+
+    tables?: SchemaTypes.TableMap;
+    tableNames: List<string>;
     tableSelected: boolean;
+
     fileSelected: boolean;
     file: string;
     filetype: string;
     filename: string;
-    filesize: number;
   } = {
     fileImportState: FileImportStore.getState(),
-    serverNames: List([]),
-    dbNames: List([]),
-    tableNames: List([]),
     columnOptionNames: List([]),
     stepId: 0,
+
     serverIndex: -1,
+    serverNames: List([]),
     serverSelected: false,
+
+    dbNames: List([]),
     dbSelected: false,
+
+    tableNames: List([]),
     tableSelected: false,
+
     fileSelected: false,
     file: '',
     filetype: '',
     filename: '',
-    filesize: 0,
   };
 
   constructor(props)
@@ -149,7 +155,7 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
-        this.parseAndChooseFile(this.state.file, this.state.filetype);
+        // this.parseAndChooseFile(this.state.file, this.state.filetype);
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -252,83 +258,62 @@ class FileImport extends TerrainComponent<any>
     Actions.changeTableText(tableText);
   }
 
-  public parseJsonByLine(file: string, numLines: number): object[]
+  public parseJson(file: string)
   {
-    let lineCount = 0;
-    let openBracketCount = 0;
-    let closeBracketCount = 0;
-    let charIndex = 0;
-
-    while (lineCount < numLines)
+    const items = parseJsonByLine(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+    if (!Array.isArray(items))
     {
-      if (charIndex >= file.length - 1)
-      {
-        if (file.charAt(charIndex) === '\n')
-        {
-          charIndex--;
-        }
-        break;
-      }
+      alert('Input JSON file must parse to an array of objects.');
+      return [];
+    }
+    return items;
+  }
 
-      if (file.charAt(charIndex) === '{')
+  public parseCsv(file: string)
+  {
+    const config = {
+      quoteChar: '\'',
+      header: this.state.fileImportState.hasCsvHeader,
+      preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
+      error: (err) =>
       {
-        openBracketCount++;
-      }
-      else if (file.charAt(charIndex) === '}')
-      {
-        closeBracketCount++;
-      }
-      charIndex++;
+        alert('CSV format incorrect: ' + String(err));
+        return;
+      },
+      skipEmptyLines: true,
+    };
 
-      if (openBracketCount === closeBracketCount && openBracketCount !== 0)
+    const items = Papa.parse(file, config).data;
+    for (let i = 1; i < items.length; i++)
+    {
+      if (items[i].length !== items[0].length)
       {
-        lineCount++;
-        openBracketCount = 0;
-        closeBracketCount = 0;
+        alert('CSV format incorrect: each row must have same number of fields');
+        return [];
       }
     }
-    return JSON.parse(file.substring(0, charIndex) + ']');
+    return items;
   }
 
   public parseAndChooseFile(file: string, filetype: string)
   {
     let items = [];
-
-    if (filetype === 'json')
+    switch (filetype)
     {
-      items = this.parseJsonByLine(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
-      if (!Array.isArray(items))
-      {
-        alert('Input JSON file must parse to an array of objects.');
-        return;
-      }
+      case 'json':
+        items = this.parseJson(file);
+        break;
+      case 'csv':
+        items = this.parseCsv(file);
+        break;
+      default:
     }
-    else if (filetype === 'csv')
+    if (!items)
     {
-      const config = {
-        quoteChar: '\'',
-        header: this.state.fileImportState.hasCsvHeader,
-        preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
-        error: (err) =>
-        {
-          alert('CSV format incorrect: ' + String(err));
-          return;
-        },
-        skipEmptyLines: true,
-      };
-      items = Papa.parse(file, config).data;
-
-      items.map((item) =>
-      {
-        if (item.length !== items[0].length)
-        {
-          alert('CSV format incorrect: each row must have same number of fields');
-          return;
-        }
-      });
+      return;
     }
 
-    items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
+    // items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
         typeof value === 'string' ? value : JSON.stringify(value),
@@ -352,7 +337,6 @@ class FileImport extends TerrainComponent<any>
     this.setState({
       fileSelected,
       filename: file.target.files[0].name,
-      filesize: file.target.files[0].size,
     });
 
     const filetype = file.target.files[0].name.split('.').pop();
@@ -361,30 +345,92 @@ class FileImport extends TerrainComponent<any>
       alert('Invalid filetype: ' + String(filetype));
       return;
     }
+    // TODO: import as normal if below some file size threshold
+    /*
+     const fr = new FileReader();
+     fr.readAsText(file.target.files[0]);
+
+     fr.onloadend = () =>
+     {
+     console.log('finished reading: ', fr.result);
+     this.setState({
+     file: fr.result,
+     filetype,
+     });
+     this.refs['file']['value'] = null;                 // prevent file-caching
+     };*/
+
     Actions.setFile(file.target.files[0]);
 
-    /*
-    const chunk = file.target.files[0].slice(0, 1000);
-
+    // first chunk to extract preview rows
+    const chunk = file.target.files[0].slice(0, FileImportTypes.CHUNK_SIZE);
     const fr = new FileReader();
     fr.readAsText(chunk);
-
     fr.onloadend = () =>
     {
-      console.log('finished reading: ', fr.result);
-      this.setState({
-        file: fr.result,
-        filetype,
-      });
-      this.refs['file']['value'] = null;                 // prevent file-caching
-    };*/
+      let index = 0;
+      let end = 0;
+      while (index < fr.result.length)
+      {
+        if (fr.result.charAt(index) === '\n')
+        {
+          end = index;
+        }
+        index++;
+      }
+      Actions.updateQueue(fr.result, end);
+
+      // set preview
+      const config = {
+        quoteChar: '\'',
+        header: this.state.fileImportState.hasCsvHeader,
+        preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
+        error: (err) =>
+        {
+          alert('CSV format incorrect: ' + String(err));
+          return;
+        },
+        skipEmptyLines: true,
+      };
+      const items = Papa.parse(fr.result, config).data;
+
+      const previewRows = items.map((item, i) =>
+        _.map(item, (value, key) =>
+          typeof value === 'string' ? value : JSON.stringify(value),
+        ),
+      );
+
+      const columnNames = _.map(items[0], (value, i) =>
+        filetype === 'csv' && !this.state.fileImportState.hasCsvHeader ? 'column' + String(i) : i,
+      );
+
+      Actions.chooseFile(null, filetype, List<List<string>>(previewRows), List<string>(columnNames));
+    };
   }
 
-  public render()
+  public renderSteps()
+  {
+    return (
+      <div className='fi-step'>
+        <div className='fi-step-name'>
+          {
+            FileImportTypes.STEP_NAMES[this.state.stepId]
+          }
+        </div>
+        <div className='fi-step-title'>
+          {
+            FileImportTypes.STEP_TITLES[this.state.stepId]
+          }
+        </div>
+      </div>
+    );
+  }
+
+  public renderContent()
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      hasCsvHeader, primaryKey, templates, transforms, blob } = fileImportState;
+      hasCsvHeader, primaryKey, templates, transforms, blob, chunkQueue, nextChunk, update } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -444,7 +490,10 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
+            chunkQueue={chunkQueue}
+            nextChunk={nextChunk}
             blob={blob}
+            update={update}
           />;
         break;
       default:
@@ -452,56 +501,59 @@ class FileImport extends TerrainComponent<any>
 
     return (
       <div
+        className='fi-content'
+      >
+        {
+          content
+        }
+      </div>
+    );
+  }
+
+  public renderNav()
+  {
+    return (
+      <div
+        className='fi-nav'
+      >
+        {
+          this.state.stepId > 0 &&
+          <div
+            className='fi-back-button'
+            onClick={this.handlePrevStepChange}
+            style={buttonColors()}
+            ref='fi-back-button'
+          >
+            &lt; back
+          </div>
+        }
+        {
+          this.state.stepId < 4 &&
+          <div
+            className='fi-next-button'
+            onClick={this.handleNextStepChange}
+            style={buttonColors()}
+            ref='fi-next-button'
+          >
+            next &gt;
+          </div>
+        }
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div
         className='file-import'
       >
         <div
           className='file-import-inner'
         >
-          <div className='fi-step-name'>
-            {
-              FileImportTypes.STEP_NAMES[this.state.stepId]
-            }
-          </div>
-
-          <div className='fi-step-title'>
-            {
-              FileImportTypes.STEP_TITLES[this.state.stepId]
-            }
-          </div>
-
-          <div
-            className='fi-content'
-          >
-            {
-              content
-            }
-          </div>
-          <div
-            className='fi-nav-button'
-          >
-            {
-              this.state.stepId > 0 &&
-              <div
-                className='fi-back-button'
-                onClick={this.handlePrevStepChange}
-                style={buttonColors()}
-                ref='fi-back-button'
-              >
-                &lt; back
-              </div>
-            }
-            {
-              this.state.stepId < 4 &&
-              <div
-                className='fi-next-button'
-                onClick={this.handleNextStepChange}
-                style={buttonColors()}
-                ref='fi-next-button'
-              >
-                next &gt;
-              </div>
-            }
-          </div>
+          {this.renderSteps()}
+          {this.renderContent()}
+          {this.renderNav()}
         </div>
       </div>
     );

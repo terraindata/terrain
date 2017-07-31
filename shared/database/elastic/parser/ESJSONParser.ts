@@ -206,10 +206,9 @@ export default class ESJSONParser
 
   private readValue(): ESValueInfo | null
   {
+    const nextChar: string = this.peek();
     const valueInfo: ESValueInfo = this.beginValueInfo();
     const token: ESParserToken = this.accumulateToken();
-
-    const nextChar: string = this.peek();
 
     let jsonType: ESJSONType = ESJSONType.invalid;
 

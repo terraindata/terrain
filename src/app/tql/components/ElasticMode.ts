@@ -46,61 +46,50 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as CodeMirror from 'codemirror';
 
-import * as BlockUtils from '../../../blocks/BlockUtils';
-import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
-import { Card } from '../../../blocks/types/Card';
-import Query from '../../../items/types/Query';
-import Options from '../../types/CardsToCodeOptions';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+import { toInputMap } from '../../../blocks/types/Input';
+import { BuilderState, BuilderStore } from '../../builder/data/BuilderStore';
 
-import { InputPrefix } from '../../../blocks/types/Input';
-import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
-
-class CardsToElastic
+CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {
-  public static toElastic(query: Query, options: Options = {}): string
-  {
-    const elasticObj: ESQueryObject = {};
-    query.cards.map(
-      (card: Card) =>
-      {
-        const val = CardsToElastic.blockToElastic(card, options);
-        const key = card['key'];
-
-        if (key)
-        {
-          elasticObj[key] = val;
-        }
-        else if (typeof val === 'object' && !Array.isArray(val))
-        {
-          _.extend(elasticObj, val);
-        }
-      },
-    );
-
-    return ESQueryToCode(elasticObj, options, query.inputs);
-  }
-
-  public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
-  {
-    if (typeof block !== 'object')
+  return {
+    startState: () =>
     {
-      return block;
-    }
-
-    if (block && block.static.tql)
+      return {};
+    },
+    token: (stream, state) =>
     {
-      if (typeof block['value'] === 'string' && block['value'].charAt(0) === InputPrefix)
-      {
-        return block['value'];
-      }
-      const tql = block.static.tql as TQLRecursiveObjectFn;
-      return tql(block, CardsToElastic.blockToElastic, options);
-    }
-    return { notYet: 'not yet done' };
-  }
-}
+      stream.skipToEnd();
+      return null;
+    },
+    helperType: 'elastic',
+  };
+});
 
-export default CardsToElastic;
+CodeMirror.registerHelper('lint', 'elastic', (text) =>
+{
+  const found = [];
+  try
+  {
+    const state = BuilderStore.getState();
+    const inputs = state.query && state.query.inputs;
+    const params: { [name: string]: any; } = toInputMap(inputs);
+    const interpreter = new ESInterpreter(text, params);
+    for (const e of interpreter.parser.getErrors())
+    {
+      const token = e.token;
+      found.push({
+        from: CodeMirror.Pos(token.row, token.col),
+        to: CodeMirror.Pos(token.toRow, token.toCol),
+        message: e.message,
+      });
+    }
+  }
+  catch (e)
+  {
+    throw new Error('Exception when parsing ' + text + ' error: ' + e);
+  }
+  return found;
+});

@@ -78,7 +78,7 @@ class MySQLBackend implements Backend
 
   codeToQuery = SQLToCards;
 
-  parseQuery = (tql) => null;
+  parseQuery = (query) => null;
 
   parseTreeToQueryString = CardsToSQL.toSQL;
 

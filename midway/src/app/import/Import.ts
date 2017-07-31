@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import sha1 = require('sha1');
 
-import * as csv from 'csvtojson';
+import * as csvjson from 'csvjson';
 import * as fs from 'fs';
 import * as socketio from 'socket.io';
 import * as winston from 'winston';
@@ -61,8 +61,8 @@ export interface ImportConfig extends ImportTemplateBase
 {
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
-
   streaming: boolean;   // if true, contents is an address to read contents from (?)
+  update: boolean;    // false means replace (instead of update) ; default should be true
 }
 
 export class Import
@@ -84,53 +84,59 @@ export class Import
   };
   private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
   private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
+  private quoteChar: string = '\'';
+  private batchSize: number = 5000;
 
   private imprt;
   private buffer: string[];
 
   public setUpSocket(io: socketio.Server)
   {
-    console.log('set up server');
+    // console.log('set up server');
     io.on('connection', (socket) =>
     {
-      console.log('someone connected!!!');
+      // console.log('someone connected!!!');
       let count: number = 0;
       socket.emit('ready');
       socket.on('message', async (data) =>
       {
-        console.log('just got data!');
+        // console.log('just got data!');
         const items: object[] = await this._getItems(this.imprt, data);
-        console.log('got data!!!');
+        // console.log('got data!!!');
         const num: number = count;
         count++;
-        fs.open('test/testout' + String(num) + '.txt', 'wx', (err, fd) =>
-        {
-          console.log('opened file.');
-          if (err !== undefined && err !== null)
-          {
-            if (err.code === 'EEXIST')
-            {
-              // TODO: try writing to a different file
-            }
-            throw err;
-          }
-          fs.write(fd, JSON.stringify(items), (writeErr) =>
-          {
-            throw writeErr;
-          });
-          console.log('wrote to file.');
-        });
-        socket.emit('done');
+        // fs.open('test/testout' + String(num) + '.txt', 'wx', (err, fd) =>
+        // {
+        //   // console.log('opened file.');
+        //   if (err !== undefined && err !== null)
+        //   {
+        //     if (err.code === 'EEXIST')
+        //     {
+        //       // TODO: try writing to a different file
+        //     }
+        //     throw err;
+        //   }
+        //   fs.write(fd, JSON.stringify(items), (writeErr) =>
+        //   {
+        //     throw writeErr;
+        //   });
+        //   // console.log('wrote to file.');
+        // });
         // fs.unlink('test/testout.txt', (err) => {
         //     if (err)
         //     {
         //         throw err;
         //     }
         // });
+        socket.emit('ready');
       });
+      // socket.on('done', () =>
+      // {
+      //   socket.emit('ready');
+      // });
       socket.on('finished', () =>
       {
-        console.log('client finished!');
+        // console.log('client finished!');
         // this.server.close();   // TODO: fix
       });
     });
@@ -138,7 +144,7 @@ export class Import
 
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
-    this.imprt = imprt;   // TODO: fix?
+    this.imprt = imprt;
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
       const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
@@ -152,7 +158,7 @@ export class Import
       }
 
       let time: number = Date.now();
-      winston.info('checking config and schema...');
+      // winston.info('checking config and schema...');
       // const configError: string = this._verifyConfig(imprt);
       // if (configError !== '')
       // {
@@ -165,7 +171,7 @@ export class Import
       // {
       //   return reject(mappingForSchema);
       // }
-      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
+      // winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
 
       const items: object[] = [];
       try
@@ -201,7 +207,15 @@ export class Import
 
       time = Date.now();
       winston.info('about to upsert via tasty...');
-      // const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      // let res: ImportConfig;
+      // if (imprt.update)
+      // {
+      //   res = await database.getTasty().update(insertTable, items) as ImportConfig;
+      // }
+      // else
+      // {
+      //   res = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      // }
       winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
       // resolve(res);
     });
@@ -215,7 +229,7 @@ export class Import
       let items: object[];
       try
       {
-        items = await this._parseData(imprt, imprt.contents);
+        items = await this._parseData(imprt, contents);
       } catch (e)
       {
         return reject('Error parsing data: ' + String(e));
@@ -229,7 +243,7 @@ export class Import
       }
       try
       {
-        items = await this._transformAndCheck(items, imprt);
+        items = [].concat.apply([], await this._transformAndCheck(items, imprt));
       } catch (e)
       {
         return reject(e);
@@ -253,7 +267,7 @@ export class Import
       return typeError;
     }
 
-    if (imprt.csvHeaderMissing === undefined)
+    if (imprt.csvHeaderMissing === undefined || imprt.csvHeaderMissing === null)
     {
       imprt.csvHeaderMissing = false;
     }
@@ -401,21 +415,26 @@ export class Import
         }
       } else if (imprt.filetype === 'csv')
       {
-        csv({
-          flatKeys: true,
-          checkColumn: true,
-          noheader: imprt.csvHeaderMissing,
-          headers: imprt.originalNames,
-          quote: '\'',
-          // workerNum: 4,
-        }).fromString(contents).on('end_parsed', (jsonArrObj) =>
-        // }).fromFile(contents).on('end_parsed', (jsonArrObj) =>
+        try
         {
-          resolve(jsonArrObj);
-        }).on('error', (e) =>
+          const options: object = {
+            delimiter: ',',
+            quote: this.quoteChar,
+            // TODO: handle case where field name contains quoteChar
+            headers: imprt.originalNames.map((val) => this.quoteChar + val + this.quoteChar).join(','),
+          };
+          const items: object[] = csvjson.toObject(contents, options);
+          if (imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
+          {
+            items.shift();
+          }
+          resolve(items);
+        }
+        catch (e)
         {
+          // NOTE: csvjson parser will not throw errors for rows that contain the wrong number of entries
           return reject('CSV format incorrect: ' + String(e));
-        });
+        }
       } else
       {
         return reject('Invalid file-type provided.');
@@ -424,39 +443,48 @@ export class Import
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(items: object[], imprt: ImportConfig): Promise<object[]>
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig): Promise<object[][]>
   {
-    const promises: Array<Promise<object>> = [];
-    let ind: number = 0;
-    for (let item of items)
+    const promises: Array<Promise<object[]>> = [];
+    let baseInd: number = 0;
+    let items: object[];
+    while (allItems.length > 0)
     {
+      items = allItems.splice(0, this.batchSize);
       promises.push(
-        new Promise<object>(async (thisResolve, thisReject) =>
+        new Promise<object[]>(async (thisResolve, thisReject) =>
         {
-          try
+          const transformedItems: object[] = [];
+          let ind: number = 0;
+          for (let item of items)
           {
-            item = this._applyTransforms(item, imprt.transformations);
-          } catch (e)
-          {
-            return thisReject('Failed to apply transforms: ' + String(e));
-          }
-          // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
-          const trimmedItem: object = {};
-          for (const name in imprt.columnTypes)
-          {
-            if (imprt.columnTypes.hasOwnProperty(name))
+            try
             {
-              trimmedItem[name] = item[name];
+              item = this._applyTransforms(item, imprt.transformations);
+            } catch (e)
+            {
+              return thisReject('Failed to apply transforms: ' + String(e));
             }
+            // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
+            const trimmedItem: object = {};
+            for (const name in imprt.columnTypes)
+            {
+              if (imprt.columnTypes.hasOwnProperty(name))
+              {
+                trimmedItem[name] = item[name];
+              }
+            }
+            const typeError: string = this._checkTypes(trimmedItem, imprt, baseInd + ind);
+            if (typeError !== '')
+            {
+              return thisReject(typeError);
+            }
+            transformedItems.push(trimmedItem);
+            ind++;
           }
-          const typeError: string = this._checkTypes(trimmedItem, imprt, ind);
-          if (typeError !== '')
-          {
-            return thisReject(typeError);
-          }
-          thisResolve(trimmedItem);
+          thisResolve(transformedItems);
         }));
-      ind++;
+      baseInd++;
     }
     return Promise.all(promises);
   }

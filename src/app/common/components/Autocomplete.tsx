@@ -90,7 +90,8 @@ class Autocomplete extends TerrainComponent<Props>
     this.value = props.value;
     this.state =
       {
-        value: props.value,
+        value: props.value === null || props.value === undefined
+          ? '' : props.value,
         open: false,
         selectedIndex: -1,
       };
@@ -306,7 +307,7 @@ class Autocomplete extends TerrainComponent<Props>
               options.map(this.renderOption)
             }
             {
-              options.size ? null : null && <div className='ac-no-options'>No matches</div>
+              options.size ? null : <div className='ac-no-options'>No matches</div>
             }
           </div>
         }

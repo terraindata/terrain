@@ -65,24 +65,24 @@ interface TokenParts
 
 class ESFormatter
 {
-  public static tab = '  ';
+  public tab: string;
 
-  constructor()
+  constructor(indentSize: number = 2)
   {
-    // do nothing
+    this.tab = (' ').repeat(indentSize);
   }
 
   public formatQuery(parser: ESJSONParser): string
   {
     const tokens: FlaggedToken[] = ESParserTokenizer.getTokens(parser, true);
-    const accumulation: TokenParts = tokens.map(this.mapTokens).reduce(this.reduceParts);
+    const accumulation: TokenParts = tokens.map(this.mapTokens).reduce(this.reduceParts.bind(this));
     return accumulation.str;
   }
 
   protected reduceParts(a: TokenParts, b: TokenParts, i: number, arr: TokenParts[]): TokenParts
   {
     // const sewn = a.tail + b.head;
-    const indent: string = '\n' + ESFormatter.tab.repeat(b.depth);
+    const indent: string = '\n' + this.tab.repeat(b.depth);
     const sewn: string = (a.tail + b.head)
       .replace(/\n+/, '\n')
       .replace(new RegExp('\n', 'mg'), indent);

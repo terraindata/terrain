@@ -183,6 +183,7 @@ export const Ajax =
       }
 
       const xhr = new XMLHttpRequest();
+      xhr.timeout = 180000;
       xhr.onerror = (err: any) =>
       {
         const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
@@ -694,8 +695,8 @@ export const Ajax =
       columnTypes: Immutable.Map<string, object>,
       primaryKey: string,
       transformations: Immutable.List<object>,
+      update: boolean,
       onLoad: (resp: object[]) => void,
-      streaming: boolean,
       onError?: (ev: string) => void,
       hasCsvHeader?: boolean,
     )
@@ -711,7 +712,7 @@ export const Ajax =
         primaryKey,
         csvHeaderMissing: !hasCsvHeader,
         transformations,
-        streaming,
+        update,
       };
       console.log('import payload: ', payload);
       const onLoadHandler = (resp) =>
@@ -785,7 +786,7 @@ export const Ajax =
         dbname,
         tablename,
       };
-      console.log('getTemplates payload: ', payload);
+
       Ajax.req(
         'post',
         'templates/',

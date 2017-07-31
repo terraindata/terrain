@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
-import * as Immutable from 'immutable';
-const { Map, List } = Immutable;
 import { line } from 'd3-shape';
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -383,7 +383,9 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       const eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
-        {},
+        {
+          replaceInputs: true,
+        },
       );
 
       this.setState({
@@ -402,12 +404,16 @@ export class ResultsManager extends TerrainComponent<Props>
           },
         ),
       });
+
       let allFieldsQueryCode;
       try
       {
         allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
           query,
-          { allFields: true },
+          {
+            allFields: true,
+            replaceInputs: true,
+          },
         );
       }
       catch (err)
