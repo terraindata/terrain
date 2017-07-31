@@ -155,7 +155,11 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
-        this.parseAndChooseFile(this.state.file, this.state.filetype);
+        const isSuccess = this.parseAndChooseFile(this.state.file, this.state.filetype);
+        if (!isSuccess)
+        {
+          return;
+        }
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -167,7 +171,7 @@ class FileImport extends TerrainComponent<any>
       case 2:
         if (!this.state.dbSelected)
         {
-          alert('Please select a database');
+          alert('Please select or enter a database');
           return;
         }
         let msg = isValidIndexName(this.state.fileImportState.dbText);
@@ -180,7 +184,7 @@ class FileImport extends TerrainComponent<any>
       case 3:
         if (!this.state.tableSelected)
         {
-          alert('Please select a table');
+          alert('Please select or enter a table');
           return;
         }
         msg = isValidTypeName(this.state.fileImportState.tableText);
@@ -211,16 +215,14 @@ class FileImport extends TerrainComponent<any>
 
   public handleServerChange(serverIndex: number)
   {
-    const serverName = this.state.serverNames.get(serverIndex);
+    const { servers, serverNames } = this.state;
+    const serverName = serverNames.get(serverIndex);
     this.setState({
       serverIndex,
       serverSelected: true,
-      dbNames: this.state.servers && serverName && this.state.servers.get(serverName) ?
-        List(this.state.servers.get(serverName).databaseIds.map((db) =>
-          db.split('/').pop(),
-        ))
-        :
-        List([]),
+      dbNames: List(servers.get(serverName).databaseIds.map((db) =>
+        db.split('/').pop(),
+      )),
     });
 
     Actions.changeServer(this.state.servers.get(serverName).connectionId, serverName);
@@ -228,11 +230,12 @@ class FileImport extends TerrainComponent<any>
 
   public handleAutocompleteDbChange(dbText: string)
   {
+    const { dbs } = this.state;
     const { serverText } = this.state.fileImportState;
     this.setState({
       dbSelected: !!dbText,
-      tableNames: this.state.dbs && dbText && this.state.dbs.get(databaseId(serverText, dbText)) ?
-        List(this.state.dbs.get(databaseId(this.state.fileImportState.serverText, dbText)).tableIds.map((table) =>
+      tableNames: dbText && dbs.get(databaseId(serverText, dbText)) ?
+        List(dbs.get(databaseId(serverText, dbText)).tableIds.map((table) =>
           table.split('.').pop(),
         ))
         :
@@ -244,11 +247,12 @@ class FileImport extends TerrainComponent<any>
 
   public handleAutocompleteTableChange(tableText: string)
   {
+    const { tables } = this.state;
     const { serverText, dbText } = this.state.fileImportState;
     this.setState({
       tableSelected: !!tableText,
-      columnOptionNames: this.state.tables && tableText && this.state.tables.get(tableId(serverText, dbText, tableText)) ?
-        List(this.state.tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
+      columnOptionNames: tableText && tables.get(tableId(serverText, dbText, tableText)) ?
+        List(tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
           column.split('.').pop(),
         ))
         :
@@ -258,7 +262,7 @@ class FileImport extends TerrainComponent<any>
     Actions.changeTableText(tableText);
   }
 
-  public parseJson(file: string)
+  public parseJson(file: string): object[]
   {
     const items = parseJsonByLine(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
     if (!Array.isArray(items))
@@ -269,11 +273,12 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseCsv(file: string)
+  public parseCsv(file: string): object[]
   {
+    const { csvHeaderMissing } = this.state.fileImportState;
     const config = {
       quoteChar: '\'',
-      header: this.state.fileImportState.hasCsvHeader,
+      header: !csvHeaderMissing,
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       error: (err) =>
       {
@@ -295,8 +300,9 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseAndChooseFile(file: string, filetype: string)
+  public parseAndChooseFile(file: string, filetype: string): boolean
   {
+    const { csvHeaderMissing } = this.state.fileImportState;
     let items = [];
     switch (filetype)
     {
@@ -310,21 +316,21 @@ class FileImport extends TerrainComponent<any>
     }
     if (!items)
     {
-      return;
+      return false;
     }
 
-    items.splice(FileImportTypes.NUMBER_PREVIEW_ROWS, items.length - FileImportTypes.NUMBER_PREVIEW_ROWS);
+    // extract header names and rows
+    const columnNames = _.map(items[0], (value, index) =>
+      filetype === 'csv' && csvHeaderMissing ? 'column' + String(index) : index,
+    );
     const previewRows = items.map((item, i) =>
       _.map(item, (value, key) =>
         typeof value === 'string' ? value : JSON.stringify(value),
       ),
     );
 
-    const columnNames = _.map(items[0], (value, index) =>
-      filetype === 'csv' && !this.state.fileImportState.hasCsvHeader ? 'column' + String(index) : index,
-    );
-
     Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
+    return true;
   }
 
   public handleSelectFile(file)
@@ -380,7 +386,7 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, hasCsvHeader,
+    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, csvHeaderMissing,
       primaryKey, templates, transforms } = fileImportState;
 
     let content = {};
@@ -392,7 +398,7 @@ class FileImport extends TerrainComponent<any>
             <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
             has header row (csv only)
             <CheckBox
-              checked={hasCsvHeader}
+              checked={!csvHeaderMissing}
               onChange={this.handleCsvHeaderChange}
             />
             {

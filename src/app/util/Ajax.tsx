@@ -697,7 +697,7 @@ export const Ajax =
       transformations: Immutable.List<object>,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
+      csvHeaderMissing?: boolean,
     )
     {
       const payload: object = {
@@ -709,7 +709,7 @@ export const Ajax =
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
+        csvHeaderMissing,
         transformations,
       };
       console.log('import payload: ', payload);
@@ -740,7 +740,7 @@ export const Ajax =
       name: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
+      csvHeaderMissing?: boolean,
     )
     {
       const payload: object = {
@@ -750,7 +750,7 @@ export const Ajax =
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
+        csvHeaderMissing,
         transformations,
         name,
       };
