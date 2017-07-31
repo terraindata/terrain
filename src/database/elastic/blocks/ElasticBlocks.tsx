@@ -58,13 +58,13 @@ import { Input, InputType } from '../../../blocks/types/Input';
 import Util from '../../../app/util/Util';
 
 import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
-import
-{
-  elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
-  elasticNumber, elasticObject, elasticText, elasticValue,
-} from './ElasticJSONBlocks';
-import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
-import elasticRootCard from './ElasticRootCard';
+// import
+// {
+//   elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
+//   elasticNumber, elasticObject, elasticText, elasticValue,
+// } from './ElasticJSONBlocks';
+// import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
+// import elasticRootCard from './ElasticRootCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';
 import { elasticTransform, scorePoint } from './ElasticTransformCard';
 
@@ -75,26 +75,26 @@ export const ElasticBlocks = _.extend(
   {
     // JSON
 
-    elasticObject,
-    elasticArray,
+    // elasticObject,
+    // elasticArray,
 
     // JSON Value blocks
-    elasticBool,
-    elasticNumber,
-    elasticText,
-    elasticNull,
+    // elasticBool,
+    // elasticNumber,
+    // elasticText,
+    // elasticNull,
 
     elasticScore,
     scorePoint,
     elasticTransform,
     elasticWeight,
 
-    elasticRootCard,
+    // elasticRootCard,
 
-    elasticMagicValue,
-    elasticMagicList,
-    elasticMagicListItem,
-    elasticMagicCard,
+    // elasticMagicValue,
+    // elasticMagicList,
+    // elasticMagicListItem,
+    // elasticMagicCard,
 
     elasticCreating: _card( // a placeholder for when a card is being created
       {
@@ -110,9 +110,9 @@ export const ElasticBlocks = _.extend(
         },
       }),
 
-    elasticKeyValueWrap,
-    // JSON toggle the type blocks
-    elasticValue,
+    // elasticKeyValueWrap,
+    // // JSON toggle the type blocks
+    // elasticValue,
 
     elasticInput: _block(
       {

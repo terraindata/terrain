@@ -44,15 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// Part of events PoC
-
 import * as KoaRouter from 'koa-router';
 
 import EventRouter from './events/EventRouter';
-
 import * as Util from './Util';
 
-const AnalyticsRouter = new KoaRouter();
+export const AnalyticsRouter = new KoaRouter();
 AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
 
 export default AnalyticsRouter;

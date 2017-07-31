@@ -42,31 +42,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-"use strict";
-// A dummy mode
-(function(mod)
+// Copyright 2017 Terrain Data, Inc.
+
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+
+import * as Util from '../Util';
+import { Scheduler, SchedulerConfig } from './Scheduler';
+
+export const scheduler: Scheduler = new Scheduler();
+
+const Router = new KoaRouter();
+
+// Get job by search parameter, or all if none provided
+Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror)
-{
-  CodeMirror.defineMode("elastic", function(config, parserConfig)
-  {
-    return {
-      startState: function()
-      {
-        return {}
-      },
-      token: function(stream, state)
-      {
-        stream.skipToEnd();
-        return null;
-      },
-      helperType: "elastic"
-    };
-  });
+  ctx.body = await scheduler.getSchedule(ctx.params.id);
 });
+
+// Post new scheduled job
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const schedule: SchedulerConfig = ctx.request.body.body;
+  Util.verifyParameters(schedule, ['jobId', 'schedule']);
+  ctx.body = await scheduler.createSchedule(schedule);
+});
+
+// Delete scheduled jobs by parameter
+Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await scheduler.deleteSchedule(ctx.params.id);
+});
+
+// Update job
+Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const schedule: SchedulerConfig = ctx.request.body.body;
+  schedule.id = ctx.params.id;
+  Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
+  ctx.body = await scheduler.updateSchedule(schedule);
+});
+
+export default Router;

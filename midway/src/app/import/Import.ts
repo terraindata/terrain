@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import sha1 = require('sha1');
 
-import * as csv from 'csvtojson';
+import * as csvjson from 'csvjson';
 import * as fs from 'fs';
 import * as http from 'http';
 import * as socketio from 'socket.io';
@@ -62,8 +62,8 @@ export interface ImportConfig extends ImportTemplateBase
 {
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
-
   streaming: boolean;   // if true, contents is an address to read contents from (?)
+  update: boolean;    // false means replace (instead of update) ; default should be true
 }
 
 export class Import
@@ -85,6 +85,8 @@ export class Import
   };
   private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
   private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
+  private quoteChar: string = '\'';
+  private batchSize: number = 5000;
 
   private server;
   private io;
@@ -210,7 +212,15 @@ export class Import
 
       time = Date.now();
       winston.info('about to upsert via tasty...');
-      const res: ImportConfig = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      let res: ImportConfig;
+      if (imprt.update)
+      {
+        res = await database.getTasty().update(insertTable, items) as ImportConfig;
+      }
+      else
+      {
+        res = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      }
       winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
       resolve(res);
     });
@@ -238,7 +248,7 @@ export class Import
       }
       try
       {
-        items = await this._transformAndCheck(items, imprt);
+        items = [].concat.apply([], await this._transformAndCheck(items, imprt));
       } catch (e)
       {
         return reject(e);
@@ -262,7 +272,7 @@ export class Import
       return typeError;
     }
 
-    if (imprt.csvHeaderMissing === undefined)
+    if (imprt.csvHeaderMissing === undefined || imprt.csvHeaderMissing === null)
     {
       imprt.csvHeaderMissing = false;
     }
@@ -410,21 +420,26 @@ export class Import
         }
       } else if (imprt.filetype === 'csv')
       {
-        csv({
-          flatKeys: true,
-          checkColumn: true,
-          noheader: imprt.csvHeaderMissing,
-          headers: imprt.originalNames,
-          quote: '\'',
-          // workerNum: 4,
-        }).fromString(contents).on('end_parsed', (jsonArrObj) =>
-        // }).fromFile(contents).on('end_parsed', (jsonArrObj) =>
+        try
         {
-          resolve(jsonArrObj);
-        }).on('error', (e) =>
+          const options: object = {
+            delimiter: ',',
+            quote: this.quoteChar,
+            // TODO: handle case where field name contains quoteChar
+            headers: imprt.originalNames.map((val) => this.quoteChar + val + this.quoteChar).join(','),
+          };
+          const items: object[] = csvjson.toObject(contents, options);
+          if (imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
+          {
+            items.shift();
+          }
+          resolve(items);
+        }
+        catch (e)
         {
+          // NOTE: csvjson parser will not throw errors for rows that contain the wrong number of entries
           return reject('CSV format incorrect: ' + String(e));
-        });
+        }
       } else
       {
         return reject('Invalid file-type provided.');
@@ -433,39 +448,48 @@ export class Import
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(items: object[], imprt: ImportConfig): Promise<object[]>
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig): Promise<object[][]>
   {
-    const promises: Array<Promise<object>> = [];
-    let ind: number = 0;
-    for (let item of items)
+    const promises: Array<Promise<object[]>> = [];
+    let baseInd: number = 0;
+    let items: object[];
+    while (allItems.length > 0)
     {
+      items = allItems.splice(0, this.batchSize);
       promises.push(
-        new Promise<object>(async (thisResolve, thisReject) =>
+        new Promise<object[]>(async (thisResolve, thisReject) =>
         {
-          try
+          const transformedItems: object[] = [];
+          let ind: number = 0;
+          for (let item of items)
           {
-            item = this._applyTransforms(item, imprt.transformations);
-          } catch (e)
-          {
-            return thisReject('Failed to apply transforms: ' + String(e));
-          }
-          // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
-          const trimmedItem: object = {};
-          for (const name in imprt.columnTypes)
-          {
-            if (imprt.columnTypes.hasOwnProperty(name))
+            try
             {
-              trimmedItem[name] = item[name];
+              item = this._applyTransforms(item, imprt.transformations);
+            } catch (e)
+            {
+              return thisReject('Failed to apply transforms: ' + String(e));
             }
+            // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
+            const trimmedItem: object = {};
+            for (const name in imprt.columnTypes)
+            {
+              if (imprt.columnTypes.hasOwnProperty(name))
+              {
+                trimmedItem[name] = item[name];
+              }
+            }
+            const typeError: string = this._checkTypes(trimmedItem, imprt, baseInd + ind);
+            if (typeError !== '')
+            {
+              return thisReject(typeError);
+            }
+            transformedItems.push(trimmedItem);
+            ind++;
           }
-          const typeError: string = this._checkTypes(trimmedItem, imprt, ind);
-          if (typeError !== '')
-          {
-            return thisReject(typeError);
-          }
-          thisResolve(trimmedItem);
+          thisResolve(transformedItems);
         }));
-      ind++;
+      baseInd++;
     }
     return Promise.all(promises);
   }

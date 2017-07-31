@@ -127,6 +127,10 @@ const FileImportActions =
     shiftQueue:
     () =>
       $(ActionTypes.shiftQueue, {}),
+
+    toggleUpdate:
+    () =>
+      $(ActionTypes.toggleUpdate, {}),
   };
 
 export default FileImportActions;

@@ -722,6 +722,7 @@ describe('File import route tests', () =>
           tablename: 'fileImportTestTable',
           contents: '[{"pkey":1,"column1":"hello","col2":"goodbye","col3":false,"col4":null}]',
           filetype: 'json',
+          update: true,
 
           originalNames: ['pkey', 'column1', 'col2', 'col3', 'col4'],
           columnTypes:
@@ -774,6 +775,7 @@ describe('File import route tests', () =>
           tablename: 'fileImportTestTable',
           contents: 'pkey,column1,column2,sillyname,column4\n1,hi,hello,false,1970-01-01\n2,bye,goodbye,,',
           filetype: 'csv',
+          update: true,
 
           csvHeaderMissing: false,
           originalNames: ['pkey', 'column1', 'column2', 'column3', 'column4'],
@@ -828,6 +830,7 @@ describe('File import route tests', () =>
           tablename: 'fileImportTestTable',
           contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           filetype: 'json',
+          update: true,
 
           originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:

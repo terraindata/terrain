@@ -44,24 +44,119 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { default as ESInterpreter } from '../../../../shared/database/elastic/parser/ESInterpreter';
-import { Query } from '../../../items/types/Query';
-import ParseTreeToQueryOptions from '../../types/ParseTreeToQueryOptions';
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-export function ParseElasticQuery(tql: string)
+import { Query } from '../../../items/types/Query';
+import Options from '../../types/CardsToCodeOptions';
+
+import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
+import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import { Input, InputType, isInput, toInputMap } from '../../../blocks/types/Input';
+
+export function stringifyWithParameters(
+  obj: object | number | boolean | string | null,
+  inputs?: Immutable.List<Input>): string | null
 {
-  return new ESInterpreter(tql);
+  if (typeof obj === 'number' || typeof obj === 'boolean' || obj === null)
+  {
+    return '' + obj;
+  }
+  else if (typeof obj === 'string')
+  {
+    if (isInput(obj, inputs))
+    {
+      return obj;
+    }
+    return '"' + obj + '"';
+  }
+  else if (Array.isArray(obj))
+  {
+    let str = '[';
+    for (let i = 0; i < obj.length; i++)
+    {
+      str += stringifyWithParameters(obj[i], inputs);
+      if (i < obj.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += ']';
+    return str;
+  }
+  else if (typeof obj === 'object')
+  {
+    let str = '{';
+    const keys = Object.keys(obj);
+    for (let i = 0; i < keys.length; i++)
+    {
+      str += '"' + keys[i] + '": ';
+      str += stringifyWithParameters(obj[keys[i]], inputs);
+      if (i < keys.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += '}';
+    return str;
+  }
+  else
+  {
+    return '';
+  }
 }
 
-export function ElasticParseTreeToQuery(query: Query, options: ParseTreeToQueryOptions): string
+export interface ESQueryObject
 {
-  const queryObject = JSON.parse(JSON.stringify(query.parseTree.parser.getValue()));
-  if (options.allFields === true)
+  index?: string;
+  type?: string;
+  body?: {
+    _source: object;
+  };
+
+  [key: string]: any;
+}
+
+export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, inputs?: List<Input>): string
+{
+  if (options && options.replaceInputs)
+  {
+    const valueInfo: ESValueInfo = parser.getValueInfo();
+    const params = toInputMap(inputs);
+    const result = ESParameterFiller.generate(valueInfo, params);
+    return ESConverter.formatES(new ESJSONParser(result));
+  }
+  else
+  {
+    return ESConverter.formatES(parser);
+  }
+}
+
+export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inputs?: List<Input>): string
+{
+  if (options && options.allFields === true)
   {
     if (queryObject.body && queryObject.body._source)
     {
       queryObject.body._source = [];
     }
   }
-  return JSON.stringify(queryObject);
+
+  const text: string = stringifyWithParameters(queryObject, inputs);
+  const parser: ESJSONParser = new ESJSONParser(text, true);
+  return ESParseTreeToCode(parser, options);
+}
+
+export function ParseElasticQuery(query: Query)
+{
+  const parser = new ESJSONParser(query.tql, true);
+  const params = toInputMap(query.inputs);
+  return new ESInterpreter(parser, params);
+}
+
+export function ElasticParseTreeToQuery(query: Query, options: Options): string
+{
+  return ESParseTreeToCode(query.parseTree.parser, options, query.inputs);
 }

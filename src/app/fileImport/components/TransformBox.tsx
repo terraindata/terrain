@@ -196,17 +196,8 @@ class TransformBox extends TerrainComponent<Props>
     return '';
   }
 
-  public handleTransformClick()
+  public setTransform(transformName: string)
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
-    const transformName = FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex];
-    const msg = this.transformErrorCheck(transformName);
-    if (msg)
-    {
-      alert(msg);
-      return;
-    }
-
     const transform: FileImportTypes.Transform = {
       name: transformName,
       colName: this.props.colName,
@@ -215,6 +206,12 @@ class TransformBox extends TerrainComponent<Props>
 
     switch (transformName)
     {
+      case 'duplicate':
+        transform.args = {
+          newName: this.state.duplicateNewName,
+        };
+        break;
+
       case 'append':
         transform.args = {
           text: this.state.transformText,
@@ -243,15 +240,23 @@ class TransformBox extends TerrainComponent<Props>
         };
         this.props.setLocalColumnName(this.state.mergeNewName);
         break;
-
-      case 'duplicate':
-        transform.args = {
-          newName: this.state.duplicateNewName,
-        };
-        break;
       default:
     }
+    return transform;
+  }
 
+  public handleTransformClick()
+  {
+    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const transformName = FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex];
+    const msg = this.transformErrorCheck(transformName);
+    if (msg)
+    {
+      alert(msg);
+      return;
+    }
+
+    const transform = this.setTransform(transformName);
     Actions.updatePreviewRows(transform);
     Actions.addTransform(transform);
 
@@ -266,57 +271,25 @@ class TransformBox extends TerrainComponent<Props>
     });
   }
 
-  public render()
+  public renderText(transformType: string)
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
-    let transformContent;
-    if (this.props.datatype === 'text')
+    switch (transformType)
     {
-      transformContent =
-        <div>
-          {
-            FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex] === 'split' &&
-            <div>
-              <Autocomplete
-                value={this.state.splitNames.get(0)}
-                options={null}
-                onChange={this.handleSplitNameAChange}
-                placeholder={'new column 1'}
-                disabled={false}
-              />
-              <Autocomplete
-                value={this.state.splitNames.get(1)}
-                options={null}
-                onChange={this.handleSplitNameBChange}
-                placeholder={'new column 2'}
-                disabled={false}
-              />
-            </div>
-          }
-          {
-            FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex] === 'merge' &&
-            <div>
-              {
-                this.state.mergeIndex === -1 &&
-                <p>column to merge</p>
-              }
-              <Dropdown
-                selectedIndex={this.state.mergeIndex}
-                options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
-                onChange={this.handleMergeIndexChange}
-                canEdit={true}
-              />
-              <Autocomplete
-                value={this.state.mergeNewName}
-                options={null}
-                onChange={this.handleMergeNewNameChange}
-                placeholder={'new column name'}
-                disabled={false}
-              />
-            </div>
-          }
-          {
-            this.state.transformTypeIndex > 0 &&
+      case 'duplicate':
+        return (
+          <div>
+            <Autocomplete
+              value={this.state.duplicateNewName}
+              options={null}
+              onChange={this.handleDuplicateNewNameChange}
+              placeholder={'duplicate column name'}
+              disabled={false}
+            />
+          </div>
+        );
+      case 'append':
+        return (
+          <div>
             <Autocomplete
               value={this.state.transformText}
               options={null}
@@ -324,10 +297,112 @@ class TransformBox extends TerrainComponent<Props>
               placeholder={'text'}
               disabled={false}
             />
-          }
-        </div>;
+          </div>
+        );
+      case 'prepend':
+        return (
+          <div>
+            <Autocomplete
+              value={this.state.transformText}
+              options={null}
+              onChange={this.handleAutocompleteTransformTextChange}
+              placeholder={'text'}
+              disabled={false}
+            />
+          </div>
+        );
+      case 'split':
+        return (
+          <div>
+            <Autocomplete
+              value={this.state.splitNames.get(0)}
+              options={null}
+              onChange={this.handleSplitNameAChange}
+              placeholder={'new column 1'}
+              disabled={false}
+            />
+            <Autocomplete
+              value={this.state.splitNames.get(1)}
+              options={null}
+              onChange={this.handleSplitNameBChange}
+              placeholder={'new column 2'}
+              disabled={false}
+            />
+            <Autocomplete
+              value={this.state.transformText}
+              options={null}
+              onChange={this.handleAutocompleteTransformTextChange}
+              placeholder={'text'}
+              disabled={false}
+            />
+          </div>
+        );
+      case 'merge':
+        return (
+          <div>
+            {
+              this.state.mergeIndex === -1 &&
+              <p>column to merge</p>
+            }
+            <Dropdown
+              selectedIndex={this.state.mergeIndex}
+              options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
+              onChange={this.handleMergeIndexChange}
+              canEdit={true}
+            />
+            <Autocomplete
+              value={this.state.mergeNewName}
+              options={null}
+              onChange={this.handleMergeNewNameChange}
+              placeholder={'new column name'}
+              disabled={false}
+            />
+            <Autocomplete
+              value={this.state.transformText}
+              options={null}
+              onChange={this.handleAutocompleteTransformTextChange}
+              placeholder={'text'}
+              disabled={false}
+            />
+          </div>
+        );
+      default:
     }
+  }
 
+  public renderDefault(transformType: string)
+  {
+    if (transformType === 'duplicate')
+    {
+      return (
+        <div>
+          <Autocomplete
+            value={this.state.duplicateNewName}
+            options={null}
+            onChange={this.handleDuplicateNewNameChange}
+            placeholder={'duplicate column name'}
+            disabled={false}
+          />
+        </div>
+      );
+    }
+  }
+
+  public renderTransform()
+  {
+    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    switch (this.props.datatype)
+    {
+      case 'text':            // currently only strings have transform operations besides duplicate
+        return this.renderText(FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex]);
+      default:
+        return this.renderDefault(FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex]);
+    }
+  }
+
+  public render()
+  {
+    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
     return (
       <div
         className='fi-transform-box'
@@ -339,21 +414,7 @@ class TransformBox extends TerrainComponent<Props>
           onChange={this.handleTransformTypeChange}
           canEdit={true}
         />
-        {
-          transformContent
-        }
-        {
-          FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex] === 'duplicate' &&
-          <div>
-            <Autocomplete
-              value={this.state.duplicateNewName}
-              options={null}
-              onChange={this.handleDuplicateNewNameChange}
-              placeholder={'duplicate column name'}
-              disabled={false}
-            />
-          </div>
-        }
+        {this.renderTransform()}
         <div
           className='fi-transform-button'
           onClick={this.handleTransformClick}

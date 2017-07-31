@@ -55,6 +55,14 @@ interface Theme
   // main background color
   base: string;
 
+  altColor1: string;
+  altColor2: string;
+
+  altBg1: string;
+  altBg2: string;
+
+  fadedOutBg: string;
+
   // text
   text: {
     baseDark: string,
@@ -83,6 +91,7 @@ interface Theme
   {
     base: string,
     selectedSquare: string,
+    arrowBg: string,
   };
 
   // Library ------
@@ -231,6 +240,14 @@ const DARK: Theme =
     // main background color
     base: '#2F2F2F',
 
+    altColor1: '#242424',
+    altColor2: '#424242',
+
+    altBg1: '#fff',
+    altBg2: '#EDEFF3',
+
+    fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
     // text
     text:
     {
@@ -259,8 +276,9 @@ const DARK: Theme =
     // side bar
     sideBar:
     {
-      base: '#303030',
+      base: '#646464',
       selectedSquare: '#CAD847',
+      arrowBg: '#474747',
     },
 
     // Library ------
@@ -324,7 +342,7 @@ const DARK: Theme =
 
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
-        cardBase: '#424242', // TODO
+        cardBase: '#2F2F2F', // '#424242', // TODO
 
         card1: '#559DCE',
         card2: '#397DD0',

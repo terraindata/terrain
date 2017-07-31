@@ -66,6 +66,7 @@ import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
+import SchemaStore from '../../schema/data/SchemaStore';
 import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
 
@@ -97,7 +98,7 @@ export interface Props
   parentId?: string;
 
   autoDisabled?: boolean;
-  autoTerms?: List<string>;
+  getAutoTerms?: (schemaState) => List<string>;
 
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
@@ -285,12 +286,21 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public computeOptions()
   {
-    if (this.props.autoTerms || this.props.autoDisabled)
+    if (this.props.autoDisabled)
     {
       return;
     }
 
-    const options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+    let options: List<string>;
+
+    if (this.props.getAutoTerms)
+    {
+      options = this.props.getAutoTerms(SchemaStore.getState());
+    }
+    else
+    {
+      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+    }
 
     if (!options.equals(this.state.options))
     {
@@ -306,15 +316,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
 
-      let { options } = this.state;
-      if (this.props.autoTerms)
-      {
-        options = this.props.autoTerms;
-      }
-      if (this.props.autoDisabled)
-      {
-        options = null;
-      }
+      const { options } = this.state;
 
       return (
         <div

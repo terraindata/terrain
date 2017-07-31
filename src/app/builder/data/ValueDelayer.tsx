@@ -43,12 +43,76 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// Copyright 2017 Terrain Data, Inc.
-interface ParseTreeToQueryOptions
-{
-  allFields?: boolean; // amend the final Select card to include all possible fields.
-  limit?: number;
-  count?: boolean;
-}
+import * as Immutable from 'immutable';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
-export default ParseTreeToQueryOptions;
+/*
+ *  Data type that represents a cached value.
+ *  Value gets updated after a configurable amount of time each time it is set,
+ *  with the timer resetting each time the value is set (Much like lodash debounced).
+ */
+export default class ValueDelayer<T>
+{
+  protected resource: T;
+  protected cachedResource: T;
+  protected delay: number; // milliseconds
+  protected lastTimer;
+  protected onUpdate: () => void;
+
+  // onUpdate gets called whenever the cached value is updated
+  constructor(initialValue: T, onUpdate: () => void, delay: number = 500)
+  {
+    this.resource = initialValue;
+    this.cachedResource = initialValue;
+    this.delay = delay;
+    this.onUpdate = onUpdate;
+  }
+
+  public isDirty(): boolean
+  {
+    return this.lastTimer !== undefined;
+  }
+
+  public getCached(): T
+  {
+    return this.cachedResource;
+  }
+
+  // pre-emptively calls the update timeout function and returns the new value
+  public flush(): T
+  {
+    if (this.isDirty())
+    {
+      this.clearTimer();
+      this.cacheUpdateTimeout();
+    }
+    return this.resource;
+  }
+
+  public setValue(newValue: T): ValueDelayer<T>
+  {
+    if (newValue !== this.resource)
+    {
+      this.clearTimer();
+      this.resource = newValue;
+      this.lastTimer = setTimeout(this.cacheUpdateTimeout.bind(this), this.delay);
+    }
+    return this;
+  }
+
+  protected cacheUpdateTimeout()
+  {
+    this.cachedResource = this.resource;
+    this.lastTimer = undefined;
+    this.onUpdate();
+  }
+
+  protected clearTimer()
+  {
+    if (this.lastTimer)
+    {
+      clearTimeout(this.lastTimer);
+      this.lastTimer = undefined;
+    }
+  }
+}

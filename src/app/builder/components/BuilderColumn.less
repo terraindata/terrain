@@ -2,7 +2,7 @@
 
 @title-bar-height: 36px;
 @handle-width: 20px;
-@side-border-color: rgba(255,255,255,0.25);
+@side-border-color: rgba(255,255,255,0.15);
 
 
 .builder-column {
@@ -17,9 +17,11 @@
     padding: 9px;
     height: @title-bar-height;
     box-sizing: border-box;
-    // z-index: 999999;
     position: relative;
-    border-left: 1px solid rgba(255,255,255,0.25);
+    border-left: 1px solid @side-border-color;
+
+    box-shadow: 0px 3px 12px rgba(0,0,0,0.9);
+    z-index: 9999;
 
     &:hover {
       .builder-split-screen,

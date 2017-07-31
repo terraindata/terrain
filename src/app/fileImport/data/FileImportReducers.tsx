@@ -140,8 +140,6 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'duplicate')
   {
-    console.log('duplicate');
-    console.log('duplicate name: ', transform.args.newName);
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
       .set('primaryKey', primaryKey)
@@ -163,7 +161,6 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'split')
   {
-    console.log('split');
     const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
       .set('primaryKey', primaryKey)
@@ -192,10 +189,6 @@ const applyTransform = (state, transform) =>
   else if (transform.name === 'merge')
   {
     const mergeCol = state.columnNames.indexOf(transform.args.mergeName);
-    console.log('mergeCol: ', mergeCol);
-    console.log(state.columnNames.delete(mergeCol));
-    console.log(state.columnTypes);
-    console.log(state.columnsToInclude);
 
     let primaryKey = '';
     if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
@@ -251,6 +244,12 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
       .set('hasCsvHeader', !state.hasCsvHeader)
+  ;
+
+FileImportReducers[ActionTypes.toggleUpdate] =
+  (state, action) =>
+    state
+      .set('update', !state.update)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -350,11 +349,11 @@ FileImportReducers[ActionTypes.uploadFile] =
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
+      state.update,
       () =>
       {
         alert('success');
       },
-      state.streaming,
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
@@ -416,7 +415,6 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
-    console.log(state.templates);
     const template = state.templates.get(action.payload.templateId);
     template.transformations.map((transform, i) =>
     {

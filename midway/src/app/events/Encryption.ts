@@ -44,38 +44,33 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+import * as aesjs from 'aes-js';
+import * as sha1 from 'sha1';
 
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
-
-    CodeMirror.registerHelper("lint", "elastic", function(text)
-    {
-      var found = [];
-      try
-      {
-        const t = new ESInterpreter(text);
-        for (let e of t.parser.errors)
-        {
-          const token = e.token;
-          found.push({
-            from: CodeMirror.Pos(token.row, token.col),
-            to: CodeMirror.Pos(token.toRow, token.toCol),
-            message: e.message
-          });
-        }
-      }
-      catch(e)
-      {
-        console.log('Exception when parsing ' + text + " error: " + e);
-      }
-      return found;
+/*
+* Decrypt a message with the private key using AES128
+*/
+export async function decrypt(msg: string, privateKey: string): Promise<string>
+{
+  return new Promise<string>((resolve, reject) =>
+  {
+    const key = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
+    const msgBytes = aesjs.utils.hex.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
   });
-});
+}
+
+/*
+* Encrypt a message with the private key using AES128
+*/
+export async function encrypt(msg: string, privateKey: string): Promise<string>
+{
+  return new Promise<string>((resolve, reject) =>
+  {
+    const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
+    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+  });
+}

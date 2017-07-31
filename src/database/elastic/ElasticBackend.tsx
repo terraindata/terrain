@@ -69,7 +69,13 @@ class ElasticBackend implements Backend
   inputType = ElasticBlocks.elasticInput.type;
 
   topLevelCards =
-  List(_.keys(ElasticBlocks)); // TODO change this to true top level cards
+  List([
+    'eqlindex',
+    'eqltype',
+    'eqlfrom',
+    'eqlsize',
+    'eqlbody',
+  ]);
 
   // Ordering of the cards deck
   cardsDeck = ElasticCardsDeck;

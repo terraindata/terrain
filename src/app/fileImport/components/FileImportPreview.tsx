@@ -56,6 +56,7 @@ import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
@@ -80,6 +81,7 @@ export interface Props
   blob: File;
   chunkQueue: List<string>;
   nextChunk: string;
+  update: boolean;
 }
 
 @Radium
@@ -109,7 +111,6 @@ class FileImportPreview extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     this.setState({
-      // resetLocalColumnNames: this.props.columnNames.size !== nextProps.columnNames.size,
       resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
     });
   }
@@ -251,93 +252,119 @@ class FileImportPreview extends TerrainComponent<Props>
     this.stream();
   }
 
+  public handleUpdateChange()
+  {
+    Actions.toggleUpdate();
+  }
+
+  public renderTemplate()
+  {
+    return (
+      <div
+        className='fi-preview-template'
+      >
+        <div
+          className='fi-preview-load'
+        >
+          <div
+            className='fi-load-button'
+            onClick={this.handleLoadTemplate}
+            style={buttonColors()}
+            ref='fi-load-button'
+          >
+            Load Template
+          </div>
+          <Dropdown
+            selectedIndex={this.state.templateId}
+            options={List<string>(this.props.templates.map((template, i) => String(template.id) + ': ' + template.name))}
+            onChange={this.handleTemplateChange}
+            className={'fi-load-dropdown'}
+            canEdit={true}
+          />
+        </div>
+
+        <div
+          className='fi-preview-save'
+        >
+          <div
+            className='fi-save-button'
+            onClick={this.handleSaveTemplate}
+            style={buttonColors()}
+            ref='fi-save-button'
+          >
+            Save Template
+          </div>
+          <Autocomplete
+            value={this.state.templateText}
+            options={null}
+            onChange={this.handleAutocompleteTemplateChange}
+            placeholder={'template name'}
+            className={'fi-save-autocomplete'}
+            disabled={false}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderTable()
+  {
+    return (
+      <div
+        className='fi-preview-table-container'
+      >
+        <div
+          className='fi-preview-columns-container'
+        >
+          {
+            this.props.columnNames.map((value, key) =>
+              <FileImportPreviewColumn
+                key={key}
+                columnId={key}
+                isIncluded={this.props.columnsToInclude.get(key)}
+                columnType={JSON.parse(JSON.stringify(this.props.columnTypes.get(key)))}
+                isPrimaryKey={this.props.primaryKey === key}
+                columnNames={this.props.columnNames}
+                columnOptions={this.props.columnOptions}
+                editing={key === this.state.editColumnId}
+                resetLocalColumnNames={this.state.resetLocalColumnNames}
+                handleEditColumnChange={this.handleEditColumnChange}
+              />,
+            ).toArray()
+          }
+        </div>
+        <div
+          className='fi-preview-rows-container'
+        >
+          {
+            this.props.previewRows.map((items, key) =>
+              <FileImportPreviewRow
+                key={key}
+                items={items}
+              />,
+            )
+          }
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
-    console.log('done streaming: ', this.state.streamed);
     return (
       <div
         className='fi-preview'
       >
+        {this.renderTemplate()}
+        {this.renderTable()}
         <div
-          className='fi-preview-template'
+          className='fi-preview-update'
         >
-          <div
-            className='fi-preview-load'
-          >
-            <div
-              className='fi-load-button'
-              onClick={this.handleLoadTemplate}
-              style={buttonColors()}
-              ref='fi-load-button'
-            >
-              Load Template
-            </div>
-            <Dropdown
-              selectedIndex={this.state.templateId}
-              options={List<string>(this.props.templates.map((template, i) => template.name))}
-              onChange={this.handleTemplateChange}
-              className={'fi-load-dropdown'}
-              canEdit={true}
-            />
-          </div>
-
-          <div
-            className='fi-preview-save'
-          >
-            <div
-              className='fi-save-button'
-              onClick={this.handleSaveTemplate}
-              style={buttonColors()}
-              ref='fi-save-button'
-            >
-              Save Template
-            </div>
-            <Autocomplete
-              value={this.state.templateText}
-              options={null}
-              onChange={this.handleAutocompleteTemplateChange}
-              placeholder={'template name'}
-              className={'fi-save-autocomplete'}
-              disabled={false}
-            />
-          </div>
-        </div>
-
-        <div
-          className='fi-preview-table-container'
-        >
-          <div
-            className='fi-preview-columns-container'
-          >
-            {
-              this.props.columnNames.map((value, key) =>
-                <FileImportPreviewColumn
-                  key={key}
-                  columnId={key}
-                  isIncluded={this.props.columnsToInclude.get(key)}
-                  columnType={JSON.parse(JSON.stringify(this.props.columnTypes.get(key)))}
-                  isPrimaryKey={this.props.primaryKey === key}
-                  columnNames={this.props.columnNames}
-                  columnOptions={this.props.columnOptions}
-                  editing={key === this.state.editColumnId}
-                  resetLocalColumnNames={this.state.resetLocalColumnNames}
-                  handleEditColumnChange={this.handleEditColumnChange}
-                />,
-              ).toArray()
-            }
-          </div>
-          <div
-            className='fi-preview-rows-container'
-          >
-            {
-              this.props.previewRows.map((items, key) =>
-                <FileImportPreviewRow
-                  key={key}
-                  items={items}
-                />,
-              )
-            }
-          </div>
+          update
+          <CheckBox
+            checked={this.props.update}
+            onChange={this.handleUpdateChange}
+          />
         </div>
         <div
           className='fi-preview-import-button'

@@ -47,14 +47,13 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import './TQLEditor.less';
-const { List } = Immutable;
-import * as _ from 'underscore';
-import TerrainComponent from './../../common/components/TerrainComponent';
+
 const CodeMirror = require('./Codemirror.js');
+import './TQLEditor.less';
+
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
 import ElasticHighlighter from '../highlighters/ElasticHighlighter';
@@ -64,9 +63,10 @@ import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
+import './ElasticMode';
+import './TQLMode.js';
+
 // Style sheets and addons for CodeMirror
-require('./elastic.js');
-require('./tql.js');
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/edit/matchbrackets.js';
@@ -75,12 +75,10 @@ import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/lint/lint.js';
 import 'codemirror/mode/javascript/javascript.js';
 
-import './eslint.js';
-
-import './cobalt.less';
 import './codemirror.less';
-import './monokai.less';
-import './neo.less';
+import './themes/cobalt.less';
+import './themes/monokai.less';
+import './themes/neo.less';
 
 import 'codemirror/addon/dialog/dialog.js';
 import 'codemirror/addon/scroll/annotatescrollbar.js';
@@ -105,7 +103,6 @@ export interface Props
   diffTql?: string;
 
   onChange?(tql: string);
-  onFocusChange?(focused: boolean);
 
   toggleSyntaxPopup?(event, line);
   defineTerm?(value, event);
@@ -118,7 +115,7 @@ class TQLEditor extends TerrainComponent<Props>
   public state: {
     codeMirrorInstance, // CodeMirror instance does not have a defined type.
   } = {
-    codeMirrorInstance: null,
+    codeMirrorInstance: undefined,
   };
 
   public render()
@@ -140,10 +137,9 @@ class TQLEditor extends TerrainComponent<Props>
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
         revertButtons: false,
         connect: 'align',
-
+        tabSize: ESConverter.defaultIndentSize,
         origLeft: this.props.diffTql,
       };
-
     if (this.props.language === 'elastic')
     {
       options['mode'] = 'elastic';
@@ -171,7 +167,6 @@ class TQLEditor extends TerrainComponent<Props>
         />
       );
     }
-
     return (
       <CodeMirror
         ref='cm'
@@ -185,7 +180,6 @@ class TQLEditor extends TerrainComponent<Props>
         defineTerm={this.props.defineTerm}
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
-        onFocusChange={this.props.onFocusChange}
         onCodeMirrorMount={this.registerCodeMirror}
       />
     );
@@ -215,8 +209,10 @@ class TQLEditor extends TerrainComponent<Props>
       const formatted = this.autoFormatQuery(cmInstance.getValue());
       if (formatted)
       {
+        const cursor = cmInstance.getCursor();
         this.state.codeMirrorInstance.setValue(formatted);
         this.props.onChange(cmInstance.getValue());
+        cmInstance.setCursor(cursor);
       }
     }
   }
@@ -239,6 +235,7 @@ class TQLEditor extends TerrainComponent<Props>
       codeMirrorInstance: cmInstance,
     });
     cmInstance.on('change', this.handleChange);
+
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
       ElasticHighlighter.highlightES(cmInstance);
