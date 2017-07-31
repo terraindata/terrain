@@ -50,7 +50,7 @@ interface BackendInstance
   id: string | number;
   name: string;
   type: string;
-  source: 'm1' | 'm2';
+  source?: 'm1' | 'm2';
 }
 
 export default BackendInstance;

@@ -83,6 +83,7 @@ import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
+import Connections from './users/components/Connections';
 import EditProfile from './users/components/EditProfile';
 import Notifications from './users/components/Notifications';
 import Profile from './users/components/Profile';
@@ -92,6 +93,7 @@ import X from './x/components/X';
 const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
+import StyleTag from './common/components/StyleTag';
 import DeployModal from './deploy/components/DeployModal';
 import Ajax from './util/Ajax';
 import Util from './util/Util';
@@ -114,7 +116,7 @@ import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
 
 // Icons
-const TerrainIcon = require('./../images/icon_terrain_108x17.svg?name=TerrainIcon');
+const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
@@ -361,16 +363,17 @@ class App extends TerrainComponent<Props>
         key='app'
         style={[
           fontColor(Colors().text.baseLight),
-          backgroundColor(Colors().base),
+          backgroundColor(Colors().bg1),
         ]}
       >
         {
           this.state.loggedInAndLoaded &&
           <div
             className='app-top-bar'
-            style={backgroundColor(Colors().titleBar.base)}
+            style={backgroundColor(Colors().bg2)}
           >
-            <TerrainIcon
+            <img
+              src={TerrainIcon}
               className='app-top-bar-icon'
             />
             <AccountDropdown />
@@ -393,6 +396,10 @@ class App extends TerrainComponent<Props>
           hideOnClick={true}
         />
 
+        <StyleTag
+          style={SCROLLBAR_STYLE}
+        />
+
         <InAppNotification />
 
         <EasterEggs />
@@ -400,6 +407,15 @@ class App extends TerrainComponent<Props>
     );
   }
 }
+
+const SCROLLBAR_STYLE = {
+  '::-webkit-scrollbar-track': {
+    background: Colors().scrollbarBG,
+  },
+  '::-webkit-scrollbar-thumb': {
+    background: Colors().scrollbarPiece,
+  },
+};
 
 const router = (
   <Router history={browserHistory}>
@@ -429,6 +445,7 @@ const router = (
         <Route path='/account/profile/edit' component={EditProfile} />
         <Route path='/account/settings' component={Settings} />
         <Route path='/account/notifications' component={Notifications} />
+        <Route path='/account/connections' component={Connections} />
         <Route path='/account/team' component={Team} />
       </Route>
 

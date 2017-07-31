@@ -44,21 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-console no-unused-expression member-access max-line-length
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-unused-expression member-access max-line-length
 
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { Card } from '../../../../blocks/types/Card';
+import { Card, CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import FadeInOut from '../../../common/components/FadeInOut';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
+import CreateCardOption from './CreateCardOption';
 import './CreateCardTool.less';
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -92,17 +93,13 @@ export interface Props
 class CreateCardTool extends TerrainComponent<Props>
 {
   public state: {
-    opening: boolean;
     focusedIndex: number;
   } = {
-    opening: false,
     focusedIndex: -1,
   };
 
-  handleCardClick(event)
+  public handleCardClick(block, index)
   {
-    const index = +Util.rel(event.target);
-
     if (this.props.overrideClick)
     {
       this.props.overrideClick(index);
@@ -136,49 +133,27 @@ class CreateCardTool extends TerrainComponent<Props>
     this.props.onToggle && this.props.onToggle();
   }
 
-  public componentDidUpdate(prevProps, prevState)
+  public renderCardOption(type: string, index: number)
   {
-    if (!prevState.opening && this.state.opening)
-    {
-      Util.animateToAutoHeight(this.refs['selector']);
-    }
-  }
+    const { overrideText } = this.props;
 
-  private renderCardOption(type: string, index: number)
-  {
-    const block = AllBackendsMap[this.props.language].blocks[type];
-    if (!block)
-    {
-      console.log('Missing block type: ', block);
-      // TODO throw error instead
-      return null;
-    }
-    const text = this.props.overrideText ? this.props.overrideText.get(index).text : block.static.title;
-    // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
     return (
-      <a
-        className={classNames({
-          'create-card-button': true,
-          'create-card-button-focused': this.state.focusedIndex === index,
-        })}
-        key={'' + index}
-        rel={'' + index}
+      <CreateCardOption
+        card={AllBackendsMap[this.props.language].blocks[type] as CardConfig}
+        index={index}
         onClick={this.handleCardClick}
-        style={{
-          backgroundColor: block.static.colors[0],
-        }}
-        data-tip={'test'}
-      >
-        <div className='create-card-button-inner' data-rel={'' + index}>
-          {
-            text
-          }
-        </div>
-      </a>
+        overrideTitle={
+          overrideText &&
+          overrideText.get(index) &&
+          overrideText.get(index).text
+        }
+        isFocused={this.state.focusedIndex === index}
+        key={'' + index}
+      />
     );
   }
 
-  getCardTypeList(): List<string>
+  public getCardTypeList(): List<string>
   {
     if (this.props.overrideText)
     {
@@ -194,32 +169,32 @@ class CreateCardTool extends TerrainComponent<Props>
     const isEmpty = cardTypeList.size === 0;
 
     return (
-      <FadeInOut
-        open={this.props.open}
+      <div
+        className={classNames({
+          'create-card-selector': true,
+          'create-card-selector-open': this.props.open,
+          'create-card-selector-focused': this.state.focusedIndex !== -1,
+        })}
+        ref='selector'
+        style={
+          backgroundColor(Colors().bg2)
+        }
       >
-        <div
-          className={classNames({
-            'create-card-selector': true,
-            'create-card-selector-focused': this.state.focusedIndex !== -1,
-          })}
-          ref='selector'
-        >
-          <div className='create-card-selector-inner'>
-            {
-              isEmpty &&
-              <div className='create-card-empty'>
-                There are no remaining cards that can be created here.
+        <div className='create-card-selector-inner'>
+          {
+            isEmpty &&
+            <div className='create-card-empty'>
+              There are no remaining cards that can be created here.
                 </div>
-            }
-            {
-              cardTypeList.map(this.renderCardOption)
-            }
-            {
-              _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
-            }
-          </div>
+          }
+          {
+            cardTypeList.map(this.renderCardOption)
+          }
+          {
+            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
+          }
         </div>
-      </FadeInOut>
+      </div>
     );
     // {
     //   !this.props.cannotClose &&
@@ -301,7 +276,6 @@ class CreateCardTool extends TerrainComponent<Props>
       'create-card-wrapper': true,
       'create-card-open': this.props.open,
       'create-card-closed': !this.props.open,
-      'create-card-opening': this.state.opening,
     });
     classes += ' ' + this.props.className;
 

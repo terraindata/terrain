@@ -320,7 +320,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
           item ?
             <div
               className='library-info'
-              style={backgroundColor(Colors().library.infoColumn.baseUpper)}
+              style={backgroundColor(Colors().bg3)}
             >
               <div
                 className='library-info-image'
@@ -358,7 +358,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             :
             <div
               className='library-info'
-              style={backgroundColor(Colors().library.infoColumn.baseUpper)}
+              style={backgroundColor(Colors().bg3)}
             >
               <InfoArea
                 large='Select a Group'
