@@ -48,7 +48,6 @@ import sha1 = require('sha1');
 
 import * as csv from 'csvtojson';
 import * as fs from 'fs';
-import * as http from 'http';
 import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
@@ -86,30 +85,27 @@ export class Import
   private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
   private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
 
-  private server;
-  private io;
   private imprt;
   private buffer: string[];
-  constructor()
+
+  public setUpSocket(io: socketio.Server)
   {
-    this.server = http.createServer();   // TODO: what url is this going to??
-    this.io = socketio(this.server);
-    // console.log('set up server');
-    this.io.on('connection', (socket) =>
+    console.log('set up server');
+    io.on('connection', (socket) =>
     {
-      // console.log('someone connected!!!');
+      console.log('someone connected!!!');
       let count: number = 0;
       socket.emit('ready');
       socket.on('message', async (data) =>
       {
-        // console.log('just got data!');
+        console.log('just got data!');
         const items: object[] = await this._getItems(this.imprt, data);
-        // console.log('got data!!!');
+        console.log('got data!!!');
         const num: number = count;
         count++;
         fs.open('test/testout' + String(num) + '.txt', 'wx', (err, fd) =>
         {
-          // console.log('opened file.');
+          console.log('opened file.');
           if (err !== undefined && err !== null)
           {
             if (err.code === 'EEXIST')
@@ -122,7 +118,7 @@ export class Import
           {
             throw writeErr;
           });
-          // console.log('wrote to file.');
+          console.log('wrote to file.');
         });
         socket.emit('done');
         // fs.unlink('test/testout.txt', (err) => {
@@ -134,15 +130,15 @@ export class Import
       });
       socket.on('finished', () =>
       {
-        // console.log('client finished!');
+        console.log('client finished!');
         // this.server.close();   // TODO: fix
       });
     });
-    this.server.listen(3300);   // TODO: which port?
   }
 
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
+    this.imprt = imprt;   // TODO: fix?
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
       const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);

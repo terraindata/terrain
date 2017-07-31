@@ -138,6 +138,7 @@ class App
 
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
+
   }
 
   public getConfig(): Config.Config

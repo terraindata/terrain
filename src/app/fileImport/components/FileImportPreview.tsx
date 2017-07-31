@@ -215,7 +215,7 @@ class FileImportPreview extends TerrainComponent<Props>
   public stream()
   {
     console.log('setting up socket...');
-    const socket = io('http://localhost:3300/');
+    const socket = io(MIDWAY_HOST + '/import/streaming', { path: '/importtest' });
     socket.on('connect', () =>
     {
       console.log('connected');

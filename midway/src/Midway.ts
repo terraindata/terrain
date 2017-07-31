@@ -44,10 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as socketio from 'socket.io';
+
 import App from './app/App';
 import CmdLineArgs from './app/CmdLineArgs';
+import { imprt } from './app/import/ImportRouter';
 
 export const app = new App(CmdLineArgs);
 export const server = app.start();
+export const io = socketio(server, {path: '/importtestt'}).of('/import/streaming');
+imprt.setUpSocket(io);
 
 export default server;
