@@ -105,6 +105,7 @@ export class Import
       socket.on('message', async (data) =>
       {
         // console.log('just got data!');
+        // console.log(data);
         const items: object[] = await this._getItems(this.imprt, data);
         // console.log('got data!!!');
         const num: number = count;
@@ -163,20 +164,20 @@ export class Import
       }
 
       let time: number = Date.now();
-      winston.info('checking config and schema...');
-      const configError: string = this._verifyConfig(imprt);
-      if (configError !== '')
-      {
-        return reject(configError);
-      }
-      const expectedMapping: object = this._getMappingForSchema(imprt);
-      const mappingForSchema: object | string =
-        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
-      if (typeof mappingForSchema === 'string')
-      {
-        return reject(mappingForSchema);
-      }
-      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
+      // winston.info('checking config and schema...');
+      // const configError: string = this._verifyConfig(imprt);
+      // if (configError !== '')
+      // {
+      //   return reject(configError);
+      // }
+      // const expectedMapping: object = this._getMappingForSchema(imprt);
+      // const mappingForSchema: object | string =
+      //   this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
+      // if (typeof mappingForSchema === 'string')
+      // {
+      //   return reject(mappingForSchema);
+      // }
+      // winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
 
       const items: object[] = [];
       try
@@ -205,24 +206,24 @@ export class Import
         [imprt.primaryKey],
         columns,
         imprt.dbname,
-        mappingForSchema,
+        // mappingForSchema,
       );
-      await database.getTasty().getDB().putMapping(insertTable);
+      // await database.getTasty().getDB().putMapping(insertTable);
       winston.info('created tasty table and put mapping (s): ' + String((Date.now() - time) / 1000));
 
       time = Date.now();
       winston.info('about to upsert via tasty...');
-      let res: ImportConfig;
-      if (imprt.update)
-      {
-        res = await database.getTasty().update(insertTable, items) as ImportConfig;
-      }
-      else
-      {
-        res = await database.getTasty().upsert(insertTable, items) as ImportConfig;
-      }
+      // let res: ImportConfig;
+      // if (imprt.update)
+      // {
+      //   res = await database.getTasty().update(insertTable, items) as ImportConfig;
+      // }
+      // else
+      // {
+      //   res = await database.getTasty().upsert(insertTable, items) as ImportConfig;
+      // }
       winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
-      resolve(res);
+      // resolve(res);
     });
   }
   private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
