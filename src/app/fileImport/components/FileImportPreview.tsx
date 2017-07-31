@@ -91,8 +91,6 @@ class FileImportPreview extends TerrainComponent<Props>
     editColumnId: number,
     resetLocalColumnNames: boolean,
     blobCount: number,
-    // chunkQueue: List<string>,
-    // nextChunk: string,
     streamed: boolean,
   } = {
     templateId: -1,
@@ -100,8 +98,6 @@ class FileImportPreview extends TerrainComponent<Props>
     editColumnId: -1,
     resetLocalColumnNames: false,
     blobCount: 0,
-    // chunkQueue: List([]),
-    // nextChunk: '',
     streamed: false,
   };
 
@@ -172,14 +168,11 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (isLast)
     {
-      console.log('final chunk: ', chunk);
+      console.log('final chunk');
       this.setState({
-        // chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk),
-        // nextChunk: '',
         streamed: true,
       });
       Actions.updateQueue(chunk, chunk.length);
-      // this.stream();
     }
     else
     {
@@ -195,14 +188,10 @@ class FileImportPreview extends TerrainComponent<Props>
       }
       // console.log('chunk size: ', chunk.length);
       // console.log('chunk: ', chunk);
-      console.log('parsed chunk: ', chunk.substring(0, end));
+      // console.log('parsed chunk: ', chunk.substring(0, end));
       console.log('nextChunk: ', chunk.substring(end, chunk.length));
 
       Actions.updateQueue(chunk, end);
-      // this.setState({
-      //   chunkQueue: this.state.chunkQueue.push(this.state.nextChunk + chunk.substring(0, end)),
-      //   nextChunk: chunk.substring(end, chunk.length),
-      // });
     }
   }
 
@@ -227,16 +216,12 @@ class FileImportPreview extends TerrainComponent<Props>
     socket.on('ready', () =>
     {
       console.log('ready');
-      console.log('queue isEmpty: ', this.props.chunkQueue.isEmpty());
-      if (!this.props.chunkQueue.isEmpty() && !this.state.streamed)
+      console.log('queue: ', this.props.chunkQueue);
+      if (!this.props.chunkQueue.isEmpty())      // assume filereader parses chunks faster than backend processes them
       {
-        console.log('queue to be streamed: ', this.props.chunkQueue);
         socket.send(this.props.chunkQueue.first());
-
         Actions.shiftQueue();
-        // this.setState({
-        //   chunkQueue: this.props.chunkQueue.shift(),
-        // });
+        socket.emit('done');
       }
       else
       {

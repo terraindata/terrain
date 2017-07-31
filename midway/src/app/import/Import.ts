@@ -124,13 +124,16 @@ export class Import
           });
           // console.log('wrote to file.');
         });
-        socket.emit('done');
         // fs.unlink('test/testout.txt', (err) => {
         //     if (err)
         //     {
         //         throw err;
         //     }
         // });
+      });
+      socket.on('done', () =>
+      {
+        socket.emit('ready');
       });
       socket.on('finished', () =>
       {

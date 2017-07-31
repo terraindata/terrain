@@ -413,19 +413,16 @@ class FileImport extends TerrainComponent<any>
         skipEmptyLines: true,
       };
       const items = Papa.parse(fr.result, config).data;
-      // console.log(items);
 
       const previewRows = items.map((item, i) =>
         _.map(item, (value, key) =>
           typeof value === 'string' ? value : JSON.stringify(value),
         ),
       );
-      // console.log(previewRows);
 
       const columnNames = _.map(items[0], (value, i) =>
         filetype === 'csv' && !this.state.fileImportState.hasCsvHeader ? 'column' + String(i) : i,
       );
-      // console.log(columnNames);
 
       Actions.chooseFile(null, filetype, List<List<string>>(previewRows), List<string>(columnNames));
     };
