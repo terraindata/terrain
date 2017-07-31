@@ -350,6 +350,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
       state.update,
+      state.streaming,
       () =>
       {
         alert('success');
