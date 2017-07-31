@@ -75,6 +75,9 @@ interface Theme
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
+  scrollbarBG: string;
+  scrollbarPiece: string;
+
   // text
   text: {
     baseDark: string,
@@ -262,6 +265,9 @@ const DARK: Theme =
     active: darkActive,
     inactiveHover: Color(darkActive).fade(0.25).string(),
     activeHover: Color(darkActive).fade(0.75).string(),
+
+    scrollbarBG: 'rgba(255,255,255,0.15)',
+    scrollbarPiece: 'rgba(255,255,255,0.25)',
 
     // text
     text:

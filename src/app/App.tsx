@@ -93,6 +93,7 @@ import X from './x/components/X';
 const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
+import StyleTag from './common/components/StyleTag';
 import DeployModal from './deploy/components/DeployModal';
 import Ajax from './util/Ajax';
 import Util from './util/Util';
@@ -395,6 +396,10 @@ class App extends TerrainComponent<Props>
           hideOnClick={true}
         />
 
+        <StyleTag
+          style={SCROLLBAR_STYLE}
+        />
+
         <InAppNotification />
 
         <EasterEggs />
@@ -402,6 +407,15 @@ class App extends TerrainComponent<Props>
     );
   }
 }
+
+const SCROLLBAR_STYLE = {
+  '::-webkit-scrollbar-track': {
+    background: Colors().scrollbarBG,
+  },
+  '::-webkit-scrollbar-thumb': {
+    background: Colors().scrollbarPiece,
+  },
+};
 
 const router = (
   <Router history={browserHistory}>
