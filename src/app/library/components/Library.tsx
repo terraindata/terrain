@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import TerrainAreaChart from '../../charts/TerrainAreaChart';
@@ -61,7 +62,6 @@ import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
-import * as _ from 'lodash';
 
 export interface Props
 {
@@ -131,21 +131,26 @@ class Library extends TerrainComponent<any>
     UserActions.fetch();
   }
 
-  getData()
+  public getData()
   {
-    return [...Array(20).keys()].map(i => {
-      return { x: i, y: _.random(1, 100) }
+    return [...Array(20).keys()].map((i) =>
+    {
+      return { x: i, y: _.random(1, 100) };
     });
   }
 
-  getDatasets()
+  public getDatasets()
   {
     const { libraryState } = this.state;
     const { variants, selectedVariants } = libraryState;
 
     const datasets = variants
-      .filter(variant => selectedVariants.includes(variant.id.toString()))
-      .map(variant => {
+      .filter((variant) =>
+      {
+        return selectedVariants.includes(variant.id.toString());
+      })
+      .map((variant) =>
+      {
         return { id: +variant.id, name: variant.name, data: this.getData() };
       });
 
@@ -218,51 +223,15 @@ class Library extends TerrainComponent<any>
 
     return (
       <div className='library'>
-<<<<<<< HEAD
-        <GroupsColumn
-          {...{
-            groups,
-            groupsOrder,
-            params,
-            basePath,
-          }}
-          isFocused={algorithm === undefined}
-        />
-        <AlgorithmsColumn
-          {...{
-            algorithms,
-            variants,
-            algorithmsOrder,
-            groupId,
-            params,
-            basePath,
-          }}
-          isFocused={variant === undefined}
-        />
-        <VariantsColumn
-          {...{
-            variants,
-            selectedVariants,
-            variantsOrder,
-            groupId,
-            algorithmId,
-            params,
-            multiselect: variantsMultiselect,
-            basePath,
-          }}
-        />
-        {!variantsMultiselect ?
-          <LibraryInfoColumn
-=======
         <div className='library-top'>
           <GroupsColumn
->>>>>>> Added react-chartjs and added an example chart to the analytics page.
             {...{
               groups,
               groupsOrder,
               params,
               basePath,
             }}
+            isFocused={algorithm === undefined}
           />
           <AlgorithmsColumn
             {...{
@@ -273,6 +242,7 @@ class Library extends TerrainComponent<any>
               params,
               basePath,
             }}
+            isFocused={variant === undefined}
           />
           <VariantsColumn
             {...{

@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
+import { browserHistory } from 'react-router';
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -55,6 +55,7 @@ import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
+import LibraryActions from './library/data/LibraryActions';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
@@ -65,10 +66,10 @@ import Profile from './users/components/Profile';
 import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
-import LibraryActions from './library/data/LibraryActions';
 
 class AppRouter extends TerrainComponent<{}> {
-  public libraryOnEnter() {
+  public libraryOnEnter()
+  {
     LibraryActions.variants.unselectAll();
   }
 

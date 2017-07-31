@@ -44,31 +44,31 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as React from 'react';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
+import ContainerDimensions from 'react-container-dimensions';
 import
 {
   VictoryArea,
   VictoryAxis,
   VictoryBrushContainer,
   VictoryChart,
+  VictoryContainer,
   VictoryGroup,
   VictoryLabel,
+  VictoryLegend,
   VictoryScatter,
   VictoryTheme,
   VictoryTooltip,
   VictoryZoomContainer,
-  VictoryContainer,
-  VictoryLegend,
 } from 'victory';
-import ContainerDimensions from 'react-container-dimensions';
-import * as _ from 'lodash';
 
-interface Dataset 
+interface Dataset
 {
   id: number;
   name: string;
-  data: Array<any>;
+  data: any[];
 }
 
 interface Props
@@ -88,13 +88,13 @@ const colors = ['blue', 'red', 'green', 'yellow'];
 export default class TerrainAreaChart extends React.Component<Props, State> {
   public static defaultProps = {
     datasets: [],
-  }
+  };
 
   constructor(props)
   {
     super(props);
 
-    const visibleDatasets = props.datasets.map(ds => ds.id)
+    const visibleDatasets = props.datasets.map((ds) => ds.id);
 
     this.state = {
       selectedDomain: {},
@@ -105,8 +105,8 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
 
   public componentWillReceiveProps(nextProps)
   {
-    const visibleDatasets = nextProps.datasets.map(ds => ds.id);
-    this.setState({ visibleDatasets: visibleDatasets.toList() });
+    const visibleDatasets = nextProps.datasets.map((ds) => ds.id);
+    this.setState({ visibleDatasets: visibleDatasets.toList() });
   }
 
   public handleZoom(domain)
@@ -119,28 +119,31 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
     this.setState({ zoomDomain: domain });
   }
 
-  public renderAreas() {
+  public renderAreas()
+  {
     const { datasets } = this.props;
     const { visibleDatasets } = this.state;
     const chartStyle = {};
     const areas = [];
 
-    datasets.forEach((ds, index) => {
-      if (visibleDatasets.includes(ds.id)) {
+    datasets.forEach((ds, index) =>
+    {
+      if (visibleDatasets.includes(ds.id))
+      {
         areas.push(
           <VictoryArea
             key={ds.id}
             style={{ data: { fill: colors[index % colors.length] } }}
             data={ds.data}
             interpolation='monotoneX'
-          />
+          />,
         );
         areas.push(
           <VictoryScatter
             key={ds.id}
             size={5}
             data={ds.data}
-          />
+          />,
         );
       }
     });
@@ -154,7 +157,8 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
     const { visibleDatasets } = this.state;
 
     const data = datasets
-      .map(ds => {
+      .map((ds) =>
+      {
         return {
           id: ds.id,
           name: ds.name,
@@ -185,12 +189,14 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
   {
     const { visibleDatasets } = this.state;
 
-    if (visibleDatasets.includes(datasetId)) {
+    if (visibleDatasets.includes(datasetId))
+    {
       const datasetIdIndex = visibleDatasets.indexOf(datasetId);
       this.setState({
         visibleDatasets: visibleDatasets.remove(datasetIdIndex),
       });
-    } else {
+    } else
+    {
       this.setState({
         visibleDatasets: visibleDatasets.push(datasetId),
       });
@@ -209,7 +215,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
       <div style={{ width: '100%', display: 'flex', flexFlow: 'column nowrap' }}>
         <div style={{ height: '80%' }}>
           <ContainerDimensions>
-            { ({ width, height }) =>
+            {({ width, height }) =>
               <VictoryChart
                 scale={{ x: 'linear' }}
                 theme={VictoryTheme.material}
@@ -230,7 +236,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
                     data: { strokeWidth: 3, fillOpacity: 0.4 },
                   }}
                 >
-                {areas}
+                  {areas}
                 </VictoryGroup>
                 {legend}
               </VictoryChart>
@@ -239,7 +245,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
         </div>
         <div style={{ width: '100%', height: '20%' }}>
           <ContainerDimensions>
-            { ({ width, height }) =>
+            {({ width, height }) =>
               <VictoryChart
                 padding={{ top: 10, bottom: 25, left: 40, right: 0 }}
                 theme={VictoryTheme.material}
@@ -255,7 +261,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
                 <VictoryAxis />
                 <VictoryArea
                   style={{ data: { fill: '#c43a31' } }}
-                  data={datasets.first() ? datasets.first().data : []}
+                  data={datasets.first() !== null ? datasets.first().data : []}
                   interpolation='monotoneX'
                 />
               </VictoryChart>
