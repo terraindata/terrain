@@ -82,7 +82,7 @@ class ElasticClient
    */
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
   {
-    this.log('bulk', params);
+    // this.log('bulk', params);
     this.delegate.bulk(params, callback);
   }
 

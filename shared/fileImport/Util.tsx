@@ -44,27 +44,92 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export function dbTableErrorCheck(dbText: string, tableText: string): string
+/* returns an error message if there are any; else returns empty string */
+export function isValidIndexName(name: string): string
 {
-  if (dbText === '' || tableText === '')
+  if (name === '')
   {
-    return 'Database and table names cannot be empty strings';
+    return 'Index name cannot be an empty string.';
   }
-  if (dbText !== dbText.toLowerCase())
+  if (name !== name.toLowerCase())
   {
-    return 'Database may not contain uppercase letters';
+    return 'Index name may not contain uppercase letters.';
   }
-  if (!/^[a-z\d].*$/.test(dbText))
+  if (!/^[a-z\d].*$/.test(name))
   {
-    return 'Database name must start with a lowercase letter or digit';
+    return 'Index name must start with a lowercase letter or digit.';
   }
-  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(dbText))
+  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(name))
   {
-    return 'Database name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses';
-  }
-  if (/^_.*/.test(tableText))
-  {
-    return 'Table name may not start with an underscore';
+    return 'Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.';
   }
   return '';
+}
+/* returns an error message if there are any; else returns empty string */
+export function isValidTypeName(name: string): string
+{
+  if (name === '')
+  {
+    return 'Document type cannot be an empty string.';
+  }
+  if (/^_.*/.test(name))
+  {
+    return 'Document type may not start with an underscore.';
+  }
+  return '';
+}
+/* returns an error message if there are any; else returns empty string */
+export function isValidFieldName(name: string): string
+{
+  if (name === '')
+  {
+    return 'Field name cannot be an empty string.';
+  }
+  if (/^_.*/.test(name))
+  {
+    return 'Field name may not start with an underscore.';
+  }
+  if (name.indexOf('.') !== -1)
+  {
+    return 'Field name may not contain periods.';
+  }
+  return '';
+}
+
+export function parseJSONSubset(file: string, numLines: number): object[]
+{
+  let lineCount = 0;
+  let openBracketCount = 0;
+  let closeBracketCount = 0;
+  let charIndex = 0;
+
+  while (lineCount < numLines)
+  {
+    if (charIndex >= file.length - 1)
+    {
+      if (file.charAt(charIndex) === '\n')
+      {
+        charIndex--;
+      }
+      break;
+    }
+
+    if (file.charAt(charIndex) === '{')
+    {
+      openBracketCount++;
+    }
+    else if (file.charAt(charIndex) === '}')
+    {
+      closeBracketCount++;
+    }
+    charIndex++;
+
+    if (openBracketCount === closeBracketCount && openBracketCount !== 0)
+    {
+      lineCount++;
+      openBracketCount = 0;
+      closeBracketCount = 0;
+    }
+  }
+  return JSON.parse(file.substring(0, charIndex) + ']');
 }

@@ -237,6 +237,19 @@ interface Theme
       background: string,
     },
   };
+
+  // File Import -----------------------------
+
+  fileimport: {
+    preview: {
+      column: {
+        base: string,
+        typeDropdown: string,
+        transform: string,
+      };
+      cell: string;
+    },
+  };
 }
 
 const darkActive = '#1eb4fa';
@@ -427,6 +440,19 @@ const DARK: Theme =
       inputs:
       {
         background: '#626262',
+      },
+    },
+
+    // File import -----------------------------
+
+    fileimport: {
+      preview: {
+        column: {
+          base: '#9d6b6b',
+          typeDropdown: '#005d69',
+          transform: '#70b9e7',
+        },
+        cell: '#f1d7d7',
       },
     },
   };

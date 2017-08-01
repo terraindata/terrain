@@ -70,6 +70,7 @@
     "command-line-args": "^4.0.3",
     "command-line-usage": "^4.0.0",
     "create-react-class": "^15.6.0",
+    "csvjson": "^4.3.3",
     "csvtojson": "^1.1.7",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",

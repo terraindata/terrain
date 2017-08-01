@@ -43,51 +43,64 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as Radium from 'radium';
-import * as React from 'react';
-import * as _ from 'underscore';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './FileImportPreviewRow.less';
 
-export interface Props
-{
-  items: List<string>;
-}
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-@Radium
-class FileImportPreviewRow extends TerrainComponent<Props>
+import * as Util from '../Util';
+import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+
+const Router = new KoaRouter();
+export const templates = new ImportTemplates();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  public render()
+  winston.info('getting all templates');
+  ctx.body = await templates.get();
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting template ID ' + String(ctx.params.id));
+  ctx.body = await templates.get(Number(ctx.params.id));
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting filtered templates');
+  const request: object = ctx.request.body.body;
+  const filter: object = {};
+  if (request !== undefined)
   {
-    return (
-      <div
-        className='fi-preview-row'
-      >
-        {
-          this.props.items.map((value, key) =>
-            <div
-              key={key}
-              className='fi-preview-row-cell'
-              style={backgroundColor(Colors().fileimport.preview.cell)}
-            >
-              <div
-                className='fi-preview-row-cell-text'
-              >
-                {
-                  value
-                }
-              </div>
-            </div>,
-          )
-        }
-      </div>
-    );
+    if (request['dbid'] !== undefined)
+    {
+      filter['dbid'] = request['dbid'];
+    }
+    if (request['dbname'] !== undefined)
+    {
+      filter['dbname'] = request['dbname'];
+    }
+    if (request['tablename'] !== undefined)
+    {
+      filter['tablename'] = request['tablename'];
+    }
   }
-}
+  ctx.body = await templates.select([], filter);
+});
 
-export default FileImportPreviewRow;
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add new template');
+  const template: ImportTemplateConfig = ctx.request.body.body;
+  Util.verifyParameters(template, ['name', 'dbid', 'dbname', 'tablename']);
+  Util.verifyParameters(template, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  if (template.id !== undefined)
+  {
+    throw Error('Invalid parameter template ID');
+  }
+
+  ctx.body = await templates.upsert(ctx.state.user, template);
+});
+
+export default Router;

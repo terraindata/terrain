@@ -80,6 +80,17 @@ const appSchemaSQL: string[] = [
      password text NOT NULL,
      timezone string,
      meta text);`,
+  `CREATE TABLE IF NOT EXISTS importTemplates
+    (id integer PRIMARY KEY,
+     name text NOT NULL,
+     dbid integer NOT NULL,
+     dbname text NOT NULL,
+     tablename text NOT NULL,
+     csvHeaderMissing bool,
+     originalNames text NOT NULL,
+     columnTypes text NOT NULL,
+     primaryKey text NOT NULL,
+     transformations text NOT NULL);`,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

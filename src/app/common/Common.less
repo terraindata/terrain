@@ -118,7 +118,7 @@ input {
 	background: #fff;
 	border-radius: 5px;
 	padding: 5px;
-  
+
   &:disabled {
     background: #f5f5f5;
   }
@@ -142,14 +142,14 @@ input {
 .no-transition,
 .transition.no-transition {
   -webkit-transition: none !important;
-  transition: none !important; 
+  transition: none !important;
 }
 
 .info-message {
   text-align: center;
   color: rgba(0,0,0,0.5);
   .transition;
-  
+
   &.info-message-clickable:hover {
     color: #000;
   }
@@ -243,7 +243,7 @@ input {
   animation-delay: @s;
 }
 
-  
+
 
 .rotate180 {
   -moz-transform: rotate(180deg);
@@ -273,7 +273,7 @@ input {
   position: relative;
   z-index: 99;
   cursor: pointer;
-     
+
   &:before {
     border-radius: 5px;
     content: "";
@@ -286,7 +286,7 @@ input {
     left: 0px;
     .transition;
   }
-  
+
   &:hover:before {
     width: 105%;
     height: 105%;
@@ -320,7 +320,7 @@ input {
   &:hover {
     fill: #fff;
     background: rgba(255,60,70,1);
-  }           
+  }
 }
 
 .close-large {
@@ -419,9 +419,9 @@ input {
 	border-bottom-left-radius:          @bottomleft;
 	border-top-left-radius:             @topleft;
 
-	-moz-background-clip:    padding; 
-	-webkit-background-clip: padding-box; 
-	background-clip:         padding-box; 
+	-moz-background-clip:    padding;
+	-webkit-background-clip: padding-box;
+	background-clip:         padding-box;
 }
 
 .opacity (@opacity: 0.5) {
@@ -454,10 +454,10 @@ input {
 }
 
 .transition (@transition) {
-	-webkit-transition: @transition;  
+	-webkit-transition: @transition;
 	-moz-transition:    @transition;
-	-ms-transition:     @transition; 
-	-o-transition:      @transition;  
+	-ms-transition:     @transition;
+	-o-transition:      @transition;
 }
 .transform(@string){
 	-webkit-transform: @string;
@@ -522,11 +522,11 @@ input {
   user-select: none;           /* Non-prefixed version, currently */
 }
 
-.force-select {  
+.force-select {
   -webkit-user-select: all;  /* Chrome 49+ */
   -moz-user-select: all;     /* Firefox 43+ */
   -ms-user-select: all;      /* No support yet */
-  user-select: all;          /* Likely future */   
+  user-select: all;          /* Likely future */
 }
 
 
@@ -573,6 +573,14 @@ input {
 .smallest-text {
   font-weight: 400;
   font-size: 9px;
+}
+
+.fi-button {
+  font-size: 16px;
+  margin: 3px;
+  padding: 6px 12px;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 .title-white-text {
@@ -661,12 +669,11 @@ input {
   height: 24px;
   box-sizing: border-box;
   cursor: pointer;
-  border: 1px solid rgba(0,0,0,0);  
+  border: 1px solid rgba(0,0,0,0);
   text-transform: capitalize;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  
   .normal-white-text;
   
   &:hover,

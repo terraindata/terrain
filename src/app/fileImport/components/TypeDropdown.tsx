@@ -43,51 +43,72 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:strict-boolean-expressions
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
+import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './FileImportPreviewRow.less';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
+import './TypeDropdown.less';
+import shallowCompare = require('react-addons-shallow-compare');
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
+const { List } = Immutable;
+
+const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
 
 export interface Props
 {
-  items: List<string>;
+  columnId: number;
+  recursionDepth: number;
+  columnType: IMMap<string, any>;
+  editing: boolean;
 }
 
 @Radium
-class FileImportPreviewRow extends TerrainComponent<Props>
+class TypeDropdown extends TerrainComponent<Props>
 {
+  public handleTypeChange(typeIndex: number)
+  {
+    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
+  }
+
   public render()
   {
     return (
       <div
-        className='fi-preview-row'
+        className='fi-type-dropdown'
+        style={backgroundColor(Colors().fileimport.preview.column.typeDropdown)}
       >
+        <div
+          className='fi-type-dropdown-dropdown'
+        >
+          <Dropdown
+            selectedIndex={Number(this.props.columnType.get('type'))}
+            options={DATATYPES}
+            onChange={this.handleTypeChange}
+            canEdit={true}
+          />
+        </div>
         {
-          this.props.items.map((value, key) =>
-            <div
-              key={key}
-              className='fi-preview-row-cell'
-              style={backgroundColor(Colors().fileimport.preview.cell)}
-            >
-              <div
-                className='fi-preview-row-cell-text'
-              >
-                {
-                  value
-                }
-              </div>
-            </div>,
-          )
+          FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')] === 'array' &&
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionDepth={this.props.recursionDepth + 1}
+            columnType={this.props.columnType.get('innerType')}
+            editing={this.props.editing}
+          />
         }
       </div>
     );
   }
 }
 
-export default FileImportPreviewRow;
+export default TypeDropdown;
