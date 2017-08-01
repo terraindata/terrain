@@ -119,6 +119,11 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     {
       this.highlightError(nextProps.resultsState.errorLine);
     }
+
+    if (nextProps.query.tql !== this.state.tql)
+    {
+      this.updateTql(nextProps.query.tql, true);
+    }
   }
 
   public updateTql(tql: string, noAction: boolean = false, manualRequest: boolean = false)
@@ -388,7 +393,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
           className='tql-section'
         >
           <TQLEditor
-            tql={this.props.query.tql}
+            tql={this.state.tql}
             language={this.props.language}
             canEdit={this.props.canEdit}
             theme={this.state.theme}

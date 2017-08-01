@@ -62,13 +62,13 @@ class FileImportStateC extends BaseClass
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
 
-  public hasCsvHeader: boolean = true;
+  public csvHeaderMissing: boolean = false;
   public primaryKey: number = -1;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<ColumnTypesTree> = List([]);
+  public columnTypes: List<IMMap<string, any>> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);

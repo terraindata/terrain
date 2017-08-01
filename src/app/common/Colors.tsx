@@ -51,17 +51,35 @@ const Color = require('color');
 
 interface Theme
 {
+  // Use these colors
 
-  // main background color
-  base: string;
+  // main background colors
+  bg1: string; // most contrast
+  bg2: string;
+  bg3: string; // least contrast
 
-  altColor1: string;
-  altColor2: string;
+  emptyBg: string; // special BG to denote "empty nothingness"
+
+  text1: string; // most contrast
+  text2: string;
+  text3: string; // least contrast
+
+  altText1: string;
+  altText2: string;
 
   altBg1: string;
   altBg2: string;
 
-  fadedOutBg: string;
+  active: string; // active color
+  inactiveHover: string; // when something isn't active but could be
+  activeHover: string; // when an active thing is hovered
+
+  fadedOutBg: string; // for obscuring background contents behind a dark blur
+
+  scrollbarBG: string;
+  scrollbarPiece: string;
+
+  // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
   text: {
@@ -81,39 +99,15 @@ interface Theme
     backgroundHover: string,
   };
 
-  // main title bar
-  titleBar:
-  {
-    base: string,
-  };
-  // side bar
-  sideBar:
-  {
-    base: string,
-    selectedSquare: string,
-    arrowBg: string,
-  };
-
   // Library ------
 
   library:
   {
-    // title bar
-    titleBar: {
-      base: string,
-    },
-
     // item
     item: {
       title: string,
       body: string,
       activeBody: string,
-    },
-
-    // info panel
-    infoColumn: {
-      baseUpper: string,
-      baseLower: string,
     },
 
     // info graph selection btn
@@ -143,11 +137,6 @@ interface Theme
       tabTopRibbonInactive: string,
     },
 
-    // title bar
-    titleBar: {
-      base: string,
-    }
-
     // deck
     deck: {
       background: string,
@@ -157,6 +146,36 @@ interface Theme
     cards: {
       cardBase: string,
 
+      // card theme colors
+      atom: string,
+      number: string,
+
+      property: string,
+      keyword: string,
+      builtin: string,
+      string: string,
+
+      variable: string,
+      variable2: string,
+      variable3: string,
+      def: string,
+      bracket: string,
+
+      atomBG: string,
+      numberBG: string,
+
+      propertyBG: string,
+      keywordBG: string,
+      builtinBG: string,
+      stringBG: string,
+
+      variableBG: string,
+      variable2BG: string,
+      variable3BG: string,
+      defBG: string,
+      bracketBG: string,
+
+      // DO NOT USE -- Saving for reference, remove soon
       card1: string,
       card2: string,
       card3: string,
@@ -233,20 +252,38 @@ interface Theme
   };
 }
 
+const darkActive = '#1eb4fa';
+
 const DARK: Theme =
   {
-    // Universal Elements------------------------------
+    // Use these colors
 
-    // main background color
-    base: '#2F2F2F',
+    bg1: 'rgb(39, 39, 39)',
+    bg2: 'rgb(47, 47, 47)',
+    bg3: 'rgb(62, 60, 60)',
 
-    altColor1: '#242424',
-    altColor2: '#424242',
+    emptyBg: 'rgb(21, 21, 21)',
+
+    text1: '#fff',
+    text2: 'rgba(255,255,255,0.7)',
+    text3: 'rgba(255,255,255,0.5)',
 
     altBg1: '#fff',
     altBg2: '#EDEFF3',
 
+    altText1: '#242424',
+    altText2: '#424242',
+
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+    active: darkActive,
+    inactiveHover: Color(darkActive).fade(0.25).string(),
+    activeHover: Color(darkActive).fade(0.75).string(),
+
+    scrollbarBG: 'rgba(255,255,255,0.15)',
+    scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+    // DO NOT USE these below colors anymore -- these need to be cleaned up
 
     // text
     text:
@@ -268,39 +305,15 @@ const DARK: Theme =
       backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
     },
 
-    // main title bar
-    titleBar:
-    {
-      base: '#3E3C3C',
-    },
-    // side bar
-    sideBar:
-    {
-      base: '#646464',
-      selectedSquare: '#CAD847',
-      arrowBg: '#474747',
-    },
-
     // Library ------
 
     library:
     {
-      // title bar
-      titleBar: {
-        base: '#272727',
-      },
-
       // item
       item: {
         title: '#424242',
         body: '#4B4B4B',
         activeBody: '#4C7C9C',
-      },
-
-      // info panel
-      infoColumn: {
-        baseUpper: '#656363',
-        baseLower: '#545252',
       },
 
       // info graph selection btn
@@ -330,11 +343,6 @@ const DARK: Theme =
         tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
       },
 
-      // title bar
-      titleBar: {
-        base: '#272727',
-      },
-
       // deck
       deck: {
         background: '#2B2A2A',
@@ -343,6 +351,35 @@ const DARK: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
         cardBase: '#2F2F2F', // '#424242', // TODO
+
+        // card theme colors
+        atom: '#ae81ff',
+        number: '#ae81ff',
+
+        property: '#a6e22e',
+        keyword: '#f92672',
+        builtin: '#66d9ef',
+        string: '#e6db74',
+
+        variable: '#f8f8f2',
+        variable2: '#9effff',
+        variable3: '#66d9ef',
+        def: '#fd971f',
+        bracket: '#f8f8f2',
+
+        atomBG: Color('#ae81ff').alpha(0.7).string(),
+        numberBG: Color('#ae81ff').alpha(0.7).string(),
+
+        propertyBG: Color('#a6e22e').alpha(0.7).string(),
+        keywordBG: Color('#f92672').alpha(0.7).string(),
+        builtinBG: Color('#66d9ef').alpha(0.7).string(),
+        stringBG: Color('#e6db74').alpha(0.7).string(),
+
+        variableBG: Color('#f8f8f2').alpha(0.7).string(),
+        variable2BG: Color('#9effff').alpha(0.7).string(),
+        variable3BG: Color('#66d9ef').alpha(0.7).string(),
+        defBG: Color('#fd971f').alpha(0.7).string(),
+        bracketBG: Color('#f8f8f2').alpha(0.7).string(),
 
         card1: '#559DCE',
         card2: '#397DD0',
@@ -456,12 +493,32 @@ export function link()
   return fontColor(Colors().text.link, Colors().text.linkHover);
 }
 
+const CACHE: any = {};
+
+export function altStyle()
+{
+  if (!CACHE['altStyle' + curTheme])
+  {
+    CACHE['altStyle' + curTheme] = extend({},
+      backgroundColor(Colors().altBg1),
+      fontColor(Colors().altText1),
+    );
+  }
+
+  return CACHE['altStyle' + curTheme];
+}
+
 export function buttonColors()
 {
-  return extend({},
-    backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-    fontColor(Colors().button.text),
-  );
+  if (!CACHE['buttonColors' + curTheme])
+  {
+    CACHE['buttonColors' + curTheme] = extend({},
+      backgroundColor(Colors().button.background, Colors().button.backgroundHover),
+      fontColor(Colors().button.text),
+    );
+  }
+
+  return CACHE['buttonColors' + curTheme];
 }
 
 export function getStyle(color: string, style: string, hoverColor?: string)

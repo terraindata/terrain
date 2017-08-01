@@ -65,6 +65,7 @@ const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon')
 const LogoutIcon = require('./../../../images/icon_logout.svg');
 const EditIcon = require('./../../../images/icon_edit.svg');
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
+const ConnectionsIcon = require('./../../../images/icon_gear.svg?name=ConnectionsIcon');
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 
 export interface Props
@@ -122,6 +123,11 @@ class AccountDropdown extends TerrainComponent<Props>
     this.go('/account/profile/edit');
   }
 
+  public showConnections()
+  {
+    this.go('/account/connections');
+  }
+
   public goTeamGoTeamGo()
   {
     this.go('/account/team');
@@ -160,6 +166,14 @@ class AccountDropdown extends TerrainComponent<Props>
           </div>
           <div className='account-dropdown-link'>
             My Team
+          </div>
+        </div>
+        <div className='account-dropdown-row' onMouseDown={this.showConnections}>
+          <div className='account-dropdown-icon account-dropdown-icon-green'>
+            <ConnectionsIcon />
+          </div>
+          <div className='account-dropdown-link'>
+            Connections
           </div>
         </div>
         {

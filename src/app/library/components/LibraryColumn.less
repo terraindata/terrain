@@ -2,7 +2,9 @@
 
 .library-column {
   display: flex;
-  flex: 1;
+  flex-grow: 1;
+  overflow: auto;
+  flex-basis: 25%;
   flex-direction: column;
   height: 100%;
 
@@ -17,7 +19,6 @@
   .library-column-title {
     .title-text;
 
-    background: #a2af93;
     padding-left: 15px;
     padding-top: 7px;
     box-sizing: border-box;
@@ -32,9 +33,9 @@
     width: calc(~"100% - 6px");
     box-sizing: border-box;
     height: calc(~"100% - @{title-height}");
-    top: @title-height;
     text-align: center;
     overflow-y: auto;
+    position: relative;
 
     &.library-column-content-no-title {
       height: 100%;

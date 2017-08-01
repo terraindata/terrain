@@ -96,7 +96,7 @@ export function isValidFieldName(name: string): string
   return '';
 }
 
-export function parseJsonByLine(file: string, numLines: number): object[]
+export function parseJSONSubset(file: string, numLines: number): object[]
 {
   let lineCount = 0;
   let openBracketCount = 0;

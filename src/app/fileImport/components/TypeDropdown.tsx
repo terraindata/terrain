@@ -68,7 +68,7 @@ export interface Props
 {
   columnId: number;
   recursionDepth: number;
-  columnType: FileImportTypes.ColumnTypesTree;
+  columnType: IMMap<string, any>;
   editing: boolean;
 }
 
@@ -78,12 +78,6 @@ class TypeDropdown extends TerrainComponent<Props>
   public handleTypeChange(typeIndex: number)
   {
     Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
-  }
-
-  public shouldComponentUpdate(nextProps: Props)
-  {
-    const shouldUpdateShallow = shallowCompare(this, nextProps);
-    return shouldUpdateShallow || JSON.stringify(this.props.columnType) !== JSON.stringify(nextProps.columnType);
   }
 
   public render()
@@ -97,18 +91,18 @@ class TypeDropdown extends TerrainComponent<Props>
           className='fi-type-dropdown-dropdown'
         >
           <Dropdown
-            selectedIndex={Number(this.props.columnType.type)}
+            selectedIndex={Number(this.props.columnType.get('type'))}
             options={DATATYPES}
             onChange={this.handleTypeChange}
             canEdit={true}
           />
         </div>
         {
-          FileImportTypes.ELASTIC_TYPES[this.props.columnType.type] === 'array' &&
+          FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')] === 'array' &&
           <TypeDropdown
             columnId={this.props.columnId}
             recursionDepth={this.props.recursionDepth + 1}
-            columnType={this.props.columnType.innerType}
+            columnType={this.props.columnType.get('innerType')}
             editing={this.props.editing}
           />
         }
