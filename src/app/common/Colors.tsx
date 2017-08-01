@@ -51,6 +51,7 @@ const Color = require('color');
 
 interface Theme
 {
+  // Use these colors
 
   // main background colors
   bg1: string; // most contrast
@@ -63,8 +64,8 @@ interface Theme
   text2: string;
   text3: string; // least contrast
 
-  altColor1: string;
-  altColor2: string;
+  altText1: string;
+  altText2: string;
 
   altBg1: string;
   altBg2: string;
@@ -77,6 +78,8 @@ interface Theme
 
   scrollbarBG: string;
   scrollbarPiece: string;
+
+  // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
   text: {
@@ -253,9 +256,7 @@ const darkActive = '#1eb4fa';
 
 const DARK: Theme =
   {
-    // Universal Elements------------------------------
-
-    // main background color
+    // Use these colors
 
     bg1: 'rgb(39, 39, 39)',
     bg2: 'rgb(47, 47, 47)',
@@ -265,13 +266,13 @@ const DARK: Theme =
 
     text1: '#fff',
     text2: 'rgba(255,255,255,0.7)',
-    text3: 'rgba(255,255,255,0.3)',
-
-    altColor1: '#242424',
-    altColor2: '#424242',
+    text3: 'rgba(255,255,255,0.5)',
 
     altBg1: '#fff',
     altBg2: '#EDEFF3',
+
+    altText1: '#242424',
+    altText2: '#424242',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
@@ -281,6 +282,8 @@ const DARK: Theme =
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+    // DO NOT USE these below colors anymore -- these need to be cleaned up
 
     // text
     text:
@@ -490,12 +493,32 @@ export function link()
   return fontColor(Colors().text.link, Colors().text.linkHover);
 }
 
+const CACHE: any = {};
+
+export function altStyle()
+{
+  if (!CACHE['altStyle' + curTheme])
+  {
+    CACHE['altStyle' + curTheme] = extend({},
+      backgroundColor(Colors().altBg1),
+      fontColor(Colors().altText1),
+    );
+  }
+
+  return CACHE['altStyle' + curTheme];
+}
+
 export function buttonColors()
 {
-  return extend({},
-    backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-    fontColor(Colors().button.text),
-  );
+  if (!CACHE['buttonColors' + curTheme])
+  {
+    CACHE['buttonColors' + curTheme] = extend({},
+      backgroundColor(Colors().button.background, Colors().button.backgroundHover),
+      fontColor(Colors().button.text),
+    );
+  }
+
+  return CACHE['buttonColors' + curTheme];
 }
 
 export function getStyle(color: string, style: string, hoverColor?: string)
