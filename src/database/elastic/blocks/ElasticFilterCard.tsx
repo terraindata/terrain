@@ -58,7 +58,10 @@ import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
+import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
+
 export const elasticFilter = _card({
+  filters: List(),
   key: 'query',
 
   static:
@@ -78,22 +81,41 @@ export const elasticFilter = _card({
 
     anythingAccepts: true, // TODO change
 
+    init: () => ({
+      filters: List([]),
+    }),
+
     display:
-    [
+    {
+      displayType: DisplayType.ROWS,
+      key: 'values',
+      english: 'Key / Value',
+      factoryType: 'elasticMagicValue',
+      provideParentData: false,
+      row:
       {
-        displayType: DisplayType.TEXT,
-        key: 'field',
-        getAutoTerms: (schemaState) =>
+        inner:
+        [
+          {
+            displayType: DisplayType.TEXT,
+            key: 'field',
+            getAutoTerms: (schemaState) =>
+            {
+              return List(['movies', 'baseball', 'zazzle']);
+            },
+          },
+          {
+            displayType: DisplayType.DROPDOWN,
+            key: 'bool',
+            options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
+            dropdownUsesRawValues: true,
+          }
+        ],
+        below:
         {
-          return List(['movies', 'baseball', 'zazzle']);
+          displayType: DisplayType.CARDSFORTEXT,
+          key: 'value',
         },
-      },
-      {
-        displayType: DisplayType.DROPDOWN,
-        key: 'index',
-        options: List(),
-        dropdownUsesRawValues: true,
-      },
       // {
       //   displayType: DisplayType.TEXT,
       //   key: 'rootType',
@@ -115,7 +137,8 @@ export const elasticFilter = _card({
       //   key: 'cards',
       //   // accepts,
       // },
-    ],
+      },
+    },
   },
 });
 
