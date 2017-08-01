@@ -319,29 +319,6 @@ class FileImport extends TerrainComponent<any>
       return false;
     }
 
-    // extract column header names and preview rows
-    // const colNameSet = new Set();
-    // const columnNames = _.map(items[0], (value, index) =>
-    //   {
-    //     if (filetype === 'csv' && csvHeaderMissing)
-    //     {
-    //       return 'column ' + String(index); // default header names: 'column 0, column 1, ...'
-    //     }
-    //     else
-    //     {
-    //       if (colNameSet.has(index))
-    //       {
-    //         return index + '-copy';
-    //       }
-    //       else
-    //       {
-    //         colNameSet.add(index);
-    //         return index;
-    //       }
-    //     }
-    //   }
-    // );
-
     const columnNames = _.map(items[0], (value, index) =>
       filetype === 'csv' && csvHeaderMissing ? 'column ' + String(index) : index,
     );
@@ -383,7 +360,7 @@ class FileImport extends TerrainComponent<any>
         file: fr.result,
         filetype,
       });
-      this.refs['file']['value'] = null;                 // prevent file-caching
+      this.refs['file']['value'] = null; // prevent file-caching
     };
   }
 

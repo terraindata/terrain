@@ -73,6 +73,7 @@ export interface Props
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<IMMap<string, any>>;
+
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
@@ -86,13 +87,11 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     templateOptions: List<string>,
     editColumnId: number,
-    resetLocalColumnNames: boolean,
   } = {
     templateId: -1,
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
-    resetLocalColumnNames: false,
   };
 
   public componentDidMount()
@@ -113,10 +112,10 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
-  public onColumnNameChange(columnId: number, localColumnName: string)
+  public onColumnNameChange(columnId: number, localColumnName: string): boolean
   {
-    // If column name entered already exists when autocomplete box goes out of focus, throw an error and roll back change
-    // otherwise, if the name has actually changed - set the new name and add the rename transform
+    // If column name entered already exists when autocomplete box goes out of focus, return false to roll back change
+    // otherwise, if the name has actually changed - set the new name and add the rename transform and return true
     if (this.props.columnNames.delete(columnId).contains(localColumnName))
     {
       alert('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
@@ -279,7 +278,6 @@ class FileImportPreview extends TerrainComponent<Props>
                 isPrimaryKey={this.props.primaryKey === key}
                 columnOptions={this.props.columnOptions}
                 editing={key === this.state.editColumnId}
-                resetLocalColumnNames={this.state.resetLocalColumnNames}
                 handleEditColumnChange={this.handleEditColumnChange}
                 onColumnNameChange={this.onColumnNameChange}
               />,

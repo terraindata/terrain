@@ -110,7 +110,7 @@ const applyTransform = (state, transform) =>
       .set('columnTypes', state.columnTypes.insert(transformCol + 1, state.columnTypes.get(transformCol)))
       .set('previewRows', List(state.previewRows.map((row, i) =>
         [].concat(...row.map((col, j) =>           // convoluted way of mapping an array and returning a larger array
-        {                                          // since one column needs to be added (ditto for split below)
+        {                                          // since one column needs to be added (same for split below)
           if (j === transformCol)
           {
             return [col, col];
@@ -221,10 +221,9 @@ FileImportReducers[ActionTypes.setColumnToInclude] =
 
 FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
-  {
-    return state
-      .setIn(['columnNames', action.payload.columnId], action.payload.newName);
-  };
+    state
+      .setIn(['columnNames', action.payload.columnId], action.payload.newName)
+  ;
 
 FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
@@ -248,21 +247,17 @@ FileImportReducers[ActionTypes.setColumnType] =
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
-  {
-    console.log('add transform: ', action.payload.transform);
-    return state.set('transforms', state.transforms.push(action.payload.transform));
-  };
+    state.set('transforms', state.transforms.push(action.payload.transform))
+  ;
 
 FileImportReducers[ActionTypes.updatePreviewRows] =
   (state, action) =>
-  {
-    return applyTransform(state, action.payload.transform);
-  };
+    applyTransform(state, action.payload.transform)
+  ;
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
-  {
-    return state
+    state
       .set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
@@ -272,8 +267,8 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('columnNames', action.payload.originalNames)
       .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
       .set('columnTypes', List(action.payload.originalNames.map(() => (Immutable.fromJS({ type: 0 })))))
-      .set('transforms', List([]));
-  };
+      .set('transforms', List([]))
+  ;
 
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
@@ -363,32 +358,21 @@ FileImportReducers[ActionTypes.loadTemplate] =
     {
       state = applyTransform(state, transform);
     });
-    const { primaryKey, columnNames, columnTypes, columnsToInclude, previewRows } = state;
+    const { columnNames, previewRows } = state;
 
-    const colTypes = [];
-    const colsToInclude = [];
-    columnNames.map((colName, i) =>
-    {
-      const colType = template.columnTypes[colName];
-      if (colType)
-      {
-        colTypes.push(Immutable.fromJS(deeplyColumnTypeToNumber(colType)));         // frontend requires type as number
-        colsToInclude.push(true);
-      }
-      else
-      {
-        colTypes.push(Immutable.fromJS({ type: 0 }));
-        colsToInclude.push(false);
-      }
-    });
     return state
       .set('originalNames', List(template.originalNames))
       .set('primaryKey', columnNames.indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('csvHeaderMissing', template.csvHeaderMissing)
       .set('columnNames', columnNames)
-      .set('columnTypes', List(colTypes))
-      .set('columnsToInclude', List(colsToInclude))
+      .set('columnTypes', List(template.columnNames.map((colName) =>
+        template.columnTypes[colName] ?
+          Immutable.fromJS(deeplyColumnTypeToNumber(colName))
+          :
+          Immutable.fromJS({ type: 0 }),
+      )))
+      .set('columnsToInclude', List(template.columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewRows', previewRows);
   };
 

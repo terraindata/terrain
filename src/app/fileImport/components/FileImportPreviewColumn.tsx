@@ -66,13 +66,12 @@ export interface Props
 {
   columnId: number;
   columnName: string;
-  columnNames: List<string>;
+  columnNames: List<string>; // TODO: move to parent component while preserving merge transformation options
   isIncluded: boolean;
   columnType: IMMap<string, any>;
   isPrimaryKey: boolean;
   columnOptions: List<string>;
   editing: boolean;
-  resetLocalColumnNames: boolean;
   handleEditColumnChange(editColumnId: number);
   onColumnNameChange(columnId: number, localColumnName: string);
 }
