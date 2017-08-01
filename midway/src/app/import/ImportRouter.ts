@@ -44,23 +44,89 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as stream from 'stream';
+
+import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import { users } from '../users/UserRouter';
 import * as Util from '../Util';
 import { Import, ImportConfig } from './Import';
+import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
+const importTemplates = new ImportTemplates();
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('importing to database');
   const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype']);
+  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype', 'update']);
   Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
 
+  ctx.body = await imprt.upsert(imprtConf);
+});
+
+Router.post('/headless', async (ctx, next) =>
+{
+  winston.info('importing to database, from file and template id');
+  const { files, fields } = await asyncBusboy(ctx.req);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+
+  Util.verifyParameters(fields, ['templateID', 'filetype']);
+
+  const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
+  if (templates.length === 0)
+  {
+    throw new Error('Invalid template ID provided: ' + String(fields['templateID']));
+  }
+  const template: ImportTemplateConfig = templates[0];
+
+  let update: boolean = true;
+  if (fields['update'] === 'false')
+  {
+    update = false;
+  }
+  else if (fields['update'] !== undefined && fields['update'] !== 'true')
+  {
+    throw new Error('Invalid value for parameter "update": ' + String(fields['update']));
+  }
+
+  let file: stream.Readable | null = null;
+  for (const f of files)
+  {
+    if (f.fieldname === 'file')
+    {
+      file = f;
+    }
+  }
+  if (file === null)
+  {
+    throw new Error('No file specified.');
+  }
+
+  const imprtConf: ImportConfig = {
+    dbid: template['dbid'],
+    dbname: template['dbname'],
+    tablename: template['tablename'],
+    csvHeaderMissing: template['csvHeaderMissing'],
+    originalNames: template['originalNames'],
+    columnTypes: template['columnTypes'],
+    primaryKey: template['primaryKey'],
+    transformations: template['transformations'],
+
+    contents: await Util.getStreamContents(file),
+    filetype: fields['filetype'],
+    update,
+  };
   ctx.body = await imprt.upsert(imprtConf);
 });
 

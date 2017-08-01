@@ -207,6 +207,20 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
       .set('csvHeaderMissing', !state.csvHeaderMissing)
   ;
 
+FileImportReducers[ActionTypes.toggleLoading] =
+  (state, action) =>
+  {
+    console.log(!state.loading);
+    return state
+      .set('loading', !state.loading);
+  };
+
+FileImportReducers[ActionTypes.toggleUpdate] =
+  (state, action) =>
+    state
+      .set('update', !state.update)
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
@@ -286,18 +300,21 @@ FileImportReducers[ActionTypes.uploadFile] =
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
+      state.update,
       () =>
       {
         alert('success');
+        action.payload.toggleLoading();
       },
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        action.payload.toggleLoading();
       },
       state.csvHeaderMissing,
     );
 
-    return state;
+    return state.set('loading', true);
   };
 
 FileImportReducers[ActionTypes.saveTemplate] =

@@ -3,6 +3,15 @@
 .fi-preview {
   white-space: nowrap;
 
+  .fi-preview-loading-container {
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    .transition(~"all 0.5s");
+  }
+
   .fi-preview-template {
     height: 60px;
 
@@ -43,13 +52,18 @@
   }
 
   .fi-preview-table-container {
-    overflow-x: scroll;
+    overflow-x: auto;
 
     .fi-preview-columns-container {
     }
 
     .fi-preview-rows-container {
     }
+  }
+
+  .fi-preview-update {
+    color: #FFFFFF;
+    float: right;
   }
 
   .fi-preview-import-button {

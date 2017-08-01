@@ -55,7 +55,9 @@ import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import Loading from './../../common/components/Loading';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -77,6 +79,8 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
+  loading: boolean;
+  update: boolean;
 }
 
 @Radium
@@ -87,11 +91,13 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     templateOptions: List<string>,
     editColumnId: number,
+    showLoading: boolean,
   } = {
     templateId: -1,
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
+    showLoading: false,
   };
 
   public componentDidMount()
@@ -202,6 +208,11 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.templateText);
   }
 
+  public handleUpdateChange()
+  {
+    Actions.toggleUpdate();
+  }
+
   public handleUploadFile()
   {
     Actions.uploadFile();
@@ -302,6 +313,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
+    console.log('loading: ', this.props.loading);
     return (
       <div
         className='fi-preview'
@@ -309,12 +321,33 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTemplate()}
         {this.renderTable()}
         <div
+          className='fi-preview-update'
+        >
+          update
+          <CheckBox
+            checked={this.props.update}
+            onChange={this.handleUpdateChange}
+          />
+        </div>
+        <div
           className='fi-preview-import-button'
           onClick={this.handleUploadFile}
           style={buttonColors()}
         >
           Import
         </div>
+        {
+          this.props.loading &&
+          <div className='fi-preview-loading-container'>
+            <Loading
+              width={100}
+              height={100}
+              loading={this.props.loading}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          </div>
+        }
       </div>
     );
   }
