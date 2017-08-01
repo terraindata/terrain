@@ -160,7 +160,7 @@ const parseElasticWeightBlock = (obj: object): Block =>
 {
   if (obj['weight'] === 0)
   {
-    return ;
+    return;
   }
 
   const scorePoints = [];
