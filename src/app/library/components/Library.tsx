@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
+import * as _ from 'underscore';
 import TerrainAreaChart from '../../charts/TerrainAreaChart';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from './../../common/components/InfoArea';
@@ -71,10 +71,13 @@ export interface Props
   route?: any;
   variantsMultiselect?: boolean;
   basePath: string;
-  // params?: any;
-  // location?: {
-  //   pathname: string;
-  // };
+}
+
+export interface State
+{
+  libraryState: LibraryState;
+  selectedDomain: any;
+  zoomDomain: any;
 }
 
 class Library extends TerrainComponent<any>
@@ -89,11 +92,7 @@ class Library extends TerrainComponent<any>
 
   public cancelSubscription = null;
 
-  public state: {
-    libraryState: LibraryState;
-    selectedDomain: any;
-    zoomDomain: any;
-  } = {
+  public state: State = {
     libraryState: null,
     selectedDomain: {},
     zoomDomain: {},
@@ -109,13 +108,14 @@ class Library extends TerrainComponent<any>
   public componentWillMount()
   {
     const { basePath } = this.props;
-    if ((!this.props.params || !this.props.params.groupId) && basePath === 'library')
+
+    if ((!this.props.params || !this.props.params.groupId))
     {
       // no path given, redirect to last library path
-      const path = localStorage.getItem('lastLibraryPath');
+      const path = this.getLastPath();
       if (path != null)
       {
-        // browserHistory.replace(path);
+        browserHistory.replace(path);
       }
     }
   }
@@ -157,12 +157,30 @@ class Library extends TerrainComponent<any>
     return datasets.toList();
   }
 
+  public getLastPath()
+  {
+    const { basePath } = this.props;
+
+    const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+    // no path given, redirect to last library path
+    return localStorage.getItem(lastPath);
+  }
+
+  public setLastPath()
+  {
+    const { location, basePath } = this.props;
+
+    const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+    localStorage.setItem(lastPath, location.pathname);
+  }
+
   public render()
   {
     const { libraryState } = this.state;
 
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
-    const { params, basePath, variantsMultiselect } = this.props;
+    const { router, basePath, variantsMultiselect } = this.props;
+    const { params } = router;
 
     const datasets = this.getDatasets();
 
@@ -218,7 +236,7 @@ class Library extends TerrainComponent<any>
 
     if (!!this.props.location.pathname)
     {
-      localStorage.setItem('lastLibraryPath', this.props.location.pathname);
+      this.setLastPath();
     }
 
     return (
@@ -242,7 +260,7 @@ class Library extends TerrainComponent<any>
               params,
               basePath,
             }}
-            isFocused={variant === undefined}
+            isFocused={variantIds !== null && variantIds.length === 0}
           />
           <VariantsColumn
             {...{
@@ -254,6 +272,7 @@ class Library extends TerrainComponent<any>
               params,
               multiselect: variantsMultiselect,
               basePath,
+              router,
             }}
           />
           {!variantsMultiselect ?

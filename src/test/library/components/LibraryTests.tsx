@@ -86,7 +86,7 @@ describe('Library', () =>
     libraryComponent = shallow(
       <Library
         store={store}
-        params={{ groupId: '1' }}
+        router={{ params: { groupId: '1' } }}
       />,
     );
   });
