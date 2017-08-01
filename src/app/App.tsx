@@ -55,9 +55,9 @@ import './App.less';
 
 // Libraries
 import * as $ from 'jquery';
-import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
@@ -172,7 +172,11 @@ interface Props
   children: any;
 }
 
-@Radium
+const APP_STYLE = _.extend({},
+  fontColor(Colors().text.baseLight),
+  backgroundColor(Colors().bg1),
+);
+
 class App extends TerrainComponent<Props>
 {
   public state = {
@@ -361,10 +365,7 @@ class App extends TerrainComponent<Props>
         className='app'
         onMouseMove={this.handleMouseMove}
         key='app'
-        style={[
-          fontColor(Colors().text.baseLight),
-          backgroundColor(Colors().bg1),
-        ]}
+        style={APP_STYLE}
       >
         {
           this.state.loggedInAndLoaded &&
