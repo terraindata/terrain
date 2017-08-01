@@ -104,7 +104,7 @@ class BuilderComponent extends TerrainComponent<Props>
     data: IMMap<any, any>,
     options?: {
       className: string;
-    } ): (El | El[])
+    }): (El | El[])
   {
     const keySeed = parentKeyPath.join(',');
     if (Array.isArray(displayArg))

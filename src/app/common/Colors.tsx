@@ -148,6 +148,24 @@ interface Theme
       cardBase: string,
 
       // card theme colors
+
+      // new
+      anyClause: string[];
+      arrayClause: string[];
+      baseClause: string[];
+      booleanClause: string[];
+      enumClause: string[];
+      fieldClause: string[];
+      indexClause: string[];
+      mapClause: string[];
+      nullClause: string[];
+      numberClause: string[];
+      objectClause: string[];
+      stringClause: string[];
+      structureClause: string[];
+      typeClause: string[];
+
+      // old
       atom: string,
       number: string,
 
@@ -340,9 +358,25 @@ const DARK: Theme =
 
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
-        cardBase: 'rgb(47, 47, 47)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
+        cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
         // card theme colors
+
+        anyClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
+        arrayClause: ['rgb(170, 177, 180)', 'rgb(60, 63, 67)'],
+        baseClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
+        booleanClause: ['rgb(204, 50, 50)', 'rgb(60, 63, 67)'],
+        enumClause: ['rgb(255, 189, 86)', 'rgb(60, 63, 67)'],
+        fieldClause: ['rgb(144, 118, 170)', 'rgb(60, 63, 67)'],
+        indexClause: ['rgb(144, 118, 170)', 'rgb(60, 63, 67)'],
+        mapClause: ['rgb(204, 120, 50)', 'rgb(60, 63, 67)'],
+        nullClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
+        numberClause: ['rgb(205, 156, 25)', 'rgb(60, 63, 67)'],
+        objectClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
+        stringClause: ['rgb(100, 135, 89)', 'rgb(60, 63, 67)'],
+        structureClause: ['rgb(30, 179, 249)', 'rgb(60, 63, 67)'],
+        typeClause: ['rgb(144, 118, 170)', 'rgb(60, 63, 67)'],
+
         atom: '#ae81ff',
         number: '#ae81ff',
 
@@ -393,32 +427,32 @@ const DARK: Theme =
         card20: '#4A979A',
         card21: '#3A91A5',
 
-        card1BG: Color('#559DCE').alpha(0.7).string(),
-        card2BG: Color('#397DD0').alpha(0.7).string(),
-        card3BG: Color('#D14F42').alpha(0.7).string(),
-        card4BG: Color('#D55A44').alpha(0.7).string(),
-        card5BG: Color('#DA6846').alpha(0.7).string(),
-        card6BG: Color('#DD7547').alpha(0.7).string(),
-        card7BG: Color('#DD8846').alpha(0.7).string(),
-        card8BG: Color('#DAA043').alpha(0.7).string(),
-        card9BG: Color('#D9B540').alpha(0.7).string(),
-        card10BG: Color('#86A760').alpha(0.7).string(),
-        card11BG: Color('#659F72').alpha(0.7).string(),
-        card12BG: Color('#4B977F').alpha(0.7).string(),
-        card13BG: Color('#39908B').alpha(0.7).string(),
-        card14BG: Color('#2E8C9A').alpha(0.7).string(),
-        card15BG: Color('#2589AA').alpha(0.7).string(),
-        card16BG: Color('#466AA3').alpha(0.7).string(),
-        card17BG: Color('#824BA0').alpha(0.7).string(),
-        card18BG: Color('#B161BC').alpha(0.7).string(),
-        card19BG: Color('#319AA9').alpha(0.7).string(),
-        card20BG: Color('#4A979A').alpha(0.7).string(),
-        card21BG: Color('#3A91A5').alpha(0.7).string(),
+        card1BG: Color('#559DCE').alpha(.2).string(),
+        card2BG: Color('#397DD0').alpha(0.2).string(),
+        card3BG: Color('#D14F42').alpha(0.2).string(),
+        card4BG: Color('#D55A44').alpha(0.2).string(),
+        card5BG: Color('#DA6846').alpha(0.2).string(),
+        card6BG: Color('#DD7547').alpha(0.2).string(),
+        card7BG: Color('#DD8846').alpha(0.2).string(),
+        card8BG: Color('#DAA043').alpha(0.2).string(),
+        card9BG: Color('#D9B540').alpha(0.2).string(),
+        card10BG: Color('#86A760').alpha(0.2).string(),
+        card11BG: Color('#659F72').alpha(0.2).string(),
+        card12BG: Color('#4B977F').alpha(0.2).string(),
+        card13BG: Color('#39908B').alpha(0.2).string(),
+        card14BG: Color('#2E8C9A').alpha(0.2).string(),
+        card15BG: Color('#2589AA').alpha(0.2).string(),
+        card16BG: Color('#466AA3').alpha(0.2).string(),
+        card17BG: Color('#824BA0').alpha(0.2).string(),
+        card18BG: Color('#B161BC').alpha(0.2).string(),
+        card19BG: Color('#319AA9').alpha(0.2).string(),
+        card20BG: Color('#4A979A').alpha(0.2).string(),
+        card21BG: Color('#3A91A5').alpha(0.2).string(),
       },
 
       //builder column
       builderColumn: {
-        background: 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
+        background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
       },
 
       results:

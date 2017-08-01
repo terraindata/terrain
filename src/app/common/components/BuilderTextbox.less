@@ -9,13 +9,13 @@
   flex-basis: 100px;
   margin: 0px 3px;
   // min-height: @input-height;
-  
+
   &.builder-tb-accepts-cards {
     input, textarea {
       // padding-right: @switch-width + 6px;
     }
   }
-  
+
   &:hover {
     .builder-tb-switch {
       svg {
@@ -29,10 +29,10 @@
       opacity: 0.5;
     }
   }
-  
+
   .builder-tb-switch {
     background: rgba(235,235,235,0.5);
-    
+
     position: absolute;
     text-align: center;
     display: block;
@@ -49,11 +49,11 @@
     width: 30px;
     .transition;
     cursor: pointer;
-    
+
     &:hover {
       background: #ddd;
     }
-    
+
     svg {
       opacity: 0;
       .transition;
@@ -61,17 +61,17 @@
       top: 1px;
       height: 17px;
       vertical-align: middle;
-      
+
       .cls-1 {
         fill:#7c7d7b;
       }
     }
   }
-  
+
   .builder-tb-card-wrapper {
     position: relative;
   }
-  
+
   .builder-tb-cards-input {
     height: @input-height;
     border-radius: 5px;
@@ -81,10 +81,10 @@
     background: rgba(255,255,255,0.5);
     // margin-bottom: @standard-margin;
   }
-  
+
   &.builder-tb-cards {
   }
-  
+
   @card-chip-offset: 35px;
   @t: 6px; // triangle half-height
   .builder-tb-cards-input-value {
@@ -104,7 +104,7 @@
     justify-content: center;
     height: 17px;
     .transition;
-    
+
     .card-preview {
       position: relative;
       top: 0px;
@@ -112,12 +112,12 @@
       border-radius: 3px;
     }
   }
-  
+
   .builder-tb-cards-input-value-text {
     display: inline-block;
     vertical-align: middle;
   }
-  
+
   .builder-tb-cards-arrow {
     border-top: 1px solid #47a7ff;
     border-right: 1px solid #47a7ff;
@@ -128,7 +128,7 @@
     top: @input-height / 2 - 1px;
     z-index: 9; // put it on top of the child card's background
     .transition;
-    
+
     .builder-tb-cards-arrow-inner {
       .transition;
       position: absolute;
@@ -149,28 +149,28 @@
       height: @input-height / 2 + @standard-margin - 1px;
       border-bottom: 1px solid #fff;
       border-top-width: 0px;
-      
+
       .builder-tb-cards-arrow-inner {
         bottom: -1 * @t;
         top: auto;
       }
     }
   }
-  
+
   &.builder-tb-cards-closed {
     .builder-tb-cards-input-value {
       width: calc(~"100% - 6px - 24px");
     }
-    
+
     .builder-tb-cards-arrow {
       height: 0px;
       border-color: rgba(0,0,0,0) !important;
     }
-    
+
     .builder-tb-cards-arrow-inner {
       border-color: rgba(0,0,0,0) !important;
     }
-    
+
     .builder-tb-cards-toggle {
       top: 1px;
       svg {
@@ -178,7 +178,7 @@
       }
     }
   }
-  
+
 }
 
 .builder-tb-cards-area {
@@ -215,18 +215,18 @@
   left: 0px;
   top: -1px;
   z-index: 1;
-  
+
   padding: 6px;
   cursor: pointer;
-  
+
   .transition;
-  
+
   svg {
     .transition;
     width: 10px;
     fill: #fff;
   }
-  
+
   opacity: 0;
   &:hover {
     opacity: 0.9;
@@ -239,23 +239,23 @@
 .card {
   .builder-tb {
     input {
-      background: rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.25);
       color: #fff;
       &::placeholder {
-        color: rgba(255,255,255,0.5) !important;
+        color: rgba(0,0,0,0.5) !important;
       }
     }
     &:hover {
       input {
-        background: rgba(255,255,255,0.25);
+        background: rgba(0,0,0,0.37);
       }
     }
     input {
       &:focus {
         color: #242424;
-        background: rgba(255,255,255,1);
+        background: rgba(0,0,0,.5);
         &::placeholder {
-          color: rgba(0,0,0,0.5) !important;
+          color: rgba(0,0,0,0.7) !important;
         }
       }
     }

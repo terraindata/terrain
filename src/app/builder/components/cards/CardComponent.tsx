@@ -546,7 +546,9 @@ class _CardComponent extends TerrainComponent<Props>
         <div
           className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
           style={{
-            background: this.state.hovering ? this.props.card.static.colors[1] : Colors().bg2,
+            background: this.state.hovering ?
+              Color(this.props.card.static.colors[0]).alpha(.4) :
+              Colors().bg2,
             // background:  Color(this.props.card.static.colors[1]),
             // borderTopColor: Color(this.props.card.static.colors[1]).lighten(0.25),
             // borderLeftColor: Color(this.props.card.static.colors[1]).lighten(0.2),
@@ -594,7 +596,7 @@ class _CardComponent extends TerrainComponent<Props>
                   <div
                     className='card-title-inner'
                     style={{
-                      background: card.static.colors[0],
+                      background: card.static.colors[1],
                     }}
                   >
                     {
