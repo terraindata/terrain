@@ -270,6 +270,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static:
       {
         preview: '[cards.size] ' + clause.type + '(s)',
+        colors: [Colors().builder.cards.variable3, Colors().builder.cards.variable3BG],
 
         display:
         {
@@ -297,8 +298,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
+        colors: [Colors().builder.cards.atom, Colors().builder.cards.atomBG],
       static: {
         preview: '[value]',
+        colors: [Colors().builder.cards.builtin, Colors().builder.cards.builtinBG],
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -315,6 +318,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static: {
         preview: '[value]',
+        colors: [Colors().builder.cards.atom, Colors().builder.cards.atomBG],
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
@@ -332,6 +336,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? clause.values[0] : clause.template,
+      colors: [Colors().builder.cards.variable2, Colors().builder.cards.variable2BG],
       static: {
         preview: '[value]',
         display: {
@@ -351,6 +356,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       value: clause.template === undefined ? '' : clause.template,
       static: {
         preview: '[value]',
+        colors: [Colors().builder.cards.variable, Colors().builder.cards.variableBG],
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -401,13 +407,13 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
       childrenHaveKeys: true,
-      colors: [Colors().builder.cards.property, Colors().builder.cards.propertyBG],
 
       // TODO incorporate nameType into the keys
 
       static:
       {
         preview: '[cards.size] properties',
+        colors: [Colors().builder.cards.keyword, Colors().builder.cards.keywordBG],
 
         display:
         {
@@ -437,6 +443,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       static: {
         preview: '',
+        colors: [Colors().builder.cards.atom, Colors().builder.cards.atomBG],
         display: [],
         tql: () => null,
       },

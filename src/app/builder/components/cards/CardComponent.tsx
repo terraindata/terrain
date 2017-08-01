@@ -498,7 +498,10 @@ class _CardComponent extends TerrainComponent<Props>
       columnIndex={this.props.columnIndex}
       keyPath={this.getKeyPath()}
       language={this.props.card.static.language}
-      textStyle={{ color: this.props.card.static.colors[0] }}
+      textStyle={{
+        color: this.props.card.static.colors[0],
+        backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
+      }}
     />;
 
     const { card } = this.props;
@@ -546,16 +549,19 @@ class _CardComponent extends TerrainComponent<Props>
         <div
           className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
           style={{
-            background: this.state.hovering ? this.props.card.static.colors[1] : Colors().bg2,
+            background: this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
+            borderColor: this.state.hovering ? this.props.card.static.colors[0] : this.props.card.static.colors[0],
+            borderWidth: this.state.hovering ? 3 : 1,
+            paddingLeft: this.state.hovering ? 1 : 3,
             // background:  Color(this.props.card.static.colors[1]),
             // borderTopColor: Color(this.props.card.static.colors[1]).lighten(0.25),
             // borderLeftColor: Color(this.props.card.static.colors[1]).lighten(0.2),
             // borderBottomColor: Color(this.props.card.static.colors[1]).darken(0.25),
             // borderRightColor: Color(this.props.card.static.colors[1]).darken(0.2),
-            borderTopColor: Colors().border3,
-            borderLeftColor: Colors().border3,
-            borderBottomColor: Colors().border2,
-            borderRightColor: Colors().border2,
+            // borderTopColor: Colors().border3,
+            // borderLeftColor: Colors().border3,
+            // borderBottomColor: Colors().border2,
+            // borderRightColor: Colors().border2,
           }}
           ref='cardInner'
         >

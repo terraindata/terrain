@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-unused-expression member-access max-line-length
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
@@ -90,6 +91,7 @@ export interface Props
   overrideClick?: (index: number) => void; // override the click handler
 }
 
+@Radium
 class CreateCardTool extends TerrainComponent<Props>
 {
   public state: {
@@ -177,7 +179,7 @@ class CreateCardTool extends TerrainComponent<Props>
         })}
         ref='selector'
         style={
-          backgroundColor(Colors().bg3)
+          backgroundColor(Colors().bg1)
         }
       >
         <div className='create-card-selector-inner'>
@@ -230,6 +232,12 @@ class CreateCardTool extends TerrainComponent<Props>
       <div
         onClick={this.props.onToggle}
         className='create-card-placeholder'
+        style={{
+          borderColor: Colors().inactiveHover,
+          ':hover': {
+            background: Colors().inactiveHover,
+          }
+        }}
       >
         {
           this.props.open ? <CloseIcon /> : <AddIcon />
@@ -297,7 +305,7 @@ class CreateCardTool extends TerrainComponent<Props>
         className={classes}
         style={_.extend(
           style,
-          backgroundColor(Colors().builder.builderColumn.background),
+          backgroundColor(Colors().bg1),
         )}
       >
         {

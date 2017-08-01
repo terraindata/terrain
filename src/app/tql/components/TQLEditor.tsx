@@ -53,6 +53,8 @@ import * as ReactDOM from 'react-dom';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
+import { Colors } from '../../common/Colors';
+import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
@@ -152,10 +154,12 @@ class TQLEditor extends TerrainComponent<Props>
       options['mode'] = '';
     }
 
+    let CM: any;
+
     if (this.props.isDiff)
     {
       options['value'] = this.props.tql || '';
-      return (
+      CM = (
         <CodeMirror
           ref='cm2'
           className='codemirror-text'
@@ -166,7 +170,7 @@ class TQLEditor extends TerrainComponent<Props>
         />
       );
     }
-    return (
+    CM = (
       <CodeMirror
         ref='cm'
         className='codemirror-text'
@@ -181,6 +185,17 @@ class TQLEditor extends TerrainComponent<Props>
         hideTermDefinition={this.props.hideTermDefinition}
         onCodeMirrorMount={this.registerCodeMirror}
       />
+    );
+    
+    return (
+      <div>
+        {
+          CM
+        }
+        <StyleTag
+          style={CODE_HIGHLIGHTING_STYLE}
+        />
+      </div>
     );
   }
 
@@ -253,5 +268,20 @@ class TQLEditor extends TerrainComponent<Props>
   }
 
 }
+
+const CODE_HIGHLIGHTING_STYLE = {
+  ".cm-s-monokai span.cm-atom": { color: Colors().builder.cards.atom },
+  ".cm-s-monokai span.cm-number": { color: Colors().builder.cards.number },
+
+  ".cm-s-monokai span.cm-property": { color: Colors().builder.cards.property },
+  ".cm-s-monokai span.cm-attribute": { color: '#f00' },
+  ".cm-s-monokai span.cm-keyword": { color: Colors().builder.cards.keyword },
+  ".cm-s-monokai span.cm-builtin": { color: Colors().builder.cards.builtin },
+  ".cm-s-monokai span.cm-string": { color: Colors().builder.cards.string },
+
+  ".cm-s-monokai span.cm-variable": { color: Colors().builder.cards.variable },
+  ".cm-s-monokai span.cm-variable-2": { color: Colors().builder.cards.variable2 },
+  ".cm-s-monokai span.cm-variable-3": { color: Colors().builder.cards.variable3 },
+};
 
 export default TQLEditor;

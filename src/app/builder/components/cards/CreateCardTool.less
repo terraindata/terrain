@@ -53,25 +53,27 @@
   .create-card-placeholder {
     @h: 18px;
     height: @h;
-    width: @h * 1.3333;
-    background: #fff;
+    width: calc(~"100% - 24px");
     display: inline-block;
     position: relative;
-    left: 50%;
     border-radius: 3px;
     // margin-top: 6px;
     margin-bottom: 6px;
+    margin-left: 12px;
+    margin-right: 12px;
+    box-sizing: border-box;
     text-align: center;
     cursor: pointer;
     
-      opacity: 0.35;
+    border: 1px solid #fff;
     
+    opacity: 0.2;
     
     svg {
       @sh: @h * 2 / 3;
       height: @sh;
       margin-top: (@h - @sh)/2;
-      fill: #47a7ff;
+      fill: #fff;
     }
     
     &:hover {
@@ -120,7 +122,7 @@
   .card {
     .create-card-wrapper {
       .create-card-placeholder {
-        opacity: 0.35;
+        opacity: 0.2;
       }
     } 
   }

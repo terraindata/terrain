@@ -193,7 +193,7 @@ class CardsArea extends TerrainComponent<Props>
             [this.props.className]: !!this.props.className,
           })}
           style={
-            backgroundColor(Colors().builder.cards.cardBase)
+            backgroundColor(Colors().bg1)
           }
         >
           {
