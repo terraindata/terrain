@@ -54,7 +54,7 @@ import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import { isValidIndexName, isValidTypeName, parseJsonByLine } from './../../../../shared/fileImport/Util';
+import { isValidIndexName, isValidTypeName, parseJSONSubset } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -264,7 +264,7 @@ class FileImport extends TerrainComponent<any>
 
   public parseJson(file: string): object[]
   {
-    const items = parseJsonByLine(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+    const items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
     if (!Array.isArray(items))
     {
       alert('Input JSON file must parse to an array of objects.');

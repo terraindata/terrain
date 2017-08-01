@@ -754,7 +754,6 @@ export const Ajax =
         transformations,
         name,
       };
-      console.log('saveTemplate payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -771,7 +770,7 @@ export const Ajax =
       return;
     },
 
-    getTemplates(
+    fetchTemplates(
       connectionId: number,
       dbname: string,
       tablename: string,

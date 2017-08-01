@@ -380,13 +380,15 @@ FileImportReducers[ActionTypes.saveTemplate] =
       },
       state.csvHeaderMissing,
     );
+
+    action.payload.fetchTemplates();
     return state;
   };
 
-FileImportReducers[ActionTypes.getTemplates] =
+FileImportReducers[ActionTypes.fetchTemplates] =
   (state, action) =>
   {
-    Ajax.getTemplates(
+    Ajax.fetchTemplates(
       state.connectionId,
       state.dbText,
       state.tableText,
@@ -409,7 +411,7 @@ FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
     const template = state.templates.get(action.payload.templateId);
-    template.transformations.map((transform, i) =>
+    template.transformations.map((transform) =>
     {
       state = applyTransform(state, transform);
     });

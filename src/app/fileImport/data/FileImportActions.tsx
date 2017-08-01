@@ -102,11 +102,11 @@ const FileImportActions =
 
     saveTemplate:
     (templateText: string) =>
-      $(ActionTypes.saveTemplate, { templateText }),
+      $(ActionTypes.saveTemplate, { templateText, fetchTemplates: FileImportActions.fetchTemplates }),
 
-    getTemplates:
+    fetchTemplates:
     () =>
-      $(ActionTypes.getTemplates, { setTemplates: FileImportActions.setTemplates }),
+      $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
     (templates: List<FileImportTypes.Template>) =>

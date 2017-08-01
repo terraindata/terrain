@@ -84,18 +84,23 @@ class FileImportPreview extends TerrainComponent<Props>
   public state: {
     templateId: number,
     templateText: string,
+    templateOptions: List<string>,
     editColumnId: number,
     resetLocalColumnNames: boolean,
   } = {
     templateId: -1,
     templateText: '',
+    templateOptions: List([]),
     editColumnId: -1,
     resetLocalColumnNames: false,
   };
 
   public componentDidMount()
   {
-    Actions.getTemplates();
+    Actions.fetchTemplates();
+    this.setState({
+      templateOptions: this.props.templates.map((template, i) => template.name),
+    });
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -103,6 +108,13 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
     });
+
+    if (!this.props.templates.equals(nextProps.templates))
+    {
+      this.setState({
+        templateOptions: nextProps.templates.map((template, i) => template.name),
+      });
+    }
   }
 
   public handleEditColumnChange(editColumnId: number)
@@ -133,10 +145,27 @@ class FileImportPreview extends TerrainComponent<Props>
       alert('Please select a template to load');
       return;
     }
-    if (!this.props.columnNames.equals(List(this.props.templates.get(this.state.templateId).originalNames)))
+    const templateNames = List(this.props.templates.get(this.state.templateId).originalNames);
+    let isCompatible = true;
+    const unmatchedTemplateNames = [];
+    const unmatchedTableNames = this.props.columnNames.toArray();
+    templateNames.map((templateName) =>
     {
-      console.log(this.props.templates.get(this.state.templateId).originalNames);
-      alert('Incompatible column names with template');
+      if (!this.props.columnNames.contains(templateName))
+      {
+        isCompatible = false;
+        unmatchedTemplateNames.push(templateName);
+      }
+      else
+      {
+        unmatchedTableNames.splice(unmatchedTableNames.indexOf(templateName), 1);
+      }
+    });
+
+    if (!isCompatible)
+    {
+      alert('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedTemplateNames) + '\n and \n'
+        + JSON.stringify(unmatchedTableNames));
       return;
     }
     Actions.loadTemplate(this.state.templateId);
@@ -150,7 +179,6 @@ class FileImportPreview extends TerrainComponent<Props>
       return;
     }
     Actions.saveTemplate(this.state.templateText);
-    Actions.getTemplates();
   }
 
   public handleUploadFile()
@@ -177,7 +205,7 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
           <Dropdown
             selectedIndex={this.state.templateId}
-            options={List<string>(this.props.templates.map((template, i) => template.name))}
+            options={this.state.templateOptions}
             onChange={this.handleTemplateChange}
             className={'fi-load-dropdown'}
             canEdit={true}
