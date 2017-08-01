@@ -78,6 +78,7 @@ import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/EST
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
+import { ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Colors } from '../../common/Colors';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
 import { BuilderStore } from '../data/BuilderStore';
@@ -356,11 +357,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            return List(['movieId', 'title', 'budget', 'released', 'revenue']);
-            // TODO change from tables to dbs?
-            // const db = BuilderStore.getState().db.name; // TODO correct?
-            //  const tableNames = schemaState.tableNamesByDb.get(db);
-            //  return tableNames;
+            return ElasticBlockHelpers.fieldsInScope(schemaState);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -674,34 +671,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            const state = BuilderStore.getState();
-            const cards = state.query.cards;
-            const isIndexCard = (card) => card['type'] === 'eqlindex';
-
-            let indexCard = cards.find(isIndexCard);
-            if (indexCard === undefined)
-            {
-              indexCard = cards.get(0);
-              if (indexCard !== undefined)
-              {
-                indexCard = indexCard['cards'].find(isIndexCard);
-              }
-            }
-
-            // TODO idea: have the selected index and type stored on the Query object
-
-            if (indexCard !== undefined)
-            {
-              const index = indexCard['value'];
-              const indexId = state.db.name + '/' + String(index);
-              return schemaState.tables.filter(
-                (table) => table.databaseId === indexId,
-              ).map(
-                (table) => table.name,
-              ).toList();
-            }
-
-            return List([]);
+            return ElasticBlockHelpers.typesInScope(schemaState);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
