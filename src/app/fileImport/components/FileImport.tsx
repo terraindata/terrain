@@ -330,6 +330,20 @@ class FileImport extends TerrainComponent<any>
           break;
         case 'csv':
           items = this.parseCsv(parsedFile);
+          // remove first line if csv has header
+          if (this.state.fileImportState.hasCsvHeader)
+          {
+            let cutoff = 0;
+            while (cutoff < parsedFile.length)
+            {
+              if (parsedFile.charAt(cutoff) === '\n')
+              {
+                break;
+              }
+              cutoff++;
+            }
+            parsedFile.slice(0, cutoff);
+          }
           break;
         default:
       }
@@ -346,7 +360,7 @@ class FileImport extends TerrainComponent<any>
         this.state.filetype === 'csv' && !hasCsvHeader ? 'column' + String(i) : i,
       );
 
-      Actions.chooseFile(streaming ? parsedFile : '', this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      Actions.chooseFile(streaming ? '' : parsedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
     };
   }
 

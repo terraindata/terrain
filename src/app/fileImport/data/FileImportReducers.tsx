@@ -359,7 +359,6 @@ FileImportReducers[ActionTypes.uploadFile] =
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
       },
-      state.hasCsvHeader,
     );
 
     return state;
@@ -386,7 +385,6 @@ FileImportReducers[ActionTypes.saveTemplate] =
       {
         alert('Error saving template: ' + JSON.parse(err).errors[0].detail);
       },
-      state.hasCsvHeader,
     );
     return state;
   };
@@ -443,7 +441,6 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('originalNames', List(template.originalNames))
       .set('primaryKey', columnNames.indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
-      .set('hasCsvHeader', !template.csvHeaderMissing)
       .set('columnNames', columnNames)
       .set('columnTypes', List(colTypes))
       .set('columnsToInclude', List(colsToInclude))

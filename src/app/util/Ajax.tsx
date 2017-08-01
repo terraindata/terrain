@@ -699,7 +699,6 @@ export const Ajax =
       streaming: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
     )
     {
       const payload: object = {
@@ -711,7 +710,6 @@ export const Ajax =
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
         transformations,
         update,
         streaming,
@@ -744,7 +742,6 @@ export const Ajax =
       name: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
     )
     {
       const payload: object = {
@@ -754,7 +751,6 @@ export const Ajax =
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
         transformations,
         name,
       };
