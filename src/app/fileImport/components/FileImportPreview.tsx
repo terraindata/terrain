@@ -105,15 +105,44 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    this.setState({
-      resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
-    });
+    // this.setState({
+    //   resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
+    // });
 
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
         templateOptions: nextProps.templates.map((template, i) => template.name),
       });
+    }
+  }
+
+  public onColumnNameChange(columnId: number, localColumnName: string)
+  {
+    // If column name entered already exists when autocomplete box goes out of focus, throw an error and roll back change
+    // otherwise, if the name has actually changed - set the new name and add the rename transform
+    if (this.props.columnNames.delete(columnId).contains(localColumnName))
+    {
+      alert('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
+      // this.setState({
+      //   localColumnName: this.props.columnNames.get(columnId),
+      // });
+      return false;
+    }
+
+    if (this.props.columnNames.get(columnId) !== localColumnName)
+    {
+      Actions.setColumnName(columnId, this.props.columnNames.get(columnId), localColumnName);
+      Actions.addTransform(
+        {
+          name: 'rename',
+          colName: this.props.columnNames.get(columnId),
+          args: {
+            newName: localColumnName,
+          },
+        },
+      );
+      return true;
     }
   }
 
@@ -250,14 +279,16 @@ class FileImportPreview extends TerrainComponent<Props>
               <FileImportPreviewColumn
                 key={key}
                 columnId={key}
-                isIncluded={this.props.columnsToInclude.get(key)}
-                columnType={JSON.parse(JSON.stringify(this.props.columnTypes.get(key)))}
-                isPrimaryKey={this.props.primaryKey === key}
+                columnName={this.props.columnNames.get(key)}
                 columnNames={this.props.columnNames}
+                isIncluded={this.props.columnsToInclude.get(key)}
+                columnType={this.props.columnTypes.get(key)}
+                isPrimaryKey={this.props.primaryKey === key}
                 columnOptions={this.props.columnOptions}
                 editing={key === this.state.editColumnId}
                 resetLocalColumnNames={this.state.resetLocalColumnNames}
                 handleEditColumnChange={this.handleEditColumnChange}
+                onColumnNameChange={this.onColumnNameChange}
               />,
             ).toArray()
           }

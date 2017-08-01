@@ -301,29 +301,16 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
   {
-    const columnNames = [];
-    const columnsToInclude = [];
-    const columnTypes = [];
-    let colsCount = 0;
-
-    _.map(action.payload.preview.get(0), (value, key) =>
-    {
-      columnNames.push(action.payload.originalNames.get(key));
-      columnsToInclude.push(true);
-      columnTypes.push({ type: 0 });
-      colsCount++;
-    });
-
     return state
       .set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
-      .set('columnsCount', colsCount)
-      .set('originalNames', List(columnNames))
-      .set('columnNames', List(columnNames))
-      .set('columnsToInclude', List(columnsToInclude))
-      .set('columnTypes', List(columnTypes))
+      .set('columnsCount', action.payload.originalNames.size)
+      .set('originalNames', action.payload.originalNames)
+      .set('columnNames', action.payload.originalNames)
+      .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
+      .set('columnTypes', List(action.payload.originalNames.map(() => ({ type: 0 }))))
       .set('transforms', List([]));
   };
 
