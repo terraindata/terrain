@@ -55,9 +55,9 @@ import './App.less';
 
 // Libraries
 import * as $ from 'jquery';
-import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 
 const Perf = require('react-addons-perf');
 import { IndexRoute, Route, Router } from 'react-router';
@@ -93,6 +93,7 @@ import X from './x/components/X';
 const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
+import StyleTag from './common/components/StyleTag';
 import DeployModal from './deploy/components/DeployModal';
 import Ajax from './util/Ajax';
 import Util from './util/Util';
@@ -171,7 +172,11 @@ interface Props
   children: any;
 }
 
-@Radium
+const APP_STYLE = _.extend({},
+  fontColor(Colors().text.baseLight),
+  backgroundColor(Colors().bg1),
+);
+
 class App extends TerrainComponent<Props>
 {
   public state = {
@@ -360,10 +365,7 @@ class App extends TerrainComponent<Props>
         className='app'
         onMouseMove={this.handleMouseMove}
         key='app'
-        style={[
-          fontColor(Colors().text.baseLight),
-          backgroundColor(Colors().bg1),
-        ]}
+        style={APP_STYLE}
       >
         {
           this.state.loggedInAndLoaded &&
@@ -395,6 +397,10 @@ class App extends TerrainComponent<Props>
           hideOnClick={true}
         />
 
+        <StyleTag
+          style={SCROLLBAR_STYLE}
+        />
+
         <InAppNotification />
 
         <EasterEggs />
@@ -402,6 +408,15 @@ class App extends TerrainComponent<Props>
     );
   }
 }
+
+const SCROLLBAR_STYLE = {
+  '::-webkit-scrollbar-track': {
+    background: Colors().scrollbarBG,
+  },
+  '::-webkit-scrollbar-thumb': {
+    background: Colors().scrollbarPiece,
+  },
+};
 
 const router = (
   <Router history={browserHistory}>

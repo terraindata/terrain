@@ -46,9 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-unused-expression
 
+import * as Radium from 'radium';
 import './VariantVersions.less';
 const classNames = require('classnames');
 import * as React from 'react';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import UserStore from './../../users/data/UserStore';
@@ -71,6 +73,7 @@ export interface Props
   variant: Variant;
 }
 
+@Radium
 class VariantVersions extends TerrainComponent<Props>
 {
   public state: {
@@ -142,6 +145,8 @@ class VariantVersions extends TerrainComponent<Props>
 
   public renderVersion(version, i)
   {
+    const isCurrent = i === 0;
+
     const { roles } = this.state;
     const groupId = this.props.variant.groupId;
     let role = 'Viewer';
@@ -167,10 +172,11 @@ class VariantVersions extends TerrainComponent<Props>
         onClick={
           this._fn(this.showVersion, version.id, i)
         }
+        style={isCurrent ? ACTIVE_VERSION_STYLE : VERSION_STYLE}
       >
         <div className='versions-table-element'>
           <UserThumbnail
-            userId={version.userId}
+            userId={version.createdByUserId}
             small={true}
             showName={true}
             extra={role}
@@ -194,7 +200,10 @@ class VariantVersions extends TerrainComponent<Props>
         <div className='versions-table-title'>
           Version History
         </div>
-        <div className='versions-table-right-align'>
+        <div
+          className='versions-table-right-align'
+          style={fontColor(Colors().text3)}
+        >
           Current Version
         </div>
         {
@@ -213,5 +222,17 @@ class VariantVersions extends TerrainComponent<Props>
     );
   }
 }
+
+const VERSION_STYLE = [
+  borderColor(Colors().bg1, Colors().inactiveHover),
+  backgroundColor(Colors().bg2, Colors().inactiveHover),
+  fontColor(Colors().text2, Colors().text1),
+];
+
+const ACTIVE_VERSION_STYLE = [
+  borderColor(Colors().active, Colors().inactiveHover),
+  backgroundColor(Colors().active, Colors().inactiveHover),
+  fontColor(Colors().text1, Colors().text1),
+];
 
 export default VariantVersions;

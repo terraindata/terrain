@@ -76,8 +76,14 @@ export default class ESVariantClause extends ESClause
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
     const valueType: string = ESJSONType[valueInfo.jsonType];
+    const refinedValueType: string = this.refineType(valueType, valueInfo);
 
-    const subtype: string | undefined = this.subtypes[valueType];
+    // try with refined value type first
+    let subtype: string | undefined = this.subtypes[refinedValueType];
+    if (subtype === undefined)
+    {
+      subtype = this.subtypes[valueType];
+    }
     if (subtype === undefined)
     {
       interpreter.accumulateError(valueInfo,
@@ -93,5 +99,25 @@ export default class ESVariantClause extends ESClause
     valueInfo.clause = subclause;
 
     subclause.mark(interpreter, valueInfo);
+  }
+
+  private refineType(jsonType: string, valueInfo: ESValueInfo): string
+  {
+    switch (jsonType)
+    {
+      case 'string':
+        return jsonType + ':' + String(valueInfo.value);
+      case 'object':
+        const keys = Object.keys(valueInfo.value);
+        if (keys.length === 1)
+        {
+          return jsonType + ':' + keys[0];
+        } else
+        {
+          return jsonType;
+        }
+      default:
+        return jsonType;
+    }
   }
 }
