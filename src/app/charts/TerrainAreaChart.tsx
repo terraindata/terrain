@@ -123,7 +123,6 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
   {
     const { datasets } = this.props;
     const { visibleDatasets } = this.state;
-    const chartStyle = {};
     const areas = [];
 
     datasets.forEach((ds, index) =>
