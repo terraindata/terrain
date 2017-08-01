@@ -48,6 +48,7 @@ import sha1 = require('sha1');
 
 import * as csvjson from 'csvjson';
 import * as fs from 'fs';
+import * as rimraf from 'rimraf';
 import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
@@ -185,6 +186,7 @@ export class Import
             }
             items = JSON.parse(data);
           });
+          winston.info('@#$^@$%^@#$%@#$%got items for upsert@#$%@#$^@$%^@#$%@#$%@#$%@#');
           // await this._tastyUpsert(this.imprt, items);
           // fs.unlink('test/testout' + String(num) + '.txt', (err) =>
           // {
@@ -195,13 +197,12 @@ export class Import
           // });
         }
         // TODO: make read calls synchronous to make sure this doesn't happen prematurely?
-        // TODO: can this delete a non-empty directory?
-        fs.rmdir('import_streaming_tmp', (err) =>
+        rimraf('import_streaming_tmp', (err) =>
         {
-            if (err !== undefined && err !== null)
-            {
-                throw err;
-            }
+          if (err !== undefined && err !== null)
+          {
+            throw err;
+          }
         });
         winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
 

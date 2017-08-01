@@ -55,6 +55,7 @@ import * as io from 'socket.io-client';
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
+import AuthStore from './../../auth/data/AuthStore';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -214,6 +215,14 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('connected');
     });
+    socket.on('request_auth', () =>
+    {
+      const authState = AuthStore.getState();
+      socket.emit('auth', {
+        id: authState.id,
+        accessToken: authState.accessToken,
+      });
+    });
     socket.on('ready', () =>
     {
       console.log('ready');
@@ -240,7 +249,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.streaming)
     {
       console.log('filesize: ', this.props.file.size);
-      const test = 50000000;
+      const test = 5000000;
 
       let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
       while (fileStart < test)
