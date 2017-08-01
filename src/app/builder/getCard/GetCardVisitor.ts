@@ -511,7 +511,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   }
 
   public visitESScriptClause(clause: ESScriptClause): any
-  { return this.visitESStructureClause(clause); }
+  {
+    return this.visitESStructureClause(clause);
+  }
 
   public visitESStringClause(clause: ESStringClause): any
   {
