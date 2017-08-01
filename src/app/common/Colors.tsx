@@ -265,7 +265,7 @@ const DARK: Theme =
 
     text1: '#fff',
     text2: 'rgba(255,255,255,0.7)',
-    text3: 'rgba(255,255,255,0.3)',
+    text3: 'rgba(255,255,255,0.5)',
 
     altColor1: '#242424',
     altColor2: '#424242',

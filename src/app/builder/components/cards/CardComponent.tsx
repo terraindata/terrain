@@ -569,7 +569,6 @@ class _CardComponent extends TerrainComponent<Props>
                 }
                 {
                   this.props.canEdit &&
-                  this.state.hovering &&
                   <Menu
                     options={this.state.menuOptions}
                   />
