@@ -102,10 +102,19 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   const valueMap: { value?: any, cards?: List<Card> } = {};
   if (isScoreCard(valueInfo))
   {
+    const weights = [];
+    for (const factor of valueInfo.value.params.factors)
+    {
+      const weight = parseElasticWeightBlock(factor);
+      if (weight)
+      {
+        weights.push(weight)
+      }
+    }
     return make(
       Blocks, 'elasticScore',
       {
-        weights: List(valueInfo.value.params.factors.map(parseElasticWeightBlock)),
+        weights: List(weights),
       });
   }
 
@@ -141,26 +150,6 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   return make(Blocks, clauseCardType, valueMap);
 };
 
-const parseObjectWrap = (obj: object): Cards =>
-{
-  const arr: Card[] = _.map(obj,
-    (value: any, key: string) =>
-    {
-      return make(
-        Blocks, 'elasticKeyValueWrap',
-        {
-          key,
-          cards: List([
-            parseValueSingleCard(value),
-          ]),
-        },
-      );
-    },
-  );
-
-  return List(arr);
-};
-
 const isScoreCard = (valueInfo: ESValueInfo): boolean =>
 {
   return (valueInfo.clause.clauseType === ESClauseType.ESScriptClause) &&
@@ -169,6 +158,11 @@ const isScoreCard = (valueInfo: ESValueInfo): boolean =>
 
 const parseElasticWeightBlock = (obj: object): Block =>
 {
+  if (obj['weight'] === 0)
+  {
+    return ;
+  }
+
   const scorePoints = [];
   for (let i = 0; i < obj['ranges'].length; ++i)
   {
@@ -188,6 +182,26 @@ const parseElasticWeightBlock = (obj: object): Block =>
     key: card,
     weight: obj['weight'],
   });
+};
+
+const parseObjectWrap = (obj: object): Cards =>
+{
+  const arr: Card[] = _.map(obj,
+    (value: any, key: string) =>
+    {
+      return make(
+        Blocks, 'elasticKeyValueWrap',
+        {
+          key,
+          cards: List([
+            parseValueSingleCard(value),
+          ]),
+        },
+      );
+    },
+  );
+
+  return List(arr);
 };
 
 const parseArrayWrap = (arr: any[]): Cards =>

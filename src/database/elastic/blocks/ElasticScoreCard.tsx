@@ -96,6 +96,7 @@ export const elasticScore = _card(
 
         return {
           type: 'number',
+          order: 'desc',
           script: {
             stored: 'Terrain.Score.PWL',
             params: {
