@@ -51,6 +51,7 @@ const Color = require('color');
 
 interface Theme
 {
+  // Use these colors
 
   // main background colors
   bg1: string; // most contrast
@@ -77,6 +78,8 @@ interface Theme
 
   scrollbarBG: string;
   scrollbarPiece: string;
+
+  // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
   text: {
@@ -240,9 +243,7 @@ const darkActive = '#1eb4fa';
 
 const DARK: Theme =
   {
-    // Universal Elements------------------------------
-
-    // main background color
+    // Use these colors
 
     bg1: 'rgb(39, 39, 39)',
     bg2: 'rgb(47, 47, 47)',
@@ -268,6 +269,8 @@ const DARK: Theme =
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+    // DO NOT USE these below colors anymore -- these need to be cleaned up
 
     // text
     text:
