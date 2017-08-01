@@ -882,7 +882,7 @@ class Builder extends TerrainComponent<Props>
           'builder': true,
           'builder-no-column-animation': this.state.noColumnAnimation,
         })}
-        style={backgroundColor(Colors().bg2)}
+        style={backgroundColor(Colors().bg1)}
       >
         {
           !config || !config.length ?

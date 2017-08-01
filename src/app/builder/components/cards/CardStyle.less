@@ -5,10 +5,10 @@
 @top-height: 24px;
 @title-width: 110px;
 @stroke-height: 5px;
-@card-border-radius: 0px;
+@card-border-radius: 6px;
 @card-padding-horizontal: 15px;
 @card-padding-vertical: 7px;
-  
+
 .card {
   position: relative;
   border-radius: @card-border-radius;
@@ -16,30 +16,33 @@
   box-sizing: border-box;
   padding-right: 0px;
   padding-top: 0px;
-  
+
   &.single-card {
     padding-top: 6px;
   }
-  
+
   min-width: 400px;
- 
+
   .card-inner {
-    border: 1px solid @medium-dark-green;
+    //background: #3c3f41;
+    //border-color: #646464;
+    border: 1px solid;// #646464;
     border-radius: @card-border-radius;
     box-sizing: border-box;
-    
+    box-shadow: 3px 3px 2px 1px rgba(0,0,0,.49);
+
     min-height: 35px;
-    
+
     padding: 3px;
     padding-right: 0px;
     // transition: all 0.25s;
   }
-  
+
   .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
     opacity: 0;
     .transition;
   }
-  
+
   &.card-hovering {
     .menu-wrapper, .manual-popup-wrapper {
       opacity: 1;
@@ -49,21 +52,22 @@
         opacity: 0;
       }
     }
-    
+
     .card-inner {
+      //background: #404345;
       border-width: 3px;
       border-right-width: 1px;
       padding: 1px;
       padding-right: 0px;
     }
-    
+
     .card .card-inner {
       border-width: 1px;
       padding: 3px;
       padding-right: 0px;
     }
   }
-  
+
   .menu-wrapper {
     top: 5px;
     left: 34px;
@@ -72,18 +76,18 @@
       z-index: 99;
     }
   }
-  
+
   .card-title-card-hovering {
     .manual-popup-wrapper {
       opacity: 1;
     }
   }
-  
+
   &.card-selected {
     box-shadow: 0px 0px 0px 3px @drag-color;
     z-index: 9001;
   }
-  
+
   &.card-dragging {
     &:after {
       content: "";
@@ -98,7 +102,7 @@
       border-radius: @card-border-radius;
       overflow: hidden;
     }
-    
+
     .card-inner {
       .card-drop-area {
         // can't drop a card inside of itself
@@ -107,12 +111,12 @@
       }
     }
   }
- 
+
  .card-sub-bar {
   border-bottom-left-radius: calc(@card-border-radius - 1px);
   border-bottom-right-radius: calc(@card-border-radius - 1px);
  }
-  
+
   &.card-opening {
     .card-body-wrapper {
       height: 0px;
@@ -125,22 +129,22 @@
       padding: inherit;
     }
   }
-  
+
   .create-card-wrapper {
     opacity: 1;
     .transition;
   }
-  
+
   .card-assignment {
     text-align: center;
     padding-top: 3px;
   }
-  
+
   .card-arrow {
     height: 27px;
     position: relative;
     text-align: left;
-    
+
     svg {
       margin-top: 5px;
       width: 42px;
@@ -159,23 +163,23 @@
   text-transform: capitalize;
   position: relative; // for menu component
   text-align: left;
-  
+
   display: flex;
   height: @title-height;
   padding: @card-padding-vertical 17px;
   .transition;
-  
+
   .normal-white-text;
-  
+
   .card-title-inner {
     white-space: nowrap;
     padding: 4px 8px;
     border-radius: 6px;
-    
+
     position: absolute;
     top: 7px;
     left: 37px;
-    
+
     margin-left: 27px;
   }
 
@@ -188,15 +192,15 @@
     left: 21px;
     .transition;
     opacity: 0;
-    
+
     &:hover {
       fill: #fff;
     }
   }
-  
+
   .card-handle-icon {
     cursor: move;
-    
+
     .transition;
     .rotate90;
     width: 20px;
@@ -207,12 +211,12 @@
     &:active {
       fill: #fff;
     }
-    
+
     position: absolute;
     top: 8px;
     left: 2px;
   }
-  
+
   &.card-title-closed {
     width: calc(~"100% - 1px");
     padding-right: 20px;
@@ -224,7 +228,7 @@
       left: 18px;
     }
   }
-  
+
   &.card-title-card-hovering {
     .card-minimize-icon {
       opacity: 1;
@@ -236,31 +240,31 @@
   .transition;
 
   padding-top: 6px;
-  
+
   .cards-area {
     // for nested cards
     margin-right: -2.5 * @standard-margin - 1px;
     border-right: 0px;
-    
+
     margin-left: -6px;
-    
+
     .card {
       margin-right: 0px;
     }
-    
+
     // add margin so that textboxes don't edge up on cards area
-    margin-top: 6px; 
-  } 
-  
+    margin-top: 6px;
+  }
+
   .card .card {
     margin-right: 0px;
   }
-  
+
   &.drag-over {
     background: lighten(#bcd4ae, 5%);
   }
-  
-    
+
+
     // TODO TODO
   .card-field-add {
     display: inline-block;
@@ -273,25 +277,25 @@
     border-radius: 18px;
     background: #fff;
     margin-top: 3px;
-    
+
     svg {
       width: 12px;
       fill: #8ac541;
       .dead-center;
     }
-    
+
     &:hover {
       background: #8ac541;
       svg {
         fill: #fff;
       }
     }
-    
+
     &:active {
       background: #7ab536;
     }
   }
-  
+
   .card-field-top-add {
     position: absolute;
     right: 5px;
@@ -303,7 +307,7 @@
 .drag-over:not(.cards-area) {
   .cards-area {
     background: lighten(#bcd4ae, 5%);
-    
+
     .cards-area {
       background: #bcd4ae;
     }
@@ -395,7 +399,7 @@
     opacity: 1;
     padding-top: 7px;
     padding-left: 6px;
-    
+
     .normal-white-text;
 }
 
@@ -432,7 +436,7 @@
 }
 
 .builder-tb-cards-area {
-  
+
 }
 
 .card-flex {
@@ -480,7 +484,7 @@
 
 .card-preview {
   .small-black-text;
-  
+
   opacity: 1;
   margin: 0px 10px;
   text-transform: none;
@@ -492,13 +496,13 @@
   border-radius: @card-border-radius;
   background: rgba(255,255,255,0.5);
   background-blend-mode: multiply;
-  
+
   .transition;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   vertical-align: middle;
-  
+
   &.card-preview-hidden {
     opacity: 0;
   }
@@ -513,16 +517,16 @@
   background: rgba(255,255,255,0) !important;
   color: #fff;
   .transition;
-  
+
   &:hover, &[value=""] {
     background: rgba(255,255,255,0.25) !important;
   }
-  
+
   &:focus {
     background: #fff !important;
     color: #242424;
   }
-  
+
   &::placeholder {
     color: rgba(255,255,255,0.75) !important;
   }

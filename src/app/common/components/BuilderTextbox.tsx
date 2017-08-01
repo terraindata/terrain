@@ -112,6 +112,8 @@ export interface Props
 
   onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
+
+  textStyle?: React.CSSProperties;
 }
 
 class BuilderTextbox extends TerrainComponent<Props>
@@ -350,6 +352,7 @@ class BuilderTextbox extends TerrainComponent<Props>
                 className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
+                style={this.props.textStyle}
               />
           }
           {this.props.acceptsCards && this.renderSwitch()}
@@ -448,6 +451,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     );
   }
 }
+
 // const btbTarget =
 // {
 //   canDrop(props, monitor)

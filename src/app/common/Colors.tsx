@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format
 
 import { extend } from 'underscore';
+
 const Color = require('color');
 
 interface Theme
@@ -58,6 +59,10 @@ interface Theme
   bg3: string; // least contrast
 
   emptyBg: string; // special BG to denote "empty nothingness"
+
+  border1: string; // high contrast border
+  border2: string; // medium contrast border
+  border3: string; // low contrast border
 
   text1: string; // most contrast
   text2: string;
@@ -98,8 +103,7 @@ interface Theme
 
   // Library ------
 
-  library:
-  {
+  library: {
     // item
     item: {
       title: string,
@@ -223,14 +227,12 @@ interface Theme
       background: string,
     },
 
-    results:
-    {
+    results: {
       background: string,
       lines: string,
     },
 
-    inputs:
-    {
+    inputs: {
       background: string,
     },
   };
@@ -246,9 +248,13 @@ const DARK: Theme =
 
     bg1: 'rgb(39, 39, 39)',
     bg2: 'rgb(47, 47, 47)',
-    bg3: 'rgb(62, 60, 60)',
+    bg3: 'rgb(60, 63, 65)',
 
     emptyBg: 'rgb(21, 21, 21)',
+
+    border1: 'rgb(72,72,72)',
+    border2: 'rgb(100,105,107)',
+    border3: 'rgb(125,130,139)',
 
     text1: '#fff',
     text2: 'rgba(255,255,255,0.7)',
@@ -334,7 +340,7 @@ const DARK: Theme =
 
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
-        cardBase: '#2F2F2F', // '#424242', // TODO
+        cardBase: 'rgb(47, 47, 47)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
         // card theme colors
         atom: '#ae81ff',
@@ -412,7 +418,7 @@ const DARK: Theme =
 
       //builder column
       builderColumn: {
-        background: '#2F2F2F',
+        background: 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
       },
 
       results:

@@ -61,6 +61,7 @@ export interface Props
   value: string;
   onChange: (value: string) => void;
   options: List<string>;
+  style?: React.CSSProperties;
 
   placeholder?: string;
   help?: string;
@@ -281,6 +282,7 @@ class Autocomplete extends TerrainComponent<Props>
     return (
       <div className='autocomplete'>
         <input
+          style={this.props.style}
           ref='input'
           type='text'
           className={inputClassName}
