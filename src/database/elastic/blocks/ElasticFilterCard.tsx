@@ -59,54 +59,62 @@ import { Input, InputType } from '../../../blocks/types/Input';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 export const elasticFilter = _card({
+  key: 'query',
+
   static:
   {
-    title: 'Filter Card',
+    title: 'Filter',
     colors: ['#456', '#789'],
-    preview: '[index], [rootType]',
+    preview: '',
     language: 'elastic',
 
     tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      return {};
+      return {
+        bool: {
+        }
+      };
     },
+
+    anythingAccepts: true, // TODO change
 
     display:
     [
       {
-        displayType: DisplayType.CARDTEXT, // TODO change
-        key: 'index',
+        displayType: DisplayType.TEXT,
+        key: 'field',
         getAutoTerms: (schemaState) =>
         {
-          return Immutable.List(['movies', 'baseball', 'zazzle']);
+          return List(['movies', 'baseball', 'zazzle']);
         },
-        // autoDisabled: true,
       },
       {
-        displayType: DisplayType.CARDSFORTEXT, // TODO change
+        displayType: DisplayType.DROPDOWN,
         key: 'index',
+        options: List(),
+        dropdownUsesRawValues: true,
       },
-      {
-        displayType: DisplayType.TEXT,
-        key: 'rootType',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'from',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'rootSize',
-        autoDisabled: true,
-      },
+      // {
+      //   displayType: DisplayType.TEXT,
+      //   key: 'rootType',
+      //   autoDisabled: true,
+      // },
+      // {
+      //   displayType: DisplayType.NUM,
+      //   key: 'from',
+      //   autoDisabled: true,
+      // },
+      // {
+      //   displayType: DisplayType.NUM,
+      //   key: 'rootSize',
+      //   autoDisabled: true,
+      // },
 
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-        // accepts,
-      },
+      // {
+      //   displayType: DisplayType.CARDS,
+      //   key: 'cards',
+      //   // accepts,
+      // },
     ],
   },
 });

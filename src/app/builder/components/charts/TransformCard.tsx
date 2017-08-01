@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
-import * as Immutable from 'immutable';
-const { Map, List } = Immutable;
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
+
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
 import { Card, CardString } from '../../../../blocks/types/Card';
@@ -60,6 +60,7 @@ import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
+import TransformCardPeriscope from './TransformCardPeriscope';
 
 const NUM_BARS = 1000;
 
@@ -89,8 +90,6 @@ export interface Bar
   };
 }
 export type Bars = List<Bar>;
-
-import TransformCardPeriscope from './TransformCardPeriscope';
 
 class TransformCard extends TerrainComponent<Props>
 {
@@ -458,8 +457,6 @@ class TransformCard extends TerrainComponent<Props>
     );
   }
 }
-
-// import CardsToSQL from '../../../../../shared/backends/mysql/conversion/CardsToSQL';
 
 export default Dimensions({
   elementResize: true,

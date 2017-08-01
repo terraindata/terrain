@@ -46,16 +46,18 @@ THE SOFTWARE.
 
 // tslint:disable:no-console
 
+import { List } from 'immutable';
 import * as _ from 'underscore';
 
-import { List } from 'immutable';
-import * as Immutable from 'immutable';
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
+import { Colors } from '../../common/Colors';
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
+import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
+import { BuilderStore } from '../data/BuilderStore';
 
 import ESAnyClause from '../../../../shared/database/elastic/parser/clauses/ESAnyClause';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
@@ -78,9 +80,6 @@ import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/EST
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
-import { Colors } from '../../common/Colors';
-import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
-import { BuilderStore } from '../data/BuilderStore';
 
 const KEY_INLINE_DISPLAYS = [
   DisplayType.TEXT,
@@ -318,7 +317,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
-          options: Immutable.List([
+          options: List([
             'false',
             'true',
           ]),
@@ -337,7 +336,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
-          options: Immutable.List(clause.values),
+          options: List(clause.values),
           dropdownUsesRawValues: true,
         },
         tql: (block) => block['value'],
@@ -535,7 +534,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESStructureClause(clause: ESStructureClause): any
   {
-    const accepts = Immutable.List(
+    const accepts = List(
       _.keys(clause.structure).map((type) => 'eql' + type),
     );
 
@@ -590,7 +589,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           ),
         );
 
-        config['cards'] = Immutable.List(cards);
+        config['cards'] = List(cards);
       }
 
       return config;
@@ -598,12 +597,12 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     return GetCardVisitor.seedCard(clause,
       {
-        cards: Immutable.List([]),
+        cards: List([]),
 
         // provide options of all possible card types
         getChildOptions: (card) =>
         {
-          return Immutable.List(_.compact(_.map(
+          return List(_.compact(_.map(
             clause.structure,
             (type, key) =>
             {
