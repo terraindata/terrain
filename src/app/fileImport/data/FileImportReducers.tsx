@@ -453,14 +453,13 @@ FileImportReducers[ActionTypes.saveFile] =
       .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD)
   ;
 
-FileImportReducers[ActionTypes.updateQueue] =
+FileImportReducers[ActionTypes.enqueueChunk] =
   (state, action) =>
   {
-    return state.set('chunkQueue', state.chunkQueue.push(action.payload.chunk.substring(0, action.payload.cutoff)))
-      .set('nextChunk', action.payload.chunk.substring(action.payload.cutoff, action.payload.chunk.length));
+    return state.set('chunkQueue', state.chunkQueue.push(action.payload.chunk));
   }
   ;
-FileImportReducers[ActionTypes.shiftQueue] =
+FileImportReducers[ActionTypes.dequeueChunk] =
   (state, action) =>
   {
     return state.set('chunkQueue', state.chunkQueue.shift());
