@@ -276,6 +276,37 @@ class FileImport extends TerrainComponent<any>
   public parseCsv(file: string): object[]
   {
     const { csvHeaderMissing } = this.state.fileImportState;
+
+    if (!csvHeaderMissing)
+    {
+      const testDuplicateConfig = {
+        quoteChar: '\'',
+        header: false,
+        preview: 1,
+        skipEmptyLines: true,
+      };
+
+      const columnHeaders = Papa.parse(file, testDuplicateConfig).data;
+
+      const colHeaderSet = new Set();
+      const duplicateHeaderSet = new Set();
+      columnHeaders[0].map((colHeader) =>
+      {
+        if (colHeaderSet.has(colHeader))
+        {
+          duplicateHeaderSet.add(colHeader);
+        }
+        else
+        {
+          colHeaderSet.add(colHeader);
+        }
+      });
+      if (duplicateHeaderSet.size > 0)
+      {
+        alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
+        return [];
+      }
+    }
     const config = {
       quoteChar: '\'',
       header: !csvHeaderMissing,
@@ -283,7 +314,6 @@ class FileImport extends TerrainComponent<any>
       error: (err) =>
       {
         alert('CSV format incorrect: ' + String(err));
-        return;
       },
       skipEmptyLines: true,
     };
@@ -314,7 +344,7 @@ class FileImport extends TerrainComponent<any>
         break;
       default:
     }
-    if (!items)
+    if (items.length === 0)
     {
       return false;
     }
