@@ -63,7 +63,6 @@ import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElast
 //   elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
 //   elasticNumber, elasticObject, elasticText, elasticValue,
 // } from './ElasticJSONBlocks';
-// import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
 // import elasticRootCard from './ElasticRootCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';
 import { elasticTransform, scorePoint } from './ElasticTransformCard';
@@ -90,11 +89,6 @@ export const ElasticBlocks = _.extend(
     elasticWeight,
 
     // elasticRootCard,
-
-    // elasticMagicValue,
-    // elasticMagicList,
-    // elasticMagicListItem,
-    // elasticMagicCard,
 
     elasticCreating: _card( // a placeholder for when a card is being created
       {

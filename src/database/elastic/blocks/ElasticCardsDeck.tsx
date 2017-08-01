@@ -75,11 +75,6 @@ export const ElasticCardsDeck =
       //   Blocks.elasticNull.type,
       // ],
 
-      // [
-      //   Blocks.elasticMagicCard.type,
-      //   Blocks.elasticMagicList.type,
-      // ],
-
       [
         // Score and transform cards
         Blocks.elasticScore.type,
