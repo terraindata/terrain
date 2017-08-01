@@ -777,7 +777,6 @@ describe('File import route tests', () =>
   //         filetype: 'csv',
   //         update: true,
   //
-  //         csvHeaderMissing: false,
   //         originalNames: ['pkey', 'column1', 'column2', 'column3', 'column4'],
   //         columnTypes:
   //         {

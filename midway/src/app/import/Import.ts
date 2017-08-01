@@ -418,8 +418,7 @@ export class Import
             // TODO: handle case where field name contains quoteChar
             headers: imprt.originalNames.map((val) => this.quoteChar + val + this.quoteChar).join(','),
           };
-          const items: object[] = csvjson.toObject(contents, options);
-          resolve(items);
+          resolve(csvjson.toObject(contents, options));
         }
         catch (e)
         {
