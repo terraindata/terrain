@@ -366,13 +366,13 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('csvHeaderMissing', template.csvHeaderMissing)
       .set('columnNames', columnNames)
-      .set('columnTypes', List(template.columnNames.map((colName) =>
+      .set('columnTypes', List(columnNames.map((colName) =>
         template.columnTypes[colName] ?
-          Immutable.fromJS(deeplyColumnTypeToNumber(colName))
+          Immutable.fromJS(deeplyColumnTypeToNumber(template.columnTypes[colName]))
           :
           Immutable.fromJS({ type: 0 }),
       )))
-      .set('columnsToInclude', List(template.columnNames.map((colName) => !!template.columnTypes[colName])))
+      .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewRows', previewRows);
   };
 
