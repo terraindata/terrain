@@ -108,7 +108,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       const weight = parseElasticWeightBlock(factor);
       if (weight)
       {
-        weights.push(weight)
+        weights.push(weight);
       }
     }
     return make(
@@ -160,7 +160,7 @@ const parseElasticWeightBlock = (obj: object): Block =>
 {
   if (obj['weight'] === 0)
   {
-    return;
+    return null;
   }
 
   const scorePoints = [];
