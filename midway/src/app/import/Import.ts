@@ -267,11 +267,6 @@ export class Import
       return typeError;
     }
 
-    if (imprt.csvHeaderMissing === undefined || imprt.csvHeaderMissing === null)
-    {
-      imprt.csvHeaderMissing = false;
-    }
-
     const columnList: string[] = Object.keys(imprt.columnTypes);
     const columns: Set<string> = new Set(columnList);
     if (columns.size !== columnList.length)
@@ -424,10 +419,6 @@ export class Import
             headers: imprt.originalNames.map((val) => this.quoteChar + val + this.quoteChar).join(','),
           };
           const items: object[] = csvjson.toObject(contents, options);
-          if (imprt.csvHeaderMissing === undefined || !imprt.csvHeaderMissing)
-          {
-            items.shift();
-          }
           resolve(items);
         }
         catch (e)

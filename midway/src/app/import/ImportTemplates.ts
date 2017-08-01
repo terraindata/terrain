@@ -57,9 +57,6 @@ export interface ImportTemplateBase
   dbname: string;         // for elastic, index name
   tablename: string;      // for elastic, type name
 
-  // if filetype is 'csv', default is to assume the first line contains headers
-  // set this to true if this is not the case
-  csvHeaderMissing?: boolean;
   // array of strings (oldName)
   originalNames: string[];
   // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
@@ -82,7 +79,6 @@ interface ImportTemplateConfigStringified
   dbid: number;
   dbname: string;
   tablename: string;
-  csvHeaderMissing?: boolean;
   originalNames: string;
   columnTypes: string;
   primaryKey: string;
@@ -103,7 +99,6 @@ export class ImportTemplates
         'dbid',
         'dbname',
         'tablename',
-        'csvHeaderMissing',
         'originalNames',
         'columnTypes',
         'primaryKey',
@@ -158,7 +153,6 @@ export class ImportTemplates
         dbid: template['dbid'],
         dbname: template['dbname'],
         tablename: template['tablename'],
-        csvHeaderMissing: template['csvHeaderMissing'],
         originalNames: JSON.stringify(template['originalNames']),
         columnTypes: JSON.stringify(template['columnTypes']),
         primaryKey: template['primaryKey'],
@@ -185,7 +179,6 @@ export class ImportTemplates
         dbid: stringified['dbid'],
         dbname: stringified['dbname'],
         tablename: stringified['tablename'],
-        csvHeaderMissing: stringified['csvHeaderMissing'],
         originalNames: JSON.parse(stringified['originalNames']),
         columnTypes: JSON.parse(stringified['columnTypes']),
         primaryKey: stringified['primaryKey'],

@@ -321,7 +321,7 @@ FileImportReducers[ActionTypes.chooseFile] =
     });
 
     return state
-      .set('file', action.payload.file)
+      .set('fileContents', action.payload.fileContents)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
@@ -337,7 +337,7 @@ FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
     Ajax.importFile(
-      state.file,
+      state.fileContents,
       state.filetype,
       state.dbText,
       state.tableText,
@@ -359,7 +359,6 @@ FileImportReducers[ActionTypes.uploadFile] =
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
       },
-      state.hasCsvHeader,
     );
 
     return state;
@@ -386,7 +385,6 @@ FileImportReducers[ActionTypes.saveTemplate] =
       {
         alert('Error saving template: ' + JSON.parse(err).errors[0].detail);
       },
-      state.hasCsvHeader,
     );
     return state;
   };
@@ -443,19 +441,16 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('originalNames', List(template.originalNames))
       .set('primaryKey', columnNames.indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
-      .set('hasCsvHeader', !template.csvHeaderMissing)
       .set('columnNames', columnNames)
       .set('columnTypes', List(colTypes))
       .set('columnsToInclude', List(colsToInclude))
       .set('previewRows', previewRows);
   };
 
-FileImportReducers[ActionTypes.setFile] =
+FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
-  {
-    console.log(action.payload.file);
-    return state.set('blob', action.payload.file);
-  }
+    state.set('file', action.payload.file)
+      .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD)
   ;
 
 FileImportReducers[ActionTypes.updateQueue] =

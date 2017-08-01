@@ -686,7 +686,7 @@ export const Ajax =
       );
     },
 
-    importFile(file: string,
+    importFile(fileContents: string,
       filetype: string,
       dbname: string,
       tablename: string,
@@ -699,19 +699,17 @@ export const Ajax =
       streaming: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
     )
     {
       const payload: object = {
         dbid: connectionId,
         dbname,
         tablename,
-        contents: file,
+        contents: fileContents,
         filetype,
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
         transformations,
         update,
         streaming,
@@ -744,7 +742,6 @@ export const Ajax =
       name: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
     )
     {
       const payload: object = {
@@ -754,7 +751,6 @@ export const Ajax =
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
         transformations,
         name,
       };

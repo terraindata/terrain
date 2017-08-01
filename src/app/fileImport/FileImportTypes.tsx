@@ -56,13 +56,13 @@ class FileImportStateC extends BaseClass
   public serverText: string = '';
   public dbText: string = '';
   public tableText: string = '';
-  public file: string = '';
+  public fileContents: string = '';       // use when file small enough to upload through ajax post
   public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
 
-  public hasCsvHeader: boolean = true;   // TODO: change to csvHeaderMissing to be consistent with backend
+  public hasCsvHeader: boolean = true;
   public primaryKey: number = -1;
 
   public originalNames: List<string> = List([]);
@@ -72,7 +72,7 @@ class FileImportStateC extends BaseClass
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
-  public blob: File = null;
+  public file: File = null;
   public streaming: boolean = true;
 
   public chunkQueue: List<string> = List([]);
@@ -121,7 +121,7 @@ export interface ColumnTypesTree
 
 export const NUMBER_PREVIEW_ROWS = 5;
 
-export const SLICE_SIZE = 1000;
+export const STREAMING_THRESHOLD = 10000;  // upload file in ajax request when below, stream when above
 
 export const CHUNK_SIZE = 10000000;    // assume this chunk size contains number of preview rows
 

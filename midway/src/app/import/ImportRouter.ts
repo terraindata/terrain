@@ -117,7 +117,6 @@ Router.post('/headless', async (ctx, next) =>
     dbid: template['dbid'],
     dbname: template['dbname'],
     tablename: template['tablename'],
-    csvHeaderMissing: template['csvHeaderMissing'],
     originalNames: template['originalNames'],
     columnTypes: template['columnTypes'],
     primaryKey: template['primaryKey'],
