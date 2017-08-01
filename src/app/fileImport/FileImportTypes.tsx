@@ -76,7 +76,6 @@ class FileImportStateC extends BaseClass
   public streaming: boolean = true;
 
   public chunkQueue: List<string> = List([]);
-  public nextChunk: string = '';
   public update: boolean = true;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes

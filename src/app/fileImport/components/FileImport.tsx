@@ -301,48 +301,28 @@ class FileImport extends TerrainComponent<any>
     fr.readAsText(fileToRead);
     fr.onloadend = () =>
     {
-      let parsedFile;
+      let stringifiedFile;
       if (streaming)
       {
-        let index = 0;
-        let end = 0;
-        while (index < fr.result.length)
-        {
-          if (fr.result.charAt(index) === '\n')
-          {
-            end = index;
-          }
-          index++;
-        }
-        Actions.updateQueue(fr.result, end);
-        parsedFile = fr.result.substring(0, end);
+        Actions.enqueueChunk(fr.result);
+        stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
       }
       else
       {
-        parsedFile = fr.result;
+        stringifiedFile = fr.result;
       }
 
       let items = [];
       switch (this.state.filetype)
       {
         case 'json':
-          items = this.parseJson(parsedFile);
+          items = this.parseJson(stringifiedFile);
           break;
         case 'csv':
-          items = this.parseCsv(parsedFile);
-          // remove first line if csv has header
-          if (this.state.fileImportState.hasCsvHeader)
+          items = this.parseCsv(stringifiedFile);
+          if (this.state.fileImportState.hasCsvHeader) // remove first line if csv has header
           {
-            let cutoff = 0;
-            while (cutoff < parsedFile.length)
-            {
-              if (parsedFile.charAt(cutoff) === '\n')
-              {
-                break;
-              }
-              cutoff++;
-            }
-            parsedFile.slice(0, cutoff);
+            stringifiedFile.slice(0, stringifiedFile.indexOf('\n'));
           }
           break;
         default:
@@ -360,7 +340,7 @@ class FileImport extends TerrainComponent<any>
         this.state.filetype === 'csv' && !hasCsvHeader ? 'column' + String(i) : i,
       );
 
-      Actions.chooseFile(streaming ? '' : parsedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      Actions.chooseFile(streaming ? '' : stringifiedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
     };
   }
 
@@ -409,7 +389,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      hasCsvHeader, primaryKey, templates, transforms, file, chunkQueue, nextChunk, update, streaming } = fileImportState;
+      hasCsvHeader, primaryKey, templates, transforms, file, chunkQueue, update, streaming } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -470,7 +450,6 @@ class FileImport extends TerrainComponent<any>
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
             chunkQueue={chunkQueue}
-            nextChunk={nextChunk}
             file={file}
             update={update}
             streaming={streaming}

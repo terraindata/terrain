@@ -120,13 +120,13 @@ const FileImportActions =
     (file: File) =>
       $(ActionTypes.saveFile, { file }),
 
-    updateQueue:
-    (chunk: string, lastNewLine: number) =>
-      $(ActionTypes.updateQueue, { chunk, lastNewLine }),
+    enqueueChunk:
+    (chunk: string) =>
+      $(ActionTypes.enqueueChunk, { chunk }),
 
-    shiftQueue:
+    dequeueChunk:
     () =>
-      $(ActionTypes.shiftQueue, {}),
+      $(ActionTypes.dequeueChunk, {}),
 
     toggleUpdate:
     () =>

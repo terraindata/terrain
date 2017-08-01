@@ -80,7 +80,6 @@ export interface Props
   transforms: List<FileImportTypes.Transform>;
   file: File;
   chunkQueue: List<string>;
-  nextChunk: string;
   update: boolean;
   streaming: boolean;
 }
@@ -166,44 +165,44 @@ class FileImportPreview extends TerrainComponent<Props>
 
   /* parse the chunk to last new line character and add it to queue of chunks to be streamed
    * save the leftover chunk and append it to the front of the next chunk */
-  public parseChunk(chunk: string, isLast: boolean)
-  {
-    if (isLast)
-    {
-      console.log('final chunk');
-      this.setState({
-        streamed: true,
-      });
-      Actions.updateQueue(chunk, chunk.length);
-    }
-    else
-    {
-      let index = 0;
-      let end = 0;
-      while (index < chunk.length)
-      {
-        if (chunk.charAt(index) === '\n')
-        {
-          end = index;
-        }
-        index++;
-      }
-      // console.log('chunk size: ', chunk.length);
-      // console.log('chunk: ', chunk);
-      // console.log('parsed chunk: ', chunk.substring(0, end));
-      console.log('nextChunk: ', chunk.substring(end, chunk.length));
+  // public parseChunk(chunk: string, isLast: boolean)
+  // {
+  //   if (isLast)
+  //   {
+  //     console.log('final chunk');
+  //     this.setState({
+  //       streamed: true,
+  //     });
+  //     Actions.updateQueue(chunk, chunk.length);
+  //   }
+  //   else
+  //   {
+  //     let index = 0;
+  //     let end = 0;
+  //     while (index < chunk.length)
+  //     {
+  //       if (chunk.charAt(index) === '\n')
+  //       {
+  //         end = index;
+  //       }
+  //       index++;
+  //     }
+  //     // console.log('chunk size: ', chunk.length);
+  //     // console.log('chunk: ', chunk);
+  //     // console.log('parsed chunk: ', chunk.substring(0, end));
+  //     console.log('nextChunk: ', chunk.substring(end, chunk.length));
+  //
+  //     Actions.updateQueue(chunk, end);
+  //   }
+  // }
 
-      Actions.updateQueue(chunk, end);
-    }
-  }
-
-  public readFile(file: Blob, isLast: boolean)
+  public readChunk(chunk: Blob)
   {
     const fr = new FileReader();
-    fr.readAsText(file);
+    fr.readAsText(chunk);
     fr.onloadend = () =>
     {
-      this.parseChunk(fr.result, isLast);
+      Actions.enqueueChunk(fr.result);
     };
   }
 
@@ -222,7 +221,7 @@ class FileImportPreview extends TerrainComponent<Props>
       if (!this.props.chunkQueue.isEmpty())      // assume filereader parses chunks faster than backend processes them
       {
         socket.send(this.props.chunkQueue.first());
-        Actions.shiftQueue();
+        Actions.dequeueChunk();
         socket.emit('done');
       }
       else
@@ -243,13 +242,13 @@ class FileImportPreview extends TerrainComponent<Props>
       console.log('filesize: ', this.props.file.size);
       const test = 50000000;
 
-      let blobStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
-      while (blobStart < test)
+      let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
+      while (fileStart < test)
       {
-        console.log('blobStart: ', blobStart);
-        const chunk = this.props.file.slice(blobStart, blobStart + FileImportTypes.CHUNK_SIZE);
-        this.readFile(chunk, blobStart + FileImportTypes.CHUNK_SIZE >= test);
-        blobStart += FileImportTypes.CHUNK_SIZE;
+        console.log('fileStart: ', fileStart);
+        const chunk = this.props.file.slice(fileStart, fileStart + FileImportTypes.CHUNK_SIZE);
+        this.readChunk(chunk);
+        fileStart += FileImportTypes.CHUNK_SIZE;
       }
       this.stream();
     }

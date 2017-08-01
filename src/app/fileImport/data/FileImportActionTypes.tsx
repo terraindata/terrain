@@ -66,8 +66,8 @@ const FileImportActionTypes =
     setTemplates: '',
     loadTemplate: '',
     saveFile: '',
-    updateQueue: '',
-    shiftQueue: '',
+    enqueueChunk: '',
+    dequeueChunk: '',
     toggleUpdate: '',
   };
 
