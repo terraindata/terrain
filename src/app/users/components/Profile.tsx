@@ -106,11 +106,11 @@ class Profile extends TerrainComponent<Props>
     const userState: UserTypes.UserState = UserStore.getState();
     const authState = AuthStore.getState();
     let userId = authState.id;
-    const routeUserId = this.props.params.userId;
+    const routeUserId = +this.props.params.userId;
     let isLoggedInUser = true;
     let routeIsDirect = false;
 
-    if (routeUserId && routeUserId.length)
+    if (!isNaN(routeUserId))
     {
       isLoggedInUser = routeUserId === userId;
       userId = routeUserId;

@@ -63,8 +63,8 @@ interface Theme
   text2: string;
   text3: string; // least contrast
 
-  altColor1: string;
-  altColor2: string;
+  altText1: string;
+  altText2: string;
 
   altBg1: string;
   altBg2: string;
@@ -254,11 +254,11 @@ const DARK: Theme =
     text2: 'rgba(255,255,255,0.7)',
     text3: 'rgba(255,255,255,0.5)',
 
-    altColor1: '#242424',
-    altColor2: '#424242',
-
     altBg1: '#fff',
     altBg2: '#EDEFF3',
+
+    altText1: '#242424',
+    altText2: '#424242',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
@@ -464,12 +464,32 @@ export function link()
   return fontColor(Colors().text.link, Colors().text.linkHover);
 }
 
+const CACHE: any = {};
+
+export function altStyle()
+{
+  if (!CACHE['altStyle' + curTheme])
+  {
+    CACHE['altStyle' + curTheme] = extend({},
+      backgroundColor(Colors().altBg1),
+      fontColor(Colors().altText1),
+    );
+  }
+
+  return CACHE['altStyle' + curTheme];
+}
+
 export function buttonColors()
 {
-  return extend({},
-    backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-    fontColor(Colors().button.text),
-  );
+  if (!CACHE['buttonColors' + curTheme])
+  {
+    CACHE['buttonColors' + curTheme] = extend({},
+      backgroundColor(Colors().button.background, Colors().button.backgroundHover),
+      fontColor(Colors().button.text),
+    );
+  }
+
+  return CACHE['buttonColors' + curTheme];
 }
 
 export function getStyle(color: string, style: string, hoverColor?: string)

@@ -71,7 +71,8 @@ export default function ElasticToCards(
   {
     // TODO: we may want to show some error messages on the cards.
     return query
-      .set('cardsAndCodeInSync', false);
+      .set('cardsAndCodeInSync', false)
+      .set('parseError', true);
   } else
   {
     try
