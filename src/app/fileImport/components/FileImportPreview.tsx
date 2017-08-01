@@ -72,7 +72,7 @@ export interface Props
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<FileImportTypes.ColumnTypesTree>;
+  columnTypes: List<IMMap<string, any>>;
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
@@ -105,10 +105,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    // this.setState({
-    //   resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
-    // });
-
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
@@ -124,9 +120,6 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.columnNames.delete(columnId).contains(localColumnName))
     {
       alert('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
-      // this.setState({
-      //   localColumnName: this.props.columnNames.get(columnId),
-      // });
       return false;
     }
 

@@ -56,45 +56,6 @@ const { List, Map } = Immutable;
 
 const FileImportReducers = {};
 
-const deeplySetColumnType = (columnTypesTree: FileImportTypes.ColumnTypesTree, count: number, recursionDepth: number, typeIndex: number) =>
-{
-  if (count < recursionDepth)
-  {
-    deeplySetColumnType(columnTypesTree.innerType, count + 1, recursionDepth, typeIndex);
-  }
-  else
-  {
-    columnTypesTree.type = typeIndex;
-  }
-  return columnTypesTree;
-};
-
-const deeplyAddColumnType = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
-{
-  if (columnTypesTree.innerType)
-  {
-    deeplyAddColumnType(columnTypesTree.innerType);
-  }
-  else
-  {
-    columnTypesTree.innerType = { type: 0 };
-  }
-  return columnTypesTree;
-};
-
-const deeplyDeleteColumnType = (columnTypesTree: FileImportTypes.ColumnTypesTree, count: number, recursionDepth: number) =>
-{
-  if (count < recursionDepth - 1 && columnTypesTree.innerType)
-  {
-    deeplyDeleteColumnType(columnTypesTree.innerType, count + 1, recursionDepth);
-  }
-  else
-  {
-    delete columnTypesTree.innerType;
-  }
-  return columnTypesTree;
-};
-
 const deeplyColumnTypeToString = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
 {
   columnTypesTree.type = FileImportTypes.ELASTIC_TYPES[columnTypesTree.type];
@@ -168,7 +129,7 @@ const applyTransform = (state, transform) =>
         .set(transformCol, transform.args.newName[0])
         .insert(transformCol + 1, transform.args.newName[1]))
       .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
-      .set('columnTypes', state.columnTypes.insert(transformCol + 1, { type: 0 }))
+      .set('columnTypes', state.columnTypes.insert(transformCol + 1, Immutable.fromJS({ type: 0 })))
       .set('previewRows', List(state.previewRows.map((row, i) =>
         [].concat(...row.map((col, j) =>
         {
@@ -268,21 +229,21 @@ FileImportReducers[ActionTypes.setColumnName] =
 FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
   {
-    const columnTypes = state.columnTypes.toArray();
-    columnTypes[action.payload.columnId] = deeplySetColumnType(columnTypes[action.payload.columnId], 0,
-      action.payload.recursionDepth, action.payload.typeIndex);
+    const keyPath = ['columnTypes', action.payload.columnId];
+    for (let i = 0; i < action.payload.recursionDepth; i++)
+    {
+      keyPath.push('innerType');
+    }
+    keyPath.push('type');
 
     if (FileImportTypes.ELASTIC_TYPES[action.payload.typeIndex] === 'array')
     {
-      columnTypes[action.payload.columnId] = deeplyAddColumnType(columnTypes[action.payload.columnId]);
+      const keyPathAdd = keyPath.slice();
+      keyPathAdd[keyPathAdd.length - 1] = 'innerType'; // add new 'innerType' at the same level as highest 'type'
+      return state.setIn(keyPath, action.payload.typeIndex)
+        .setIn(keyPathAdd, Immutable.fromJS({ type: 0 }));
     }
-    else
-    {
-      columnTypes[action.payload.columnId] = deeplyDeleteColumnType(columnTypes[action.payload.columnId], 0,
-        action.payload.recursionDepth + 1);
-    }
-
-    return state.set('columnTypes', List(columnTypes));
+    return state.setIn(keyPath, action.payload.typeIndex);
   };
 
 FileImportReducers[ActionTypes.addTransform] =
@@ -310,7 +271,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
       .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
-      .set('columnTypes', List(action.payload.originalNames.map(() => ({ type: 0 }))))
+      .set('columnTypes', List(action.payload.originalNames.map(() => (Immutable.fromJS({ type: 0 })))))
       .set('transforms', List([]));
   };
 
@@ -326,7 +287,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.originalNames,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&                          // backend requires type as string
-        [colName, deeplyColumnTypeToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
@@ -352,7 +313,8 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.connectionId,
       state.originalNames,
       Map<string, FileImportTypes.ColumnTypesTree>(state.columnNames.map((colName, colId) =>
-        state.columnsToInclude.get(colId) && [colName, deeplyColumnTypeToString(JSON.parse(JSON.stringify(state.columnTypes.get(colId))))],
+        state.columnsToInclude.get(colId) &&
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
@@ -360,6 +322,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       () =>
       {
         alert('successfully saved template');
+        action.payload.fetchTemplates();
       },
       (err: string) =>
       {
@@ -367,8 +330,6 @@ FileImportReducers[ActionTypes.saveTemplate] =
       },
       state.csvHeaderMissing,
     );
-
-    action.payload.fetchTemplates();
     return state;
   };
 
@@ -411,12 +372,12 @@ FileImportReducers[ActionTypes.loadTemplate] =
       const colType = template.columnTypes[colName];
       if (colType)
       {
-        colTypes.push(deeplyColumnTypeToNumber(colType));         // frontend requires type as number
+        colTypes.push(Immutable.fromJS(deeplyColumnTypeToNumber(colType)));         // frontend requires type as number
         colsToInclude.push(true);
       }
       else
       {
-        colTypes.push({ type: 0 });
+        colTypes.push(Immutable.fromJS({ type: 0 }));
         colsToInclude.push(false);
       }
     });

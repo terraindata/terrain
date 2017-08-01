@@ -68,7 +68,7 @@ class FileImportStateC extends BaseClass
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<ColumnTypesTree> = List([]);
+  public columnTypes: List<IMMap<string, any>> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
