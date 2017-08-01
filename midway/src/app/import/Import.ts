@@ -55,6 +55,7 @@ import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
+import { users } from '../users/UserRouter';
 import { ImportTemplateBase } from './ImportTemplates';
 
 export interface ImportConfig extends ImportTemplateBase
@@ -87,57 +88,124 @@ export class Import
   private quoteChar: string = '\'';
   private batchSize: number = 5000;
 
-  private imprt;
+  private imprt: ImportConfig;
+  private database: DatabaseController;
+  private insertTable: Tasty.Table;
   private buffer: string[];
 
   public setUpSocket(io: socketio.Server)
   {
-    // console.log('set up server');
+    winston.info('set up file import streaming server.');
     io.on('connection', (socket) =>
     {
-      // console.log('someone connected!!!');
+      winston.info('streaming server received connection.');
+      let authorized: boolean = false;
+      socket.emit('request_auth');
+      socket.on('auth', async (data) =>
+      {
+        const user = await users.loginWithAccessToken(Number(data['id']), data['accessToken']);
+        if (user === null)
+        {
+          socket.close();
+          return;
+        }
+        authorized = true;
+        fs.mkdirSync('import_streaming_tmp');
+        socket.emit('ready');
+      });
       let count: number = 0;
-      socket.emit('ready');
+      let nextChunk: string = '';
       socket.on('message', async (data) =>
       {
-        // console.log('just got data!');
-        const items: object[] = await this._getItems(this.imprt, data);
-        // console.log('got data!!!');
-        const num: number = count;
+        winston.info('streaming server received data from client.');
+        if (!authorized || typeof data !== 'string')
+        {
+          socket.close();
+          return;
+        }
+        // get valid piece of csv data ; TODO: SUPPORT JSON AS WELL
+        const end: number = data.lastIndexOf('\n');
+        const thisChunk: string = nextChunk + data.substring(0, end);
+        nextChunk = data.substring(end + 1, data.length);
+        let items: object[];
+        try
+        {
+          items = await this._getItems(this.imprt, thisChunk);
+        }
+        catch (e)
+        {
+          throw e;
+        }
+        winston.info('streaming server got items from data');
+
+        const num: number = count;   // TODO: if have race conditions, chunk handling above has bigger issues
         count++;
-        // fs.open('test/testout' + String(num) + '.txt', 'wx', (err, fd) =>
-        // {
-        //   // console.log('opened file.');
-        //   if (err !== undefined && err !== null)
-        //   {
-        //     if (err.code === 'EEXIST')
-        //     {
-        //       // TODO: try writing to a different file
-        //     }
-        //     throw err;
-        //   }
-        //   fs.write(fd, JSON.stringify(items), (writeErr) =>
-        //   {
-        //     throw writeErr;
-        //   });
-        //   // console.log('wrote to file.');
-        // });
-        // fs.unlink('test/testout.txt', (err) => {
-        //     if (err)
-        //     {
-        //         throw err;
-        //     }
-        // });
+        fs.open('import_streaming_tmp/testout' + String(num) + '.txt', 'wx', (err, fd) =>
+        {
+          winston.info('opened file for writing.');
+          if (err !== undefined && err !== null)
+          {
+            if (err.code === 'EEXIST')
+            {
+              // TODO: try writing to a different file?
+            }
+            throw err;
+          }
+          fs.write(fd, JSON.stringify(items), (writeErr) =>
+          {
+            throw writeErr;
+          });
+          winston.info('wrote items to file.');
+        });
         socket.emit('ready');
       });
       // socket.on('done', () =>
       // {
       //   socket.emit('ready');
       // });
-      socket.on('finished', () =>
+      socket.on('finished', async () =>
       {
-        // console.log('client finished!');
-        // this.server.close();   // TODO: fix
+        winston.info('streaming client finished.');
+        // TODO: wait until all the data has finished being processed -- how?
+        let time: number = Date.now();
+        winston.info('putting mapping...');
+        // await this._tastyPutMapping();
+        winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
+
+        time = Date.now();
+        winston.info('about to upsert via tasty...');
+        for (let num = 0; num < count; num++)
+        {
+          let items: object[];
+          fs.readFile('import_streaming_tmp/testout' + String(num) + '.txt', 'utf8', (err, data) =>
+          {
+            if (err !== undefined && err !== null)
+            {
+              throw err;
+            }
+            items = JSON.parse(data);
+          });
+          // await this._tastyUpsert(this.imprt, items);
+          // fs.unlink('test/testout' + String(num) + '.txt', (err) =>
+          // {
+          //   if (err)
+          //   {
+          //     throw err;
+          //   }
+          // });
+        }
+        // TODO: make read calls synchronous to make sure this doesn't happen prematurely?
+        // TODO: can this delete a non-empty directory?
+        fs.rmdir('import_streaming_tmp', (err) =>
+        {
+            if (err !== undefined && err !== null)
+            {
+                throw err;
+            }
+        });
+        winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
+
+        // TODO: send response to client
       });
     });
   }
@@ -156,68 +224,60 @@ export class Import
       {
         return reject('File import currently is only supported for Elastic databases.');
       }
+      this.database = database;
 
       let time: number = Date.now();
-      // winston.info('checking config and schema...');
-      // const configError: string = this._verifyConfig(imprt);
-      // if (configError !== '')
-      // {
-      //   return reject(configError);
-      // }
-      // const expectedMapping: object = this._getMappingForSchema(imprt);
-      // const mappingForSchema: object | string =
-      //   this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
-      // if (typeof mappingForSchema === 'string')
-      // {
-      //   return reject(mappingForSchema);
-      // }
-      // winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
-
-      const items: object[] = [];
-      try
+      winston.info('checking config and schema...');
+      const configError: string = this._verifyConfig(imprt);
+      if (configError !== '')
       {
-        // TODO: what's the point of creating a server, versus just using the standalone option?
-        // TODO: set up a buffer?
-        // TODO: write the items to a file
-        if (imprt.streaming)
-        {
-          // TODO: something
-        }
-        else
-        {
-          items.push(...await this._getItems(imprt, imprt.contents));
-        }
-      } catch (e)
-      {
-        return reject(e);
+        return reject(configError);
       }
+      const expectedMapping: object = this._getMappingForSchema(imprt);
+      const mappingForSchema: object | string =
+        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
+      if (typeof mappingForSchema === 'string')
+      {
+        return reject(mappingForSchema);
+      }
+      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
 
-      time = Date.now();
-      winston.info('creating tasty table and putting mapping...');
       const columns: string[] = Object.keys(imprt.columnTypes);
-      const insertTable: Tasty.Table = new Tasty.Table(
+      this.insertTable = new Tasty.Table(
         imprt.tablename,
         [imprt.primaryKey],
         columns,
         imprt.dbname,
-        // mappingForSchema,
+        mappingForSchema,
       );
-      // await database.getTasty().getDB().putMapping(insertTable);
-      winston.info('created tasty table and put mapping (s): ' + String((Date.now() - time) / 1000));
 
-      time = Date.now();
-      winston.info('about to upsert via tasty...');
-      // let res: ImportConfig;
-      // if (imprt.update)
-      // {
-      //   res = await database.getTasty().update(insertTable, items) as ImportConfig;
-      // }
-      // else
-      // {
-      //   res = await database.getTasty().upsert(insertTable, items) as ImportConfig;
-      // }
-      winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
-      // resolve(res);
+      if (!imprt.streaming)
+      {
+        const items: object[] = [];
+        try
+        {
+          items.push(...await this._getItems(imprt, imprt.contents));
+        } catch (e)
+        {
+          return reject(e);
+        }
+
+        time = Date.now();
+        winston.info('putting mapping...');
+        await this._tastyPutMapping();
+        winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
+
+        time = Date.now();
+        winston.info('about to upsert via tasty...');
+        const res: ImportConfig = await this._tastyUpsert(imprt, items);
+        winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
+        resolve(res);
+      }
+      else
+      {
+        // logic handled through socket.io connection
+        resolve(imprt);
+      }
     });
   }
   private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
@@ -250,6 +310,26 @@ export class Import
       }
       winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
       resolve(items);
+    });
+  }
+  private async _tastyPutMapping(): Promise<object>
+  {
+    return this.database.getTasty().getDB().putMapping(this.insertTable);
+  }
+  private async _tastyUpsert(imprt: ImportConfig, items: object[]): Promise<ImportConfig>
+  {
+    return new Promise<ImportConfig>(async (resolve, reject) =>
+    {
+      let res: ImportConfig;
+      if (imprt.update)
+      {
+        res = await this.database.getTasty().update(this.insertTable, items) as ImportConfig;
+      }
+      else
+      {
+        res = await this.database.getTasty().upsert(this.insertTable, items) as ImportConfig;
+      }
+      resolve(res);
     });
   }
 
