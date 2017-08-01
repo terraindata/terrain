@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as http from 'http';
 import * as Koa from 'koa';
+import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
 import babelRegister = require('babel-register');
@@ -61,6 +62,7 @@ import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
+import { imprt } from './import/ImportRouter';
 import './Logging';
 import Middleware from './Middleware';
 import MidwayRouter from './Router';
@@ -94,6 +96,8 @@ class App
   private DB: Tasty.Tasty;
   private app: Koa;
   private config: Config.Config;
+  private server: http.Server;
+  private io: socketio.Server;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
@@ -135,6 +139,10 @@ class App
     this.app.use(MidwayRouter.routes());
     this.app.use(AnalyticsRouter.routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
+
+    this.server = http.createServer(this.app.callback());
+    this.io = socketio(this.server, { path: '/import_streaming' });
+    imprt.setUpSocket(this.io);
   }
 
   public async start(): Promise<http.Server>
@@ -145,8 +153,8 @@ class App
     await Users.initializeDefaultUser();
 
     winston.info('Listening on port ' + String(this.config.port));
-    return this.app.listen(this.config.port);
-
+    this.server.listen(this.config.port);
+    return this.server;
   }
 
   public getConfig(): Config.Config
