@@ -82,7 +82,7 @@ export interface Props
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
   file: File;
-  chunkQueue: List<string>;
+  chunkQueue: List<object>;
   streaming: boolean;
   uploadInProgress: boolean;
   elasticUpdate: boolean;
@@ -244,13 +244,13 @@ class FileImportPreview extends TerrainComponent<Props>
   //   }
   // }
 
-  public readChunk(chunk: Blob)
+  public readChunk(chunk: Blob, isLast: boolean)
   {
     const fr = new FileReader();
     fr.readAsText(chunk);
     fr.onloadend = () =>
     {
-      Actions.enqueueChunk(fr.result);
+      Actions.enqueueChunk(fr.result, isLast);
     };
   }
 
@@ -278,7 +278,6 @@ class FileImportPreview extends TerrainComponent<Props>
       {
         socket.send(this.props.chunkQueue.first());
         Actions.dequeueChunk();
-        socket.emit('done');
       }
       else
       {
@@ -310,14 +309,14 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.streaming)
     {
       console.log('filesize: ', this.props.file.size);
-      const test = 5000000;
+      const test = Math.min(5000000, this.props.file.size);
 
       let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
       while (fileStart < test)
       {
         console.log('fileStart: ', fileStart);
         const chunk = this.props.file.slice(fileStart, fileStart + FileImportTypes.CHUNK_SIZE);
-        this.readChunk(chunk);
+        this.readChunk(chunk, fileStart + FileImportTypes.CHUNK_SIZE > test);
         fileStart += FileImportTypes.CHUNK_SIZE;
       }
       this.stream();

@@ -164,7 +164,7 @@ class FileImport extends TerrainComponent<any>
           let stringifiedFile;
           if (streaming)
           {
-            Actions.enqueueChunk(fr.result);
+            Actions.enqueueChunk(fr.result, file.size <= FileImportTypes.CHUNK_SIZE);
             stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
           }
           else
@@ -384,7 +384,7 @@ class FileImport extends TerrainComponent<any>
       let stringifiedFile;
       if (streaming)
       {
-        Actions.enqueueChunk(fr.result);
+        Actions.enqueueChunk(fr.result, file.size <= FileImportTypes.CHUNK_SIZE);
         stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
       }
       else

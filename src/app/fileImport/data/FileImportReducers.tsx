@@ -400,7 +400,7 @@ FileImportReducers[ActionTypes.saveFile] =
 FileImportReducers[ActionTypes.enqueueChunk] =
   (state, action) =>
   {
-    return state.set('chunkQueue', state.chunkQueue.push(action.payload.chunk));
+    return state.set('chunkQueue', state.chunkQueue.push(action.payload));
   }
   ;
 FileImportReducers[ActionTypes.dequeueChunk] =
