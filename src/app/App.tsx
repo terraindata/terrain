@@ -60,8 +60,7 @@ import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 
 const Perf = require('react-addons-perf');
-import { IndexRoute, Route, Router } from 'react-router';
-import { browserHistory } from 'react-router';
+
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
 window['PerfStart'] = Perf.start;
@@ -69,27 +68,11 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 
 // Components
 import Login from './auth/components/Login';
-import Builder from './builder/components/Builder';
 import LayoutManager from './builder/components/layout/LayoutManager';
 import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
-import Logout from './common/components/Logout';
-import Placeholder from './common/components/Placeholder';
-import Redirect from './common/components/Redirect';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
-import FileImport from './fileImport/components/FileImport';
-import Library from './library/components/LibraryDnd';
-import ManualWrapper from './manual/components/ManualWrapper';
-import SchemaPage from './schema/components/SchemaPage';
-import Account from './users/components/Account';
-import Connections from './users/components/Connections';
-import EditProfile from './users/components/EditProfile';
-import Notifications from './users/components/Notifications';
-import Profile from './users/components/Profile';
-import Settings from './users/components/Settings';
-import Team from './users/components/Team';
-import X from './x/components/X';
 const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
@@ -156,6 +139,11 @@ const links =
       icon: <ImportIcon />,
       text: 'Import',
       route: '/import',
+    },
+    {
+      icon: <ReportingIcon />,
+      text: 'Analytics',
+      route: '/analytics',
     },
     // {
     //   icon: <ManualIcon />,
@@ -418,98 +406,4 @@ const SCROLLBAR_STYLE = {
   },
 };
 
-const router = (
-  <Router history={browserHistory}>
-    <Route path='/' component={App}>rsv E`
-      <IndexRoute component={Redirect} />
-
-      <Route path='/builder' component={Builder} />
-      <Route path='/builder/:config' component={Builder} />
-      <Route path='/builder/:config/:splitConfig' component={Builder} />
-
-      <Route path='/library'>
-        <IndexRoute component={Library} />
-        <Route path=':groupId' component={Library}>
-          <IndexRoute component={Library} />
-          <Route path=':algorithmId' component={Library}>
-            <IndexRoute component={Library} />
-            <Route path=':variantId' component={Library}>
-              <IndexRoute component={Library} />
-            </Route>
-          </Route>
-        </Route>
-      </Route>
-
-      <Route path='/account' component={Account}>
-        <IndexRoute component={Profile} />
-        <Route path='/account/profile' component={Profile} />
-        <Route path='/account/profile/edit' component={EditProfile} />
-        <Route path='/account/settings' component={Settings} />
-        <Route path='/account/notifications' component={Notifications} />
-        <Route path='/account/connections' component={Connections} />
-        <Route path='/account/team' component={Team} />
-      </Route>
-
-      <Route path='/manual' component={ManualWrapper} />
-      <Route path='/manual/:term' component={ManualWrapper} />
-
-      <Route path='/users/:userId' component={Profile} />
-
-      <Route path='/reporting' component={Placeholder} />
-
-      <Route path='/logout' component={Logout} />
-
-      <Route path='/x' component={X} />
-      <Route path='/x/:x' component={X} />
-
-      <Route path='/browser' component={Redirect} />
-      <Route path='/browser/:a' component={Redirect} />
-      <Route path='/browser/:a/:b' component={Redirect} />
-      <Route path='/browser/:a/:b/:c' component={Redirect} />
-
-      <Route path='/schema' component={SchemaPage} />
-
-      <Route path='/import' component={FileImport} />
-    </Route>
-  </Router>
-);
-
-if (!DEV)
-{
-  // report uncaught errors in production
-  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
-  {
-
-    const user = UserStore.getState().get('currentUser');
-    const userId = user && user.id;
-    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
-    const builderState = JSON.stringify(BuilderStore.getState().toJS());
-    const location = JSON.stringify(window.location);
-
-    const msg = `${errorMsg} by ${userId}
-      Location:
-      ${location}
-
-      Library State:
-      ${libraryState}
-
-      Builder State:
-      ${builderState}
-
-      Error Stack:
-      ${error && error.stack}
-    `;
-
-    $.post('http://lukeknepper.com/email.php', {
-      msg,
-      secret: '11235813',
-    });
-
-    return false;
-  };
-}
-
-ReactDOM.render(router, document.getElementById('app'), () =>
-{
-  // tests can go here
-});
+export default App;

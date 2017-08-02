@@ -21,3 +21,5 @@ midway.db
 moviesdb.db
 *.swp
 build/
+package-lock.json
+yarn-error.log

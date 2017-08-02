@@ -73,6 +73,7 @@ export interface Props
   style?: any;
   id?: ID;
   vertical?: boolean;
+  openRight?: boolean; // menu will open to the right
 }
 
 export class Menu extends TerrainComponent<Props>
@@ -182,6 +183,7 @@ export class Menu extends TerrainComponent<Props>
           'menu-wrapper-small': this.props.small,
           'menu-open': this.state.open,
           'menu-vertical': this.props.vertical,
+          'menu-wrapper-right': this.props.openRight,
         })}
         style={this.props.style ? this.props.style : null}
       >

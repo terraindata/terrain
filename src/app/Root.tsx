@@ -43,59 +43,49 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { shallow } from 'enzyme';
-import * as Immutable from 'immutable';
 import * as React from 'react';
-import configureStore from 'redux-mock-store';
-import Library from '../../../app/library/components/Library';
-import { _LibraryState, LibraryState } from '../../../app/library/data/LibraryStore';
-import * as LibraryTypes from '../../../app/library/LibraryTypes';
-import { ItemType } from '../../../items/types/Item';
+import * as ReactDOM from 'react-dom';
+import AppRouter from './AppRouter';
+import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+import LibraryStore from './library/data/LibraryStore';
+import UserStore from './users/data/UserStore';
 
-describe('Library', () =>
+if (!DEV)
 {
-  let initialState: LibraryState = _LibraryState({
-    groups: Immutable.Map<number, LibraryTypes.Group>({}),
-    variants: Immutable.Map<number, LibraryTypes.Variant>({}),
-  });
-
-  initialState = initialState.set('groups', initialState.groups.set(1, LibraryTypes._Group({
-    type: ItemType.Group,
-    id: 1,
-    name: 'Group 1',
-    algorithmsOrder: Immutable.List<number>([2]),
-    lastEdited: '',
-    lastUserId: '',
-    userIds: Immutable.List([]),
-    defaultLanguage: 'elastic',
-    parent: 0,
-  })));
-
-  initialState = initialState.set('variants', initialState.variants.set(3, LibraryTypes._Variant({
-    id: 3,
-    name: 'Variant 1',
-  })));
-
-  const mockStore = configureStore();
-  let store = null;
-  let libraryComponent = null;
-
-  beforeEach(() =>
+  // report uncaught errors in production
+  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
   {
-    store = mockStore(initialState);
-    libraryComponent = shallow(
-      <Library
-        store={store}
-        router={{ params: { groupId: '1' } }}
-      />,
-    );
-  });
 
-  it('should have 3 columns', () =>
-  {
-    // Render a checkbox with label in the document
-    expect(libraryComponent.find('GroupsColumn').length).toEqual(1);
-    expect(libraryComponent.find('AlgorithmsColumn').length).toEqual(1);
-    expect(libraryComponent.find('VariantsColumn').length).toEqual(1);
-  });
+    const user = UserStore.getState().get('currentUser');
+    const userId = user && user.id;
+    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
+    const builderState = JSON.stringify(BuilderStore.getState().toJS());
+    const location = JSON.stringify(window.location);
+
+    const msg = `${errorMsg} by ${userId}
+      Location:
+      ${location}
+
+      Library State:
+      ${libraryState}
+
+      Builder State:
+      ${builderState}
+
+      Error Stack:
+      ${(error != null && error.stack != null) ? error.stack : ''}
+    `;
+
+    $.post('http://lukeknepper.com/email.php', {
+      msg,
+      secret: '11235813',
+    });
+
+    return false;
+  };
+}
+
+ReactDOM.render(<AppRouter />, document.getElementById('app'), () =>
+{
+  // tests can go here
 });
