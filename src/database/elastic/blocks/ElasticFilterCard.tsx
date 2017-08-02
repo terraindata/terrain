@@ -151,12 +151,15 @@ export const elasticFilter = _card({
               options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
               dropdownUsesRawValues: true,
               autoDisabled: true,
+              centerDropdown: true,
+              widthDropdown: '50px',
             },
             {
               displayType: DisplayType.DROPDOWN,
               key: 'rangeQuery',
               options: List(Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
               dropdownUsesRawValues: true,
+              centerDropdown: true,
               autoDisabled: true,
             },
             {
