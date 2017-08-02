@@ -135,13 +135,6 @@ export const elasticFilter = _card({
         factoryType: 'elasticFilterBlock',
         row:
         {
-          above:
-          {
-            displayType: DisplayType.LABEL,
-            key: '',
-            label: '\n',
-          },
-
           inner:
           [
             {
