@@ -111,7 +111,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
-        templateOptions: nextProps.templates.map((template, i) => template.name),
+        templateOptions: nextProps.templates.map((template, i) => String(template.id) + ': ' + template.name),
       });
     }
   }
