@@ -43,70 +43,80 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as SchemaTypes from '../SchemaTypes';
 
-let servers = Immutable.Map({});
-let databases = Immutable.Map({});
-let tables = Immutable.Map({});
-let columns = Immutable.Map({});
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-console no-unused-expression member-access max-line-length
 
-['Example Database Server'].map(
-  (serverName) =>
+import * as classNames from 'classnames';
+import * as Radium from 'radium';
+import * as React from 'react';
+import * as _ from 'underscore';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { CardConfig } from '../../../../blocks/types/Card';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import TerrainComponent from '../../../common/components/TerrainComponent';
+import Util from '../../../util/Util';
+import './CreateCardOption.less';
+
+export interface Props
+{
+  index: number;
+  card: CardConfig;
+  onClick: (card: CardConfig, index: number) => void;
+  overrideTitle?: string;
+  isFocused?: boolean;
+}
+
+@Radium
+class CreateCardOption extends TerrainComponent<Props>
+{
+  private handleClick()
   {
-    let server = SchemaTypes._Server({ name: serverName, connectionId: -1 });
+    this.props.onClick(this.props.card, this.props.index);
+  }
 
-    ['movieDB', 'baseballDB'].map(
-      (dbName) =>
-      {
-        let db = SchemaTypes._Database({ name: dbName, serverId: server.id });
-        server = server.set('databaseIds', server.databaseIds.push(db.id));
+  public render()
+  {
+    const { card } = this.props;
 
-        ['movies', 'actors', 'reviews', 'characters', 'users'].map(
-          (tableName) =>
+    if (!card)
+    {
+      console.log('Missing card type: ', card);
+      // TODO throw error instead
+      return null;
+    }
+
+    const text = this.props.overrideTitle || card.static.title;
+
+    return (
+      <div
+        className={classNames({
+          'create-card-option': true,
+          'create-card-option-focused': this.props.isFocused,
+        })}
+        onClick={this.handleClick}
+        style={
+          backgroundColor(Colors().bg3, Colors().inactiveHover)
+        }
+        key='create-option'
+      >
+        <div
+          className='create-card-option-button'
+          style={backgroundColor(card.static.colors[0], card.static.colors[0])}
+          key='create-button'
+        >
           {
-            let table = SchemaTypes._Table({ name: tableName, serverId: server.id, databaseId: db.id });
-            db = db.set('tableIds', db.tableIds.push(table.id));
-
-            ['first', 'second', 'third', 'fourth', 'fifth'].map(
-              (colName) =>
-              {
-                const column = SchemaTypes._Column({
-                  name: colName,
-                  tableId: table.id,
-                  databaseId: db.id,
-                  serverId: server.id,
-                  datatype: 'VARCHAR',
-                  isNullable: true,
-                  defaultValue: '',
-                  isPrimaryKey: false,
-                });
-
-                columns = columns.set(column.id, column);
-
-                table = table.set('columnIds', table.columnIds.push(column.id));
-              },
-            );
-
-            tables = tables.set(table.id, table);
-          },
-        );
-
-        databases = databases.set(db.id, db);
-      },
+            text
+          }
+        </div>
+        <div
+          className='create-card-option-description'
+        >
+          {
+            card.static.description || 'Create a ' + card.static.title + ' card.'
+          }
+        </div>
+      </div>
     );
-
-    servers = servers.set(server.id, server);
-  },
-);
-
-const ExampleSchemaData =
-  SchemaTypes._SchemaState()
-    .set('servers', servers)
-    .set('databases', databases)
-    .set('columns', columns)
-    .set('tables', tables)
-    .set('loading', false)
-    .set('loaded', true);
-
-export default ExampleSchemaData;
+  }
+}
+export default CreateCardOption;

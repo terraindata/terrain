@@ -1,21 +1,12 @@
 @import "common/fonts/Roboto.less";
 @import "common/Common.less";
 
-.noselect {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
 
 body {
     padding: 0px;
     margin: 0px;
     font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif;
 
-    .noselect;
     .black-text;
 
     background: @builder-bg;
@@ -55,7 +46,7 @@ body {
 }
 
 @top-bar-height: 36px;
-@icon-height: 17px;
+@icon-height: 24px;
 @icon-padding: calc((@top-bar-height - @icon-height) / 2);
 
 .app-top-bar {
@@ -93,7 +84,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #eaede7; //d3d6d0;
+  background: rgba(255,255,255,0.15);
   border-radius: 7px;
   margin: 5px 3px;
 }
@@ -103,7 +94,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C7CAC9;
+  background: rgba(255,255,255,0.25);
   border-radius: 10px;
   // border-top: 1px solid #c1d1af;
   // border-bottom: 1px solid #c1d1af;

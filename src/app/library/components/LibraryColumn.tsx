@@ -50,7 +50,8 @@ import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
+import * as _ from 'underscore';
+import { backgroundColor, borderColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
@@ -58,6 +59,11 @@ export interface Props
   index: number;
   title: string;
 }
+
+const COLUMN_STYLE = _.extend({},
+  backgroundColor(Colors().bg1),
+  borderColor(Colors().bg3),
+);
 
 class LibraryColumn extends TerrainComponent<Props>
 {
@@ -71,17 +77,20 @@ class LibraryColumn extends TerrainComponent<Props>
           this.props.title &&
           <div
             className='library-column-title'
-            style={backgroundColor(Colors().library.titleBar.base)}
+            style={backgroundColor(Colors().bg3)}
           >
             {
               this.props.title
             }
           </div>
         }
-        <div className={classNames({
-          'library-column-content': true,
-          'library-column-content-no-title': !this.props.title,
-        })}>
+        <div
+          className={classNames({
+            'library-column-content': true,
+            'library-column-content-no-title': !this.props.title,
+          })}
+          style={COLUMN_STYLE}
+        >
           {
             this.props['children']
           }

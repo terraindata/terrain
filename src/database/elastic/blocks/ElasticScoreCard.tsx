@@ -46,10 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:max-line-length
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
+
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
@@ -67,7 +66,7 @@ const transformScoreInputTypes = CommonElastic.acceptsValues;
 
 export const elasticScore = _card(
   {
-    weights: L(),
+    weights: List(),
     method: '',
 
     key: '_script',

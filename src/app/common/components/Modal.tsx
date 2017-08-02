@@ -224,12 +224,12 @@ const InfoIcon = require('./../../../images/icon_info.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
 const MODAL_BODY_STYLE = {
-  fontColor: Colors().altColor1,
+  fontColor: Colors().altText1,
   backgroundColor: Colors().altBg1,
 };
 
 const MODAL_HEADER_FOOTER_STYLE = {
-  fontColor: Colors().altColor1,
+  fontColor: Colors().altText1,
   backgroundColor: Colors().altBg2,
 };
 

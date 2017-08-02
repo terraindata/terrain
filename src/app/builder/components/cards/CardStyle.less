@@ -17,6 +17,10 @@
   padding-right: 0px;
   padding-top: 0px;
   
+  &.single-card {
+    padding-top: 6px;
+  }
+  
   min-width: 400px;
  
   .card-inner {
@@ -28,7 +32,7 @@
     
     padding: 3px;
     padding-right: 0px;
-    transition: all 0.25s;
+    // transition: all 0.25s;
   }
   
   .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
@@ -161,7 +165,7 @@
   padding: @card-padding-vertical 17px;
   .transition;
   
-  .bold-normal-white-text;
+  .normal-white-text;
   
   .card-title-inner {
     white-space: nowrap;
@@ -191,6 +195,8 @@
   }
   
   .card-handle-icon {
+    cursor: move;
+    
     .transition;
     .rotate90;
     width: 20px;
@@ -306,7 +312,6 @@
 
 .if-card-else {
   color: rgba(0,0,0,0.6);
-  font-weight: bold;
   display: inline-block;
   margin: @standard-margin;
   margin-right: 12px;
@@ -391,7 +396,7 @@
     padding-top: 7px;
     padding-left: 6px;
     
-    .bold-normal-white-text;
+    .normal-white-text;
 }
 
 .card-closed {
@@ -410,11 +415,14 @@
 }
 
 .card-no-title {
-  .cards-area,
-  .builder-tb-cards-area,
-  .transform-card-inner {
+  // .builder-tb-cards-area,
+  .cards-area {
     margin-left: -55px;
     // width: calc(~"100% + 110px");
+  }
+  .transform-card-inner {
+    margin-left: -55px;
+    width: calc(~"100% + 55px");
   }
 }
 

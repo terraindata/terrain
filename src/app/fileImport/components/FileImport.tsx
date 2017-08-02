@@ -54,7 +54,7 @@ import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import { isValidIndexName, isValidTypeName, parseJsonByLine } from './../../../../shared/fileImport/Util';
+import { isValidIndexName, isValidTypeName, parseJSONSubset } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -153,7 +153,53 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
-        this.parseAndChooseFile();
+        const { file, streaming, csvHeaderMissing } = this.state.fileImportState;
+        const fileToRead = streaming ? file.slice(0, FileImportTypes.CHUNK_SIZE) : file;
+        const fr = new FileReader();
+        fr.readAsText(fileToRead);
+        fr.onloadend = () =>
+        {
+          let stringifiedFile;
+          if (streaming)
+          {
+            Actions.enqueueChunk(fr.result);
+            stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
+          }
+          else
+          {
+            stringifiedFile = fr.result;
+          }
+
+          let items = [];
+          switch (this.state.filetype)
+          {
+            case 'json':
+              items = this.parseJson(stringifiedFile);
+              break;
+            case 'csv':
+              items = this.parseCsv(stringifiedFile);
+              if (!this.state.fileImportState.csvHeaderMissing) // remove first line if csv has header
+              {
+                stringifiedFile.slice(0, stringifiedFile.indexOf('\n'));
+              }
+              break;
+            default:
+          }
+          if (items.length === 0)
+          {
+            return;
+          }
+          const previewRows = items.map((item, i) =>
+            _.map(item, (value, key) =>
+              typeof value === 'string' ? value : JSON.stringify(value),
+            ),
+          );
+          const columnNames = _.map(items[0], (value, i) =>
+            this.state.filetype === 'csv' && csvHeaderMissing ? 'column' + String(i) : i,
+          );
+
+          Actions.chooseFile(streaming ? '' : stringifiedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
+        };
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -165,7 +211,7 @@ class FileImport extends TerrainComponent<any>
       case 2:
         if (!this.state.dbSelected)
         {
-          alert('Please select a database');
+          alert('Please select or enter a database');
           return;
         }
         let msg = isValidIndexName(this.state.fileImportState.dbText);
@@ -178,7 +224,7 @@ class FileImport extends TerrainComponent<any>
       case 3:
         if (!this.state.tableSelected)
         {
-          alert('Please select a table');
+          alert('Please select or enter a table');
           return;
         }
         msg = isValidTypeName(this.state.fileImportState.tableText);
@@ -209,16 +255,14 @@ class FileImport extends TerrainComponent<any>
 
   public handleServerChange(serverIndex: number)
   {
-    const serverName = this.state.serverNames.get(serverIndex);
+    const { servers, serverNames } = this.state;
+    const serverName = serverNames.get(serverIndex);
     this.setState({
       serverIndex,
       serverSelected: true,
-      dbNames: this.state.servers && serverName && this.state.servers.get(serverName) ?
-        List(this.state.servers.get(serverName).databaseIds.map((db) =>
-          db.split('/').pop(),
-        ))
-        :
-        List([]),
+      dbNames: List(servers.get(serverName).databaseIds.map((db) =>
+        db.split('/').pop(),
+      )),
     });
 
     Actions.changeServer(this.state.servers.get(serverName).connectionId, serverName);
@@ -226,11 +270,12 @@ class FileImport extends TerrainComponent<any>
 
   public handleAutocompleteDbChange(dbText: string)
   {
+    const { dbs } = this.state;
     const { serverText } = this.state.fileImportState;
     this.setState({
       dbSelected: !!dbText,
-      tableNames: this.state.dbs && dbText && this.state.dbs.get(databaseId(serverText, dbText)) ?
-        List(this.state.dbs.get(databaseId(this.state.fileImportState.serverText, dbText)).tableIds.map((table) =>
+      tableNames: dbText && dbs.get(databaseId(serverText, dbText)) ?
+        List(dbs.get(databaseId(serverText, dbText)).tableIds.map((table) =>
           table.split('.').pop(),
         ))
         :
@@ -242,11 +287,12 @@ class FileImport extends TerrainComponent<any>
 
   public handleAutocompleteTableChange(tableText: string)
   {
+    const { tables } = this.state;
     const { serverText, dbText } = this.state.fileImportState;
     this.setState({
       tableSelected: !!tableText,
-      columnOptionNames: this.state.tables && tableText && this.state.tables.get(tableId(serverText, dbText, tableText)) ?
-        List(this.state.tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
+      columnOptionNames: tableText && tables.get(tableId(serverText, dbText, tableText)) ?
+        List(tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
           column.split('.').pop(),
         ))
         :
@@ -256,9 +302,9 @@ class FileImport extends TerrainComponent<any>
     Actions.changeTableText(tableText);
   }
 
-  public parseJson(file: string)
+  public parseJson(file: string): object[]
   {
-    const items = parseJsonByLine(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+    const items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
     if (!Array.isArray(items))
     {
       alert('Input JSON file must parse to an array of objects.');
@@ -267,16 +313,46 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseCsv(file: string)
+  public parseCsv(file: string): object[]
   {
+    const { csvHeaderMissing } = this.state.fileImportState;
+
+    if (!csvHeaderMissing)
+    {
+      const testDuplicateConfig = {
+        quoteChar: '\'',
+        header: false,
+        preview: 1,
+        skipEmptyLines: true,
+      };
+
+      const columnHeaders = Papa.parse(file, testDuplicateConfig).data;
+      const colHeaderSet = new Set();
+      const duplicateHeaderSet = new Set();
+      columnHeaders[0].map((colHeader) =>
+      {
+        if (colHeaderSet.has(colHeader))
+        {
+          duplicateHeaderSet.add(colHeader);
+        }
+        else
+        {
+          colHeaderSet.add(colHeader);
+        }
+      });
+      if (duplicateHeaderSet.size > 0)
+      {
+        alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
+        return [];
+      }
+    }
     const config = {
       quoteChar: '\'',
-      header: this.state.fileImportState.hasCsvHeader,
+      header: !csvHeaderMissing,
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       error: (err) =>
       {
         alert('CSV format incorrect: ' + String(err));
-        return;
       },
       skipEmptyLines: true,
     };
@@ -293,9 +369,11 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
+  /*
   public parseAndChooseFile()
   {
-    const { file, streaming, hasCsvHeader } = this.state.fileImportState;
+    const { file, streaming, csvHeaderMissing } = this.state.fileImportState;
+    console.log(file);
     const fileToRead = streaming ? file.slice(0, FileImportTypes.CHUNK_SIZE) : file;
     const fr = new FileReader();
     fr.readAsText(fileToRead);
@@ -320,14 +398,14 @@ class FileImport extends TerrainComponent<any>
           break;
         case 'csv':
           items = this.parseCsv(stringifiedFile);
-          if (this.state.fileImportState.hasCsvHeader) // remove first line if csv has header
+          if (!this.state.fileImportState.csvHeaderMissing) // remove first line if csv has header
           {
             stringifiedFile.slice(0, stringifiedFile.indexOf('\n'));
           }
           break;
         default:
       }
-      if (!items)
+      if (items.length === 0)
       {
         return;
       }
@@ -337,12 +415,12 @@ class FileImport extends TerrainComponent<any>
         ),
       );
       const columnNames = _.map(items[0], (value, i) =>
-        this.state.filetype === 'csv' && !hasCsvHeader ? 'column' + String(i) : i,
+        this.state.filetype === 'csv' && csvHeaderMissing ? 'column' + String(i) : i,
       );
 
       Actions.chooseFile(streaming ? '' : stringifiedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
     };
-  }
+  } */
 
   public handleSelectFile(file)
   {
@@ -388,8 +466,8 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      hasCsvHeader, primaryKey, templates, transforms, file, chunkQueue, update, streaming } = fileImportState;
+    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, csvHeaderMissing,
+      primaryKey, templates, transforms, uploadInProgress, elasticUpdate, file, chunkQueue, streaming } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -400,7 +478,7 @@ class FileImport extends TerrainComponent<any>
             <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
             has header row (csv only)
             <CheckBox
-              checked={hasCsvHeader}
+              checked={!csvHeaderMissing}
               onChange={this.handleCsvHeaderChange}
             />
             {
@@ -451,8 +529,9 @@ class FileImport extends TerrainComponent<any>
             columnOptions={this.state.columnOptionNames}
             chunkQueue={chunkQueue}
             file={file}
-            update={update}
             streaming={streaming}
+            uploadInProgress={uploadInProgress}
+            elasticUpdate={elasticUpdate}
           />;
         break;
       default:
