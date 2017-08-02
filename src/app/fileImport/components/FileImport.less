@@ -6,12 +6,14 @@
 
 	.file-import-inner {
 		.dead-center;
-    min-width: 600px;
+    min-width: 100px;
+    max-width: 100%;
 
     .fi-step {
       .fi-step-name {
         .title-text;
         text-align: center;
+        margin-bottom: 12px;
       }
 
       .fi-step-title {
@@ -22,12 +24,25 @@
 
     .fi-content {
       margin-top: 24px;
-      width: 1200px;
-      min-height: 300px;
+      width: auto;
+      padding: 12px;
+      border-radius: 3px;
+      max-width: 100%;
+      margin: 12px;
+
+      .fi-step-row {
+        margin-bottom: 12px;
+        align-items: center;
+      }
+
+      .fi-input-label {
+        margin-left: 12px;
+      }
     }
 
     .fi-nav {
       float: right;
+      margin-top: 12px;
 
       .fi-back-button {
         .fi-button;
@@ -40,4 +55,8 @@
       }
     }
 	}
+
+  input[type=file] {
+    display: none;
+  }
 }

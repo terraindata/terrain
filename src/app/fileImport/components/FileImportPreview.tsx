@@ -429,20 +429,26 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTemplate()}
         {this.renderTable()}
         <div
-          className='fi-preview-update'
+          className='fi-import-button-wrapper'
         >
-          update
-          <CheckBox
-            checked={this.props.elasticUpdate}
-            onChange={this.handleElasticUpdateChange}
-          />
-        </div>
-        <div
-          className='fi-preview-import-button'
-          onClick={this.handleUploadFile}
-          style={buttonColors()}
-        >
-          Import
+          <div
+            className='fi-preview-update'
+          >
+            <CheckBox
+              checked={this.props.elasticUpdate}
+              onChange={this.handleElasticUpdateChange}
+            />
+            <span>
+              Join against any existing entries
+            </span>
+          </div>
+          <div
+            className='fi-preview-import-button'
+            onClick={this.handleUploadFile}
+            style={buttonColors()}
+          >
+            Import
+          </div>
         </div>
         {
           this.props.uploadInProgress &&

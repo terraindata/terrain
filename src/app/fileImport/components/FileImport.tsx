@@ -457,6 +457,11 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
+  public handleSelectFileButtonClick()
+  {
+    this.refs['file']['click']();
+  }
+
   public renderContent()
   {
     const { fileImportState } = this.state;
@@ -469,15 +474,38 @@ class FileImport extends TerrainComponent<any>
       case 0:
         content =
           <div>
-            <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
-            has header row (csv only)
-            <CheckBox
-              checked={!this.state.csvHeaderMissing}
-              onChange={this.handleCsvHeaderChange}
-            />
-            {
-              this.state.filename ? this.state.filename + ' selected' : 'no file selected'
-            }
+            <div
+              className='flex-container fi-step-row'
+            >
+              <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
+              <div
+                className='button'
+                onClick={this.handleSelectFileButtonClick}
+                style={buttonColors()}
+              >
+                Choose File
+              </div>
+              <div
+                className='flex-grow fi-input-label'
+              >
+                {
+                  this.state.filename ? this.state.filename + ' selected' : 'No file selected'
+                }
+              </div>
+            </div>
+            <div>
+              <CheckBox
+                checked={!this.state.csvHeaderMissing}
+                onChange={this.handleCsvHeaderChange}
+
+              />
+              <span
+                className='clickable'
+                onClick={this.handleCsvHeaderChange}
+              >
+                File has header row (csv only)
+              </span>
+            </div>
           </div>;
         break;
       case 1:
@@ -534,6 +562,7 @@ class FileImport extends TerrainComponent<any>
     return (
       <div
         className='fi-content'
+        style={backgroundColor(Colors().bg3)}
       >
         {
           content
@@ -556,7 +585,7 @@ class FileImport extends TerrainComponent<any>
             style={buttonColors()}
             ref='fi-back-button'
           >
-            &lt; back
+            &lt; Back
           </div>
         }
         {
@@ -567,7 +596,7 @@ class FileImport extends TerrainComponent<any>
             style={buttonColors()}
             ref='fi-next-button'
           >
-            next &gt;
+            Next &gt;
           </div>
         }
       </div>
