@@ -73,61 +73,15 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
-  const { files, fields } = await asyncBusboy(ctx.req);
-  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-  if (user === null)
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
   {
     ctx.status = 400;
     return;
   }
+  Util.verifyParameters(authStream['fields'], ['templateID', 'filetype']);
 
-  Util.verifyParameters(fields, ['templateID', 'filetype']);
-
-  const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
-  if (templates.length === 0)
-  {
-    throw new Error('Invalid template ID provided: ' + String(fields['templateID']));
-  }
-  const template: ImportTemplateConfig = templates[0];
-
-  let update: boolean = true;
-  if (fields['update'] === 'false')
-  {
-    update = false;
-  }
-  else if (fields['update'] !== undefined && fields['update'] !== 'true')
-  {
-    throw new Error('Invalid value for parameter "update": ' + String(fields['update']));
-  }
-
-  let file: stream.Readable | null = null;
-  for (const f of files)
-  {
-    if (f.fieldname === 'file')
-    {
-      file = f;
-    }
-  }
-  if (file === null)
-  {
-    throw new Error('No file specified.');
-  }
-
-  const imprtConf: ImportConfig = {
-    dbid: template['dbid'],
-    dbname: template['dbname'],
-    tablename: template['tablename'],
-    csvHeaderMissing: template['csvHeaderMissing'],
-    originalNames: template['originalNames'],
-    columnTypes: template['columnTypes'],
-    primaryKey: template['primaryKey'],
-    transformations: template['transformations'],
-
-    contents: await Util.getStreamContents(file),
-    filetype: fields['filetype'],
-    update,
-  };
-  ctx.body = await imprt.upsert(imprtConf);
+  ctx.body = await imprt.headlessUpsert(authStream);
 });
 
 export default Router;

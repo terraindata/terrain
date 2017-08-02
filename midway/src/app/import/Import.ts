@@ -54,7 +54,9 @@ import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import { ExportTemplateBase, ImportTemplateBase } from './ImportTemplates';
+import * as Util from '../Util';
+import { ExportTemplateBase, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+const importTemplates = new ImportTemplates();
 
 export interface ImportConfig extends ImportTemplateBase
 {
@@ -90,6 +92,58 @@ export class Import
   private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
   private quoteChar: string = '\'';
   private batchSize: number = 5000;
+
+  public async headlessUpsert(authStream: object): Promise<any>
+  {
+    return new Promise<any>(async (resolve, reject) =>
+    {
+      const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(authStream['fields']['templateID']));
+      if (templates.length === 0)
+      {
+        return reject('Invalid template ID provided: ' + String(authStream['fields']['templateID']));
+      }
+      const template: ImportTemplateConfig = templates[0];
+
+      let update: boolean = true;
+      if (authStream['fields']['update'] === 'false')
+      {
+        update = false;
+      }
+      else if (authStream['fields']['update'] !== undefined && authStream['fields']['update'] !== 'true')
+      {
+        return reject('Invalid value for parameter "update": ' + String(authStream['fields']['update']));
+      }
+
+      let file: stream.Readable | null = null;
+      for (const f of authStream['files'])
+      {
+        if (f.fieldname === 'file')
+        {
+          file = f;
+        }
+      }
+      if (file === null)
+      {
+        return reject('No file specified.');
+      }
+
+      const imprtConf: ImportConfig = {
+        dbid: template['dbid'],
+        dbname: template['dbname'],
+        tablename: template['tablename'],
+        csvHeaderMissing: template['csvHeaderMissing'],
+        originalNames: template['originalNames'],
+        columnTypes: template['columnTypes'],
+        primaryKey: template['primaryKey'],
+        transformations: template['transformations'],
+
+        contents: await Util.getStreamContents(file),
+        filetype: authStream['fields']['filetype'],
+        update,
+      };
+      resolve(this.upsert(imprtConf));
+    });
+  }
 
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
