@@ -46,17 +46,16 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
 
-import createReactClass = require('create-react-class');
-import * as Immutable from 'immutable';
-import * as PropTypes from 'prop-types';
+import * as Radium from 'radium';
+import {List, Map} from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import './InputStyle.less';
-const { List } = Immutable;
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
-import Menu from '../../../common/components/Menu';
+import Dropdown from '../../../common/components/Dropdown';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
@@ -70,64 +69,48 @@ const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
 import { Input, InputType } from '../../../../blocks/types/Input';
 
-const InputComponent = createReactClass<any, any>({
-  mixins: [PanelMixin],
+interface Props
+{
+  input: any;
+  index: number;
+  canEdit: boolean;
+}
 
-  propTypes:
-  {
-    input: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired,
-    canEdit: PropTypes.bool.isRequired,
-    // since inputs still are regular classes, instead of TerrainComponent, we construct keyPaths for Actions on execution
-    //  rather than caching. This is fine since inputs aren't nested, there would be no
-    //  benefit to caching keyPaths anyways.
-  },
+const TYPE_OPTIONS =
+  List([
+    InputType[0],
+    InputType[1],
+    InputType[2],
+  ]);
 
+@Radium
+class InputComponent extends TerrainComponent<Props>
+{
   getKeyPath(type?: string)
   {
-    const keyPath = Immutable.List(['query', 'inputs']);
+    const keyPath = List(['query', 'inputs']);
     if (type)
     {
-      return keyPath.push(this.props.index).push(type);
+      return keyPath.push(this.props.index as any).push(type);
     }
     return keyPath;
-  },
-
-  shouldComponentUpdate(nextProps, nextState)
+  }
+  
+  handleInputTypeChange(inputType: number)
   {
-    return shallowCompare(this, nextProps, nextState);
-  },
-
-  getDefaultProps()
-  {
-    return {
-      drag_x: false,
-      drag_y: true,
-      reorderOnDrag: true,
-    };
-  },
-
-  convertToDate()
-  {
-    let date = new Date(this.props.input.value);
-    if (date.toString() === 'Invalid Date')
+    Actions.change(this.getKeyPath('inputType'), inputType);
+    
+    if (inputType === InputType.DATE)
     {
-      date = new Date();
+      let date = new Date(this.props.input.value);
+      if (date.toString() === 'Invalid Date')
+      {
+        date = new Date();
+      }
+      const value = Util.formatInputDate(date);
+      Actions.change(this.getKeyPath('value'), value);
     }
-    const value = Util.formatInputDate(date);
-    Actions.change(this.getKeyPath('value'), value);
-    Actions.change(this.getKeyPath('inputType'), InputType.DATE);
-  },
-
-  convertToText()
-  {
-    Actions.change(this.getKeyPath('inputType'), InputType.TEXT);
-  },
-
-  convertToNumber()
-  {
-    Actions.change(this.getKeyPath('inputType'), InputType.NUMBER);
-  },
+  }
 
   closeInput()
   {
@@ -136,44 +119,17 @@ const InputComponent = createReactClass<any, any>({
     {
       Actions.remove(this.getKeyPath(), this.props.index);
     }, 250);
-  },
+  }
 
   createInput()
   {
     Actions.create(this.getKeyPath(), this.props.index, 'input');
-  },
-
-  getMenuOptions()
-  {
-    return List([
-      {
-        text: 'Number',
-        onClick: this.convertToNumber,
-        disabled: this.props.input.inputType === InputType.NUMBER,
-        icon: <NumberIcon />,
-        iconColor: '#805DA8',
-      },
-      {
-        text: 'Text',
-        onClick: this.convertToText,
-        disabled: this.props.input.inputType === InputType.TEXT,
-        icon: <TextIcon />,
-        iconColor: '#31B2BC',
-      },
-      {
-        text: 'Date',
-        onClick: this.convertToDate,
-        disabled: this.props.input.inputType === InputType.DATE,
-        icon: <DateIcon />,
-        iconColor: '#FF735B',
-      },
-    ]);
-  },
+  }
 
   changeValue(value)
   {
     Actions.change(this.getKeyPath('value'), value);
-  },
+  }
 
   renderInputValue()
   {
@@ -189,7 +145,7 @@ const InputComponent = createReactClass<any, any>({
         </div>
       );
     }
-
+    
     return (
       <BuilderTextbox
         canEdit={true}
@@ -201,17 +157,40 @@ const InputComponent = createReactClass<any, any>({
         placeholder='Sample value'
         autoDisabled={true}
         language={null}
+        onFocus={this.focus}
+        onBlur={this.blur}
+        textStyle={
+          this.props.input.inputType === InputType.NUMBER ?
+            fontColor(Colors().builder.cards.numberClause[0]) :
+            fontColor(Colors().builder.cards.stringClause[0])
+        }
       />
     );
-  },
+  }
+  
+  focus()
+  {
+    this.setState({
+      focused: true,
+    });
+  }
+
+  blur()
+  {
+    this.setState({
+      focused: false,
+    });
+  }
 
   componentDidMount()
   {
     Util.animateToAutoHeight(this.refs.input);
-  },
+  }
 
   render()
   {
+    const {input} = this.props;
+    
     return (
       <div className='input' ref='input'>
         {
@@ -225,22 +204,31 @@ const InputComponent = createReactClass<any, any>({
         }
         <div
           className='input-inner'
-          style={
-            backgroundColor(Colors().builder.inputs.background)
-          }
+          style={[
+            backgroundColor(Colors().bg3),
+            borderColor(Colors().highlight, Colors().activeHover),
+            this.state.focused && borderColor(Colors().active, Colors().active),
+          ]}
         >
-          <div className='input-top-row'>
+          <div className='input-top-row flex-container'>
             <BuilderTextbox
               canEdit={this.props.canEdit}
-              value={this.props.input.key}
-              className='input-text input-text-first input-borderless'
+              value={input.key}
+              className='flex-grow input-text input-text-first input-borderless standard-input'
               keyPath={this.getKeyPath('key')}
               placeholder='Input name'
               autoDisabled={true}
               language={null}
+              onFocus={this.focus}
+              onBlur={this.blur}
+              textStyle={fontColor(Colors().active)}
             />
-            <Menu
-              options={this.getMenuOptions()}
+            <Dropdown
+              options={TYPE_OPTIONS}
+              selectedIndex={input.inputType}
+              onChange={this.handleInputTypeChange}
+              centerAlign={true}
+              canEdit={true}
             />
             <div className='input-close' onClick={this.closeInput}>
               <CloseIcon />
@@ -254,7 +242,7 @@ const InputComponent = createReactClass<any, any>({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default InputComponent;

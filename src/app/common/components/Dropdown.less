@@ -1,12 +1,12 @@
 @import "../../common/Common.less";
 
-@option-height: 29px;
-@border-radius: 6px;
+@option-height: 24px;
+@border-radius: 3px;
 
 .dropdown-wrapper {
  cursor: pointer;
  background: @white;
- height: @option-height;
+ height: calc(@option-height + 5px);
  border-radius: @border-radius;
  box-sizing: border-box;
  z-index: 0;
@@ -26,10 +26,10 @@
 
  text-align: left;
 
- border: 1px solid #fff;
+ // border: 1px solid #fff;
  &:hover:not(.dropdown-disabled),
  &.dropdown-open {
-  border-color: #aaa;
+  // border-color: #aaa;
  }
 
  &.dropdown-disabled {
@@ -62,9 +62,9 @@
     min-width: 100%;
     overflow-y: auto;
     background: #ffffff;
-    border-radius: 6px;
+    border-radius: @border-radius;
     padding: 6px 0px;
-    box-shadow: 0px 0px 4px 1px #999999;
+    box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.5);
   }
 
   &:not(.dropdown-up) {
@@ -118,7 +118,7 @@
     }
 
     &.dropdown-option-focused {
-      border-color: #d1efe7;
+      // border-color: #d1efe7;
     }
   }
 

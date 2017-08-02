@@ -9,6 +9,32 @@
   flex-basis: 100px;
   margin: 0px 3px;
   // min-height: @input-height;
+  
+  input {
+    font-size: @font-size;
+    padding: 6px;
+    
+    background: rgba(0,0,0,0.25);
+    color: #fff;
+    
+    &::placeholder {
+      color: rgba(255,255,255,0.5) !important;
+    }
+    
+    &:hover {
+      input {
+        background: rgba(0,0,0,0.37);
+      }
+    }
+    
+    &:focus {
+      color: #fff;
+      background: rgba(0,0,0,.5);
+      &::placeholder {
+        color: rgba(255,255,255,0.5) !important;
+      }
+    }
+  }
 
   &.builder-tb-accepts-cards {
     input, textarea {
@@ -233,31 +259,5 @@
   }
   &:active {
     opacity: 1.0;
-  }
-}
-
-.card {
-  .builder-tb {
-    input {
-      background: rgba(0,0,0,0.25);
-      color: #fff;
-      &::placeholder {
-        color: rgba(0,0,0,0.5) !important;
-      }
-    }
-    &:hover {
-      input {
-        background: rgba(0,0,0,0.37);
-      }
-    }
-    input {
-      &:focus {
-        color: #242424;
-        background: rgba(0,0,0,.5);
-        &::placeholder {
-          color: rgba(0,0,0,0.7) !important;
-        }
-      }
-    }
   }
 }

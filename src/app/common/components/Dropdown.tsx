@@ -48,10 +48,12 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as Radium from 'radium';
+import { backgroundColor, Colors, fontColor, link, altStyle } from '../../common/Colors';
 import Actions from '../../builder/data/BuilderActions';
-import { Colors, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -68,8 +70,10 @@ export interface Props
   className?: string;
   centerAlign?: boolean;
   optionsDisplayName?: Map<any, string>; // maps value to display name
+  textColor?: string |  ((index: number) => string);
 }
 
+@Radium
 class Dropdown extends TerrainComponent<Props>
 {
   public _clickHandlers: { [index: number]: () => void } = {};
@@ -111,15 +115,51 @@ class Dropdown extends TerrainComponent<Props>
 
   public renderOption(option, index)
   {
+    const focused = index === this.state.focusedIndex;
+    const selected = index === this.props.selectedIndex;
+    
+    const { textColor } = this.props;
+    const customColor = textColor && typeof textColor === "function" ?
+          textColor(this.props.selectedIndex) : textColor;
+    console.log(customColor);
+    let style = {
+      color: customColor,
+      ':hover': {
+        backgroundColor: Colors().inactiveHover,
+        color: Colors().text1,
+      }
+    };
+    
+    if (focused)
+    {
+      _.extend(style, {
+        borderColor: Colors().inactiveHover,
+        // color: Colors().text1,
+      });
+    }
+    
+    if (selected)
+    {
+      _.extend(style, {
+        backgroundColor: customColor || Colors().active,
+        color: Colors().text1,
+        ':hover': {
+          backgroundColor: customColor || Colors().active,
+          color: Colors().text1,
+        }
+      });
+    }
+    
     return (
       <div
         className={classNames({
           'dropdown-option': true,
-          'dropdown-option-selected': index === this.props.selectedIndex,
-          'dropdown-option-focused': index === this.state.focusedIndex,
+          'dropdown-option-selected': selected,
+          'dropdown-option-focused': focused,
         })}
         key={index}
         onClick={this.clickHandler(index)}
+        style={style}
       >
         <div className='dropdown-option-inner'>
           {
@@ -203,7 +243,10 @@ class Dropdown extends TerrainComponent<Props>
     if (this.state.open)
     {
       optionsEl =
-        <div className='dropdown-options-wrapper'>
+        <div
+          className='dropdown-options-wrapper'
+          style={altStyle()}
+        >
           {
             this.props.options ?
               this.props.options.map(this.renderOption)
@@ -224,7 +267,8 @@ class Dropdown extends TerrainComponent<Props>
           'dropdown-center': this.props.centerAlign,
           [this.props.className]: !!this.props.className,
         })}
-        style={fontColor(Colors().text.baseDark)}
+        style={this.state.open ? DROPDOWN_OPEN_STYLE : DROPDOWN_STYLE}
+        key='dropdown-body'
       >
         {
           this.state.up && this.state.open
@@ -269,4 +313,25 @@ class Dropdown extends TerrainComponent<Props>
     );
   }
 }
+
+const DROPDOWN_STYLE = {
+  backgroundColor: Colors().bg1,
+  fontColor: Colors().text1,
+  
+  ':hover': {
+    backgroundColor: Colors().inactiveHover,
+  }
+}
+
+const DROPDOWN_OPEN_STYLE = _.extend({},
+  DROPDOWN_STYLE,
+  {
+    backgroundColor: Colors().active,
+    
+    ':hover': {
+      backgroundColor: Colors().active,
+    }
+  }
+);
+
 export default Dropdown;

@@ -279,6 +279,9 @@ class Autocomplete extends TerrainComponent<Props>
   {
     const options = this.props.options && this.props.options.filter(this.showOption);
     const inputClassName = 'ac-input ' + (this.props.className || '');
+   
+    const open = this.state.open && !! options && options.size > 0;
+    
     return (
       <div className='autocomplete'>
         <input
@@ -296,7 +299,7 @@ class Autocomplete extends TerrainComponent<Props>
           data-tip={this.props.help}
           data-html={true}
         />
-        {!options || !this.state.open ? null :
+        {!open ? null :
           <div
             className={classNames({
               'ac-options': true,

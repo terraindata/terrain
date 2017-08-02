@@ -304,7 +304,7 @@ class BuilderTextbox extends TerrainComponent<Props>
       options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
     }
 
-    if (!options.equals(this.state.options))
+    if (options && !options.equals(this.state.options))
     {
       this.setState({
         options,

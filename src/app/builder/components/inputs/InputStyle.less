@@ -21,27 +21,25 @@
   height: 0px;
 
 	.input-inner {
-		padding: 12px;
-		background: @light-green;
-	  border-radius: 6px;
+		padding: 12px 6px;
+    border-left: 6px solid;
+    .transition;
+    
+	  // border-radius: 6px;
     
     .menu-wrapper {
       position: absolute;
       top: 0px;
       right: 15px;
-      opacity: 0;
+      // opacity: 0;
     }
 
-    &:hover {
+    // &:hover {
       .menu-wrapper {
         opacity: 1;
       }
       
       .input-top-row {
-        .input-close {
-          .transition;
-          opacity: 1;
-        }
         .builder-tb {
           .transition;
           width: calc(~"100% - 60px") !important;
@@ -50,7 +48,7 @@
           width: calc(~"100% - 50px") !important;
         }
       }
-    }
+    // }
 
 		.input-text {
 			font-size: @medium-font-size;
@@ -75,6 +73,12 @@
     opacity: 1;
     .transition;
   }
+  
+  &:hover {
+    .input-close {
+      opacity: 1;
+    }
+  }
 }
 
 .panel-dragging {
@@ -89,15 +93,21 @@
 }
 
 .input-close {
+  margin-left: 6px;
+  margin-right: 6px;
   .close;
-  right: 0px;
-  position: absolute;
-  top: 6px;
-  opacity: 0;
-  transition: .transition;
+  // right: 0px;
+  // position: absolute;
+  // top: 6px;
+  // opacity: 0;
+  // transition: .transition;
   fill: #fff;
+  .transition;
+  
+  opacity: 0.35;
 }
 
 .input-top-row {
   margin-bottom: 6px;
+  align-items: center;
 }

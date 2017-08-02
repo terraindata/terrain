@@ -77,6 +77,8 @@ interface Theme
   active: string; // active color
   inactiveHover: string; // when something isn't active but could be
   activeHover: string; // when an active thing is hovered
+  
+  highlight: string; // for slight emphasis
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
@@ -283,6 +285,8 @@ const DARK: Theme =
 
     altText1: '#242424',
     altText2: '#424242',
+    
+    highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
@@ -532,7 +536,7 @@ export function buttonColors()
   return CACHE['buttonColors' + curTheme];
 }
 
-export function getStyle(color: string, style: string, hoverColor?: string)
+export function getStyle(color: string, style: string, hoverColor?: string): Object
 {
   if (!dynamicMap[curTheme])
   {
