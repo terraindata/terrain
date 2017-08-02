@@ -44,19 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESClauseSettings from '../ESClauseSettings';
-import ESClauseType from '../ESClauseType';
-import ESStringClause from './ESStringClause';
-
 /**
- * A clause which is a field name (column name)
+ * Settings passed to and stored in an ESClause
  */
-export default class ESFieldClause extends ESStringClause
+interface ESClauseSettings
 {
-  public constructor(type: string, settings?: ESClauseSettings)
-  {
-    super(type, settings, ESClauseType.ESFieldClause);
-  }
-
-  // TODO: add field validation here
+  def?: string | { [key: string]: string | null };
+  name?: string;
+  desc?: string;
+  url?: string;
+  template?: any;
+  required?: string[];
+  suggestions?: any[];
 }
+
+export default ESClauseSettings;

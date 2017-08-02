@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands member-ordering no-console
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
@@ -59,10 +60,9 @@ export default class ESScriptClause extends ESStructureClause
 {
   public constructor(type: string,
     structure: { [name: string]: string },
-    required: string[],
-    settings: any)
+    settings?: ESClauseSettings)
   {
-    super(type, structure, required, settings, ESClauseType.ESScriptClause);
+    super(type, structure, settings, ESClauseType.ESScriptClause);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void

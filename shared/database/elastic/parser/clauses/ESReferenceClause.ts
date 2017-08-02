@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import EQLConfig from '../EQLConfig';
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESValueInfo from '../ESValueInfo';
@@ -66,9 +67,9 @@ export default class ESReferenceClause extends ESClause
   public delegateType: string;
   public delegateClause: ESClause;
 
-  public constructor(type: string, delegateType: string, settings: any)
+  public constructor(type: string, delegateType: string, settings?: ESClauseSettings)
   {
-    super(type, settings, ESClauseType.ESReferenceClause);
+    super(type, ESClauseType.ESReferenceClause, settings);
     this.delegateType = delegateType;
   }
 

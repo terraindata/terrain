@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
@@ -56,10 +57,10 @@ import ESTerminalClause from './ESTerminalClause';
 export default class ESStringClause extends ESTerminalClause
 {
   public constructor(type: string,
-    settings: any,
+    settings?: ESClauseSettings,
     clauseType: ESClauseType = ESClauseType.ESStringClause,
     jsonType: ESJSONType = ESJSONType.string)
   {
-    super(type, settings, clauseType, jsonType);
+    super(type, clauseType, jsonType, settings);
   }
 }
