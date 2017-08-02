@@ -58,6 +58,7 @@ import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
+import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
 
 export const scorePoint = _block(
   {
@@ -103,6 +104,10 @@ export const elasticTransform = _card(
           key: 'input',
           placeholder: 'Input field',
           showWhenCards: true,
+          getAutoTerms: (schemaState): List<string> =>
+          {
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+          },
         },
         // TODO, in the future, if we allow complicated formulas inside
         //  transforms, then we can change this back to a cards view

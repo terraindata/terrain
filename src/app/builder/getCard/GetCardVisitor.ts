@@ -54,6 +54,7 @@ import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
+import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Colors } from '../../common/Colors';
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
@@ -355,11 +356,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            return List(['movieId', 'title', 'budget', 'released', 'revenue']);
-            // TODO change from tables to dbs?
-            // const db = BuilderStore.getState().db.name; // TODO correct?
-            //  const tableNames = schemaState.tableNamesByDb.get(db);
-            //  return tableNames;
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -379,13 +376,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            // TODO cache list in schema state
-            const server = BuilderStore.getState().db.name;
-            return schemaState.databases.toList().filter(
-              (db) => db.serverId === server,
-            ).map(
-              (db) => db.name,
-            ).toList();
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -675,34 +666,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            const state = BuilderStore.getState();
-            const cards = state.query.cards;
-            const isIndexCard = (card) => card['type'] === 'eqlindex';
-
-            let indexCard = cards.find(isIndexCard);
-            if (indexCard === undefined)
-            {
-              indexCard = cards.get(0);
-              if (indexCard !== undefined)
-              {
-                indexCard = indexCard['cards'].find(isIndexCard);
-              }
-            }
-
-            // TODO idea: have the selected index and type stored on the Query object
-
-            if (indexCard !== undefined)
-            {
-              const index = indexCard['value'];
-              const indexId = state.db.name + '/' + String(index);
-              return schemaState.tables.filter(
-                (table) => table.databaseId === indexId,
-              ).map(
-                (table) => table.name,
-              ).toList();
-            }
-
-            return List([]);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
           },
         },
         tql: (stringBlock) => stringBlock['value'],

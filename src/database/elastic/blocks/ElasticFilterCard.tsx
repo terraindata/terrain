@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'underscore';
 
+import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import { Colors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -57,8 +58,7 @@ import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-
-import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
+import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 export const elasticFilterBlock = _block(
   {
@@ -140,7 +140,7 @@ export const elasticFilter = _card({
               key: 'field',
               getAutoTerms: (schemaState) =>
               {
-                return List(['budget', 'popularity', 'votecount']);
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
               },
             },
             {
