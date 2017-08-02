@@ -65,7 +65,7 @@
     text-align: center;
     cursor: pointer;
     
-    border: 1px solid #fff;
+    // border: 1px solid #fff;
     
     opacity: 0.2;
     
@@ -91,16 +91,16 @@
     .create-card-placeholder {
       // margin-bottom: 0px;
             
-      svg {
-        fill: #f00;
-      }
+      // svg {
+      //   fill: #f00;
+      // }
       
-      &:hover {
-        background: #f00;
-        svg {
-          fill: #fff;
-        }
-      }
+      // &:hover {
+      //   background: #f00;
+      //   svg {
+      //     fill: #fff;
+      //   }
+      // }
     }
   }
   
@@ -114,15 +114,17 @@
 
 
 .card-hovering {
-  .create-card-wrapper {
+  .create-card-wrapper.create-card-closed {
     .create-card-placeholder {
       opacity: 1;
+      background: rgba(255,255,255,0.15);
     }
   }
   .card {
-    .create-card-wrapper {
+    .create-card-wrapper.create-card-closed {
       .create-card-placeholder {
         opacity: 0.2;
+        background: none;
       }
     } 
   }

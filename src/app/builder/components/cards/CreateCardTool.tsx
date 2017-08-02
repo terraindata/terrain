@@ -179,7 +179,7 @@ class CreateCardTool extends TerrainComponent<Props>
         })}
         ref='selector'
         style={
-          backgroundColor(Colors().bg1)
+          null //backgroundColor(Colors().bg1)
         }
       >
         <div className='create-card-selector-inner'>
@@ -305,7 +305,7 @@ class CreateCardTool extends TerrainComponent<Props>
         className={classes}
         style={_.extend(
           style,
-          backgroundColor(Colors().bg1),
+          {} // backgroundColor(Colors().bg1),
         )}
       >
         {
