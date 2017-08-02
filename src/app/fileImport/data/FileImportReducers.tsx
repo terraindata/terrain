@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands no-console
+// tslint:disable:restrict-plus-operands no-console strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
@@ -56,17 +56,145 @@ const { List, Map } = Immutable;
 
 const FileImportReducers = {};
 
+const deeplyColumnTypeToString = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
+{
+  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES[columnTypesTree.type];
+  if (columnTypesTree.innerType)
+  {
+    deeplyColumnTypeToString(columnTypesTree.innerType);
+  }
+  return columnTypesTree;
+};
+
+const deeplyColumnTypeToNumber = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
+{
+  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES.indexOf(String(columnTypesTree.type));
+  if (columnTypesTree.innerType)
+  {
+    deeplyColumnTypeToNumber(columnTypesTree.innerType);
+  }
+  return columnTypesTree;
+};
+
+const applyTransform = (state, transform) =>
+{
+  const transformCol = state.columnNames.indexOf(transform.colName);
+
+  if (transform.name === 'rename')
+  {
+    return state.setIn(['columnNames', state.columnNames.indexOf(transform.colName)], transform.args.newName);
+  }
+  else if (transform.name === 'append' || transform.name === 'prepend')
+  {
+    return state
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        row.map((col, j) =>
+        {
+          if (j === transformCol)
+          {
+            return transform.name === 'append' ? col + transform.args.text : transform.args.text + col;
+          }
+          return col;
+        }),
+      )),
+    );
+  }
+  else if (transform.name === 'duplicate')
+  {
+    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    return state
+      .set('primaryKey', primaryKey)
+      .set('columnNames', state.columnNames
+        .insert(transformCol + 1, transform.args.newName))
+      .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
+      .set('columnTypes', state.columnTypes.insert(transformCol + 1, state.columnTypes.get(transformCol)))
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        [].concat(...row.map((col, j) =>           // convoluted way of mapping an array and returning a larger array
+        {                                          // since one column needs to be added (same for split below)
+          if (j === transformCol)
+          {
+            return [col, col];
+          }
+          return col;
+        },
+        )),
+      )));
+  }
+  else if (transform.name === 'split')
+  {
+    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    return state
+      .set('primaryKey', primaryKey)
+      .set('columnNames', state.columnNames
+        .set(transformCol, transform.args.newName[0])
+        .insert(transformCol + 1, transform.args.newName[1]))
+      .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
+      .set('columnTypes', state.columnTypes.insert(transformCol + 1, Immutable.fromJS({ type: 0 })))
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        [].concat(...row.map((col, j) =>
+        {
+          if (j === transformCol)
+          {
+            const index = col.indexOf(transform.args.text);
+            if (index === -1)
+            {
+              return [col, ''];
+            }
+            return [col.substring(0, index), col.substring(index + transform.args.text.length)];
+          }
+          return col;
+        },
+        )),
+      )));
+  }
+  else if (transform.name === 'merge')
+  {
+    const mergeCol = state.columnNames.indexOf(transform.args.mergeName);
+
+    let primaryKey = '';
+    if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
+    {
+      primaryKey = mergeCol < transformCol ? transformCol - 1 : transformCol;
+    }
+    else
+    {
+      primaryKey = state.primaryKey < mergeCol ? state.primaryKey : state.primaryKey - 1;
+    }
+
+    return state
+      .set('primaryKey', primaryKey)
+      .set('columnNames', state.columnNames
+        .set(transformCol, transform.args.newName)
+        .delete(mergeCol))
+      .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
+      .set('columnTypes', state.columnTypes.delete(mergeCol))
+      .set('previewRows', List(state.previewRows.map((row, i) =>
+        row.map((col, j) =>
+        {
+          return j === transformCol ? col + transform.args.text + row[mergeCol] : col;
+        }).filter((col, j) =>
+          j !== mergeCol,
+        ),
+      )));
+  }
+  return state;
+};
+
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
       .set('connectionId', action.payload.connectionId)
       .set('serverText', action.payload.name)
+      .set('dbText', '')
+      .set('tableText', '')
   ;
 
 FileImportReducers[ActionTypes.changeDbText] =
   (state, action) =>
     state
-      .set('dbText', action.payload.dbText);
+      .set('dbText', action.payload.dbText)
+      .set('tableText', '')
+  ;
 
 FileImportReducers[ActionTypes.changeTableText] =
   (state, action) =>
@@ -76,100 +204,88 @@ FileImportReducers[ActionTypes.changeTableText] =
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
-      .set('hasCsvHeader', !state.hasCsvHeader)
+      .set('csvHeaderMissing', !state.csvHeaderMissing)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
-      .set('primaryKey', state.columnNames.get(action.payload.id))
+      .set('primaryKey', action.payload.columnId)
   ;
 
 FileImportReducers[ActionTypes.setColumnToInclude] =
   (state, action) =>
     state
-      .updateIn(['columnsToInclude', action.payload.id], (isColIncluded: boolean) => !isColIncluded)
+      .updateIn(['columnsToInclude', action.payload.columnId], (isColIncluded: boolean) => !isColIncluded)
   ;
 
 FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
     state
-      .setIn(['columnNames', action.payload.id], action.payload.columnName)
+      .setIn(['columnNames', action.payload.columnId], action.payload.newName)
   ;
 
 FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
-    state
-      .setIn(['columnTypes', action.payload.id], action.payload.typeIndex)
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    for (let i = 0; i < action.payload.recursionDepth; i++)
+    {
+      keyPath.push('innerType');
+    }
+    keyPath.push('type');
+
+    if (FileImportTypes.ELASTIC_TYPES[action.payload.typeIndex] === 'array')
+    {
+      const keyPathAdd = keyPath.slice();
+      keyPathAdd[keyPathAdd.length - 1] = 'innerType'; // add new 'innerType' at the same level as highest 'type'
+      return state.setIn(keyPath, action.payload.typeIndex)
+        .setIn(keyPathAdd, Immutable.fromJS({ type: 0 }));
+    }
+    return state.setIn(keyPath, action.payload.typeIndex);
+  };
+
+FileImportReducers[ActionTypes.addTransform] =
+  (state, action) =>
+    state.set('transforms', state.transforms.push(action.payload.transform))
+  ;
+
+FileImportReducers[ActionTypes.updatePreviewRows] =
+  (state, action) =>
+    applyTransform(state, action.payload.transform)
   ;
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
-  {
-    const columnsToInclude = [];
-    const columnNames = [];
-    const columnTypes = [];
-    let colsCount = 0;
-
-    if (action.payload.filetype === 'csv' && !state.hasCsvHeader)
-    {
-      console.log('headerless csv');
-      action.payload.preview[0].map((value, i) =>
-      {
-        columnsToInclude.push(['column' + i, true]);
-        columnNames.push(['column' + i, 'column' + i]);
-        columnTypes.push(['column' + i, 0]);
-        colsCount++;
-      });
-    }
-    else
-    {
-      console.log('csv with header/json');
-      _.map(action.payload.preview[0], (value, key) =>
-      {
-        columnsToInclude.push([key, true]);
-        columnNames.push([key, key]);
-        columnTypes.push([key, 0]);
-        colsCount++;
-      });
-    }
-
-    return state
+    state
       .set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
-      .set('primaryKey', '')
+      .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
-      .set('columnsCount', colsCount)
-      .set('columnsToInclude', Map(columnsToInclude))
-      .set('columnNames', Map(columnNames))
-      .set('columnTypes', Map(columnTypes));
-  };
+      .set('columnsCount', action.payload.originalNames.size)
+      .set('originalNames', action.payload.originalNames)
+      .set('columnNames', action.payload.originalNames)
+      .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
+      .set('columnTypes', List(action.payload.originalNames.map(() => (Immutable.fromJS({ type: 0 })))))
+      .set('transforms', List([]))
+  ;
 
 FileImportReducers[ActionTypes.uploadFile] =
-  (state) =>
+  (state, action) =>
   {
-    const isCsv = state.filetype === 'csv';
-    const columnTypes = [];
-    state.columnTypes.forEach((value, key) =>
-    {
-      const typeName = FileImportTypes.ELASTIC_TYPES[value];
-      columnTypes.push(isCsv ? typeName : [key, typeName]);
-    });
-
-    const cTypes = isCsv ? List<string>(columnTypes) : Map<string, string>(columnTypes);
-    const cNames = isCsv ? state.columnNames.toList() : state.columnNames;
-    const cToInclude = isCsv ? state.columnsToInclude.toList() : state.columnsToInclude;
-
     Ajax.importFile(
       state.file,
       state.filetype,
       state.dbText,
       state.tableText,
       state.connectionId,
-      cNames,
-      cToInclude,
-      cTypes,
-      state.primaryKey,
+      state.originalNames,
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&                          // backend requires type as string
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+      )),
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
       () =>
       {
         alert('success');
@@ -178,9 +294,86 @@ FileImportReducers[ActionTypes.uploadFile] =
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
       },
-      state.hasCsvHeader,
+      state.csvHeaderMissing,
+    );
+
+    return state;
+  };
+
+FileImportReducers[ActionTypes.saveTemplate] =
+  (state, action) =>
+  {
+    Ajax.saveTemplate(state.dbText,
+      state.tableText,
+      state.connectionId,
+      state.originalNames,
+      Map<string, FileImportTypes.ColumnTypesTree>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+      )),
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
+      action.payload.templateText,
+      () =>
+      {
+        alert('successfully saved template');
+        action.payload.fetchTemplates();
+      },
+      (err: string) =>
+      {
+        alert('Error saving template: ' + JSON.parse(err).errors[0].detail);
+      },
+      state.csvHeaderMissing,
     );
     return state;
+  };
+
+FileImportReducers[ActionTypes.fetchTemplates] =
+  (state, action) =>
+  {
+    Ajax.fetchTemplates(
+      state.connectionId,
+      state.dbText,
+      state.tableText,
+
+      (templatesArr) =>
+      {
+        const templates: Immutable.List<FileImportTypes.Template> = Immutable.List<FileImportTypes.Template>(templatesArr);
+        action.payload.setTemplates(templates);
+      },
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setTemplates] =
+  (state, action) =>
+    state.set('templates', action.payload.templates)
+  ;
+
+FileImportReducers[ActionTypes.loadTemplate] =
+  (state, action) =>
+  {
+    const template = state.templates.get(action.payload.templateId);
+    template.transformations.map((transform) =>
+    {
+      state = applyTransform(state, transform);
+    });
+    const { columnNames, previewRows } = state;
+
+    return state
+      .set('originalNames', List(template.originalNames))
+      .set('primaryKey', columnNames.indexOf(template.primaryKey))
+      .set('transforms', List<FileImportTypes.Transform>(template.transformations))
+      .set('csvHeaderMissing', template.csvHeaderMissing)
+      .set('columnNames', columnNames)
+      .set('columnTypes', List(columnNames.map((colName) =>
+        template.columnTypes[colName] ?
+          Immutable.fromJS(deeplyColumnTypeToNumber(template.columnTypes[colName]))
+          :
+          Immutable.fromJS({ type: 0 }),
+      )))
+      .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
+      .set('previewRows', previewRows);
   };
 
 export default FileImportReducers;

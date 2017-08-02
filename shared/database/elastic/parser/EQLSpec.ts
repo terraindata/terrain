@@ -280,7 +280,7 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('script_sort',
       {
         _script: 'script_sort_object',
-      }, ['"_script"'],
+      }, ['_script'],
       { desc: 'script sort' }),
     new ESStructureClause('script_sort_object',
       {
@@ -291,7 +291,7 @@ const EQLSpec: ESClause[] =
         script: 'script',
         mode: 'sort_mode',
       },
-      ['"type"', '"script"'],
+      ['type', 'script'],
       {
         desc: 'Script Sorting',
         url: '',
@@ -597,7 +597,7 @@ const EQLSpec: ESClause[] =
         path: 'terms_lookup_path',
         routing: 'string',
       },
-      ['value'],
+      [],
       {}),
     new ESStringClause('terms_lookup_id',
       {

@@ -74,13 +74,34 @@ class ElasticIndices
   }
 
   /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-create
+   * @param params
+   * @param callback
+   */
+  public create(params: Elastic.IndicesCreateParams, callback: (error: any, response: any, status: any) => void): void
+  {
+    return this.delegate.indices.create(params, callback);
+  }
+
+  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-delete
    * @param params
    * @param callback
    */
-  public delete(params: Elastic.IndicesDeleteParams, callback: (errror: any, response: any, status: any) => void): void
+  public delete(params: Elastic.IndicesDeleteParams, callback: (error: any, response: any, status: any) => void): void
   {
     return this.delegate.indices.delete(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-putmapping
+   * @param params
+   * @param callback
+   */
+  public putMapping(params: Elastic.IndicesPutMappingParams, callback: (err: any, response: any, status: any) => void): void
+  {
+    this.log('putMapping', params);
+    return this.delegate.indices.putMapping(params, callback);
   }
 
   private log(methodName: string, info: any)

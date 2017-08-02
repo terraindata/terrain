@@ -43,51 +43,49 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './FileImportPreviewRow.less';
+import * as ReactDOM from 'react-dom';
+import AppRouter from './AppRouter';
+import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+import LibraryStore from './library/data/LibraryStore';
+import UserStore from './users/data/UserStore';
 
-export interface Props
+if (!DEV)
 {
-  items: List<string>;
-}
-
-@Radium
-class FileImportPreviewRow extends TerrainComponent<Props>
-{
-  public render()
+  // report uncaught errors in production
+  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
   {
-    return (
-      <div
-        className='fi-preview-row'
-      >
-        {
-          this.props.items.map((value, key) =>
-            <div
-              key={key}
-              className='fi-preview-row-cell'
-              style={backgroundColor(Colors().fileimport.preview.cell)}
-            >
-              <div
-                className='fi-preview-row-cell-text'
-              >
-                {
-                  value
-                }
-              </div>
-            </div>,
-          )
-        }
-      </div>
-    );
-  }
+
+    const user = UserStore.getState().get('currentUser');
+    const userId = user && user.id;
+    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
+    const builderState = JSON.stringify(BuilderStore.getState().toJS());
+    const location = JSON.stringify(window.location);
+
+    const msg = `${errorMsg} by ${userId}
+      Location:
+      ${location}
+
+      Library State:
+      ${libraryState}
+
+      Builder State:
+      ${builderState}
+
+      Error Stack:
+      ${(error != null && error.stack != null) ? error.stack : ''}
+    `;
+
+    $.post('http://lukeknepper.com/email.php', {
+      msg,
+      secret: '11235813',
+    });
+
+    return false;
+  };
 }
 
-export default FileImportPreviewRow;
+ReactDOM.render(<AppRouter />, document.getElementById('app'), () =>
+{
+  // tests can go here
+});

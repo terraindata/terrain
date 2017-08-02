@@ -114,6 +114,16 @@ abstract class TastyDB
    * @memberof TastyDB
    */
   public async abstract destroy(): Promise<void>;
+
+  /**
+   * insert mapping of column name to data type
+   *
+   * @abstract
+   * @returns {Promise<void>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract putMapping(table: TastyTable): Promise<object>;
 }
 
 export default TastyDB;
