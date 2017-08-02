@@ -82,7 +82,7 @@ export const elasticFilterBlock = _block(
 
 export const elasticFilter = _card({
   filters: List(),
-  key: 'query',
+  key: 'bool',
 
   static: {
     language: 'elastic',
@@ -92,9 +92,7 @@ export const elasticFilter = _card({
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      const filterObj = {
-        bool: {},
-      };
+      const filterObj = {};
 
       const filters = block['filters'].map(
         (filterBlock) =>
@@ -102,13 +100,13 @@ export const elasticFilter = _card({
           const f = tqlTranslationFn(filterBlock, tqlConfig);
           _.map(f as any, (v, k) =>
           {
-            if (filterObj.bool[k] === undefined)
+            if (filterObj[k] === undefined)
             {
-              filterObj.bool[k] = [v];
+              filterObj[k] = [v];
             }
             else
             {
-              filterObj.bool[k].push(v);
+              filterObj[k].push(v);
             }
           });
         });
