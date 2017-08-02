@@ -169,7 +169,7 @@ const EQLSpec: ESClause[] =
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { index: null, type: null, from: null, size: null, body: null },
-        autocomplete: ['index', 'type'],
+        autocomplete: ['body', 'index', 'type', 'from', 'size'],
       }),
     new ESIndexClause('index',
       {
@@ -223,6 +223,7 @@ const EQLSpec: ESClause[] =
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { query: null },
+        autocomplete: ['query', 'sort', 'from', 'size'],
       }),
     new ESVariantClause('sort_object',
       {
@@ -243,8 +244,7 @@ const EQLSpec: ESClause[] =
         string: 'field',
         object: 'field_sort_object',
       },
-      {
-      }),
+      {}),
     new ESStructureClause('field_sort_object',
       {
         missing: 'sort_missing',
@@ -258,6 +258,7 @@ const EQLSpec: ESClause[] =
       {
         desc: 'Script Sorting',
         url: '',
+        autocomplete: ['order', 'missing', 'unmapped_type'],
       }),
     new ESStructureClause('score_sort',
       {
@@ -321,18 +322,23 @@ const EQLSpec: ESClause[] =
         'script': 'script',
       },
       [],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html' }),
+      {
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html',
+        autocomplete: ['order', 'missing', 'unmapped_type', 'script'],
+      }),
     new ESEnumClause('sort_mode',
       ['min', 'max', 'sum', 'avg', 'median'],
       {
         desc: 'When sorting by an array or multi-valued field, controls how that field is used to sort results.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_sort_mode_option',
+        template: 'avg',
       }),
     new ESEnumClause('sort_order',
       ['asc', 'desc'],
       {
         desc: 'The order to sort this field by: ascending or descending.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_sort_order',
+        template: 'asc',
       }),
     new ESReferenceClause('sort_nested_path',
       'field',
@@ -402,7 +408,11 @@ const EQLSpec: ESClause[] =
         stored: 'script_name',
       },
       [],
-      {}),
+      {
+        desc: 'Calls a script function and returns the result. Can be used to call a stored or inline script.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html',
+        autocomplete: ['lang', 'params', 'stored', 'inline'],
+      }),
     new ESStringClause('script_inline',
       { desc: 'The code for this inline script' }),
     new ESMapClause('script_params', 'string', 'any',
@@ -475,6 +485,7 @@ const EQLSpec: ESClause[] =
         desc: 'Controls match, term, and range filtering and matching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-query.html',
         // template: { bool: null },
+        autocomplete: ['term', 'terms', 'range', 'match', 'bool', 'query_string'],
       }),
     new ESArrayClause('ids',
       'string',
@@ -504,6 +515,7 @@ const EQLSpec: ESClause[] =
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
         // template: { must: null, must_not: null, should: null, minimum_should_match: null },
+        autocomplete: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
       }),
     new ESVariantClause('must',
       {
@@ -730,7 +742,10 @@ const EQLSpec: ESClause[] =
         max_expansions: 'fuzzy_max_expansions',
       },
       ['value'],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html' }),
+      {
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html',
+        autocomplete: ['value', 'boost'],
+      }),
     new ESNumberClause('boost',
       {
         desc: 'Boosts the score of matches by the given amount. Boosts are not exactly multiplicative.',
@@ -786,10 +801,13 @@ const EQLSpec: ESClause[] =
       },
       ['query'],
       {
+        desc: 'Settings for a match clause.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html',
         template: {
           query: '',
           operator: null,
         },
+        autocomplete: ['query', 'operator', 'analyzer', 'max_expansions', 'slop', 'lenient'],
       }),
     new ESEnumClause('match_operator',
       ['and', 'or'],
@@ -831,7 +849,7 @@ const EQLSpec: ESClause[] =
         desc: 'Chooses which analyzer to use to convert strings into lists of words (tokens) when searching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html',
         template: 'standard',
-        suggestions: [
+        autocomplete: [
           'standard',
           'english',
           'simple',
@@ -990,6 +1008,7 @@ const EQLSpec: ESClause[] =
         name: 'multi match query',
         desc: 'A match query that allows multi-field queries',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html',
+        autocomplete: ['query', 'type', 'fields'],
       }),
     new ESArrayClause('multi_match_field', 'field',
       {
@@ -1050,6 +1069,16 @@ const EQLSpec: ESClause[] =
       {
         desc: 'Uses a query parser to parse its content so that operators like AND and OR can be used inside a query string.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html',
+        autocomplete: [
+          'query',
+          'default_operator',
+          'default_field',
+          'analyzer',
+          'phrase_slop',
+          'fuzziness',
+          'lenient',
+          'boost',
+        ],
       }),
     new ESReferenceClause('query_string_default_field',
       'field',
@@ -1074,7 +1103,7 @@ const EQLSpec: ESClause[] =
         query: 'query',
         ignore_unmapped: 'ignore_unmapped',
       },
-      [],
+      ['path', 'query'],
       {
         desc: 'Queries nested documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html',
@@ -1083,6 +1112,7 @@ const EQLSpec: ESClause[] =
           score_mode: null,
           query: null,
         },
+        autocomplete: ['path', 'score_mode', 'query'],
       }),
     new ESEnumClause('nested_score_mode',
       ['avg', 'sum', 'min', 'max', 'none'],
@@ -1110,6 +1140,7 @@ const EQLSpec: ESClause[] =
           score_mode: null,
           query: null,
         },
+        autocomplete: ['type', 'query', 'score_mode'],
       }),
     new ESEnumClause('has_child_score_mode',
       ['avg', 'sum', 'min', 'max', 'none'],
@@ -1165,6 +1196,7 @@ const EQLSpec: ESClause[] =
         name: 'simple query string clause',
         desc: 'A simplified version of a query string clause that works even when the query string is malformed.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html',
+        autocomplete: ['query', 'fields', 'default_operator', 'analyzer', 'lenient'],
       }),
     new ESStringClause('query_string',
       {
