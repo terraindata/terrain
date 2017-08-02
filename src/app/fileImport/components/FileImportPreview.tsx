@@ -79,8 +79,8 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
-  loading: boolean;
-  update: boolean;
+  uploadInProgress: boolean;
+  elasticUpdate: boolean;
 }
 
 @Radium
@@ -91,13 +91,11 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     templateOptions: List<string>,
     editColumnId: number,
-    showLoading: boolean,
   } = {
     templateId: -1,
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
-    showLoading: false,
   };
 
   public componentDidMount()
@@ -208,9 +206,9 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.templateText);
   }
 
-  public handleUpdateChange()
+  public handleElasticUpdateChange()
   {
-    Actions.toggleUpdate();
+    Actions.changeElasticUpdate();
   }
 
   public handleUploadFile()
@@ -313,7 +311,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('loading: ', this.props.loading);
     return (
       <div
         className='fi-preview'
@@ -325,8 +322,8 @@ class FileImportPreview extends TerrainComponent<Props>
         >
           update
           <CheckBox
-            checked={this.props.update}
-            onChange={this.handleUpdateChange}
+            checked={this.props.elasticUpdate}
+            onChange={this.handleElasticUpdateChange}
           />
         </div>
         <div
@@ -337,12 +334,12 @@ class FileImportPreview extends TerrainComponent<Props>
           Import
         </div>
         {
-          this.props.loading &&
+          this.props.uploadInProgress &&
           <div className='fi-preview-loading-container'>
             <Loading
               width={100}
               height={100}
-              loading={this.props.loading}
+              loading={this.props.uploadInProgress}
               loaded={false}
               onLoadedEnd={null}
             />

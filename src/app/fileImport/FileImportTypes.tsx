@@ -72,8 +72,8 @@ class FileImportStateC extends BaseClass
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
-  public loading: boolean = false;
-  public update: boolean = true;
+  public uploadInProgress: boolean = false;
+  public elasticUpdate: boolean = true;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.

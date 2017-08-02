@@ -78,7 +78,7 @@ const FileImportActions =
 
     uploadFile:
     () =>
-      $(ActionTypes.uploadFile, { toggleLoading: FileImportActions.toggleLoading }),
+      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     addTransform:
     (transform: FileImportTypes.Transform) =>
@@ -116,13 +116,13 @@ const FileImportActions =
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
 
-    toggleLoading:
+    changeUploadInProgress:
     () =>
-      $(ActionTypes.toggleLoading, {}),
+      $(ActionTypes.changeUploadInProgress, {}),
 
-    toggleUpdate:
+    changeElasticUpdate:
     () =>
-      $(ActionTypes.toggleUpdate, {}),
+      $(ActionTypes.changeElasticUpdate, {}),
   };
 
 export default FileImportActions;
