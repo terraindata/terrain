@@ -121,7 +121,7 @@ export const NUMBER_PREVIEW_ROWS = 5;
 
 export const STREAMING_THRESHOLD = 100;  // upload file in ajax request when below, stream when above ; TODO: increase
 
-export const CHUNK_SIZE = 1000000;    // assume this chunk size contains number of preview rows ; TODO: increase
+export const CHUNK_SIZE = 10000000;    // assume this chunk size contains number of preview rows ; TODO: increase
 
 export const FILE_TYPES =
   [

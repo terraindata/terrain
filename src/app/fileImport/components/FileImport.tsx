@@ -173,12 +173,12 @@ class FileImport extends TerrainComponent<any>
               items = this.parseCsv(stringifiedFile);
               if (!this.state.csvHeaderMissing) // remove first line if csv has header
               {
-                stringifiedFile = stringifiedFile.slice(stringifiedFile.indexOf('\n'), stringifiedFile.length - 1);
-                Actions.enqueueChunk(fr.result.slice(fr.result.indexOf('\n'), fr.result.length - 1), fr.result.length <= FileImportTypes.CHUNK_SIZE);
+                stringifiedFile = stringifiedFile.slice(Number(stringifiedFile.indexOf('\n')) + 1, stringifiedFile.length);
+                Actions.enqueueChunk(fr.result.slice(Number(fr.result.indexOf('\n')) + 1, fr.result.length), file.size <= FileImportTypes.CHUNK_SIZE);
               }
               else
               {
-                Actions.enqueueChunk(fr.result, fr.result.length <= FileImportTypes.CHUNK_SIZE);
+                Actions.enqueueChunk(fr.result, file.size <= FileImportTypes.CHUNK_SIZE);
               }
               break;
             default:
