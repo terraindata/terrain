@@ -63,6 +63,7 @@ import
   VictoryTooltip,
   VictoryZoomContainer,
 } from 'victory';
+import TerrainComponent from './../common/components/TerrainComponent';
 
 interface Dataset
 {
@@ -85,9 +86,15 @@ interface State
 
 const colors = ['blue', 'red', 'green', 'yellow'];
 
-export default class TerrainAreaChart extends React.Component<Props, State> {
+export default class TerrainAreaChart extends TerrainComponent<Props> {
   public static defaultProps = {
     datasets: [],
+  };
+
+  public state: State = {
+    selectedDomain: {},
+    zoomDomain: {},
+    visibleDatasets: null,
   };
 
   constructor(props)
@@ -95,12 +102,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
     super(props);
 
     const visibleDatasets = props.datasets.map((ds) => ds.id);
-
-    this.state = {
-      selectedDomain: {},
-      zoomDomain: {},
-      visibleDatasets: Immutable.List(visibleDatasets),
-    };
+    this.state.visibleDatasets = Immutable.List<ID>(visibleDatasets);
   }
 
   public componentWillReceiveProps(nextProps)
@@ -172,7 +174,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
         events={[{
           target: 'labels',
           eventHandlers: {
-            onClick: this.handleLegendClick.bind(this),
+            onClick: this.handleLegendClick,
           },
         }]}
       />
@@ -224,7 +226,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
                     responsive={false}
                     dimension='x'
                     zoomDomain={this.state.zoomDomain}
-                    onDomainChange={this.handleZoom.bind(this)}
+                    onDomainChange={this.handleZoom}
                   />
                 }
                 width={width}
@@ -253,7 +255,7 @@ export default class TerrainAreaChart extends React.Component<Props, State> {
                   <VictoryBrushContainer responsive={false}
                     dimension='x'
                     selectedDomain={this.state.selectedDomain}
-                    onDomainChange={this.handleBrush.bind(this)}
+                    onDomainChange={this.handleBrush}
                   />
                 }
               >
