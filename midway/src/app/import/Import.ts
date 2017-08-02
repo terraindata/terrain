@@ -107,7 +107,7 @@ export class Import
         const user = await users.loginWithAccessToken(Number(data['id']), data['accessToken']);
         if (user === null)
         {
-          socket.close();
+          this._sendSocketError(socket, 'Bad authentication.');
           return;
         }
         authorized = true;
@@ -121,7 +121,7 @@ export class Import
         winston.info('streaming server received data from client.');
         if (!authorized || typeof data !== 'string')
         {
-          socket.close();
+          this._sendSocketError(socket, 'Must authenticate before sending messages.');
           return;
         }
         // get valid piece of csv data ; TODO: SUPPORT JSON AS WELL
@@ -135,8 +135,8 @@ export class Import
         }
         catch (e)
         {
-          winston.info('throwing error from streaming _getItems.');
-          throw e;
+          this._sendSocketError(socket, 'Failed to get items: ' + String(e));
+          return;
         }
         winston.info('streaming server got items from data');
 
@@ -151,15 +151,15 @@ export class Import
             {
               // TODO: try writing to a different file?
             }
-            winston.info('throwing error from streaming file write open.');
-            throw err;
+            this._sendSocketError(socket, 'Failed to open temp file for dumping: ' + String(err));
+            return;
           }
           fs.write(fd, JSON.stringify(items), (writeErr) =>
           {
             if (writeErr !== undefined && writeErr !== null)
             {
-              winston.info('throwing error from streaming file write.');
-              throw writeErr;
+              this._sendSocketError(socket, 'Failed to dump to temp file: ' + String(writeErr));
+              return;
             }
           });
           winston.info('wrote items to file.');
@@ -188,33 +188,28 @@ export class Import
           {
             if (err !== undefined && err !== null)
             {
-              winston.info('throwing error from streaming file read.');
-              throw err;
+              this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
+              return;
             }
             items = JSON.parse(data);
           });
           winston.info('@#$^@$%^@#$%@#$%got items for upsert@#$%@#$^@$%^@#$%@#$%@#$%@#');
           // await this._tastyUpsert(this.imprt, items);
-          // fs.unlink('test/testout' + String(num) + '.txt', (err) =>
-          // {
-          //   if (err)
-          //   {
-          //     throw err;
-          //   }
-          // });
         }
         // TODO: make read calls synchronous to make sure this doesn't happen prematurely?
         rimraf('import_streaming_tmp', (err) =>
         {
           if (err !== undefined && err !== null)
           {
-            winston.info('throwing error from streaming file delete.');
-            throw err;
+            this._sendSocketError(socket, 'Failed to delete temp file: ' + String(err));
+            return;
           }
         });
         winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
 
-        // TODO: send response to client
+        // TODO: wait until all async calls have finished -- how?
+        socket.emit('midway_success');
+        socket.disconnect(true);
       });
     });
   }
@@ -340,6 +335,13 @@ export class Import
       }
       resolve(res);
     });
+  }
+
+  private _sendSocketError(socket: socketio.Socket, error: string)
+  {
+    winston.info('emitting socket error: ' + error);
+    socket.emit('midway_error', error);
+    socket.disconnect(true);
   }
 
   /* returns an error message if there are any; else returns empty string */
