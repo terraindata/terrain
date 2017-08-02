@@ -56,7 +56,7 @@ import { Input, InputType } from '../../../blocks/types/Input';
 import Util from '../../../app/util/Util';
 
 import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
-import { elasticFilter } from './ElasticFilterCard';
+import { elasticFilter, elasticFilterBlock } from './ElasticFilterCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';
 import { elasticTransform, scorePoint } from './ElasticTransformCard';
 
@@ -72,6 +72,7 @@ export const ElasticBlocks = _.extend(
     elasticWeight,
 
     // Filter Card
+    elasticFilterBlock,
     elasticFilter,
 
     elasticCreating: _card( // a placeholder for when a card is being created

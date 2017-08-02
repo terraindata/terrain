@@ -57,7 +57,6 @@ export const ElasticCardsDeck =
         // Score and transform cards
         Blocks.elasticScore.type,
         Blocks.elasticFilter.type,
-        // Blocks.elasticTransform.type,
       ],
 
       ElasticElasticCardDeckTypes,

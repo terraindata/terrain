@@ -50,95 +50,131 @@ import { List, Map } from 'immutable';
 import * as _ from 'underscore';
 
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
+import { Colors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
+
+export const elasticFilterBlock = _block(
+  {
+    field: '',
+    value: '',
+    boolQuery: '',
+    rangeQuery: '',
+    static: {
+      language: 'elastic',
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+      {
+        const filterObj = {};
+        filterObj[block['boolQuery']] = { range: {} };
+        filterObj[block['boolQuery']].range[block['field']] = {};
+        filterObj[block['boolQuery']].range[block['field']][block['rangeQuery']] = block['value'];
+        return filterObj;
+      },
+      removeOnCardRemove: true,
+    },
+  });
 
 export const elasticFilter = _card({
   filters: List(),
   key: 'query',
 
-  static:
-  {
-    title: 'Filter',
-    colors: ['#456', '#789'],
-    preview: '',
+  static: {
     language: 'elastic',
+    title: 'Filter',
+    colors: [Colors().builder.cards.builtin, Colors().builder.cards.builtinBG],
+    preview: '[filters.length] Filters',
 
-    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      return {
-        bool: {
-        }
+      const filterObj = {
+        bool: {},
       };
+
+      const filters = block['filters'].map(
+        (filterBlock) =>
+        {
+          const f = tqlTranslationFn(filterBlock, tqlConfig);
+          _.map(f as any, (v, k) =>
+          {
+            if (filterObj.bool[k] === undefined)
+            {
+              filterObj.bool[k] = [v];
+            }
+            else
+            {
+              filterObj.bool[k].push(v);
+            }
+          });
+        });
+      return filterObj;
     },
 
     anythingAccepts: true, // TODO change
 
-    init: () => ({
-      filters: List([]),
-    }),
+    init: (blocksConfig) =>
+    {
+      return {
+        filters: List([
+          BlockUtils.make(blocksConfig, 'elasticFilterBlock'),
+        ]),
+      };
+    },
 
     display:
-    {
-      displayType: DisplayType.ROWS,
-      key: 'values',
-      english: 'Key / Value',
-      factoryType: 'elasticMagicValue',
-      provideParentData: false,
-      row:
+    [
       {
-        inner:
-        [
-          {
-            displayType: DisplayType.TEXT,
-            key: 'field',
-            getAutoTerms: (schemaState) =>
-            {
-              return List(['movies', 'baseball', 'zazzle']);
-            },
-          },
-          {
-            displayType: DisplayType.DROPDOWN,
-            key: 'bool',
-            options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
-            dropdownUsesRawValues: true,
-          }
-        ],
-        below:
+        displayType: DisplayType.ROWS,
+        key: 'filters',
+        english: 'Filter',
+        factoryType: 'elasticFilterBlock',
+        row:
         {
-          displayType: DisplayType.CARDSFORTEXT,
-          key: 'value',
-        },
-      // {
-      //   displayType: DisplayType.TEXT,
-      //   key: 'rootType',
-      //   autoDisabled: true,
-      // },
-      // {
-      //   displayType: DisplayType.NUM,
-      //   key: 'from',
-      //   autoDisabled: true,
-      // },
-      // {
-      //   displayType: DisplayType.NUM,
-      //   key: 'rootSize',
-      //   autoDisabled: true,
-      // },
+          above:
+          {
+            displayType: DisplayType.LABEL,
+            key: '',
+            label: '\n',
+          },
 
-      // {
-      //   displayType: DisplayType.CARDS,
-      //   key: 'cards',
-      //   // accepts,
-      // },
+          inner:
+          [
+            {
+              displayType: DisplayType.TEXT,
+              key: 'field',
+              getAutoTerms: (schemaState) =>
+              {
+                return List(['budget', 'popularity', 'votecount']);
+              },
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              key: 'boolQuery',
+              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
+              dropdownUsesRawValues: true,
+              autoDisabled: true,
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              key: 'rangeQuery',
+              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+              dropdownUsesRawValues: true,
+              autoDisabled: true,
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'value',
+              autoDisabled: true,
+            },
+          ],
+        },
       },
-    },
+    ],
   },
 });
 

@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'underscore';
 
+import { Colors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
@@ -85,7 +86,7 @@ export const elasticTransform = _card(
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: ['#4b979a', 'rgba(75, 153, 154, 0.7)'],
+      colors: [Colors().builder.cards.builtin, Colors().builder.cards.builtinBG],
       title: 'Transform',
       preview: (card: any) =>
       {
