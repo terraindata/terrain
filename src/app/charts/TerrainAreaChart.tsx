@@ -60,10 +60,46 @@ import
   VictoryLegend,
   VictoryScatter,
   VictoryTheme,
-  VictoryTooltip,
   VictoryZoomContainer,
 } from 'victory';
 import TerrainComponent from './../common/components/TerrainComponent';
+
+const styles = {
+  wrapper: {
+    width: '100%',
+    display: 'flex',
+    flexFlow: 'column nowrap',
+  },
+  topChartWrapper: {
+    height: '80%',
+  },
+  bottomChartWrapper: {
+    width: '100%',
+    height: '20%',
+  },
+  topChart: {
+    padding: { top: 10, bottom: 25, left: 40, right: 0 },
+    areas: { data: { strokeWidth: 2, fillOpacity: 0.4 } },
+  },
+  bottomChart: {
+    padding: { top: 10, bottom: 25, left: 40, right: 0 },
+    areas: { data: { fill: '#c43a31' } },
+  },
+};
+
+const config = {
+  topChart: {
+    scale: { x: 'linear' },
+    interpolation: 'monotoneX',
+    animate: { duration: 500 },
+  },
+  bottomChart: {
+    interpolation: 'monotoneX',
+  },
+  legend: {
+    orientation: 'horizontal',
+  }
+}
 
 interface Dataset
 {
@@ -139,7 +175,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
             key={ds.id}
             style={{ data: { fill: colors[index % colors.length] } }}
             data={ds.data}
-            interpolation='monotoneX'
+            interpolation={config.topChart.interpolation}
           />,
         );
         areas.push(
@@ -172,8 +208,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     return (
       <VictoryLegend
         data={data.toArray()}
-        orientation={'horizontal'}
-        style={{ labels: { backgroundColor: 'red', border: '1px solid white' } }}
+        orientation={config.legend.orientation}
         events={[{
           target: 'labels',
           eventHandlers: {
@@ -213,17 +248,15 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     const areas = this.renderAreas();
     const legend = this.renderLegend();
 
-    const chartsPadding = { top: 10, bottom: 25, left: 40, right: 0 };
-
     return (
-      <div style={{ width: '100%', display: 'flex', flexFlow: 'column nowrap' }}>
-        <div style={{ height: '80%' }}>
+      <div style={styles.wrapper}>
+        <div style={styles.topChartWrapper}>
           <ContainerDimensions>
             {({ width, height }) =>
               <VictoryChart
-                scale={{ x: 'linear' }}
+                scale={config.topChart.scale}
                 theme={VictoryTheme.material}
-                padding={chartsPadding}
+                padding={styles.topChart.padding}
                 containerComponent={
                   <VictoryZoomContainer
                     responsive={false}
@@ -234,11 +267,10 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
                 }
                 width={width}
                 height={height}
+                animate={config.topChart.animate}
               >
                 <VictoryGroup
-                  style={{
-                    data: { strokeWidth: 3, fillOpacity: 0.4 },
-                  }}
+                  style={styles.topChart.areas}
                 >
                   {areas}
                 </VictoryGroup>
@@ -247,11 +279,11 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
             }
           </ContainerDimensions>
         </div>
-        <div style={{ width: '100%', height: '20%' }}>
+        <div style={styles.bottomChartWrapper}>
           <ContainerDimensions>
             {({ width, height }) =>
               <VictoryChart
-                padding={{ top: 10, bottom: 25, left: 40, right: 0 }}
+                padding={styles.bottomChart.padding}
                 theme={VictoryTheme.material}
                 width={width} height={height}
                 containerComponent={
@@ -264,9 +296,9 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               >
                 <VictoryAxis />
                 <VictoryArea
-                  style={{ data: { fill: '#c43a31' } }}
+                  style={styles.bottomChart.areas}
                   data={datasets.first() !== null ? datasets.first().data : []}
-                  interpolation='monotoneX'
+                  interpolation={config.bottomChart.interpolation}
                 />
               </VictoryChart>
             }
