@@ -48,8 +48,15 @@ import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
+export const enum AutocompleteMatchType
+{
+  Index = 1,
+  Type = 2,
+  Field = 3,
+}
+
 export const ElasticBlockHelpers = {
-  fieldsInScope(schemaState): List<string>
+  autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
   {
     // 1. Need to get current index
 
@@ -57,6 +64,15 @@ export const ElasticBlockHelpers = {
     const cards = state.query.cards;
     const isIndexCard = (card) => card['type'] === 'eqlindex';
     const server = BuilderStore.getState().db.name;
+
+    if (matchType === AutocompleteMatchType.Index)
+    {
+      return schemaState.databases.toList().filter(
+        (db) => db.serverId === server,
+      ).map(
+        (db) => db.name,
+      ).toList();
+    }
 
     let indexCard = cards.find(isIndexCard);
     if (indexCard === undefined)
@@ -72,6 +88,17 @@ export const ElasticBlockHelpers = {
     {
       const index = indexCard['value'];
       const indexId = state.db.name + '/' + String(index);
+
+      if (matchType === AutocompleteMatchType.Type)
+      {
+        return schemaState.tables.filter(
+          (table) => table.databaseId === indexId,
+        ).map(
+          (table) => table.name,
+        ).toList();
+      }
+
+      // else we are in the Field case...
 
       // 2. Need to get current type
 
@@ -102,38 +129,6 @@ export const ElasticBlockHelpers = {
           (column) => column.name,
         ).toList();
       }
-    }
-
-    return List([]);
-  },
-
-  typesInScope(schemaState): List<string>
-  {
-    const state = BuilderStore.getState();
-    const cards = state.query.cards;
-    const isIndexCard = (card) => card['type'] === 'eqlindex';
-
-    let indexCard = cards.find(isIndexCard);
-    if (indexCard === undefined)
-    {
-      indexCard = cards.get(0);
-      if (indexCard !== undefined)
-      {
-        indexCard = indexCard['cards'].find(isIndexCard);
-      }
-    }
-
-    // TODO idea: have the selected index and type stored on the Query object
-
-    if (indexCard !== undefined)
-    {
-      const index = indexCard['value'];
-      const indexId = state.db.name + '/' + String(index);
-      return schemaState.tables.filter(
-        (table) => table.databaseId === indexId,
-      ).map(
-        (table) => table.name,
-      ).toList();
     }
 
     return List([]);

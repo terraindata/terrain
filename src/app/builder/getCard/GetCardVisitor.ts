@@ -78,7 +78,7 @@ import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/EST
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
-import { ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
+import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Colors } from '../../common/Colors';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
 import { BuilderStore } from '../data/BuilderStore';
@@ -357,7 +357,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            return ElasticBlockHelpers.fieldsInScope(schemaState);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -377,13 +377,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            // TODO cache list in schema state
-            const server = BuilderStore.getState().db.name;
-            return schemaState.databases.toList().filter(
-              (db) => db.serverId === server,
-            ).map(
-              (db) => db.name,
-            ).toList();
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -673,7 +667,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            return ElasticBlockHelpers.typesInScope(schemaState);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
