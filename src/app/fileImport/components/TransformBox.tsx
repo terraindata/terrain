@@ -79,7 +79,7 @@ class TransformBox extends TerrainComponent<Props>
     mergeIndex: number;
     transformText: string;
     splitNames: List<string>;
-    colToMergeId: number;
+    mergeName: string;
     mergeNewName: string;
     duplicateNewName: string;
   } = {
@@ -87,7 +87,7 @@ class TransformBox extends TerrainComponent<Props>
     mergeIndex: -1,
     transformText: '',
     splitNames: List(['', '']),
-    colToMergeId: -1,
+    mergeName: '',
     mergeNewName: '',
     duplicateNewName: '',
   };
@@ -113,7 +113,7 @@ class TransformBox extends TerrainComponent<Props>
       mergeIndex: -1,
       transformText: '',
       splitNames: List(['', '']),
-      colToMergeId: -1,
+      mergeName: '',
       mergeNewName: '',
       duplicateNewName: '',
     });
@@ -138,7 +138,7 @@ class TransformBox extends TerrainComponent<Props>
     const mergeName = this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName)).get(mergeIndex);
     this.setState({
       mergeIndex,
-      colToMergeId: this.props.columnNames.indexOf(mergeName),
+      mergeName,
     });
   }
 
@@ -184,7 +184,7 @@ class TransformBox extends TerrainComponent<Props>
     }
     if (transformName === 'merge')
     {
-      if (!this.props.columnNames.get(this.state.colToMergeId))
+      if (!this.state.mergeName)
       {
         return 'Select column to merge';
       }
@@ -234,7 +234,7 @@ class TransformBox extends TerrainComponent<Props>
 
       case 'merge':
         transform.args = {
-          mergeName: this.props.columnNames.get(this.state.colToMergeId),
+          mergeName: this.state.mergeName,
           newName: this.state.mergeNewName,
           text: this.state.transformText,
         };
@@ -265,7 +265,7 @@ class TransformBox extends TerrainComponent<Props>
       mergeIndex: -1,
       transformText: '',
       splitNames: List(['', '']),
-      colToMergeId: -1,
+      mergeName: '',
       mergeNewName: '',
       duplicateNewName: '',
     });

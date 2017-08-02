@@ -55,7 +55,7 @@ import './Loading.less';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 
-const Sprites = require('./../../../images/spritesheet_terrainLoading.png');
+const Sprites = require('./../../../images/spritesheet_terrainLoading_blue.png');
 
 export interface Props
 {
@@ -103,6 +103,7 @@ class Loading extends TerrainComponent<Props>
     },
     {
       loop: false,
+      fadeOut: true,
       startFrame: 50,
       endFrame: 55,
       onStageEnd: this.handleEnd,
@@ -177,6 +178,7 @@ class Loading extends TerrainComponent<Props>
         className={classNames({
           'loading-wrapper': true,
           'dead-center': this.props.center,
+          'loading-wrapper-loaded': this.state.stage === 3,
         })}
         style={{
           height: this.props.height,
@@ -195,7 +197,7 @@ class Loading extends TerrainComponent<Props>
     );
   }
 }
-const fps = 35;
+const fps = DEV ? 55 : 35;
 
 interface IStage
 {
@@ -204,6 +206,7 @@ interface IStage
   startFrame: number;
   followThrough?: boolean;
   onStageEnd?: () => void;
+  fadeOut?: boolean;
 }
 
 class ImgLooper
@@ -213,6 +216,7 @@ class ImgLooper
   public stage: number;
   public frame: number;
   public width: number;
+  public fadeOpacity: number = 0;
 
   public interval: any;
 
@@ -282,6 +286,21 @@ class ImgLooper
     const m = -1 * this.width * _frame;
     this.el.style.marginLeft = m + 'px';
     this.frame = _frame;
+
+    if (this.stages[this.stage] && this.stages[this.stage].fadeOut &&
+      this.stages[this.stage].startFrame <= _frame)
+    {
+      this.fadeOpacity = Math.max(this.fadeOpacity - 0.1, 0);
+      if (_frame === this.stages[this.stage].endFrame)
+      {
+        this.fadeOpacity = 0;
+      }
+    }
+    else
+    {
+      this.fadeOpacity = Math.min(this.fadeOpacity + 0.1, 1);
+    }
+    $('.loading-wrapper').css('opacity', this.fadeOpacity);
   }
 
   private clearInterval()

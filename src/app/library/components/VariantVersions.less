@@ -11,7 +11,6 @@
   
   .versions-table-title {
     font-size: 14px;
-    font-weight: bold;
 	}
   
   .versions-table-right-align {
@@ -21,12 +20,13 @@
 
 	.versions-table {
 		cursor: pointer;
-		border-radius: 6px;
+		border-radius: 4px;
     
 		.versions-table-row {
-			padding: 3px;
+			padding: 6px;
 			border-radius: 6px;
-      border-bottom: @version-table-hover-bg 1px solid;
+      border: @version-table-hover-bg 1px solid;
+      margin-bottom: 6px;
       
       &:hover,
       &.versions-table-row-current {
@@ -35,14 +35,25 @@
       &.versions-table-row-current {
         // margin-bottom: 6px;
       }
+      
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
 
 			.versions-table-element {
-				display: inline-block;
-				vertical-align: middle;
-        max-width: 50%;
-        overflow-x: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+				// display: inline-block;
+				// vertical-align: middle;
+    //     // max-width: 50%;
+    //     overflow-x: hidden;
+    //     white-space: nowrap;
+    //     text-overflow: ellipsis;
+        
+        &:first-child {
+          flex-grow: 1;
+        }
+        &:last-child {
+          margin-left: 12px;
+        }
 			}
       
 			// .versions-table-right-align {

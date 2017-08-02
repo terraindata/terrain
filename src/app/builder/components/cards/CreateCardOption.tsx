@@ -44,12 +44,79 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-console no-unused-expression member-access max-line-length
 
-import EventRouter from './events/EventRouter';
-import * as Util from './Util';
+import * as classNames from 'classnames';
+import * as Radium from 'radium';
+import * as React from 'react';
+import * as _ from 'underscore';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { CardConfig } from '../../../../blocks/types/Card';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import TerrainComponent from '../../../common/components/TerrainComponent';
+import Util from '../../../util/Util';
+import './CreateCardOption.less';
 
-export const AnalyticsRouter = new KoaRouter();
-AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
+export interface Props
+{
+  index: number;
+  card: CardConfig;
+  onClick: (card: CardConfig, index: number) => void;
+  overrideTitle?: string;
+  isFocused?: boolean;
+}
 
-export default AnalyticsRouter;
+@Radium
+class CreateCardOption extends TerrainComponent<Props>
+{
+  private handleClick()
+  {
+    this.props.onClick(this.props.card, this.props.index);
+  }
+
+  public render()
+  {
+    const { card } = this.props;
+
+    if (!card)
+    {
+      console.log('Missing card type: ', card);
+      // TODO throw error instead
+      return null;
+    }
+
+    const text = this.props.overrideTitle || card.static.title;
+
+    return (
+      <div
+        className={classNames({
+          'create-card-option': true,
+          'create-card-option-focused': this.props.isFocused,
+        })}
+        onClick={this.handleClick}
+        style={
+          backgroundColor(Colors().bg3, Colors().inactiveHover)
+        }
+        key='create-option'
+      >
+        <div
+          className='create-card-option-button'
+          style={backgroundColor(card.static.colors[0], card.static.colors[0])}
+          key='create-button'
+        >
+          {
+            text
+          }
+        </div>
+        <div
+          className='create-card-option-description'
+        >
+          {
+            card.static.description || 'Create a ' + card.static.title + ' card.'
+          }
+        </div>
+      </div>
+    );
+  }
+}
+export default CreateCardOption;

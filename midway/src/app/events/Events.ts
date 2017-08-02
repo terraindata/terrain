@@ -44,50 +44,51 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// Part of events PoC
-
-import aesjs = require('aes-js');
-import hashObj = require('hash-object');
-import srs = require('secure-random-string');
-import sha1 = require('sha1');
+import * as srs from 'secure-random-string';
+import * as sha1 from 'sha1';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
+import * as EventEncryption from './Encryption';
 
 const timeInterval: number = 5; // minutes before refreshing
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
 const timeSalt: string = srs({ length: 256 }); // time salt
-const payloadSkeleton: object = {}; // payload object where key is the eventId and the value is the empty payload
 
-export interface EventConfig
+export interface EventTemplateConfig
 {
-  date?: number;
-  eventId: string;
-  id?: number;
-  ip?: string;
-  message: string;
-  payload: any;
+  id: string;
+  ip: string;
+  url?: string;
+  variantId?: string;
+}
+
+export interface EventConfig extends EventTemplateConfig
+{
+  eventType?: string;
+  date?: string;
+  message?: string;
+  name?: string;
+  payload?: any;
   type: string;
 }
 
-export interface EventRequestConfig
+export interface PayloadConfig
 {
-  id?: number;
-  ip: string;
-  date?: number;
-  message?: string;
-  payload?: object;
-  eventId: string;
-  variantId?: string;
+  id: string;
+  meta: any;
+  payload: any;
 }
 
 export class Events
 {
   private eventTable: Tasty.Table;
+  private payloadTable: Tasty.Table;
   private elasticController: ElasticController;
 
   constructor()
@@ -96,15 +97,24 @@ export class Events
     this.elasticController = new ElasticController(elasticConfig, 0, 'Events');
     this.eventTable = new Tasty.Table(
       'data',
-      ['eventId'],
+      ['id'],
       [
         'date',
         'ip',
-        'message',
         'payload',
         'type',
       ],
       'events',
+    );
+
+    this.payloadTable = new Tasty.Table(
+      'data',
+      ['id'],
+      [
+        'meta',
+        'payload',
+      ],
+      'payload',
     );
   }
 
@@ -114,83 +124,41 @@ export class Events
    */
   public async decodeMessage(event: EventConfig): Promise<boolean>
   {
-    const checkTime = this.getClosestTime();
-    const message = event['message'];
-    const emptyPayloadHash: string = hashObj(this.getEmptyObject(event.payload));
-    for (let tp = 0; tp < timePeriods; ++tp)
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      const newTime: number = checkTime - tp * timeInterval * 60;
-      const privateKey: string = this.getUniqueId(event.ip as string, event.eventId, newTime);
-      const decodedMsg: string = this.decrypt(message, privateKey);
-      if (this.isJSON(decodedMsg) && emptyPayloadHash === hashObj(JSON.parse(decodedMsg)))
+      const checkTime = this.getClosestTime();
+      const message = event['message'] as string;
+      const emptyPayloadHash: string = Util.buildDesiredHash(event.payload);
+      for (let tp = 0; tp < timePeriods; ++tp)
       {
+        const newTime: number = checkTime - tp * timeInterval * 60;
+        const privateKey: string = await this.getUniqueId(event.ip as string, event.id, newTime);
+        const decodedMsg: string = await EventEncryption.decrypt(message, privateKey);
+        if (Util.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
+        {
 
-        await this.storeEvent(event);
-        return true;
+          await this.storeEvent(event);
+          return resolve(true);
+        }
       }
-    }
-    return false;
-  }
-
-  /*
-   * Decrypt a message with the private key using AES128
-   *
-   */
-  public decrypt(msg: string, privateKey: string): string
-  {
-    const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
-    const msgBytes: any = aesjs.utils.hex.toBytes(msg);
-    const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes));
+      return resolve(false);
+    });
   }
 
   /*
    * Prep an empty payload with the encoded message
    *
    */
-  public async encodeMessage(eventReq: EventRequestConfig): Promise<EventRequestConfig>
+  public async encodeMessage(eventReq: EventConfig): Promise<EventConfig>
   {
-    return new Promise<EventRequestConfig>(async (resolve, reject) =>
+    return new Promise<EventConfig>(async (resolve, reject) =>
     {
-      eventReq.payload = payloadSkeleton[eventReq.eventId];
-      const privateKey: string = this.getUniqueId(eventReq.ip, eventReq.eventId);
-      eventReq.message = await this.encrypt(JSON.stringify(eventReq.payload), privateKey);
+      eventReq.payload = await this.getPayload(eventReq.id);
+      const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.id);
+      eventReq.message = await EventEncryption.encrypt(JSON.stringify(eventReq.payload), privateKey);
       delete eventReq['ip'];
       resolve(eventReq);
     });
-  }
-
-  /*
-   * Encrypt a message with the private key using AES128
-   *
-   */
-  public encrypt(msg: string, privateKey: string): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
-      const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-      const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-      resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
-    });
-  }
-
-  /*
-   * Validate that the string is valid JSON
-   *
-   */
-  public isJSON(str: string): boolean
-  {
-    let res: any = false;
-    try
-    {
-      res = JSON.parse(str);
-    }
-    catch (e)
-    {
-      return false;
-    }
-    return res;
   }
 
   /*
@@ -205,43 +173,115 @@ export class Events
   }
 
   /*
-   * Create an object with the same keys but empty values
+  * Return a list of HTML IDs and relevant info for event tracking purposes
+  *
+  */
+  public async getHTMLIDs(): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      const itemLst = await items.get();
+      const payloadLst: object[] = [];
+      const returnLst: object[] = [];
+      itemLst.forEach((item) =>
+      {
+        if (item.status !== 'ARCHIVE' && item.meta !== undefined)
+        {
+          const meta = JSON.parse(item.meta);
+          let itemParent: any;
+          let itemId: any;
+          if (item.parent !== undefined)
+          {
+            itemParent = item.parent.toString();
+          }
+          if (item.id !== undefined)
+          {
+            itemId = item.id.toString();
+          }
+          const otherFields: object =
+            {
+              eventType: 'group',
+              ip: '',
+              language: 'elastic',
+              name: '',
+              type: 'click',
+              url: '',
+              variantId: '',
+            };
+
+          const payloadEvent: object =
+            {
+              id: 'item' + (itemId as string),
+              meta: otherFields,
+              payload:
+              {
+                date: '',
+                dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
+                numClicks: 0,
+                loadTime: 0,
+              },
+            };
+          const returnEvent: object =
+            {
+              id: 'item' + (itemId as string),
+            };
+
+          // for now, only use items that are ES
+          if (meta.algorithmsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['eventType'] = 'group';
+            payloadLst.push(payloadEvent);
+            returnLst.push(returnEvent);
+          }
+          if (meta.variantsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['eventType'] = 'algorithm';
+            payloadLst.push(payloadEvent);
+            returnLst.push(returnEvent);
+          }
+          if (meta.query !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
+          {
+            returnEvent['eventType'] = 'variant';
+            payloadLst.push(payloadEvent);
+            returnLst.push(returnEvent);
+          }
+        }
+      });
+      await this.elasticController.getTasty().upsert(this.payloadTable, payloadLst);
+      resolve(returnLst);
+    });
+  }
+
+  /*
+   * Get payload from datastore given the id
    *
    */
-  public getEmptyObject(payload: object): object
+  public async getPayload(id: string): Promise<PayloadConfig>
   {
-    return Object.keys(payload).reduce((res, item) =>
+    return new Promise<PayloadConfig>(async (resolve, reject) =>
     {
-      switch (typeof (payload[item]))
+      const payloads: PayloadConfig[] = await this.elasticController.getTasty().select(
+        this.payloadTable, [], { id }) as PayloadConfig[];
+      if (payloads.length === 0)
       {
-        case 'boolean':
-          res[item] = false;
-          break;
-
-        case 'number':
-          res[item] = 0;
-          break;
-
-        default:
-          res[item] = '';
+        return resolve({} as PayloadConfig);
       }
-      return res;
-    },
-      {});
+      resolve(payloads[0] as PayloadConfig);
+    });
   }
 
   /*
    * Generate a random string that will be used as a private key for encryption/decryption
    *
    */
-  public getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): string
+  public async getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): Promise<string>
   {
-    currTime = currTime !== undefined ? currTime : this.getClosestTime();
-    if (uniqueId === undefined)
+    return new Promise<string>(async (resolve, reject) =>
     {
-      uniqueId = '';
-    }
-    return sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16);
+      currTime = currTime !== undefined ? currTime : this.getClosestTime();
+      uniqueId = uniqueId !== undefined ? uniqueId : '';
+      resolve(sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16));
+    });
   }
 
   /*
@@ -254,32 +294,51 @@ export class Events
     {
       if (req === undefined || (Object.keys(req).length === 0 && req.constructor === Object) || req.length === 0)
       {
-        resolve();
-        return;
+        return resolve('');
       }
-
       const JSONArr: object[] = req;
-      const encodedEventArr: EventRequestConfig[] = [];
+      const encodedEventArr: EventTemplateConfig[] = [];
       for (const jsonObj of JSONArr)
       {
-        if (jsonObj['eventId'] === undefined || !(jsonObj['eventId'] in payloadSkeleton))
+        const payload: PayloadConfig = await this.getPayload(jsonObj['id']);
+        const meta: object = payload.meta;
+        delete payload.meta;
+        const fullPayload: object = Object.assign(payload, meta);
+        if (jsonObj['id'] === undefined || !(Object.keys(payload).length === 0))
         {
           continue;
         }
-        const eventRequest: EventRequestConfig =
+        const eventRequest: EventConfig =
           {
-            eventId: jsonObj['eventId'],
-            variantId: jsonObj['variantId'],
+            id: fullPayload['id'],
+            eventType: fullPayload['eventType'],
             ip: IPSource,
+            name: fullPayload['name'],
+            payload: fullPayload['payload'],
+            type: fullPayload['type'],
+            url: jsonObj['url'] !== undefined ? jsonObj['url'] : fullPayload['url'],
+            variantId: jsonObj['variantId'] !== undefined ? jsonObj['variantId'] : fullPayload['variantId'],
           };
         encodedEventArr.push(await this.encodeMessage(eventRequest));
       }
       if (encodedEventArr.length === 0)
       {
-        resolve();
-        return;
+        return resolve('');
       }
       resolve(JSON.stringify(encodedEventArr));
+    });
+  }
+
+  /*
+   * Check if id exists in payload table
+   *
+   */
+  public async payloadExists(id: string): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, [], { id }) as object[];
+      return resolve(payloads.length === 0 ? false : true);
     });
   }
 
@@ -287,11 +346,10 @@ export class Events
    * Store the validated event in the datastore
    *
    */
-  public async storeEvent(event: EventConfig): Promise<any>
+  public async storeEvent(event: EventConfig): Promise<EventConfig>
   {
     event.payload = JSON.stringify(event.payload);
-    const events: object[] = [event as object];
-    return await this.elasticController.getTasty().upsert(this.eventTable, events);
+    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 }
 

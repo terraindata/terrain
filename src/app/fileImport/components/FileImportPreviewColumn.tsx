@@ -65,14 +65,15 @@ import './FileImportPreviewColumn.less';
 export interface Props
 {
   columnId: number;
+  columnName: string;
+  columnNames: List<string>; // TODO: move to parent component while preserving merge transformation options
   isIncluded: boolean;
-  columnType: FileImportTypes.ColumnTypesTree;
+  columnType: IMMap<string, any>;
   isPrimaryKey: boolean;
-  columnNames: List<string>;
   columnOptions: List<string>;
   editing: boolean;
-  resetLocalColumnNames: boolean;
   handleEditColumnChange(editColumnId: number);
+  onColumnNameChange(columnId: number, localColumnName: string);
 }
 
 @Radium
@@ -81,7 +82,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
   public state: {
     localColumnName: string;
   } = {
-    localColumnName: this.props.columnNames.get(this.props.columnId),
+    localColumnName: this.props.columnName,
   };
 
   public handleEditClick()
@@ -108,44 +109,21 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public handleBlur()
   {
-    // If column name entered already exists when autocomplete box goes out of focus, throw an error and roll back change
-    // otherwise, if the name has actually changed - set the new name and add the rename transform
-    if (this.props.columnNames.delete(this.props.columnId).contains(this.state.localColumnName))
+    const success = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
+    if (!success)
     {
-      alert('column name: ' + this.state.localColumnName + ' already exists, duplicate column names are not allowed');
       this.setState({
-        localColumnName: this.props.columnNames.get(this.props.columnId),
+        localColumnName: this.props.columnName,
       });
-      return;
     }
-
-    if (this.props.columnNames.get(this.props.columnId) !== this.state.localColumnName)
-    {
-      Actions.setColumnName(this.props.columnId, this.props.columnNames.get(this.props.columnId), this.state.localColumnName);
-      Actions.addTransform(
-        {
-          name: 'rename',
-          colName: this.props.columnNames.get(this.props.columnId),
-          args: {
-            newName: this.state.localColumnName,
-          },
-        },
-      );
-    }
-  }
-
-  public shouldComponentUpdate(nextProps: Props)
-  {
-    const shouldUpdateShallow = shallowCompare(this, nextProps);
-    return shouldUpdateShallow || JSON.stringify(this.props.columnType) !== JSON.stringify(nextProps.columnType);
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (this.props.resetLocalColumnNames)
+    if (this.props.columnName !== nextProps.columnName)
     {
       this.setState({
-        localColumnName: nextProps.columnNames.get(this.props.columnId),
+        localColumnName: nextProps.columnName,
       });
     }
   }
@@ -194,8 +172,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           />
         </div>
         <TransformBox
-          datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
-          colName={this.props.columnNames.get(this.props.columnId)}
+          datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
+          colName={this.props.columnName}
           columnNames={this.props.columnNames}
           setLocalColumnName={this.handleLocalColumnNameChange}
         />
@@ -211,10 +189,10 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         style={backgroundColor(Colors().fileimport.preview.column.base)}
       >
         <div className='fi-preview-column-title-name'>
-          {this.props.columnNames.get(this.props.columnId)}
+          {this.props.columnName}
         </div>
         <div className='fi-preview-column-title-type'>
-          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.type]}
+          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
         </div>
         <div
           className='fi-preview-column-edit-button'

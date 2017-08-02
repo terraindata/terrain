@@ -698,7 +698,7 @@ export const Ajax =
       update: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
+      csvHeaderMissing?: boolean,
     )
     {
       const payload: object = {
@@ -710,7 +710,7 @@ export const Ajax =
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
+        csvHeaderMissing,
         transformations,
         update,
       };
@@ -742,7 +742,7 @@ export const Ajax =
       name: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
+      csvHeaderMissing?: boolean,
     )
     {
       const payload: object = {
@@ -752,11 +752,10 @@ export const Ajax =
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
+        csvHeaderMissing,
         transformations,
         name,
       };
-      console.log('saveTemplate payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -773,7 +772,7 @@ export const Ajax =
       return;
     },
 
-    getTemplates(
+    fetchTemplates(
       connectionId: number,
       dbname: string,
       tablename: string,
@@ -882,6 +881,38 @@ export const Ajax =
         },
       );
     },
+
+    createDb(name: string, dsn: string, type: string,
+      onSave: (response: any) => void,
+      onError: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        `database`,
+        {
+          name,
+          dsn,
+          host: dsn,
+          type,
+        },
+        onSave,
+        onError,
+      );
+    },
+
+    deleteDb(id: number,
+      onSave: (response: any) => void,
+      onError: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        `database/` + id + `/delete`,
+        {},
+        onSave,
+        onError,
+      );
+    },
+
     login(email: string,
       password: string,
       onLoad: (data: {

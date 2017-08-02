@@ -43,76 +43,34 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import TerrainComponent from './../../common/components/TerrainComponent';
+
+import * as aesjs from 'aes-js';
+import * as sha1 from 'sha1';
 
 /*
- *  Data type that represents a cached value.
- *  Value gets updated after a configurable amount of time each time it is set,
- *  with the timer resetting each time the value is set (Much like lodash debounced).
- */
-export default class ValueDelayer<T>
+* Decrypt a message with the private key using AES128
+*/
+export async function decrypt(msg: string, privateKey: string): Promise<string>
 {
-  protected resource: T;
-  protected cachedResource: T;
-  protected delay: number; // milliseconds
-  protected lastTimer;
-  protected onUpdate: () => void;
-
-  // onUpdate gets called whenever the cached value is updated
-  constructor(initialValue: T, onUpdate: () => void, delay: number = 500)
+  return new Promise<string>((resolve, reject) =>
   {
-    this.resource = initialValue;
-    this.cachedResource = initialValue;
-    this.delay = delay;
-    this.onUpdate = onUpdate;
-  }
+    const key = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
+    const msgBytes = aesjs.utils.hex.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
+  });
+}
 
-  public isDirty(): boolean
+/*
+* Encrypt a message with the private key using AES128
+*/
+export async function encrypt(msg: string, privateKey: string): Promise<string>
+{
+  return new Promise<string>((resolve, reject) =>
   {
-    return this.lastTimer !== undefined;
-  }
-
-  public getCached(): T
-  {
-    return this.cachedResource;
-  }
-
-  // pre-emptively calls the update timeout function and returns the new value
-  public flush(): T
-  {
-    if (this.isDirty())
-    {
-      this.clearTimer();
-      this.cacheUpdateTimeout();
-    }
-    return this.resource;
-  }
-
-  public setValue(newValue: T): ValueDelayer<T>
-  {
-    if (newValue !== this.resource)
-    {
-      this.clearTimer();
-      this.resource = newValue;
-      this.lastTimer = setTimeout(this.cacheUpdateTimeout.bind(this), this.delay);
-    }
-    return this;
-  }
-
-  protected cacheUpdateTimeout()
-  {
-    this.cachedResource = this.resource;
-    this.lastTimer = undefined;
-    this.onUpdate();
-  }
-
-  protected clearTimer()
-  {
-    if (this.lastTimer)
-    {
-      clearTimeout(this.lastTimer);
-      this.lastTimer = undefined;
-    }
-  }
+    const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
+    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+    resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+  });
 }

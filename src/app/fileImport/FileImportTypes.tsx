@@ -62,17 +62,18 @@ class FileImportStateC extends BaseClass
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
 
-  public hasCsvHeader: boolean = true;
+  public csvHeaderMissing: boolean = false;
   public primaryKey: number = -1;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<ColumnTypesTree> = List([]);
+  public columnTypes: List<IMMap<string, any>> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
-  public update: boolean = true;
+  public uploadInProgress: boolean = false;
+  public elasticUpdate: boolean = true;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -98,6 +99,7 @@ export interface Transform
 
 export interface Template
 {
+  id: number;
   name: string;
   originalNames: List<string>;
   columnTypes: Immutable.Map<string, object>;
