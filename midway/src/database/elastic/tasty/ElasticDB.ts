@@ -411,7 +411,10 @@ export class ElasticDB implements TastyDB
       }
 
       body.push(command);
-      body.push(element);
+      body.push({
+        doc: element,
+        doc_as_upsert: true,
+      });
     }
 
     return new Promise((resolve, reject) =>
