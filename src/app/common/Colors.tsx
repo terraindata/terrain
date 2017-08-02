@@ -448,9 +448,9 @@ const DARK: Theme =
     fileimport: {
       preview: {
         column: {
-          base: '#9d6b6b',
+          base: '#00a0f4',
           typeDropdown: '#005d69',
-          transform: '#70b9e7',
+          transform: '#a2af93',
         },
         cell: '#f1d7d7',
       },
