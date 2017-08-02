@@ -302,13 +302,19 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.streaming,
       () =>
       {
-        alert('success');
-        action.payload.changeUploadInProgress();
+        if (!state.streaming)
+        {
+          alert('success');
+          action.payload.changeUploadInProgress();
+        }
       },
       (err: string) =>
       {
-        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-        action.payload.changeUploadInProgress();
+        if (!state.streaming)
+        {
+          alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+          action.payload.changeUploadInProgress();
+        }
       },
     );
 
@@ -391,10 +397,8 @@ FileImportReducers[ActionTypes.loadTemplate] =
 
 FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
-  {
-    return state.set('file', action.payload.file)
-      .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD);
-  }
+    state.set('file', action.payload.file)
+      .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD)
   ;
 
 FileImportReducers[ActionTypes.enqueueChunk] =

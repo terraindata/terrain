@@ -290,11 +290,14 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('error from midway: ' + String(err));
       // TODO: handle error analogously as from Ajax request (in non-streaming case)
+      alert(String(err));
     });
     socket.on('midway_success', () =>
     {
       console.log('upsert successful!');
       // TODO: handle success analogously as from Ajax request (in non-streaming case)
+      Actions.changeUploadInProgress();
+      alert('successful');
     });
   }
 

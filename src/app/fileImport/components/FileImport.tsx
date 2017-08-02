@@ -161,18 +161,9 @@ class FileImport extends TerrainComponent<any>
         fr.readAsText(fileToRead);
         fr.onloadend = () =>
         {
-          let stringifiedFile;
-          if (streaming)
-          {
-            Actions.enqueueChunk(fr.result);
-            stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
-          }
-          else
-          {
-            stringifiedFile = fr.result;
-          }
+          let stringifiedFile = streaming ? fr.result.substring(0, fr.result.lastIndexOf('\n')) : fr.result;
 
-          let items = [];
+          let items;
           switch (this.state.filetype)
           {
             case 'json':
@@ -183,6 +174,7 @@ class FileImport extends TerrainComponent<any>
               if (!this.state.csvHeaderMissing) // remove first line if csv has header
               {
                 stringifiedFile = stringifiedFile.slice(stringifiedFile.indexOf('\n'), stringifiedFile.length - 1);
+                Actions.enqueueChunk(fr.result.slice(fr.result.indexOf('\n'), fr.result.length - 1));
               }
               break;
             default:
@@ -443,7 +435,7 @@ class FileImport extends TerrainComponent<any>
       filetype,
       filename: file.target.files[0].name,
     });
-    Actions.saveFile(file.target.files[0], file.target.files[0].size);
+    Actions.saveFile(file.target.files[0]);
     // this.refs['file']['value'] = null;                 // prevent file-caching
   }
 
