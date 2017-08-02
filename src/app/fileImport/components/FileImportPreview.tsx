@@ -59,6 +59,7 @@ import AuthStore from './../../auth/data/AuthStore';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import Loading from './../../common/components/Loading';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -75,14 +76,16 @@ export interface Props
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<FileImportTypes.ColumnTypesTree>;
+  columnTypes: List<IMMap<string, any>>;
+
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
   file: File;
   chunkQueue: List<string>;
-  update: boolean;
   streaming: boolean;
+  uploadInProgress: boolean;
+  elasticUpdate: boolean;
 }
 
 @Radium
@@ -91,29 +94,57 @@ class FileImportPreview extends TerrainComponent<Props>
   public state: {
     templateId: number,
     templateText: string,
+    templateOptions: List<string>,
     editColumnId: number,
-    resetLocalColumnNames: boolean,
-    blobCount: number,
-    streamed: boolean,
   } = {
     templateId: -1,
     templateText: '',
+    templateOptions: List([]),
     editColumnId: -1,
-    resetLocalColumnNames: false,
-    blobCount: 0,
-    streamed: false,
   };
 
   public componentDidMount()
   {
-    Actions.getTemplates();
+    Actions.fetchTemplates();
+    this.setState({
+      templateOptions: this.props.templates.map((template, i) => template.name),
+    });
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    this.setState({
-      resetLocalColumnNames: !this.props.columnNames.equals(nextProps.columnNames),
-    });
+    if (!this.props.templates.equals(nextProps.templates))
+    {
+      this.setState({
+        templateOptions: nextProps.templates.map((template, i) => template.name),
+      });
+    }
+  }
+
+  public onColumnNameChange(columnId: number, localColumnName: string): boolean
+  {
+    // If column name entered already exists when autocomplete box goes out of focus, return false to roll back change
+    // otherwise, if the name has actually changed - set the new name and add the rename transform and return true
+    if (this.props.columnNames.delete(columnId).contains(localColumnName))
+    {
+      alert('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
+      return false;
+    }
+
+    if (this.props.columnNames.get(columnId) !== localColumnName)
+    {
+      Actions.setColumnName(columnId, this.props.columnNames.get(columnId), localColumnName);
+      Actions.addTransform(
+        {
+          name: 'rename',
+          colName: this.props.columnNames.get(columnId),
+          args: {
+            newName: localColumnName,
+          },
+        },
+      );
+      return true;
+    }
   }
 
   public handleEditColumnChange(editColumnId: number)
@@ -144,10 +175,27 @@ class FileImportPreview extends TerrainComponent<Props>
       alert('Please select a template to load');
       return;
     }
-    if (!this.props.columnNames.equals(List(this.props.templates.get(this.state.templateId).originalNames)))
+    const templateNames = List(this.props.templates.get(this.state.templateId).originalNames);
+    let isCompatible = true;
+    const unmatchedTemplateNames = [];
+    const unmatchedTableNames = this.props.columnNames.toArray();
+    templateNames.map((templateName) =>
     {
-      console.log(this.props.templates.get(this.state.templateId).originalNames);
-      alert('Incompatible column names with template');
+      if (!this.props.columnNames.contains(templateName))
+      {
+        isCompatible = false;
+        unmatchedTemplateNames.push(templateName);
+      }
+      else
+      {
+        unmatchedTableNames.splice(unmatchedTableNames.indexOf(templateName), 1);
+      }
+    });
+
+    if (!isCompatible)
+    {
+      alert('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedTemplateNames) + '\n and \n'
+        + JSON.stringify(unmatchedTableNames));
       return;
     }
     Actions.loadTemplate(this.state.templateId);
@@ -161,7 +209,6 @@ class FileImportPreview extends TerrainComponent<Props>
       return;
     }
     Actions.saveTemplate(this.state.templateText);
-    Actions.getTemplates();
   }
 
   /* parse the chunk to last new line character and add it to queue of chunks to be streamed
@@ -251,6 +298,11 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
+  }
+
   public handleUploadFile()
   {
     Actions.uploadFile();
@@ -272,11 +324,6 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
-  public handleUpdateChange()
-  {
-    Actions.toggleUpdate();
-  }
-
   public renderTemplate()
   {
     return (
@@ -296,7 +343,7 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
           <Dropdown
             selectedIndex={this.state.templateId}
-            options={List<string>(this.props.templates.map((template, i) => String(template.id) + ': ' + template.name))}
+            options={this.state.templateOptions}
             onChange={this.handleTemplateChange}
             className={'fi-load-dropdown'}
             canEdit={true}
@@ -341,14 +388,15 @@ class FileImportPreview extends TerrainComponent<Props>
               <FileImportPreviewColumn
                 key={key}
                 columnId={key}
-                isIncluded={this.props.columnsToInclude.get(key)}
-                columnType={JSON.parse(JSON.stringify(this.props.columnTypes.get(key)))}
-                isPrimaryKey={this.props.primaryKey === key}
+                columnName={this.props.columnNames.get(key)}
                 columnNames={this.props.columnNames}
+                isIncluded={this.props.columnsToInclude.get(key)}
+                columnType={this.props.columnTypes.get(key)}
+                isPrimaryKey={this.props.primaryKey === key}
                 columnOptions={this.props.columnOptions}
                 editing={key === this.state.editColumnId}
-                resetLocalColumnNames={this.state.resetLocalColumnNames}
                 handleEditColumnChange={this.handleEditColumnChange}
+                onColumnNameChange={this.onColumnNameChange}
               />,
             ).toArray()
           }
@@ -382,8 +430,8 @@ class FileImportPreview extends TerrainComponent<Props>
         >
           update
           <CheckBox
-            checked={this.props.update}
-            onChange={this.handleUpdateChange}
+            checked={this.props.elasticUpdate}
+            onChange={this.handleElasticUpdateChange}
           />
         </div>
         <div
@@ -393,6 +441,18 @@ class FileImportPreview extends TerrainComponent<Props>
         >
           Import
         </div>
+        {
+          this.props.uploadInProgress &&
+          <div className='fi-preview-loading-container'>
+            <Loading
+              width={100}
+              height={100}
+              loading={this.props.uploadInProgress}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          </div>
+        }
       </div>
     );
   }

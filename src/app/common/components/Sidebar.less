@@ -1,14 +1,9 @@
 @import "../Common.less";
 
-@sidebar-bg: #646464;
-@sidebar-selected-bg: #CDDE20;
-@sidebar-hover-bg: #676E5F;
 @sidebar-link-height: 36px;
-@sidebar-expand-bg: #434A3C;
 @sidebar-container-expanded-width: 130px;
 
 .sidebar-container {
-  background: @sidebar-bg;
   width: @sidebar-link-height;
   height: 100%;
   .transition;
@@ -37,7 +32,6 @@
   }
   
   .sidebar-selected-square {
-    background: @sidebar-selected-bg;
     height: @sidebar-link-height;
     width: 100%;
     position: absolute;
@@ -54,9 +48,6 @@
     cursor: pointer;
     .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
     
-    &:hover {
-      background: rgba(255,255,255,0.1);
-    }
     .sidebar-link-inner {
       // .dead-center;
       white-space: nowrap;
@@ -71,28 +62,16 @@
     }
     
     .sidebar-link-text {
-      .semi-bold-big-white-text;
+      .big-white-text;
       display: inline-block;
       position: relative;
       top: -3px;
       left: 10px;
     }
-    
-    &.sidebar-link-selected {
-      .sidebar-link-text {
-        color: #3e3c3c;
-      }
-      svg {
-        fill: #3e3c3c;
-      }
-    }
-    
   }
-  
   
   .sidebar-expand {
     margin-top: 10px;
-    background: @sidebar-expand-bg;
     float: right;
     // height: @sidebar-link-height;
     // padding: 10px 10px;
@@ -103,16 +82,8 @@
     position: relative;
     cursor: pointer;
     .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
-    &:hover {
-      background: darken(@sidebar-expand-bg, 10%);
-      // padding: 9px 9px;
-      // svg {
-      //   width: 11px;
-      // }
-    }
     
     svg {
-      fill: #fff;
       width: 9px;
       // .dead-center;
       .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");

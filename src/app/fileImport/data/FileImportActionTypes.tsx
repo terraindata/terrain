@@ -62,13 +62,14 @@ const FileImportActionTypes =
     setColumnType: '',
     updatePreviewRows: '',
     saveTemplate: '',
-    getTemplates: '',
+    fetchTemplates: '',
     setTemplates: '',
     loadTemplate: '',
     saveFile: '',
     enqueueChunk: '',
     dequeueChunk: '',
-    toggleUpdate: '',
+    changeUploadInProgress: '',
+    changeElasticUpdate: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

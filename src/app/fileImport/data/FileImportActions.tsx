@@ -78,7 +78,7 @@ const FileImportActions =
 
     uploadFile:
     () =>
-      $(ActionTypes.uploadFile, {}),
+      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     addTransform:
     (transform: FileImportTypes.Transform) =>
@@ -102,11 +102,11 @@ const FileImportActions =
 
     saveTemplate:
     (templateText: string) =>
-      $(ActionTypes.saveTemplate, { templateText }),
+      $(ActionTypes.saveTemplate, { templateText, fetchTemplates: FileImportActions.fetchTemplates }),
 
-    getTemplates:
+    fetchTemplates:
     () =>
-      $(ActionTypes.getTemplates, { setTemplates: FileImportActions.setTemplates }),
+      $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
     (templates: List<FileImportTypes.Template>) =>
@@ -117,8 +117,8 @@ const FileImportActions =
       $(ActionTypes.loadTemplate, { templateId }),
 
     saveFile:
-    (file: File) =>
-      $(ActionTypes.saveFile, { file }),
+    (file: File, filesize: number) =>
+      $(ActionTypes.saveFile, { file, filesize }),
 
     enqueueChunk:
     (chunk: string) =>
@@ -128,9 +128,13 @@ const FileImportActions =
     () =>
       $(ActionTypes.dequeueChunk, {}),
 
-    toggleUpdate:
+    changeUploadInProgress:
     () =>
-      $(ActionTypes.toggleUpdate, {}),
+      $(ActionTypes.changeUploadInProgress, {}),
+
+    changeElasticUpdate:
+    () =>
+      $(ActionTypes.changeElasticUpdate, {}),
   };
 
 export default FileImportActions;

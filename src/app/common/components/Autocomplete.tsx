@@ -306,9 +306,6 @@ class Autocomplete extends TerrainComponent<Props>
             {
               options.map(this.renderOption)
             }
-            {
-              options.size ? null : <div className='ac-no-options'>No matches</div>
-            }
           </div>
         }
       </div>
