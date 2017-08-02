@@ -135,6 +135,7 @@ export class Import
         }
         catch (e)
         {
+          winston.info('throwing error from streaming _getItems.');
           throw e;
         }
         winston.info('streaming server got items from data');
@@ -150,11 +151,16 @@ export class Import
             {
               // TODO: try writing to a different file?
             }
+            winston.info('throwing error from streaming file write open.');
             throw err;
           }
           fs.write(fd, JSON.stringify(items), (writeErr) =>
           {
-            throw writeErr;
+            if (writeErr !== undefined && writeErr !== null)
+            {
+              winston.info('throwing error from streaming file write.');
+              throw writeErr;
+            }
           });
           winston.info('wrote items to file.');
         });
@@ -182,6 +188,7 @@ export class Import
           {
             if (err !== undefined && err !== null)
             {
+              winston.info('throwing error from streaming file read.');
               throw err;
             }
             items = JSON.parse(data);
@@ -201,6 +208,7 @@ export class Import
         {
           if (err !== undefined && err !== null)
           {
+            winston.info('throwing error from streaming file delete.');
             throw err;
           }
         });
