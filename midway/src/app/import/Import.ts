@@ -47,20 +47,26 @@ THE SOFTWARE.
 import sha1 = require('sha1');
 
 import * as csvjson from 'csvjson';
+import * as stream from 'stream';
 import * as winston from 'winston';
 
 import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import { ImportTemplateBase } from './ImportTemplates';
+import { ExportTemplateBase, ImportTemplateBase } from './ImportTemplates';
 
 export interface ImportConfig extends ImportTemplateBase
 {
   contents: string;   // should parse directly into a JSON object
   filetype: string;   // either 'json' or 'csv'
-
   update: boolean;    // false means replace (instead of update) ; default should be true
+}
+
+export interface ExportConfig extends ExportTemplateBase
+{
+  filetype: string;
+  filestream: any; // TODO use a more strict type
 }
 
 export class Import
@@ -170,6 +176,46 @@ export class Import
     });
   }
 
+  public async export(imprt: ImportConfig): Promise<ImportConfig>
+  {
+    return new Promise<ImportConfig>(async (resolve, reject) =>
+    {
+      const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + imprt.dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('File import currently is only supported for Elastic databases.');
+      }
+
+      let time: number = Date.now();
+      let items: object[];
+
+      // get items from query
+
+      winston.info('transforming data...');
+      if (items.length === 0)
+      {
+        return reject('No data provided in file to upload.');
+      }
+      try
+      {
+        items = [].concat.apply([], await this._transformAndCheck(items, imprt, false));
+      } catch (e)
+      {
+        return reject(e);
+      }
+      winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
+
+      time = Date.now();
+
+      // export to csv
+
+    });
+  }
+
   /* returns an error message if there are any; else returns empty string */
   private _verifyConfig(imprt: ImportConfig): string
   {
@@ -184,7 +230,7 @@ export class Import
       return typeError;
     }
 
-    if (imprt.csvHeaderMissing === undefined)
+    if (imprt.csvHeaderMissing === undefined || imprt.csvHeaderMissing === null)
     {
       imprt.csvHeaderMissing = false;
     }
@@ -360,7 +406,7 @@ export class Import
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(allItems: object[], imprt: ImportConfig): Promise<object[][]>
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig, dontCheck?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
     let baseInd: number = 0;
@@ -391,10 +437,13 @@ export class Import
                 trimmedItem[name] = item[name];
               }
             }
-            const typeError: string = this._checkTypes(trimmedItem, imprt, baseInd + ind);
-            if (typeError !== '')
+            if (dontCheck !== true)
             {
-              return thisReject(typeError);
+              const typeError: string = this._checkTypes(trimmedItem, imprt, baseInd + ind);
+              if (typeError !== '')
+              {
+                return thisReject(typeError);
+              }
             }
             transformedItems.push(trimmedItem);
             ind++;

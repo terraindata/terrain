@@ -57,6 +57,7 @@ export interface ImportTemplateBase
   dbname: string;         // for elastic, index name
   tablename: string;      // for elastic, type name
 
+  export?: boolean;       // export type template
   // if filetype is 'csv', default is to assume the first line contains headers
   // set this to true if this is not the case
   csvHeaderMissing?: boolean;
@@ -74,6 +75,15 @@ export interface ImportTemplateConfig extends ImportTemplateBase
   id?: number;
   name: string;
 }
+
+export interface ExportTemplateBase extends ImportTemplateBase
+{
+  id?: number;
+  name: string;
+  query?: string;
+  variantId?: number;
+}
+
 interface ImportTemplateConfigStringified
 {
   id?: number;
@@ -122,9 +132,15 @@ export class ImportTemplates
     });
   }
 
-  public async get(id?: number): Promise<ImportTemplateConfig[]>
+  public async getImport(id?: number): Promise<ImportTemplateConfig[]>
   {
-    const filter: object = (id !== undefined) ? { id } : {};
+    const filter: object = (id !== undefined) ? { export: false, id } : {};
+    return this.select([], filter);
+  }
+
+  public async getExport(id?: number): Promise<ImportTemplateConfig[]>
+  {
+    const filter: object = (id !== undefined) ? { export: true, id } : {};
     return this.select([], filter);
   }
 
@@ -134,7 +150,7 @@ export class ImportTemplates
     {
       if (template.id !== undefined)
       {
-        const results: ImportTemplateConfig[] = await this.get(template.id);
+        const results: ImportTemplateConfig[] = await this.getImport(template.id);
         // template id specified but template not found
         if (results.length === 0)
         {

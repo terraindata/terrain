@@ -57,13 +57,13 @@ export const templates = new ImportTemplates();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all templates');
-  ctx.body = await templates.get();
+  ctx.body = await templates.getImport();
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting template ID ' + String(ctx.params.id));
-  ctx.body = await templates.get(Number(ctx.params.id));
+  ctx.body = await templates.getImport(Number(ctx.params.id));
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
