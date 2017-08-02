@@ -85,6 +85,7 @@ class FileImport extends TerrainComponent<any>
     fileImportState: FileImportTypes.FileImportState;
     columnOptionNames: List<string>;
     stepId: number;
+    csvHeaderMissing: boolean;
 
     servers?: SchemaTypes.ServerMap;
     serverNames: List<string>;
@@ -106,6 +107,7 @@ class FileImport extends TerrainComponent<any>
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
     stepId: 0,
+    csvHeaderMissing: false,
 
     serverIndex: -1,
     serverNames: List([]),
@@ -153,7 +155,7 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
-        const { file, streaming, csvHeaderMissing } = this.state.fileImportState;
+        const { file, streaming } = this.state.fileImportState;
         const fileToRead = streaming ? file.slice(0, FileImportTypes.CHUNK_SIZE) : file;
         const fr = new FileReader();
         fr.readAsText(fileToRead);
@@ -178,9 +180,9 @@ class FileImport extends TerrainComponent<any>
               break;
             case 'csv':
               items = this.parseCsv(stringifiedFile);
-              if (!this.state.fileImportState.csvHeaderMissing) // remove first line if csv has header
+              if (!this.state.csvHeaderMissing) // remove first line if csv has header
               {
-                stringifiedFile.slice(0, stringifiedFile.indexOf('\n'));
+                stringifiedFile = stringifiedFile.slice(stringifiedFile.indexOf('\n'), stringifiedFile.length - 1);
               }
               break;
             default:
@@ -195,7 +197,7 @@ class FileImport extends TerrainComponent<any>
             ),
           );
           const columnNames = _.map(items[0], (value, i) =>
-            this.state.filetype === 'csv' && csvHeaderMissing ? 'column' + String(i) : i,
+            this.state.filetype === 'csv' && this.state.csvHeaderMissing ? 'column' + String(i) : i,
           );
 
           Actions.chooseFile(streaming ? '' : stringifiedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
@@ -250,7 +252,9 @@ class FileImport extends TerrainComponent<any>
 
   public handleCsvHeaderChange()
   {
-    Actions.changeHasCsvHeader();
+    this.setState({
+      csvHeaderMissing: !this.state.csvHeaderMissing,
+    });
   }
 
   public handleServerChange(serverIndex: number)
@@ -315,9 +319,7 @@ class FileImport extends TerrainComponent<any>
 
   public parseCsv(file: string): object[]
   {
-    const { csvHeaderMissing } = this.state.fileImportState;
-
-    if (!csvHeaderMissing)
+    if (!this.state.csvHeaderMissing)
     {
       const testDuplicateConfig = {
         quoteChar: '\'',
@@ -348,7 +350,7 @@ class FileImport extends TerrainComponent<any>
     }
     const config = {
       quoteChar: '\'',
-      header: !csvHeaderMissing,
+      header: !this.state.csvHeaderMissing,
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       error: (err) =>
       {
@@ -441,7 +443,7 @@ class FileImport extends TerrainComponent<any>
       filetype,
       filename: file.target.files[0].name,
     });
-    Actions.saveFile(file.target.files[0]);
+    Actions.saveFile(file.target.files[0], file.target.files[0].size);
     // this.refs['file']['value'] = null;                 // prevent file-caching
   }
 
@@ -466,7 +468,7 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, csvHeaderMissing,
+    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
       primaryKey, templates, transforms, uploadInProgress, elasticUpdate, file, chunkQueue, streaming } = fileImportState;
 
     let content = {};
@@ -478,7 +480,7 @@ class FileImport extends TerrainComponent<any>
             <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
             has header row (csv only)
             <CheckBox
-              checked={!csvHeaderMissing}
+              checked={!this.state.csvHeaderMissing}
               onChange={this.handleCsvHeaderChange}
             />
             {

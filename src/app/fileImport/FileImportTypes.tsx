@@ -61,8 +61,6 @@ class FileImportStateC extends BaseClass
 
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
-
-  public csvHeaderMissing: boolean = false;
   public primaryKey: number = -1;
 
   public originalNames: List<string> = List([]);
@@ -73,7 +71,7 @@ class FileImportStateC extends BaseClass
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
   public file: File = null;
-  public streaming: boolean = true;
+  public streaming: boolean = false;
 
   public chunkQueue: List<string> = List([]);
   public uploadInProgress: boolean = false;

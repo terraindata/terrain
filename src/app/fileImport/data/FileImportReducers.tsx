@@ -270,7 +270,7 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
     state
-      .set('file', action.payload.file)
+      .set('fileContents', action.payload.fileContents)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
@@ -391,8 +391,10 @@ FileImportReducers[ActionTypes.loadTemplate] =
 
 FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
-    state.set('file', action.payload.file)
-      .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD)
+  {
+    return state.set('file', action.payload.file)
+      .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD);
+  }
   ;
 
 FileImportReducers[ActionTypes.enqueueChunk] =
