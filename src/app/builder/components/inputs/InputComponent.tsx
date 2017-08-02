@@ -46,11 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
 
+import { List, Map } from 'immutable';
 import * as Radium from 'radium';
-import {List, Map} from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
-import './InputStyle.less';
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
@@ -59,6 +58,7 @@ import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
+import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 
@@ -74,6 +74,7 @@ interface Props
   input: any;
   index: number;
   canEdit: boolean;
+  onCreateInput: (index: number) => void;
 }
 
 const TYPE_OPTIONS =
@@ -83,10 +84,25 @@ const TYPE_OPTIONS =
     InputType[2],
   ]);
 
+const colorForInputType = (inputType: InputType): string =>
+{
+  switch (inputType)
+  {
+    case InputType.NUMBER:
+      return Colors().builder.cards.numberClause[0];
+    case InputType.TEXT:
+      return Colors().builder.cards.stringClause[0];
+    case InputType.DATE:
+      return Colors().builder.cards.enumClause[0];
+    default:
+      return '#f00';
+  }
+};
+
 @Radium
 class InputComponent extends TerrainComponent<Props>
 {
-  getKeyPath(type?: string)
+  public getKeyPath(type?: string)
   {
     const keyPath = List(['query', 'inputs']);
     if (type)
@@ -95,11 +111,11 @@ class InputComponent extends TerrainComponent<Props>
     }
     return keyPath;
   }
-  
-  handleInputTypeChange(inputType: number)
+
+  public handleInputTypeChange(inputType: number)
   {
     Actions.change(this.getKeyPath('inputType'), inputType);
-    
+
     if (inputType === InputType.DATE)
     {
       let date = new Date(this.props.input.value);
@@ -112,7 +128,7 @@ class InputComponent extends TerrainComponent<Props>
     }
   }
 
-  closeInput()
+  public closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() =>
@@ -121,17 +137,17 @@ class InputComponent extends TerrainComponent<Props>
     }, 250);
   }
 
-  createInput()
+  public createInput()
   {
-    Actions.create(this.getKeyPath(), this.props.index, 'input');
+    this.props.onCreateInput(this.props.index);
   }
 
-  changeValue(value)
+  public changeValue(value)
   {
     Actions.change(this.getKeyPath('value'), value);
   }
 
-  renderInputValue()
+  public renderInputValue()
   {
     if (this.props.input.inputType === InputType.DATE)
     {
@@ -145,7 +161,7 @@ class InputComponent extends TerrainComponent<Props>
         </div>
       );
     }
-    
+
     return (
       <BuilderTextbox
         canEdit={true}
@@ -159,38 +175,34 @@ class InputComponent extends TerrainComponent<Props>
         language={null}
         onFocus={this.focus}
         onBlur={this.blur}
-        textStyle={
-          this.props.input.inputType === InputType.NUMBER ?
-            fontColor(Colors().builder.cards.numberClause[0]) :
-            fontColor(Colors().builder.cards.stringClause[0])
-        }
+        textStyle={fontColor(colorForInputType(this.props.input.inputType))}
       />
     );
   }
-  
-  focus()
+
+  public focus()
   {
     this.setState({
       focused: true,
     });
   }
 
-  blur()
+  public blur()
   {
     this.setState({
       focused: false,
     });
   }
 
-  componentDidMount()
+  public componentDidMount()
   {
     Util.animateToAutoHeight(this.refs.input);
   }
 
-  render()
+  public render()
   {
-    const {input} = this.props;
-    
+    const { input } = this.props;
+
     return (
       <div className='input' ref='input'>
         {
@@ -229,6 +241,7 @@ class InputComponent extends TerrainComponent<Props>
               onChange={this.handleInputTypeChange}
               centerAlign={true}
               canEdit={true}
+              textColor={colorForInputType}
             />
             <div className='input-close' onClick={this.closeInput}>
               <CloseIcon />

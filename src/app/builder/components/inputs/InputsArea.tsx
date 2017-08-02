@@ -69,25 +69,26 @@ export interface Props
 
 class InputsArea extends TerrainComponent<Props>
 {
-  public createInput()
+  public handleCreateInput(index: number = -1)
   {
+    if (typeof index !== 'number')
+    {
+      index = -1;
+    }
+
     Actions.create(
-      Immutable.List(['query', 'inputs']), -1,
+      Immutable.List(['query', 'inputs']), index,
       AllBackendsMap[this.props.language].inputType,
     );
   }
 
   public renderNoInputs()
   {
-    const large = ''; // "No inputs have been added, yet."
-    const button = this.props.canEdit ? 'Add an Input' : null;
-    const onClick = this.createInput;
-
     return (
       <InfoArea
-        large={large}
-        button={button}
-        onClick={onClick}
+        large={this.props.canEdit ? '' : 'No inputs have been created, yet.'}
+        button={this.props.canEdit ? 'Add an Input' : null}
+        onClick={this.handleCreateInput}
       />
     );
   }
@@ -108,6 +109,7 @@ class InputsArea extends TerrainComponent<Props>
               index={index}
               canEdit={this.props.canEdit}
               key={input.id}
+              onCreateInput={this.handleCreateInput}
             />,
           )
         }
@@ -117,7 +119,7 @@ class InputsArea extends TerrainComponent<Props>
             this.props.canEdit &&
             <CreateLine
               open={false}
-              onClick={this.createInput}
+              onClick={this.handleCreateInput}
             />
           }
         </div>

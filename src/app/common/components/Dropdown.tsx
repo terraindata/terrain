@@ -48,16 +48,17 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
-import * as _ from 'underscore';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as Radium from 'radium';
-import { backgroundColor, Colors, fontColor, link, altStyle } from '../../common/Colors';
+import * as _ from 'underscore';
 import Actions from '../../builder/data/BuilderActions';
+import { altStyle, backgroundColor, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
+import StyleTag from './StyleTag';
 
 export interface Props
 {
@@ -70,7 +71,7 @@ export interface Props
   className?: string;
   centerAlign?: boolean;
   optionsDisplayName?: Map<any, string>; // maps value to display name
-  textColor?: string |  ((index: number) => string);
+  textColor?: string | ((index: number) => string);
 }
 
 @Radium
@@ -113,23 +114,37 @@ class Dropdown extends TerrainComponent<Props>
     return this._clickHandlers[index];
   }
 
+  public colorForOption(index): string
+  {
+    const { textColor } = this.props;
+
+    if (typeof textColor === 'function')
+    {
+      return textColor(index);
+    }
+
+    if (typeof textColor === 'string')
+    {
+      return textColor;
+    }
+
+    return undefined;
+  }
+
   public renderOption(option, index)
   {
     const focused = index === this.state.focusedIndex;
     const selected = index === this.props.selectedIndex;
-    
-    const { textColor } = this.props;
-    const customColor = textColor && typeof textColor === "function" ?
-          textColor(this.props.selectedIndex) : textColor;
-    console.log(customColor);
-    let style = {
-      color: customColor,
+    const customColor = this.colorForOption(index);
+
+    const style = {
+      'color': customColor,
       ':hover': {
         backgroundColor: Colors().inactiveHover,
         color: Colors().text1,
-      }
+      },
     };
-    
+
     if (focused)
     {
       _.extend(style, {
@@ -137,19 +152,19 @@ class Dropdown extends TerrainComponent<Props>
         // color: Colors().text1,
       });
     }
-    
+
     if (selected)
     {
       _.extend(style, {
-        backgroundColor: customColor || Colors().active,
-        color: Colors().text1,
+        'backgroundColor': customColor || Colors().active,
+        'color': Colors().text1,
         ':hover': {
           backgroundColor: customColor || Colors().active,
           color: Colors().text1,
-        }
+        },
       });
     }
-    
+
     return (
       <div
         className={classNames({
@@ -256,6 +271,9 @@ class Dropdown extends TerrainComponent<Props>
         </div>;
     }
 
+    const { selectedIndex, textColor, options } = this.props;
+    const customColor = this.colorForOption(selectedIndex);
+
     return (
       <div
         onClick={this.toggleOpen}
@@ -267,9 +285,9 @@ class Dropdown extends TerrainComponent<Props>
           'dropdown-center': this.props.centerAlign,
           [this.props.className]: !!this.props.className,
         })}
-        style={this.state.open ? DROPDOWN_OPEN_STYLE : DROPDOWN_STYLE}
         key='dropdown-body'
       >
+
         {
           this.state.up && this.state.open
           && optionsEl
@@ -277,16 +295,28 @@ class Dropdown extends TerrainComponent<Props>
         <div
           className='dropdown-value'
           ref='value'
+          style={{
+            'backgroundColor': !this.state.open ? Colors().bg1 :
+              customColor || Colors().active,
+            'color': !this.state.open ? customColor || Colors().text1
+              : Colors().text1,
+
+            ':hover': {
+              backgroundColor: customColor || Colors().inactiveHover,
+              color: Colors().text1,
+            },
+          }}
+          key='dropdown-value'
         >
           {
             // map through all of the options so that the dropdown takes the width of the longest one
             //  CSS hides all but the selected option
-            this.props.options && this.props.options.map((option, index) =>
+            options && options.map((option, index) =>
               <div
                 key={index}
                 className={classNames({
                   'dropdown-option-inner': true,
-                  'dropdown-option-value-selected': index === this.props.selectedIndex,
+                  'dropdown-option-value-selected': index === selectedIndex,
                 })}
               >
                 {
@@ -305,7 +335,7 @@ class Dropdown extends TerrainComponent<Props>
           onFocusLost={this.handleFocusLost}
           index={this.state.focusedIndex}
           onIndexChange={this.handleFocusedIndexChange}
-          length={this.props.options && this.props.options.size}
+          length={options && options.size}
           onSelect={this.handleKeyboardSelect}
           focusOverride={this.state.open}
         />
@@ -313,25 +343,5 @@ class Dropdown extends TerrainComponent<Props>
     );
   }
 }
-
-const DROPDOWN_STYLE = {
-  backgroundColor: Colors().bg1,
-  fontColor: Colors().text1,
-  
-  ':hover': {
-    backgroundColor: Colors().inactiveHover,
-  }
-}
-
-const DROPDOWN_OPEN_STYLE = _.extend({},
-  DROPDOWN_STYLE,
-  {
-    backgroundColor: Colors().active,
-    
-    ':hover': {
-      backgroundColor: Colors().active,
-    }
-  }
-);
 
 export default Dropdown;
