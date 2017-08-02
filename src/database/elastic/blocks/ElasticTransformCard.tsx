@@ -60,6 +60,7 @@ import { Input, InputType } from '../../../blocks/types/Input';
 const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
+import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
 
 const transformScoreInputTypes = CommonElastic.acceptsValues;
 
@@ -108,6 +109,10 @@ export const elasticTransform = _card(
           placeholder: 'Input field',
           accepts: transformScoreInputTypes,
           showWhenCards: true,
+          getAutoTerms: (schemaState): List<string> =>
+          {
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+          },
         },
         // TODO, in the future, if we allow complicated formulas inside
         //  transforms, then we can change this back to a cards view
