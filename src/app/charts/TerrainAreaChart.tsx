@@ -107,8 +107,11 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
   public componentWillReceiveProps(nextProps)
   {
-    const visibleDatasets = nextProps.datasets.map((ds) => ds.id);
-    this.setState({ visibleDatasets: visibleDatasets.toList() });
+    if (!this.props.datasets.equals(nextProps.datasets))
+    {
+      const visibleDatasets = nextProps.datasets.map((ds) => ds.id);
+      this.setState({ visibleDatasets: visibleDatasets.toList() });
+    }
   }
 
   public handleZoom(domain)
