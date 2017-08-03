@@ -61,7 +61,7 @@ var CodeMirror = createReactClass({
 
   propTypes:
   {
-    onChange: PropTypes.func,
+    onManualEditorChange: PropTypes.func,
     onFocusChange: PropTypes.func,
     options: PropTypes.object,
     path: PropTypes.string,
@@ -428,9 +428,9 @@ var CodeMirror = createReactClass({
   },
   codemirrorIssueQuery: function codemirrorIssueQuery(cm)
   {
-    if (this.props.onChange)
+    if (this.props.onManualEditorChange)
     {
-      this.props.onChange(cm.getDoc().getValue(), false, true);
+      this.props.onManualEditorChange(cm.getDoc().getValue(), false, true);
     }
   },
   render: function render()

@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
@@ -117,6 +118,16 @@ class TQLEditor extends TerrainComponent<Props>
     codeMirrorInstance: undefined,
   };
 
+  constructor(props: Props)
+  {
+    super(props);
+    this.executeChange = _.debounce(this.executeChange, 300);
+  }
+  public componentWillUnmount()
+  {
+    this.executeChange.flush();
+  }
+
   public render()
   {
     const options =
@@ -174,7 +185,8 @@ class TQLEditor extends TerrainComponent<Props>
         options={options}
 
         highlightedLine={this.props.highlightedLine}
-        onChange={this.props.onChange}
+        onManualEditorChange={this.props.onChange}
+        onFocusChange={this.handleFocusChange}
         toggleSyntaxPopup={this.props.toggleSyntaxPopup}
         defineTerm={this.props.defineTerm}
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
@@ -210,10 +222,15 @@ class TQLEditor extends TerrainComponent<Props>
       {
         const cursor = cmInstance.getCursor();
         this.state.codeMirrorInstance.setValue(formatted);
-        this.props.onChange(cmInstance.getValue());
+        this.executeChange();
         cmInstance.setCursor(cursor);
       }
     }
+  }
+
+  private executeChange: any = () =>
+  {
+    this.props.onChange(this.state.codeMirrorInstance.getValue());
   }
 
   private handleCMHighlighting(cmInstance, change)
@@ -226,7 +243,15 @@ class TQLEditor extends TerrainComponent<Props>
 
   private handleTQLChange(cmInstance, changes)
   {
-    this.props.onChange(cmInstance.getValue());
+    this.executeChange();
+  }
+
+  private handleFocusChange(focused: boolean)
+  {
+    if (!focused)
+    {
+      this.executeChange.flush();
+    }
   }
 
   private registerCodeMirror(cmInstance)
