@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESJSONType from '../ESJSONType';
 import ESTerminalClause from './ESTerminalClause';
@@ -53,8 +54,8 @@ import ESTerminalClause from './ESTerminalClause';
  */
 export default class ESNullClause extends ESTerminalClause
 {
-  public constructor(type: string, settings: any)
+  public constructor(type: string, settings?: ESClauseSettings)
   {
-    super(type, settings, ESClauseType.ESNullClause, ESJSONType.null);
+    super(type, ESClauseType.ESNullClause, ESJSONType.null, settings);
   }
 }

@@ -46,16 +46,19 @@ THE SOFTWARE.
 
 // tslint:disable:no-console
 
+import { List } from 'immutable';
 import * as _ from 'underscore';
 
-import { List } from 'immutable';
-import * as Immutable from 'immutable';
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
+import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
+import { Colors } from '../../common/Colors';
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
+import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
+import { BuilderStore } from '../data/BuilderStore';
 
 import ESAnyClause from '../../../../shared/database/elastic/parser/clauses/ESAnyClause';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
@@ -78,9 +81,6 @@ import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/EST
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
-import { Colors } from '../../common/Colors';
-import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
-import { BuilderStore } from '../data/BuilderStore';
 
 const KEY_INLINE_DISPLAYS = [
   DisplayType.TEXT,
@@ -326,7 +326,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
-          options: Immutable.List([
+          options: List([
             'false',
             'true',
           ]),
@@ -347,7 +347,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
-          options: Immutable.List(clause.values),
+          options: List(clause.values),
           dropdownUsesRawValues: true,
         },
         tql: (block) => block['value'],
@@ -367,11 +367,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            return List(['movieId', 'title', 'budget', 'released', 'revenue']);
-            // TODO change from tables to dbs?
-            // const db = BuilderStore.getState().db.name; // TODO correct?
-            //  const tableNames = schemaState.tableNamesByDb.get(db);
-            //  return tableNames;
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -391,13 +387,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            // TODO cache list in schema state
-            const server = BuilderStore.getState().db.name;
-            return schemaState.databases.toList().filter(
-              (db) => db.serverId === server,
-            ).map(
-              (db) => db.name,
-            ).toList();
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -548,7 +538,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESStructureClause(clause: ESStructureClause): any
   {
-    const accepts = Immutable.List(
+    const accepts = List(
       _.keys(clause.structure).map((type) => 'eql' + type),
     );
 
@@ -603,7 +593,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           ),
         );
 
-        config['cards'] = Immutable.List(cards);
+        config['cards'] = List(cards);
       }
 
       return config;
@@ -611,25 +601,36 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     return GetCardVisitor.seedCard(clause,
       {
-        cards: Immutable.List([]),
+        cards: List([]),
 
         // provide options of all possible card types
         getChildOptions: (card) =>
         {
-          return Immutable.List(_.compact(_.map(
-            clause.structure,
-            (type, key) =>
+          const seen = new Set();
+          const result = [];
+          const handler = (name) =>
+          {
+            if (!seen.has(name))
             {
-              if (card['cards'].find((p) => p.key === key))
+              seen.add(name);
+
+              const key = clause.structure[name];
+              if (card['cards'].find((p) => p.key === key) === undefined)
               {
-                return null;
+                result.push({
+                  text: name,
+                  type: 'eql' + key,
+                });
               }
-              return {
-                text: key,
-                type: 'eql' + type,
-              };
-            },
-          )));
+            }
+          };
+
+          clause.suggestions.forEach(handler);
+          clause.required.forEach(handler);
+          Object.keys(clause.template).forEach(handler);
+          Object.keys(clause.structure).forEach(handler);
+
+          return List(result);
         },
 
         childOptionClickHandler: null, // set in init()
@@ -689,34 +690,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           getAutoTerms: (schemaState): List<string> =>
           {
-            const state = BuilderStore.getState();
-            const cards = state.query.cards;
-            const isIndexCard = (card) => card['type'] === 'eqlindex';
-
-            let indexCard = cards.find(isIndexCard);
-            if (indexCard === undefined)
-            {
-              indexCard = cards.get(0);
-              if (indexCard !== undefined)
-              {
-                indexCard = indexCard['cards'].find(isIndexCard);
-              }
-            }
-
-            // TODO idea: have the selected index and type stored on the Query object
-
-            if (indexCard !== undefined)
-            {
-              const index = indexCard['value'];
-              const indexId = state.db.name + '/' + String(index);
-              return schemaState.tables.filter(
-                (table) => table.databaseId === indexId,
-              ).map(
-                (table) => table.name,
-              ).toList();
-            }
-
-            return List([]);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
           },
         },
         tql: (stringBlock) => stringBlock['value'],

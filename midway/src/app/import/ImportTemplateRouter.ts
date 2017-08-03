@@ -44,79 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
-import * as BlockUtils from '../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
-import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
-// const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-export const elasticRootCard = _card({
-  index: '',
-  from: 0,
-  rootType: '',
-  rootSize: 1000,
+import * as Util from '../Util';
+import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
-  static:
-  {
-    title: 'Root Settings',
-    colors: ['#456', '#789'],
-    preview: '[index], [rootType]',
-    language: 'elastic',
+const Router = new KoaRouter();
+export const templates = new ImportTemplates();
 
-    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      return {
-        index: rootBlock['index'],
-        type: rootBlock['rootType'],
-        from: rootBlock['from'],
-        size: rootBlock['rootSize'],
-      };
-    },
-
-    display:
-    [
-      {
-        displayType: DisplayType.CARDTEXT, // TODO change
-        key: 'index',
-        getAutoTerms: (schemaState) =>
-        {
-          return Immutable.List(['movies', 'baseball', 'zazzle']);
-        },
-        // autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.CARDSFORTEXT, // TODO change
-        key: 'index',
-      },
-      {
-        displayType: DisplayType.TEXT,
-        key: 'rootType',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'from',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'rootSize',
-        autoDisabled: true,
-      },
-
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-        // accepts,
-      },
-    ],
-  },
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all templates');
+  ctx.body = await templates.get();
 });
 
-export default elasticRootCard;
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting template ID ' + String(ctx.params.id));
+  ctx.body = await templates.get(Number(ctx.params.id));
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting filtered templates');
+  const request: object = ctx.request.body.body;
+  const filter: object = {};
+  if (request !== undefined)
+  {
+    if (request['dbid'] !== undefined)
+    {
+      filter['dbid'] = request['dbid'];
+    }
+    if (request['dbname'] !== undefined)
+    {
+      filter['dbname'] = request['dbname'];
+    }
+    if (request['tablename'] !== undefined)
+    {
+      filter['tablename'] = request['tablename'];
+    }
+  }
+  ctx.body = await templates.select([], filter);
+});
+
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add new template');
+  const template: ImportTemplateConfig = ctx.request.body.body;
+  Util.verifyParameters(template, ['name', 'dbid', 'dbname', 'tablename']);
+  Util.verifyParameters(template, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  if (template.id !== undefined)
+  {
+    throw Error('Invalid parameter template ID');
+  }
+
+  ctx.body = await templates.upsert(ctx.state.user, template);
+});
+
+export default Router;

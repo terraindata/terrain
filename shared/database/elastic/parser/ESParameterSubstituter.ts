@@ -126,12 +126,10 @@ export default class ESParameterSubstituter
             this.convert(property.propertyName);
             this.result += ':';
 
-            if (property.propertyValue === null)
+            if (property.propertyValue !== null)
             {
-              throw new Error('Property with no value found.');
+              this.convert(property.propertyValue);
             }
-
-            this.convert(property.propertyValue);
           });
 
         this.result += ' } '; // extra spaces to avoid confusion with mustache tags

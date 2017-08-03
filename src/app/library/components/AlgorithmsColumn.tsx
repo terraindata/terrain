@@ -73,6 +73,7 @@ type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
+  basePath: string;
   algorithms: Immutable.Map<ID, Algorithm>;
   variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
@@ -224,7 +225,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderAlgorithm(id: ID, fadeIndex: number)
   {
-    const { params } = this.props;
+    const { params, basePath } = this.props;
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
     const scores = {
@@ -325,7 +326,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         key={algorithm.id}
-        to={`/library/${this.props.groupId}/${algorithm.id}`}
+        to={`/${basePath}/${this.props.groupId}/${algorithm.id}`}
         className='library-item-lighter'
         id={id}
         onNameChange={this.handleNameChange}

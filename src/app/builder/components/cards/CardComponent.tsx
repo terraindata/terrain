@@ -580,6 +580,7 @@ class _CardComponent extends TerrainComponent<Props>
                   this.props.canEdit &&
                   <Menu
                     options={this.state.menuOptions}
+                    openRight={true}
                   />
                 }
                 {

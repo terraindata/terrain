@@ -72,6 +72,7 @@ export interface Props
   centerAlign?: boolean;
   optionsDisplayName?: Map<any, string>; // maps value to display name
   textColor?: string | ((index: number) => string);
+  width?: string;
 }
 
 @Radium
@@ -294,6 +295,7 @@ class Dropdown extends TerrainComponent<Props>
         }
         <div
           className='dropdown-value'
+          style={{ width: this.props.width }}
           ref='value'
           style={{
             'backgroundColor': !this.state.open ? Colors().bg1 :
