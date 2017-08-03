@@ -70,11 +70,15 @@ export const elasticFilterBlock = _block(
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        const filterObj = {};
-        filterObj[block['boolQuery']] = { range: {} };
-        filterObj[block['boolQuery']].range[block['field']] = {};
-        filterObj[block['boolQuery']].range[block['field']][block['rangeQuery']] = block['value'];
-        return filterObj;
+        return {
+          [block['boolQuery']]: {
+            range: {
+              [block['field']]: {
+                [block['rangeQuery']]: block['value'],
+              }
+            }
+          }
+        }
       },
       removeOnCardRemove: true,
     },
