@@ -98,8 +98,8 @@ const config = {
   },
   legend: {
     orientation: 'horizontal',
-  }
-}
+  },
+};
 
 interface Dataset
 {
