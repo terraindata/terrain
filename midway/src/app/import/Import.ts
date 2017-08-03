@@ -48,6 +48,7 @@ import sha1 = require('sha1');
 
 import * as csvjson from 'csvjson';
 import * as stream from 'stream';
+import * as _ from 'underscore';
 import * as winston from 'winston';
 
 import * as SharedUtil from '../../../../shared/fileImport/Util';
@@ -55,7 +56,7 @@ import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
-import { ExportTemplateBase, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 const importTemplates = new ImportTemplates();
 
 export interface ImportConfig extends ImportTemplateBase
@@ -65,7 +66,7 @@ export interface ImportConfig extends ImportTemplateBase
   update: boolean;    // false means replace (instead of update) ; default should be true
 }
 
-export interface ExportConfig extends ExportTemplateBase
+export interface ExportConfig extends ImportConfig
 {
   filetype: string;
   filestream: any; // TODO use a more strict type
@@ -230,43 +231,68 @@ export class Import
     });
   }
 
-  public async export(imprt: ImportConfig): Promise<ImportConfig>
+  public async export(exprt: ExportConfig): Promise<stream.Readable>
   {
-    return new Promise<ImportConfig>(async (resolve, reject) =>
+    return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
+      const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
       if (database === undefined)
       {
-        return reject('Database "' + imprt.dbid.toString() + '" not found.');
+        return reject('Database "' + exprt.dbid.toString() + '" not found.');
       }
       if (database.getType() !== 'ElasticController')
       {
-        return reject('File import currently is only supported for Elastic databases.');
+        return reject('File export currently is only supported for Elastic databases.');
       }
 
-      let time: number = Date.now();
-      let items: object[];
-
-      // get items from query
-
+      // get query data from variantId or query
+      let newDocs: object[] = [];
+      const doc: object = {};
+      newDocs.push(await this._checkDocumentAgainstMapping(doc, await database.getTasty().schema(), exprt.dbname));
       winston.info('transforming data...');
-      if (items.length === 0)
+      if (newDocs.length === 0)
       {
-        return reject('No data provided in file to upload.');
+        return reject('No data provided to export.');
       }
       try
       {
-        items = [].concat.apply([], await this._transformAndCheck(items, imprt, false));
+        newDocs = [].concat.apply([], await this._transformAndCheck(newDocs, exprt, false));
       } catch (e)
       {
         return reject(e);
       }
-      winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
-
-      time = Date.now();
+      // winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
 
       // export to csv
 
+    });
+  }
+
+  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object>
+  {
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      const newDocument: object = document;
+      for (const table of schema.tableNames(database))
+      {
+        const fields: object = schema.fields(database, table);
+        const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
+        for (const field of fieldsInMappingNotInDocument)
+        {
+          newDocument[field] = null;
+          if (fields[field]['type'] === 'text')
+          {
+            newDocument[field] = '';
+          }
+        }
+        const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
+        for (const field of fieldsInDocumentNotMapping)
+        {
+          delete newDocument[field];
+        }
+      }
+      // console.log(newDocument);
+      resolve(newDocument);
     });
   }
 
@@ -395,6 +421,7 @@ export class Import
     }
     return mapping;
   }
+
   /* proposed: ES mapping
    * existing: ES mapping */
   private _isCompatibleType(proposed: object, existing: object): boolean
@@ -460,7 +487,7 @@ export class Import
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(allItems: object[], imprt: ImportConfig, dontCheck?: boolean): Promise<object[][]>
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig, dontCheck?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
     let baseInd: number = 0;
@@ -484,7 +511,7 @@ export class Import
             }
             // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
             const trimmedItem: object = {};
-            for (const name in imprt.columnTypes)
+            for (const name of Object.keys(imprt.columnTypes))
             {
               if (imprt.columnTypes.hasOwnProperty(name))
               {
@@ -521,7 +548,7 @@ export class Import
 
       // parse dates
       const dateColumns: string[] = [];
-      for (const colName in imprt.columnTypes)
+      for (const colName of Object.keys(imprt.columnTypes))
       {
         if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName]) === 'date')
         {
@@ -547,7 +574,7 @@ export class Import
         {
           return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
         }
-        for (const key in obj)
+        for (const key of Object.keys(obj))
         {
           if (obj.hasOwnProperty(key) && obj[key] !== null)
           {
@@ -562,7 +589,7 @@ export class Import
     }
     else if (imprt.filetype === 'csv')
     {
-      for (const name in imprt.columnTypes)
+      for (const name of Object.keys(imprt.columnTypes))
       {
         if (imprt.columnTypes.hasOwnProperty(name))
         {

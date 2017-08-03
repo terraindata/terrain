@@ -76,7 +76,7 @@ export interface ImportTemplateConfig extends ImportTemplateBase
   name: string;
 }
 
-export interface ExportTemplateBase extends ImportTemplateBase
+export interface ExportTemplateConfig extends ImportTemplateBase
 {
   id?: number;
   name: string;
