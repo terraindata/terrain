@@ -406,7 +406,6 @@ class TransformBox extends TerrainComponent<Props>
     return (
       <div
         className='fi-transform-box'
-        style={backgroundColor(Colors().fileimport.preview.column.transform)}
       >
         <Dropdown
           selectedIndex={this.state.transformTypeIndex}
@@ -415,12 +414,16 @@ class TransformBox extends TerrainComponent<Props>
           canEdit={true}
         />
         {this.renderTransform()}
-        <div
-          className='fi-transform-button'
-          onClick={this.handleTransformClick}
-        >
-          Transform
-        </div>
+        {
+          this.state.transformTypeIndex !== -1 &&
+          <span
+            className='fi-transform-button clickable'
+            onClick={this.handleTransformClick}
+            style={buttonColors()}
+          >
+            Apply
+          </span>
+        }
       </div>
     );
   }

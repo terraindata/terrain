@@ -82,7 +82,7 @@ export interface Props
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
   file: File;
-  chunkQueue: List<string>;
+  chunkQueue: List<object>;
   streaming: boolean;
   uploadInProgress: boolean;
   elasticUpdate: boolean;
@@ -116,7 +116,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
-        templateOptions: nextProps.templates.map((template, i) => template.name),
+        templateOptions: nextProps.templates.map((template, i) => String(template.id) + ': ' + template.name),
       });
     }
   }
@@ -244,13 +244,13 @@ class FileImportPreview extends TerrainComponent<Props>
   //   }
   // }
 
-  public readChunk(chunk: Blob)
+  public readChunk(chunk: Blob, isLast: boolean)
   {
     const fr = new FileReader();
     fr.readAsText(chunk);
     fr.onloadend = () =>
     {
-      Actions.enqueueChunk(fr.result);
+      Actions.enqueueChunk(fr.result, isLast);
     };
   }
 
@@ -278,7 +278,6 @@ class FileImportPreview extends TerrainComponent<Props>
       {
         socket.send(this.props.chunkQueue.first());
         Actions.dequeueChunk();
-        socket.emit('done');
       }
       else
       {
@@ -313,14 +312,13 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.streaming)
     {
       console.log('filesize: ', this.props.file.size);
-      const test = 5000000;
 
       let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
-      while (fileStart < test)
+      while (fileStart < this.props.file.size)
       {
         console.log('fileStart: ', fileStart);
         const chunk = this.props.file.slice(fileStart, fileStart + FileImportTypes.CHUNK_SIZE);
-        this.readChunk(chunk);
+        this.readChunk(chunk, fileStart + FileImportTypes.CHUNK_SIZE > this.props.file.size);
         fileStart += FileImportTypes.CHUNK_SIZE;
       }
       this.stream();
@@ -331,16 +329,16 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='fi-preview-template'
+        className='flex-container fi-preview-template'
       >
         <div
-          className='fi-preview-load'
+          className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='fi-load-button'
+            className='flex-shrink fi-preview-template-button'
             onClick={this.handleLoadTemplate}
             style={buttonColors()}
-            ref='fi-load-button'
+            ref='fi-preview-template-button-load'
           >
             Load Template
           </div>
@@ -348,19 +346,19 @@ class FileImportPreview extends TerrainComponent<Props>
             selectedIndex={this.state.templateId}
             options={this.state.templateOptions}
             onChange={this.handleTemplateChange}
-            className={'fi-load-dropdown'}
+            className={'flex-shrink fi-preview-template-load-dropdown'}
             canEdit={true}
           />
         </div>
 
         <div
-          className='fi-preview-save'
+          className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='fi-save-button'
+            className='flex-shrink fi-preview-template-button'
             onClick={this.handleSaveTemplate}
             style={buttonColors()}
-            ref='fi-save-button'
+            ref='fi-preview-template-button-save'
           >
             Save Template
           </div>
@@ -369,7 +367,7 @@ class FileImportPreview extends TerrainComponent<Props>
             options={null}
             onChange={this.handleAutocompleteTemplateChange}
             placeholder={'template name'}
-            className={'fi-save-autocomplete'}
+            className={'flex-shrink fi-preview-template-save-autocomplete'}
             disabled={false}
           />
         </div>
@@ -438,7 +436,10 @@ class FileImportPreview extends TerrainComponent<Props>
               checked={this.props.elasticUpdate}
               onChange={this.handleElasticUpdateChange}
             />
-            <span>
+            <span
+              className='clickable'
+              onClick={this.handleElasticUpdateChange}
+            >
               Join against any existing entries
             </span>
           </div>

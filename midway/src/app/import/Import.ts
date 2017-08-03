@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 import sha1 = require('sha1');
 
+import * as stream from 'stream';
+
 import * as csvjson from 'csvjson';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
@@ -57,7 +59,10 @@ import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import { users } from '../users/UserRouter';
-import { ImportTemplateBase } from './ImportTemplates';
+import * as Util from '../Util';
+import { ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+
+const importTemplates = new ImportTemplates();
 
 export interface ImportConfig extends ImportTemplateBase
 {
@@ -119,15 +124,20 @@ export class Import
       socket.on('message', async (data) =>
       {
         winston.info('streaming server received data from client.');
-        if (!authorized || typeof data !== 'string')
+        if (!authorized)
         {
           this._sendSocketError(socket, 'Must authenticate before sending messages.');
           return;
         }
+        if (typeof data['chunk'] !== 'string' || typeof data['isLast'] !== 'boolean')
+        {
+          this._sendSocketError(socket, 'Malformed message.');
+          return;
+        }
         // get valid piece of csv data ; TODO: SUPPORT JSON AS WELL
-        const end: number = data.lastIndexOf('\n');
-        const thisChunk: string = nextChunk + data.substring(0, end);
-        nextChunk = data.substring(end + 1, data.length);
+        const end: number = data['isLast'] ? data['chunk'].length : data['chunk'].lastIndexOf('\n');
+        const thisChunk: string = nextChunk + String(data['chunk'].substring(0, end));
+        nextChunk = data['chunk'].substring(end + 1, data['chunk'].length);
         let items: object[];
         try
         {
@@ -166,17 +176,13 @@ export class Import
         });
         socket.emit('ready');
       });
-      // socket.on('done', () =>
-      // {
-      //   socket.emit('ready');
-      // });
       socket.on('finished', async () =>
       {
         winston.info('streaming client finished.');
         // TODO: wait until all the data has finished being processed -- how?
         let time: number = Date.now();
         winston.info('putting mapping...');
-        // await this._tastyPutMapping();
+        await this._tastyPutMapping();
         winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
 
         time = Date.now();
@@ -184,7 +190,7 @@ export class Import
         for (let num = 0; num < count; num++)
         {
           let items: object[];
-          fs.readFile('import_streaming_tmp/testout' + String(num) + '.txt', 'utf8', (err, data) =>
+          fs.readFile('import_streaming_tmp/testout' + String(num) + '.txt', 'utf8', async (err, data) =>
           {
             if (err !== undefined && err !== null)
             {
@@ -192,19 +198,12 @@ export class Import
               return;
             }
             items = JSON.parse(data);
+            winston.info('@#$^@$%^@#$%@#$%got items for upsert@#$%@#$^@$%^@#$%@#$%@#$%@#');
+            await this._tastyUpsert(this.imprt, items);
           });
-          winston.info('@#$^@$%^@#$%@#$%got items for upsert@#$%@#$^@$%^@#$%@#$%@#$%@#');
-          // await this._tastyUpsert(this.imprt, items);
         }
         // TODO: make read calls synchronous to make sure this doesn't happen prematurely?
-        rimraf('import_streaming_tmp', (err) =>
-        {
-          if (err !== undefined && err !== null)
-          {
-            this._sendSocketError(socket, 'Failed to delete temp file: ' + String(err));
-            return;
-          }
-        });
+        this._deleteStreamingTempFolder(socket);
         winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
 
         // TODO: wait until all async calls have finished -- how?
@@ -284,6 +283,54 @@ export class Import
       }
     });
   }
+  public async upsertHeadless(files: stream.Readable[], fields: object): Promise<ImportConfig>
+  {
+    const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
+    if (templates.length === 0)
+    {
+      throw new Error('Invalid template ID provided: ' + String(fields['templateID']));
+    }
+    const template: ImportTemplateConfig = templates[0];
+
+    let update: boolean = true;
+    if (fields['update'] === 'false')
+    {
+      update = false;
+    }
+    else if (fields['update'] !== undefined && fields['update'] !== 'true')
+    {
+      throw new Error('Invalid value for parameter "update": ' + String(fields['update']));
+    }
+
+    let file: stream.Readable | null = null;
+    for (const f of files)
+    {
+      if (f['fieldname'] === 'file')
+      {
+        file = f;
+      }
+    }
+    if (file === null)
+    {
+      throw new Error('No file specified.');
+    }
+
+    const imprtConf: ImportConfig = {
+      dbid: template['dbid'],
+      dbname: template['dbname'],
+      tablename: template['tablename'],
+      originalNames: template['originalNames'],
+      columnTypes: template['columnTypes'],
+      primaryKey: template['primaryKey'],
+      transformations: template['transformations'],
+
+      contents: await Util.getStreamContents(file),
+      filetype: fields['filetype'],
+      streaming: false,     // TODO: SUPPORT STREAMING
+      update,
+    };
+    return this.upsert(imprtConf);
+  }
   private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
   {
     return new Promise<object[]>(async (resolve, reject) =>
@@ -341,7 +388,19 @@ export class Import
   {
     winston.info('emitting socket error: ' + error);
     socket.emit('midway_error', error);
+    this._deleteStreamingTempFolder(socket);
     socket.disconnect(true);
+  }
+  private _deleteStreamingTempFolder(socket: socketio.Socket)
+  {
+    rimraf('import_streaming_tmp', (err) =>
+    {
+      if (err !== undefined && err !== null)
+      {
+        this._sendSocketError(socket, 'Failed to delete temp file: ' + String(err));
+        return;
+      }
+    });
   }
 
   /* returns an error message if there are any; else returns empty string */

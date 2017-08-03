@@ -121,8 +121,8 @@ const FileImportActions =
       $(ActionTypes.saveFile, { file }),
 
     enqueueChunk:
-    (chunk: string) =>
-      $(ActionTypes.enqueueChunk, { chunk }),
+    (chunk: string, isLast: boolean) =>
+      $(ActionTypes.enqueueChunk, { chunk, isLast }),
 
     dequeueChunk:
     () =>

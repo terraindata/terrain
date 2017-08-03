@@ -174,7 +174,11 @@ class FileImport extends TerrainComponent<any>
               if (!this.state.csvHeaderMissing) // remove first line if csv has header
               {
                 stringifiedFile = stringifiedFile.slice(stringifiedFile.indexOf('\n'), stringifiedFile.length - 1);
-                Actions.enqueueChunk(fr.result.slice(fr.result.indexOf('\n'), fr.result.length - 1));
+                Actions.enqueueChunk(fr.result.slice(fr.result.indexOf('\n'), fr.result.length - 1), fr.result.length <= FileImportTypes.CHUNK_SIZE);
+              }
+              else
+              {
+                Actions.enqueueChunk(fr.result, fr.result.length <= FileImportTypes.CHUNK_SIZE);
               }
               break;
             default:
@@ -376,7 +380,7 @@ class FileImport extends TerrainComponent<any>
       let stringifiedFile;
       if (streaming)
       {
-        Actions.enqueueChunk(fr.result);
+        Actions.enqueueChunk(fr.result, file.size <= FileImportTypes.CHUNK_SIZE);
         stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
       }
       else
