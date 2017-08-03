@@ -299,14 +299,10 @@ export class Import
     }
     const template: ImportTemplateConfig = templates[0];
 
-    let update: boolean = true;
-    if (fields['update'] === 'false')
+    const update: boolean | string = this._parseBooleanField(fields, 'update', false);
+    if (typeof update === 'string')
     {
-      update = false;
-    }
-    else if (fields['update'] !== undefined && fields['update'] !== 'true')
-    {
-      throw new Error('Invalid value for parameter "update": ' + String(fields['update']));
+      throw new Error(update);
     }
 
     let file: stream.Readable | null = null;
@@ -322,6 +318,17 @@ export class Import
       throw new Error('No file specified.');
     }
 
+    const hasCsvHeader: boolean | string = this._parseBooleanField(fields, 'hasCsvHeader', true);
+    if (typeof hasCsvHeader === 'string')
+    {
+      throw new Error(hasCsvHeader);
+    }
+    let contents: string = await Util.getStreamContents(file);
+    if (fields['filetype'] === 'csv' && hasCsvHeader)
+    {
+      contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
+    }
+
     const imprtConf: ImportConfig = {
       dbid: template['dbid'],
       dbname: template['dbname'],
@@ -331,12 +338,25 @@ export class Import
       primaryKey: template['primaryKey'],
       transformations: template['transformations'],
 
-      contents: await Util.getStreamContents(file),
+      contents,
       filetype: fields['filetype'],
       streaming: false,     // TODO: SUPPORT STREAMING
       update,
     };
     return this.upsert(imprtConf);
+  }
+  private _parseBooleanField(obj: object, field: string, defaultRet: boolean): boolean | string
+  {
+    let parsed: boolean = defaultRet;
+    if (obj[field] === 'false')
+    {
+      parsed = false;
+    }
+    else if (obj[field] !== undefined && obj[field] !== 'true')
+    {
+      return 'Invalid value for parameter "' + field + '": ' + String(obj[field]);
+    }
+    return parsed;
   }
   private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
   {
