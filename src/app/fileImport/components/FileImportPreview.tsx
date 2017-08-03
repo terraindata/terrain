@@ -256,6 +256,14 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public stream()
   {
+    // let test: List<string> = List([]);
+    // test = test.set(5, 'test');
+    // console.log('test: ', test);
+    //
+    // test = test.set(1, 'test2');
+    // console.log(test.first());
+    let id = 0;
+
     console.log('setting up socket...');
     const socket = io(MIDWAY_HOST + '/', { path: '/import_streaming' });
     socket.on('connect', () =>
@@ -276,9 +284,10 @@ class FileImportPreview extends TerrainComponent<Props>
       console.log('queue: ', this.props.chunkQueue);
       if (!this.props.chunkQueue.isEmpty())      // assume filereader parses chunks faster than backend processes them
       {
-        console.log('chunkId: ', this.props.chunkQueue.first());
-        socket.send(this.props.chunkQueue.first());
-        Actions.dequeueChunk();
+        console.log('chunk: ', this.props.chunkQueue.get(id));
+        socket.send(this.props.chunkQueue.get(id));
+        // Actions.dequeueChunk();
+        id++;
       }
       else
       {
