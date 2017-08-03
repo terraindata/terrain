@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -87,6 +87,8 @@ export interface Props
 class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
+    pointsCache: ScorePoints;
+    lastUpdateConcrete?: boolean;
     selectedPointIds: IMMap<string, boolean>;
     lastSelectedPointId?: string;
     initialScore?: number;
@@ -97,10 +99,17 @@ class TransformCardChart extends TerrainComponent<Props>
     moveSeed: number;
     movedSeed: number;
   } = {
+    pointsCache: this.props.points,
     selectedPointIds: Map<string, boolean>({}),
     moveSeed: 0,
     movedSeed: -1,
   };
+
+  constructor(props: Props)
+  {
+    super(props);
+    this.debouncedUpdatePoints = _.debounce(this.debouncedUpdatePoints, 300);
+  }
 
   public componentDidMount()
   {
@@ -149,6 +158,10 @@ class TransformCardChart extends TerrainComponent<Props>
 
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
   }
+  public debouncedUpdatePoints: any = () =>
+  {
+    this.props.updatePoints(this.state.pointsCache, this.state.lastUpdateConcrete);
+  }
 
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
@@ -158,7 +171,12 @@ class TransformCardChart extends TerrainComponent<Props>
           .set('score', Util.roundNumber(scorePoint.score, 4))
           .set('value', Util.roundNumber(scorePoint.value, 4)),
     ).toList();
-    this.props.updatePoints(points, isConcrete);
+    this.setState({
+      pointsCache: points,
+      lastUpdateConcrete: isConcrete,
+    });
+    this.debouncedUpdatePoints();
+    // this.props.updatePoints(points, isConcrete);
   }
 
   public onPointMoveStart(initialScore, initialValue)
@@ -166,7 +184,7 @@ class TransformCardChart extends TerrainComponent<Props>
     this.setState({
       initialScore,
       initialValue,
-      initialPoints: this.props.points,
+      initialPoints: this.state.pointsCache,
       moveSeed: this.state.moveSeed + 1,
     });
   }
@@ -181,7 +199,7 @@ class TransformCardChart extends TerrainComponent<Props>
     const scoreDiff = this.state.initialScore - newScore;
     const valueDiff = this.state.initialValue - newValue;
     pointValues.sort(this.sortNumber);
-    const pointIndex = this.props.points.findIndex((scorePoint) => scorePoint.id === pointId);
+    const pointIndex = this.state.pointsCache.findIndex((scorePoint) => scorePoint.id === pointId);
     let min: number;
     let max: number;
 
@@ -222,6 +240,7 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public onPointRelease()
   {
+    this.debouncedUpdatePoints.flush();
   }
 
   public onLineClick(x, y)
@@ -229,7 +248,7 @@ class TransformCardChart extends TerrainComponent<Props>
     this.setState({
       lineMoving: true,
       initialLineY: y,
-      initialPoints: this.props.points,
+      initialPoints: this.state.pointsCache,
     });
   }
 
@@ -244,9 +263,10 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public onDelete(pointId)
   {
-    this.updatePoints(this.props.points.filterNot(
+    this.updatePoints(this.state.pointsCache.filterNot(
       (point) => point.id === pointId || this.state.selectedPointIds.get(point.id),
     ).toList(), true);
+    this.debouncedUpdatePoints.flush();
   }
 
   public onCreate(value, score)
@@ -269,6 +289,7 @@ class TransformCardChart extends TerrainComponent<Props>
       ).toList(),
       true,
     );
+    this.debouncedUpdatePoints.flush();
   }
 
   public componentDidUpdate()
@@ -280,7 +301,7 @@ class TransformCardChart extends TerrainComponent<Props>
   {
     overrideState = overrideState || {};
 
-    const points = (overrideState.points || this.props.points).map((scorePoint) => ({
+    const points = (overrideState.points || this.state.pointsCache).map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
@@ -314,6 +335,7 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
+    this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
   }
