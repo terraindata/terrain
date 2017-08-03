@@ -75,10 +75,10 @@ export const elasticFilterBlock = _block(
             range: {
               [block['field']]: {
                 [block['rangeQuery']]: block['value'],
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        };
       },
       removeOnCardRemove: true,
     },
