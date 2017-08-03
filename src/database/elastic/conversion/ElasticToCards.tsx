@@ -170,7 +170,12 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 function isFilterCard(valueInfo: ESValueInfo): boolean
 {
   return (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
-    (valueInfo.clause.name === 'bool');
+    (valueInfo.clause.name === 'bool') &&
+    _.reduce(valueInfo.value,
+      (memo, value: object[]) =>
+      {
+        return memo && value.reduce((memo0, value0) => memo0 && value0['range'], true);
+      }, true);
 }
 
 function parseFilterBlock(boolQuery: string, filters: any): Block[]
