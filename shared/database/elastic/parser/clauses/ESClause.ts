@@ -94,8 +94,8 @@ abstract class ESClause
    */
   public def: string | { [key: string]: string | null };
 
-  public path: string[]; // human-facing categorization of this clause type & function
   public name: string; // human type name
+  public path: string[]; // human-facing categorization of this clause type & function
   public desc: string; // clause description
   public url: string; // clause documentation url
   public template: any; // template for this clause type
@@ -113,8 +113,8 @@ abstract class ESClause
     this.type = type;
     this.settings = settings === undefined ? {} : settings;
     this.setDefaultProperty('def', () => 'value');
-    this.setDefaultProperty('path', () => ['general']);
     this.setDefaultProperty('name', () => this.type.replace('_', ' '));
+    this.setDefaultProperty('path', () => ['general']);
     this.setDefaultProperty('desc', () => '');
     this.setDefaultProperty('url', () => '');
     this.setDefaultProperty('template', () => undefined);
