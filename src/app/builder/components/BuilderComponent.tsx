@@ -209,11 +209,7 @@ class BuilderComponent extends TerrainComponent<Props>
         />;
         break;
       case DisplayType.DROPDOWN:
-        let selectedIndex = value;
-        if (d.dropdownUsesRawValues)
-        {
-          selectedIndex = d.options.indexOf(value);
-        }
+        let selectedIndex = d.options.indexOf(typeof value === 'string' ? value : JSON.stringify(value));
 
         content = (
           <div key={key} className='builder-component-wrapper  builder-component-wrapper-wide'>

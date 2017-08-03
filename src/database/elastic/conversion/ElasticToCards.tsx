@@ -169,12 +169,23 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 
 function isFilterCard(valueInfo: ESValueInfo): boolean
 {
-  return (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
-    (valueInfo.clause.name === 'bool') &&
+  const isBool = (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
+    (valueInfo.clause.name === 'bool');
+
+  return isBool &&
     _.reduce(valueInfo.value,
-      (memo, value: object[]) =>
+      (memo, value: any) =>
       {
-        return memo && value.reduce((memo0, value0) => memo0 && value0['range'], true);
+        let rangeExists = typeof value === 'object';
+        if (Array.isArray(value))
+        {
+          rangeExists = _.reduce(value, (memo0, value0) => memo0 && value0['range'], true);
+        }
+        else
+        {
+          rangeExists = (value['range'] !== undefined);
+        }
+        return memo && rangeExists;
       }, true);
 }
 
@@ -196,7 +207,7 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
     {
       const field = Object.keys(obj['range'])[0];
       const rangeQuery = Object.keys(obj['range'][field])[0];
-      const value = obj['range'][field][rangeQuery];
+      const value = JSON.stringify(obj['range'][field][rangeQuery]);
 
       return make(Blocks, 'elasticFilterBlock', {
         field,
