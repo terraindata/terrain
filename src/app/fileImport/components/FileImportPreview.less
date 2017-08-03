@@ -13,88 +13,16 @@
   }
 
   .fi-preview-template {
-    height: 60px;
+    align-items: center;
 
-    @media (max-width: 1999px) {
-      .fi-preview-load {
-        width: 400px;
-        display: inline-block;
-        text-align: center;
+    .fi-preview-template-wrapper {
+      align-items: center;
+      flex-wrap: nowrap;
 
-        .fi-load-button {
-          .fi-button;
-          width: 100px;
-          display: inline-block;
-        }
-
-        .fi-load-dropdown {
-          vertical-align: middle;
-          width: 250px;
-          display: inline-block;
-        }
+      .fi-preview-template-button {
+        .fi-button;
       }
     }
-
-    @media (min-width: 2000px) {
-      .fi-preview-load {
-        width: 600px;
-        display: inline-block;
-        text-align: center;
-
-        .fi-load-button {
-          .fi-button;
-          width: 120px;
-          display: inline-block;
-        }
-
-        .fi-load-dropdown {
-          vertical-align: middle;
-          width: 300px;
-          display: inline-block;
-        }
-      }
-    }
-
-    @media (max-width: 1999px)
-    {
-      .fi-preview-save {
-        width: 400px;
-        display: inline-block;
-        text-align: center;
-
-        .fi-save-button {
-          .fi-button;
-          width: 100px;
-          display: inline-block;
-        }
-
-        .autocomplete {
-          width: 250px;
-          display: inline-block;
-        }
-      }
-    }
-
-    @media (min-width: 2000px)
-    {
-      .fi-preview-save {
-        width: 600px;
-        display: inline-block;
-        text-align: center;
-
-        .fi-save-button {
-          .fi-button;
-          width: 120px;
-          display: inline-block;
-        }
-
-        .autocomplete {
-          width: 300px;
-          display: inline-block;
-        }
-      }
-    }
-
   }
 
   .fi-preview-table-container {
@@ -107,14 +35,16 @@
     }
   }
 
-  .fi-preview-update {
-    color: #FFFFFF;
-    float: right;
-    margin: 12px;
-  }
+  .fi-import-button-wrapper {
+    text-align: center;
+    margin-top: 12px;
 
-  .fi-preview-import-button {
-    .fi-button;
-    float: right;
+    .fi-preview-update {
+      color: #FFFFFF;
+    }
+
+    .fi-preview-import-button {
+      .fi-button;
+    }
   }
 }

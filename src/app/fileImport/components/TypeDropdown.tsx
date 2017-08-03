@@ -85,7 +85,6 @@ class TypeDropdown extends TerrainComponent<Props>
     return (
       <div
         className='fi-type-dropdown'
-        style={backgroundColor(Colors().fileimport.preview.column.typeDropdown)}
       >
         <div
           className='fi-type-dropdown-dropdown'
