@@ -63,23 +63,33 @@ import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/el
 export const elasticFilterBlock = _block(
   {
     field: '',
-    value: '',
+    value: undefined,
     boolQuery: '',
     rangeQuery: '',
     static: {
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-      {
-        return {
-          [block['boolQuery']]: {
-            range: {
-              [block['field']]: {
-                [block['rangeQuery']]: block['value'],
-              },
-            },
-          },
-        };
-      },
+                {
+                  let value: any;
+                  try
+                  {
+                    value = JSON.parse(block['value']);
+                  }
+                  catch (e)
+                  {
+                    value = block['value'];
+                  }
+
+                  return {
+                    [block['boolQuery']]: {
+                      range: {
+                        [block['field']]: {
+                          [block['rangeQuery']]: value,
+                        },
+                      },
+                    },
+                  };
+                },
       removeOnCardRemove: true,
     },
   });
@@ -95,84 +105,84 @@ export const elasticFilter = _card({
     preview: '[filters.length] Filters',
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      const filterObj = {};
+         {
+           const filterObj = {};
 
-      const filters = block['filters'].map(
-        (filterBlock) =>
-        {
-          const f = tqlTranslationFn(filterBlock, tqlConfig);
-          _.map(f as any, (v, k) =>
-          {
-            if (filterObj[k] === undefined)
-            {
-              filterObj[k] = [v];
-            }
-            else
-            {
-              filterObj[k].push(v);
-            }
-          });
-        });
-      return filterObj;
-    },
+           const filters = block['filters'].map(
+             (filterBlock) =>
+             {
+               const f = tqlTranslationFn(filterBlock, tqlConfig);
+               _.map(f as any, (v, k) =>
+               {
+                 if (filterObj[k] === undefined)
+                 {
+                   filterObj[k] = [v];
+                 }
+                 else
+                 {
+                   filterObj[k].push(v);
+                 }
+               });
+             });
+           return filterObj;
+         },
 
     anythingAccepts: true, // TODO change
 
     init: (blocksConfig) =>
-    {
-      return {
-        filters: List([
-          BlockUtils.make(blocksConfig, 'elasticFilterBlock'),
-        ]),
-      };
-    },
+          {
+            return {
+              filters: List([
+                BlockUtils.make(blocksConfig, 'elasticFilterBlock'),
+              ]),
+            };
+          },
 
     display:
-    [
-      {
-        displayType: DisplayType.ROWS,
-        key: 'filters',
-        english: 'Filter',
-        factoryType: 'elasticFilterBlock',
-        row:
+      [
         {
-          inner:
-          [
-            {
-              displayType: DisplayType.TEXT,
-              key: 'field',
-              getAutoTerms: (schemaState) =>
-              {
-                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
-              },
-            },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'boolQuery',
-              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
-              dropdownUsesRawValues: true,
-              autoDisabled: true,
-              centerDropdown: true,
-              widthDropdown: '50px',
-            },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'rangeQuery',
-              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
-              dropdownUsesRawValues: true,
-              centerDropdown: true,
-              autoDisabled: true,
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'value',
-              autoDisabled: true,
-            },
-          ],
+          displayType: DisplayType.ROWS,
+          key: 'filters',
+          english: 'Filter',
+          factoryType: 'elasticFilterBlock',
+          row:
+                       {
+                         inner:
+                           [
+                             {
+                               displayType: DisplayType.TEXT,
+                               key: 'field',
+                               getAutoTerms: (schemaState) =>
+                                            {
+                                              return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+                                            },
+                             },
+                             {
+                               displayType: DisplayType.DROPDOWN,
+                               key: 'boolQuery',
+                               options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
+                               dropdownUsesRawValues: true,
+                               autoDisabled: true,
+                               centerDropdown: true,
+                               widthDropdown: '50px',
+                             },
+                             {
+                               displayType: DisplayType.DROPDOWN,
+                               key: 'rangeQuery',
+                               options: List(Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+                               dropdownUsesRawValues: true,
+                               centerDropdown: true,
+                               autoDisabled: true,
+                             },
+                             {
+                               displayType: DisplayType.TEXT,
+                               key: 'value',
+                               autoDisabled: true,
+                             },
+                           ],
+                       },
         },
-      },
-    ],
+      ],
   },
 });
 
