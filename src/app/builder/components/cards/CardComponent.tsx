@@ -498,20 +498,15 @@ class _CardComponent extends TerrainComponent<Props>
       columnIndex={this.props.columnIndex}
       keyPath={this.getKeyPath()}
       language={this.props.card.static.language}
-      textStyle={{ color: this.props.card.static.colors[0] }}
+      textStyle={{
+        color: this.props.card.static.colors[0],
+        backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
+      }}
     />;
 
     const { card } = this.props;
     const { title } = card.static;
     const { isDragging, connectDragSource } = this.props;
-
-    // TODO
-    // <ManualPopup
-    //                 cardName={card.static.title}
-    //                 rightAlign={!this.props.canEdit}
-    //                 addColumn={this.props.addColumn}
-    //                 columnIndex={this.props.columnIndex}
-    //               />
 
     return (
       <div
@@ -546,18 +541,15 @@ class _CardComponent extends TerrainComponent<Props>
         <div
           className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
           style={{
-            background: this.state.hovering ?
-              Color(this.props.card.static.colors[0]).alpha(.4) :
-              Colors().bg2,
-            // background:  Color(this.props.card.static.colors[1]),
-            // borderTopColor: Color(this.props.card.static.colors[1]).lighten(0.25),
-            // borderLeftColor: Color(this.props.card.static.colors[1]).lighten(0.2),
-            // borderBottomColor: Color(this.props.card.static.colors[1]).darken(0.25),
-            // borderRightColor: Color(this.props.card.static.colors[1]).darken(0.2),
-            borderTopColor: Colors().border3,
-            borderLeftColor: Colors().border3,
-            borderBottomColor: Colors().border2,
-            borderRightColor: Colors().border2,
+            background: this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
+            borderLeftColor: this.props.card.static.colors[0],
+
+            borderLeftWidth: 3, //this.state.hovering ? 6 : 3,
+            paddingLeft: 0, //this.state.hovering ? 0 : 3,
+
+            borderTopColor: Colors().highlight,
+            borderRightColor: Color(Colors().highlight).darken(0.4),
+            borderBottomColor: Color(Colors().highlight).darken(0.4),
           }}
           ref='cardInner'
         >

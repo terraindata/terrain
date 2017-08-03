@@ -260,6 +260,44 @@ interface Theme
 
 const darkActive = '#1eb4fa';
 
+const code =
+  {
+    atom: '#9969ef',
+    number: '#48b14c',
+
+    property: '#1eb4fa',
+    keyword: '#f92672',
+    builtin: '#66d9ef',
+    string: '#ff9b0d',
+
+    variable: '#29a698',
+    variable2: '#9effff',
+    variable3: '#66d9ef',
+
+    def: '#fd971f',
+    bracket: '#f8f8f2',
+
+
+
+    anyClause: 'rgb(100, 105, 107)',
+    arrayClause: 'rgb(170, 177, 180)',
+    baseClause: 'rgb(100, 105, 107)',
+    booleanClause: 'rgb(204, 50, 50)',
+    enumClause: 'rgb(255, 189, 86)',
+    fieldClause: 'rgb(144, 118, 170)',
+    indexClause: 'rgb(144, 118, 170)',
+    mapClause: 'rgb(204, 120, 50)',
+    nullClause: 'rgb(100, 105, 107)',
+    numberClause: 'rgb(205, 156, 25)',
+    objectClause: 'rgb(100, 105, 107)',
+    stringClause: 'rgb(100, 135, 89)',
+    structureClause: 'rgb(30, 179, 249)',
+    typeClause: 'rgb(144, 118, 170)',
+
+  };
+
+const cardBgOpacity = 0.45;
+
 const DARK: Theme =
   {
     // Universal Elements------------------------------
@@ -366,48 +404,49 @@ const DARK: Theme =
 
         // card theme colors
 
-        anyClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
-        arrayClause: ['rgb(170, 177, 180)', 'rgb(60, 63, 67)'],
-        baseClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
-        booleanClause: ['rgb(204, 50, 50)', 'rgb(60, 63, 67)'],
-        enumClause: ['rgb(255, 189, 86)', 'rgb(60, 63, 67)'],
-        fieldClause: ['rgb(144, 118, 170)', 'rgb(60, 63, 67)'],
-        indexClause: ['rgb(144, 118, 170)', 'rgb(60, 63, 67)'],
-        mapClause: ['rgb(204, 120, 50)', 'rgb(60, 63, 67)'],
-        nullClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
-        numberClause: ['rgb(205, 156, 25)', 'rgb(60, 63, 67)'],
-        objectClause: ['rgb(100, 105, 107)', 'rgb(60, 63, 67)'],
-        stringClause: ['rgb(100, 135, 89)', 'rgb(60, 63, 67)'],
-        structureClause: ['rgb(30, 179, 249)', 'rgb(60, 63, 67)'],
-        typeClause: ['rgb(144, 118, 170)', 'rgb(60, 63, 67)'],
+        anyClause: [code.anyClause, Color(code.anyClause).alpha(cardBgOpacity).string()],
+        arrayClause: [code.arrayClause, Color(code.arrayClause).alpha(cardBgOpacity).string()],
+        baseClause: [code.baseClause, Color(code.baseClause).alpha(cardBgOpacity).string()],
+        booleanClause: [code.booleanClause, Color(code.booleanClause).alpha(cardBgOpacity).string()],
+        enumClause: [code.enumClause, Color(code.enumClause).alpha(cardBgOpacity).string()],
+        fieldClause: [code.fieldClause, Color(code.fieldClause).alpha(cardBgOpacity).string()],
+        indexClause: [code.indexClause, Color(code.indexClause).alpha(cardBgOpacity).string()],
+        mapClause: [code.mapClause, Color(code.mapClause).alpha(cardBgOpacity).string()],
+        nullClause: [code.nullClause, Color(code.nullClause).alpha(cardBgOpacity).string()],
+        numberClause: [code.numberClause, Color(code.numberClause).alpha(cardBgOpacity).string()],
+        objectClause: [code.objectClause, Color(code.objectClause).alpha(cardBgOpacity).string()],
+        stringClause: [code.stringClause, Color(code.stringClause).alpha(cardBgOpacity).string()],
+        structureClause: [code.structureClause, Color(code.structureClause).alpha(cardBgOpacity).string()],
+        typeClause: [code.typeClause, Color(code.typeClause).alpha(cardBgOpacity).string()],
 
-        atom: '#ae81ff',
-        number: '#ae81ff',
+        atom: code.atom,
+        number: code.number,
 
-        property: '#a6e22e',
-        keyword: '#f92672',
-        builtin: '#66d9ef',
-        string: '#e6db74',
+        property: code.property,
+        keyword: code.keyword,
+        builtin: code.builtin,
+        string: code.string,
 
-        variable: '#f8f8f2',
-        variable2: '#9effff',
-        variable3: '#66d9ef',
-        def: '#fd971f',
-        bracket: '#f8f8f2',
+        variable: code.variable,
+        variable2: code.variable2,
+        variable3: code.variable3,
+        def: code.def,
+        bracket: code.bracket,
 
-        atomBG: Color('#ae81ff').alpha(0.7).string(),
-        numberBG: Color('#ae81ff').alpha(0.7).string(),
+        atomBG: Color(code.atom).alpha(cardBgOpacity).string(),
+        numberBG: Color(code.number).alpha(cardBgOpacity).string(),
 
-        propertyBG: Color('#a6e22e').alpha(0.7).string(),
-        keywordBG: Color('#f92672').alpha(0.7).string(),
-        builtinBG: Color('#66d9ef').alpha(0.7).string(),
-        stringBG: Color('#e6db74').alpha(0.7).string(),
+        propertyBG: Color(code.property).alpha(cardBgOpacity).string(),
+        keywordBG: Color(code.keyword).alpha(cardBgOpacity).string(),
+        builtinBG: Color(code.builtin).alpha(cardBgOpacity).string(),
+        stringBG: Color(code.string).alpha(cardBgOpacity).string(),
 
-        variableBG: Color('#f8f8f2').alpha(0.7).string(),
-        variable2BG: Color('#9effff').alpha(0.7).string(),
-        variable3BG: Color('#66d9ef').alpha(0.7).string(),
-        defBG: Color('#fd971f').alpha(0.7).string(),
-        bracketBG: Color('#f8f8f2').alpha(0.7).string(),
+        variableBG: Color(code.variable).alpha(cardBgOpacity).string(),
+        variable2BG: Color(code.variable2).alpha(cardBgOpacity).string(),
+        variable3BG: Color(code.variable3).alpha(cardBgOpacity).string(),
+        defBG: Color(code.def).alpha(cardBgOpacity).string(),
+        bracketBG: Color(code.bracket).alpha(cardBgOpacity).string(),
+
 
         card1: '#559DCE',
         card2: '#397DD0',

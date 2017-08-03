@@ -272,6 +272,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: Colors().builder.cards.arrayClause,
         preview: '[cards.size] ' + clause.type + '(s)',
+
         display:
         {
           displayType: DisplayType.CARDS,
@@ -298,6 +299,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
+      colors: [Colors().builder.cards.atom, Colors().builder.cards.atomBG],
       static: {
         colors: Colors().builder.cards.baseClause,
         preview: '[value]',
@@ -335,6 +337,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? clause.values[0] : clause.template,
+      colors: [Colors().builder.cards.variable2, Colors().builder.cards.variable2BG],
       static: {
         colors: Colors().builder.cards.enumClause,
         preview: '[value]',
@@ -406,7 +409,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
       childrenHaveKeys: true,
-      colorss: Colors().builder.cards.mapClause,
 
       // TODO incorporate nameType into the keys
 
@@ -414,6 +416,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: Colors().builder.cards.mapClause,
         preview: '[cards.size] properties',
+
         display:
         {
           displayType: DisplayType.CARDS,
