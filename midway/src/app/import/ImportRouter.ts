@@ -78,6 +78,7 @@ Router.post('/headless', async (ctx, next) =>
   }
 
   Util.verifyParameters(fields, ['templateID', 'filetype']);
+  // optional parameters: update, hasCsvHeader
 
   ctx.body = await imprt.upsertHeadless(files, fields);
 });

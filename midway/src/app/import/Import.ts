@@ -101,6 +101,7 @@ export class Import
   private streamingTempFolder: string = 'import_streaming_tmp';
   private streamingTempFilePrefix: string = 'chunk';
   private totalReads: number;
+  private readyToStream: boolean = false;
 
   public setUpSocket(io: socketio.Server)
   {
@@ -120,6 +121,7 @@ export class Import
         }
         winston.info('streaming auth successful.');
         authorized = true;
+        this._deleteStreamingTempFolder(socket);    // in case the folder was improperly cleaned up last time
         fs.mkdirSync(this.streamingTempFolder);
         winston.info('created streaming temp directory.');
         socket.emit('ready');
@@ -157,7 +159,7 @@ export class Import
 
         const num: number = count;   // TODO: if have race conditions, chunk handling above has bigger issues
         count++;
-        fs.open(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num) + '.txt', 'wx', (err, fd) =>
+        fs.open(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num), 'wx', (err, fd) =>
         {
           winston.info('opened file for writing.');
           if (err !== undefined && err !== null)
@@ -185,6 +187,13 @@ export class Import
       socket.on('finished', async () =>
       {
         winston.info('streaming client finished.');
+
+        if (!this.readyToStream)
+        {
+          // close connection since there was a config issue
+          this._sendSocketError(socket, 'config error -- see Ajax response.');
+        }
+
         // TODO: wait until all the data has finished being processed -- how?
         const time: number = Date.now();
         winston.info('putting mapping...');
@@ -208,6 +217,7 @@ export class Import
   public async upsert(imprt: ImportConfig): Promise<ImportConfig>
   {
     this.imprt = imprt;
+    this.readyToStream = false;
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
       const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
@@ -274,6 +284,7 @@ export class Import
       }
       else
       {
+        this.readyToStream = true;
         // logic handled through socket.io connection
         resolve(imprt);
       }
@@ -288,14 +299,10 @@ export class Import
     }
     const template: ImportTemplateConfig = templates[0];
 
-    let update: boolean = true;
-    if (fields['update'] === 'false')
+    const update: boolean | string = this._parseBooleanField(fields, 'update', false);
+    if (typeof update === 'string')
     {
-      update = false;
-    }
-    else if (fields['update'] !== undefined && fields['update'] !== 'true')
-    {
-      throw new Error('Invalid value for parameter "update": ' + String(fields['update']));
+      throw new Error(update);
     }
 
     let file: stream.Readable | null = null;
@@ -311,6 +318,17 @@ export class Import
       throw new Error('No file specified.');
     }
 
+    const hasCsvHeader: boolean | string = this._parseBooleanField(fields, 'hasCsvHeader', true);
+    if (typeof hasCsvHeader === 'string')
+    {
+      throw new Error(hasCsvHeader);
+    }
+    let contents: string = await Util.getStreamContents(file);
+    if (fields['filetype'] === 'csv' && hasCsvHeader)
+    {
+      contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
+    }
+
     const imprtConf: ImportConfig = {
       dbid: template['dbid'],
       dbname: template['dbname'],
@@ -320,12 +338,25 @@ export class Import
       primaryKey: template['primaryKey'],
       transformations: template['transformations'],
 
-      contents: await Util.getStreamContents(file),
+      contents,
       filetype: fields['filetype'],
       streaming: false,     // TODO: SUPPORT STREAMING
       update,
     };
     return this.upsert(imprtConf);
+  }
+  private _parseBooleanField(obj: object, field: string, defaultRet: boolean): boolean | string
+  {
+    let parsed: boolean = defaultRet;
+    if (obj[field] === 'false')
+    {
+      parsed = false;
+    }
+    else if (obj[field] !== undefined && obj[field] !== 'true')
+    {
+      return 'Invalid value for parameter "' + field + '": ' + String(obj[field]);
+    }
+    return parsed;
   }
   private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
   {
@@ -392,7 +423,7 @@ export class Import
     winston.info('beginning read file upload number ' + String(num));
 
     let items: object[];
-    fs.readFile(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num) + '.txt', 'utf8', async (err, data) =>
+    fs.readFile(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num), 'utf8', async (err, data) =>
     {
       if (err !== undefined && err !== null)
       {
@@ -655,12 +686,12 @@ export class Import
           }
           thisResolve(transformedItems);
         }));
-      baseInd++;
+      baseInd += items.length;
     }
     return Promise.all(promises);
   }
 
-  /* checks whether all objects in "items" have the fields and types specified by nameToType
+  /* checks whether obj has the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(obj: object, imprt: ImportConfig, ind: number): string
@@ -731,6 +762,11 @@ export class Import
           return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
         }
       }
+    }
+
+    if (obj[imprt.primaryKey] === '' || obj[imprt.primaryKey] === null)
+    {
+      return 'Object number ' + String(ind) + ' has an empty primary key.';
     }
 
     return '';
