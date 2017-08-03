@@ -533,8 +533,11 @@ const EQLSpec: ESClause[] =
         desc: 'All results must not match this query. Filters out documents that match this subquery. The must not clause may be a single query object, or an array of query objects.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html',
       }),
-    new ESReferenceClause('filter',
-      'query',
+    new ESVariantClause('filter',
+      {
+        object: 'query',
+        array: 'query[]',
+      },
       {
         name: 'filter context clause',
         desc: 'Query conditions in a filter clause aren\'t used when computing a document\'s elastic __score.',

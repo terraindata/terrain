@@ -46,23 +46,19 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands max-line-length
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
-import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
+
+import { Colors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
-
-const transformScoreInputTypes = CommonElastic.acceptsValues;
 
 export const scorePoint = _block(
   {
@@ -91,7 +87,7 @@ export const elasticTransform = _card(
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: ['#4b979a', 'rgba(75, 153, 154, 0.7)'],
+      colors: [Colors().builder.cards.builtin, Colors().builder.cards.builtinBG],
       title: 'Transform',
       preview: (card: any) =>
       {
@@ -107,7 +103,6 @@ export const elasticTransform = _card(
           // help: ManualConfig.help['input'],
           key: 'input',
           placeholder: 'Input field',
-          accepts: transformScoreInputTypes,
           showWhenCards: true,
           getAutoTerms: (schemaState): List<string> =>
           {

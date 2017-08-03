@@ -226,6 +226,7 @@ class BuilderComponent extends TerrainComponent<Props>
               centerAlign={d.centerDropdown}
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}
+              width={d.widthDropdown}
             />
             {this.props.helpOn && d.help ?
               <ManualInfo
