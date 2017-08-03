@@ -89,7 +89,6 @@ interface Theme
 
   error: string;
 
-
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
@@ -318,7 +317,6 @@ const DARK: Theme =
     scrollbarPiece: 'rgba(255,255,255,0.25)',
 
     error: '#d14f42',
-
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
