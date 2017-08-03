@@ -282,7 +282,7 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('ready');
       console.log('queue: ', this.props.chunkQueue);
-      if (!this.props.chunkQueue.isEmpty())      // assume filereader parses chunks faster than backend processes them
+      if (id < this.props.chunkQueue.size)      // assume filereader parses chunks faster than backend processes them
       {
         console.log('chunk: ', this.props.chunkQueue.get(id));
         socket.send(this.props.chunkQueue.get(id));

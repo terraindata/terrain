@@ -121,7 +121,7 @@ export class Import
         }
         winston.info('streaming auth successful.');
         authorized = true;
-        this._deleteStreamingTempFolder(socket);    // in case the folder was improperly cleaned up last time
+        this._deleteStreamingTempFolder(socket);    // in case the folder was improperly cleaned up last time (shouldn't happen)
         fs.mkdirSync(this.streamingTempFolder);
         winston.info('created streaming temp directory.');
         socket.emit('ready');
@@ -172,7 +172,6 @@ export class Import
             return;
           }
           fs.write(fd, JSON.stringify(items), (writeErr) =>
-          // fs.write(fd, data['chunk'], (writeErr) =>
           {
             if (writeErr !== undefined && writeErr !== null)
             {
