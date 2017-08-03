@@ -53,7 +53,7 @@ const moment = require('moment');
 
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
-import CreateItem from '../../common/components/CreateItem';
+import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
@@ -438,9 +438,9 @@ class VariantsColumn extends TerrainComponent<Props>
         }
         {
           canCreate && !archived &&
-          <CreateItem
-            name='variant'
-            onCreate={this.handleCreate}
+          <CreateLine
+            onClick={this.handleCreate}
+            open={false}
           />
         }
       </LibraryItemCategory>

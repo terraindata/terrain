@@ -133,7 +133,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     }): any
   {
     // hide the title for elastic
-    obj['noTitle'] = true;
+    if (obj['noTitle'] === undefined)
+    {
+      obj['noTitle'] = true;
+    }
 
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
@@ -299,7 +302,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
-      colors: [Colors().builder.cards.atom, Colors().builder.cards.atomBG],
+      colors: Colors().builder.cards.baseClause,
       static: {
         colors: Colors().builder.cards.baseClause,
         preview: '[value]',
@@ -337,7 +340,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? clause.values[0] : clause.template,
-      colors: [Colors().builder.cards.variable2, Colors().builder.cards.variable2BG],
+      colors: Colors().builder.cards.enumClause,
       static: {
         colors: Colors().builder.cards.enumClause,
         preview: '[value]',
@@ -443,6 +446,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESNullClause(clause: ESNullClause): any
   {
     return GetCardVisitor.seedCard(clause, {
+      noTitle: false,
       static: {
         colors: Colors().builder.cards.nullClause,
         preview: '',

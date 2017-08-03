@@ -51,10 +51,10 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
-import CreateLine from '../../../common/components/CreateLine';
 import { Card, CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import CreateLine from '../../../common/components/CreateLine';
 import FadeInOut from '../../../common/components/FadeInOut';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -180,7 +180,7 @@ class CreateCardTool extends TerrainComponent<Props>
         })}
         ref='selector'
         style={
-          null //backgroundColor(Colors().bg1)
+          null // was: backgroundColor(Colors().bg1)
         }
       >
         <div className='create-card-selector-inner'>
@@ -313,7 +313,7 @@ class CreateCardTool extends TerrainComponent<Props>
         className={classes}
         style={_.extend(
           style,
-          {} // backgroundColor(Colors().bg1),
+          {}, // backgroundColor(Colors().bg1),
         )}
       >
         {

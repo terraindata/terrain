@@ -55,15 +55,19 @@ import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../blocks/BlockUtils';
+
 import { Display } from '../../../blocks/displays/Display';
 import { Block } from '../../../blocks/types/Block';
 import { Card, CardString } from '../../../blocks/types/Card';
+import { isInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
+import { BuilderStore } from '../../builder/data/BuilderStore';
+import { Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
@@ -319,6 +323,14 @@ class BuilderTextbox extends TerrainComponent<Props>
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
 
       const { options } = this.state;
+
+      const textStyle = this.props.textStyle || {};
+      if (typeof this.props.value === 'string' &&
+        isInput(this.props.value as string, BuilderStore.getState().query.inputs)
+      )
+      {
+        textStyle.color = Colors().builder.cards.inputParameter[0];
+      }
 
       return (
         <div

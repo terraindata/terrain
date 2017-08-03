@@ -76,7 +76,6 @@ import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
-const Color = require('color');
 
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
@@ -544,12 +543,12 @@ class _CardComponent extends TerrainComponent<Props>
             background: this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
             borderLeftColor: this.props.card.static.colors[0],
 
-            borderLeftWidth: 3, //this.state.hovering ? 6 : 3,
-            paddingLeft: 0, //this.state.hovering ? 0 : 3,
+            borderLeftWidth: 3,
+            paddingLeft: 0,
 
             borderTopColor: Colors().highlight,
-            borderRightColor: Color(Colors().highlight).darken(0.4),
-            borderBottomColor: Color(Colors().highlight).darken(0.4),
+            borderRightColor: Colors().darkerHighlight,
+            borderBottomColor: Colors().darkerHighlight,
           }}
           ref='cardInner'
         >

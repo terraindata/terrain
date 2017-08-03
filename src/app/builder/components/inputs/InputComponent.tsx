@@ -60,7 +60,7 @@ import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -202,6 +202,8 @@ class InputComponent extends TerrainComponent<Props>
   public render()
   {
     const { input } = this.props;
+    const inputColor = Colors().builder.cards.inputParameter[0];
+    const inputBg = Colors().builder.cards.inputParameter[1];
 
     return (
       <div className='input' ref='input'>
@@ -217,12 +219,24 @@ class InputComponent extends TerrainComponent<Props>
         <div
           className='input-inner'
           style={[
-            backgroundColor(Colors().bg3),
-            borderColor(Colors().highlight, Colors().activeHover),
-            this.state.focused && borderColor(Colors().active, Colors().active),
+            backgroundColor(Colors().bg3, inputBg),
+            {
+              borderTopColor: Colors().highlight,
+              borderRightColor: Colors().darkerHighlight,
+              borderBottomColor: Colors().darkerHighlight,
+            },
+            getStyle('borderLeftColor', inputColor),
+
+            this.state.focused && backgroundColor(inputBg),
           ]}
         >
           <div className='input-top-row flex-container'>
+            <div
+              className='input-prefix'
+              style={fontColor(inputColor)}
+            >
+              @
+            </div>
             <BuilderTextbox
               canEdit={this.props.canEdit}
               value={input.key}
@@ -233,7 +247,7 @@ class InputComponent extends TerrainComponent<Props>
               language={null}
               onFocus={this.focus}
               onBlur={this.blur}
-              textStyle={fontColor(Colors().active)}
+              textStyle={fontColor(inputColor)}
             />
             <Dropdown
               options={TYPE_OPTIONS}

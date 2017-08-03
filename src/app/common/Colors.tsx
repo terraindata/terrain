@@ -79,11 +79,14 @@ interface Theme
   activeHover: string; // when an active thing is hovered
 
   highlight: string; // for slight emphasis
+  darkerHighlight: string; // for depth effect with highlight
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   scrollbarBG: string;
   scrollbarPiece: string;
+
+  error: string;
 
   // text
   text: {
@@ -166,35 +169,7 @@ interface Theme
       stringClause: string[];
       structureClause: string[];
       typeClause: string[];
-
-      // old
-      atom: string,
-      number: string,
-
-      property: string,
-      keyword: string,
-      builtin: string,
-      string: string,
-
-      variable: string,
-      variable2: string,
-      variable3: string,
-      def: string,
-      bracket: string,
-
-      atomBG: string,
-      numberBG: string,
-
-      propertyBG: string,
-      keywordBG: string,
-      builtinBG: string,
-      stringBG: string,
-
-      variableBG: string,
-      variable2BG: string,
-      variable3BG: string,
-      defBG: string,
-      bracketBG: string,
+      inputParameter: string[];
 
       // DO NOT USE -- Saving for reference, remove soon
       card1: string,
@@ -262,37 +237,28 @@ const darkActive = '#1eb4fa';
 
 const code =
   {
-    atom: '#9969ef',
-    number: '#48b14c',
+    numberClause: '#1eb4fa',
+    nullClause: '#d14f42', // code mirror marks nulls as numbers
 
-    property: '#1eb4fa',
-    keyword: '#f92672',
-    builtin: '#66d9ef',
-    string: '#ff9b0d',
+    booleanClause: '#b161bc',
+    baseClause: '#f99c49',
 
-    variable: '#29a698',
-    variable2: '#9effff',
-    variable3: '#66d9ef',
+    anyClause: '#559dce',
 
-    def: '#fd971f',
-    bracket: '#f8f8f2',
+    arrayClause: '#b161bc',
 
-
-
-    anyClause: 'rgb(100, 105, 107)',
-    arrayClause: 'rgb(170, 177, 180)',
-    baseClause: 'rgb(100, 105, 107)',
-    booleanClause: 'rgb(204, 50, 50)',
     enumClause: 'rgb(255, 189, 86)',
-    fieldClause: 'rgb(144, 118, 170)',
-    indexClause: 'rgb(144, 118, 170)',
-    mapClause: 'rgb(204, 120, 50)',
-    nullClause: 'rgb(100, 105, 107)',
-    numberClause: 'rgb(205, 156, 25)',
-    objectClause: 'rgb(100, 105, 107)',
-    stringClause: 'rgb(100, 135, 89)',
-    structureClause: 'rgb(30, 179, 249)',
-    typeClause: 'rgb(144, 118, 170)',
+    fieldClause: '#fad14b', // pastel purple: 'rgb(144, 118, 170)',
+
+    structureClause: '#4fc0ba',
+    mapClause: '#4fc0ba',
+    objectClause: '#4fc0ba',
+
+    stringClause: '#f99c49', // string types
+    indexClause: '#f99c49',
+    typeClause: '#f99c49',
+
+    inputParameter: '#4ef9ab', // '#da62ea',
 
   };
 
@@ -325,6 +291,7 @@ const DARK: Theme =
     altText2: '#424242',
 
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
+    darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
@@ -334,6 +301,8 @@ const DARK: Theme =
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+    error: '#d14f42',
 
     // text
     text:
@@ -418,35 +387,7 @@ const DARK: Theme =
         stringClause: [code.stringClause, Color(code.stringClause).alpha(cardBgOpacity).string()],
         structureClause: [code.structureClause, Color(code.structureClause).alpha(cardBgOpacity).string()],
         typeClause: [code.typeClause, Color(code.typeClause).alpha(cardBgOpacity).string()],
-
-        atom: code.atom,
-        number: code.number,
-
-        property: code.property,
-        keyword: code.keyword,
-        builtin: code.builtin,
-        string: code.string,
-
-        variable: code.variable,
-        variable2: code.variable2,
-        variable3: code.variable3,
-        def: code.def,
-        bracket: code.bracket,
-
-        atomBG: Color(code.atom).alpha(cardBgOpacity).string(),
-        numberBG: Color(code.number).alpha(cardBgOpacity).string(),
-
-        propertyBG: Color(code.property).alpha(cardBgOpacity).string(),
-        keywordBG: Color(code.keyword).alpha(cardBgOpacity).string(),
-        builtinBG: Color(code.builtin).alpha(cardBgOpacity).string(),
-        stringBG: Color(code.string).alpha(cardBgOpacity).string(),
-
-        variableBG: Color(code.variable).alpha(cardBgOpacity).string(),
-        variable2BG: Color(code.variable2).alpha(cardBgOpacity).string(),
-        variable3BG: Color(code.variable3).alpha(cardBgOpacity).string(),
-        defBG: Color(code.def).alpha(cardBgOpacity).string(),
-        bracketBG: Color(code.bracket).alpha(cardBgOpacity).string(),
-
+        inputParameter: [code.inputParameter, Color(code.inputParameter).alpha(cardBgOpacity).string()],
 
         card1: '#559DCE',
         card2: '#397DD0',
@@ -529,17 +470,17 @@ const dynamicMap: any = {
 
 export function backgroundColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'backgroundColor', hoverColor);
+  return getStyle('backgroundColor', color, hoverColor);
 }
 
 export function fontColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'color', hoverColor);
+  return getStyle('color', color, hoverColor);
 }
 
 export function borderColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'borderColor', hoverColor);
+  return getStyle('borderColor', color, hoverColor);
 }
 
 export function link()
@@ -575,7 +516,7 @@ export function buttonColors()
   return CACHE['buttonColors' + curTheme];
 }
 
-export function getStyle(color: string, style: string, hoverColor?: string): object
+export function getStyle(style: string, color: string, hoverColor?: string): object
 {
   if (!dynamicMap[curTheme])
   {

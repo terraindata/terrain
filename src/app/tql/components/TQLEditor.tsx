@@ -270,18 +270,23 @@ class TQLEditor extends TerrainComponent<Props>
 }
 
 const CODE_HIGHLIGHTING_STYLE = {
-  ".cm-s-monokai span.cm-atom": { color: Colors().builder.cards.atom },
-  ".cm-s-monokai span.cm-number": { color: Colors().builder.cards.number },
+  '.cm-s-monokai span.cm-atom': { color: Colors().builder.cards.booleanClause[0] },
 
-  ".cm-s-monokai span.cm-property": { color: Colors().builder.cards.property },
-  ".cm-s-monokai span.cm-attribute": { color: '#f00' },
-  ".cm-s-monokai span.cm-keyword": { color: Colors().builder.cards.keyword },
-  ".cm-s-monokai span.cm-builtin": { color: Colors().builder.cards.builtin },
-  ".cm-s-monokai span.cm-string": { color: Colors().builder.cards.string },
+  '.cm-s-monokai span.cm-property': { color: Colors().builder.cards.structureClause[0] },
+  '.cm-s-monokai span.cm-attribute': { color: '#f00' /* what is an attribute? */ },
+  '.cm-s-monokai span.cm-keyword': { color: Colors().builder.cards.mapClause[0] },
+  '.cm-s-monokai span.cm-builtin': { color: Colors().builder.cards.baseClause[0] },
+  '.cm-s-monokai span.cm-string': { color: Colors().builder.cards.stringClause[0] },
 
-  ".cm-s-monokai span.cm-variable": { color: Colors().builder.cards.variable },
-  ".cm-s-monokai span.cm-variable-2": { color: Colors().builder.cards.variable2 },
-  ".cm-s-monokai span.cm-variable-3": { color: Colors().builder.cards.variable3 },
+  '.cm-s-monokai span.cm-variable': { color: Colors().builder.cards.fieldClause[0] },
+  '.cm-s-monokai span.cm-variable-2': { color: Colors().builder.cards.inputParameter[0] },
+  '.cm-s-monokai span.cm-variable-3': { color: Colors().builder.cards.fieldClause[0] },
+
+  '.cm-s-monokai span.es-null': { color: Colors().builder.cards.nullClause[0] },
+  '.cm-s-monokai span.es-number': { color: Colors().builder.cards.numberClause[0] },
+  '.cm-s-monokai span.es-boolean': { color: Colors().builder.cards.booleanClause[0] },
+  '.cm-s-monokai span.es-parameter': { color: Colors().builder.cards.inputParameter[0] },
+  '.cm-s-monokai span.es-string': { color: Colors().builder.cards.stringClause[0] },
 };
 
 export default TQLEditor;
