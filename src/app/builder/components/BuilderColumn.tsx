@@ -377,7 +377,7 @@ const BuilderColumn = createReactClass<any, any>(
               this.state.column === COLUMNS.Builder ||
               this.state.column === COLUMNS.Inputs,
             })}
-            style={backgroundColor(Colors().builder.builderColumn.background)}
+            style={backgroundColor(Colors().bg1)}
           >
             {
               this.renderContent(canEdit)

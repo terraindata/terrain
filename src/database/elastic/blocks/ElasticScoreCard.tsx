@@ -69,7 +69,7 @@ export const elasticScore = _card(
     static: {
       language: 'elastic',
       title: 'Score',
-      colors: [Colors().builder.cards.builtin, Colors().builder.cards.builtinBG],
+      colors: Colors().builder.cards.enumClause,
       preview: '[weights.length] Factors',
       // manualEntry: ManualConfig.cards['score'],
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>

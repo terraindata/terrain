@@ -307,14 +307,15 @@ class NotificationItem extends TerrainComponent<Props> {
 
   public renderLogo()
   {
-    return (
-      <TerrainLogo
-        style={{
-          position: 'relative',
-          width: '48px',
-        }}
-      />
-    );
+    return null;
+    // return (
+    //   <TerrainLogo
+    //     style={{
+    //       position: 'relative',
+    //       width: '48px',
+    //     }}
+    //   />
+    // );
   }
 
   public renderTitle()

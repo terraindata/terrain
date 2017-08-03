@@ -101,7 +101,7 @@ export const elasticFilter = _card({
   static: {
     language: 'elastic',
     title: 'Filter',
-    colors: [Colors().builder.cards.builtin, Colors().builder.cards.builtinBG],
+    colors: Colors().builder.cards.booleanClause,
     preview: '[filters.length] Filters',
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>

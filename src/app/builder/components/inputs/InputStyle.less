@@ -2,10 +2,6 @@
 
 .inputs-area {
   height: 100%;
-  overflow-y: auto;
-  // display: flex;
-  // flex-wrap: wrap;
-  // align-content: flex-start;
   
   .input-spacing {
     height: 6px;
@@ -21,27 +17,27 @@
   height: 0px;
 
 	.input-inner {
-		padding: 12px;
-		background: @light-green;
-	  border-radius: 6px;
+		padding: 12px 6px;
+    border: 1px solid;
+    border-left: 3px solid;
+    box-shadow: 3px 3px 5px 2px rgba(0,0,0,.39);
+    .transition;
+    
+	  // border-radius: 6px;
     
     .menu-wrapper {
       position: absolute;
       top: 0px;
       right: 15px;
-      opacity: 0;
+      // opacity: 0;
     }
 
-    &:hover {
+    // &:hover {
       .menu-wrapper {
         opacity: 1;
       }
       
       .input-top-row {
-        .input-close {
-          .transition;
-          opacity: 1;
-        }
         .builder-tb {
           .transition;
           width: calc(~"100% - 60px") !important;
@@ -50,11 +46,16 @@
           width: calc(~"100% - 50px") !important;
         }
       }
-    }
+    // }
 
 		.input-text {
 			font-size: @medium-font-size;
 		}
+    
+    .input-prefix {
+      position: relative;
+      top: -3px;
+    }
 	}
     
   .builder-tb {
@@ -71,9 +72,10 @@
     }
   }
   
-  .create-line-row {
-    opacity: 1;
-    .transition;
+  &:hover {
+    .input-close {
+      opacity: 1;
+    }
   }
 }
 
@@ -89,15 +91,21 @@
 }
 
 .input-close {
+  margin-left: 6px;
+  margin-right: 6px;
   .close;
-  right: 0px;
-  position: absolute;
-  top: 6px;
-  opacity: 0;
-  transition: .transition;
+  // right: 0px;
+  // position: absolute;
+  // top: 6px;
+  // opacity: 0;
+  // transition: .transition;
   fill: #fff;
+  .transition;
+  
+  opacity: 0.35;
 }
 
 .input-top-row {
   margin-bottom: 6px;
+  align-items: center;
 }

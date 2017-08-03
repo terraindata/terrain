@@ -87,7 +87,7 @@ function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<s
 
   const block = BuilderStore.getState().getIn(keyPath);
 
-  if (block._isCard)
+  if (block && block._isCard)
   {
     const card = block as Card;
 

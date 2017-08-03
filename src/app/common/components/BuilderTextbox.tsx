@@ -55,15 +55,19 @@ import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../blocks/BlockUtils';
+
 import { Display } from '../../../blocks/displays/Display';
 import { Block } from '../../../blocks/types/Block';
 import { Card, CardString } from '../../../blocks/types/Card';
+import { isInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
+import { BuilderStore } from '../../builder/data/BuilderStore';
+import { Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
@@ -112,6 +116,8 @@ export interface Props
 
   onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
+
+  textStyle?: React.CSSProperties;
 }
 
 class BuilderTextbox extends TerrainComponent<Props>
@@ -302,7 +308,7 @@ class BuilderTextbox extends TerrainComponent<Props>
       options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
     }
 
-    if (!options.equals(this.state.options))
+    if (options && !options.equals(this.state.options))
     {
       this.setState({
         options,
@@ -317,6 +323,14 @@ class BuilderTextbox extends TerrainComponent<Props>
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
 
       const { options } = this.state;
+
+      const textStyle = this.props.textStyle || {};
+      if (typeof this.props.value === 'string' &&
+        isInput(this.props.value as string, BuilderStore.getState().query.inputs)
+      )
+      {
+        textStyle.color = Colors().builder.cards.inputParameter[0];
+      }
 
       return (
         <div
@@ -350,6 +364,7 @@ class BuilderTextbox extends TerrainComponent<Props>
                 className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
+                style={this.props.textStyle}
               />
           }
           {this.props.acceptsCards && this.renderSwitch()}
@@ -448,6 +463,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     );
   }
 }
+
 // const btbTarget =
 // {
 //   canDrop(props, monitor)
