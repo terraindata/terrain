@@ -97,7 +97,8 @@ export class Import
   private imprt: ImportConfig;
   private database: DatabaseController;
   private insertTable: Tasty.Table;
-  private buffer: string[];
+  private maxActiveReads: number = 3;
+  private totalReads: number;
 
   public setUpSocket(io: socketio.Server)
   {
@@ -180,31 +181,18 @@ export class Import
       {
         winston.info('streaming client finished.');
         // TODO: wait until all the data has finished being processed -- how?
-        let time: number = Date.now();
+        const time: number = Date.now();
         winston.info('putting mapping...');
         await this._tastyPutMapping();
         winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
 
-        time = Date.now();
-        winston.info('about to upsert via tasty...');
-        for (let num = 0; num < count; num++)
+        winston.info('opening files for uspert...');
+        this.totalReads = 0;
+        for (let num = 0; num < Math.min(count, this.maxActiveReads); num++)
         {
-          let items: object[];
-          fs.readFile('import_streaming_tmp/testout' + String(num) + '.txt', 'utf8', async (err, data) =>
-          {
-            if (err !== undefined && err !== null)
-            {
-              this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
-              return;
-            }
-            items = JSON.parse(data);
-            winston.info('@#$^@$%^@#$%@#$%got items for upsert@#$%@#$^@$%^@#$%@#$%@#$%@#');
-            await this._tastyUpsert(this.imprt, items);
-          });
+          this.totalReads++;
+          await this._readFileAndUpsert(num, count, socket);
         }
-        // TODO: make read calls synchronous to make sure this doesn't happen prematurely?
-        this._deleteStreamingTempFolder(socket);
-        winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
 
         // TODO: wait until all async calls have finished -- how?
         socket.emit('midway_success');
@@ -277,7 +265,7 @@ export class Import
         time = Date.now();
         winston.info('about to upsert via tasty...');
         const res: ImportConfig = await this._tastyUpsert(imprt, items);
-        winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
+        winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
         resolve(res);
       }
       else
@@ -394,6 +382,41 @@ export class Import
     socket.emit('midway_error', error);
     this._deleteStreamingTempFolder(socket);
     socket.disconnect(true);
+  }
+  private async _readFileAndUpsert(num: number, targetNum: number, socket: socketio.Socket)
+  {
+    winston.info('beginning read file upload number ' + String(num));
+
+    let items: object[];
+    fs.readFile('import_streaming_tmp/testout' + String(num) + '.txt', 'utf8', async (err, data) =>
+    {
+      if (err !== undefined && err !== null)
+      {
+        this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
+        return;
+      }
+      const time = Date.now();
+      winston.info('about to upsert to tasty...');
+      items = JSON.parse(data);
+      winston.info('@#$^@$%^@#$%@#$%got items for upsert@#$%@#$^@$%^@#$%@#$%@#$%@#');
+      await this._tastyUpsert(this.imprt, items);
+      winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
+      winston.info('finished read file upload number ' + String(num));
+
+      // TODO: make sure the filereader is closed before this callback is entered
+      if (this.totalReads < targetNum)
+      {
+        const nextNum: number = this.totalReads;
+        this.totalReads++;
+        await this._readFileAndUpsert(nextNum, targetNum, socket);   // TODO: recursion limit?
+      }
+      else if (this.totalReads === targetNum)
+      {
+        this.totalReads++;
+        this._deleteStreamingTempFolder(socket);
+        winston.info('deleted streaming temp folder');
+      }
+    });
   }
   private _deleteStreamingTempFolder(socket: socketio.Socket)
   {

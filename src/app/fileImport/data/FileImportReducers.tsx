@@ -398,7 +398,7 @@ FileImportReducers[ActionTypes.loadTemplate] =
 FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
     state.set('file', action.payload.file)
-      .set('streaming', action.payload.file.size > FileImportTypes.STREAMING_THRESHOLD)
+      .set('streaming', action.payload.file.size > FileImportTypes.CHUNK_SIZE)
   ;
 
 FileImportReducers[ActionTypes.enqueueChunk] =
