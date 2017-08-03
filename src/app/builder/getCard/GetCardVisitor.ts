@@ -593,20 +593,31 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         // provide options of all possible card types
         getChildOptions: (card) =>
         {
-          return List(_.compact(_.map(
-            clause.structure,
-            (type, key) =>
+          const seen = new Set();
+          const result = [];
+          const handler = (name) =>
+          {
+            if (!seen.has(name))
             {
-              if (card['cards'].find((p) => p.key === key))
+              seen.add(name);
+
+              const key = clause.structure[name];
+              if (card['cards'].find((p) => p.key === key) === undefined)
               {
-                return null;
+                result.push({
+                  text: name,
+                  type: 'eql' + key,
+                });
               }
-              return {
-                text: key,
-                type: 'eql' + type,
-              };
-            },
-          )));
+            }
+          };
+
+          clause.suggestions.forEach(handler);
+          clause.required.forEach(handler);
+          Object.keys(clause.template).forEach(handler);
+          Object.keys(clause.structure).forEach(handler);
+
+          return List(result);
         },
 
         childOptionClickHandler: null, // set in init()

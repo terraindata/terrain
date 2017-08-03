@@ -63,22 +63,33 @@ import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/el
 export const elasticFilterBlock = _block(
   {
     field: '',
-    value: '',
+    value: undefined,
     boolQuery: '',
     rangeQuery: '',
     static: {
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
+        let value: any;
+        try
+        {
+          value = JSON.parse(block['value']);
+        }
+        catch (e)
+        {
+          value = block['value'];
+        }
+
         return {
           [block['boolQuery']]: {
             range: {
               [block['field']]: {
-                [block['rangeQuery']]: block['value'],
+                [block['rangeQuery']]: value,
               },
             },
           },
         };
+
       },
       removeOnCardRemove: true,
     },
