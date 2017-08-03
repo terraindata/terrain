@@ -51,6 +51,7 @@ interface ESClauseSettings
 {
   def?: string | { [key: string]: string | null };
   name?: string;
+  path?: string[];
   desc?: string;
   url?: string;
   template?: any;
