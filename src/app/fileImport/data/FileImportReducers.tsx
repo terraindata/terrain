@@ -404,7 +404,10 @@ FileImportReducers[ActionTypes.saveFile] =
 FileImportReducers[ActionTypes.enqueueChunk] =
   (state, action) =>
   {
-    return state.set('chunkQueue', state.chunkQueue.push(action.payload));
+    console.log('chunk added: ', action.payload.id);
+    return state.setIn(['chunkQueue', action.payload.id], action.payload);
+    // return state.setIn(['chunkQueue', action.payload.id, 'chunk'], action.payload.chunk)
+    // .setIn(['chunkQueue', action.payload.id, 'isLast'], action.payload.isLast);
   }
   ;
 FileImportReducers[ActionTypes.dequeueChunk] =

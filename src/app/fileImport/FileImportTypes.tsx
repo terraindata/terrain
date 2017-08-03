@@ -73,7 +73,7 @@ class FileImportStateC extends BaseClass
   public file: File = null;
   public streaming: boolean = false;
 
-  public chunkQueue: List<object> = List([]);
+  public chunkQueue: List<Chunk> = List([]);
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
 }
@@ -115,6 +115,13 @@ export interface ColumnTypesTree
 {
   type: string | number;
   innerType?: ColumnTypesTree;
+}
+
+export interface Chunk
+{
+  id: number;
+  chunk: string;
+  isLast: boolean;
 }
 
 export const NUMBER_PREVIEW_ROWS = 5;
