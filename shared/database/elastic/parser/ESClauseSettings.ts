@@ -50,6 +50,7 @@ THE SOFTWARE.
 interface ESClauseSettings
 {
   def?: string | { [key: string]: string | null };
+  path?: string[];
   name?: string;
   desc?: string;
   url?: string;
