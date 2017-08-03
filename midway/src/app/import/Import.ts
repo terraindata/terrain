@@ -259,7 +259,11 @@ export class Import
         const items: object[] = [];
         try
         {
-          items.push(...await this._getItems(imprt, imprt.contents));
+          const newItems: object[] = await this._getItems(imprt, imprt.contents);
+          newItems.forEach((val) =>
+          {
+            items.push(val);
+          });
         } catch (e)
         {
           return reject(e);
@@ -656,13 +660,8 @@ export class Import
         });
       }
 
-      if (this._hashObjectStructure(obj) === targetHash)
+      if (this._hashObjectStructure(obj) !== targetHash)
       {
-        winston.info('checktypes: hash matches');
-      }
-      else
-      {
-        winston.info('checktypes: hashes do not match');
         if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
         {
           return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
