@@ -87,7 +87,7 @@ export const elasticTransform = _card(
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: [Colors().builder.cards.builtin, Colors().builder.cards.builtinBG],
+      colors: Colors().builder.cards.inputParameter,
       title: 'Transform',
       preview: (card: any) =>
       {
