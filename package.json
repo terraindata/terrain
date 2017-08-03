@@ -17,10 +17,11 @@
     "build": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack --config webpack.config.js --output-filename ./midway/src/assets/bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony -- ./midway/src/Midway.ts",
     "lint": "yarn run lint-front && yarn run lint-back",
+    "lint-parallel": "parallel --no-notice yarn run ::: lint-front ::: lint-back",
     "lint-back": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
     "lint-front": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "find midway src shared -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
-    "fix": "yarn run style && yarn run lint;"
+    "fix": "yarn run style && yarn run lint-parallel;"
   },
   "repository": {
     "type": "git",
