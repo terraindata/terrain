@@ -15,7 +15,7 @@
     "commit-log": "git log --pretty=format:\"%h%x09%an%x09%ad%x09%s\" | head -n 10 > src/commitlog.txt",
     "build-prod": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack --config webpack.config.prod.js --output-filename ./midway/src/assets/bundle.min.js",
     "build": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack --config webpack.config.js --output-filename ./midway/src/assets/bundle.js",
-    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony -- ./midway/src/Midway.ts",
+    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony ./midway/src/Midway.ts",
     "lint": "yarn run lint-front && yarn run lint-back",
     "lint-back": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
     "lint-front": "./node_modules/.bin/tslint -c tslint.json --fix --type-check --project tsconfig.json",
