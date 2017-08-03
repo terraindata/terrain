@@ -98,6 +98,8 @@ export class Import
   private database: DatabaseController;
   private insertTable: Tasty.Table;
   private maxActiveReads: number = 3;
+  private streamingTempFolder: string = 'import_streaming_tmp';
+  private streamingTempFilePrefix: string = 'chunk';
   private totalReads: number;
 
   public setUpSocket(io: socketio.Server)
@@ -116,8 +118,10 @@ export class Import
           this._sendSocketError(socket, 'Bad authentication.');
           return;
         }
+        winston.info('streaming auth successful.');
         authorized = true;
-        fs.mkdirSync('import_streaming_tmp');
+        fs.mkdirSync(this.streamingTempFolder);
+        winston.info('created streaming temp directory.');
         socket.emit('ready');
       });
       let count: number = 0;
@@ -153,7 +157,7 @@ export class Import
 
         const num: number = count;   // TODO: if have race conditions, chunk handling above has bigger issues
         count++;
-        fs.open('import_streaming_tmp/testout' + String(num) + '.txt', 'wx', (err, fd) =>
+        fs.open(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num) + '.txt', 'wx', (err, fd) =>
         {
           winston.info('opened file for writing.');
           if (err !== undefined && err !== null)
@@ -166,6 +170,7 @@ export class Import
             return;
           }
           fs.write(fd, JSON.stringify(items), (writeErr) =>
+          // fs.write(fd, data['chunk'], (writeErr) =>
           {
             if (writeErr !== undefined && writeErr !== null)
             {
@@ -194,7 +199,6 @@ export class Import
           await this._readFileAndUpsert(num, count, socket);
         }
 
-        // TODO: wait until all async calls have finished -- how?
         socket.emit('midway_success');
         socket.disconnect(true);
       });
@@ -388,7 +392,7 @@ export class Import
     winston.info('beginning read file upload number ' + String(num));
 
     let items: object[];
-    fs.readFile('import_streaming_tmp/testout' + String(num) + '.txt', 'utf8', async (err, data) =>
+    fs.readFile(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num) + '.txt', 'utf8', async (err, data) =>
     {
       if (err !== undefined && err !== null)
       {
@@ -420,7 +424,7 @@ export class Import
   }
   private _deleteStreamingTempFolder(socket: socketio.Socket)
   {
-    rimraf('import_streaming_tmp', (err) =>
+    rimraf(this.streamingTempFolder, (err) =>
     {
       if (err !== undefined && err !== null)
       {
