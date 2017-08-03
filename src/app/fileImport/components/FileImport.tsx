@@ -470,7 +470,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      primaryKey, templates, transforms, uploadInProgress, elasticUpdate, file, chunkQueue, streaming } = fileImportState;
+      primaryKey, templates, transforms, uploadInProgress, elasticUpdate, file, chunkQueue, streaming, chunkMap } = fileImportState;
 
     let content = {};
     switch (this.state.stepId)
@@ -489,13 +489,14 @@ class FileImport extends TerrainComponent<any>
               >
                 Choose File
               </div>
-              <div
-                className='flex-grow fi-input-label'
+              <span
+                className='flex-grow fi-input-label clickable'
+                onClick={this.handleSelectFileButtonClick}
               >
                 {
                   this.state.filename ? this.state.filename + ' selected' : 'No file selected'
                 }
-              </div>
+              </span>
             </div>
             <div>
               <CheckBox
@@ -558,6 +559,7 @@ class FileImport extends TerrainComponent<any>
             streaming={streaming}
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
+            chunkMap={chunkMap}
           />;
         break;
       default:

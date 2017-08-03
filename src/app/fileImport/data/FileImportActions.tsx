@@ -125,8 +125,8 @@ const FileImportActions =
       $(ActionTypes.enqueueChunk, { chunk, id, isLast }),
 
     dequeueChunk:
-    () =>
-      $(ActionTypes.dequeueChunk, {}),
+    (id: number) =>
+      $(ActionTypes.dequeueChunk, { id }),
 
     changeUploadInProgress:
     () =>

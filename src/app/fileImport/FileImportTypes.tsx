@@ -74,6 +74,7 @@ class FileImportStateC extends BaseClass
   public streaming: boolean = false;
 
   public chunkQueue: List<Chunk> = List([]);
+  public chunkMap: IMMap<number, Chunk> = Immutable.Map<number, Chunk>({});
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
 }
@@ -126,6 +127,7 @@ export interface Chunk
 
 export const NUMBER_PREVIEW_ROWS = 5;
 
+export const MAX_CHUNKMAP_SIZE = 10;
 export const CHUNK_SIZE = 10000000;    // assume this chunk size contains number of preview rows
 
 export const FILE_TYPES =

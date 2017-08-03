@@ -55,6 +55,7 @@ import * as io from 'socket.io-client';
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
+import { MAX_CHUNKMAP_SIZE } from '../FileImportTypes';
 import AuthStore from './../../auth/data/AuthStore';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -86,6 +87,7 @@ export interface Props
   streaming: boolean;
   uploadInProgress: boolean;
   elasticUpdate: boolean;
+  chunkMap: IMMap<number, FileImportTypes.Chunk>;
 }
 
 @Radium
@@ -96,11 +98,15 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     templateOptions: List<string>,
     editColumnId: number,
+    fileStart: number,
+    chunkId: number,
   } = {
     templateId: -1,
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
+    fileStart: FileImportTypes.CHUNK_SIZE,
+    chunkId: 1,
   };
 
   public componentDidMount()
@@ -281,12 +287,17 @@ class FileImportPreview extends TerrainComponent<Props>
     socket.on('ready', () =>
     {
       console.log('ready');
-      console.log('queue: ', this.props.chunkQueue);
-      if (!this.props.chunkQueue.isEmpty())      // assume filereader parses chunks faster than backend processes them
+      console.log('queue: ', this.props.chunkMap);
+
+      if (this.props.chunkMap.size < FileImportTypes.MAX_CHUNKMAP_SIZE - 5)
       {
-        console.log('chunk: ', this.props.chunkQueue.get(id));
-        socket.send(this.props.chunkQueue.get(id));
-        // Actions.dequeueChunk();
+        this.fill();
+      }
+      if (!this.props.chunkMap.isEmpty())      // assume filereader parses chunks faster than backend processes them
+      {
+        console.log('chunk: ', this.props.chunkMap.get(id));
+        socket.send(this.props.chunkMap.get(id));
+        Actions.dequeueChunk(id);
         id++;
       }
       else
@@ -315,6 +326,31 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.changeElasticUpdate();
   }
 
+  public fill()
+  {
+    const { fileStart, chunkId } = this.state;
+    let start = fileStart;
+    let id = chunkId;
+
+    const nChunks = FileImportTypes.MAX_CHUNKMAP_SIZE - this.props.chunkMap.size;
+    console.log('add ' + String(nChunks) + ' chunks');
+    console.log(fileStart, chunkId);
+    for (let i = 0; i < nChunks; i++)
+    {
+      const chunk = this.props.file.slice(start, start + FileImportTypes.CHUNK_SIZE);
+      this.readChunk(chunk, id, start + FileImportTypes.CHUNK_SIZE > this.props.file.size);
+
+      start += FileImportTypes.CHUNK_SIZE;
+      id++;
+    }
+
+    this.setState({
+      fileStart: fileStart + nChunks * FileImportTypes.CHUNK_SIZE,
+      chunkId: chunkId + nChunks,
+    });
+    return;
+  }
+
   public handleUploadFile()
   {
     Actions.uploadFile();
@@ -323,16 +359,16 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('filesize: ', this.props.file.size);
 
-      let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
-      let id = 1;
-      while (fileStart < this.props.file.size)
-      {
-        console.log('fileStart: ', fileStart);
-        const chunk = this.props.file.slice(fileStart, fileStart + FileImportTypes.CHUNK_SIZE);
-        this.readChunk(chunk, id, fileStart + FileImportTypes.CHUNK_SIZE > this.props.file.size);
-        fileStart += FileImportTypes.CHUNK_SIZE;
-        id++;
-      }
+      // let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
+      // let id = 1;
+      // while (fileStart < this.props.file.size)
+      // {
+      //   console.log('fileStart: ', fileStart);
+      //   const chunk = this.props.file.slice(fileStart, fileStart + FileImportTypes.CHUNK_SIZE);
+      //   this.readChunk(chunk, id, fileStart + FileImportTypes.CHUNK_SIZE > this.props.file.size);
+      //   fileStart += FileImportTypes.CHUNK_SIZE;
+      //   id++;
+      // }
       this.stream();
     }
   }
