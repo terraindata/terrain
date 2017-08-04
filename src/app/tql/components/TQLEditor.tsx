@@ -142,7 +142,7 @@ class TQLEditor extends TerrainComponent<Props>
           'Tab': 'indentMore',
           'Ctrl-F': 'findPersistent',
           'Ctrl-Alt-F': this.handleAutoFormatRequest,
-          'Ctrl-Enter': this.issueQuery
+          'Ctrl-Enter': this.issueQuery,
         },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
