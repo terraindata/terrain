@@ -60,7 +60,7 @@ import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -204,7 +204,7 @@ class InputComponent extends TerrainComponent<Props>
     const { input } = this.props;
     const inputColor = Colors().builder.cards.inputParameter[0];
     const inputBg = Colors().builder.cards.inputParameter[1];
-
+    console.log(cardStyle(inputColor, this.state.focused ? inputBg : Colors().bg3));
     return (
       <div className='input' ref='input'>
         {
@@ -218,17 +218,9 @@ class InputComponent extends TerrainComponent<Props>
         }
         <div
           className='input-inner'
-          style={[
-            backgroundColor(Colors().bg3, inputBg),
-            {
-              borderTopColor: Colors().highlight,
-              borderRightColor: Colors().darkerHighlight,
-              borderBottomColor: Colors().darkerHighlight,
-            },
-            getStyle('borderLeftColor', inputColor),
-
-            this.state.focused && backgroundColor(inputBg),
-          ]}
+          style={
+            cardStyle(inputColor, this.state.focused ? inputBg : Colors().bg3)
+          }
         >
           <div className='input-top-row flex-container'>
             <div

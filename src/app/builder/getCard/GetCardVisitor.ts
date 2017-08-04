@@ -60,6 +60,8 @@ import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderT
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
 import { BuilderStore } from '../data/BuilderStore';
 
+import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
+
 import ESAnyClause from '../../../../shared/database/elastic/parser/clauses/ESAnyClause';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
 import ESBaseClause from '../../../../shared/database/elastic/parser/clauses/ESBaseClause';
@@ -200,6 +202,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private config: EQLConfig;
   private colorIndex: number;
 
+  private variantClauses: { [clauseType: string]: ESClause } = {};
+
   public constructor(config: EQLConfig)
   {
     super();
@@ -210,6 +214,18 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     const clauses: { [name: string]: ESClause } =
       this.config.getClauses();
+
+    // first, populate the variant clause map, since it will be used by getCard
+    _.mapObject(
+      clauses,
+      (clause, key) =>
+      {
+        if (clause.clauseType === ESClauseType.ESVariantClause)
+        {
+          this.variantClauses[clause.type] = clause;
+        }
+      },
+    );
 
     _.mapObject(
       clauses,

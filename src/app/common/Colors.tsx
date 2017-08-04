@@ -84,11 +84,12 @@ interface Theme
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
+  inputBg: string;
+
   scrollbarBG: string;
   scrollbarPiece: string;
 
   error: string;
-
 
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
@@ -310,6 +311,8 @@ const DARK: Theme =
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
+    inputBg: 'rgba(0,0,0,0.25)',
+
     active: darkActive,
     inactiveHover: Color(darkActive).fade(0.25).string(),
     activeHover: Color(darkActive).fade(0.75).string(),
@@ -318,7 +321,6 @@ const DARK: Theme =
     scrollbarPiece: 'rgba(255,255,255,0.25)',
 
     error: '#d14f42',
-
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
@@ -532,6 +534,35 @@ export function altStyle()
   }
 
   return CACHE['altStyle' + curTheme];
+}
+
+export function cardStyle(strongColor, bgColor, hoverBg?: string)
+{
+  const key = 'card-' + strongColor + bgColor;
+
+  if (!CACHE[key])
+  {
+    CACHE[key] = {
+      background: bgColor,
+      color: strongColor,
+
+      boxShadow: '3px 3px 5px 2px rgba(0,0,0,.39)',
+      borderWidth: 1,
+      borderStyle: 'solid',
+      borderLeftWidth: '3px',
+      borderLeftColor: strongColor,
+
+      borderTopColor: Colors().highlight,
+      borderRightColor: Colors().darkerHighlight,
+      borderBottomColor: Colors().darkerHighlight,
+
+      [hoverBg && ':hover']: {
+        background: hoverBg,
+      },
+    };
+  }
+
+  return CACHE[key];
 }
 
 export function buttonColors()
