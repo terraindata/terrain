@@ -352,18 +352,6 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.streaming)
     {
       console.log('filesize: ', this.props.file.size);
-
-      // let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
-      // let id = 1;
-      // while (fileStart < this.props.file.size)
-      // {
-      //   console.log('fileStart: ', fileStart);
-      //   const chunk = this.props.file.slice(fileStart, fileStart + FileImportTypes.CHUNK_SIZE);
-      //   this.readChunk(chunk, id, fileStart + FileImportTypes.CHUNK_SIZE > this.props.file.size);
-      //   fileStart += FileImportTypes.CHUNK_SIZE;
-      //   id++;
-      // }
-      this.fill();
       this.stream();
     }
   }

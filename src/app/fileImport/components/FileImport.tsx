@@ -93,22 +93,18 @@ class FileImport extends TerrainComponent<any>
     servers?: SchemaTypes.ServerMap;
     serverNames: List<string>;
     serverIndex: number;
-    serverSelected: boolean;
 
     dbs?: SchemaTypes.DatabaseMap;
     dbNames: List<string>;
-    dbSelected: boolean;
 
     tables?: SchemaTypes.TableMap;
     tableNames: List<string>;
-    tableSelected: boolean;
 
     fileSelected: boolean;
     filetype: string,
     filename: string,
 
     showCsvHeaderOption: boolean,
-    nextEnabled: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
@@ -116,20 +112,16 @@ class FileImport extends TerrainComponent<any>
 
     serverIndex: -1,
     serverNames: List([]),
-    serverSelected: false,
 
     dbNames: List([]),
-    dbSelected: false,
 
     tableNames: List([]),
-    tableSelected: false,
 
     fileSelected: false,
     filetype: '',
     filename: '',
 
     showCsvHeaderOption: false,
-    nextEnabled: false,
   };
 
   constructor(props)
@@ -158,25 +150,10 @@ class FileImport extends TerrainComponent<any>
     switch (this.state.stepId)
     {
       case 0:
-        if (!this.state.fileSelected)
-        {
-          alert('Please select a file');
-          return;
-        }
         break;
       case 1:
-        if (!this.state.serverSelected)
-        {
-          alert('Please select a server');
-          return;
-        }
         break;
       case 2:
-        if (!this.state.dbSelected)
-        {
-          alert('Please select or enter a database');
-          return;
-        }
         let msg = isValidIndexName(this.state.fileImportState.dbText);
         if (msg)
         {
@@ -185,11 +162,6 @@ class FileImport extends TerrainComponent<any>
         }
         break;
       case 3:
-        if (!this.state.tableSelected)
-        {
-          alert('Please select or enter a table');
-          return;
-        }
         msg = isValidTypeName(this.state.fileImportState.tableText);
         if (msg)
         {
@@ -217,7 +189,6 @@ class FileImport extends TerrainComponent<any>
     const serverName = serverNames.get(serverIndex);
     this.setState({
       serverIndex,
-      serverSelected: true,
       dbNames: List(servers.get(serverName).databaseIds.map((db) =>
         db.split('/').pop(),
       )),
@@ -231,7 +202,6 @@ class FileImport extends TerrainComponent<any>
     const { dbs } = this.state;
     const { serverText } = this.state.fileImportState;
     this.setState({
-      dbSelected: !!dbText,
       tableNames: dbText && dbs.get(databaseId(serverText, dbText)) ?
         List(dbs.get(databaseId(serverText, dbText)).tableIds.map((table) =>
           table.split('.').pop(),
@@ -248,7 +218,6 @@ class FileImport extends TerrainComponent<any>
     const { tables } = this.state;
     const { serverText, dbText } = this.state.fileImportState;
     this.setState({
-      tableSelected: !!tableText,
       columnOptionNames: tableText && tables.get(tableId(serverText, dbText, tableText)) ?
         List(tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
           column.split('.').pop(),
@@ -388,7 +357,6 @@ class FileImport extends TerrainComponent<any>
       Actions.chooseFile(streaming ? '' : stringifiedFile, filetype, List<List<string>>(previewRows), List<string>(columnNames));
       this.setState({
         fileSelected: true,
-        nextEnabled: true,
       });
     };
   }
@@ -584,12 +552,32 @@ class FileImport extends TerrainComponent<any>
 
   public renderNav()
   {
+    const { stepId, fileSelected } = this.state;
+    const { serverText, dbText, tableText } = this.state.fileImportState;
+    let nextEnabled = false;
+    switch (stepId)
+    {
+      case 0:
+        nextEnabled = fileSelected;
+        break;
+      case 1:
+        nextEnabled = !!serverText;
+        break;
+      case 2:
+        nextEnabled = !!dbText;
+        break;
+      case 3:
+        nextEnabled = !!tableText;
+        break;
+      default:
+    }
+
     return (
       <div
         className='fi-nav'
       >
         {
-          this.state.stepId > 0 &&
+          stepId > 0 &&
           <div
             className='fi-back-button'
             onClick={this.handlePrevStepChange}
@@ -600,11 +588,11 @@ class FileImport extends TerrainComponent<any>
           </div>
         }
         {
-          this.state.stepId < 4 &&
+          stepId < 4 &&
           <div
             className='fi-next-button'
-            onClick={this.handleNextStepChange}
-            style={this.state.nextEnabled ? buttonColors() : backgroundColor(Colors().bg3)}
+            onClick={nextEnabled ? this.handleNextStepChange : null}
+            style={nextEnabled ? buttonColors() : backgroundColor(Colors().bg3)}
             ref='fi-next-button'
           >
             Next &gt;
