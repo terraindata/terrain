@@ -67,6 +67,7 @@ import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
+import has = Reflect.has;
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
@@ -88,7 +89,6 @@ class FileImport extends TerrainComponent<any>
     fileImportState: FileImportTypes.FileImportState;
     columnOptionNames: List<string>;
     stepId: number;
-    hasCsvHeader: boolean;
 
     servers?: SchemaTypes.ServerMap;
     serverNames: List<string>;
@@ -113,7 +113,6 @@ class FileImport extends TerrainComponent<any>
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
     stepId: 0,
-    hasCsvHeader: true,
 
     serverIndex: -1,
     serverNames: List([]),
@@ -212,13 +211,6 @@ class FileImport extends TerrainComponent<any>
     });
   }
 
-  public handleCsvHeaderChange()
-  {
-    this.setState({
-      hasCsvHeader: !this.state.hasCsvHeader,
-    });
-  }
-
   public handleServerChange(serverIndex: number)
   {
     const { servers, serverNames } = this.state;
@@ -279,9 +271,9 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseCsv(file: string): object[]
+  public parseCsv(file: string, hasCsvHeader: boolean): object[]
   {
-    if (this.state.hasCsvHeader)
+    if (hasCsvHeader)
     {
       const testDuplicateConfig = {
         quoteChar: '\'',
@@ -312,7 +304,7 @@ class FileImport extends TerrainComponent<any>
     }
     const config = {
       quoteChar: '\'',
-      header: this.state.hasCsvHeader,
+      header: hasCsvHeader,
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       error: (err) =>
       {
@@ -333,9 +325,9 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseFile()
+  public parseFile(hasCsvHeader: boolean)
   {
-    const { filetype, hasCsvHeader } = this.state;
+    const { filetype } = this.state;
     const { file, streaming } = this.state.fileImportState;
 
     // completely fill the chunk buffer if streaming
@@ -356,7 +348,7 @@ class FileImport extends TerrainComponent<any>
           items = this.parseJson(stringifiedFile);
           break;
         case 'csv':
-          items = this.parseCsv(stringifiedFile);
+          items = this.parseCsv(stringifiedFile, hasCsvHeader);
           break;
         default:
       }
@@ -429,7 +421,7 @@ class FileImport extends TerrainComponent<any>
     }
     else
     {
-      this.parseFile();
+      this.parseFile(null);
     }
   }
 
@@ -457,12 +449,12 @@ class FileImport extends TerrainComponent<any>
     this.refs['file']['click']();
   }
 
-  public handleContinueButton()
+  public handleCsvHeaderChoice(hasCsvHeader: boolean)
   {
     this.setState({
       showCsvHeaderOption: false,
     });
-    this.parseFile();
+    this.parseFile(hasCsvHeader);
   }
 
   public renderContent()
@@ -501,26 +493,27 @@ class FileImport extends TerrainComponent<any>
             {
               this.state.showCsvHeaderOption &&
               <div
-                className='fi-csv-header-option'
+                className='fi-csv'
               >
-                <CheckBox
-                  checked={this.state.hasCsvHeader}
-                  onChange={this.handleCsvHeaderChange}
-                />
-                <span
-                  className='clickable'
-                  onClick={this.handleCsvHeaderChange}
-                >
+                <span>
                   Does your csv have a header row?
-                  </span>
+                </span>
                 <div
-                  className='button'
-                  onClick={this.handleContinueButton}
+                  className='fi-csv-option button'
+                  onClick={() => this.handleCsvHeaderChoice(true)}
                   style={buttonColors()}
-                  ref='fi-continue-button'
+                  ref='fi-yes-button'
                 >
-                  Continue
-                  </div>
+                  Yes
+                </div>
+                <div
+                  className='fi-csv-option button'
+                  onClick={() => this.handleCsvHeaderChoice(false)}
+                  style={buttonColors()}
+                  ref='fi-no-button'
+                >
+                  No
+                </div>
               </div>
             }
           </div>;
