@@ -61,10 +61,11 @@ import { Input, InputType } from '../../../blocks/types/Input';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 const esFilterOperatorsMap = {
-  gt: '>',
-  gte: '≥',
-  lt: '<',
-  lte: '≤',
+  '>': 'gt',
+  '≥': 'gte',
+  '<': 'lt',
+  '≤': 'lte',
+  '=': 'term',
 };
 
 export const elasticFilterBlock = _block(
@@ -72,7 +73,7 @@ export const elasticFilterBlock = _block(
     field: '',
     value: undefined,
     boolQuery: '',
-    rangeQuery: esFilterOperatorsMap.gt,
+    rangeQuery: '=',
 
     static: {
       language: 'elastic',
@@ -88,33 +89,36 @@ export const elasticFilterBlock = _block(
           value = block['value'];
         }
 
-        const rangeOp = _.reduce(
-          esFilterOperatorsMap,
-          (memo, displayValue, esValue) =>
-          {
-            if (displayValue === block['rangeQuery'])
-            {
-              return esValue;
-            }
-            return memo;
-          },
-          null,
-        );
-
-        if (rangeOp === null)
+        // term query
+        if (block['rangeQuery'] === '=')
         {
-          throw new Error('Unspecified range operation for: ' + block['rangeQuery']);
-        }
-
-        return {
-          [block['boolQuery']]: {
-            range: {
-              [block['field']]: {
-                [rangeOp]: value,
+          return {
+            [block['boolQuery']]: {
+              term: {
+                [block['field']]: value,
               },
             },
-          },
-        };
+          };
+        }
+        else
+        {
+          // range query
+          const rangeOp = esFilterOperatorsMap[block['rangeQuery']];
+          if (rangeOp === undefined)
+          {
+            throw new Error('Unspecified range operation for: ' + block['rangeQuery']);
+          }
+
+          return {
+            [block['boolQuery']]: {
+              range: {
+                [block['field']]: {
+                  [rangeOp]: value,
+                },
+              },
+            },
+          };
+        }
 
       },
       removeOnCardRemove: true,
@@ -209,7 +213,7 @@ export const elasticFilter = _card({
               displayType: DisplayType.DROPDOWN,
               key: 'rangeQuery',
               options: List(
-                _.values(esFilterOperatorsMap),
+                _.keys(esFilterOperatorsMap),
                 // can consider using this, but it includes 'boost', and uses raw text values
                 // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
               ),
