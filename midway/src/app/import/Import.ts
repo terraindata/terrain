@@ -102,6 +102,8 @@ export class Import
   private streamingTempFilePrefix: string = 'chunk';
   private nextChunk: string;
   private chunkCount: number;
+  private maxAllowedQueueSize: number = 3;
+  private chunkSize: number = 10000000;
   private chunkQueue: object[];
   private readStream: stream.Readable;
   private totalReads: number;
@@ -338,7 +340,7 @@ export class Import
       this.readStream.on('data', async (chunk) =>
       {
         contents += chunk.toString();
-        if (contents.length > 10000000)
+        if (contents.length > this.chunkSize)
         {
           if (!csvHeaderRemoved)
           {
@@ -347,7 +349,7 @@ export class Import
           }
           this.chunkQueue.push({ chunk: contents, isLast: false });
           contents = '';
-          if (this.chunkQueue.length > 2)
+          if (this.chunkQueue.length >= this.maxAllowedQueueSize)
           {
             this.readStream.pause();
           }
@@ -393,7 +395,7 @@ export class Import
       return;
     }
     const chunkObj: object = this.chunkQueue.shift() as object;
-    if (this.chunkQueue.length < 3)
+    if (this.chunkQueue.length < this.maxAllowedQueueSize)
     {
       this.readStream.resume();
     }
