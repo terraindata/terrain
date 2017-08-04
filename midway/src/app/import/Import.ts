@@ -162,17 +162,11 @@ export class Import
         }
         winston.info('streaming server got items from data');
 
-        const num: number = count;   // TODO: if have race conditions, chunk handling above has bigger issues
-        count++;
-        fs.open(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num), 'wx', (err, fd) =>
+        fs.open(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(count), 'wx', (err, fd) =>
         {
           winston.info('opened file for writing.');
           if (err !== undefined && err !== null)
           {
-            if (err.code === 'EEXIST')
-            {
-              // TODO: try writing to a different file?
-            }
             this._sendSocketError(socket, 'Failed to open temp file for dumping: ' + String(err));
             return;
           }
@@ -186,6 +180,7 @@ export class Import
           });
           winston.info('wrote items to file.');
         });
+        count++;
         socket.emit('ready');
       });
       socket.on('finished', async () =>
@@ -203,7 +198,6 @@ export class Import
           return;
         }
 
-        // TODO: wait until all the data has finished being processed -- how?
         const time: number = Date.now();
         winston.info('putting mapping...');
         await this._tastyPutMapping();
@@ -429,7 +423,7 @@ export class Import
   }
   private async _readFileAndUpsert(num: number, targetNum: number, socket: socketio.Socket)
   {
-    winston.info('beginning read file upload number ' + String(num));
+    winston.info('BEGINNING read file upload number ' + String(num));
 
     let items: object[];
     fs.readFile(this.streamingTempFolder + '/' + this.streamingTempFilePrefix + String(num), 'utf8', async (err, data) =>
@@ -442,17 +436,15 @@ export class Import
       const time = Date.now();
       winston.info('about to upsert to tasty...');
       items = JSON.parse(data);
-      winston.info('@#$^@$%^@#$%@#$%got items for upsert@#$%@#$^@$%^@#$%@#$%@#$%@#');
       await this._tastyUpsert(this.imprt, items);
       winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
-      winston.info('finished read file upload number ' + String(num));
+      winston.info('FINISHED read file upload number ' + String(num));
 
-      // TODO: make sure the filereader is closed before this callback is entered
       if (this.totalReads < targetNum)
       {
         const nextNum: number = this.totalReads;
         this.totalReads++;
-        await this._readFileAndUpsert(nextNum, targetNum, socket);   // TODO: recursion limit?
+        await this._readFileAndUpsert(nextNum, targetNum, socket);   // TODO: recursion limit??
       }
       else if (this.totalReads === targetNum)
       {
