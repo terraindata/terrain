@@ -88,7 +88,6 @@ class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
     pointsCache: ScorePoints;
-    lastUpdateConcrete?: boolean;
     selectedPointIds: IMMap<string, boolean>;
     lastSelectedPointId?: string;
     initialScore?: number;
@@ -158,9 +157,9 @@ class TransformCardChart extends TerrainComponent<Props>
 
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
   }
-  public debouncedUpdatePoints: any = () =>
+  public debouncedUpdatePoints: any = (lastUpdateConcrete) =>
   {
-    this.props.updatePoints(this.state.pointsCache, this.state.lastUpdateConcrete);
+    this.props.updatePoints(this.state.pointsCache, lastUpdateConcrete);
   }
 
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
@@ -173,10 +172,8 @@ class TransformCardChart extends TerrainComponent<Props>
     ).toList();
     this.setState({
       pointsCache: points,
-      lastUpdateConcrete: isConcrete,
     });
-    this.debouncedUpdatePoints();
-    // this.props.updatePoints(points, isConcrete);
+    this.debouncedUpdatePoints(isConcrete);
   }
 
   public onPointMoveStart(initialScore, initialValue)
@@ -338,6 +335,16 @@ class TransformCardChart extends TerrainComponent<Props>
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.points !== this.state.pointsCache)
+    {
+      this.setState({
+        pointsCache: nextProps.points
+      });
+    }
   }
 
   public render()
