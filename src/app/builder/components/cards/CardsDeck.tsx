@@ -49,10 +49,11 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { Card, Cards } from '../../../../blocks/types/Card';
-import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, cardStyle, Colors, fontColor } from '../../../common/Colors';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Switch from './../../../common/components/Switch';
@@ -158,6 +159,7 @@ interface CardProps
   connectDragSource?: (el: El) => El;
 }
 
+@Radium
 class CardDeckCardComponent extends TerrainComponent<CardProps>
 {
   public render()
@@ -173,9 +175,7 @@ class CardDeckCardComponent extends TerrainComponent<CardProps>
           'cards-deck-card': true,
           'cards-deck-card-hidden': hidden,
         })}
-        style={{
-          background: data.colors[0],
-        }}
+        style={cardStyle(data.colors[0], Colors().bg3, data.colors[1])}
       >
         {
           data.title

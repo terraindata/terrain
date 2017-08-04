@@ -47,8 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
 import * as Immutable from 'immutable';
+import * as Redux from 'redux';
 import * as _ from 'underscore';
-const Redux = require('redux');
+// const Redux = require('redux');
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from './../../auth/data/AuthStore';
@@ -137,7 +138,7 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
   }
 }
 
-export const LibraryStore: IStore<LibraryState> = Redux.createStore(
+export const LibraryStore = Redux.createStore(
   (state: LibraryState = DefaultState, action) =>
   {
     if (LibraryReducers[action.type])

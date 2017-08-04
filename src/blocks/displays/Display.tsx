@@ -89,7 +89,6 @@ export interface Display
   // for dropdown
   options?: List<(string | El)>;
   centerDropdown?: boolean;
-  widthDropdown?: string;
   optionsDisplayName?: Map<any, string>; // maps value to display name
   dropdownUsesRawValues?: boolean; // use the raw values, instead of the indices
 
@@ -118,6 +117,8 @@ export interface Display
 
   // for FLEX, its content
   flex?: Display | Display[];
+
+  style?: React.CSSProperties;
 
   // for components
   component?: any; // TerrainComponent?

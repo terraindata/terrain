@@ -63,7 +63,7 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, Colors } from '../../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 import { Card, Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
@@ -260,9 +260,12 @@ class CardsColumn extends TerrainComponent<Props>
             <ExpandIcon
               className='cards-deck-knob-icon'
             />
-            <div className='cards-deck-knob-text'>
+            <div
+              className='cards-deck-knob-text'
+              style={fontColor(Colors().text3)}
+            >
               Card Deck
-              </div>
+            </div>
           </div>
         }
 

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format
+// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'underscore';
 
@@ -83,6 +83,8 @@ interface Theme
   darkerHighlight: string; // for depth effect with highlight
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
+
+  inputBg: string;
 
   scrollbarBG: string;
   scrollbarPiece: string;
@@ -309,6 +311,8 @@ const DARK: Theme =
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
+    inputBg: 'rgba(0,0,0,0.25)',
+
     active: darkActive,
     inactiveHover: Color(darkActive).fade(0.25).string(),
     activeHover: Color(darkActive).fade(0.75).string(),
@@ -530,6 +534,35 @@ export function altStyle()
   }
 
   return CACHE['altStyle' + curTheme];
+}
+
+export function cardStyle(strongColor, bgColor, hoverBg?: string)
+{
+  const key = 'card-' + strongColor + bgColor;
+
+  if (!CACHE[key])
+  {
+    CACHE[key] = {
+      background: bgColor,
+      color: strongColor,
+
+      boxShadow: '3px 3px 5px 2px rgba(0,0,0,.39)',
+      borderWidth: 1,
+      borderStyle: 'solid',
+      borderLeftWidth: '3px',
+      borderLeftColor: strongColor,
+
+      borderTopColor: Colors().highlight,
+      borderRightColor: Colors().darkerHighlight,
+      borderBottomColor: Colors().darkerHighlight,
+
+      [hoverBg && ':hover']: {
+        background: hoverBg,
+      },
+    };
+  }
+
+  return CACHE[key];
 }
 
 export function buttonColors()

@@ -164,7 +164,10 @@ export const elasticFilter = _card({
               dropdownUsesRawValues: true,
               autoDisabled: true,
               centerDropdown: true,
-              widthDropdown: '50px',
+              style: {
+                maxWidth: 75,
+                marginRight: 3,
+              },
             },
             {
               displayType: DisplayType.DROPDOWN,
@@ -173,6 +176,9 @@ export const elasticFilter = _card({
               dropdownUsesRawValues: true,
               centerDropdown: true,
               autoDisabled: true,
+              style: {
+                maxWidth: 75,
+              },
             },
             {
               displayType: DisplayType.TEXT,
