@@ -84,6 +84,7 @@ export interface Props
   algorithmId: ID;
   multiselect?: boolean;
   params?: any;
+  variantActions?: any;
 }
 
 class VariantsColumn extends TerrainComponent<Props>
@@ -111,7 +112,7 @@ class VariantsColumn extends TerrainComponent<Props>
     if (multiselect && params && params.variantId)
     {
       const variantIds = params.variantId.split(',');
-      variantIds.forEach((id) => Actions.variants.select(id));
+      variantIds.forEach((id) => this.props.variantActions.select(id));
     }
 
     this._subscribe(UserStore, {

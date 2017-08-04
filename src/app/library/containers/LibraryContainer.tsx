@@ -43,55 +43,38 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import AppRouter from './AppRouter';
-import BuilderStore from './builder/data/BuilderStore'; // for error reporting
-import LibraryStore from './library/data/LibraryStore';
-import TerrainStore from './store/TerrainStore';
-import UserStore from './users/data/UserStore';
 
-if (!DEV)
+import * as _ from 'lodash';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import Library from '../components/Library';
+import LibraryActions from '../data/LibraryActions';
+import { LibraryState } from '../data/LibraryStore';
+
+const mapStateToProps = (state: LibraryState) =>
 {
-  // report uncaught errors in production
-  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
-  {
+  return state;
+};
 
-    const user = UserStore.getState().get('currentUser');
-    const userId = user && user.id;
-    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
-    const builderState = JSON.stringify(BuilderStore.getState().toJS());
-    const location = JSON.stringify(window.location);
-
-    const msg = `${errorMsg} by ${userId}
-      Location:
-      ${location}
-
-      Library State:
-      ${libraryState}
-
-      Builder State:
-      ${builderState}
-
-      Error Stack:
-      ${(error != null && error.stack != null) ? error.stack : ''}
-    `;
-
-    $.post('http://lukeknepper.com/email.php', {
-      msg,
-      secret: '11235813',
-    });
-
-    return false;
+function mapDispatchToProps(dispatch)
+{
+  return {
+    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
+    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
+    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
+    libraryActions: bindActionCreators(
+      _.pick(
+        LibraryActions,
+        ['loadState', 'setDbs', 'fetch'],
+      ),
+      dispatch,
+    ),
   };
 }
 
-ReactDOM.render(
-  <Provider store={TerrainStore}>
-    <AppRouter />
-  </Provider>,
-  document.getElementById('app'), () =>
-  {
-    // tests can go here
-  });
+const LibraryContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Library);
+
+export default LibraryContainer;

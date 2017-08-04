@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
@@ -53,7 +54,6 @@ import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import UserActions from './../../users/data/UserActions';
-import Actions from './../data/LibraryActions';
 import { LibraryState } from './../data/LibraryStore';
 import Store from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
@@ -102,7 +102,8 @@ class Library extends TerrainComponent<any>
   {
     super(props);
 
-    this.state.libraryState = props.store ? props.store.getState() : Store.getState();
+    const { library } = props;
+    this.state.libraryState = library;
   }
 
   public componentWillMount()
@@ -184,6 +185,7 @@ class Library extends TerrainComponent<any>
     const { libraryState } = this.state;
 
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
+
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
 
@@ -278,6 +280,7 @@ class Library extends TerrainComponent<any>
               multiselect: variantsMultiselect,
               basePath,
               router,
+              variantActions: this.props.libraryVariantActions,
             }}
           />
           {!variantsMultiselect ?
