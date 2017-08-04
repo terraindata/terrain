@@ -70,6 +70,9 @@ import FileImportPreview from './FileImportPreview';
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
+const CHUNK_SIZE = FileImportTypes.CHUNK_SIZE;
+const MAX_NUM_CHUNKS = FileImportTypes.MAX_CHUNKMAP_SIZE;
+
 export interface Props
 {
   params?: any;
@@ -85,7 +88,7 @@ class FileImport extends TerrainComponent<any>
     fileImportState: FileImportTypes.FileImportState;
     columnOptionNames: List<string>;
     stepId: number;
-    csvHeaderMissing: boolean;
+    hasCsvHeader: boolean;
 
     servers?: SchemaTypes.ServerMap;
     serverNames: List<string>;
@@ -103,11 +106,14 @@ class FileImport extends TerrainComponent<any>
     fileSelected: boolean;
     filetype: string,
     filename: string,
+
+    showCsvHeaderOption: boolean,
+    nextEnabled: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
     stepId: 0,
-    csvHeaderMissing: false,
+    hasCsvHeader: true,
 
     serverIndex: -1,
     serverNames: List([]),
@@ -122,6 +128,9 @@ class FileImport extends TerrainComponent<any>
     fileSelected: false,
     filetype: '',
     filename: '',
+
+    showCsvHeaderOption: false,
+    nextEnabled: false,
   };
 
   constructor(props)
@@ -155,49 +164,6 @@ class FileImport extends TerrainComponent<any>
           alert('Please select a file');
           return;
         }
-        const { file, streaming } = this.state.fileImportState;
-        const fileToRead = streaming ? file.slice(0, FileImportTypes.CHUNK_SIZE) : file;
-        const fr = new FileReader();
-        fr.readAsText(fileToRead);
-        fr.onloadend = () =>
-        {
-          let stringifiedFile = streaming ? fr.result.substring(0, fr.result.lastIndexOf('\n')) : fr.result;
-
-          let items;
-          switch (this.state.filetype)
-          {
-            case 'json':
-              items = this.parseJson(stringifiedFile);
-              break;
-            case 'csv':
-              items = this.parseCsv(stringifiedFile);
-              if (!this.state.csvHeaderMissing) // remove first line if csv has header
-              {
-                stringifiedFile = stringifiedFile.slice(Number(stringifiedFile.indexOf('\n')) + 1, stringifiedFile.length);
-                Actions.enqueueChunk(fr.result.slice(Number(fr.result.indexOf('\n')) + 1, fr.result.length), 0, file.size <= FileImportTypes.CHUNK_SIZE);
-              }
-              else
-              {
-                Actions.enqueueChunk(fr.result, 0, file.size <= FileImportTypes.CHUNK_SIZE);
-              }
-              break;
-            default:
-          }
-          if (items.length === 0)
-          {
-            return;
-          }
-          const previewRows = items.map((item, i) =>
-            _.map(item, (value, key) =>
-              typeof value === 'string' ? value : JSON.stringify(value),
-            ),
-          );
-          const columnNames = _.map(items[0], (value, i) =>
-            this.state.filetype === 'csv' && this.state.csvHeaderMissing ? 'column' + String(i) : i,
-          );
-
-          Actions.chooseFile(streaming ? '' : stringifiedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
-        };
         break;
       case 1:
         if (!this.state.serverSelected)
@@ -249,7 +215,7 @@ class FileImport extends TerrainComponent<any>
   public handleCsvHeaderChange()
   {
     this.setState({
-      csvHeaderMissing: !this.state.csvHeaderMissing,
+      hasCsvHeader: !this.state.hasCsvHeader,
     });
   }
 
@@ -315,7 +281,7 @@ class FileImport extends TerrainComponent<any>
 
   public parseCsv(file: string): object[]
   {
-    if (!this.state.csvHeaderMissing)
+    if (this.state.hasCsvHeader)
     {
       const testDuplicateConfig = {
         quoteChar: '\'',
@@ -346,7 +312,7 @@ class FileImport extends TerrainComponent<any>
     }
     const config = {
       quoteChar: '\'',
-      header: !this.state.csvHeaderMissing,
+      header: this.state.hasCsvHeader,
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       error: (err) =>
       {
@@ -367,39 +333,30 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  /*
-  public parseAndChooseFile()
+  public parseFile()
   {
-    const { file, streaming, csvHeaderMissing } = this.state.fileImportState;
-    console.log(file);
-    const fileToRead = streaming ? file.slice(0, FileImportTypes.CHUNK_SIZE) : file;
+    const { filetype, hasCsvHeader } = this.state;
+    const { file, streaming } = this.state.fileImportState;
+
+    // completely fill the chunk buffer if streaming
+    const numChunks = Math.min(Math.ceil(file.size / CHUNK_SIZE), MAX_NUM_CHUNKS);
+    // console.log('numChunks: ', numChunks);
+    const fileToRead = streaming ? file.slice(0, numChunks * CHUNK_SIZE) : file;
     const fr = new FileReader();
     fr.readAsText(fileToRead);
     fr.onloadend = () =>
     {
-      let stringifiedFile;
-      if (streaming)
-      {
-        Actions.enqueueChunk(fr.result, file.size <= FileImportTypes.CHUNK_SIZE);
-        stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
-      }
-      else
-      {
-        stringifiedFile = fr.result;
-      }
-
-      let items = [];
-      switch (this.state.filetype)
+      // assume preview fits in first chunk in streaming case
+      let firstChunk = fr.result.substring(0, CHUNK_SIZE);
+      let stringifiedFile = streaming ? fr.result.substring(0, firstChunk.lastIndexOf('\n')) : fr.result;
+      let items;
+      switch (filetype)
       {
         case 'json':
           items = this.parseJson(stringifiedFile);
           break;
         case 'csv':
           items = this.parseCsv(stringifiedFile);
-          if (!this.state.fileImportState.csvHeaderMissing) // remove first line if csv has header
-          {
-            stringifiedFile.slice(0, stringifiedFile.indexOf('\n'));
-          }
           break;
         default:
       }
@@ -407,18 +364,42 @@ class FileImport extends TerrainComponent<any>
       {
         return;
       }
-      const previewRows = items.map((item, i) =>
+
+      if (filetype === 'csv' && hasCsvHeader) // remove header row
+      {
+        stringifiedFile = stringifiedFile.slice(Number(stringifiedFile.indexOf('\n')) + 1);
+        firstChunk = firstChunk.slice(Number(firstChunk.indexOf('\n')) + 1);
+      }
+
+      if (streaming)
+      {
+        // first chunk has 'id' 0, since files smaller than one chunk will not be streamed first chunk will never be last
+        Actions.enqueueChunk(firstChunk, 0, false);
+        for (let i = 1; i < numChunks; i++)
+        {
+          const fileStart = CHUNK_SIZE * i;
+          const chunk = fr.result.slice(fileStart, fileStart + CHUNK_SIZE);
+          Actions.enqueueChunk(chunk, i, fileStart + CHUNK_SIZE > file.size);
+        }
+      }
+
+      const previewRows = items.map((item) =>
         _.map(item, (value, key) =>
-          typeof value === 'string' ? value : JSON.stringify(value),
+          typeof value === 'string' ? value : JSON.stringify(value), // JSON files infer types
         ),
       );
-      const columnNames = _.map(items[0], (value, i) =>
-        this.state.filetype === 'csv' && csvHeaderMissing ? 'column' + String(i) : i,
+      const columnNames = _.map(items[0], (value, index) =>
+        filetype === 'csv' && !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
       );
 
-      Actions.chooseFile(streaming ? '' : stringifiedFile, this.state.filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      // send empty fileContents when streaming
+      Actions.chooseFile(streaming ? '' : stringifiedFile, filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      this.setState({
+        fileSelected: true,
+        nextEnabled: true,
+      });
     };
-  } */
+  }
 
   public handleSelectFile(file)
   {
@@ -435,12 +416,21 @@ class FileImport extends TerrainComponent<any>
       return;
     }
     this.setState({
-      fileSelected,
       filetype,
       filename: file.target.files[0].name,
     });
     Actions.saveFile(file.target.files[0]);
-    // this.refs['file']['value'] = null;                 // prevent file-caching
+
+    if (filetype === 'csv')
+    {
+      this.setState({
+        showCsvHeaderOption: true,
+      });
+    }
+    else
+    {
+      this.parseFile();
+    }
   }
 
   public renderSteps()
@@ -463,7 +453,16 @@ class FileImport extends TerrainComponent<any>
 
   public handleSelectFileButtonClick()
   {
+    this.refs['file']['value'] = null; // prevent file-caching
     this.refs['file']['click']();
+  }
+
+  public handleContinueButton()
+  {
+    this.setState({
+      showCsvHeaderOption: false,
+    });
+    this.parseFile();
   }
 
   public renderContent()
@@ -486,6 +485,7 @@ class FileImport extends TerrainComponent<any>
                 className='button'
                 onClick={this.handleSelectFileButtonClick}
                 style={buttonColors()}
+                ref='fi-select-button'
               >
                 Choose File
               </div>
@@ -498,19 +498,31 @@ class FileImport extends TerrainComponent<any>
                 }
               </span>
             </div>
-            <div>
-              <CheckBox
-                checked={!this.state.csvHeaderMissing}
-                onChange={this.handleCsvHeaderChange}
-
-              />
-              <span
-                className='clickable'
-                onClick={this.handleCsvHeaderChange}
+            {
+              this.state.showCsvHeaderOption &&
+              <div
+                className='fi-csv-header-option'
               >
-                File has header row (csv only)
-              </span>
-            </div>
+                <CheckBox
+                  checked={this.state.hasCsvHeader}
+                  onChange={this.handleCsvHeaderChange}
+                />
+                <span
+                  className='clickable'
+                  onClick={this.handleCsvHeaderChange}
+                >
+                  Does your csv have a header row?
+                  </span>
+                <div
+                  className='button'
+                  onClick={this.handleContinueButton}
+                  style={buttonColors()}
+                  ref='fi-continue-button'
+                >
+                  Continue
+                  </div>
+              </div>
+            }
           </div>;
         break;
       case 1:
@@ -599,7 +611,7 @@ class FileImport extends TerrainComponent<any>
           <div
             className='fi-next-button'
             onClick={this.handleNextStepChange}
-            style={buttonColors()}
+            style={this.state.nextEnabled ? buttonColors() : backgroundColor(Colors().bg3)}
             ref='fi-next-button'
           >
             Next &gt;
