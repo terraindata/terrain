@@ -54,17 +54,39 @@ import { BuilderState, BuilderStore } from '../../builder/data/BuilderStore';
 
 CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {
-  const jsonMode = CodeMirror.getMode(config, { name: 'javascript', json: true });
+  const indentUnit = config.indentUnit;
   return {
     startState: () =>
     {
-      return {};
+      return {
+        indent: 0,
+      };
     },
     token: (stream, state) =>
     {
+      let ch;
+      do
+      {
+        if (stream.eol())
+        {
+          return null;
+        }
+        ch = stream.next();
+      } while (ch !== '[' && ch !== ']' && ch !== '{' && ch !== '}');
+
+      state.indent = stream.indentation();
+      if (ch === '{' || ch === '[')
+      {
+        state.indent += indentUnit;
+      }
+      else if (ch === '}' || ch === ']')
+      {
+        state.indent -= indentUnit;
+      }
       stream.skipToEnd();
       return null;
     },
+    indent: (state, textAfter) => state.indent,
     helperType: 'elastic',
   };
 });

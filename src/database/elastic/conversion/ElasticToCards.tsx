@@ -209,7 +209,7 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
     {
       const field = Object.keys(obj['range'])[0];
       const rangeQuery = Object.keys(obj['range'][field])[0];
-      const value = JSON.stringify(obj['range'][field][rangeQuery]);
+      const value = obj['range'][field][rangeQuery];
 
       return make(Blocks, 'elasticFilterBlock', {
         field,
