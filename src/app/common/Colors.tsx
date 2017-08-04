@@ -76,7 +76,9 @@ interface Theme
   altBg2: string;
 
   active: string; // active color
+  activeText: string;
   inactiveHover: string; // when something isn't active but could be
+  inactiveHoverText: string;
   activeHover: string; // when an active thing is hovered
 
   highlight: string; // for slight emphasis
@@ -314,7 +316,9 @@ const DARK: Theme =
     inputBg: 'rgba(0,0,0,0.25)',
 
     active: darkActive,
+    activeText: '#fff',
     inactiveHover: Color(darkActive).fade(0.25).string(),
+    inactiveHoverText: '#fff',
     activeHover: Color(darkActive).fade(0.75).string(),
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
@@ -564,6 +568,28 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
   }
 
   return CACHE[key];
+}
+
+export function couldHover(isFocused?: boolean)
+{
+  if (!CACHE['couldHover'])
+  {
+    CACHE['couldHover'] = {
+      ':hover': {
+        backgroundColor: Colors().inactiveHover,
+        color: Colors().inactiveHoverText,
+      },
+    };
+  }
+  if (!CACHE['couldHoverFocused'])
+  {
+    CACHE['couldHoverFocused'] = {
+      backgroundColor: Colors().inactiveHover,
+      color: Colors().inactiveHoverText,
+    };
+  }
+
+  return CACHE[isFocused ? 'couldHoverFocused' : 'couldHover'];
 }
 
 export function buttonColors()
