@@ -98,6 +98,9 @@ const KEY_DISPLAY: Display =
     autoDisabled: true, // TODO consider autocomplete for key?
     className: 'card-muted-input card-elastic-key-input',
     component: ElasticKeyBuilderTextbox,
+    style: {
+      maxWidth: 100,
+    },
   };
 
 /**

@@ -386,7 +386,7 @@ class App extends TerrainComponent<Props>
         />
 
         <StyleTag
-          style={SCROLLBAR_STYLE}
+          style={COMMON_THEME_COLOR_STYLE}
         />
 
         <InAppNotification />
@@ -397,12 +397,16 @@ class App extends TerrainComponent<Props>
   }
 }
 
-const SCROLLBAR_STYLE = {
+const COMMON_THEME_COLOR_STYLE = {
   '::-webkit-scrollbar-track': {
     background: Colors().scrollbarBG,
   },
   '::-webkit-scrollbar-thumb': {
     background: Colors().scrollbarPiece,
+  },
+  'input': {
+    background: Colors().inputBg,
+    color: Colors().text1,
   },
 };
 
