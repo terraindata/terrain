@@ -267,7 +267,6 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
                 }
                 width={width}
                 height={height}
-                animate={config.topChart.animate}
               >
                 <VictoryGroup
                   style={styles.topChart.areas}
