@@ -155,8 +155,12 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
       />;
     }
 
-    return null;
+    return <div style={PLACEHOLDER_STYLE} />;
   }
 }
+
+const PLACEHOLDER_STYLE = {
+  height: 32,
+};
 
 export default ElasticKeyBuilderTextbox;

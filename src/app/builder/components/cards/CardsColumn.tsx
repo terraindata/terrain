@@ -63,7 +63,7 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle } from '../../../common/Colors';
+import { altStyle, backgroundColor, Colors } from '../../../common/Colors';
 
 import { Card, Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;

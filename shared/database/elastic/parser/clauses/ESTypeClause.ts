@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESStringClause from './ESStringClause';
 
@@ -52,7 +53,7 @@ import ESStringClause from './ESStringClause';
  */
 export default class ESTypeClause extends ESStringClause
 {
-  public constructor(type: string, settings: any)
+  public constructor(type: string, settings?: ESClauseSettings)
   {
     super(type, settings, ESClauseType.ESTypeClause);
   }

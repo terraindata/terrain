@@ -55,6 +55,7 @@ import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
 import ESValueInfo from '../ESValueInfo';
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESAnyClause from './ESAnyClause';
 import ESArrayClause from './ESArrayClause';
 import ESBaseClause from './ESBaseClause';
@@ -80,10 +81,10 @@ import ESVariantClause from './ESVariantClause';
 abstract class ESClause
 {
   public clauseType: ESClauseType; // clause type (each class has a unique clause type)
+
   public type: string; // type name
-  public name: string; // human type name
-  public desc: string; // clause description
-  public url: string; // clause documentation url
+
+  public settings: ESClauseSettings; // additional information about this clause
 
   /**
    * Type definition for this clause. It should be one of these:
@@ -93,26 +94,32 @@ abstract class ESClause
    */
   public def: string | { [key: string]: string | null };
 
+  public name: string; // human type name
+  public path: string[]; // human-facing categorization of this clause type & function
+  public desc: string; // clause description
+  public url: string; // clause documentation url
   public template: any; // template for this clause type
-
-  protected settings;
+  public required: string[]; // required members (used for object types)
+  public suggestions: any[]; // suggested autocomplete values or keys
 
   /**
    * @param type the name to refer to this clause (type)
    * @param settings the settings object to initialize it from
    * @param clauseType the enum uniquely identifying the clause type
    */
-  public constructor(type: string, settings: any, clauseType: ESClauseType)
+  public constructor(type: string, clauseType: ESClauseType, settings?: ESClauseSettings)
   {
     this.clauseType = clauseType;
     this.type = type;
-    this.settings = settings;
-
-    this.setPropertyFromSettings(settings, 'name', () => this.type.replace('_', ' '));
-    this.setPropertyFromSettings(settings, 'desc', () => '');
-    this.setPropertyFromSettings(settings, 'url', () => '');
-    this.setPropertyFromSettings(settings, 'def', () => 'value');
-    this.setPropertyFromSettings(settings, 'template', () => null);
+    this.settings = settings === undefined ? {} : settings;
+    this.setDefaultProperty('def', () => 'value');
+    this.setDefaultProperty('name', () => this.type.replace('_', ' '));
+    this.setDefaultProperty('path', () => ['general']);
+    this.setDefaultProperty('desc', () => '');
+    this.setDefaultProperty('url', () => '');
+    this.setDefaultProperty('template', () => undefined);
+    this.setDefaultProperty('required', () => []);
+    this.setDefaultProperty('suggestions', () => []);
   }
 
   public init(config: EQLConfig): void
@@ -182,16 +189,15 @@ abstract class ESClause
     return true;
   }
 
-  private setPropertyFromSettings(settings: any, name: string, defaultValueFunction: any): void
+  protected setDefaultProperty(name: string, defaultValueFunction: any): void
   {
-    if (settings[name] !== undefined)
+    let val: any = this.settings[name];
+    if (val === undefined)
     {
-      this[name] = settings[name];
+      val = defaultValueFunction();
     }
-    else
-    {
-      this[name] = defaultValueFunction();
-    }
+
+    this[name] = val;
   }
 }
 

@@ -44,43 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
 
 import ESJSONParser from '../parser/ESJSONParser';
-
-export const valueTypes =
-  {
-    auto: 'auto',
-    text: 'text',
-    number: 'number',
-    object: 'object',
-    array: 'array',
-    bool: 'bool',
-    null: 'null',
-  };
-export const valueTypesList = _.map(valueTypes, (v) => v);
-export const valueTypesDisplayNames =
-  {
-    auto: 'Auto',
-    text: 'Text',
-    number: 'Number',
-    object: 'Map',
-    array: 'List',
-    bool: 'True / False',
-    null: 'Null',
-  };
-
-export const acceptsValues = Immutable.List(
-  ['elasticValue',
-    'elasticObject',
-    'elasticArray',
-    'elasticText',
-    'elasticBool',
-    'elasticNumber',
-    'elasticNull'],
-);
 
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];

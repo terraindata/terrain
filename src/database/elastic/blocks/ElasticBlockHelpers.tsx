@@ -44,76 +44,95 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
-
-import { Block } from '../../blocks/types/Block';
-import { Card } from '../../blocks/types/Card';
-import { Input, InputPrefix } from '../../blocks/types/Input';
-
 import * as Immutable from 'immutable';
-import SchemaStore from '../schema/data/SchemaStore';
-import { BuilderState, BuilderStore } from './data/BuilderStore';
+const { Map, List } = Immutable;
+import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
-export function getTermsForKeyPath(keyPath: KeyPath): List<string>
+export const enum AutocompleteMatchType
 {
-  const state = BuilderStore.getState();
-  const terms = getTermsForKeyPathHelper(keyPath, state);
-
-  // TODO migrate inputs reduction to the Query class if we get a query class
-  const inputs = state.query && state.query.inputs;
-  if (inputs && inputs.size)
-  {
-    const inputTerms = inputs.map(
-      (input: Input) => InputPrefix + input.key,
-    ).toList();
-    if (terms)
-    {
-      return inputTerms.concat(terms).toList();
-    }
-    return inputTerms;
-  }
-
-  return terms;
+  Index = 1,
+  Type = 2,
+  Field = 3,
 }
 
-function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
-{
-  if (!keyPath.size)
+export const ElasticBlockHelpers = {
+  autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
   {
-    return Immutable.List([]);
-  }
+    // 1. Need to get current index
 
-  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
+    const state = BuilderStore.getState();
+    const cards = state.query.cards;
+    const isIndexCard = (card) => card['type'] === 'eqlindex';
+    const server = BuilderStore.getState().db.name;
 
-  const block = BuilderStore.getState().getIn(keyPath);
-
-  if (block && block._isCard)
-  {
-    const card = block as Card;
-
-    if (card.static.getChildTerms)
+    if (matchType === AutocompleteMatchType.Index)
     {
-      terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
+      return schemaState.databases.toList().filter(
+        (db) => db.serverId === server,
+      ).map(
+        (db) => db.name,
+      ).toList();
     }
 
-    if (card.static.getNeighborTerms)
+    let indexCard = cards.find(isIndexCard);
+    if (indexCard === undefined)
     {
-      terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
+      indexCard = cards.get(0);
+      if (indexCard !== undefined)
+      {
+        indexCard = indexCard['cards'].find(isIndexCard);
+      }
     }
 
-    if (card['cards'])
+    if (indexCard !== undefined)
     {
-      card['cards'].map(
-        (childCard: Card) =>
+      const index = indexCard['value'];
+      const indexId = state.db.name + '/' + String(index);
+
+      if (matchType === AutocompleteMatchType.Type)
+      {
+        return schemaState.tables.filter(
+          (table) => table.databaseId === indexId,
+        ).map(
+          (table) => table.name,
+        ).toList();
+      }
+
+      // else we are in the Field case...
+
+      // 2. Need to get current type
+
+      const isTypeCard = (card) => card['type'] === 'eqltype';
+
+      let typeCard = cards.find(isTypeCard);
+      if (typeCard === undefined)
+      {
+        typeCard = cards.get(1);
+        if (typeCard !== undefined)
         {
-          if (childCard.static.getParentTerms)
-          {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
-          }
-        },
-      );
-    }
-  }
+          typeCard = typeCard['cards'].find(isTypeCard);
+        }
+      }
 
-  return terms;
-}
+      if (typeCard !== undefined)
+      {
+        const type = typeCard['value'];
+        const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+
+        // 3. Return columns matching this (server+)index+type
+
+        return schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(indexId) &&
+            column.tableId === String(typeId),
+        ).map(
+          (column) => column.name,
+        ).toList();
+      }
+    }
+
+    return List([]);
+  },
+};
+
+export default ElasticBlockHelpers;
