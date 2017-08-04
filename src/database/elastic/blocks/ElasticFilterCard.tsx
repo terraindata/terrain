@@ -46,168 +46,190 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
+
+import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
+import { Colors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
-export const elasticValue = _card({
-  key: '',
-  value: '',
-  valueType: CommonElastic.valueTypes[0],
+const esFilterOperatorsMap = {
+  gt: '>',
+  gte: '≥',
+  lt: '<',
+  lte: '≤',
+};
+
+export const elasticFilterBlock = _block(
+  {
+    field: '',
+    value: undefined,
+    boolQuery: '',
+    rangeQuery: esFilterOperatorsMap.gt,
+
+    static: {
+      language: 'elastic',
+      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+      {
+        let value: any;
+        try
+        {
+          value = JSON.parse(block['value']);
+        }
+        catch (e)
+        {
+          value = block['value'];
+        }
+
+        const rangeOp = _.reduce(
+          esFilterOperatorsMap,
+          (memo, displayValue, esValue) =>
+          {
+            if (displayValue === block['rangeQuery'])
+            {
+              return esValue;
+            }
+            return memo;
+          },
+          null,
+        );
+
+        if (rangeOp === null)
+        {
+          throw new Error('Unspecified range operation for: ' + block['rangeQuery']);
+        }
+
+        return {
+          [block['boolQuery']]: {
+            range: {
+              [block['field']]: {
+                [rangeOp]: value,
+              },
+            },
+          },
+        };
+
+      },
+      removeOnCardRemove: true,
+    },
+  });
+
+export const elasticFilter = _card({
+  filters: List(),
+  key: 'bool',
 
   static: {
     language: 'elastic',
-    tql: '"$value"',
-    title: 'Value',
-    colors: ['#798', '#acb'],
-    preview: '[value]',
-    display:
-    {
-      displayType: DisplayType.TEXT,
-      key: 'value',
-    },
-  },
-});
+    title: 'Filter',
+    colors: Colors().builder.cards.booleanClause,
+    preview: '[filters.length] Filters',
 
-export const elasticObject = _wrapperCard({
-  language: 'elastic',
-  tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-  {
-    const obj: object = {};
-
-    block['cards'].map(
-      (card) =>
-        _.extend(obj, tqlTranslationFn(card, tqlConfig)),
-    );
-
-    return obj;
-  },
-  title: 'Object',
-  colors: ['#123', '#456'],
-  accepts: List(['elasticKeyValueWrap']),
-});
-
-export const elasticArray = _wrapperCard({
-  title: 'Array',
-  language: 'elastic',
-  tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-  {
-    const arr: any[] = [];
-
-    block['cards'].map(
-      (card) =>
-        arr.push(tqlTranslationFn(card, tqlConfig)),
-    );
-
-    return arr;
-  },
-  colors: ['#123', '#456'],
-  accepts: CommonElastic.acceptsValues,
-});
-
-// section: each value type has its own card
-
-export const elasticKeyValueWrap = _card({
-  key: '',
-  cards: L(),
-
-  static:
-  {
-    language: 'elastic',
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
+      const filterObj = {};
+
+      const filters = block['filters'].map(
+        (filterBlock) =>
+        {
+          const f = tqlTranslationFn(filterBlock, tqlConfig);
+          _.map(f as any, (v, k) =>
+          {
+            if (filterObj[k] === undefined)
+            {
+              filterObj[k] = [v];
+            }
+            else
+            {
+              filterObj[k].push(v);
+            }
+          });
+        });
+      return filterObj;
+    },
+
+    anythingAccepts: true, // TODO change
+
+    init: (blocksConfig) =>
+    {
       return {
-        [block['key']]: tqlTranslationFn(block['cards'].get(0), tqlConfig),
+        filters: List([
+          BlockUtils.make(blocksConfig, 'elasticFilterBlock'),
+        ]),
       };
     },
-    title: 'Property W',
-    colors: ['#789', '#abc'],
-    preview: (c: Card) =>
-    {
-      const prefix = c['key'] + ': ';
 
-      if (c['cards'].size)
-      {
-        const card = c['cards'].get(0);
-        return prefix + BlockUtils.getPreview(card);
-      }
-      return prefix + 'Nothing';
-    },
-
-    accepts: CommonElastic.acceptsValues,
     display:
     [
       {
-        displayType: DisplayType.TEXT,
-        key: 'key',
-        autoDisabled: true,
-      },
-
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-        // className: 'nested-cards-content',
-        singleChild: true,
-        accepts: CommonElastic.acceptsValues,
+        displayType: DisplayType.ROWS,
+        key: 'filters',
+        english: 'Filter',
+        factoryType: 'elasticFilterBlock',
+        row:
+        {
+          inner:
+          [
+            {
+              displayType: DisplayType.DROPDOWN,
+              key: 'boolQuery',
+              options: List(
+                [
+                  'must',
+                  'must_not',
+                  'should',
+                ],
+                // Can consider using this, but it includes "minmum_should_match," which
+                //  doesn't make sense in this context
+                // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
+              ),
+              dropdownUsesRawValues: true,
+              autoDisabled: true,
+              centerDropdown: true,
+              style: {
+                maxWidth: 75,
+                marginRight: 3,
+              },
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'field',
+              getAutoTerms: (schemaState) =>
+              {
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+              },
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              key: 'rangeQuery',
+              options: List(
+                _.values(esFilterOperatorsMap),
+                // can consider using this, but it includes 'boost', and uses raw text values
+                // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+              ),
+              dropdownUsesRawValues: true,
+              centerDropdown: true,
+              autoDisabled: true,
+              style: {
+                maxWidth: 75,
+              },
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'value',
+              autoDisabled: true,
+            },
+          ],
+        },
       },
     ],
   },
 });
 
-export const elasticText = _valueCard({
-  language: 'elastic',
-  title: 'Text',
-  colors: ['#798', '#acb'],
-  defaultValue: '',
-  tql: (block: Block) => block['value'],
-  string: true,
-});
-
-export const elasticNumber = _valueCard({
-  language: 'elastic',
-  title: 'Number',
-  colors: ['#798', '#acb'],
-  defaultValue: 0,
-  tql: (block: Block) => + block['value'] as any,
-  string: true,
-});
-
-export const elasticBool = _card({
-  value: 1,
-
-  static:
-  {
-    language: 'elastic',
-    title: 'True / False',
-    preview: (card: Card) => card['value'] ? 'True' : 'False',
-    tql: (block: Block) => !!block['value'] as any,
-    colors: ['#798', '#acb'],
-    display:
-    {
-      displayType: DisplayType.DROPDOWN,
-      options: Immutable.List(['false', 'true']),
-      key: 'value',
-    },
-  },
-});
-
-export const elasticNull = _card({
-  static:
-  {
-    language: 'elastic',
-    title: 'Null',
-    preview: 'Null',
-    tql: () => null,
-    colors: ['#798', '#acb'],
-    display: [],
-  },
-});
+export default elasticFilter;

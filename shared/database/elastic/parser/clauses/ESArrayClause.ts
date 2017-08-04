@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
@@ -57,9 +58,9 @@ export default class ESArrayClause extends ESClause
 {
   public elementID: string;
 
-  public constructor(type: string, elementID: string, settings: any)
+  public constructor(type: string, elementID: string, settings?: ESClauseSettings)
   {
-    super(type, settings, ESClauseType.ESArrayClause);
+    super(type, ESClauseType.ESArrayClause, settings);
     this.elementID = elementID;
   }
 

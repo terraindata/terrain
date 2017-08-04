@@ -48,9 +48,9 @@ THE SOFTWARE.
 
 export enum InputType
 {
+  NUMBER,
   TEXT,
   DATE,
-  NUMBER,
 }
 
 export const InputPrefix: string = '@';

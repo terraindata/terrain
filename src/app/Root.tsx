@@ -43,77 +43,49 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import AppRouter from './AppRouter';
+import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+import LibraryStore from './library/data/LibraryStore';
+import UserStore from './users/data/UserStore';
 
-// tslint:disable:strict-boolean-expressions
-
-import { Block } from '../../blocks/types/Block';
-import { Card } from '../../blocks/types/Card';
-import { Input, InputPrefix } from '../../blocks/types/Input';
-
-import * as Immutable from 'immutable';
-import SchemaStore from '../schema/data/SchemaStore';
-import { BuilderState, BuilderStore } from './data/BuilderStore';
-
-export function getTermsForKeyPath(keyPath: KeyPath): List<string>
+if (!DEV)
 {
-  const state = BuilderStore.getState();
-  const terms = getTermsForKeyPathHelper(keyPath, state);
-
-  // TODO migrate inputs reduction to the Query class if we get a query class
-  const inputs = state.query && state.query.inputs;
-  if (inputs && inputs.size)
+  // report uncaught errors in production
+  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
   {
-    const inputTerms = inputs.map(
-      (input: Input) => InputPrefix + input.key,
-    ).toList();
-    if (terms)
-    {
-      return inputTerms.concat(terms).toList();
-    }
-    return inputTerms;
-  }
 
-  return terms;
+    const user = UserStore.getState().get('currentUser');
+    const userId = user && user.id;
+    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
+    const builderState = JSON.stringify(BuilderStore.getState().toJS());
+    const location = JSON.stringify(window.location);
+
+    const msg = `${errorMsg} by ${userId}
+      Location:
+      ${location}
+
+      Library State:
+      ${libraryState}
+
+      Builder State:
+      ${builderState}
+
+      Error Stack:
+      ${(error != null && error.stack != null) ? error.stack : ''}
+    `;
+
+    $.post('http://lukeknepper.com/email.php', {
+      msg,
+      secret: '11235813',
+    });
+
+    return false;
+  };
 }
 
-function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
+ReactDOM.render(<AppRouter />, document.getElementById('app'), () =>
 {
-  if (!keyPath.size)
-  {
-    return Immutable.List([]);
-  }
-
-  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
-
-  const block = BuilderStore.getState().getIn(keyPath);
-
-  if (block && block._isCard)
-  {
-    const card = block as Card;
-
-    if (card.static.getChildTerms)
-    {
-      terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
-    }
-
-    if (card.static.getNeighborTerms)
-    {
-      terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
-    }
-
-    if (card['cards'])
-    {
-      card['cards'].map(
-        (childCard: Card) =>
-        {
-          if (childCard.static.getParentTerms)
-          {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
-          }
-        },
-      );
-    }
-  }
-
-  return terms;
-}
+  // tests can go here
+});
