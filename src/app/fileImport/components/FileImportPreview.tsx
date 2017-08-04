@@ -262,12 +262,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public stream()
   {
-    // let test: List<string> = List([]);
-    // test = test.set(5, 'test');
-    // console.log('test: ', test);
-    //
-    // test = test.set(1, 'test2');
-    // console.log(test.first());
     let id = 0;
 
     console.log('setting up socket...');
@@ -289,13 +283,13 @@ class FileImportPreview extends TerrainComponent<Props>
       console.log('ready');
       console.log('queue: ', this.props.chunkMap);
 
-      if (this.props.chunkMap.size < FileImportTypes.MAX_CHUNKMAP_SIZE - 5)
+      if (this.props.chunkMap.size < FileImportTypes.MAX_CHUNKMAP_SIZE / 2)
       {
         this.fill();
       }
       if (!this.props.chunkMap.isEmpty())      // assume filereader parses chunks faster than backend processes them
       {
-        console.log('chunk: ', this.props.chunkMap.get(id));
+        console.log('send chunk: ', this.props.chunkMap.get(id));
         socket.send(this.props.chunkMap.get(id));
         Actions.dequeueChunk(id);
         id++;
@@ -369,6 +363,7 @@ class FileImportPreview extends TerrainComponent<Props>
       //   fileStart += FileImportTypes.CHUNK_SIZE;
       //   id++;
       // }
+      this.fill();
       this.stream();
     }
   }
