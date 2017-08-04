@@ -75,6 +75,7 @@ import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/lint/lint.js';
+import 'codemirror/addon/mode/overlay.js';
 import 'codemirror/mode/javascript/javascript.js';
 
 import './codemirror.less';
@@ -126,8 +127,11 @@ class TQLEditor extends TerrainComponent<Props>
         readOnly: !this.props.canEdit,
         lineNumbers: true,
         extraKeys: {
+          'Shift-Tab': 'indentLess',
+          'Tab': 'indentMore',
           'Ctrl-F': 'findPersistent',
           'Ctrl-Alt-F': this.handleAutoFormatRequest,
+          'Ctrl-Enter': this.issueQuery
         },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
@@ -216,6 +220,14 @@ class TQLEditor extends TerrainComponent<Props>
     return null;
   }
 
+  private issueQuery(cmInstance): void
+  {
+    if (this.props.onChange)
+    {
+      this.props.onChange(cmInstance.getValue());
+    }
+  }
+
   private handleAutoFormatRequest(cmInstance): void
   {
     if (this.props.language === 'elastic')
@@ -231,7 +243,7 @@ class TQLEditor extends TerrainComponent<Props>
     }
   }
 
-  private handleCMHighlighting(cmInstance, change)
+  private handleHighlighting(cmInstance, change)
   {
     if (this.props.language === 'elastic')
     {
@@ -253,7 +265,7 @@ class TQLEditor extends TerrainComponent<Props>
      * change event (https://codemirror.net/doc/manual.html#events) is fired before CodeMirror updates the DOM.
      * Because highlightES changes how codemirror renders the content, we have to call it in the chagne callback.
      */
-    cmInstance.on('change', this.handleCMHighlighting);
+    cmInstance.on('change', this.handleHighlighting);
     /*
      * changes event is fired after CodeMirror updates the DOM.
      * Because handleTQLChange may change the react state and the change could be expensieve, we call this after

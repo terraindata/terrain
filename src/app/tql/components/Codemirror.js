@@ -54,7 +54,6 @@ const CM = require('codemirror');
 const diff_match_patch = require('diff-match-patch');
 require('./merge.js');
 const Dimensions = require('react-dimensions');
-import ElasticHighlighter from '../highlighters/ElasticHighlighter.tsx'
 
 var CodeMirror = createReactClass({
   displayName: 'CodeMirror',
@@ -114,9 +113,6 @@ var CodeMirror = createReactClass({
     else
     {
       this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
-      this.codeMirror.addKeyMap({
-        'Ctrl-Enter': this.codemirrorIssueQuery,
-      });
       this.codeMirror.on('focus', this.focusChanged.bind(this, true));
       this.codeMirror.on('blur', this.focusChanged.bind(this, false));
       this.codeMirror.on('contextmenu', this.handleRightClick);
@@ -426,13 +422,6 @@ var CodeMirror = createReactClass({
       this.props.onFocusChange && this.props.onFocusChange(focused);
     }
   },
-  codemirrorIssueQuery: function codemirrorIssueQuery(cm)
-  {
-    if (this.props.onChange)
-    {
-      this.props.onChange(cm.getDoc().getValue(), false, true);
-    }
-  },
   render: function render()
   {
     var editorClassName = className('ReactCodeMirror', this.state.isFocused ? 'ReactCodeMirror--focused' : null, this.props.className);
@@ -452,7 +441,7 @@ var CodeMirror = createReactClass({
       {
         className: editorClassName,
       },
-      React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write TQL here", defaultValue: this.props.value, autoComplete: 'off' })
+      React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write your query here", defaultValue: this.props.value, autoComplete: 'off' })
     );
   }
 });

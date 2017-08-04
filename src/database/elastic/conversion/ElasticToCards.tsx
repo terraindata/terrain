@@ -119,7 +119,8 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       {
         filters: List(filters),
       });
-  } else if (isScoreCard(valueInfo))
+  }
+  else if (isScoreCard(valueInfo))
   {
     const weights = [];
     for (const factor of valueInfo.value.params.factors)
@@ -208,7 +209,7 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
     {
       const field = Object.keys(obj['range'])[0];
       const rangeQuery = Object.keys(obj['range'][field])[0];
-      const value = JSON.stringify(obj['range'][field][rangeQuery]);
+      const value = obj['range'][field][rangeQuery];
 
       return make(Blocks, 'elasticFilterBlock', {
         field,
