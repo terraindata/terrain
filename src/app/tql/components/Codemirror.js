@@ -60,7 +60,6 @@ var CodeMirror = createReactClass({
 
   propTypes:
   {
-    onChange: PropTypes.func,
     onFocusChange: PropTypes.func,
     options: PropTypes.object,
     path: PropTypes.string,

@@ -89,6 +89,7 @@ export const elasticFilterBlock = _block(
             },
           },
         };
+
       },
       removeOnCardRemove: true,
     },

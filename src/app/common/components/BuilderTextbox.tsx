@@ -50,10 +50,10 @@ import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
 import { Display } from '../../../blocks/displays/Display';
@@ -133,9 +133,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
-    // TODO?
-    // this.executeChange = _.debounce(this.executeChange, 750);
+    this.executeChange = _.debounce(this.executeChange, 300);
 
     const value: any = this.props.value;
     this.state = {
@@ -191,8 +189,13 @@ class BuilderTextbox extends TerrainComponent<Props>
     }
   }
 
-  // throttled event handler
-  public executeChange(value)
+  public componentWillUnmount()
+  {
+    this.executeChange.flush();
+  }
+
+  // throttled event handler - becomes a lodash debounce object
+  public executeChange: any = (value) =>
   {
     // if(this.props.isNumber)
     // {
@@ -251,12 +254,14 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public handleBlur(event: React.FocusEvent<any>, value: string)
   {
+    this.executeChange.flush();
     this.props.onBlur && this.props.onBlur(this, value, event);
   }
 
   public handleCardToolClose()
   {
     this.executeChange('');
+    this.executeChange.flush();
     this.setState({
       value: '',
     });
