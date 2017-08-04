@@ -204,7 +204,7 @@ class InputComponent extends TerrainComponent<Props>
     const { input } = this.props;
     const inputColor = Colors().builder.cards.inputParameter[0];
     const inputBg = Colors().builder.cards.inputParameter[1];
-    console.log(cardStyle(inputColor, this.state.focused ? inputBg : Colors().bg3));
+
     return (
       <div className='input' ref='input'>
         {

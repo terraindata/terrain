@@ -297,7 +297,7 @@ class Dropdown extends TerrainComponent<Props>
           className='dropdown-value'
           ref='value'
           style={{
-            "width": this.props.width,
+            'width': this.props.width,
             'backgroundColor': !this.state.open ? Colors().inputBg :
               customColor || Colors().active,
             'color': !this.state.open ? customColor || Colors().text1
