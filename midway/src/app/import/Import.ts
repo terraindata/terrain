@@ -130,7 +130,7 @@ export class Import
         }
         winston.info('streaming auth successful.');
         authorized = true;
-        this._deleteStreamingTempFolder(socket);    // in case the folder was improperly cleaned up last time (shouldn't happen)
+        this._deleteStreamingTempFolder();    // in case the folder was improperly cleaned up last time (shouldn't happen)
         fs.mkdirSync(this.streamingTempFolder);
         winston.info('created streaming temp directory.');
         socket.emit('ready');
@@ -300,7 +300,8 @@ export class Import
       {
         return reject(hasCsvHeader);
       }
-      let csvHeaderRemoved: boolean = (fields['filietype'] !== 'csv') || !hasCsvHeader;
+      winston.info('hascsvheader: ' + String(hasCsvHeader));
+      let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
 
       const imprtConf: ImportConfig = {
         dbid: template['dbid'],
@@ -326,13 +327,18 @@ export class Import
         reject(e);
       }
 
+      this._deleteStreamingTempFolder();    // in case the folder was improperly cleaned up last time (shouldn't happen)
+      fs.mkdirSync(this.streamingTempFolder);
+
       this.readStream = file;
       this.chunkQueue = [];
+      this.nextChunk = '';
+      this.chunkCount = 0;
       let contents: string = '';
       this.readStream.on('data', async (chunk) =>
       {
         contents += chunk.toString();
-        if (contents.length > 1000000)
+        if (contents.length > 10000000)
         {
           if (!csvHeaderRemoved)
           {
@@ -343,9 +349,9 @@ export class Import
           contents = '';
           if (this.chunkQueue.length > 2)
           {
-            this.readStream.pause();    // TODO: why is lint complaining?
+            this.readStream.pause();
           }
-          await this._fireNextChunk();
+          await this._fireNextChunk(reject);
         }
       });
       this.readStream.on('error', (e) =>
@@ -356,6 +362,11 @@ export class Import
       {
         if (contents !== '')
         {
+          if (!csvHeaderRemoved)
+          {
+            contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
+            csvHeaderRemoved = true;
+          }
           this.chunkQueue.push({ chunk: contents, isLast: true });
         }
         else
@@ -366,16 +377,16 @@ export class Import
           }
           this.chunkQueue[this.chunkQueue.length - 1]['isLast'] = true;
         }
-        for (let i = 0; i < this.chunkQueue.length; i++)
+        while (this.chunkQueue.length > 0)
         {
-          await this._fireNextChunk();    // TODO: make sure this actually waits, so no concurrency issues
+          await this._fireNextChunk(reject);
         }
         // TODO: do the actual upload
+        resolve(res);
       });
-      resolve(res);
     });
   }
-  private async _fireNextChunk()
+  private async _fireNextChunk(reject: ((r?: any) => void))
   {
     if (this.chunkQueue.length === 0 || (this.chunkQueue.length === 1 && !this.chunkQueue[0]['isLast']))
     {
@@ -386,10 +397,9 @@ export class Import
     {
       this.readStream.resume();
     }
-    return this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast']);
-    // TODO: make error handling compatible, since socket will be undefined in the above call
+    return this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast'], reject);
   }
-  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket?: socketio.Socket)
+  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: socketio.Socket | ((r?: any) => void))
   {
     // get valid piece of csv data ; TODO: SUPPORT JSON AS WELL
     const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
@@ -403,7 +413,6 @@ export class Import
     catch (e)
     {
       this._sendSocketError(socket, 'Failed to get items: ' + String(e));
-      return;
     }
     winston.info('streaming server got items from data');
 
@@ -420,7 +429,6 @@ export class Import
         if (writeErr !== undefined && writeErr !== null)
         {
           this._sendSocketError(socket, 'Failed to dump to temp file: ' + String(writeErr));
-          return;
         }
       });
       winston.info('wrote items to file.');
@@ -493,12 +501,20 @@ export class Import
     });
   }
 
-  private _sendSocketError(socket: socketio.Socket, error: string)
+  private _sendSocketError(socket: socketio.Socket | ((r?: any) => void), error: string)
   {
     winston.info('emitting socket error: ' + error);
-    socket.emit('midway_error', error);
-    this._deleteStreamingTempFolder(socket);
-    socket.disconnect(true);
+    if (typeof socket === 'function')
+    {
+      this._deleteStreamingTempFolder();
+      socket(error);
+    }
+    else
+    {
+      socket.emit('midway_error', error);
+      this._deleteStreamingTempFolder();
+      socket.disconnect(true);
+    }
   }
   private async _readFileAndUpsert(num: number, targetNum: number, socket: socketio.Socket)
   {
@@ -528,19 +544,19 @@ export class Import
       else if (this.totalReads === targetNum)
       {
         this.totalReads++;
-        this._deleteStreamingTempFolder(socket);
+        this._deleteStreamingTempFolder();
         winston.info('deleted streaming temp folder');
       }
     });
   }
-  private _deleteStreamingTempFolder(socket: socketio.Socket)
+  private _deleteStreamingTempFolder()
   {
     rimraf(this.streamingTempFolder, (err) =>
     {
       if (err !== undefined && err !== null)
       {
-        this._sendSocketError(socket, 'Failed to delete temp file: ' + String(err));
-        return;
+        // can't _sendSocketError or else would end up in an infinite cycle
+        throw new Error('Failed to delete temp file: ' + String(err));
       }
     });
   }
