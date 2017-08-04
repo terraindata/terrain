@@ -54,6 +54,8 @@ import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
+import { Colors } from '../../common/Colors';
+import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
@@ -163,10 +165,12 @@ class TQLEditor extends TerrainComponent<Props>
       options['mode'] = '';
     }
 
+    let CM: any;
+
     if (this.props.isDiff)
     {
       options['value'] = this.props.tql || '';
-      return (
+      CM = (
         <CodeMirror
           ref='cm2'
           className='codemirror-text'
@@ -177,7 +181,7 @@ class TQLEditor extends TerrainComponent<Props>
         />
       );
     }
-    return (
+    CM = (
       <CodeMirror
         ref='cm'
         className='codemirror-text'
@@ -193,6 +197,17 @@ class TQLEditor extends TerrainComponent<Props>
         hideTermDefinition={this.props.hideTermDefinition}
         onCodeMirrorMount={this.registerCodeMirror}
       />
+    );
+
+    return (
+      <div>
+        {
+          CM
+        }
+        <StyleTag
+          style={CODE_HIGHLIGHTING_STYLE}
+        />
+      </div>
     );
   }
 
@@ -278,5 +293,25 @@ class TQLEditor extends TerrainComponent<Props>
   }
 
 }
+
+const CODE_HIGHLIGHTING_STYLE = {
+  '.cm-s-monokai span.cm-atom': { color: Colors().builder.cards.booleanClause[0] },
+
+  '.cm-s-monokai span.cm-property': { color: Colors().builder.cards.structureClause[0] },
+  '.cm-s-monokai span.cm-attribute': { color: '#f00' /* what is an attribute? */ },
+  '.cm-s-monokai span.cm-keyword': { color: Colors().builder.cards.mapClause[0] },
+  '.cm-s-monokai span.cm-builtin': { color: Colors().builder.cards.baseClause[0] },
+  '.cm-s-monokai span.cm-string': { color: Colors().builder.cards.stringClause[0] },
+
+  '.cm-s-monokai span.cm-variable': { color: Colors().builder.cards.fieldClause[0] },
+  '.cm-s-monokai span.cm-variable-2': { color: Colors().builder.cards.inputParameter[0] },
+  '.cm-s-monokai span.cm-variable-3': { color: Colors().builder.cards.fieldClause[0] },
+
+  '.cm-s-monokai span.es-null': { color: Colors().builder.cards.nullClause[0] },
+  '.cm-s-monokai span.es-number': { color: Colors().builder.cards.numberClause[0] },
+  '.cm-s-monokai span.es-boolean': { color: Colors().builder.cards.booleanClause[0] },
+  '.cm-s-monokai span.es-parameter': { color: Colors().builder.cards.inputParameter[0] },
+  '.cm-s-monokai span.es-string': { color: Colors().builder.cards.stringClause[0] },
+};
 
 export default TQLEditor;

@@ -76,6 +76,8 @@ export interface Props
 
   addColumn?: (number, string?) => void;
   columnIndex?: number;
+
+  textStyle?: React.CSSProperties;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
@@ -86,23 +88,23 @@ class BuilderComponent extends TerrainComponent<Props>
   {
     BuilderActions.create(keyPath, index + 1, display.factoryType);
   }
+
   public removeRow(keyPath: KeyPath, index: number)
   {
     BuilderActions.remove(keyPath, index);
   }
+
   public moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
     BuilderActions.move(keyPath, index, newIndex);
   }
 
-  public renderDisplay(
-    displayArg: Display | Display[],
+  public renderDisplay(displayArg: Display | Display[],
     parentKeyPath: KeyPath,
     data: IMMap<any, any>,
     options?: {
       className: string;
-    },
-  ): (El | El[])
+    }): (El | El[])
   {
     const keySeed = parentKeyPath.join(',');
     if (Array.isArray(displayArg))
@@ -118,6 +120,7 @@ class BuilderComponent extends TerrainComponent<Props>
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
           language={this.props.language}
+          textStyle={this.props.textStyle}
         />,
       ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -144,7 +147,7 @@ class BuilderComponent extends TerrainComponent<Props>
 
     if (d.displayType === DisplayType.LABEL)
     {
-      // special type that is unrealted to the data
+      // special type that is unrelated to the data
       return <div
         className='builder-label'
         key={keySeed + '-label'}
@@ -222,6 +225,7 @@ class BuilderComponent extends TerrainComponent<Props>
               centerAlign={d.centerDropdown}
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}
+              textColor={this.props.textStyle && this.props.textStyle.color}
               width={d.widthDropdown}
             />
             {this.props.helpOn && d.help ?
@@ -247,6 +251,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 canEdit={this.props.canEdit}
                 parentData={this.props.parentData}
                 language={this.props.language}
+                textStyle={this.props.textStyle}
               />
             }
             <div
@@ -262,6 +267,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 addColumn={this.props.addColumn}
                 columnIndex={this.props.columnIndex}
                 language={this.props.language}
+                textStyle={this.props.textStyle}
               />
             </div>
             {!d.below ? null :
@@ -278,6 +284,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
                   language={this.props.language}
+                  textStyle={this.props.textStyle}
                 />
               </div>
             }
@@ -388,6 +395,7 @@ class BuilderComponent extends TerrainComponent<Props>
               typeErrorMessage,
               className,
             }}
+            textStyle={this.props.textStyle}
           />
           {
             this.props.helpOn && d.help ?

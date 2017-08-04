@@ -83,7 +83,8 @@ export default function ElasticToCards(
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
-        .set('cardsAndCodeInSync', true);
+        .set('cardsAndCodeInSync', true)
+        .set('parseError', false);
     }
     catch (e)
     {
