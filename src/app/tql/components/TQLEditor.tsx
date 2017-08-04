@@ -104,7 +104,7 @@ export interface Props
   isDiff?: boolean;
   diffTql?: string;
 
-  onChange?(tql: string);
+  onChange?(tql: string, noAction?: boolean, manualRequest?: boolean);
 
   toggleSyntaxPopup?(event, line);
   defineTerm?(value, event);
@@ -224,7 +224,7 @@ class TQLEditor extends TerrainComponent<Props>
   {
     if (this.props.onChange)
     {
-      this.props.onChange(cmInstance.getValue());
+      this.props.onChange(cmInstance.getValue(), false, true);
     }
   }
 
@@ -232,7 +232,7 @@ class TQLEditor extends TerrainComponent<Props>
   {
     if (this.props.language === 'elastic')
     {
-      const formatted = this.autoFormatQuery(cmInstance.getValue());
+      const formatted = this.autoFormatQuery(cmInstance.getDoc().getValue());
       if (formatted)
       {
         const cursor = cmInstance.getCursor();
