@@ -137,6 +137,9 @@ export const elasticScore = _card(
                 // help: ManualConfig.help['weight'],
                 key: 'weight',
                 placeholder: 'Weight',
+                style: {
+                  maxWidth: 120,
+                },
                 // autoDisabled: true,
               },
               {

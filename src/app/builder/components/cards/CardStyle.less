@@ -116,6 +116,12 @@
   border-bottom-left-radius: calc(@card-border-radius - 1px);
   border-bottom-right-radius: calc(@card-border-radius - 1px);
  }
+ 
+ 
+  .card-inner-with-title {
+    padding-top: 40px;
+  }
+
 
   &.card-opening {
     .card-body-wrapper {
@@ -163,7 +169,7 @@
   text-transform: capitalize;
   position: relative; // for menu component
   text-align: left;
-  top: 0px;
+  top: 3px;
 
   display: flex;
   height: @title-height;
@@ -372,6 +378,9 @@
   
   margin-left: -55px;
   width: calc(~"100% + 55px");
+  
+  // margin-left: 0px;
+  // width: 100%;
 }
 
 
@@ -419,14 +428,14 @@
   // border-left-width: 6px !important;
 }
 
-.card .cards-area, .builder-tb-cards-area {
+.card .cards-area {
   margin-right: -4px !important;
   margin-left: -108px;
   margin-left: -55px;
 }
 
-.card:not(.card-no-title) .card-inner {
-  padding-top: 40px;
+.builder-tb-cards-area {
+  margin-right: -4px !important;
 }
 
 // .card-no-title {
