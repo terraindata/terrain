@@ -55,7 +55,6 @@ import * as io from 'socket.io-client';
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
-import { MAX_CHUNKMAP_SIZE } from '../FileImportTypes';
 import AuthStore from './../../auth/data/AuthStore';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -68,6 +67,9 @@ import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 const { List } = Immutable;
+
+const CHUNK_SIZE = FileImportTypes.CHUNK_SIZE;
+const MAX_NUM_CHUNKS = FileImportTypes.MAX_CHUNKMAP_SIZE;
 
 export interface Props
 {
@@ -105,8 +107,8 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
-    fileStart: FileImportTypes.CHUNK_SIZE,
-    chunkId: 1,
+    fileStart: CHUNK_SIZE,
+    chunkId: MAX_NUM_CHUNKS,
   };
 
   public componentDidMount()
@@ -217,39 +219,6 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.templateText);
   }
 
-  /* parse the chunk to last new line character and add it to queue of chunks to be streamed
-   * save the leftover chunk and append it to the front of the next chunk */
-  // public parseChunk(chunk: string, isLast: boolean)
-  // {
-  //   if (isLast)
-  //   {
-  //     console.log('final chunk');
-  //     this.setState({
-  //       streamed: true,
-  //     });
-  //     Actions.updateQueue(chunk, chunk.length);
-  //   }
-  //   else
-  //   {
-  //     let index = 0;
-  //     let end = 0;
-  //     while (index < chunk.length)
-  //     {
-  //       if (chunk.charAt(index) === '\n')
-  //       {
-  //         end = index;
-  //       }
-  //       index++;
-  //     }
-  //     // console.log('chunk size: ', chunk.length);
-  //     // console.log('chunk: ', chunk);
-  //     // console.log('parsed chunk: ', chunk.substring(0, end));
-  //     console.log('nextChunk: ', chunk.substring(end, chunk.length));
-  //
-  //     Actions.updateQueue(chunk, end);
-  //   }
-  // }
-
   public readChunk(chunk: Blob, id: number, isLast: boolean)
   {
     const fr = new FileReader();
@@ -283,7 +252,7 @@ class FileImportPreview extends TerrainComponent<Props>
       console.log('ready');
       console.log('queue: ', this.props.chunkMap);
 
-      if (this.props.chunkMap.size < FileImportTypes.MAX_CHUNKMAP_SIZE / 2)
+      if (this.props.chunkMap.size < MAX_NUM_CHUNKS / 2)
       {
         this.fill();
       }
@@ -310,7 +279,7 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('upsert successful!');
       // TODO: handle success analogously as from Ajax request (in non-streaming case)
-      Actions.changeUploadInProgress();
+      Actions.changeUploadInProgress(true);
       alert('successful');
     });
   }
@@ -326,21 +295,27 @@ class FileImportPreview extends TerrainComponent<Props>
     let start = fileStart;
     let id = chunkId;
 
-    const nChunks = FileImportTypes.MAX_CHUNKMAP_SIZE - this.props.chunkMap.size;
-    console.log('add ' + String(nChunks) + ' chunks');
-    console.log(fileStart, chunkId);
-    for (let i = 0; i < nChunks; i++)
+    const numChunksInFile = this.props.file.size / CHUNK_SIZE;
+    if (id >= numChunksInFile)
     {
-      const chunk = this.props.file.slice(start, start + FileImportTypes.CHUNK_SIZE);
-      this.readChunk(chunk, id, start + FileImportTypes.CHUNK_SIZE > this.props.file.size);
+      return;
+    }
 
-      start += FileImportTypes.CHUNK_SIZE;
+    const numChunksToRead = Math.min(numChunksInFile - id, MAX_NUM_CHUNKS - this.props.chunkMap.size);
+    console.log('add ' + String(numChunksToRead) + ' chunks');
+    console.log(fileStart, chunkId);
+    for (let i = 0; i < numChunksToRead; i++)
+    {
+      const chunk = this.props.file.slice(start, start + CHUNK_SIZE);
+      this.readChunk(chunk, id, start + CHUNK_SIZE > this.props.file.size);
+
+      start += CHUNK_SIZE;
       id++;
     }
 
     this.setState({
-      fileStart: fileStart + nChunks * FileImportTypes.CHUNK_SIZE,
-      chunkId: chunkId + nChunks,
+      fileStart: fileStart + numChunksToRead * CHUNK_SIZE,
+      chunkId: chunkId + numChunksToRead,
     });
     return;
   }

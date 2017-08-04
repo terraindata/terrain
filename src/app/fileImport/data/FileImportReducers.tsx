@@ -210,7 +210,7 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
 FileImportReducers[ActionTypes.changeUploadInProgress] =
   (state, action) =>
     state
-      .set('uploadInProgress', !state.uploadInProgress)
+      .set('uploadInProgress', action.payload.uploading)
   ;
 
 FileImportReducers[ActionTypes.changeElasticUpdate] =
@@ -305,7 +305,7 @@ FileImportReducers[ActionTypes.uploadFile] =
         if (!state.streaming)
         {
           alert('success');
-          action.payload.changeUploadInProgress();
+          action.payload.changeUploadInProgress(false);
         }
       },
       (err: string) =>
@@ -313,7 +313,7 @@ FileImportReducers[ActionTypes.uploadFile] =
         if (!state.streaming)
         {
           alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-          action.payload.changeUploadInProgress();
+          action.payload.changeUploadInProgress(false);
         }
       },
     );

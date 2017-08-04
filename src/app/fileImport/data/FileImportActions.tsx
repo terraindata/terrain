@@ -129,8 +129,8 @@ const FileImportActions =
       $(ActionTypes.dequeueChunk, { id }),
 
     changeUploadInProgress:
-    () =>
-      $(ActionTypes.changeUploadInProgress, {}),
+    (uploading: boolean) =>
+      $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
     () =>
