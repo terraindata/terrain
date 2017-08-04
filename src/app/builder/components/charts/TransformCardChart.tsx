@@ -157,9 +157,11 @@ class TransformCardChart extends TerrainComponent<Props>
 
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
   }
-  public debouncedUpdatePoints: any = (lastUpdateConcrete) =>
+
+  // gets turned into debounced function/object
+  public debouncedUpdatePoints: any = (points, lastUpdateConcrete) =>
   {
-    this.props.updatePoints(this.state.pointsCache, lastUpdateConcrete);
+    this.props.updatePoints(points, lastUpdateConcrete);
   }
 
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
@@ -173,7 +175,11 @@ class TransformCardChart extends TerrainComponent<Props>
     this.setState({
       pointsCache: points,
     });
-    this.debouncedUpdatePoints(isConcrete);
+    this.debouncedUpdatePoints(points, isConcrete);
+    if (isConcrete)
+    {
+      this.debouncedUpdatePoints.flush();
+    }
   }
 
   public onPointMoveStart(initialScore, initialValue)
@@ -263,7 +269,6 @@ class TransformCardChart extends TerrainComponent<Props>
     this.updatePoints(this.state.pointsCache.filterNot(
       (point) => point.id === pointId || this.state.selectedPointIds.get(point.id),
     ).toList(), true);
-    this.debouncedUpdatePoints.flush();
   }
 
   public onCreate(value, score)
@@ -286,7 +291,6 @@ class TransformCardChart extends TerrainComponent<Props>
       ).toList(),
       true,
     );
-    this.debouncedUpdatePoints.flush();
   }
 
   public componentDidUpdate()
@@ -337,6 +341,7 @@ class TransformCardChart extends TerrainComponent<Props>
     TransformChart.destroy(el);
   }
 
+  // happens on undos/redos
   public componentWillReceiveProps(nextProps)
   {
     if (nextProps.points !== this.state.pointsCache)
