@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import { users } from '../users/UserRouter';
 import * as Util from '../Util';
 import { Import, ImportConfig } from './Import';
 
@@ -58,10 +60,26 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   winston.info('importing to database');
   const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype']);
+  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype', 'update']);
   Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
 
   ctx.body = await imprt.upsert(imprtConf);
+});
+
+Router.post('/headless', async (ctx, next) =>
+{
+  winston.info('importing to database, from file and template id');
+  const { files, fields } = await asyncBusboy(ctx.req);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+
+  Util.verifyParameters(fields, ['templateID', 'filetype']);
+
+  ctx.body = await imprt.upsertHeadless(files, fields);
 });
 
 export default Router;
