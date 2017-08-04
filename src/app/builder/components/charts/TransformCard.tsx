@@ -208,10 +208,11 @@ class TransformCard extends TerrainComponent<Props>
       // TODO MOD adapt Transform card for elastic.
       return;
     }
-
+    console.log("CardString: " + input);
     // TODO consider putting the query in context
     const { builderState } = this.props;
     const { cards } = builderState.query;
+    console.log("cards: " + JSON.stringify(cards));
     const { db } = builderState;
 
     if (typeof input === 'string')
@@ -222,8 +223,9 @@ class TransformCard extends TerrainComponent<Props>
       {
         const alias = parts[0];
         const field = parts[1];
-
+        console.log("alias field " + alias + ":" + field);
         const table = this.findTableForAlias(cards, alias);
+        console.log("table: " + table);
 
         if (table)
         {
