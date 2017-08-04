@@ -54,6 +54,7 @@ import { BuilderState, BuilderStore } from '../../builder/data/BuilderStore';
 
 CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {
+  const jsonMode = CodeMirror.getMode(config, { name: 'javascript', json: true });
   return {
     startState: () =>
     {

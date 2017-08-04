@@ -119,7 +119,8 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       {
         filters: List(filters),
       });
-  } else if (isScoreCard(valueInfo))
+  }
+  else if (isScoreCard(valueInfo))
   {
     const weights = [];
     for (const factor of valueInfo.value.params.factors)
