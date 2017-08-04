@@ -67,7 +67,7 @@ import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
-import { Colors } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
@@ -395,7 +395,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     // var card = cards.get(0);
     const color = card.static.colors[0] as string;
-    const title: string = card.closed ? card.static.title : '';
+    const title: string = card.static.title;
     const preview = card.closed ? null : BlockUtils.getPreview(card);
     // }
     // else
@@ -404,18 +404,9 @@ class BuilderTextbox extends TerrainComponent<Props>
     //   var title = "Add a Card";
     // }
 
-    const chipStyle =
-      {
-        background: color,
-      };
-    const arrowLineStyle =
-      {
-        borderColor: color,
-      };
-    const arrowHeadStyle =
-      {
-        borderLeftColor: color,
-      };
+    const chipStyle = cardStyle(color, Colors().bg3, null, true);
+    const arrowLineStyle = borderColor(color);
+    const arrowHeadStyle = getStyle('borderTopColor', color);
 
     return (
       <div
@@ -452,6 +443,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               </div>
             }
             {
+              !card['cannotBeMoved'] &&
               this.renderSwitch()
             }
           </div>

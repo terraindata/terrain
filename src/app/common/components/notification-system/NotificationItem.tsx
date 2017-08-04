@@ -407,7 +407,7 @@ class NotificationItem extends TerrainComponent<Props> {
 
       if (this.state.visible && !this.state.removed)
       {
-        notificationStyle.height = 'auto';
+        notificationStyle.height = 60;
         notificationStyle[cssByPos.property] = 0;
       }
 
@@ -439,17 +439,6 @@ class NotificationItem extends TerrainComponent<Props> {
         >
           <div
             style={{
-              opacity: this.state.visible ? .95 : 0,
-              position: 'relative',
-              width: '48px',
-              display: 'inline-block',
-              transition: this.state.visible ? '.3s ease-in-out' : '.2s ease-in-out',
-            }}
-          >
-            {this.renderLogo()}
-          </div>
-          <div
-            style={{
               position: 'absolute',
               paddingLeft: '10px',
               width: '196px',
@@ -462,6 +451,17 @@ class NotificationItem extends TerrainComponent<Props> {
           </div>
         </div>
       </div>
+          // <div
+          //   style={{
+          //     opacity: this.state.visible ? .95 : 0,
+          //     position: 'relative',
+          //     width: '48px',
+          //     display: 'inline-block',
+          //     transition: this.state.visible ? '.3s ease-in-out' : '.2s ease-in-out',
+          //   }}
+          // >
+          //   {this.renderLogo()}
+          // </div>
     );
   }
 }

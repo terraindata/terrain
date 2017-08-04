@@ -175,7 +175,7 @@ class CardDeckCardComponent extends TerrainComponent<CardProps>
           'cards-deck-card': true,
           'cards-deck-card-hidden': hidden,
         })}
-        style={cardStyle(data.colors[0], Colors().bg3, data.colors[1])}
+        style={cardStyle(data.colors[0], Colors().bg3, data.colors[1], true)}
       >
         {
           data.title

@@ -536,9 +536,9 @@ export function altStyle()
   return CACHE['altStyle' + curTheme];
 }
 
-export function cardStyle(strongColor, bgColor, hoverBg?: string)
+export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean)
 {
-  const key = 'card-' + strongColor + bgColor;
+  const key = 'card-' + strongColor + bgColor + hoverBg + small;
 
   if (!CACHE[key])
   {
@@ -546,7 +546,8 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string)
       background: bgColor,
       color: strongColor,
 
-      boxShadow: '3px 3px 5px 2px rgba(0,0,0,.39)',
+      boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
+        '3px 3px 5px 2px rgba(0,0,0,.39)',
       borderWidth: 1,
       borderStyle: 'solid',
       borderLeftWidth: '3px',
