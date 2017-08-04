@@ -113,6 +113,11 @@ export class Import
       socket.emit('request_auth');
       socket.on('auth', async (data) =>
       {
+        if (authorized)
+        {
+          this._sendSocketError(socket, 'Already authenticated ; repeat attempt received.');
+          return;
+        }
         const user = await users.loginWithAccessToken(Number(data['id']), data['accessToken']);
         if (user === null)
         {
@@ -186,11 +191,16 @@ export class Import
       socket.on('finished', async () =>
       {
         winston.info('streaming client finished.');
-
+        if (!authorized)
+        {
+          this._sendSocketError(socket, 'Must authenticate before sending messages.');
+          return;
+        }
         if (!this.readyToStream)
         {
           // close connection since there was a config issue
           this._sendSocketError(socket, 'config error -- see Ajax response.');
+          return;
         }
 
         // TODO: wait until all the data has finished being processed -- how?
