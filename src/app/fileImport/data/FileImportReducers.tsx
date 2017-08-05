@@ -207,6 +207,18 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
       .set('csvHeaderMissing', !state.csvHeaderMissing)
   ;
 
+FileImportReducers[ActionTypes.changeUploadInProgress] =
+  (state, action) =>
+    state
+      .set('uploadInProgress', action.payload.uploading)
+  ;
+
+FileImportReducers[ActionTypes.changeElasticUpdate] =
+  (state, action) =>
+    state
+      .set('elasticUpdate', !state.elasticUpdate)
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
     state
@@ -286,18 +298,21 @@ FileImportReducers[ActionTypes.uploadFile] =
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
+      state.elasticUpdate,
       () =>
       {
         alert('success');
+        action.payload.changeUploadInProgress(false);
       },
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        action.payload.changeUploadInProgress(false);
       },
       state.csvHeaderMissing,
     );
 
-    return state;
+    return state.set('uploadInProgress', true);
   };
 
 FileImportReducers[ActionTypes.saveTemplate] =

@@ -135,16 +135,20 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         className='fi-preview-column'
         style={backgroundColor(Colors().fileimport.preview.column.base)}
       >
-        include
-        <CheckBox
-          checked={this.props.isIncluded}
-          onChange={this.handleIncludedChange}
-        />
-        primary key
-        <CheckBox
-          checked={this.props.isPrimaryKey}
-          onChange={this.handlePrimaryKeyChange}
-        />
+        <div
+          className='fi-preview-misc'
+        >
+          include
+          <CheckBox
+            checked={this.props.isIncluded}
+            onChange={this.handleIncludedChange}
+          />
+          primary key
+          <CheckBox
+            checked={this.props.isPrimaryKey}
+            onChange={this.handlePrimaryKeyChange}
+          />
+        </div>
         <div
           className='fi-preview-column-name'
         >

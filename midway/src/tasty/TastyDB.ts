@@ -96,6 +96,18 @@ abstract class TastyDB
   public async abstract upsert(table: TastyTable, elements: object[]): Promise<object[]>;
 
   /**
+   * update an array of objects in a TastyTable
+   *
+   * @abstract
+   * @param {TastyTable} table
+   * @param {object[]} elements
+   * @returns {Promise<object[]>}
+   *
+   * @memberof TastyDB
+   */
+  public async abstract update(table: TastyTable, elements: object[]): Promise<object[]>;
+
+  /**
    * returns schema information for a database
    *
    * @abstract
