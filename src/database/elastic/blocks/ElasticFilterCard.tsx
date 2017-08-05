@@ -128,6 +128,7 @@ export const elasticFilter = _card({
   static: {
     language: 'elastic',
     title: 'Filter',
+    description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: Colors().builder.cards.booleanClause,
     preview: '[filters.length] Filters',
 
@@ -153,8 +154,6 @@ export const elasticFilter = _card({
         });
       return filterObj;
     },
-
-    anythingAccepts: true, // TODO change
 
     init: (blocksConfig) =>
     {

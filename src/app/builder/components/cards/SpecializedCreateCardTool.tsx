@@ -100,7 +100,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
 
   public getOptions(props: Props)
   {
-    const options = props.data['getChildOptions'](props.data);
+    const options = props.data['getChildOptions'](props.data, AllBackendsMap[this.props.language]);
 
     if (this.state && options.equals(this.state.options))
     {
