@@ -522,7 +522,7 @@ export function borderColor(color: string, hoverColor?: string)
 
 export function link()
 {
-  return fontColor(Colors().text.link, Colors().text.linkHover);
+  return fontColor(Colors().inactiveHover, Colors().active);
 }
 
 const CACHE: any = {};
@@ -597,8 +597,8 @@ export function buttonColors()
   if (!CACHE['buttonColors' + curTheme])
   {
     CACHE['buttonColors' + curTheme] = extend({},
-      backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-      fontColor(Colors().button.text),
+      backgroundColor(Colors().inactiveHover, Colors().active),
+      fontColor(Colors().text1),
     );
   }
 
