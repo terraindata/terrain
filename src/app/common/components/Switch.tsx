@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import * as Radium from 'radium';
 import './Switch.less';
 
 export interface Props
@@ -111,13 +111,13 @@ class Switch extends TerrainComponent<Props>
 }
 
 const SWITCH_STYLE = {
-  backgroundColor: Colors().bg3,
-  color: Colors().text2,
-  
+  'backgroundColor': Colors().bg3,
+  'color': Colors().text2,
+
   ':hover': {
     color: Colors().text1,
-  }
-}
+  },
+};
 
 const ACTIVE_SECTION_STYLE = {
   color: Colors().text1,

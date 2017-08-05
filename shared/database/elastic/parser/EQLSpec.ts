@@ -263,7 +263,7 @@ const EQLSpec: ESClause[] =
       'field_sort_value',
       {
         path: ['sort'],
-        desc: 'Sort the field.',
+        desc: 'Sort by a single field, either ascending or descending.',
       },
     ),
     new ESVariantClause('field_sort_value',

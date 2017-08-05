@@ -52,7 +52,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { CardConfig } from '../../../../blocks/types/Card';
-import { backgroundColor, Colors, fontColor, borderColor, cardStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, cardStyle, Colors, fontColor } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import './CreateCardOption.less';

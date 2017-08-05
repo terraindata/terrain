@@ -55,6 +55,7 @@ import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
+import { Backend } from '../../../database/types/Backend';
 import { Colors } from '../../common/Colors';
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
@@ -208,6 +209,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
+  private customCardTypesMap: { [elasticClauseType: string]: string[] } = {
+    sort_clause: ['elasticScore'],
+    query: ['elasticFilter'],
+  };
+
   public constructor(config: EQLConfig)
   {
     super();
@@ -228,69 +234,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         this.getCard(clause);
       });
   }
-  
-  private computeVariantClauses(clauses: { [name: string]: ESClause })
-  {
-    const variantClauses: { [clauseType: string]: ESClause } = {};
-    _.mapObject(clauses, (clause, key) =>
-      {
-        if (clause.clauseType === ESClauseType.ESVariantClause)
-        {
-          variantClauses[clause.type] = clause;
-        }
-      },
-    );
-    
-    const getClauseTypesForVariant = (clause: ESVariantClause): string[] =>
-    {
-      let types: string[] = [];
-      _.mapObject(clause.subtypes, (subtype) =>
-      {
-        if (variantClauses[subtype] !== undefined)
-        {
-          types = types.concat(getClauseTypesForVariant(clauses[subtype] as ESVariantClause));
-        }
-        else
-        {
-          types.push(subtype);
-        }
-      });
-      return types;
-    }
-    
-    this.variantClauseMapping = _.mapObject(variantClauses, getClauseTypesForVariant);
-  }
-  
-  // We need to replace occurences of variant card types with their final types
-  // We also need to splice in some custom types
-  private getCardTypes(initialCardTypes: string[], forClause?: ESClause): List<string>
-  {
-    let cardTypes: string[] = [];
-    initialCardTypes.map((childType) =>
-    {
-      if (this.variantClauseMapping[childType] !== undefined)
-      {
-        // variant clause, substitute
-        cardTypes = cardTypes.concat(this.variantClauseMapping[childType]);
-      }
-      else
-      {
-        cardTypes.push(childType);
-      }
-    });
-    
-    if (forClause !== undefined && this.customCardTypesMap[forClause.type] !== undefined)
-    {
-      // HERE
-      cardTypes = cardTypes.concat(this.customCardTypesMap[forClause.type]);
-    }
-    
-    return List(cardTypes.map((type) => 'eql' + type));
-  }
-  
-  private customCardTypesMap: {[elasticClauseType: string]: string[]} = {
-    script_sort: ['elasticScore'],
-  };
 
   public getCard(clause: ESClause): any
   {
@@ -302,7 +245,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     }
 
     card = clause.accept(this);
-    
+
     if (card === null) // no card for this clause type
     {
       return;
@@ -680,32 +623,49 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         cards: List([]),
 
         // provide options of all possible card types
-        getChildOptions: (card) =>
+        getChildOptions: (card, backend: Backend) =>
         {
           const seen = new Set();
           const result = [];
-          const handler = (key) =>
+          const handler = (key: string) =>
           {
             if (!seen.has(key))
             {
               seen.add(key);
 
               const clauseType = clause.structure[key];
-              
+
               if (card['cards'].find((p) => p.key === key) === undefined)
               {
-                let cardTypes = this.getCardTypes([clauseType]);
-                
-                cardTypes.map((cardType) => 
+                const cardTypes = this.getCardTypes([clauseType]);
+
+                cardTypes.map((cardType) =>
                   result.push({
-                    text: key + ': ' + this.clauses[cardType.substr(3)].name,
+                    text: key + ': ' + (backend.blocks[cardType].static['title'] as string),
                     key,
                     type: cardType,
-                  })
+                  }),
                 );
               }
             }
           };
+
+          if (this.customCardTypesMap[clause.type] !== undefined)
+          {
+            this.customCardTypesMap[clause.type].forEach(
+              (cardType) =>
+              {
+                const cardConfig = backend.blocks[cardType];
+                const key: string = cardConfig['key'];
+
+                result.push({
+                  text: key + ': ' + (cardConfig.static['title'] as string),
+                  key,
+                  type: cardType,
+                });
+              },
+            );
+          }
 
           clause.suggestions.forEach(handler);
           clause.required.forEach(handler);
@@ -782,79 +742,150 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESVariantClause(clause: ESVariantClause): any
   {
-    return null;
-    
-    // const accepts = List(
-    //   _.map(
-    //     clause.subtypes,
-    //     (type: string, jsonType: string) =>
-    //       'eql' + type,
-    //   ),
-    // );
+    const accepts = List(
+      _.map(
+        clause.subtypes,
+        (type: string, jsonType: string) =>
+          'eql' + type,
+      ),
+    );
 
-    // const childOptions = List(
-    //   _.map(
-    //     clause.subtypes,
-    //     (type: string, jsonType: string) =>
-    //       ({
-    //         text: type,
-    //         type: 'eql' + type,
-    //       }),
-    //   ),
-    // );
+    const childOptions = List(
+      _.map(
+        clause.subtypes,
+        (type: string, jsonType: string) =>
+          ({
+            text: type,
+            type: 'eql' + type,
+          }),
+      ),
+    );
 
-    // return GetCardVisitor.seedCard(clause, {
-    //   // cards: List([]),
+    return GetCardVisitor.seedCard(clause, {
+      // cards: List([]),
 
-    //   // provide options of all possible card types
-    //   getChildOptions: (card) =>
-    //   {
-    //     return childOptions;
-    //   },
+      // provide options of all possible card types
+      getChildOptions: (card) =>
+      {
+        return childOptions;
+      },
 
-    //   childOptionClickHandler: null, // set in init()
+      childOptionClickHandler: null, // set in init()
 
-    //   static:
-    //   {
-    //     title: clause.type + ' (Variant)',
-    //     tql: (block, tqlFn, tqlConfig) =>
-    //     {
-    //       return ''; // tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
-    //     },
+      static:
+      {
+        title: clause.type + ' (Variant)',
+        tql: (block, tqlFn, tqlConfig) =>
+        {
+          return ''; // tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+        },
 
-    //     init: (blocksConfig) =>
-    //       ({
-    //         childOptionClickHandler:
-    //         (card: Card, option: { text: string, type: string }): Card =>
-    //         {
-    //           // replace current card with newly made card of type
-    //           return BlockUtils.make(
-    //             blocksConfig, option.type,
-    //             {
-    //               key: card['key'],
-    //             },
-    //           );
-    //         },
-    //       }),
+        init: (blocksConfig) =>
+          ({
+            childOptionClickHandler:
+            (card: Card, option: { text: string, type: string }): Card =>
+            {
+              // replace current card with newly made card of type
+              return BlockUtils.make(
+                blocksConfig, option.type,
+                {
+                  key: card['key'],
+                },
+              );
+            },
+          }),
 
-    //     // accepts,
+        // accepts,
 
-    //     display:
-    //     {
-    //       provideParentData: true, // need this to grey out the type dropdown
-    //       displayType: DisplayType.COMPONENT,
-    //       component: SpecializedCreateCardTool,
-    //       key: null,
-    //       // help: ManualConfig.help['score'],
-    //     },
-    //     // {
-    //     //   displayType: DisplayType.CARDS,
-    //     //   key: null,
-    //     //   singleChild: true,
-    //     // },
-    //     preview: '',
-    //   },
-    // });
+        display:
+        {
+          provideParentData: true, // need this to grey out the type dropdown
+          displayType: DisplayType.COMPONENT,
+          component: SpecializedCreateCardTool,
+          key: null,
+          // help: ManualConfig.help['score'],
+        },
+        // {
+        //   displayType: DisplayType.CARDS,
+        //   key: null,
+        //   singleChild: true,
+        // },
+        preview: '',
+      },
+    });
   }
 
+  // for computing a variant clause to final subtypes mapping
+  private computeVariantClauses(clauses: { [name: string]: ESClause })
+  {
+    const variantClauses: { [clauseType: string]: ESClause } = {};
+    _.mapObject(clauses, (clause, key) =>
+    {
+      if (clause.clauseType === ESClauseType.ESVariantClause)
+      {
+        variantClauses[clause.type] = clause;
+      }
+    },
+    );
+
+    const getClauseTypesForVariant = (clause: ESVariantClause): string[] =>
+    {
+      let types: string[] = [];
+      _.mapObject(clause.subtypes, (subtype) =>
+      {
+        if (variantClauses[subtype] !== undefined)
+        {
+          types = types.concat(getClauseTypesForVariant(clauses[subtype] as ESVariantClause));
+        }
+        else
+        {
+          types.push(subtype);
+        }
+      });
+
+      if (this.customCardTypesMap[clause.type] !== undefined)
+      {
+        types = this.customCardTypesMap[clause.type].concat(types);
+      }
+
+      return types;
+    };
+
+    this.variantClauseMapping = _.mapObject(variantClauses, getClauseTypesForVariant);
+  }
+
+  // We need to replace occurences of variant card types with their final types
+  // We also need to splice in some custom types
+  private getCardTypes(initialCardTypes: string[], forClause?: ESClause): List<string>
+  {
+    let cardTypes: string[] = [];
+    initialCardTypes.map((childType) =>
+    {
+      if (this.variantClauseMapping[childType] !== undefined)
+      {
+        // variant clause, substitute
+        cardTypes = cardTypes.concat(this.variantClauseMapping[childType]);
+      }
+      else
+      {
+        cardTypes.push(childType);
+      }
+    });
+
+    if (forClause !== undefined && this.customCardTypesMap[forClause.type] !== undefined)
+    {
+      cardTypes = this.customCardTypesMap[forClause.type].concat(cardTypes);
+    }
+
+    cardTypes = cardTypes.map((type) =>
+    {
+      if (this.clauses[type] !== undefined)
+      {
+        return GetCardVisitor.getCardType(this.clauses[type]);
+      }
+      return type;
+    });
+
+    return List(cardTypes);
+  }
 }
