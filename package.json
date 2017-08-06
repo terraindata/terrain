@@ -62,6 +62,7 @@
   "dependencies": {
     "@types/node-schedule": "^1.2.0",
     "aes-js": "^3.1.0",
+    "async-busboy": "^0.6.1",
     "bcrypt": "^1.0.2",
     "bodybuilder": "^2.1.0",
     "chart.js": "^1.1.1",

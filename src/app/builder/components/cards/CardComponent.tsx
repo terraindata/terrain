@@ -538,13 +538,18 @@ class _CardComponent extends TerrainComponent<Props>
           language={card.static.language}
         />
         <div
-          className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
+          className={classNames({
+            'card-inner': true,
+            'card-inner-with-title': !card['noTitle'],
+            'single-card-inner': this.props.singleCard,
+          })}
           style={cardStyle(
             card.static.colors[0], this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
           )}
           ref='cardInner'
         >
           {
+            !card['cannotBeMoved'] &&
             connectDragSource(
               <div
                 className={classNames({

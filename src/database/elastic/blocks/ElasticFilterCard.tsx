@@ -60,12 +60,20 @@ import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
+const esFilterOperatorsMap = {
+  gt: '>',
+  gte: '≥',
+  lt: '<',
+  lte: '≤',
+};
+
 export const elasticFilterBlock = _block(
   {
     field: '',
     value: undefined,
     boolQuery: '',
-    rangeQuery: '',
+    rangeQuery: esFilterOperatorsMap.gt,
+
     static: {
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
@@ -80,15 +88,34 @@ export const elasticFilterBlock = _block(
           value = block['value'];
         }
 
+        const rangeOp = _.reduce(
+          esFilterOperatorsMap,
+          (memo, displayValue, esValue) =>
+          {
+            if (displayValue === block['rangeQuery'])
+            {
+              return esValue;
+            }
+            return memo;
+          },
+          null,
+        );
+
+        if (rangeOp === null)
+        {
+          throw new Error('Unspecified range operation for: ' + block['rangeQuery']);
+        }
+
         return {
           [block['boolQuery']]: {
             range: {
               [block['field']]: {
-                [block['rangeQuery']]: value,
+                [rangeOp]: value,
               },
             },
           },
         };
+
       },
       removeOnCardRemove: true,
     },
@@ -101,6 +128,7 @@ export const elasticFilter = _card({
   static: {
     language: 'elastic',
     title: 'Filter',
+    description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: Colors().builder.cards.booleanClause,
     preview: '[filters.length] Filters',
 
@@ -127,8 +155,6 @@ export const elasticFilter = _card({
       return filterObj;
     },
 
-    anythingAccepts: true, // TODO change
-
     init: (blocksConfig) =>
     {
       return {
@@ -150,17 +176,18 @@ export const elasticFilter = _card({
           inner:
           [
             {
-              displayType: DisplayType.TEXT,
-              key: 'field',
-              getAutoTerms: (schemaState) =>
-              {
-                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
-              },
-            },
-            {
               displayType: DisplayType.DROPDOWN,
               key: 'boolQuery',
-              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
+              options: List(
+                [
+                  'must',
+                  'must_not',
+                  'should',
+                ],
+                // Can consider using this, but it includes "minmum_should_match," which
+                //  doesn't make sense in this context
+                // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
+              ),
               dropdownUsesRawValues: true,
               autoDisabled: true,
               centerDropdown: true,
@@ -170,9 +197,21 @@ export const elasticFilter = _card({
               },
             },
             {
+              displayType: DisplayType.TEXT,
+              key: 'field',
+              getAutoTerms: (schemaState) =>
+              {
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+              },
+            },
+            {
               displayType: DisplayType.DROPDOWN,
               key: 'rangeQuery',
-              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+              options: List(
+                _.values(esFilterOperatorsMap),
+                // can consider using this, but it includes 'boost', and uses raw text values
+                // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+              ),
               dropdownUsesRawValues: true,
               centerDropdown: true,
               autoDisabled: true,

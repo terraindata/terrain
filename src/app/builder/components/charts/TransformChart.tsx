@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 import './TransformChart.less';
 
+import * as Colors from '../../../common/Colors';
+
 // consider upgrading to v4 which has types
 const d3 = require('d3');
 // import * as d3 from 'd3';
@@ -305,6 +307,7 @@ const TransformChart = {
       .orient('left');
     d3.select(el).select('.yLeftAxis')
       .attr('transform', 'translate(' + xMargin + ',0)')
+      .style('color', '#fff')
       .call(yLeftAxis);
 
     const yRightAxis = d3.svg.axis()

@@ -100,35 +100,31 @@
 
   .builder-tb-cards-input {
     height: @input-height;
-    border-radius: 5px;
-    padding-top: 6px;
+    // border-radius: 3px;
+    // padding-top: 6px;
     box-sizing: border-box;
-    border: 1px solid #fff;
-    background: rgba(255,255,255,0.5);
+    // border: 1px solid #fff;
+    // background: rgba(255,255,255,0.5);
     // margin-bottom: @standard-margin;
   }
 
   &.builder-tb-cards {
   }
 
-  @card-chip-offset: 35px;
+  @card-chip-width: 20px;
+  @card-chip-margin: 0px;
   @t: 6px; // triangle half-height
   .builder-tb-cards-input-value {
+    height: @input-height;
     display: inline-block;
-    background: #47a7ff;
-    padding: 3px 12px;
     text-align: center;
-    border-radius: 5px;
-    color: #fff;
-    width: calc(~"100% - @{card-chip-offset} - 6px - 24px");
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    width: calc(~"100% - @{card-chip-width} - @{card-chip-margin}");
+    padding-left: 3px;
+    box-sizing: border-box;
+    
     display: flex;
     justify-content: center;
-    height: 17px;
+    align-items: center;
     .transition;
 
     .card-preview {
@@ -142,14 +138,17 @@
   .builder-tb-cards-input-value-text {
     display: inline-block;
     vertical-align: middle;
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   .builder-tb-cards-arrow {
     border-top: 1px solid #47a7ff;
     border-right: 1px solid #47a7ff;
     position: absolute;
-    left: calc(~"100% - 40px");
-    width: @card-chip-offset - 6px;
+    right: @card-chip-margin;
+    width: @card-chip-width;
     height: @input-height / 2 + @standard-margin + 2px;
     top: @input-height / 2 - 1px;
     z-index: 9; // put it on top of the child card's background
@@ -159,14 +158,14 @@
       .transition;
       position: absolute;
       left: 14px;
-      top: -1 * @t;
+      bottom: -1 * @t;
       width: 0px;
       height: 0px;
       // http://html-tuts.com/css-arrows-up-down-left-right-triangle/
-      border-top: @t solid transparent;
+      border-top: @t solid transparent; // change this one to the card color
       border-bottom: @t solid transparent;
       border-right: @t solid transparent;
-      border-left: @t solid #47a7ff;
+      border-left: @t solid transparent;
     }
   }
   &.builder-tb-cards-top {
@@ -185,7 +184,7 @@
 
   &.builder-tb-cards-closed {
     .builder-tb-cards-input-value {
-      width: calc(~"100% - 6px - 24px");
+      width: calc(~"100% - 6px");
     }
 
     .builder-tb-cards-arrow {
@@ -198,7 +197,7 @@
     }
 
     .builder-tb-cards-toggle {
-      top: 1px;
+      top: 0px;
       svg {
         .rotate90;
       }
@@ -237,12 +236,13 @@
 }
 
 .builder-tb-cards-toggle {
-  position: absolute;
-  left: 0px;
-  top: -1px;
-  z-index: 1;
+  position: relative;
+  top: -3px;
+  // left: 0px;
+  // top: -1px;
+  // z-index: 1;
 
-  padding: 6px;
+  // padding: 6px;
   cursor: pointer;
 
   .transition;

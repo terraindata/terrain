@@ -1,15 +1,10 @@
 @import "../../common/Common.less";
 
-@on: rgb(138, 200, 136); //@terrain-selected; //@light-blue;
-@on-color: #fff; // @grey; //@trans-black;
-@off: @grey;
-@off-color: rgba(255,255,255,0.65); // @dark-grey;
 @br: 4px;
 
 .switch {
   display: inline-block;
   cursor: pointer;
-  background: @off;
   border-radius: @br;
   overflow: hidden;
   // border: 1px solid rgba(0,0,0,0.1);
@@ -61,7 +56,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    color: @off-color;
     height: 100%;
     .transition(~"all 0.35s");
     box-sizing: border-box;
@@ -75,21 +69,17 @@
   }
   
   .switch-on {
-    background: @on;
     .transition(~"all 0.35s");
     // border: 1px solid rgba(0,0,0,0.1);
   }
   
   &:hover{
     .switch-on {
-      background: lighten((@on), 4%)
     }
   }
   
   &.switch-on-first {
     .switch-first {
-      // background: @on;
-      color: @on-color;
     }
     .switch-on {
       left: 0px;
@@ -101,8 +91,6 @@
   
   &.switch-on-second {
     .switch-second {
-      // background: @on;
-      color: @on-color;
     }
     .switch-on {
       left: 50%;
