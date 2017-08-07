@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
 import * as csvjson from 'csvjson';
@@ -53,11 +54,15 @@ import * as winston from 'winston';
 
 import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
+import { ItemConfig, Items } from '../items/Items';
 import * as Util from '../Util';
 import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 const importTemplates = new ImportTemplates();
+
+const TastyItems: Items = new Items();
 
 export interface ImportConfig extends ImportTemplateBase
 {
@@ -66,7 +71,7 @@ export interface ImportConfig extends ImportTemplateBase
   update: boolean;    // false means replace (instead of update) ; default should be true
 }
 
-export interface ExportConfig extends ImportConfig
+export interface ExportConfig extends ImportConfig, ExportTemplateConfig
 {
   filetype: string;
   filestream: any; // TODO use a more strict type
@@ -226,7 +231,7 @@ export class Import
       {
         res = await database.getTasty().upsert(insertTable, items) as ImportConfig;
       }
-      winston.info('usperted to tasty (s): ' + String((Date.now() - time) / 1000));
+      winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
       resolve(res);
     });
   }
@@ -235,6 +240,7 @@ export class Import
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
+      console.log('1');
       const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
       if (database === undefined)
       {
@@ -244,27 +250,90 @@ export class Import
       {
         return reject('File export currently is only supported for Elastic databases.');
       }
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
 
-      // get query data from variantId or query
-      let newDocs: object[] = [];
-      const doc: object = {};
-      newDocs.push(await this._checkDocumentAgainstMapping(doc, await database.getTasty().schema(), exprt.dbname));
-      winston.info('transforming data...');
-      if (newDocs.length === 0)
+      // get a template given the template ID
+      console.log('2');
+      const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateId);
+      if (templates.length === 0)
       {
-        return reject('No data provided to export.');
+        return reject('Template not found.');
       }
-      try
+      const template = templates[0] as object;
+      for (const templateKey in Object.keys(template))
       {
-        newDocs = [].concat.apply([], await this._transformAndCheck(newDocs, exprt, false));
-      } catch (e)
+        exprt[templateKey] = template[templateKey];
+      }
+
+      let qry: string;
+      // get query data from variantId or query
+      console.log('3');
+      if (exprt.variantId !== undefined && exprt.query === undefined)
       {
-        return reject(e);
+        const variants: ItemConfig[] = await TastyItems.get(exprt.variantId);
+        if (variants.length === 0)
+        {
+          return reject('Variant not found.');
+        }
+        if (variants[0]['tql'] !== undefined)
+        {
+          qry = variants[0]['tql'];
+        }
+      }
+      else if (exprt.variantId === undefined && exprt.query !== undefined)
+      {
+        qry = exprt.query;
+      }
+      else
+      {
+        return reject('Must provide either variant ID or query, not both or neither.');
+      }
+
+      const result: any = await new Promise((resolveES, rejectES) =>
+      {
+        elasticClient.search(JSON.parse(qry),
+          Util.makePromiseCallback(resolveES, rejectES));
+      });
+
+      console.log('4');
+      let newDocs: object[] = result as object[];
+      for (const doc of newDocs)
+      {
+        // verify schema mapping with documents and fix documents accordingly
+        newDocs.push(await this._checkDocumentAgainstMapping(doc, await database.getTasty().schema(), exprt.dbname));
+        winston.info('transforming data...');
+        if (newDocs.length === 0)
+        {
+          return reject('No data provided to export.');
+        }
+
+        // transform documents with template
+
+        if (exprt.export !== true)
+        {
+          return reject('Cannot use an import template for export.');
+        }
+        try
+        {
+          newDocs = [].concat.apply([], await this._transformAndCheck(newDocs, exprt, false));
+        } catch (e)
+        {
+          return reject(e);
+        }
       }
       // winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
 
+      console.log('5');
       // export to csv
-
+      const writer = csvWriter();
+      const pass = new stream.PassThrough();
+      writer.pipe(pass);
+      for (const newDoc of newDocs)
+      {
+        writer.write(newDoc);
+      }
+      writer.end();
+      resolve(pass);
     });
   }
 
@@ -362,7 +431,7 @@ export class Import
   private _getMappingForSchemaHelper(mapping: object): object
   {
     const body: object = {};
-    for (const key in mapping)
+    for (const key of Object.keys(mapping))
     {
       if (mapping.hasOwnProperty(key) && key !== '__isNested__')
       {
@@ -402,7 +471,7 @@ export class Import
     for (const table of schema.tableNames(database))
     {
       const fields: object = schema.fields(database, table);
-      for (const field in fields)
+      for (const field of Object.keys(fields))
       {
         if (fields.hasOwnProperty(field) && fieldsToCheck.has(field))
         {

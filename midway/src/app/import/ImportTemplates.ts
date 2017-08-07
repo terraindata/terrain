@@ -82,6 +82,7 @@ export interface ExportTemplateConfig extends ImportTemplateBase
   name: string;
   query?: string;
   variantId?: number;
+  templateId?: number;
 }
 
 interface ImportTemplateConfigStringified
@@ -91,6 +92,7 @@ interface ImportTemplateConfigStringified
 
   dbid: number;
   dbname: string;
+  export: boolean;
   tablename: string;
   csvHeaderMissing?: boolean;
   originalNames: string;
@@ -112,6 +114,7 @@ export class ImportTemplates
         'name',
         'dbid',
         'dbname',
+        'export',
         'tablename',
         'csvHeaderMissing',
         'originalNames',
@@ -173,6 +176,7 @@ export class ImportTemplates
         name: template['name'],
         dbid: template['dbid'],
         dbname: template['dbname'],
+        export: false,
         tablename: template['tablename'],
         csvHeaderMissing: template['csvHeaderMissing'],
         originalNames: JSON.stringify(template['originalNames']),
@@ -200,6 +204,7 @@ export class ImportTemplates
         name: stringified['name'],
         dbid: stringified['dbid'],
         dbname: stringified['dbname'],
+        export: false,
         tablename: stringified['tablename'],
         csvHeaderMissing: stringified['csvHeaderMissing'],
         originalNames: JSON.parse(stringified['originalNames']),

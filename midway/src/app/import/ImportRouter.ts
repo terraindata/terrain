@@ -53,7 +53,7 @@ import * as winston from 'winston';
 
 import { users } from '../users/UserRouter';
 import * as Util from '../Util';
-import { Import, ImportConfig } from './Import';
+import { Import, ImportConfig, ExportConfig } from './Import';
 import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
 const Router = new KoaRouter();
@@ -68,6 +68,19 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
 
   ctx.body = await imprt.upsert(imprtConf);
+});
+
+Router.post('/export', async (ctx, next) =>
+{
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+  Util.verifyParameters(authStream['variantId'], ['templateId']);
+
+  ctx.body = await imprt.export(authStream as ExportConfig);
 });
 
 Router.post('/headless', async (ctx, next) =>
