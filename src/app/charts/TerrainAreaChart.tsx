@@ -143,7 +143,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
   public componentWillReceiveProps(nextProps)
   {
-    if (!this.props.datasets.equals(nextProps.datasets))
+    if (this.props.datasets !== nextProps.datasets)
     {
       const visibleDatasets = nextProps.datasets.map((ds) => ds.id);
       this.setState({ visibleDatasets: visibleDatasets.toList() });
