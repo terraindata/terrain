@@ -307,6 +307,7 @@ FileImportReducers[ActionTypes.uploadFile] =
           alert('success');
           action.payload.changeUploadInProgress(false);
         }
+        // TODO: stream after this response
       },
       (err: string) =>
       {
@@ -315,6 +316,7 @@ FileImportReducers[ActionTypes.uploadFile] =
           alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
           action.payload.changeUploadInProgress(false);
         }
+        // TODO: or stop streaming on error
       },
     );
 
@@ -406,18 +408,10 @@ FileImportReducers[ActionTypes.enqueueChunk] =
   {
     console.log('chunk added: ' + action.payload.id + ', isLast: ' + action.payload.isLast);
     return state.set('chunkMap', state.chunkMap.set(action.payload.id, action.payload));
-    // return state.set('chunkQueue', state.chunkQueue.push(action.payload));
-    // return state.setIn(['chunkQueue', action.payload.id], action.payload);
-    // return state.setIn(['chunkQueue', action.payload.id, 'chunk'], action.payload.chunk)
-    // .setIn(['chunkQueue', action.payload.id, 'isLast'], action.payload.isLast);
-  }
-  ;
+  };
 FileImportReducers[ActionTypes.dequeueChunk] =
   (state, action) =>
-  {
-    return state.deleteIn(['chunkMap', action.payload.id]);
-    // return state.set('chunkQueue', state.chunkQueue.shift());
-  }
+    state.deleteIn(['chunkMap', action.payload.id])
   ;
 
 export default FileImportReducers;

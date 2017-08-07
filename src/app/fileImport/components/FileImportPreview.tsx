@@ -84,11 +84,12 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
-  file: File;
-  chunkQueue: List<FileImportTypes.Chunk>;
-  streaming: boolean;
+
   uploadInProgress: boolean;
   elasticUpdate: boolean;
+
+  file: File;
+  streaming: boolean;
   chunkMap: IMMap<number, FileImportTypes.Chunk>;
 }
 
@@ -252,7 +253,7 @@ class FileImportPreview extends TerrainComponent<Props>
       console.log('ready');
       console.log('queue: ', this.props.chunkMap);
 
-      if (this.props.chunkMap.size < MAX_NUM_CHUNKS / 2)
+      if (this.props.chunkMap.size < MAX_NUM_CHUNKS / 2) // refill buffer when size falls below half
       {
         this.fill();
       }
@@ -265,6 +266,7 @@ class FileImportPreview extends TerrainComponent<Props>
       }
       else
       {
+        Actions.changeUploadInProgress(true);
         console.log('finished');
         socket.emit('finished');
       }

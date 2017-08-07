@@ -73,7 +73,6 @@ class FileImportStateC extends BaseClass
   public file: File = null;
   public streaming: boolean = false;
 
-  public chunkQueue: List<Chunk> = List([]);
   public chunkMap: IMMap<number, Chunk> = Immutable.Map<number, Chunk>({});
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;

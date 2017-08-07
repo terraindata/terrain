@@ -147,14 +147,16 @@ class FileImport extends TerrainComponent<any>
 
   public handleNextStepChange()
   {
-    switch (this.state.stepId)
+    const { stepId } = this.state;
+    const { dbText, tableText } = this.state.fileImportState;
+    switch (stepId)
     {
       case 0:
         break;
       case 1:
         break;
       case 2:
-        let msg = isValidIndexName(this.state.fileImportState.dbText);
+        let msg = isValidIndexName(dbText);
         if (msg)
         {
           alert(msg);
@@ -162,7 +164,7 @@ class FileImport extends TerrainComponent<any>
         }
         break;
       case 3:
-        msg = isValidTypeName(this.state.fileImportState.tableText);
+        msg = isValidTypeName(tableText);
         if (msg)
         {
           alert(msg);
@@ -172,14 +174,15 @@ class FileImport extends TerrainComponent<any>
       default:
     }
     this.setState({
-      stepId: this.state.stepId + 1,
+      stepId: stepId + 1,
     });
   }
 
   public handlePrevStepChange()
   {
+    const { stepId } = this.state;
     this.setState({
-      stepId: this.state.stepId - 1,
+      stepId: stepId - 1,
     });
   }
 
@@ -299,15 +302,13 @@ class FileImport extends TerrainComponent<any>
     const { filetype } = this.state;
     const { file, streaming } = this.state.fileImportState;
 
-    // completely fill the chunk buffer if streaming
     const numChunks = Math.min(Math.ceil(file.size / CHUNK_SIZE), MAX_NUM_CHUNKS);
-    // console.log('numChunks: ', numChunks);
     const fileToRead = streaming ? file.slice(0, numChunks * CHUNK_SIZE) : file;
     const fr = new FileReader();
     fr.readAsText(fileToRead);
     fr.onloadend = () =>
     {
-      // assume preview fits in first chunk in streaming case
+      // assume preview fits in first chunk when streaming
       let firstChunk = fr.result.substring(0, CHUNK_SIZE);
       let stringifiedFile = streaming ? fr.result.substring(0, firstChunk.lastIndexOf('\n')) : fr.result;
       let items;
@@ -332,9 +333,9 @@ class FileImport extends TerrainComponent<any>
         firstChunk = firstChunk.slice(Number(firstChunk.indexOf('\n')) + 1);
       }
 
-      if (streaming)
+      if (streaming) // completely fill the chunk buffer if streaming
       {
-        // first chunk has 'id' 0, since files smaller than one chunk will not be streamed first chunk will never be last
+        // first chunk has 'id' 0. Since files smaller than one chunk will not be streamed first chunk will never be last
         Actions.enqueueChunk(firstChunk, 0, false);
         for (let i = 1; i < numChunks; i++)
         {
@@ -428,10 +429,12 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes,
-      primaryKey, templates, transforms, uploadInProgress, elasticUpdate, file, chunkQueue, streaming, chunkMap } = fileImportState;
+    const { dbText, tableText } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
+    const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
+    const { file, streaming, chunkMap } = fileImportState;
 
-    let content = {};
+    let content;
     switch (this.state.stepId)
     {
       case 0:
@@ -527,7 +530,6 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
-            chunkQueue={chunkQueue}
             file={file}
             streaming={streaming}
             uploadInProgress={uploadInProgress}
