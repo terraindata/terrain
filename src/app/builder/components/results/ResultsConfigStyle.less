@@ -17,6 +17,7 @@
   left: 0px;
   width: 100%;
   height: 100%;
+  background: rgba(0,0,0,0.5);
   z-index: 999;
   
   .results-config {
@@ -27,21 +28,21 @@
     height: 90%;
     overflow: hidden;
     
-    // background: @bg;
+    // background: @bg; // handled
     border-radius: @br;
     
     .results-config-bar {
       height: @bar-h;
       position: relative;
-      // background: @fresh-moss;
+      // background: @fresh-moss; // handled
       
       .results-config-title {
         font-size: 14px;
         padding: 9px 12px;
-        // color: rgba(0,0,0,0.5);
+        color: rgba(0,0,0,0.5);
         font-weight: 400;
         letter-spacing: 0.5px;
-        // color: #fff;
+        // color: #fff; // handled
       }
       
       
@@ -53,7 +54,7 @@
         // font-size: 16px;
         float: right;
         padding: 4px 30px;
-        // background: #eee; //@light-foam; //rgb(138, 200, 136);
+        // background: #eee; //@light-foam; //rgb(138, 200, 136); handled
         color: @grey;
         font-weight: 500;
         
@@ -63,7 +64,7 @@
         .transition;
         
         &:hover {
-          // background: #fff;
+          // background: #fff; handled
         }
       }
       
@@ -81,7 +82,7 @@
     .results-config-instructions {
       text-align: left;
       margin-bottom: 12px;
-      // color: @fresh-moss;
+      // color: @fresh-moss; handled
       letter-spacing: 0.5px;
       line-height: 18px;
       font-size: 12px;
@@ -112,14 +113,14 @@
         }
         
         .results-config-area-title {
-          // color: rgba(0, 0, 0, 0.65);
+          // color: rgba(0, 0, 0, 0.65); handled
           margin: 6px;
           margin-top: 0px;
           letter-spacing: 0.5px;
         }
         
         .results-config-name {
-          // background: @result-name-bg;
+          // background: @result-name-bg; handled
           border-top-left-radius: 5px;
           border-top-right-radius: 5px;
           &.results-config-over {
@@ -129,7 +130,7 @@
         }
         
         .results-config-score {
-          // background: @result-score-bg;
+          // background: @result-score-bg; // handled
           &.results-config-over {
             border: 3px solid fade(@bright-green, 50%);
             padding: 3px;
@@ -137,7 +138,7 @@
         }
         
         .results-config-fields {
-          // background: #fff;
+          // background: #fff; handled
           min-height: 100px;
           padding-bottom: 30px;
           &.results-config-over {
@@ -153,7 +154,7 @@
         }
         
         .results-config-field {
-          // border-color: @field-border-color;
+          border-color: @field-border-color;
         }
       }
     }
@@ -168,7 +169,7 @@
       // }
       
       .results-config-field {
-        // background: #fff;
+        background: #fff;
       }
     }
     
@@ -186,16 +187,16 @@
     }
     
     .results-config-placeholder {
-      // background: fade(@aged-moss, 20%);
+      // background: fade(@aged-moss, 20%); handled
       background-blend-mode: multiply;
-      border: 1px solid fade(@aged-moss, 20%);
-      // color: @grey;
+      // border: 1px solid fade(@aged-moss, 20%); handled
+      // color: @grey; handled
     }
     
     .results-config-field {
-      // background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.25);
       blend-mode: multiply;
-      // border: 1px solid #fff;
+      border: 1px solid #fff;
       font-weight: 500;
       letter-spacing: 0.5px;
       cursor: pointer;
@@ -224,7 +225,7 @@
         fill: @grey;
         opacity: 0.5;
         &:hover {
-          // fill: #fff;
+          fill: #fff;
           opacity: 1;
         }
         position: absolute;
@@ -262,7 +263,7 @@
       }
       
       &:hover {
-        // border-color: @field-border-color;
+        border-color: @field-border-color;
         
         .results-config-handle {
           opacity: 0.5;
@@ -317,14 +318,14 @@
           }
           
           &:hover {
-            // background: fade(@light-green, 25%);
+            background: fade(@light-green, 25%);
           }
         }
         
         .rc-selected, .rc-selected:hover {
-          // background: @light-green;
-          // color: @grey;
-          // border-color: @light-green;
+          background: @light-green;
+          color: @grey;
+          border-color: @light-green;
         }
         
         .results-config-image {
@@ -376,7 +377,7 @@
   top: @bar-h;
   width: 100%;
   height: calc(~"100% - @{bar-h}");
-  // background: rgba(0,0,0,0);
+  background: rgba(0,0,0,0);
   opacity: 0;
   pointer-events: none;
   .transition(~"all 0.35s");
@@ -392,14 +393,14 @@
       margin-bottom: 6px;
       text-align: center;
     }
-    text-shadow: 0px 0px 20px rgba(0,0,0,0.55);
+    // text-shadow: 0px 0px 20px rgba(0,0,0,0.55);
   }
 }
 
 .results-config-disabled {
   .results-config-disabled-veil {
     opacity: 1;
-    // background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0.55);
     pointer-events: all;
   }
 }

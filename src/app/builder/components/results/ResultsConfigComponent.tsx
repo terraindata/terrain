@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty max-classes-per-file strict-boolean-expressions max-line-length no-var-requires
 
 import * as Immutable from 'immutable';
+import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
 import * as classNames from 'classnames';
@@ -54,7 +55,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as _ from 'underscore';
 import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
@@ -77,6 +78,7 @@ export interface Props
   onClose: () => void;
 }
 
+@Radium
 export class ResultsConfigComponent extends TerrainComponent<Props>
 {
   public state: {
@@ -233,14 +235,24 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const { config } = this.state;
     const { enabled, formats } = config;
 
+    const bgcolor01 = backgroundColor(Colors().bg1);
+    const bgcolor02 = backgroundColor(Colors().bg2);
+    const color01 = fontColor(Colors().text1);
+    const bgPlusHover01 = backgroundColor(Colors().bg2, Colors().bg3);
+    const color02 = fontColor(Colors().text3);
+    const bgPlusBorder01 = _.extend({}, fontColor(Colors().text1), borderColor(Colors().border1), backgroundColor(Colors().bg1));
+
     return (
-      <div className='results-config-wrapper' style={_.extend({}, backgroundColor('fadedOutBg'))}>
-        <div className={classNames({
-          'results-config': true,
-          'results-config-disabled': !enabled,
-        })}>
-          <div className='results-config-bar'>
-            <div className='results-config-title'>
+      <div className='results-config-wrapper'>
+        <div
+          className={classNames({
+            'results-config': true,
+            'results-config-disabled': !enabled,
+          })}
+          style={bgcolor01}
+        >
+          <div className='results-config-bar' style={bgcolor02}>
+            <div className='results-config-title' style={color01}>
               Customize Results
             </div>
             <div className='results-config-switch'>
@@ -251,22 +263,27 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 selected={enabled ? 1 : 2}
               />
             </div>
-            <div className='results-config-button' onClick={this.handleClose}>
+            <div key={'results-config-button'}
+              className='results-config-button'
+              style={bgPlusHover01}
+              onClick={this.handleClose}
+            >
               Done
             </div>
           </div>
           <div className='results-config-config-wrapper'>
-            <div className='results-config-instructions'>
+            <div className='results-config-instructions' style={bgcolor02}>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
             <div className='results-config-config'>
               <CRTarget
                 className='results-config-name'
+                style={bgcolor01}
                 type='name'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title'>
+                <div className='results-config-area-title' style={color02}>
                   Name
                 </div>
                 {
@@ -281,7 +298,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className='results-config-placeholder'>
+                    <div className='results-config-placeholder' style={bgPlusBorder01}>
                       Drag name field <em>(optional)</em>
                     </div>
                 }
@@ -289,9 +306,10 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               <CRTarget
                 className='results-config-score'
                 type='score'
+                style={bgcolor01}
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title'>
+                <div className='results-config-area-title' style={color02}>
                   Score
                 </div>
                 {
@@ -306,17 +324,18 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className='results-config-placeholder'>
+                    <div className='results-config-placeholder' style={bgPlusBorder01}>
                       Drag score field <em>(optional)</em>
                     </div>
                 }
               </CRTarget>
               <CRTarget
                 className='results-config-fields'
+                style={bgPlusBorder01}
                 type='field'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title'>
+                <div className='results-config-area-title' style={color02}>
                   Fields
                 </div>
                 {
@@ -337,7 +356,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                     </div>,
                   )
                 }
-                <div className='results-config-placeholder'>
+                <div className='results-config-placeholder' style={bgPlusBorder01}>
                   Drag more fields here
                 </div>
               </CRTarget>
