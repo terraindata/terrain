@@ -178,18 +178,28 @@ function isFilterCard(valueInfo: ESValueInfo): boolean
     _.reduce(valueInfo.value,
       (memo, value: any) =>
       {
-        let rangeExists = typeof value === 'object';
+        let validFilter = typeof value === 'object';
         if (Array.isArray(value))
         {
-          rangeExists = _.reduce(value, (memo0, value0) => memo0 && value0['range'], true);
+          validFilter = _.reduce(value,
+            (memo0, value0) => memo0 && (value0['range'] || value0['term']),
+            true);
         }
         else
         {
-          rangeExists = (value['range'] !== undefined);
+          validFilter = (value['range'] !== undefined) || (value['term'] !== undefined);
         }
-        return memo && rangeExists;
+        return memo && validFilter;
       }, true);
 }
+
+const esFilterOperatorsMap = {
+  gt: '>',
+  gte: '≥',
+  lt: '<',
+  lte: '≤',
+  term: '=',
+};
 
 function parseFilterBlock(boolQuery: string, filters: any): Block[]
 {
@@ -205,19 +215,30 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
 
   const filterBlocks = filters.map((obj: object) =>
   {
+    let field;
+    let filterOp;
+    let value;
+
     if (obj['range'] !== undefined)
     {
-      const field = Object.keys(obj['range'])[0];
-      const rangeQuery = Object.keys(obj['range'][field])[0];
-      const value = obj['range'][field][rangeQuery];
-
-      return make(Blocks, 'elasticFilterBlock', {
-        field,
-        value,
-        boolQuery,
-        rangeQuery,
-      });
+      field = Object.keys(obj['range'])[0];
+      filterOp = Object.keys(obj['range'][field])[0];
+      value = obj['range'][field][filterOp];
+      filterOp = esFilterOperatorsMap[filterOp];
     }
+    else if (obj['term'] !== undefined)
+    {
+      field = Object.keys(obj['term'])[0];
+      filterOp = '=';
+      value = obj['term'][field];
+    }
+
+    return make(Blocks, 'elasticFilterBlock', {
+      field,
+      value,
+      boolQuery,
+      filterOp,
+    });
   });
 
   return filterBlocks;
