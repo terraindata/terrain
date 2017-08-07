@@ -50,10 +50,10 @@ import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
 import { Display } from '../../../blocks/displays/Display';
@@ -67,7 +67,7 @@ import CardDropArea from '../../builder/components/cards/CardDropArea';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
-import { Colors } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
@@ -133,9 +133,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
-    // TODO?
-    // this.executeChange = _.debounce(this.executeChange, 750);
+    this.executeChange = _.debounce(this.executeChange, 300);
 
     const value: any = this.props.value;
     this.state = {
@@ -191,8 +189,13 @@ class BuilderTextbox extends TerrainComponent<Props>
     }
   }
 
-  // throttled event handler
-  public executeChange(value)
+  public componentWillUnmount()
+  {
+    this.executeChange.flush();
+  }
+
+  // throttled event handler - becomes a lodash debounce object
+  public executeChange: any = (value) =>
   {
     // if(this.props.isNumber)
     // {
@@ -251,12 +254,14 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public handleBlur(event: React.FocusEvent<any>, value: string)
   {
+    this.executeChange.flush();
     this.props.onBlur && this.props.onBlur(this, value, event);
   }
 
   public handleCardToolClose()
   {
     this.executeChange('');
+    this.executeChange.flush();
     this.setState({
       value: '',
     });
@@ -395,7 +400,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     // var card = cards.get(0);
     const color = card.static.colors[0] as string;
-    const title: string = card.closed ? card.static.title : '';
+    const title: string = card.static.title;
     const preview = card.closed ? null : BlockUtils.getPreview(card);
     // }
     // else
@@ -404,18 +409,9 @@ class BuilderTextbox extends TerrainComponent<Props>
     //   var title = "Add a Card";
     // }
 
-    const chipStyle =
-      {
-        background: color,
-      };
-    const arrowLineStyle =
-      {
-        borderColor: color,
-      };
-    const arrowHeadStyle =
-      {
-        borderLeftColor: color,
-      };
+    const chipStyle = cardStyle(color, Colors().bg3, null, true);
+    const arrowLineStyle = borderColor(color);
+    const arrowHeadStyle = getStyle('borderTopColor', color);
 
     return (
       <div
@@ -452,6 +448,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               </div>
             }
             {
+              !card['cannotBeMoved'] &&
               this.renderSwitch()
             }
           </div>

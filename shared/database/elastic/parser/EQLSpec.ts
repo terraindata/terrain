@@ -266,7 +266,7 @@ const EQLSpec: ESClause[] =
       'field_sort_value',
       {
         path: ['sort'],
-        desc: 'Sort the field.',
+        desc: 'Sort by a single field, either ascending or descending.',
       },
     ),
     new ESVariantClause('field_sort_value',
@@ -298,7 +298,7 @@ const EQLSpec: ESClause[] =
       },
       {
         path: ['sort'],
-        desc: 'score sort',
+        desc: 'Sort using Elastic\'s built-in scoring functionality.',
       }),
     new ESStructureClause('score_sort_object',
       {
@@ -317,7 +317,7 @@ const EQLSpec: ESClause[] =
       },
       {
         path: ['sort'],
-        desc: 'script sort',
+        desc: 'Sort results using a script',
         required: ['_script'],
       }),
     new ESStructureClause('script_sort_object',
@@ -331,7 +331,7 @@ const EQLSpec: ESClause[] =
       },
       {
         path: ['sort'],
-        desc: 'Script Sorting',
+        desc: 'The contents of a scripted sort',
         url: '',
         required: ['type', 'script'],
       }),

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format
+// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'underscore';
 import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
@@ -77,13 +77,17 @@ interface Theme
   altBg2: string;
 
   active: string; // active color
+  activeText: string;
   inactiveHover: string; // when something isn't active but could be
+  inactiveHoverText: string;
   activeHover: string; // when an active thing is hovered
 
   highlight: string; // for slight emphasis
   darkerHighlight: string; // for depth effect with highlight
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
+
+  inputBg: string;
 
   scrollbarBG: string;
   scrollbarPiece: string;
@@ -311,7 +315,7 @@ const DARK: Theme =
     border3: 'rgb(125,130,139)',
 
     text1: '#fff',
-    text2: 'rgba(255,255,255,0.7)',
+    text2: 'rgba(255,255,255,0.85)',
     text3: 'rgba(255,255,255,0.5)',
 
     altBg1: '#fff',
@@ -325,8 +329,12 @@ const DARK: Theme =
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
+    inputBg: 'rgba(0,0,0,0.25)',
+
     active: darkActive,
+    activeText: '#fff',
     inactiveHover: Color(darkActive).fade(0.25).string(),
+    inactiveHoverText: '#fff',
     activeHover: Color(darkActive).fade(0.75).string(),
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
@@ -506,9 +514,9 @@ const DARK: Theme =
     fileimport: {
       preview: {
         column: {
-          base: '#9d6b6b',
+          base: '#00a0f4',
           typeDropdown: '#005d69',
-          transform: '#70b9e7',
+          transform: '#a2af93',
         },
         cell: '#f1d7d7',
       },
@@ -549,7 +557,7 @@ export function borderColor(color: string, hoverColor?: string)
 
 export function link()
 {
-  return fontColor(Colors().text.link, Colors().text.linkHover);
+  return fontColor(Colors().inactiveHover, Colors().active);
 }
 
 const CACHE: any = {};
@@ -567,13 +575,65 @@ export function altStyle()
   return CACHE['altStyle' + curTheme];
 }
 
+export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean)
+{
+  const key = 'card-' + strongColor + bgColor + hoverBg + small;
+
+  if (!CACHE[key])
+  {
+    CACHE[key] = {
+      background: bgColor,
+      color: strongColor,
+
+      boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
+        '3px 3px 5px 2px rgba(0,0,0,.39)',
+      borderWidth: 1,
+      borderStyle: 'solid',
+      borderLeftWidth: '3px',
+      borderLeftColor: strongColor,
+
+      borderTopColor: Colors().highlight,
+      borderRightColor: Colors().darkerHighlight,
+      borderBottomColor: Colors().darkerHighlight,
+
+      [hoverBg && ':hover']: {
+        background: hoverBg,
+      },
+    };
+  }
+
+  return CACHE[key];
+}
+
+export function couldHover(isFocused?: boolean)
+{
+  if (!CACHE['couldHover'])
+  {
+    CACHE['couldHover'] = {
+      ':hover': {
+        backgroundColor: Colors().inactiveHover,
+        color: Colors().inactiveHoverText,
+      },
+    };
+  }
+  if (!CACHE['couldHoverFocused'])
+  {
+    CACHE['couldHoverFocused'] = {
+      backgroundColor: Colors().inactiveHover,
+      color: Colors().inactiveHoverText,
+    };
+  }
+
+  return CACHE[isFocused ? 'couldHoverFocused' : 'couldHover'];
+}
+
 export function buttonColors()
 {
   if (!CACHE['buttonColors' + curTheme])
   {
     CACHE['buttonColors' + curTheme] = extend({},
-      backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-      fontColor(Colors().button.text),
+      backgroundColor(Colors().inactiveHover, Colors().active),
+      fontColor(Colors().text1),
     );
   }
 

@@ -55,7 +55,9 @@ import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import Loading from './../../common/components/Loading';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -77,6 +79,8 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
+  uploadInProgress: boolean;
+  elasticUpdate: boolean;
 }
 
 @Radium
@@ -107,7 +111,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
-        templateOptions: nextProps.templates.map((template, i) => template.name),
+        templateOptions: nextProps.templates.map((template, i) => String(template.id) + ': ' + template.name),
       });
     }
   }
@@ -200,6 +204,11 @@ class FileImportPreview extends TerrainComponent<Props>
       return;
     }
     Actions.saveTemplate(this.state.templateText);
+  }
+
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
   }
 
   public handleUploadFile()
@@ -309,12 +318,33 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTemplate()}
         {this.renderTable()}
         <div
+          className='fi-preview-update'
+        >
+          update
+          <CheckBox
+            checked={this.props.elasticUpdate}
+            onChange={this.handleElasticUpdateChange}
+          />
+        </div>
+        <div
           className='fi-preview-import-button'
           onClick={this.handleUploadFile}
           style={buttonColors()}
         >
           Import
         </div>
+        {
+          this.props.uploadInProgress &&
+          <div className='fi-preview-loading-container'>
+            <Loading
+              width={100}
+              height={100}
+              loading={this.props.uploadInProgress}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          </div>
+        }
       </div>
     );
   }

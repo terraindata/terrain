@@ -52,6 +52,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
+import { getStyle } from '../../common/Colors';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
@@ -151,6 +152,7 @@ class BuilderComponent extends TerrainComponent<Props>
       return <div
         className='builder-label'
         key={keySeed + '-label'}
+        style={d.style}
       >
         {d.label}
       </div>
@@ -226,7 +228,6 @@ class BuilderComponent extends TerrainComponent<Props>
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}
               textColor={this.props.textStyle && this.props.textStyle.color}
-              width={d.widthDropdown}
             />
             {this.props.helpOn && d.help ?
               <ManualInfo
@@ -404,6 +405,20 @@ class BuilderComponent extends TerrainComponent<Props>
                 className='builder-component-help-right'
               />
               : null
+          }
+        </div>
+      );
+    }
+
+    if (d.style)
+    {
+      content = (
+        <div
+          style={d.style}
+          key={key}
+        >
+          {
+            content
           }
         </div>
       );

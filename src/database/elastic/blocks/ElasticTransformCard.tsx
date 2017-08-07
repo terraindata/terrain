@@ -83,20 +83,22 @@ export const elasticTransform = _card(
     hasCustomDomain: false, // has the user set a custom domain
 
     noTitle: true,
+    cannotBeMoved: true,
 
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
       colors: getCardColors('score', Colors().builder.cards.inputParameter),
       title: 'Transform',
-      preview: (card: any) =>
-      {
-        if (card.input._isCard)
-        {
-          return '' + BlockUtils.getPreview(card.input);
-        }
-        return '' + card.input;
-      },
+      preview: '',
+      // preview: (card: any) =>
+      // {
+      //   if (card.input._isCard)
+      //   {
+      //     return '' + BlockUtils.getPreview(card.input);
+      //   }
+      //   return '' + card.input;
+      // },
       display: [
         {
           displayType: DisplayType.TEXT,

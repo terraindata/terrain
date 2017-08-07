@@ -82,7 +82,7 @@ class QueryC
   tql: string = '';
   parseTree: ESInterpreter = null;
   lastMutation: number = 0;
-  deckOpen: boolean = true;
+  deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
 
   cardsAndCodeInSync: boolean = false;
   parseError: string = null;

@@ -52,7 +52,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './BuilderTQLColumn.less';
 const { List } = Immutable;
-import * as _ from 'underscore';
 import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
 import Query from '../../../items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
@@ -147,7 +146,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
       {
         this.sendTqlAction();
       }
-    } else
+    }
+    else
     {
       this.setState({
         tql,

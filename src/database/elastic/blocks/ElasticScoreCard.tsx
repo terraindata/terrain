@@ -64,11 +64,14 @@ export const elasticScore = _card(
   {
     weights: List(),
 
-    key: '_script',
+    key: 'sort',
 
     static: {
       language: 'elastic',
-      title: 'Score',
+      title: 'Terrain Score Sort',
+      description: 'Sort results using Terrain\'s proprietary scoring method: Transform \
+        individual field values using a simple graphing tool, and combine the transformed \
+        fields in a weighted sum.',
       colors: getCardColors('score', Colors().builder.cards.structureClause),
       preview: '[weights.length] Factors',
       // manualEntry: ManualConfig.cards['score'],
@@ -90,18 +93,19 @@ export const elasticScore = _card(
         });
 
         return {
-          type: 'number',
-          order: 'desc',
-          script: {
-            stored: 'Terrain.Score.PWL',
-            params: {
-              factors,
+          _script:
+          {
+            type: 'number',
+            order: 'desc',
+            script: {
+              stored: 'Terrain.Score.PWL',
+              params: {
+                factors,
+              },
             },
           },
         };
       },
-
-      anythingAccepts: true, // TODO change
 
       init: (blocksConfig) =>
       {
@@ -137,6 +141,9 @@ export const elasticScore = _card(
                 // help: ManualConfig.help['weight'],
                 key: 'weight',
                 placeholder: 'Weight',
+                style: {
+                  maxWidth: 120,
+                },
                 // autoDisabled: true,
               },
               {
