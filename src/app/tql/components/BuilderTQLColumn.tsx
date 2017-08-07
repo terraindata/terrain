@@ -146,7 +146,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
       {
         this.sendTqlAction();
       }
-    } else
+    }
+    else
     {
       this.setState({
         tql,

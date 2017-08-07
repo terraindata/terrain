@@ -299,7 +299,7 @@ const DARK: Theme =
     border3: 'rgb(125,130,139)',
 
     text1: '#fff',
-    text2: 'rgba(255,255,255,0.7)',
+    text2: 'rgba(255,255,255,0.85)',
     text3: 'rgba(255,255,255,0.5)',
 
     altBg1: '#fff',
