@@ -85,7 +85,6 @@ class QueryC
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
 
   cardsAndCodeInSync: boolean = false;
-  parseError: string = null;
 
   meta: IMMap<string, any> = Immutable.Map<string, any>({});
 

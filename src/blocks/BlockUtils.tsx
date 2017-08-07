@@ -150,7 +150,7 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
 
   if (block.static.init)
   {
-    block = _.extend({}, block, block.static.init(blocksConfig));
+    block = _.extend({}, block, block.static.init(blocksConfig, extraConfig));
   }
 
   if (extraConfig)
