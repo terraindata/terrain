@@ -146,13 +146,6 @@ class CardsArea extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    this.setState({
-      cardToolOpen: nextProps.cards.size === 0,
-    });
-  }
-
   public copy() { }
 
   public clear() { }
