@@ -76,7 +76,7 @@ export default class MidwayQueryResponse extends QueryResponse
       source._type = hit._type;
       source._id = hit._id;
       source._score = hit._score;
-      source._sort = hit._sort;
+      source._sort = hit.sort && hit.sort[0];
       return source;
     });
     ret = results;
@@ -86,6 +86,21 @@ export default class MidwayQueryResponse extends QueryResponse
   public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
   {
     super(result, errors, request);
+  }
+
+  public getAggregationResult(): any
+  {
+    let aggs;
+    switch (this.request.databasetype)
+    {
+      case 'elastic':
+        aggs = (this.result as ElasticQueryResult).aggregations;
+        break;
+      default:
+        aggs = {};
+        console.log('Unknown request type when extracting results from midway query response ' + this.request.type);
+    }
+    return aggs;
   }
 
   public getResultsData(): any[]

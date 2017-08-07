@@ -236,7 +236,7 @@ const EQLSpec: ESClause[] =
         search_after: 'any[]',
         suggest: 'object',
         aggregations: 'any[]',
-        aggs: 'any[]',
+        aggs: 'any',
         cutoff_frequency: 'cutoff_frequency',
         minimum_should_match: 'minimum_should_match',
       },

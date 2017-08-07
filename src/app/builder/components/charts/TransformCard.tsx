@@ -61,6 +61,10 @@ import SpotlightStore from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
+import {Ajax} from '../../../util/Ajax';
+import {QueryResult} from '../../../../database/types/QueryResponse';
+import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
+import {MidwayError} from '../../../../../shared/error/MidwayError';
 
 const NUM_BARS = 1000;
 
@@ -126,6 +130,9 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    console.log("nextProps.data" + JSON.stringify(nextProps.data));
+    console.log("nextProps.query" + nextProps.builderState.tql);
+
     if (nextProps.data.input !== this.props.data.input)
     {
       this.computeBars(nextProps.data.input);
@@ -202,109 +209,18 @@ class TransformCard extends TerrainComponent<Props>
   // TODO move the bars computation to a higher level
   public computeBars(input: CardString)
   {
-    if (this.props.language !== 'mysql')
+    console.log("CardString: " + input + " input type " + typeof input);
+    switch (this.props.language)
     {
-      // TODO MOD adapt Transform card for elastic.
-      return;
+      case "mysql":
+        this.computeTQLBars(input);
+        break;
+      case "elastic":
+        this.computeEQLBars(input);
+        break;
+      default:
+        break;
     }
-    console.log("CardString: " + input);
-    // TODO consider putting the query in context
-    const { builderState } = this.props;
-    const { cards } = builderState.query;
-    console.log("cards: " + JSON.stringify(cards));
-    const { db } = builderState;
-
-    if (typeof input === 'string')
-    {
-      // TODO: cache somewhere
-      const parts = input.split('.');
-      if (parts.length === 2)
-      {
-        const alias = parts[0];
-        const field = parts[1];
-        console.log("alias field " + alias + ":" + field);
-        const table = this.findTableForAlias(cards, alias);
-        console.log("table: " + table);
-
-        if (table)
-        {
-          this.setState(
-            AjaxM1.queryM1(
-              `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
-              db,
-              this.handleQueryResponse,
-              this.handleQueryError,
-            ),
-          );
-          return;
-        }
-      }
-    }
-    else if (input && input._isCard)
-    {
-      const card = input as Card;
-      if (card.type === 'score' && card['weights'].size)
-      {
-        // only case we know how to handle so far is a score card with a bunch of fields
-        //  that all come from the same table
-        let finalTable: string = '';
-        let finalAlias: string = '';
-        card['weights'].map((weight) =>
-        {
-          if (finalTable === null)
-          {
-            return; // already broke
-          }
-
-          const key = weight.get('key');
-          if (typeof key === 'string')
-          {
-            const parts = key.split('.');
-            if (parts.length === 2)
-            {
-              const alias = parts[0];
-              if (finalAlias === '')
-              {
-                finalAlias = alias;
-              }
-              if (alias === finalAlias)
-              {
-                const table = this.findTableForAlias(cards, alias);
-                if (!finalTable.length)
-                {
-                  finalTable = table;
-                }
-                if (finalTable === table)
-                {
-                  return; // so far so good, continue
-                }
-              }
-            }
-          }
-
-          finalTable = null; // Not good, abort!
-        });
-
-        if (finalTable)
-        {
-          // convert the score to TQL, do the query
-          // this.setState(
-          //   AjaxM1.queryM1(
-          //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
-          //     db,
-          //     this.handleQueryResponse,
-          //     this.handleQueryError,
-          //   ),
-          // );
-          return;
-        }
-      }
-
-      // TODO, or something
-    }
-    this.setState({
-      bars: List([]), // no can do get bars sadly, need to figure it out one day
-    });
   }
 
   public componentWillUnmount()
@@ -315,11 +231,203 @@ class TransformCard extends TerrainComponent<Props>
 
   public killQuery()
   {
-    this && this.state && this.state.queryId &&
+    if (this.props.language === 'mysql')
+    {
+      this && this.state && this.state.queryId &&
       AjaxM1.killQuery(this.state.queryId);
+    }
   }
 
-  public handleQueryResponse(response: M1QueryResponse)
+
+
+  public handleQueryError(error: any)
+  {
+    this.setState({
+      bars: List([]),
+      error: true,
+      queryXhr: null,
+      queryId: null,
+    });
+  }
+
+  public handleDomainChange(domain: List<number>)
+  {
+    this.setState({
+      domain,
+    });
+  }
+
+  public handleUpdatePoints(points, isConcrete?: boolean)
+  {
+    this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
+    // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
+    //  set an Undo checkpoint. Moving the same point in the same movement should not result
+    //  in more than one state on the Undo stack.
+  }
+
+  public render()
+  {
+    const spotlights = this.state.spotlights;
+    const { data } = this.props;
+    const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
+
+    return (
+      <div
+        className='transform-card-inner'
+      >
+        <TransformCardChart
+          canEdit={this.props.canEdit}
+          points={data.scorePoints}
+          bars={this.state.bars}
+          domain={this.state.domain}
+          range={this.state.range}
+          spotlights={spotlights && spotlights.toList().toJS()}
+          inputKey={BlockUtils.transformAlias(this.props.data)}
+          updatePoints={this.handleUpdatePoints}
+          width={width}
+          language={this.props.language}
+        />
+        <TransformCardPeriscope
+          onDomainChange={this.handleDomainChange}
+          barsData={this.state.bars}
+          domain={this.state.domain}
+          range={this.state.range}
+          maxDomain={data.domain}
+          keyPath={this.props.keyPath}
+          canEdit={this.props.canEdit}
+          width={width}
+          language={this.props.language}
+        />
+      </div>
+    );
+  }
+
+  private handleElasticAggregationError(err: MidwayError|string)
+  {
+  }
+
+  private handleElasticAggregationResponse(resp: MidwayQueryResponse)
+  {
+    console.log("handleElasticAggregationResult:  " + JSON.stringify(resp));
+    this.setState({
+      queryXhr: null,
+      queryId: null,
+    });
+
+    const min = Number(this.props.data.domain.get(0));
+    const max = Number(this.props.data.domain.get(1));
+    const elasticHistogram = resp.getAggregationResult();
+    let theHist;
+    if (elasticHistogram.transformCard &&  elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+    {
+      theHist = elasticHistogram.transformCard.buckets;
+    } else
+    {
+      console.log('Error ' + elasticHistogram.transformCard.buckets.length);
+      return this.handleElasticAggregationError('The size of aggregation buckets is < ' + NUM_BARS);
+    }
+
+    const bars: Bar[] = [];
+      for (let j = 0; j < NUM_BARS; j++)
+      {
+        bars.push({
+          id: '' + j,
+          count: theHist[j].doc_count,
+          percentage: theHist[j].doc_count,
+          range: {
+            min: min + (max - min) * j / NUM_BARS,
+            max: min + (max - min) * (j + 1) / NUM_BARS,
+          },
+        });
+      }
+
+/*      results.map((v) =>
+      {
+        const val = +v.value;
+        let i = Math.floor((val - min) / (max - min) * NUM_BARS);
+        if (i === NUM_BARS)
+        {
+          i = NUM_BARS - 1;
+        }
+        if (i < 0 || i >= bars.length)
+        {
+          // out of bounds for our custom domain
+          return;
+        }
+
+        bars[i].count++;
+        bars[i].percentage += 1 / results.length;
+      });*/
+
+      this.setState({
+        bars: List(bars),
+      });
+
+      if (!this.props.data.hasCustomDomain)
+      {
+        const domain = List([min, max]);
+        this.setState({
+          domain: this.trimDomain(this.state.domain, domain),
+        });
+        this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), domain, true);
+      }
+  }
+
+  private computeEQLBars(input: CardString)
+  {
+    const { builderState } = this.props;
+    const { db } = builderState;
+
+    if (!input)
+    {
+      return;
+    }
+
+    const min = Number(this.props.data.domain.get(0));
+    const max = Number(this.props.data.domain.get(1));
+    const interval = (max - min) / NUM_BARS;
+    console.log("min,max,interval = "  + min + "," + max + "," + interval);
+
+    const aggQuery = {
+      index: '',
+      type: '',
+      body: {
+        size: 0,
+        query: {
+          bool: {
+            must: {
+              range: {
+                "votecount": {"gte": min, "lte": max}
+              }
+            }
+          }
+        },
+        aggs: {
+          transformCard: {
+            histogram: {
+              field: input,
+              interval: interval,
+            }
+          }
+        }
+      }};
+
+    this.setState(
+      Ajax.query(
+        JSON.stringify(aggQuery),
+        db,
+        (resp) =>
+        {
+          this.handleElasticAggregationResponse(resp)
+        },
+        (err) =>
+        {
+          this.handleElasticAggregationError(err)
+        }, ),
+    );
+  }
+
+  private handleM1TQLQueryResponse(response: M1QueryResponse)
   {
     this.setState({
       queryXhr: null,
@@ -397,67 +505,106 @@ class TransformCard extends TerrainComponent<Props>
     }
   }
 
-  public handleQueryError(error: any)
+  private computeTQLBars(input: CardString)
   {
+    // TODO consider putting the query in context
+    const { builderState } = this.props;
+    const { cards } = builderState.query;
+    const { db } = builderState;
+
+    if (typeof input === 'string')
+    {
+      // TODO: cache somewhere
+      const parts = input.split('.');
+      if (parts.length === 2)
+      {
+        const alias = parts[0];
+        const field = parts[1];
+        console.log("alias field " + alias + ":" + field);
+        const table = this.findTableForAlias(cards, alias);
+        console.log("table: " + table);
+
+        if (table)
+        {
+          this.setState(
+            AjaxM1.queryM1(
+              `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
+              db,
+              this.handleM1TQLQueryResponse,
+              this.handleQueryError,
+            ),
+          );
+          return;
+        }
+      }
+    }
+    else if (input && input._isCard) // looks like this is never called
+    {
+      const card = input as Card;
+      if (card.type === 'score' && card['weights'].size)
+      {
+        // only case we know how to handle so far is a score card with a bunch of fields
+        //  that all come from the same table
+        let finalTable: string = '';
+        let finalAlias: string = '';
+        card['weights'].map((weight) =>
+        {
+          if (finalTable === null)
+          {
+            return; // already broke
+          }
+
+          const key = weight.get('key');
+          if (typeof key === 'string')
+          {
+            const parts = key.split('.');
+            if (parts.length === 2)
+            {
+              const alias = parts[0];
+              if (finalAlias === '')
+              {
+                finalAlias = alias;
+              }
+              if (alias === finalAlias)
+              {
+                const table = this.findTableForAlias(cards, alias);
+                if (!finalTable.length)
+                {
+                  finalTable = table;
+                }
+                if (finalTable === table)
+                {
+                  return; // so far so good, continue
+                }
+              }
+            }
+          }
+
+          finalTable = null; // Not good, abort!
+        });
+
+        if (finalTable)
+        {
+          // convert the score to TQL, do the query
+          // this.setState(
+          //   AjaxM1.queryM1(
+          //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+          //     db,
+          //     this.handleQueryResponse,
+          //     this.handleQueryError,
+          //   ),
+          // );
+          return;
+        }
+      }
+
+      // TODO, or something
+    }
     this.setState({
-      bars: List([]),
-      error: true,
-      queryXhr: null,
-      queryId: null,
+      bars: List([]), // no can do get bars sadly, need to figure it out one day
     });
   }
 
-  public handleDomainChange(domain: List<number>)
-  {
-    this.setState({
-      domain,
-    });
-  }
-
-  public handleUpdatePoints(points, isConcrete?: boolean)
-  {
-    this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
-    // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
-    //  set an Undo checkpoint. Moving the same point in the same movement should not result
-    //  in more than one state on the Undo stack.
-  }
-
-  public render()
-  {
-    const spotlights = this.state.spotlights;
-    const { data } = this.props;
-    const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
-
-    return (
-      <div
-        className='transform-card-inner'
-      >
-        <TransformCardChart
-          canEdit={this.props.canEdit}
-          points={data.scorePoints}
-          bars={this.state.bars}
-          domain={this.state.domain}
-          range={this.state.range}
-          spotlights={spotlights && spotlights.toList().toJS()}
-          inputKey={BlockUtils.transformAlias(this.props.data)}
-          updatePoints={this.handleUpdatePoints}
-          width={width}
-          language={this.props.language}
-        />
-        <TransformCardPeriscope
-          onDomainChange={this.handleDomainChange}
-          barsData={this.state.bars}
-          domain={this.state.domain}
-          range={this.state.range}
-          maxDomain={data.domain}
-          keyPath={this.props.keyPath}
-          canEdit={this.props.canEdit}
-          width={width}
-          language={this.props.language}
-        />
-      </div>
-    );
-  }
 }
 
 export default Dimensions({

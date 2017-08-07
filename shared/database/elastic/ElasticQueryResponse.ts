@@ -56,7 +56,7 @@ export interface ElasticQueryHit
   _id: string;
   _score: number;
   _source: ElasticQueryHitSource;
-  _sort?: boolean;
+  sort?: number[];
 }
 
 export interface ElasticQueryShards
@@ -78,6 +78,7 @@ export interface ElasticQueryResult
   took: number;
   timed_out: boolean;
   hits: ElasticQueryHits;
+  aggregations?: any;
   _shards: ElasticQueryShards;
 
 }
