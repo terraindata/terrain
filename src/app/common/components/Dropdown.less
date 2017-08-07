@@ -1,18 +1,18 @@
 @import "../../common/Common.less";
 
-@option-height: 29px;
-@border-radius: 6px;
+@option-height: 26px;
+@dropdown-height: @option-height + 5px;
+@border-radius: 3px;
 
 .dropdown-wrapper {
  cursor: pointer;
- background: @white;
- height: @option-height;
- border-radius: @border-radius;
+ height: @dropdown-height;
  box-sizing: border-box;
  z-index: 0;
  transition: height 0.15s;
  margin: 0px (@standard-margin / 2);
- padding-top: 2px;
+ 
+ font-size: @font-size;
 
  &:last-child {
   // if it's the last child in a row, we don't want to margin the right side
@@ -26,10 +26,10 @@
 
  text-align: left;
 
- border: 1px solid #fff;
+ // border: 1px solid #fff;
  &:hover:not(.dropdown-disabled),
  &.dropdown-open {
-  border-color: #aaa;
+  // border-color: #aaa;
  }
 
  &.dropdown-disabled {
@@ -62,20 +62,20 @@
     min-width: 100%;
     overflow-y: auto;
     background: #ffffff;
-    border-radius: 6px;
+    border-radius: @border-radius;
     padding: 6px 0px;
-    box-shadow: 0px 0px 4px 1px #999999;
+    // box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.25);
   }
 
   &:not(.dropdown-up) {
     .dropdown-options-wrapper {
-      top: @option-height;
+      top: @dropdown-height + 1px;
     }
   }
 
   &.dropdown-up {
     .dropdown-options-wrapper {
-      bottom: @option-height;
+      bottom:  @dropdown-height + 1px;
     }
   }
  }
@@ -83,24 +83,68 @@
  .dropdown-value,
  .dropdown-option {
     height: @option-height;
-    padding: 0px 12px;
+    padding: 0px 6px;
     position: relative;
     margin: 0px 6px;
     transition: all 0.05s;
     border-radius: @border-radius;
   }
+  
   .dropdown-value {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    box-sizing: border-box;
+    padding-right: 28px; // apply padding that exists in options menu
+    padding-top: 2px;
+    
     .dropdown-option-inner {
-      padding-top: 0px;
+      // we keep even the unselected ones around so that the width of
+      //  the dropdown can take the width of the widest one
+      padding: 0px;
+      margin: 0px;
       opacity: 0;
 
       &.dropdown-option-value-selected {
-        padding-top: 12px;
+        display: block;
+        padding-top: 15px;
         opacity: 1;
         white-space: nowrap;
       }
     }
+    
+ 
+    // draw arrow icon   
+    &:before {
+        content: "";
+        width: 0px;
+        height: 0px;
+        position: absolute;
+        right: 6px;
+        top: 12px;
+        
+        .transition;
+        opacity: 0.25;
+
+        border-top: 7px solid #fff;
+        border-right: 7px solid transparent;
+        border-left: 7px solid transparent;
+    }
+    
+    &:hover {
+      &:before {
+        opacity: 1;
+      }
+    }
   }
+  
+  &.dropdown-open {
+    .dropdown-value:before {
+      // rotate arrow
+      .rotate180;
+    }
+  }
+  
   .dropdown-option {
     background: @white;
   }
@@ -118,7 +162,7 @@
     }
 
     &.dropdown-option-focused {
-      border-color: #d1efe7;
+      // border-color: #d1efe7;
     }
   }
 
@@ -128,11 +172,11 @@
 
  &.dropdown-center {
   text-align: center;
-  .dropdown-option,
-  .dropdown-value {
-    padding-left: 6px;
-    padding-right: 6px;
-  }
+  // .dropdown-option,
+  // .dropdown-value {
+  //   padding-left: 6px;
+  //   padding-right: 6px;
+  // }
  }
 
 }

@@ -55,6 +55,7 @@ import * as React from 'react';
 import { DragSource } from 'react-dnd';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
+
 const { createDragPreview } = require('react-dnd-text-dragpreview');
 import { Display } from '../../../../blocks/displays/Display';
 import { Card } from '../../../../blocks/types/Card';
@@ -67,13 +68,15 @@ import ManualPopup from './../../../manual/components/ManualPopup';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
+
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, cardStyle, Colors, fontColor, link } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
+
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
 
@@ -239,8 +242,8 @@ class _CardComponent extends TerrainComponent<Props>
     this.dragPreview = createDragPreview(
       this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')',
       {
-        backgroundColor: this.props.card.static.colors[0],
-        borderColor: this.props.card.static.colors[0],
+        // backgroundColor: this.props.card.static.colors[0],
+        // borderColor: this.props.card.static.colors[0],
         color: '#fff',
         fontSize: 15,
         fontWeight: 'bold',
@@ -337,7 +340,8 @@ class _CardComponent extends TerrainComponent<Props>
   {
     if (this.props.singleCard || this.props.singleChild)
     {
-      alert("Can't duplicate this card because it is not in a position where it can have neighborhing cards. Try moving it to another spot on the Builder and duplicating it there.");
+      alert(
+        'Can\'t duplicate this card because it is not in a position where it can have neighborhing cards. Try moving it to another spot on the Builder and duplicating it there.');
       return;
     }
 
@@ -493,19 +497,15 @@ class _CardComponent extends TerrainComponent<Props>
       columnIndex={this.props.columnIndex}
       keyPath={this.getKeyPath()}
       language={this.props.card.static.language}
+      textStyle={{
+        color: this.props.card.static.colors[0],
+        backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
+      }}
     />;
 
     const { card } = this.props;
     const { title } = card.static;
     const { isDragging, connectDragSource } = this.props;
-
-    // TODO
-    // <ManualPopup
-    //                 cardName={card.static.title}
-    //                 rightAlign={!this.props.canEdit}
-    //                 addColumn={this.props.addColumn}
-    //                 columnIndex={this.props.columnIndex}
-    //               />
 
     return (
       <div
@@ -524,7 +524,9 @@ class _CardComponent extends TerrainComponent<Props>
         ref='card'
         id={id}
         onMouseMove={this.handleMouseMove}
-        style={backgroundColor(Colors().builder.cards.cardBase)}
+        style={{
+          // backgroundColor(Colors().builder.cards.cardBase)
+        }}
       >
         <CDA
           half={true}
@@ -536,14 +538,18 @@ class _CardComponent extends TerrainComponent<Props>
           language={card.static.language}
         />
         <div
-          className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
-          style={{
-            background: card.static.colors[1],
-            borderColor: card.static.colors[0],
-          }}
+          className={classNames({
+            'card-inner': true,
+            'card-inner-with-title': !card['noTitle'],
+            'single-card-inner': this.props.singleCard,
+          })}
+          style={cardStyle(
+            card.static.colors[0], this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
+          )}
           ref='cardInner'
         >
           {
+            !card['cannotBeMoved'] &&
             connectDragSource(
               <div
                 className={classNames({
@@ -553,7 +559,8 @@ class _CardComponent extends TerrainComponent<Props>
                 })}
                 style={{
                   // shrink the width if the card does not have a title
-                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+                  // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+                  width: NO_TITLE_WIDTH,
                 }}
                 onClick={this.handleTitleClick}
               >
@@ -579,7 +586,7 @@ class _CardComponent extends TerrainComponent<Props>
                   <div
                     className='card-title-inner'
                     style={{
-                      background: card.static.colors[0],
+                      color: card.static.colors[0],
                     }}
                   >
                     {

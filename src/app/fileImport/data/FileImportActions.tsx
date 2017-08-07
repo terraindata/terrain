@@ -117,8 +117,8 @@ const FileImportActions =
       $(ActionTypes.loadTemplate, { templateId }),
 
     changeUploadInProgress:
-    () =>
-      $(ActionTypes.changeUploadInProgress, {}),
+    (uploading: boolean) =>
+      $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
     () =>

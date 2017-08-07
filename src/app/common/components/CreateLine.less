@@ -2,7 +2,7 @@
 
 @margin: 2 * @standard-margin;
 @total-height: 2 * @margin + 1px;
-@create-icon-height: 9px;
+@create-icon-height: 16px;
 @create-icon-padding: 1px;
 @create-line-padding: @margin - ((@create-icon-height - 1px) / 2);
 
@@ -13,15 +13,22 @@
   position: relative;
   overflow: hidden;
   
+  opacity: 0.2;
+  &:hover {
+    opacity: 1.0;
+  }
+  &:active {
+    opacity: 0.2;
+  }
+  
   .transition;
    
   .create-line-plus {
-    background: #a2af93;
     display: inline-block;
     padding: @create-icon-padding;
     border-radius: 10px;
-    position: relative;
-    left: 15px;
+    position: absolute;
+    left: calc(~"50% - @{create-icon-height} / 2");
     top: (@total-height - @create-icon-height - 2 * @create-icon-padding) / 2;
     .transition;
     box-sizing: border-box;
@@ -32,20 +39,20 @@
     }
   }
   
+  @line-margin: 12px;
   .create-line-line {
     border-bottom: 1px solid #dde0d9;
     position: absolute;
-    width: 100%;
+    width: calc(~"50% - @{create-icon-height} - @{line-margin}");
     top: @margin;
     .transition;
-  }
-  
-  &:hover {
-    .create-line-line {
-      border-color: darken(@dark-green, 5%);
+    
+    &.create-line-line-left {
+      left: 0px;
     }
-    .create-line-plus {
-      background: darken(@dark-green, 5%);
+    
+    &.create-line-line-right {
+      right: 0px;
     }
   }
 }

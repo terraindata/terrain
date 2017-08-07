@@ -50,7 +50,7 @@ var path = require("path");
 
 module.exports =
 {
-    entry: "./src/app/App.tsx",
+    entry: "./src/app/Root.tsx",
     devtool: "cheap-module-source-map",
 
     output:

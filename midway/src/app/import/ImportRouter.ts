@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
-
 import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
@@ -58,7 +56,6 @@ import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
-const importTemplates = new ImportTemplates();
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -80,6 +77,7 @@ Router.post('/export', async (ctx, next) =>
   }
   Util.verifyParameters(authStream['variantId'], ['templateId']);
 
+<<<<<<< HEAD
   ctx.body = await imprt.export(authStream as ExportConfig);
 });
 
@@ -95,6 +93,11 @@ Router.post('/headless', async (ctx, next) =>
   Util.verifyParameters(authStream['fields'], ['templateID', 'filetype']);
 
   ctx.body = await imprt.headlessUpsert(authStream);
+=======
+  Util.verifyParameters(fields, ['templateID', 'filetype']);
+
+  ctx.body = await imprt.upsertHeadless(files, fields);
+>>>>>>> master
 });
 
 export default Router;

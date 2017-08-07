@@ -47,12 +47,14 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-unused-expression member-access max-line-length
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { Card, CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import CreateLine from '../../../common/components/CreateLine';
 import FadeInOut from '../../../common/components/FadeInOut';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -90,6 +92,7 @@ export interface Props
   overrideClick?: (index: number) => void; // override the click handler
 }
 
+@Radium
 class CreateCardTool extends TerrainComponent<Props>
 {
   public state: {
@@ -227,15 +230,28 @@ class CreateCardTool extends TerrainComponent<Props>
     }
 
     return (
-      <div
+      <CreateLine
         onClick={this.props.onToggle}
-        className='create-card-placeholder'
-      >
-        {
-          this.props.open ? <CloseIcon /> : <AddIcon />
-        }
-      </div>
+        open={this.props.open}
+      />
     );
+
+    // return (
+    //   <div
+    //     onClick={this.props.onToggle}
+    //     className='create-card-placeholder'
+    //     style={{
+    //       borderColor: Colors().inactiveHover,
+    //       ':hover': {
+    //         background: Colors().inactiveHover,
+    //       }
+    //     }}
+    //   >
+    //     {
+    //       this.props.open ? <CloseIcon /> : <AddIcon />
+    //     }
+    //   </div>
+    // );
   }
 
   handleFocus()
@@ -297,7 +313,7 @@ class CreateCardTool extends TerrainComponent<Props>
         className={classes}
         style={_.extend(
           style,
-          backgroundColor(Colors().builder.builderColumn.background),
+          {}, // backgroundColor(Colors().bg1),
         )}
       >
         {

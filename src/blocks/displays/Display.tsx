@@ -118,6 +118,8 @@ export interface Display
   // for FLEX, its content
   flex?: Display | Display[];
 
+  style?: React.CSSProperties;
+
   // for components
   component?: any; // TerrainComponent?
 

@@ -47,6 +47,8 @@ THE SOFTWARE.
 import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
+import * as stream from 'stream';
+
 import * as csvjson from 'csvjson';
 import * as stream from 'stream';
 import * as _ from 'underscore';
@@ -57,6 +59,7 @@ import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
+
 import { ItemConfig, Items } from '../items/Items';
 import * as Util from '../Util';
 import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
@@ -234,6 +237,54 @@ export class Import
       winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
       resolve(res);
     });
+  }
+  public async upsertHeadless(files: stream.Readable[], fields: object): Promise<ImportConfig>
+  {
+    const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
+    if (templates.length === 0)
+    {
+      throw new Error('Invalid template ID provided: ' + String(fields['templateID']));
+    }
+    const template: ImportTemplateConfig = templates[0];
+
+    let update: boolean = true;
+    if (fields['update'] === 'false')
+    {
+      update = false;
+    }
+    else if (fields['update'] !== undefined && fields['update'] !== 'true')
+    {
+      throw new Error('Invalid value for parameter "update": ' + String(fields['update']));
+    }
+
+    let file: stream.Readable | null = null;
+    for (const f of files)
+    {
+      if (f['fieldname'] === 'file')
+      {
+        file = f;
+      }
+    }
+    if (file === null)
+    {
+      throw new Error('No file specified.');
+    }
+
+    const imprtConf: ImportConfig = {
+      dbid: template['dbid'],
+      dbname: template['dbname'],
+      tablename: template['tablename'],
+      csvHeaderMissing: template['csvHeaderMissing'],
+      originalNames: template['originalNames'],
+      columnTypes: template['columnTypes'],
+      primaryKey: template['primaryKey'],
+      transformations: template['transformations'],
+
+      contents: await Util.getStreamContents(file),
+      filetype: fields['filetype'],
+      update,
+    };
+    return this.upsert(imprtConf);
   }
 
   public async export(exprt: ExportConfig): Promise<stream.Readable>
