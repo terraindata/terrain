@@ -70,6 +70,7 @@ const FileImportActionTypes =
     dequeueChunk: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
+    clearChunkMap: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

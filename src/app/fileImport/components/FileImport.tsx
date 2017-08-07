@@ -89,39 +89,31 @@ class FileImport extends TerrainComponent<any>
     fileImportState: FileImportTypes.FileImportState;
     columnOptionNames: List<string>;
     stepId: number;
-
     servers?: SchemaTypes.ServerMap;
     serverNames: List<string>;
     serverIndex: number;
-
     dbs?: SchemaTypes.DatabaseMap;
     dbNames: List<string>;
-
     tables?: SchemaTypes.TableMap;
     tableNames: List<string>;
-
     fileSelected: boolean;
     filetype: string,
     filename: string,
-
     showCsvHeaderOption: boolean,
+    bufferingComplete: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
     stepId: 0,
-
     serverIndex: -1,
     serverNames: List([]),
-
     dbNames: List([]),
-
     tableNames: List([]),
-
     fileSelected: false,
     filetype: '',
     filename: '',
-
     showCsvHeaderOption: false,
+    bufferingComplete: false,
   };
 
   constructor(props)
@@ -303,6 +295,10 @@ class FileImport extends TerrainComponent<any>
     const { file, streaming } = this.state.fileImportState;
 
     const numChunks = Math.min(Math.ceil(file.size / CHUNK_SIZE), MAX_NUM_CHUNKS);
+    this.setState({
+      bufferingComplete: Math.ceil(file.size / CHUNK_SIZE) < MAX_NUM_CHUNKS,
+    });
+
     const fileToRead = streaming ? file.slice(0, numChunks * CHUNK_SIZE) : file;
     const fr = new FileReader();
     fr.readAsText(fileToRead);
@@ -381,6 +377,7 @@ class FileImport extends TerrainComponent<any>
       filename: file.target.files[0].name,
     });
     Actions.saveFile(file.target.files[0]);
+    Actions.clearChunkMap();
 
     if (filetype === 'csv')
     {
@@ -535,6 +532,7 @@ class FileImport extends TerrainComponent<any>
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
             chunkMap={chunkMap}
+            bufferingComplete={this.state.bufferingComplete}
           />;
         break;
       default:

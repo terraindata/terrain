@@ -77,8 +77,8 @@ const FileImportActions =
       $(ActionTypes.chooseFile, { fileContents, filetype, preview, originalNames }),
 
     uploadFile:
-    () =>
-      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+    (stream: () => void) =>
+      $(ActionTypes.uploadFile, { startStreaming: stream, changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     addTransform:
     (transform: FileImportTypes.Transform) =>
@@ -135,6 +135,10 @@ const FileImportActions =
     changeElasticUpdate:
     () =>
       $(ActionTypes.changeElasticUpdate, {}),
+
+    clearChunkMap:
+    () =>
+      $(ActionTypes.clearChunkMap, {}),
   };
 
 export default FileImportActions;

@@ -91,6 +91,7 @@ export interface Props
   file: File;
   streaming: boolean;
   chunkMap: IMMap<number, FileImportTypes.Chunk>;
+  bufferingComplete: boolean;
 }
 
 @Radium
@@ -161,6 +162,11 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       editColumnId,
     });
+  }
+
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
   }
 
   public handleTemplateChange(templateId: number)
@@ -253,11 +259,11 @@ class FileImportPreview extends TerrainComponent<Props>
       console.log('ready');
       console.log('queue: ', this.props.chunkMap);
 
-      if (this.props.chunkMap.size < MAX_NUM_CHUNKS / 2) // refill buffer when size falls below half
+      if (!this.props.bufferingComplete && this.props.chunkMap.size < MAX_NUM_CHUNKS / 2) // refill buffer when size falls below half
       {
         this.fill();
       }
-      if (!this.props.chunkMap.isEmpty())      // assume filereader parses chunks faster than backend processes them
+      if (!this.props.chunkMap.isEmpty()) // assume filereader parses chunks faster than backend processes them
       {
         console.log('send chunk: ', this.props.chunkMap.get(id));
         socket.send(this.props.chunkMap.get(id));
@@ -266,7 +272,7 @@ class FileImportPreview extends TerrainComponent<Props>
       }
       else
       {
-        Actions.changeUploadInProgress(true);
+        Actions.changeUploadInProgress(false);
         console.log('finished');
         socket.emit('finished');
       }
@@ -275,20 +281,16 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('error from midway: ' + String(err));
       // TODO: handle error analogously as from Ajax request (in non-streaming case)
+      Actions.changeUploadInProgress(false);
       alert(String(err));
     });
     socket.on('midway_success', () =>
     {
       console.log('upsert successful!');
       // TODO: handle success analogously as from Ajax request (in non-streaming case)
-      Actions.changeUploadInProgress(true);
+      Actions.changeUploadInProgress(false);
       alert('successful');
     });
-  }
-
-  public handleElasticUpdateChange()
-  {
-    Actions.changeElasticUpdate();
   }
 
   public fill()
@@ -324,13 +326,13 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleUploadFile()
   {
-    Actions.uploadFile();
+    Actions.uploadFile(this.stream);
 
-    if (this.props.streaming)
-    {
-      console.log('filesize: ', this.props.file.size);
-      this.stream();
-    }
+    // if (this.props.streaming)
+    // {
+    //   console.log('filesize: ', this.props.file.size);
+    //   this.stream();
+    // }
   }
 
   public renderTemplate()

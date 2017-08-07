@@ -302,15 +302,22 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.streaming,
       () =>
       {
+        console.log('response');
         if (!state.streaming)
         {
           alert('success');
           action.payload.changeUploadInProgress(false);
         }
+        else
+        {
+          console.log('begin streaming');
+          action.payload.startStreaming();
+        }
         // TODO: stream after this response
       },
       (err: string) =>
       {
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         if (!state.streaming)
         {
           alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
@@ -409,9 +416,15 @@ FileImportReducers[ActionTypes.enqueueChunk] =
     console.log('chunk added: ' + action.payload.id + ', isLast: ' + action.payload.isLast);
     return state.set('chunkMap', state.chunkMap.set(action.payload.id, action.payload));
   };
+
 FileImportReducers[ActionTypes.dequeueChunk] =
   (state, action) =>
     state.deleteIn(['chunkMap', action.payload.id])
+  ;
+
+FileImportReducers[ActionTypes.clearChunkMap] =
+  (state, action) =>
+    state.set('chunkMap', Immutable.Map({}))
   ;
 
 export default FileImportReducers;

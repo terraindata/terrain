@@ -127,6 +127,7 @@ export interface Chunk
 export const NUMBER_PREVIEW_ROWS = 5;
 
 export const MAX_CHUNKMAP_SIZE = 10;
+
 export const CHUNK_SIZE = 10000000;    // assume this chunk size contains number of preview rows
 
 export const FILE_TYPES =
