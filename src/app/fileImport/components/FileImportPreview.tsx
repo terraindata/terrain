@@ -108,7 +108,7 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
-    fileStart: CHUNK_SIZE,
+    fileStart: MAX_NUM_CHUNKS * CHUNK_SIZE,
     chunkId: MAX_NUM_CHUNKS,
   };
 
@@ -343,7 +343,7 @@ class FileImportPreview extends TerrainComponent<Props>
           className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='flex-shrink fi-preview-template-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleLoadTemplate}
             style={buttonColors()}
             ref='fi-preview-template-button-load'
@@ -354,7 +354,7 @@ class FileImportPreview extends TerrainComponent<Props>
             selectedIndex={this.state.templateId}
             options={this.state.templateOptions}
             onChange={this.handleTemplateChange}
-            className={'flex-shrink fi-preview-template-load-dropdown'}
+            className={'flex-grow fi-preview-template-load-dropdown'}
             canEdit={true}
           />
         </div>
@@ -363,7 +363,7 @@ class FileImportPreview extends TerrainComponent<Props>
           className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='flex-shrink fi-preview-template-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleSaveTemplate}
             style={buttonColors()}
             ref='fi-preview-template-button-save'
@@ -375,7 +375,7 @@ class FileImportPreview extends TerrainComponent<Props>
             options={null}
             onChange={this.handleAutocompleteTemplateChange}
             placeholder={'template name'}
-            className={'flex-shrink fi-preview-template-save-autocomplete'}
+            className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
           />
         </div>
