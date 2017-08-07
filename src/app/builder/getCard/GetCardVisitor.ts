@@ -55,7 +55,8 @@ import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
-import { Colors } from '../../common/Colors';
+import { Colors, getCardColors } from '../../common/Colors';
+
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
 import { BuilderStore } from '../data/BuilderStore';
@@ -81,6 +82,8 @@ import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/EST
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
+
+const Color = require('color');
 
 const KEY_INLINE_DISPLAYS = [
   DisplayType.TEXT,
@@ -141,7 +144,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: clause.name,
-      colors: [Colors().border2, Colors().bg2],
+      colors: getCardColors(clause.path[0], Colors().border2),
       language: 'elastic',
       description: clause.desc,
     }, obj['static']);
@@ -248,7 +251,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.anyClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.anyClause),
         title: clause.type + ' (Variant)',
         tql: (block, tqlFn, tqlConfig) =>
         {
@@ -273,7 +276,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.arrayClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
         preview: '[cards.size] ' + clause.type + '(s)',
 
         display:
@@ -302,9 +305,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
-      colors: Colors().builder.cards.baseClause,
+      colors: getCardColors(clause.path[0], Colors().builder.cards.baseClause),
       static: {
-        colors: Colors().builder.cards.baseClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.baseClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -321,7 +324,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       value: true,
 
       static: {
-        colors: Colors().builder.cards.booleanClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.booleanClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.DROPDOWN,
@@ -340,9 +343,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? clause.values[0] : clause.template,
-      colors: Colors().builder.cards.enumClause,
+      colors: getCardColors(clause.path[0], Colors().builder.cards.enumClause),
       static: {
-        colors: Colors().builder.cards.enumClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.enumClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.DROPDOWN,
@@ -360,7 +363,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
-        colors: Colors().builder.cards.fieldClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.fieldClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -380,7 +383,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
-        colors: Colors().builder.cards.indexClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.indexClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -407,7 +410,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.mapClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.mapClause),
         preview: '[cards.size] properties',
 
         display:
@@ -438,7 +441,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       noTitle: false,
       static: {
-        colors: Colors().builder.cards.nullClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.nullClause),
         preview: '',
         display: [],
         tql: () => null,
@@ -453,7 +456,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         ? 0 : clause.template,
       static: {
         preview: '[value]',
-        colors: Colors().builder.cards.numberClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.numberClause),
         display: {
           displayType: DisplayType.NUM,
           key: 'value',
@@ -472,7 +475,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.objectClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.objectClause),
         preview: '[cards.size] properties',
 
         display:
@@ -523,7 +526,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
-        colors: Colors().builder.cards.stringClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.stringClause),
         preview: '[value]',
 
         display: {
@@ -653,7 +656,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             return json;
           },
 
-          colors: Colors().builder.cards.structureClause,
+          colors: getCardColors(clause.path[0], Colors().builder.cards.structureClause),
           preview: '[cards.size] Properties',
 
           accepts,
@@ -683,7 +686,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: typeof clause.template === 'string' ? clause.template : '',
       static: {
-        colors: Colors().builder.cards.typeClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.typeClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,

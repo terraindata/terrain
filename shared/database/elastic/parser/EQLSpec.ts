@@ -193,21 +193,24 @@ const EQLSpec: ESClause[] =
       }),
     new ESIndexClause('index',
       {
-        path: ['primary'],
+        path: ['control'],
         desc: 'Selects which index to search.',
         template: '',
       },
     ),
-    new ESTypeClause('type', { desc: 'Selects which type to search.' }),
+    new ESTypeClause('type', {
+      path: ['control'],
+      desc: 'Selects which type to search.',
+    }),
     new ESNumberClause('from',
       {
-        path: ['primary'],
+        path: ['control'],
         desc: 'How many results to skip over. This is usually used to implement pagination.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
       }),
     new ESNumberClause('size',
       {
-        path: ['primary'],
+        path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
         template: 1000,
