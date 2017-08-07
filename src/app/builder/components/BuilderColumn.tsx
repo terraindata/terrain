@@ -85,7 +85,7 @@ const ManualIcon = require('./../../../images/icon_info.svg');
 
 enum COLUMNS
 {
-  Builder,
+  Cards,
   Results,
   Editor,
   Inputs,
@@ -212,7 +212,7 @@ const BuilderColumn = createReactClass<any, any>(
 
       switch (this.state.column)
       {
-        case COLUMNS.Builder:
+        case COLUMNS.Cards:
           return <CardsColumn
             cards={query.cards}
             deckOpen={query.deckOpen}
@@ -320,11 +320,10 @@ const BuilderColumn = createReactClass<any, any>(
       return this.renderPanel((
         <div
           className={'builder-column builder-column-' + this.props.index}
-          style={backgroundColor(Colors().bg1)}
+          style={backgroundColor(Colors().bg2)}
         >
           <div
             className='builder-title-bar'
-            style={backgroundColor(Colors().bg2)}
           >
             {
               this.props.index === 0 ? null : (
@@ -334,7 +333,10 @@ const BuilderColumn = createReactClass<any, any>(
                 </div>
               )
             }
-            <div className='builder-title-bar-title'>
+            <div
+              className='builder-title-bar-title'
+              style={fontColor(Colors().text2)}
+            >
               <span ref='handle'>
                 {
                   COLUMNS[this.state.column]
@@ -374,7 +376,7 @@ const BuilderColumn = createReactClass<any, any>(
               'builder-column-content': true,
               // 'builder-column-manual': this.state.column === COLUMNS.Manual,
               'builder-column-content-scroll':
-              this.state.column === COLUMNS.Builder ||
+              this.state.column === COLUMNS.Cards ||
               this.state.column === COLUMNS.Inputs,
             })}
             style={backgroundColor(Colors().bg1)}
