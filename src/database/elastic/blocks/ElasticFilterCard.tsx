@@ -73,7 +73,7 @@ export const elasticFilterBlock = _block(
     field: '',
     value: undefined,
     boolQuery: '',
-    rangeQuery: '=',
+    filterOp: '=',
 
     static: {
       language: 'elastic',
@@ -90,7 +90,7 @@ export const elasticFilterBlock = _block(
         }
 
         // term query
-        if (block['rangeQuery'] === '=')
+        if (block['filterOp'] === '=')
         {
           return {
             [block['boolQuery']]: {
@@ -103,10 +103,10 @@ export const elasticFilterBlock = _block(
         else
         {
           // range query
-          const rangeOp = esFilterOperatorsMap[block['rangeQuery']];
+          const rangeOp = esFilterOperatorsMap[block['filterOp']];
           if (rangeOp === undefined)
           {
-            throw new Error('Unspecified range operation for: ' + block['rangeQuery']);
+            throw new Error('Unspecified range operation for: ' + block['filterOp']);
           }
 
           return {
@@ -211,7 +211,7 @@ export const elasticFilter = _card({
             },
             {
               displayType: DisplayType.DROPDOWN,
-              key: 'rangeQuery',
+              key: 'filterOp',
               options: List(
                 _.keys(esFilterOperatorsMap),
                 // can consider using this, but it includes 'boost', and uses raw text values

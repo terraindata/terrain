@@ -67,7 +67,14 @@ export default class ESParserError
     this.message = message;
     this.isWarning = isWarning;
 
-    this.token.attachError(this);
-    this.valueInfo.attachError(this);
+    if (this.token !== null)
+    {
+      this.token.attachError(this);
+    }
+
+    if (this.valueInfo !== null)
+    {
+      this.valueInfo.attachError(this);
+    }
   }
 }
