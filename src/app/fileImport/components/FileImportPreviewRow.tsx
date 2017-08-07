@@ -46,35 +46,46 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import './FileImportPreviewRow.less';
 
 export interface Props
 {
-  items: object;
+  items: List<string>;
 }
 
+@Radium
 class FileImportPreviewRow extends TerrainComponent<Props>
 {
-  public shouldComponentUpdate(nextProps: Props)
-  {
-    return this.props.items !== nextProps.items;
-  }
-
   public render()
   {
-    const row = Object.keys(this.props.items).map((key) =>
-      <td key={key}>
-        {
-          this.props.items[key]
-        }
-      </td>,
-    );
-
     return (
-      <tr>{row}</tr>
+      <div
+        className='fi-preview-row'
+      >
+        {
+          this.props.items.map((value, key) =>
+            <div
+              key={key}
+              className='fi-preview-row-cell'
+              style={backgroundColor(Colors().fileimport.preview.cell)}
+            >
+              <div
+                className='fi-preview-row-cell-text'
+              >
+                {
+                  value
+                }
+              </div>
+            </div>,
+          )
+        }
+      </div>
     );
   }
 }

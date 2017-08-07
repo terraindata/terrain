@@ -60,9 +60,9 @@ import * as BlockUtils from '../../../blocks/BlockUtils';
 import Card from './../../builder/components/cards/CardComponent';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');
-require('./../../tql/components/tql.js');
+require('./../../tql/components/TQLMode.js');
 import './../../tql/components/codemirror.less';
-import './../../tql/components/monokai.less';
+import './../../tql/components/themes/monokai.less';
 
 const reactStringReplace = require('react-string-replace');
 

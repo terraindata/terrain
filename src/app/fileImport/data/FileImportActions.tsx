@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
+import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
 
@@ -68,28 +69,60 @@ const FileImportActions =
       $(ActionTypes.changeHasCsvHeader, {}),
 
     changePrimaryKey:
-    (id: string) =>
-      $(ActionTypes.changePrimaryKey, { id }),
+    (columnId: number) =>
+      $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
-    (file: string, filetype: string, preview: object) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview }),
+    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
 
     uploadFile:
     () =>
-      $(ActionTypes.uploadFile, {}),
+      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+
+    addTransform:
+    (transform: FileImportTypes.Transform) =>
+      $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
-    (id: string) =>
-      $(ActionTypes.setColumnToInclude, { id }),
+    (columnId: number) =>
+      $(ActionTypes.setColumnToInclude, { columnId }),
 
     setColumnName:
-    (id: string, columnName: string) =>
-      $(ActionTypes.setColumnName, { id, columnName }),
+    (columnId: number, colName: string, newName: string) =>
+      $(ActionTypes.setColumnName, { columnId, colName, newName }),
 
     setColumnType:
-    (id: string, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { id, typeIndex }),
+    (columnId: number, recursionDepth: number, typeIndex: number) =>
+      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
+
+    updatePreviewRows:
+    (transform: FileImportTypes.Transform) =>
+      $(ActionTypes.updatePreviewRows, { transform }),
+
+    saveTemplate:
+    (templateText: string) =>
+      $(ActionTypes.saveTemplate, { templateText, fetchTemplates: FileImportActions.fetchTemplates }),
+
+    fetchTemplates:
+    () =>
+      $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
+
+    setTemplates:
+    (templates: List<FileImportTypes.Template>) =>
+      $(ActionTypes.setTemplates, { templates }),
+
+    loadTemplate:
+    (templateId: number) =>
+      $(ActionTypes.loadTemplate, { templateId }),
+
+    changeUploadInProgress:
+    (uploading: boolean) =>
+      $(ActionTypes.changeUploadInProgress, { uploading }),
+
+    changeElasticUpdate:
+    () =>
+      $(ActionTypes.changeElasticUpdate, {}),
   };
 
 export default FileImportActions;

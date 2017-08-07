@@ -100,7 +100,7 @@ export interface Display
   defaultValue?: string;
   // for textboxes with cards
   top?: boolean;
-  getAutoTerms?: (comp: React.Component<any, any>, schemaState) => List<string>; // overrides standard terms
+  getAutoTerms?: (schemaState) => List<string>; // overrides standard terms
   autoDisabled?: boolean;
   showWhenCards?: boolean;
   onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
@@ -117,6 +117,8 @@ export interface Display
 
   // for FLEX, its content
   flex?: Display | Display[];
+
+  style?: React.CSSProperties;
 
   // for components
   component?: any; // TerrainComponent?

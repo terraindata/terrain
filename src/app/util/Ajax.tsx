@@ -183,6 +183,7 @@ export const Ajax =
       }
 
       const xhr = new XMLHttpRequest();
+      xhr.timeout = 180000;
       xhr.onerror = (err: any) =>
       {
         const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
@@ -687,36 +688,38 @@ export const Ajax =
 
     importFile(file: string,
       filetype: string,
-      db: string,
-      table: string,
+      dbname: string,
+      tablename: string,
       connectionId: number,
-      columnNames: IMMap<string, string> | Immutable.List<string>,
-      columnsToInclude: IMMap<string, boolean> | Immutable.List<boolean>,
-      columnTypes: IMMap<string, string> | Immutable.List<string>,
+      originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
       primaryKey: string,
+      transformations: Immutable.List<object>,
+      update: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      hasCsvHeader?: boolean,
-    ): { xhr: XMLHttpRequest, queryId: string }
+      csvHeaderMissing?: boolean,
+    )
     {
       const payload: object = {
         dbid: connectionId,
-        db,
-        table,
+        dbname,
+        tablename,
         contents: file,
         filetype,
-        columnMap: columnNames,
-        columnsToInclude,
+        originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing: !hasCsvHeader,
+        csvHeaderMissing,
+        transformations,
+        update,
       };
-      console.log('payload: ', payload);
+      console.log('import payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
       };
-      const xhr = Ajax.req(
+      Ajax.req(
         'post',
         'import/',
         payload,
@@ -727,6 +730,71 @@ export const Ajax =
       );
 
       return;
+    },
+
+    saveTemplate(dbname: string,
+      tablename: string,
+      connectionId: number,
+      originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKey: string,
+      transformations: List<object>,
+      name: string,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+      csvHeaderMissing?: boolean,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+        originalNames,
+        columnTypes,
+        primaryKey,
+        csvHeaderMissing,
+        transformations,
+        name,
+      };
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/create',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
+    fetchTemplates(
+      connectionId: number,
+      dbname: string,
+      tablename: string,
+
+      onLoad: (templates: object[]) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+      };
+
+      Ajax.req(
+        'post',
+        'templates/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
@@ -813,6 +881,38 @@ export const Ajax =
         },
       );
     },
+
+    createDb(name: string, dsn: string, type: string,
+      onSave: (response: any) => void,
+      onError: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        `database`,
+        {
+          name,
+          dsn,
+          host: dsn,
+          type,
+        },
+        onSave,
+        onError,
+      );
+    },
+
+    deleteDb(id: number,
+      onSave: (response: any) => void,
+      onError: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        `database/` + id + `/delete`,
+        {},
+        onSave,
+        onError,
+      );
+    },
+
     login(email: string,
       password: string,
       onLoad: (data: {

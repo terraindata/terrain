@@ -42,31 +42,77 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-"use strict";
-// A dummy mode
-(function(mod)
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
+
+import * as CodeMirror from 'codemirror';
+
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+import { toInputMap } from '../../../blocks/types/Input';
+import { BuilderState, BuilderStore } from '../../builder/data/BuilderStore';
+
+CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror)
+  const indentUnit = config.indentUnit;
+  return {
+    startState: () =>
+    {
+      return {
+        indent: 0,
+      };
+    },
+    token: (stream, state) =>
+    {
+      let ch;
+      do
+      {
+        if (stream.eol())
+        {
+          return null;
+        }
+        ch = stream.next();
+      } while (ch !== '[' && ch !== ']' && ch !== '{' && ch !== '}');
+
+      state.indent = stream.indentation();
+      if (ch === '{' || ch === '[')
+      {
+        state.indent += indentUnit;
+      }
+      else if (ch === '}' || ch === ']')
+      {
+        state.indent -= indentUnit;
+      }
+      stream.skipToEnd();
+      return null;
+    },
+    indent: (state, textAfter) => state.indent,
+    helperType: 'elastic',
+  };
+});
+
+CodeMirror.registerHelper('lint', 'elastic', (text) =>
 {
-  CodeMirror.defineMode("elastic", function(config, parserConfig)
+  const found = [];
+  try
   {
-    return {
-      startState: function()
-      {
-        return {}
-      },
-      token: function(stream, state)
-      {
-        stream.skipToEnd();
-        return null;
-      },
-      helperType: "elastic"
-    };
-  });
+    const state = BuilderStore.getState();
+    const inputs = state.query && state.query.inputs;
+    const params: { [name: string]: any; } = toInputMap(inputs);
+    const interpreter = new ESInterpreter(text, params);
+    for (const e of interpreter.parser.getErrors())
+    {
+      const token = e.token;
+      found.push({
+        from: CodeMirror.Pos(token.row, token.col),
+        to: CodeMirror.Pos(token.toRow, token.toCol),
+        message: e.message,
+      });
+    }
+  }
+  catch (e)
+  {
+    throw new Error('Exception when parsing ' + text + ' error: ' + e);
+  }
+  return found;
 });

@@ -52,12 +52,12 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
+import { getStyle } from '../../common/Colors';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
-import SchemaStore from '../../schema/data/SchemaStore';
 import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
 import CardField from './cards/CardField';
@@ -77,6 +77,8 @@ export interface Props
 
   addColumn?: (number, string?) => void;
   columnIndex?: number;
+
+  textStyle?: React.CSSProperties;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
@@ -87,23 +89,23 @@ class BuilderComponent extends TerrainComponent<Props>
   {
     BuilderActions.create(keyPath, index + 1, display.factoryType);
   }
+
   public removeRow(keyPath: KeyPath, index: number)
   {
     BuilderActions.remove(keyPath, index);
   }
+
   public moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
     BuilderActions.move(keyPath, index, newIndex);
   }
 
-  public renderDisplay(
-    displayArg: Display | Display[],
+  public renderDisplay(displayArg: Display | Display[],
     parentKeyPath: KeyPath,
     data: IMMap<any, any>,
     options?: {
       className: string;
-    },
-  ): (El | El[])
+    }): (El | El[])
   {
     const keySeed = parentKeyPath.join(',');
     if (Array.isArray(displayArg))
@@ -119,6 +121,7 @@ class BuilderComponent extends TerrainComponent<Props>
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
           language={this.props.language}
+          textStyle={this.props.textStyle}
         />,
       ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -145,10 +148,11 @@ class BuilderComponent extends TerrainComponent<Props>
 
     if (d.displayType === DisplayType.LABEL)
     {
-      // special type that is unrealted to the data
+      // special type that is unrelated to the data
       return <div
         className='builder-label'
         key={keySeed + '-label'}
+        style={d.style}
       >
         {d.label}
       </div>
@@ -210,14 +214,10 @@ class BuilderComponent extends TerrainComponent<Props>
         />;
         break;
       case DisplayType.DROPDOWN:
-        let selectedIndex = value;
-        if (d.dropdownUsesRawValues)
-        {
-          selectedIndex = d.options.indexOf(value);
-        }
+        let selectedIndex = d.options.indexOf(typeof value === 'string' ? value : JSON.stringify(value));
 
         content = (
-          <div key={key} className='builder-component-wrapper'>
+          <div key={key} className='builder-component-wrapper  builder-component-wrapper-wide'>
             <Dropdown
               canEdit={this.props.canEdit}
               className={className}
@@ -227,6 +227,7 @@ class BuilderComponent extends TerrainComponent<Props>
               centerAlign={d.centerDropdown}
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}
+              textColor={this.props.textStyle && this.props.textStyle.color}
             />
             {this.props.helpOn && d.help ?
               <ManualInfo
@@ -251,6 +252,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 canEdit={this.props.canEdit}
                 parentData={this.props.parentData}
                 language={this.props.language}
+                textStyle={this.props.textStyle}
               />
             }
             <div
@@ -266,6 +268,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 addColumn={this.props.addColumn}
                 columnIndex={this.props.columnIndex}
                 language={this.props.language}
+                textStyle={this.props.textStyle}
               />
             </div>
             {!d.below ? null :
@@ -282,6 +285,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
                   language={this.props.language}
+                  textStyle={this.props.textStyle}
                 />
               </div>
             }
@@ -323,7 +327,6 @@ class BuilderComponent extends TerrainComponent<Props>
         break;
       case DisplayType.COMPONENT:
         const Comp = d.component as any;
-        const isTransformCard = d.key === 'scorePoints';
         content = (
           <div
             key={key}
@@ -347,26 +350,10 @@ class BuilderComponent extends TerrainComponent<Props>
             }
             {this.props.helpOn && d.help ?
               (
-                isTransformCard ?
-                  (d.help as string[]).map((info, index) =>
-                  {
-                    return <ManualInfo
-                      information={info as string}
-                      wide={index === 0}
-                      key={'info' + index}
-                      leftSide={index === 2}
-                      className={classNames({
-                        'builder-component-help-transform-center': index === 0,
-                        'builder-component-help-transform-left': index === 1,
-                        'builder-component-help-transform-bottom': index === 2,
-                      })}
-                    />;
-                  })
-                  :
-                  <ManualInfo
-                    information={d.help as string}
-                    className='builder-component-help-right'
-                  />
+                <ManualInfo
+                  information={d.help as string}
+                  className='builder-component-help-right'
+                />
               )
               : null
             }
@@ -399,7 +386,7 @@ class BuilderComponent extends TerrainComponent<Props>
             options={d.options}
             display={d}
             autoDisabled={d.autoDisabled}
-            autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}
+            getAutoTerms={d.getAutoTerms}
             language={this.props.language}
             {...{
               keyPath,
@@ -409,6 +396,7 @@ class BuilderComponent extends TerrainComponent<Props>
               typeErrorMessage,
               className,
             }}
+            textStyle={this.props.textStyle}
           />
           {
             this.props.helpOn && d.help ?
@@ -417,6 +405,20 @@ class BuilderComponent extends TerrainComponent<Props>
                 className='builder-component-help-right'
               />
               : null
+          }
+        </div>
+      );
+    }
+
+    if (d.style)
+    {
+      content = (
+        <div
+          style={d.style}
+          key={key}
+        >
+          {
+            content
           }
         </div>
       );

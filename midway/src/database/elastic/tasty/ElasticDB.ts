@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
+import * as winston from 'winston';
+
 import TastyDB from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
@@ -178,8 +180,49 @@ export class ElasticDB implements TastyDB
     return results;
   }
 
+  /**-----------------------------------------------------------------------
+   * Updates the given objects, based on primary key ('id' in elastic).
+   */
+  public async update(table: TastyTable, elements: object[])
+  {
+    const updated = await this.updateObjects(table, elements);
+    const primaryKeys = table.getPrimaryKeys();
+    const results = new Array(updated.length);
+    for (let i = 0; i < updated.length; i++)
+    {
+      results[i] = elements[i];
+      if (updated[i]['_id'] !== undefined)
+      {
+        if ((primaryKeys.length === 1) &&
+          (elements[i][primaryKeys[0]] === undefined))
+        {
+          results[i][primaryKeys[0]] = updated[i]['_id'];
+        }
+      }
+    }
+
+    return results;
+  }
+
   /*
-   * Deletes the given objects based on their primary key
+   * Creates the given index
+   */
+  public async createIndex(indexName)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const params = {
+        index: indexName,
+      };
+
+      this.client.indices.create(
+        params,
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  /*
+   * Deletes the given index
    */
   public async deleteIndex(indexName)
   {
@@ -191,6 +234,27 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.delete(
         params,
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  public async putMapping(table: TastyTable): Promise<object>
+  {
+    const schema: TastySchema = await this.schema();
+    if (schema.databaseNames().indexOf(table.getDatabaseName()) === -1)
+    {
+      await this.createIndex(table.getDatabaseName());
+    }
+
+    const payload: object = table.getMapping();
+    return new Promise((resolve, reject) =>
+    {
+      this.client.indices.putMapping(
+        {
+          index: table.getDatabaseName(),
+          type: table.getTableName(),
+          body: payload,
+        },
         makePromiseCallback(resolve, reject));
     });
   }
@@ -256,6 +320,44 @@ export class ElasticDB implements TastyDB
     return Promise.all(promises);
   }
 
+  private async updateObjects(table: TastyTable, elements: object[])
+  {
+    if (elements.length > 2)
+    {
+      await this.bulkUpdate(table, elements);
+      return elements;
+    }
+
+    const promises: Array<Promise<any>> = [];
+    for (const element of elements)
+    {
+      promises.push(
+        new Promise((resolve, reject) =>
+        {
+          const query = {
+            body: {
+              doc: element,
+              doc_as_upsert: true,
+            },
+            index: table.getDatabaseName(),
+            type: table.getTableName(),
+          };
+
+          const compositePrimaryKey = this.makeID(table, element);
+          if (compositePrimaryKey !== '')
+          {
+            query['id'] = compositePrimaryKey;
+          }
+
+          this.client.update(
+            query as any,
+            makePromiseCallback(resolve, reject));
+        }),
+      );
+    }
+    return Promise.all(promises);
+  }
+
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
   {
     const body: any[] = [];
@@ -277,6 +379,42 @@ export class ElasticDB implements TastyDB
 
       body.push(command);
       body.push(element);
+    }
+
+    return new Promise((resolve, reject) =>
+    {
+      this.client.bulk(
+        {
+          body,
+        },
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  private async bulkUpdate(table: TastyTable, elements: object[]): Promise<any>
+  {
+    const body: any[] = [];
+    for (const element of elements)
+    {
+      const command =
+        {
+          update: {
+            _index: table.getDatabaseName(),
+            _type: table.getTableName(),
+          },
+        };
+
+      const compositePrimaryKey = this.makeID(table, element);
+      if (compositePrimaryKey !== '')
+      {
+        command.update['_id'] = compositePrimaryKey;
+      }
+
+      body.push(command);
+      body.push({
+        doc: element,
+        doc_as_upsert: true,
+      });
     }
 
     return new Promise((resolve, reject) =>

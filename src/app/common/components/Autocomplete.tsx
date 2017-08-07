@@ -49,10 +49,11 @@ THE SOFTWARE.
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { altStyle, backgroundColor, Colors, couldHover, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -61,6 +62,7 @@ export interface Props
   value: string;
   onChange: (value: string) => void;
   options: List<string>;
+  style?: React.CSSProperties;
 
   placeholder?: string;
   help?: string;
@@ -72,6 +74,7 @@ export interface Props
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
 }
 
+@Radium
 class Autocomplete extends TerrainComponent<Props>
 {
   public value: string;
@@ -90,7 +93,8 @@ class Autocomplete extends TerrainComponent<Props>
     this.value = props.value;
     this.state =
       {
-        value: props.value,
+        value: props.value === null || props.value === undefined
+          ? '' : props.value,
         open: false,
         selectedIndex: -1,
       };
@@ -267,6 +271,7 @@ class Autocomplete extends TerrainComponent<Props>
         data-value={option}
         key={option}
         ref={'opt' + index}
+        style={couldHover(index === this.state.selectedIndex)}
       >
         {first}<b>{second}</b>{third}
       </div>
@@ -277,9 +282,13 @@ class Autocomplete extends TerrainComponent<Props>
   {
     const options = this.props.options && this.props.options.filter(this.showOption);
     const inputClassName = 'ac-input ' + (this.props.className || '');
+
+    const open = this.state.open && !!options && options.size > 0;
+
     return (
       <div className='autocomplete'>
         <input
+          style={this.props.style}
           ref='input'
           type='text'
           className={inputClassName}
@@ -293,20 +302,17 @@ class Autocomplete extends TerrainComponent<Props>
           data-tip={this.props.help}
           data-html={true}
         />
-        {!options || !this.state.open ? null :
+        {!open ? null :
           <div
             className={classNames({
               'ac-options': true,
               'ac-options-open': this.state.open,
             })}
             ref='ac'
-            style={fontColor(Colors().text.baseDark)}
+            style={altStyle()}
           >
             {
               options.map(this.renderOption)
-            }
-            {
-              options.size ? null : null && <div className='ac-no-options'>No matches</div>
             }
           </div>
         }

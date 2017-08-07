@@ -46,12 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length no-shadowed-variable
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'underscore';
 const Color = require('color');
 
-const { List, Map } = Immutable;
-const L = () => List([]);
 import CommonSQL from '../../../../shared/database/mysql/syntax/CommonSQL';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
@@ -117,7 +115,7 @@ const _mathCard = (config: {
   colors: string[];
 }) =>
   _card({
-    fields: L(),
+    fields: List(),
 
     static:
     {
@@ -231,8 +229,8 @@ export const MySQLBlocks =
 
     sfw: _card(
       {
-        fields: L(),
-        cards: L(),
+        fields: List(),
+        cards: List(),
 
         static: {
           language: 'mysql',
@@ -314,7 +312,7 @@ export const MySQLBlocks =
       }),
 
     from: _card({
-      tables: L(),
+      tables: List(),
 
       static:
       {
@@ -337,7 +335,7 @@ export const MySQLBlocks =
               const dbName = Store.getState().db.name;
               let columnNames = schemaState.columnNamesByDb.getIn(
                 [dbName, dbName + '.' + tableBlock.table],
-              ) || Immutable.List([]);
+              ) || List([]);
               columnNames = columnNames.map(
                 (columnName) => tableBlock.alias + '.' + columnName,
               );
@@ -369,7 +367,7 @@ export const MySQLBlocks =
                 // help: ManualConfig.help['table'],
                 accepts: List(['sfw']),
                 showWhenCards: true,
-                getAutoTerms: (comp: React.Component<any, any>, schemaState) =>
+                getAutoTerms: (schemaState) =>
                 {
                   const db = Store.getState().db.name; // TODO correct?
                   const tableNames = schemaState.tableNamesByDb.get(db);
@@ -520,7 +518,7 @@ export const MySQLBlocks =
             {
               displayType: DisplayType.DROPDOWN,
               key: 'operator',
-              options: Immutable.List(CommonSQL.Operators),
+              options: List(CommonSQL.Operators),
               // help: ManualConfig.help['operator'],
               centerDropdown: true,
             },
@@ -587,7 +585,7 @@ export const MySQLBlocks =
                 {
                   displayType: DisplayType.DROPDOWN,
                   key: 'direction',
-                  options: Immutable.List(CommonSQL.Directions),
+                  options: List(CommonSQL.Directions),
                   // help: ManualConfig.help['direction'],
                 },
               ],
@@ -973,7 +971,7 @@ export const MySQLBlocks =
 
     groupBy: _card(
       {
-        fields: L(),
+        fields: List(),
 
         static: {
           language: 'mysql',

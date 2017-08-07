@@ -52,7 +52,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './BuilderTQLColumn.less';
 const { List } = Immutable;
-import * as _ from 'underscore';
 import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
 import Query from '../../../items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
@@ -84,10 +83,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 {
   public state: {
     tql: string;
-    cardsTQL: string;
     theme: string;
     runMode: string;
-    focused: boolean;
     highlightedLine: number;
     theme_index: number;
     syntaxHelpOpen: boolean;
@@ -96,13 +93,10 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
     resultsBarOpen: boolean;
-    queriesInFlight: number;
   } = {
     tql: this.props.query.tql,
-    cardsTQL: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'monokai',
     runMode: 'auto',
-    focused: false,
     highlightedLine: null,
     theme_index: 0,
     syntaxHelpOpen: false,
@@ -111,35 +105,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionOpen: false,
     termDefinitionPos: {},
     resultsBarOpen: false,
-    queriesInFlight: 0,
   };
-
-  public debouncedSendTqlAction = _.debounce(
-    () =>
-    {
-      BuilderActions.changeTQL(this.state.tql);
-    },
-    1000,
-  );
-
-  public debouncedUpdateCardsTql = _.debounce(
-    () =>
-    {
-      if (this.state.queriesInFlight === 0)
-      {
-        this.setState({
-          cardsTQL: this.props.query.tql,
-        });
-      }
-      else
-      {
-        this.setState({
-          queriesInFlight: this.state.queriesInFlight - 1,
-        });
-      }
-    },
-    1000,
-  );
 
   constructor(props: Props)
   {
@@ -151,6 +117,11 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     if (nextProps.resultsState.errorLine)
     {
       this.highlightError(nextProps.resultsState.errorLine);
+    }
+
+    if (nextProps.query.tql !== this.state.tql)
+    {
+      this.updateTql(nextProps.query.tql, true);
     }
   }
 
@@ -175,7 +146,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
       {
         this.sendTqlAction();
       }
-    } else
+    }
+    else
     {
       this.setState({
         tql,
@@ -202,10 +174,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
   public sendTqlAction()
   {
-    this.setState({
-      queriesInFlight: this.state.queriesInFlight + 1,
-    });
-    this.debouncedSendTqlAction();
+    BuilderActions.changeTQL(this.state.tql);
   }
 
   public changeThemeDefault()
@@ -401,20 +370,12 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleFocusChange(focused)
-  {
-    this.setState({
-      focused,
-    });
-  }
-
   public render()
   {
     const manualEntry = null;
 
     // cardList[this.state.cardName] &&
     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
-    this.debouncedUpdateCardsTql();
     return (
       <div
         className={classNames({
@@ -432,13 +393,12 @@ class BuilderTQLColumn extends TerrainComponent<Props>
           className='tql-section'
         >
           <TQLEditor
-            tql={this.state.cardsTQL}
+            tql={this.state.tql}
             language={this.props.language}
             canEdit={this.props.canEdit}
             theme={this.state.theme}
 
             onChange={this.updateTql}
-            onFocusChange={this.handleFocusChange}
 
             highlightedLine={this.state.highlightedLine}
             toggleSyntaxPopup={this.toggleSyntaxPopup}

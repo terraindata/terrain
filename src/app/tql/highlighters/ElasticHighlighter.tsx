@@ -123,12 +123,14 @@ class ElasticHighlighter extends SyntaxHighlighter
       // invalid types
       case ESJSONType.unknown:
       case ESJSONType.invalid:
-        return 'cm-error';
+        return 'cm-error es-error';
       // true JSON types
       case ESJSONType.null:
+        return 'cm-number es-null';
       case ESJSONType.boolean:
+        return 'cm-number es-boolean';
       case ESJSONType.number:
-        return 'cm-number';
+        return 'cm-number es-number';
       case ESJSONType.string:
         return 'cm-string';
       case ESJSONType.array:
@@ -142,7 +144,7 @@ class ElasticHighlighter extends SyntaxHighlighter
         return 'cm-bracket';
       // additional types
       case ESJSONType.parameter:
-        return 'cm-variable-2';
+        return 'cm-variable-2 es-parameter';
       default:
         assertUnreachable(fToken.parserToken.jsonType);
       // an error on assertUnreachable might mean a missing case

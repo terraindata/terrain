@@ -44,11 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
-
 import * as React from 'react';
-
 import { browserHistory } from 'react-router';
+import * as _ from 'underscore';
+import TerrainAreaChart from '../../charts/TerrainAreaChart';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -70,10 +69,15 @@ export interface Props
   location?: any;
   router?: any;
   route?: any;
-  // params?: any;
-  // location?: {
-  //   pathname: string;
-  // };
+  variantsMultiselect?: boolean;
+  basePath: string;
+}
+
+export interface State
+{
+  libraryState: LibraryState;
+  selectedDomain: any;
+  zoomDomain: any;
 }
 
 class Library extends TerrainComponent<any>
@@ -83,14 +87,15 @@ class Library extends TerrainComponent<any>
     location: {},
     router: {},
     route: {},
+    variantsMultiselect: false,
   };
 
   public cancelSubscription = null;
 
-  public state: {
-    libraryState: LibraryState;
-  } = {
+  public state: State = {
     libraryState: null,
+    selectedDomain: {},
+    zoomDomain: {},
   };
 
   constructor(props)
@@ -102,10 +107,12 @@ class Library extends TerrainComponent<any>
 
   public componentWillMount()
   {
-    if (!this.props.params || !this.props.params.groupId)
+    const { basePath } = this.props;
+
+    if ((!this.props.params || !this.props.params.groupId))
     {
       // no path given, redirect to last library path
-      const path = localStorage.getItem('lastLibraryPath');
+      const path = this.getLastPath();
       if (path != null)
       {
         browserHistory.replace(path);
@@ -124,17 +131,62 @@ class Library extends TerrainComponent<any>
     UserActions.fetch();
   }
 
+  public getData()
+  {
+    return [...Array(20).keys()].map((i) =>
+    {
+      return { x: i, y: _.random(1, 100) };
+    });
+  }
+
+  public getDatasets()
+  {
+    const { libraryState } = this.state;
+    const { variants, selectedVariants } = libraryState;
+
+    const datasets = variants
+      .filter((variant) =>
+      {
+        return selectedVariants.includes(variant.id.toString());
+      })
+      .map((variant) =>
+      {
+        return { id: +variant.id, name: variant.name, data: this.getData() };
+      });
+
+    return datasets.toList();
+  }
+
+  public getLastPath()
+  {
+    const { basePath } = this.props;
+
+    const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+    // no path given, redirect to last library path
+    return localStorage.getItem(lastPath);
+  }
+
+  public setLastPath()
+  {
+    const { location, basePath } = this.props;
+
+    const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+    localStorage.setItem(lastPath, location.pathname);
+  }
+
   public render()
   {
     const { libraryState } = this.state;
 
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
-    const { params } = this.props;
+    const { router, basePath, variantsMultiselect } = this.props;
+    const { params } = router;
+
+    const datasets = this.getDatasets();
 
     const groupId = params.groupId ? +params.groupId : null;
     const algorithmId = params.algorithmId ? +params.algorithmId : null;
-    const variantId = params.variantId ? +params.variantId : null;
-    const multiselect = false;
+    const variantIds = params.variantId ? params.variantId.split(',') : null;
 
     let group: LibraryTypes.Group;
     let algorithm: LibraryTypes.Algorithm;
@@ -142,13 +194,11 @@ class Library extends TerrainComponent<any>
     let algorithmsOrder: List<ID>;
     let variantsOrder: List<ID>;
 
-    group = groups.get(groupId);
-
     if (groupId !== null)
     {
       group = groups.get(groupId);
 
-      if (group !== null)
+      if (group !== undefined)
       {
         algorithmsOrder = group.algorithmsOrder;
 
@@ -156,75 +206,88 @@ class Library extends TerrainComponent<any>
         {
           algorithm = algorithms.get(algorithmId);
 
-          if (algorithm !== null)
+          if (algorithm !== undefined)
           {
             variantsOrder = algorithm.variantsOrder;
 
-            if (variantId !== null)
+            if (variantIds !== null)
             {
-              variant = variants.get(variantId);
-
-              if (variant === null)
+              if (variantIds.length === 0)
               {
-                browserHistory.replace(`/library/${groupId}/${algorithmId}`);
+                browserHistory.replace(`/${basePath}/${groupId}/${algorithmId}`);
+              } else if (variantIds.length === 1)
+              {
+                variant = variants.get(+variantIds[0]);
               }
             }
           } else
           {
             // !algorithm
-            browserHistory.replace(`/library/${groupId}`);
+            browserHistory.replace(`/${basePath}/${groupId}`);
           }
         }
       }
       else
       {
         // !group
-        browserHistory.replace('/library');
+        browserHistory.replace(`/${basePath}`);
       }
     }
 
     if (!!this.props.location.pathname)
     {
-      localStorage.setItem('lastLibraryPath', this.props.location.pathname);
+      this.setLastPath();
     }
 
     return (
       <div className='library'>
-        <GroupsColumn
-          {...{
-            groups,
-            groupsOrder,
-            params,
-          }}
-        />
-        <AlgorithmsColumn
-          {...{
-            algorithms,
-            variants,
-            algorithmsOrder,
-            groupId,
-            params,
-          }}
-        />
-        <VariantsColumn
-          {...{
-            variants,
-            selectedVariants,
-            variantsOrder,
-            groupId,
-            algorithmId,
-            params,
-            multiselect,
-          }}
-        />
-        {!multiselect ?
-          <LibraryInfoColumn
+        <div className='library-top'>
+          <GroupsColumn
             {...{
-              group,
-              algorithm,
-              variant,
+              groups,
+              groupsOrder,
+              params,
+              basePath,
             }}
-          /> : null
+            isFocused={algorithm === undefined}
+          />
+          <AlgorithmsColumn
+            {...{
+              algorithms,
+              variants,
+              algorithmsOrder,
+              groupId,
+              params,
+              basePath,
+            }}
+            isFocused={variantIds !== null && variantIds.length === 0}
+          />
+          <VariantsColumn
+            {...{
+              variants,
+              selectedVariants,
+              variantsOrder,
+              groupId,
+              algorithmId,
+              params,
+              multiselect: variantsMultiselect,
+              basePath,
+              router,
+            }}
+          />
+          {!variantsMultiselect ?
+            <LibraryInfoColumn
+              {...{
+                group,
+                algorithm,
+                variant,
+              }}
+            /> : null}
+        </div>
+        {variantsMultiselect && selectedVariants.count() > 0 ?
+          <div className='library-bottom'>
+            <TerrainAreaChart datasets={datasets} />
+          </div> : null
         }
       </div>
     );

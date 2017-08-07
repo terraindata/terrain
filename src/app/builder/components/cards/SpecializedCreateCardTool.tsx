@@ -73,6 +73,12 @@ export interface Props
 
 const emptyList = Immutable.List([]);
 
+const STYLE = {
+  marginTop: -2,
+  width: 'calc(100% + 59px)',
+  marginLeft: -55,
+};
+
 class SpecializedCreateCardTool extends TerrainComponent<Props>
 {
   state: {
@@ -94,7 +100,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
 
   public getOptions(props: Props)
   {
-    const options = props.data['getChildOptions'](props.data);
+    const options = props.data['getChildOptions'](props.data, AllBackendsMap[this.props.language]);
 
     if (this.state && options.equals(this.state.options))
     {
@@ -125,7 +131,6 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
       this.props.keyPath,
       card,
     );
-
     this.setState({
       open: false,
     });
@@ -134,20 +139,23 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
   public render()
   {
     return (
-      <CreateCardTool
-        index={null}
-        keyPath={this.props.keyPath}
-        canEdit={this.props.canEdit}
-        language={this.props.language}
-        className={this.props.className}
-        accepts={emptyList}
+      <div style={STYLE} >
+        <CreateCardTool
+          index={-1 /* TODO this will have to adjust if we use component
+           in in more places */ }
+          keyPath={this.props.keyPath.push('cards')}
+          canEdit={this.props.canEdit}
+          language={this.props.language}
+          className={this.props.className}
+          accepts={emptyList}
 
-        open={this.state.open}
-        onToggle={this._toggle('open')}
+          open={this.state.open}
+          onToggle={this._toggle('open')}
 
-        overrideText={this.state.options}
-        overrideClick={this.onClick}
-      />
+          overrideText={this.state.options}
+          overrideClick={this.onClick}
+        />
+      </div>
     );
   }
 }

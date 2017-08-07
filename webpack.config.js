@@ -43,12 +43,14 @@ THE SOFTWARE.
 */
 
 
+let CircularDependencyPlugin = require('circular-dependency-plugin');
+
 var webpack = require("webpack");
 var path = require("path");
 
 module.exports =
 {
-    entry: "./src/app/App.tsx",
+    entry: "./src/app/Root.tsx",
     devtool: "cheap-module-source-map",
 
     output:
@@ -108,5 +110,13 @@ module.exports =
             DEV: true,
         }),
         new webpack.optimize.AggressiveMergingPlugin(),
+	
+	// You can enable this plugin to detect for circular dependencies
+	// new CircularDependencyPlugin({
+	//	// exclude detection of files based on a RegExp 
+	//	exclude: /a\.js|node_modules/,
+	//	// add errors to webpack instead of warnings 
+	//	failOnError: false
+	//    })
     ],
 };

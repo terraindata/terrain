@@ -55,7 +55,6 @@ type SchemaState = SchemaTypes.SchemaState;
 import BackendInstance from '../../../database/types/BackendInstance';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
-import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import * as SchemaParser from './SchemaParser';
 
@@ -201,8 +200,8 @@ export const SchemaStore: Store<SchemaState> =
         state.set('highlightedId', action.payload.id)
           .set('highlightedInSearchResults', action.payload.inSearchResults),
     },
-    DEV ? ExampleSchemaData : SchemaTypes._SchemaState(),
-  ), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
+    SchemaTypes._SchemaState(),
+  ), SchemaTypes._SchemaState());
 
 const $ = (type: string, payload: any) => SchemaStore.dispatch({ type, payload });
 

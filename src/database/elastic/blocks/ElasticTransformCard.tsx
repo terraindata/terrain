@@ -46,22 +46,19 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands max-line-length
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
-import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
+
+import { Colors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
-
-const transformScoreInputTypes = CommonElastic.acceptsValues;
+import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
 
 export const scorePoint = _block(
   {
@@ -85,33 +82,42 @@ export const elasticTransform = _card(
     domain: List([0, 100]),
     hasCustomDomain: false, // has the user set a custom domain
 
+    noTitle: true,
+    cannotBeMoved: true,
+
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: ['#4b979a', '#aef3f6'],
+      colors: Colors().builder.cards.inputParameter,
       title: 'Transform',
-      preview: (card: any) =>
-      {
-        if (card.input._isCard)
-        {
-          return '' + BlockUtils.getPreview(card.input);
-        }
-        return '' + card.input;
-      },
+      preview: '',
+      // preview: (card: any) =>
+      // {
+      //   if (card.input._isCard)
+      //   {
+      //     return '' + BlockUtils.getPreview(card.input);
+      //   }
+      //   return '' + card.input;
+      // },
       display: [
         {
-          displayType: DisplayType.CARDTEXT,
+          displayType: DisplayType.TEXT,
           // help: ManualConfig.help['input'],
           key: 'input',
           placeholder: 'Input field',
-          accepts: transformScoreInputTypes,
           showWhenCards: true,
+          getAutoTerms: (schemaState): List<string> =>
+          {
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+          },
         },
-        {
-          displayType: DisplayType.CARDSFORTEXT,
-          key: 'input',
-          accepts: transformScoreInputTypes,
-        },
+        // TODO, in the future, if we allow complicated formulas inside
+        //  transforms, then we can change this back to a cards view
+        // {
+        //   displayType: DisplayType.CARDSFORTEXT,
+        //   key: 'input',
+        //   accepts: transformScoreInputTypes,
+        // },
         {
           displayType: DisplayType.COMPONENT,
           component: TransformCard,
@@ -128,8 +134,8 @@ export const elasticTransform = _card(
           b: 1,
           numerators: [[block['input'], 1]],
           denominators: [],
-          ranges: block['scorePoints'].map((scorePt) => scorePt.value),
-          outputs: block['scorePoints'].map((scorePt) => scorePt.score),
+          ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
+          outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
         };
       },
 

@@ -183,6 +183,16 @@ export class SQLiteDB implements TastyDB
       this.client.close(makePromiseCallback0(resolve, reject));
     });
   }
+
+  public async putMapping(table: TastyTable): Promise<object>
+  {
+    throw new Error('putMapping() is currently only supported for Elastic databases.');
+  }
+
+  public async update(table: TastyTable, elements: object[]): Promise<object[]>
+  {
+    throw new Error('update() is currently only supported for Elastic databases.');
+  }
 }
 
 export default SQLiteDB;

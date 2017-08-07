@@ -82,7 +82,7 @@ export interface Props
   parentId?: string;
 
   autoDisabled?: boolean;
-  autoTerms?: List<string>;
+  getAutoTerms?: (schemaState) => List<string>;
 
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
@@ -155,8 +155,12 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
       />;
     }
 
-    return null;
+    return <div style={PLACEHOLDER_STYLE} />;
   }
 }
+
+const PLACEHOLDER_STYLE = {
+  height: 32,
+};
 
 export default ElasticKeyBuilderTextbox;

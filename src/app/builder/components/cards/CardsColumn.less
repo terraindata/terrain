@@ -1,6 +1,8 @@
 @import "../../../common/Common.less";
 
 .cards-column {
+  .noselect;
+  
   overflow: hidden;
   height: 100%;
   position: relative;
@@ -23,7 +25,6 @@
   
   .cards-deck {
     background: #4e4f4d;
-    border-right: 1px solid #ccc;
     width: 0px;
   }
   
@@ -35,7 +36,7 @@
     width: 100%;
   }
   
-  @deck-width: 110px;
+  @deck-width: 125px;
   &.cards-column-deck-open {
     .cards-deck {
       width: @deck-width;
@@ -46,6 +47,14 @@
     }
     .cards-deck-knob {
       width: @deck-width - 1px;
+    }
+  }
+  
+  &:not(.cards-column-deck-open) {
+    .cards-column-cards-area {
+      @knob-width: 24px;
+      width: calc(~"100% - @{knob-width}");
+      left: @knob-width;
     }
   }
   

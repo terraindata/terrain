@@ -54,14 +54,12 @@ const CM = require('codemirror');
 const diff_match_patch = require('diff-match-patch');
 require('./merge.js');
 const Dimensions = require('react-dimensions');
-import ElasticHighlighter from '../highlighters/ElasticHighlighter.tsx'
 
 var CodeMirror = createReactClass({
   displayName: 'CodeMirror',
 
   propTypes:
   {
-    onChange: PropTypes.func,
     onFocusChange: PropTypes.func,
     options: PropTypes.object,
     path: PropTypes.string,
@@ -114,15 +112,12 @@ var CodeMirror = createReactClass({
     else
     {
       this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
-      this.codeMirror.addKeyMap({
-        'Ctrl-Enter': this.codemirrorIssueQuery,
-      });
       this.codeMirror.on('focus', this.focusChanged.bind(this, true));
       this.codeMirror.on('blur', this.focusChanged.bind(this, false));
       this.codeMirror.on('contextmenu', this.handleRightClick);
       this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
       this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
-      this.codeMirror.setSize("100%", "100%");
+      this.codeMirror.setSize("100%", this.props.containerHeight);
       this.props.onCodeMirrorMount && this.props.onCodeMirrorMount(this.codeMirror);
     }
   },
@@ -370,11 +365,14 @@ var CodeMirror = createReactClass({
     if (nextProps.containerHeight !== this.props.containerHeight)
     {
       this.codeMirror && this.codeMirror.wrap && (this.codeMirror.wrap.style.height = nextProps.containerHeight + 'px');
+      this.codeMirror.setSize("100%", nextProps.containerHeight);
     }
 
-    if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value)
+    if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getDoc().getValue() != nextProps.value)
     {
+      const cursor = this.codeMirror.getCursor();
       this.codeMirror.setValue(nextProps.value);
+      this.codeMirror.setCursor(cursor);
     }
     if (typeof nextProps.options === 'object' && this.codeMirror && this.codeMirror.setOption)
     {
@@ -382,7 +380,10 @@ var CodeMirror = createReactClass({
       {
         if (nextProps.options.hasOwnProperty(optionName))
         {
-          this.codeMirror.setOption(optionName, nextProps.options[optionName]);
+          if (JSON.stringify(this.codeMirror.getOption(optionName)) !== JSON.stringify(nextProps.options[optionName]))
+          {
+            this.codeMirror.setOption(optionName, nextProps.options[optionName]);
+          }
         }
       }
     }
@@ -420,13 +421,6 @@ var CodeMirror = createReactClass({
       this.props.onFocusChange && this.props.onFocusChange(focused);
     }
   },
-  codemirrorIssueQuery: function codemirrorIssueQuery(cm)
-  {
-    if (this.props.onChange)
-    {
-      this.props.onChange(cm.getDoc().getValue(), false, true);
-    }
-  },
   render: function render()
   {
     var editorClassName = className('ReactCodeMirror', this.state.isFocused ? 'ReactCodeMirror--focused' : null, this.props.className);
@@ -446,7 +440,7 @@ var CodeMirror = createReactClass({
       {
         className: editorClassName,
       },
-      React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write TQL here", defaultValue: this.props.value, autoComplete: 'off' })
+      React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write your query here", defaultValue: this.props.value, autoComplete: 'off' })
     );
   }
 });

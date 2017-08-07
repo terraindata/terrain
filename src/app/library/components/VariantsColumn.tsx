@@ -53,7 +53,7 @@ const moment = require('moment');
 
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
-import CreateItem from '../../common/components/CreateItem';
+import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
@@ -63,7 +63,6 @@ import { notificationManager } from './../../common/components/InAppNotification
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
@@ -77,6 +76,7 @@ type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
+  basePath: string;
   variants: Immutable.Map<ID, Variant>;
   selectedVariants: Immutable.List<ID>;
   variantsOrder: Immutable.List<ID>;
@@ -147,14 +147,14 @@ class VariantsColumn extends TerrainComponent<Props>
       });
     }
 
-    const { multiselect, selectedVariants } = this.props;
+    const { multiselect, selectedVariants, basePath } = this.props;
     const { params } = nextProps;
     const { groupId, algorithmId } = params;
     const nextSelectedVariants = nextProps.selectedVariants;
     if (multiselect && !selectedVariants.equals(nextSelectedVariants))
     {
       browserHistory
-        .replace(`/library/${groupId}/${algorithmId}/${nextSelectedVariants.join(',')}`);
+        .replace(`/${basePath}/${groupId}/${algorithmId}/${nextSelectedVariants.join(',')}`);
     }
   }
 
@@ -270,6 +270,7 @@ class VariantsColumn extends TerrainComponent<Props>
     const {
       multiselect,
       selectedVariants,
+      basePath,
       groupId,
       algorithmId,
     } = this.props;
@@ -285,7 +286,7 @@ class VariantsColumn extends TerrainComponent<Props>
       }
     } else
     {
-      browserHistory.push(`/library/${groupId}/${algorithmId}/${id}`);
+      browserHistory.push(`/${basePath}/${groupId}/${algorithmId}/${id}`);
       const { variantId } = this.props.params;
       Actions.variants.unselectAll();
       Actions.variants.select(variantId);
@@ -299,7 +300,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public renderVariant(id: ID, fadeIndex: number)
   {
-    const { multiselect, params } = this.props;
+    const { multiselect, params, basePath } = this.props;
     const currentVariantId = params.variantId;
     const variant = this.props.variants.get(id);
     const { selectedVariants } = this.props;
@@ -347,9 +348,8 @@ class VariantsColumn extends TerrainComponent<Props>
         onArchive={this.handleArchive}
         canArchive={canDrag}
         canDuplicate={canEdit}
-        color={ColorManager.colorForKey(this.props.groupId)}
         key={variant.id}
-        to={`/library/${this.props.groupId}/${this.props.algorithmId}/${id}`}
+        to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'
         id={id}
         type='variant'
@@ -365,6 +365,7 @@ class VariantsColumn extends TerrainComponent<Props>
         isStarred={variant.status === 'DEFAULT'}
         onSelect={this.handleItemSelect}
         isSelected={isSelected}
+        isFocused={true}
       >
         <div className='flex-container'>
           <UserThumbnail
@@ -439,9 +440,9 @@ class VariantsColumn extends TerrainComponent<Props>
         }
         {
           canCreate && !archived &&
-          <CreateItem
-            name='variant'
-            onCreate={this.handleCreate}
+          <CreateLine
+            onClick={this.handleCreate}
+            open={false}
           />
         }
       </LibraryItemCategory>

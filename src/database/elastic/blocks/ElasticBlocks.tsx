@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:import-spacing
-
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 
@@ -58,13 +56,7 @@ import { Input, InputType } from '../../../blocks/types/Input';
 import Util from '../../../app/util/Util';
 
 import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
-import
-{
-  elasticArray, elasticBool, elasticKeyValueWrap, elasticNull,
-  elasticNumber, elasticObject, elasticText, elasticValue,
-} from './ElasticJSONBlocks';
-import { elasticMagicCard, elasticMagicList, elasticMagicListItem, elasticMagicValue } from './ElasticMagicCard';
-import elasticRootCard from './ElasticRootCard';
+import { elasticFilter, elasticFilterBlock } from './ElasticFilterCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';
 import { elasticTransform, scorePoint } from './ElasticTransformCard';
 
@@ -73,28 +65,15 @@ const { make } = BlockUtils;
 
 export const ElasticBlocks = _.extend(
   {
-    // JSON
-
-    elasticObject,
-    elasticArray,
-
-    // JSON Value blocks
-    elasticBool,
-    elasticNumber,
-    elasticText,
-    elasticNull,
-
+    // Score and transform blocks
     elasticScore,
     scorePoint,
     elasticTransform,
     elasticWeight,
 
-    elasticRootCard,
-
-    elasticMagicValue,
-    elasticMagicList,
-    elasticMagicListItem,
-    elasticMagicCard,
+    // Filter Card
+    elasticFilterBlock,
+    elasticFilter,
 
     elasticCreating: _card( // a placeholder for when a card is being created
       {
@@ -109,10 +88,6 @@ export const ElasticBlocks = _.extend(
           // manualEntry: null,
         },
       }),
-
-    elasticKeyValueWrap,
-    // JSON toggle the type blocks
-    elasticValue,
 
     elasticInput: _block(
       {

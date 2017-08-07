@@ -48,15 +48,33 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
 import Library from '../../../app/library/components/Library';
+import { _LibraryState, LibraryState } from '../../../app/library/data/LibraryStore';
+import * as LibraryTypes from '../../../app/library/LibraryTypes';
+import { ItemType } from '../../../items/types/Item';
 
 describe('Library', () =>
 {
-  const initialState = {
-    groups: Immutable.Map({
-      id: 1,
-      name: 'Group 1',
-    }),
-  };
+  let initialState: LibraryState = _LibraryState({
+    groups: Immutable.Map<number, LibraryTypes.Group>({}),
+    variants: Immutable.Map<number, LibraryTypes.Variant>({}),
+  });
+
+  initialState = initialState.set('groups', initialState.groups.set(1, LibraryTypes._Group({
+    type: ItemType.Group,
+    id: 1,
+    name: 'Group 1',
+    algorithmsOrder: Immutable.List<number>([2]),
+    lastEdited: '',
+    lastUserId: '',
+    userIds: Immutable.List([]),
+    defaultLanguage: 'elastic',
+    parent: 0,
+  })));
+
+  initialState = initialState.set('variants', initialState.variants.set(3, LibraryTypes._Variant({
+    id: 3,
+    name: 'Variant 1',
+  })));
 
   const mockStore = configureStore();
   let store = null;
@@ -68,7 +86,7 @@ describe('Library', () =>
     libraryComponent = shallow(
       <Library
         store={store}
-        params={{ groupId: 1 }}
+        router={{ params: { groupId: '1' } }}
       />,
     );
   });

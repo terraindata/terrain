@@ -87,8 +87,12 @@ export class Databases
     );
   }
 
-  public async delete(id: number): Promise<object>
+  public async delete(user: UserConfig, id: number): Promise<object>
   {
+    if (user.isSuperUser === 0)
+    {
+      throw new Error('Only superusers can delete databases.');
+    }
     return App.DB.delete(this.databaseTable, { id } as DatabaseConfig);
   }
 

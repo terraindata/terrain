@@ -47,6 +47,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { BaseClass, New } from '../Classes';
 import Util from './../util/Util';
+const { List } = Immutable;
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
@@ -58,15 +59,21 @@ class FileImportStateC extends BaseClass
   public file: string = '';
   public filetype: string = '';
 
-  public previewRows: object[] = null;
+  public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
 
-  public columnsToInclude: IMMap<string, boolean> = null;
-  public columnNames: IMMap<string, string> = null;
-  public columnTypes: IMMap<string, number> = null;
+  public csvHeaderMissing: boolean = false;
+  public primaryKey: number = -1;
 
-  public hasCsvHeader: boolean = true;
-  public primaryKey: string = '';
+  public originalNames: List<string> = List([]);
+  public columnNames: List<string> = List([]);
+  public columnsToInclude: List<boolean> = List([]);
+  public columnTypes: List<IMMap<string, any>> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
+
+  public transforms: List<Transform> = List([]);
+  public templates: List<Template> = List([]);
+  public uploadInProgress: boolean = false;
+  public elasticUpdate: boolean = true;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -79,6 +86,35 @@ export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
 export const _FileImportState = (config?: { [key: string]: any }) =>
   New<FileImportState>(new FileImportStateC(config), config);
 
+export interface Transform
+{
+  name: string;                         // transform name
+  colName: string;                      // name of column to be transformed
+  args: {
+    mergeName?: string;                 // name of column to be merged
+    newName?: string | string[];        // rename name, duplicate name, split names
+    text?: string;                      // text to append/prepend, text to split/merge on
+  };
+}
+
+export interface Template
+{
+  id: number;
+  name: string;
+  originalNames: List<string>;
+  columnTypes: Immutable.Map<string, object>;
+  transformations: List<object>;
+  csvHeaderMissing: boolean;
+  primaryKey: number;
+}
+
+// supports nested types, i.e. an array of array of dates
+export interface ColumnTypesTree
+{
+  type: string | number;
+  innerType?: ColumnTypesTree;
+}
+
 export const NUMBER_PREVIEW_ROWS = 5;
 
 export const FILE_TYPES =
@@ -89,10 +125,55 @@ export const FILE_TYPES =
 
 export const ELASTIC_TYPES =
   [
-    'string',
-    'number',
+    'text',
+    'long',
     'boolean',
     'date',
     'array',
-    'object',
+    'double',
+    'short',
+    'byte',
+    'integer',
+    'half_float',
+    'float',
+  ];
+
+// contains set of transforms applicable to each elastic type
+export const TRANSFORM_TYPES =
+  [
+    [                 // text
+      'duplicate',
+      'append',
+      'prepend',
+      'split',
+      'merge',
+    ],
+    ['duplicate'],    // long
+    ['duplicate'],    // boolean
+    ['duplicate'],    // date
+    ['duplicate'],    // array
+    ['duplicate'],    // double
+    ['duplicate'],    // short
+    ['duplicate'],    // byte
+    ['duplicate'],    // integer
+    ['duplicate'],    // half_float
+    ['duplicate'],    // float
+  ];
+
+export const STEP_NAMES =
+  [
+    'Step 1',
+    'Step 2',
+    'Step 3',
+    'Step 4',
+    'Step 5',
+  ];
+
+export const STEP_TITLES =
+  [
+    'Select a File',
+    'Select a Server',
+    'Select a Database',
+    'Select a Table',
+    'Select and Rename Columns you\'d like to Import',
   ];

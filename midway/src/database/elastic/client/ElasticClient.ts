@@ -82,7 +82,7 @@ class ElasticClient
    */
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
   {
-    this.log('bulk', params);
+    // this.log('bulk', params);
     this.delegate.bulk(params, callback);
   }
 
@@ -121,6 +121,15 @@ class ElasticClient
   {
     this.log('index', params);
     this.delegate.index(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-update
+   */
+  public update<T>(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
+  {
+    this.log('update', params);
+    this.delegate.update(params, callback);
   }
 
   /**

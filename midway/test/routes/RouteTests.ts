@@ -718,36 +718,28 @@ describe('File import route tests', () =>
         accessToken: 'AccessToken',
         body: {
           dbid: 1,
-          db: 'test_elastic_db',
-          table: 'fileImportTestTable',
-          contents: '[{"pkey":1,"column1":"hello","column2":"goodbye","column3":false,"column4":null}]',
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
+          contents: '[{"pkey":1,"column1":"hello","col2":"goodbye","col3":false,"col4":null}]',
           filetype: 'json',
+          update: true,
 
-          columnMap:
-          {
-            pkey: 'pkey',
-            column1: 'col1',
-            column2: 'col2',
-            column3: 'col3',
-            column4: 'col4',
-          },
-          columnsToInclude:
-          {
-            pkey: true,
-            column1: true,
-            column2: false,
-            column3: true,
-            column4: true,
-          },
+          originalNames: ['pkey', 'column1', 'col2', 'col3', 'col4'],
           columnTypes:
           {
-            pkey: 'number',
-            column1: 'string',
-            column2: 'string',
-            column3: 'boolean',
-            column4: 'date',
+            pkey: { type: 'long' },
+            col1: { type: 'text' },
+            col3: { type: 'boolean' },
+            col4: { type: 'date' },
           },
           primaryKey: 'pkey',
+          transformations: [
+            {
+              name: 'rename',
+              colName: 'column1',
+              args: { newName: 'col1' },
+            },
+          ],
         },
       })
       .expect(200)
@@ -779,16 +771,23 @@ describe('File import route tests', () =>
         accessToken: 'AccessToken',
         body: {
           dbid: 1,
-          db: 'test_elastic_db',
-          table: 'fileImportTestTable',
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
           contents: 'pkey,column1,column2,sillyname,column4\n1,hi,hello,false,1970-01-01\n2,bye,goodbye,,',
           filetype: 'csv',
+          update: true,
 
           csvHeaderMissing: false,
-          columnMap: ['pkey', 'column1', 'column2', 'column3', 'column4'],
-          columnsToInclude: [true, true, false, true, true],
-          columnTypes: ['number', 'string', 'string', 'boolean', 'date'],
+          originalNames: ['pkey', 'column1', 'column2', 'column3', 'column4'],
+          columnTypes:
+          {
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column3: { type: 'boolean' },
+            column4: { type: 'date' },
+          },
           primaryKey: 'pkey',
+          transformations: [],
         },
       })
       .expect(200)
@@ -827,30 +826,21 @@ describe('File import route tests', () =>
         accessToken: 'AccessToken',
         body: {
           dbid: 1,
-          db: 'test_elastic_db',
-          table: 'fileImportTestTable',
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
           contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
           filetype: 'json',
+          update: true,
 
-          columnMap:
-          {
-            pkey: 'pkey',
-            column1: 'column1',
-            column2: 'column2',
-          },
-          columnsToInclude:
-          {
-            pkey: true,
-            column1: true,
-            column2: true,
-          },
+          originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
           {
-            pkey: 'number',
-            column1: 'string',
-            column2: 'string',
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column2: { type: 'text' },
           },
           primaryKey: 'pkey',
+          transformations: [],
         },
       })
       .expect(400)
@@ -861,6 +851,130 @@ describe('File import route tests', () =>
       .catch((error) =>
       {
         fail('POST /midway/v1/import/ request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('File import templates route tests', () =>
+{
+  test('Create template: POST /midway/v1/templates/create', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/templates/create')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          name: 'my_template',
+
+          dbid: 1,
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
+
+          originalNames: ['pkey', 'column1', 'column2'],
+          columnTypes:
+          {
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column2: { type: 'text' },
+          },
+          primaryKey: 'pkey',
+          transformations: [],
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            id: 1,
+            name: 'my_template',
+
+            dbid: 1,
+            dbname: 'test_elastic_db',
+            tablename: 'fileImportTestTable',
+
+            originalNames: ['pkey', 'column1', 'column2'],
+            columnTypes:
+            {
+              pkey: { type: 'long' },
+              column1: { type: 'text' },
+              column2: { type: 'text' },
+            },
+            primaryKey: 'pkey',
+            transformations: [],
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/templates/create request returned an error: ' + String(error));
+      });
+  });
+
+  test('Get all templates: GET /midway/v1/templates/', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/templates/')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0]).toMatchObject({
+          id: 1,
+          name: 'my_template',
+
+          dbid: 1,
+          dbname: 'test_elastic_db',
+          tablename: 'fileImportTestTable',
+
+          originalNames: ['pkey', 'column1', 'column2'],
+          columnTypes:
+          {
+            pkey: { type: 'long' },
+            column1: { type: 'text' },
+            column2: { type: 'text' },
+          },
+          primaryKey: 'pkey',
+          transformations: [],
+        });
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/templates/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Get filtered templates: POST /midway/v1/templates/', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/templates/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          dbid: 1,
+          dbname: 'badname',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toEqual(0);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/templates/ request returned an error: ' + String(error));
       });
   });
 });

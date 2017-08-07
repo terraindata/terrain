@@ -43,39 +43,49 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import AppRouter from './AppRouter';
+import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+import LibraryStore from './library/data/LibraryStore';
+import UserStore from './users/data/UserStore';
 
-import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+if (!DEV)
+{
+  // report uncaught errors in production
+  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
+  {
 
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../../../node_modules/codemirror/lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
+    const user = UserStore.getState().get('currentUser');
+    const userId = user && user.id;
+    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
+    const builderState = JSON.stringify(BuilderStore.getState().toJS());
+    const location = JSON.stringify(window.location);
 
-    CodeMirror.registerHelper("lint", "elastic", function(text)
-    {
-      var found = [];
-      try
-      {
-        const t = new ESInterpreter(text);
-        for (let e of t.parser.errors)
-        {
-          const token = e.token;
-          found.push({
-            from: CodeMirror.Pos(token.row, token.col),
-            to: CodeMirror.Pos(token.toRow, token.toCol),
-            message: e.message
-          });
-        }
-      }
-      catch(e)
-      {
-        console.log('Exception when parsing ' + text + " error: " + e);
-      }
-      return found;
-  });
+    const msg = `${errorMsg} by ${userId}
+      Location:
+      ${location}
+
+      Library State:
+      ${libraryState}
+
+      Builder State:
+      ${builderState}
+
+      Error Stack:
+      ${(error != null && error.stack != null) ? error.stack : ''}
+    `;
+
+    $.post('http://lukeknepper.com/email.php', {
+      msg,
+      secret: '11235813',
+    });
+
+    return false;
+  };
+}
+
+ReactDOM.render(<AppRouter />, document.getElementById('app'), () =>
+{
+  // tests can go here
 });

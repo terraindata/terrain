@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
-import * as Immutable from 'immutable';
-const { Map, List } = Immutable;
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 import * as _ from 'underscore';
+
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
 import { Card, CardString } from '../../../../blocks/types/Card';
@@ -60,8 +60,7 @@ import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
-
-import CardsToSQL from '../../../../database/mysql/conversion/CardsToSQL';
+import TransformCardPeriscope from './TransformCardPeriscope';
 
 const NUM_BARS = 1000;
 
@@ -91,8 +90,6 @@ export interface Bar
   };
 }
 export type Bars = List<Bar>;
-
-import TransformCardPeriscope from './TransformCardPeriscope';
 
 class TransformCard extends TerrainComponent<Props>
 {
@@ -289,14 +286,14 @@ class TransformCard extends TerrainComponent<Props>
         if (finalTable)
         {
           // convert the score to TQL, do the query
-          this.setState(
-            AjaxM1.queryM1(
-              `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
-              db,
-              this.handleQueryResponse,
-              this.handleQueryError,
-            ),
-          );
+          // this.setState(
+          //   AjaxM1.queryM1(
+          //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+          //     db,
+          //     this.handleQueryResponse,
+          //     this.handleQueryError,
+          //   ),
+          // );
           return;
         }
       }
@@ -427,8 +424,7 @@ class TransformCard extends TerrainComponent<Props>
   {
     const spotlights = this.state.spotlights;
     const { data } = this.props;
-    const width = this.props.containerWidth ? this.props.containerWidth + 110 : 300;
-
+    const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
     return (
       <div
         className='transform-card-inner'
@@ -460,6 +456,7 @@ class TransformCard extends TerrainComponent<Props>
     );
   }
 }
+
 export default Dimensions({
   elementResize: true,
   containerStyle: {

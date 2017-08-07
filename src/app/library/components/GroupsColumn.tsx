@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import { ItemStatus } from '../../../items/types/Item';
-import CreateItem from '../../common/components/CreateItem';
+import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
@@ -56,7 +56,6 @@ import * as UserTypes from '../../users/UserTypes';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
@@ -69,9 +68,11 @@ type Group = LibraryTypes.Group;
 
 export interface Props
 {
+  basePath: string;
   groups: Immutable.Map<ID, Group>;
   groupsOrder: Immutable.List<ID>;
   params: any;
+  isFocused: boolean; // is this the last thing focused / selected?
 }
 
 class GroupsColumn extends TerrainComponent<Props>
@@ -150,6 +151,7 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public renderGroup(id: ID, index: number)
   {
+    const { basePath } = this.props;
     const group = this.props.groups.get(id);
     const { params } = this.props;
     const { me, roles } = this.state;
@@ -167,9 +169,8 @@ class GroupsColumn extends TerrainComponent<Props>
         id={id}
         icon={<GroupIcon />}
         onArchive={this.handleArchive}
-        color={ColorManager.colorForKey(group.id)}
         key={group.id}
-        to={'/library/' + group.id}
+        to={`/${basePath}/${group.id}`}
         onNameChange={this.handleNameChange}
         type='group'
         rendered={this.state.rendered}
@@ -182,6 +183,7 @@ class GroupsColumn extends TerrainComponent<Props>
         canDuplicate={false}
         canCreate={canCreate}
         isSelected={+group.id === +params.groupId}
+        isFocused={this.props.isFocused}
       >
         <div className='group-library-info-wrapper'>
           {
@@ -234,7 +236,7 @@ class GroupsColumn extends TerrainComponent<Props>
 
     return (
       <LibraryItemCategory
-        status={ItemStatus[status]}
+        status={status}
         key={status}
         onHover={this.handleCategoryHover}
         type='group'
@@ -248,9 +250,9 @@ class GroupsColumn extends TerrainComponent<Props>
         }
         {
           status === ItemStatus.Build && canCreate &&
-          <CreateItem
-            name='group'
-            onCreate={this.handleCreate}
+          <CreateLine
+            onClick={this.handleCreate}
+            open={false}
           />
         }
       </LibraryItemCategory>

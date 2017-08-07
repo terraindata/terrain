@@ -44,16 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format
+// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'underscore';
+
 const Color = require('color');
 
 interface Theme
 {
+  // Use these colors
 
-  // main background color
-  base: string;
+  // main background colors
+  bg1: string; // most contrast
+  bg2: string;
+  bg3: string; // least contrast
+
+  emptyBg: string; // special BG to denote "empty nothingness"
+
+  border1: string; // high contrast border
+  border2: string; // medium contrast border
+  border3: string; // low contrast border
+
+  text1: string; // most contrast
+  text2: string;
+  text3: string; // least contrast
+
+  altText1: string;
+  altText2: string;
+
+  altBg1: string;
+  altBg2: string;
+
+  active: string; // active color
+  activeText: string;
+  inactiveHover: string; // when something isn't active but could be
+  inactiveHoverText: string;
+  activeHover: string; // when an active thing is hovered
+
+  highlight: string; // for slight emphasis
+  darkerHighlight: string; // for depth effect with highlight
+
+  fadedOutBg: string; // for obscuring background contents behind a dark blur
+
+  inputBg: string;
+
+  scrollbarBG: string;
+  scrollbarPiece: string;
+
+  error: string;
+
+  // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
   text: {
@@ -73,38 +113,14 @@ interface Theme
     backgroundHover: string,
   };
 
-  // main title bar
-  titleBar:
-  {
-    base: string,
-  };
-  // side bar
-  sideBar:
-  {
-    base: string,
-    selectedSquare: string,
-  };
-
   // Library ------
 
-  library:
-  {
-    // title bar
-    titleBar: {
-      base: string,
-    },
-
+  library: {
     // item
     item: {
       title: string,
       body: string,
       activeBody: string,
-    },
-
-    // info panel
-    infoColumn: {
-      baseUpper: string,
-      baseLower: string,
     },
 
     // info graph selection btn
@@ -134,11 +150,6 @@ interface Theme
       tabTopRibbonInactive: string,
     },
 
-    // title bar
-    titleBar: {
-      base: string,
-    }
-
     // deck
     deck: {
       background: string,
@@ -148,6 +159,26 @@ interface Theme
     cards: {
       cardBase: string,
 
+      // card theme colors
+
+      // new
+      anyClause: string[];
+      arrayClause: string[];
+      baseClause: string[];
+      booleanClause: string[];
+      enumClause: string[];
+      fieldClause: string[];
+      indexClause: string[];
+      mapClause: string[];
+      nullClause: string[];
+      numberClause: string[];
+      objectClause: string[];
+      stringClause: string[];
+      structureClause: string[];
+      typeClause: string[];
+      inputParameter: string[];
+
+      // DO NOT USE -- Saving for reference, remove soon
       card1: string,
       card2: string,
       card3: string,
@@ -198,25 +229,104 @@ interface Theme
       background: string,
     },
 
-    results:
-    {
+    results: {
       background: string,
       lines: string,
     },
 
-    inputs:
-    {
+    inputs: {
       background: string,
+    },
+  };
+
+  // File Import -----------------------------
+
+  fileimport: {
+    preview: {
+      column: {
+        base: string,
+        typeDropdown: string,
+        transform: string,
+      };
+      cell: string;
     },
   };
 }
 
+const darkActive = '#1eb4fa';
+
+const code =
+  {
+    numberClause: '#1eb4fa',
+    nullClause: '#d14f42', // code mirror marks nulls as numbers
+
+    booleanClause: '#b161bc',
+    baseClause: '#f99c49',
+
+    anyClause: '#559dce',
+
+    arrayClause: '#b161bc',
+
+    enumClause: 'rgb(255, 189, 86)',
+    fieldClause: '#fad14b', // pastel purple: 'rgb(144, 118, 170)',
+
+    structureClause: '#4fc0ba',
+    mapClause: '#4fc0ba',
+    objectClause: '#4fc0ba',
+
+    stringClause: '#f99c49', // string types
+    indexClause: '#f99c49',
+    typeClause: '#f99c49',
+
+    inputParameter: '#4ef9ab', // '#da62ea',
+
+  };
+
+const cardBgOpacity = 0.45;
+
 const DARK: Theme =
   {
-    // Universal Elements------------------------------
+    // Use these colors
 
-    // main background color
-    base: '#2F2F2F',
+    bg1: 'rgb(39, 39, 39)',
+    bg2: 'rgb(47, 47, 47)',
+    bg3: 'rgb(60, 63, 65)',
+
+    emptyBg: 'rgb(21, 21, 21)',
+
+    border1: 'rgb(72,72,72)',
+    border2: 'rgb(100,105,107)',
+    border3: 'rgb(125,130,139)',
+
+    text1: '#fff',
+    text2: 'rgba(255,255,255,0.85)',
+    text3: 'rgba(255,255,255,0.5)',
+
+    altBg1: '#fff',
+    altBg2: '#EDEFF3',
+
+    altText1: '#242424',
+    altText2: '#424242',
+
+    highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
+    darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
+
+    fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+    inputBg: 'rgba(0,0,0,0.25)',
+
+    active: darkActive,
+    activeText: '#fff',
+    inactiveHover: Color(darkActive).fade(0.25).string(),
+    inactiveHoverText: '#fff',
+    activeHover: Color(darkActive).fade(0.75).string(),
+
+    scrollbarBG: 'rgba(255,255,255,0.15)',
+    scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+    error: '#d14f42',
+
+    // DO NOT USE these below colors anymore -- these need to be cleaned up
 
     // text
     text:
@@ -238,38 +348,15 @@ const DARK: Theme =
       backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
     },
 
-    // main title bar
-    titleBar:
-    {
-      base: '#3E3C3C',
-    },
-    // side bar
-    sideBar:
-    {
-      base: '#303030',
-      selectedSquare: '#CAD847',
-    },
-
     // Library ------
 
     library:
     {
-      // title bar
-      titleBar: {
-        base: '#272727',
-      },
-
       // item
       item: {
         title: '#424242',
         body: '#4B4B4B',
         activeBody: '#4C7C9C',
-      },
-
-      // info panel
-      infoColumn: {
-        baseUpper: '#656363',
-        baseLower: '#545252',
       },
 
       // info graph selection btn
@@ -299,11 +386,6 @@ const DARK: Theme =
         tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
       },
 
-      // title bar
-      titleBar: {
-        base: '#272727',
-      },
-
       // deck
       deck: {
         background: '#2B2A2A',
@@ -311,7 +393,25 @@ const DARK: Theme =
 
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
-        cardBase: '#424242', // TODO
+        cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
+
+        // card theme colors
+
+        anyClause: [code.anyClause, Color(code.anyClause).alpha(cardBgOpacity).string()],
+        arrayClause: [code.arrayClause, Color(code.arrayClause).alpha(cardBgOpacity).string()],
+        baseClause: [code.baseClause, Color(code.baseClause).alpha(cardBgOpacity).string()],
+        booleanClause: [code.booleanClause, Color(code.booleanClause).alpha(cardBgOpacity).string()],
+        enumClause: [code.enumClause, Color(code.enumClause).alpha(cardBgOpacity).string()],
+        fieldClause: [code.fieldClause, Color(code.fieldClause).alpha(cardBgOpacity).string()],
+        indexClause: [code.indexClause, Color(code.indexClause).alpha(cardBgOpacity).string()],
+        mapClause: [code.mapClause, Color(code.mapClause).alpha(cardBgOpacity).string()],
+        nullClause: [code.nullClause, Color(code.nullClause).alpha(cardBgOpacity).string()],
+        numberClause: [code.numberClause, Color(code.numberClause).alpha(cardBgOpacity).string()],
+        objectClause: [code.objectClause, Color(code.objectClause).alpha(cardBgOpacity).string()],
+        stringClause: [code.stringClause, Color(code.stringClause).alpha(cardBgOpacity).string()],
+        structureClause: [code.structureClause, Color(code.structureClause).alpha(cardBgOpacity).string()],
+        typeClause: [code.typeClause, Color(code.typeClause).alpha(cardBgOpacity).string()],
+        inputParameter: [code.inputParameter, Color(code.inputParameter).alpha(cardBgOpacity).string()],
 
         card1: '#559DCE',
         card2: '#397DD0',
@@ -335,32 +435,32 @@ const DARK: Theme =
         card20: '#4A979A',
         card21: '#3A91A5',
 
-        card1BG: Color('#559DCE').alpha(0.7).string(),
-        card2BG: Color('#397DD0').alpha(0.7).string(),
-        card3BG: Color('#D14F42').alpha(0.7).string(),
-        card4BG: Color('#D55A44').alpha(0.7).string(),
-        card5BG: Color('#DA6846').alpha(0.7).string(),
-        card6BG: Color('#DD7547').alpha(0.7).string(),
-        card7BG: Color('#DD8846').alpha(0.7).string(),
-        card8BG: Color('#DAA043').alpha(0.7).string(),
-        card9BG: Color('#D9B540').alpha(0.7).string(),
-        card10BG: Color('#86A760').alpha(0.7).string(),
-        card11BG: Color('#659F72').alpha(0.7).string(),
-        card12BG: Color('#4B977F').alpha(0.7).string(),
-        card13BG: Color('#39908B').alpha(0.7).string(),
-        card14BG: Color('#2E8C9A').alpha(0.7).string(),
-        card15BG: Color('#2589AA').alpha(0.7).string(),
-        card16BG: Color('#466AA3').alpha(0.7).string(),
-        card17BG: Color('#824BA0').alpha(0.7).string(),
-        card18BG: Color('#B161BC').alpha(0.7).string(),
-        card19BG: Color('#319AA9').alpha(0.7).string(),
-        card20BG: Color('#4A979A').alpha(0.7).string(),
-        card21BG: Color('#3A91A5').alpha(0.7).string(),
+        card1BG: Color('#559DCE').alpha(.2).string(),
+        card2BG: Color('#397DD0').alpha(0.2).string(),
+        card3BG: Color('#D14F42').alpha(0.2).string(),
+        card4BG: Color('#D55A44').alpha(0.2).string(),
+        card5BG: Color('#DA6846').alpha(0.2).string(),
+        card6BG: Color('#DD7547').alpha(0.2).string(),
+        card7BG: Color('#DD8846').alpha(0.2).string(),
+        card8BG: Color('#DAA043').alpha(0.2).string(),
+        card9BG: Color('#D9B540').alpha(0.2).string(),
+        card10BG: Color('#86A760').alpha(0.2).string(),
+        card11BG: Color('#659F72').alpha(0.2).string(),
+        card12BG: Color('#4B977F').alpha(0.2).string(),
+        card13BG: Color('#39908B').alpha(0.2).string(),
+        card14BG: Color('#2E8C9A').alpha(0.2).string(),
+        card15BG: Color('#2589AA').alpha(0.2).string(),
+        card16BG: Color('#466AA3').alpha(0.2).string(),
+        card17BG: Color('#824BA0').alpha(0.2).string(),
+        card18BG: Color('#B161BC').alpha(0.2).string(),
+        card19BG: Color('#319AA9').alpha(0.2).string(),
+        card20BG: Color('#4A979A').alpha(0.2).string(),
+        card21BG: Color('#3A91A5').alpha(0.2).string(),
       },
 
       //builder column
       builderColumn: {
-        background: '#2F2F2F',
+        background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
       },
 
       results:
@@ -372,6 +472,19 @@ const DARK: Theme =
       inputs:
       {
         background: '#626262',
+      },
+    },
+
+    // File import -----------------------------
+
+    fileimport: {
+      preview: {
+        column: {
+          base: '#00a0f4',
+          typeDropdown: '#005d69',
+          transform: '#a2af93',
+        },
+        cell: '#f1d7d7',
       },
     },
   };
@@ -394,33 +507,105 @@ const dynamicMap: any = {
 
 export function backgroundColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'backgroundColor', hoverColor);
+  return getStyle('backgroundColor', color, hoverColor);
 }
 
 export function fontColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'color', hoverColor);
+  return getStyle('color', color, hoverColor);
 }
 
 export function borderColor(color: string, hoverColor?: string)
 {
-  return getStyle(color, 'borderColor', hoverColor);
+  return getStyle('borderColor', color, hoverColor);
 }
 
 export function link()
 {
-  return fontColor(Colors().text.link, Colors().text.linkHover);
+  return fontColor(Colors().inactiveHover, Colors().active);
+}
+
+const CACHE: any = {};
+
+export function altStyle()
+{
+  if (!CACHE['altStyle' + curTheme])
+  {
+    CACHE['altStyle' + curTheme] = extend({},
+      backgroundColor(Colors().altBg1),
+      fontColor(Colors().altText1),
+    );
+  }
+
+  return CACHE['altStyle' + curTheme];
+}
+
+export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean)
+{
+  const key = 'card-' + strongColor + bgColor + hoverBg + small;
+
+  if (!CACHE[key])
+  {
+    CACHE[key] = {
+      background: bgColor,
+      color: strongColor,
+
+      boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
+        '3px 3px 5px 2px rgba(0,0,0,.39)',
+      borderWidth: 1,
+      borderStyle: 'solid',
+      borderLeftWidth: '3px',
+      borderLeftColor: strongColor,
+
+      borderTopColor: Colors().highlight,
+      borderRightColor: Colors().darkerHighlight,
+      borderBottomColor: Colors().darkerHighlight,
+
+      [hoverBg && ':hover']: {
+        background: hoverBg,
+      },
+    };
+  }
+
+  return CACHE[key];
+}
+
+export function couldHover(isFocused?: boolean)
+{
+  if (!CACHE['couldHover'])
+  {
+    CACHE['couldHover'] = {
+      ':hover': {
+        backgroundColor: Colors().inactiveHover,
+        color: Colors().inactiveHoverText,
+      },
+    };
+  }
+  if (!CACHE['couldHoverFocused'])
+  {
+    CACHE['couldHoverFocused'] = {
+      backgroundColor: Colors().inactiveHover,
+      color: Colors().inactiveHoverText,
+    };
+  }
+
+  return CACHE[isFocused ? 'couldHoverFocused' : 'couldHover'];
 }
 
 export function buttonColors()
 {
-  return extend({},
-    backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-    fontColor(Colors().button.text),
-  );
+  if (!CACHE['buttonColors' + curTheme])
+  {
+    CACHE['buttonColors' + curTheme] = extend({},
+      backgroundColor(Colors().inactiveHover, Colors().active),
+      fontColor(Colors().text1),
+    );
+  }
+
+  return CACHE['buttonColors' + curTheme];
 }
 
-export function getStyle(color: string, style: string, hoverColor?: string)
+export function getStyle(style: string, color: string, hoverColor?: string): object
 {
   if (!dynamicMap[curTheme])
   {

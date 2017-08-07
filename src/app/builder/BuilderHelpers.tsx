@@ -57,7 +57,6 @@ import { BuilderState, BuilderStore } from './data/BuilderStore';
 export function getTermsForKeyPath(keyPath: KeyPath): List<string>
 {
   const state = BuilderStore.getState();
-
   const terms = getTermsForKeyPathHelper(keyPath, state);
 
   // TODO migrate inputs reduction to the Query class if we get a query class
@@ -88,7 +87,7 @@ function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<s
 
   const block = BuilderStore.getState().getIn(keyPath);
 
-  if (block._isCard)
+  if (block && block._isCard)
   {
     const card = block as Card;
 

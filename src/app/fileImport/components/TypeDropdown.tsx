@@ -44,79 +44,71 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as Radium from 'radium';
+import * as React from 'react';
 import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
-import * as BlockUtils from '../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
-import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
-// const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+import Util from '../../util/Util';
+import Dropdown from './../../common/components/Dropdown';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import Actions from './../data/FileImportActions';
+import * as FileImportTypes from './../FileImportTypes';
+import './TypeDropdown.less';
+import shallowCompare = require('react-addons-shallow-compare');
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
+const { List } = Immutable;
 
-export const elasticRootCard = _card({
-  index: '',
-  from: 0,
-  rootType: '',
-  rootSize: 1000,
+const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
 
-  static:
+export interface Props
+{
+  columnId: number;
+  recursionDepth: number;
+  columnType: IMMap<string, any>;
+  editing: boolean;
+}
+
+@Radium
+class TypeDropdown extends TerrainComponent<Props>
+{
+  public handleTypeChange(typeIndex: number)
   {
-    title: 'Root Settings',
-    colors: ['#456', '#789'],
-    preview: '[index], [rootType]',
-    language: 'elastic',
+    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
+  }
 
-    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      return {
-        index: rootBlock['index'],
-        type: rootBlock['rootType'],
-        from: rootBlock['from'],
-        size: rootBlock['rootSize'],
-      };
-    },
-
-    display:
-    [
-      {
-        displayType: DisplayType.CARDTEXT, // TODO change
-        key: 'index',
-        getAutoTerms: (schemaState) =>
+  public render()
+  {
+    return (
+      <div
+        className='fi-type-dropdown'
+        style={backgroundColor(Colors().fileimport.preview.column.typeDropdown)}
+      >
+        <div
+          className='fi-type-dropdown-dropdown'
+        >
+          <Dropdown
+            selectedIndex={Number(this.props.columnType.get('type'))}
+            options={DATATYPES}
+            onChange={this.handleTypeChange}
+            canEdit={true}
+          />
+        </div>
         {
-          return Immutable.List(['movies', 'baseball', 'zazzle']);
-        },
-        // autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.CARDSFORTEXT, // TODO change
-        key: 'index',
-      },
-      {
-        displayType: DisplayType.TEXT,
-        key: 'rootType',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'from',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'rootSize',
-        autoDisabled: true,
-      },
+          FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')] === 'array' &&
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionDepth={this.props.recursionDepth + 1}
+            columnType={this.props.columnType.get('innerType')}
+            editing={this.props.editing}
+          />
+        }
+      </div>
+    );
+  }
+}
 
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-        // accepts,
-      },
-    ],
-  },
-});
-
-export default elasticRootCard;
+export default TypeDropdown;

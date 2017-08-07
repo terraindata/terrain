@@ -1,20 +1,12 @@
+@import "common/fonts/Roboto.less";
 @import "common/Common.less";
 
-.noselect {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
 
 body {
     padding: 0px;
     margin: 0px;
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
+    font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif;
 
-    .noselect;
     .black-text;
 
     background: @builder-bg;
@@ -41,7 +33,6 @@ body {
   color: #fff;
 }
 
-
 .__react_component_tooltip {
   z-index: 999999 !important;
   transition: 0.0s !important;
@@ -55,7 +46,7 @@ body {
 }
 
 @top-bar-height: 36px;
-@icon-height: 17px;
+@icon-height: 24px;
 @icon-padding: calc((@top-bar-height - @icon-height) / 2);
 
 .app-top-bar {
@@ -93,7 +84,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #eaede7; //d3d6d0;
+  background: rgba(255,255,255,0.15);
   border-radius: 7px;
   margin: 5px 3px;
 }
@@ -103,7 +94,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C7CAC9;
+  background: rgba(255,255,255,0.25);
   border-radius: 10px;
   // border-top: 1px solid #c1d1af;
   // border-bottom: 1px solid #c1d1af;
@@ -112,27 +103,45 @@ body {
 textarea, input {
   outline: none;
   margin: 0px; // because Safari gives inputs a 2px margin
-  font-family: 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
-input[type=text], input[type=email], input[type=tel], input[type=num]
+input[type=text], input[type=email], input[type=tel], 
+input[type=num], input[type=password]
 {
   .transition;
-  border: 1px solid rgba(0,0,0,0);
+  // border: 1px solid rgba(0,0,0,0);
+  border-radius: 3px;
   
   &:hover:not(:disabled) {
-    border-color: @dark-green; //#ccc; //fade(#00bcd6, 50%);
+    border-color: #fff;
   }
   
   &:focus:not(:disabled) {
-   border-color: rgba(140,213,106,1); 
+   border-color: #fff;
+  }
+  
+  &.standard-input { // TODO make this the default
+    background: #fff;
+    padding: @spacing;
+    margin: @spacing;
+    width: calc(~"100% - @{spacing} * 2");
+    font-size: @font-size;
+    border: 1px solid #dddff3;
+    border-radius: 3px;
+    
+    &:hover,
+    &:focus {
+      border: 1px solid #ccd1d7;
+    }
   }
 }
 
 input[type=password]
 {
-  color: #617214;
+  color: #617214 !important;
 }
+
 
 .button {
   display: inline-block;

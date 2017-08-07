@@ -1,18 +1,11 @@
 @import "../../../common/Common.less";
 
-@background: #4e4f4d;
 @focus-color: @bright-green;
 
 .create-card-wrapper {
-  &.create-card-open {
-    // background: @builder-bg;
-  }
   
   position: relative;
-  // overflow: hidden;
   @create-card-border-radius: 5px;
-  border-radius: @create-card-border-radius 0px 0px @create-card-border-radius;
-  // padding: 6px;
   padding-right: 0px;
   
   &.create-card-closed {
@@ -34,12 +27,15 @@
   }
   
   .create-card-selector {
-    // height: 0px;
-    // overflow: hidden;
-    background: @background;
+    overflow: auto;
+    max-height: 0px;
+    &.create-card-selector-open {
+      max-height: 250px;
+    }
+    
+    
     border-radius: @create-card-border-radius;
     box-sizing: border-box;
-    border: 1px solid @background;
     .transition;
     
     &:hover,
@@ -48,67 +44,110 @@
     }
     
     .create-card-selector-inner {
-      padding: @standard-margin / 2;
-      display: flex;
-      flex-wrap: wrap;
+      padding: @standard-margin;
     }
+  }
+  
+  
+  
+  // .create-card-placeholder {
+  //   @h: 18px;
+  //   height: @h;
+  //   width: calc(~"100% - 24px");
+  //   display: inline-block;
+  //   position: relative;
+  //   border-radius: 3px;
+  //   // margin-top: 6px;
+  //   margin-bottom: 6px;
+  //   margin-left: 12px;
+  //   margin-right: 12px;
+  //   box-sizing: border-box;
+  //   text-align: center;
+  //   cursor: pointer;
     
-    .create-card-button {
-      .create-card-button-style;
-      flex-grow: 1;
-      min-width: 100px;
-      position: relative;
-      display: inline-block;
-      margin: 3px;
+  //   // border: 1px solid #fff;
+    
+  //   opacity: 0.2;
+    
+  //   svg {
+  //     @sh: @h * 2 / 3;
+  //     height: @sh;
+  //     margin-top: (@h - @sh)/2;
+  //     fill: #fff;
+  //   }
+    
+  //   &:hover {
+  //     background: #47a7ff;
+  //     opacity: 1;
+  //     svg {
+  //       fill: #fff;
+  //     }
+  //   }
+    
+  //   .transition;
+  // }
+  
+  &.create-card-open {
+    // .create-card-placeholder {
+    //   // margin-bottom: 0px;
+            
+    //   // svg {
+    //   //   fill: #f00;
+    //   // }
       
-      .transition;
-    }
-    
-    .create-card-button-fodder {
-      min-width: 100px;
-      flex-grow: 1;
-      flex-basis: 100px;
-      margin: 0px 3px;
-    }
+    //   // &:hover {
+    //   //   background: #f00;
+    //   //   svg {
+    //   //     fill: #fff;
+    //   //   }
+    //   // }
+    // }
   }
   
-  .create-card-placeholder {
-    @h: 12px;
-    height: @h;
-    width: @h;
-    background: #fff;
-    display: inline-block;
-    position: relative;
-    left: 50%;
-    border-radius: 200px;
-    margin-top: 4px;
-    margin-bottom: -2px;
-    text-align: center;
-    
-    svg {
-      @sh: @h * 2 / 3;
-      height: @sh;
-      margin-top: (@h - @sh)/2;
-      fill: #7c7d7b;
-    }
-    
-    opacity: 0.25;
-    .transition;
-  }
-  
-  .create-card-close {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    background: rgba(255,255,255,0.25);
-  }
+  // .create-card-close {
+  //   position: absolute;
+  //   right: 8px;
+  //   top: 8px;
+  //   background: rgba(255,0,0,0.25);
+  // }
 }
 
-.card-hovering {
-  .create-card-wrapper .create-card-placeholder {
-    opacity: 1;
+
+.card-hovering, .create-card-open {
+  .create-line-row {
+    opacity: 0.75;
   }
-  .card .create-card-wrapper .create-card-placeholder {
-    opacity: 0.25;
+  .card .create-line-row {
+    opacity: 0.2;
   }
+  // .create-card-wrapper.create-card-closed {
+  //   .create-card-placeholder {
+  //     opacity: 1;
+  //     background: rgba(255,255,255,0.15);
+  //   }
+  // }
+  // .card {
+  //   .create-card-wrapper.create-card-closed {
+  //     .create-card-placeholder {
+  //       opacity: 0.2;
+  //       background: none;
+  //     }
+  //   } 
+  // }
 }
+
+// a little experiment to make the placeholders only appear on card hover
+// .create-card-wrapper {
+//   height: 0px;
+//   overflow: hidden;
+// }
+
+// .card-hovering {
+//   .create-card-wrapper {
+//     height: auto;
+//   }
+  
+//   .card .create-card-wrapper {
+//     height: 0px;
+//   }
+// }

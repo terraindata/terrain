@@ -47,12 +47,14 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands interface-name
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
+import StyleTag from './StyleTag';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -73,6 +75,7 @@ export interface Props
   onExpand?: () => void;
 }
 
+@Radium
 export class Sidebar extends TerrainComponent<Props>
 {
   public render()
@@ -83,13 +86,13 @@ export class Sidebar extends TerrainComponent<Props>
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
-        style={backgroundColor(Colors().sideBar.base)}
+        style={backgroundColor(Colors().bg2)}
       >
         <div
           className='sidebar-selected-square'
           style={{
             top: (this.props.selectedIndex * linkHeight) + 'px',
-            backgroundColor: Colors().sideBar.selectedSquare,
+            backgroundColor: Colors().active,
           }}
         />
         {
@@ -103,12 +106,22 @@ export class Sidebar extends TerrainComponent<Props>
                   'sidebar-link': true,
                   'sidebar-link-selected': index === this.props.selectedIndex,
                 })}
+                key={'sidebar-link-' + index}
+                style={{
+                  ':hover': {
+                    background: Colors().inactiveHover,
+                  },
+                }}
               >
-                <div className='sidebar-link-inner'>
+                <div
+                  className='sidebar-link-inner'
+                >
                   {
                     link.icon
                   }
-                  <div className='sidebar-link-text'>
+                  <div
+                    className='sidebar-link-text'
+                  >
                     {
                       link.text
                     }
@@ -121,9 +134,23 @@ export class Sidebar extends TerrainComponent<Props>
         {
           this.props.expandable ?
             (
-              <div className='sidebar-expand' onClick={this.props.onExpand}>
+              <div
+                className='sidebar-expand' onClick={this.props.onExpand}
+                style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
+              >
                 <div className='dead-center'>
-                  <ExpandIcon />
+                  <ExpandIcon
+                    className='sidebar-expand-icon'
+                    style={{
+                      'fill': Colors().text2,
+                      ':active': {
+                        fill: Colors().text1,
+                      },
+                    }}
+                  />
+                  <StyleTag
+                    style={SVG_STYLE}
+                  />
                 </div>
               </div>
             )
@@ -133,4 +160,14 @@ export class Sidebar extends TerrainComponent<Props>
     );
   }
 }
+
+const SVG_STYLE = {
+  '.sidebar-expand-icon': {
+    fill: Colors().text2,
+  },
+  '.sidebar-expand:hover .sidebar-expand-icon': {
+    fill: Colors().text1,
+  },
+};
+
 export default Sidebar;

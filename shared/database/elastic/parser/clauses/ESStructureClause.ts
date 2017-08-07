@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 
 import EQLConfig from '../EQLConfig';
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESJSONType from '../ESJSONType';
@@ -60,14 +61,13 @@ import ESClause from './ESClause';
 export default class ESStructureClause extends ESClause
 {
   public structure: { [name: string]: string };
-  public required: any[];
 
-  public constructor(type: string, structure: { [name: string]: string }, required: string[], settings: any,
+  public constructor(type: string, structure: { [name: string]: string }, settings?: ESClauseSettings,
     clauseType: ESClauseType = ESClauseType.ESStructureClause)
   {
-    super(type, settings, clauseType);
+    super(type, clauseType, settings);
     this.structure = structure;
-    this.required = required;
+    this.setDefaultProperty('template', () => ({}));
   }
 
   public init(config: EQLConfig): void
@@ -77,6 +77,10 @@ export default class ESStructureClause extends ESClause
       {
         config.declareType(this.structure[key]);
       });
+
+    this.checkValidAndUniqueProperties(this.required, 'required');
+    this.checkValidAndUniqueProperties(this.suggestions, 'suggestions');
+    this.checkValidAndUniqueProperties(Object.keys(this.template), 'template');
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
@@ -89,7 +93,7 @@ export default class ESStructureClause extends ESClause
     // check required members
     this.required.forEach((name: string): void =>
     {
-      if (children[name] !== undefined)
+      if (children[name] === undefined)
       {
         interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
       }
@@ -127,5 +131,30 @@ export default class ESStructureClause extends ESClause
           viTuple.propertyValue.clause = valueClause;
         }
       });
+  }
+
+  protected checkValidAndUniqueProperties(names: string[], listName: string): void
+  {
+    const seen = new Set();
+    names.forEach((name) =>
+    {
+      if (!this.structure.hasOwnProperty(name))
+      {
+        throw new Error('Unknown property "' +
+          name + '" found in ' + listName + ' list for clause "' +
+          this.name +
+          '".');
+      }
+
+      if (seen.has(name))
+      {
+        throw new Error('Duplicate property "' +
+          name + '" found in ' + listName + ' list for clause "' +
+          this.name +
+          '".');
+      }
+
+      seen.add(name);
+    });
   }
 }

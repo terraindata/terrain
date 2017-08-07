@@ -43,13 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty strict-boolean-expressions no-console
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
+import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
+import Dropdown from './../../common/components/Dropdown';
+import Loading from './../../common/components/Loading';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
@@ -58,42 +68,234 @@ const { List } = Immutable;
 
 export interface Props
 {
-  previewRows: object[];
+  previewRows: List<List<string>>;
   columnsCount: number;
-  primaryKey: string;
-  columnsToInclude: IMMap<string, boolean>;
-  columnNames: IMMap<string, string>;
-  columnTypes: IMMap<string, number>;
+  primaryKey: number;
+
+  columnsToInclude: List<boolean>;
+  columnNames: List<string>;
+  columnTypes: List<IMMap<string, any>>;
+
   columnOptions: List<string>;
+  templates: List<FileImportTypes.Template>;
+  transforms: List<FileImportTypes.Transform>;
+  uploadInProgress: boolean;
+  elasticUpdate: boolean;
 }
 
+@Radium
 class FileImportPreview extends TerrainComponent<Props>
 {
-  public render()
+  public state: {
+    templateId: number,
+    templateText: string,
+    templateOptions: List<string>,
+    editColumnId: number,
+  } = {
+    templateId: -1,
+    templateText: '',
+    templateOptions: List([]),
+    editColumnId: -1,
+  };
+
+  public componentDidMount()
+  {
+    Actions.fetchTemplates();
+    this.setState({
+      templateOptions: this.props.templates.map((template, i) => template.name),
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (!this.props.templates.equals(nextProps.templates))
+    {
+      this.setState({
+        templateOptions: nextProps.templates.map((template, i) => String(template.id) + ': ' + template.name),
+      });
+    }
+  }
+
+  public onColumnNameChange(columnId: number, localColumnName: string): boolean
+  {
+    // If column name entered already exists when autocomplete box goes out of focus, return false to roll back change
+    // otherwise, if the name has actually changed - set the new name and add the rename transform and return true
+    if (this.props.columnNames.delete(columnId).contains(localColumnName))
+    {
+      alert('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
+      return false;
+    }
+
+    if (this.props.columnNames.get(columnId) !== localColumnName)
+    {
+      Actions.setColumnName(columnId, this.props.columnNames.get(columnId), localColumnName);
+      Actions.addTransform(
+        {
+          name: 'rename',
+          colName: this.props.columnNames.get(columnId),
+          args: {
+            newName: localColumnName,
+          },
+        },
+      );
+      return true;
+    }
+  }
+
+  public handleEditColumnChange(editColumnId: number)
+  {
+    this.setState({
+      editColumnId,
+    });
+  }
+
+  public handleTemplateChange(templateId: number)
+  {
+    this.setState({
+      templateId,
+    });
+  }
+
+  public handleAutocompleteTemplateChange(templateText: string)
+  {
+    this.setState({
+      templateText,
+    });
+  }
+
+  public handleLoadTemplate()
+  {
+    if (this.state.templateId === -1)
+    {
+      alert('Please select a template to load');
+      return;
+    }
+    const templateNames = List(this.props.templates.get(this.state.templateId).originalNames);
+    let isCompatible = true;
+    const unmatchedTemplateNames = [];
+    const unmatchedTableNames = this.props.columnNames.toArray();
+    templateNames.map((templateName) =>
+    {
+      if (!this.props.columnNames.contains(templateName))
+      {
+        isCompatible = false;
+        unmatchedTemplateNames.push(templateName);
+      }
+      else
+      {
+        unmatchedTableNames.splice(unmatchedTableNames.indexOf(templateName), 1);
+      }
+    });
+
+    if (!isCompatible)
+    {
+      alert('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedTemplateNames) + '\n and \n'
+        + JSON.stringify(unmatchedTableNames));
+      return;
+    }
+    Actions.loadTemplate(this.state.templateId);
+  }
+
+  public handleSaveTemplate()
+  {
+    if (!this.state.templateText)
+    {
+      alert('Please enter a template name');
+      return;
+    }
+    Actions.saveTemplate(this.state.templateText);
+  }
+
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
+  }
+
+  public handleUploadFile()
+  {
+    Actions.uploadFile();
+  }
+
+  public renderTemplate()
   {
     return (
-      <table>
-        <thead>
-          <tr>
-            {
-              this.props.columnNames.map((value, key) =>
-                <FileImportPreviewColumn
-                  key={key}
-                  id={key}
-                  isIncluded={this.props.columnsToInclude.get(key)}
-                  name={this.props.columnNames.get(key)}
-                  typeIndex={this.props.columnTypes.get(key)}
-                  types={List(FileImportTypes.ELASTIC_TYPES)}
-                  canSelectType={true}
-                  canSelectColumn={true}
-                  isPrimaryKey={this.props.primaryKey === value}
-                  columnOptions={this.props.columnOptions}
-                />,
-              ).toArray()
-            }
-          </tr>
-        </thead>
-        <tbody>
+      <div
+        className='fi-preview-template'
+      >
+        <div
+          className='fi-preview-load'
+        >
+          <div
+            className='fi-load-button'
+            onClick={this.handleLoadTemplate}
+            style={buttonColors()}
+            ref='fi-load-button'
+          >
+            Load Template
+          </div>
+          <Dropdown
+            selectedIndex={this.state.templateId}
+            options={this.state.templateOptions}
+            onChange={this.handleTemplateChange}
+            className={'fi-load-dropdown'}
+            canEdit={true}
+          />
+        </div>
+
+        <div
+          className='fi-preview-save'
+        >
+          <div
+            className='fi-save-button'
+            onClick={this.handleSaveTemplate}
+            style={buttonColors()}
+            ref='fi-save-button'
+          >
+            Save Template
+          </div>
+          <Autocomplete
+            value={this.state.templateText}
+            options={null}
+            onChange={this.handleAutocompleteTemplateChange}
+            placeholder={'template name'}
+            className={'fi-save-autocomplete'}
+            disabled={false}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderTable()
+  {
+    return (
+      <div
+        className='fi-preview-table-container'
+      >
+        <div
+          className='fi-preview-columns-container'
+        >
+          {
+            this.props.columnNames.map((value, key) =>
+              <FileImportPreviewColumn
+                key={key}
+                columnId={key}
+                columnName={this.props.columnNames.get(key)}
+                columnNames={this.props.columnNames}
+                isIncluded={this.props.columnsToInclude.get(key)}
+                columnType={this.props.columnTypes.get(key)}
+                isPrimaryKey={this.props.primaryKey === key}
+                columnOptions={this.props.columnOptions}
+                editing={key === this.state.editColumnId}
+                handleEditColumnChange={this.handleEditColumnChange}
+                onColumnNameChange={this.onColumnNameChange}
+              />,
+            ).toArray()
+          }
+        </div>
+        <div
+          className='fi-preview-rows-container'
+        >
           {
             this.props.previewRows.map((items, key) =>
               <FileImportPreviewRow
@@ -102,8 +304,48 @@ class FileImportPreview extends TerrainComponent<Props>
               />,
             )
           }
-        </tbody>
-      </table>
+        </div>
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div
+        className='fi-preview'
+      >
+        {this.renderTemplate()}
+        {this.renderTable()}
+        <div
+          className='fi-preview-update'
+        >
+          update
+          <CheckBox
+            checked={this.props.elasticUpdate}
+            onChange={this.handleElasticUpdateChange}
+          />
+        </div>
+        <div
+          className='fi-preview-import-button'
+          onClick={this.handleUploadFile}
+          style={buttonColors()}
+        >
+          Import
+        </div>
+        {
+          this.props.uploadInProgress &&
+          <div className='fi-preview-loading-container'>
+            <Loading
+              width={100}
+              height={100}
+              loading={this.props.uploadInProgress}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          </div>
+        }
+      </div>
     );
   }
 }

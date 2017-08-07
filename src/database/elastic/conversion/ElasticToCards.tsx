@@ -58,6 +58,7 @@ import { Block } from '../../../blocks/types/Block';
 import { Card, Cards, CardString } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
+import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 const { make } = BlockUtils;
@@ -71,18 +72,19 @@ export default function ElasticToCards(
   {
     // TODO: we may want to show some error messages on the cards.
     return query
-      .set('cardsAndCodeInSync', false);
+      .set('cardsAndCodeInSync', false)
+      .set('parseError', true);
   } else
   {
     try
     {
-      // let cards = parseMagicObject(query.parseTree.parser.getValue());
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      let cards = List([parseCardFromValueInfo(rootValueInfo)]);
+      let cards = parseCardFromValueInfo(rootValueInfo)['cards'];
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
-        .set('cardsAndCodeInSync', true);
+        .set('cardsAndCodeInSync', true)
+        .set('parseError', false);
     }
     catch (e)
     {
@@ -96,13 +98,47 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 {
   if (!valueInfo)
   {
-    return BlockUtils.make(Blocks, 'eqlnull');
+    return make(Blocks, 'eqlnull');
   }
 
   const valueMap: { value?: any, cards?: List<Card> } = {};
+  if (isFilterCard(valueInfo))
+  {
+    let filters = [];
+    _.map(valueInfo.value, (value: any, key: string) =>
+    {
+      const fs = parseFilterBlock(key, value);
+      if (fs)
+      {
+        filters = filters.concat(fs);
+      }
+    });
+
+    return make(
+      Blocks, 'elasticFilter',
+      {
+        filters: List(filters),
+      });
+  }
+  else if (isScoreCard(valueInfo))
+  {
+    const weights = [];
+    for (const factor of valueInfo.value.params.factors)
+    {
+      const weight = parseElasticWeightBlock(factor);
+      if (weight)
+      {
+        weights.push(weight);
+      }
+    }
+    return make(
+      Blocks, 'elasticScore',
+      {
+        weights: List(weights),
+      });
+  }
 
   const clauseCardType = 'eql' + valueInfo.clause.type;
-
   if (typeof valueInfo.value !== 'object')
   {
     valueMap.value = valueInfo.value;
@@ -117,8 +153,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   {
     if (valueMap.cards)
     {
-      console.log('Error with: ', valueInfo);
-      throw new Error('Found both arrayChildren and objectChildren in a ValueInfo');
+      throw new Error('Found both arrayChildren and objectChildren in a ValueInfo: ' + valueInfo);
     }
 
     valueMap.cards = List(_.map(valueInfo.objectChildren,
@@ -131,41 +166,97 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     ));
   }
 
-  return BlockUtils.make(Blocks, clauseCardType, valueMap);
+  return make(Blocks, clauseCardType, valueMap);
 };
 
-const isScoreCard = (obj: object): boolean =>
+function isFilterCard(valueInfo: ESValueInfo): boolean
 {
-  return obj.hasOwnProperty('script')
-    && obj['script'].hasOwnProperty('stored')
-    && obj['script'].hasOwnProperty('params')
-    && obj['script']['stored'] === 'terrain_PWLScore'
-    && obj['script']['params'].hasOwnProperty('factors')
-    && Array.isArray(obj['script']['params']['factors']);
-};
+  const isBool = (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
+    (valueInfo.clause.name === 'bool');
 
-const parseObjectWrap = (obj: object): Cards =>
-{
-  const arr: Card[] = _.map(obj,
-    (value: any, key: string) =>
-    {
-      return make(
-        Blocks, 'elasticKeyValueWrap',
+  return isBool &&
+    _.reduce(valueInfo.value,
+      (memo, value: any) =>
+      {
+        let validFilter = typeof value === 'object';
+        if (Array.isArray(value))
         {
-          key,
-          cards: List([
-            parseValueSingleCard(value),
-          ]),
-        },
-      );
-    },
-  );
+          validFilter = _.reduce(value,
+            (memo0, value0) => memo0 && (value0['range'] || value0['term']),
+            true);
+        }
+        else
+        {
+          validFilter = (value['range'] !== undefined) || (value['term'] !== undefined);
+        }
+        return memo && validFilter;
+      }, true);
+}
 
-  return List(arr);
+const esFilterOperatorsMap = {
+  gt: '>',
+  gte: '≥',
+  lt: '<',
+  lte: '≤',
+  term: '=',
 };
 
-const parseElasticWeightBlock = (obj: object): Block =>
+function parseFilterBlock(boolQuery: string, filters: any): Block[]
 {
+  if (typeof filters !== 'object')
+  {
+    return [];
+  }
+
+  if (!Array.isArray(filters))
+  {
+    return parseFilterBlock(boolQuery, [filters]);
+  }
+
+  const filterBlocks = filters.map((obj: object) =>
+  {
+    let field;
+    let filterOp;
+    let value;
+
+    if (obj['range'] !== undefined)
+    {
+      field = Object.keys(obj['range'])[0];
+      filterOp = Object.keys(obj['range'][field])[0];
+      value = obj['range'][field][filterOp];
+      filterOp = esFilterOperatorsMap[filterOp];
+    }
+    else if (obj['term'] !== undefined)
+    {
+      field = Object.keys(obj['term'])[0];
+      filterOp = '=';
+      value = obj['term'][field];
+    }
+
+    return make(Blocks, 'elasticFilterBlock', {
+      field,
+      value,
+      boolQuery,
+      filterOp,
+    });
+  });
+
+  return filterBlocks;
+}
+
+function isScoreCard(valueInfo: ESValueInfo): boolean
+{
+  return (valueInfo.clause.clauseType === ESClauseType.ESScriptClause) &&
+    (valueInfo.objectChildren.stored.propertyValue.value === 'Terrain.Score.PWL');
+}
+
+function parseElasticWeightBlock(obj: object): Block
+{
+  if (obj['weight'] === 0)
+  {
+    return null;
+  }
+
   const scorePoints = [];
   for (let i = 0; i < obj['ranges'].length; ++i)
   {
@@ -185,146 +276,4 @@ const parseElasticWeightBlock = (obj: object): Block =>
     key: card,
     weight: obj['weight'],
   });
-};
-
-const parseArrayWrap = (arr: any[]): Cards =>
-{
-  return List(arr.map(parseValueSingleCard));
-};
-
-const parseValueSingleCard = (value: any): Card =>
-{
-  switch (typeof value)
-  {
-    case 'string':
-      return make(Blocks, 'elasticText', {
-        value,
-      });
-    case 'number':
-      return make(Blocks, 'elasticNumber', {
-        value,
-      });
-    case 'boolean':
-      return make(Blocks, 'elasticBool', {
-        value: value ? 1 : 0,
-      });
-    case 'object':
-      if (value === null)
-      {
-        return make(Blocks, 'elasticNull');
-      }
-      else if (Array.isArray(value))
-      {
-        return make(
-          Blocks, 'elasticArray',
-          {
-            cards: parseArrayWrap(value),
-          },
-        );
-      }
-      else
-      {
-        // value is an object
-        return make(
-          Blocks, 'elasticObject',
-          {
-            cards: parseObjectWrap(value),
-          },
-        );
-      }
-    default:
-      throw new Error('Elastic Parsing: Unsupported value: ' + value);
-  }
-};
-
-const parseMagicArray = (arr: any[]): Card =>
-{
-  const values: Card[] = _.map(arr,
-    (value: any) =>
-    {
-      if (Array.isArray(value) && (value !== []))
-      {
-        value = parseMagicArray(value);
-      }
-      else if (typeof value === 'object' && (value !== null || value !== {}))
-      {
-        value = parseMagicObject(value).first();
-      }
-      else
-      {
-        value = CommonElastic.parseESValue(value);
-      }
-
-      return make(Blocks, 'elasticMagicListItem', {
-        value,
-      });
-    },
-  );
-
-  return make(
-    Blocks, 'elasticMagicList',
-    {
-      values: List(values),
-    },
-  );
-};
-
-const parseMagicObject = (obj: object): Cards =>
-{
-  if (obj === {} || obj === null)
-  {
-    return List([
-      make(Blocks, 'elasticMagicValue', {
-        value: obj,
-      }),
-    ],
-    );
-  }
-
-  if (isScoreCard(obj))
-  {
-    return List([
-      make(
-        Blocks, 'elasticScore',
-        {
-          weights: List(obj['script']['params']['factors'].map(parseElasticWeightBlock)),
-        }),
-    ]);
-  }
-
-  const values: Card[] = _.map(obj,
-    (value: any, key: string) =>
-    {
-      if (value === null || value === {})
-      {
-        value = JSON.stringify(value);
-      }
-      else if (Array.isArray(value) && (value !== []))
-      {
-        value = parseMagicArray(value);
-      }
-      else if (typeof value === 'object' && (value !== null || value !== {}))
-      {
-        value = parseMagicObject(value).first();
-      }
-      else
-      {
-        value = CommonElastic.parseESValue(value);
-      }
-
-      return make(Blocks, 'elasticMagicValue', {
-        key,
-        value,
-      });
-    },
-  );
-
-  const magicCard = make(
-    Blocks, 'elasticMagicCard',
-    {
-      values: List(values),
-    },
-  );
-
-  return List([magicCard]);
-};
+}

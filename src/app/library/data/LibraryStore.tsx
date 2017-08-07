@@ -47,8 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
 import * as Immutable from 'immutable';
+import * as Redux from 'redux';
 import * as _ from 'underscore';
-const Redux = require('redux');
+// const Redux = require('redux');
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from './../../auth/data/AuthStore';
@@ -98,6 +99,25 @@ export const _LibraryState = (config?: any) =>
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 
+// So this is the best way I’ve found so far to combine the advantages of ImmutableJS with Typescript.
+// It does get a little messy or hacky
+// 1. `LibraryStateC` is just a plain ES6 class with properties that all have to have default values
+// but by itself, that class won’t have Immutability, so we make:
+// 2. `LibraryState_Record` is an Immutable class that’s created from `LibraryStateC`. It will contain
+//      the members that are specified in LibraryStateC and their default values (they have to have default values for Immutable)
+// but Typescript doesn’t know the properties that LibraryState_Record can have (e.g. `loaded`, `groups`), so we make
+// 3. `interface LibraryState`, which is just a union of the `LibraryStateC` type with the Immutable Record type for LibraryState.
+//  This correctly expresses the typings of `LibraryState_Record`, and this is the actual type that we use throughout
+//   the app when referring to LibraryState types
+// 4. `_LibraryState` is just a utility function to make new objects of type `LibraryState`,
+//     basically just instantiating a `LibraryState_Record` and casting it to type `LibraryState`, an applying some smarter
+//     default values
+
+// …So I know it’s a little messy and a lot to take in. The goal is to be able to do things like these:
+// const libraryState = _LibraryState({ ... });
+// const groups = libraryState.groups; // typescript recognizes the groups property on libraryState
+// const loadingLibraryState = libraryState.set('loading', true); // typescript still knows that this returns a LibraryState type
+
 const DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers';
@@ -118,7 +138,7 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
   }
 }
 
-export const LibraryStore: IStore<LibraryState> = Redux.createStore(
+export const LibraryStore = Redux.createStore(
   (state: LibraryState = DefaultState, action) =>
   {
     if (LibraryReducers[action.type])

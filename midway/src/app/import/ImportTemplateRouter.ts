@@ -43,12 +43,64 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// Copyright 2017 Terrain Data, Inc.
-interface ParseTreeToQueryOptions
-{
-  allFields?: boolean; // amend the final Select card to include all possible fields.
-  limit?: number;
-  count?: boolean;
-}
 
-export default ParseTreeToQueryOptions;
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+
+import * as Util from '../Util';
+import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+
+const Router = new KoaRouter();
+export const templates = new ImportTemplates();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all templates');
+  ctx.body = await templates.get();
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting template ID ' + String(ctx.params.id));
+  ctx.body = await templates.get(Number(ctx.params.id));
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting filtered templates');
+  const request: object = ctx.request.body.body;
+  const filter: object = {};
+  if (request !== undefined)
+  {
+    if (request['dbid'] !== undefined)
+    {
+      filter['dbid'] = request['dbid'];
+    }
+    if (request['dbname'] !== undefined)
+    {
+      filter['dbname'] = request['dbname'];
+    }
+    if (request['tablename'] !== undefined)
+    {
+      filter['tablename'] = request['tablename'];
+    }
+  }
+  ctx.body = await templates.select([], filter);
+});
+
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add new template');
+  const template: ImportTemplateConfig = ctx.request.body.body;
+  Util.verifyParameters(template, ['name', 'dbid', 'dbname', 'tablename']);
+  Util.verifyParameters(template, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  if (template.id !== undefined)
+  {
+    throw Error('Invalid parameter template ID');
+  }
+
+  ctx.body = await templates.upsert(ctx.state.user, template);
+});
+
+export default Router;

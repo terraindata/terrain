@@ -44,57 +44,79 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../database/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../Utils';
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-console no-unused-expression member-access max-line-length
 
-function getExpectedFile(): string
+import * as classNames from 'classnames';
+import * as Radium from 'radium';
+import * as React from 'react';
+import * as _ from 'underscore';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import { CardConfig } from '../../../../blocks/types/Card';
+import { backgroundColor, borderColor, cardStyle, Colors, fontColor } from '../../../common/Colors';
+import TerrainComponent from '../../../common/components/TerrainComponent';
+import Util from '../../../util/Util';
+import './CreateCardOption.less';
+
+export interface Props
 {
-  return __filename.split('.')[0] + '.expected';
+  index: number;
+  card: CardConfig;
+  onClick: (card: CardConfig, index: number) => void;
+  overrideTitle?: string;
+  isFocused?: boolean;
 }
 
-let expected;
-
-beforeAll(async (done) =>
+@Radium
+class CreateCardOption extends TerrainComponent<Props>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
+  private handleClick()
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
+    this.props.onClick(this.props.card, this.props.index);
+  }
 
-  expected = JSON.parse(expectedString);
-  done();
-});
+  public render()
+  {
+    const { card } = this.props;
 
-function testParse(testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing \'' + testString + '\'');
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser;
-
-  winston.info(util.inspect(parser.getValueInfo(), false, 16));
-
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
+    if (!card)
     {
-      const testValue: any = expected[testName];
+      console.log('Missing card type: ', card);
+      // TODO throw error instead
+      return null;
+    }
 
-      // test parsing the value using a few spacing options
-      testParse(JSON.stringify(testValue), testValue);
-    });
-});
+    const text = this.props.overrideTitle || card.static.title;
+
+    return (
+      <div
+        className={classNames({
+          'create-card-option': true,
+          'create-card-option-focused': this.props.isFocused,
+        })}
+        onClick={this.handleClick}
+        style={
+          borderColor(Colors().bg3, Colors().inactiveHover)
+        }
+        key='create-option'
+      >
+        <div
+          className='create-card-option-button'
+          style={cardStyle(card.static.colors[0], Colors().bg3, null, true)}
+          key='create-button'
+        >
+          {
+            text
+          }
+        </div>
+        <div
+          className='create-card-option-description'
+        >
+          {
+            card.static.description || 'Create a ' + card.static.title + ' card.'
+          }
+        </div>
+      </div>
+    );
+  }
+}
+export default CreateCardOption;

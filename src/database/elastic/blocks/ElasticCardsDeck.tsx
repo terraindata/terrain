@@ -46,44 +46,17 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
+
 import Blocks from './ElasticBlocks';
 import { ElasticElasticCardDeckTypes } from './ElasticElasticCards';
 
 export const ElasticCardsDeck =
   Immutable.fromJS(
     [
-      // [
-      //   Blocks.elasticRootCard.type,
-      // ],
-
-      [
-        // JSON key wraps
-        Blocks.elasticKeyValueWrap.type,
-      ],
-
-      [
-        // JSON wrapper cards
-        Blocks.elasticObject.type,
-        Blocks.elasticArray.type,
-      ],
-
-      // [
-      //   // JSON individual value cards
-      //   Blocks.elasticBool.type,
-      //   Blocks.elasticNumber.type,
-      //   Blocks.elasticText.type,
-      //   Blocks.elasticNull.type,
-      // ],
-
-      [
-        Blocks.elasticMagicCard.type,
-        Blocks.elasticMagicList.type,
-      ],
-
       [
         // Score and transform cards
         Blocks.elasticScore.type,
-        Blocks.elasticTransform.type,
+        Blocks.elasticFilter.type,
       ],
 
       ElasticElasticCardDeckTypes,

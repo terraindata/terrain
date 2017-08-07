@@ -46,16 +46,22 @@ THE SOFTWARE.
 
 // tslint:disable:no-console
 
+import { List } from 'immutable';
 import * as _ from 'underscore';
 
-import { List } from 'immutable';
-import * as Immutable from 'immutable';
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
+import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
+import { Backend } from '../../../database/types/Backend';
+import { Colors } from '../../common/Colors';
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
+import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
+import { BuilderStore } from '../data/BuilderStore';
+
+import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 
 import ESAnyClause from '../../../../shared/database/elastic/parser/clauses/ESAnyClause';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
@@ -78,9 +84,6 @@ import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/EST
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
-import { Colors } from '../../common/Colors';
-import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
-import { BuilderStore } from '../data/BuilderStore';
 
 const KEY_INLINE_DISPLAYS = [
   DisplayType.TEXT,
@@ -96,6 +99,9 @@ const KEY_DISPLAY: Display =
     autoDisabled: true, // TODO consider autocomplete for key?
     className: 'card-muted-input card-elastic-key-input',
     component: ElasticKeyBuilderTextbox,
+    style: {
+      maxWidth: 100,
+    },
   };
 
 /**
@@ -133,15 +139,17 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     }): any
   {
     // hide the title for elastic
-    obj['noTitle'] = true;
+    if (obj['noTitle'] === undefined)
+    {
+      obj['noTitle'] = true;
+    }
 
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: clause.name,
-      colors: [],
+      colors: [Colors().border2, Colors().bg2],
       language: 'elastic',
-
-      anythingAccepts: true, // TODO remove after testing
+      description: clause.desc,
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach
@@ -195,25 +203,32 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public elasticElasticCards: { [type: string]: any };
   public elasticElasticCardDeckTypes: string[];
 
+  private clauses: { [name: string]: ESClause };
   private config: EQLConfig;
-  private numColors: number;
   private colorIndex: number;
 
-  public constructor(config: EQLConfig, numColors: number)
+  private variantClauseMapping: { [clauseType: string]: string[] } = {};
+
+  private customCardTypesMap: { [elasticClauseType: string]: string[] } = {
+    sort_clause: ['elasticScore'],
+    query: ['elasticFilter'],
+  };
+
+  public constructor(config: EQLConfig)
   {
     super();
     this.elasticElasticCards = {};
     this.elasticElasticCardDeckTypes = [];
 
     this.config = config;
-    this.numColors = 21;
-    this.colorIndex = 0;
 
-    const clauses: { [name: string]: ESClause } =
-      this.config.getClauses();
+    this.clauses = this.config.getClauses();
+
+    // first, populate the variant clause map, since it will be used by getCard
+    this.computeVariantClauses(this.clauses);
 
     _.mapObject(
-      clauses,
+      this.clauses,
       (clause, key) =>
       {
         this.getCard(clause);
@@ -230,11 +245,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     }
 
     card = clause.accept(this);
-    const colorKey = ((++this.colorIndex) % this.numColors) + 1;
-    card['static']['colors'] = [
-      Colors().builder.cards['card' + String(colorKey)],
-      Colors().builder.cards['card' + String(colorKey) + 'BG'],
-    ];
+
+    if (card === null) // no card for this clause type
+    {
+      return;
+    }
 
     this.elasticElasticCardDeckTypes.push(GetCardVisitor.getCardType(clause));
     this.elasticElasticCards[cardType] = card;
@@ -254,6 +269,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
+        colors: Colors().builder.cards.anyClause,
         title: clause.type + ' (Variant)',
         tql: (block, tqlFn, tqlConfig) =>
         {
@@ -278,6 +294,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
+        colors: Colors().builder.cards.arrayClause,
         preview: '[cards.size] ' + clause.type + '(s)',
 
         display:
@@ -306,7 +323,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
+      colors: Colors().builder.cards.baseClause,
       static: {
+        colors: Colors().builder.cards.baseClause,
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -323,11 +342,12 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       value: true,
 
       static: {
+        colors: Colors().builder.cards.booleanClause,
         preview: '[value]',
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
-          options: Immutable.List([
+          options: List([
             'false',
             'true',
           ]),
@@ -341,12 +361,14 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? clause.values[0] : clause.template,
+      colors: Colors().builder.cards.enumClause,
       static: {
+        colors: Colors().builder.cards.enumClause,
         preview: '[value]',
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
-          options: Immutable.List(clause.values),
+          options: List(clause.values),
           dropdownUsesRawValues: true,
         },
         tql: (block) => block['value'],
@@ -359,17 +381,14 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
+        colors: Colors().builder.cards.fieldClause,
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
+          getAutoTerms: (schemaState): List<string> =>
           {
-            return List(['movieId', 'title', 'budget', 'released', 'revenue']);
-            // TODO change from tables to dbs?
-            // const db = BuilderStore.getState().db.name; // TODO correct?
-            //  const tableNames = schemaState.tableNamesByDb.get(db);
-            //  return tableNames;
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -382,19 +401,14 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
+        colors: Colors().builder.cards.indexClause,
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
+          getAutoTerms: (schemaState): List<string> =>
           {
-            // TODO cache list in schema state
-            const server = BuilderStore.getState().db.name;
-            return schemaState.databases.toList().filter(
-              (db) => db.serverId === server,
-            ).map(
-              (db) => db.name,
-            ).toList();
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -414,6 +428,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
+        colors: Colors().builder.cards.mapClause,
         preview: '[cards.size] properties',
 
         display:
@@ -442,7 +457,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESNullClause(clause: ESNullClause): any
   {
     return GetCardVisitor.seedCard(clause, {
+      noTitle: false,
       static: {
+        colors: Colors().builder.cards.nullClause,
         preview: '',
         display: [],
         tql: () => null,
@@ -453,9 +470,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESNumberClause(clause: ESNumberClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? 0 : clause.template,
+      value: clause.template == null || clause.template === undefined
+        ? 0 : clause.template,
       static: {
         preview: '[value]',
+        colors: Colors().builder.cards.numberClause,
         display: {
           displayType: DisplayType.NUM,
           key: 'value',
@@ -474,6 +493,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
+        colors: Colors().builder.cards.objectClause,
         preview: '[cards.size] properties',
 
         display:
@@ -515,14 +535,18 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   }
 
   public visitESScriptClause(clause: ESScriptClause): any
-  { return this.visitESStructureClause(clause); }
+  {
+    return this.visitESStructureClause(clause);
+  }
 
   public visitESStringClause(clause: ESStringClause): any
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
+        colors: Colors().builder.cards.stringClause,
         preview: '[value]',
+
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -535,16 +559,14 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESStructureClause(clause: ESStructureClause): any
   {
-    const accepts = Immutable.List(
-      _.keys(clause.structure).map((type) => 'eql' + type),
-    );
+    const accepts = this.getCardTypes(_.keys(clause.structure), clause);
 
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
     const init = (blocksConfig) =>
     {
       const config = {
-        childOptionClickHandler: (card, option: { text: string, type: string }): Card =>
+        childOptionClickHandler: (card, option: { text: string, key: string, type: string }): Card =>
         {
           // reducer to apply the option to the card
           return card.update('cards', (cards) =>
@@ -552,7 +574,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               BlockUtils.make(
                 blocksConfig, option.type,
                 {
-                  key: option.text,
+                  key: option.key,
                 },
               ),
             ),
@@ -569,9 +591,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             (templateValue, templateKey) =>
             {
               const clauseType = 'eql' +
-                String(templateValue === undefined ? clause.structure[templateKey] : templateValue);
+                String(templateValue === null ? clause.structure[templateKey] : templateValue);
               if (blocksConfig[clauseType])
               {
+                // console.log(clauseType, templateKey);
                 return BlockUtils.make(
                   blocksConfig, clauseType,
                   {
@@ -589,7 +612,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           ),
         );
 
-        config['cards'] = Immutable.List(cards);
+        config['cards'] = List(cards);
       }
 
       return config;
@@ -597,25 +620,59 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     return GetCardVisitor.seedCard(clause,
       {
-        cards: Immutable.List([]),
+        cards: List([]),
 
         // provide options of all possible card types
-        getChildOptions: (card) =>
+        getChildOptions: (card, backend: Backend) =>
         {
-          return Immutable.List(_.compact(_.map(
-            clause.structure,
-            (type, key) =>
+          const seen = new Set();
+          const result = [];
+          const handler = (key: string) =>
+          {
+            if (!seen.has(key))
             {
-              if (card['cards'].find((p) => p.key === key))
+              seen.add(key);
+
+              const clauseType = clause.structure[key];
+
+              if (card['cards'].find((p) => p.key === key) === undefined)
               {
-                return null;
+                const cardTypes = this.getCardTypes([clauseType]);
+
+                cardTypes.map((cardType) =>
+                  result.push({
+                    text: key + ': ' + (backend.blocks[cardType].static['title'] as string),
+                    key,
+                    type: cardType,
+                  }),
+                );
               }
-              return {
-                text: key,
-                type: 'eql' + type,
-              };
-            },
-          )));
+            }
+          };
+
+          if (this.customCardTypesMap[clause.type] !== undefined)
+          {
+            this.customCardTypesMap[clause.type].forEach(
+              (cardType) =>
+              {
+                const cardConfig = backend.blocks[cardType];
+                const key: string = cardConfig['key'];
+
+                result.push({
+                  text: key + ': ' + (cardConfig.static['title'] as string),
+                  key,
+                  type: cardType,
+                });
+              },
+            );
+          }
+
+          clause.suggestions.forEach(handler);
+          clause.required.forEach(handler);
+          Object.keys(clause.template).forEach(handler);
+          Object.keys(clause.structure).forEach(handler);
+
+          return List(result);
         },
 
         childOptionClickHandler: null, // set in init()
@@ -638,6 +695,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             return json;
           },
 
+          colors: Colors().builder.cards.structureClause,
           preview: '[cards.size] Properties',
 
           accepts,
@@ -665,42 +723,16 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESTypeClause(clause: ESTypeClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? '' : clause.template,
+      value: typeof clause.template === 'string' ? clause.template : '',
       static: {
+        colors: Colors().builder.cards.typeClause,
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (comp: React.Component<any, any>, schemaState): List<string> =>
+          getAutoTerms: (schemaState): List<string> =>
           {
-            const state = BuilderStore.getState();
-            const cards = state.query.cards;
-            const isIndexCard = (card) => card['type'] === 'eqlindex';
-
-            let indexCard = cards.find(isIndexCard);
-            if (indexCard === undefined)
-            {
-              indexCard = cards.get(0);
-              if (indexCard !== undefined)
-              {
-                indexCard = indexCard['cards'].find(isIndexCard);
-              }
-            }
-
-            // TODO idea: have the selected index and type stored on the Query object
-
-            if (indexCard !== undefined)
-            {
-              const index = indexCard['value'];
-              const indexId = state.db.name + '/' + String(index);
-              return schemaState.tables.filter(
-                (table) => table.databaseId === indexId,
-              ).map(
-                (table) => table.name,
-              ).toList();
-            }
-
-            return List([]);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -783,4 +815,77 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     });
   }
 
+  // for computing a variant clause to final subtypes mapping
+  private computeVariantClauses(clauses: { [name: string]: ESClause })
+  {
+    const variantClauses: { [clauseType: string]: ESClause } = {};
+    _.mapObject(clauses, (clause, key) =>
+    {
+      if (clause.clauseType === ESClauseType.ESVariantClause)
+      {
+        variantClauses[clause.type] = clause;
+      }
+    },
+    );
+
+    const getClauseTypesForVariant = (clause: ESVariantClause): string[] =>
+    {
+      let types: string[] = [];
+      _.mapObject(clause.subtypes, (subtype) =>
+      {
+        if (variantClauses[subtype] !== undefined)
+        {
+          types = types.concat(getClauseTypesForVariant(clauses[subtype] as ESVariantClause));
+        }
+        else
+        {
+          types.push(subtype);
+        }
+      });
+
+      if (this.customCardTypesMap[clause.type] !== undefined)
+      {
+        types = this.customCardTypesMap[clause.type].concat(types);
+      }
+
+      return types;
+    };
+
+    this.variantClauseMapping = _.mapObject(variantClauses, getClauseTypesForVariant);
+  }
+
+  // We need to replace occurences of variant card types with their final types
+  // We also need to splice in some custom types
+  private getCardTypes(initialCardTypes: string[], forClause?: ESClause): List<string>
+  {
+    let cardTypes: string[] = [];
+    initialCardTypes.map((childType) =>
+    {
+      if (this.variantClauseMapping[childType] !== undefined)
+      {
+        // variant clause, substitute
+        cardTypes = cardTypes.concat(this.variantClauseMapping[childType]);
+      }
+      else
+      {
+        cardTypes.push(childType);
+      }
+    });
+
+    if (forClause !== undefined && this.customCardTypesMap[forClause.type] !== undefined)
+    {
+      cardTypes = this.customCardTypesMap[forClause.type].concat(cardTypes);
+    }
+
+    cardTypes = cardTypes.map((type) =>
+    {
+      if (this.clauses[type] !== undefined)
+      {
+        return GetCardVisitor.getCardType(this.clauses[type]);
+      }
+      return type;
+    });
+
+    return List(cardTypes);
+  }
 }

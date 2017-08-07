@@ -882,7 +882,7 @@ class Builder extends TerrainComponent<Props>
           'builder': true,
           'builder-no-column-animation': this.state.noColumnAnimation,
         })}
-        style={backgroundColor(Colors().base)}
+        style={backgroundColor(Colors().bg1)}
       >
         {
           !config || !config.length ?
@@ -928,6 +928,7 @@ class Builder extends TerrainComponent<Props>
           onConfirm={this.handleModalSaveAs}
           initialTextboxValue={this.state.saveAsTextboxValue}
           textboxPlaceholderValue={'Variant Name'}
+          message={'What would you like to name the copy of the variant?'}
           showTextbox={true}
           onTextboxValueChange={this.handleSaveAsTextboxChange}
         />

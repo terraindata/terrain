@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import { ItemStatus } from '../../../items/types/Item';
-import CreateItem from '../../common/components/CreateItem';
+import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
@@ -60,7 +60,6 @@ import InfoArea from './../../common/components/InfoArea';
 import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import ColorManager from './../../util/ColorManager';
 import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
@@ -74,11 +73,13 @@ type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
+  basePath: string;
   algorithms: Immutable.Map<ID, Algorithm>;
   variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
   groupId: ID;
   params: any;
+  isFocused: boolean; // is this the last thing focused / selected?
 }
 
 class AlgorithmsColumn extends TerrainComponent<Props>
@@ -224,7 +225,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderAlgorithm(id: ID, fadeIndex: number)
   {
-    const { params } = this.props;
+    const { params, basePath } = this.props;
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
     const scores = {
@@ -324,9 +325,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         icon={<AlgorithmIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
-        color={ColorManager.colorForKey(this.props.groupId)}
         key={algorithm.id}
-        to={`/library/${this.props.groupId}/${algorithm.id}`}
+        to={`/${basePath}/${this.props.groupId}/${algorithm.id}`}
         className='library-item-lighter'
         id={id}
         onNameChange={this.handleNameChange}
@@ -341,6 +341,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         canArchive={canArchive}
         canDuplicate={canDuplicate}
         isSelected={+algorithm.id === +params.algorithmId}
+        isFocused={this.props.isFocused}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />
@@ -396,9 +397,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         }
         {
           status === ItemStatus.Build && canCreate &&
-          <CreateItem
-            name='algorithm'
-            onCreate={this.handleCreate}
+          <CreateLine
+            onClick={this.handleCreate}
+            open={false}
           />
         }
       </LibraryItemCategory>

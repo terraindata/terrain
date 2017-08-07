@@ -1,4 +1,52 @@
 @import "../../common/Common.less";
 
 .file-import {
+	height: 100%;
+	position: relative;
+
+	.file-import-inner {
+		.dead-center;
+    min-width: 600px;
+
+    .fi-step {
+      .fi-step-name {
+        .title-text;
+        text-align: center;
+      }
+
+      .fi-step-title {
+        .big-text;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 1999px) {
+      .fi-content {
+        margin-top: 24px;
+        width: 800px;
+        min-height: 300px;
+      }
+    }
+    @media (min-width: 2000px) {
+      .fi-content {
+        margin-top: 24px;
+        width: 1200px;
+        min-height: 300px;
+      }
+    }
+
+    .fi-nav {
+      float: right;
+
+      .fi-back-button {
+        .fi-button;
+        display: inline-block;
+      }
+
+      .fi-next-button {
+        .fi-button;
+        display: inline-block;
+      }
+    }
+	}
 }
