@@ -234,7 +234,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const { enabled, formats } = config;
 
     return (
-      <div className='results-config-wrapper'>
+      <div className='results-config-wrapper' style={_.extend({}, backgroundColor('fadedOutBg'))}>
         <div className={classNames({
           'results-config': true,
           'results-config-disabled': !enabled,
