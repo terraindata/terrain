@@ -70,7 +70,7 @@ class FileImportStateC extends BaseClass
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
-  public file: File = null;
+  public file: File = new File([''], '');
   public streaming: boolean = false;
 
   public chunkMap: IMMap<number, Chunk> = Immutable.Map<number, Chunk>({});

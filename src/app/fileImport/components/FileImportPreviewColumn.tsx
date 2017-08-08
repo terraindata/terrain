@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import shallowCompare = require('react-addons-shallow-compare');
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
@@ -59,7 +60,6 @@ import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
-import shallowCompare = require('react-addons-shallow-compare');
 import './FileImportPreviewColumn.less';
 
 export interface Props
