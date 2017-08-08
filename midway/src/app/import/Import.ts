@@ -47,8 +47,6 @@ THE SOFTWARE.
 import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
-import * as stream from 'stream';
-
 import * as csvjson from 'csvjson';
 import * as stream from 'stream';
 import * as _ from 'underscore';
@@ -240,7 +238,7 @@ export class Import
   }
   public async upsertHeadless(files: stream.Readable[], fields: object): Promise<ImportConfig>
   {
-    const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
+    const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateID']));
     if (templates.length === 0)
     {
       throw new Error('Invalid template ID provided: ' + String(fields['templateID']));
@@ -291,7 +289,6 @@ export class Import
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      console.log('1');
       const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
       if (database === undefined)
       {
@@ -303,22 +300,26 @@ export class Import
       }
       const elasticClient: ElasticClient = database.getClient() as ElasticClient;
 
+      const dbSchema: Tasty.Schema = await database.getTasty().schema();
+
       // get a template given the template ID
-      console.log('2');
-      const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateId);
+      const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
       if (templates.length === 0)
       {
         return reject('Template not found.');
       }
       const template = templates[0] as object;
-      for (const templateKey in Object.keys(template))
+      for (const templateKey of Object.keys(template))
       {
         exprt[templateKey] = template[templateKey];
       }
+      if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
+      {
+        return reject('Cannot use an import template for export.');
+      }
 
-      let qry: string;
+      let qry: string = '';
       // get query data from variantId or query
-      console.log('3');
       if (exprt.variantId !== undefined && exprt.query === undefined)
       {
         const variants: ItemConfig[] = await TastyItems.get(exprt.variantId);
@@ -326,9 +327,13 @@ export class Import
         {
           return reject('Variant not found.');
         }
-        if (variants[0]['tql'] !== undefined)
+        if (variants[0]['meta'] !== undefined)
         {
-          qry = variants[0]['tql'];
+          const variantMeta: object = JSON.parse(variants[0]['meta'] as string);
+          if (variantMeta['query'] !== undefined && variantMeta['query']['tql'] !== undefined)
+          {
+            qry = variantMeta['query']['tql'];
+          }
         }
       }
       else if (exprt.variantId === undefined && exprt.query !== undefined)
@@ -339,60 +344,81 @@ export class Import
       {
         return reject('Must provide either variant ID or query, not both or neither.');
       }
-
+      if (qry === '')
+      {
+        return reject('Empty query provided.');
+      }
       const result: any = await new Promise((resolveES, rejectES) =>
       {
         elasticClient.search(JSON.parse(qry),
           Util.makePromiseCallback(resolveES, rejectES));
       });
-
-      console.log('4');
-      let newDocs: object[] = result as object[];
+      const newDocs: object[] = result.hits.hits as object[];
+      let returnDocs: object[] = [];
       for (const doc of newDocs)
       {
         // verify schema mapping with documents and fix documents accordingly
-        newDocs.push(await this._checkDocumentAgainstMapping(doc, await database.getTasty().schema(), exprt.dbname));
-        winston.info('transforming data...');
-        if (newDocs.length === 0)
+        const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname);
+        if (typeof newDoc === 'string')
         {
-          return reject('No data provided to export.');
+          return reject(newDoc);
         }
-
-        // transform documents with template
-
-        if (exprt.export !== true)
+        for (const field of Object.keys(newDoc))
         {
-          return reject('Cannot use an import template for export.');
+          if (newDoc.hasOwnProperty(field) && newDoc[field] instanceof Array)
+          {
+            newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
+          }
         }
-        try
-        {
-          newDocs = [].concat.apply([], await this._transformAndCheck(newDocs, exprt, false));
-        } catch (e)
-        {
-          return reject(e);
-        }
+        returnDocs.push(newDoc as object);
       }
-      // winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
 
-      console.log('5');
+      console.log(returnDocs);
+      // transform documents with template
+      try
+      {
+        returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
+      } catch (e)
+      {
+        return reject(e);
+      }
+
       // export to csv
       const writer = csvWriter();
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      for (const newDoc of newDocs)
+      for (const returnDoc of returnDocs)
       {
-        writer.write(newDoc);
+        writer.write(returnDoc);
       }
       writer.end();
       resolve(pass);
     });
   }
 
-  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object>
+  private _convertArrayToCSVArray(arr: any[]): string
   {
-    return new Promise<object>(async (resolve, reject) =>
+    let returnStr: string = '"[';
+    for (const field of arr)
+    {
+      returnStr += field + ', ';
+    }
+    if (arr.length !== 0)
+    {
+      returnStr = returnStr.substring(0, returnStr.length - 2);
+    }
+    return returnStr + ']"';
+  }
+
+  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
     {
       const newDocument: object = document;
+      if (schema.tableNames(database).length === 0)
+      {
+        return resolve('Schema not found for database ' + database);
+      }
       for (const table of schema.tableNames(database))
       {
         const fields: object = schema.fields(database, table);

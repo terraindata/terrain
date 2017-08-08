@@ -67,18 +67,12 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   ctx.body = await imprt.upsert(imprtConf);
 });
 
-Router.post('/export', async (ctx, next) =>
+Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const authStream: object = await Util.authenticateStream(ctx.req);
-  if (authStream['user'] === null)
-  {
-    ctx.status = 400;
-    return;
-  }
-  Util.verifyParameters(authStream['variantId'], ['templateId']);
-
-<<<<<<< HEAD
-  ctx.body = await imprt.export(authStream as ExportConfig);
+  const exprtConf: ExportConfig = ctx.request.body.body;
+  Util.verifyParameters(exprtConf, ['variantId', 'templateID']);
+  console.log('0');
+  ctx.body = await imprt.export(exprtConf);
 });
 
 Router.post('/headless', async (ctx, next) =>
@@ -90,14 +84,10 @@ Router.post('/headless', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  Util.verifyParameters(authStream['fields'], ['templateID', 'filetype']);
+  const body: object = authStream['body'];
+  Util.verifyParameters(authStream, ['templateID', 'filetype']);
 
-  ctx.body = await imprt.headlessUpsert(authStream);
-=======
-  Util.verifyParameters(fields, ['templateID', 'filetype']);
-
-  ctx.body = await imprt.upsertHeadless(files, fields);
->>>>>>> master
+  ctx.body = await imprt.headlessUpsert(body as ImportConfig);
 });
 
 export default Router;
