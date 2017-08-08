@@ -5,6 +5,7 @@
 @bg: @builder-bg;
 @bar-h: 34px;
 @br: 5px;
+@br-tight: 3px;
 @field-border-color: fade(#000, 20%);
 
 .results-config-wrapper {
@@ -33,6 +34,8 @@
     .results-config-bar {
       height: @bar-h;
       position: relative;
+      border-bottom: 1px solid;
+      padding-bottom: 1px;
       // background: @fresh-moss; // handled
       
       .results-config-title {
@@ -54,12 +57,12 @@
         float: right;
         padding: 4px 30px;
         // background: #eee; //@light-foam; //rgb(138, 200, 136); handled
-        color: @grey;
+        // color: @grey;
         font-weight: 500;
-        
+        border: 1px solid;
         cursor: pointer;
         // padding-top: 6px;
-        border-radius: @br;
+        border-radius: @br-tight;
         .transition;
         
         &:hover {
@@ -73,7 +76,8 @@
         right: 110px;
         
         .switch {
-          border: 1px solid mix(@fresh-moss, @grey);
+          // border-width: 1px;
+          // border-style: solid;
         }
       }
     }
@@ -123,7 +127,7 @@
           border-top-left-radius: 5px;
           border-top-right-radius: 5px;
           &.results-config-over {
-            border: 3px solid fade(@bright-green, 50%);
+            border: 3px solid; // fade(@bright-green, 50%);
             padding: 3px;
           }
         }
@@ -131,7 +135,7 @@
         .results-config-score {
           // background: @result-score-bg; // handled
           &.results-config-over {
-            border: 3px solid fade(@bright-green, 50%);
+            border: 3px solid; // fade(@bright-green, 50%);
             padding: 3px;
           }
         }
@@ -141,14 +145,14 @@
           min-height: 100px;
           padding-bottom: 30px;
           &.results-config-over {
-            border: 3px solid fade(@bright-green, 50%);
+            border: 3px solid; // fade(@bright-green, 50%);
             padding: 3px;
           }
           
           .results-config-field-wrapper {
             padding-bottom: 6px;
             margin-bottom: 6px;
-            border-bottom: 1px solid @field-border-color;
+            // border-bottom: 1px solid @field-border-color;
           }
         }
         
@@ -171,6 +175,7 @@
         // background: #fff;
         margin-bottom: 4px;
         // box-shadow: 1px 2px 4px 1px rgba(0,0,0,0.39);
+        border-left: 3px solid;
       }
     }
     
@@ -195,21 +200,26 @@
     }
     
     .results-config-field {
-      background: rgba(255,255,255,0.25);
+      // background: rgba(255,255,255,0.25);
       blend-mode: multiply;
-      border: 1px solid #fff;
+      border: 1px solid; // #fff;
+      // border-left: 3px solid;
       font-weight: 500;
       letter-spacing: 0.5px;
       cursor: pointer;
       position: relative;
       padding-left: 30px;
-      
+
       .results-config-text {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: calc(~"100% - 25px");
         display: inline-block;
+      }
+
+      &.results-config-field-used {
+        // border-left: 3px solid;
       }
 
       .close {
@@ -288,12 +298,12 @@
           flex-grow: 1;
           text-align: center;
           
-          color: @grey;
+          // color: @grey;
           .transition;
           
           border-radius: 6px;
           padding: 6px 0px;
-          border: 1px solid #ddd;
+          border: 1px solid; // #ddd;
           margin-right: 6px;
           
           svg {
@@ -307,14 +317,14 @@
           }
           
           &:hover {
-            background: fade(@light-green, 25%);
+            // background: fade(@light-green, 25%);
           }
         }
         
         .rc-selected, .rc-selected:hover {
-          background: @light-green;
-          color: @grey;
-          border-color: @light-green;
+          // background: @light-green;
+          // color: @grey;
+          // border-color: @light-green;
         }
         
         .results-config-image {
@@ -344,7 +354,7 @@
         }
         
         input {
-          border: 1px solid @fresh-moss;
+          border: 1px solid; // @fresh-moss;
           
           &[type='checkbox'] {
             width: auto;
