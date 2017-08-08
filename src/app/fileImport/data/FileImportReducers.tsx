@@ -210,7 +210,7 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
 FileImportReducers[ActionTypes.changeUploadInProgress] =
   (state, action) =>
     state
-      .set('uploadInProgress', !state.uploadInProgress)
+      .set('uploadInProgress', action.payload.uploading)
   ;
 
 FileImportReducers[ActionTypes.changeElasticUpdate] =
@@ -302,18 +302,25 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.streaming,
       () =>
       {
+        console.log('response');
         if (!state.streaming)
         {
           alert('success');
-          action.payload.changeUploadInProgress();
+          action.payload.changeUploadInProgress(false);
+        }
+        else
+        {
+          console.log('begin streaming');
+          action.payload.startStreaming();
         }
       },
       (err: string) =>
       {
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         if (!state.streaming)
         {
           alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-          action.payload.changeUploadInProgress();
+          action.payload.changeUploadInProgress(false);
         }
       },
     );
@@ -404,18 +411,18 @@ FileImportReducers[ActionTypes.saveFile] =
 FileImportReducers[ActionTypes.enqueueChunk] =
   (state, action) =>
   {
-    console.log('chunk added: ', action.payload.id);
-    // return state.set('chunkQueue', state.chunkQueue.push(action.payload));
-    return state.setIn(['chunkQueue', action.payload.id], action.payload);
-    // return state.setIn(['chunkQueue', action.payload.id, 'chunk'], action.payload.chunk)
-    // .setIn(['chunkQueue', action.payload.id, 'isLast'], action.payload.isLast);
-  }
-  ;
+    console.log('chunk added: ' + action.payload.id + ', isLast: ' + action.payload.isLast);
+    return state.set('chunkMap', state.chunkMap.set(action.payload.id, action.payload));
+  };
+
 FileImportReducers[ActionTypes.dequeueChunk] =
   (state, action) =>
-  {
-    return state.set('chunkQueue', state.chunkQueue.shift());
-  }
+    state.deleteIn(['chunkMap', action.payload.id])
+  ;
+
+FileImportReducers[ActionTypes.clearChunkMap] =
+  (state, action) =>
+    state.set('chunkMap', Immutable.Map({}))
   ;
 
 export default FileImportReducers;

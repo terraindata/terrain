@@ -109,11 +109,19 @@ const Actions =
         groupId: ID,
         algorithm = LibraryTypes._Algorithm(),
         idCallback?: (id: ID) => void,
+        useParentDefaults = true,
       ) =>
       {
         algorithm = algorithm
           .set('parent', groupId)
           .set('groupId', groupId);
+        if (useParentDefaults)
+        {
+          const group = LibraryStore.getState().groups.get(groupId);
+          algorithm = algorithm
+            .set('db', group && group.db)
+            .set('language', group && group.defaultLanguage);
+        }
 
         Ajax.saveItem(
           algorithm,
@@ -164,6 +172,7 @@ const Actions =
               },
             );
           },
+          false,
         );
       },
     },
@@ -171,13 +180,25 @@ const Actions =
     variants:
     {
       create:
-      (groupId: ID, algorithmId: ID, variant = LibraryTypes._Variant(), responseHandler?: (response, variant) => any) =>
+      (
+        groupId: ID,
+        algorithmId: ID,
+        variant = LibraryTypes._Variant(),
+        responseHandler?: (response, variant) => any,
+        useParentDefaults = true,
+      ) =>
       {
         variant = variant
           .set('parent', algorithmId)
           .set('algorithmId', algorithmId)
           .set('groupId', groupId);
-
+        if (useParentDefaults)
+        {
+          const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
+          variant = variant
+            .set('db', algorithm && algorithm.db)
+            .set('language', algorithm && algorithm.language);
+        }
         Ajax.saveItem(
           variant,
           (response) =>
@@ -214,7 +235,7 @@ const Actions =
           .set('status', ItemStatus.Build);
         newVariant = LibraryTypes.touchVariant(newVariant);
 
-        Actions.variants.create(groupId, algorithmId, newVariant);
+        Actions.variants.create(groupId, algorithmId, newVariant, undefined, false);
       },
 
       duplicateAs:

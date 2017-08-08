@@ -52,7 +52,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { CardConfig } from '../../../../blocks/types/Card';
-import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, borderColor, cardStyle, Colors, fontColor } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import './CreateCardOption.less';
@@ -95,13 +95,13 @@ class CreateCardOption extends TerrainComponent<Props>
         })}
         onClick={this.handleClick}
         style={
-          backgroundColor(Colors().bg3, Colors().inactiveHover)
+          borderColor(Colors().bg3, Colors().inactiveHover)
         }
         key='create-option'
       >
         <div
           className='create-card-option-button'
-          style={backgroundColor(card.static.colors[0], card.static.colors[0])}
+          style={cardStyle(card.static.colors[0], Colors().bg3, null, true)}
           key='create-button'
         >
           {

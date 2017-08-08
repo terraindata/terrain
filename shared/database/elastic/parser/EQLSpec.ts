@@ -68,34 +68,54 @@ import ESVariantClause from './clauses/ESVariantClause';
 
 const EQLSpec: ESClause[] =
   [
-    new ESAnyClause('any', { desc: 'Any valid JSON value.', url: 'http://www.json.org/' }),
+    new ESAnyClause('any', {
+      path: ['value'],
+      desc: 'Any valid JSON value.',
+      url: 'http://www.json.org/',
+    }),
     new ESBaseClause('base',
       {
         name: 'value',
+        path: ['value'],
         desc: 'A null, boolean, number, or string value.',
         url: 'http://www.json.org/',
       }),
-    new ESNullClause('null', { desc: 'A null value.', url: 'http://www.json.org/' }),
-    new ESBooleanClause('boolean', { desc: 'A boolean, either true or false.', url: 'http://www.json.org/' }),
+    new ESNullClause('null', {
+      path: ['value'],
+      desc: 'A null value.',
+      url: 'http://www.json.org/',
+    }),
+    new ESBooleanClause('boolean', {
+      path: ['value'],
+      desc: 'A boolean, either true or false.',
+      url: 'http://www.json.org/',
+    }),
     new ESNumberClause('number',
       {
+        path: ['value'],
         desc: 'A number. Numbers must begin with either \'-\', or a digit. For decimals type the leading zero (0.1234). For scientific notation use e or E to indicate the order of magnitude (1.23e10).',
         url: 'http://www.json.org/',
       }),
     new ESStringClause('string',
       {
+        path: ['value'],
         desc: 'A string. Strings are enclosed in double quotes ("example string"). Quotes and other special symbols can be encoded by escaping them. See json.org for more information.',
         url: 'http://www.json.org/',
       }),
     new ESObjectClause('object',
       {
+        path: ['value'],
         desc: 'A JSON object. Objects consist of name : value pairs enclosed in curly braces and separated by commas. See json.org for more information.',
         url: 'http://www.json.org/',
       }),
-    new ESPropertyClause('property', {}),
+    new ESPropertyClause('property',
+      {
+        path: ['value'],
+      }),
     new ESFieldClause('field',
       {
         name: 'field',
+        path: ['value'],
         desc: 'The name of a document field.',
       }),
     new ESEnumClause('field_type',
@@ -163,16 +183,17 @@ const EQLSpec: ESClause[] =
         size: 'size',
         body: 'body',
       },
-      [],
       {
         name: 'root clause',
+        path: ['primary'],
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { index: null, type: null, from: null, size: null, body: null },
-        autocomplete: ['index', 'type'],
+        suggestions: ['body', 'index', 'type', 'from', 'size'],
       }),
     new ESIndexClause('index',
       {
+        path: ['primary'],
         desc: 'Selects which index to search.',
         template: '',
       },
@@ -180,11 +201,13 @@ const EQLSpec: ESClause[] =
     new ESTypeClause('type', { desc: 'Selects which type to search.' }),
     new ESNumberClause('from',
       {
+        path: ['primary'],
         desc: 'How many results to skip over. This is usually used to implement pagination.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
       }),
     new ESNumberClause('size',
       {
+        path: ['primary'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
         template: 1000,
@@ -217,12 +240,13 @@ const EQLSpec: ESClause[] =
         cutoff_frequency: 'cutoff_frequency',
         minimum_should_match: 'minimum_should_match',
       },
-      [],
       {
         name: 'body',
+        path: ['primary'],
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { query: null },
+        suggestions: ['query', 'sort', 'from', 'size'],
       }),
     new ESVariantClause('sort_object',
       {
@@ -231,12 +255,16 @@ const EQLSpec: ESClause[] =
         'object': 'field_sort',
       },
       {
+        path: ['sort'],
         desc: 'Sort object value can be a field sort, a script sort, a score sort, or a geo distance sort.',
       }),
     new ESMapClause('field_sort',
       'field',
       'field_sort_value',
-      { desc: 'Sort the field.' },
+      {
+        path: ['sort'],
+        desc: 'Sort by a single field, either ascending or descending.',
+      },
     ),
     new ESVariantClause('field_sort_value',
       {
@@ -244,6 +272,7 @@ const EQLSpec: ESClause[] =
         object: 'field_sort_object',
       },
       {
+        path: ['sort'],
       }),
     new ESStructureClause('field_sort_object',
       {
@@ -254,34 +283,40 @@ const EQLSpec: ESClause[] =
         nested_filter: 'sort_nested_filter',
         mode: 'sort_mode',
       },
-      [],
       {
+        path: ['sort'],
         desc: 'Script Sorting',
         url: '',
+        suggestions: ['order', 'missing', 'unmapped_type'],
       }),
     new ESStructureClause('score_sort',
       {
         _score: 'score_sort_object',
       },
-      [],
-      { desc: 'score sort' }),
-
+      {
+        path: ['sort'],
+        desc: 'Sort using Elastic\'s built-in scoring functionality.',
+      }),
     new ESStructureClause('score_sort_object',
       {
         order: 'sort_order',
         nested_path: 'sort_nested_path',
         nested_filter: 'sort_nested_filter',
       },
-      [],
       {
+        path: ['sort'],
         desc: 'Score Sorting',
         url: '',
       }),
     new ESStructureClause('script_sort',
       {
         _script: 'script_sort_object',
-      }, ['_script'],
-      { desc: 'script sort' }),
+      },
+      {
+        path: ['sort'],
+        desc: 'Sort results using a script',
+        required: ['_script'],
+      }),
     new ESStructureClause('script_sort_object',
       {
         order: 'sort_order',
@@ -291,10 +326,11 @@ const EQLSpec: ESClause[] =
         script: 'script',
         mode: 'sort_mode',
       },
-      ['type', 'script'],
       {
-        desc: 'Script Sorting',
+        path: ['sort'],
+        desc: 'The contents of a scripted sort',
         url: '',
+        required: ['type', 'script'],
       }),
     new ESVariantClause('sort_clause',
       {
@@ -303,6 +339,7 @@ const EQLSpec: ESClause[] =
         string: 'field',
       },
       {
+        path: ['sort'],
         desc: 'Controls the order in which results are returned. Results will be sorted by the first condition, and ties are broken by the second, and so on.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html',
       }),
@@ -320,23 +357,31 @@ const EQLSpec: ESClause[] =
         'type': 'sort_field_type',
         'script': 'script',
       },
-      [],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html' }),
+      {
+        path: ['sort'],
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html',
+        suggestions: ['order', 'missing', 'unmapped_type', 'script'],
+      }),
     new ESEnumClause('sort_mode',
       ['min', 'max', 'sum', 'avg', 'median'],
       {
+        path: ['sort'],
         desc: 'When sorting by an array or multi-valued field, controls how that field is used to sort results.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_sort_mode_option',
+        template: 'avg',
       }),
     new ESEnumClause('sort_order',
       ['asc', 'desc'],
       {
+        path: ['sort'],
         desc: 'The order to sort this field by: ascending or descending.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_sort_order',
+        template: 'asc',
       }),
     new ESReferenceClause('sort_nested_path',
       'field',
       {
+        path: ['sort'],
         name: 'nested path',
         desc: 'The name of the nested object to sort by.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#nested-sorting',
@@ -344,12 +389,14 @@ const EQLSpec: ESClause[] =
     new ESReferenceClause('sort_nested_filter',
       'query',
       {
+        path: ['sort'],
         name: 'nested sort filter',
         desc: 'A query that filters the nested objects before using them to sort by.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#nested-sorting',
       }),
     new ESBaseClause('sort_missing',
       {
+        path: ['sort'],
         name: 'missing value clause',
         desc: 'Sets how documents missing this sort field will be treated. The special values of _last and _first can be used to sort these documents after or before other results, or substitute value can be specified.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_missing_values',
@@ -358,15 +405,20 @@ const EQLSpec: ESClause[] =
     new ESReferenceClause('sort_unmapped_type',
       'field_type',
       {
+        path: ['sort'],
         name: 'unmapped type',
         desc: 'If no mapping is defined for this field, unmapped_type can be used to set what type the field is interpreted as.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_ignoring_unmapped_fields',
       }),
     new ESReferenceClause('sort_field_type',
       'field_type',
-      { desc: 'The type to interpret the result of the sort script as.' }),
+      {
+        path: ['sort'],
+        desc: 'The type to interpret the result of the sort script as.',
+      }),
     new ESBooleanClause('track_scores',
       {
+        path: ['score'],
         desc: 'When set to true, the Elastic _score field will be computed even when it isn\'t used to sort the results.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_multiple_reference_points',
         template: true,
@@ -377,19 +429,22 @@ const EQLSpec: ESClause[] =
         array: 'geo_point[]',
       },
       {
+        path: ['geo'],
         desc: 'Either a single geo point, or a list of several.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_multiple_reference_points',
       }),
     new ESVariantClause('geo_point',
       { object: 'latlon_object', array: 'number[]', string: 'string' },
       {
+        path: ['geo'],
         desc: 'Indicates a point location. Should be one of these: a lat-lon object, {"lat":40, "lon":-70}; a lat lon string, "40,-70"; a geohash, "drm3btev3e86"; or a lat lon array, [40, -70].',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_lat_lon_as_properties',
       }),
-    new ESStructureClause('latlon_object', { lat: 'number', lon: 'number' }, [], {}),
+    new ESStructureClause('latlon_object', { lat: 'number', lon: 'number' }, {}),
     new ESEnumClause('distance_type',
       ['arc', 'plane'],
       {
+        path: ['geo'],
         desc: 'Chooses the distance formula to use. arc is the default, plane is faster but less accurate.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html#geo-sorting',
         template: 'arc',
@@ -401,21 +456,33 @@ const EQLSpec: ESClause[] =
         inline: 'script_inline',
         stored: 'script_name',
       },
-      [],
-      {}),
+      {
+        path: ['script'],
+        desc: 'Calls a script function and returns the result. Can be used to call a stored or inline script.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html',
+        suggestions: ['lang', 'params', 'stored', 'inline'],
+      }),
     new ESStringClause('script_inline',
-      { desc: 'The code for this inline script' }),
+      {
+        path: ['script'],
+        desc: 'The code for this inline script',
+      }),
     new ESMapClause('script_params', 'string', 'any',
-      { desc: 'Parameters to pass to the script.' }),
+      {
+        path: ['script'],
+        desc: 'Parameters to pass to the script.',
+      }),
     new ESEnumClause('script_language',
       ['painless', 'groovy', 'expression', 'mustache', 'javascript', 'python'],
       {
+        path: ['script'],
         desc: 'The scripting language to use.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html#_general_purpose_languages',
         template: 'painless',
       }),
     new ESStringClause('script_name',
       {
+        path: ['script'],
         desc: 'The name of the stored script to call.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html#modules-scripting-stored-scripts',
       }),
@@ -427,6 +494,7 @@ const EQLSpec: ESClause[] =
         array: 'field[]',
       },
       {
+        path: ['primary'],
         name: 'source clause',
         desc: 'Controls which source fields are returned by this query',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-source-filtering.html',
@@ -436,8 +504,11 @@ const EQLSpec: ESClause[] =
         includes: 'field[]',
         excludes: 'field[]',
       },
-      [],
-      { name: 'include and exclude lists', desc: 'Filters in include values and out exclude values.' }),
+      {
+        path: ['filter'],
+        name: 'include and exclude lists',
+        desc: 'Filters in include values and out exclude values.',
+      }),
     new ESStructureClause('query',
       {
         bool: 'bool_query',
@@ -469,16 +540,18 @@ const EQLSpec: ESClause[] =
         has_child: 'has_child_query',
         has_parent: 'has_parent_query',
       },
-      [],
       {
+        path: ['primary'],
         name: 'query',
         desc: 'Controls match, term, and range filtering and matching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-query.html',
         // template: { bool: null },
+        suggestions: ['term', 'terms', 'range', 'match', 'bool', 'query_string'],
       }),
     new ESArrayClause('ids',
       'string',
       {
+        path: ['filter'],
         name: 'ids clause',
         desc: 'Selects a set of document ids to search within.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html',
@@ -486,6 +559,7 @@ const EQLSpec: ESClause[] =
     new ESReferenceClause('constant_score',
       'query',
       {
+        path: ['score'],
         name: 'constant score query',
         desc: 'A query clause that is not used to compute result scores.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html',
@@ -498,12 +572,13 @@ const EQLSpec: ESClause[] =
         should: 'should',
         minimum_should_match: 'minimum_should_match',
       },
-      [],
       {
+        path: ['filter'],
         name: 'bool',
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
         // template: { must: null, must_not: null, should: null, minimum_should_match: null },
+        suggestions: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
       }),
     new ESVariantClause('must',
       {
@@ -511,6 +586,7 @@ const EQLSpec: ESClause[] =
         array: 'query[]',
       },
       {
+        path: ['filter'],
         name: 'must clause',
         desc: 'All results must match this subquery. The better a result matches, the higher its __score will be. The must clause may be a single query object, or an array of query objects.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html',
@@ -521,13 +597,18 @@ const EQLSpec: ESClause[] =
         array: 'query[]',
       },
       {
+        path: ['filter'],
         name: 'must not clause',
         desc: 'All results must not match this query. Filters out documents that match this subquery. The must not clause may be a single query object, or an array of query objects.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html',
       }),
-    new ESReferenceClause('filter',
-      'query',
+    new ESVariantClause('filter',
       {
+        object: 'query',
+        array: 'query[]',
+      },
+      {
+        path: ['filter'],
         name: 'filter context clause',
         desc: 'Query conditions in a filter clause aren\'t used when computing a document\'s elastic __score.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html#_scoring_with_literal_bool_filter_literal',
@@ -538,6 +619,7 @@ const EQLSpec: ESClause[] =
         array: 'query[]',
       },
       {
+        path: ['filter'],
         name: 'should clause',
         desc: 'Results should match this query. The better a result matches, the higher its __score will be. Also see minimum_should_match. The should clause may be a single query object, or an array of query objects.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html',
@@ -548,6 +630,7 @@ const EQLSpec: ESClause[] =
         string: 'string',
       },
       {
+        path: ['filter'],
         name: 'minimum should match',
         desc: 'Controls how many or what percentage of should clauses are required to match.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html',
@@ -556,6 +639,7 @@ const EQLSpec: ESClause[] =
       'field',
       'term_value',
       {
+        path: ['filter'],
         desc: 'Matches documents that contain an exact match for the given term.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html',
       }),
@@ -567,17 +651,24 @@ const EQLSpec: ESClause[] =
         number: 'number',
         string: 'string',
       },
-      { required: ['value'] }),
+      {
+        path: ['filter'],
+        required: ['value'],
+      }),
     new ESStructureClause('term_settings',
       {
         value: 'base',
         boost: 'boost',
       },
-      ['value'], {}),
+      {
+        path: ['filter'],
+        required: ['value'],
+      }),
     new ESMapClause('terms_query',
       'field',
       'terms_value',
       {
+        path: ['filter'],
         desc: 'Matches documents that contain an exact match for any of the given terms. Can also be populated by a terms lookup clause.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html',
       }),
@@ -585,7 +676,10 @@ const EQLSpec: ESClause[] =
       {
         object: 'terms_lookup',
         array: 'any[]',
-      }, {}),
+      },
+      {
+        path: ['filter'],
+      }),
     new ESStructureClause('terms_lookup',
       {
         index: 'index',
@@ -594,17 +688,20 @@ const EQLSpec: ESClause[] =
         path: 'terms_lookup_path',
         routing: 'string',
       },
-      [],
-      {}),
+      {
+        path: ['filter'],
+      }),
     new ESStringClause('terms_lookup_id',
       {
         name: 'id',
+        path: ['filter'],
         desc: 'The id of the document to query inside a terms lookup clause.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html',
       }),
     new ESStringClause('terms_lookup_path',
       {
         name: 'path',
+        path: ['filter'],
         desc: 'The field to get the term values from in the lookup document.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html',
       }),
@@ -612,6 +709,7 @@ const EQLSpec: ESClause[] =
       'field',
       'range_value',
       {
+        path: ['filter'],
         desc: 'Matches documents that have a value within the specified range.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html',
       }),
@@ -623,22 +721,25 @@ const EQLSpec: ESClause[] =
         lte: 'base',
         boost: 'boost',
       },
-      [],
-      {}),
+      {
+        path: ['filter'],
+      }),
     new ESStructureClause('exists_query',
       {
         field: 'field',
         null_value: 'base',
       },
-      ['field'],
       {
+        path: ['filter'],
         desc: 'Matches documents that have one or more non-null values in the specified field.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html',
+        required: ['field'],
       }),
     new ESMapClause('prefix_query',
       'field',
       'prefix_query_value',
       {
+        path: ['filter'],
         desc: 'Matches documents that contain terms with the given prefix.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html',
       }),
@@ -650,18 +751,24 @@ const EQLSpec: ESClause[] =
         number: 'base',
         string: 'base',
       },
-      {}),
+      {
+        path: ['filter'],
+      }),
     new ESStructureClause('prefix_query_settings',
       {
         value: 'base',
         boost: 'boost',
       },
-      ['value'],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html' }),
+      {
+        path: ['filter'],
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html',
+        required: ['value'],
+      }),
     new ESMapClause('wildcard_query',
       'field',
       'wildcard_query_value',
       {
+        path: ['filter'],
         desc: 'Matches documents using a wildcard expression.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html',
       }),
@@ -673,18 +780,24 @@ const EQLSpec: ESClause[] =
         number: 'base',
         string: 'base',
       },
-      {}),
+      {
+        path: ['filter'],
+      }),
     new ESStructureClause('wildcard_query_settings',
       {
         value: 'base',
         boost: 'boost',
       },
-      ['value'],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html' }),
+      {
+        path: ['filter'],
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html',
+        required: ['value'],
+      }),
     new ESMapClause('regexp_query',
       'field',
       'regexp_query_value',
       {
+        path: ['filter'],
         desc: 'Matches documents using a regular expression.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html',
       }),
@@ -696,15 +809,20 @@ const EQLSpec: ESClause[] =
         number: 'base',
         string: 'base',
       },
-      {}),
+      {
+        path: ['filter'],
+      }),
     new ESStructureClause('regexp_query_settings',
       {
         value: 'base',
         boost: 'boost',
         flags: 'string',
       },
-      ['value'],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html' }),
+      {
+        path: ['filter'],
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html',
+        required: ['value'],
+      }),
     new ESMapClause('fuzzy_query',
       'field',
       'fuzzy_query_value',
@@ -720,7 +838,9 @@ const EQLSpec: ESClause[] =
         number: 'base',
         string: 'base',
       },
-      {}),
+      {
+        path: ['filter'],
+      }),
     new ESStructureClause('fuzzy_query_settings',
       {
         value: 'base',
@@ -729,17 +849,23 @@ const EQLSpec: ESClause[] =
         prefix_length: 'fuzzy_prefix_length',
         max_expansions: 'fuzzy_max_expansions',
       },
-      ['value'],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html' }),
+      {
+        path: ['filter'],
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html',
+        suggestions: ['value', 'boost'],
+        required: ['value'],
+      }),
     new ESNumberClause('boost',
       {
         desc: 'Boosts the score of matches by the given amount. Boosts are not exactly multiplicative.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/guide/current/_boosting_query_clauses.html',
       }),
     new ESStructureClause('match_all',
-      { boost: 'boost' },
-      [],
       {
+        boost: 'boost',
+      },
+      {
+        path: ['filter'],
         name: 'match all clause',
         desc: 'Matches all documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html',
@@ -749,6 +875,7 @@ const EQLSpec: ESClause[] =
       'match_value',
       {
         name: 'match none clause',
+        path: ['filter'],
         desc: 'Matches no documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html#query-dsl-match-none-query',
       }),
@@ -757,6 +884,7 @@ const EQLSpec: ESClause[] =
       'match_value',
       {
         name: 'match clause',
+        path: ['match'],
         desc: 'Does an analyzed (full-text) match on the given term.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html',
       }),
@@ -768,7 +896,9 @@ const EQLSpec: ESClause[] =
         number: 'number',
         string: 'string',
       },
-      {}),
+      {
+        path: ['match'],
+      }),
     new ESStructureClause('match_settings',
       {
         query: 'string',
@@ -784,30 +914,40 @@ const EQLSpec: ESClause[] =
         slop: 'slop',
         lenient: 'boolean',
       },
-      ['query'],
       {
+        path: ['match'],
+        desc: 'Settings for a match clause.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html',
         template: {
           query: '',
           operator: null,
         },
+        required: ['query'],
+        suggestions: ['query', 'operator', 'analyzer', 'max_expansions', 'slop', 'lenient'],
       }),
     new ESEnumClause('match_operator',
       ['and', 'or'],
       {
+        path: ['match'],
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero',
         template: 'or',
       }),
     new ESEnumClause('zero_terms_query',
       ['none', 'all'],
-      { url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero' }),
+      {
+        path: ['match'],
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-zero',
+      }),
     new ESNumberClause('cutoff_frequency',
       {
+        path: ['match'],
         desc: 'How common a word (term) needs to be before it is moved into a subquery that is only used if the uncommon words match.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-cutoff',
         template: '0.1',
       }),
     new ESBaseClause('fuzziness',
       {
+        path: ['match'],
         desc: 'Can help to make inexact matches in the case of misspellings or multiple spellings of words. The maximum Levenshtein edit distance to expand words (terms) to. The higher this is, the slower and broader queries will be. When applied to a numeric value, the fuzziness is the additional +/- margin that a match can have from the queried value.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#fuzziness',
         template: 'AUTO',
@@ -815,6 +955,7 @@ const EQLSpec: ESClause[] =
       }),
     new ESBooleanClause('fuzzy_transpositions',
       {
+        path: ['match'],
         desc: 'Sets if transpositions are allowed when computing fuzzy matches.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-fuzziness',
         template: 'true',
@@ -822,12 +963,14 @@ const EQLSpec: ESClause[] =
     new ESEnumClause('slop',
       [0, 1, 2],
       {
+        path: ['match'],
         desc: 'How many word (term) transpositions are tolerated when matching a phrase.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html',
         template: 0,
       }),
     new ESStringClause('analyzer',
       {
+        path: ['match'],
         desc: 'Chooses which analyzer to use to convert strings into lists of words (tokens) when searching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html',
         template: 'standard',
@@ -877,12 +1020,14 @@ const EQLSpec: ESClause[] =
       }),
     new ESNumberClause('fuzzy_prefix_length',
       {
+        path: ['match'],
         desc: 'When using fuzzy matching, this and max_expansions configures fuzzy matching.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-fuzziness',
         template: '1',
       }),
     new ESNumberClause('fuzzy_max_expansions',
       {
+        path: ['match'],
         name: 'maximum prefix expansions',
         desc: 'Number of suffixes that fuzzy terms are expanded into when matching words. The more expansions, the broader and slower the query will be.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-fuzziness',
@@ -907,6 +1052,7 @@ const EQLSpec: ESClause[] =
         'top_terms_blended_freqs_4',
       ],
       {
+        path: ['match'],
         desc: 'Chooses what method is used to rewrite multi term queries.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-term-rewrite.html#query-dsl-multi-term-rewrite',
         template: 'constant_score',
@@ -917,15 +1063,17 @@ const EQLSpec: ESClause[] =
         boost: 'boost',
         queries: 'query[]',
       },
-      ['queries'],
       {
         name: 'dis max query',
+        path: ['compound'],
         desc: 'Combines results from each of the given queries, ordering results by their maximum score in each query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html',
+        required: ['queries'],
       }),
     new ESNumberClause('dis_max_tie_breaker',
       {
         name: 'tie breaker',
+        path: ['compound'],
         desc: 'Boosts documents that contain the same term in multiple fields.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html',
         template: 0,
@@ -934,10 +1082,11 @@ const EQLSpec: ESClause[] =
       {
         script: 'script',
       },
-      ['script'],
       {
+        path: ['score'],
         desc: 'Customizes the scoring of a subquery using a script.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#function-script-score',
+        required: ['script'],
       }),
     new ESStructureClause('boosting_query',
       {
@@ -945,8 +1094,8 @@ const EQLSpec: ESClause[] =
         negative: 'query',
         negative_boost: 'boost',
       },
-      [],
       {
+        path: ['compound'],
         desc: 'Reduces the score of results that match the given query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html',
       }),
@@ -954,6 +1103,7 @@ const EQLSpec: ESClause[] =
       'field',
       'match_phrase_value',
       {
+        path: ['match'],
         name: 'match phrase query',
         desc: 'Makes a phrase query using analyzed text. Matches documents containing the words (tokens) in the phrase text.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html',
@@ -963,12 +1113,15 @@ const EQLSpec: ESClause[] =
         object: 'match_settings',
         string: 'query_string',
       },
-      {}),
+      {
+        path: ['match'],
+      }),
     new ESMapClause('match_phrase_prefix',
       'field',
       'match_phrase_prefix_value',
       {
         name: 'match phrase prefix query',
+        path: ['match'],
         desc: 'Makes a query using analyzed text which matches on all terms and any term starting with the prefix of the last term in the phrase text.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html',
       }),
@@ -977,7 +1130,9 @@ const EQLSpec: ESClause[] =
         object: 'match_settings',
         string: 'query_string',
       },
-      {}),
+      {
+        path: ['match'],
+      }),
     new ESStructureClause('multi_match',
       {
         query: 'query_string',
@@ -985,14 +1140,17 @@ const EQLSpec: ESClause[] =
         type: 'multi_match_type',
         tie_breaker: 'multi_match_tie_breaker',
       },
-      ['query', 'fields'],
       {
         name: 'multi match query',
+        path: ['match'],
         desc: 'A match query that allows multi-field queries',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html',
+        suggestions: ['query', 'type', 'fields'],
+        required: ['query', 'fields'],
       }),
     new ESArrayClause('multi_match_field', 'field',
       {
+        path: ['match'],
         desc: 'A list of fields to match against.',
       }),
     new ESEnumClause('multi_match_type',
@@ -1004,6 +1162,7 @@ const EQLSpec: ESClause[] =
         'phrase_prefix',
       ],
       {
+        path: ['match'],
         desc: 'Sets how the multi match query finds and scores documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html#multi-match-types',
         template: 'best_fields',
@@ -1011,6 +1170,7 @@ const EQLSpec: ESClause[] =
     new ESNumberClause('multi_match_tie_breaker',
       {
         name: 'tie breaker',
+        path: ['match'],
         desc: 'A setting of 0 causes the query to use the best score out of each field\'s match; a setting of 1 causes the query to add all of the scores. Settings in between are a blend of these methods.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html#_literal_tie_breaker_literal',
         template: 0,
@@ -1018,6 +1178,7 @@ const EQLSpec: ESClause[] =
     new ESReferenceClause('common_terms_query',
       'root',
       {
+        path: ['match'],
         desc: 'A query which breaks the query words (terms) into common and uncommon sets. Matches on uncommon words are given more weight than matches on common words.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-common-terms-query.html',
       }),
@@ -1046,15 +1207,27 @@ const EQLSpec: ESClause[] =
         use_dis_max: 'boolean',
         tie_breaker: 'dis_max_tie_breaker',
       },
-      ['query'],
       {
+        path: ['match'],
         desc: 'Uses a query parser to parse its content so that operators like AND and OR can be used inside a query string.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html',
+        suggestions: [
+          'query',
+          'default_operator',
+          'default_field',
+          'analyzer',
+          'phrase_slop',
+          'fuzziness',
+          'lenient',
+          'boost',
+        ],
+        required: ['query'],
       }),
     new ESReferenceClause('query_string_default_field',
       'field',
       {
         name: 'default field',
+        path: ['match'],
         desc: 'Defines which field is queried when no prefix is specified.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html',
         template: '_all',
@@ -1062,10 +1235,11 @@ const EQLSpec: ESClause[] =
     new ESEnumClause('query_string_default_operator',
       ['AND', 'OR'],
       {
-        template: 'OR',
         name: 'default operator',
+        path: ['match'],
         desc: 'Defines how consecutive terms in the query are combined.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html',
+        template: 'OR',
       }),
     new ESStructureClause('nested_query',
       {
@@ -1074,8 +1248,8 @@ const EQLSpec: ESClause[] =
         query: 'query',
         ignore_unmapped: 'ignore_unmapped',
       },
-      [],
       {
+        path: ['join'],
         desc: 'Queries nested documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html',
         template: {
@@ -1083,11 +1257,14 @@ const EQLSpec: ESClause[] =
           score_mode: null,
           query: null,
         },
+        required: ['path', 'query'],
+        suggestions: ['path', 'score_mode', 'query'],
       }),
     new ESEnumClause('nested_score_mode',
       ['avg', 'sum', 'min', 'max', 'none'],
       {
         name: 'score mode',
+        path: ['join'],
         desc: 'Controls the way in which nested document matching adjusts the score of the parent document.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html',
         template: 'avg',
@@ -1101,8 +1278,8 @@ const EQLSpec: ESClause[] =
         ignore_unmapped: 'ignore_unmapped',
         query: 'query',
       },
-      ['type', 'query'],
       {
+        path: ['join'],
         desc: 'Matches documents that have nested (child) documents that match this query',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-child-query.html',
         template: {
@@ -1110,10 +1287,13 @@ const EQLSpec: ESClause[] =
           score_mode: null,
           query: null,
         },
+        required: ['type', 'query'],
+        suggestions: ['type', 'query', 'score_mode'],
       }),
     new ESEnumClause('has_child_score_mode',
       ['avg', 'sum', 'min', 'max', 'none'],
       {
+        path: ['join'],
         name: 'score mode',
         desc: 'Controls the way in which nested document matching adjusts the score of the parent document.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-child-query.html',
@@ -1126,8 +1306,8 @@ const EQLSpec: ESClause[] =
         ignore_unmapped: 'ignore_unmapped',
         query: 'query',
       },
-      ['parent_type', 'query'],
       {
+        path: ['join'],
         desc: 'Query that returns nested (child) documents that have parents that match the query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-parent-query.html',
         template: {
@@ -1135,9 +1315,11 @@ const EQLSpec: ESClause[] =
           score: null,
           query: null,
         },
+        required: ['parent_type', 'query'],
       }),
     new ESBooleanClause('has_parent_score',
       {
+        path: ['join'],
         desc: 'If set to false, the document score is set to the boost on the has_parent query. If set to true, the score of the parent document is used to score the child documents.',
         template: false,
       }),
@@ -1160,20 +1342,24 @@ const EQLSpec: ESClause[] =
         quote_field_suffix: 'string',
         all_fields: 'boolean',
       },
-      ['query'],
       {
         name: 'simple query string clause',
+        path: ['match'],
         desc: 'A simplified version of a query string clause that works even when the query string is malformed.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html',
+        required: ['query'],
+        suggestions: ['query', 'fields', 'default_operator', 'analyzer', 'lenient'],
       }),
     new ESStringClause('query_string',
       {
         name: 'query string',
+        path: ['match'],
         desc: 'The text to match. This text will be analyzed (broken into words) and elastic will find documents containing those words. Some additional syntax is allowed in query strings; see the documentation for more information.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax',
       }),
     new ESBooleanClause('lenient',
       {
+        path: ['match'],
         desc: 'Whether or not query string formatting errors should be ignored.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html',
       }),

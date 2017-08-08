@@ -68,6 +68,9 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 const { List } = Immutable;
 
+const CHUNK_SIZE = FileImportTypes.CHUNK_SIZE;
+const MAX_NUM_CHUNKS = FileImportTypes.MAX_CHUNKMAP_SIZE;
+
 export interface Props
 {
   previewRows: List<List<string>>;
@@ -81,11 +84,14 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
-  file: File;
-  chunkQueue: List<FileImportTypes.Chunk>;
-  streaming: boolean;
+
   uploadInProgress: boolean;
   elasticUpdate: boolean;
+
+  file: File;
+  streaming: boolean;
+  chunkMap: IMMap<number, FileImportTypes.Chunk>;
+  bufferingComplete: boolean;
 }
 
 @Radium
@@ -96,11 +102,15 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     templateOptions: List<string>,
     editColumnId: number,
+    fileStart: number,
+    chunkId: number,
   } = {
     templateId: -1,
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
+    fileStart: MAX_NUM_CHUNKS * CHUNK_SIZE,
+    chunkId: MAX_NUM_CHUNKS,
   };
 
   public componentDidMount()
@@ -152,6 +162,11 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       editColumnId,
     });
+  }
+
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
   }
 
   public handleTemplateChange(templateId: number)
@@ -211,39 +226,6 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.templateText);
   }
 
-  /* parse the chunk to last new line character and add it to queue of chunks to be streamed
-   * save the leftover chunk and append it to the front of the next chunk */
-  // public parseChunk(chunk: string, isLast: boolean)
-  // {
-  //   if (isLast)
-  //   {
-  //     console.log('final chunk');
-  //     this.setState({
-  //       streamed: true,
-  //     });
-  //     Actions.updateQueue(chunk, chunk.length);
-  //   }
-  //   else
-  //   {
-  //     let index = 0;
-  //     let end = 0;
-  //     while (index < chunk.length)
-  //     {
-  //       if (chunk.charAt(index) === '\n')
-  //       {
-  //         end = index;
-  //       }
-  //       index++;
-  //     }
-  //     // console.log('chunk size: ', chunk.length);
-  //     // console.log('chunk: ', chunk);
-  //     // console.log('parsed chunk: ', chunk.substring(0, end));
-  //     console.log('nextChunk: ', chunk.substring(end, chunk.length));
-  //
-  //     Actions.updateQueue(chunk, end);
-  //   }
-  // }
-
   public readChunk(chunk: Blob, id: number, isLast: boolean)
   {
     const fr = new FileReader();
@@ -256,12 +238,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public stream()
   {
-    // let test: List<string> = List([]);
-    // test = test.set(5, 'test');
-    // console.log('test: ', test);
-    //
-    // test = test.set(1, 'test2');
-    // console.log(test.first());
     let id = 0;
 
     console.log('setting up socket...');
@@ -281,16 +257,22 @@ class FileImportPreview extends TerrainComponent<Props>
     socket.on('ready', () =>
     {
       console.log('ready');
-      console.log('queue: ', this.props.chunkQueue);
-      if (id < this.props.chunkQueue.size)      // assume filereader parses chunks faster than backend processes them
+      console.log('queue: ', this.props.chunkMap);
+
+      if (!this.props.bufferingComplete && this.props.chunkMap.size < MAX_NUM_CHUNKS / 2) // refill buffer when size falls below half
       {
-        console.log('chunk: ', this.props.chunkQueue.get(id));
-        socket.send(this.props.chunkQueue.get(id));
-        // Actions.dequeueChunk();
+        this.fill();
+      }
+      if (!this.props.chunkMap.isEmpty()) // assume filereader parses chunks faster than backend processes them
+      {
+        console.log('send chunk: ', this.props.chunkMap.get(id));
+        socket.send(this.props.chunkMap.get(id));
+        Actions.dequeueChunk(id);
         id++;
       }
       else
       {
+        Actions.changeUploadInProgress(false);
         console.log('finished');
         socket.emit('finished');
       }
@@ -299,42 +281,52 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       console.log('error from midway: ' + String(err));
       // TODO: handle error analogously as from Ajax request (in non-streaming case)
+      Actions.changeUploadInProgress(false);
       alert(String(err));
     });
     socket.on('midway_success', () =>
     {
       console.log('upsert successful!');
       // TODO: handle success analogously as from Ajax request (in non-streaming case)
-      Actions.changeUploadInProgress();
+      Actions.changeUploadInProgress(false);
       alert('successful');
     });
   }
 
-  public handleElasticUpdateChange()
+  public fill()
   {
-    Actions.changeElasticUpdate();
+    const { fileStart, chunkId } = this.state;
+    let start = fileStart;
+    let id = chunkId;
+
+    const numChunksInFile = this.props.file.size / CHUNK_SIZE;
+    if (id >= numChunksInFile)
+    {
+      return;
+    }
+
+    const numChunksToRead = Math.min(numChunksInFile - id, MAX_NUM_CHUNKS - this.props.chunkMap.size);
+    console.log('add ' + String(numChunksToRead) + ' chunks');
+    console.log(fileStart, chunkId);
+    for (let i = 0; i < numChunksToRead; i++)
+    {
+      const chunk = this.props.file.slice(start, start + CHUNK_SIZE);
+      this.readChunk(chunk, id, start + CHUNK_SIZE > this.props.file.size);
+
+      start += CHUNK_SIZE;
+      id++;
+    }
+
+    this.setState({
+      fileStart: fileStart + numChunksToRead * CHUNK_SIZE,
+      chunkId: chunkId + numChunksToRead,
+    });
+    return;
   }
 
   public handleUploadFile()
   {
-    Actions.uploadFile();
-
-    if (this.props.streaming)
-    {
-      console.log('filesize: ', this.props.file.size);
-
-      let fileStart = FileImportTypes.CHUNK_SIZE;   // 1 chunk read for preview already
-      let id = 1;
-      while (fileStart < this.props.file.size)
-      {
-        console.log('fileStart: ', fileStart);
-        const chunk = this.props.file.slice(fileStart, fileStart + FileImportTypes.CHUNK_SIZE);
-        this.readChunk(chunk, id, fileStart + FileImportTypes.CHUNK_SIZE > this.props.file.size);
-        fileStart += FileImportTypes.CHUNK_SIZE;
-        id++;
-      }
-      this.stream();
-    }
+    Actions.uploadFile(this.stream);
   }
 
   public renderTemplate()
@@ -347,7 +339,7 @@ class FileImportPreview extends TerrainComponent<Props>
           className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='flex-shrink fi-preview-template-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleLoadTemplate}
             style={buttonColors()}
             ref='fi-preview-template-button-load'
@@ -358,7 +350,7 @@ class FileImportPreview extends TerrainComponent<Props>
             selectedIndex={this.state.templateId}
             options={this.state.templateOptions}
             onChange={this.handleTemplateChange}
-            className={'flex-shrink fi-preview-template-load-dropdown'}
+            className={'flex-grow fi-preview-template-load-dropdown'}
             canEdit={true}
           />
         </div>
@@ -367,7 +359,7 @@ class FileImportPreview extends TerrainComponent<Props>
           className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='flex-shrink fi-preview-template-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleSaveTemplate}
             style={buttonColors()}
             ref='fi-preview-template-button-save'
@@ -379,7 +371,7 @@ class FileImportPreview extends TerrainComponent<Props>
             options={null}
             onChange={this.handleAutocompleteTemplateChange}
             placeholder={'template name'}
-            className={'flex-shrink fi-preview-template-save-autocomplete'}
+            className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
           />
         </div>

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESValueInfo from '../ESValueInfo';
@@ -57,9 +58,9 @@ export default class ESEnumClause extends ESClause
   public values: any[];
   public valueMap: any;
 
-  public constructor(type: string, values: any[], settings: any)
+  public constructor(type: string, values: any[], settings?: ESClauseSettings)
   {
-    super(type, settings, ESClauseType.ESEnumClause);
+    super(type, ESClauseType.ESEnumClause, settings);
 
     this.values = values;
     this.valueMap = new Map();

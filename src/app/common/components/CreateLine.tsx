@@ -46,7 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
+import * as Radium from 'radium';
 import * as React from 'react';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './CreateLine.less';
@@ -60,15 +62,43 @@ export interface Props
   onClick: () => void;
 }
 
+const ROW_STYLE = {
+  // opacity: 0.2,
+  // ':hover': {
+  //   opacity: 1.0,
+  // }
+};
+
+const LINE_STYLE = borderColor(Colors().highlight);
+
+const PLUS_STYLE = {};
+
+@Radium
 class CreateLine extends TerrainComponent<Props>
 {
   public render()
   {
     return (
-      <div className='create-line-row' onClick={this.props.onClick}>
-        <div className='create-line-line'></div>
-        <div className='create-line-plus'>
-          {this.props.open ? <CloseIcon /> : <AddIcon />}
+      <div
+        className='create-line-row'
+        onClick={this.props.onClick}
+        style={ROW_STYLE}
+      >
+        <div
+          className='create-line-line create-line-line-left'
+          style={LINE_STYLE}
+        />
+        <div
+          className='create-line-line create-line-line-right'
+          style={LINE_STYLE}
+        />
+        <div
+          className='create-line-plus'
+          style={PLUS_STYLE}
+        >
+          {
+            this.props.open ? <CloseIcon /> : <AddIcon />
+          }
         </div>
       </div>
     );

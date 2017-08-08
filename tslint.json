@@ -49,6 +49,7 @@
     "interface-name" : [
       true,
       "never-prefix"
-    ]
+    ],
+    "import-spacing": false
   }
 }
