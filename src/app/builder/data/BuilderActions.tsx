@@ -46,12 +46,12 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import BackendInstance from '../../../database/types/BackendInstance';
-import { CardItem } from '../components/cards/CardComponent';
-import ActionTypes from './BuilderActionTypes';
-import Store from './BuilderStore';
 import List = Immutable.List;
 import Map = Immutable.Map;
 import Query from '../../../items/types/Query';
+import { CardItem } from '../components/cards/CardComponent';
+import ActionTypes from './BuilderActionTypes';
+import Store from './BuilderStore';
 
 const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 

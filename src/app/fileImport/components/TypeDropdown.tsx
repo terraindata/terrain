@@ -51,15 +51,15 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import shallowCompare = require('react-addons-shallow-compare');
 import * as _ from 'underscore';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './TypeDropdown.less';
-import shallowCompare = require('react-addons-shallow-compare');
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 const { List } = Immutable;
 
 const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);

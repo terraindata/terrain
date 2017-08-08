@@ -50,9 +50,9 @@ import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
 import babelRegister = require('babel-register');
+import cors = require('kcors');
 import session = require('koa-session');
 import serve = require('koa-static-server');
-import cors = require('kcors');
 import srs = require('secure-random-string');
 
 import * as DBUtil from '../database/Util';

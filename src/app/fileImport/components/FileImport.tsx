@@ -289,10 +289,10 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseFile(hasCsvHeader: boolean)
+  public parseFile(file: File, hasCsvHeader: boolean)
   {
     const { filetype } = this.state;
-    const { file, streaming } = this.state.fileImportState;
+    const { streaming } = this.state.fileImportState;
 
     const numChunks = Math.min(Math.ceil(file.size / CHUNK_SIZE), MAX_NUM_CHUNKS);
     this.setState({
@@ -387,7 +387,7 @@ class FileImport extends TerrainComponent<any>
     }
     else
     {
-      this.parseFile(null);
+      this.parseFile(file.target.files[0], null);
     }
   }
 
@@ -411,16 +411,20 @@ class FileImport extends TerrainComponent<any>
 
   public handleSelectFileButtonClick()
   {
+    this.setState({
+      showCsvHeaderOption: false,
+    });
     this.refs['file']['value'] = null; // prevent file-caching
     this.refs['file']['click']();
   }
 
   public handleCsvHeaderChoice(hasCsvHeader: boolean)
   {
+    const { file } = this.state.fileImportState;
     this.setState({
       showCsvHeaderOption: false,
     });
-    this.parseFile(hasCsvHeader);
+    this.parseFile(file, hasCsvHeader);
   }
 
   public renderContent()
