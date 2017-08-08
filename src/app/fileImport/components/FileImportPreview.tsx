@@ -60,6 +60,7 @@ import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
+import ProgressBar from './../../common/components/ProgressBar';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -103,14 +104,18 @@ class FileImportPreview extends TerrainComponent<Props>
     templateOptions: List<string>,
     editColumnId: number,
     fileStart: number,
-    chunkId: number,
+    chunkIdToAdd: number,
+    progress: number,
+    totalChunks: number,
   } = {
     templateId: -1,
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
     fileStart: MAX_NUM_CHUNKS * CHUNK_SIZE,
-    chunkId: MAX_NUM_CHUNKS,
+    chunkIdToAdd: MAX_NUM_CHUNKS,
+    progress: 0,
+    totalChunks: Math.ceil(this.props.file.size / CHUNK_SIZE),
   };
 
   public componentDidMount()
@@ -238,7 +243,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public stream()
   {
-    let id = 0;
+    let chunkIdToSend = 0;
 
     console.log('setting up socket...');
     const socket = io(MIDWAY_HOST + '/', { path: '/import_streaming' });
@@ -265,10 +270,14 @@ class FileImportPreview extends TerrainComponent<Props>
       }
       if (!this.props.chunkMap.isEmpty()) // assume filereader parses chunks faster than backend processes them
       {
-        console.log('send chunk: ', this.props.chunkMap.get(id));
-        socket.send(this.props.chunkMap.get(id));
-        Actions.dequeueChunk(id);
-        id++;
+        console.log('send chunk: ', this.props.chunkMap.get(chunkIdToSend));
+        socket.send(this.props.chunkMap.get(chunkIdToSend));
+        Actions.dequeueChunk(chunkIdToSend);
+        chunkIdToSend++;
+
+        this.setState({
+          progress: chunkIdToSend / this.state.totalChunks,
+        });
       }
       else
       {
@@ -295,19 +304,18 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public fill()
   {
-    const { fileStart, chunkId } = this.state;
+    const { fileStart, chunkIdToAdd, totalChunks } = this.state;
     let start = fileStart;
-    let id = chunkId;
+    let id = chunkIdToAdd;
 
-    const numChunksInFile = this.props.file.size / CHUNK_SIZE;
-    if (id >= numChunksInFile)
+    if (id >= totalChunks)
     {
       return;
     }
 
-    const numChunksToRead = Math.min(numChunksInFile - id, MAX_NUM_CHUNKS - this.props.chunkMap.size);
+    const numChunksToRead = Math.min(totalChunks - id, MAX_NUM_CHUNKS - this.props.chunkMap.size);
     console.log('add ' + String(numChunksToRead) + ' chunks');
-    console.log(fileStart, chunkId);
+    console.log(fileStart, chunkIdToAdd);
     for (let i = 0; i < numChunksToRead; i++)
     {
       const chunk = this.props.file.slice(start, start + CHUNK_SIZE);
@@ -319,7 +327,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
     this.setState({
       fileStart: fileStart + numChunksToRead * CHUNK_SIZE,
-      chunkId: chunkId + numChunksToRead,
+      chunkIdToAdd: chunkIdToAdd + numChunksToRead,
     });
     return;
   }
@@ -430,31 +438,40 @@ class FileImportPreview extends TerrainComponent<Props>
       >
         {this.renderTemplate()}
         {this.renderTable()}
-        <div
-          className='fi-import-button-wrapper'
-        >
-          <div
-            className='fi-preview-update'
-          >
-            <CheckBox
-              checked={this.props.elasticUpdate}
-              onChange={this.handleElasticUpdateChange}
-            />
-            <span
-              className='clickable'
-              onClick={this.handleElasticUpdateChange}
+        {
+          this.props.uploadInProgress ?
+            <div>
+              <ProgressBar
+                progress={this.state.progress}
+              />
+            </div>
+            :
+            <div
+              className='fi-import-button-wrapper'
             >
-              Join against any existing entries
-            </span>
-          </div>
-          <div
-            className='fi-preview-import-button'
-            onClick={this.handleUploadFile}
-            style={buttonColors()}
-          >
-            Import
-          </div>
-        </div>
+              <div
+                className='fi-preview-update'
+              >
+                <CheckBox
+                  checked={this.props.elasticUpdate}
+                  onChange={this.handleElasticUpdateChange}
+                />
+                <span
+                  className='clickable'
+                  onClick={this.handleElasticUpdateChange}
+                >
+                  Join against any existing entries
+                </span>
+                <div
+                  className='fi-preview-import-button'
+                  onClick={this.handleUploadFile}
+                  style={buttonColors()}
+                >
+                  Import
+                </div>
+              </div>
+            </div>
+        }
         {
           this.props.uploadInProgress &&
           <div className='fi-preview-loading-container'>
