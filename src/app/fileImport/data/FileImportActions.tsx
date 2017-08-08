@@ -117,8 +117,8 @@ const FileImportActions =
       $(ActionTypes.loadTemplate, { templateId }),
 
     saveFile:
-    (file: File) =>
-      $(ActionTypes.saveFile, { file }),
+    (file: File, filetype: string) =>
+      $(ActionTypes.saveFile, { file, filetype }),
 
     enqueueChunk:
     (chunk: string, id: number, isLast: boolean) =>
