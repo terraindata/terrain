@@ -317,11 +317,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-        if (!state.streaming)
-        {
-          alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-          action.payload.changeUploadInProgress(false);
-        }
+        action.payload.changeUploadInProgress(false);
       },
     );
 
