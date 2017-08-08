@@ -84,6 +84,8 @@ interface Theme
   highlight: string; // for slight emphasis
   darkerHighlight: string; // for depth effect with highlight
 
+  boxShadow: string; // shadow color
+
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   inputBg: string;
@@ -310,6 +312,8 @@ const DARK: Theme =
 
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
     darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
+
+    boxShadow: 'rgba(0, 0, 0, 0.39)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 

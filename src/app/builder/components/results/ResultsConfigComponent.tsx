@@ -64,6 +64,8 @@ import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Results } from './ResultTypes';
 
+const Color = require('color');
+
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
 const TextIcon = require('./../../../../images/icon_text_12x18.svg?name=TextIcon');
@@ -235,6 +237,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const { config } = this.state;
     const { enabled, formats } = config;
 
+    const shadowStyle = getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow);
     const mainBg = backgroundColor(Colors().bg1);
     const mainFontColor = fontColor(Colors().text2);
     const placeholderStyle = [
@@ -281,7 +284,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
-            <div className='results-config-config' style={backgroundColor(Colors().bg2)}>
+            <div className='results-config-config' style={[backgroundColor(Colors().bg2), shadowStyle]}>
               <CRTarget
                 className='results-config-name'
                 type='name'
@@ -385,7 +388,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               )
             }
           </CRTarget>
-          <div className='results-config-disabled-veil'>
+          <div className='results-config-disabled-veil'
+            style={backgroundColor(Color(Colors().bg1).alpha(0.5))} // bg1 but with alpha 0.5
+          >
             <div className='results-config-disabled-veil-inner'>
               <b>Custom results view is off.</b>
               Results will display the information returned from the query.
@@ -498,6 +503,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const mainStyle = [
       backgroundColor(Colors().bg3),
       fontColor(Colors().text1),
+      getStyle('boxShadow', '1px 2px 4px 1px ' + Colors().boxShadow),
       getStyle('borderRightColor', Colors().border1, Colors().border2),
       getStyle('borderTopColor', Colors().border1, Colors().border2),
       getStyle('borderBottomColor', Colors().border1, Colors().border2),
