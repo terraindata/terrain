@@ -301,7 +301,6 @@ export class Import
       {
         return reject(hasCsvHeader);
       }
-      winston.info('hascsvheader: ' + String(hasCsvHeader));
       this.csvHeaderRemoved = (fields['filetype'] !== 'csv') || !hasCsvHeader;
       this.jsonBracketRemoved = fields['filetype'] !== 'json';
 
@@ -453,11 +452,20 @@ export class Import
         let left: number = 0;
         let right: number = 0;
         let match: number = 0;
+        let previousMatch: boolean = true;
         for (let i = 0; i < thisChunk.length; i++)
         {
           if (left === right)
           {
-            match = i;
+            if (!previousMatch)
+            {
+              match = i;
+            }
+            previousMatch = true;
+          }
+          else
+          {
+            previousMatch = false;
           }
           if (thisChunk.charAt(i) === '{')
           {
