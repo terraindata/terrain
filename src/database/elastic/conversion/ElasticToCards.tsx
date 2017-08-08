@@ -184,8 +184,8 @@ function isFilterCard(valueInfo: ESValueInfo): boolean
           validFilter = _.reduce(value,
             (memo0, value0) => memo0 &&
               (value0['range'] ||
-               value0['term'] ||
-               value0['match']),
+                value0['term'] ||
+                value0['match']),
             true);
         }
         else
