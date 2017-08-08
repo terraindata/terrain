@@ -49,32 +49,30 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'underscore';
 
-import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
+import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
+import { Colors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
-const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
-
-import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
 
 import { elasticTransform } from './ElasticTransformCard';
-
-const transformScoreInputTypes = CommonElastic.acceptsValues;
 
 export const elasticScore = _card(
   {
     weights: List(),
-    method: '',
 
-    key: '_script',
+    key: 'sort',
 
     static: {
       language: 'elastic',
-      title: 'Score',
-      colors: ['#3a91a6', 'rgba(58, 145, 166, 0.7)'],
+      title: 'Terrain Score Sort',
+      description: 'Sort results using Terrain\'s proprietary scoring method: Transform \
+        individual field values using a simple graphing tool, and combine the transformed \
+        fields in a weighted sum.',
+      colors: Colors().builder.cards.enumClause,
       preview: '[weights.length] Factors',
       // manualEntry: ManualConfig.cards['score'],
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
@@ -95,19 +93,19 @@ export const elasticScore = _card(
         });
 
         return {
-          type: 'number',
-          order: 'desc',
-          script: {
-            stored: 'Terrain.Score.PWL',
-            params: {
-              factors,
+          _script:
+          {
+            type: 'number',
+            order: 'desc',
+            script: {
+              stored: 'Terrain.Score.PWL',
+              params: {
+                factors,
+              },
             },
           },
         };
       },
-      accepts: transformScoreInputTypes,
-
-      anythingAccepts: true, // TODO change
 
       init: (blocksConfig) =>
       {
@@ -143,6 +141,9 @@ export const elasticScore = _card(
                 // help: ManualConfig.help['weight'],
                 key: 'weight',
                 placeholder: 'Weight',
+                style: {
+                  maxWidth: 120,
+                },
                 // autoDisabled: true,
               },
               {
@@ -157,7 +158,6 @@ export const elasticScore = _card(
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'key',
-              accepts: transformScoreInputTypes,
             },
           },
         },

@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import { ItemStatus } from '../../../items/types/Item';
-import CreateItem from '../../common/components/CreateItem';
+import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
@@ -68,6 +68,7 @@ type Group = LibraryTypes.Group;
 
 export interface Props
 {
+  basePath: string;
   groups: Immutable.Map<ID, Group>;
   groupsOrder: Immutable.List<ID>;
   params: any;
@@ -150,6 +151,7 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public renderGroup(id: ID, index: number)
   {
+    const { basePath } = this.props;
     const group = this.props.groups.get(id);
     const { params } = this.props;
     const { me, roles } = this.state;
@@ -168,7 +170,7 @@ class GroupsColumn extends TerrainComponent<Props>
         icon={<GroupIcon />}
         onArchive={this.handleArchive}
         key={group.id}
-        to={'/library/' + group.id}
+        to={`/${basePath}/${group.id}`}
         onNameChange={this.handleNameChange}
         type='group'
         rendered={this.state.rendered}
@@ -248,9 +250,9 @@ class GroupsColumn extends TerrainComponent<Props>
         }
         {
           status === ItemStatus.Build && canCreate &&
-          <CreateItem
-            name='group'
-            onCreate={this.handleCreate}
+          <CreateLine
+            onClick={this.handleCreate}
+            open={false}
           />
         }
       </LibraryItemCategory>

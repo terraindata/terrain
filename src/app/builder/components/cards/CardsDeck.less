@@ -13,12 +13,8 @@
   box-sizing: border-box;
   
   .cards-deck-search {
-    background: rgba(255,255,255,0.25);
-    color: #fff;
-    
-    &::placeholder {
-      color: rgba(255,255,255,0.5);
-    }
+    text-align: center;
+    font-size: 12px;
   }
 }
   
@@ -33,8 +29,9 @@
   .cards-deck-card {
     .create-card-button-style;
     
+    border-radius: 0px;
     margin: 3px;
-    
+    border: 1px solid;
     
     &.cards-deck-card-hidden {
       height: 0px;
@@ -95,6 +92,8 @@
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
+  
+  font-size: 14px;
   
   .cards-deck-knob-icon {
     border: 1px solid @knob-bg;

@@ -192,9 +192,7 @@ class CardsArea extends TerrainComponent<Props>
             'cards-area': true,
             [this.props.className]: !!this.props.className,
           })}
-          style={
-            backgroundColor(Colors().builder.cards.cardBase)
-          }
+
         >
           {
             cards.map((card: Card, index: number) =>

@@ -50,9 +50,12 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
+import { Colors } from '../../common/Colors';
+import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
@@ -73,6 +76,7 @@ import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/lint/lint.js';
+import 'codemirror/addon/mode/overlay.js';
 import 'codemirror/mode/javascript/javascript.js';
 
 import './codemirror.less';
@@ -101,7 +105,7 @@ export interface Props
   isDiff?: boolean;
   diffTql?: string;
 
-  onChange?(tql: string);
+  onChange?(tql: string, noAction?: boolean, manualRequest?: boolean);
 
   toggleSyntaxPopup?(event, line);
   defineTerm?(value, event);
@@ -117,6 +121,16 @@ class TQLEditor extends TerrainComponent<Props>
     codeMirrorInstance: undefined,
   };
 
+  constructor(props: Props)
+  {
+    super(props);
+    this.executeChange = _.debounce(this.executeChange, 300);
+  }
+  public componentWillUnmount()
+  {
+    this.executeChange.flush();
+  }
+
   public render()
   {
     const options =
@@ -124,8 +138,11 @@ class TQLEditor extends TerrainComponent<Props>
         readOnly: !this.props.canEdit,
         lineNumbers: true,
         extraKeys: {
+          'Shift-Tab': 'indentLess',
+          'Tab': 'indentMore',
           'Ctrl-F': 'findPersistent',
           'Ctrl-Alt-F': this.handleAutoFormatRequest,
+          'Ctrl-Enter': this.issueQuery,
         },
         lineWrapping: true,
         theme: this.props.theme || localStorage.getItem('theme') || 'default',
@@ -152,10 +169,12 @@ class TQLEditor extends TerrainComponent<Props>
       options['mode'] = '';
     }
 
+    let CM: any;
+
     if (this.props.isDiff)
     {
       options['value'] = this.props.tql || '';
-      return (
+      CM = (
         <CodeMirror
           ref='cm2'
           className='codemirror-text'
@@ -166,7 +185,7 @@ class TQLEditor extends TerrainComponent<Props>
         />
       );
     }
-    return (
+    CM = (
       <CodeMirror
         ref='cm'
         className='codemirror-text'
@@ -174,13 +193,24 @@ class TQLEditor extends TerrainComponent<Props>
         options={options}
 
         highlightedLine={this.props.highlightedLine}
-        onChange={this.props.onChange}
+        onFocusChange={this.handleFocusChange}
         toggleSyntaxPopup={this.props.toggleSyntaxPopup}
         defineTerm={this.props.defineTerm}
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
         onCodeMirrorMount={this.registerCodeMirror}
       />
+    );
+
+    return (
+      <div>
+        {
+          CM
+        }
+        <StyleTag
+          style={CODE_HIGHLIGHTING_STYLE}
+        />
+      </div>
     );
   }
 
@@ -201,22 +231,35 @@ class TQLEditor extends TerrainComponent<Props>
     return null;
   }
 
+  private issueQuery(cmInstance): void
+  {
+    if (this.props.onChange)
+    {
+      this.props.onChange(cmInstance.getValue(), false, true);
+    }
+  }
+
   private handleAutoFormatRequest(cmInstance): void
   {
     if (this.props.language === 'elastic')
     {
-      const formatted = this.autoFormatQuery(cmInstance.getValue());
+      const formatted = this.autoFormatQuery(cmInstance.getDoc().getValue());
       if (formatted)
       {
         const cursor = cmInstance.getCursor();
         this.state.codeMirrorInstance.setValue(formatted);
-        this.props.onChange(cmInstance.getValue());
+        this.executeChange();
         cmInstance.setCursor(cursor);
       }
     }
   }
 
-  private handleCMHighlighting(cmInstance, change)
+  private executeChange: any = () =>
+  {
+    this.props.onChange(this.state.codeMirrorInstance.getValue());
+  }
+
+  private handleHighlighting(cmInstance, change)
   {
     if (this.props.language === 'elastic')
     {
@@ -226,7 +269,15 @@ class TQLEditor extends TerrainComponent<Props>
 
   private handleTQLChange(cmInstance, changes)
   {
-    this.props.onChange(cmInstance.getValue());
+    this.executeChange();
+  }
+
+  private handleFocusChange(focused: boolean)
+  {
+    if (!focused)
+    {
+      this.executeChange.flush();
+    }
   }
 
   private registerCodeMirror(cmInstance)
@@ -238,7 +289,7 @@ class TQLEditor extends TerrainComponent<Props>
      * change event (https://codemirror.net/doc/manual.html#events) is fired before CodeMirror updates the DOM.
      * Because highlightES changes how codemirror renders the content, we have to call it in the chagne callback.
      */
-    cmInstance.on('change', this.handleCMHighlighting);
+    cmInstance.on('change', this.handleHighlighting);
     /*
      * changes event is fired after CodeMirror updates the DOM.
      * Because handleTQLChange may change the react state and the change could be expensieve, we call this after
@@ -253,5 +304,25 @@ class TQLEditor extends TerrainComponent<Props>
   }
 
 }
+
+const CODE_HIGHLIGHTING_STYLE = {
+  '.cm-s-monokai span.cm-atom': { color: Colors().builder.cards.booleanClause[0] },
+
+  '.cm-s-monokai span.cm-property': { color: Colors().builder.cards.structureClause[0] },
+  '.cm-s-monokai span.cm-attribute': { color: '#f00' /* what is an attribute? */ },
+  '.cm-s-monokai span.cm-keyword': { color: Colors().builder.cards.mapClause[0] },
+  '.cm-s-monokai span.cm-builtin': { color: Colors().builder.cards.baseClause[0] },
+  '.cm-s-monokai span.cm-string': { color: Colors().builder.cards.stringClause[0] },
+
+  '.cm-s-monokai span.cm-variable': { color: Colors().builder.cards.fieldClause[0] },
+  '.cm-s-monokai span.cm-variable-2': { color: Colors().builder.cards.inputParameter[0] },
+  '.cm-s-monokai span.cm-variable-3': { color: Colors().builder.cards.fieldClause[0] },
+
+  '.cm-s-monokai span.es-null': { color: Colors().builder.cards.nullClause[0] },
+  '.cm-s-monokai span.es-number': { color: Colors().builder.cards.numberClause[0] },
+  '.cm-s-monokai span.es-boolean': { color: Colors().builder.cards.booleanClause[0] },
+  '.cm-s-monokai span.es-parameter': { color: Colors().builder.cards.inputParameter[0] },
+  '.cm-s-monokai span.es-string': { color: Colors().builder.cards.stringClause[0] },
+};
 
 export default TQLEditor;

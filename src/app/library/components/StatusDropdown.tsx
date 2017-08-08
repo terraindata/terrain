@@ -108,7 +108,7 @@ class StatusDropdown extends TerrainComponent<Props>
       (this.state.isBuilder && variant.status !== Status.Live);
   }
 
-  public getOptions(): List<El>
+  public getOptions(): List<string> // List<El>
   {
     const { variant } = this.props;
 
@@ -175,60 +175,62 @@ class StatusDropdown extends TerrainComponent<Props>
     }
 
     return (
-      <div className='status-dropdown-wrapper'>
-        <div
-          className={classNames({
-            'status-dropdown': true,
-            'status-dropdown-no-border': this.props.noBorder,
-            'status-dropdown-can-edit': this.canEdit(),
-          })}
-          data-tip={tooltip}
-          data-html={true}
-        >
-          <Dropdown
-            options={this.getOptions()}
-            selectedIndex={this.getSelectedIndex()}
-            onChange={this.handleChange}
-            canEdit={this.canEdit()}
-          />
-        </div>
-      </div>
+      <Dropdown
+        options={this.getOptions()}
+        selectedIndex={this.getSelectedIndex()}
+        onChange={this.handleChange}
+        canEdit={this.canEdit()}
+      />
     );
+    // <div className='status-dropdown-wrapper'>
+    //   <div
+    //     className={classNames({
+    //       'status-dropdown': true,
+    //       'status-dropdown-no-border': this.props.noBorder,
+    //       'status-dropdown-can-edit': this.canEdit(),
+    //     })}
+    //     data-tip={tooltip}
+    //     data-html={true}
+    //   >
+    //   </div>
+    // </div>
   }
 }
 
 function getOption(status: Status)
 {
-  return (
-    <div
-      className='status-dropdown-option'
-      style={{
-        color: LibraryTypes.colorForStatus(status),
-      }}
-    >
-      {
-        status === Status.Default
-          ?
-          <StarIcon
-            className='status-dropdown-option-star'
-          />
-          :
-          <div
-            className='status-dropdown-option-marker'
-            style={{
-              background: LibraryTypes.colorForStatus(status),
-            }}
-          />
-      }
-      <div
-        className='status-dropdown-option-text'
-      >
-        {
-          LibraryTypes.nameForStatus(status as Status)
-        }
-      </div>
-    </div>
-  );
+  return LibraryTypes.nameForStatus(status as Status);
+
+  // return (
+  //   <div
+  //     className='status-dropdown-option'
+  //     style={{
+  //       color: LibraryTypes.colorForStatus(status),
+  //     }}
+  //   >
+  //     {
+  //       status === Status.Default
+  //         ?
+  //         <StarIcon
+  //           className='status-dropdown-option-star'
+  //         />
+  //         :
+  //         <div
+  //           className='status-dropdown-option-marker'
+  //           style={{
+  //             background: LibraryTypes.colorForStatus(status),
+  //           }}
+  //         />
+  //     }
+  //     <div
+  //       className='status-dropdown-option-text'
+  //     >
+  //       {
+  //         LibraryTypes.nameForStatus(status as Status)
+  //       }
+  //     </div>
+  //   </div>
+  // );
 }
 
 const AdminOptionsOrder =

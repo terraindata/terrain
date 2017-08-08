@@ -100,7 +100,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
 
   public getOptions(props: Props)
   {
-    const options = props.data['getChildOptions'](props.data);
+    const options = props.data['getChildOptions'](props.data, AllBackendsMap[this.props.language]);
 
     if (this.state && options.equals(this.state.options))
     {
@@ -131,7 +131,6 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
       this.props.keyPath,
       card,
     );
-
     this.setState({
       open: false,
     });
@@ -142,8 +141,9 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
     return (
       <div style={STYLE} >
         <CreateCardTool
-          index={null}
-          keyPath={this.props.keyPath}
+          index={-1 /* TODO this will have to adjust if we use component
+           in in more places */ }
+          keyPath={this.props.keyPath.push('cards')}
           canEdit={this.props.canEdit}
           language={this.props.language}
           className={this.props.className}

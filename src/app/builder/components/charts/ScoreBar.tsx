@@ -54,8 +54,9 @@ import './ScoreBar.less';
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
   {
-    POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#88C33E'],
-    NEGATIVE: ['#F8B14A', '#FF735B', '#DD333C', '#A50808'],
+    // POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#4ef9ab'],
+    POSITIVE: ['#4ef9ab'],
+    NEGATIVE: ['#d14f42'],
   };
 
 class ScoreBar extends TerrainComponent<{
@@ -90,14 +91,14 @@ class ScoreBar extends TerrainComponent<{
     if (weight.weight > 0)
     {
       style.left = '50%';
-      style['background'] = SCORE_COLORS.POSITIVE[Math.floor((perc - 1) / 25)];
+      style['background'] = SCORE_COLORS.POSITIVE[Math.floor((perc - 1) / (100 / SCORE_COLORS.POSITIVE.length))];
       style.borderTopRightRadius = BORDER_RADIUS;
       style.borderBottomRightRadius = BORDER_RADIUS;
     }
     else if (weight.weight < 0)
     {
       style.right = '50%';
-      style['background'] = SCORE_COLORS.NEGATIVE[Math.floor((perc - 1) / 25)];
+      style['background'] = SCORE_COLORS.NEGATIVE[Math.floor((perc - 1) / (100 / SCORE_COLORS.NEGATIVE.length))];
       style.borderTopLeftRadius = BORDER_RADIUS;
       style.borderBottomLeftRadius = BORDER_RADIUS;
     }

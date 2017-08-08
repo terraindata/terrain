@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
 import ESValueInfo from '../ESValueInfo';
@@ -54,9 +55,9 @@ import ESClause from './ESClause';
  */
 export default class ESAnyClause extends ESClause
 {
-  public constructor(type: string, settings: any)
+  public constructor(type: string, settings?: ESClauseSettings)
   {
-    super(type, settings, ESClauseType.ESAnyClause);
+    super(type, ESClauseType.ESAnyClause, settings);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void

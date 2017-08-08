@@ -44,79 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-const { List, Map } = Immutable;
-const L = () => List([]);
-import * as BlockUtils from '../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
-import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
-// const { _wrapperCard, _aggregateCard, _valueCard, _aggregateNestedCard } = CommonBlocks;
+/**
+ * Settings passed to and stored in an ESClause
+ */
+interface ESClauseSettings
+{
+  def?: string | { [key: string]: string | null };
+  name?: string;
+  path?: string[];
+  desc?: string;
+  url?: string;
+  template?: any;
+  required?: string[];
+  suggestions?: any[];
+}
 
-export const elasticRootCard = _card({
-  index: '',
-  from: 0,
-  rootType: '',
-  rootSize: 1000,
-
-  static:
-  {
-    title: 'Root Settings',
-    colors: ['#456', '#789'],
-    preview: '[index], [rootType]',
-    language: 'elastic',
-
-    tql: (rootBlock: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
-    {
-      return {
-        index: rootBlock['index'],
-        type: rootBlock['rootType'],
-        from: rootBlock['from'],
-        size: rootBlock['rootSize'],
-      };
-    },
-
-    display:
-    [
-      {
-        displayType: DisplayType.CARDTEXT, // TODO change
-        key: 'index',
-        getAutoTerms: (schemaState) =>
-        {
-          return Immutable.List(['movies', 'baseball', 'zazzle']);
-        },
-        // autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.CARDSFORTEXT, // TODO change
-        key: 'index',
-      },
-      {
-        displayType: DisplayType.TEXT,
-        key: 'rootType',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'from',
-        autoDisabled: true,
-      },
-      {
-        displayType: DisplayType.NUM,
-        key: 'rootSize',
-        autoDisabled: true,
-      },
-
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-        // accepts,
-      },
-    ],
-  },
-});
-
-export default elasticRootCard;
+export default ESClauseSettings;

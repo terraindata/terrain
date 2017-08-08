@@ -313,7 +313,6 @@ FileImportReducers[ActionTypes.uploadFile] =
           console.log('begin streaming');
           action.payload.startStreaming();
         }
-        // TODO: stream after this response
       },
       (err: string) =>
       {
@@ -323,7 +322,6 @@ FileImportReducers[ActionTypes.uploadFile] =
           alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
           action.payload.changeUploadInProgress(false);
         }
-        // TODO: or stop streaming on error
       },
     );
 
