@@ -329,6 +329,12 @@ class FileImport extends TerrainComponent<any>
         firstChunk = firstChunk.slice(Number(firstChunk.indexOf('\n')) + 1);
       }
 
+      // remove open square bracket when streaming JSON
+      if (streaming && filetype === 'json')
+      {
+        firstChunk = firstChunk.slice(Number(firstChunk.indexOf('[')) + 1);
+      }
+
       if (streaming) // completely fill the chunk buffer if streaming
       {
         // first chunk has 'id' 0. Since files smaller than one chunk will not be streamed first chunk will never be last
