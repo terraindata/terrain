@@ -66,10 +66,10 @@ const importTemplates = new ImportTemplates();
 
 export interface ImportConfig extends ImportTemplateBase
 {
-  contents: string;   // should parse directly into a JSON object
-  filetype: string;   // either 'json' or 'csv'
-  streaming: boolean;   // if true, contents is an address to read contents from (?)
-  update: boolean;    // false means replace (instead of update) ; default should be true
+  contents: string;
+  filetype: string;     // either 'json' or 'csv'
+  streaming: boolean;   // if true, contents will be ignored
+  update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
 export class Import
@@ -139,6 +139,12 @@ export class Import
         if (!authorized)
         {
           this._sendSocketError(socket, 'Must authenticate before sending messages.');
+          return;
+        }
+        if (!this.readyToStream)
+        {
+          // close connection since there was a config issue
+          this._sendSocketError(socket, 'config error -- see Ajax response.');
           return;
         }
         if (typeof data['chunk'] !== 'string' || typeof data['isLast'] !== 'boolean')

@@ -327,12 +327,6 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleUploadFile()
   {
     Actions.uploadFile(this.stream);
-
-    // if (this.props.streaming)
-    // {
-    //   console.log('filesize: ', this.props.file.size);
-    //   this.stream();
-    // }
   }
 
   public renderTemplate()
