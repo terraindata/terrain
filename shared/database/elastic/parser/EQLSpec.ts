@@ -574,6 +574,7 @@ const EQLSpec: ESClause[] =
         filter: 'filter',
         should: 'should',
         minimum_should_match: 'minimum_should_match',
+        boost: 'boost',
       },
       {
         path: ['filter'],
