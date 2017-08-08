@@ -54,6 +54,7 @@ import * as rimraf from 'rimraf';
 import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
+import { json } from 'd3-request';
 import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -108,6 +109,8 @@ export class Import
   private readStream: stream.Readable;
   private totalReads: number;
   private readyToStream: boolean = false;
+  private csvHeaderRemoved;
+  private jsonBracketRemoved;
 
   /* set up websockets for import streaming from frontend GUI */
   public setUpSocket(io: socketio.Server)
@@ -298,8 +301,8 @@ export class Import
       {
         return reject(hasCsvHeader);
       }
-      winston.info('hascsvheader: ' + String(hasCsvHeader));
-      let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
+      this.csvHeaderRemoved = (fields['filetype'] !== 'csv') || !hasCsvHeader;
+      this.jsonBracketRemoved = fields['filetype'] !== 'json';
 
       const imprtConf: ImportConfig = {
         dbid: template['dbid'],
@@ -338,12 +341,7 @@ export class Import
         contents += chunk.toString();
         if (contents.length > this.chunkSize)
         {
-          if (!csvHeaderRemoved)
-          {
-            contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
-            csvHeaderRemoved = true;
-          }
-          this.chunkQueue.push({ chunk: contents, isLast: false });
+          this._enqueueChunk(contents, false);
           contents = '';
           if (this.chunkQueue.length >= this.maxAllowedQueueSize)
           {
@@ -360,12 +358,7 @@ export class Import
       {
         if (contents !== '')
         {
-          if (!csvHeaderRemoved)
-          {
-            contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
-            csvHeaderRemoved = true;
-          }
-          this.chunkQueue.push({ chunk: contents, isLast: true });
+          this._enqueueChunk(contents, true);
         }
         else
         {
@@ -403,6 +396,21 @@ export class Import
       await this._readFileAndUpsert(num, this.chunkCount, socket);
     }
   }
+  /* headless streaming helper function ; enqueue the next chunk of data for processing */
+  private _enqueueChunk(contents: string, isLast: boolean)
+  {
+    if (!this.csvHeaderRemoved)
+    {
+      contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
+      this.csvHeaderRemoved = true;
+    }
+    else if (!this.jsonBracketRemoved)
+    {
+      contents = contents.substring(contents.indexOf('[') + 1, contents.length);
+      this.jsonBracketRemoved = true;
+    }
+    this.chunkQueue.push({ chunk: contents, isLast });
+  }
   /* headless streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file
    * errors will be processed through "reject" (the reject method of a promise) */
   private async _writeNextChunk(reject: ((r?: any) => void))
@@ -422,10 +430,62 @@ export class Import
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
   private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: socketio.Socket | ((r?: any) => void))
   {
-    // get valid piece of csv data ; TODO: SUPPORT JSON AS WELL
-    const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
-    const thisChunk: string = this.nextChunk + String(chunk.substring(0, end));
-    this.nextChunk = chunk.substring(end + 1, chunk.length);
+    // get valid piece of data
+    let thisChunk: string = '';
+    if (this.imprt.filetype === 'csv')
+    {
+      const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
+      thisChunk = this.nextChunk + String(chunk.substring(0, end));
+      this.nextChunk = chunk.substring(end + 1, chunk.length);
+    }
+    else if (this.imprt.filetype === 'json')
+    {
+      // open square-bracket has already been removed by frontend/headless preprocessing
+      if (isLast)
+      {
+        thisChunk = '[' + this.nextChunk + chunk;
+        this.nextChunk = '';
+      }
+      else
+      {
+        thisChunk = this.nextChunk + chunk;
+        let left: number = 0;
+        let right: number = 0;
+        let match: number = 0;
+        let previousMatch: boolean = true;
+        for (let i = 0; i < thisChunk.length; i++)
+        {
+          if (left === right)
+          {
+            if (!previousMatch)
+            {
+              match = i;
+            }
+            previousMatch = true;
+          }
+          else
+          {
+            previousMatch = false;
+          }
+          if (thisChunk.charAt(i) === '{')
+          {
+            left++;
+          }
+          else if (thisChunk.charAt(i) === '}')
+          {
+            right++;
+          }
+        }
+        this.nextChunk = thisChunk.substring(match, thisChunk.length).trim();
+        if (this.nextChunk.length > 0 && this.nextChunk.charAt(0) !== ',')
+        {
+          this._sendSocketError(socket, 'JSON format incorrect.');
+        }
+        this.nextChunk = this.nextChunk.substring(1, this.nextChunk.length);
+        thisChunk = '[' + thisChunk.substring(0, match) + ']';
+      }
+    }
+
     let items: object[];
     try
     {
@@ -601,6 +661,11 @@ export class Import
       return typeError;
     }
 
+    if (imprt.filetype !== 'csv' && imprt.filetype !== 'json')
+    {
+      return 'Invalid file-type provided.';
+    }
+
     const columnList: string[] = Object.keys(imprt.columnTypes);
     const columns: Set<string> = new Set(columnList);
     if (columns.size !== columnList.length)
@@ -759,9 +824,6 @@ export class Import
           // NOTE: csvjson parser will not throw errors for rows that contain the wrong number of entries
           return reject('CSV format incorrect: ' + String(e));
         }
-      } else
-      {
-        return reject('Invalid file-type provided.');
       }
     });
   }
