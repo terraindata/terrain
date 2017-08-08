@@ -235,14 +235,14 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const { config } = this.state;
     const { enabled, formats } = config;
 
-    const bgcolor01 = backgroundColor(Colors().bg1);
-    const bgcolor02 = backgroundColor(Colors().bg2);
-    const color01 = fontColor(Colors().text1);
-    const bgPlusHover01 = backgroundColor(Colors().bg2, Colors().bg3);
-    const color02 = fontColor(Colors().text2);
-    const bgPlusBorder01 = _.extend({}, fontColor(Colors().text1), borderColor(Colors().border1), backgroundColor(Colors().bg1));
+    const mainBg = backgroundColor(Colors().bg1);
+    const mainFontColor = fontColor(Colors().text2);
+    const placeholderStyle = [
+      fontColor(Colors().text1),
+      borderColor(Colors().border1),
+      backgroundColor(Colors().bg1)
+    ];
 
-    const bgcolor01plusBorder = _.extend({}, backgroundColor(Colors().bg1), borderColor(Colors().border2));
     return (
       <div className='results-config-wrapper'>
         <div
@@ -250,10 +250,10 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             'results-config': true,
             'results-config-disabled': !enabled,
           })}
-          style={bgcolor01plusBorder}
+          style={[mainBg, borderColor(Colors().border2)]}
         >
-          <div className='results-config-bar' style={_.extend({}, bgcolor01, borderColor(Colors().border1))}>
-            <div className='results-config-title' style={color01}>
+          <div className='results-config-bar' style={[mainBg, borderColor(Colors().border1)]}>
+            <div className='results-config-title' style={mainFontColor}>
               Customize Results
             </div>
             <div className='results-config-switch'>
@@ -266,28 +266,28 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             </div>
             <div key={'results-config-button'}
               className='results-config-button'
-              style={_.extend({},
+              style={[
                 fontColor(Colors().text1),
                 borderColor(Colors().border1, Colors().border3),
                 backgroundColor(Colors().bg3)
-              )}
+              ]}
               onClick={this.handleClose}
             >
               Done
             </div>
           </div>
           <div className='results-config-config-wrapper'>
-            <div className='results-config-instructions' style={bgcolor01}>
+            <div className='results-config-instructions'>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
-            <div className='results-config-config' style={bgcolor02}>
+            <div className='results-config-config' style={backgroundColor(Colors().bg2)}>
               <CRTarget
                 className='results-config-name'
                 type='name'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title' style={color02}>
+                <div className='results-config-area-title' style={mainFontColor}>
                   Name
                 </div>
                 {
@@ -302,7 +302,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className='results-config-placeholder' style={bgPlusBorder01}>
+                    <div className='results-config-placeholder' style={placeholderStyle}>
                       Drag name field <em>(optional)</em>
                     </div>
                 }
@@ -312,7 +312,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 type='score'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title' style={color02}>
+                <div className='results-config-area-title' style={mainFontColor}>
                   Score
                 </div>
                 {
@@ -327,7 +327,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className='results-config-placeholder' style={bgPlusBorder01}>
+                    <div className='results-config-placeholder' style={placeholderStyle}>
                       Drag score field <em>(optional)</em>
                     </div>
                 }
@@ -337,7 +337,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 type='field'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title' style={color02}>
+                <div className='results-config-area-title' style={mainFontColor}>
                   Fields
                 </div>
                 {
@@ -358,7 +358,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                     </div>,
                   )
                 }
-                <div className='results-config-placeholder' style={bgPlusBorder01}>
+                <div className='results-config-placeholder' style={placeholderStyle}>
                   Drag more fields here
                 </div>
               </CRTarget>
@@ -501,7 +501,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
       getStyle('borderRightColor', Colors().border1, Colors().border2),
       getStyle('borderTopColor', Colors().border1, Colors().border2),
       getStyle('borderBottomColor', Colors().border1, Colors().border2),
-      getStyle('borderLeftColor', selected ? Colors().active : Colors().border1)
+      getStyle('borderLeftColor', selected ? Colors().active : Colors().border1, selected ? Colors().active : Colors().border2)
     ];
 
     const activeBtnStyle = [

@@ -1,12 +1,8 @@
 @import "../../../common/Common.less";
 
-@result-name-bg: #cfd7c8;
-@result-score-bg: #dfe6d8;
-@bg: @builder-bg;
 @bar-h: 34px;
 @br: 5px;
 @br-tight: 3px;
-@field-border-color: fade(#000, 20%);
 
 .results-config-wrapper {
   *, *:before, *:after {
@@ -28,7 +24,6 @@
     width: 90%;
     height: 90%;
     overflow: hidden;
-    // background: @bg; // handled
     border-radius: @br;
     
     .results-config-bar {
@@ -36,15 +31,12 @@
       position: relative;
       border-bottom: 1px solid;
       padding-bottom: 1px;
-      // background: @fresh-moss; // handled
       
       .results-config-title {
         font-size: 14px;
         padding: 9px 12px;
-        // color: rgba(0,0,0,0.5); handled
         font-weight: 400;
         letter-spacing: 0.5px;
-        // color: #fff; // handled
       }
       
       
@@ -56,36 +48,25 @@
         // font-size: 16px;
         float: right;
         padding: 4px 30px;
-        // background: #eee; //@light-foam; //rgb(138, 200, 136); handled
-        // color: @grey;
         font-weight: 500;
         border: 1px solid;
         cursor: pointer;
         // padding-top: 6px;
         border-radius: @br-tight;
         .transition;
-        
-        &:hover {
-          // background: #fff; handled
-        }
       }
       
       .results-config-switch {
         position: absolute;
         top: 4px;
         right: 110px;
-        
-        .switch {
-          // border-width: 1px;
-          // border-style: solid;
-        }
+
       }
     }
     
     .results-config-instructions {
       text-align: left;
       margin-bottom: 12px;
-      // color: @fresh-moss; handled
       letter-spacing: 0.5px;
       line-height: 18px;
       font-size: 12px;
@@ -116,49 +97,41 @@
         }
         
         .results-config-area-title {
-          // color: rgba(0, 0, 0, 0.65); handled
           margin: 6px;
           margin-top: 0px;
           letter-spacing: 0.5px;
         }
         
         .results-config-name {
-          // background: @result-name-bg; handled
           border-top-left-radius: 5px;
           border-top-right-radius: 5px;
           &.results-config-over {
-            border: 3px solid; // fade(@bright-green, 50%);
+            border: 3px solid;
             padding: 3px;
           }
         }
         
         .results-config-score {
-          // background: @result-score-bg; // handled
           &.results-config-over {
-            border: 3px solid; // fade(@bright-green, 50%);
+            border: 3px solid;
             padding: 3px;
           }
         }
         
         .results-config-fields {
-          // background: #fff; handled
           min-height: 100px;
           padding-bottom: 30px;
           &.results-config-over {
-            border: 3px solid; // fade(@bright-green, 50%);
+            border: 3px solid;
             padding: 3px;
           }
           
           .results-config-field-wrapper {
             padding-bottom: 6px;
             margin-bottom: 6px;
-            // border-bottom: 1px solid @field-border-color;
           }
         }
-        
-        .results-config-field {
-          // border-color: @field-border-color;
-        }
+
       }
     }
     
@@ -166,15 +139,8 @@
       left: 0%;
       padding: 6px;
       
-      // &.results-config-over {
-      //   border: 3px solid @bright-green;
-      //   padding: 6px;
-      // }
-      
       .results-config-field {
-        // background: #fff;
         margin-bottom: 4px;
-        // box-shadow: 1px 2px 4px 1px rgba(0,0,0,0.39);
         border-left: 3px solid;
       }
     }
@@ -193,17 +159,12 @@
     }
     
     .results-config-placeholder {
-      // background: fade(@aged-moss, 20%); handled
       background-blend-mode: multiply;
-      // border: 1px solid fade(@aged-moss, 20%); handled
-      // color: @grey; handled
     }
     
     .results-config-field {
-      // background: rgba(255,255,255,0.25);
       blend-mode: multiply;
-      border: 1px solid; // #fff;
-      // border-left: 3px solid;
+      border: 1px solid;
       font-weight: 500;
       letter-spacing: 0.5px;
       cursor: pointer;
@@ -216,10 +177,6 @@
         text-overflow: ellipsis;
         max-width: calc(~"100% - 25px");
         display: inline-block;
-      }
-
-      &.results-config-field-used {
-        // border-left: 3px solid;
       }
 
       .close {
@@ -285,11 +242,8 @@
         }
         
         .results-config-format-btns {
-          // background: @grey;
           display: flex;
           margin-top: 6px;
-          // border-radius: 4px;
-          // overflow: hidden;
         }
         
         .results-config-text-btn,
@@ -298,12 +252,11 @@
           flex-grow: 1;
           text-align: center;
           
-          // color: @grey;
           .transition;
           
           border-radius: 6px;
           padding: 6px 0px;
-          border: 1px solid; // #ddd;
+          border: 1px solid;
           margin-right: 6px;
           
           svg {
@@ -317,14 +270,11 @@
           }
           
           &:hover {
-            // background: fade(@light-green, 25%);
           }
         }
         
         .rc-selected, .rc-selected:hover {
-          // background: @light-green;
-          // color: @grey;
-          // border-color: @light-green;
+
         }
         
         .results-config-image {
@@ -354,7 +304,7 @@
         }
         
         input {
-          border: 1px solid; // @fresh-moss;
+          border: 1px solid;
           
           &[type='checkbox'] {
             width: auto;
@@ -385,21 +335,19 @@
   
   .results-config-disabled-veil-inner {
     .dead-center;
-    // color: #fff;
     b {
       font-size: 16px;
       display: block;
       margin-bottom: 6px;
       text-align: center;
     }
-    // text-shadow: 0px 0px 20px rgba(0,0,0,0.55);
   }
 }
 
 .results-config-disabled {
   .results-config-disabled-veil {
     opacity: 1;
-    background: rgba(0,0,0,0.75);
+    background: rgba(50,50,50,0.5);
     pointer-events: all;
   }
 }
