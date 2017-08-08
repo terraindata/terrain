@@ -239,9 +239,10 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const bgcolor02 = backgroundColor(Colors().bg2);
     const color01 = fontColor(Colors().text1);
     const bgPlusHover01 = backgroundColor(Colors().bg2, Colors().bg3);
-    const color02 = fontColor(Colors().text3);
+    const color02 = fontColor(Colors().text2);
     const bgPlusBorder01 = _.extend({}, fontColor(Colors().text1), borderColor(Colors().border1), backgroundColor(Colors().bg1));
 
+    const bgcolor01plusBorder = _.extend({}, backgroundColor(Colors().bg1), borderColor(Colors().border2));
     return (
       <div className='results-config-wrapper'>
         <div
@@ -249,7 +250,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             'results-config': true,
             'results-config-disabled': !enabled,
           })}
-          style={bgcolor01}
+          style={bgcolor01plusBorder}
         >
           <div className='results-config-bar' style={bgcolor02}>
             <div className='results-config-title' style={color01}>
@@ -272,14 +273,13 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             </div>
           </div>
           <div className='results-config-config-wrapper'>
-            <div className='results-config-instructions' style={bgcolor02}>
+            <div className='results-config-instructions' style={bgcolor01}>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
-            <div className='results-config-config'>
+            <div className='results-config-config' style={bgcolor02}>
               <CRTarget
                 className='results-config-name'
-                style={bgcolor01}
                 type='name'
                 onDrop={this.handleDrop}
               >
@@ -306,7 +306,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               <CRTarget
                 className='results-config-score'
                 type='score'
-                style={bgcolor01}
                 onDrop={this.handleDrop}
               >
                 <div className='results-config-area-title' style={color02}>
@@ -331,7 +330,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               </CRTarget>
               <CRTarget
                 className='results-config-fields'
-                style={bgPlusBorder01}
                 type='field'
                 onDrop={this.handleDrop}
               >
@@ -412,6 +410,8 @@ interface ResultsConfigResultProps
   primaryKeys: List<string>;
   onPrimaryKeysChange: (primaryKeys: List<string>) => void;
 }
+
+@Radium
 class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 {
   public state: {
@@ -490,9 +490,18 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const { format } = this.props;
     const image = format && format.type === 'image';
 
+    const selected: boolean = this.props.is !== null && this.props.isAvailableField;
+    const bgCol = selected ? Colors().highlight : Colors().bg3;
+    const borderCol = selected ? Colors().border3 : Colors().border1;
+    const mainStyle = _.extend({},
+      backgroundColor(bgCol),
+      fontColor(Colors().text1),
+      borderColor(borderCol)
+    );
+
     return this.props.connectDropTarget(this.props.connectDragSource(
       <div
-        style={fontColor(Colors().text.baseDark)}
+        style={mainStyle}
         className={classNames({
           'results-config-field': true,
           'results-config-field-dragging': this.props.isDragging ||
@@ -500,7 +509,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
           'results-config-field-name': this.props.is === 'name',
           'results-config-field-score': this.props.is === 'score',
           'results-config-field-field': this.props.is === 'field',
-          'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
         })}
       >
         <div className='results-config-field-body'>

@@ -27,7 +27,6 @@
     width: 90%;
     height: 90%;
     overflow: hidden;
-    
     // background: @bg; // handled
     border-radius: @br;
     
@@ -39,7 +38,7 @@
       .results-config-title {
         font-size: 14px;
         padding: 9px 12px;
-        color: rgba(0,0,0,0.5);
+        // color: rgba(0,0,0,0.5); handled
         font-weight: 400;
         letter-spacing: 0.5px;
         // color: #fff; // handled
@@ -102,7 +101,7 @@
       padding: 12px;
       padding-top: 6px;
       .results-config-config {
-        border-radius: 5px;
+        border-radius: 1px;
         overflow: hidden;
         box-shadow: -2px 2px 17px rgba(0, 0, 0, 0.05);
         
@@ -154,7 +153,7 @@
         }
         
         .results-config-field {
-          border-color: @field-border-color;
+          // border-color: @field-border-color;
         }
       }
     }
@@ -169,7 +168,9 @@
       // }
       
       .results-config-field {
-        background: #fff;
+        // background: #fff;
+        margin-bottom: 4px;
+        // box-shadow: 1px 2px 4px 1px rgba(0,0,0,0.39);
       }
     }
     
@@ -177,9 +178,9 @@
     .results-config-field {
       padding: 12px;
       padding-bottom: 10px;
-      border-radius: 6px;
+      border-radius: 1px;
       font-size: 12px;
-      
+      box-shadow: 1px 2px 4px 1px rgba(0,0,0,0.39);
       em {
         font-style: normal;
         opacity: 0.5;
@@ -210,19 +211,9 @@
         max-width: calc(~"100% - 25px");
         display: inline-block;
       }
-      
-      &.results-config-field-used {
-        background: @light-green;
-        // .results-config-handle {
-        //   opacity: 0;
-        //   &:hover {
-        //     opacity: 0;
-        //   }
-        // }
-      }
-      
+
       .close {
-        fill: @grey;
+        fill: rgb(255, 255, 255);
         opacity: 0.5;
         &:hover {
           fill: #fff;
@@ -258,13 +249,11 @@
           opacity: 1;
         }
         width: 11px;
-        fill: @aged-moss;
+        fill: rgb(255,255,255);
         margin-right: 10px;
       }
       
       &:hover {
-        border-color: @field-border-color;
-        
         .results-config-handle {
           opacity: 0.5;
         }
@@ -400,7 +389,7 @@
 .results-config-disabled {
   .results-config-disabled-veil {
     opacity: 1;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0.75);
     pointer-events: all;
   }
 }
