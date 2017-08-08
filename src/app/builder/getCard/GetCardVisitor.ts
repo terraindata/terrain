@@ -55,12 +55,11 @@ import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
-import { Colors, getCardColors } from '../../common/Colors';
 import { Backend } from '../../../database/types/Backend';
+import { Colors, getCardColors } from '../../common/Colors';
 
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
-import { BuilderStore } from '../data/BuilderStore';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 
@@ -85,8 +84,6 @@ import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/EST
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
-
-const Color = require('color');
 
 const KEY_INLINE_DISPLAYS = [
   DisplayType.TEXT,
