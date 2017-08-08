@@ -177,18 +177,7 @@ export class Import
           return;
         }
 
-        const time: number = Date.now();
-        winston.info('putting mapping...');
-        await this._tastyPutMapping();
-        winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
-
-        winston.info('opening files for upsert...');
-        this.totalReads = 0;
-        for (let num = 0; num < Math.min(this.chunkCount, this.maxActiveReads); num++)
-        {
-          this.totalReads++;
-          await this._readFileAndUpsert(num, this.chunkCount, socket);
-        }
+        await this._streamingUpsert(socket);
 
         socket.emit('midway_success');
         socket.disconnect(true);
@@ -359,7 +348,7 @@ export class Import
           {
             this.readStream.pause();
           }
-          await this._fireNextChunk(reject);
+          await this._writeNextChunk(reject);
         }
       });
       this.readStream.on('error', (e) =>
@@ -387,14 +376,31 @@ export class Import
         }
         while (this.chunkQueue.length > 0)
         {
-          await this._fireNextChunk(reject);
+          await this._writeNextChunk(reject);
         }
-        // TODO: do the actual upload
+
+        await this._streamingUpsert(reject);
+
         resolve(res);
       });
     });
   }
-  private async _fireNextChunk(reject: ((r?: any) => void))
+  private async _streamingUpsert(socket: socketio.Socket | ((r?: any) => void))
+  {
+    const time: number = Date.now();
+    winston.info('putting mapping...');
+    await this._tastyPutMapping();
+    winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
+
+    winston.info('opening files for upsert...');
+    this.totalReads = 0;
+    for (let num = 0; num < Math.min(this.chunkCount, this.maxActiveReads); num++)
+    {
+      this.totalReads++;
+      await this._readFileAndUpsert(num, this.chunkCount, socket);
+    }
+  }
+  private async _writeNextChunk(reject: ((r?: any) => void))
   {
     if (this.chunkQueue.length === 0 || (this.chunkQueue.length === 1 && !this.chunkQueue[0]['isLast']))
     {
@@ -524,7 +530,7 @@ export class Import
       socket.disconnect(true);
     }
   }
-  private async _readFileAndUpsert(num: number, targetNum: number, socket: socketio.Socket)
+  private async _readFileAndUpsert(num: number, targetNum: number, socket: socketio.Socket | ((r?: any) => void))
   {
     winston.info('BEGINNING read file upload number ' + String(num));
 
