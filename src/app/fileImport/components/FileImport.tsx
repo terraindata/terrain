@@ -381,7 +381,7 @@ class FileImport extends TerrainComponent<any>
       filetype,
       filename: file.target.files[0].name,
     });
-    Actions.saveFile(file.target.files[0]);
+    Actions.saveFile(file.target.files[0], filetype);
     Actions.clearChunkMap();
 
     if (filetype === 'csv')
