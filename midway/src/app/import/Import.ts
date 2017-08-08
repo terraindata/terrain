@@ -109,6 +109,7 @@ export class Import
   private totalReads: number;
   private readyToStream: boolean = false;
 
+  /* set up websockets for import streaming from frontend GUI */
   public setUpSocket(io: socketio.Server)
   {
     winston.info('set up file import streaming server.');
@@ -370,7 +371,7 @@ export class Import
         {
           if (this.chunkQueue.length === 0)
           {
-            return reject('!#$%^@#$%@#$%Logic issue with streaming queue.@$%$%&#^#^');
+            return reject('Logic issue with streaming queue.');    // shouldn't happen
           }
           this.chunkQueue[this.chunkQueue.length - 1]['isLast'] = true;
         }
@@ -385,6 +386,8 @@ export class Import
       });
     });
   }
+  /* after type-checking has completed, read from temp files to upsert via Tasty, and delete the temp files
+   * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
   private async _streamingUpsert(socket: socketio.Socket | ((r?: any) => void))
   {
     const time: number = Date.now();
@@ -400,6 +403,8 @@ export class Import
       await this._readFileAndUpsert(num, this.chunkCount, socket);
     }
   }
+  /* headless streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file
+   * errors will be processed through "reject" (the reject method of a promise) */
   private async _writeNextChunk(reject: ((r?: any) => void))
   {
     if (this.chunkQueue.length === 0 || (this.chunkQueue.length === 1 && !this.chunkQueue[0]['isLast']))
@@ -413,6 +418,8 @@ export class Import
     }
     return this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast'], reject);
   }
+  /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file
+   * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
   private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: socketio.Socket | ((r?: any) => void))
   {
     // get valid piece of csv data ; TODO: SUPPORT JSON AS WELL
@@ -449,6 +456,8 @@ export class Import
     });
     this.chunkCount++;
   }
+  /* parses obj[field] (string) into a boolean, if possible.
+   * defaultRet: default return value if obj[field] is undefined */
   private _parseBooleanField(obj: object, field: string, defaultRet: boolean): boolean | string
   {
     let parsed: boolean = defaultRet;
@@ -515,6 +524,7 @@ export class Import
     });
   }
 
+  /* streaming helper function ; process errors through "socket" (either a socket.io connection, or the reject method of a promise) */
   private _sendSocketError(socket: socketio.Socket | ((r?: any) => void), error: string)
   {
     winston.info('emitting socket error: ' + error);
@@ -530,6 +540,8 @@ export class Import
       socket.disconnect(true);
     }
   }
+  /* streaming helper function.
+   * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
   private async _readFileAndUpsert(num: number, targetNum: number, socket: socketio.Socket | ((r?: any) => void))
   {
     winston.info('BEGINNING read file upload number ' + String(num));
@@ -569,7 +581,7 @@ export class Import
     {
       if (err !== undefined && err !== null)
       {
-        // can't _sendSocketError or else would end up in an infinite cycle
+        // can't _sendSocketError() or else would end up in an infinite cycle
         throw new Error('Failed to delete temp file: ' + String(err));
       }
     });
