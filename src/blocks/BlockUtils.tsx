@@ -148,7 +148,7 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
 
   block = _.extend({}, block); // shallow clone
 
-  if (block.static.init)
+  if (block.static.init && extraConfig === undefined)
   {
     block = _.extend({}, block, block.static.init(blocksConfig, extraConfig));
   }
