@@ -54,6 +54,7 @@ import * as rimraf from 'rimraf';
 import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
+import { json } from 'd3-request';
 import * as SharedUtil from '../../../../shared/fileImport/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -108,6 +109,8 @@ export class Import
   private readStream: stream.Readable;
   private totalReads: number;
   private readyToStream: boolean = false;
+  private csvHeaderRemoved;
+  private jsonBracketRemoved;
 
   /* set up websockets for import streaming from frontend GUI */
   public setUpSocket(io: socketio.Server)
@@ -299,8 +302,8 @@ export class Import
         return reject(hasCsvHeader);
       }
       winston.info('hascsvheader: ' + String(hasCsvHeader));
-      let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
-      let jsonBracketRemoved: boolean = fields['filetype'] !== 'json';
+      this.csvHeaderRemoved = (fields['filetype'] !== 'csv') || !hasCsvHeader;
+      this.jsonBracketRemoved = fields['filetype'] !== 'json';
 
       const imprtConf: ImportConfig = {
         dbid: template['dbid'],
@@ -339,17 +342,7 @@ export class Import
         contents += chunk.toString();
         if (contents.length > this.chunkSize)
         {
-          if (!csvHeaderRemoved)
-          {
-            contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
-            csvHeaderRemoved = true;
-          }
-          else if (!jsonBracketRemoved)
-          {
-            contents = contents.substring(contents.indexOf('[') + 1, contents.length);
-            jsonBracketRemoved = true;
-          }
-          this.chunkQueue.push({ chunk: contents, isLast: false });
+          this._enqueueChunk(contents, false);
           contents = '';
           if (this.chunkQueue.length >= this.maxAllowedQueueSize)
           {
@@ -366,12 +359,7 @@ export class Import
       {
         if (contents !== '')
         {
-          if (!csvHeaderRemoved)
-          {
-            contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
-            csvHeaderRemoved = true;
-          }
-          this.chunkQueue.push({ chunk: contents, isLast: true });
+          this._enqueueChunk(contents, true);
         }
         else
         {
@@ -408,6 +396,21 @@ export class Import
       this.totalReads++;
       await this._readFileAndUpsert(num, this.chunkCount, socket);
     }
+  }
+  /* headless streaming helper function ; enqueue the next chunk of data for processing */
+  private _enqueueChunk(contents: string, isLast: boolean)
+  {
+    if (!this.csvHeaderRemoved)
+    {
+      contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
+      this.csvHeaderRemoved = true;
+    }
+    else if (!this.jsonBracketRemoved)
+    {
+      contents = contents.substring(contents.indexOf('[') + 1, contents.length);
+      this.jsonBracketRemoved = true;
+    }
+    this.chunkQueue.push({ chunk: contents, isLast });
   }
   /* headless streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file
    * errors will be processed through "reject" (the reject method of a promise) */
