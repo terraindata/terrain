@@ -72,8 +72,7 @@ export default function ElasticToCards(
   {
     // TODO: we may want to show some error messages on the cards.
     return query
-      .set('cardsAndCodeInSync', false)
-      .set('parseError', true);
+      .set('cardsAndCodeInSync', false);
   } else
   {
     try
@@ -83,8 +82,7 @@ export default function ElasticToCards(
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
-        .set('cardsAndCodeInSync', true)
-        .set('parseError', false);
+        .set('cardsAndCodeInSync', true);
     }
     catch (e)
     {

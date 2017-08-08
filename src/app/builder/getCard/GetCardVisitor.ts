@@ -780,8 +780,37 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           return ''; // tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
 
-        init: (blocksConfig) =>
-          ({
+        init: (blocksConfig, extraConfig) =>
+        {
+          if (extraConfig !== undefined)
+          {
+            // This can happen if Elastic To Cards tries to generate a Variant card
+            //  we need to try to catch its value, and if it has a value,
+            //  create the type of card appropriate for the value.
+
+            let valueType: string;
+            const { value } = extraConfig;
+            if (value !== undefined)
+            {
+              valueType = typeof value;
+            }
+            else if (extraConfig['cards'] !== undefined)
+            {
+              valueType = 'object';
+            }
+
+            const clauseType = clause.subtypes[valueType];
+            if (clauseType !== undefined)
+            {
+              // we have a matching card type -- override with that type
+              const cardType = GetCardVisitor.getCardType(this.clauses[clauseType]);
+              return ({
+                type: cardType, // override our card type
+              });
+            }
+          }
+
+          return ({
             childOptionClickHandler:
             (card: Card, option: { text: string, type: string }): Card =>
             {
@@ -793,7 +822,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
                 },
               );
             },
-          }),
+          });
+        },
 
         // accepts,
 

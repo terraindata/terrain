@@ -49,7 +49,7 @@ THE SOFTWARE.
 import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -120,28 +120,36 @@ export interface Props
   textStyle?: React.CSSProperties;
 }
 
+interface State
+{
+  // store these in state to avoid unnecessary calls to Store.getState()
+  //  might be unnecessary with container components and connect/provide
+  valueIsWrongType: boolean;
+  valueIsInput: boolean;
+
+  isSwitching: boolean;
+  backupString: number | string | Card;
+  options: List<string>;
+}
+
 class BuilderTextbox extends TerrainComponent<Props>
 {
-  public state: {
-    wrongType: boolean;
-    isSwitching: boolean;
-    value: CardString;
-    backupString: CardString;
-    options: List<string>;
-  };
+  public state: State;
 
   constructor(props: Props)
   {
     super(props);
     this.executeChange = _.debounce(this.executeChange, 300);
 
-    const value: any = this.props.value;
     this.state = {
-      wrongType: this.props.isNumber ? isNaN(value) : false,
+      // store these in state to avoid unnecessary calls to Store.getState()
+      //  might be unnecessary with container components and connect/provide
+      valueIsInput: this.valueIsInput(props),
+      valueIsWrongType: this.valueIsWrongType(props),
+
       isSwitching: false,
-      value,
-      backupString: value,
-      options: Immutable.List([]),
+      backupString: props.value,
+      options: List([]),
     };
   }
 
@@ -176,9 +184,6 @@ class BuilderTextbox extends TerrainComponent<Props>
       return;
     }
 
-    this.setState({
-      wrongType: newProps.isNumber ? isNaN(value) : false,
-    });
     if (this.refs['input'])
     {
       if (this.refs['input'] !== document.activeElement)
@@ -219,12 +224,6 @@ class BuilderTextbox extends TerrainComponent<Props>
   public handleAutocompleteChange(value)
   {
     this.executeChange(value);
-    if (this.props.isNumber)
-    {
-      this.setState({
-        wrongType: isNaN(value),
-      });
-    }
   }
 
   public isText()
@@ -239,7 +238,6 @@ class BuilderTextbox extends TerrainComponent<Props>
       AllBackendsMap[this.props.language].blocks, this.getCreatingType(),
     ) : '';
     this.setState({
-      value,
       backupString: typeof this.props.value === 'string' ? this.props.value : null,
     });
     this.executeChange(value);
@@ -321,18 +319,24 @@ class BuilderTextbox extends TerrainComponent<Props>
     }
   }
 
+  public componentWillUpdate(nextProps: Props, nextState)
+  {
+    this.setState({
+      valueIsInput: this.valueIsInput(nextProps),
+      valueIsWrongType: this.valueIsWrongType(nextProps),
+    });
+  }
+
   public render()
   {
     if (this.isText())
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
-
       const { options } = this.state;
+      const { valueIsWrongType, valueIsInput } = this.state;
 
       const textStyle = this.props.textStyle || {};
-      if (typeof this.props.value === 'string' &&
-        isInput(this.props.value as string, BuilderStore.getState().query.inputs)
-      )
+      if (valueIsInput)
       {
         textStyle.color = Colors().builder.cards.inputParameter[0];
       }
@@ -365,8 +369,8 @@ class BuilderTextbox extends TerrainComponent<Props>
                 options={options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}
-                help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
-                className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
+                help={valueIsWrongType ? this.props.typeErrorMessage : this.props.help}
+                className={valueIsWrongType ? 'ac-wrong-type' : null}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
                 style={this.props.textStyle}
@@ -458,6 +462,29 @@ class BuilderTextbox extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  private valueIsInput(props: Props): boolean
+  {
+    if (typeof this.props.value === 'string' &&
+      isInput(this.props.value as string, BuilderStore.getState().query.inputs))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  private valueIsWrongType(props: Props): boolean
+  {
+    const { isNumber, value } = props;
+
+    if (!isNumber || this.valueIsInput(props))
+    {
+      return false;
+    }
+
+    return isNaN(value as number);
   }
 }
 
