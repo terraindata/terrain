@@ -182,12 +182,18 @@ function isFilterCard(valueInfo: ESValueInfo): boolean
         if (Array.isArray(value))
         {
           validFilter = _.reduce(value,
-            (memo0, value0) => memo0 && (value0['range'] || value0['term']),
+            (memo0, value0) => memo0 &&
+              (value0['range'] ||
+               value0['term'] ||
+               value0['match']),
             true);
         }
         else
         {
-          validFilter = (value['range'] !== undefined) || (value['term'] !== undefined);
+          validFilter =
+            (value['range'] !== undefined) ||
+            (value['term'] !== undefined) ||
+            (value['match'] !== undefined);
         }
         return memo && validFilter;
       }, true);
@@ -199,6 +205,7 @@ const esFilterOperatorsMap = {
   lt: '<',
   lte: '≤',
   term: '=',
+  match: '≈',
 };
 
 function parseFilterBlock(boolQuery: string, filters: any): Block[]
@@ -231,6 +238,12 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
       field = Object.keys(obj['term'])[0];
       filterOp = '=';
       value = obj['term'][field];
+    }
+    else if (obj['match'] !== undefined)
+    {
+      field = Object.keys(obj['match'])[0];
+      filterOp = '≈';
+      value = obj['match'][field];
     }
 
     return make(Blocks, 'elasticFilterBlock', {

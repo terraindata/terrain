@@ -66,6 +66,7 @@ const esFilterOperatorsMap = {
   '<': 'lt',
   '≤': 'lte',
   '=': 'term',
+  '≈': 'match',
 };
 
 export const elasticFilterBlock = _block(
@@ -95,6 +96,16 @@ export const elasticFilterBlock = _block(
           return {
             [block['boolQuery']]: {
               term: {
+                [block['field']]: value,
+              },
+            },
+          };
+        }
+        else if (block['filterOp'] === '≈')
+        {
+          return {
+            [block['boolQuery']]: {
+              match: {
                 [block['field']]: value,
               },
             },
@@ -187,6 +198,7 @@ export const elasticFilter = _card({
                   'must',
                   'must_not',
                   'should',
+                  'filter',
                 ],
                 // Can consider using this, but it includes "minmum_should_match," which
                 //  doesn't make sense in this context
