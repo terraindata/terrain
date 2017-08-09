@@ -476,12 +476,13 @@ export class Import
             right++;
           }
         }
-        this.nextChunk = thisChunk.substring(match, thisChunk.length).trim();
-        if (this.nextChunk.length > 0 && this.nextChunk.charAt(0) !== ',')
+        this.nextChunk = thisChunk.substring(match, thisChunk.length);
+        const trimmedNextChunk: string = this.nextChunk.trim();
+        if (trimmedNextChunk.length > 0 && trimmedNextChunk.charAt(0) !== ',')
         {
           this._sendSocketError(socket, 'JSON format incorrect.');
         }
-        this.nextChunk = this.nextChunk.substring(1, this.nextChunk.length);
+        this.nextChunk = this.nextChunk.substring(this.nextChunk.indexOf(',') + 1, this.nextChunk.length);
         thisChunk = '[' + thisChunk.substring(0, match) + ']';
       }
     }
@@ -799,7 +800,8 @@ export class Import
           {
             if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
             {
-              return reject('JSON file contains an object that does not contain the expected fields.');
+              return reject('JSON file contains an object that does not contain the expected fields. Got fields: ' +
+                JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
             }
           }
           resolve(items);
