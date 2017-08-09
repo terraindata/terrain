@@ -270,7 +270,6 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
     state
-      .set('fileContents', action.payload.fileContents)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
@@ -285,42 +284,57 @@ FileImportReducers[ActionTypes.chooseFile] =
 FileImportReducers[ActionTypes.uploadFile] =
   (state, action) =>
   {
-    Ajax.streamFile(state.file);
-    // Ajax.importFile(
-    //   state.fileContents,
-    //   state.filetype,
-    //   state.dbText,
-    //   state.tableText,
-    //   state.connectionId,
-    //   state.originalNames,
-    //   Map<string, object>(state.columnNames.map((colName, colId) =>
-    //     state.columnsToInclude.get(colId) &&                          // backend requires type as string
-    //     [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
-    //   )),
-    //   state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
-    //   state.transforms,
-    //   state.elasticUpdate,
-    //   state.streaming,
-    //   () =>
-    //   {
-    //     console.log('response');
-    //     if (!state.streaming)
-    //     {
-    //       alert('success');
-    //       action.payload.changeUploadInProgress(false);
-    //     }
-    //     else
-    //     {
-    //       console.log('begin streaming');
-    //       // action.payload.startStreaming();
-    //     }
-    //   },
-    //   (err: string) =>
-    //   {
-    //     alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-    //     action.payload.changeUploadInProgress(false);
-    //   },
-    // );
+    Ajax.importFile(
+      state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+      state.originalNames,
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&                          // backend requires type as string
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+      )),
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
+      state.elasticUpdate,
+    );
+    /*
+    Ajax.importFile(
+      state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+      state.originalNames,
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&                          // backend requires type as string
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+      )),
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
+      state.elasticUpdate,
+      state.streaming,
+      () =>
+      {
+        console.log('response');
+        if (!state.streaming)
+        {
+          alert('success');
+          action.payload.changeUploadInProgress(false);
+        }
+        else
+        {
+          console.log('begin streaming');
+          // action.payload.startStreaming();
+        }
+      },
+      (err: string) =>
+      {
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        action.payload.changeUploadInProgress(false);
+      },
+    );*/
 
     return state.set('uploadInProgress', true);
   };
@@ -403,24 +417,6 @@ FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
     state.set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
-      .set('streaming', action.payload.file.size > FileImportTypes.CHUNK_SIZE)
-  ;
-
-FileImportReducers[ActionTypes.enqueueChunk] =
-  (state, action) =>
-  {
-    console.log('chunk added: ' + action.payload.id + ', isLast: ' + action.payload.isLast);
-    return state.set('chunkMap', state.chunkMap.set(action.payload.id, action.payload));
-  };
-
-FileImportReducers[ActionTypes.dequeueChunk] =
-  (state, action) =>
-    state.deleteIn(['chunkMap', action.payload.id])
-  ;
-
-FileImportReducers[ActionTypes.clearChunkMap] =
-  (state, action) =>
-    state.set('chunkMap', Immutable.Map({}))
   ;
 
 export default FileImportReducers;

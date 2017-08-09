@@ -56,7 +56,6 @@ class FileImportStateC extends BaseClass
   public serverText: string = '';
   public dbText: string = '';
   public tableText: string = '';
-  public fileContents: string = '';       // use when file small enough to upload through ajax post
   public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
@@ -71,9 +70,7 @@ class FileImportStateC extends BaseClass
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
   public file: File = new File([''], '');
-  public streaming: boolean = false;
 
-  public chunkMap: IMMap<number, Chunk> = Immutable.Map<number, Chunk>({});
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
 }
@@ -117,18 +114,9 @@ export interface ColumnTypesTree
   innerType?: ColumnTypesTree;
 }
 
-export interface Chunk
-{
-  id: number;
-  chunk: string;
-  isLast: boolean;
-}
-
 export const NUMBER_PREVIEW_ROWS = 5;
 
-export const MAX_CHUNKMAP_SIZE = 10;
-
-export const CHUNK_SIZE = 10000000;    // assume this chunk size contains number of preview rows
+export const CHUNK_SIZE = 10000000; // 10mb
 
 export const FILE_TYPES =
   [

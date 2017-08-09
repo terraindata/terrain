@@ -73,12 +73,12 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
-    (fileContents: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
-      $(ActionTypes.chooseFile, { fileContents, filetype, preview, originalNames }),
+    (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { filetype, preview, originalNames }),
 
     uploadFile:
-    (stream: () => void) =>
-      $(ActionTypes.uploadFile, { startStreaming: stream, changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+    () =>
+      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     addTransform:
     (transform: FileImportTypes.Transform) =>
@@ -120,14 +120,6 @@ const FileImportActions =
     (file: File, filetype: string) =>
       $(ActionTypes.saveFile, { file, filetype }),
 
-    enqueueChunk:
-    (chunk: string, id: number, isLast: boolean) =>
-      $(ActionTypes.enqueueChunk, { chunk, id, isLast }),
-
-    dequeueChunk:
-    (id: number) =>
-      $(ActionTypes.dequeueChunk, { id }),
-
     changeUploadInProgress:
     (uploading: boolean) =>
       $(ActionTypes.changeUploadInProgress, { uploading }),
@@ -135,10 +127,6 @@ const FileImportActions =
     changeElasticUpdate:
     () =>
       $(ActionTypes.changeElasticUpdate, {}),
-
-    clearChunkMap:
-    () =>
-      $(ActionTypes.clearChunkMap, {}),
   };
 
 export default FileImportActions;

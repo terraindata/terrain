@@ -66,11 +66,8 @@ const FileImportActionTypes =
     setTemplates: '',
     loadTemplate: '',
     saveFile: '',
-    enqueueChunk: '',
-    dequeueChunk: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
-    clearChunkMap: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

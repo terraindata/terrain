@@ -72,7 +72,6 @@ const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
 const CHUNK_SIZE = FileImportTypes.CHUNK_SIZE;
-const MAX_NUM_CHUNKS = FileImportTypes.MAX_CHUNKMAP_SIZE;
 
 export interface Props
 {
@@ -97,10 +96,8 @@ class FileImport extends TerrainComponent<any>
     tables?: SchemaTypes.TableMap;
     tableNames: List<string>;
     fileSelected: boolean;
-    filetype: string,
     filename: string,
     showCsvHeaderOption: boolean,
-    bufferingComplete: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
@@ -110,10 +107,8 @@ class FileImport extends TerrainComponent<any>
     dbNames: List([]),
     tableNames: List([]),
     fileSelected: false,
-    filetype: '',
     filename: '',
     showCsvHeaderOption: false,
-    bufferingComplete: false,
   };
 
   constructor(props)
@@ -289,21 +284,15 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseFile(file: File, filetype: string, streaming: boolean, hasCsvHeader: boolean)
+  public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
   {
-    const numChunks = Math.min(Math.ceil(file.size / CHUNK_SIZE), MAX_NUM_CHUNKS);
-    this.setState({
-      bufferingComplete: Math.ceil(file.size / CHUNK_SIZE) < MAX_NUM_CHUNKS,
-    });
-
-    const fileToRead = streaming ? file.slice(0, numChunks * CHUNK_SIZE) : file;
+    const fileToRead = file.slice(0, CHUNK_SIZE);
     const fr = new FileReader();
     fr.readAsText(fileToRead);
     fr.onloadend = () =>
     {
-      // assume preview fits in first chunk when streaming
-      let firstChunk = fr.result.substring(0, CHUNK_SIZE);
-      let stringifiedFile = streaming ? fr.result.substring(0, firstChunk.lastIndexOf('\n')) : fr.result;
+      // assume preview fits in one chunk
+      const stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
       let items;
       switch (filetype)
       {
@@ -320,30 +309,6 @@ class FileImport extends TerrainComponent<any>
         return;
       }
 
-      if (filetype === 'csv' && hasCsvHeader) // remove header row
-      {
-        stringifiedFile = stringifiedFile.slice(Number(stringifiedFile.indexOf('\n')) + 1);
-        firstChunk = firstChunk.slice(Number(firstChunk.indexOf('\n')) + 1);
-      }
-
-      // remove open square bracket when streaming JSON
-      if (streaming && filetype === 'json')
-      {
-        firstChunk = firstChunk.slice(Number(firstChunk.indexOf('[')) + 1);
-      }
-
-      if (streaming) // completely fill the chunk buffer if streaming
-      {
-        // first chunk has 'id' 0. Since files smaller than one chunk will not be streamed first chunk will never be last
-        Actions.enqueueChunk(firstChunk, 0, false);
-        for (let i = 1; i < numChunks; i++)
-        {
-          const fileStart = CHUNK_SIZE * i;
-          const chunk = fr.result.slice(fileStart, fileStart + CHUNK_SIZE);
-          Actions.enqueueChunk(chunk, i, fileStart + CHUNK_SIZE > file.size);
-        }
-      }
-
       const previewRows = items.map((item) =>
         _.map(item, (value, key) =>
           typeof value === 'string' ? value : JSON.stringify(value), // JSON files infer types
@@ -353,8 +318,7 @@ class FileImport extends TerrainComponent<any>
         filetype === 'csv' && !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
       );
 
-      // send empty fileContents when streaming
-      Actions.chooseFile(streaming ? '' : stringifiedFile, filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
       this.setState({
         fileSelected: true,
       });
@@ -376,11 +340,9 @@ class FileImport extends TerrainComponent<any>
       return;
     }
     this.setState({
-      filetype,
       filename: file.target.files[0].name,
     });
     Actions.saveFile(file.target.files[0], filetype);
-    Actions.clearChunkMap();
 
     if (filetype === 'csv')
     {
@@ -390,7 +352,7 @@ class FileImport extends TerrainComponent<any>
     }
     else
     {
-      this.parseFile(file.target.files[0], filetype, file.target.files[0].size > FileImportTypes.CHUNK_SIZE, null);
+      this.parseFile(file.target.files[0], filetype, null);
     }
   }
 
@@ -423,11 +385,11 @@ class FileImport extends TerrainComponent<any>
 
   public handleCsvHeaderChoice(hasCsvHeader: boolean)
   {
-    const { file, filetype, streaming } = this.state.fileImportState;
+    const { file, filetype } = this.state.fileImportState;
     this.setState({
       showCsvHeaderOption: false,
     });
-    this.parseFile(file, filetype, streaming, hasCsvHeader);
+    this.parseFile(file, filetype, hasCsvHeader);
   }
 
   public renderContent()
@@ -436,7 +398,7 @@ class FileImport extends TerrainComponent<any>
     const { dbText, tableText } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
-    const { file, streaming, chunkMap } = fileImportState;
+    const { file } = fileImportState;
 
     let content;
     switch (this.state.stepId)
@@ -535,11 +497,8 @@ class FileImport extends TerrainComponent<any>
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
             file={file}
-            streaming={streaming}
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
-            chunkMap={chunkMap}
-            bufferingComplete={this.state.bufferingComplete}
           />;
         break;
       default:
