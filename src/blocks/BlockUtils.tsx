@@ -134,7 +134,7 @@ export function transformAlias(transformCard: Card): string
 // This creates a new instance of a card / block
 // Usage: BlockUtils.make(MySQLBlocks, 'sort')
 export const make = (blocksConfig: { [type: string]: BlockConfig },
-  blockType: string, extraConfig?: { [key: string]: any }) =>
+  blockType: string, extraConfig?: { [key: string]: any }, skipInit?: boolean) =>
 {
   let block = blocksConfig[blockType];
 
@@ -148,7 +148,7 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
 
   block = _.extend({}, block); // shallow clone
 
-  if (block.static.init && extraConfig === undefined)
+  if (block.static.init && skipInit !== true)
   {
     block = _.extend({}, block, block.static.init(blocksConfig, extraConfig));
   }
