@@ -103,6 +103,7 @@ export class Import
   private streamingTempFilePrefix: string = 'chunk';
   private nextChunk: string;
   private chunkCount: number;
+  private itemCount: number;
   private maxAllowedQueueSize: number = 3;
   private chunkSize: number = 10000000;
   private chunkQueue: object[];
@@ -161,9 +162,13 @@ export class Import
           this._sendSocketError(socket, 'Malformed message.');
           return;
         }
-        await this._writeItemsFromChunkToFile(data['chunk'], data['isLast'], socket);
-        winston.info('emitting ready');
-        socket.emit('ready');
+        const count: number = await this._writeItemsFromChunkToFile(data['chunk'], data['isLast'], socket);
+        if (count !== -1)
+        {
+          this.itemCount += count;
+          winston.info('emitting ready');
+          socket.emit('ready');
+        }
       });
       socket.on('finished', async () =>
       {
@@ -192,6 +197,7 @@ export class Import
   {
     this.imprt = imprt;
     this.readyToStream = false;
+    this.itemCount = 0;
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
       const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
@@ -255,7 +261,6 @@ export class Import
         const res: ImportConfig = await this._tastyUpsert(imprt, items);
         winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
         resolve(res);
-        resolve(imprt);
       }
       else
       {
@@ -422,11 +427,15 @@ export class Import
     {
       this.readStream.resume();
     }
-    return this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast'], reject);
+    const count: number = await this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast'], reject);
+    if (count !== -1)
+    {
+      this.itemCount += count;
+    }
   }
   /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: socketio.Socket | ((r?: any) => void))
+  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: socketio.Socket | ((r?: any) => void)): Promise<number>
   {
     // get valid piece of data
     let thisChunk: string = '';
@@ -479,6 +488,7 @@ export class Import
         if (trimmedNextChunk.length > 0 && trimmedNextChunk.charAt(0) !== ',')
         {
           this._sendSocketError(socket, 'JSON format incorrect.');
+          return -1;
         }
         this.nextChunk = this.nextChunk.substring(this.nextChunk.indexOf(',') + 1, this.nextChunk.length);
         thisChunk = '[' + thisChunk.substring(0, match) + ']';
@@ -493,6 +503,7 @@ export class Import
     catch (e)
     {
       this._sendSocketError(socket, 'Failed to get items: ' + String(e));
+      return -1;
     }
     winston.info('streaming server got items from data');
 
@@ -514,6 +525,7 @@ export class Import
       winston.info('wrote items to file.');
     });
     this.chunkCount++;
+    return items.length;
   }
   /* parses obj[field] (string) into a boolean, if possible.
    * defaultRet: default return value if obj[field] is undefined */
@@ -837,7 +849,7 @@ export class Import
   private async _transformAndCheck(allItems: object[], imprt: ImportConfig): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
-    let baseInd: number = 0;
+    let baseInd: number = this.itemCount;
     let items: object[];
     while (allItems.length > 0)
     {
