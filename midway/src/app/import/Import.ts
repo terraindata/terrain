@@ -261,7 +261,6 @@ export class Import
         const res: ImportConfig = await this._tastyUpsert(imprt, items);
         winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
         resolve(res);
-        resolve(imprt);
       }
       else
       {
