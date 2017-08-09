@@ -136,8 +136,7 @@ export class Import
         }
         winston.info('streaming auth successful.');
         authorized = true;
-        this._deleteStreamingTempFolder();    // in case the folder was improperly cleaned up last time (shouldn't happen)
-        fs.mkdirSync(this.streamingTempFolder);
+        this._cleanStreamingTempFolder(true);
         winston.info('created streaming temp directory.');
         socket.emit('ready');
       });
@@ -328,8 +327,7 @@ export class Import
         reject(e);
       }
 
-      this._deleteStreamingTempFolder();    // in case the folder was improperly cleaned up last time (shouldn't happen)
-      fs.mkdirSync(this.streamingTempFolder);
+      this._cleanStreamingTempFolder(true);
 
       this.readStream = file;
       this.chunkQueue = [];
@@ -476,12 +474,13 @@ export class Import
             right++;
           }
         }
-        this.nextChunk = thisChunk.substring(match, thisChunk.length).trim();
-        if (this.nextChunk.length > 0 && this.nextChunk.charAt(0) !== ',')
+        this.nextChunk = thisChunk.substring(match, thisChunk.length);
+        const trimmedNextChunk: string = this.nextChunk.trim();
+        if (trimmedNextChunk.length > 0 && trimmedNextChunk.charAt(0) !== ',')
         {
           this._sendSocketError(socket, 'JSON format incorrect.');
         }
-        this.nextChunk = this.nextChunk.substring(1, this.nextChunk.length);
+        this.nextChunk = this.nextChunk.substring(this.nextChunk.indexOf(',') + 1, this.nextChunk.length);
         thisChunk = '[' + thisChunk.substring(0, match) + ']';
       }
     }
@@ -590,13 +589,13 @@ export class Import
     winston.info('emitting socket error: ' + error);
     if (typeof socket === 'function')
     {
-      this._deleteStreamingTempFolder();
+      this._cleanStreamingTempFolder();
       socket(error);
     }
     else
     {
       socket.emit('midway_error', error);
-      this._deleteStreamingTempFolder();
+      this._cleanStreamingTempFolder();
       socket.disconnect(true);
     }
   }
@@ -630,19 +629,24 @@ export class Import
       else if (this.totalReads === targetNum)
       {
         this.totalReads++;
-        this._deleteStreamingTempFolder();
+        this._cleanStreamingTempFolder();
         winston.info('deleted streaming temp folder');
       }
     });
   }
-  private _deleteStreamingTempFolder()
+  /* deletes streaming temp folder ; if "create," recreate an empty version */
+  private _cleanStreamingTempFolder(create?: boolean)
   {
     rimraf(this.streamingTempFolder, (err) =>
     {
       if (err !== undefined && err !== null)
       {
         // can't _sendSocketError() or else would end up in an infinite cycle
-        throw new Error('Failed to delete temp file: ' + String(err));
+        throw new Error('Failed to delete temp folder: ' + String(err));
+      }
+      if (create !== undefined && create)
+      {
+        fs.mkdirSync(this.streamingTempFolder);
       }
     });
   }
@@ -799,7 +803,8 @@ export class Import
           {
             if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
             {
-              return reject('JSON file contains an object that does not contain the expected fields.');
+              return reject('JSON file contains an object that does not contain the expected fields. Got fields: ' +
+                JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
             }
           }
           resolve(items);
