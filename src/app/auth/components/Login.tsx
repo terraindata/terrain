@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -58,6 +59,8 @@ import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import './Login.less';
 
+import { backgroundColor, borderColor, Colors, fontColor } from '../../common/Colors';
+
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 
 export interface Props
@@ -67,6 +70,7 @@ export interface Props
   onLoadComplete: () => void;
 }
 
+@Radium
 class Login extends TerrainComponent<Props>
 {
   public state = {
@@ -197,7 +201,7 @@ class Login extends TerrainComponent<Props>
         (ev: Event) =>
         {
           this.setState({
-            errorModalMessage: 'Error logging in:' + JSON.stringify(ev),
+            errorModalMessage: 'Invalid email or password!',
             loggingIn: false,
             xhr: null,
           });
@@ -231,6 +235,9 @@ class Login extends TerrainComponent<Props>
     //  but the app state is still loading
     const loading = (this.state.loggingIn && !this.props.loggedIn) ||
       (this.props.loggedIn && !this.props.appStateLoaded);
+    const loginInput = [fontColor(Colors().text2), backgroundColor(Colors().bg2), borderColor(Colors().text3, Colors().text2)];
+    const loginSubmitButton = [fontColor(Colors().text2), backgroundColor(Colors().active, Colors().activeHover)];
+
     return (
       <div
         className={classNames({
@@ -256,7 +263,7 @@ class Login extends TerrainComponent<Props>
           ref='container'
         >
           <div className='login-info'>
-            <div className='login-row'>
+            <div className='login-row' style={loginInput} key={'login-email'}>
               <input
                 id='login-email'
                 type='text'
@@ -273,7 +280,7 @@ class Login extends TerrainComponent<Props>
                 Email
               </label>
             </div>
-            <div className='login-row'>
+            <div className='login-row' style={loginInput} key={'login-password'}>
               <input
                 className='login-input-field'
                 type='password'
@@ -292,8 +299,12 @@ class Login extends TerrainComponent<Props>
               </label>
             </div>
           </div>
-          <div className='login-submit-button-wrapper' >
-            <div className='login-submit-button button' onClick={this.handleLogin}>
+          <div className='login-submit-button-wrapper'>
+            <div className='login-submit-button button'
+              style={loginSubmitButton}
+              key={'login-submit-button'}
+              onClick={this.handleLogin}
+            >
               Login
             </div>
           </div>
