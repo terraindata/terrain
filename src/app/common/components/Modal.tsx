@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
@@ -76,6 +77,7 @@ export interface Props
   onTextboxValueChange?: (newValue: string) => void;
 }
 
+@Radium
 class Modal extends TerrainComponent<Props>
 {
   public closeModalSuccess()
@@ -161,7 +163,7 @@ class Modal extends TerrainComponent<Props>
               }
               {
                 this.props.showTextbox &&
-                <input
+                <input style={MODAL_INPUT_STYLE}
                   type='text'
                   className='standard-input'
                   placeholder={this.props.textboxPlaceholderValue}
@@ -236,5 +238,10 @@ const MODAL_HEADER_FOOTER_STYLE = {
 const MODAL_OVERLAY_STYLE = {
   backgroundColor: Colors().fadedOutBg,
 };
+
+const MODAL_INPUT_STYLE = [
+  fontColor(Colors().altText2),
+  backgroundColor(Colors().altBg1),
+];
 
 export default Modal;

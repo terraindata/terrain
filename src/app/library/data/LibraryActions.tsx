@@ -137,6 +137,16 @@ const Actions =
         );
       },
 
+      createAs:
+      (
+        groupId: ID,
+        name: string,
+      ) =>
+      {
+        const algorithm = LibraryTypes._Algorithm().set('name', name);
+        Actions.algorithms.create(groupId, algorithm);
+      },
+
       change:
       (algorithm: Algorithm) =>
         $(ActionTypes.algorithms.change, { algorithm }),

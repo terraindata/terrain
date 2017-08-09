@@ -51,6 +51,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
+import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
@@ -91,6 +92,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     lastMoved: string;
     draggingItemIndex: number;
     draggingOverIndex: number;
+    creatingNewAlgorithm: boolean;
+    newAlgorithmTextboxValue: string;
   } = {
     rendered: false,
     me: null,
@@ -98,6 +101,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     lastMoved: '',
     draggingItemIndex: -1,
     draggingOverIndex: -1,
+    creatingNewAlgorithm: false,
+    newAlgorithmTextboxValue: '',
   };
 
   public componentWillMount()
@@ -156,17 +161,38 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
-  public handleCreate()
-  {
-    Actions.algorithms.create(this.props.groupId);
-  }
-
   public handleNameChange(id: ID, name: string)
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm,
     );
+  }
+
+  public handleNewAlgorithmModalOpen()
+  {
+    this.setState({
+      creatingNewAlgorithm: true,
+    });
+  }
+
+  public handleNewAlgorithmModalClose()
+  {
+    this.setState({
+      creatingNewAlgorithm: false,
+    })
+  }
+
+  public handleNewAlgorithmTextboxChange(value)
+  {
+    this.setState({
+      newAlgorithmTextboxValue: value
+    });
+  }
+
+  public handleNewAlgorithmCreate()
+  {
+    Actions.algorithms.createAs(this.props.groupId, this.state.newAlgorithmTextboxValue);
   }
 
   public handleHover(index: number, type: string, id: ID)
@@ -398,7 +424,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         {
           status === ItemStatus.Build && canCreate &&
           <CreateLine
-            onClick={this.handleCreate}
+            onClick={this.handleNewAlgorithmModalOpen}
             open={false}
           />
         }
@@ -413,6 +439,18 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         index={2}
         title='Algorithms'
       >
+        <Modal
+          open={this.state.creatingNewAlgorithm}
+          showTextbox={true}
+          confirm={true}
+          onClose={this.handleNewAlgorithmModalClose}
+          onConfirm={this.handleNewAlgorithmCreate}
+          onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
+          title='New Algorithm'
+          confirmButtonText='Create'
+          message={'What would you like to name the algorithm?'}
+          textboxPlaceholderValue='Algorithm Name'
+        />
         {
           this.props.algorithmsOrder ?
             (
@@ -434,7 +472,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                     Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
                       ? 'Create a algorithm' : null
                   }
-                  onClick={this.handleCreate}
+                  onClick={this.handleNewAlgorithmModalOpen}
                 />
             )
             : null
