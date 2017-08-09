@@ -19,7 +19,7 @@ stages:
 
 lint:
   script:
-   - yarn run lint
+   - yarn run lint-parallel
   stage: lint
 
 style:
