@@ -79,7 +79,6 @@ export interface Props
   addColumn: (number, string?) => void;
   columnIndex: number;
   cardsAndCodeInSync: boolean;
-  parseError: string;
 
   containerWidth?: number;
   containerHeight?: number;
@@ -199,7 +198,7 @@ class CardsColumn extends TerrainComponent<Props>
         className={classNames({
           'cards-column': true,
           'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
-          'cards-column-has-tql-parse-error': !!this.props.parseError,
+          'cards-column-has-tql-parse-error': !this.props.cardsAndCodeInSync,
         })}
       >
         {

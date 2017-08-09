@@ -51,7 +51,7 @@ import * as BlockUtils from '../BlockUtils';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
 
-export type InitFn = (blockSpec: { [type: string]: BlockConfig }) => {
+export type InitFn = (blockSpec: { [type: string]: BlockConfig }, extraConfig?: { [key: string]: any }) => {
   [k: string]: any;
 };
 
