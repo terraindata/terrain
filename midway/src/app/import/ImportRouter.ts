@@ -66,10 +66,21 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   ctx.body = await imprt.upsert(imprtConf);
 });
 
+Router.post('/test', async (ctx, next) =>
+{
+  winston.info('importing to database');
+  const { files, fields } = await asyncBusboy(ctx.req);
+  // console.log('files: ', files);
+  // console.log('fields: ', fields);
+  ctx.body = {};
+});
+
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
   const { files, fields } = await asyncBusboy(ctx.req);
+  // console.log('files: ', files);
+  // console.log('fields: ', fields);
   const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
   if (user === null)
   {

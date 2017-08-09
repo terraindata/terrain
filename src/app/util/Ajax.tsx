@@ -686,6 +686,25 @@ export const Ajax =
       );
     },
 
+    streamFile(file: File)
+    {
+      const authState = AuthStore.getState();
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('id', String(authState.id));
+      formData.append('accessToken', authState.accessToken);
+      formData.append('templateID', String(19));
+      formData.append('filetype', 'csv');
+
+      const request = new XMLHttpRequest();
+      request.timeout = 360000;
+      request.open('post', 'http://localhost:3000/midway/v1/import/headless');
+      request.send(formData);
+
+      return;
+    },
+
     importFile(fileContents: string,
       filetype: string,
       dbname: string,
