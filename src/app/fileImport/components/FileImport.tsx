@@ -240,7 +240,7 @@ class FileImport extends TerrainComponent<any>
     if (hasCsvHeader)
     {
       const testDuplicateConfig = {
-        quoteChar: '\'',
+        quoteChar: '"',
         header: false,
         preview: 1,
         skipEmptyLines: true,

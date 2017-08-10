@@ -48,7 +48,7 @@ import sha1 = require('sha1');
 
 import * as stream from 'stream';
 
-import * as csvjson from 'csvjson';
+import * as csv from 'fast-csv';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import * as socketio from 'socket.io';
@@ -92,7 +92,6 @@ export class Import
   };
   private supportedColumnTypes: Set<string> = new Set(Object.keys(this.compatibleTypes).concat(['array']));
   private numericTypes: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
-  private quoteChar: string = '\'';
   private batchSize: number = 5000;
 
   private imprt: ImportConfig;
@@ -826,21 +825,22 @@ export class Import
         }
       } else if (imprt.filetype === 'csv')
       {
-        try
+        const items: object[] = [];
+        csv.fromString(contents, { ignoreEmpty: true }).on('data', (data) =>
         {
-          const options: object = {
-            delimiter: ',',
-            quote: this.quoteChar,
-            // TODO: handle case where field name contains quoteChar
-            headers: imprt.originalNames.map((val) => this.quoteChar + val + this.quoteChar).join(','),
-          };
-          resolve(csvjson.toObject(contents, options));
-        }
-        catch (e)
+          const obj: object = {};
+          imprt.originalNames.forEach((val, ind) =>
+          {
+            obj[val] = data[ind] === undefined ? '' : data[ind];
+          });
+          items.push(obj);
+        }).on('error', (e) =>
         {
-          // NOTE: csvjson parser will not throw errors for rows that contain the wrong number of entries
-          return reject('CSV format incorrect: ' + String(e));
-        }
+          reject('CSV format incorrect: ' + String(e));
+        }).on('end', () =>
+        {
+          resolve(items);
+        });
       }
     });
   }
