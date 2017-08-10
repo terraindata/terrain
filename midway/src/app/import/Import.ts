@@ -247,6 +247,7 @@ export class Import
         reject(e);
       }
 
+      // TODO: switch back to the first line once file system callbacks have been rewritten as promises
       // this._cleanStreamingTempFolder(true);
       fs.mkdirSync(this.streamingTempFolder);
 
