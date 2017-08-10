@@ -163,7 +163,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       <div>
         <div className='library-info-line'>
           <div>
-            Default Database
+            Database
           </div>
           <Dropdown
             selectedIndex={this.state.dbs && this.state.dbs.findIndex(

@@ -155,9 +155,14 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     const group = LibraryStore.getState().groups.get(this.props.groupId);
     const dbs = LibraryStore.getState().dbs;
-    const alreadySelectedIndex = (this.state.newAlgorithmDbIndex !== -1 && this.state.newAlgorithmDbIndex);
-    const defaultIndex = dbs && group.db && dbs.findIndex((db) => db.id === group.db.id);
-    return alreadySelectedIndex || defaultIndex;
+    if (this.state.newAlgorithmDbIndex !== -1)
+    {
+      return this.state.newAlgorithmDbIndex;
+    }
+    else
+    {
+      return dbs && group.db && dbs.findIndex((db) => db.id === group.db.id);
+    }
   }
 
   public handleDuplicate(id: ID)
@@ -186,9 +191,14 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNewAlgorithmModalOpen()
   {
+    let index = this.getNewAlgorithmIndex();
+    if (index === -1)
+    {
+      index = 0;
+    }
     this.setState({
       creatingNewAlgorithm: true,
-      newAlgorithmDbIndex: -1,
+      newAlgorithmDbIndex: index,
       newAlgorithmTextboxValue: '',
     });
   }
@@ -197,7 +207,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     this.setState({
       creatingNewAlgorithm: false,
-    })
+      newAlgorithmDbIndex: -1,
+    });
   }
 
   public handleNewAlgorithmTextboxChange(value)
@@ -211,7 +222,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     this.setState({
       newAlgorithmDbIndex: dbIndex,
-    })
+    });
   }
 
   public handleNewAlgorithmCreate()
@@ -465,16 +476,44 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
-            selectedIndex={this.getNewAlgorithmIndex()}
+            selectedIndex={this.state.newAlgorithmDbIndex}
             options={dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
             onChange={this.handleNewAlgorithmDbChange}
             canEdit={true}
-            directionBias={400}
+            directionBias={300}
             className='bic-db-dropdown'
           />
         </div>
       </div>
     );
+  }
+
+  public renderCreateAlgorithmModal()
+  {
+    const canCreateAlgorithm: boolean = LibraryStore.getState().dbs.size > 0;
+    return canCreateAlgorithm ?
+      (<Modal
+        open={this.state.creatingNewAlgorithm}
+        showTextbox={true}
+        confirm={true}
+        onClose={this.handleNewAlgorithmModalClose}
+        onConfirm={this.handleNewAlgorithmCreate}
+        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
+        title='New Algorithm'
+        confirmButtonText='Create'
+        message='What would you like to name the algorithm?'
+        textboxPlaceholderValue='Algorithm Name'
+        children={this.renderDatabaseDropdown()}
+        childrenMessage='Please select a database'
+        allowOverflow={true}
+      />) :
+      (<Modal
+        open={this.state.creatingNewAlgorithm}
+        onClose={this.handleNewAlgorithmModalClose}
+        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
+        title='Cannot Create New Algorithm'
+        message='No databases available'
+      />);
   }
 
   public render()
@@ -484,21 +523,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         index={2}
         title='Algorithms'
       >
-        <Modal
-          open={this.state.creatingNewAlgorithm}
-          showTextbox={true}
-          confirm={true}
-          onClose={this.handleNewAlgorithmModalClose}
-          onConfirm={this.handleNewAlgorithmCreate}
-          onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
-          title='New Algorithm'
-          confirmButtonText='Create'
-          message='What would you like to name the algorithm?'
-          textboxPlaceholderValue='Algorithm Name'
-          children={this.renderDatabaseDropdown()}
-          childrenMessage='Please select a database'
-          allowOverflow={true}
-        />
+        {
+          this.renderCreateAlgorithmModal()
+        }
         {
           this.props.algorithmsOrder ?
             (
