@@ -220,7 +220,6 @@ const BuilderColumn = createReactClass<any, any>(
             addColumn={this.props.onAddManualColumn}
             columnIndex={this.props.index}
             cardsAndCodeInSync={query.cardsAndCodeInSync}
-            parseError={query.parseError}
             language={query.language}
           />;
 

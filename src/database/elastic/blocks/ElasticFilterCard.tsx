@@ -51,7 +51,7 @@ import * as _ from 'underscore';
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
-import { Colors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
@@ -66,6 +66,7 @@ const esFilterOperatorsMap = {
   '<': 'lt',
   '≤': 'lte',
   '=': 'term',
+  '≈': 'match',
 };
 
 export const elasticFilterBlock = _block(
@@ -95,6 +96,16 @@ export const elasticFilterBlock = _block(
           return {
             [block['boolQuery']]: {
               term: {
+                [block['field']]: value,
+              },
+            },
+          };
+        }
+        else if (block['filterOp'] === '≈')
+        {
+          return {
+            [block['boolQuery']]: {
+              match: {
                 [block['field']]: value,
               },
             },
@@ -133,7 +144,7 @@ export const elasticFilter = _card({
     language: 'elastic',
     title: 'Filter',
     description: 'Terrain\'s custom card for filtering results in a human-readable way.',
-    colors: Colors().builder.cards.booleanClause,
+    colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: '[filters.length] Filters',
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
@@ -187,6 +198,7 @@ export const elasticFilter = _card({
                   'must',
                   'must_not',
                   'should',
+                  'filter',
                 ],
                 // Can consider using this, but it includes "minmum_should_match," which
                 //  doesn't make sense in this context
