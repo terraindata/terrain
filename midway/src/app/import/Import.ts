@@ -247,7 +247,8 @@ export class Import
         reject(e);
       }
 
-      this._cleanStreamingTempFolder(true);
+      // this._cleanStreamingTempFolder(true);
+      fs.mkdirSync(this.streamingTempFolder);
 
       this.readStream = file;
       this.chunkQueue = [];
@@ -303,7 +304,7 @@ export class Import
   {
     const time: number = Date.now();
     winston.info('putting mapping...');
-    await this._tastyPutMapping();
+    await this.database.getTasty().getDB().putMapping(this.insertTable);
     winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
 
     winston.info('opening files for upsert...');
@@ -488,10 +489,6 @@ export class Import
       winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
       resolve(items);
     });
-  }
-  private async _tastyPutMapping(): Promise<object>
-  {
-    return this.database.getTasty().getDB().putMapping(this.insertTable);
   }
   private async _tastyUpsert(imprt: ImportConfig, items: object[]): Promise<ImportConfig>
   {

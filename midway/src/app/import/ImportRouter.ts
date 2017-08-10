@@ -56,12 +56,20 @@ import { Import, ImportConfig } from './Import';
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', async (ctx, next) =>
 {
   winston.info('importing to database');
   const { files, fields } = await asyncBusboy(ctx.req);
-  Util.verifyParameters(fields, ['dbid', 'dbname', 'tablename', 'filetype', 'update']);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+
+  Util.verifyParameters(fields, ['dbid', 'dbname', 'tablename', 'filetype']);
   Util.verifyParameters(fields, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  // optional parameters: update, hasCsvHeader
 
   ctx.body = await imprt.upsert(files, fields, false);
 });

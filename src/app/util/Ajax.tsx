@@ -728,6 +728,8 @@ export const Ajax =
 
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('id', String(authState.id));
+      formData.append('accessToken', authState.accessToken);
       formData.append('filetype', filetype);
       formData.append('dbname', dbname);
       formData.append('tablename', tablename);
@@ -737,7 +739,7 @@ export const Ajax =
       formData.append('primaryKey', primaryKey);
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
-      formData.append('csvHeaderMissing', String(csvHeaderMissing));
+      formData.append('hasCsvHeader', String(!csvHeaderMissing));
 
       const request = new XMLHttpRequest();
       request.open('post', MIDWAY_HOST + '/midway/v1/import/');
