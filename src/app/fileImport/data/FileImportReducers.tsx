@@ -201,10 +201,10 @@ FileImportReducers[ActionTypes.changeTableText] =
     state
       .set('tableText', action.payload.tableText);
 
-FileImportReducers[ActionTypes.changeHasCsvHeader] =
+FileImportReducers[ActionTypes.changeCsvHeaderMissing] =
   (state, action) =>
     state
-      .set('csvHeaderMissing', !state.csvHeaderMissing)
+      .set('csvHeaderMissing', action.payload.csvHeaderMissing)
   ;
 
 FileImportReducers[ActionTypes.changeUploadInProgress] =
@@ -298,6 +298,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
       state.elasticUpdate,
+      state.csvHeaderMissing,
     );
     /*
     Ajax.importFile(
