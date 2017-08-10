@@ -61,6 +61,7 @@ class FileImportStateC extends BaseClass
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
   public primaryKey: number = -1;
+  public csvHeaderMissing: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);

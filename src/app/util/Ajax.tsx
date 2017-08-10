@@ -721,6 +721,7 @@ export const Ajax =
       primaryKey: string,
       transformations: Immutable.List<object>,
       update: boolean,
+      csvHeaderMissing: boolean,
     )
     {
       const authState = AuthStore.getState();
@@ -736,6 +737,7 @@ export const Ajax =
       formData.append('primaryKey', primaryKey);
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
+      formData.append('csvHeaderMissing', String(csvHeaderMissing));
 
       const request = new XMLHttpRequest();
       request.open('post', 'http://localhost:3000/midway/v1/import/headless');

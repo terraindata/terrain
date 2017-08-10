@@ -64,9 +64,9 @@ const FileImportActions =
     (tableText: string) =>
       $(ActionTypes.changeTableText, { tableText }),
 
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
+    changeCsvHeaderMissing:
+    (csvHeaderMissing: boolean) =>
+      $(ActionTypes.changeCsvHeaderMissing, { csvHeaderMissing }),
 
     changePrimaryKey:
     (columnId: number) =>
