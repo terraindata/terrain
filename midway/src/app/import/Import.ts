@@ -280,7 +280,7 @@ export class Import
       let imprtConf: ImportConfig;
       if (headless)
       {
-        const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
+        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateID']));
         if (templates.length === 0)
         {
           return reject('Invalid template ID provided: ' + String(fields['templateID']));
