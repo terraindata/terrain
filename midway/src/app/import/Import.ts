@@ -76,6 +76,7 @@ export interface ExportConfig extends ImportConfig, ExportTemplateConfig
 {
   filetype: string;
   filestream: any; // TODO use a more strict type
+  rank?: boolean;
 }
 
 export class Import
@@ -348,66 +349,81 @@ export class Import
       {
         return reject('Empty query provided.');
       }
-      const result: any = await new Promise((resolveES, rejectES) =>
-      {
-        elasticClient.search(JSON.parse(qry),
-          Util.makePromiseCallback(resolveES, rejectES));
-      });
-      const newDocs: object[] = result.hits.hits as object[];
-      let returnDocs: object[] = [];
-      for (const doc of newDocs)
-      {
-        // verify schema mapping with documents and fix documents accordingly
-        const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname);
-        if (typeof newDoc === 'string')
-        {
-          return reject(newDoc);
-        }
-        for (const field of Object.keys(newDoc))
-        {
-          if (newDoc.hasOwnProperty(field) && newDoc[field] instanceof Array)
-          {
-            newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
-          }
-        }
-        returnDocs.push(newDoc as object);
-      }
-
-      console.log(returnDocs);
-      // transform documents with template
-      try
-      {
-        returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
-      } catch (e)
-      {
-        return reject(e);
-      }
-
-      // export to csv
+      let rankCounter: number = 1;
       const writer = csvWriter();
       const pass = new stream.PassThrough();
-      writer.pipe(pass);
-      for (const returnDoc of returnDocs)
-      {
-        writer.write(returnDoc);
-      }
-      writer.end();
+      const qryObj: object = JSON.parse(qry);
+      qryObj['scroll'] = '60s';
+      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp) {
+
+        const newDocs: object[] = resp.hits.hits as object[];
+        let returnDocs: object[] = [];
+        for (const doc of newDocs)
+        {
+          // verify schema mapping with documents and fix documents accordingly
+          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname);
+          if (typeof newDoc === 'string')
+          {
+            return reject(newDoc);
+          }
+          newDoc['rank'] = rankCounter;
+          for (const field of Object.keys(newDoc))
+          {
+            if (newDoc.hasOwnProperty(field) && newDoc[field] instanceof Array)
+            {
+              newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
+            }
+          }
+          returnDocs.push(newDoc as object);
+          rankCounter++;
+        }
+
+        // transform documents with template
+        try
+        {
+          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true, exprt.rank));
+        } catch (e)
+        {
+          return reject(e);
+        }
+
+        // export to csv
+        writer.pipe(pass);
+        for (const returnDoc of returnDocs)
+        {
+          writer.write(returnDoc);
+        }
+
+        if (resp.hits.total > rankCounter - 1) {
+          elasticClient.scroll({
+            scrollId: resp._scroll_id,
+            scroll: '60s',
+          }, getMoreUntilDone);
+        }
+        else
+        {
+          writer.end();
+        }
+      }.bind(this),
+      );
+
       resolve(pass);
     });
   }
 
   private _convertArrayToCSVArray(arr: any[]): string
   {
-    let returnStr: string = '"[';
-    for (const field of arr)
-    {
-      returnStr += field + ', ';
-    }
-    if (arr.length !== 0)
-    {
-      returnStr = returnStr.substring(0, returnStr.length - 2);
-    }
-    return returnStr + ']"';
+    return JSON.stringify(arr);
+    // let returnStr: string = '"[';
+    // for (const field of arr)
+    // {
+    //   returnStr += field + ', ';
+    // }
+    // if (arr.length !== 0)
+    // {
+    //   returnStr = returnStr.substring(0, returnStr.length - 2);
+    // }
+    // return returnStr + ']"';
   }
 
   private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object | string>
@@ -633,7 +649,7 @@ export class Import
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig, dontCheck?: boolean): Promise<object[][]>
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig, dontCheck?: boolean, rank?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
     let baseInd: number = 0;
@@ -671,6 +687,10 @@ export class Import
               {
                 return thisReject(typeError);
               }
+            }
+            if (rank === true)
+            {
+              trimmedItem['rank'] = item['rank'];
             }
             transformedItems.push(trimmedItem);
             ind++;
