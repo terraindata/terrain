@@ -68,6 +68,8 @@ export interface IColumn
   key: string;
   name: string;
   resizable?: boolean;
+  sortable?: boolean;
+  filterable?: boolean;
   width?: number;
 }
 

@@ -111,6 +111,7 @@ export default class ResultsTable extends TerrainComponent<Props>
           key: resultsConfig.name,
           name: resultsConfig.name,
           resizable: true,
+          sortable: true,
         });
       }
 
@@ -120,6 +121,7 @@ export default class ResultsTable extends TerrainComponent<Props>
           key: resultsConfig.score,
           name: resultsConfig.score,
           resizable: true,
+          sortable: true,
         });
       }
     }
@@ -132,6 +134,7 @@ export default class ResultsTable extends TerrainComponent<Props>
             key: field,
             name: field,
             resizable: true,
+            sortable: true,
           }),
       );
     }
@@ -144,6 +147,7 @@ export default class ResultsTable extends TerrainComponent<Props>
             key: field,
             name: field,
             resizable: true,
+            sortable: true,
             width: 120,
           }),
       );
@@ -252,6 +256,11 @@ export default class ResultsTable extends TerrainComponent<Props>
     this.props.onExpand(r);
   }
 
+  public handleGridSort(sortColumn, sortDirection)
+  {
+    this.setState({ sortColumn, sortDirection });
+  }
+
   public spotlight(menuIndex: number, rc: string)
   {
     // TODO
@@ -285,7 +294,9 @@ export default class ResultsTable extends TerrainComponent<Props>
     // console.log(this.state.columns);
     return (
       <Table
+        onGridSort={this.handleGridSort}
         columns={this.state.columns}
+        enableCellSelect={true}
         rowGetter={this.getRow}
         rowsCount={this.props.results.size}
         random={this.state.random}
