@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import './TransformChart.less';
 
-import * as Colors from '../../../common/Colors';
+import { Colors } from '../../../common/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
@@ -122,6 +122,15 @@ const TransformChart = {
       .attr('class', 'spotlights');
 
     this.update(el, state);
+
+    // apply CSS styles
+
+    const styleCSS = `
+    .transform-chart .tick text {
+      fill: ${Colors().text2} !important;
+    }
+    `;
+    let style = $(el).append(`<style>${styleCSS}</style>`);
   },
 
   update(el, state)
