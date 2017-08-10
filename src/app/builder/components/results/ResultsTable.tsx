@@ -48,12 +48,14 @@ THE SOFTWARE.
 
 import { List, Map } from 'immutable';
 import * as React from 'react';
+import { Toolbar } from 'react-data-grid-addons';
+
 import * as _ from 'underscore';
 
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { MenuOption } from '../../../common/components/Menu';
-import { IColumn, Table } from '../../../common/components/Table';
+import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
@@ -73,13 +75,15 @@ export default class ResultsTable extends TerrainComponent<Props>
   public state: {
     random: number;
     spotlightState: SpotlightState;
-    columns: List<IColumn>;
+    columns: List<TableColumn>;
     rows: List<any>;
+    selectedIndexes: List<any>;
   } = {
     random: 0,
     spotlightState: null,
     columns: this.getColumns(this.props),
     rows: List([]),
+    selectedIndexes: List([]),
   };
 
   public menuOptions: List<MenuOption> = List([
@@ -102,10 +106,10 @@ export default class ResultsTable extends TerrainComponent<Props>
     }
   }
 
-  public getColumns(props: Props): List<IColumn>
+  public getColumns(props: Props): List<TableColumn>
   {
     const { resultsConfig } = props;
-    let cols: IColumn[] = [];
+    let cols: TableColumn[] = [];
 
     if (resultsConfig.enabled)
     {
@@ -114,6 +118,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         cols.push({
           key: resultsConfig.name,
           name: resultsConfig.name,
+          filterable: true,
           resizable: true,
           sortable: true,
         });
@@ -124,6 +129,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         cols.push({
           key: resultsConfig.score,
           name: resultsConfig.score,
+          filterable: true,
           resizable: true,
           sortable: true,
         });
@@ -137,6 +143,7 @@ export default class ResultsTable extends TerrainComponent<Props>
           cols.push({
             key: field,
             name: field,
+            filterable: true,
             resizable: true,
             sortable: true,
           }),
@@ -150,6 +157,7 @@ export default class ResultsTable extends TerrainComponent<Props>
           cols.push({
             key: field,
             name: field,
+            filterable: true,
             resizable: true,
             sortable: true,
             width: 120,
@@ -262,6 +270,18 @@ export default class ResultsTable extends TerrainComponent<Props>
     this.props.onExpand(r);
   }
 
+  public onRowsSelected(rows)
+  {
+    const rowIndexes = rows.map((r) => r.rowIdx);
+    this.setState({ selectedIndexes: this.state.selectedIndexes.concat(rowIndexes) });
+  }
+
+  public onRowsDeselected(rows)
+  {
+    const rowIndexes = rows.map((r) => r.rowIdx);
+    this.setState({ selectedIndexes: this.state.selectedIndexes.filter((i) => rowIndexes.indexOf(i) === -1 ) });
+  }
+
   public handleGridSort(sortColumn, sortDirection)
   {
     const comparer = (aa, bb) =>
@@ -291,6 +311,31 @@ export default class ResultsTable extends TerrainComponent<Props>
     {
       this.setState({ rows: this.state.rows.sort(comparer) });
     }
+
+    if (this.state.selectedIndexes.size > 0)
+    {
+      // todo
+      this.setState({ selectedIndexes: List([]) });
+    }
+  }
+
+  public handleFilterChange(filter)
+  {
+    if (filter.filterTerm === '')
+    {
+      this.clearFilters();
+    }
+    else
+    {
+      this.setState({
+        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm)))
+      });
+    }
+  }
+
+  public clearFilters()
+  {
+    this.setState({ rows: this.props.results });
   }
 
   public spotlight(menuIndex: number, rc: string)
@@ -311,7 +356,7 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public render()
   {
-    if (!this.props.results)
+    if (!this.state.rows)
     {
       return <InfoArea large='Loading...' />;
     }
@@ -328,13 +373,25 @@ export default class ResultsTable extends TerrainComponent<Props>
       <Table
         onGridSort={this.handleGridSort}
         columns={this.state.columns}
-        enableCellSelect={true}
+        rows={this.state.rows}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.size}
         random={this.state.random}
         onCellClick={this.handleCellClick}
         menuOptions={this.menuOptions}
         rowKey={'id' /*TODO*/}
+        rowSelection={{
+          showCheckbox: true,
+          enableShiftSelect: true,
+          onRowsSelected: this.onRowsSelected,
+          onRowsDeselected: this.onRowsDeselected,
+          selectBy: {
+            indexes: this.state.selectedIndexes.toJS(),
+          }
+        }}
+        toolbar={<Toolbar enableFilter={true}/>}
+        onAddFilter={this.handleFilterChange}
+        onClearFilters={this.clearFilters}
       />
     );
   }
