@@ -51,9 +51,11 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as io from 'socket.io-client';
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
+import AuthStore from './../../auth/data/AuthStore';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -79,8 +81,11 @@ export interface Props
   columnOptions: List<string>;
   templates: List<FileImportTypes.Template>;
   transforms: List<FileImportTypes.Transform>;
+
   uploadInProgress: boolean;
   elasticUpdate: boolean;
+
+  file: File;
 }
 
 @Radium
@@ -149,6 +154,11 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
+  }
+
   public handleTemplateChange(templateId: number)
   {
     this.setState({
@@ -206,11 +216,6 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.templateText);
   }
 
-  public handleElasticUpdateChange()
-  {
-    Actions.changeElasticUpdate();
-  }
-
   public handleUploadFile()
   {
     Actions.uploadFile();
@@ -220,16 +225,16 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='fi-preview-template'
+        className='flex-container fi-preview-template'
       >
         <div
-          className='fi-preview-load'
+          className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='fi-load-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleLoadTemplate}
             style={buttonColors()}
-            ref='fi-load-button'
+            ref='fi-preview-template-button-load'
           >
             Load Template
           </div>
@@ -237,19 +242,19 @@ class FileImportPreview extends TerrainComponent<Props>
             selectedIndex={this.state.templateId}
             options={this.state.templateOptions}
             onChange={this.handleTemplateChange}
-            className={'fi-load-dropdown'}
+            className={'flex-grow fi-preview-template-load-dropdown'}
             canEdit={true}
           />
         </div>
 
         <div
-          className='fi-preview-save'
+          className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='fi-save-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleSaveTemplate}
             style={buttonColors()}
-            ref='fi-save-button'
+            ref='fi-preview-template-button-save'
           >
             Save Template
           </div>
@@ -258,7 +263,7 @@ class FileImportPreview extends TerrainComponent<Props>
             options={null}
             onChange={this.handleAutocompleteTemplateChange}
             placeholder={'template name'}
-            className={'fi-save-autocomplete'}
+            className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
           />
         </div>
@@ -318,20 +323,29 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTemplate()}
         {this.renderTable()}
         <div
-          className='fi-preview-update'
+          className='fi-import-button-wrapper'
         >
-          update
-          <CheckBox
-            checked={this.props.elasticUpdate}
-            onChange={this.handleElasticUpdateChange}
-          />
-        </div>
-        <div
-          className='fi-preview-import-button'
-          onClick={this.handleUploadFile}
-          style={buttonColors()}
-        >
-          Import
+          <div
+            className='fi-preview-update'
+          >
+            <CheckBox
+              checked={this.props.elasticUpdate}
+              onChange={this.handleElasticUpdateChange}
+            />
+            <span
+              className='clickable'
+              onClick={this.handleElasticUpdateChange}
+            >
+              Join against any existing entries
+            </span>
+          </div>
+          <div
+            className='fi-preview-import-button'
+            onClick={this.handleUploadFile}
+            style={buttonColors()}
+          >
+            Import
+          </div>
         </div>
         {
           this.props.uploadInProgress &&

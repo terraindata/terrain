@@ -44,34 +44,45 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import { users } from '../users/UserRouter';
 import * as Util from '../Util';
-import { Import, ImportConfig, ExportConfig } from './Import';
+import { ExportConfig, Import, ImportConfig } from './Import';
 import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', async (ctx, next) =>
 {
   winston.info('importing to database');
-  const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype']);
-  Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
 
-  ctx.body = await imprt.upsert(imprtConf);
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'tablename', 'filetype']);
+  Util.verifyParameters(authStream['fields'], ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  // optional parameters: update, hasCsvHeader
+
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
 });
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
   const exprtConf: ExportConfig = ctx.request.body.body;
   Util.verifyParameters(exprtConf, ['variantId', 'templateID']);
-  console.log('0');
   ctx.body = await imprt.export(exprtConf);
 });
 
@@ -84,10 +95,11 @@ Router.post('/headless', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  const body: object = authStream['body'];
-  Util.verifyParameters(authStream, ['templateID', 'filetype']);
 
-  ctx.body = await imprt.headlessUpsert(body as ImportConfig);
+  Util.verifyParameters(authStream['fields'], ['templateID', 'filetype']);
+  // optional parameters: update, hasCsvHeader
+
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });
 
 export default Router;

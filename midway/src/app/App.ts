@@ -46,12 +46,13 @@ THE SOFTWARE.
 
 import * as http from 'http';
 import * as Koa from 'koa';
+import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
 import babelRegister = require('babel-register');
+import cors = require('kcors');
 import session = require('koa-session');
 import serve = require('koa-static-server');
-import cors = require('kcors');
 import srs = require('secure-random-string');
 
 import * as DBUtil from '../database/Util';
@@ -61,6 +62,7 @@ import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
+import { imprt } from './import/ImportRouter';
 import './Logging';
 import Middleware from './Middleware';
 import MidwayRouter from './Router';
@@ -112,17 +114,15 @@ class App
     this.app = new Koa();
     this.app.proxy = true;
     this.app.keys = [srs({ length: 256 })];
+    this.app.use(async (ctx, next) =>
+    {
+      // tslint:disable-next-line:no-empty
+      ctx.req.setTimeout(0, () => { });
+      await next();
+    });
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
-    this.app.use(async (ctx, next) =>
-    {
-      if (ctx.path === '/midway/v1/import/headless')
-      {
-        ctx['disableBodyParser'] = true;
-      }
-      await next();
-    });
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
     this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));

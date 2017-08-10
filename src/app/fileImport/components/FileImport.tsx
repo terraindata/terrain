@@ -67,8 +67,11 @@ import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
+import has = Reflect.has;
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
+
+const CHUNK_SIZE = FileImportTypes.CHUNK_SIZE;
 
 export interface Props
 {
@@ -85,43 +88,27 @@ class FileImport extends TerrainComponent<any>
     fileImportState: FileImportTypes.FileImportState;
     columnOptionNames: List<string>;
     stepId: number;
-
     servers?: SchemaTypes.ServerMap;
     serverNames: List<string>;
     serverIndex: number;
-    serverSelected: boolean;
-
     dbs?: SchemaTypes.DatabaseMap;
     dbNames: List<string>;
-    dbSelected: boolean;
-
     tables?: SchemaTypes.TableMap;
     tableNames: List<string>;
-    tableSelected: boolean;
-
     fileSelected: boolean;
-    file: string;
-    filetype: string;
-    filename: string;
+    filename: string,
+    showCsvHeaderOption: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
     stepId: 0,
-
     serverIndex: -1,
     serverNames: List([]),
-    serverSelected: false,
-
     dbNames: List([]),
-    dbSelected: false,
-
     tableNames: List([]),
-    tableSelected: false,
-
     fileSelected: false,
-    file: '',
-    filetype: '',
     filename: '',
+    showCsvHeaderOption: false,
   };
 
   constructor(props)
@@ -147,34 +134,16 @@ class FileImport extends TerrainComponent<any>
 
   public handleNextStepChange()
   {
-    switch (this.state.stepId)
+    const { stepId } = this.state;
+    const { dbText, tableText } = this.state.fileImportState;
+    switch (stepId)
     {
       case 0:
-        if (!this.state.fileSelected)
-        {
-          alert('Please select a file');
-          return;
-        }
-        const isSuccess = this.parseAndChooseFile(this.state.file, this.state.filetype);
-        if (!isSuccess)
-        {
-          return;
-        }
         break;
       case 1:
-        if (!this.state.serverSelected)
-        {
-          alert('Please select a server');
-          return;
-        }
         break;
       case 2:
-        if (!this.state.dbSelected)
-        {
-          alert('Please select or enter a database');
-          return;
-        }
-        let msg = isValidIndexName(this.state.fileImportState.dbText);
+        let msg = isValidIndexName(dbText);
         if (msg)
         {
           alert(msg);
@@ -182,12 +151,7 @@ class FileImport extends TerrainComponent<any>
         }
         break;
       case 3:
-        if (!this.state.tableSelected)
-        {
-          alert('Please select or enter a table');
-          return;
-        }
-        msg = isValidTypeName(this.state.fileImportState.tableText);
+        msg = isValidTypeName(tableText);
         if (msg)
         {
           alert(msg);
@@ -197,20 +161,16 @@ class FileImport extends TerrainComponent<any>
       default:
     }
     this.setState({
-      stepId: this.state.stepId + 1,
+      stepId: stepId + 1,
     });
   }
 
   public handlePrevStepChange()
   {
+    const { stepId } = this.state;
     this.setState({
-      stepId: this.state.stepId - 1,
+      stepId: stepId - 1,
     });
-  }
-
-  public handleCsvHeaderChange()
-  {
-    Actions.changeHasCsvHeader();
   }
 
   public handleServerChange(serverIndex: number)
@@ -219,7 +179,6 @@ class FileImport extends TerrainComponent<any>
     const serverName = serverNames.get(serverIndex);
     this.setState({
       serverIndex,
-      serverSelected: true,
       dbNames: List(servers.get(serverName).databaseIds.map((db) =>
         db.split('/').pop(),
       )),
@@ -233,7 +192,6 @@ class FileImport extends TerrainComponent<any>
     const { dbs } = this.state;
     const { serverText } = this.state.fileImportState;
     this.setState({
-      dbSelected: !!dbText,
       tableNames: dbText && dbs.get(databaseId(serverText, dbText)) ?
         List(dbs.get(databaseId(serverText, dbText)).tableIds.map((table) =>
           table.split('.').pop(),
@@ -250,7 +208,6 @@ class FileImport extends TerrainComponent<any>
     const { tables } = this.state;
     const { serverText, dbText } = this.state.fileImportState;
     this.setState({
-      tableSelected: !!tableText,
       columnOptionNames: tableText && tables.get(tableId(serverText, dbText, tableText)) ?
         List(tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
           column.split('.').pop(),
@@ -273,21 +230,18 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseCsv(file: string): object[]
+  public parseCsv(file: string, hasCsvHeader: boolean): object[]
   {
-    const { csvHeaderMissing } = this.state.fileImportState;
-
-    if (!csvHeaderMissing)
+    if (hasCsvHeader)
     {
       const testDuplicateConfig = {
-        quoteChar: '\'',
+        quoteChar: '"',
         header: false,
         preview: 1,
         skipEmptyLines: true,
       };
 
       const columnHeaders = Papa.parse(file, testDuplicateConfig).data;
-
       const colHeaderSet = new Set();
       const duplicateHeaderSet = new Set();
       columnHeaders[0].map((colHeader) =>
@@ -309,7 +263,7 @@ class FileImport extends TerrainComponent<any>
     }
     const config = {
       quoteChar: '\'',
-      header: !csvHeaderMissing,
+      header: hasCsvHeader,
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       error: (err) =>
       {
@@ -330,36 +284,45 @@ class FileImport extends TerrainComponent<any>
     return items;
   }
 
-  public parseAndChooseFile(file: string, filetype: string): boolean
+  public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
   {
-    const { csvHeaderMissing } = this.state.fileImportState;
-    let items = [];
-    switch (filetype)
+    const fileToRead = file.slice(0, CHUNK_SIZE);
+    const fr = new FileReader();
+    fr.readAsText(fileToRead);
+    fr.onloadend = () =>
     {
-      case 'json':
-        items = this.parseJson(file);
-        break;
-      case 'csv':
-        items = this.parseCsv(file);
-        break;
-      default:
-    }
-    if (items.length === 0)
-    {
-      return false;
-    }
+      // assume preview fits in one chunk
+      const stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
+      let items;
+      switch (filetype)
+      {
+        case 'json':
+          items = this.parseJson(stringifiedFile);
+          break;
+        case 'csv':
+          items = this.parseCsv(stringifiedFile, hasCsvHeader);
+          break;
+        default:
+      }
+      if (items.length === 0)
+      {
+        return;
+      }
 
-    const columnNames = _.map(items[0], (value, index) =>
-      filetype === 'csv' && csvHeaderMissing ? 'column ' + String(index) : index,
-    );
-    const previewRows = items.map((item, i) =>
-      _.map(item, (value, key) =>
-        typeof value === 'string' ? value : JSON.stringify(value),
-      ),
-    );
+      const previewRows = items.map((item) =>
+        _.map(item, (value, key) =>
+          typeof value === 'string' ? value : JSON.stringify(value), // JSON files infer types
+        ),
+      );
+      const columnNames = _.map(items[0], (value, index) =>
+        filetype === 'csv' && !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
+      );
 
-    Actions.chooseFile(file, filetype, List<List<string>>(previewRows), List<string>(columnNames));
-    return true;
+      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      this.setState({
+        fileSelected: true,
+      });
+    };
   }
 
   public handleSelectFile(file)
@@ -369,10 +332,6 @@ class FileImport extends TerrainComponent<any>
     {
       return;
     }
-    this.setState({
-      fileSelected,
-      filename: file.target.files[0].name,
-    });
 
     const filetype = file.target.files[0].name.split('.').pop();
     if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)
@@ -380,18 +339,21 @@ class FileImport extends TerrainComponent<any>
       alert('Invalid filetype: ' + String(filetype));
       return;
     }
+    this.setState({
+      filename: file.target.files[0].name,
+    });
+    Actions.saveFile(file.target.files[0], filetype);
 
-    const fr = new FileReader();
-    fr.readAsText(file.target.files[0]);
-
-    fr.onloadend = () =>
+    if (filetype === 'csv')
     {
       this.setState({
-        file: fr.result,
-        filetype,
+        showCsvHeaderOption: true,
       });
-      this.refs['file']['value'] = null; // prevent file-caching
-    };
+    }
+    else
+    {
+      this.parseFile(file.target.files[0], filetype, null);
+    }
   }
 
   public renderSteps()
@@ -412,26 +374,85 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
+  public handleSelectFileButtonClick()
+  {
+    this.setState({
+      showCsvHeaderOption: false,
+    });
+    this.refs['file']['value'] = null; // prevent file-caching
+    this.refs['file']['click']();
+  }
+
+  public handleCsvHeaderChoice(hasCsvHeader: boolean)
+  {
+    Actions.changeCsvHeaderMissing(!hasCsvHeader);
+    const { file, filetype } = this.state.fileImportState;
+    this.setState({
+      showCsvHeaderOption: false,
+    });
+    this.parseFile(file, filetype, hasCsvHeader);
+  }
+
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, csvHeaderMissing,
-      primaryKey, templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
+    const { dbText, tableText } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
+    const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
+    const { file } = fileImportState;
 
-    let content = {};
+    let content;
     switch (this.state.stepId)
     {
       case 0:
         content =
           <div>
-            <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
-            has header row (csv only)
-            <CheckBox
-              checked={!csvHeaderMissing}
-              onChange={this.handleCsvHeaderChange}
-            />
+            <div
+              className='flex-container fi-step-row'
+            >
+              <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
+              <div
+                className='button'
+                onClick={this.handleSelectFileButtonClick}
+                style={buttonColors()}
+                ref='fi-select-button'
+              >
+                Choose File
+              </div>
+              <span
+                className='flex-grow fi-input-label clickable'
+                onClick={this.handleSelectFileButtonClick}
+              >
+                {
+                  this.state.filename ? this.state.filename + ' selected' : 'No file selected'
+                }
+              </span>
+            </div>
             {
-              this.state.filename ? this.state.filename + ' selected' : 'no file selected'
+              this.state.showCsvHeaderOption &&
+              <div
+                className='fi-csv'
+              >
+                <span>
+                  Does your csv have a header row?
+                </span>
+                <div
+                  className='fi-csv-option button'
+                  onClick={() => this.handleCsvHeaderChoice(true)}
+                  style={buttonColors()}
+                  ref='fi-yes-button'
+                >
+                  Yes
+                </div>
+                <div
+                  className='fi-csv-option button'
+                  onClick={() => this.handleCsvHeaderChoice(false)}
+                  style={buttonColors()}
+                  ref='fi-no-button'
+                >
+                  No
+                </div>
+              </div>
             }
           </div>;
         break;
@@ -476,6 +497,7 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
+            file={file}
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
           />;
@@ -486,6 +508,7 @@ class FileImport extends TerrainComponent<any>
     return (
       <div
         className='fi-content'
+        style={backgroundColor(Colors().bg3)}
       >
         {
           content
@@ -496,30 +519,50 @@ class FileImport extends TerrainComponent<any>
 
   public renderNav()
   {
+    const { stepId, fileSelected } = this.state;
+    const { serverText, dbText, tableText } = this.state.fileImportState;
+    let nextEnabled = false;
+    switch (stepId)
+    {
+      case 0:
+        nextEnabled = fileSelected;
+        break;
+      case 1:
+        nextEnabled = !!serverText;
+        break;
+      case 2:
+        nextEnabled = !!dbText;
+        break;
+      case 3:
+        nextEnabled = !!tableText;
+        break;
+      default:
+    }
+
     return (
       <div
         className='fi-nav'
       >
         {
-          this.state.stepId > 0 &&
+          stepId > 0 &&
           <div
             className='fi-back-button'
             onClick={this.handlePrevStepChange}
             style={buttonColors()}
             ref='fi-back-button'
           >
-            &lt; back
+            &lt; Back
           </div>
         }
         {
-          this.state.stepId < 4 &&
+          stepId < 4 &&
           <div
             className='fi-next-button'
-            onClick={this.handleNextStepChange}
-            style={buttonColors()}
+            onClick={nextEnabled ? this.handleNextStepChange : null}
+            style={nextEnabled ? buttonColors() : backgroundColor(Colors().bg3)}
             ref='fi-next-button'
           >
-            next &gt;
+            Next &gt;
           </div>
         }
       </div>

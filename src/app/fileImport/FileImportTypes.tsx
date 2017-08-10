@@ -56,14 +56,12 @@ class FileImportStateC extends BaseClass
   public serverText: string = '';
   public dbText: string = '';
   public tableText: string = '';
-  public file: string = '';
   public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
-
-  public csvHeaderMissing: boolean = false;
   public primaryKey: number = -1;
+  public csvHeaderMissing: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
@@ -72,6 +70,8 @@ class FileImportStateC extends BaseClass
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
+  public file: File = new File([''], '');
+
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
 }
@@ -116,6 +116,8 @@ export interface ColumnTypesTree
 }
 
 export const NUMBER_PREVIEW_ROWS = 5;
+
+export const CHUNK_SIZE = 10000000; // 10mb
 
 export const FILE_TYPES =
   [

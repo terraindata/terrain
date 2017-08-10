@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import shallowCompare = require('react-addons-shallow-compare');
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
@@ -59,7 +60,6 @@ import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
-import shallowCompare = require('react-addons-shallow-compare');
 import './FileImportPreviewColumn.less';
 
 export interface Props
@@ -133,50 +133,110 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     return (
       <div
         className='fi-preview-column'
-        style={backgroundColor(Colors().fileimport.preview.column.base)}
+        style={{
+          background: Colors().bg1,
+          text: Colors().text1,
+        }}
       >
         <div
-          className='fi-preview-misc'
+          className='flex-container fi-preview-column-field'
         >
-          include
-          <CheckBox
-            checked={this.props.isIncluded}
-            onChange={this.handleIncludedChange}
-          />
-          primary key
-          <CheckBox
-            checked={this.props.isPrimaryKey}
-            onChange={this.handlePrimaryKeyChange}
-          />
+          <div
+            className='fi-preview-column-field-name'
+          >
+            <CheckBox
+              checked={this.props.isIncluded}
+              onChange={this.handleIncludedChange}
+            />
+          </div>
+          <span
+            className='fi-preview-column-field-content clickable'
+            onClick={this.handleIncludedChange}
+          >
+            Include Column
+          </span>
         </div>
+
         <div
-          className='fi-preview-column-name'
+          className='flex-container fi-preview-column-field'
         >
-          <Autocomplete
-            value={this.state.localColumnName}
-            options={this.props.columnOptions}
-            onChange={this.handleLocalColumnNameChange}
-            placeholder={''}
-            disabled={false}
-            onBlur={this.handleBlur}
-          />
+          <div
+            className='fi-preview-column-field-name'
+          >
+            <CheckBox
+              checked={this.props.isPrimaryKey}
+              onChange={this.handlePrimaryKeyChange}
+            />
+          </div>
+          <span
+            className='fi-preview-column-field-content clickable'
+            onClick={this.handlePrimaryKeyChange}
+          >
+            Primary Key
+          </span>
         </div>
+
         <div
-          className='fi-preview-type-dropdown-container'
+          className='flex-container fi-preview-column-field'
         >
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={0}
-            columnType={this.props.columnType}
-            editing={this.props.editing}
-          />
+          <span
+            className='fi-preview-column-field-name'
+          >
+            Name
+          </span>
+          <div
+            className='fi-preview-column-field-content'
+          >
+            <Autocomplete
+              value={this.state.localColumnName}
+              options={this.props.columnOptions}
+              onChange={this.handleLocalColumnNameChange}
+              placeholder={''}
+              disabled={false}
+              onBlur={this.handleBlur}
+            />
+          </div>
         </div>
-        <TransformBox
-          datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
-          colName={this.props.columnName}
-          columnNames={this.props.columnNames}
-          setLocalColumnName={this.handleLocalColumnNameChange}
-        />
+
+        <div
+          className='flex-container fi-preview-column-field'
+        >
+          <span
+            className='fi-preview-column-field-name'
+          >
+            Type
+          </span>
+          <div
+            className='fi-preview-column-field-content'
+          >
+            <TypeDropdown
+              columnId={this.props.columnId}
+              recursionDepth={0}
+              columnType={this.props.columnType}
+              editing={this.props.editing}
+            />
+          </div>
+        </div>
+
+        <div
+          className='flex-container fi-preview-column-field'
+        >
+          <span
+            className='fi-preview-column-field-name'
+          >
+            Transform
+          </span>
+          <div
+            className='fi-preview-column-field-content'
+          >
+            <TransformBox
+              datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
+              colName={this.props.columnName}
+              columnNames={this.props.columnNames}
+              setLocalColumnName={this.handleLocalColumnNameChange}
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -186,7 +246,10 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     return (
       <div
         className='fi-preview-column-title'
-        style={backgroundColor(Colors().fileimport.preview.column.base)}
+        style={{
+          background: Colors().bg1,
+          text: Colors().text1,
+        }}
       >
         <div className='fi-preview-column-title-name'>
           {this.props.columnName}

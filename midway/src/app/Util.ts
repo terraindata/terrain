@@ -131,26 +131,6 @@ export function getRequest(url)
   });
 }
 
-export async function getStreamContents(readStream: stream.Readable): Promise<string>
-{
-  return new Promise<string>((resolve, reject) =>
-  {
-    let contents: string = '';
-    readStream.on('data', (chunk) =>
-    {
-      contents += chunk.toString();
-    });
-    readStream.on('error', (e) =>
-    {
-      reject(e);
-    });
-    readStream.on('end', async () =>
-    {
-      resolve(contents);
-    });
-  });
-}
-
 export function isJSON(str: string): boolean
 {
   try

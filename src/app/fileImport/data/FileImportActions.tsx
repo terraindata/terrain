@@ -64,17 +64,17 @@ const FileImportActions =
     (tableText: string) =>
       $(ActionTypes.changeTableText, { tableText }),
 
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
+    changeCsvHeaderMissing:
+    (csvHeaderMissing: boolean) =>
+      $(ActionTypes.changeCsvHeaderMissing, { csvHeaderMissing }),
 
     changePrimaryKey:
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
+    (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { filetype, preview, originalNames }),
 
     uploadFile:
     () =>
@@ -115,6 +115,10 @@ const FileImportActions =
     loadTemplate:
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
+
+    saveFile:
+    (file: File, filetype: string) =>
+      $(ActionTypes.saveFile, { file, filetype }),
 
     changeUploadInProgress:
     (uploading: boolean) =>

@@ -333,6 +333,10 @@ input {
   background: rgba(0,0,0,0.25);
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 
 @keyframes loading-keyframes {
   0% {
@@ -542,7 +546,7 @@ input {
 }
 
 .title-text {
-  font-size: 16px;
+  font-size: 24px;
 }
 .semi-bold-big-text {
   font-weight: 400;
@@ -662,7 +666,7 @@ input {
 
 .create-card-button-style {
   padding: 3px;
-  padding-top: 5px; 
+  padding-top: 5px;
   text-align: center;
   border-radius: 3px;
   .transition(~"all .25s");
@@ -675,7 +679,7 @@ input {
   overflow: hidden;
   text-overflow: ellipsis;
   .normal-white-text;
-  
+
   &:hover,
   &.create-card-button-focused {
     .transition(~"all .15s");

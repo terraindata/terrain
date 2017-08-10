@@ -201,10 +201,10 @@ FileImportReducers[ActionTypes.changeTableText] =
     state
       .set('tableText', action.payload.tableText);
 
-FileImportReducers[ActionTypes.changeHasCsvHeader] =
+FileImportReducers[ActionTypes.changeCsvHeaderMissing] =
   (state, action) =>
     state
-      .set('csvHeaderMissing', !state.csvHeaderMissing)
+      .set('csvHeaderMissing', action.payload.csvHeaderMissing)
   ;
 
 FileImportReducers[ActionTypes.changeUploadInProgress] =
@@ -270,7 +270,6 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
     state
-      .set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
@@ -299,18 +298,44 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
       state.elasticUpdate,
+      state.csvHeaderMissing,
+    );
+    /*
+    Ajax.importFile(
+      state.file,
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+      state.originalNames,
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&                          // backend requires type as string
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+      )),
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
+      state.elasticUpdate,
+      state.streaming,
       () =>
       {
-        alert('success');
-        action.payload.changeUploadInProgress(false);
+        console.log('response');
+        if (!state.streaming)
+        {
+          alert('success');
+          action.payload.changeUploadInProgress(false);
+        }
+        else
+        {
+          console.log('begin streaming');
+          // action.payload.startStreaming();
+        }
       },
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         action.payload.changeUploadInProgress(false);
       },
-      state.csvHeaderMissing,
-    );
+    );*/
 
     return state.set('uploadInProgress', true);
   };
@@ -338,7 +363,6 @@ FileImportReducers[ActionTypes.saveTemplate] =
       {
         alert('Error saving template: ' + JSON.parse(err).errors[0].detail);
       },
-      state.csvHeaderMissing,
     );
     return state;
   };
@@ -379,7 +403,6 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('originalNames', List(template.originalNames))
       .set('primaryKey', columnNames.indexOf(template.primaryKey))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
-      .set('csvHeaderMissing', template.csvHeaderMissing)
       .set('columnNames', columnNames)
       .set('columnTypes', List(columnNames.map((colName) =>
         template.columnTypes[colName] ?
@@ -390,5 +413,11 @@ FileImportReducers[ActionTypes.loadTemplate] =
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewRows', previewRows);
   };
+
+FileImportReducers[ActionTypes.saveFile] =
+  (state, action) =>
+    state.set('file', action.payload.file)
+      .set('filetype', action.payload.filetype)
+  ;
 
 export default FileImportReducers;

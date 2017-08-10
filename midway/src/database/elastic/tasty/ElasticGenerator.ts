@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
 import TastyNode from '../../../tasty/TastyNode';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import ElasticQuery from './ElasticQuery';
-import bodybuilder = require('bodybuilder');
 
 /**
  * Generates elastic queries from TastyQuery objects.
