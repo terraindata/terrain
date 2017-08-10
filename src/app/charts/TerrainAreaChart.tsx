@@ -58,8 +58,11 @@ import
   VictoryGroup,
   VictoryLabel,
   VictoryLegend,
+  VictoryLine,
   VictoryScatter,
   VictoryTheme,
+  VictoryTooltip,
+  VictoryVoronoiContainer,
   VictoryZoomContainer,
 } from 'victory';
 import TerrainComponent from './../common/components/TerrainComponent';
@@ -80,6 +83,7 @@ const styles = {
   topChart: {
     padding: { top: 10, bottom: 25, left: 40, right: 0 },
     areas: { data: { strokeWidth: 2, fillOpacity: 0.4 } },
+    tooltip: { fill: 'white' },
   },
   bottomChart: {
     padding: { top: 10, bottom: 25, left: 40, right: 0 },
@@ -160,11 +164,12 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     this.setState({ zoomDomain: domain });
   }
 
-  public renderAreas()
+  public renderData()
   {
     const { datasets } = this.props;
     const { visibleDatasets } = this.state;
     const areas = [];
+    const scatters = [];
 
     datasets.forEach((ds, index) =>
     {
@@ -178,17 +183,17 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
             interpolation={config.topChart.interpolation}
           />,
         );
-        areas.push(
+        scatters.push(
           <VictoryScatter
             key={ds.id}
-            size={5}
             data={ds.data}
+            size={0}
           />,
         );
       }
     });
 
-    return areas;
+    return { areas, scatters };
   }
 
   public renderLegend()
@@ -245,7 +250,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
   public render()
   {
     const { datasets } = this.props;
-    const areas = this.renderAreas();
+    const data = this.renderData();
     const legend = this.renderLegend();
 
     return (
@@ -270,8 +275,21 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               >
                 <VictoryGroup
                   style={styles.topChart.areas}
+                  containerComponent={
+                    <VictoryVoronoiContainer
+                      labels={(d) => `${d.x} => ${d.y}`}
+                      dimension='x'
+                      labelComponent={
+                        <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                      }
+                    />
+                  }
+                  labelComponent={<VictoryTooltip activateData={true} cornerRadius={0} flyoutStyle={{ fill: 'white' }} />}
                 >
-                  {areas}
+                  {data.areas}
+                </VictoryGroup>
+                <VictoryGroup>
+                  {data.scatters}
                 </VictoryGroup>
                 {legend}
               </VictoryChart>
