@@ -686,30 +686,30 @@ export const Ajax =
       );
     },
 
-    streamFile(file: File)
-    {
-      const authState = AuthStore.getState();
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('id', String(authState.id));
-      formData.append('accessToken', authState.accessToken);
-      formData.append('templateID', String(31));
-      formData.append('filetype', 'csv');
-
-      const request = new XMLHttpRequest();
-      request.open('post', 'http://localhost:3000/midway/v1/import/headless');
-      request.send(formData);
-      request.onreadystatechange = () =>
-      {
-        if (request.readyState === XMLHttpRequest.DONE && request.status === 200)
-        {
-          const respArr = JSON.parse(request.response);
-          console.log(respArr);
-        }
-      };
-      return;
-    },
+    // streamFile(file: File)
+    // {
+    //   const authState = AuthStore.getState();
+    //
+    //   const formData = new FormData();
+    //   formData.append('file', file);
+    //   formData.append('id', String(authState.id));
+    //   formData.append('accessToken', authState.accessToken);
+    //   formData.append('templateID', String(31));
+    //   formData.append('filetype', 'csv');
+    //
+    //   const request = new XMLHttpRequest();
+    //   request.open('post', 'http://localhost:3000/midway/v1/import/headless');
+    //   request.send(formData);
+    //   request.onreadystatechange = () =>
+    //   {
+    //     if (request.readyState === XMLHttpRequest.DONE && request.status === 200)
+    //     {
+    //       const respArr = JSON.parse(request.response);
+    //       console.log(respArr);
+    //     }
+    //   };
+    //   return;
+    // },
 
     importFile(file: File,
       filetype: string,
@@ -728,7 +728,7 @@ export const Ajax =
 
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('filetype', 'csv');
+      formData.append('filetype', filetype);
       formData.append('dbname', dbname);
       formData.append('tablename', tablename);
       formData.append('dbid', String(connectionId));
@@ -740,7 +740,7 @@ export const Ajax =
       formData.append('csvHeaderMissing', String(csvHeaderMissing));
 
       const request = new XMLHttpRequest();
-      request.open('post', 'http://localhost:3000/midway/v1/import/headless');
+      request.open('post', MIDWAY_HOST + '/midway/v1/import/');
       request.send(formData);
       request.onreadystatechange = () =>
       {
