@@ -436,7 +436,7 @@ class TransformCard extends TerrainComponent<Props>
           domain={this.state.domain}
           range={this.state.range}
           spotlights={spotlights && spotlights.toList().toJS()}
-          inputKey={BlockUtils.transformAlias(this.props.data)}
+          inputKey={this.props.data['input']}
           updatePoints={this.handleUpdatePoints}
           width={width}
           language={this.props.language}
