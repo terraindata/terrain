@@ -51,7 +51,6 @@ import * as stream from 'stream';
 import * as csvjson from 'csvjson';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
-import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
 import { json } from 'd3-request';
@@ -301,7 +300,7 @@ export class Import
   }
   /* after type-checking has completed, read from temp files to upsert via Tasty, and delete the temp files
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _streamingUpsert(socket: socketio.Socket | ((r?: any) => void))
+  private async _streamingUpsert(socket: (r?: any) => void)
   {
     const time: number = Date.now();
     winston.info('putting mapping...');
@@ -352,7 +351,7 @@ export class Import
   }
   /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: socketio.Socket | ((r?: any) => void)): Promise<number>
+  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: (r?: any) => void): Promise<number>
   {
     // get valid piece of data
     let thisChunk: string = '';
@@ -513,24 +512,15 @@ export class Import
   }
 
   /* streaming helper function ; process errors through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private _sendSocketError(socket: socketio.Socket | ((r?: any) => void), error: string)
+  private _sendSocketError(socket: (r?: any) => void, error: string)
   {
     winston.info('emitting socket error: ' + error);
-    if (typeof socket === 'function')
-    {
-      this._cleanStreamingTempFolder();
-      socket(error);
-    }
-    else
-    {
-      socket.emit('midway_error', error);
-      this._cleanStreamingTempFolder();
-      socket.disconnect(true);
-    }
+    this._cleanStreamingTempFolder();
+    socket(error);
   }
   /* streaming helper function.
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _readFileAndUpsert(num: number, targetNum: number, socket: socketio.Socket | ((r?: any) => void))
+  private async _readFileAndUpsert(num: number, targetNum: number, socket: (r?: any) => void)
   {
     winston.info('BEGINNING read file upload number ' + String(num));
 
