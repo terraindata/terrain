@@ -118,6 +118,7 @@ class ResultComponent extends TerrainComponent<Props> {
     {
       if (key !== 'result' && this.props[key] !== nextProps[key])
       {
+        this.unspotlight();
         return true;
       }
     }

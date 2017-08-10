@@ -113,7 +113,7 @@ export function spotlightAction(id: string, result: any)
     payload:
     {
       id,
-      result: _.extend(result, { id }),
+      result: result == null ? null : _.extend(result, { id }),
     },
   });
 }
