@@ -191,6 +191,11 @@ export class Import
       {
 
         const newDocs: object[] = resp.hits.hits as object[];
+        if (newDocs.length === 0)
+        {
+          writer.end();
+          return;
+        }
         let returnDocs: object[] = [];
         for (const doc of newDocs)
         {
@@ -227,8 +232,7 @@ export class Import
         {
           writer.write(returnDoc);
         }
-
-        if (resp.hits.total > rankCounter - 1)
+        if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
         {
           elasticClient.scroll({
             scrollId: resp._scroll_id,

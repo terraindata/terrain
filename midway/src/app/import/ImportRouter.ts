@@ -75,12 +75,6 @@ Router.post('/', async (ctx, next) =>
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const authStream: object = await Util.authenticateStream(ctx.req);
-  if (authStream['user'] === null)
-  {
-    ctx.status = 400;
-    return;
-  }
   const exprtConf: ExportConfig = ctx.request.body.body;
   Util.verifyParameters(exprtConf, ['variantId', 'templateID']);
   ctx.body = await imprt.export(exprtConf);
