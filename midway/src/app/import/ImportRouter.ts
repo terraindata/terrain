@@ -59,28 +59,17 @@ export const imprt: Import = new Import();
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('importing to database');
-  const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype', 'update', 'streaming']);
-  Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
-
-  ctx.body = await imprt.upsert(imprtConf);
-});
-
-Router.post('/test', async (ctx, next) =>
-{
-  winston.info('importing to database');
   const { files, fields } = await asyncBusboy(ctx.req);
-  // console.log('files: ', files);
-  // console.log('fields: ', fields);
-  ctx.body = {};
+  Util.verifyParameters(fields, ['dbid', 'dbname', 'tablename', 'filetype', 'update']);
+  Util.verifyParameters(fields, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+
+  ctx.body = await imprt.upsert(files, fields, false);
 });
 
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
   const { files, fields } = await asyncBusboy(ctx.req);
-  // console.log('files: ', files);
-  // console.log('fields: ', fields);
   const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
   if (user === null)
   {
@@ -91,7 +80,7 @@ Router.post('/headless', async (ctx, next) =>
   Util.verifyParameters(fields, ['templateID', 'filetype']);
   // optional parameters: update, hasCsvHeader
 
-  ctx.body = await imprt.upsertHeadless(files, fields);
+  ctx.body = await imprt.upsert(files, fields, true);
 });
 
 export default Router;

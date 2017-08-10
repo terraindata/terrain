@@ -67,9 +67,8 @@ const importTemplates = new ImportTemplates();
 
 export interface ImportConfig extends ImportTemplateBase
 {
-  contents: string;
+  file: stream.Readable;
   filetype: string;     // either 'json' or 'csv'
-  streaming: boolean;   // if true, contents will be ignored
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
@@ -109,94 +108,12 @@ export class Import
   private chunkQueue: object[];
   private readStream: stream.Readable;
   private totalReads: number;
-  private readyToStream: boolean = false;
   private csvHeaderRemoved;
   private jsonBracketRemoved;
 
-  /* set up websockets for import streaming from frontend GUI */
-  public setUpSocket(io: socketio.Server)
-  {
-    winston.info('set up file import streaming server.');
-    io.on('connection', (socket) =>
-    {
-      winston.info('streaming server received connection.');
-      let authorized: boolean = false;
-      socket.emit('request_auth');
-      socket.on('auth', async (data) =>
-      {
-        if (authorized)
-        {
-          this._sendSocketError(socket, 'Already authenticated ; repeat attempt received.');
-          return;
-        }
-        const user = await users.loginWithAccessToken(Number(data['id']), data['accessToken']);
-        if (user === null)
-        {
-          this._sendSocketError(socket, 'Bad authentication.');
-          return;
-        }
-        winston.info('streaming auth successful.');
-        authorized = true;
-        this._cleanStreamingTempFolder(true);
-        winston.info('created streaming temp directory.');
-        socket.emit('ready');
-      });
-      this.chunkCount = 0;
-      this.nextChunk = '';
-      socket.on('message', async (data) =>
-      {
-        winston.info('streaming server received data from client.');
-        if (!authorized)
-        {
-          this._sendSocketError(socket, 'Must authenticate before sending messages.');
-          return;
-        }
-        if (!this.readyToStream)
-        {
-          // close connection since there was a config issue
-          this._sendSocketError(socket, 'config error -- see Ajax response.');
-          return;
-        }
-        if (typeof data['chunk'] !== 'string' || typeof data['isLast'] !== 'boolean')
-        {
-          this._sendSocketError(socket, 'Malformed message.');
-          return;
-        }
-        const count: number = await this._writeItemsFromChunkToFile(data['chunk'], data['isLast'], socket);
-        if (count !== -1)
-        {
-          this.itemCount += count;
-          winston.info('emitting ready');
-          socket.emit('ready');
-        }
-      });
-      socket.on('finished', async () =>
-      {
-        winston.info('streaming client finished.');
-        if (!authorized)
-        {
-          this._sendSocketError(socket, 'Must authenticate before sending messages.');
-          return;
-        }
-        if (!this.readyToStream)
-        {
-          // close connection since there was a config issue
-          this._sendSocketError(socket, 'config error -- see Ajax response.');
-          return;
-        }
-
-        await this._streamingUpsert(socket);
-
-        socket.emit('midway_success');
-        socket.disconnect(true);
-      });
-    });
-  }
-
-  public async upsert(imprt: ImportConfig): Promise<ImportConfig>
+  public async upsertPrep(imprt: ImportConfig): Promise<ImportConfig>
   {
     this.imprt = imprt;
-    this.readyToStream = false;
     this.itemCount = 0;
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
@@ -211,7 +128,7 @@ export class Import
       }
       this.database = database;
 
-      let time: number = Date.now();
+      const time: number = Date.now();
       winston.info('checking config and schema...');
       const configError: string = this._verifyConfig(imprt);
       if (configError !== '')
@@ -236,51 +153,13 @@ export class Import
         mappingForSchema,
       );
 
-      if (!imprt.streaming)
-      {
-        const items: object[] = [];
-        try
-        {
-          const newItems: object[] = await this._getItems(imprt, imprt.contents);
-          newItems.forEach((val) =>
-          {
-            items.push(val);
-          });
-        } catch (e)
-        {
-          return reject(e);
-        }
-
-        time = Date.now();
-        winston.info('putting mapping...');
-        await this._tastyPutMapping();
-        winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
-
-        time = Date.now();
-        winston.info('about to upsert via tasty...');
-        const res: ImportConfig = await this._tastyUpsert(imprt, items);
-        winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
-        resolve(res);
-      }
-      else
-      {
-        this.readyToStream = true;
-        // logic handled through socket.io connection
-        resolve(imprt);
-      }
+      resolve(imprt);
     });
   }
-  public async upsertHeadless(files: stream.Readable[], fields: object): Promise<ImportConfig>
+  public async upsert(files: stream.Readable[], fields: object, headless: boolean): Promise<ImportConfig>
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
-      const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
-      if (templates.length === 0)
-      {
-        return reject('Invalid template ID provided: ' + String(fields['templateID']));
-      }
-      const template: ImportTemplateConfig = templates[0];
-
       const update: boolean | string = this._parseBooleanField(fields, 'update', false);
       if (typeof update === 'string')
       {
@@ -308,24 +187,62 @@ export class Import
       this.csvHeaderRemoved = (fields['filetype'] !== 'csv') || !hasCsvHeader;
       this.jsonBracketRemoved = fields['filetype'] !== 'json';
 
-      const imprtConf: ImportConfig = {
-        dbid: template['dbid'],
-        dbname: template['dbname'],
-        tablename: template['tablename'],
-        originalNames: template['originalNames'],
-        columnTypes: template['columnTypes'],
-        primaryKey: template['primaryKey'],
-        transformations: template['transformations'],
+      let imprtConf: ImportConfig;
+      if (headless)
+      {
+        const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateID']));
+        if (templates.length === 0)
+        {
+          return reject('Invalid template ID provided: ' + String(fields['templateID']));
+        }
+        const template: ImportTemplateConfig = templates[0];
 
-        contents: '',
-        filetype: fields['filetype'],
-        streaming: true,
-        update,
-      };
-      let res: ImportConfig = imprtConf;    // satisfies linter, since otherwise didn't let call resolve(res) below
+        imprtConf = {
+          dbid: template['dbid'],
+          dbname: template['dbname'],
+          tablename: template['tablename'],
+          originalNames: template['originalNames'],
+          columnTypes: template['columnTypes'],
+          primaryKey: template['primaryKey'],
+          transformations: template['transformations'],
+
+          file,
+          filetype: fields['filetype'],
+          update,
+        };
+      }
+      else
+      {
+        try
+        {
+          const originalNames: string[] = JSON.parse(fields['originalNames']);
+          const columnTypes: object = JSON.parse(fields['columnTypes']);
+          const transformations: object[] = JSON.parse(fields['transformations']);
+
+          imprtConf = {
+            dbid: Number(fields['dbid']),
+            dbname: fields['dbname'],
+            tablename: fields['tablename'],
+            originalNames,
+            columnTypes,
+            primaryKey: fields['primaryKey'],
+            transformations,
+
+            file,
+            filetype: fields['filetype'],
+            update,
+          };
+        }
+        catch (e)
+        {
+          return reject('Error parsing originalNames, columnTypes, and/or transformations of import request: ' + String(e));
+        }
+      }
+
+      let res: ImportConfig;
       try
       {
-        res = await this.upsert(imprtConf);
+        res = await this.upsertPrep(imprtConf);
       }
       catch (e)
       {
