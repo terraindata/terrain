@@ -46,9 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-console
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
+
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { MenuOption } from '../../../common/components/Menu';
@@ -73,13 +74,15 @@ export default class ResultsTable extends TerrainComponent<Props>
     random: number;
     spotlightState: SpotlightState;
     columns: List<IColumn>;
+    rows: List<any>;
   } = {
     random: 0,
     spotlightState: null,
     columns: this.getColumns(this.props),
+    rows: List([]),
   };
 
-  public menuOptions: List<MenuOption> = Immutable.List([
+  public menuOptions: List<MenuOption> = List([
     {
       text: 'Spotlight',
       onClick: this.spotlight,
@@ -94,6 +97,7 @@ export default class ResultsTable extends TerrainComponent<Props>
       this.setState({
         random: Math.random(),
         columns: this.getColumns(nextProps),
+        rows: nextProps.results,
       });
     }
   }
@@ -140,7 +144,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     }
     else
     {
-      const resultFields = props.results.size ? props.results.get(0).fields : Immutable.Map({});
+      const resultFields = props.results.size ? props.results.get(0).fields : Map({});
       resultFields.map(
         (value, field) =>
           cols.push({
@@ -176,7 +180,7 @@ export default class ResultsTable extends TerrainComponent<Props>
       }
     }
 
-    return Immutable.List(cols);
+    return List(cols);
   }
 
   public componentDidMount()
@@ -185,6 +189,8 @@ export default class ResultsTable extends TerrainComponent<Props>
       isMounted: true,
       stateKey: 'spotlightState',
     });
+
+    this.setState({ rows: this.props.results });
   }
 
   // getKey(col: number): string
@@ -214,7 +220,7 @@ export default class ResultsTable extends TerrainComponent<Props>
   public getRow(i: number): object
   {
     // TODO
-    return this.props.results.get(i).fields.toJS();
+    return this.state.rows.get(i).fields.toJS();
     // let field = this.getKey(col);
     // let {results} = this.props;
     // let {resultsConfig} = this.state;
@@ -258,7 +264,33 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public handleGridSort(sortColumn, sortDirection)
   {
-    this.setState({ sortColumn, sortDirection });
+    const comparer = (aa, bb) =>
+    {
+      const a = aa.fields.get(sortColumn);
+      const b = bb.fields.get(sortColumn);
+
+      if (sortDirection === 'ASC')
+      {
+        return (a > b) ? 1 : -1;
+      }
+      else if (sortDirection === 'DESC')
+      {
+        return (a < b) ? 1 : -1;
+      }
+      else
+      {
+        return 0;
+      }
+    };
+
+    if (sortDirection === 'NONE')
+    {
+      this.setState({ rows: this.props.results });
+    }
+    else
+    {
+      this.setState({ rows: this.state.rows.sort(comparer) });
+    }
   }
 
   public spotlight(menuIndex: number, rc: string)
@@ -298,7 +330,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         columns={this.state.columns}
         enableCellSelect={true}
         rowGetter={this.getRow}
-        rowsCount={this.props.results.size}
+        rowsCount={this.state.rows.size}
         random={this.state.random}
         onCellClick={this.handleCellClick}
         menuOptions={this.menuOptions}
