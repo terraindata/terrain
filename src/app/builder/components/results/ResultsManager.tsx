@@ -210,7 +210,6 @@ export class ResultsManager extends TerrainComponent<Props>
           );
           if (resultIndex !== -1)
           {
-            console.log('IN HERE 948');
             spotlightAction(id, _.extend({
               color: spotlight.color,
               name: spotlight.name,
