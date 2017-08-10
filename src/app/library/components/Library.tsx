@@ -98,14 +98,6 @@ class Library extends TerrainComponent<any>
     zoomDomain: {},
   };
 
-  constructor(props)
-  {
-    super(props);
-
-    const { library } = props;
-    this.state.libraryState = library;
-  }
-
   public componentWillMount()
   {
     const { basePath } = this.props;
@@ -123,11 +115,6 @@ class Library extends TerrainComponent<any>
 
   public componentDidMount()
   {
-    this._subscribe(Store, {
-      stateKey: 'libraryState',
-      isMounted: true,
-    });
-
     RolesActions.fetch();
     UserActions.fetch();
   }
@@ -143,7 +130,7 @@ class Library extends TerrainComponent<any>
 
   public getDatasets()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState } = this.props;
     const { variants, selectedVariants } = libraryState;
 
     let metricId = 0;
@@ -182,7 +169,7 @@ class Library extends TerrainComponent<any>
 
   public render()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState } = this.props;
 
     const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
 
@@ -255,6 +242,7 @@ class Library extends TerrainComponent<any>
               groupsOrder,
               params,
               basePath,
+              groupActions: this.props.libraryGroupActions,
             }}
             isFocused={algorithm === undefined}
           />
@@ -266,6 +254,7 @@ class Library extends TerrainComponent<any>
               groupId,
               params,
               basePath,
+              algorithmActions: this.props.libraryAlgorithmActions,
             }}
             isFocused={variantIds !== null && variantIds.length === 0}
           />

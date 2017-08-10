@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as Redux from 'redux';
-import * as _ from 'underscore';
 import thunk from 'redux-thunk';
+import * as _ from 'underscore';
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from './../../auth/data/AuthStore';

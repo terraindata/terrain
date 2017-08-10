@@ -63,8 +63,6 @@ import InfoArea from './../../common/components/InfoArea';
 import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import Actions from './../data/LibraryActions';
-import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
@@ -86,6 +84,7 @@ export interface Props
   groupId: ID;
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
+  algorithmActions: any;
 }
 
 class AlgorithmsColumn extends TerrainComponent<Props>
@@ -168,7 +167,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleDuplicate(id: ID)
   {
-    Actions.algorithms.duplicate(
+    this.props.algorithmActions.duplicate(
       this.props.algorithms.get(id),
       this.props.algorithmsOrder.findIndex((iid) => iid === id),
     );
@@ -176,15 +175,20 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleArchive(id: ID)
   {
-    Actions.algorithms.change(
+    this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('status', ItemStatus.Archive) as Algorithm,
     );
   }
 
+  public handleCreate()
+  {
+    this.props.algorithmActions.create(this.props.groupId);
+  }
+
   public handleNameChange(id: ID, name: string)
   {
-    Actions.algorithms.change(
+    this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm,
     );
@@ -265,7 +269,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       case 'group':
         if (shiftKey)
         {
-          Actions.algorithms.duplicate(
+          this.props.algorithmActions.duplicate(
             this.props.algorithms.get(id),
             0,
             targetItem.id,
@@ -273,7 +277,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         }
         else
         {
-          Actions.algorithms.move(
+          this.props.algorithmActions.move(
             this.props.algorithms.get(id),
             0,
             targetItem.id,
@@ -281,7 +285,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         }
         break;
       case 'algorithm':
-        Actions.algorithms.move(
+        this.props.algorithmActions.move(
           this.props.algorithms.get(id),
           this.props.algorithmsOrder.indexOf(targetItem.id),
           this.props.groupId,
@@ -343,7 +347,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
     variants.map(
       (v: Variant) =>
-        scores[v.status] && scores[v.status].score++,
+      {
+        if (v.status !== undefined)
+        {
+          scores[v.status].score++;
+        }
+      },
     );
 
     // scores.splice(0, 1); // remove Archived count
@@ -447,7 +456,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     const status = ItemStatus[statusString];
     if (a.status !== status)
     {
-      Actions.algorithms.change(a.set('status', status) as Algorithm);
+      this.props.algorithmActions.change(a.set('status', status) as Algorithm);
     }
   }
 

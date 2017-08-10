@@ -51,9 +51,11 @@ import Library from '../components/Library';
 import LibraryActions from '../data/LibraryActions';
 import { LibraryState } from '../data/LibraryStore';
 
-const mapStateToProps = (state: LibraryState) =>
+const mapStateToProps = (state) =>
 {
-  return state;
+  return {
+    library: state.get('library'),
+  };
 };
 
 function mapDispatchToProps(dispatch)

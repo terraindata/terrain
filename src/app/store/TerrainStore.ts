@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
+import * as Immutable from 'immutable';
+import { applyMiddleware, compose, createStore } from 'redux';
+import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import { LibraryStoreReducerWrapper } from '../library/data/LibraryStore';
 
@@ -53,8 +55,11 @@ const reducers = {
 };
 
 const rootReducer = combineReducers(reducers);
+const initialState = Immutable.Map();
 
-export default createStore(rootReducer, compose(
+const terrainStore = createStore(rootReducer, initialState, compose(
   applyMiddleware(thunk),
   window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
 ));
+
+export default terrainStore;
