@@ -722,8 +722,11 @@ export const Ajax =
       transformations: Immutable.List<object>,
       update: boolean,
       csvHeaderMissing: boolean,
+      onLoad: (resp: any) => void,
+      onError: (resp: any) => void,
     )
     {
+      // TODO: call Ajax.req() instead with formData in body
       const authState = AuthStore.getState();
 
       const formData = new FormData();
@@ -741,16 +744,31 @@ export const Ajax =
       formData.append('update', String(update));
       formData.append('hasCsvHeader', String(!csvHeaderMissing));
 
-      const request = new XMLHttpRequest();
-      request.open('post', MIDWAY_HOST + '/midway/v1/import/');
-      request.send(formData);
-      request.onreadystatechange = () =>
+      const xhr = new XMLHttpRequest();
+      xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
+      xhr.send(formData);
+
+      xhr.onerror = (err: any) =>
       {
-        if (request.readyState === XMLHttpRequest.DONE && request.status === 200)
+        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+        onError(routeError);
+      };
+
+      xhr.onload = (ev: Event) =>
+      {
+        if (xhr.status === 401)
         {
-          const respArr = JSON.parse(request.response);
-          console.log(respArr);
+          // TODO re-enable
+          Actions.logout();
         }
+
+        if (xhr.status !== 200)
+        {
+          onError(xhr.responseText);
+          return;
+        }
+
+        onLoad(xhr.responseText);
       };
       return;
     },

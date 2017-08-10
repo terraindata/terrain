@@ -299,6 +299,16 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.transforms,
       state.elasticUpdate,
       state.csvHeaderMissing,
+      () =>
+      {
+        alert('success');
+        action.payload.changeUploadInProgress(false);
+      },
+      (err: string) =>
+      {
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        action.payload.changeUploadInProgress(false);
+      },
     );
     /*
     Ajax.importFile(
