@@ -57,15 +57,19 @@ import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
+import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
 import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Actions from './../data/LibraryActions';
+import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
+
+import './AlgorithmsColumn.less';
 
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
@@ -94,6 +98,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     draggingOverIndex: number;
     creatingNewAlgorithm: boolean;
     newAlgorithmTextboxValue: string;
+    newAlgorithmDbIndex: number;
   } = {
     rendered: false,
     me: null,
@@ -103,6 +108,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     draggingOverIndex: -1,
     creatingNewAlgorithm: false,
     newAlgorithmTextboxValue: '',
+    newAlgorithmDbIndex: -1,
   };
 
   public componentWillMount()
@@ -145,6 +151,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
   }
 
+  public getNewAlgorithmIndex(): number
+  {
+    const group = LibraryStore.getState().groups.get(this.props.groupId);
+    const dbs = LibraryStore.getState().dbs;
+    const alreadySelectedIndex = (this.state.newAlgorithmDbIndex !== -1 && this.state.newAlgorithmDbIndex);
+    const defaultIndex = dbs && group.db && dbs.findIndex((db) => db.id === group.db.id);
+    return alreadySelectedIndex || defaultIndex;
+  }
+
   public handleDuplicate(id: ID)
   {
     Actions.algorithms.duplicate(
@@ -173,6 +188,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     this.setState({
       creatingNewAlgorithm: true,
+      newAlgorithmDbIndex: -1,
+      newAlgorithmTextboxValue: '',
     });
   }
 
@@ -190,9 +207,18 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
+  public handleNewAlgorithmDbChange(dbIndex: number)
+  {
+    this.setState({
+      newAlgorithmDbIndex: dbIndex,
+    })
+  }
+
   public handleNewAlgorithmCreate()
   {
-    Actions.algorithms.createAs(this.props.groupId, this.state.newAlgorithmTextboxValue);
+    const dbs = LibraryStore.getState().dbs;
+    const index = this.getNewAlgorithmIndex();
+    Actions.algorithms.createAs(this.props.groupId, this.state.newAlgorithmTextboxValue, dbs.get(index));
   }
 
   public handleHover(index: number, type: string, id: ID)
@@ -432,6 +458,25 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
+  public renderDatabaseDropdown()
+  {
+    const dbs = LibraryStore.getState().dbs;
+    return (
+      <div className='new-algorithm-modal-child'>
+        <div className='database-dropdown-wrapper'>
+          <Dropdown
+            selectedIndex={this.getNewAlgorithmIndex()}
+            options={dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
+            onChange={this.handleNewAlgorithmDbChange}
+            canEdit={true}
+            directionBias={400}
+            className='bic-db-dropdown'
+          />
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
     return (
@@ -448,8 +493,11 @@ class AlgorithmsColumn extends TerrainComponent<Props>
           onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
           title='New Algorithm'
           confirmButtonText='Create'
-          message={'What would you like to name the algorithm?'}
+          message='What would you like to name the algorithm?'
           textboxPlaceholderValue='Algorithm Name'
+          children={this.renderDatabaseDropdown()}
+          childrenMessage='Please select a database'
+          allowOverflow={true}
         />
         {
           this.props.algorithmsOrder ?

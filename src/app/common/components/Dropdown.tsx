@@ -73,6 +73,7 @@ export interface Props
   optionsDisplayName?: Map<any, string>; // maps value to display name
   textColor?: string | ((index: number) => string);
   width?: string;
+  directionBias?: number // bias for determining whether or not dropdown opens up or down
 }
 
 @Radium
@@ -211,7 +212,7 @@ class Dropdown extends TerrainComponent<Props>
 
     this.setState({
       open: !this.state.open,
-      up: cr.bottom > windowBottom / 2,
+      up: cr.bottom > windowBottom / 2 + (this.props.directionBias || 0),
     });
   }
 

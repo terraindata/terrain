@@ -67,6 +67,7 @@ export interface Props
   onConfirm?: () => void;
   onClose: () => void;
   children?: any;
+  childrenMessage?: string;
   thirdButtonText?: string;
   onThirdButton?: () => void;
   pre?: boolean;
@@ -75,6 +76,7 @@ export interface Props
   initialTextboxValue?: string;
   textboxPlaceholderValue?: string;
   onTextboxValueChange?: (newValue: string) => void;
+  allowOverflow?: boolean;
 }
 
 @Radium
@@ -112,6 +114,7 @@ class Modal extends TerrainComponent<Props>
             className={classNames({
               'modal-content': true,
               'modal-content-fill': this.props.fill,
+              'modal-content-allow-overflow': this.props.allowOverflow,
             })}
           >
             <div
@@ -171,6 +174,18 @@ class Modal extends TerrainComponent<Props>
                   value={this.props.textboxValue}
                   onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
                 />
+              }
+              {
+                this.props.childrenMessage &&
+                React.cloneElement(
+                  msgTag,
+                  {
+                    className: classNames({
+                      'modal-message': true,
+                    }),
+                    children: this.props.childrenMessage,
+                  },
+                )
               }
               {
                 this.props.children

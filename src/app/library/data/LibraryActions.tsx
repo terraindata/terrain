@@ -141,10 +141,12 @@ const Actions =
       (
         groupId: ID,
         name: string,
+        db: BackendInstance,
       ) =>
       {
-        const algorithm = LibraryTypes._Algorithm().set('name', name);
-        Actions.algorithms.create(groupId, algorithm);
+        const group = LibraryStore.getState().groups.get(groupId);
+        const algorithm = LibraryTypes._Algorithm().set('name', name).set('db', db).set('language', group.defaultLanguage);
+        Actions.algorithms.create(groupId, algorithm, undefined, false);
       },
 
       change:
