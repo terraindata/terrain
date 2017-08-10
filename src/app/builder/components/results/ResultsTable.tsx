@@ -279,7 +279,7 @@ export default class ResultsTable extends TerrainComponent<Props>
   public onRowsDeselected(rows)
   {
     const rowIndexes = rows.map((r) => r.rowIdx);
-    this.setState({ selectedIndexes: this.state.selectedIndexes.filter((i) => rowIndexes.indexOf(i) === -1 ) });
+    this.setState({ selectedIndexes: this.state.selectedIndexes.filter((i) => rowIndexes.indexOf(i) === -1) });
   }
 
   public handleGridSort(sortColumn, sortDirection)
@@ -389,7 +389,7 @@ export default class ResultsTable extends TerrainComponent<Props>
             indexes: this.state.selectedIndexes.toJS(),
           }
         }}
-        toolbar={<Toolbar enableFilter={true}/>}
+        toolbar={<Toolbar enableFilter={true} />}
         onAddFilter={this.handleFilterChange}
         onClearFilters={this.clearFilters}
       />
