@@ -526,6 +526,37 @@ export class Import
     return typeObj['type'];
   }
 
+  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      const newDocument: object = document;
+      if (schema.tableNames(database).length === 0)
+      {
+        return resolve('Schema not found for database ' + database);
+      }
+      for (const table of schema.tableNames(database))
+      {
+        const fields: object = schema.fields(database, table);
+        const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
+        for (const field of fieldsInMappingNotInDocument)
+        {
+          newDocument[field] = null;
+          if (fields[field]['type'] === 'text')
+          {
+            newDocument[field] = '';
+          }
+        }
+        const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
+        for (const field of fieldsInDocumentNotMapping)
+        {
+          delete newDocument[field];
+        }
+      }
+      resolve(newDocument);
+    });
+  }
+
   /* check for conflicts with existing schema, return error (string) if there is one
    * filters out fields already present in the existing mapping (since they don't need to be inserted)
    * mapping: ES mapping
@@ -641,6 +672,28 @@ export class Import
     return '';
   }
 
+  /* deletes streaming temp folder ; if "create," recreate an empty version */
+  private _cleanStreamingTempFolder(create?: boolean)
+  {
+    rimraf(this.STREAMING_TEMP_FOLDER, (err) =>
+    {
+      if (err !== undefined && err !== null)
+      {
+        // can't _sendSocketError() or else would end up in an infinite cycle
+        throw new Error('Failed to delete temp folder: ' + String(err));
+      }
+      if (create !== undefined && create)
+      {
+        fs.mkdirSync(this.STREAMING_TEMP_FOLDER);
+      }
+    });
+  }
+
+  private _convertArrayToCSVArray(arr: any[]): string
+  {
+    return JSON.stringify(arr);
+  }
+
   /* parses string input from CSV and checks against expected types ; handles arrays recursively */
   private _csvCheckTypesHelper(item: object, typeObj: object, field: string): boolean
   {
@@ -729,59 +782,6 @@ export class Import
       default:  // "text" case, leave as string
     }
     return true;
-  }
-
-  /* deletes streaming temp folder ; if "create," recreate an empty version */
-  private _cleanStreamingTempFolder(create?: boolean)
-  {
-    rimraf(this.STREAMING_TEMP_FOLDER, (err) =>
-    {
-      if (err !== undefined && err !== null)
-      {
-        // can't _sendSocketError() or else would end up in an infinite cycle
-        throw new Error('Failed to delete temp folder: ' + String(err));
-      }
-      if (create !== undefined && create)
-      {
-        fs.mkdirSync(this.STREAMING_TEMP_FOLDER);
-      }
-    });
-  }
-
-  private _convertArrayToCSVArray(arr: any[]): string
-  {
-    return JSON.stringify(arr);
-  }
-
-  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object | string>
-  {
-    return new Promise<object | string>(async (resolve, reject) =>
-    {
-      const newDocument: object = document;
-      if (schema.tableNames(database).length === 0)
-      {
-        return resolve('Schema not found for database ' + database);
-      }
-      for (const table of schema.tableNames(database))
-      {
-        const fields: object = schema.fields(database, table);
-        const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
-        for (const field of fieldsInMappingNotInDocument)
-        {
-          newDocument[field] = null;
-          if (fields[field]['type'] === 'text')
-          {
-            newDocument[field] = '';
-          }
-        }
-        const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
-        for (const field of fieldsInDocumentNotMapping)
-        {
-          delete newDocument[field];
-        }
-      }
-      resolve(newDocument);
-    });
   }
 
   /* headless streaming helper function ; enqueue the next chunk of data for processing */
