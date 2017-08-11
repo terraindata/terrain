@@ -135,6 +135,7 @@ const Actions =
         groupId: ID,
         name: string,
         db: BackendInstance,
+        onCreate?: (algorithmId) => void,
       ) =>
       {
         const group = LibraryStore.getState().groups.get(groupId);
@@ -142,7 +143,7 @@ const Actions =
           .set('name', name)
           .set('db', db)
           .set('language', group.defaultLanguage);
-        Actions.algorithms.create(groupId, algorithm);
+        Actions.algorithms.create(groupId, algorithm, onCreate);
       },
 
       change:

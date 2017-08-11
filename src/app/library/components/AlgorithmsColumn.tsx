@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
@@ -225,11 +226,22 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
+  public handleNewAlgorithmCreated(algorithmId)
+  {
+    const groupId = LibraryStore.getState().algorithms.get(algorithmId).groupId;
+    browserHistory.push(`/library/${groupId}/${algorithmId}`);
+  }
+
   public handleNewAlgorithmCreate()
   {
     const dbs = LibraryStore.getState().dbs;
     const index = this.getNewAlgorithmIndex();
-    Actions.algorithms.createAs(this.props.groupId, this.state.newAlgorithmTextboxValue, dbs.get(index));
+    Actions.algorithms.createAs(
+      this.props.groupId,
+      this.state.newAlgorithmTextboxValue,
+      dbs.get(index),
+      this.handleNewAlgorithmCreated
+    );
   }
 
   public handleHover(index: number, type: string, id: ID)
@@ -480,7 +492,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
             options={dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
             onChange={this.handleNewAlgorithmDbChange}
             canEdit={true}
-            directionBias={300}
+            directionBias={90}
             className='bic-db-dropdown'
           />
         </div>
