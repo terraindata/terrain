@@ -109,19 +109,12 @@ const Actions =
         groupId: ID,
         algorithm = LibraryTypes._Algorithm(),
         idCallback?: (id: ID) => void,
-        useParentDefaults = true,
       ) =>
       {
+        const group = LibraryStore.getState().groups.get(groupId);
         algorithm = algorithm
           .set('parent', groupId)
-          .set('groupId', groupId);
-        if (useParentDefaults)
-        {
-          const group = LibraryStore.getState().groups.get(groupId);
-          algorithm = algorithm
-            .set('db', group && group.db)
-            .set('language', group && group.defaultLanguage);
-        }
+          .set('groupId', groupId)
 
         Ajax.saveItem(
           algorithm,
@@ -135,6 +128,22 @@ const Actions =
             idCallback && idCallback(id);
           },
         );
+      },
+
+      createAs:
+      (
+        groupId: ID,
+        name: string,
+        db: BackendInstance,
+        onCreate?: (algorithmId) => void,
+      ) =>
+      {
+        const group = LibraryStore.getState().groups.get(groupId);
+        const algorithm = LibraryTypes._Algorithm()
+          .set('name', name)
+          .set('db', db)
+          .set('language', group.defaultLanguage);
+        Actions.algorithms.create(groupId, algorithm, onCreate);
       },
 
       change:
@@ -172,7 +181,6 @@ const Actions =
               },
             );
           },
-          false,
         );
       },
     },
@@ -185,20 +193,16 @@ const Actions =
         algorithmId: ID,
         variant = LibraryTypes._Variant(),
         responseHandler?: (response, variant) => any,
-        useParentDefaults = true,
       ) =>
       {
+        const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
         variant = variant
           .set('parent', algorithmId)
           .set('algorithmId', algorithmId)
-          .set('groupId', groupId);
-        if (useParentDefaults)
-        {
-          const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
-          variant = variant
-            .set('db', algorithm && algorithm.db)
-            .set('language', algorithm && algorithm.language);
-        }
+          .set('groupId', groupId)
+          .set('db', algorithm && algorithm.db)
+          .set('language', algorithm && algorithm.language);
+
         Ajax.saveItem(
           variant,
           (response) =>
@@ -219,35 +223,42 @@ const Actions =
 
       move:
       (variant: Variant, index: number, groupId: ID, algorithmId: ID) =>
-        $(ActionTypes.variants.move, { variant, index, groupId, algorithmId }),
+      {
+        const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
+        variant = variant.set('db', algorithm.db).set('language', algorithm.language);
+        $(ActionTypes.variants.move, { variant, index, groupId, algorithmId })
+      },
 
       duplicate:
       (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) =>
       {
         groupId = groupId || variant.groupId;
         algorithmId = algorithmId || variant.algorithmId;
+        const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
         let newVariant = variant
           .set('id', -1)
           .set('parent', algorithmId)
           .set('algorithmId', algorithmId)
           .set('groupId', groupId)
           .set('name', Util.duplicateNameFor(variant.name))
-          .set('status', ItemStatus.Build);
+          .set('status', ItemStatus.Build)
+          .set('db', algorithm.db)
+          .set('language', algorithm.language);
         newVariant = LibraryTypes.touchVariant(newVariant);
 
-        Actions.variants.create(groupId, algorithmId, newVariant, undefined, false);
+        Actions.variants.create(groupId, algorithmId, newVariant);
       },
 
       duplicateAs:
-      (variant: Variant, index: number, algorithmName?: string, responseHandler?: (response, variant) => any) =>
+      (variant: Variant, index: number, variantName?: string, responseHandler?: (response, variant) => any) =>
       {
-        algorithmName = algorithmName || Util.duplicateNameFor(variant.name);
+        variantName = variantName || Util.duplicateNameFor(variant.name);
         let newVariant = variant
           .set('id', -1)
           .set('parent', variant.algorithmId)
           .set('algorithmId', variant.algorithmId)
           .set('groupId', variant.groupId)
-          .set('name', algorithmName)
+          .set('name', variantName)
           .set('status', ItemStatus.Build);
         newVariant = LibraryTypes.touchVariant(newVariant);
 
