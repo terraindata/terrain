@@ -54,7 +54,7 @@ import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import { isValidIndexName, isValidTypeName, ParseCSVConfig, parseCSVSubset, parseJSONSubset } from './../../../../shared/fileImport/Util';
+import { isValidIndexName, isValidTypeName, parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -238,16 +238,15 @@ class FileImport extends TerrainComponent<any>
       quoteChar: '\"',
       escapeChar: '\"',
       comments: '#',
-      preview: 2,
-      header: hasCsvHeader,
-      skipEmptyLines: true,
+      preview: 3,
+      hasHeaderRow: hasCsvHeader,
       error: (err) =>
       {
         alert('CSV format incorrect: ' + String(err));
       },
     };
 
-    const items = parseCSVSubset(file, config);
+    const items = parseCSV(file, config);
     // console.log('items: ', items);
     return items;
   }

@@ -74,26 +74,6 @@ Router.post('/', async (ctx, next) =>
   ctx.body = await imprt.upsert(files, fields, false);
 });
 
-// Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-// {
-//   winston.info('importing to database');
-//   const imprtConf: ImportConfig = ctx.request.body.body;
-//   console.log('imprtConf');
-//   console.log(imprtConf);
-//   console.log('ctx.req');
-//   console.log(ctx.req);
-//   console.log('end');
-//   const { files, fields } = await asyncBusboy(ctx.req);
-//   console.log('files');
-//   console.log(files);
-//   console.log('fields');
-//   console.log(fields);
-//   // Util.verifyParameters(imprtConf, ['file', 'dbid', 'dbname', 'tablename', 'filetype']);
-//   // Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
-//
-//   ctx.body = {};
-// });
-
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
