@@ -294,7 +294,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       null,
     );
 
-    let date = 'There are no variants';
+    let date: string;
     let userId: string | number = 'There are no variants';
     if (lastTouched)
     {
@@ -355,8 +355,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
             <div
               className='library-item-line'
             >
-              {Util.formatDate(date)}
-
+              {
+                date === undefined ? 'There are no variants' : 
+                  'Most Recent Change: ' + Util.formatDate(date)
+              }
             </div>
           </div>
         </div>
