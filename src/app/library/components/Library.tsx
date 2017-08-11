@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
-import TerrainAreaChart from '../../charts/TerrainAreaChart';
+import TerrainAreaChart from '../../charts/components/TerrainAreaChart';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -135,7 +135,8 @@ class Library extends TerrainComponent<any>
   {
     return [...Array(20).keys()].map((i) =>
     {
-      return { x: i, y: _.random(1, 100) };
+      const time = new Date(2017, 8, i, 0, 0, 0);
+      return { time, value: _.random(1, 100) };
     });
   }
 
@@ -144,6 +145,9 @@ class Library extends TerrainComponent<any>
     const { libraryState } = this.state;
     const { variants, selectedVariants } = libraryState;
 
+    let metricId = 0;
+    const metricName = 'Click Through Rate';
+
     const datasets = variants
       .filter((variant) =>
       {
@@ -151,10 +155,11 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        return { id: +variant.id, name: variant.name, data: this.getData() };
+        metricId += 1;
+        return { metric: { id: metricId, name: metricName }, data: this.getData() };
       });
 
-    return datasets.toList();
+    return datasets.toMap();
   }
 
   public getLastPath()
@@ -286,7 +291,7 @@ class Library extends TerrainComponent<any>
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <TerrainAreaChart datasets={datasets} />
+            <TerrainAreaChart variants={variants} datasets={datasets} />
           </div> : null
         }
       </div>
