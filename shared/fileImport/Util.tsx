@@ -61,16 +61,16 @@ const VALID_NEWLINE_SEQUENCES =
 
 export interface ParseCSVConfig
 {
-  /* The delimiting character. Must be string of length 1 */
+  /* The delimiting character. Must be string of length 1. */
   delimiter: string;
 
-  /* The newLine sequence. Must be one of \r, \n, or \r\n. */
+  /* The newLine sequence. Must be one of \r or \n. */
   newLine: string;
 
-  /* The character used to quote fields */
+  /* The character used to quote fields. */
   quoteChar: string;
 
-  /* The character used to escape characters */
+  /* The character used to escape characters inside quoted fields. */
   escapeChar: string;
 
   /* The string that indicates a comment (e.g., "#" or "//"). When parser encounters a line starting with this string,
@@ -145,28 +145,29 @@ export function parseJSONSubset(file: string, numLines: number): object[]
   let lineCount = 0;
   let openBracketCount = 0;
   let closeBracketCount = 0;
-  let charIndex = 0;
+  let c = 0;
 
   while (lineCount < numLines)
   {
-    if (charIndex >= file.length - 1)
+    const curChar = file[c];
+    if (c >= file.length - 1)
     {
-      if (file.charAt(charIndex) === '\n')
+      if (curChar === '\n')
       {
-        charIndex--;
+        c--;
       }
       break;
     }
 
-    if (file.charAt(charIndex) === '{')
+    if (curChar === '{')
     {
       openBracketCount++;
     }
-    else if (file.charAt(charIndex) === '}')
+    else if (curChar === '}')
     {
       closeBracketCount++;
     }
-    charIndex++;
+    c++;
 
     if (openBracketCount === closeBracketCount && openBracketCount !== 0)
     {
@@ -175,7 +176,7 @@ export function parseJSONSubset(file: string, numLines: number): object[]
       closeBracketCount = 0;
     }
   }
-  return JSON.parse(file.substring(0, charIndex) + ']');
+  return JSON.parse(file.substring(0, c) + ']');
 }
 
 export function parseCSV(file, config: ParseCSVConfig)
