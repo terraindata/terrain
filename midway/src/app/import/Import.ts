@@ -54,7 +54,7 @@ import * as rimraf from 'rimraf';
 import * as winston from 'winston';
 
 import { json } from 'd3-request';
-import * as SharedUtil from '../../../../shared/fileImport/Util';
+import * as SharedUtil from '../../../../shared/database/elastic/ElasticUtil';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
