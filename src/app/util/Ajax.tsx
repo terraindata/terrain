@@ -716,9 +716,9 @@ export const Ajax =
       dbname: string,
       tablename: string,
       connectionId: number,
-      originalNames: List<string>,
+      originalNames: Immutable.List<string>,
       columnTypes: Immutable.Map<string, object>,
-      primaryKey: string,
+      primaryKeys: List<string>,
       transformations: Immutable.List<object>,
       update: boolean,
       csvHeaderMissing: boolean,
@@ -739,7 +739,7 @@ export const Ajax =
       formData.append('dbid', String(connectionId));
       formData.append('originalNames', JSON.stringify(originalNames));
       formData.append('columnTypes', JSON.stringify(columnTypes));
-      formData.append('primaryKey', primaryKey);
+      formData.append('primaryKeys', JSON.stringify(primaryKeys));
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
       formData.append('hasCsvHeader', String(!csvHeaderMissing));
@@ -824,7 +824,7 @@ export const Ajax =
       connectionId: number,
       originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
-      primaryKey: string,
+      primaryKeys: List<string>,
       transformations: List<object>,
       name: string,
       onLoad: (resp: object[]) => void,
@@ -837,7 +837,7 @@ export const Ajax =
         tablename,
         originalNames,
         columnTypes,
-        primaryKey,
+        primaryKeys,
         transformations,
         name,
       };

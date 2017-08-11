@@ -60,7 +60,7 @@ class FileImportStateC extends BaseClass
 
   public previewRows: List<List<string>> = List([]);
   public columnsCount: number = 0;
-  public primaryKey: number = -1;
+  public primaryKeys: List<number> = List([]);
   public csvHeaderMissing: boolean = false;
 
   public originalNames: List<string> = List([]);
@@ -105,7 +105,7 @@ export interface Template
   columnTypes: Immutable.Map<string, object>;
   transformations: List<object>;
   csvHeaderMissing: boolean;
-  primaryKey: number;
+  primaryKeys: List<number>;
 }
 
 // supports nested types, i.e. an array of array of dates

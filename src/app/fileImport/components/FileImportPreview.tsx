@@ -72,7 +72,7 @@ export interface Props
 {
   previewRows: List<List<string>>;
   columnsCount: number;
-  primaryKey: number;
+  primaryKeys: List<number>;
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
@@ -289,7 +289,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 columnNames={this.props.columnNames}
                 isIncluded={this.props.columnsToInclude.get(key)}
                 columnType={this.props.columnTypes.get(key)}
-                isPrimaryKey={this.props.primaryKey === key}
+                isPrimaryKey={this.props.primaryKeys.includes(key)}
                 columnOptions={this.props.columnOptions}
                 editing={key === this.state.editColumnId}
                 handleEditColumnChange={this.handleEditColumnChange}

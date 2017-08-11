@@ -101,9 +101,9 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'duplicate')
   {
-    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    const primaryKeys = state.primaryKeys.map((pkey) => pkey > transformCol ? pkey + 1 : pkey);
     return state
-      .set('primaryKey', primaryKey)
+      .set('primaryKeys', primaryKeys)
       .set('columnNames', state.columnNames
         .insert(transformCol + 1, transform.args.newName))
       .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
@@ -122,9 +122,9 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'split')
   {
-    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    const primaryKeys = state.primaryKeys.map((pkey) => pkey > transformCol ? pkey + 1 : pkey);
     return state
-      .set('primaryKey', primaryKey)
+      .set('primaryKeys', primaryKeys)
       .set('columnNames', state.columnNames
         .set(transformCol, transform.args.newName[0])
         .insert(transformCol + 1, transform.args.newName[1]))
@@ -151,18 +151,20 @@ const applyTransform = (state, transform) =>
   {
     const mergeCol = state.columnNames.indexOf(transform.args.mergeName);
 
-    let primaryKey = '';
-    if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
+    const primaryKeys = state.primaryKeys.map((pkey) =>
     {
-      primaryKey = mergeCol < transformCol ? transformCol - 1 : transformCol;
-    }
-    else
-    {
-      primaryKey = state.primaryKey < mergeCol ? state.primaryKey : state.primaryKey - 1;
-    }
+      if (pkey === transformCol || pkey === mergeCol)
+      {
+        return mergeCol < transformCol ? transformCol - 1 : transformCol;
+      }
+      else
+      {
+        return pkey < mergeCol ? pkey : pkey - 1;
+      }
+    });
 
     return state
-      .set('primaryKey', primaryKey)
+      .set('primaryKeys', primaryKeys)
       .set('columnNames', state.columnNames
         .set(transformCol, transform.args.newName)
         .delete(mergeCol))
@@ -221,9 +223,13 @@ FileImportReducers[ActionTypes.changeElasticUpdate] =
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
-    state
-      .set('primaryKey', action.payload.columnId)
-  ;
+  {
+    const index = state.primaryKeys.indexOf(action.payload.columnId);
+    return index > -1 ?
+      state.set('primaryKeys', state.primaryKeys.delete(index))
+      :
+      state.set('primaryKeys', state.primaryKeys.push(action.payload.columnId));
+  };
 
 FileImportReducers[ActionTypes.setColumnToInclude] =
   (state, action) =>
@@ -271,7 +277,7 @@ FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
     state
       .set('filetype', action.payload.filetype)
-      .set('primaryKey', -1)
+      .set('primaryKeys', List([]))
       .set('previewRows', action.payload.preview)
       .set('columnsCount', action.payload.originalNames.size)
       .set('originalNames', action.payload.originalNames)
@@ -295,7 +301,8 @@ FileImportReducers[ActionTypes.uploadFile] =
         state.columnsToInclude.get(colId) &&                          // backend requires type as string
         [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
       )),
-      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      // state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
       state.transforms,
       state.elasticUpdate,
       state.csvHeaderMissing,
@@ -361,7 +368,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
         state.columnsToInclude.get(colId) &&
         [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
       )),
-      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
       state.transforms,
       action.payload.templateText,
       () =>
@@ -411,7 +418,7 @@ FileImportReducers[ActionTypes.loadTemplate] =
 
     return state
       .set('originalNames', List(template.originalNames))
-      .set('primaryKey', columnNames.indexOf(template.primaryKey))
+      .set('primaryKeys', template.primaryKeys.map((pkey) => columnNames.indexOf(pkey)))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('columnNames', columnNames)
       .set('columnTypes', List(columnNames.map((colName) =>

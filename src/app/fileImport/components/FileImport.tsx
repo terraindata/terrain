@@ -398,7 +398,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbText, tableText } = fileImportState;
-    const { previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKeys } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
     const { file } = fileImportState;
 
@@ -491,7 +491,7 @@ class FileImport extends TerrainComponent<any>
           <FileImportPreview
             previewRows={previewRows}
             columnsCount={columnsCount}
-            primaryKey={primaryKey}
+            primaryKeys={primaryKeys}
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
