@@ -356,7 +356,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
               className='library-item-line'
             >
               {
-                date === undefined ? 'There are no variants' : 
+                date === undefined ? 'There are no variants' :
                   'Most Recent Change: ' + Util.formatDate(date)
               }
             </div>
