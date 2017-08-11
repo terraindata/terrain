@@ -54,7 +54,7 @@ import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import { isValidIndexName, isValidTypeName, parseJSONSubset } from './../../../../shared/fileImport/Util';
+import { isValidIndexName, isValidTypeName, ParseCSVConfig, parseCSVSubset, parseJSONSubset } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -232,57 +232,80 @@ class FileImport extends TerrainComponent<any>
 
   public parseCsv(file: string, hasCsvHeader: boolean): object[]
   {
-    if (hasCsvHeader)
-    {
-      const testDuplicateConfig = {
-        quoteChar: '"',
-        header: false,
-        preview: 1,
-        skipEmptyLines: true,
-      };
-
-      const columnHeaders = Papa.parse(file, testDuplicateConfig).data;
-      const colHeaderSet = new Set();
-      const duplicateHeaderSet = new Set();
-      columnHeaders[0].map((colHeader) =>
-      {
-        if (colHeaderSet.has(colHeader))
-        {
-          duplicateHeaderSet.add(colHeader);
-        }
-        else
-        {
-          colHeaderSet.add(colHeader);
-        }
-      });
-      if (duplicateHeaderSet.size > 0)
-      {
-        alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
-        return [];
-      }
-    }
-    const config = {
-      quoteChar: '\'',
+    const config: ParseCSVConfig = {
+      delimiter: ',',
+      newLine: '\n',
+      quoteChar: '\"',
+      escapeChar: '\"',
+      comments: '#',
+      preview: 2,
       header: hasCsvHeader,
-      preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
+      skipEmptyLines: true,
       error: (err) =>
       {
         alert('CSV format incorrect: ' + String(err));
       },
-      skipEmptyLines: true,
     };
 
-    const items = Papa.parse(file, config).data;
-    for (let i = 1; i < items.length; i++)
-    {
-      if (items[i].length !== items[0].length)
-      {
-        alert('CSV format incorrect: each row must have same number of fields');
-        return [];
-      }
-    }
+    const items = parseCSVSubset(file, config);
+    // console.log('items: ', items);
     return items;
   }
+
+  // public parseCsv(file: string, hasCsvHeader: boolean): object[]
+  // {
+  //   if (hasCsvHeader)
+  //   {
+  //     const testDuplicateConfig = {
+  //       quoteChar: '"',
+  //       header: false,
+  //       preview: 1,
+  //       skipEmptyLines: true,
+  //     };
+  //
+  //     const columnHeaders = Papa.parse(file, testDuplicateConfig).data;
+  //     const colHeaderSet = new Set();
+  //     const duplicateHeaderSet = new Set();
+  //     columnHeaders[0].map((colHeader) =>
+  //     {
+  //       if (colHeaderSet.has(colHeader))
+  //       {
+  //         duplicateHeaderSet.add(colHeader);
+  //       }
+  //       else
+  //       {
+  //         colHeaderSet.add(colHeader);
+  //       }
+  //     });
+  //     if (duplicateHeaderSet.size > 0)
+  //     {
+  //       alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
+  //       return [];
+  //     }
+  //   }
+  //   const config = {
+  //     quoteChar: '\'',
+  //     header: hasCsvHeader,
+  //     preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
+  //     error: (err) =>
+  //     {
+  //       alert('CSV format incorrect: ' + String(err));
+  //     },
+  //     skipEmptyLines: true,
+  //   };
+  //
+  //   const items = Papa.parse(file, config).data;
+  //   console.log('items: ', items);
+  //   for (let i = 1; i < items.length; i++)
+  //   {
+  //     if (items[i].length !== items[0].length)
+  //     {
+  //       alert('CSV format incorrect: each row must have same number of fields');
+  //       return [];
+  //     }
+  //   }
+  //   return items;
+  // }
 
   public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
   {

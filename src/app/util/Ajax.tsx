@@ -234,7 +234,7 @@ export const Ajax =
 
       if (config.json)
       {
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Content-Type', 'multipart/form-data');
       }
 
       if (!config.noToken)
@@ -711,6 +711,68 @@ export const Ajax =
     //   return;
     // },
 
+    // importFile(file: File,
+    //   filetype: string,
+    //   dbname: string,
+    //   tablename: string,
+    //   connectionId: number,
+    //   originalNames: List<string>,
+    //   columnTypes: Immutable.Map<string, object>,
+    //   primaryKey: string,
+    //   transformations: Immutable.List<object>,
+    //   update: boolean,
+    //   csvHeaderMissing: boolean,
+    //   onLoad: (resp: any) => void,
+    //   onError: (resp: any) => void,
+    // )
+    // {
+    //   // TODO: call Ajax.req() instead with formData in body
+    //   const authState = AuthStore.getState();
+    //
+    //   const formData = new FormData();
+    //   formData.append('file', file);
+    //   formData.append('id', String(authState.id));
+    //   formData.append('accessToken', authState.accessToken);
+    //   formData.append('filetype', filetype);
+    //   formData.append('dbname', dbname);
+    //   formData.append('tablename', tablename);
+    //   formData.append('dbid', String(connectionId));
+    //   formData.append('originalNames', JSON.stringify(originalNames));
+    //   formData.append('columnTypes', JSON.stringify(columnTypes));
+    //   formData.append('primaryKey', primaryKey);
+    //   formData.append('transformations', JSON.stringify(transformations));
+    //   formData.append('update', String(update));
+    //   formData.append('hasCsvHeader', String(!csvHeaderMissing));
+    //
+    //   const xhr = new XMLHttpRequest();
+    //   xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
+    //   xhr.send(formData);
+    //
+    //   xhr.onerror = (err: any) =>
+    //   {
+    //     const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+    //     onError(routeError);
+    //   };
+    //
+    //   xhr.onload = (ev: Event) =>
+    //   {
+    //     if (xhr.status === 401)
+    //     {
+    //       // TODO re-enable
+    //       Actions.logout();
+    //     }
+    //
+    //     if (xhr.status !== 200)
+    //     {
+    //       onError(xhr.responseText);
+    //       return;
+    //     }
+    //
+    //     onLoad(xhr.responseText);
+    //   };
+    //   return;
+    // },
+
     importFile(file: File,
       filetype: string,
       dbname: string,
@@ -721,103 +783,46 @@ export const Ajax =
       primaryKey: string,
       transformations: Immutable.List<object>,
       update: boolean,
-      csvHeaderMissing: boolean,
-      onLoad: (resp: any) => void,
-      onError: (resp: any) => void,
+      streaming: boolean,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
     )
     {
-      // TODO: call Ajax.req() instead with formData in body
-      const authState = AuthStore.getState();
-
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('id', String(authState.id));
-      formData.append('accessToken', authState.accessToken);
-      formData.append('filetype', filetype);
       formData.append('dbname', dbname);
       formData.append('tablename', tablename);
       formData.append('dbid', String(connectionId));
-      formData.append('originalNames', JSON.stringify(originalNames));
-      formData.append('columnTypes', JSON.stringify(columnTypes));
-      formData.append('primaryKey', primaryKey);
-      formData.append('transformations', JSON.stringify(transformations));
-      formData.append('update', String(update));
-      formData.append('hasCsvHeader', String(!csvHeaderMissing));
 
-      const xhr = new XMLHttpRequest();
-      xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
-      xhr.send(formData);
-
-      xhr.onerror = (err: any) =>
-      {
-        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-        onError(routeError);
+      const payload: object = {
+        file: formData,
+        dbid: connectionId,
+        dbname,
+        tablename,
+        filetype,
+        originalNames,
+        columnTypes,
+        primaryKey,
+        transformations,
+        update,
       };
-
-      xhr.onload = (ev: Event) =>
+      console.log('import payload: ', payload);
+      const onLoadHandler = (resp) =>
       {
-        if (xhr.status === 401)
-        {
-          // TODO re-enable
-          Actions.logout();
-        }
-
-        if (xhr.status !== 200)
-        {
-          onError(xhr.responseText);
-          return;
-        }
-
-        onLoad(xhr.responseText);
+        onLoad(resp);
       };
+      Ajax.req(
+        'post',
+        'import/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+
       return;
     },
-
-    // importFile(fileContents: string,
-    //   filetype: string,
-    //   dbname: string,
-    //   tablename: string,
-    //   connectionId: number,
-    //   originalNames: List<string>,
-    //   columnTypes: Immutable.Map<string, object>,
-    //   primaryKey: string,
-    //   transformations: Immutable.List<object>,
-    //   update: boolean,
-    //   streaming: boolean,
-    //   onLoad: (resp: object[]) => void,
-    //   onError?: (ev: string) => void,
-    // )
-    // {
-    //   const payload: object = {
-    //     dbid: connectionId,
-    //     dbname,
-    //     tablename,
-    //     contents: fileContents,
-    //     filetype,
-    //     originalNames,
-    //     columnTypes,
-    //     primaryKey,
-    //     transformations,
-    //     update,
-    //     streaming,
-    //   };
-    //   console.log('import payload: ', payload);
-    //   const onLoadHandler = (resp) =>
-    //   {
-    //     onLoad(resp);
-    //   };
-    //   Ajax.req(
-    //     'post',
-    //     'import/',
-    //     payload,
-    //     onLoadHandler,
-    //     {
-    //       onError,
-    //     },
-    //   );
-    //
-    //   return;
-    // },
 
     saveTemplate(dbname: string,
       tablename: string,

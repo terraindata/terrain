@@ -44,6 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires strict-boolean-expressions max-line-length
+
+export interface ParseCSVConfig
+{
+  /* The delimiting character. Must be string of length 1 */
+  delimiter: string;
+
+  /* The newLine sequence. Must be one of \r, \n, or \r\n. */
+  newLine: string;
+
+  /* The character used to quote fields */
+  quoteChar: string;
+
+  /* The character used to escape characters */
+  escapeChar: string;
+
+  /* The string that indicates a comment (e.g., "#" or "//"). When parser encounters a line starting with this string,
+     it will skip the line. */
+  comments: string;
+
+  /* If > 0, only that many rows will be parsed. */
+  preview: number;
+
+  /* if true, the first row of parsed data will be interpreted as field names. Warning: Duplicate field names will
+     overwrite values in previous fields having the same name */
+  header: boolean;
+
+  /* If true, lines that are completely empty will be skipped. An empty line is defined to be one which evaluates to
+     empty string. */
+  skipEmptyLines: boolean;
+
+  /* callback to execute if parser encounters an error. The function is passed two arguments: the error and the File. */
+  error: (err: any) => void;
+}
+
 /* returns an error message if there are any; else returns empty string */
 export function isValidIndexName(name: string): string
 {
@@ -132,4 +167,161 @@ export function parseJSONSubset(file: string, numLines: number): object[]
     }
   }
   return JSON.parse(file.substring(0, charIndex) + ']');
+}
+
+// export function parseCSVSubset(file: string, config: ParseCsvConfig): object[]
+// {
+//   const delim = config.delimiter;
+//   const newLine = config.newLine;
+//   const quoteChar = config.quoteChar;
+//   const escapeChar = config.escapeChar;
+//   const comments = config.comments;
+//   const preview = config.preview;
+//   const header = config.header;
+//   const skipEmptyLines = config.skipEmptyLines;
+//
+//   let items = [];
+//   const rows = file.split(newLine);
+//   for (let i = 0; i < rows.length; i++)
+//   {
+//     const row = rows[i];
+//     console.log('row: ', row);
+//     if (comments && row.substr(0, comments.length) === comments)
+//     {
+//       continue;
+//     }
+//     if (preview && i >= preview)
+//     {
+//       items = items.slice(0, preview);
+//       return items;
+//     }
+//
+//     const rowItems = [];
+//     let fieldStart = 0;
+//     for (let j = 0; j < row.length; j++)
+//     {
+//       console.log(j + ': ' + row.charAt(j));
+//       const curChar = row.charAt(j);
+//       if (curChar === escapeChar)
+//       {
+//         j++;
+//         continue;
+//       }
+//       else if (curChar === quoteChar)
+//       {
+//         console.log('quoteChar');
+//         // find end quote char, throw error if not found
+//         const endQuoteIndex = row.indexOf(quoteChar, j + 1);
+//         console.log('endQuoteIndex: ', endQuoteIndex);
+//         if (endQuoteIndex === -1)
+//         {
+//           return [];
+//         }
+//         j = endQuoteIndex;
+//       }
+//       else if (curChar === delim)
+//       {
+//         console.log('field: ', row.substring(fieldStart, j));
+//         rowItems.push(row.substring(fieldStart, j));
+//         fieldStart = j + 1;
+//       }
+//     }
+//     rowItems.push(row.substring(fieldStart, row.length));
+//     items.push(rowItems);
+//     // items.push(row.split(delim));
+//   }
+//   return items;
+// }
+
+export function parseCSVSubset(file, config: ParseCSVConfig)
+{
+  const delim = config.delimiter;
+  const newLine = config.newLine;
+  const quoteChar = config.quoteChar;
+  const escapeChar = config.escapeChar;
+  const comments = config.comments;
+  const header = config.header;
+  const skipEmptyLines = config.skipEmptyLines;
+  let preview = config.preview;
+
+  if (header)
+  {
+    preview += 1;
+  }
+
+  const arr: string[][] = [];
+  let insideQuote = false;
+  let rowStart = true;
+  let emptyLineCount;
+
+  let row = 0;
+  let col = 0;
+
+  for (let c = 0; c < file.length; c++)
+  {
+    const curChar = file[c];
+    const nextChar = file[c + 1];
+    arr[row] = arr[row] || [];             // create a new row if necessary
+    arr[row][col] = arr[row][col] || '';   // create a new column (start with empty string) if necessary
+
+    if (rowStart && comments && file.substr(c, comments.length) === comments)
+    {
+      c = Number(file.indexOf(newLine, c));
+      continue;
+    }
+    rowStart = false;
+
+    if (curChar === escapeChar && insideQuote && nextChar === quoteChar)
+    {
+      arr[row][col] += curChar;
+      c++;
+      continue;
+    }
+    if (curChar === quoteChar)
+    {
+      insideQuote = !insideQuote;
+      continue;
+    }
+    if (curChar === delim && !insideQuote)
+    {
+      col++;
+      continue;
+    }
+    if (curChar === newLine && !insideQuote)
+    {
+      if (skipEmptyLines && arr[row].length === 1)
+      {
+        emptyLineCount++;
+        preview++;
+      }
+      if (preview && arr.length >= preview)
+      {
+        break;
+      }
+      row++;
+      col = 0;
+      rowStart = true;
+      continue;
+    }
+
+    arr[row][col] += curChar;
+  }
+  if (file[file.length - 1] === delim)
+  {
+    arr[row][col] = '';
+  }
+
+  if (header)
+  {
+    const headers = arr[0];
+    const arrObj = arr.slice(1).map((arrRow) =>
+      arrRow.reduce((acc, cur, i) =>
+      {
+        acc[headers[i]] = cur;
+        return acc;
+      }, {}),
+    );
+    return arrObj;
+  }
+  return arr;
 }
