@@ -66,6 +66,7 @@ import Actions from '../../data/BuilderActions';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import Result from '../results/Result';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
+import ResultsExportComponent from '../results/ResultsExportComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import Radium = require('radium');
@@ -98,6 +99,8 @@ interface State
 
   resultsPages: number;
   onResultsLoaded?: (unchanged?: boolean) => void;
+
+  showingExport?: boolean;
 }
 
 @Radium
@@ -107,6 +110,7 @@ class ResultsArea extends TerrainComponent<Props>
     expanded: false,
     expandedResultIndex: null,
     showingConfig: false,
+    showingExport: false,
     resultsPages: 1,
     resultFormat: 'icon',
   };
@@ -453,7 +457,7 @@ column if you have customized the results view.');
 
         <div
           className='results-top-config'
-          onClick={this.handleESresultExport}
+          onClick={this.showExport}
           key='results-area-export'
           style={link()}
         >
@@ -480,6 +484,20 @@ column if you have customized the results view.');
     );
   }
 
+  public showExport()
+  {
+    this.setState({
+      showingExport: true,
+    });
+  }
+
+  public hideExport()
+  {
+    this.setState({
+      showingExport: false,
+    });
+  }
+
   public showConfig()
   {
     this.setState({
@@ -492,6 +510,22 @@ column if you have customized the results view.');
     this.setState({
       showingConfig: false,
     });
+  }
+
+  public renderExport()
+  {
+    if (this.state.showingExport)
+    {
+      return (
+        <ResultsExportComponent
+          query={this.props.query}
+          fields={this.props.resultsState.fields}
+          results={this.props.resultsState.results}
+          handleESresultExport={this.handleESresultExport}
+          onClose={this.hideExport}
+        />
+      );
+    }
   }
 
   public renderConfig()
@@ -526,6 +560,7 @@ column if you have customized the results view.');
         {this.renderResults()}
         {this.renderExpandedResult()}
         {this.renderConfig()}
+        {this.renderExport()}
       </div>
     );
   }

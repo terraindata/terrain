@@ -60,6 +60,7 @@ import { Card, Cards } from '../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
+import { Template, Transform } from '../../fileImport/FileImportTypes';
 
 export class BuilderStateClass
 {
@@ -94,6 +95,25 @@ export class BuilderStateClass
   public isDirty: boolean = false;
 
   public resultsState: ResultsState = _ResultsState();
+
+  // export
+  public connectionId: number = -1; // db: BackendInstance .id = dbid
+  public serverText: string = '';
+  public dbText: string = '';
+  public tableText: string = '';
+
+  public previewRows: List<List<string>> = List([]);
+  public columnsCount: number = 0;
+  public primaryKey: number = -1;
+  public csvHeaderMissing: boolean = false;
+
+  public originalNames: List<string> = List([]);
+  public columnNames: List<string> = List([]);
+  public columnsToInclude: List<boolean> = List([]);
+  public columnTypes: List<IMMap<string, any>> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
+
+  public transforms: List<Transform> = List([]);
+  public templates: List<Template> = List([]);
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());

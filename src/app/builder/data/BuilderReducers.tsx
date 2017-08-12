@@ -478,6 +478,33 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       action: Action<{ resultsState }>,
     ) =>
       state.set('resultsState', action.payload.resultsState),
+
+    [ActionTypes.loadTemplate]:
+    (
+      state: BuilderState,
+      action: Action<{ templateId }>,
+    ) =>
+    {
+      return state;
+    },
+
+    [ActionTypes.saveTemplate]:
+    (
+      state: BuilderState,
+      action: Action<{ templateName }>,
+    ) =>
+    {
+      return state;
+    },
+
+    [ActionTypes.exportResults]:
+    (
+      state: BuilderState,
+      action: Action<{}>,
+    ) =>
+    {
+      return state;
+    },
   };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState

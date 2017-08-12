@@ -827,6 +827,7 @@ export const Ajax =
       primaryKey: string,
       transformations: List<object>,
       name: string,
+      isExport: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -840,6 +841,7 @@ export const Ajax =
         primaryKey,
         transformations,
         name,
+        export: isExport,
       };
       const onLoadHandler = (resp) =>
       {

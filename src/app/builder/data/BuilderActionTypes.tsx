@@ -89,6 +89,11 @@ export let BuilderActionTypes =
     undo: '',
     redo: '',
     checkpoint: '', // inserts an undo checkpoint
+
+    // export
+    loadTemplate: '',
+    saveTemplate: '',
+    exportResults: '',
   };
 
 // I tried using this type to correclty classify this function,

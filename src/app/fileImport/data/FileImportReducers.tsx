@@ -364,6 +364,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
       action.payload.templateText,
+      false,
       () =>
       {
         alert('successfully saved template');

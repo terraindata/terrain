@@ -146,6 +146,19 @@ const BuilderActions =
       $(ActionTypes.results, {
         resultsState,
       }),
+
+    // export
+    loadTemplate:
+    (templateId: number) =>
+      $(ActionTypes.loadTemplate, { templateId }),
+
+    saveTemplate:
+    (templateName: string) =>
+      $(ActionTypes.saveTemplate, { templateName }),
+
+    exportResults:
+    () =>
+      $(ActionTypes.exportResults, {}),
   };
 
 _.map(ActionTypes,

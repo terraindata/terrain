@@ -106,6 +106,7 @@ export interface Template
   transformations: List<object>;
   csvHeaderMissing: boolean;
   primaryKey: number;
+  export: boolean;
 }
 
 // supports nested types, i.e. an array of array of dates
