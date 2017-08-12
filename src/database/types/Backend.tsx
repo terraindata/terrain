@@ -96,13 +96,6 @@ export interface Backend
     options: CardsToCodeOptions,
   ): string;
 
-/*
-  getColumnHistogram(
-    column: string,
-    query: Query,
-  ):
-*/
-
   syntaxConfig: object;
 
   // schema?

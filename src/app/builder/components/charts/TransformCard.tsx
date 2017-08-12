@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
-import { List} from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 
@@ -54,14 +54,14 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
 import { Card, CardString } from '../../../../blocks/types/Card';
 
-import {Ajax} from '../../../util/Ajax';
+import { Ajax } from '../../../util/Ajax';
 import AjaxM1 from '../../../util/AjaxM1';
 import SpotlightStore from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
 
-import {MidwayError} from '../../../../../shared/error/MidwayError';
+import { MidwayError } from '../../../../../shared/error/MidwayError';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
 
@@ -167,7 +167,7 @@ class TransformCard extends TerrainComponent<Props>
     if (this.props.language === 'mysql')
     {
       this && this.state && this.state.queryId &&
-      AjaxM1.killQuery(this.state.queryId);
+        AjaxM1.killQuery(this.state.queryId);
     }
   }
 
@@ -237,7 +237,7 @@ class TransformCard extends TerrainComponent<Props>
   {
     const low = maxDomain.get(0);
     const high = maxDomain.get(1);
-    if (Number.isNaN(low) ||  Number.isNaN(high) || low >= high || low < 0 || high < 0)
+    if (Number.isNaN(low) || Number.isNaN(high) || low >= high || low < 0 || high < 0)
     {
       // TODO: show an error message about the wrong domain values.
       return curStateDomain;
@@ -245,7 +245,7 @@ class TransformCard extends TerrainComponent<Props>
     return List([low, high]);
   }
 
-  private handleElasticAggregationError(err: MidwayError|string)
+  private handleElasticAggregationError(err: MidwayError | string)
   {
     this.setState({
       bars: List([]),
@@ -366,16 +366,17 @@ class TransformCard extends TerrainComponent<Props>
             histogram: {
               field: input,
               interval,
-              extended_bounds : {
+              extended_bounds: {
                 min, max, // make sure the buckets start from min
               },
             },
           },
         },
-      }};
+      }
+    };
     aggQuery['index'] = index;
     aggQuery['type'] = type;
-    aggQuery.body.query.bool.must.range[input as string] =  {gte: min, lte: max};
+    aggQuery.body.query.bool.must.range[input as string] = { gte: min, lte: max };
 
     this.setState(
       Ajax.query(
@@ -388,7 +389,7 @@ class TransformCard extends TerrainComponent<Props>
         (err) =>
         {
           this.handleElasticAggregationError(err);
-        } ),
+        }),
     );
   }
 
