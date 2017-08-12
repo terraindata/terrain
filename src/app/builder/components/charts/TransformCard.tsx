@@ -46,25 +46,24 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
-import { List, Map } from 'immutable';
+import { List} from 'immutable';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
-import * as _ from 'underscore';
 
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
 import { Card, CardString } from '../../../../blocks/types/Card';
-import { M1QueryResponse } from '../../../util/AjaxM1';
+
+import {Ajax} from '../../../util/Ajax';
 import AjaxM1 from '../../../util/AjaxM1';
-import Util from '../../../util/Util';
 import SpotlightStore from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
-import {Ajax} from '../../../util/Ajax';
-import {QueryResult} from '../../../../database/types/QueryResponse';
-import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
+
 import {MidwayError} from '../../../../../shared/error/MidwayError';
+import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
+import { M1QueryResponse } from '../../../util/AjaxM1';
 
 const NUM_BARS = 1000;
 
@@ -98,7 +97,10 @@ export type Bars = List<Bar>;
 class TransformCard extends TerrainComponent<Props>
 {
   public state: {
-    domain: List<number>;
+    // the domain of the chart and the periscope, updated by the periscope domain change.
+    chartDomain: List<number>;
+    // the maximum domain, updated by the two input fields.
+    maxDomain: List<number>;
     range: List<number>;
     bars: Bars;
     spotlights: IMMap<string, any>;
@@ -111,7 +113,9 @@ class TransformCard extends TerrainComponent<Props>
   {
     super(props);
     this.state = {
-      domain: List(props.data.domain as number[]),
+      // props.data.doma is List<string>
+      maxDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
+      chartDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
       range: List([0, 1]),
       bars: List([]),
       spotlights: null,
@@ -120,7 +124,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    this.computeBars(this.props.data.input);
+    this.computeBars(this.props.data.input, this.state.maxDomain);
     this._subscribe(SpotlightStore, {
       isMounted: true,
       storeKeyPath: ['spotlights'],
@@ -130,98 +134,28 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    console.log("nextProps.data" + JSON.stringify(nextProps.data));
-    console.log("nextProps.query" + nextProps.builderState.tql);
+    // nextProps.data.domain is list<string>
+    const newDomain: List<number> = List([Number(nextProps.data.domain.get(0)), Number(nextProps.data.domain.get(1))]);
+    if (!newDomain.equals(this.state.maxDomain))
+    {
+      const trimmedDomain = this.trimDomain(this.state.maxDomain, newDomain);
+      if (trimmedDomain !== this.state.maxDomain)
+      {
+        this.setState({
+          maxDomain: trimmedDomain,
+          chartDomain: trimmedDomain
+        });
+        this.computeBars(nextProps.data.input, trimmedDomain);
+        return;
+      }
+    }
 
     if (nextProps.data.input !== this.props.data.input)
     {
-      this.computeBars(nextProps.data.input);
-    }
-
-    if (!nextProps.data.domain.equals(this.props.data.domain))
-    {
-      this.setState({
-        domain: this.trimDomain(this.state.domain, nextProps.data.domain),
-      });
-
-      if (nextProps.data.input === this.props.data.input)
-      {
-        // input didn't change but still need to compute bars to get the set within this domain
-        this.computeBars(this.props.data.input);
-      }
+      this.computeBars(nextProps.data.input, this.state.maxDomain);
     }
   }
 
-  public trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
-  {
-    const low = maxDomain.get(0);
-    const high = maxDomain.get(1);
-    const buffer = (high - low) * 0.02;
-
-    return List([
-      Util.valueMinMax(curStateDomain.get(0), low, high - buffer),
-      Util.valueMinMax(curStateDomain.get(1), low + buffer, high),
-    ]);
-  }
-
-  public findTableForAlias(data: Block | List<Block>, alias: string): string
-  {
-    if (Immutable.List.isList(data))
-    {
-      const list = data as List<Block>;
-      for (let i = 0; i < list.size; i++)
-      {
-        const table = this.findTableForAlias(list.get(i), alias);
-        if (table)
-        {
-          return table;
-        }
-      }
-      return null;
-    }
-
-    if (data['type'] === 'table' && data['alias'] === alias)
-    {
-      return data['table'];
-    }
-
-    if (Immutable.Iterable.isIterable(data))
-    {
-      const keys = data.keys();
-      let i = keys.next();
-      while (!i.done)
-      {
-        const value = data[i.value];
-        if (Immutable.Iterable.isIterable(value))
-        {
-          const table = this.findTableForAlias(value, alias);
-          if (table)
-          {
-            return table;
-          }
-        }
-        i = keys.next();
-      }
-    }
-    return null;
-  }
-
-  // TODO move the bars computation to a higher level
-  public computeBars(input: CardString)
-  {
-    console.log("CardString: " + input + " input type " + typeof input);
-    switch (this.props.language)
-    {
-      case "mysql":
-        this.computeTQLBars(input);
-        break;
-      case "elastic":
-        this.computeEQLBars(input);
-        break;
-      default:
-        break;
-    }
-  }
 
   public componentWillUnmount()
   {
@@ -250,10 +184,10 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
-  public handleDomainChange(domain: List<number>)
+  public handleChartDomainChange(chartDomain: List<number>)
   {
     this.setState({
-      domain,
+      chartDomain,
     });
   }
 
@@ -279,7 +213,7 @@ class TransformCard extends TerrainComponent<Props>
           canEdit={this.props.canEdit}
           points={data.scorePoints}
           bars={this.state.bars}
-          domain={this.state.domain}
+          domain={this.state.chartDomain}
           range={this.state.range}
           spotlights={spotlights && spotlights.toList().toJS()}
           inputKey={BlockUtils.transformAlias(this.props.data)}
@@ -288,11 +222,11 @@ class TransformCard extends TerrainComponent<Props>
           language={this.props.language}
         />
         <TransformCardPeriscope
-          onDomainChange={this.handleDomainChange}
+          onDomainChange={this.handleChartDomainChange}
           barsData={this.state.bars}
-          domain={this.state.domain}
+          domain={this.state.chartDomain}
           range={this.state.range}
-          maxDomain={data.domain}
+          maxDomain={this.state.maxDomain}
           keyPath={this.props.keyPath}
           canEdit={this.props.canEdit}
           width={width}
@@ -302,78 +236,91 @@ class TransformCard extends TerrainComponent<Props>
     );
   }
 
+  private trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
+  {
+    const low = maxDomain.get(0);
+    const high = maxDomain.get(1);
+    if (Number.isNaN(low) ||  Number.isNaN(high) || low >= high || low < 0 || high < 0)
+    {
+      // TODO: show an error message about the wrong domain values.
+      return curStateDomain;
+    }
+    return List([low, high]);
+  }
+
   private handleElasticAggregationError(err: MidwayError|string)
   {
+    this.setState({
+      bars: List([]),
+      error: true,
+      queryXhr: null,
+      queryId: null,
+    });
   }
 
   private handleElasticAggregationResponse(resp: MidwayQueryResponse)
   {
-    console.log("handleElasticAggregationResult:  " + JSON.stringify(resp));
     this.setState({
       queryXhr: null,
       queryId: null,
     });
 
-    const min = Number(this.props.data.domain.get(0));
-    const max = Number(this.props.data.domain.get(1));
+    const min = this.state.maxDomain.get(0);
+    const max = this.state.maxDomain.get(1);
     const elasticHistogram = resp.getAggregationResult();
     let theHist;
-    if (elasticHistogram.transformCard &&  elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+    try
     {
-      theHist = elasticHistogram.transformCard.buckets;
-    } else
+      if (elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+      {
+        theHist = elasticHistogram.transformCard.buckets;
+      } else
+      {
+        throw Error('elasticHistogram.transformCard.buckets.length < NUM_BARS');
+      }
+    } catch (e)
     {
-      console.log('Error ' + elasticHistogram.transformCard.buckets.length);
-      return this.handleElasticAggregationError('The size of aggregation buckets is < ' + NUM_BARS);
+      return this.handleElasticAggregationError(e.message);
     }
 
+    // because the query's min,max,interl are same as the input parameters,
+    // we can directly set the count and the percentage sequentially.
     const bars: Bar[] = [];
-      for (let j = 0; j < NUM_BARS; j++)
-      {
-        bars.push({
-          id: '' + j,
-          count: theHist[j].doc_count,
-          percentage: theHist[j].doc_count,
-          range: {
-            min: min + (max - min) * j / NUM_BARS,
-            max: min + (max - min) * (j + 1) / NUM_BARS,
-          },
-        });
-      }
-
-/*      results.map((v) =>
-      {
-        const val = +v.value;
-        let i = Math.floor((val - min) / (max - min) * NUM_BARS);
-        if (i === NUM_BARS)
-        {
-          i = NUM_BARS - 1;
-        }
-        if (i < 0 || i >= bars.length)
-        {
-          // out of bounds for our custom domain
-          return;
-        }
-
-        bars[i].count++;
-        bars[i].percentage += 1 / results.length;
-      });*/
-
-      this.setState({
-        bars: List(bars),
+    for (let j = 0; j < NUM_BARS; j++)
+    {
+      bars.push({
+        id: '' + j,
+        count: theHist[j].doc_count,
+        percentage: theHist[j].doc_count,
+        range: {
+          min: min + (max - min) * j / NUM_BARS,
+          max: min + (max - min) * (j + 1) / NUM_BARS,
+        },
       });
+    }
 
-      if (!this.props.data.hasCustomDomain)
-      {
-        const domain = List([min, max]);
-        this.setState({
-          domain: this.trimDomain(this.state.domain, domain),
-        });
-        this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), domain, true);
-      }
+    this.setState({
+      bars: List(bars),
+    });
   }
 
-  private computeEQLBars(input: CardString)
+  // TODO move the bars computation to a higher level
+  private computeBars(input: CardString, maxDomain: List<number>)
+  {
+    switch (this.props.language)
+    {
+      case "mysql":
+        this.computeTQLBars(input);
+        break;
+      case "elastic":
+        this.computeEQLBars(input, maxDomain);
+        break;
+      default:
+        break;
+    }
+  }
+
+  private computeEQLBars(input: CardString, maxDomain: List<number>)
   {
     const { builderState } = this.props;
     const { db } = builderState;
@@ -383,21 +330,36 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    const min = Number(this.props.data.domain.get(0));
-    const max = Number(this.props.data.domain.get(1));
+    // get the index and type from the cards
+    let index: string = '';
+    let type: string = '';
+    const cards = builderState.query.cards;
+    cards.map((card) =>
+    {
+      if (card._isCard)
+      {
+        const title = card.static.title;
+        if (title === 'index')
+        {
+          index = card.value;
+        } else if (title === 'type')
+        {
+          type = card.value;
+        }
+      }
+    });
+
+    const min = maxDomain.get(0);
+    const max = maxDomain.get(1);
     const interval = (max - min) / NUM_BARS;
-    console.log("min,max,interval = "  + min + "," + max + "," + interval);
 
     const aggQuery = {
-      index: '',
-      type: '',
       body: {
         size: 0,
         query: {
           bool: {
             must: {
               range: {
-                "votecount": {"gte": min, "lte": max}
               }
             }
           }
@@ -406,11 +368,17 @@ class TransformCard extends TerrainComponent<Props>
           transformCard: {
             histogram: {
               field: input,
-              interval: interval,
+              interval,
+              extended_bounds : {
+                min, max // make sure the buckets start from min
+              }
             }
           }
         }
       }};
+    aggQuery['index'] = index;
+    aggQuery['type'] = type;
+    aggQuery.body.query.bool.must.range[input as string] =  {gte: min, lte: max};
 
     this.setState(
       Ajax.query(
@@ -498,11 +466,53 @@ class TransformCard extends TerrainComponent<Props>
       {
         const domain = List([min, max]);
         this.setState({
-          domain: this.trimDomain(this.state.domain, domain),
+          domain: this.trimDomain(this.state.maxDomain, domain),
         });
         this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), domain, true);
       }
     }
+  }
+
+  private findTableForAlias(data: Block | List<Block>, alias: string): string
+  {
+    if (Immutable.List.isList(data))
+    {
+      const list = data as List<Block>;
+      for (let i = 0; i < list.size; i++)
+      {
+        const table = this.findTableForAlias(list.get(i), alias);
+        if (table)
+        {
+          return table;
+        }
+      }
+      return null;
+    }
+
+    if (data['type'] === 'table' && data['alias'] === alias)
+    {
+      return data['table'];
+    }
+
+    if (Immutable.Iterable.isIterable(data))
+    {
+      const keys = data.keys();
+      let i = keys.next();
+      while (!i.done)
+      {
+        const value = data[i.value];
+        if (Immutable.Iterable.isIterable(value))
+        {
+          const table = this.findTableForAlias(value, alias);
+          if (table)
+          {
+            return table;
+          }
+        }
+        i = keys.next();
+      }
+    }
+    return null;
   }
 
   private computeTQLBars(input: CardString)
