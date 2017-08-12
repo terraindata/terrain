@@ -50,7 +50,7 @@ import { List, Map } from 'immutable';
 import * as _ from 'underscore';
 
 import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
-import { Colors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
@@ -64,12 +64,15 @@ export const elasticScore = _card(
   {
     weights: List(),
 
-    key: '_script',
+    key: 'sort',
 
     static: {
       language: 'elastic',
-      title: 'Score',
-      colors: Colors().builder.cards.enumClause,
+      title: 'Terrain Score Sort',
+      description: 'Sort results using Terrain\'s proprietary scoring method: Transform \
+        individual field values using a simple graphing tool, and combine the transformed \
+        fields in a weighted sum.',
+      colors: getCardColors('score', Colors().builder.cards.structureClause),
       preview: '[weights.length] Factors',
       // manualEntry: ManualConfig.cards['score'],
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
@@ -90,18 +93,19 @@ export const elasticScore = _card(
         });
 
         return {
-          type: 'number',
-          order: 'desc',
-          script: {
-            stored: 'Terrain.Score.PWL',
-            params: {
-              factors,
+          _script:
+          {
+            type: 'number',
+            order: 'desc',
+            script: {
+              stored: 'Terrain.Score.PWL',
+              params: {
+                factors,
+              },
             },
           },
         };
       },
-
-      anythingAccepts: true, // TODO change
 
       init: (blocksConfig) =>
       {
@@ -137,6 +141,9 @@ export const elasticScore = _card(
                 // help: ManualConfig.help['weight'],
                 key: 'weight',
                 placeholder: 'Weight',
+                style: {
+                  maxWidth: 120,
+                },
                 // autoDisabled: true,
               },
               {

@@ -30,7 +30,6 @@
     border-radius: 0px;
     // border-radius: @card-border-radius;
     box-sizing: border-box;
-    box-shadow: 3px 3px 5px 2px rgba(0,0,0,.39);
 
     min-height: 35px;
 
@@ -117,6 +116,12 @@
   border-bottom-left-radius: calc(@card-border-radius - 1px);
   border-bottom-right-radius: calc(@card-border-radius - 1px);
  }
+ 
+ 
+  .card-inner-with-title {
+    padding-top: 46px;
+  }
+
 
   &.card-opening {
     .card-body-wrapper {
@@ -164,6 +169,7 @@
   text-transform: capitalize;
   position: relative; // for menu component
   text-align: left;
+  top: 3px;
 
   display: flex;
   height: @title-height;
@@ -178,9 +184,10 @@
     border-radius: 6px;
 
     position: absolute;
-    top: 7px;
+    top: 11px;
     left: 37px;
 
+    font-size: @font-size;
     margin-left: 27px;
   }
 
@@ -204,13 +211,21 @@
 
     .transition;
     .rotate90;
-    width: 20px;
-    fill: rgba(255,255,255,0.5);
+    
+    svg {
+      width: 20px;
+      fill: rgba(255,255,255,0.5);
+      
+    }
     &:hover {
-      fill: rgba(255,255,255,0.75);
+      svg {
+        fill: rgba(255,255,255,0.75);
+      }
     }
     &:active {
-      fill: #fff;
+      svg {
+        fill: #fff;
+      }
     }
 
     position: absolute;
@@ -368,6 +383,12 @@
   text-align: center;
   margin-left: -110px;
   width: calc(~"100% + 110px");
+  
+  margin-left: -55px;
+  width: calc(~"100% + 55px");
+  
+  // margin-left: 0px;
+  // width: 100%;
 }
 
 
@@ -375,6 +396,7 @@
   // top: -32px;
   .transition;
   margin-left: @title-width;
+  margin-left: 0px;
   padding: 6px 3px;
 }
 
@@ -414,22 +436,27 @@
   // border-left-width: 6px !important;
 }
 
-.card .cards-area, .builder-tb-cards-area {
+.card .cards-area {
   margin-right: -4px !important;
   margin-left: -108px;
+  margin-left: -55px;
 }
 
-.card-no-title {
-  // .builder-tb-cards-area,
-  .cards-area {
-    margin-left: -55px;
-    // width: calc(~"100% + 110px");
-  }
-  .transform-card-inner {
-    margin-left: -55px;
-    width: calc(~"100% + 55px");
-  }
+.builder-tb-cards-area {
+  margin-right: -4px !important;
 }
+
+// .card-no-title {
+//   // .builder-tb-cards-area,
+//   .cards-area {
+//     margin-left: -55px;
+//     // width: calc(~"100% + 110px");
+//   }
+//   .transform-card-inner {
+//     margin-left: -55px;
+//     width: calc(~"100% + 55px");
+//   }
+// }
 
 .builder-comp-list-item.card-fields {
     margin-bottom: 6px !important;

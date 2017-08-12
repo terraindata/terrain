@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -59,6 +60,7 @@ export interface Props
   medium?: boolean;
 }
 
+@Radium
 class Switch extends TerrainComponent<Props>
 {
   public handleSwitch()
@@ -74,22 +76,51 @@ class Switch extends TerrainComponent<Props>
       'switch-on-second': this.props.selected !== 1,
       'switch-small': this.props.small,
       'switch-medium': this.props.medium,
+      'noselect': true,
     });
 
     return (
-      <div className={classes} onClick={this.handleSwitch}>
+      <div
+        className={classes}
+        onClick={this.handleSwitch}
+        style={SWITCH_STYLE}
+      >
         <div
           className='switch-on'
-          style={backgroundColor(Colors().text.link, Colors().text.linkHover)}
+          style={backgroundColor(Colors().active)}
         />
-        <div className='switch-first'>
-          {this.props.first}
+        <div
+          className='switch-first'
+          style={this.props.selected === 1 ? ACTIVE_SECTION_STYLE : undefined}
+        >
+          {
+            this.props.first
+          }
         </div>
-        <div className='switch-second'>
-          {this.props.second}
+        <div
+          className='switch-second'
+          style={this.props.selected !== 1 ? ACTIVE_SECTION_STYLE : undefined}
+        >
+          {
+            this.props.second
+          }
         </div>
       </div>
     );
   }
 }
+
+const SWITCH_STYLE = {
+  'backgroundColor': Colors().bg3,
+  'color': Colors().text2,
+
+  ':hover': {
+    color: Colors().text1,
+  },
+};
+
+const ACTIVE_SECTION_STYLE = {
+  color: Colors().text1,
+};
+
 export default Switch;

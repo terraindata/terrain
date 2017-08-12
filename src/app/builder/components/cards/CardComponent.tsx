@@ -72,7 +72,7 @@ import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, cardStyle, Colors, fontColor, link } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -538,77 +538,76 @@ class _CardComponent extends TerrainComponent<Props>
           language={card.static.language}
         />
         <div
-          className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
-          style={{
-            background: this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
-            borderLeftColor: this.props.card.static.colors[0],
-
-            borderLeftWidth: 3,
-            paddingLeft: 0,
-
-            borderTopColor: Colors().highlight,
-            borderRightColor: Colors().darkerHighlight,
-            borderBottomColor: Colors().darkerHighlight,
-          }}
+          className={classNames({
+            'card-inner': true,
+            'card-inner-with-title': !card['noTitle'],
+            'single-card-inner': this.props.singleCard,
+          })}
+          style={cardStyle(
+            card.static.colors[0], this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
+          )}
           ref='cardInner'
         >
-          {
-            connectDragSource(
+          <div
+            className={classNames({
+              'card-title': true,
+              'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
+              'card-title-card-hovering': this.state.hovering,
+            })}
+            style={{
+              // shrink the width if the card does not have a title
+              // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+              width: NO_TITLE_WIDTH,
+            }}
+            onClick={this.handleTitleClick}
+          >
+            {
+              this.props.canEdit &&
+              !card['cannotBeMoved'] &&
+              connectDragSource(
+                <div
+                  className='card-handle-icon'
+                >
+                  <HandleIcon />
+                </div>
+              )
+            }
+            {
+              this.state.hovering &&
+              <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
+            }
+            {
+              this.props.canEdit &&
+              !card['cannotBeMoved'] &&
+              <Menu
+                options={this.state.menuOptions}
+                openRight={true}
+              />
+            }
+            {
+              !(this.props.card && this.props.card['noTitle']) &&
               <div
-                className={classNames({
-                  'card-title': true,
-                  'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
-                  'card-title-card-hovering': this.state.hovering,
-                })}
+                className='card-title-inner'
                 style={{
-                  // shrink the width if the card does not have a title
-                  width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+                  color: card.static.colors[0],
                 }}
-                onClick={this.handleTitleClick}
               >
                 {
-                  this.props.canEdit &&
-                  <HandleIcon
-                    className='card-handle-icon'
-                  />
+                  title
                 }
-                {
-                  this.state.hovering &&
-                  <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
-                }
-                {
-                  this.props.canEdit &&
-                  <Menu
-                    options={this.state.menuOptions}
-                    openRight={true}
-                  />
-                }
-                {
-                  !(this.props.card && this.props.card['noTitle']) &&
-                  <div
-                    className='card-title-inner'
-                    style={{
-                      background: card.static.colors[1],
-                    }}
-                  >
-                    {
-                      title
-                    }
-                  </div>
-                }
+              </div>
+            }
 
-                {
-                  !this.props.card.closed ? null :
-                    <div className={classNames({
-                      'card-preview': true,
-                      'card-preview-hidden': this.state.opening,
-                    })}>
-                      {BlockUtils.getPreview(card)}
-                    </div>
-                }
-              </div>,
-            )
-          }
+            {
+              !this.props.card.closed ? null :
+                <div className={classNames({
+                  'card-preview': true,
+                  'card-preview-hidden': this.state.opening,
+                })}>
+                  {BlockUtils.getPreview(card)}
+                </div>
+            }
+          </div>
 
           {
             (!this.props.card.closed || this.state.opening) &&

@@ -167,6 +167,11 @@ export class MySQLDB implements TastyDB
     throw new Error('putMapping() is currently only supported for Elastic databases.');
   }
 
+  public async update(table: TastyTable, elements: object[]): Promise<object[]>
+  {
+    throw new Error('update() is currently only supported for Elastic databases.');
+  }
+
   private async getConnection(): Promise<mysql.IConnection>
   {
     return new Promise<mysql.IConnection>((resolve, reject) =>

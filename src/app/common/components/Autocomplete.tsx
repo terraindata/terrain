@@ -49,10 +49,11 @@ THE SOFTWARE.
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { altStyle, backgroundColor, Colors, couldHover, fontColor } from '../../common/Colors';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -73,6 +74,7 @@ export interface Props
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
 }
 
+@Radium
 class Autocomplete extends TerrainComponent<Props>
 {
   public value: string;
@@ -269,6 +271,7 @@ class Autocomplete extends TerrainComponent<Props>
         data-value={option}
         key={option}
         ref={'opt' + index}
+        style={couldHover(index === this.state.selectedIndex)}
       >
         {first}<b>{second}</b>{third}
       </div>
@@ -306,7 +309,7 @@ class Autocomplete extends TerrainComponent<Props>
               'ac-options-open': this.state.open,
             })}
             ref='ac'
-            style={fontColor(Colors().text.baseDark)}
+            style={altStyle()}
           >
             {
               options.map(this.renderOption)

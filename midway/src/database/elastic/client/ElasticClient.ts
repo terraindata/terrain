@@ -124,6 +124,15 @@ class ElasticClient
   }
 
   /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-update
+   */
+  public update<T>(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
+  {
+    this.log('update', params);
+    this.delegate.update(params, callback);
+  }
+
+  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-putscript
    */
   public putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void

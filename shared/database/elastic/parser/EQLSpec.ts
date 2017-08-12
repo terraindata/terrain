@@ -193,21 +193,24 @@ const EQLSpec: ESClause[] =
       }),
     new ESIndexClause('index',
       {
-        path: ['primary'],
+        path: ['control'],
         desc: 'Selects which index to search.',
         template: '',
       },
     ),
-    new ESTypeClause('type', { desc: 'Selects which type to search.' }),
+    new ESTypeClause('type', {
+      path: ['control'],
+      desc: 'Selects which type to search.',
+    }),
     new ESNumberClause('from',
       {
-        path: ['primary'],
+        path: ['control'],
         desc: 'How many results to skip over. This is usually used to implement pagination.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
       }),
     new ESNumberClause('size',
       {
-        path: ['primary'],
+        path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
         template: 1000,
@@ -263,7 +266,7 @@ const EQLSpec: ESClause[] =
       'field_sort_value',
       {
         path: ['sort'],
-        desc: 'Sort the field.',
+        desc: 'Sort by a single field, either ascending or descending.',
       },
     ),
     new ESVariantClause('field_sort_value',
@@ -295,7 +298,7 @@ const EQLSpec: ESClause[] =
       },
       {
         path: ['sort'],
-        desc: 'score sort',
+        desc: 'Sort using Elastic\'s built-in scoring functionality.',
       }),
     new ESStructureClause('score_sort_object',
       {
@@ -314,7 +317,7 @@ const EQLSpec: ESClause[] =
       },
       {
         path: ['sort'],
-        desc: 'script sort',
+        desc: 'Sort results using a script',
         required: ['_script'],
       }),
     new ESStructureClause('script_sort_object',
@@ -328,7 +331,7 @@ const EQLSpec: ESClause[] =
       },
       {
         path: ['sort'],
-        desc: 'Script Sorting',
+        desc: 'The contents of a scripted sort',
         url: '',
         required: ['type', 'script'],
       }),
@@ -571,6 +574,7 @@ const EQLSpec: ESClause[] =
         filter: 'filter',
         should: 'should',
         minimum_should_match: 'minimum_should_match',
+        boost: 'boost',
       },
       {
         path: ['filter'],

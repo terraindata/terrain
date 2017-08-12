@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format
+// tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'underscore';
+import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
 
 const Color = require('color');
 
@@ -76,13 +77,19 @@ interface Theme
   altBg2: string;
 
   active: string; // active color
+  activeText: string;
   inactiveHover: string; // when something isn't active but could be
+  inactiveHoverText: string;
   activeHover: string; // when an active thing is hovered
 
   highlight: string; // for slight emphasis
   darkerHighlight: string; // for depth effect with highlight
 
+  boxShadow: string; // shadow color
+
   fadedOutBg: string; // for obscuring background contents behind a dark blur
+
+  inputBg: string;
 
   scrollbarBG: string;
   scrollbarPiece: string;
@@ -153,26 +160,43 @@ interface Theme
 
     // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
     cards: {
+
+      cardBgOpacity: number,
+
       cardBase: string,
 
       // card theme colors
 
-      // new
-      anyClause: string[];
-      arrayClause: string[];
-      baseClause: string[];
-      booleanClause: string[];
-      enumClause: string[];
-      fieldClause: string[];
-      indexClause: string[];
-      mapClause: string[];
-      nullClause: string[];
-      numberClause: string[];
-      objectClause: string[];
-      stringClause: string[];
-      structureClause: string[];
-      typeClause: string[];
-      inputParameter: string[];
+      //by category
+      categories: {
+        primary: string,
+        control: string,
+        sort: string,
+        filter: string,
+        match: string,
+        score: string,
+        script: string,
+        compound: string,
+        join: string,
+        geo: string,
+      };
+
+      //by clause type
+      anyClause: string,
+      arrayClause: string,
+      baseClause: string,
+      booleanClause: string,
+      enumClause: string,
+      fieldClause: string,
+      indexClause: string,
+      mapClause: string,
+      nullClause: string,
+      numberClause: string,
+      objectClause: string,
+      stringClause: string,
+      structureClause: string,
+      typeClause: string,
+      inputParameter: string,
 
       // DO NOT USE -- Saving for reference, remove soon
       card1: string,
@@ -278,8 +302,6 @@ const code =
 
   };
 
-const cardBgOpacity = 0.45;
-
 const DARK: Theme =
   {
     // Use these colors
@@ -295,7 +317,7 @@ const DARK: Theme =
     border3: 'rgb(125,130,139)',
 
     text1: '#fff',
-    text2: 'rgba(255,255,255,0.7)',
+    text2: 'rgba(255,255,255,0.85)',
     text3: 'rgba(255,255,255,0.5)',
 
     altBg1: '#fff',
@@ -307,10 +329,16 @@ const DARK: Theme =
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
     darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
 
+    boxShadow: 'rgba(0, 0, 0, 0.39)',
+
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
+    inputBg: 'rgba(0,0,0,0.25)',
+
     active: darkActive,
+    activeText: '#fff',
     inactiveHover: Color(darkActive).fade(0.25).string(),
+    inactiveHoverText: '#fff',
     activeHover: Color(darkActive).fade(0.75).string(),
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
@@ -385,25 +413,43 @@ const DARK: Theme =
 
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
+
+        cardBgOpacity: 0.45,
+
         cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
         // card theme colors
 
-        anyClause: [code.anyClause, Color(code.anyClause).alpha(cardBgOpacity).string()],
-        arrayClause: [code.arrayClause, Color(code.arrayClause).alpha(cardBgOpacity).string()],
-        baseClause: [code.baseClause, Color(code.baseClause).alpha(cardBgOpacity).string()],
-        booleanClause: [code.booleanClause, Color(code.booleanClause).alpha(cardBgOpacity).string()],
-        enumClause: [code.enumClause, Color(code.enumClause).alpha(cardBgOpacity).string()],
-        fieldClause: [code.fieldClause, Color(code.fieldClause).alpha(cardBgOpacity).string()],
-        indexClause: [code.indexClause, Color(code.indexClause).alpha(cardBgOpacity).string()],
-        mapClause: [code.mapClause, Color(code.mapClause).alpha(cardBgOpacity).string()],
-        nullClause: [code.nullClause, Color(code.nullClause).alpha(cardBgOpacity).string()],
-        numberClause: [code.numberClause, Color(code.numberClause).alpha(cardBgOpacity).string()],
-        objectClause: [code.objectClause, Color(code.objectClause).alpha(cardBgOpacity).string()],
-        stringClause: [code.stringClause, Color(code.stringClause).alpha(cardBgOpacity).string()],
-        structureClause: [code.structureClause, Color(code.structureClause).alpha(cardBgOpacity).string()],
-        typeClause: [code.typeClause, Color(code.typeClause).alpha(cardBgOpacity).string()],
-        inputParameter: [code.inputParameter, Color(code.inputParameter).alpha(cardBgOpacity).string()],
+        //by category
+        categories: {
+          primary: '#4fc0ba',
+          control: '#fad14b',
+          sort: '#5ed04b',
+          filter: '#d14f42',
+          match: '#b161bc',
+          score: '#1eb4fa',
+          script: '#4fc0ba',
+          compound: '#fad14b',
+          join: '#fad14b',
+          geo: '#0ee06b',
+        },
+
+        //by clause type
+        anyClause: code.anyClause,
+        arrayClause: code.arrayClause,
+        baseClause: code.baseClause,
+        booleanClause: code.booleanClause,
+        enumClause: code.enumClause,
+        fieldClause: code.fieldClause,
+        indexClause: code.indexClause,
+        mapClause: code.mapClause,
+        nullClause: code.nullClause,
+        numberClause: code.numberClause,
+        objectClause: code.objectClause,
+        stringClause: code.stringClause,
+        structureClause: code.structureClause,
+        typeClause: code.typeClause,
+        inputParameter: code.inputParameter,
 
         card1: '#559DCE',
         card2: '#397DD0',
@@ -472,18 +518,19 @@ const DARK: Theme =
     fileimport: {
       preview: {
         column: {
-          base: '#9d6b6b',
+          base: '#00a0f4',
           typeDropdown: '#005d69',
-          transform: '#70b9e7',
+          transform: '#a2af93',
         },
         cell: '#f1d7d7',
       },
     },
   };
 
-const Themes = {
-  DARK,
-};
+const Themes: { [name: string]: Theme } =
+  {
+    DARK,
+  };
 
 const curTheme = 'DARK';
 
@@ -514,7 +561,7 @@ export function borderColor(color: string, hoverColor?: string)
 
 export function link()
 {
-  return fontColor(Colors().text.link, Colors().text.linkHover);
+  return fontColor(Colors().inactiveHover, Colors().active);
 }
 
 const CACHE: any = {};
@@ -532,13 +579,65 @@ export function altStyle()
   return CACHE['altStyle' + curTheme];
 }
 
+export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean)
+{
+  const key = 'card-' + strongColor + bgColor + hoverBg + small;
+
+  if (!CACHE[key])
+  {
+    CACHE[key] = {
+      background: bgColor,
+      color: strongColor,
+
+      boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
+        '3px 3px 5px 2px rgba(0,0,0,.39)',
+      borderWidth: 1,
+      borderStyle: 'solid',
+      borderLeftWidth: '3px',
+      borderLeftColor: strongColor,
+
+      borderTopColor: Colors().highlight,
+      borderRightColor: Colors().darkerHighlight,
+      borderBottomColor: Colors().darkerHighlight,
+
+      [hoverBg && ':hover']: {
+        background: hoverBg,
+      },
+    };
+  }
+
+  return CACHE[key];
+}
+
+export function couldHover(isFocused?: boolean)
+{
+  if (!CACHE['couldHover'])
+  {
+    CACHE['couldHover'] = {
+      ':hover': {
+        backgroundColor: Colors().inactiveHover,
+        color: Colors().inactiveHoverText,
+      },
+    };
+  }
+  if (!CACHE['couldHoverFocused'])
+  {
+    CACHE['couldHoverFocused'] = {
+      backgroundColor: Colors().inactiveHover,
+      color: Colors().inactiveHoverText,
+    };
+  }
+
+  return CACHE[isFocused ? 'couldHoverFocused' : 'couldHover'];
+}
+
 export function buttonColors()
 {
   if (!CACHE['buttonColors' + curTheme])
   {
     CACHE['buttonColors' + curTheme] = extend({},
-      backgroundColor(Colors().button.background, Colors().button.backgroundHover),
-      fontColor(Colors().button.text),
+      backgroundColor(Colors().inactiveHover, Colors().active),
+      fontColor(Colors().text1),
     );
   }
 
@@ -573,6 +672,24 @@ export function getStyle(style: string, color: string, hoverColor?: string): obj
   }
 
   return dynamicMap[curTheme][color][style][hoverColor];
+}
+
+export function getCardColors(category: string | undefined, typeColor: string): string[]
+{
+  const colors = Colors();
+
+  let color: string = typeColor;
+
+  if (category !== undefined)
+  {
+    color = colors.builder.cards.categories[category];
+    if (color === undefined)
+    {
+      color = typeColor;
+    }
+  }
+
+  return [color, Color(color).alpha(colors.builder.cards.cardBgOpacity).string()];
 }
 
 export default Colors;

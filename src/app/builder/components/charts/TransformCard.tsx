@@ -610,7 +610,6 @@ class TransformCard extends TerrainComponent<Props>
       bars: List([]), // no can do get bars sadly, need to figure it out one day
     });
   }
-
 }
 
 export default Dimensions({

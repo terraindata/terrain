@@ -49,7 +49,7 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'underscore';
 
-import { Colors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
@@ -84,19 +84,31 @@ export const elasticTransform = _card(
     hasCustomDomain: false, // has the user set a custom domain
 
     noTitle: true,
+    cannotBeMoved: true,
 
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: Colors().builder.cards.inputParameter,
+      colors: getCardColors('score', Colors().builder.cards.inputParameter),
       title: 'Transform',
       preview: (card: any) =>
       {
+        let preview = '';
         if (card.input._isCard)
         {
-          return '' + BlockUtils.getPreview(card.input);
+          preview = '' + BlockUtils.getPreview(card.input);
         }
-        return '' + card.input;
+        else
+        {
+          preview = '' + card.input;
+        }
+
+        if (preview.length === 0)
+        {
+          preview = 'No input set';
+        }
+
+        return preview;
       },
       display: [
         {

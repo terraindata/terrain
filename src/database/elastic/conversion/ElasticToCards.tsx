@@ -72,8 +72,7 @@ export default function ElasticToCards(
   {
     // TODO: we may want to show some error messages on the cards.
     return query
-      .set('cardsAndCodeInSync', false)
-      .set('parseError', true);
+      .set('cardsAndCodeInSync', false);
   } else
   {
     try
@@ -83,8 +82,7 @@ export default function ElasticToCards(
       cards = BlockUtils.reconcileCards(query.cards, cards);
       return query
         .set('cards', cards)
-        .set('cardsAndCodeInSync', true)
-        .set('parseError', false);
+        .set('cardsAndCodeInSync', true);
     }
     catch (e)
     {
@@ -119,7 +117,8 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       {
         filters: List(filters),
       });
-  } else if (isScoreCard(valueInfo))
+  }
+  else if (isScoreCard(valueInfo))
   {
     const weights = [];
     for (const factor of valueInfo.value.params.factors)
@@ -177,18 +176,35 @@ function isFilterCard(valueInfo: ESValueInfo): boolean
     _.reduce(valueInfo.value,
       (memo, value: any) =>
       {
-        let rangeExists = typeof value === 'object';
+        let validFilter = typeof value === 'object';
         if (Array.isArray(value))
         {
-          rangeExists = _.reduce(value, (memo0, value0) => memo0 && value0['range'], true);
+          validFilter = _.reduce(value,
+            (memo0, value0) => memo0 &&
+              (value0['range'] ||
+                value0['term'] ||
+                value0['match']),
+            true);
         }
         else
         {
-          rangeExists = (value['range'] !== undefined);
+          validFilter =
+            (value['range'] !== undefined) ||
+            (value['term'] !== undefined) ||
+            (value['match'] !== undefined);
         }
-        return memo && rangeExists;
+        return memo && validFilter;
       }, true);
 }
+
+const esFilterOperatorsMap = {
+  gt: '>',
+  gte: '≥',
+  lt: '<',
+  lte: '≤',
+  term: '=',
+  match: '≈',
+};
 
 function parseFilterBlock(boolQuery: string, filters: any): Block[]
 {
@@ -204,19 +220,36 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
 
   const filterBlocks = filters.map((obj: object) =>
   {
+    let field;
+    let filterOp;
+    let value;
+
     if (obj['range'] !== undefined)
     {
-      const field = Object.keys(obj['range'])[0];
-      const rangeQuery = Object.keys(obj['range'][field])[0];
-      const value = JSON.stringify(obj['range'][field][rangeQuery]);
-
-      return make(Blocks, 'elasticFilterBlock', {
-        field,
-        value,
-        boolQuery,
-        rangeQuery,
-      });
+      field = Object.keys(obj['range'])[0];
+      filterOp = Object.keys(obj['range'][field])[0];
+      value = obj['range'][field][filterOp];
+      filterOp = esFilterOperatorsMap[filterOp];
     }
+    else if (obj['term'] !== undefined)
+    {
+      field = Object.keys(obj['term'])[0];
+      filterOp = '=';
+      value = obj['term'][field];
+    }
+    else if (obj['match'] !== undefined)
+    {
+      field = Object.keys(obj['match'])[0];
+      filterOp = '≈';
+      value = obj['match'][field];
+    }
+
+    return make(Blocks, 'elasticFilterBlock', {
+      field,
+      value,
+      boolQuery,
+      filterOp,
+    });
   });
 
   return filterBlocks;

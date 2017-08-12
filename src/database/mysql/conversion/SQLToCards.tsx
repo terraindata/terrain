@@ -102,7 +102,6 @@ const parseTreeLoaded = (response, context) =>
   if (error)
   {
     query = query
-      .set('parseError', error)
       .set('cardsAndCodeInSync', false);
   }
   else
@@ -124,7 +123,6 @@ const parseTreeError = (error, context) =>
 
   query = query.setIn(['meta', 'parseTreeReq'], null);
   query = query
-    .set('parseError', (error && error.errorMessage) || error)
     .set('cardsAndCodeInSync', false);
 
   // alert the state that the query needs to change

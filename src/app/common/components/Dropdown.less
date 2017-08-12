@@ -1,6 +1,6 @@
 @import "../../common/Common.less";
 
-@option-height: 24px;
+@option-height: 26px;
 @dropdown-height: @option-height + 5px;
 @border-radius: 3px;
 
@@ -11,6 +11,8 @@
  z-index: 0;
  transition: height 0.15s;
  margin: 0px (@standard-margin / 2);
+ 
+ font-size: @font-size;
 
  &:last-child {
   // if it's the last child in a row, we don't want to margin the right side
@@ -94,6 +96,7 @@
     margin: 0px;
     box-sizing: border-box;
     padding-right: 28px; // apply padding that exists in options menu
+    padding-top: 2px;
     
     .dropdown-option-inner {
       // we keep even the unselected ones around so that the width of

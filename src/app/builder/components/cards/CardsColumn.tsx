@@ -63,7 +63,7 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, Colors } from '../../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 import { Card, Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
@@ -79,7 +79,6 @@ export interface Props
   addColumn: (number, string?) => void;
   columnIndex: number;
   cardsAndCodeInSync: boolean;
-  parseError: string;
 
   containerWidth?: number;
   containerHeight?: number;
@@ -199,7 +198,7 @@ class CardsColumn extends TerrainComponent<Props>
         className={classNames({
           'cards-column': true,
           'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
-          'cards-column-has-tql-parse-error': !!this.props.parseError,
+          'cards-column-has-tql-parse-error': !this.props.cardsAndCodeInSync,
         })}
       >
         {
@@ -260,9 +259,12 @@ class CardsColumn extends TerrainComponent<Props>
             <ExpandIcon
               className='cards-deck-knob-icon'
             />
-            <div className='cards-deck-knob-text'>
+            <div
+              className='cards-deck-knob-text'
+              style={fontColor(Colors().text3)}
+            >
               Card Deck
-              </div>
+            </div>
           </div>
         }
 

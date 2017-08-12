@@ -51,7 +51,7 @@ import * as _ from 'underscore';
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
-import { Colors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
@@ -60,12 +60,22 @@ import { _card, Card, CardString } from '../../../blocks/types/Card';
 import { Input, InputType } from '../../../blocks/types/Input';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
+const esFilterOperatorsMap = {
+  '>': 'gt',
+  '≥': 'gte',
+  '<': 'lt',
+  '≤': 'lte',
+  '=': 'term',
+  '≈': 'match',
+};
+
 export const elasticFilterBlock = _block(
   {
     field: '',
     value: undefined,
     boolQuery: '',
-    rangeQuery: '',
+    filterOp: '=',
+
     static: {
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
@@ -80,15 +90,47 @@ export const elasticFilterBlock = _block(
           value = block['value'];
         }
 
-        return {
-          [block['boolQuery']]: {
-            range: {
-              [block['field']]: {
-                [block['rangeQuery']]: value,
+        // term query
+        if (block['filterOp'] === '=')
+        {
+          return {
+            [block['boolQuery']]: {
+              term: {
+                [block['field']]: value,
               },
             },
-          },
-        };
+          };
+        }
+        else if (block['filterOp'] === '≈')
+        {
+          return {
+            [block['boolQuery']]: {
+              match: {
+                [block['field']]: value,
+              },
+            },
+          };
+        }
+        else
+        {
+          // range query
+          const rangeOp = esFilterOperatorsMap[block['filterOp']];
+          if (rangeOp === undefined)
+          {
+            throw new Error('Unspecified range operation for: ' + block['filterOp']);
+          }
+
+          return {
+            [block['boolQuery']]: {
+              range: {
+                [block['field']]: {
+                  [rangeOp]: value,
+                },
+              },
+            },
+          };
+        }
+
       },
       removeOnCardRemove: true,
     },
@@ -101,7 +143,8 @@ export const elasticFilter = _card({
   static: {
     language: 'elastic',
     title: 'Filter',
-    colors: Colors().builder.cards.booleanClause,
+    description: 'Terrain\'s custom card for filtering results in a human-readable way.',
+    colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: '[filters.length] Filters',
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
@@ -127,8 +170,6 @@ export const elasticFilter = _card({
       return filterObj;
     },
 
-    anythingAccepts: true, // TODO change
-
     init: (blocksConfig) =>
     {
       return {
@@ -150,6 +191,28 @@ export const elasticFilter = _card({
           inner:
           [
             {
+              displayType: DisplayType.DROPDOWN,
+              key: 'boolQuery',
+              options: List(
+                [
+                  'must',
+                  'must_not',
+                  'should',
+                  'filter',
+                ],
+                // Can consider using this, but it includes "minmum_should_match," which
+                //  doesn't make sense in this context
+                // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
+              ),
+              dropdownUsesRawValues: true,
+              autoDisabled: true,
+              centerDropdown: true,
+              style: {
+                maxWidth: 75,
+                marginRight: 3,
+              },
+            },
+            {
               displayType: DisplayType.TEXT,
               key: 'field',
               getAutoTerms: (schemaState) =>
@@ -159,20 +222,18 @@ export const elasticFilter = _card({
             },
             {
               displayType: DisplayType.DROPDOWN,
-              key: 'boolQuery',
-              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])),
-              dropdownUsesRawValues: true,
-              autoDisabled: true,
-              centerDropdown: true,
-              widthDropdown: '50px',
-            },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'rangeQuery',
-              options: List(Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+              key: 'filterOp',
+              options: List(
+                _.keys(esFilterOperatorsMap),
+                // can consider using this, but it includes 'boost', and uses raw text values
+                // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+              ),
               dropdownUsesRawValues: true,
               centerDropdown: true,
               autoDisabled: true,
+              style: {
+                maxWidth: 75,
+              },
             },
             {
               displayType: DisplayType.TEXT,
