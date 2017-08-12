@@ -143,7 +143,7 @@ class TransformCard extends TerrainComponent<Props>
       {
         this.setState({
           maxDomain: trimmedDomain,
-          chartDomain: trimmedDomain
+          chartDomain: trimmedDomain,
         });
         this.computeBars(nextProps.data.input, trimmedDomain);
         return;
@@ -155,7 +155,6 @@ class TransformCard extends TerrainComponent<Props>
       this.computeBars(nextProps.data.input, this.state.maxDomain);
     }
   }
-
 
   public componentWillUnmount()
   {
@@ -171,8 +170,6 @@ class TransformCard extends TerrainComponent<Props>
       AjaxM1.killQuery(this.state.queryId);
     }
   }
-
-
 
   public handleQueryError(error: any)
   {
@@ -309,10 +306,10 @@ class TransformCard extends TerrainComponent<Props>
   {
     switch (this.props.language)
     {
-      case "mysql":
+      case 'mysql':
         this.computeTQLBars(input);
         break;
-      case "elastic":
+      case 'elastic':
         this.computeEQLBars(input, maxDomain);
         break;
       default:
@@ -360,9 +357,9 @@ class TransformCard extends TerrainComponent<Props>
           bool: {
             must: {
               range: {
-              }
-            }
-          }
+              },
+            },
+          },
         },
         aggs: {
           transformCard: {
@@ -370,11 +367,11 @@ class TransformCard extends TerrainComponent<Props>
               field: input,
               interval,
               extended_bounds : {
-                min, max // make sure the buckets start from min
-              }
-            }
-          }
-        }
+                min, max, // make sure the buckets start from min
+              },
+            },
+          },
+        },
       }};
     aggQuery['index'] = index;
     aggQuery['type'] = type;
@@ -386,12 +383,12 @@ class TransformCard extends TerrainComponent<Props>
         db,
         (resp) =>
         {
-          this.handleElasticAggregationResponse(resp)
+          this.handleElasticAggregationResponse(resp);
         },
         (err) =>
         {
-          this.handleElasticAggregationError(err)
-        }, ),
+          this.handleElasticAggregationError(err);
+        } ),
     );
   }
 
@@ -530,9 +527,7 @@ class TransformCard extends TerrainComponent<Props>
       {
         const alias = parts[0];
         const field = parts[1];
-        console.log("alias field " + alias + ":" + field);
         const table = this.findTableForAlias(cards, alias);
-        console.log("table: " + table);
 
         if (table)
         {
