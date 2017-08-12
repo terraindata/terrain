@@ -101,7 +101,6 @@ export default class MidwayQueryResponse extends QueryResponse
         break;
       default:
         aggs = {};
-        console.log('Unknown request type when extracting results from midway query response ' + this.request.type);
     }
     return aggs;
   }
