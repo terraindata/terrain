@@ -78,6 +78,7 @@ type Variant = LibraryTypes.Variant;
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
+import FileImportPreviewColumn from '../../fileImport/components/FileImportPreviewColumn';
 import { notificationManager } from './../../common/components/InAppNotification';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
@@ -630,6 +631,7 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.state.builderState.resultsState}
+        exportState={this.state.builderState.exportState}
         index={index}
         colKey={key}
         variant={variant}
@@ -935,6 +937,7 @@ class Builder extends TerrainComponent<Props>
         <ResultsManager
           query={query}
           resultsState={this.state.builderState.resultsState}
+          exportState={this.state.builderState.exportState}
           db={this.state.builderState.db}
           onResultsStateChange={Actions.results}
         />

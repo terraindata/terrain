@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
-import './ResultsConfigStyle.less';
+import './ResultsExportComponent.less';
 const { List, Map } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -59,11 +59,14 @@ import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import FileImportPreviewColumn from '../../../fileImport/components/FileImportPreviewColumn';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
 import Result from '../results/Result';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import FileExportColumn from './FileExportColumn';
 import { MAX_RESULTS, Results } from './ResultTypes';
 
 const Color = require('color');
@@ -81,13 +84,16 @@ export interface Props
   fields: List<string>;
   onClose: () => void;
   handleESresultExport: () => void;
+  exportState: FileImportState;
 }
 
 @Radium
 export class ResultsExportComponent extends TerrainComponent<Props>
 {
   public state: {
+    editColumnId: number,
   } = {
+    editColumnId: -1,
   };
 
   constructor(props: Props)
@@ -99,9 +105,93 @@ export class ResultsExportComponent extends TerrainComponent<Props>
   {
   }
 
+  public onColumnNameChange(columnId: number, localColumnName: string): boolean
+  {
+    const { columnNames } = this.props.exportState;
+
+    // If column name entered already exists when autocomplete box goes out of focus, return false to roll back change
+    // otherwise, if the name has actually changed - set the new name and add the rename transform and return true
+    if (columnNames.delete(columnId).contains(localColumnName))
+    {
+      alert('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
+      return false;
+    }
+
+    if (columnNames.get(columnId) !== localColumnName)
+    {
+      Actions.setColumnName(columnId, localColumnName);
+      Actions.addTransform(
+        {
+          name: 'rename',
+          colName: columnNames.get(columnId),
+          args: {
+            newName: localColumnName,
+          },
+        },
+      );
+      return true;
+    }
+  }
+
+  public handleEditColumnChange(editColumnId: number)
+  {
+    this.setState({
+      editColumnId,
+    });
+  }
+
   public handleClose()
   {
     this.props.onClose();
+  }
+
+  public handleExport()
+  {
+    Actions.exportResults(this.props.handleESresultExport);
+  }
+
+  public renderTable()
+  {
+    const { columnNames, columnsToInclude, columnTypes, primaryKey } = this.props.exportState;
+    return (
+      <div
+        className='fe-preview-table-container'
+      >
+        <div
+          className='fe-preview-columns-container'
+        >
+          {
+            columnNames.map((value, key) =>
+              <FileExportColumn
+                key={key}
+                columnId={key}
+                columnName={columnNames.get(key)}
+                columnNames={columnNames}
+                isIncluded={columnsToInclude.get(key)}
+                columnType={columnTypes.get(key)}
+                isPrimaryKey={primaryKey === key}
+                columnOptions={null}
+                editing={key === this.state.editColumnId}
+                handleEditColumnChange={this.handleEditColumnChange}
+                onColumnNameChange={this.onColumnNameChange}
+              />,
+            ).toArray()
+          }
+        </div>
+        {/*<div*/}
+        {/*className='fi-preview-rows-container'*/}
+        {/*>*/}
+        {/*{*/}
+        {/*this.props.previewRows.map((items, key) =>*/}
+        {/*<FileImportPreviewRow*/}
+        {/*key={key}*/}
+        {/*items={items}*/}
+        {/*/>,*/}
+        {/*)*/}
+        {/*}*/}
+        {/*</div>*/}
+      </div>
+    );
   }
 
   public render()
@@ -115,6 +205,9 @@ export class ResultsExportComponent extends TerrainComponent<Props>
       backgroundColor(Colors().bg1),
     ];
 
+    // console.log(this.props.query);
+    // console.log(this.props.query.cards);
+    // console.log(this.props.query.db);
     // console.log(this.props.results);
     // console.log(this.props.fields);
     return (
@@ -153,6 +246,9 @@ export class ResultsExportComponent extends TerrainComponent<Props>
               Done
             </div>
           </div>
+
+          {this.renderTable()}
+
         </div>
       </div>
     );

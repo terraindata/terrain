@@ -89,8 +89,8 @@ const FileImportActions =
       $(ActionTypes.setColumnToInclude, { columnId }),
 
     setColumnName:
-    (columnId: number, colName: string, newName: string) =>
-      $(ActionTypes.setColumnName, { columnId, colName, newName }),
+    (columnId: number, newName: string) =>
+      $(ActionTypes.setColumnName, { columnId, newName }),
 
     setColumnType:
     (columnId: number, recursionDepth: number, typeIndex: number) =>

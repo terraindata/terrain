@@ -60,6 +60,7 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -81,6 +82,7 @@ const RESULTS_PAGE_SIZE = 20;
 export interface Props
 {
   resultsState: ResultsState;
+  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -523,6 +525,7 @@ column if you have customized the results view.');
           results={this.props.resultsState.results}
           handleESresultExport={this.handleESresultExport}
           onClose={this.hideExport}
+          exportState={this.props.exportState}
         />
       );
     }

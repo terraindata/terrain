@@ -773,6 +773,60 @@ export const Ajax =
       return;
     },
 
+    exportFile(filetype: string,
+      dbname: string,
+      tablename: string,
+      connectionId: number,
+      originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKey: string,
+      transformations: Immutable.List<object>,
+      update: boolean,
+      exporting: boolean,
+      templateName: string,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+      query?: Query,
+      variantId?: number,
+      templateID?: number,
+      rank?: boolean,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        dbname,
+        tablename,
+        filetype,
+        originalNames,
+        columnTypes,
+        primaryKey,
+        transformations,
+        update,
+        export: exporting,
+        query,
+        variantId,
+        templateID,
+        name: templateName,
+        rank,
+      };
+      console.log('import payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'import/export/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+
+      return;
+    },
+
     // importFile(fileContents: string,
     //   filetype: string,
     //   dbname: string,

@@ -52,27 +52,26 @@ import * as BlockUtils from '../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
+import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
 import AjaxM1 from './../../util/AjaxM1';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import { BuilderState } from './BuilderStore';
+const { List, Map } = Immutable;
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
   {
 
-    [ActionTypes.fetchQuery]:
-    (
-      state: BuilderState,
+    [ActionTypes.fetchQuery]: (state: BuilderState,
       action: {
         payload?: {
           variantId: ID,
           handleNoVariant: (id: ID) => void,
           db: BackendInstance,
         },
-      },
-    ) =>
+      }) =>
     {
       const { variantId, handleNoVariant } = action.payload;
 
@@ -111,15 +110,12 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         ;
     },
 
-    [ActionTypes.queryLoaded]:
-    (
-      state: BuilderState,
+    [ActionTypes.queryLoaded]: (state: BuilderState,
       action: Action<{
         query: Query,
         xhr: XMLHttpRequest,
         db: BackendInstance,
-      }>,
-    ) =>
+      }>) =>
     {
       let { query } = action.payload;
       if (state.loadingXhr !== action.payload.xhr)
@@ -166,35 +162,27 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         ;
     },
 
-    [ActionTypes.change]:
-    (
-      state: BuilderState,
+    [ActionTypes.change]: (state: BuilderState,
       action: {
         payload?: {
           keyPath: KeyPath,
           value: any,
         },
-      },
-    ) =>
+      }) =>
       state.setIn(
         action.payload.keyPath,
         action.payload.value,
       ),
 
-    [ActionTypes.changeQuery]:
-    (
-      state: BuilderState,
+    [ActionTypes.changeQuery]: (state: BuilderState,
       action: {
         payload?: {
           query: Query,
         },
-      },
-    ) =>
+      }) =>
       state.set('query', action.payload.query),
 
-    [ActionTypes.create]:
-    (
-      state: BuilderState,
+    [ActionTypes.create]: (state: BuilderState,
       action: {
         payload?: {
           keyPath: KeyPath,
@@ -202,8 +190,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           factoryType: string,
           data: any,
         },
-      },
-    ) =>
+      }) =>
       state.updateIn(
         action.payload.keyPath,
         (arr) =>
@@ -228,17 +215,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       )
     ,
 
-    [ActionTypes.move]:
-    (
-      state: BuilderState,
+    [ActionTypes.move]: (state: BuilderState,
       action: {
         payload?: {
           keyPath: KeyPath,
           index: number,
           newIndex; number
         },
-      },
-    ) =>
+      }) =>
       state.updateIn(
         action.payload.keyPath,
         (arr) =>
@@ -312,8 +296,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-    [ActionTypes.remove]:
-    (state: BuilderState, action: {
+    [ActionTypes.remove]: (state: BuilderState, action: {
       payload?: { keyPath: KeyPath, index: number },
     }) =>
     {
@@ -330,13 +313,10 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     },
 
     // change handwritten tql
-    [ActionTypes.changeTQL]:
-    (
-      state: BuilderState,
+    [ActionTypes.changeTQL]: (state: BuilderState,
       action: Action<{
         tql: string,
-      }>,
-    ) =>
+      }>) =>
     {
       // TODO MOD convert
       let { query } = state;
@@ -351,15 +331,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-    [ActionTypes.hoverCard]:
-    (state: BuilderState, action: Action<{
+    [ActionTypes.hoverCard]: (state: BuilderState, action: Action<{
       cardId: ID,
     }>) =>
       state.set('hoveringCardId', action.payload.cardId),
     // if hovered over same card, will return original state object
 
-    [ActionTypes.selectCard]:
-    (state: BuilderState, action: Action<{
+    [ActionTypes.selectCard]: (state: BuilderState, action: Action<{
       cardId: ID,
       shiftKey: boolean,
       ctrlKey: boolean,
@@ -378,17 +356,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state.setIn(['selectedCardIds', cardId], true);
     },
 
-    [ActionTypes.dragCard]:
-    (
-      state: BuilderState,
+    [ActionTypes.dragCard]: (state: BuilderState,
       action: Action<{
         cardItem: any,
-      }>,
-    ) =>
+      }>) =>
       state.set('draggingCardItem', action.payload.cardItem),
 
-    [ActionTypes.dragCardOver]:
-    (state: BuilderState, action: {
+    [ActionTypes.dragCardOver]: (state: BuilderState, action: {
       payload?: { keyPath: KeyPath, index: number },
     }) =>
     {
@@ -398,44 +372,33 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         .set('draggingOverIndex', index);
     },
 
-    [ActionTypes.dropCard]:
-    (state) => state
+    [ActionTypes.dropCard]: (state) => state
       .set('draggingOverKeyPath', null)
       .set('draggingOverIndex', null)
       .set('draggingCardItem', null),
 
-    [ActionTypes.toggleDeck]:
-    (state: BuilderState, action) => state
+    [ActionTypes.toggleDeck]: (state: BuilderState, action) => state
       .setIn(['query', 'deckOpen'], action.payload.open),
 
-    [ActionTypes.changeResultsConfig]:
-    (
-      state: BuilderState,
+    [ActionTypes.changeResultsConfig]: (state: BuilderState,
       action: Action<{
         resultsConfig: any,
-      }>,
-    ) =>
+      }>) =>
       state
         .update('query',
         (query) =>
           query.set('resultsConfig', action.payload.resultsConfig),
       ),
 
-    [ActionTypes.save]:
-    (
-      state: BuilderState,
+    [ActionTypes.save]: (state: BuilderState,
       action: Action<{
         failed?: boolean,
-      }>,
-    ) =>
+      }>) =>
       state
         .set('isDirty', action.payload && action.payload.failed),
 
-    [ActionTypes.undo]:
-    (
-      state: BuilderState,
-      action: Action<{}>,
-    ) =>
+    [ActionTypes.undo]: (state: BuilderState,
+      action: Action<{}>) =>
     {
       if (state.pastQueries.size)
       {
@@ -450,11 +413,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-    [ActionTypes.redo]:
-    (
-      state: BuilderState,
-      action: Action<{}>,
-    ) =>
+    [ActionTypes.redo]: (state: BuilderState,
+      action: Action<{}>) =>
     {
       if (state.nextQueries.size)
       {
@@ -469,43 +429,155 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-    [ActionTypes.checkpoint]:
-    (state: BuilderState, action: Action<{}>) => state,
+    [ActionTypes.checkpoint]: (state: BuilderState, action: Action<{}>) => state,
 
-    [ActionTypes.results]:
-    (
-      state: BuilderState,
-      action: Action<{ resultsState }>,
-    ) =>
-      state.set('resultsState', action.payload.resultsState),
+    [ActionTypes.results]: (state: BuilderState,
+      action: Action<{ resultsState, exportState }>) =>
+      state.set('resultsState', action.payload.resultsState)
+        .set('exportState', action.payload.exportState),
 
-    [ActionTypes.loadTemplate]:
-    (
-      state: BuilderState,
-      action: Action<{ templateId }>,
-    ) =>
+    /*---------------------------- Export -------------------------------*/
+    [ActionTypes.loadTemplate]: (state: BuilderState,
+      action: Action<{ templateId: number }>) =>
     {
+      // const template = state.templates.get(action.payload.templateId);
+      // template.transformations.map((transform) =>
+      // {
+      //   state = applyTransform(state, transform);
+      // });
+      // const { columnNames, previewRows } = state;
+      //
+      // return state
+      //   .set('originalNames', List(template.originalNames))
+      //   .set('primaryKey', columnNames.indexOf(template.primaryKey))
+      //   .set('transforms', List<FileImportTypes.Transform>(template.transformations))
+      //   .set('columnNames', columnNames)
+      //   .set('columnTypes', List(columnNames.map((colName) =>
+      //     template.columnTypes[colName] ?
+      //       Immutable.fromJS(deeplyColumnTypeToNumber(template.columnTypes[colName]))
+      //       :
+      //       Immutable.fromJS({ type: 0 }),
+      //   )))
+      //   .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
+      //   .set('previewRows', previewRows);
       return state;
     },
 
-    [ActionTypes.saveTemplate]:
-    (
-      state: BuilderState,
-      action: Action<{ templateName }>,
-    ) =>
+    [ActionTypes.saveTemplate]: (state: BuilderState,
+      action: Action<{ templateName: string }>) =>
     {
+      // Ajax.saveTemplate(state.dbText,
+      //   state.tableText,
+      //   state.connectionId,
+      //   state.originalNames,
+      //   Map<string, FileImportTypes.ColumnTypesTree>(state.columnNames.map((colName, colId) =>
+      //     state.columnsToInclude.get(colId) &&
+      //     [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+      //   )),
+      //   state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      //   state.transforms,
+      //   action.payload.templateText,
+      //   false,
+      //   () =>
+      //   {
+      //     alert('successfully saved template');
+      //     action.payload.fetchTemplates();
+      //   },
+      //   (err: string) =>
+      //   {
+      //     alert('Error saving template: ' + JSON.parse(err).errors[0].detail);
+      //   },
+      // );
       return state;
     },
 
-    [ActionTypes.exportResults]:
-    (
-      state: BuilderState,
-      action: Action<{}>,
-    ) =>
+    [ActionTypes.exportResults]: (state: BuilderState,
+      action: Action<{ handleESresultExport: () => void }>) =>
     {
+      const { originalNames, columnNames, columnTypes, columnsToInclude, primaryKey, transforms } = state.exportState;
+      Ajax.exportFile(
+        'json',
+        'movies',
+        'data',
+        1,
+        originalNames,
+        Map<string, object>(columnNames.map((colName, colId) =>
+          columnsToInclude.get(colId) &&                          // backend requires type as string
+          [colName, deeplyColumnTypeToString(columnTypes.get(colId).toJS())],
+        )),
+        primaryKey === -1 ? '' : columnNames.get(primaryKey),
+        transforms,
+        true, // update
+        true, // exporting
+        'temp1', // templateName
+        () =>
+        {
+          alert('success');
+        },
+        (err: string) =>
+        {
+          alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        },
+      );
+
+      action.payload.handleESresultExport();
       return state;
     },
+
+    [ActionTypes.changePrimaryKey]: (state: BuilderState, action: Action<{
+      columnId,
+    }>) =>
+      state.setIn(['exportState', 'primaryKey'], action.payload.columnId),
+
+    [ActionTypes.setColumnToInclude]: (state: BuilderState, action: Action<{
+      columnId,
+    }>) =>
+      state.updateIn(['exportState', 'columnsToInclude', action.payload.columnId], (isColIncluded: boolean) => !isColIncluded),
+
+    [ActionTypes.setColumnName]: (state: BuilderState, action: Action<{
+      columnId,
+      newName,
+    }>) =>
+      state.setIn(['exportState', 'columnNames', action.payload.columnId], action.payload.newName),
+
+    [ActionTypes.setColumnType]: (state: BuilderState, action: Action<{
+      columnId,
+      recursionDepth,
+      typeIndex,
+    }>) =>
+    {
+      const keyPath = ['exportState', 'columnTypes', action.payload.columnId];
+      for (let i = 0; i < action.payload.recursionDepth; i++)
+      {
+        keyPath.push('innerType');
+      }
+      keyPath.push('type');
+
+      if (FileImportTypes.ELASTIC_TYPES[action.payload.typeIndex] === 'array')
+      {
+        const keyPathAdd = keyPath.slice();
+        keyPathAdd[keyPathAdd.length - 1] = 'innerType'; // add new 'innerType' at the same level as highest 'type'
+        return state.setIn(keyPath, action.payload.typeIndex)
+          .setIn(keyPathAdd, Immutable.fromJS({ type: 0 }));
+      }
+      return state.setIn(keyPath, action.payload.typeIndex);
+    },
+
+    [ActionTypes.addTransform]: (state: BuilderState, action: Action<{ transform }>) =>
+      state.setIn(['exportState', 'transforms'], state.exportState.transforms.push(action.payload.transform)),
   };
+
+/*---------------------------- Export -------------------------------*/
+
+const deeplyColumnTypeToString = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
+{
+  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES[columnTypesTree.type];
+  if (columnTypesTree.innerType)
+  {
+    deeplyColumnTypeToString(columnTypesTree.innerType);
+  }
+  return columnTypesTree;
+};
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
 {

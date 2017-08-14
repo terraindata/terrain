@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { line } from 'd3-shape';
 import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 
@@ -64,14 +65,16 @@ import Util from '../../../util/Util';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import { _Result, _ResultsState, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
 
 export interface Props
 {
   query: Query;
   resultsState: ResultsState;
+  exportState?: FileImportState;
   db: BackendInstance;
-  onResultsStateChange: (resultsState: ResultsState) => void;
+  onResultsStateChange: (resultsState: ResultsState, exportState: FileImportState) => void;
   noExtraFields?: boolean;
 }
 
@@ -278,15 +281,23 @@ export class ResultsManager extends TerrainComponent<Props>
     // );
   }
 
-  public changeResults(changes: { [key: string]: any })
+  public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
   {
-    let { resultsState } = this.props;
+    let { resultsState, exportState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
         resultsState = resultsState.set(key, value),
     );
 
-    this.props.onResultsStateChange(resultsState);
+    if (exportChanges)
+    {
+      _.map(exportChanges,
+        (value: any, key: string) =>
+          exportState = exportState.set(key, value),
+      );
+    }
+
+    this.props.onResultsStateChange(resultsState, exportState);
   }
 
   public render()
@@ -509,7 +520,16 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = results.size;
     }
 
-    this.changeResults(changes);
+    const exportChanges: any = {
+      originalNames: fields,
+      columnNames: fields,
+      columnTypes: fields.map((field) => Immutable.fromJS({ type: 0 })),
+      columnsToInclude: fields.map((field) => true),
+      primaryKey: -1, // getPrimaryKeyFor(result, this.props.query.resultsConfig, index),
+    };
+    console.log('exportChanges: ', exportChanges);
+
+    this.changeResults(changes, exportChanges);
   }
 
   private handleM1QueryResponse(response: M1QueryResponse, isAllFields: boolean)
@@ -551,7 +571,7 @@ export class ResultsManager extends TerrainComponent<Props>
   {
     let { errorMessage } = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
-    let { resultsState } = this.props;
+    let { resultsState, exportState } = this.props;
 
     if (typeof errorMessage === 'string')
     {
@@ -603,6 +623,7 @@ export class ResultsManager extends TerrainComponent<Props>
         'loading',
         false,
       ),
+      exportState,
     );
   }
 
@@ -610,7 +631,7 @@ export class ResultsManager extends TerrainComponent<Props>
   {
     // TODO: handle myltiple errors.
     const err = errors[0];
-    let { resultsState } = this.props;
+    let { resultsState, exportState } = this.props;
     if (!isAllFields)
     {
       resultsState = resultsState
@@ -640,6 +661,7 @@ export class ResultsManager extends TerrainComponent<Props>
         'loading',
         false,
       ),
+      exportState,
     );
   }
 

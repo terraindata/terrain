@@ -49,6 +49,7 @@ import BackendInstance from '../../../database/types/BackendInstance';
 import List = Immutable.List;
 import Map = Immutable.Map;
 import Query from '../../../items/types/Query';
+import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';
 import ActionTypes from './BuilderActionTypes';
 import Store from './BuilderStore';
@@ -142,9 +143,10 @@ const BuilderActions =
       }),
 
     results:
-    (resultsState) =>
+    (resultsState, exportState) =>
       $(ActionTypes.results, {
         resultsState,
+        exportState,
       }),
 
     // export
@@ -157,8 +159,28 @@ const BuilderActions =
       $(ActionTypes.saveTemplate, { templateName }),
 
     exportResults:
-    () =>
-      $(ActionTypes.exportResults, {}),
+    (handleESresultExport: () => void) =>
+      $(ActionTypes.exportResults, { handleESresultExport }),
+
+    setColumnName:
+    (columnId: number, newName: string) =>
+      $(ActionTypes.setColumnName, { columnId, newName }),
+
+    setColumnToInclude:
+    (columnId: number) =>
+      $(ActionTypes.setColumnToInclude, { columnId }),
+
+    setColumnType:
+    (columnId: number, recursionDepth: number, typeIndex: number) =>
+      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
+
+    changePrimaryKey:
+    (columnId: number) =>
+      $(ActionTypes.changePrimaryKey, { columnId }),
+
+    addTransform:
+    (transform: FileImportTypes.Transform) =>
+      $(ActionTypes.addTransform, { transform }),
   };
 
 _.map(ActionTypes,

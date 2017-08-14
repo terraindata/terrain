@@ -123,6 +123,7 @@ const BuilderColumn = createReactClass<any, any>(
     {
       query: PropTypes.object.isRequired,
       resultsState: PropTypes.object.isRequired,
+      exportState: PropTypes.object.isRequired,
       variant: PropTypes.object.isRequired,
       className: PropTypes.string,
       index: PropTypes.number,
@@ -238,6 +239,7 @@ const BuilderColumn = createReactClass<any, any>(
             variantName={this.props.variant.name}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
+            exportState={this.props.exportState}
           />;
 
         case COLUMNS.Editor:

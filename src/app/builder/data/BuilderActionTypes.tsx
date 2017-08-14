@@ -94,6 +94,11 @@ export let BuilderActionTypes =
     loadTemplate: '',
     saveTemplate: '',
     exportResults: '',
+    changePrimaryKey: '',
+    setColumnType: '',
+    setColumnName: '',
+    setColumnToInclude: '',
+    addTransform: '',
   };
 
 // I tried using this type to correclty classify this function,

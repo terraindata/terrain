@@ -52,6 +52,7 @@ import * as ReduxActions from 'redux-actions';
 import * as _ from 'underscore';
 import { CardItem } from '../components/cards/CardComponent';
 const Redux = require('redux');
+import { _FileImportState, FileImportState } from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
@@ -95,25 +96,7 @@ export class BuilderStateClass
   public isDirty: boolean = false;
 
   public resultsState: ResultsState = _ResultsState();
-
-  // export
-  public connectionId: number = -1; // db: BackendInstance .id = dbid
-  public serverText: string = '';
-  public dbText: string = '';
-  public tableText: string = '';
-
-  public previewRows: List<List<string>> = List([]);
-  public columnsCount: number = 0;
-  public primaryKey: number = -1;
-  public csvHeaderMissing: boolean = false;
-
-  public originalNames: List<string> = List([]);
-  public columnNames: List<string> = List([]);
-  public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<IMMap<string, any>> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
-
-  public transforms: List<Transform> = List([]);
-  public templates: List<Template> = List([]);
+  public exportState: FileImportState = _FileImportState();
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());

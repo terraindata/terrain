@@ -133,7 +133,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
     if (this.props.columnNames.get(columnId) !== localColumnName)
     {
-      Actions.setColumnName(columnId, this.props.columnNames.get(columnId), localColumnName);
+      Actions.setColumnName(columnId, localColumnName);
       Actions.addTransform(
         {
           name: 'rename',

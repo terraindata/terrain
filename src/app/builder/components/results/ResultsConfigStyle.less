@@ -8,7 +8,7 @@
   *, *:before, *:after {
     box-sizing: border-box;
   }
-  
+
   position: absolute;
   top: 0px;
   left: 0px;
@@ -16,30 +16,31 @@
   height: 100%;
   background: rgba(0,0,0,0.5);
   z-index: 999;
-  
+
   .results-config {
     position: absolute;
     left: 5%;
     top: 5%;
     width: 90%;
     height: 90%;
-    overflow: hidden;
+    overflow: auto;
     border-radius: @br;
-    
+    white-space: nowrap;
+
     .results-config-bar {
       height: @bar-h;
       position: relative;
       border-bottom: 1px solid;
       padding-bottom: 1px;
-      
+
       .results-config-title {
         font-size: 14px;
         padding: 9px 12px;
         font-weight: 400;
         letter-spacing: 0.5px;
       }
-      
-      
+
+
       .results-config-button {
         position: absolute;
         right: 8px;
@@ -55,7 +56,7 @@
         border-radius: @br-tight;
         .transition;
       }
-      
+
       .results-config-switch {
         position: absolute;
         top: 4px;
@@ -63,7 +64,7 @@
 
       }
     }
-    
+
     .results-config-instructions {
       text-align: left;
       margin-bottom: 12px;
@@ -71,7 +72,7 @@
       line-height: 18px;
       font-size: 12px;
     }
-    
+
     .results-config-config-wrapper,
     .results-config-available-fields {
       position: absolute;
@@ -80,7 +81,7 @@
       width: 50%;
       height: calc(~"100% - @{bar-h}");
     }
-    
+
     .results-config-config-wrapper {
       left: 50%;
       padding: 12px;
@@ -88,19 +89,19 @@
       .results-config-config {
         border-radius: 1px;
         overflow: hidden;
-        
+
         .results-config-name,
         .results-config-score,
         .results-config-fields {
           padding: 6px;
         }
-        
+
         .results-config-area-title {
           margin: 6px;
           margin-top: 0px;
           letter-spacing: 0.5px;
         }
-        
+
         .results-config-name {
           border-top-left-radius: 5px;
           border-top-right-radius: 5px;
@@ -109,14 +110,14 @@
             padding: 3px;
           }
         }
-        
+
         .results-config-score {
           &.results-config-over {
             border: 3px solid;
             padding: 3px;
           }
         }
-        
+
         .results-config-fields {
           min-height: 100px;
           padding-bottom: 30px;
@@ -124,7 +125,7 @@
             border: 3px solid;
             padding: 3px;
           }
-          
+
           .results-config-field-wrapper {
             padding-bottom: 6px;
             margin-bottom: 6px;
@@ -133,17 +134,17 @@
 
       }
     }
-    
+
     .results-config-available-fields {
       left: 0%;
       padding: 6px;
-      
+
       .results-config-field {
         margin-bottom: 4px;
         border-left: 3px solid;
       }
     }
-    
+
     .results-config-placeholder,
     .results-config-field {
       padding: 12px;
@@ -155,11 +156,11 @@
         opacity: 0.5;
       }
     }
-    
+
     .results-config-placeholder {
       background-blend-mode: multiply;
     }
-    
+
     .results-config-field {
       blend-mode: multiply;
       border: 1px solid;
@@ -188,7 +189,7 @@
         right: 6px;
         top: 14px;
       }
-      
+
       .results-config-handle {
         margin-right: 8px;
         opacity: 0.25;
@@ -198,13 +199,13 @@
         @h: 16px;
         top: 50%;
         margin-top: -1 * @h / 2;
-        
+
         svg {
-          height: @h; 
+          height: @h;
           fill: @trans-black;
         }
       }
-      
+
       .results-config-field-gear {
         float: right;
         margin-top: 2px;
@@ -217,46 +218,46 @@
         fill: rgb(255,255,255);
         margin-right: 10px;
       }
-      
+
       &:hover {
         .results-config-handle {
           opacity: 0.5;
         }
       }
-      
+
       &.results-config-field-dragging {
         opacity: 0;
       }
-      
+
       .results-config-field-format {
         display: none;
         &.results-config-field-format-showing {
           display: block;
         }
-        
+
         .results-config-format-header {
           margin-top: 10px;
           font-weight: normal;
         }
-        
+
         .results-config-format-btns {
           display: flex;
           margin-top: 6px;
         }
-        
+
         .results-config-text-btn,
         .results-config-image-btn {
           padding: 3px 0px;
           flex-grow: 1;
           text-align: center;
-          
+
           .transition;
-          
+
           border-radius: 6px;
           padding: 6px 0px;
           border: 1px solid;
           margin-right: 6px;
-          
+
           svg {
             max-width: 12px;
             max-height: 12px;
@@ -266,51 +267,51 @@
             float: left;
             left: 6px;
           }
-          
+
           &:hover {
           }
         }
-        
+
         .rc-selected, .rc-selected:hover {
 
         }
-        
+
         .results-config-image {
           display: none;
         }
-        
+
         &.results-config-field-format-text {
           .results-config-text-btn {
             .rc-selected;
           }
         }
-        
+
         &.results-config-field-format-image {
           .results-config-image-btn {
             .rc-selected;
           }
-          
+
           .results-config-image {
             display: block;
             margin-top: 6px;
-            
+
             .results-config-field-value,
             .results-config-raw-value {
               margin-top: 6px;
             }
           }
         }
-        
+
         input {
           border: 1px solid;
-          
+
           &[type='checkbox'] {
             width: auto;
             display: inline-block;
             -webkit-appearance: checkbox;
           }
         }
-        
+
         label {
           margin-left: 6px;
         }
@@ -330,7 +331,7 @@
   .transition(~"all 0.35s");
   border-bottom-left-radius: @br;
   border-bottom-right-radius: @br;
-  
+
   .results-config-disabled-veil-inner {
     .dead-center;
     b {

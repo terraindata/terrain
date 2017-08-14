@@ -50,17 +50,17 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import shallowCompare = require('react-addons-shallow-compare');
 import * as _ from 'underscore';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
-import Autocomplete from './../../common/components/Autocomplete';
-import CheckBox from './../../common/components/CheckBox';
-import Dropdown from './../../common/components/Dropdown';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import TransformBox from './../components/TransformBox';
-import TypeDropdown from './../components/TypeDropdown';
-import Actions from './../data/FileImportActions';
-import * as FileImportTypes from './../FileImportTypes';
-import './FileImportPreviewColumn.less';
+import Actions from '../../../builder/data/BuilderActions';
+import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../../common/Colors';
+import Autocomplete from '../../../common/components/Autocomplete';
+import CheckBox from '../../../common/components/CheckBox';
+import Dropdown from '../../../common/components/Dropdown';
+import TerrainComponent from '../../../common/components/TerrainComponent';
+import '../../../fileImport/components/FileImportPreviewColumn.less';
+import TransformBox from '../../../fileImport/components/TransformBox';
+import TypeDropdown from '../../../fileImport/components/TypeDropdown';
+import * as FileImportTypes from '../../../fileImport/FileImportTypes';
+import Util from '../../../util/Util';
 
 export interface Props
 {
@@ -77,7 +77,7 @@ export interface Props
 }
 
 @Radium
-class FileImportPreviewColumn extends TerrainComponent<Props>
+class FileExportColumn extends TerrainComponent<Props>
 {
   public state: {
     localColumnName: string;
@@ -273,4 +273,4 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
   }
 }
 
-export default FileImportPreviewColumn;
+export default FileExportColumn;
