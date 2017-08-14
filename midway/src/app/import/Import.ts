@@ -48,7 +48,6 @@ import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
-import * as fs from 'fs';
 import * as stream from 'stream';
 import * as _ from 'underscore';
 import * as winston from 'winston';
@@ -116,7 +115,6 @@ export class Import
   private jsonBracketRemoved: boolean;
   private nextChunk: string;
   private readStream: stream.Readable;
-  private totalReads: number;
 
   public async export(exprt: ExportConfig): Promise<stream.Readable>
   {
@@ -1112,42 +1110,30 @@ export class Import
 
   /* streaming helper function.
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _readFileAndUpsert(num: number, targetNum: number, socket: (r?: string) => void)
+  private async _readFileAndUpsert(num: number)
   {
-    winston.info('BEGINNING read file upload number ' + String(num));
-
-    let items: object[];
-    try
+    return new Promise<void>(async (resolve, reject) =>
     {
-      // TODO: will this actually come back as a string??
-      const data: string = await Util.readFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
-        { encoding: 'utf8' }) as string;
-
-      const time = Date.now();
-      winston.info('about to upsert to tasty...');
-      items = JSON.parse(data);
-      await this._tastyUpsert(this.imprt, items);
-      winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
-      winston.info('FINISHED read file upload number ' + String(num));
-
-      if (this.totalReads < targetNum)
+      winston.info('BEGINNING read file upload number ' + String(num));
+      let items: object[];
+      try
       {
-        const nextNum: number = this.totalReads;
-        this.totalReads++;
-        await this._readFileAndUpsert(nextNum, targetNum, socket);   // TODO: recursion limit??
+        const data: string = await Util.readFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
+          { encoding: 'utf8' }) as string;
+
+        const time = Date.now();
+        winston.info('about to upsert to tasty...');
+        items = JSON.parse(data);
+        await this._tastyUpsert(this.imprt, items);
+        winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
+        winston.info('FINISHED read file upload number ' + String(num));
+        resolve();
       }
-      else if (this.totalReads === targetNum)
+      catch (err)
       {
-        this.totalReads++;
-        await this._cleanStreamingTempFolder();
-        winston.info('deleted streaming temp folder');
+        return reject(err);
       }
-    }
-    catch (err)
-    {
-      await this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
-      return;
-    }
+    });
   }
 
   /* streaming helper function ; process errors through "socket" (either a socket.io connection, or the reject method of a promise) */
@@ -1168,12 +1154,28 @@ export class Import
     winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
 
     winston.info('opening files for upsert...');
-    this.totalReads = 0;
-    for (let num = 0; num < Math.min(this.chunkCount, this.MAX_ACTIVE_READS); num++)
+    let totalReads: number = 0;
+    while (totalReads < this.chunkCount)
     {
-      this.totalReads++;
-      await this._readFileAndUpsert(num, this.chunkCount, socket);
+      const promises: Array<Promise<void>> = [];
+      const readNum: number = Math.min(this.MAX_ACTIVE_READS, this.chunkCount - totalReads);
+      for (let num = totalReads; num < totalReads + readNum; num++)
+      {
+        promises.push(this._readFileAndUpsert(num));
+      }
+      try
+      {
+        await Promise.all(promises);
+      }
+      catch (err)
+      {
+        await this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
+        return;
+      }
+      totalReads += readNum;
     }
+    await this._cleanStreamingTempFolder();
+    winston.info('deleted streaming temp folder');
   }
 
   private async _tastyUpsert(imprt: ImportConfig, items: object[]): Promise<ImportConfig>
