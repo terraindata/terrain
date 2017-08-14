@@ -105,13 +105,8 @@ export class Import
   private STREAMING_TEMP_FOLDER: string = 'import_streaming_tmp';
   private SUPPORTED_COLUMN_TYPES: Set<string> = new Set(Object.keys(this.COMPATIBLE_TYPES).concat(['array']));
 
-  private csvHeaderRemoved: boolean;
   private chunkCount: number;
   private chunkQueue: object[];
-  private database: DatabaseController;
-  private imprt: ImportConfig;
-  private insertTable: Tasty.Table;
-  private jsonBracketRemoved: boolean;
   private nextChunk: string;
   private readStream: stream.Readable;
 
@@ -278,8 +273,8 @@ export class Import
       {
         return reject(hasCsvHeader);
       }
-      this.csvHeaderRemoved = (fields['filetype'] !== 'csv') || !hasCsvHeader;
-      this.jsonBracketRemoved = fields['filetype'] !== 'json';
+      let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
+      let jsonBracketRemoved: boolean = fields['filetype'] !== 'json';
 
       let imprtConf: ImportConfig;
       if (headless)
@@ -331,15 +326,40 @@ export class Import
         }
       }
 
-      let res: ImportConfig;
-      try
+      const database: DatabaseController | undefined = DatabaseRegistry.get(imprtConf.dbid);
+      if (database === undefined)
       {
-        res = await this._upsertPrep(imprtConf);
+        return reject('Database "' + imprtConf.dbid.toString() + '" not found.');
       }
-      catch (e)
+      if (database.getType() !== 'ElasticController')
       {
-        return reject(e);
+        return reject('File import currently is only supported for Elastic databases.');
       }
+
+      const time: number = Date.now();
+      winston.info('checking config and schema...');
+      const configError: string = this._verifyConfig(imprtConf);
+      if (configError !== '')
+      {
+        return reject(configError);
+      }
+      const expectedMapping: object = this._getMappingForSchema(imprtConf);
+      const mappingForSchema: object | string =
+        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprtConf.dbname);
+      if (typeof mappingForSchema === 'string')
+      {
+        return reject(mappingForSchema);
+      }
+      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
+
+      const columns: string[] = Object.keys(imprtConf.columnTypes);
+      const insertTable: Tasty.Table = new Tasty.Table(
+        imprtConf.tablename,
+        [imprtConf.primaryKey],
+        columns,
+        imprtConf.dbname,
+        mappingForSchema,
+      );
 
       await this._deleteStreamingTempFolder();
       await Util.mkdir(this.STREAMING_TEMP_FOLDER);
@@ -354,11 +374,13 @@ export class Import
         contents += chunk.toString();
         if (contents.length > this.CHUNK_SIZE)
         {
-          const chunkError: string = this._enqueueChunk(contents, false);
+          const chunkError: string = this._enqueueChunk(imprtConf, contents, false, csvHeaderRemoved, jsonBracketRemoved);
           if (chunkError !== '')
           {
             return reject(chunkError);
           }
+          csvHeaderRemoved = true;
+          jsonBracketRemoved = true;
           contents = '';
           if (this.chunkQueue.length >= this.MAX_ALLOWED_QUEUE_SIZE)
           {
@@ -366,7 +388,7 @@ export class Import
           }
           try
           {
-            await this._writeNextChunk();
+            await this._writeNextChunk(imprtConf);
           }
           catch (e)
           {
@@ -384,12 +406,14 @@ export class Import
       {
         if (contents !== '')
         {
-          const chunkError: string = this._enqueueChunk(contents, true);
+          const chunkError: string = this._enqueueChunk(imprtConf, contents, true, csvHeaderRemoved, jsonBracketRemoved);
           if (chunkError !== '')
           {
             await this._deleteStreamingTempFolder();
             return reject(chunkError);
           }
+          csvHeaderRemoved = true;
+          jsonBracketRemoved = true;
         }
         else
         {
@@ -404,7 +428,7 @@ export class Import
         {
           try
           {
-            await this._writeNextChunk();
+            await this._writeNextChunk(imprtConf);
           }
           catch (e)
           {
@@ -415,7 +439,7 @@ export class Import
 
         try
         {
-          await this._streamingUpsert();
+          await this._streamingUpsert(imprtConf, database, insertTable);
         }
         catch (e)
         {
@@ -423,7 +447,7 @@ export class Import
           return reject(e);
         }
 
-        resolve(res);
+        resolve(imprtConf);
       });
     });
   }
@@ -812,24 +836,23 @@ export class Import
 
   /* streaming helper function ; enqueue the next chunk of data for processing
    * returns an error message if there was one, else empty string */
-  private _enqueueChunk(contents: string, isLast: boolean): string
+  private _enqueueChunk(imprt: ImportConfig, contents: string, isLast: boolean,
+    csvHeaderRemoved: boolean, jsonBracketRemoved: boolean): string
   {
-    if (!this.csvHeaderRemoved)
+    if (!csvHeaderRemoved)
     {
       const ind: number = contents.indexOf('\n');
       const headers: string[] = contents.substring(0, ind).split(',');
-      if (headers.length !== this.imprt.originalNames.length)
+      if (headers.length !== imprt.originalNames.length)
       {
         return 'CSV header does not contain the expected number of columns (' +
-          String(this.imprt.originalNames.length) + '): ' + JSON.stringify(headers);
+          String(imprt.originalNames.length) + '): ' + JSON.stringify(headers);
       }
       contents = contents.substring(ind + 1, contents.length);
-      this.csvHeaderRemoved = true;
     }
-    else if (!this.jsonBracketRemoved)
+    else if (!jsonBracketRemoved)
     {
       contents = contents.substring(contents.indexOf('[') + 1, contents.length);
-      this.jsonBracketRemoved = true;
     }
     this.chunkQueue.push({ chunk: contents, isLast });
     return '';
@@ -1095,10 +1118,10 @@ export class Import
         const items: object[] = [];
         csv.fromString(contents, { ignoreEmpty: true }).on('data', (data) =>
         {
-          if (data.length !== this.imprt.originalNames.length)
+          if (data.length !== imprt.originalNames.length)
           {
             return reject('CSV row does not contain the expected number of entries (' +
-              String(this.imprt.originalNames.length) + '): ' + JSON.stringify(data));
+              String(imprt.originalNames.length) + '): ' + JSON.stringify(data));
           }
           const obj: object = {};
           imprt.originalNames.forEach((val, ind) =>
@@ -1140,7 +1163,7 @@ export class Import
   }
 
   /* streaming helper function ; read from temp file number "num" to upsert to tasty */
-  private async _readFileAndUpsert(num: number)
+  private async _readFileAndUpsert(imprt: ImportConfig, database: DatabaseController, insertTable: Tasty.Table, num: number)
   {
     return new Promise<void>(async (resolve, reject) =>
     {
@@ -1154,7 +1177,14 @@ export class Import
         const time = Date.now();
         winston.info('about to upsert to tasty...');
         items = JSON.parse(data);
-        await this._tastyUpsert(this.imprt, items);
+        if (imprt.update)
+        {
+          await database.getTasty().update(insertTable, items);
+        }
+        else
+        {
+          await database.getTasty().upsert(insertTable, items);
+        }
         winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
         winston.info('FINISHED read file upload number ' + String(num));
         resolve();
@@ -1167,13 +1197,13 @@ export class Import
   }
 
   /* after type-checking has completed, read from temp files to upsert via Tasty, and delete the temp files */
-  private async _streamingUpsert(): Promise<void>
+  private async _streamingUpsert(imprt: ImportConfig, database: DatabaseController, insertTable: Tasty.Table): Promise<void>
   {
     return new Promise<void>(async (resolve, reject) =>
     {
       const time: number = Date.now();
       winston.info('putting mapping...');
-      await this.database.getTasty().getDB().putMapping(this.insertTable);
+      await database.getTasty().getDB().putMapping(insertTable);
       winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
 
       winston.info('opening files for upsert...');
@@ -1184,7 +1214,7 @@ export class Import
         const readNum: number = Math.min(this.MAX_ACTIVE_READS, this.chunkCount - totalReads);
         for (let num = totalReads; num < totalReads + readNum; num++)
         {
-          promises.push(this._readFileAndUpsert(num));
+          promises.push(this._readFileAndUpsert(imprt, database, insertTable, num));
         }
         try
         {
@@ -1199,23 +1229,6 @@ export class Import
       await this._deleteStreamingTempFolder();
       winston.info('deleted streaming temp folder');
       resolve();
-    });
-  }
-
-  private async _tastyUpsert(imprt: ImportConfig, items: object[]): Promise<ImportConfig>
-  {
-    return new Promise<ImportConfig>(async (resolve, reject) =>
-    {
-      let res: ImportConfig;
-      if (imprt.update)
-      {
-        res = await this.database.getTasty().update(this.insertTable, items) as ImportConfig;
-      }
-      else
-      {
-        res = await this.database.getTasty().upsert(this.insertTable, items) as ImportConfig;
-      }
-      resolve(res);
     });
   }
 
@@ -1270,51 +1283,6 @@ export class Import
     return Promise.all(promises);
   }
 
-  private async _upsertPrep(imprt: ImportConfig): Promise<ImportConfig>
-  {
-    this.imprt = imprt;
-    return new Promise<ImportConfig>(async (resolve, reject) =>
-    {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + imprt.dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File import currently is only supported for Elastic databases.');
-      }
-      this.database = database;
-
-      const time: number = Date.now();
-      winston.info('checking config and schema...');
-      const configError: string = this._verifyConfig(imprt);
-      if (configError !== '')
-      {
-        return reject(configError);
-      }
-      const expectedMapping: object = this._getMappingForSchema(imprt);
-      const mappingForSchema: object | string =
-        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprt.dbname);
-      if (typeof mappingForSchema === 'string')
-      {
-        return reject(mappingForSchema);
-      }
-      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
-
-      const columns: string[] = Object.keys(imprt.columnTypes);
-      this.insertTable = new Tasty.Table(
-        imprt.tablename,
-        [imprt.primaryKey],
-        columns,
-        imprt.dbname,
-        mappingForSchema,
-      );
-
-      resolve(imprt);
-    });
-  }
-
   /* returns an error message if there are any; else returns empty string */
   private _verifyConfig(imprt: ImportConfig): string
   {
@@ -1365,19 +1333,19 @@ export class Import
   }
 
   /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file */
-  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean): Promise<void>
+  private async _writeItemsFromChunkToFile(imprt: ImportConfig, chunk: string, isLast: boolean): Promise<void>
   {
     return new Promise<void>(async (resolve, reject) =>
     {
       // get valid piece of data
       let thisChunk: string = '';
-      if (this.imprt.filetype === 'csv')
+      if (imprt.filetype === 'csv')
       {
         const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
         thisChunk = this.nextChunk + String(chunk.substring(0, end));
         this.nextChunk = chunk.substring(end + 1, chunk.length);
       }
-      else if (this.imprt.filetype === 'json')
+      else if (imprt.filetype === 'json')
       {
         // open square-bracket has already been removed by frontend/headless preprocessing
         if (isLast)
@@ -1429,7 +1397,7 @@ export class Import
       let items: object[];
       try
       {
-        items = await this._getItems(this.imprt, thisChunk);
+        items = await this._getItems(imprt, thisChunk);
       }
       catch (e)
       {
@@ -1454,7 +1422,7 @@ export class Import
   }
 
   /* streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file */
-  private async _writeNextChunk(): Promise<void>
+  private async _writeNextChunk(imprt: ImportConfig): Promise<void>
   {
     if (this.chunkQueue.length === 0 || (this.chunkQueue.length === 1 && !this.chunkQueue[0]['isLast']))
     {
@@ -1465,7 +1433,7 @@ export class Import
     {
       this.readStream.resume();
     }
-    return this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast']);
+    return this._writeItemsFromChunkToFile(imprt, chunkObj['chunk'], chunkObj['isLast']);
   }
 }
 
