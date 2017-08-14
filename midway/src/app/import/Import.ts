@@ -49,7 +49,6 @@ import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
 import * as fs from 'fs';
-import * as rimraf from 'rimraf';
 import * as stream from 'stream';
 import * as _ from 'underscore';
 import * as winston from 'winston';
@@ -61,6 +60,7 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import { ItemConfig, Items } from '../items/Items';
+import * as Util from '../Util';
 import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 const importTemplates = new ImportTemplates();
 
@@ -346,8 +346,7 @@ export class Import
         reject(e);
       }
 
-      // this._cleanStreamingTempFolder(true);
-      fs.mkdirSync(this.STREAMING_TEMP_FOLDER);
+      await this._cleanStreamingTempFolder(true);
 
       this.readStream = file;
       this.chunkQueue = [];
@@ -673,20 +672,21 @@ export class Import
   }
 
   /* deletes streaming temp folder ; if "create," recreate an empty version */
-  private _cleanStreamingTempFolder(create?: boolean)
+  private async _cleanStreamingTempFolder(create?: boolean)
   {
-    rimraf(this.STREAMING_TEMP_FOLDER, (err) =>
+    try
     {
-      if (err !== undefined && err !== null)
-      {
-        // can't _sendSocketError() or else would end up in an infinite cycle
-        throw new Error('Failed to delete temp folder: ' + String(err));
-      }
+      await Util.rmdir(this.STREAMING_TEMP_FOLDER);
       if (create !== undefined && create)
       {
-        fs.mkdirSync(this.STREAMING_TEMP_FOLDER);
+        await Util.mkdir(this.STREAMING_TEMP_FOLDER);
       }
-    });
+    }
+    catch (e)
+    {
+      // can't _sendSocketError() or else would end up in an infinite cycle
+      throw new Error('Failed to clean streaming temp folder: ' + String(e));
+    }
   }
 
   private _convertArrayToCSVArray(arr: any[]): string
@@ -1106,13 +1106,12 @@ export class Import
     winston.info('BEGINNING read file upload number ' + String(num));
 
     let items: object[];
-    fs.readFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num), 'utf8', async (err, data) =>
+    try
     {
-      if (err !== undefined && err !== null)
-      {
-        this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
-        return;
-      }
+      // TODO: will this actually come back as a string??
+      const data: string = await Util.readFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
+        { encoding: 'utf8' }) as string;
+
       const time = Date.now();
       winston.info('about to upsert to tasty...');
       items = JSON.parse(data);
@@ -1129,17 +1128,22 @@ export class Import
       else if (this.totalReads === targetNum)
       {
         this.totalReads++;
-        this._cleanStreamingTempFolder();
+        await this._cleanStreamingTempFolder();
         winston.info('deleted streaming temp folder');
       }
-    });
+    }
+    catch (err)
+    {
+      await this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
+      return;
+    }
   }
 
   /* streaming helper function ; process errors through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private _sendSocketError(socket: (r?: any) => void, error: string)
+  private async _sendSocketError(socket: (r?: any) => void, error: string)
   {
     winston.info('emitting socket error: ' + error);
-    this._cleanStreamingTempFolder();
+    await this._cleanStreamingTempFolder();
     socket(error);
   }
 
@@ -1382,7 +1386,7 @@ export class Import
         const trimmedNextChunk: string = this.nextChunk.trim();
         if (trimmedNextChunk.length > 0 && trimmedNextChunk.charAt(0) !== ',')
         {
-          this._sendSocketError(socket, 'JSON format incorrect.');
+          await this._sendSocketError(socket, 'JSON format incorrect.');
           return -1;
         }
         this.nextChunk = this.nextChunk.substring(this.nextChunk.indexOf(',') + 1, this.nextChunk.length);
@@ -1397,28 +1401,23 @@ export class Import
     }
     catch (e)
     {
-      this._sendSocketError(socket, 'Failed to get items: ' + String(e));
+      await this._sendSocketError(socket, 'Failed to get items: ' + String(e));
       return -1;
     }
     winston.info('streaming server got items from data');
 
-    fs.open(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(this.chunkCount), 'wx', (err, fd) =>
+    try
     {
-      winston.info('opened file for writing.');
-      if (err !== undefined && err !== null)
-      {
-        this._sendSocketError(socket, 'Failed to open temp file for dumping: ' + String(err));
-        return;
-      }
-      fs.write(fd, JSON.stringify(items), (writeErr) =>
-      {
-        if (writeErr !== undefined && writeErr !== null)
-        {
-          this._sendSocketError(socket, 'Failed to dump to temp file: ' + String(writeErr));
-        }
-      });
+      winston.info('opening file for writing...');
+      await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(this.chunkCount),
+        JSON.stringify(items), { flag: 'wx' });
       winston.info('wrote items to file.');
-    });
+    }
+    catch (err)
+    {
+      await this._sendSocketError(socket, 'Failed to dump to temp file: ' + String(err));
+      return -1;
+    }
     this.chunkCount++;
     return items.length;
   }
