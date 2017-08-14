@@ -111,7 +111,6 @@ export class Import
   private database: DatabaseController;
   private imprt: ImportConfig;
   private insertTable: Tasty.Table;
-  private itemCount: number;
   private jsonBracketRemoved: boolean;
   private nextChunk: string;
   private readStream: stream.Readable;
@@ -339,10 +338,11 @@ export class Import
       }
       catch (e)
       {
-        reject(e);
+        return reject(e);
       }
 
-      await this._cleanStreamingTempFolder(true);
+      await this._deleteStreamingTempFolder();
+      await Util.mkdir(this.STREAMING_TEMP_FOLDER);
 
       this.readStream = file;
       this.chunkQueue = [];
@@ -354,39 +354,74 @@ export class Import
         contents += chunk.toString();
         if (contents.length > this.CHUNK_SIZE)
         {
-          await this._enqueueChunk(contents, false, reject);
+          const chunkError: string = this._enqueueChunk(contents, false);
+          if (chunkError !== '')
+          {
+            return reject(chunkError);
+          }
           contents = '';
           if (this.chunkQueue.length >= this.MAX_ALLOWED_QUEUE_SIZE)
           {
             this.readStream.pause();
           }
-          await this._writeNextChunk(reject);
+          try
+          {
+            await this._writeNextChunk();
+          }
+          catch (e)
+          {
+            await this._deleteStreamingTempFolder();
+            return reject(e);
+          }
         }
       });
-      this.readStream.on('error', (e) =>
+      this.readStream.on('error', async (e) =>
       {
-        throw e;
+        await this._deleteStreamingTempFolder();
+        return reject(e);
       });
       this.readStream.on('end', async () =>
       {
         if (contents !== '')
         {
-          await this._enqueueChunk(contents, true, reject);
+          const chunkError: string = this._enqueueChunk(contents, true);
+          if (chunkError !== '')
+          {
+            await this._deleteStreamingTempFolder();
+            return reject(chunkError);
+          }
         }
         else
         {
           if (this.chunkQueue.length === 0)
           {
+            await this._deleteStreamingTempFolder();
             return reject('Logic issue with streaming queue.');    // shouldn't happen
           }
           this.chunkQueue[this.chunkQueue.length - 1]['isLast'] = true;
         }
         while (this.chunkQueue.length > 0)
         {
-          await this._writeNextChunk(reject);
+          try
+          {
+            await this._writeNextChunk();
+          }
+          catch (e)
+          {
+            await this._deleteStreamingTempFolder();
+            return reject(e);
+          }
         }
 
-        await this._streamingUpsert(reject);
+        try
+        {
+          await this._streamingUpsert();
+        }
+        catch (e)
+        {
+          await this._deleteStreamingTempFolder();
+          return reject(e);
+        }
 
         resolve(res);
       });
@@ -589,7 +624,7 @@ export class Import
   /* checks whether obj has the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(obj: object, imprt: ImportConfig, ind: number): string
+  private _checkTypes(obj: object, imprt: ImportConfig): string
   {
     if (imprt.filetype === 'json')
     {
@@ -617,7 +652,7 @@ export class Import
       {
         if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
         {
-          return 'Object number ' + String(ind) + ' does not have the set of specified keys.';
+          return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
         }
         for (const key of Object.keys(obj))
         {
@@ -625,8 +660,8 @@ export class Import
           {
             if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
-              return 'Field "' + key + '" of object number ' + String(ind) +
-                ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[key]);
+              return 'Encountered an object whose field "' + key + ' does not match the specified type (' +
+                JSON.stringify(imprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
             }
           }
         }
@@ -640,8 +675,8 @@ export class Import
         {
           if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
           {
-            return 'Field "' + name + '" of object number ' + String(ind) +
-              ' does not match the specified type: ' + JSON.stringify(imprt.columnTypes[name]);
+            return 'Encountered an object whose field "' + name + ' does not match the specified type (' +
+              JSON.stringify(imprt.columnTypes[name]) + '): ' + JSON.stringify(obj);
           }
         }
       }
@@ -654,35 +689,17 @@ export class Import
       {
         if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
         {
-          return 'Array in field "' + field + '" of object number ' + String(ind) + ' contains inconsistent types.';
+          return 'Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj);
         }
       }
     }
 
     if (obj[imprt.primaryKey] === '' || obj[imprt.primaryKey] === null)
     {
-      return 'Object number ' + String(ind) + ' has an empty primary key.';
+      return 'Encountered an object with an empty primary key: ' + JSON.stringify(obj);
     }
 
     return '';
-  }
-
-  /* deletes streaming temp folder ; if "create," recreate an empty version */
-  private async _cleanStreamingTempFolder(create?: boolean)
-  {
-    try
-    {
-      await Util.rmdir(this.STREAMING_TEMP_FOLDER);
-      if (create !== undefined && create)
-      {
-        await Util.mkdir(this.STREAMING_TEMP_FOLDER);
-      }
-    }
-    catch (e)
-    {
-      // can't _sendSocketError() or else would end up in an infinite cycle
-      throw new Error('Failed to clean streaming temp folder: ' + String(e));
-    }
   }
 
   private _convertArrayToCSVArray(arr: any[]): string
@@ -780,8 +797,22 @@ export class Import
     return true;
   }
 
-  /* headless streaming helper function ; enqueue the next chunk of data for processing */
-  private async _enqueueChunk(contents: string, isLast: boolean, socket: (r?: string) => void)
+  private async _deleteStreamingTempFolder()
+  {
+    try
+    {
+      await Util.rmdir(this.STREAMING_TEMP_FOLDER);
+    }
+    catch (e)
+    {
+      // can't catch this error more gracefully, or else would end up in an infinite cycle
+      throw new Error('Failed to clean streaming temp folder: ' + String(e));
+    }
+  }
+
+  /* streaming helper function ; enqueue the next chunk of data for processing
+   * returns an error message if there was one, else empty string */
+  private _enqueueChunk(contents: string, isLast: boolean): string
   {
     if (!this.csvHeaderRemoved)
     {
@@ -789,9 +820,8 @@ export class Import
       const headers: string[] = contents.substring(0, ind).split(',');
       if (headers.length !== this.imprt.originalNames.length)
       {
-        await this._sendSocketError(socket, 'CSV header does not contain the expected number of columns (' +
-          String(this.imprt.originalNames.length) + '): ' + JSON.stringify(headers));
-        return;
+        return 'CSV header does not contain the expected number of columns (' +
+          String(this.imprt.originalNames.length) + '): ' + JSON.stringify(headers);
       }
       contents = contents.substring(ind + 1, contents.length);
       this.csvHeaderRemoved = true;
@@ -802,6 +832,7 @@ export class Import
       this.jsonBracketRemoved = true;
     }
     this.chunkQueue.push({ chunk: contents, isLast });
+    return '';
   }
 
   /* return ES type from type specification format of ImportConfig
@@ -1108,8 +1139,7 @@ export class Import
     }
   }
 
-  /* streaming helper function.
-   * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
+  /* streaming helper function ; read from temp file number "num" to upsert to tasty */
   private async _readFileAndUpsert(num: number)
   {
     return new Promise<void>(async (resolve, reject) =>
@@ -1136,46 +1166,40 @@ export class Import
     });
   }
 
-  /* streaming helper function ; process errors through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _sendSocketError(socket: (r?: any) => void, error: string)
+  /* after type-checking has completed, read from temp files to upsert via Tasty, and delete the temp files */
+  private async _streamingUpsert(): Promise<void>
   {
-    winston.info('emitting socket error: ' + error);
-    await this._cleanStreamingTempFolder();
-    socket(error);
-  }
-
-  /* after type-checking has completed, read from temp files to upsert via Tasty, and delete the temp files
-   * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _streamingUpsert(socket: (r?: string) => void)
-  {
-    const time: number = Date.now();
-    winston.info('putting mapping...');
-    await this.database.getTasty().getDB().putMapping(this.insertTable);
-    winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
-
-    winston.info('opening files for upsert...');
-    let totalReads: number = 0;
-    while (totalReads < this.chunkCount)
+    return new Promise<void>(async (resolve, reject) =>
     {
-      const promises: Array<Promise<void>> = [];
-      const readNum: number = Math.min(this.MAX_ACTIVE_READS, this.chunkCount - totalReads);
-      for (let num = totalReads; num < totalReads + readNum; num++)
+      const time: number = Date.now();
+      winston.info('putting mapping...');
+      await this.database.getTasty().getDB().putMapping(this.insertTable);
+      winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
+
+      winston.info('opening files for upsert...');
+      let totalReads: number = 0;
+      while (totalReads < this.chunkCount)
       {
-        promises.push(this._readFileAndUpsert(num));
+        const promises: Array<Promise<void>> = [];
+        const readNum: number = Math.min(this.MAX_ACTIVE_READS, this.chunkCount - totalReads);
+        for (let num = totalReads; num < totalReads + readNum; num++)
+        {
+          promises.push(this._readFileAndUpsert(num));
+        }
+        try
+        {
+          await Promise.all(promises);
+        }
+        catch (err)
+        {
+          return reject('Failed to read from temp file: ' + String(err));
+        }
+        totalReads += readNum;
       }
-      try
-      {
-        await Promise.all(promises);
-      }
-      catch (err)
-      {
-        await this._sendSocketError(socket, 'Failed to read from temp file: ' + String(err));
-        return;
-      }
-      totalReads += readNum;
-    }
-    await this._cleanStreamingTempFolder();
-    winston.info('deleted streaming temp folder');
+      await this._deleteStreamingTempFolder();
+      winston.info('deleted streaming temp folder');
+      resolve();
+    });
   }
 
   private async _tastyUpsert(imprt: ImportConfig, items: object[]): Promise<ImportConfig>
@@ -1200,7 +1224,6 @@ export class Import
     dontCheck?: boolean, rank?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
-    let baseInd: number = this.itemCount;
     let items: object[];
     while (allItems.length > 0)
     {
@@ -1209,7 +1232,6 @@ export class Import
         new Promise<object[]>(async (thisResolve, thisReject) =>
         {
           const transformedItems: object[] = [];
-          let ind: number = 0;
           for (let item of items)
           {
             try
@@ -1230,7 +1252,7 @@ export class Import
             }
             if (dontCheck !== true)
             {
-              const typeError: string = this._checkTypes(trimmedItem, imprt, baseInd + ind);
+              const typeError: string = this._checkTypes(trimmedItem, imprt);
               if (typeError !== '')
               {
                 return thisReject(typeError);
@@ -1241,11 +1263,9 @@ export class Import
               trimmedItem['terrainRank'] = item['terrainRank'];
             }
             transformedItems.push(trimmedItem);
-            ind++;
           }
           thisResolve(transformedItems);
         }));
-      baseInd += items.length;
     }
     return Promise.all(promises);
   }
@@ -1253,7 +1273,6 @@ export class Import
   private async _upsertPrep(imprt: ImportConfig): Promise<ImportConfig>
   {
     this.imprt = imprt;
-    this.itemCount = 0;
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
       const database: DatabaseController | undefined = DatabaseRegistry.get(imprt.dbid);
@@ -1345,99 +1364,97 @@ export class Import
     return '';
   }
 
-  /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file
-   * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: (r?: string) => void): Promise<number>
+  /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file */
+  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean): Promise<void>
   {
-    // get valid piece of data
-    let thisChunk: string = '';
-    if (this.imprt.filetype === 'csv')
+    return new Promise<void>(async (resolve, reject) =>
     {
-      const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
-      thisChunk = this.nextChunk + String(chunk.substring(0, end));
-      this.nextChunk = chunk.substring(end + 1, chunk.length);
-    }
-    else if (this.imprt.filetype === 'json')
-    {
-      // open square-bracket has already been removed by frontend/headless preprocessing
-      if (isLast)
+      // get valid piece of data
+      let thisChunk: string = '';
+      if (this.imprt.filetype === 'csv')
       {
-        thisChunk = '[' + this.nextChunk + chunk;
-        this.nextChunk = '';
+        const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
+        thisChunk = this.nextChunk + String(chunk.substring(0, end));
+        this.nextChunk = chunk.substring(end + 1, chunk.length);
       }
-      else
+      else if (this.imprt.filetype === 'json')
       {
-        thisChunk = this.nextChunk + chunk;
-        let left: number = 0;
-        let right: number = 0;
-        let match: number = 0;
-        let previousMatch: boolean = true;
-        for (let i = 0; i < thisChunk.length; i++)
+        // open square-bracket has already been removed by frontend/headless preprocessing
+        if (isLast)
         {
-          if (left === right)
+          thisChunk = '[' + this.nextChunk + chunk;
+          this.nextChunk = '';
+        }
+        else
+        {
+          thisChunk = this.nextChunk + chunk;
+          let left: number = 0;
+          let right: number = 0;
+          let match: number = 0;
+          let previousMatch: boolean = true;
+          for (let i = 0; i < thisChunk.length; i++)
           {
-            if (!previousMatch)
+            if (left === right)
             {
-              match = i;
+              if (!previousMatch)
+              {
+                match = i;
+              }
+              previousMatch = true;
             }
-            previousMatch = true;
+            else
+            {
+              previousMatch = false;
+            }
+            if (thisChunk.charAt(i) === '{')
+            {
+              left++;
+            }
+            else if (thisChunk.charAt(i) === '}')
+            {
+              right++;
+            }
           }
-          else
+          this.nextChunk = thisChunk.substring(match, thisChunk.length);
+          const trimmedNextChunk: string = this.nextChunk.trim();
+          if (trimmedNextChunk.length > 0 && trimmedNextChunk.charAt(0) !== ',')
           {
-            previousMatch = false;
+            return reject('JSON format incorrect.');
           }
-          if (thisChunk.charAt(i) === '{')
-          {
-            left++;
-          }
-          else if (thisChunk.charAt(i) === '}')
-          {
-            right++;
-          }
+          this.nextChunk = this.nextChunk.substring(this.nextChunk.indexOf(',') + 1, this.nextChunk.length);
+          thisChunk = '[' + thisChunk.substring(0, match) + ']';
         }
-        this.nextChunk = thisChunk.substring(match, thisChunk.length);
-        const trimmedNextChunk: string = this.nextChunk.trim();
-        if (trimmedNextChunk.length > 0 && trimmedNextChunk.charAt(0) !== ',')
-        {
-          await this._sendSocketError(socket, 'JSON format incorrect.');
-          return -1;
-        }
-        this.nextChunk = this.nextChunk.substring(this.nextChunk.indexOf(',') + 1, this.nextChunk.length);
-        thisChunk = '[' + thisChunk.substring(0, match) + ']';
       }
-    }
 
-    let items: object[];
-    try
-    {
-      items = await this._getItems(this.imprt, thisChunk);
-    }
-    catch (e)
-    {
-      await this._sendSocketError(socket, 'Failed to get items: ' + String(e));
-      return -1;
-    }
-    winston.info('streaming server got items from data');
+      let items: object[];
+      try
+      {
+        items = await this._getItems(this.imprt, thisChunk);
+      }
+      catch (e)
+      {
+        return reject('Failed to get items: ' + String(e));
+      }
+      winston.info('streaming server got items from data');
 
-    try
-    {
-      winston.info('opening file for writing...');
-      await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(this.chunkCount),
-        JSON.stringify(items), { flag: 'wx' });
-      winston.info('wrote items to file.');
-    }
-    catch (err)
-    {
-      await this._sendSocketError(socket, 'Failed to dump to temp file: ' + String(err));
-      return -1;
-    }
-    this.chunkCount++;
-    return items.length;
+      try
+      {
+        winston.info('opening file for writing...');
+        await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(this.chunkCount),
+          JSON.stringify(items), { flag: 'wx' });
+        winston.info('wrote items to file.');
+      }
+      catch (err)
+      {
+        return reject('Failed to dump to temp file: ' + String(err));
+      }
+      this.chunkCount++;
+      resolve();
+    });
   }
 
-  /* headless streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file
-   * errors will be processed through "reject" (the reject method of a promise) */
-  private async _writeNextChunk(reject: ((r?: string) => void))
+  /* streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file */
+  private async _writeNextChunk(): Promise<void>
   {
     if (this.chunkQueue.length === 0 || (this.chunkQueue.length === 1 && !this.chunkQueue[0]['isLast']))
     {
@@ -1448,11 +1465,7 @@ export class Import
     {
       this.readStream.resume();
     }
-    const count: number = await this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast'], reject);
-    if (count !== -1)
-    {
-      this.itemCount += count;
-    }
+    return this._writeItemsFromChunkToFile(chunkObj['chunk'], chunkObj['isLast']);
   }
 }
 
