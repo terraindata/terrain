@@ -51,11 +51,9 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as io from 'socket.io-client';
 import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
-import AuthStore from './../../auth/data/AuthStore';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -70,6 +68,7 @@ const { List } = Immutable;
 
 export interface Props
 {
+  file: File;
   previewRows: List<List<string>>;
   columnsCount: number;
   primaryKey: number;
@@ -84,8 +83,6 @@ export interface Props
 
   uploadInProgress: boolean;
   elasticUpdate: boolean;
-
-  file: File;
 }
 
 @Radium
@@ -93,12 +90,12 @@ class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
     templateId: number,
-    templateText: string,
+    templateName: string,
     templateOptions: List<string>,
     editColumnId: number,
   } = {
     templateId: -1,
-    templateText: '',
+    templateName: '',
     templateOptions: List([]),
     editColumnId: -1,
   };
@@ -166,10 +163,10 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleAutocompleteTemplateChange(templateText: string)
+  public handleAutocompleteTemplateChange(templateName: string)
   {
     this.setState({
-      templateText,
+      templateName,
     });
   }
 
@@ -180,10 +177,10 @@ class FileImportPreview extends TerrainComponent<Props>
       alert('Please select a template to load');
       return;
     }
-    const templateNames = List(this.props.templates.get(this.state.templateId).originalNames);
-    let isCompatible = true;
-    const unmatchedTemplateNames = [];
-    const unmatchedTableNames = this.props.columnNames.toArray();
+    const templateNames: Immutable.List<string> = this.props.templates.get(this.state.templateId).originalNames;
+    let isCompatible: boolean = true;
+    const unmatchedTemplateNames: string[] = [];
+    const unmatchedTableNames: string[] = this.props.columnNames.toArray();
     templateNames.map((templateName) =>
     {
       if (!this.props.columnNames.contains(templateName))
@@ -208,12 +205,12 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleSaveTemplate()
   {
-    if (!this.state.templateText)
+    if (!this.state.templateName)
     {
       alert('Please enter a template name');
       return;
     }
-    Actions.saveTemplate(this.state.templateText);
+    Actions.saveTemplate(this.state.templateName);
   }
 
   public handleUploadFile()
@@ -259,7 +256,7 @@ class FileImportPreview extends TerrainComponent<Props>
             Save Template
           </div>
           <Autocomplete
-            value={this.state.templateText}
+            value={this.state.templateName}
             options={null}
             onChange={this.handleAutocompleteTemplateChange}
             placeholder={'template name'}

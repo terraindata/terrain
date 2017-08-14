@@ -109,7 +109,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public handleBlur()
   {
-    const success = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
+    const success: boolean = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
     if (!success)
     {
       this.setState({
@@ -130,6 +130,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public renderColumn()
   {
+    // TODO: make less redundant
     return (
       <div
         className='fi-preview-column'

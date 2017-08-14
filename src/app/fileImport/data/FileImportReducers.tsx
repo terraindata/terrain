@@ -78,7 +78,7 @@ const deeplyColumnTypeToNumber = (columnTypesTree: FileImportTypes.ColumnTypesTr
 
 const applyTransform = (state, transform) =>
 {
-  const transformCol = state.columnNames.indexOf(transform.colName);
+  const transformCol: number = state.columnNames.indexOf(transform.colName);
 
   if (transform.name === 'rename')
   {
@@ -101,7 +101,7 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'duplicate')
   {
-    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    const primaryKey: number = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
       .set('primaryKey', primaryKey)
       .set('columnNames', state.columnNames
@@ -122,7 +122,7 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'split')
   {
-    const primaryKey = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
+    const primaryKey: number = state.primaryKey > transformCol ? state.primaryKey + 1 : state.primaryKey;
     return state
       .set('primaryKey', primaryKey)
       .set('columnNames', state.columnNames
@@ -149,9 +149,9 @@ const applyTransform = (state, transform) =>
   }
   else if (transform.name === 'merge')
   {
-    const mergeCol = state.columnNames.indexOf(transform.args.mergeName);
+    const mergeCol: number = state.columnNames.indexOf(transform.args.mergeName);
 
-    let primaryKey = '';
+    let primaryKey: number;
     if (state.primaryKey === transformCol || state.primaryKey === mergeCol)
     {
       primaryKey = mergeCol < transformCol ? transformCol - 1 : transformCol;
@@ -183,23 +183,23 @@ const applyTransform = (state, transform) =>
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
-      .set('connectionId', action.payload.connectionId)
-      .set('serverText', action.payload.name)
-      .set('dbText', '')
-      .set('tableText', '')
+      .set('serverId', action.payload.serverId)
+      .set('serverName', action.payload.name)
+      .set('dbName', '')
+      .set('tableName', '')
   ;
 
-FileImportReducers[ActionTypes.changeDbText] =
+FileImportReducers[ActionTypes.changeDbName] =
   (state, action) =>
     state
-      .set('dbText', action.payload.dbText)
-      .set('tableText', '')
+      .set('dbName', action.payload.dbName)
+      .set('tableName', '')
   ;
 
-FileImportReducers[ActionTypes.changeTableText] =
+FileImportReducers[ActionTypes.changeTableName] =
   (state, action) =>
     state
-      .set('tableText', action.payload.tableText);
+      .set('tableName', action.payload.tableName);
 
 FileImportReducers[ActionTypes.changeCsvHeaderMissing] =
   (state, action) =>
@@ -287,9 +287,9 @@ FileImportReducers[ActionTypes.uploadFile] =
     Ajax.importFile(
       state.file,
       state.filetype,
-      state.dbText,
-      state.tableText,
-      state.connectionId,
+      state.dbName,
+      state.tableName,
+      state.serverId,
       state.originalNames,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&                          // backend requires type as string
@@ -310,42 +310,6 @@ FileImportReducers[ActionTypes.uploadFile] =
         action.payload.changeUploadInProgress(false);
       },
     );
-    /*
-    Ajax.importFile(
-      state.file,
-      state.filetype,
-      state.dbText,
-      state.tableText,
-      state.connectionId,
-      state.originalNames,
-      Map<string, object>(state.columnNames.map((colName, colId) =>
-        state.columnsToInclude.get(colId) &&                          // backend requires type as string
-        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
-      )),
-      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
-      state.transforms,
-      state.elasticUpdate,
-      state.streaming,
-      () =>
-      {
-        console.log('response');
-        if (!state.streaming)
-        {
-          alert('success');
-          action.payload.changeUploadInProgress(false);
-        }
-        else
-        {
-          console.log('begin streaming');
-          // action.payload.startStreaming();
-        }
-      },
-      (err: string) =>
-      {
-        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-        action.payload.changeUploadInProgress(false);
-      },
-    );*/
 
     return state.set('uploadInProgress', true);
   };
@@ -353,9 +317,9 @@ FileImportReducers[ActionTypes.uploadFile] =
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
   {
-    Ajax.saveTemplate(state.dbText,
-      state.tableText,
-      state.connectionId,
+    Ajax.saveTemplate(state.dbName,
+      state.tableName,
+      state.serverId,
       state.originalNames,
       Map<string, FileImportTypes.ColumnTypesTree>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&
@@ -363,7 +327,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
-      action.payload.templateText,
+      action.payload.templateName,
       () =>
       {
         alert('successfully saved template');
@@ -381,9 +345,9 @@ FileImportReducers[ActionTypes.fetchTemplates] =
   (state, action) =>
   {
     Ajax.fetchTemplates(
-      state.connectionId,
-      state.dbText,
-      state.tableText,
+      state.serverId,
+      state.dbName,
+      state.tableName,
 
       (templatesArr) =>
       {
@@ -402,7 +366,7 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
-    const template = state.templates.get(action.payload.templateId);
+    const template: FileImportTypes.Template = state.templates.get(action.payload.templateId);
     template.transformations.map((transform) =>
     {
       state = applyTransform(state, transform);

@@ -52,10 +52,10 @@ const { List } = Immutable;
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
 {
-  public connectionId: number = -1;
-  public serverText: string = '';
-  public dbText: string = '';
-  public tableText: string = '';
+  public serverId: number = -1;
+  public serverName: string = '';
+  public dbName: string = '';
+  public tableName: string = '';
   public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);

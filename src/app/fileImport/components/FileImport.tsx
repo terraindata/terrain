@@ -54,9 +54,8 @@ import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { parseJSONSubset, parseCSV, ParseCSVConfig } from './../../../../shared/Util';
+import { parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
-import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
@@ -135,7 +134,7 @@ class FileImport extends TerrainComponent<any>
   public handleNextStepChange()
   {
     const { stepId } = this.state;
-    const { dbText, tableText } = this.state.fileImportState;
+    const { dbName, tableName } = this.state.fileImportState;
     switch (stepId)
     {
       case 0:
@@ -143,7 +142,7 @@ class FileImport extends TerrainComponent<any>
       case 1:
         break;
       case 2:
-        let msg = isValidIndexName(dbText);
+        let msg: string = isValidIndexName(dbName);
         if (msg)
         {
           alert(msg);
@@ -151,7 +150,7 @@ class FileImport extends TerrainComponent<any>
         }
         break;
       case 3:
-        msg = isValidTypeName(tableText);
+        msg = isValidTypeName(tableName);
         if (msg)
         {
           alert(msg);
@@ -187,41 +186,41 @@ class FileImport extends TerrainComponent<any>
     Actions.changeServer(this.state.servers.get(serverName).connectionId, serverName);
   }
 
-  public handleAutocompleteDbChange(dbText: string)
+  public handleAutocompleteDbChange(dbName: string)
   {
     const { dbs } = this.state;
-    const { serverText } = this.state.fileImportState;
+    const { serverName } = this.state.fileImportState;
     this.setState({
-      tableNames: dbText && dbs.get(databaseId(serverText, dbText)) ?
-        List(dbs.get(databaseId(serverText, dbText)).tableIds.map((table) =>
+      tableNames: dbName && dbs.get(databaseId(serverName, dbName)) ?
+        List(dbs.get(databaseId(serverName, dbName)).tableIds.map((table) =>
           table.split('.').pop(),
         ))
         :
         List([]),
     });
 
-    Actions.changeDbText(dbText);
+    Actions.changeDbName(dbName);
   }
 
-  public handleAutocompleteTableChange(tableText: string)
+  public handleAutocompleteTableChange(tableName: string)
   {
     const { tables } = this.state;
-    const { serverText, dbText } = this.state.fileImportState;
+    const { serverName, dbName } = this.state.fileImportState;
     this.setState({
-      columnOptionNames: tableText && tables.get(tableId(serverText, dbText, tableText)) ?
-        List(tables.get(tableId(serverText, dbText, tableText)).columnIds.map((column) =>
+      columnOptionNames: tableName && tables.get(tableId(serverName, dbName, tableName)) ?
+        List(tables.get(tableId(serverName, dbName, tableName)).columnIds.map((column) =>
           column.split('.').pop(),
         ))
         :
         List([]),
     });
 
-    Actions.changeTableText(tableText);
+    Actions.changeTableName(tableName);
   }
 
   public parseJson(file: string): object[]
   {
-    const items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+    const items: object[] = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
     if (!Array.isArray(items))
     {
       alert('Input JSON file must parse to an array of objects.');
@@ -290,21 +289,20 @@ class FileImport extends TerrainComponent<any>
 
   public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
   {
-    const fileToRead = file.slice(0, CHUNK_SIZE);
+    const fileToRead: Blob = file.slice(0, CHUNK_SIZE);
     const fr = new FileReader();
     fr.readAsText(fileToRead);
     fr.onloadend = () =>
     {
       // assume preview fits in one chunk
-      const stringifiedFile = fr.result;
       let items;
       switch (filetype)
       {
         case 'json':
-          items = this.parseJson(stringifiedFile);
+          items = this.parseJson(fr.result);
           break;
         case 'csv':
-          items = this.parseCsv(stringifiedFile, hasCsvHeader);
+          items = this.parseCsv(fr.result, hasCsvHeader);
           break;
         default:
       }
@@ -340,7 +338,7 @@ class FileImport extends TerrainComponent<any>
       fileSelected: false,
     });
 
-    const filetype = file.target.files[0].name.split('.').pop();
+    const filetype: string = file.target.files[0].name.split('.').pop();
     if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)
     {
       alert('Invalid filetype: ' + String(filetype));
@@ -403,10 +401,9 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { dbText, tableText } = fileImportState;
-    const { previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
+    const { dbName, tableName } = fileImportState;
+    const { file, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
-    const { file } = fileImportState;
 
     let content;
     switch (this.state.stepId)
@@ -475,7 +472,7 @@ class FileImport extends TerrainComponent<any>
       case 2:
         content =
           <Autocomplete
-            value={dbText}
+            value={dbName}
             options={this.state.dbNames}
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
@@ -485,7 +482,7 @@ class FileImport extends TerrainComponent<any>
       case 3:
         content =
           <Autocomplete
-            value={tableText}
+            value={tableName}
             options={this.state.tableNames}
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
@@ -527,7 +524,7 @@ class FileImport extends TerrainComponent<any>
   public renderNav()
   {
     const { stepId, fileSelected } = this.state;
-    const { serverText, dbText, tableText } = this.state.fileImportState;
+    const { serverName, dbName, tableName } = this.state.fileImportState;
     let nextEnabled = false;
     switch (stepId)
     {
@@ -535,13 +532,13 @@ class FileImport extends TerrainComponent<any>
         nextEnabled = fileSelected;
         break;
       case 1:
-        nextEnabled = !!serverText;
+        nextEnabled = !!serverName;
         break;
       case 2:
-        nextEnabled = !!dbText;
+        nextEnabled = !!dbName;
         break;
       case 3:
-        nextEnabled = !!tableText;
+        nextEnabled = !!tableName;
         break;
       default:
     }

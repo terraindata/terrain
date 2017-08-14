@@ -55,7 +55,6 @@ import * as _ from 'underscore';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
-import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
@@ -247,16 +246,16 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleTransformClick()
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
-    const transformName = FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex];
-    const msg = this.transformErrorCheck(transformName);
+    const datatypeId: number = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const transformName: string = FileImportTypes.TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex];
+    const msg: string = this.transformErrorCheck(transformName);
     if (msg)
     {
       alert(msg);
       return;
     }
 
-    const transform = this.setTransform(transformName);
+    const transform: FileImportTypes.Transform = this.setTransform(transformName);
     Actions.updatePreviewRows(transform);
     Actions.addTransform(transform);
 
@@ -390,26 +389,26 @@ class TransformBox extends TerrainComponent<Props>
 
   public renderTransform()
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const datatypeId: number = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
     switch (this.props.datatype)
     {
-      case 'text':            // currently only strings have transform operations besides duplicate
-        return this.renderText(FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex]);
+      case 'text': // currently only strings have transform operations besides duplicate
+        return this.renderText(FileImportTypes.TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
       default:
-        return this.renderDefault(FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex]);
+        return this.renderDefault(FileImportTypes.TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
     }
   }
 
   public render()
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const datatypeId: number = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
     return (
       <div
         className='fi-transform-box'
       >
         <Dropdown
           selectedIndex={this.state.transformTypeIndex}
-          options={List(FileImportTypes.TRANSFORM_TYPES[datatype])}
+          options={List(FileImportTypes.TRANSFORM_TYPES[datatypeId])}
           onChange={this.handleTransformTypeChange}
           canEdit={true}
         />

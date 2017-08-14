@@ -56,13 +56,13 @@ const FileImportActions =
     (connectionId: number, name: string) =>
       $(ActionTypes.changeServer, { connectionId, name }),
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+    changeDbName:
+    (dbName: string) =>
+      $(ActionTypes.changeDbName, { dbName }),
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+    changeTableName:
+    (tableName: string) =>
+      $(ActionTypes.changeTableName, { tableName }),
 
     changeCsvHeaderMissing:
     (csvHeaderMissing: boolean) =>
@@ -101,8 +101,8 @@ const FileImportActions =
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateText: string) =>
-      $(ActionTypes.saveTemplate, { templateText, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateName: string) =>
+      $(ActionTypes.saveTemplate, { templateName, fetchTemplates: FileImportActions.fetchTemplates }),
 
     fetchTemplates:
     () =>
