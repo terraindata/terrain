@@ -357,7 +357,7 @@ export class Import
         contents += chunk.toString();
         if (contents.length > this.CHUNK_SIZE)
         {
-          this._enqueueChunk(contents, false);
+          this._enqueueChunk(contents, false, reject);
           contents = '';
           if (this.chunkQueue.length >= this.MAX_ALLOWED_QUEUE_SIZE)
           {
@@ -374,7 +374,7 @@ export class Import
       {
         if (contents !== '')
         {
-          this._enqueueChunk(contents, true);
+          this._enqueueChunk(contents, true, reject);
         }
         else
         {
@@ -783,11 +783,19 @@ export class Import
   }
 
   /* headless streaming helper function ; enqueue the next chunk of data for processing */
-  private _enqueueChunk(contents: string, isLast: boolean)
+  private _enqueueChunk(contents: string, isLast: boolean, socket: (r?: string) => void)
   {
     if (!this.csvHeaderRemoved)
     {
-      contents = contents.substring(contents.indexOf('\n') + 1, contents.length);
+      const ind: number = contents.indexOf('\n');
+      const headers: string[] = contents.substring(0, ind).split(',');
+      if (headers.length !== this.imprt.originalNames.length)
+      {
+        this._sendSocketError(socket, 'CSV header does not contain the expected number of columns (' +
+          String(this.imprt.originalNames.length) + '): ' + JSON.stringify(headers));
+        return;
+      }
+      contents = contents.substring(ind + 1, contents.length);
       this.csvHeaderRemoved = true;
     }
     else if (!this.jsonBracketRemoved)
@@ -1058,15 +1066,20 @@ export class Import
         const items: object[] = [];
         csv.fromString(contents, { ignoreEmpty: true }).on('data', (data) =>
         {
+          if (data.length !== this.imprt.originalNames.length)
+          {
+            return reject('CSV row does not contain the expected number of entries (' +
+              String(this.imprt.originalNames.length) + '): ' + JSON.stringify(data));
+          }
           const obj: object = {};
           imprt.originalNames.forEach((val, ind) =>
           {
-            obj[val] = data[ind] === undefined ? '' : data[ind];
+            obj[val] = data[ind];
           });
           items.push(obj);
         }).on('error', (e) =>
         {
-          reject('CSV format incorrect: ' + String(e));
+          return reject('CSV format incorrect: ' + String(e));
         }).on('end', () =>
         {
           resolve(items);
