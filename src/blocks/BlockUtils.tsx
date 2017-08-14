@@ -128,7 +128,14 @@ export function forAllBlocks(
 
 export function transformAlias(transformCard: Card): string
 {
-  return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
+  if (typeof transformCard['input'] === 'string')
+  {
+    return transformCard['input'];
+  }
+  else
+  {
+    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
+  }
 }
 
 // This creates a new instance of a card / block
