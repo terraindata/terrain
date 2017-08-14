@@ -548,65 +548,66 @@ class _CardComponent extends TerrainComponent<Props>
           )}
           ref='cardInner'
         >
-          {
-            !card['cannotBeMoved'] &&
-            connectDragSource(
+          <div
+            className={classNames({
+              'card-title': true,
+              'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
+              'card-title-card-hovering': this.state.hovering,
+            })}
+            style={{
+              // shrink the width if the card does not have a title
+              // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+              width: NO_TITLE_WIDTH,
+            }}
+            onClick={this.handleTitleClick}
+          >
+            {
+              this.props.canEdit &&
+              !card['cannotBeMoved'] &&
+              connectDragSource(
+                <div
+                  className='card-handle-icon'
+                >
+                  <HandleIcon />
+                </div>,
+              )
+            }
+            {
+              this.state.hovering &&
+              <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
+            }
+            {
+              this.props.canEdit &&
+              !card['cannotBeMoved'] &&
+              <Menu
+                options={this.state.menuOptions}
+                openRight={true}
+              />
+            }
+            {
+              !(this.props.card && this.props.card['noTitle']) &&
               <div
-                className={classNames({
-                  'card-title': true,
-                  'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
-                  'card-title-card-hovering': this.state.hovering,
-                })}
+                className='card-title-inner'
                 style={{
-                  // shrink the width if the card does not have a title
-                  // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
-                  width: NO_TITLE_WIDTH,
+                  color: card.static.colors[0],
                 }}
-                onClick={this.handleTitleClick}
               >
                 {
-                  this.props.canEdit &&
-                  <HandleIcon
-                    className='card-handle-icon'
-                  />
+                  title
                 }
-                {
-                  this.state.hovering &&
-                  <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
-                }
-                {
-                  this.props.canEdit &&
-                  <Menu
-                    options={this.state.menuOptions}
-                    openRight={true}
-                  />
-                }
-                {
-                  !(this.props.card && this.props.card['noTitle']) &&
-                  <div
-                    className='card-title-inner'
-                    style={{
-                      color: card.static.colors[0],
-                    }}
-                  >
-                    {
-                      title
-                    }
-                  </div>
-                }
+              </div>
+            }
 
-                {
-                  !this.props.card.closed ? null :
-                    <div className={classNames({
-                      'card-preview': true,
-                      'card-preview-hidden': this.state.opening,
-                    })}>
-                      {BlockUtils.getPreview(card)}
-                    </div>
-                }
-              </div>,
-            )
-          }
+            {
+              !this.props.card.closed ? null :
+                <div className={classNames({
+                  'card-preview': true,
+                  'card-preview-hidden': this.state.opening,
+                })}>
+                  {BlockUtils.getPreview(card)}
+                </div>
+            }
+          </div>
 
           {
             (!this.props.card.closed || this.state.opening) &&

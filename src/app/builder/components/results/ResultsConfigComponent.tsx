@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty max-classes-per-file strict-boolean-expressions max-line-length no-var-requires
 
 import * as Immutable from 'immutable';
+import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
 import * as classNames from 'classnames';
@@ -54,7 +55,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as _ from 'underscore';
 import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
@@ -62,6 +63,8 @@ import Result from '../results/Result';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Results } from './ResultTypes';
+
+const Color = require('color');
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
@@ -77,6 +80,7 @@ export interface Props
   onClose: () => void;
 }
 
+@Radium
 export class ResultsConfigComponent extends TerrainComponent<Props>
 {
   public state: {
@@ -233,14 +237,26 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const { config } = this.state;
     const { enabled, formats } = config;
 
+    const shadowStyle = getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow);
+    const mainBg = backgroundColor(Colors().bg1);
+    const mainFontColor = fontColor(Colors().text2);
+    const placeholderStyle = [
+      fontColor(Colors().text1),
+      borderColor(Colors().border1),
+      backgroundColor(Colors().bg1),
+    ];
+
     return (
       <div className='results-config-wrapper'>
-        <div className={classNames({
-          'results-config': true,
-          'results-config-disabled': !enabled,
-        })}>
-          <div className='results-config-bar'>
-            <div className='results-config-title'>
+        <div
+          className={classNames({
+            'results-config': true,
+            'results-config-disabled': !enabled,
+          })}
+          style={[mainBg, borderColor(Colors().border2)]}
+        >
+          <div className='results-config-bar' style={[mainBg, borderColor(Colors().border1)]}>
+            <div className='results-config-title' style={mainFontColor}>
               Customize Results
             </div>
             <div className='results-config-switch'>
@@ -251,7 +267,15 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 selected={enabled ? 1 : 2}
               />
             </div>
-            <div className='results-config-button' onClick={this.handleClose}>
+            <div key={'results-config-button'}
+              className='results-config-button'
+              style={[
+                fontColor(Colors().text1),
+                borderColor(Colors().border1, Colors().border3),
+                backgroundColor(Colors().bg3),
+              ]}
+              onClick={this.handleClose}
+            >
               Done
             </div>
           </div>
@@ -260,13 +284,13 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
-            <div className='results-config-config'>
+            <div className='results-config-config' style={[backgroundColor(Colors().bg2), shadowStyle]}>
               <CRTarget
                 className='results-config-name'
                 type='name'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title'>
+                <div className='results-config-area-title' style={mainFontColor}>
                   Name
                 </div>
                 {
@@ -281,7 +305,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className='results-config-placeholder'>
+                    <div className='results-config-placeholder' style={placeholderStyle}>
                       Drag name field <em>(optional)</em>
                     </div>
                 }
@@ -291,7 +315,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 type='score'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title'>
+                <div className='results-config-area-title' style={mainFontColor}>
                   Score
                 </div>
                 {
@@ -306,7 +330,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                     :
-                    <div className='results-config-placeholder'>
+                    <div className='results-config-placeholder' style={placeholderStyle}>
                       Drag score field <em>(optional)</em>
                     </div>
                 }
@@ -316,7 +340,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 type='field'
                 onDrop={this.handleDrop}
               >
-                <div className='results-config-area-title'>
+                <div className='results-config-area-title' style={mainFontColor}>
                   Fields
                 </div>
                 {
@@ -337,7 +361,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                     </div>,
                   )
                 }
-                <div className='results-config-placeholder'>
+                <div className='results-config-placeholder' style={placeholderStyle}>
                   Drag more fields here
                 </div>
               </CRTarget>
@@ -364,7 +388,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               )
             }
           </CRTarget>
-          <div className='results-config-disabled-veil'>
+          <div className='results-config-disabled-veil'
+            style={backgroundColor(Color(Colors().bg1).alpha(0.5))} // bg1 but with alpha 0.5
+          >
             <div className='results-config-disabled-veil-inner'>
               <b>Custom results view is off.</b>
               Results will display the information returned from the query.
@@ -393,6 +419,8 @@ interface ResultsConfigResultProps
   primaryKeys: List<string>;
   onPrimaryKeysChange: (primaryKeys: List<string>) => void;
 }
+
+@Radium
 class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 {
   public state: {
@@ -471,9 +499,32 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const { format } = this.props;
     const image = format && format.type === 'image';
 
+    const selected: boolean = this.props.is !== null && this.props.isAvailableField;
+    const mainStyle = [
+      backgroundColor(Colors().bg3),
+      fontColor(Colors().text1),
+      getStyle('boxShadow', '1px 2px 4px 1px ' + Colors().boxShadow),
+      getStyle('borderRightColor', Colors().border1, Colors().border2),
+      getStyle('borderTopColor', Colors().border1, Colors().border2),
+      getStyle('borderBottomColor', Colors().border1, Colors().border2),
+      getStyle('borderLeftColor', selected ? Colors().active : Colors().border1, selected ? Colors().active : Colors().border2),
+    ];
+
+    const activeBtnStyle = [
+      backgroundColor(Colors().active),
+      fontColor(Colors().text1),
+      borderColor(Colors().border2),
+    ];
+
+    const inactiveBtnStyle = [
+      backgroundColor(Colors().bg1),
+      fontColor(Colors().text3, Colors().text2),
+      borderColor(Colors().border1, Colors().border2),
+    ];
+
     return this.props.connectDropTarget(this.props.connectDragSource(
       <div
-        style={fontColor(Colors().text.baseDark)}
+        style={mainStyle}
         className={classNames({
           'results-config-field': true,
           'results-config-field-dragging': this.props.isDragging ||
@@ -481,7 +532,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
           'results-config-field-name': this.props.is === 'name',
           'results-config-field-score': this.props.is === 'score',
           'results-config-field-field': this.props.is === 'field',
-          'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
+          'results-config-field-used': selected,
         })}
       >
         <div className='results-config-field-body'>
@@ -532,10 +583,18 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             Display the value of {this.props.field} as:
           </div>
           <div className='results-config-format-btns'>
-            <div className='results-config-text-btn' onClick={this.changeToText}>
+            <div className='results-config-text-btn'
+              key={'text-btn-' + this.props.field}
+              onClick={this.changeToText}
+              style={image ? inactiveBtnStyle : activeBtnStyle}
+            >
               <TextIcon /> Text
             </div>
-            <div className='results-config-image-btn' onClick={this.changeToImage}>
+            <div className='results-config-image-btn'
+              key={'image-btn-' + this.props.field}
+              onClick={this.changeToImage}
+              style={image ? activeBtnStyle : inactiveBtnStyle}
+            >
               <ImageIcon /> Image
             </div>
           </div>
@@ -547,6 +606,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             <div>
               <input
                 type='text'
+                style={borderColor(Colors().border1)}
                 value={format ? format.template : ''}
                 onChange={this.handleTemplateChange}
                 placeholder={'http://web.com/img/[value].png'}
@@ -656,7 +716,9 @@ class CRTargetC extends TerrainComponent<CRTargetProps>
   public render()
   {
     return this.props.connectDropTarget(
-      <div className={this.props.className + (this.props.isOver ? ' results-config-over' : '')}>
+      <div className={this.props.className + (this.props.isOver ? ' results-config-over' : '')}
+        style={borderColor(Colors().active)}
+      >
         {this.props.children}
       </div>,
     );

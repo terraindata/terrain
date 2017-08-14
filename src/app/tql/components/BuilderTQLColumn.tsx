@@ -186,30 +186,12 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     });
   }
 
-  public changeThemeNeo()
-  {
-    localStorage.setItem('theme', 'neo');
-    this.setState({
-      theme: 'neo',
-      theme_index: 1,
-    });
-  }
-
-  public changeThemeCobalt()
-  {
-    localStorage.setItem('theme', 'cobalt');
-    this.setState({
-      theme: 'cobalt',
-      theme_index: 2,
-    });
-  }
-
   public changeThemeMonokai()
   {
     localStorage.setItem('theme', 'monokai');
     this.setState({
       theme: 'monokai',
-      theme_index: 3,
+      theme_index: 0,
     });
   }
 
@@ -217,12 +199,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   {
     switch (this.state.theme)
     {
-      case 'monokai':
-        return 3;
-      case 'cobalt':
-        return 2;
-      case 'neo':
-        return 1;
       default:
         return 0;
     }
@@ -246,26 +222,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   {
     const options: List<MenuOption> =
       List([
-        {
-          text: 'Plain',
-          onClick: this.changeThemeDefault,
-          disabled: this.getThemeIndex() === 0,
-        },
-        {
-          text: 'Neo',
-          onClick: this.changeThemeNeo,
-          disabled: this.getThemeIndex() === 1,
-        },
-        {
-          text: 'Cobalt',
-          onClick: this.changeThemeCobalt,
-          disabled: this.getThemeIndex() === 2,
-        },
-        {
-          text: 'Monokai',
-          onClick: this.changeThemeMonokai,
-          disabled: this.getThemeIndex() === 3,
-        },
         {
           text: 'Auto',
           onClick: this.changeRunModeToAuto,

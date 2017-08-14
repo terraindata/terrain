@@ -47,14 +47,14 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
 import * as Immutable from 'immutable';
-import * as Papa from 'papaparse';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import { isValidIndexName, isValidTypeName, parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/fileImport/Util';
+import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
+import { parseJSONSubset, parseCSV, ParseCSVConfig } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -232,46 +232,46 @@ class FileImport extends TerrainComponent<any>
 
   public parseCsv(file: string, hasCsvHeader: boolean): object[]
   {
-    // if (hasCsvHeader)
-    // {
-    //   const testDuplicateConfig: ParseCSVConfig = {
-    //     delimiter: ',',
-    //     newLine: '\n',
-    //     quoteChar: '\"',
-    //     escapeChar: '\"',
-    //     comments: '#',
-    //     preview: 1,
-    //     hasHeaderRow: false,
-    //     error: (err) =>
-    //     {
-    //       alert(String(err));
-    //     },
-    //   };
-    //
-    //   const columnHeaders = parseCSV(file, testDuplicateConfig);
-    //   if (columnHeaders === undefined)
-    //   {
-    //     return undefined;
-    //   }
-    //   const colHeaderSet = new Set();
-    //   const duplicateHeaderSet = new Set();
-    //   _.map(columnHeaders[0], (colHeader) =>
-    //   {
-    //     if (colHeaderSet.has(colHeader))
-    //     {
-    //       duplicateHeaderSet.add(colHeader);
-    //     }
-    //     else
-    //     {
-    //       colHeaderSet.add(colHeader);
-    //     }
-    //   });
-    //   if (duplicateHeaderSet.size > 0)
-    //   {
-    //     alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
-    //     return undefined;
-    //   }
-    // }
+    if (hasCsvHeader)
+    {
+      const testDuplicateConfig: ParseCSVConfig = {
+        delimiter: ',',
+        newLine: '\n',
+        quoteChar: '\"',
+        escapeChar: '\"',
+        comments: '#',
+        preview: 1,
+        hasHeaderRow: false,
+        error: (err) =>
+        {
+          alert(String(err));
+        },
+      };
+
+      const columnHeaders = parseCSV(file, testDuplicateConfig);
+      if (columnHeaders === undefined)
+      {
+        return undefined;
+      }
+      const colHeaderSet = new Set();
+      const duplicateHeaderSet = new Set();
+      _.map(columnHeaders[0], (colHeader) =>
+      {
+        if (colHeaderSet.has(colHeader))
+        {
+          duplicateHeaderSet.add(colHeader);
+        }
+        else
+        {
+          colHeaderSet.add(colHeader);
+        }
+      });
+      if (duplicateHeaderSet.size > 0)
+      {
+        alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
+        return undefined;
+      }
+    }
     const config: ParseCSVConfig = {
       delimiter: ',',
       newLine: '\n',
@@ -296,7 +296,6 @@ class FileImport extends TerrainComponent<any>
     fr.onloadend = () =>
     {
       // assume preview fits in one chunk
-      // const stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
       const stringifiedFile = fr.result;
       let items;
       switch (filetype)
