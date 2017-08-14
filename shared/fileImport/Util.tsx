@@ -234,6 +234,11 @@ export function parseCSV(file, config: ParseCSVConfig)
     if (rowStart && comments && file.substr(c, comments.length) === comments)
     {
       c = Number(file.indexOf(newLine, c));
+      if (c === -1) // EOF
+      {
+        arr.pop();
+        c = file.length;
+      }
       continue;
     }
     rowStart = false;

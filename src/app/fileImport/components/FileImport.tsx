@@ -232,42 +232,46 @@ class FileImport extends TerrainComponent<any>
 
   public parseCsv(file: string, hasCsvHeader: boolean): object[]
   {
-    if (hasCsvHeader)
-    {
-      const testDuplicateConfig: ParseCSVConfig = {
-        delimiter: ',',
-        newLine: '\n',
-        quoteChar: '\"',
-        escapeChar: '\"',
-        comments: '#',
-        preview: 1,
-        hasHeaderRow: false,
-        error: (err) =>
-        {
-          alert(String(err));
-        },
-      };
-
-      const columnHeaders = parseCSV(file, testDuplicateConfig);
-      const colHeaderSet = new Set();
-      const duplicateHeaderSet = new Set();
-      _.map(columnHeaders[0], (colHeader) =>
-      {
-        if (colHeaderSet.has(colHeader))
-        {
-          duplicateHeaderSet.add(colHeader);
-        }
-        else
-        {
-          colHeaderSet.add(colHeader);
-        }
-      });
-      if (duplicateHeaderSet.size > 0)
-      {
-        alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
-        return undefined;
-      }
-    }
+    // if (hasCsvHeader)
+    // {
+    //   const testDuplicateConfig: ParseCSVConfig = {
+    //     delimiter: ',',
+    //     newLine: '\n',
+    //     quoteChar: '\"',
+    //     escapeChar: '\"',
+    //     comments: '#',
+    //     preview: 1,
+    //     hasHeaderRow: false,
+    //     error: (err) =>
+    //     {
+    //       alert(String(err));
+    //     },
+    //   };
+    //
+    //   const columnHeaders = parseCSV(file, testDuplicateConfig);
+    //   if (columnHeaders === undefined)
+    //   {
+    //     return undefined;
+    //   }
+    //   const colHeaderSet = new Set();
+    //   const duplicateHeaderSet = new Set();
+    //   _.map(columnHeaders[0], (colHeader) =>
+    //   {
+    //     if (colHeaderSet.has(colHeader))
+    //     {
+    //       duplicateHeaderSet.add(colHeader);
+    //     }
+    //     else
+    //     {
+    //       colHeaderSet.add(colHeader);
+    //     }
+    //   });
+    //   if (duplicateHeaderSet.size > 0)
+    //   {
+    //     alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
+    //     return undefined;
+    //   }
+    // }
     const config: ParseCSVConfig = {
       delimiter: ',',
       newLine: '\n',
@@ -281,7 +285,6 @@ class FileImport extends TerrainComponent<any>
         alert(String(err));
       },
     };
-
     return parseCSV(file, config);
   }
 
@@ -293,7 +296,8 @@ class FileImport extends TerrainComponent<any>
     fr.onloadend = () =>
     {
       // assume preview fits in one chunk
-      const stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
+      // const stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
+      const stringifiedFile = fr.result;
       let items;
       switch (filetype)
       {
