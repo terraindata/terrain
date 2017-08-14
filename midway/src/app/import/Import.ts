@@ -295,16 +295,15 @@ export class Import
         const template: ImportTemplateConfig = templates[0];
 
         imprtConf = {
+          columnTypes: template['columnTypes'],
           dbid: template['dbid'],
           dbname: template['dbname'],
-          tablename: template['tablename'],
-          originalNames: template['originalNames'],
-          columnTypes: template['columnTypes'],
-          primaryKey: template['primaryKey'],
-          transformations: template['transformations'],
-
           file,
           filetype: fields['filetype'],
+          originalNames: template['originalNames'],
+          primaryKey: template['primaryKey'],
+          tablename: template['tablename'],
+          transformations: template['transformations'],
           update,
         };
       }
@@ -312,21 +311,20 @@ export class Import
       {
         try
         {
-          const originalNames: string[] = JSON.parse(fields['originalNames']);
           const columnTypes: object = JSON.parse(fields['columnTypes']);
+          const originalNames: string[] = JSON.parse(fields['originalNames']);
           const transformations: object[] = JSON.parse(fields['transformations']);
 
           imprtConf = {
+            columnTypes,
             dbid: Number(fields['dbid']),
             dbname: fields['dbname'],
-            tablename: fields['tablename'],
-            originalNames,
-            columnTypes,
-            primaryKey: fields['primaryKey'],
-            transformations,
-
             file,
             filetype: fields['filetype'],
+            originalNames,
+            primaryKey: fields['primaryKey'],
+            tablename: fields['tablename'],
+            transformations,
             update,
           };
         }
@@ -1101,7 +1099,7 @@ export class Import
 
   /* streaming helper function.
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _readFileAndUpsert(num: number, targetNum: number, socket: (r?: any) => void)
+  private async _readFileAndUpsert(num: number, targetNum: number, socket: (r?: string) => void)
   {
     winston.info('BEGINNING read file upload number ' + String(num));
 
@@ -1136,7 +1134,7 @@ export class Import
   }
 
   /* streaming helper function ; process errors through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private _sendSocketError(socket: (r?: any) => void, error: string)
+  private _sendSocketError(socket: (r?: string) => void, error: string)
   {
     winston.info('emitting socket error: ' + error);
     this._cleanStreamingTempFolder();
@@ -1145,7 +1143,7 @@ export class Import
 
   /* after type-checking has completed, read from temp files to upsert via Tasty, and delete the temp files
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _streamingUpsert(socket: (r?: any) => void)
+  private async _streamingUpsert(socket: (r?: string) => void)
   {
     const time: number = Date.now();
     winston.info('putting mapping...');
@@ -1330,7 +1328,7 @@ export class Import
 
   /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file
    * errors will be processed through "socket" (either a socket.io connection, or the reject method of a promise) */
-  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: (r?: any) => void): Promise<number>
+  private async _writeItemsFromChunkToFile(chunk: string, isLast: boolean, socket: (r?: string) => void): Promise<number>
   {
     // get valid piece of data
     let thisChunk: string = '';
@@ -1425,7 +1423,7 @@ export class Import
 
   /* headless streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file
    * errors will be processed through "reject" (the reject method of a promise) */
-  private async _writeNextChunk(reject: ((r?: any) => void))
+  private async _writeNextChunk(reject: ((r?: string) => void))
   {
     if (this.chunkQueue.length === 0 || (this.chunkQueue.length === 1 && !this.chunkQueue[0]['isLast']))
     {
