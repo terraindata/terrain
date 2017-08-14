@@ -4,6 +4,9 @@
 
 @import "../../common/Common.less";
 
+@day-corner-radius: 3px;
+@day-border-width: 1px;
+
 .date-picker {
   border-radius: 5px;
   padding-bottom: 35px;
@@ -28,7 +31,7 @@
 
 .DayPicker {
   outline: none;
-  
+
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -50,7 +53,6 @@
 
 .DayPicker-Month {
   display: table;
-  border-collapse: collapse;
   border-spacing: 0;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -112,6 +114,10 @@
         padding: .5rem;
         font-size: .875em;
         text-align: center;
+
+        abbr {
+          text-decoration: none;
+        }
       }
 
   .DayPicker-Body {
@@ -120,6 +126,35 @@
 
     .DayPicker-Week {
       display: table-row;
+      &:first-child {
+        .DayPicker-Day {
+          border-bottom-width: 0px;
+          &:first-child {
+            border-top-left-radius: @day-corner-radius;
+          }
+          &:last-child {
+            border-top-right-radius: @day-corner-radius;
+          }
+        }
+      }
+      &:last-child {
+        .DayPicker-Day {
+          border-bottom-width: @day-border-width;
+          &:first-child {
+            border-bottom-left-radius: @day-corner-radius;
+          }
+          &:last-child {
+            border-bottom-right-radius: @day-corner-radius;
+          }
+        }
+      }
+      .DayPicker-Day {
+        border-bottom-width: 0px;
+        border-right-width: 0px;
+        &:last-child {
+          border-right-width: @day-border-width;
+        }
+      }
     }
 
       .DayPicker-Day {
@@ -127,7 +162,7 @@
         
         display: table-cell;
         padding: .5rem;
-        border: 1px solid;
+        border: @day-border-width solid;
         text-align: center;
         cursor: pointer;
         vertical-align: middle;

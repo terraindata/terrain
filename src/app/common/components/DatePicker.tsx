@@ -177,22 +177,23 @@ const DATE_PICKER_STYLE = {
   },
 
   '.DayPicker-Day': {
-    'border-color': Colors().border2,
-    'background': Colors().altBg2,
-    'color': Colors().altText2,
+    'border-color': Colors().altHighlight,
+    'background': Colors().altBg1,
+    'color': Colors().altText3,
   },
 
   '.DayPicker-Day:hover:not(.DayPicker-Day--selected):not(.DayPicker-Day--outside)': {
-    background: Colors().border3,
+    background: Colors().inactiveHover,
   },
 
   '.DayPicker-Day--today': {
-    color: Colors().altText1,
+    'color': Colors().altText1,
+    'background-color': Colors().altBg1,
   },
 
   '.DayPicker-Day--disabled': {
     'color': Colors().text2,
-    'background-color': Colors().bg3,
+    'background-color': Colors().altBg2,
   },
 
   '.DayPicker-Day--outside': {
@@ -202,7 +203,7 @@ const DATE_PICKER_STYLE = {
 
   '.DayPicker-Day--sunday': {
     'color': Colors().text2,
-    'background-color': Colors().altBg2,
+    'background-color': Colors().altBg1,
   },
 
   '.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)': {
