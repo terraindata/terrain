@@ -60,7 +60,7 @@ export interface ImportTemplateBase
   dbname: string;         // for elastic, index name
   export?: boolean;       // export type template
   originalNames: string[];    // array of strings (oldName)
-  primaryKey: string;  // newName of primary key
+  primaryKeys: string[];  // newName of primary key(s)
   tablename: string;      // for elastic, type name
   transformations: object[];  // list of in-order data transformations
 }
@@ -80,7 +80,7 @@ interface ImportTemplateConfigStringified
   id?: number;
   name: string;
   originalNames: string;
-  primaryKey: string;
+  primaryKeys: string;
   tablename: string;
   transformations: string;
 }
@@ -110,7 +110,7 @@ export class ImportTemplates
         'export',
         'name',
         'originalNames',
-        'primaryKey',
+        'primaryKeys',
         'tablename',
         'transformations',
       ],
@@ -180,7 +180,7 @@ export class ImportTemplates
         id: stringified['id'],
         name: stringified['name'],
         originalNames: JSON.parse(stringified['originalNames']),
-        primaryKey: stringified['primaryKey'],
+        primaryKeys: JSON.parse(stringified['primaryKeys']),
         tablename: stringified['tablename'],
         transformations: JSON.parse(stringified['transformations']),
       };
@@ -198,7 +198,7 @@ export class ImportTemplates
         id: template['id'],
         name: template['name'],
         originalNames: JSON.stringify(template['originalNames']),
-        primaryKey: template['primaryKey'],
+        primaryKeys: JSON.stringify(template['primaryKeys']),
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };

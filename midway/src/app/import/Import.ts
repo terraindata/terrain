@@ -293,7 +293,7 @@ export class Import
           file,
           filetype: fields['filetype'],
           originalNames: template['originalNames'],
-          primaryKey: template['primaryKey'],
+          primaryKeys: template['primaryKeys'],
           tablename: template['tablename'],
           transformations: template['transformations'],
           update,
@@ -305,6 +305,7 @@ export class Import
         {
           const columnTypes: object = JSON.parse(fields['columnTypes']);
           const originalNames: string[] = JSON.parse(fields['originalNames']);
+          const primaryKeys: string[] = JSON.parse(fields['primaryKeys']);
           const transformations: object[] = JSON.parse(fields['transformations']);
 
           imprtConf = {
@@ -314,7 +315,7 @@ export class Import
             file,
             filetype: fields['filetype'],
             originalNames,
-            primaryKey: fields['primaryKey'],
+            primaryKeys,
             tablename: fields['tablename'],
             transformations,
             update,
@@ -355,7 +356,7 @@ export class Import
       const columns: string[] = Object.keys(imprtConf.columnTypes);
       const insertTable: Tasty.Table = new Tasty.Table(
         imprtConf.tablename,
-        [imprtConf.primaryKey],
+        imprtConf.primaryKeys,
         columns,
         imprtConf.dbname,
         mappingForSchema,
@@ -716,9 +717,12 @@ export class Import
       }
     }
 
-    if (obj[imprt.primaryKey] === '' || obj[imprt.primaryKey] === null)
+    for (const key of imprt.primaryKeys)
     {
-      return 'Encountered an object with an empty primary key: ' + JSON.stringify(obj);
+      if (obj[key] === '' || obj[key] === null)
+      {
+        return 'Encountered an object with an empty primary key ("' + key + '"): ' + JSON.stringify(obj);
+      }
     }
 
     return '';
@@ -1302,9 +1306,16 @@ export class Import
     {
       return 'Provided column names must be distinct.';
     }
-    if (!columns.has(imprt.primaryKey))
+    if (imprt.primaryKeys.length === 0)
     {
-      return 'A column to be included in the uploaded must be specified as the primary key.';
+      return 'At least one column must be specified as a primary key.';
+    }
+    for (const key of imprt.primaryKeys)
+    {
+      if (!columns.has(key))
+      {
+        return 'The column "' + key + '" was specified to be part of the primary key, so it must be included.';
+      }
     }
     let fieldError: string;
     for (const colName of columnList)

@@ -67,7 +67,7 @@ Router.post('/', async (ctx, next) =>
   }
 
   Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
-  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKey', 'transformations']);
+  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   // optional parameters: update, hasCsvHeader
 
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
