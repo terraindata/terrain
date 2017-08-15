@@ -235,9 +235,6 @@ class Login extends TerrainComponent<Props>
     //  but the app state is still loading
     const loading = (this.state.loggingIn && !this.props.loggedIn) ||
       (this.props.loggedIn && !this.props.appStateLoaded);
-    const loginInput = [fontColor(Colors().text2), backgroundColor(Colors().bg2), borderColor(Colors().text3, Colors().text2)];
-    const loginSubmitButton = [fontColor(Colors().text2), backgroundColor(Colors().active, Colors().activeHover)];
-
     return (
       <div
         className={classNames({
@@ -263,7 +260,15 @@ class Login extends TerrainComponent<Props>
           ref='container'
         >
           <div className='login-info'>
-            <div className='login-row' style={loginInput} key={'login-email'}>
+            <div className='login-row'
+              style={[
+                fontColor(Colors().text2),
+                backgroundColor(Colors().bg2),
+                borderColor(Colors().text3,
+                Colors().text2)
+              ]}
+              key={'login-email'}
+            >
               <input
                 id='login-email'
                 type='text'
@@ -280,7 +285,15 @@ class Login extends TerrainComponent<Props>
                 Email
               </label>
             </div>
-            <div className='login-row' style={loginInput} key={'login-password'}>
+            <div className='login-row'
+              style={[
+                fontColor(Colors().text2),
+                backgroundColor(Colors().bg2),
+                borderColor(Colors().text3,
+                Colors().text2)
+              ]}
+              key={'login-password'}
+            >
               <input
                 className='login-input-field'
                 type='password'
@@ -301,7 +314,11 @@ class Login extends TerrainComponent<Props>
           </div>
           <div className='login-submit-button-wrapper'>
             <div className='login-submit-button button'
-              style={loginSubmitButton}
+              style={[
+                fontColor(Colors().text2),
+                backgroundColor(Colors().active,
+                Colors().activeHover)
+              ]}
               key={'login-submit-button'}
               onClick={this.handleLogin}
             >
