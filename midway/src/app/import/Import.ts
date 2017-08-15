@@ -110,9 +110,9 @@ export class Import
   private chunkQueue: object[];
   private nextChunk: string;
 
-  public async export(exprt: ExportConfig): Promise<stream.Readable>
+  public async export(exprt: ExportConfig): Promise<stream.Readable | string>
   {
-    return new Promise<stream.Readable>(async (resolve, reject) =>
+    return new Promise<stream.Readable | string>(async (resolve, reject) =>
     {
       const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
       if (database === undefined)
@@ -176,20 +176,27 @@ export class Import
       let rankCounter: number = 1;
       const writer = csvWriter();
       const pass = new stream.PassThrough();
+      writer.pipe(pass);
       const qryObj: object = JSON.parse(qry);
       if (qryObj.hasOwnProperty('terrainRank') && exprt.rank === true)
       {
         return reject('Conflicting field: terrainRank.');
       }
       qryObj['scroll'] = this.SCROLL_TIMEOUT;
+      let errMsg: string = '';
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
-
+        if (resp.hits === undefined || resp.hits.total === 0)
+        {
+          writer.end();
+          errMsg = 'Nothing to export.';
+          return reject(errMsg);
+        }
         const newDocs: object[] = resp.hits.hits as object[];
         if (newDocs.length === 0)
         {
           writer.end();
-          return;
+          return resolve(pass);
         }
         let returnDocs: object[] = [];
         for (const doc of newDocs)
@@ -198,7 +205,9 @@ export class Import
           const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname);
           if (typeof newDoc === 'string')
           {
-            return reject(newDoc);
+            writer.end();
+            errMsg = newDoc;
+            return reject(errMsg);
           }
           newDoc['terrainRank'] = rankCounter;
           for (const field of Object.keys(newDoc))
@@ -218,11 +227,12 @@ export class Import
           returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true, exprt.rank));
         } catch (e)
         {
-          return reject(e);
+          writer.end();
+          errMsg = e;
+          return reject(errMsg);
         }
 
         // export to csv
-        writer.pipe(pass);
         for (const returnDoc of returnDocs)
         {
           writer.write(returnDoc);
@@ -237,11 +247,10 @@ export class Import
         else
         {
           writer.end();
+          resolve(pass);
         }
       }.bind(this),
       );
-
-      resolve(pass);
     });
   }
 
