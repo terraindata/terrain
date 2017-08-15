@@ -146,7 +146,7 @@ class TransformCardChart extends TerrainComponent<Props>
     }
     else
     {
-      selectedPointIds = Map<string, boolean>({});
+      selectedPointIds = Map<string, boolean>();
     }
     // else, a click to unselect things
 

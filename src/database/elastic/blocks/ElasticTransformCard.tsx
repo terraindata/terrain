@@ -90,15 +90,25 @@ export const elasticTransform = _card(
       // manualEntry: ManualConfig.cards['transform'],
       colors: getCardColors('score', Colors().builder.cards.inputParameter),
       title: 'Transform',
-      preview: '',
-      // preview: (card: any) =>
-      // {
-      //   if (card.input._isCard)
-      //   {
-      //     return '' + BlockUtils.getPreview(card.input);
-      //   }
-      //   return '' + card.input;
-      // },
+      preview: (card: any) =>
+      {
+        let preview = '';
+        if (card.input._isCard)
+        {
+          preview = '' + BlockUtils.getPreview(card.input);
+        }
+        else
+        {
+          preview = '' + card.input;
+        }
+
+        if (preview.length === 0)
+        {
+          preview = 'No input set';
+        }
+
+        return preview;
+      },
       display: [
         {
           displayType: DisplayType.TEXT,
