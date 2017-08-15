@@ -49,7 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { heapAvail } from '../App';
+import { HA } from '../App';
 import { users } from '../users/UserRouter';
 import * as Util from '../Util';
 import { ExportConfig, Import, ImportConfig } from './Import';
@@ -78,7 +78,7 @@ Router.post('/', async (ctx, next) =>
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   console.log('???!');
-  console.log(heapAvail);
+  console.log(HA);
   const exprtConf: ExportConfig = ctx.request.body.body;
   Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
   const exportReturn: stream.Readable | string = await imprt.export(exprtConf);

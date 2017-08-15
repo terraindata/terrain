@@ -149,7 +149,8 @@ class App
     await Users.initializeDefaultUser();
 
     const heapStats: object = v8.getHeapStatistics();
-    this.heapAvail = 0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']);
+    this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
+    HA = this.heapAvail;
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
   }

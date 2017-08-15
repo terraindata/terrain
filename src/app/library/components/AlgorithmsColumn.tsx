@@ -48,23 +48,29 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
+import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
+import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
 import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Actions from './../data/LibraryActions';
+import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
+
+import './AlgorithmsColumn.less';
 
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
@@ -91,6 +97,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     lastMoved: string;
     draggingItemIndex: number;
     draggingOverIndex: number;
+    creatingNewAlgorithm: boolean;
+    newAlgorithmTextboxValue: string;
+    newAlgorithmDbIndex: number;
   } = {
     rendered: false,
     me: null,
@@ -98,6 +107,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     lastMoved: '',
     draggingItemIndex: -1,
     draggingOverIndex: -1,
+    creatingNewAlgorithm: false,
+    newAlgorithmTextboxValue: '',
+    newAlgorithmDbIndex: -1,
   };
 
   public componentWillMount()
@@ -140,6 +152,20 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
   }
 
+  public getNewAlgorithmIndex(): number
+  {
+    const group = LibraryStore.getState().groups.get(this.props.groupId);
+    const dbs = LibraryStore.getState().dbs;
+    if (this.state.newAlgorithmDbIndex !== -1)
+    {
+      return this.state.newAlgorithmDbIndex;
+    }
+    else
+    {
+      return dbs && group.db && dbs.findIndex((db) => db.id === group.db.id);
+    }
+  }
+
   public handleDuplicate(id: ID)
   {
     Actions.algorithms.duplicate(
@@ -156,16 +182,65 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
-  public handleCreate()
-  {
-    Actions.algorithms.create(this.props.groupId);
-  }
-
   public handleNameChange(id: ID, name: string)
   {
     Actions.algorithms.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm,
+    );
+  }
+
+  public handleNewAlgorithmModalOpen()
+  {
+    let index = this.getNewAlgorithmIndex();
+    if (index === -1)
+    {
+      index = 0;
+    }
+    this.setState({
+      creatingNewAlgorithm: true,
+      newAlgorithmDbIndex: index,
+      newAlgorithmTextboxValue: '',
+    });
+  }
+
+  public handleNewAlgorithmModalClose()
+  {
+    this.setState({
+      creatingNewAlgorithm: false,
+      newAlgorithmDbIndex: -1,
+    });
+  }
+
+  public handleNewAlgorithmTextboxChange(value)
+  {
+    this.setState({
+      newAlgorithmTextboxValue: value
+    });
+  }
+
+  public handleNewAlgorithmDbChange(dbIndex: number)
+  {
+    this.setState({
+      newAlgorithmDbIndex: dbIndex,
+    });
+  }
+
+  public handleNewAlgorithmCreated(algorithmId)
+  {
+    const groupId = LibraryStore.getState().algorithms.get(algorithmId).groupId;
+    browserHistory.push(`/library/${groupId}/${algorithmId}`);
+  }
+
+  public handleNewAlgorithmCreate()
+  {
+    const dbs = LibraryStore.getState().dbs;
+    const index = this.getNewAlgorithmIndex();
+    Actions.algorithms.createAs(
+      this.props.groupId,
+      this.state.newAlgorithmTextboxValue,
+      dbs.get(index),
+      this.handleNewAlgorithmCreated
     );
   }
 
@@ -294,7 +369,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       null,
     );
 
-    let date = 'There are no variants';
+    let date: string;
     let userId: string | number = 'There are no variants';
     if (lastTouched)
     {
@@ -355,8 +430,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
             <div
               className='library-item-line'
             >
-              {Util.formatDate(date)}
-
+              {
+                date === undefined ? 'There are no variants' :
+                  'Most Recent Change: ' + Util.formatDate(date)
+              }
             </div>
           </div>
         </div>
@@ -398,12 +475,59 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         {
           status === ItemStatus.Build && canCreate &&
           <CreateLine
-            onClick={this.handleCreate}
+            onClick={this.handleNewAlgorithmModalOpen}
             open={false}
           />
         }
       </LibraryItemCategory>
     );
+  }
+
+  public renderDatabaseDropdown()
+  {
+    const dbs = LibraryStore.getState().dbs;
+    return (
+      <div className='new-algorithm-modal-child'>
+        <div className='database-dropdown-wrapper'>
+          <Dropdown
+            selectedIndex={this.state.newAlgorithmDbIndex}
+            options={dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
+            onChange={this.handleNewAlgorithmDbChange}
+            canEdit={true}
+            directionBias={90}
+            className='bic-db-dropdown'
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderCreateAlgorithmModal()
+  {
+    const canCreateAlgorithm: boolean = LibraryStore.getState().dbs.size > 0;
+    return canCreateAlgorithm ?
+      (<Modal
+        open={this.state.creatingNewAlgorithm}
+        showTextbox={true}
+        confirm={true}
+        onClose={this.handleNewAlgorithmModalClose}
+        onConfirm={this.handleNewAlgorithmCreate}
+        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
+        title='New Algorithm'
+        confirmButtonText='Create'
+        message='What would you like to name the algorithm?'
+        textboxPlaceholderValue='Algorithm Name'
+        children={this.renderDatabaseDropdown()}
+        childrenMessage='Please select a database'
+        allowOverflow={true}
+      />) :
+      (<Modal
+        open={this.state.creatingNewAlgorithm}
+        onClose={this.handleNewAlgorithmModalClose}
+        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
+        title='Cannot Create New Algorithm'
+        message='No databases available'
+      />);
   }
 
   public render()
@@ -413,6 +537,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         index={2}
         title='Algorithms'
       >
+        {
+          this.renderCreateAlgorithmModal()
+        }
         {
           this.props.algorithmsOrder ?
             (
@@ -434,7 +561,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                     Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
                       ? 'Create a algorithm' : null
                   }
-                  onClick={this.handleCreate}
+                  onClick={this.handleNewAlgorithmModalOpen}
                 />
             )
             : null

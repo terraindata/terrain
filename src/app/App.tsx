@@ -104,6 +104,7 @@ const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
+const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
 const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
@@ -131,7 +132,7 @@ const links =
       route: '/builder',
     },
     {
-      icon: <ReportingIcon />,
+      icon: <SchemaIcon />,
       text: 'Schema',
       route: '/schema',
     },
