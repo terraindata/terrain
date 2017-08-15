@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-const v8 = require('v8');
-
 import * as http from 'http';
 import * as Koa from 'koa';
 import * as socketio from 'socket.io';
@@ -56,6 +54,7 @@ import cors = require('kcors');
 import session = require('koa-session');
 import serve = require('koa-static-server');
 import srs = require('secure-random-string');
+import v8 = require('v8');
 
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
