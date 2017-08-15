@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+const v8 = require('v8');
+
 import * as http from 'http';
 import * as Koa from 'koa';
 import * as socketio from 'socket.io';
@@ -71,6 +73,7 @@ import Users from './users/Users';
 
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
+export let HA: number;
 
 class App
 {
@@ -96,6 +99,7 @@ class App
   private DB: Tasty.Tasty;
   private app: Koa;
   private config: Config.Config;
+  private heapAvail: number;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
@@ -144,6 +148,8 @@ class App
     await Config.handleConfig(this.config);
     await Users.initializeDefaultUser();
 
+    const heapStats: object = v8.getHeapStatistics();
+    this.heapAvail = 0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']);
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
   }
