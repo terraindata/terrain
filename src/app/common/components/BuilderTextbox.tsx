@@ -397,7 +397,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               <textarea
                 ref='input'
                 disabled={!this.props.canEdit}
-                defaultValue={this.state.boxValue as string}
+                defaultValue={this.state.boxValue as string || ''}
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
@@ -406,7 +406,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               <Autocomplete
                 ref='input'
                 disabled={!this.props.canEdit}
-                value={this.state.boxValue as string}
+                value={this.state.boxValue as string || ''}
                 options={options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}
