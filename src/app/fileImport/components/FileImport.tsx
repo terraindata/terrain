@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
 import * as Immutable from 'immutable';
-import * as Papa from 'papaparse';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
@@ -55,7 +54,7 @@ import * as _ from 'underscore';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { parseJSONSubset } from './../../../../shared/Util';
+import { parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -226,7 +225,7 @@ class FileImport extends TerrainComponent<any>
     if (!Array.isArray(items))
     {
       alert('Input JSON file must parse to an array of objects.');
-      return [];
+      return undefined;
     }
     return items;
   }
@@ -235,17 +234,28 @@ class FileImport extends TerrainComponent<any>
   {
     if (hasCsvHeader)
     {
-      const testDuplicateConfig = {
-        quoteChar: '"',
-        header: false,
+      const testDuplicateConfig: ParseCSVConfig = {
+        delimiter: ',',
+        newLine: '\n',
+        quoteChar: '\"',
+        escapeChar: '\"',
+        comments: '#',
         preview: 1,
-        skipEmptyLines: true,
+        hasHeaderRow: false,
+        error: (err) =>
+        {
+          alert(String(err));
+        },
       };
 
-      const columnHeaders = Papa.parse(file, testDuplicateConfig).data;
+      const columnHeaders = parseCSV(file, testDuplicateConfig);
+      if (columnHeaders === undefined)
+      {
+        return undefined;
+      }
       const colHeaderSet = new Set();
       const duplicateHeaderSet = new Set();
-      columnHeaders[0].map((colHeader) =>
+      _.map(columnHeaders[0], (colHeader) =>
       {
         if (colHeaderSet.has(colHeader))
         {
@@ -259,30 +269,23 @@ class FileImport extends TerrainComponent<any>
       if (duplicateHeaderSet.size > 0)
       {
         alert('duplicate column names not allowed: ' + JSON.stringify(Array.from(duplicateHeaderSet)));
-        return [];
+        return undefined;
       }
     }
-    const config = {
-      quoteChar: '\'',
-      header: hasCsvHeader,
+    const config: ParseCSVConfig = {
+      delimiter: ',',
+      newLine: '\n',
+      quoteChar: '\"',
+      escapeChar: '\"',
+      comments: '#',
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
+      hasHeaderRow: hasCsvHeader,
       error: (err) =>
       {
-        alert('CSV format incorrect: ' + String(err));
+        alert(String(err));
       },
-      skipEmptyLines: true,
     };
-
-    const items = Papa.parse(file, config).data;
-    for (let i = 1; i < items.length; i++)
-    {
-      if (items[i].length !== items[0].length)
-      {
-        alert('CSV format incorrect: each row must have same number of fields');
-        return [];
-      }
-    }
-    return items;
+    return parseCSV(file, config);
   }
 
   public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
@@ -293,7 +296,7 @@ class FileImport extends TerrainComponent<any>
     fr.onloadend = () =>
     {
       // assume preview fits in one chunk
-      const stringifiedFile = fr.result.substring(0, fr.result.lastIndexOf('\n'));
+      const stringifiedFile = fr.result;
       let items;
       switch (filetype)
       {
@@ -305,7 +308,7 @@ class FileImport extends TerrainComponent<any>
           break;
         default:
       }
-      if (items.length === 0)
+      if (items === undefined)
       {
         return;
       }
@@ -333,6 +336,9 @@ class FileImport extends TerrainComponent<any>
     {
       return;
     }
+    this.setState({
+      fileSelected: false,
+    });
 
     const filetype = file.target.files[0].name.split('.').pop();
     if (FileImportTypes.FILE_TYPES.indexOf(filetype) === -1)

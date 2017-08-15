@@ -114,7 +114,7 @@ const Actions =
         const group = LibraryStore.getState().groups.get(groupId);
         algorithm = algorithm
           .set('parent', groupId)
-          .set('groupId', groupId)
+          .set('groupId', groupId);
 
         Ajax.saveItem(
           algorithm,
@@ -226,7 +226,7 @@ const Actions =
       {
         const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
         variant = variant.set('db', algorithm.db).set('language', algorithm.language);
-        $(ActionTypes.variants.move, { variant, index, groupId, algorithmId })
+        $(ActionTypes.variants.move, { variant, index, groupId, algorithmId });
       },
 
       duplicate:

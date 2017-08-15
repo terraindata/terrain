@@ -317,42 +317,6 @@ FileImportReducers[ActionTypes.uploadFile] =
         action.payload.changeUploadInProgress(false);
       },
     );
-    /*
-    Ajax.importFile(
-      state.file,
-      state.filetype,
-      state.dbText,
-      state.tableText,
-      state.connectionId,
-      state.originalNames,
-      Map<string, object>(state.columnNames.map((colName, colId) =>
-        state.columnsToInclude.get(colId) &&                          // backend requires type as string
-        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
-      )),
-      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
-      state.transforms,
-      state.elasticUpdate,
-      state.streaming,
-      () =>
-      {
-        console.log('response');
-        if (!state.streaming)
-        {
-          alert('success');
-          action.payload.changeUploadInProgress(false);
-        }
-        else
-        {
-          console.log('begin streaming');
-          // action.payload.startStreaming();
-        }
-      },
-      (err: string) =>
-      {
-        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
-        action.payload.changeUploadInProgress(false);
-      },
-    );*/
 
     return state.set('uploadInProgress', true);
   };

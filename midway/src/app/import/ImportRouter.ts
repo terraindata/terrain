@@ -50,13 +50,11 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { HA } from '../App';
-import { users } from '../users/UserRouter';
 import * as Util from '../Util';
-import { ExportConfig, Import, ImportConfig } from './Import';
-import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+import { ExportConfig, Import } from './Import';
 
 const Router = new KoaRouter();
-export const imprt: Import = new Import();
+const imprt: Import = new Import();
 
 Router.post('/', async (ctx, next) =>
 {
