@@ -60,12 +60,12 @@ import
   VictoryLabel,
   VictoryLegend,
   VictoryLine,
+  VictoryPortal,
   VictoryScatter,
   VictoryTheme,
   VictoryTooltip,
   VictoryVoronoiContainer,
   VictoryZoomContainer,
-  VictoryPortal,
 } from 'victory';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import * as LibraryTypes from './../../library/LibraryTypes';
@@ -152,14 +152,15 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
   {
     super(props);
 
-    const { datasets } = props;
+    const { datasets } = props;
 
     this.state.visibleDatasets = datasets.keySeq().toList();
     this.state.datasetColors = this.mapDatasetColors(datasets);
     console.log(this.state.datasetColors)
   }
 
-  public mapDatasetColors(datasets) {
+  public mapDatasetColors(datasets)
+  {
     const datasetColors = {};
 
     datasets.keySeq().forEach((datasetId, index) => {
@@ -230,7 +231,6 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
         else {
           areaToHightlight = (
             <VictoryArea
-
               name={`area-${key}`}
               key={key}
               style={{ data: { fill: this.getDatasetColor(key) } }}
@@ -253,11 +253,13 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
       }
     });
 
-    if (areaToHightlight !== null) {
+    if (areaToHightlight !== null)
+    {
       areas.push(areaToHightlight);
     }
 
-    if (scatterToHightlight !== null) {
+    if (scatterToHightlight !== null)
+    {
       scatters.push(scatterToHightlight);
     }
 
@@ -288,14 +290,15 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
     return (
       <VictoryLegend
-        name="legend"
+        name='legend'
         data={data.toArray()}
         orientation={config.legend.orientation}
       />
     );
   }
 
-  public getDatasetColor(datasetId) {
+  public getDatasetColor(datasetId)
+  {
     return this.state.datasetColors[datasetId];
   }
 
@@ -304,47 +307,52 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     this.toggleDatasetVisibility(props.datum.id);
   }
 
-  public handleLegendMouseOver(e, props) {
+  public handleLegendMouseOver(e, props)
+  {
     return [
       {
         target: 'labels',
-        mutation: (labelProps) => {
+        mutation: (labelProps) =>
+        {
           const newStyle = Object.assign({}, labelProps.style, { fontSize: 16 });
-          return { style: newStyle };
-        }
+          return { style: newStyle };
+        },
       },
       {
         childName: `area-${props.datum.id}`,
         target: 'data',
         eventKey: 'all',
-        mutation: (areaProps) => {
+        mutation: (areaProps) =>
+        {
           this.setState({ highlightDataset: props.datum.id });
-          return { 
+          return {
             style: Object.assign(
               {},
               areaProps.style,
-              { fill: this.getDatasetColor(props.datum.id), strokeWidth: 3, fillOpacity: 0.7 }
+              { fill: this.getDatasetColor(props.datum.id), strokeWidth: 3, fillOpacity: 0.7 },
             ),
-          }
+          };
         },
-      }
+      },
     ];
   }
 
-  public handleLegendMouseOut(e, props) {
+  public handleLegendMouseOut(e, props)
+  {
     return [
       {
         target: 'labels',
-        mutation: (props) => { return null }
+        mutation: () => null,
       },
       {
         childName: [`area-${props.datum.id}`],
         target: 'data',
         eventKey: 'all',
-        mutation: () => {
+        mutation: () =>
+        {
           return null;
         },
-      }
+      },
     ];
   }
 
