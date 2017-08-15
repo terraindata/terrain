@@ -433,8 +433,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
     [ActionTypes.results]: (state: BuilderState,
       action: Action<{ resultsState, exportState }>) =>
-      state.set('resultsState', action.payload.resultsState)
-        .set('exportState', action.payload.exportState),
+      state.set('resultsState', action.payload.resultsState),
 
     /*---------------------------- Export -------------------------------*/
     [ActionTypes.loadTemplate]: (state: BuilderState,

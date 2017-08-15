@@ -60,6 +60,7 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
+import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
@@ -71,7 +72,7 @@ import ResultsExportComponent from '../results/ResultsExportComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import Radium = require('radium');
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -518,15 +519,73 @@ column if you have customized the results view.');
   {
     if (this.state.showingExport)
     {
+      // return (
+      //   <ResultsExportComponent
+      //     query={this.props.query}
+      //     fields={this.props.resultsState.fields}
+      //     results={this.props.resultsState.results}
+      //     handleESresultExport={this.handleESresultExport}
+      //     onClose={this.hideExport}
+      //     exportState={this.props.exportState}
+      //   />
+      // );
+
+      const mainBg = backgroundColor(Colors().bg1);
+      const mainFontColor = fontColor(Colors().text2);
+      const { previewRows, primaryKey, columnNames, columnsToInclude, columnTypes, templates, transforms,
+        elasticUpdate } = this.props.exportState;
       return (
-        <ResultsExportComponent
-          query={this.props.query}
-          fields={this.props.resultsState.fields}
-          results={this.props.resultsState.results}
-          handleESresultExport={this.handleESresultExport}
-          onClose={this.hideExport}
-          exportState={this.props.exportState}
-        />
+        <div className='results-config-wrapper'>
+          <div
+            className={classNames({
+              'results-config': true,
+              'results-config-disabled': false,
+            })}
+            style={[mainBg, borderColor(Colors().border2)]}
+          >
+            <div className='results-config-bar' style={[mainBg, borderColor(Colors().border1)]}>
+              <div className='results-config-title' style={mainFontColor}>
+                Export Results
+              </div>
+              <div key={'results-export-button'}
+                className='results-config-switch'
+                style={[
+                  fontColor(Colors().text1),
+                  borderColor(Colors().border1, Colors().border3),
+                  backgroundColor(Colors().bg3),
+                ]}
+              >
+                Export
+              </div>
+              <div key={'results-config-button'}
+                className='results-config-button'
+                style={[
+                  fontColor(Colors().text1),
+                  borderColor(Colors().border1, Colors().border3),
+                  backgroundColor(Colors().bg3),
+                ]}
+                onClick={this.hideExport}
+              >
+                Done
+              </div>
+            </div>
+
+            <FileImportPreview
+              previewRows={previewRows}
+              primaryKey={primaryKey}
+              columnNames={columnNames}
+              columnsToInclude={columnsToInclude}
+              columnTypes={columnTypes}
+              templates={templates}
+              transforms={transforms}
+              columnOptions={List([])}
+              uploadInProgress={false}
+              elasticUpdate={elasticUpdate}
+              exporting={true}
+            />
+
+          </div>
+        </div>
       );
     }
   }

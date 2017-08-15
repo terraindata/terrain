@@ -201,6 +201,13 @@ FileImportReducers[ActionTypes.changeTableText] =
     state
       .set('tableText', action.payload.tableText);
 
+FileImportReducers[ActionTypes.changeServerDbTable] =
+  (state, action) =>
+    state
+      .set('connectionId', action.payload.connectionId)
+      .set('dbText', action.payload.dbText)
+      .set('tableText', action.payload.tableText);
+
 FileImportReducers[ActionTypes.changeCsvHeaderMissing] =
   (state, action) =>
     state
@@ -273,7 +280,6 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('filetype', action.payload.filetype)
       .set('primaryKey', -1)
       .set('previewRows', action.payload.preview)
-      .set('columnsCount', action.payload.originalNames.size)
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
       .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
@@ -281,7 +287,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('transforms', List([]))
   ;
 
-FileImportReducers[ActionTypes.uploadFile] =
+FileImportReducers[ActionTypes.importFile] =
   (state, action) =>
   {
     Ajax.importFile(
@@ -314,6 +320,41 @@ FileImportReducers[ActionTypes.uploadFile] =
     return state.set('uploadInProgress', true);
   };
 
+FileImportReducers[ActionTypes.exportFile] =
+  (state, action) =>
+  {
+    Ajax.exportFile(
+      state.filetype,
+      state.dbText,
+      state.tableText,
+      state.connectionId,
+      state.originalNames,
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&                          // backend requires type as string
+        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+      )),
+      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
+      state.transforms,
+      state.elasticUpdate,
+      true, // exporting
+      state.templateName,
+      () =>
+      {
+        alert('success');
+      },
+      (err: string) =>
+      {
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+      },
+      // query?: Query,
+      // variantId?: number,
+      // templateID?: number,
+      // rank?: boolean,
+    );
+
+    return state.set('uploadInProgress', true);
+  };
+
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
   {
@@ -328,7 +369,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
       action.payload.templateText,
-      false,
+      action.payload.exporting, // isExport
       () =>
       {
         alert('successfully saved template');

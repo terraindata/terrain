@@ -143,10 +143,9 @@ const BuilderActions =
       }),
 
     results:
-    (resultsState, exportState) =>
+    (resultsState) =>
       $(ActionTypes.results, {
         resultsState,
-        exportState,
       }),
 
     // export

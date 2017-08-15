@@ -397,9 +397,8 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbText, tableText } = fileImportState;
-    const { previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKey } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
-    const { file } = fileImportState;
 
     let content;
     switch (this.state.stepId)
@@ -489,7 +488,6 @@ class FileImport extends TerrainComponent<any>
         content =
           <FileImportPreview
             previewRows={previewRows}
-            columnsCount={columnsCount}
             primaryKey={primaryKey}
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
@@ -497,9 +495,9 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
-            file={file}
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
+            exporting={false}
           />;
         break;
       default:

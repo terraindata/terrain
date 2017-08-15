@@ -56,9 +56,12 @@ import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
+import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
+import Actions from '../../../fileImport/data/FileImportActions';
+import * as SchemaTypes from '../../../schema/SchemaTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
@@ -72,9 +75,9 @@ export interface Props
 {
   query: Query;
   resultsState: ResultsState;
-  exportState?: FileImportState;
+  schemaState?: SchemaTypes.SchemaState;
   db: BackendInstance;
-  onResultsStateChange: (resultsState: ResultsState, exportState: FileImportState) => void;
+  onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
 
@@ -283,7 +286,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
   {
-    let { resultsState, exportState } = this.props;
+    let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
         resultsState = resultsState.set(key, value),
@@ -291,13 +294,11 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (exportChanges)
     {
-      _.map(exportChanges,
-        (value: any, key: string) =>
-          exportState = exportState.set(key, value),
-      );
+      const { filetype, preview, originalNames } = exportChanges;
+      Actions.chooseFile(filetype, preview, originalNames);
     }
 
-    this.props.onResultsStateChange(resultsState, exportState);
+    this.props.onResultsStateChange(resultsState);
   }
 
   public render()
@@ -521,13 +522,17 @@ export class ResultsManager extends TerrainComponent<Props>
     }
 
     const exportChanges: any = {
+      filetype: 'csv',
       originalNames: fields,
-      columnNames: fields,
-      columnTypes: fields.map((field) => Immutable.fromJS({ type: 0 })),
-      columnsToInclude: fields.map((field) => true),
-      primaryKey: -1, // getPrimaryKeyFor(result, this.props.query.resultsConfig, index),
+      preview: Immutable.List(results.map((result) =>
+        Immutable.List(result.fields.valueSeq().toList().map((field) =>
+          field,
+        )),
+      )),
     };
     console.log('exportChanges: ', exportChanges);
+    console.log(Number(this.props.db.id), getIndex(this.props.schemaState), getType(this.props.schemaState));
+    Actions.changeServerDbTable(Number(this.props.db.id), getIndex(this.props.schemaState), getType(this.props.schemaState));
 
     this.changeResults(changes, exportChanges);
   }
@@ -571,7 +576,7 @@ export class ResultsManager extends TerrainComponent<Props>
   {
     let { errorMessage } = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
-    let { resultsState, exportState } = this.props;
+    let { resultsState } = this.props;
 
     if (typeof errorMessage === 'string')
     {
@@ -623,7 +628,6 @@ export class ResultsManager extends TerrainComponent<Props>
         'loading',
         false,
       ),
-      exportState,
     );
   }
 
@@ -631,7 +635,7 @@ export class ResultsManager extends TerrainComponent<Props>
   {
     // TODO: handle myltiple errors.
     const err = errors[0];
-    let { resultsState, exportState } = this.props;
+    let { resultsState } = this.props;
     if (!isAllFields)
     {
       resultsState = resultsState
@@ -661,7 +665,6 @@ export class ResultsManager extends TerrainComponent<Props>
         'loading',
         false,
       ),
-      exportState,
     );
   }
 

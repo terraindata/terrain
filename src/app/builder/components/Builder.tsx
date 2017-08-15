@@ -61,11 +61,15 @@ import { withRouter } from 'react-router';
 // Data
 import { ItemStatus } from '../../../items/types/Item';
 import Query from '../../../items/types/Query';
+import FileImportStore from '../../fileImport/data/FileImportStore';
+import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import LibraryActions from '../../library/data/LibraryActions';
 import { LibraryState, LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesActions from '../../roles/data/RolesActions';
 import RolesStore from '../../roles/data/RolesStore';
+import SchemaStore from '../../schema/data/SchemaStore';
+import * as SchemaTypes from '../../schema/SchemaTypes';
 import UserActions from '../../users/data/UserActions';
 import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
@@ -105,6 +109,8 @@ export interface Props
 class Builder extends TerrainComponent<Props>
 {
   public state: {
+    schemaState: SchemaTypes.SchemaState,
+    exportState: FileImportTypes.FileImportState,
     builderState: BuilderState,
     variants: IMMap<ID, Variant>,
 
@@ -127,6 +133,8 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
+    schemaState: SchemaStore.getState(),
+    exportState: FileImportStore.getState(),
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
 
@@ -176,6 +184,14 @@ class Builder extends TerrainComponent<Props>
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
       storeKeyPath: ['variants'],
+    });
+
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportState',
+    });
+
+    this._subscribe(SchemaStore, {
+      stateKey: 'schemaState',
     });
 
     let colKeys: List<number>;
@@ -631,7 +647,7 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.state.builderState.resultsState}
-        exportState={this.state.builderState.exportState}
+        exportState={this.state.exportState}
         index={index}
         colKey={key}
         variant={variant}
@@ -937,7 +953,7 @@ class Builder extends TerrainComponent<Props>
         <ResultsManager
           query={query}
           resultsState={this.state.builderState.resultsState}
-          exportState={this.state.builderState.exportState}
+          schemaState={this.state.schemaState}
           db={this.state.builderState.db}
           onResultsStateChange={Actions.results}
         />

@@ -135,4 +135,40 @@ export const ElasticBlockHelpers = {
   },
 };
 
+export function getIndex(schemastate): string
+{
+  const state = BuilderStore.getState();
+  const cards = state.query.cards;
+  const isIndexCard = (card) => card['type'] === 'eqlindex';
+
+  let indexCard = cards.find(isIndexCard);
+  if (indexCard === undefined)
+  {
+    indexCard = cards.get(0);
+    if (indexCard !== undefined)
+    {
+      indexCard = indexCard['cards'].find(isIndexCard);
+    }
+  }
+  return indexCard['value'];
+}
+
+export function getType(schemastate): string
+{
+  const state = BuilderStore.getState();
+  const cards = state.query.cards;
+  const isTypeCard = (card) => card['type'] === 'eqltype';
+
+  let typeCard = cards.find(isTypeCard);
+  if (typeCard === undefined)
+  {
+    typeCard = cards.get(1);
+    if (typeCard !== undefined)
+    {
+      typeCard = typeCard['cards'].find(isTypeCard);
+    }
+  }
+  return typeCard['value'];
+}
+
 export default ElasticBlockHelpers;

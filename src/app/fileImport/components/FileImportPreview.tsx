@@ -71,7 +71,6 @@ const { List } = Immutable;
 export interface Props
 {
   previewRows: List<List<string>>;
-  columnsCount: number;
   primaryKey: number;
 
   columnsToInclude: List<boolean>;
@@ -84,8 +83,7 @@ export interface Props
 
   uploadInProgress: boolean;
   elasticUpdate: boolean;
-
-  file: File;
+  exporting: boolean;
 }
 
 @Radium
@@ -213,12 +211,19 @@ class FileImportPreview extends TerrainComponent<Props>
       alert('Please enter a template name');
       return;
     }
-    Actions.saveTemplate(this.state.templateText);
+    Actions.saveTemplate(this.state.templateText, this.props.exporting);
   }
 
   public handleUploadFile()
   {
-    Actions.uploadFile();
+    if (this.props.exporting)
+    {
+      Actions.exportFile();
+    }
+    else
+    {
+      Actions.importFile();
+    }
   }
 
   public renderTemplate()

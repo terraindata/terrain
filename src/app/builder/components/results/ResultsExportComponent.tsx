@@ -59,10 +59,11 @@ import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import FileImportPreviewColumn from '../../../fileImport/components/FileImportPreviewColumn';
+import FileImportPreviewRow from '../../../fileImport/components/FileImportPreviewRow';
+import Actions from '../../../fileImport/data/FileImportActions';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
 import Result from '../results/Result';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -147,12 +148,12 @@ export class ResultsExportComponent extends TerrainComponent<Props>
 
   public handleExport()
   {
-    Actions.exportResults(this.props.handleESresultExport);
+    Actions.exportFile();
   }
 
   public renderTable()
   {
-    const { columnNames, columnsToInclude, columnTypes, primaryKey } = this.props.exportState;
+    const { columnNames, columnsToInclude, columnTypes, primaryKey, previewRows } = this.props.exportState;
     return (
       <div
         className='fe-preview-table-container'
@@ -162,7 +163,7 @@ export class ResultsExportComponent extends TerrainComponent<Props>
         >
           {
             columnNames.map((value, key) =>
-              <FileExportColumn
+              <FileImportPreviewColumn
                 key={key}
                 columnId={key}
                 columnName={columnNames.get(key)}
@@ -178,18 +179,18 @@ export class ResultsExportComponent extends TerrainComponent<Props>
             ).toArray()
           }
         </div>
-        {/*<div*/}
-        {/*className='fi-preview-rows-container'*/}
-        {/*>*/}
-        {/*{*/}
-        {/*this.props.previewRows.map((items, key) =>*/}
-        {/*<FileImportPreviewRow*/}
-        {/*key={key}*/}
-        {/*items={items}*/}
-        {/*/>,*/}
-        {/*)*/}
-        {/*}*/}
-        {/*</div>*/}
+        <div
+          className='fi-preview-rows-container'
+        >
+          {
+            previewRows.map((items, key) =>
+              <FileImportPreviewRow
+                key={key}
+                items={items}
+              />,
+            )
+          }
+        </div>
       </div>
     );
   }
@@ -230,7 +231,7 @@ export class ResultsExportComponent extends TerrainComponent<Props>
                 borderColor(Colors().border1, Colors().border3),
                 backgroundColor(Colors().bg3),
               ]}
-              onClick={this.props.handleESresultExport}
+              onClick={this.handleExport}
             >
               Export
             </div>
