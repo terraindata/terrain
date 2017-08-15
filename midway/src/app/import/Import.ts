@@ -48,6 +48,7 @@ import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
+import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
 import * as _ from 'underscore';
 import * as winston from 'winston';
@@ -1204,28 +1205,24 @@ export class Import
       winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
 
       winston.info('opening files for upsert...');
-      let totalReads: number = 0;
-      while (totalReads < this.chunkCount)
+      const queue = new promiseQueue(this.MAX_ACTIVE_READS, this.chunkCount);
+      let counter: number = 0;
+      for (let num = 0; num < this.chunkCount; num++)
       {
-        const promises: Array<Promise<void>> = [];
-        const readNum: number = Math.min(this.MAX_ACTIVE_READS, this.chunkCount - totalReads);
-        for (let num = totalReads; num < totalReads + readNum; num++)
-        {
-          promises.push(this._readFileAndUpsert(imprt, database, insertTable, num));
-        }
-        try
-        {
-          await Promise.all(promises);
-        }
-        catch (err)
-        {
-          return reject('Failed to read from temp file: ' + String(err));
-        }
-        totalReads += readNum;
+        queue.add(() =>
+          new Promise<void>(async (thisResolve, thisReject) =>
+          {
+            await this._readFileAndUpsert(imprt, database, insertTable, num);
+            counter++;
+            if (counter === this.chunkCount)
+            {
+              await this._deleteStreamingTempFolder();
+              winston.info('deleted streaming temp folder');
+              resolve();
+            }
+            thisResolve();
+          }));
       }
-      await this._deleteStreamingTempFolder();
-      winston.info('deleted streaming temp folder');
-      resolve();
     });
   }
 
