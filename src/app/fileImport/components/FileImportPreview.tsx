@@ -159,6 +159,11 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.changeElasticUpdate();
   }
 
+  public deletePrimaryKey(columnName: string)
+  {
+    Actions.changePrimaryKey(this.props.columnNames.indexOf(columnName));
+  }
+
   public handleTemplateChange(templateId: number)
   {
     this.setState({
@@ -271,6 +276,48 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderPrimaryKeys()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-pkeys'
+      >
+        {
+          this.props.primaryKeys.size > 0 ?
+            this.props.primaryKeys.map((pkey) =>
+              <div
+                key={pkey}
+                className='flex-shrink fi-preview-pkeys-pkey'
+                style={{
+                  background: Colors().bg1,
+                  text: Colors().text1,
+                }}
+              >
+                {
+                  this.props.columnNames.get(pkey)
+                }
+                <span
+                  className='fi-preview-pkeys-pkey-delete clickable'
+                  onClick={() => this.deletePrimaryKey(this.props.columnNames.get(pkey))}
+                >
+                  x
+                </span>
+              </div>,
+            )
+            :
+            <div
+              className='flex-shrink fi-preview-pkeys-nokey'
+              style={{
+                text: Colors().text1,
+              }}
+            >
+              No Primary Keys Selected
+            </div>
+        }
+      </div>
+    );
+  }
+
   public renderTable()
   {
     return (
@@ -314,39 +361,58 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderTopBar()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-topbar'
+      >
+        {this.renderPrimaryKeys()}
+        {this.renderTemplate()}
+      </div>
+    );
+  }
+
+  public renderBottomBar()
+  {
+    return (
+      <div
+        className='fi-import-button-wrapper'
+      >
+        <div
+          className='fi-preview-update'
+        >
+          <CheckBox
+            checked={this.props.elasticUpdate}
+            onChange={this.handleElasticUpdateChange}
+          />
+          <span
+            className='clickable'
+            onClick={this.handleElasticUpdateChange}
+          >
+            Join against any existing entries
+            </span>
+        </div>
+        <div
+          className='fi-preview-import-button'
+          onClick={this.handleUploadFile}
+          style={buttonColors()}
+        >
+          Import
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
     return (
       <div
         className='fi-preview'
       >
-        {this.renderTemplate()}
+        {this.renderTopBar()}
         {this.renderTable()}
-        <div
-          className='fi-import-button-wrapper'
-        >
-          <div
-            className='fi-preview-update'
-          >
-            <CheckBox
-              checked={this.props.elasticUpdate}
-              onChange={this.handleElasticUpdateChange}
-            />
-            <span
-              className='clickable'
-              onClick={this.handleElasticUpdateChange}
-            >
-              Join against any existing entries
-            </span>
-          </div>
-          <div
-            className='fi-preview-import-button'
-            onClick={this.handleUploadFile}
-            style={buttonColors()}
-          >
-            Import
-          </div>
-        </div>
+        {this.renderBottomBar()}
         {
           this.props.uploadInProgress &&
           <div className='fi-preview-loading-container'>
