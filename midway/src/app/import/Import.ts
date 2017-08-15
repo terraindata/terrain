@@ -48,6 +48,7 @@ import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
+import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
 import * as _ from 'underscore';
 import * as winston from 'winston';
@@ -108,7 +109,6 @@ export class Import
   private chunkCount: number;
   private chunkQueue: object[];
   private nextChunk: string;
-  private readStream: stream.Readable;
 
   public async export(exprt: ExportConfig): Promise<stream.Readable | string>
   {
@@ -373,12 +373,11 @@ export class Import
       await this._deleteStreamingTempFolder();
       await Util.mkdir(this.STREAMING_TEMP_FOLDER);
 
-      this.readStream = file;
       this.chunkQueue = [];
       this.nextChunk = '';
       this.chunkCount = 0;
       let contents: string = '';
-      this.readStream.on('data', async (chunk) =>
+      file.on('data', async (chunk) =>
       {
         contents += chunk.toString();
         if (contents.length > this.CHUNK_SIZE)
@@ -393,25 +392,27 @@ export class Import
           contents = '';
           if (this.chunkQueue.length >= this.MAX_ALLOWED_QUEUE_SIZE)
           {
-            this.readStream.pause();
-          }
-          try
-          {
-            await this._writeNextChunk(imprtConf);
-          }
-          catch (e)
-          {
-            await this._deleteStreamingTempFolder();
-            return reject(e);
+            (file as stream.Readable).pause();     // hack around silly lint error
+            try
+            {
+              // do not read the last one in case "isLast" still needs to be set through the "end" event below
+              await this._writeFromChunkQueue(imprtConf, 1);
+            }
+            catch (e)
+            {
+              await this._deleteStreamingTempFolder();
+              return reject(e);
+            }
+            (file as stream.Readable).resume();     // hack around silly lint error
           }
         }
       });
-      this.readStream.on('error', async (e) =>
+      file.on('error', async (e) =>
       {
         await this._deleteStreamingTempFolder();
         return reject(e);
       });
-      this.readStream.on('end', async () =>
+      file.on('end', async () =>
       {
         if (contents !== '')
         {
@@ -433,17 +434,14 @@ export class Import
           }
           this.chunkQueue[this.chunkQueue.length - 1]['isLast'] = true;
         }
-        while (this.chunkQueue.length > 0)
+        try
         {
-          try
-          {
-            await this._writeNextChunk(imprtConf);
-          }
-          catch (e)
-          {
-            await this._deleteStreamingTempFolder();
-            return reject(e);
-          }
+          await this._writeFromChunkQueue(imprtConf, 0);
+        }
+        catch (e)
+        {
+          await this._deleteStreamingTempFolder();
+          return reject(e);
         }
 
         try
@@ -1216,28 +1214,24 @@ export class Import
       winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
 
       winston.info('opening files for upsert...');
-      let totalReads: number = 0;
-      while (totalReads < this.chunkCount)
+      const queue = new promiseQueue(this.MAX_ACTIVE_READS, this.chunkCount);
+      let counter: number = 0;
+      for (let num = 0; num < this.chunkCount; num++)
       {
-        const promises: Array<Promise<void>> = [];
-        const readNum: number = Math.min(this.MAX_ACTIVE_READS, this.chunkCount - totalReads);
-        for (let num = totalReads; num < totalReads + readNum; num++)
-        {
-          promises.push(this._readFileAndUpsert(imprt, database, insertTable, num));
-        }
-        try
-        {
-          await Promise.all(promises);
-        }
-        catch (err)
-        {
-          return reject('Failed to read from temp file: ' + String(err));
-        }
-        totalReads += readNum;
+        queue.add(() =>
+          new Promise<void>(async (thisResolve, thisReject) =>
+          {
+            await this._readFileAndUpsert(imprt, database, insertTable, num);
+            counter++;
+            if (counter === this.chunkCount)
+            {
+              await this._deleteStreamingTempFolder();
+              winston.info('deleted streaming temp folder');
+              resolve();
+            }
+            thisResolve();
+          }));
       }
-      await this._deleteStreamingTempFolder();
-      winston.info('deleted streaming temp folder');
-      resolve();
     });
   }
 
@@ -1341,8 +1335,21 @@ export class Import
     return '';
   }
 
+  /* streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file */
+  private async _writeFromChunkQueue(imprt: ImportConfig, targetQueueSize: number): Promise<void[]>
+  {
+    const promises: Array<Promise<void>> = [];
+    while (this.chunkQueue.length > targetQueueSize)
+    {
+      const chunkObj: object = this.chunkQueue.shift() as object;
+      promises.push(this._writeItemsFromChunkToFile(imprt, chunkObj['chunk'], chunkObj['isLast'], this.chunkCount));
+      this.chunkCount++;
+    }
+    return Promise.all(promises);
+  }
+
   /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file */
-  private async _writeItemsFromChunkToFile(imprt: ImportConfig, chunk: string, isLast: boolean): Promise<void>
+  private async _writeItemsFromChunkToFile(imprt: ImportConfig, chunk: string, isLast: boolean, num: number): Promise<void>
   {
     return new Promise<void>(async (resolve, reject) =>
     {
@@ -1417,7 +1424,7 @@ export class Import
       try
       {
         winston.info('opening file for writing...');
-        await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(this.chunkCount),
+        await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
           JSON.stringify(items), { flag: 'wx' });
         winston.info('wrote items to file.');
       }
@@ -1425,24 +1432,8 @@ export class Import
       {
         return reject('Failed to dump to temp file: ' + String(err));
       }
-      this.chunkCount++;
       resolve();
     });
-  }
-
-  /* streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file */
-  private async _writeNextChunk(imprt: ImportConfig): Promise<void>
-  {
-    if (this.chunkQueue.length === 0 || (this.chunkQueue.length === 1 && !this.chunkQueue[0]['isLast']))
-    {
-      return;
-    }
-    const chunkObj: object = this.chunkQueue.shift() as object;
-    if (this.chunkQueue.length < this.MAX_ALLOWED_QUEUE_SIZE)
-    {
-      this.readStream.resume();
-    }
-    return this._writeItemsFromChunkToFile(imprt, chunkObj['chunk'], chunkObj['isLast']);
   }
 }
 
