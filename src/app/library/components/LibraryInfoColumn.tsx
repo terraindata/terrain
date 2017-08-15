@@ -158,22 +158,26 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     {
       return null;
     }
-
+    const db = this.props.algorithm.db;
     return (
-      <div>
-        <div className='library-info-line'>
-          <div>
-            Default Database
+      <div className='library-info-line'>
+        <div className='library-info-table'>
+          <div className='library-info-row'>
+            <div className='library-info-row-data'>
+              Database
+            </div>
+            <div className='library-info-row-data'>
+              {db.name}
+            </div>
           </div>
-          <Dropdown
-            selectedIndex={this.state.dbs && this.state.dbs.findIndex(
-              (db) => db.id === this.props.algorithm.db.id,
-            )}
-            options={this.state.dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
-            onChange={this.handleAlgorithmDbChange}
-            canEdit={isBuilder || isSuperUser}
-            className='bic-db-dropdown'
-          />
+          <div className='library-info-row'>
+            <div className='library-info-row-data'>
+              Language
+            </div>
+            <div className='library-info-row-data'>
+              {db.type}
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -96,7 +96,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 {
   if (!valueInfo)
   {
-    return make(Blocks, 'eqlnull');
+    return make(Blocks, 'eqlnull', null, true);
   }
 
   const valueMap: { value?: any, cards?: List<Card> } = {};
@@ -116,7 +116,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       Blocks, 'elasticFilter',
       {
         filters: List(filters),
-      });
+      }, true);
   }
   else if (isScoreCard(valueInfo))
   {
@@ -133,7 +133,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       Blocks, 'elasticScore',
       {
         weights: List(weights),
-      });
+      }, true);
   }
 
   const clauseCardType = 'eql' + valueInfo.clause.type;
@@ -164,7 +164,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     ));
   }
 
-  return make(Blocks, clauseCardType, valueMap);
+  return make(Blocks, clauseCardType, valueMap, true);
 };
 
 function isFilterCard(valueInfo: ESValueInfo): boolean
@@ -249,7 +249,7 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
       value,
       boolQuery,
       filterOp,
-    });
+    }, true);
   });
 
   return filterBlocks;
@@ -275,16 +275,16 @@ function parseElasticWeightBlock(obj: object): Block
       make(Blocks, 'scorePoint', {
         value: obj['ranges'][i],
         score: obj['outputs'][i],
-      }));
+      }, true));
   }
 
   const card = make(Blocks, 'elasticTransform', {
     input: obj['numerators'][0][0],
     scorePoints: List(scorePoints),
-  });
+  }, true);
 
   return make(Blocks, 'elasticWeight', {
     key: card,
     weight: obj['weight'],
-  });
+  }, true);
 }

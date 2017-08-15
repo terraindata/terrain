@@ -50,7 +50,8 @@
   .login-row {
     position: relative;
     margin-bottom: @m / 2;
-    
+    border: 1px solid;
+
     .login-label {
       position: absolute;
       top: 6px;
@@ -62,13 +63,8 @@
     .login-input-field {
       font-size: 14px;
       width: 100%;
-      border: 1px solid #ccc;
       border-radius: 4px;
       padding-left: @m;
-      color: #617214;
-      // :hover{
-      //   border: none !important;
-      // }
     }
   }
   
@@ -79,13 +75,11 @@
         transform: translateX(-100%);
         padding-right: 18px;
       }
-    }
+    } 
   }
 
   .login-submit-button-wrapper {
     .login-submit-button {
-      color: #fff;
-      background: #50594A;
       font-size: 14px;
       display: inline-block;
       padding: 6px 24px;
@@ -93,10 +87,6 @@
       cursor: pointer;
       
       .transition;
-      
-      &:hover {
-        background: lighten(saturate(#50594A, 20%), 10%);
-      }
     }
   }
 

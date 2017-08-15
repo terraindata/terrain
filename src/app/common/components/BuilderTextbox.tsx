@@ -405,7 +405,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // var card = cards.get(0);
     const color = card.static.colors[0] as string;
     const title: string = card.static.title;
-    const preview = card.closed ? null : BlockUtils.getPreview(card);
+    const preview = BlockUtils.getPreview(card);
     // }
     // else
     // {
@@ -440,17 +440,9 @@ class BuilderTextbox extends TerrainComponent<Props>
             </div>
             <div className='builder-tb-cards-input-value-text'>
               {
-                title
+                preview
               }
             </div>
-            {
-              preview &&
-              <div className='card-preview'>
-                {
-                  preview
-                }
-              </div>
-            }
             {
               !card['cannotBeMoved'] &&
               this.renderSwitch()
