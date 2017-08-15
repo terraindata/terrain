@@ -129,6 +129,7 @@ interface State
   selectedDomain: any;
   zoomDomain: any;
   visibleDatasets: List<ID>;
+  highlightDataset: ID;
   datasetColors: any;
 }
 
@@ -143,6 +144,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     selectedDomain: {},
     zoomDomain: {},
     visibleDatasets: null,
+    highlightDataset: null,
     datasetColors: {},
   };
 
@@ -192,37 +194,72 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
   public renderData()
   {
     const { datasets } = this.props;
-    const { visibleDatasets } = this.state;
+    const { visibleDatasets, highlightDataset } = this.state;
     const areas = [];
     const scatters = [];
+
+    let areaToHightlight = null;
+    let scatterToHightlight = null;
 
     datasets.forEach((ds, key) =>
     {
       if (visibleDatasets.includes(key))
       {
-        const dsIndex = visibleDatasets.indexOf(key);
-        areas.push(
-          <VictoryArea
-            key={key}
-            data={ds.data.map((d) => Object.assign({}, d, { l: true }))}
-            name={`area-${key}`}
-            style={{ data: { fill: this.getDatasetColor(key) } }}
-            interpolation={config.topChart.interpolation}
-            x='time'
-            y='value'
-          />,
-        );
-        scatters.push(
-          <VictoryScatter
-            key={key}
-            size={(datum, active) => active ? 5 : 0}
-            data={ds.data}
-            x='time'
-            y='value'
-          />,
-        );
+        if (key !== highlightDataset) {
+          areas.push(
+            <VictoryArea
+              key={key}
+              name={`area-${key}`}
+              style={{ data: { fill: this.getDatasetColor(key) } }}
+              data={ds.data}
+              interpolation={config.topChart.interpolation}
+              x='time'
+              y='value'
+            />,
+          );
+          scatters.push(
+            <VictoryScatter
+              key={key}
+              data={ds.data}
+              size={0}
+              x='time'
+              y='value'
+            />,
+          );
+        }
+        else {
+          areaToHightlight = (
+            <VictoryArea
+
+              name={`area-${key}`}
+              key={key}
+              style={{ data: { fill: this.getDatasetColor(key) } }}
+              interpolation={config.topChart.interpolation}
+              x='time'
+              y='value'
+            />
+          );
+
+          scatterToHightlight = (
+            <VictoryScatter
+              key={key}
+              size={(datum, active) => active ? 5 : 0}
+              data={ds.data}
+              x='time'
+              y='value'
+            />
+          );
+        }
       }
     });
+
+    if (areaToHightlight !== null) {
+      areas.push(areaToHightlight);
+    }
+
+    if (scatterToHightlight !== null) {
+      scatters.push(scatterToHightlight);
+    }
 
     return { areas, scatters };
   }
@@ -281,11 +318,12 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
         target: 'data',
         eventKey: 'all',
         mutation: (areaProps) => {
+          this.setState({ highlightDataset: props.datum.id });
           return { 
             style: Object.assign(
               {},
               areaProps.style,
-              { fill: this.getDatasetColor(props.datum.id), strokeWidth: 3, fillOpacity: 0.6 }
+              { fill: this.getDatasetColor(props.datum.id), strokeWidth: 3, fillOpacity: 0.7 }
             ),
           }
         },
