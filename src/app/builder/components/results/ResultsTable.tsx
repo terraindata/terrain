@@ -54,7 +54,6 @@ import * as _ from 'underscore';
 
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
-import { MenuOption } from '../../../common/components/Menu';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
@@ -85,13 +84,6 @@ export default class ResultsTable extends TerrainComponent<Props>
     rows: List([]),
     selectedIndexes: List([]),
   };
-
-  public menuOptions: List<MenuOption> = List([
-    {
-      text: 'Spotlight',
-      onClick: this.spotlight,
-    },
-  ]);
 
   public componentWillReceiveProps(nextProps: Props)
   {
@@ -268,6 +260,7 @@ export default class ResultsTable extends TerrainComponent<Props>
   public handleCellClick(r: number, c: number)
   {
     this.props.onExpand(r);
+    this.spotlight(r, c);
   }
 
   public onRowsSelected(rows)
@@ -338,12 +331,10 @@ export default class ResultsTable extends TerrainComponent<Props>
     this.setState({ rows: this.props.results });
   }
 
-  public spotlight(menuIndex: number, rc: string)
+  public spotlight(row: number, col: number)
   {
     // TODO
-    const row = rc.split('-')[0];
-    const col = rc.split('-')[1];
-    const result = this.props.results && this.props.results.get(+row);
+    const result = this.props.results && this.props.results.get(row);
     const id = result.primaryKey;
     const spotlightColor = ColorManager.colorForKey(id);
 
@@ -378,7 +369,6 @@ export default class ResultsTable extends TerrainComponent<Props>
         rowsCount={this.state.rows.size}
         random={this.state.random}
         onCellClick={this.handleCellClick}
-        menuOptions={this.menuOptions}
         rowKey={'id' /*TODO*/}
         rowSelection={{
           showCheckbox: true,
