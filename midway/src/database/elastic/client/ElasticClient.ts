@@ -160,6 +160,16 @@ class ElasticClient
     this.delegate.search(params, callback);
   }
 
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
+   */
+  public scroll<T>(params: Elastic.ScrollParams,
+    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  {
+    this.log('scroll', params);
+    this.delegate.scroll(params, callback);
+  }
+
   public getDelegate(): Elastic.Client
   {
     return this.delegate;

@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import { users } from '../users/UserRouter';
 import * as Util from '../Util';
-import { Import, ImportConfig } from './Import';
+import { ExportConfig, Import, ImportConfig } from './Import';
+import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
@@ -59,36 +59,41 @@ export const imprt: Import = new Import();
 Router.post('/', async (ctx, next) =>
 {
   winston.info('importing to database');
-  const { files, fields } = await asyncBusboy(ctx.req);
-  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-  if (user === null)
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
   {
     ctx.status = 400;
     return;
   }
 
-  Util.verifyParameters(fields, ['dbid', 'dbname', 'tablename', 'filetype']);
-  Util.verifyParameters(fields, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
+  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKey', 'transformations']);
   // optional parameters: update, hasCsvHeader
 
-  ctx.body = await imprt.upsert(files, fields, false);
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
+});
+
+Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const exprtConf: ExportConfig = ctx.request.body.body;
+  Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
+  ctx.body = await imprt.export(exprtConf);
 });
 
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
-  const { files, fields } = await asyncBusboy(ctx.req);
-  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-  if (user === null)
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
   {
     ctx.status = 400;
     return;
   }
 
-  Util.verifyParameters(fields, ['templateID', 'filetype']);
+  Util.verifyParameters(authStream['fields'], ['filetype', 'templateID']);
   // optional parameters: update, hasCsvHeader
 
-  ctx.body = await imprt.upsert(files, fields, true);
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });
 
 export default Router;
