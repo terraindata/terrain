@@ -77,8 +77,6 @@ Router.post('/', async (ctx, next) =>
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  console.log('???!');
-  console.log(HA);
   const exprtConf: ExportConfig = ctx.request.body.body;
   Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
   const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
