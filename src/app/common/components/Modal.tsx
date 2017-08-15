@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
@@ -66,6 +67,7 @@ export interface Props
   onConfirm?: () => void;
   onClose: () => void;
   children?: any;
+  childrenMessage?: string;
   thirdButtonText?: string;
   onThirdButton?: () => void;
   pre?: boolean;
@@ -74,8 +76,10 @@ export interface Props
   initialTextboxValue?: string;
   textboxPlaceholderValue?: string;
   onTextboxValueChange?: (newValue: string) => void;
+  allowOverflow?: boolean;
 }
 
+@Radium
 class Modal extends TerrainComponent<Props>
 {
   public closeModalSuccess()
@@ -110,6 +114,7 @@ class Modal extends TerrainComponent<Props>
             className={classNames({
               'modal-content': true,
               'modal-content-fill': this.props.fill,
+              'modal-content-allow-overflow': this.props.allowOverflow,
             })}
           >
             <div
@@ -161,7 +166,7 @@ class Modal extends TerrainComponent<Props>
               }
               {
                 this.props.showTextbox &&
-                <input
+                <input style={MODAL_INPUT_STYLE}
                   type='text'
                   className='standard-input'
                   placeholder={this.props.textboxPlaceholderValue}
@@ -169,6 +174,18 @@ class Modal extends TerrainComponent<Props>
                   value={this.props.textboxValue}
                   onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
                 />
+              }
+              {
+                this.props.childrenMessage &&
+                React.cloneElement(
+                  msgTag,
+                  {
+                    className: classNames({
+                      'modal-message': true,
+                    }),
+                    children: this.props.childrenMessage,
+                  },
+                )
               }
               {
                 this.props.children
@@ -236,5 +253,10 @@ const MODAL_HEADER_FOOTER_STYLE = {
 const MODAL_OVERLAY_STYLE = {
   backgroundColor: Colors().fadedOutBg,
 };
+
+const MODAL_INPUT_STYLE = [
+  fontColor(Colors().altText2),
+  backgroundColor(Colors().altBg1),
+];
 
 export default Modal;

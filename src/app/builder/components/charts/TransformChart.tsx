@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import './TransformChart.less';
 
-import * as Colors from '../../../common/Colors';
+import { Colors } from '../../../common/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
@@ -122,6 +122,15 @@ const TransformChart = {
       .attr('class', 'spotlights');
 
     this.update(el, state);
+
+    // apply CSS styles
+
+    const styleCSS = `
+    .transform-chart .tick text {
+      fill: ${Colors().text2} !important;
+    }
+    `;
+    let style = $(el).append(`<style>${styleCSS}</style>`);
   },
 
   update(el, state)
@@ -385,21 +394,21 @@ const TransformChart = {
 
     const spotlight = g.selectAll('.spotlight')
       .data(
-      spotlights.filter((d) => d[inputKey] !== undefined),
-      (d) => d['id'],
+      spotlights.filter((d) => d['fields'][inputKey] !== undefined),
+      (d) => d['fields']['_id'],
     );
 
     const spotlightEnter = spotlight.enter()
       .append('g')
       .attr('class', 'spotlight')
-      .attr('_id', (d) => d['id']);
+      .attr('id', (d) => d['fields']['_id']);
     spotlightEnter.append('circle');
     spotlightEnter.append('rect');
     spotlightEnter.append('text');
 
     const minX = scaleDomainMin(scales.realX);
     const maxX = scaleDomainMax(scales.realX);
-    const getSpotlightX = (d) => Util.valueMinMax(d[inputKey], minX, maxX);
+    const getSpotlightX = (d) => Util.valueMinMax(d['fields'][inputKey], minX, maxX);
 
     const SPOTLIGHT_SIZE = 12;
     const SPOTLIGHT_PADDING = 6;
