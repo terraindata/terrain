@@ -171,7 +171,14 @@ class Library extends TerrainComponent<any>
   {
     const { library: libraryState } = this.props;
 
-    const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
+    const {
+      dbs,
+      groups,
+      algorithms,
+      variants,
+      selectedVariants,
+      groupsOrder
+    } = libraryState;
 
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
@@ -248,6 +255,8 @@ class Library extends TerrainComponent<any>
           />
           <AlgorithmsColumn
             {...{
+              dbs,
+              groups,
               algorithms,
               variants,
               algorithmsOrder,

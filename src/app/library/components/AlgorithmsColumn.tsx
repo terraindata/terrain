@@ -67,17 +67,21 @@ import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
+import BackendInstance from '../../../database/types/BackendInstance';
 
 import './AlgorithmsColumn.less';
 
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
+type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   basePath: string;
+  dbs: List<BackendInstance>;
+  groups: Immutable.Map<ID, Group>;
   algorithms: Immutable.Map<ID, Algorithm>;
   variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
@@ -153,8 +157,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public getNewAlgorithmIndex(): number
   {
-    const group = LibraryStore.getState().groups.get(this.props.groupId);
-    const dbs = LibraryStore.getState().dbs;
+    const { groups, dbs } = this.props;
+    const group = groups.get(this.props.groupId);
+
     if (this.state.newAlgorithmDbIndex !== -1)
     {
       return this.state.newAlgorithmDbIndex;
@@ -232,15 +237,16 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNewAlgorithmCreated(algorithmId)
   {
-    const groupId = LibraryStore.getState().algorithms.get(algorithmId).groupId;
+    const { algorithms } = this.props;
+    const groupId = algorithms.get(algorithmId).groupId;
     browserHistory.push(`/library/${groupId}/${algorithmId}`);
   }
 
   public handleNewAlgorithmCreate()
   {
-    const dbs = LibraryStore.getState().dbs;
+    const { dbs } = this.props;
     const index = this.getNewAlgorithmIndex();
-    Actions.algorithms.createAs(
+    this.props.algorithmActions.createAs(
       this.props.groupId,
       this.state.newAlgorithmTextboxValue,
       dbs.get(index),
@@ -494,7 +500,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderDatabaseDropdown()
   {
-    const dbs = LibraryStore.getState().dbs;
+    const { dbs } = this.props;
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
@@ -513,7 +519,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderCreateAlgorithmModal()
   {
-    const canCreateAlgorithm: boolean = LibraryStore.getState().dbs.size > 0;
+    const { dbs } = this.props;
+    const canCreateAlgorithm: boolean = dbs.size > 0;
     return canCreateAlgorithm ?
       (<Modal
         open={this.state.creatingNewAlgorithm}
