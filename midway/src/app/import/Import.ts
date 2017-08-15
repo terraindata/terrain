@@ -347,7 +347,7 @@ export class Import
       }
 
       const time: number = Date.now();
-      winston.info('checking config and schema...');
+      winston.info('File Import: beginning config/schema check.');
       const configError: string = this._verifyConfig(imprtConf);
       if (configError !== '')
       {
@@ -360,7 +360,7 @@ export class Import
       {
         return reject(mappingForSchema);
       }
-      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished config/schema check. Time (s): ' + String((Date.now() - time) / 1000));
 
       const columns: string[] = Object.keys(imprtConf.columnTypes);
       const insertTable: Tasty.Table = new Tasty.Table(
@@ -889,7 +889,7 @@ export class Import
     return new Promise<object[]>(async (resolve, reject) =>
     {
       let time: number = Date.now();
-      winston.info('parsing data...');
+      winston.info('File Import: beginning data parsing.');
       let items: object[];
       try
       {
@@ -898,9 +898,9 @@ export class Import
       {
         return reject('Error parsing data: ' + String(e));
       }
-      winston.info('got parsed data! (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished parsing data. Time (s): ' + String((Date.now() - time) / 1000));
       time = Date.now();
-      winston.info('transforming and type-checking data...');
+      winston.info('File Import: beginning transform/type-checking of data.');
       if (items.length === 0)
       {
         return reject('No data provided in file to upload.');
@@ -912,7 +912,7 @@ export class Import
       {
         return reject(e);
       }
-      winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished transforming/type-checking data. Time (s): ' + String((Date.now() - time) / 1000));
       resolve(items);
     });
   }
@@ -1178,7 +1178,7 @@ export class Import
   {
     return new Promise<void>(async (resolve, reject) =>
     {
-      winston.info('BEGINNING read file upload number ' + String(num));
+      winston.info('File Import: beginning read/upload file number ' + String(num) + '.');
       let items: object[];
       try
       {
@@ -1186,7 +1186,7 @@ export class Import
           { encoding: 'utf8' }) as string;
 
         const time = Date.now();
-        winston.info('about to upsert to tasty...');
+        winston.info('File Import: about to update/upsert to ES.');
         items = JSON.parse(data);
         if (imprt.update)
         {
@@ -1196,8 +1196,8 @@ export class Import
         {
           await database.getTasty().upsert(insertTable, items);
         }
-        winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
-        winston.info('FINISHED read file upload number ' + String(num));
+        winston.info('File Import: finished update/upsert to ES. Time (s): ' + String((Date.now() - time) / 1000));
+        winston.info('File Import: finished read/upload file number ' + String(num) + '.');
         resolve();
       }
       catch (err)
@@ -1213,11 +1213,10 @@ export class Import
     return new Promise<void>(async (resolve, reject) =>
     {
       const time: number = Date.now();
-      winston.info('putting mapping...');
+      winston.info('File Import: beginning to insert ES mapping.');
       await database.getTasty().getDB().putMapping(insertTable);
-      winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished inserted ES mapping. Time (s): ' + String((Date.now() - time) / 1000));
 
-      winston.info('opening files for upsert...');
       const queue = new promiseQueue(this.MAX_ACTIVE_READS, this.chunkCount);
       let counter: number = 0;
       for (let num = 0; num < this.chunkCount; num++)
@@ -1230,7 +1229,7 @@ export class Import
             if (counter === this.chunkCount)
             {
               await this._deleteStreamingTempFolder();
-              winston.info('deleted streaming temp folder');
+              winston.info('File Import: deleted streaming temp folder.');
               resolve();
             }
             thisResolve();
@@ -1430,14 +1429,13 @@ export class Import
       {
         return reject('Failed to get items: ' + String(e));
       }
-      winston.info('streaming server got items from data');
 
       try
       {
-        winston.info('opening file for writing...');
+        winston.info('File Import: opening temp file for writing.');
         await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
           JSON.stringify(items), { flag: 'wx' });
-        winston.info('wrote items to file.');
+        winston.info('File Import: finished writing items to temp file.');
       }
       catch (err)
       {
