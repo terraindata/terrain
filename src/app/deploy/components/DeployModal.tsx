@@ -77,11 +77,15 @@ class DeployModal extends TerrainComponent<Props>
     changingStatusOf: LibraryTypes.Variant;
     changingStatusTo: ItemStatus;
     defaultChecked: boolean;
+    errorModalMessage: string;
+    showErrorModal: boolean;
   } = {
     changingStatus: false,
     changingStatusOf: null,
     changingStatusTo: null,
     defaultChecked: false,
+    errorModalMessage: '',
+    showErrorModal: false,
   };
 
   public componentDidMount()
@@ -129,10 +133,12 @@ class DeployModal extends TerrainComponent<Props>
       const valueInfo: ESValueInfo = parser.getValueInfo();
       if (parser.getErrors().length > 0)
       {
-        // TODO: handle and display error.
+        this.setState({
+          errorModalMessage: 'Error changing status of ' + this.state.changingStatusOf.name + ' to ' + this.state.changingStatusTo,
+        });
+        this.toggleErrorModal();
         return;
       }
-
       const template = EQLTemplateGenerator.generate(valueInfo);
       const body: object = {
         id,
@@ -173,6 +179,13 @@ class DeployModal extends TerrainComponent<Props>
     );
   }
 
+  public toggleErrorModal()
+  {
+    this.setState({
+      showErrorModal: !this.state.showErrorModal,
+    });
+  }
+
   public handleDefaultCheckedChange(defaultChecked: boolean)
   {
     this.setState({
@@ -206,6 +219,7 @@ class DeployModal extends TerrainComponent<Props>
     }
 
     return (
+      <div>
       <Modal
         open={this.state.changingStatus}
         message={null}
@@ -234,7 +248,14 @@ class DeployModal extends TerrainComponent<Props>
             />
           </div>
         }
+        <Modal
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal}
+          open={this.state.showErrorModal}
+          error={true}
+        />
       </Modal>
+      </div>
     );
   }
 }
