@@ -302,6 +302,7 @@ export class Import
           file,
           filetype: fields['filetype'],
           originalNames: template['originalNames'],
+          primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
           tablename: template['tablename'],
           transformations: template['transformations'],
@@ -324,6 +325,7 @@ export class Import
             file,
             filetype: fields['filetype'],
             originalNames,
+            primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
             tablename: fields['tablename'],
             transformations,
@@ -369,6 +371,7 @@ export class Import
         columns,
         imprtConf.dbname,
         mappingForSchema,
+        imprtConf.primaryKeyDelimiter,
       );
 
       await this._deleteStreamingTempFolder();

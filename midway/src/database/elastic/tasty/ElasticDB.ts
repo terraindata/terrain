@@ -433,7 +433,7 @@ export class ElasticDB implements TastyDB
       (key: string) =>
       {
         return element[key];
-      }).join('-');
+      }).join(table.getPrimaryKeyDelimiter());
   }
 }
 
