@@ -117,15 +117,46 @@ export class ImportTemplates
     );
   }
 
+  public async delete(user: UserConfig, id: number): Promise<ImportTemplateConfig[]>
+  {
+    return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
+    {
+      const results: ImportTemplateConfig[] = await this.get(id);
+      // template id specified but template not found
+      if (results.length === 0)
+      {
+        return reject('Invalid template id passed');
+      }
+
+      const deleted: ImportTemplateConfigStringified[] =
+        await App.DB.delete(this.templateTable, { id }) as ImportTemplateConfigStringified[];
+      resolve(this._parseConfig(deleted) as ImportTemplateConfig[]);
+    });
+  }
+
+  public async get(id?: number): Promise<ImportTemplateConfig[]>
+  {
+    const filter: object = (id !== undefined) ? { id } : {};
+    return this.select([], filter);
+  }
+
   public async getExport(id?: number): Promise<ImportTemplateConfig[]>
   {
-    const filter: object = (id !== undefined) ? { export: true, id } : {};
+    const filter: object = { export: true };
+    if (id !== undefined)
+    {
+      filter['id'] = id;
+    }
     return this.select([], filter);
   }
 
   public async getImport(id?: number): Promise<ImportTemplateConfig[]>
   {
-    const filter: object = (id !== undefined) ? { export: false, id } : {};
+    const filter: object = { export: false };
+    if (id !== undefined)
+    {
+      filter['id'] = id;
+    }
     return this.select([], filter);
   }
 
@@ -145,7 +176,7 @@ export class ImportTemplates
     {
       if (template.id !== undefined)
       {
-        const results: ImportTemplateConfig[] = await this.getImport(template.id);
+        const results: ImportTemplateConfig[] = await this.get(template.id);
         // template id specified but template not found
         if (results.length === 0)
         {

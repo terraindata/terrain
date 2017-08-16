@@ -797,6 +797,7 @@ export const Ajax =
       const payload: object = {
         dbid: connectionId,
         dbname,
+        importOnly: true,
         tablename,
       };
 
