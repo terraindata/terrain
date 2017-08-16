@@ -203,10 +203,10 @@ FileImportReducers[ActionTypes.changeTableText] =
     state
       .set('tableText', action.payload.tableText);
 
-FileImportReducers[ActionTypes.changeCsvHeaderMissing] =
+FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
-      .set('csvHeaderMissing', action.payload.csvHeaderMissing)
+      .set('hasCsvHeader', action.payload.hasCsvHeader)
   ;
 
 FileImportReducers[ActionTypes.changeUploadInProgress] =
@@ -311,7 +311,8 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
       state.transforms,
       state.elasticUpdate,
-      state.csvHeaderMissing,
+      state.hasCsvHeader,
+      state.primaryKeyDelimiter,
       () =>
       {
         alert('success');
@@ -341,6 +342,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
       state.transforms,
       action.payload.templateText,
+      state.primaryKeyDelimiter,
       () =>
       {
         alert('successfully saved template');
@@ -398,7 +400,8 @@ FileImportReducers[ActionTypes.loadTemplate] =
           Immutable.fromJS({ type: 0 }),
       )))
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
-      .set('previewRows', previewRows);
+      .set('previewRows', previewRows)
+      .set('primaryKeyDelimiter', template.primaryKeyDelimiter);
   };
 
 FileImportReducers[ActionTypes.saveFile] =

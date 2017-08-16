@@ -696,7 +696,8 @@ export const Ajax =
       primaryKeys: List<string>,
       transformations: Immutable.List<object>,
       update: boolean,
-      csvHeaderMissing: boolean,
+      hasCsvHeader: boolean,
+      primaryKeyDelimiter: string,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
     )
@@ -717,7 +718,8 @@ export const Ajax =
       formData.append('primaryKeys', JSON.stringify(primaryKeys));
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
-      formData.append('hasCsvHeader', String(!csvHeaderMissing));
+      formData.append('hasCsvHeader', String(hasCsvHeader));
+      formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
 
       const xhr = new XMLHttpRequest();
       xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
@@ -756,6 +758,7 @@ export const Ajax =
       primaryKeys: List<string>,
       transformations: List<object>,
       name: string,
+      primaryKeyDelimiter: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -769,6 +772,7 @@ export const Ajax =
         primaryKeys,
         transformations,
         name,
+        primaryKeyDelimiter,
       };
       const onLoadHandler = (resp) =>
       {

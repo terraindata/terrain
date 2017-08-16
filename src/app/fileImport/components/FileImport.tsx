@@ -392,7 +392,7 @@ class FileImport extends TerrainComponent<any>
 
   public handleCsvHeaderChoice(hasCsvHeader: boolean)
   {
-    Actions.changeCsvHeaderMissing(!hasCsvHeader);
+    Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
     this.setState({
       showCsvHeaderOption: false,

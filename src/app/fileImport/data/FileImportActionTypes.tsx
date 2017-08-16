@@ -52,7 +52,7 @@ const FileImportActionTypes =
     changeServer: '',
     changeDbText: '',
     changeTableText: '',
-    changeCsvHeaderMissing: '',
+    changeHasCsvHeader: '',
     changePrimaryKey: '',
     changePrimaryKeyDelimiter: '',
     chooseFile: '',

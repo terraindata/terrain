@@ -62,7 +62,7 @@ class FileImportStateC extends BaseClass
   public columnsCount: number = 0;
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
-  public csvHeaderMissing: boolean = false;
+  public hasCsvHeader: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
@@ -105,7 +105,7 @@ export interface Template
   originalNames: List<string>;
   columnTypes: Immutable.Map<string, object>;
   transformations: List<object>;
-  csvHeaderMissing: boolean;
+  hasCsvHeader: boolean;
   primaryKeys: List<number>;
 }
 
