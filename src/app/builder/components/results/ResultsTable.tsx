@@ -264,7 +264,8 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public onRowsSelected(rows)
   {
-    const rowIndexes = rows.map((r) => {
+    const rowIndexes = rows.map((r) =>
+    {
       this.spotlight(r.rowIdx);
       return r.rowIdx;
     });
@@ -273,7 +274,8 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public onRowsDeselected(rows)
   {
-    const rowIndexes = rows.map((r) => {
+    const rowIndexes = rows.map((r) =>
+    {
       this.unspotlight(r.rowIdx);
       return r.rowIdx;
     });
