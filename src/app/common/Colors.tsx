@@ -182,6 +182,7 @@ interface Theme
         compound: string,
         join: string,
         geo: string,
+        parameter: string,
       };
 
       //by clause type
@@ -438,6 +439,7 @@ const DARK: Theme =
           compound: '#fad14b',
           join: '#fad14b',
           geo: '#0ee06b',
+          parameter: code.inputParameter,
         },
 
         //by clause type

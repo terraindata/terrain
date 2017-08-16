@@ -389,9 +389,12 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             }
           </CRTarget>
           <div className='results-config-disabled-veil'
-            style={backgroundColor(Color(Colors().bg1).alpha(0.5))} // bg1 but with alpha 0.5
+            style={backgroundColor(Colors().fadedOutBg)}
           >
-            <div className='results-config-disabled-veil-inner'>
+            <div
+              className='results-config-disabled-veil-inner'
+              style={backgroundColor(Colors().bg1)}
+            >
               <b>Custom results view is off.</b>
               Results will display the information returned from the query.
             </div>
