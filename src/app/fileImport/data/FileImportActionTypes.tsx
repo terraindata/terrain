@@ -54,6 +54,7 @@ const FileImportActionTypes =
     changeTableText: '',
     changeCsvHeaderMissing: '',
     changePrimaryKey: '',
+    changePrimaryKeyDelimiter: '',
     chooseFile: '',
     uploadFile: '',
     addTransform: '',

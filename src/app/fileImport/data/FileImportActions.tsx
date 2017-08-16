@@ -72,6 +72,10 @@ const FileImportActions =
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
 
+    changePrimaryKeyDelimiter:
+    (delim: string) =>
+      $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
+
     chooseFile:
     (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
       $(ActionTypes.chooseFile, { filetype, preview, originalNames }),

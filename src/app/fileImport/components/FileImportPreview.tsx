@@ -71,8 +71,8 @@ const { List } = Immutable;
 export interface Props
 {
   previewRows: List<List<string>>;
-  columnsCount: number;
   primaryKeys: List<number>;
+  primaryKeyDelimiter: string;
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
@@ -84,8 +84,6 @@ export interface Props
 
   uploadInProgress: boolean;
   elasticUpdate: boolean;
-
-  file: File;
 }
 
 @Radium
@@ -96,11 +94,13 @@ class FileImportPreview extends TerrainComponent<Props>
     templateText: string,
     templateOptions: List<string>,
     editColumnId: number,
+    showingDelimTextBox: boolean,
   } = {
     templateId: -1,
     templateText: '',
     templateOptions: List([]),
     editColumnId: -1,
+    showingDelimTextBox: false,
   };
 
   public componentDidMount()
@@ -162,6 +162,25 @@ class FileImportPreview extends TerrainComponent<Props>
   public deletePrimaryKey(columnName: string)
   {
     Actions.changePrimaryKey(this.props.columnNames.indexOf(columnName));
+  }
+
+  public changePrimaryKeyDelimiter(delim: string)
+  {
+    Actions.changePrimaryKeyDelimiter(delim);
+  }
+
+  public showDelimTextBox()
+  {
+    this.setState({
+      showingDelimTextBox: true,
+    });
+  }
+
+  public onDelimChange()
+  {
+    this.setState({
+      showingDelimTextBox: false,
+    });
   }
 
   public handleTemplateChange(templateId: number)
@@ -284,24 +303,56 @@ class FileImportPreview extends TerrainComponent<Props>
       >
         {
           this.props.primaryKeys.size > 0 ?
-            this.props.primaryKeys.map((pkey) =>
+            this.props.primaryKeys.map((pkey, index) =>
               <div
                 key={pkey}
-                className='flex-shrink fi-preview-pkeys-pkey'
-                style={{
-                  background: Colors().bg1,
-                  text: Colors().text1,
-                }}
+                className='flex-shrink flex-container fi-preview-pkeys-wrapper'
               >
-                {
-                  this.props.columnNames.get(pkey)
-                }
-                <span
-                  className='fi-preview-pkeys-pkey-delete clickable'
-                  onClick={() => this.deletePrimaryKey(this.props.columnNames.get(pkey))}
+                <div
+                  className='flex-shrink fi-preview-pkeys-pkey'
+                  style={{
+                    background: Colors().bg1,
+                    text: Colors().text1,
+                  }}
                 >
-                  x
-                </span>
+                  {
+                    this.props.columnNames.get(pkey)
+                  }
+                  <span
+                    className='fi-preview-pkeys-pkey-delete clickable'
+                    onClick={() => this.deletePrimaryKey(this.props.columnNames.get(pkey))}
+                  >
+                    x
+                  </span>
+                </div>
+                {
+                  index !== this.props.primaryKeys.size - 1 &&
+                  <div
+                    className='flex-shrink fi-preview-pkeys-delim'
+                    onClick={this.showDelimTextBox}
+                  >
+                    {
+                      this.state.showingDelimTextBox ?
+                        <Autocomplete
+                          value={this.props.primaryKeyDelimiter}
+                          options={null}
+                          onChange={this.changePrimaryKeyDelimiter}
+                          placeholder={'delimiter'}
+                          className={'fi-preview-pkeys-autocomplete'}
+                          disabled={false}
+                          onBlur={this.onDelimChange}
+                        />
+                        :
+                        <span
+                          className='clickable'
+                        >
+                          {
+                            this.props.primaryKeyDelimiter
+                          }
+                        </span>
+                    }
+                  </div>
+                }
               </div>,
             )
             :

@@ -231,6 +231,12 @@ FileImportReducers[ActionTypes.changePrimaryKey] =
       state.set('primaryKeys', state.primaryKeys.push(action.payload.columnId));
   };
 
+FileImportReducers[ActionTypes.changePrimaryKeyDelimiter] =
+  (state, action) =>
+    state
+      .set('primaryKeyDelimiter', action.payload.delim)
+  ;
+
 FileImportReducers[ActionTypes.setColumnToInclude] =
   (state, action) =>
     state
