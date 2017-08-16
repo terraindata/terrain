@@ -390,7 +390,7 @@ FileImportReducers[ActionTypes.loadTemplate] =
 
     return state
       .set('originalNames', List(template.originalNames))
-      .set('primaryKeys', template.primaryKeys.map((pkey) => columnNames.indexOf(pkey)))
+      .set('primaryKeys', List(template.primaryKeys.map((pkey) => columnNames.indexOf(pkey))))
       .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('columnNames', columnNames)
       .set('columnTypes', List(columnNames.map((colName) =>
