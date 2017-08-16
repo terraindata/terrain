@@ -156,14 +156,14 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
     this.state.visibleDatasets = datasets.keySeq().toList();
     this.state.datasetColors = this.mapDatasetColors(datasets);
-    console.log(this.state.datasetColors)
   }
 
   public mapDatasetColors(datasets)
   {
     const datasetColors = {};
 
-    datasets.keySeq().forEach((datasetId, index) => {
+    datasets.keySeq().forEach((datasetId, index) =>
+    {
       datasetColors[datasetId] = colors[index % colors.length];
     });
 
@@ -206,7 +206,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     {
       if (visibleDatasets.includes(key))
       {
-        if (key !== highlightDataset) {
+        if (key !== highlightDataset || highlightDataset === null)
+        {
           areas.push(
             <VictoryArea
               key={key}
@@ -228,12 +229,14 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
             />,
           );
         }
-        else {
+        else
+        {
           areaToHightlight = (
             <VictoryArea
               name={`area-${key}`}
               key={key}
               style={{ data: { fill: this.getDatasetColor(key) } }}
+              data={ds.data}
               interpolation={config.topChart.interpolation}
               x='time'
               y='value'
@@ -277,7 +280,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
         const variant = variants.get(key);
         let labelsStyle = {};
 
-        if (visibleDatasets.includes(key)) {
+        if (visibleDatasets.includes(key))
+        {
           labelsStyle = { textDecoration: 'underline' };
         }
 
