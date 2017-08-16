@@ -75,7 +75,6 @@ export interface Props
 {
   query: Query;
   resultsState: ResultsState;
-  schemaState?: SchemaTypes.SchemaState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
@@ -531,8 +530,8 @@ export class ResultsManager extends TerrainComponent<Props>
       )),
     };
     console.log('exportChanges: ', exportChanges);
-    console.log(Number(this.props.db.id), getIndex(this.props.schemaState), getType(this.props.schemaState));
-    Actions.changeServerDbTable(Number(this.props.db.id), getIndex(this.props.schemaState), getType(this.props.schemaState));
+    console.log(Number(this.props.db.id), getIndex(), getType());
+    Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
 
     this.changeResults(changes, exportChanges);
   }

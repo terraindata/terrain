@@ -203,10 +203,17 @@ FileImportReducers[ActionTypes.changeTableText] =
 
 FileImportReducers[ActionTypes.changeServerDbTable] =
   (state, action) =>
-    state
+  {
+    console.log('set mapping: ', action.payload);
+    return state
       .set('connectionId', action.payload.connectionId)
       .set('dbText', action.payload.dbText)
       .set('tableText', action.payload.tableText);
+  };
+// state
+//   .set('connectionId', action.payload.connectionId)
+//   .set('dbText', action.payload.dbText)
+//   .set('tableText', action.payload.tableText);
 
 FileImportReducers[ActionTypes.changeCsvHeaderMissing] =
   (state, action) =>
@@ -373,7 +380,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       () =>
       {
         alert('successfully saved template');
-        action.payload.fetchTemplates();
+        action.payload.fetchTemplates(action.payload.exporting);
       },
       (err: string) =>
       {
@@ -394,7 +401,15 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       (templatesArr) =>
       {
         const templates: Immutable.List<FileImportTypes.Template> = Immutable.List<FileImportTypes.Template>(templatesArr);
-        action.payload.setTemplates(templates);
+        console.log('templates: ', templates);
+        if (action.payload.exporting)
+        {
+          action.payload.setTemplates(List(templates.filter((template) => !!template.export)));
+        }
+        else
+        {
+          action.payload.setTemplates(List(templates.filter((template) => !template.export)));
+        }
       },
     );
     return state;

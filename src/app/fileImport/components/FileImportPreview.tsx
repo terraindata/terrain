@@ -103,7 +103,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    Actions.fetchTemplates();
+    Actions.fetchTemplates(this.props.exporting);
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.name),
     });

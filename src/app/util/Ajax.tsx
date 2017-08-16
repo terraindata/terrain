@@ -825,6 +825,7 @@ export const Ajax =
         name,
         export: isExport,
       };
+      console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -854,6 +855,7 @@ export const Ajax =
         dbname,
         tablename,
       };
+      console.log('fetch templates payload: ', payload);
 
       Ajax.req(
         'post',

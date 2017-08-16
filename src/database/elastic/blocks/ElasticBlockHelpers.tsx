@@ -135,7 +135,7 @@ export const ElasticBlockHelpers = {
   },
 };
 
-export function getIndex(schemastate): string
+export function getIndex(): string
 {
   const state = BuilderStore.getState();
   const cards = state.query.cards;
@@ -153,7 +153,7 @@ export function getIndex(schemastate): string
   return indexCard['value'];
 }
 
-export function getType(schemastate): string
+export function getType(): string
 {
   const state = BuilderStore.getState();
   const cards = state.query.cards;

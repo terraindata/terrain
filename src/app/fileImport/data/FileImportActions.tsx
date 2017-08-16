@@ -66,7 +66,7 @@ const FileImportActions =
 
     changeServerDbTable:
     (connectionId: number, dbText: string, tableText: string) =>
-      $(ActionTypes.changeTableText, { connectionId, dbText, tableText }),
+      $(ActionTypes.changeServerDbTable, { connectionId, dbText, tableText }),
 
     changeCsvHeaderMissing:
     (csvHeaderMissing: boolean) =>
@@ -113,8 +113,8 @@ const FileImportActions =
       $(ActionTypes.saveTemplate, { templateText, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
     fetchTemplates:
-    () =>
-      $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
+    (exporting: boolean) =>
+      $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
     (templates: List<FileImportTypes.Template>) =>
