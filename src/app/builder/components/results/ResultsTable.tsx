@@ -260,18 +260,23 @@ export default class ResultsTable extends TerrainComponent<Props>
   public handleCellClick(r: number, c: number)
   {
     this.props.onExpand(r);
-    this.spotlight(r, c);
   }
 
   public onRowsSelected(rows)
   {
-    const rowIndexes = rows.map((r) => r.rowIdx);
+    const rowIndexes = rows.map((r) => {
+      this.spotlight(r.rowIdx);
+      return r.rowIdx;
+    });
     this.setState({ selectedIndexes: this.state.selectedIndexes.concat(rowIndexes) });
   }
 
   public onRowsDeselected(rows)
   {
-    const rowIndexes = rows.map((r) => r.rowIdx);
+    const rowIndexes = rows.map((r) => {
+      this.unspotlight(r.rowIdx);
+      return r.rowIdx;
+    });
     this.setState({ selectedIndexes: this.state.selectedIndexes.filter((i) => rowIndexes.indexOf(i) === -1) });
   }
 
@@ -331,18 +336,23 @@ export default class ResultsTable extends TerrainComponent<Props>
     this.setState({ rows: this.props.results });
   }
 
-  public spotlight(row: number, col: number)
+  public spotlight(row: number)
   {
-    // TODO
     const result = this.props.results && this.props.results.get(row);
     const id = result.primaryKey;
-    const spotlightColor = ColorManager.colorForKey(id);
+    const spotlightColor = ColorManager.altColorForKey(id);
 
     const spotlightData = _.extend({}, result);
     spotlightData['name'] = getResultName(result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
+  }
+
+  public unspotlight(row: number)
+  {
+    const result = this.props.results && this.props.results.get(row);
+    spotlightAction(result.primaryKey, null);
   }
 
   public render()
@@ -369,7 +379,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         rowsCount={this.state.rows.size}
         random={this.state.random}
         onCellClick={this.handleCellClick}
-        rowKey={'id' /*TODO*/}
+        rowKey={'_id' /*TODO*/}
         rowSelection={{
           showCheckbox: true,
           enableShiftSelect: true,
