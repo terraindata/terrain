@@ -356,19 +356,6 @@ class BuilderTextbox extends TerrainComponent<Props>
     });
   }
 
-  public shouldComponentUpdate(nextProps, nextState)
-  {
-    return shallowCompare(this, nextProps, nextState);
-    // if (! this.state.focused)
-    // {
-    //   return shallowCompare(this, nextProps, nextState);
-    // }
-    // else
-    // {
-    //   return false;
-    // }
-  }
-
   public render()
   {
     if (this.isText())
