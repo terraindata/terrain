@@ -96,7 +96,7 @@ class CardsToElastic
       const tql = block.static.tql as TQLRecursiveObjectFn;
       let value = tql(block, CardsToElastic.blockToElastic, options);
 
-      if ((value === undefined || (typeof(value) === 'number' && isNaN(value)))
+      if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
         && isInput(block['value'], BuilderStore.getState().query.inputs))
       {
         value = block['value'];
