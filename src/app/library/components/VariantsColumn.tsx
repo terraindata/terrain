@@ -258,7 +258,10 @@ class VariantsColumn extends TerrainComponent<Props>
         );
         break;
     }
+  }
 
+  public handleDragFinish()
+  {
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
@@ -357,6 +360,7 @@ class VariantsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={variant}
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}

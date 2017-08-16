@@ -291,7 +291,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         // no good
         break;
     }
+  }
 
+  public handleDragFinish()
+  {
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
@@ -409,6 +412,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={algorithm}
         canEdit={canEdit}
         canDrag={canDrag}
