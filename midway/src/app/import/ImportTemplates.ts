@@ -117,6 +117,23 @@ export class ImportTemplates
     );
   }
 
+  public async delete(user: UserConfig, id: number): Promise<ImportTemplateConfig[]>
+  {
+    return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
+    {
+      const results: ImportTemplateConfig[] = await this.getImport(id);
+      // template id specified but template not found
+      if (results.length === 0)
+      {
+        return reject('Invalid template id passed');
+      }
+
+      const deleted: ImportTemplateConfigStringified[] =
+        await App.DB.delete(this.templateTable, { id }) as ImportTemplateConfigStringified[];
+      resolve(this._parseConfig(deleted) as ImportTemplateConfig[]);
+    });
+  }
+
   public async getExport(id?: number): Promise<ImportTemplateConfig[]>
   {
     const filter: object = (id !== undefined) ? { export: true, id } : {};
