@@ -72,7 +72,7 @@ export const elasticFilterBlock = _block(
   {
     field: '',
     value: undefined,
-    boolQuery: '',
+    boolQuery: 'must',
     filterOp: '=',
 
     static: {
