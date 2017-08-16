@@ -144,7 +144,7 @@ export class Users
     });
   }
 
-  public async update(isSuperUser: boolean, user: UserConfig): Promise<UserConfig>
+  public async update(user: UserConfig): Promise<UserConfig>
   {
     return new Promise<UserConfig>(async (resolve, reject) =>
     {
@@ -155,10 +155,6 @@ export class Users
       }
 
       const oldUser = results[0];
-      if (!isSuperUser && (user.isDisabled !== undefined || user.isSuperUser !== undefined))
-      {
-        return reject('Only superuser can change user privileges or status');
-      }
 
       // authenticate if email change or password change
       if (user.email !== oldUser.email || user.oldPassword !== undefined)
