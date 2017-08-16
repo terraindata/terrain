@@ -50,6 +50,7 @@ import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
 import
 {
+  createContainer,
   VictoryArea,
   VictoryAxis,
   VictoryBrushContainer,
@@ -184,8 +185,12 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
         areas.push(
           <VictoryArea
             key={key}
-            style={{ data: { fill: colors[dsIndex % colors.length] } }}
-            data={ds.data}
+            style={{
+              data: {
+                fill: colors[dsIndex % colors.length],
+              },
+            }}
+            data={ds.data.map((d) => Object.assign({}, d, { l: true }))}
             interpolation={config.topChart.interpolation}
             x='time'
             y='value'
@@ -194,8 +199,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
         scatters.push(
           <VictoryScatter
             key={key}
+            size={(datum, active) => active ? 5 : 0}
             data={ds.data}
-            size={0}
             x='time'
             y='value'
           />,
@@ -264,6 +269,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     const data = this.renderData();
     const legend = this.renderLegend();
 
+    const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
+
     return (
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
@@ -274,11 +281,15 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
                 theme={VictoryTheme.material}
                 padding={styles.topChart.padding}
                 containerComponent={
-                  <VictoryZoomContainer
+                  <VictoryZoomVoronoiContainer
                     responsive={false}
                     dimension='x'
                     zoomDomain={this.state.zoomDomain}
                     onDomainChange={this.handleZoom}
+                    labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
+                    labelComponent={
+                      <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                    }
                   />
                 }
                 width={width}
@@ -286,20 +297,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               >
                 <VictoryGroup
                   style={styles.topChart.areas}
-                  containerComponent={
-                    <VictoryVoronoiContainer
-                      labels={(d) => `${d.x.toDateString()} => ${d.y}`}
-                      dimension='x'
-                      labelComponent={
-                        <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
-                      }
-                    />
-                  }
-                  labelComponent={<VictoryTooltip activateData={true} cornerRadius={0} flyoutStyle={{ fill: 'white' }} />}
                 >
                   {data.areas}
-                </VictoryGroup>
-                <VictoryGroup>
                   {data.scatters}
                 </VictoryGroup>
                 {legend}
