@@ -64,6 +64,23 @@ module.exports =
     {
         // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly
         extensions: [ ".js", ".tsx", ".jsx", ".ts", ".css", ".less", ".json", ".svg" ],
+        alias: {
+            auth: path.resolve(__dirname, 'src/app/auth'),
+            builder: path.resolve(__dirname, 'src/app/builder'),
+            charts: path.resolve(__dirname, 'src/app/charts'),
+            common: path.resolve(__dirname, 'src/app/common'),
+            deploy: path.resolve(__dirname, 'src/app/deploy'),
+            fileimport: path.resolve(__dirname, 'src/app/fileimport'),
+            library: path.resolve(__dirname, 'src/app/library'),
+            manual: path.resolve(__dirname, 'src/app/manual'),
+            roles: path.resolve(__dirname, 'src/app/roles'),
+            schema: path.resolve(__dirname, 'src/app/schema'),
+            store: path.resolve(__dirname, 'src/app/store'),
+            tql: path.resolve(__dirname, 'src/app/tql'),
+            users: path.resolve(__dirname, 'src/app/users'),
+            util: path.resolve(__dirname, 'src/app/util'),
+            x: path.resolve(__dirname, 'src/app/x'),
+        },
     },
 
     module:
@@ -110,12 +127,12 @@ module.exports =
             DEV: true,
         }),
         new webpack.optimize.AggressiveMergingPlugin(),
-	
+
 	// You can enable this plugin to detect for circular dependencies
 	// new CircularDependencyPlugin({
-	//	// exclude detection of files based on a RegExp 
+	//	// exclude detection of files based on a RegExp
 	//	exclude: /a\.js|node_modules/,
-	//	// add errors to webpack instead of warnings 
+	//	// add errors to webpack instead of warnings
 	//	failOnError: false
 	//    })
     ],

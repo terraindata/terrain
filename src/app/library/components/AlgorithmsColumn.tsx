@@ -343,7 +343,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
     variants.map(
       (v: Variant) =>
-        scores[v.status].score++,
+        scores[v.status] && scores[v.status].score++,
     );
 
     // scores.splice(0, 1); // remove Archived count
