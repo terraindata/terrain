@@ -394,10 +394,9 @@ class VariantsColumn extends TerrainComponent<Props>
   public handlItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
-    const status = ItemStatus[statusString];
-    if (v.status !== status)
+    if (v.status !== statusString)
     {
-      Actions.variants.change(v.set('status', status) as Variant);
+      Actions.variants.change(v.set('status', statusString) as Variant);
     }
   }
 

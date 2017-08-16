@@ -444,10 +444,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
-    const status = ItemStatus[statusString];
-    if (a.status !== status)
+    if (a.status !== statusString)
     {
-      Actions.algorithms.change(a.set('status', status) as Algorithm);
+      Actions.algorithms.change(a.set('status', statusString) as Algorithm);
     }
   }
 
