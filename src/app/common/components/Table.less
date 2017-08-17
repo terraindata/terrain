@@ -1,8 +1,7 @@
 @import "../../common/Common.less";
 
-.react-grid-Grid {
+.react-grid-Grid, .react-grid-Toolbar {
   border: 0px;
-  
   color: #242424;
 }
 
@@ -12,4 +11,12 @@
 
 .react-grid-Cell {
   box-sizing: border-box;
+}
+
+.react-grid-Row.row-selected {
+  background-color: inherit
+}
+
+.react-grid-Row.row-selected .react-grid-Cell {
+  background-color: inherit
 }
