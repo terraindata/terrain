@@ -240,19 +240,41 @@ export default class ResultsTable extends TerrainComponent<Props>
       }
     };
 
+    let rows;
     if (sortDirection === 'NONE')
     {
-      this.setState({ rows: this.props.results });
+      rows = this.props.results;
     }
     else
     {
-      this.setState({ rows: this.state.rows.sort(comparer) });
+      rows = this.state.rows.sort(comparer);
     }
 
     if (this.state.selectedIndexes.size > 0)
     {
-      // todo
-      this.setState({ selectedIndexes: List([]) });
+      const primaryKeys = this.state.selectedIndexes.map(
+        (v) => this.state.rows && this.state.rows.get(v).primaryKey
+      );
+
+      const selectedIndexes = [];
+      rows.map((r, idx) =>
+      {
+        if (primaryKeys.includes(r.fields.get('_id')))
+        {
+          selectedIndexes.push(idx);
+        }
+      });
+
+      this.setState({
+        rows,
+        selectedIndexes: List(selectedIndexes)
+      });
+    }
+    else
+    {
+      this.setState({
+        rows,
+      });
     }
   }
 
@@ -265,7 +287,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     else
     {
       this.setState({
-        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm)))
+        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm.toLowerCase())))
       });
     }
   }
@@ -277,7 +299,7 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public spotlight(row: number)
   {
-    const result = this.props.results && this.props.results.get(row);
+    const result = this.state.rows && this.state.rows.get(row);
     const id = result.primaryKey;
     const spotlightColor = ColorManager.altColorForKey(id);
 
@@ -290,17 +312,22 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public unspotlight(row: number)
   {
-    const result = this.props.results && this.props.results.get(row);
+    const result = this.state.rows && this.state.rows.get(row);
     spotlightAction(result.primaryKey, null);
   }
 
   public rowRenderer(props)
   {
-    if (this.state.selectedIndexes.indexOf(props.idx) > -1)
+    if (this.state.selectedIndexes.includes(props.idx))
     {
-      const result = this.props.results && this.props.results.get(props.idx);
+      const result = this.state.rows && this.state.rows.get(props.idx);
       const id = result.primaryKey;
       const spotlight = this.state.spotlightState.getIn(['spotlights', id])
+      if (spotlight === undefined)
+      {
+        return (<ReactDataGrid.Row {...props} />);
+      }
+
       return (
         <div
           style={{
@@ -311,9 +338,7 @@ export default class ResultsTable extends TerrainComponent<Props>
       );
     }
 
-    return (
-      <ReactDataGrid.Row {...props} />
-    );
+    return (<ReactDataGrid.Row {...props} />);
   }
 
   public render()
@@ -342,7 +367,7 @@ export default class ResultsTable extends TerrainComponent<Props>
             indexes: this.state.selectedIndexes.toJS(),
           }
         }}
-        toolbar={<Toolbar enableFilter={true} />}
+        toolbar={<Toolbar enableFilter={true} filterRowsButtonText={'Search Within Results'} />}
         onAddFilter={this.handleFilterChange}
         onClearFilters={this.clearFilters}
       />

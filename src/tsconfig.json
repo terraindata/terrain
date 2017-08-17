@@ -20,7 +20,6 @@
             "common*": ["app/common/*"],
             "deploy*": ["app/deploy/*"],
             "fileimport*": ["app/fileimport/*"],
-            "library*": ["app/library/*"],
             "manual*": ["app/manual/*"],
             "roles*": ["app/roles/*"],
             "schema*": ["app/schema/*"],
