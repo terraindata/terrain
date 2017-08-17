@@ -149,6 +149,11 @@ class GroupsColumn extends TerrainComponent<Props>
 
   }
 
+  public handleDragFinish()
+  {
+
+  }
+
   public renderGroup(id: ID, index: number)
   {
     const { basePath } = this.props;
@@ -176,6 +181,7 @@ class GroupsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={group}
         canEdit={canEdit || canDrag}
         canDrag={canDrag}

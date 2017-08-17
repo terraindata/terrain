@@ -315,7 +315,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         // no good
         break;
     }
+  }
 
+  public handleDragFinish()
+  {
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
@@ -438,6 +441,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={algorithm}
         canEdit={canEdit}
         canDrag={canDrag}
@@ -473,10 +477,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
-    const status = ItemStatus[statusString];
-    if (a.status !== status && status !== undefined)
+    if (a.status !== statusString && statusString !== undefined)
     {
-      this.props.algorithmActions.change(a.set('status', status) as Algorithm);
+      this.props.algorithmActions.change(a.set('status', statusString) as Algorithm);
     }
   }
 
