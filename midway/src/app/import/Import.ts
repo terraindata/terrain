@@ -477,8 +477,11 @@ export class Import
           {
             throw new Error('Rename transformation must supply colName and newName arguments.');
           }
-          obj[newName] = obj[oldName];
-          delete obj[oldName];
+          if (oldName !== newName)
+          {
+            obj[newName] = obj[oldName];
+            delete obj[oldName];
+          }
           break;
         case 'split':
           const oldCol: string | undefined = transform['colName'];
@@ -496,18 +499,18 @@ export class Import
           {
             throw new Error('Can only split columns containing text.');
           }
-          const ind: number = obj[oldCol].indexOf(splitText);
+          const oldText: string = obj[oldCol];
+          delete obj[oldCol];
+          const ind: number = oldText.indexOf(splitText);
           if (ind === -1)
           {
-            obj[newCols[0]] = obj[oldCol];
+            obj[newCols[0]] = oldText;
             obj[newCols[1]] = '';
-            delete obj[oldCol];
           }
           else
           {
-            obj[newCols[0]] = obj[oldCol].substring(0, ind);
-            obj[newCols[1]] = obj[oldCol].substring(ind + splitText.length);
-            delete obj[oldCol];
+            obj[newCols[0]] = oldText.substring(0, ind);
+            obj[newCols[1]] = oldText.substring(ind + splitText.length);
           }
           break;
         case 'merge':
@@ -524,8 +527,14 @@ export class Import
             throw new Error('Can only merge columns containing text.');
           }
           obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
-          delete obj[startCol];
-          delete obj[mergeCol];
+          if (startCol !== newCol)
+          {
+            delete obj[startCol];
+          }
+          if (mergeCol !== newCol)
+          {
+            delete obj[mergeCol];
+          }
           break;
         case 'duplicate':
           colName = transform['colName'];
@@ -695,7 +704,7 @@ export class Import
           {
             if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
-              return 'Encountered an object whose field "' + key + ' does not match the specified type (' +
+              return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
                 JSON.stringify(imprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
             }
           }
@@ -710,7 +719,7 @@ export class Import
         {
           if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
           {
-            return 'Encountered an object whose field "' + name + ' does not match the specified type (' +
+            return 'Encountered an object whose field "' + name + '"does not match the specified type (' +
               JSON.stringify(imprt.columnTypes[name]) + '): ' + JSON.stringify(obj);
           }
         }
