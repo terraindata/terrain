@@ -906,7 +906,7 @@ export class Import
       winston.info('File Import: beginning transform/type-checking of data.');
       if (items.length === 0)
       {
-        return reject('No data provided in file to upload.');
+        return resolve(items);
       }
       try
       {
@@ -1191,6 +1191,10 @@ export class Import
         const time = Date.now();
         winston.info('File Import: about to update/upsert to ES.');
         items = JSON.parse(data);
+        if (items.length === 0)
+        {
+          return resolve();
+        }
         if (imprt.update)
         {
           await database.getTasty().update(insertTable, items);
