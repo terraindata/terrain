@@ -57,6 +57,7 @@ type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
+type FieldProperty = SchemaTypes.FieldProperty;
 
 export function parseMySQLDbs_m1(db: BackendInstance,
   colsData: object,
@@ -68,7 +69,7 @@ export function parseMySQLDbs_m1(db: BackendInstance,
   });
   const serverId = server.id;
 
-  let databases: IMMap<string, Database> = Map<string, Database>({});
+  let databases: IMMap<string, Database> = Map<string, Database>();
 
   let database = SchemaTypes._Database({
     name: db['name'],
@@ -77,12 +78,13 @@ export function parseMySQLDbs_m1(db: BackendInstance,
   const databaseId = database.id;
   server = server.set('databaseIds', server.databaseIds.push(databaseId));
 
-  let tables: IMMap<string, Table> = Map<string, Table>({});
-  let columns: IMMap<string, Column> = Map<string, Column>({});
-  const indexes: IMMap<string, Index> = Map<string, Index>({});
+  let tables: IMMap<string, Table> = Map<string, Table>();
+  let columns: IMMap<string, Column> = Map<string, Column>();
+  const indexes: IMMap<string, Index> = Map<string, Index>();
+  const fieldProperties: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
 
-  let tableNames = List<string>([]);
-  let columnNamesByTable = Map<string, List<string>>([]);
+  let tableNames = List<string>();
+  let columnNamesByTable = Map<string, List<string>>();
 
   _.map((colsData as any),
     (col: {
@@ -161,6 +163,7 @@ export function parseMySQLDbs_m1(db: BackendInstance,
     tables,
     columns,
     indexes,
+    fieldProperties,
     tableNames,
     columnNames: columnNamesByTable,
   });
@@ -176,7 +179,7 @@ export function parseMySQLDb(rawServer: object,
   });
   const serverId = server.id;
 
-  let databases: IMMap<string, Database> = Map<string, Database>({});
+  let databases: IMMap<string, Database> = Map<string, Database>();
 
   _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
   {
@@ -187,13 +190,14 @@ export function parseMySQLDb(rawServer: object,
     const databaseId = database.id;
     server = server.set('databaseIds', server.databaseIds.push(databaseId));
 
-    let tables: IMMap<string, Table> = Map<string, Table>({});
-    let columns: IMMap<string, Column> = Map<string, Column>({});
-    const indexes: IMMap<string, Index> = Map<string, Index>({});
+    let tables: IMMap<string, Table> = Map<string, Table>();
+    let columns: IMMap<string, Column> = Map<string, Column>();
+    const indexes: IMMap<string, Index> = Map<string, Index>();
+    const fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
 
-    let tableNames = List<string>([]);
-    let columnIds = List<string>([]);
-    let columnNamesByTable = Map<string, List<string>>([]);
+    let tableNames = List<string>();
+    let columnIds = List<string>();
+    let columnNamesByTable = Map<string, List<string>>();
 
     _.each((databaseValue as any),
       (tableFields, tableName, tableList) =>
@@ -255,6 +259,7 @@ export function parseMySQLDb(rawServer: object,
       tables,
       columns,
       indexes,
+      fieldProperties: fieldPropertiesMap,
       tableNames,
       columnNames: columnNamesByTable,
     });
@@ -272,7 +277,7 @@ export function parseElasticDb(elasticServer: object,
   });
   const serverId = server.id;
 
-  let databases: IMMap<string, Database> = Map<string, Database>({});
+  let databases: IMMap<string, Database> = Map<string, Database>();
 
   _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
   {
@@ -283,13 +288,15 @@ export function parseElasticDb(elasticServer: object,
     const databaseId = database.id;
     server = server.set('databaseIds', server.databaseIds.push(databaseId));
 
-    let tables: IMMap<string, Table> = Map<string, Table>({});
-    let columns: IMMap<string, Column> = Map<string, Column>({});
-    const indexes: IMMap<string, Index> = Map<string, Index>({});
+    let tables: IMMap<string, Table> = Map<string, Table>();
+    let columns: IMMap<string, Column> = Map<string, Column>();
+    const indexes: IMMap<string, Index> = Map<string, Index>();
+    let fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
 
-    let tableNames = List<string>([]);
-    let columnIds = List<string>([]);
-    let columnNamesByTable = Map<string, List<string>>([]);
+    let tableNames = List<string>();
+    let columnIds = List<string>();
+    let fieldPropertyIds = List<string>();
+    let columnNamesByTable = Map<string, List<string>>();
 
     _.each((databaseValue as any),
       (tableFields, tableName, tableList) =>
@@ -316,13 +323,39 @@ export function parseElasticDb(elasticServer: object,
 
         _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
         {
-          const column = SchemaTypes._Column({
+          // fieldPropertiesMap = fieldPropertiesMap.clear();
+          fieldPropertyIds = fieldPropertyIds.clear();
+
+          _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName, fieldPropertyList) => {
+            const fieldProperty = SchemaTypes._FieldProperty({
+              name: (fieldPropertyName as any) as string,
+              value: fieldPropertyValue,
+              serverId,
+              databaseId,
+              tableId,
+              columnId: (fieldName as any) as string,
+            });
+
+            fieldPropertiesMap = fieldPropertiesMap.set(fieldProperty.id, fieldProperty);
+
+            fieldPropertyIds = fieldPropertyIds.push(fieldProperty.id);
+          });
+
+          let column = SchemaTypes._Column({
             name: (fieldName as any) as string,
             serverId,
             databaseId,
             tableId,
             datatype: fieldProperties['type'],
+            // fieldProperties: fieldPropertiesMap,
           });
+
+          column = column.set(
+            'fieldPropertyIds', fieldPropertyIds,
+          );
+
+          console.log('column');
+          console.log(column);
 
           columns = columns.set(column.id, column);
 
@@ -351,6 +384,7 @@ export function parseElasticDb(elasticServer: object,
       tables,
       columns,
       indexes,
+      fieldProperties: fieldPropertiesMap,
       tableNames,
       columnNames: columnNamesByTable,
     });

@@ -52,6 +52,7 @@ import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeItem from './SchemaTreeItem';
 const Radium = require('radium');
+import Colors from '../../common/Colors';
 import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
@@ -72,7 +73,7 @@ class State
 }
 
 const NORMAL_STYLE = {
-  borderLeft: ('0.5px solid ' + Styles.colors.active),
+  borderLeft: ('0.5px solid ' + Colors().active),
   paddingLeft: Styles.margin,
 };
 
@@ -128,8 +129,11 @@ class SchemaTreeList extends TerrainComponent<Props>
 
   public render()
   {
+    console.log('props');
+    console.log(this.props);
     if (!this.props.itemIds)
     {
+      console.log('LOADING 1');
       return (
         <div
           className='loading-text'
@@ -138,6 +142,9 @@ class SchemaTreeList extends TerrainComponent<Props>
     }
 
     const { itemIds, itemType, search, label, topLevel } = this.props;
+
+    console.log('itemIds = ');
+    console.log(itemIds);
 
     return (
       <div

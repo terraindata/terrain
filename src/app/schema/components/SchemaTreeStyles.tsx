@@ -47,19 +47,27 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as _ from 'underscore';
+import Colors from '../../common/Colors';
 import Styles from '../../Styles';
 const color = require('color');
 
 const itemHeaderHeight = 22;
 
 const arrowSvgStyles = {
-  width: '12px',
-  fill: Styles.colors.transBlack,
+  'width': '12px',
+  'height': '12px',
+  'fill': Colors().text3,
+  'cursor': 'pointer',
+  // fill: Styles.colors.transBlack,
   // fill: 'rgba(0,0,0,0)',
   // stroke: Styles.colors.transBlack,
   // strokeWidth: 20,
-  cursor: 'pointer',
-  marginLeft: 6,
+  'marginLeft': 6,
+  'position': 'relative',
+  'top': 5,
+  ':hover': {
+    fill: Colors().text2,
+  },
 };
 
 const headerHighlightedColor = color(Styles.colors.active).fade('0.85').string();
@@ -92,11 +100,24 @@ const SchemaTreeStyles =
       Styles.transition,
     ),
 
+    /*arrow: [{
+      'fill': Colors().text3,
+      ':hover': {
+        fill: Colors().text2,
+      },
+      'width': '12px',
+      'cursor': 'pointer',
+      'marginLeft': 6,
+    },
+    Styles.rotate90,
+    Styles.transition,
+    ],*/
+
     arrowOpen: _.extend(
       {},
       arrowSvgStyles,
       {
-        fill: Styles.colors.active,
+        fill: Colors().active,
         // stroke: Styles.colors.active,
       },
       Styles.rotate180,
@@ -111,7 +132,7 @@ const SchemaTreeStyles =
       'borderRadius': 4,
 
       ':hover': {
-        background: headerHighlightedColor,
+        background: Colors().inactiveHover,
       },
     },
     Styles.transition,
@@ -119,15 +140,15 @@ const SchemaTreeStyles =
 
     treeItemHeaderSelected:
     {
-      'background': headerSelectedColor,
+      'background': Colors().inactiveHover,
       ':hover': {
-        background: headerSelectedColor,
+        background: Colors().inactiveHover,
       },
     },
 
     treeItemHeaderHighlighted:
     {
-      background: headerHighlightedColor,
+      background: Colors().inactiveHover,
     },
 
     name: {

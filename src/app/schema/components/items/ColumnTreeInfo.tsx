@@ -74,18 +74,6 @@ export class ColumnTreeInfo extends TerrainComponent<Props>
       <div
         style={Styles.infoPieces as any}
       >
-        {
-          column.isPrimaryKey &&
-          <div
-            style={Styles.infoPiece as any}
-          >
-            <span
-              style={Styles.infoPieceNumber as any}
-            >
-              Primary key
-              </span>
-          </div>
-        }
 
         <div
           style={Styles.infoPiece as any}
@@ -97,28 +85,6 @@ export class ColumnTreeInfo extends TerrainComponent<Props>
           </span>
         </div>
 
-        <div
-          style={Styles.infoPiece}
-        >
-          default: "
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {column.defaultValue}
-          </span>
-          "
-        </div>
-
-        <div
-          style={Styles.infoPiece}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {column.isNullable ? 'nullable' : 'not nullable'}
-          </span>
-        </div>
-
       </div>
     );
   }
@@ -127,8 +93,8 @@ export class ColumnTreeInfo extends TerrainComponent<Props>
 export const columnChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Indexes',
-      type: 'index',
+      label: 'Properties',
+      type: 'fieldProperty',
     },
   ];
 

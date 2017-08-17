@@ -59,6 +59,7 @@ const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 import FadeInOut from '../../common/components/FadeInOut';
+import {fieldPropertyChildrenConfig, FieldPropertyTreeInfo} from './items/FieldPropertyTreeInfo';
 import SchemaTreeList from './SchemaTreeList';
 
 export interface Props
@@ -110,6 +111,13 @@ const typeToRendering: {
     {
       component: ColumnTreeInfo,
       childConfig: columnChildrenConfig,
+      canSelect: true,
+    },
+
+    fieldProperty:
+    {
+      component: FieldPropertyTreeInfo,
+      childConfig: fieldPropertyChildrenConfig,
       canSelect: true,
     },
 
@@ -174,13 +182,17 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
   public renderItemInfo()
   {
+    console.log('here45');
+    console.log(this.state);
     const { item } = this.state;
 
     if (!item)
     {
+      console.log('here456');
       return null;
     }
 
+    console.log('item.type = ' + item.type);
     if (typeToRendering[item.type])
     {
       const Comp = typeToRendering[item.type].component;
@@ -198,19 +210,23 @@ class SchemaTreeItem extends TerrainComponent<Props>
   {
     const { item } = this.state;
 
-    if (!this.state.open)
+    if (!this.state.open || item.type === 'fieldProperty')
     {
       return null;
     }
 
     if (!item)
     {
+      console.log('LOADING 2');
       return (
         <div
           className='loading-text'
         />
       );
     }
+
+    console.log('foobar');
+    console.log(item['fieldPropertyIds']);
 
     return (
       <div
@@ -299,6 +315,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
     let nameText: string | El = <span className='loading-text' />;
 
+    console.log('h383833');
+    console.log(this.state);
     if (item)
     {
       if (this.props.search)
@@ -310,7 +328,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
         nameText = (
           <div>
             {
-              ['table', 'database', 'server'].map(
+              ['column', 'table', 'database', 'server'].map(
                 (type) =>
                 {
                   const id = item[type + 'Id'];
@@ -345,6 +363,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
         // show plain name
         nameText = item.name;
       }
+    } else {
+      console.log('LOADING 3');
     }
 
     return (
@@ -388,12 +408,11 @@ class SchemaTreeItem extends TerrainComponent<Props>
                 onClick={this.handleHeaderClick}
                 onDoubleClick={this.handleHeaderDoubleClick}
               >
+                <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='foo'>
                 <ArrowIcon
                   onClick={this.handleArrowClick}
-                  style={
-                    this.state.open ? Styles.arrowOpen : Styles.arrow
-                  }
                 />
+                </div>
 
                 {
                   this.renderName()

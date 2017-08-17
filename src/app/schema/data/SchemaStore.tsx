@@ -103,7 +103,8 @@ export const SchemaStore: Store<SchemaState> =
                       {
                         if (db['type'] === 'mysql')
                         {
-                          SchemaParser.parseMySQLDb(db, schemaData, SchemaActions.setServer);
+                          // Don't support MySQL for now
+                          // SchemaParser.parseMySQLDb(db, schemaData, SchemaActions.setServer);
                         }
                         else if (db['type'] === 'elastic')
                         {
@@ -112,7 +113,8 @@ export const SchemaStore: Store<SchemaState> =
                       }
                       else
                       {
-                        SchemaParser.parseMySQLDbs_m1(db, schemaData, SchemaActions.addDbToServer);
+                        // Don't support old midway for now
+                        // SchemaParser.parseMySQLDbs_m1(db, schemaData, SchemaActions.addDbToServer);
                       }
                     }
                   },
@@ -147,18 +149,22 @@ export const SchemaStore: Store<SchemaState> =
         action: Action<SchemaTypes.SetServerActionPayload>,
       ) =>
       {
-        const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+        const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
         if (state.servers.size === state.serverCount - 1)
         {
           state = state.set('loading', false).set('loaded', true);
         }
+
+        //console.log('state fp 1 = ');
+        //console.log(state.fieldProperties);
 
         return state
           .setIn(['servers', server.id], server)
           .set('databases', state.databases.merge(databases))
           .set('tables', state.tables.merge(tables))
           .set('columns', state.columns.merge(columns))
-          .set('indexes', state.indexes.merge(indexes));
+          .set('indexes', state.indexes.merge(indexes))
+          .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
         // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
         // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
       },
@@ -169,7 +175,7 @@ export const SchemaStore: Store<SchemaState> =
         action: Action<SchemaTypes.AddDbToServerActionPayload>,
       ) =>
       {
-        const { server, databases, tables, columns, indexes, tableNames, columnNames } = action.payload;
+        const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
 
         let newServer = server;
         if (state.servers.get(server.id))
@@ -178,12 +184,16 @@ export const SchemaStore: Store<SchemaState> =
             state.servers.get(server.id).databaseIds.concat(server.databaseIds));
         }
 
+        //console.log('state fp 2 = ');
+        //console.log(state.fieldProperties);
+
         return state
           .setIn(['servers', server.id], newServer)
           .set('databases', state.databases.merge(databases))
           .set('tables', state.tables.merge(tables))
           .set('columns', state.columns.merge(columns))
-          .set('indexes', state.indexes.merge(indexes));
+          .set('indexes', state.indexes.merge(indexes))
+          .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
         // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
         // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
       },

@@ -62,13 +62,14 @@ class State
 }
 
 @Radium
-export class IndexTreeInfo extends TerrainComponent<Props>
+export class FieldPropertyTreeInfo extends TerrainComponent<Props>
 {
   public state: State = new State();
 
   public render()
   {
     const index = this.props.item;
+    console.log('I MADE IT HERE');
 
     return (
       <div
@@ -80,31 +81,20 @@ export class IndexTreeInfo extends TerrainComponent<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            {index.indexType}
+            HELO!
           </span>
-        </div>
-
-        <div
-          style={Styles.infoPiece}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {index.columnIds.size}
-          </span>
-          columns
         </div>
       </div>
     );
   }
 }
 
-export const indexChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
+export const fieldPropertyChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Fields',
-      type: 'column',
+      label: 'Properties',
+      type: 'fieldProperty',
     },
   ];
 
-export default IndexTreeInfo;
+export default FieldPropertyTreeInfo;
