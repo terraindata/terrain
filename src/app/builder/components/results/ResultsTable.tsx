@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { List, Map } from 'immutable';
 import * as React from 'react';
+import * as ReactDataGrid from 'react-data-grid';
 import { Toolbar } from 'react-data-grid-addons';
 
 import * as _ from 'underscore';
@@ -193,73 +194,9 @@ export default class ResultsTable extends TerrainComponent<Props>
     this.setState({ rows: this.props.results });
   }
 
-  // getKey(col: number): string
-  // {
-  //   let config = this.state.resultsConfig;
-  //   let hasName = this.hasName();
-  //   let hasScore = this.hasScore();
-
-  //   if(col === 0 && hasName)
-  //   {
-  //     return config.name;
-  //   }
-  //   if(col === 0 && hasScore)
-  //   {
-  //     return config.score;
-  //   }
-  //   if(col === 1 && hasName && hasScore)
-  //   {
-  //     return config.score;
-  //   }
-
-  //   let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
-  //   let fieldIndex = col - offset;
-  //   return config.fields.get(fieldIndex);
-  // }
-
   public getRow(i: number): object
   {
-    // TODO
     return this.state.rows.get(i).fields.toJS();
-    // let field = this.getKey(col);
-    // let {results} = this.props;
-    // let {resultsConfig} = this.state;
-    // let primaryKey = getPrimaryKeyFor(results && results.get(i), resultsConfig);
-    // let spotlight = col === 0
-    //   && this.state.spotlightState
-    //   && this.state.spotlightState.getIn(['spotlights', primaryKey]);
-
-    // return (
-    //   <div>
-    //     {
-    //       spotlight &&
-    //         <div
-    //           className='result-spotlight'
-    //           style={{
-    //             background: spotlight.color,
-    //           }}
-    //         />
-    //     }
-    //     {
-    //       getResultValue(results && results.get(i), field, resultsConfig)
-    //     }
-    //   </div>
-    // );
-  }
-
-  // hasScore(): boolean
-  // {
-  //   return this.state.resultsConfig.score !== "";
-  // }
-
-  // hasName(): boolean
-  // {
-  //   return this.state.resultsConfig.name !== "";
-  // }
-
-  public handleCellClick(r: number, c: number)
-  {
-    this.props.onExpand(r);
   }
 
   public onRowsSelected(rows)
@@ -344,7 +281,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     const id = result.primaryKey;
     const spotlightColor = ColorManager.altColorForKey(id);
 
-    const spotlightData = _.extend({}, result);
+    const spotlightData = result.toJS();
     spotlightData['name'] = getResultName(result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
@@ -357,6 +294,28 @@ export default class ResultsTable extends TerrainComponent<Props>
     spotlightAction(result.primaryKey, null);
   }
 
+  public rowRenderer(props)
+  {
+    if (this.state.selectedIndexes.indexOf(props.idx) > -1)
+    {
+      const result = this.props.results && this.props.results.get(props.idx);
+      const id = result.primaryKey;
+      const spotlight = this.state.spotlightState.getIn(['spotlights', id])
+      return (
+        <div
+          style={{
+            backgroundColor: spotlight.color
+          }}>
+          <ReactDataGrid.Row {...props} />
+        </div>
+      );
+    }
+
+    return (
+      <ReactDataGrid.Row {...props} />
+    );
+  }
+
   public render()
   {
     if (!this.state.rows)
@@ -364,14 +323,6 @@ export default class ResultsTable extends TerrainComponent<Props>
       return <InfoArea large='Loading...' />;
     }
 
-    // let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
-    // let fieldCount = this.state.resultsConfig.fields.size + pinnedCols;
-
-    // if(!fieldCount && this.props.results.size)
-    // {
-    //   fieldCount = this.props.results.get(0).fields.size;
-    // }
-    // console.log(this.state.columns);
     return (
       <Table
         onGridSort={this.handleGridSort}
@@ -380,7 +331,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         rowGetter={this.getRow}
         rowsCount={this.state.rows.size}
         random={this.state.random}
-        onCellClick={this.handleCellClick}
+        rowRenderer={this.rowRenderer}
         rowKey={'_id' /*TODO*/}
         rowSelection={{
           showCheckbox: true,
