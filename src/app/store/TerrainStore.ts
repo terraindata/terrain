@@ -48,10 +48,12 @@ import * as Immutable from 'immutable';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
-import { LibraryStoreReducerWrapper } from '../library/data/LibraryStore';
+import LibraryReducer from 'library/data/LibraryReducers';
+import RolesReducer from 'roles/data/RolesReducers';
 
 const reducers = {
-  library: LibraryStoreReducerWrapper,
+  library: LibraryReducer,
+  roles: RolesReducer,
 };
 
 const rootReducer = combineReducers(reducers);
