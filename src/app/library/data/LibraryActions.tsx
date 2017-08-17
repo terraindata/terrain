@@ -232,7 +232,7 @@ const Actions =
       {
         const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
         variant = variant.set('db', algorithm.db).set('language', algorithm.language);
-        $(ActionTypes.variants.move, { variant, index, groupId, algorithmId })
+        return $(ActionTypes.variants.move, { variant, index, groupId, algorithmId })
       },
 
       duplicate:

@@ -460,7 +460,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     const a = this.props.algorithms.get(id);
     const status = ItemStatus[statusString];
-    if (a.status !== status)
+    if (a.status !== status && status !== undefined)
     {
       this.props.algorithmActions.change(a.set('status', status) as Algorithm);
     }
@@ -548,6 +548,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public render()
   {
+    const { algorithms, algorithmsOrder, groupId } = this.props;
+
     return (
       <LibraryColumn
         index={2}
@@ -557,9 +559,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
           this.renderCreateAlgorithmModal()
         }
         {
-          this.props.algorithmsOrder ?
+          algorithmsOrder ?
             (
-              this.props.algorithmsOrder.size ?
+              algorithmsOrder.size ?
                 (
                   <div>
                     {
@@ -574,7 +576,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                 <InfoArea
                   large='No algorithms created, yet.'
                   button={
-                    Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(groupId, 'admin', UserStore, RolesStore)
                       ? 'Create a algorithm' : null
                   }
                   onClick={this.handleNewAlgorithmModalOpen}
