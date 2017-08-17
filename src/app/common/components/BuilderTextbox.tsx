@@ -206,6 +206,12 @@ class BuilderTextbox extends TerrainComponent<Props>
     if (!this.state.focused)
     {
       this.setState({
+        boxValue: value,
+      });
+    }
+    else
+    {
+      this.setState({
         boxValueBuffer: value,
       });
     }

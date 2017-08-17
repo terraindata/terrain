@@ -87,7 +87,8 @@ export interface Props
 class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
-    pointsCache: ScorePoints;
+    pointsCache: ScorePoints; //  this component points
+    pointsBuffer: ScorePoints; // parent component points
     selectedPointIds: IMMap<string, boolean>;
     lastSelectedPointId?: string;
     initialScore?: number;
@@ -100,6 +101,7 @@ class TransformCardChart extends TerrainComponent<Props>
     dragging: boolean;
   } = {
     pointsCache: this.props.points,
+    pointsBuffer: null,
     selectedPointIds: Map<string, boolean>({}),
     moveSeed: 0,
     movedSeed: -1,
@@ -176,6 +178,7 @@ class TransformCardChart extends TerrainComponent<Props>
     ).toList();
     this.setState({
       pointsCache: points,
+      pointsBuffer: null,
     });
     this.debouncedUpdatePoints(points, isConcrete);
     if (isConcrete)
@@ -246,10 +249,17 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public onPointRelease()
   {
+    this.debouncedUpdatePoints.flush();
     this.setState({
       dragging: false,
     });
-    this.debouncedUpdatePoints.flush();
+    if (this.state.pointsBuffer !== null)
+    {
+      this.setState({
+        pointsCache: this.state.pointsBuffer,
+        pointsBuffer: null,
+      });
+    }
   }
 
   public onLineClick(x, y)
@@ -352,10 +362,16 @@ class TransformCardChart extends TerrainComponent<Props>
   // happens on undos/redos
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.points !== this.state.pointsCache && !this.state.dragging)
+    if (!this.state.dragging)
     {
       this.setState({
         pointsCache: nextProps.points,
+      });
+    }
+    else
+    {
+      this.setState({
+        pointsBuffer: nextProps.points,
       });
     }
   }
