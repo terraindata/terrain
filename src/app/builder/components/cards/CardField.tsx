@@ -46,10 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions interface-name no-var-requires
 import * as $ from 'jquery';
-import * as React from 'react';
 import * as Radium from 'radium';
+import * as React from 'react';
 import * as _ from 'underscore';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
@@ -57,7 +58,6 @@ import BuilderComponent from '../BuilderComponent';
 import { CardItem } from './CardComponent';
 import CardDropArea from './CardDropArea';
 import './CardField.less';
-import { backgroundColor, getStyle, Colors, borderColor, fontColor } from '../../../common/Colors';
 const classNames = require('classnames');
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -328,20 +328,20 @@ class CardField extends TerrainComponent<Props>
 
     const removeToolStyle = _.extend({},
       getStyle('fill', Colors().text1),
-      );
+    );
 
     const addToolStyle = _.extend({},
       getStyle('fill', Colors().text1),
       backgroundColor('transparent', Colors().inactiveHover),
       borderColor(Colors().text1),
-     );
+    );
 
     const handleToolStyle = _.extend({},
       this.state.moving ? getStyle('color', Colors().active) : getStyle('color', Colors().text1, Colors().inactiveHover),
-     );
+    );
 
     const cardFieldMovingStyle = _.extend({},
-      borderColor(Colors().active)
+      borderColor(Colors().active),
     );
 
     const { row } = this.props;
