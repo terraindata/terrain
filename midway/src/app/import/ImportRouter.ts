@@ -46,8 +46,10 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { HA } from '../App';
 import { users } from '../users/UserRouter';
 import * as Util from '../Util';
 import { ExportConfig, Import, ImportConfig } from './Import';
@@ -77,7 +79,8 @@ Router.post('/export', passport.authenticate('access-token-local'), async (ctx, 
 {
   const exprtConf: ExportConfig = ctx.request.body.body;
   // Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
-  ctx.body = await imprt.export(exprtConf);
+  const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
+  ctx.body = exportReturn;
 });
 
 Router.post('/headless', async (ctx, next) =>
