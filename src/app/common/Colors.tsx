@@ -72,9 +72,12 @@ interface Theme
 
   altText1: string;
   altText2: string;
+  altText3: string;
 
   altBg1: string;
   altBg2: string;
+
+  altHighlight: string;
 
   active: string; // active color
   activeText: string;
@@ -179,6 +182,7 @@ interface Theme
         compound: string,
         join: string,
         geo: string,
+        parameter: string,
       };
 
       //by clause type
@@ -323,8 +327,11 @@ const DARK: Theme =
     altBg1: '#fff',
     altBg2: '#EDEFF3',
 
-    altText1: '#242424',
-    altText2: '#424242',
+    altText1: '#000',
+    altText2: '#242424',
+    altText3: '#424242',
+
+    altHighlight: 'rgba(210,215,219,0.75)',
 
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
     darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
@@ -432,6 +439,7 @@ const DARK: Theme =
           compound: '#fad14b',
           join: '#fad14b',
           geo: '#0ee06b',
+          parameter: code.inputParameter,
         },
 
         //by clause type

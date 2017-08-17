@@ -50,6 +50,7 @@ import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
 import
 {
+  createContainer,
   VictoryArea,
   VictoryAxis,
   VictoryBrushContainer,
@@ -65,7 +66,8 @@ import
   VictoryVoronoiContainer,
   VictoryZoomContainer,
 } from 'victory';
-import TerrainComponent from './../common/components/TerrainComponent';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import * as LibraryTypes from './../../library/LibraryTypes';
 
 const styles = {
   wrapper: {
@@ -93,11 +95,12 @@ const styles = {
 
 const config = {
   topChart: {
-    scale: { x: 'linear' },
+    scale: { x: 'time', y: 'linear' },
     interpolation: 'monotoneX',
     animate: { duration: 500 },
   },
   bottomChart: {
+    scale: { x: 'time' },
     interpolation: 'monotoneX',
   },
   legend: {
@@ -107,14 +110,17 @@ const config = {
 
 interface Dataset
 {
-  id: number;
-  name: string;
+  metric: {
+    id: number;
+    name: string;
+  };
   data: any[];
 }
 
 interface Props
 {
-  datasets: List<Dataset>;
+  datasets: Immutable.Map<ID, Dataset>;
+  variants: Immutable.Map<ID, LibraryTypes.Variant>;
 }
 
 interface State
@@ -149,7 +155,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
   {
     if (this.props.datasets !== nextProps.datasets)
     {
-      const visibleDatasets = nextProps.datasets.map((ds) => ds.id);
+      const visibleDatasets = nextProps.datasets.keySeq();
       this.setState({ visibleDatasets: visibleDatasets.toList() });
     }
   }
@@ -171,23 +177,32 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     const areas = [];
     const scatters = [];
 
-    datasets.forEach((ds, index) =>
+    datasets.forEach((ds, key) =>
     {
-      if (visibleDatasets.includes(ds.id))
+      if (visibleDatasets.includes(key))
       {
+        const dsIndex = visibleDatasets.indexOf(key);
         areas.push(
           <VictoryArea
-            key={ds.id}
-            style={{ data: { fill: colors[index % colors.length] } }}
-            data={ds.data}
+            key={key}
+            style={{
+              data: {
+                fill: colors[dsIndex % colors.length],
+              },
+            }}
+            data={ds.data.map((d) => Object.assign({}, d, { l: true }))}
             interpolation={config.topChart.interpolation}
+            x='time'
+            y='value'
           />,
         );
         scatters.push(
           <VictoryScatter
-            key={ds.id}
+            key={key}
+            size={(datum, active) => active ? 5 : 0}
             data={ds.data}
-            size={0}
+            x='time'
+            y='value'
           />,
         );
       }
@@ -198,15 +213,16 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
   public renderLegend()
   {
-    const { datasets } = this.props;
+    const { variants, datasets } = this.props;
     const { visibleDatasets } = this.state;
 
     const data = datasets
-      .map((ds) =>
+      .map((ds, key) =>
       {
+        const variant = variants.get(key);
         return {
-          id: ds.id,
-          name: ds.name,
+          id: variant.get('id'),
+          name: variant.get('name'),
         };
       });
 
@@ -253,6 +269,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     const data = this.renderData();
     const legend = this.renderLegend();
 
+    const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
+
     return (
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
@@ -263,11 +281,15 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
                 theme={VictoryTheme.material}
                 padding={styles.topChart.padding}
                 containerComponent={
-                  <VictoryZoomContainer
+                  <VictoryZoomVoronoiContainer
                     responsive={false}
                     dimension='x'
                     zoomDomain={this.state.zoomDomain}
                     onDomainChange={this.handleZoom}
+                    labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
+                    labelComponent={
+                      <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                    }
                   />
                 }
                 width={width}
@@ -275,20 +297,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               >
                 <VictoryGroup
                   style={styles.topChart.areas}
-                  containerComponent={
-                    <VictoryVoronoiContainer
-                      labels={(d) => `${d.x} => ${d.y}`}
-                      dimension='x'
-                      labelComponent={
-                        <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
-                      }
-                    />
-                  }
-                  labelComponent={<VictoryTooltip activateData={true} cornerRadius={0} flyoutStyle={{ fill: 'white' }} />}
                 >
                   {data.areas}
-                </VictoryGroup>
-                <VictoryGroup>
                   {data.scatters}
                 </VictoryGroup>
                 {legend}
@@ -300,6 +310,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
           <ContainerDimensions>
             {({ width, height }) =>
               <VictoryChart
+                scale={config.bottomChart.scale}
                 padding={styles.bottomChart.padding}
                 theme={VictoryTheme.material}
                 width={width} height={height}
@@ -316,6 +327,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
                   style={styles.bottomChart.areas}
                   data={datasets.first() !== null ? datasets.first().data : []}
                   interpolation={config.bottomChart.interpolation}
+                  x='time'
+                  y='value'
                 />
               </VictoryChart>
             }

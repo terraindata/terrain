@@ -249,7 +249,7 @@ class GroupsColumn extends TerrainComponent<Props>
           ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
-          status === ItemStatus.Build && canCreate &&
+          status === ItemStatus.Build && !!canCreate &&
           <CreateLine
             onClick={this.handleCreate}
             open={false}
