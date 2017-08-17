@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
@@ -53,7 +54,6 @@ import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import UserActions from './../../users/data/UserActions';
-import Actions from './../data/LibraryActions';
 import { LibraryState } from './../data/LibraryStore';
 import Store from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
@@ -98,13 +98,6 @@ class Library extends TerrainComponent<any>
     zoomDomain: {},
   };
 
-  constructor(props)
-  {
-    super(props);
-
-    this.state.libraryState = props.store ? props.store.getState() : Store.getState();
-  }
-
   public componentWillMount()
   {
     const { basePath } = this.props;
@@ -122,11 +115,6 @@ class Library extends TerrainComponent<any>
 
   public componentDidMount()
   {
-    this._subscribe(Store, {
-      stateKey: 'libraryState',
-      isMounted: true,
-    });
-
     RolesActions.fetch();
     UserActions.fetch();
   }
@@ -142,7 +130,7 @@ class Library extends TerrainComponent<any>
 
   public getDatasets()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState } = this.props;
     const { variants, selectedVariants } = libraryState;
 
     let metricId = 0;
@@ -181,9 +169,17 @@ class Library extends TerrainComponent<any>
 
   public render()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState } = this.props;
 
-    const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
+    const {
+      dbs,
+      groups,
+      algorithms,
+      variants,
+      selectedVariants,
+      groupsOrder,
+    } = libraryState;
+
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
 
@@ -253,17 +249,21 @@ class Library extends TerrainComponent<any>
               groupsOrder,
               params,
               basePath,
+              groupActions: this.props.libraryGroupActions,
             }}
             isFocused={algorithm === undefined}
           />
           <AlgorithmsColumn
             {...{
+              dbs,
+              groups,
               algorithms,
               variants,
               algorithmsOrder,
               groupId,
               params,
               basePath,
+              algorithmActions: this.props.libraryAlgorithmActions,
             }}
             isFocused={variantIds !== null && variantIds.length === 0}
           />
@@ -278,6 +278,7 @@ class Library extends TerrainComponent<any>
               multiselect: variantsMultiselect,
               basePath,
               router,
+              variantActions: this.props.libraryVariantActions,
             }}
           />
           {!variantsMultiselect ?

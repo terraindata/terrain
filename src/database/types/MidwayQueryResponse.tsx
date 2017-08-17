@@ -76,7 +76,10 @@ export default class MidwayQueryResponse extends QueryResponse
       source._type = hit._type;
       source._id = hit._id;
       source._score = hit._score;
-      source._sort = hit._sort;
+      if (hit.sort !== undefined)
+      {
+        source._sort = hit.sort[0];
+      }
       return source;
     });
     ret = results;

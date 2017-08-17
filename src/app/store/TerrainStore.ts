@@ -44,43 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface ElasticQueryHitSource
-{
-  [key: string]: any;
-}
+import * as Immutable from 'immutable';
+import { applyMiddleware, compose, createStore } from 'redux';
+import { combineReducers } from 'redux-immutable';
+import thunk from 'redux-thunk';
+import { LibraryStoreReducerWrapper } from '../library/data/LibraryStore';
 
-export interface ElasticQueryHit
-{
-  _index: string;
-  _type: string;
-  _id: string;
-  _score: number;
-  _source: ElasticQueryHitSource;
-  sort?: number[];
-}
+const reducers = {
+  library: LibraryStoreReducerWrapper,
+};
 
-export interface ElasticQueryShards
-{
-  total: number;
-  successful: number;
-  failed: number;
-}
+const rootReducer = combineReducers(reducers);
+const initialState = Immutable.Map();
 
-export interface ElasticQueryHits
-{
-  total: number;
-  max_score: number;
-  hits: ElasticQueryHit[];
-}
+const terrainStore = createStore(rootReducer, initialState, compose(
+  applyMiddleware(thunk),
+  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
+));
 
-export interface ElasticQueryResult
-{
-  took: number;
-  timed_out: boolean;
-  hits: ElasticQueryHits;
-  aggregations?: any;
-  _shards: ElasticQueryShards;
-
-}
-
-export default ElasticQueryResult;
+export default terrainStore;
