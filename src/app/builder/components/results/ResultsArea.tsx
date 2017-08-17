@@ -164,7 +164,7 @@ class ResultsArea extends TerrainComponent<Props>
         'result-expanded-wrapper': true,
         'result-collapsed-wrapper': !this.state.expanded,
         'result-expanded-config-open': this.state.showingConfig,
-         })}>
+      })}>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result
           result={result}
