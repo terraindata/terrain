@@ -616,7 +616,8 @@ const Util = {
 
   sortDatabases(dbs)
   {
-    return dbs.sort((a, b) => {
+    return dbs.sort((a, b) =>
+    {
       if (a.type === b.type)
       {
         return (a.name > b.name && 1) || -1;
@@ -624,6 +625,7 @@ const Util = {
       return (a.type > b.type && 1) || -1;
     });
   },
+
 };
 
 export default Util;

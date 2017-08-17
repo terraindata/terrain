@@ -135,6 +135,11 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     });
   }
 
+  public getSortedDatabases(dbs)
+  {
+    return Util.sortDatabases(dbs);
+  }
+
   public renderVariant(isSuperUser, isBuilder)
   {
     return (
@@ -142,14 +147,14 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         variant={this.props.variant}
         isSuperUser={isSuperUser}
         isBuilder={isBuilder}
-        dbs={this.state.dbs}
       />
     );
   }
 
   public handleAlgorithmDbChange(dbIndex: number)
   {
-    Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
+    const dbs = this.getSortedDatabases(this.state.dbs);
+    Actions.algorithms.change(this.props.algorithm.set('db', dbs.get(dbIndex)) as Algorithm);
   }
 
   public renderAlgorithm(isSuperUser, isBuilder)
@@ -240,7 +245,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public handleGroupDbChange(dbIndex: number)
   {
-    Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
+    const dbs = this.getSortedDatabases(this.state.dbs);
+    Actions.groups.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
   }
 
   public renderGroup(isSuperUser, isBuilder)
@@ -256,7 +262,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
 
     const isSysAdmin = this.state.me && this.state.me.isSuperUser;
-
+    const dbs = this.getSortedDatabases(this.state.dbs);
     return (
       <div>
         <div className='library-info-line'>
@@ -264,10 +270,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             Default Database
           </div>
           <Dropdown
-            selectedIndex={this.state.dbs && this.state.dbs.findIndex(
+            selectedIndex={dbs && dbs.findIndex(
               (db) => db.id === this.props.group.db.id,
             )}
-            options={this.state.dbs.map((db) => db.name).toList()}
+            options={dbs.map((db) => db.name + ` (${db.type})`).toList()}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isSuperUser}
             className='bic-db-dropdown'

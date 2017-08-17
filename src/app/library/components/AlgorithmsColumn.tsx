@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
 import * as Immutable from 'immutable';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
@@ -100,7 +101,6 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     creatingNewAlgorithm: boolean;
     newAlgorithmTextboxValue: string;
     newAlgorithmDbIndex: number;
-    newAlgorithmDbList?;
   } = {
     rendered: false,
     me: null,
@@ -112,6 +112,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     newAlgorithmTextboxValue: '',
     newAlgorithmDbIndex: -1,
   };
+
+  constructor(props)
+  {
+    super(props);
+    this.getSortedDatabases = memoizeOne(this.getSortedDatabases);
+  }
 
   public componentWillMount()
   {
@@ -145,12 +151,6 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (! this.state.newAlgorithmDbList)
-    {
-      this.setState({
-        newAlgorithmDbList: Util.sortDatabases(LibraryStore.getState().dbs),
-      });
-    }
     if (nextProps.groupId !== this.props.groupId)
     {
       this.setState({
@@ -159,10 +159,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
   }
 
+  public getSortedDatabases(dbs)
+  {
+    return Util.sortDatabases(dbs);
+  }
+
   public getNewAlgorithmIndex(): number
   {
     const group = LibraryStore.getState().groups.get(this.props.groupId);
-    const dbs = this.state.newAlgorithmDbList;
+    const dbs = this.getSortedDatabases(LibraryStore.getState().dbs);
     if (this.state.newAlgorithmDbIndex !== -1)
     {
       return this.state.newAlgorithmDbIndex;
@@ -241,7 +246,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNewAlgorithmCreate()
   {
-    const dbs = this.state.newAlgorithmDbList;
+    const dbs = this.getSortedDatabases(LibraryStore.getState().dbs);
     const index = this.getNewAlgorithmIndex();
     Actions.algorithms.createAs(
       this.props.groupId,
@@ -492,7 +497,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderDatabaseDropdown()
   {
-    const dbs = this.state.newAlgorithmDbList;
+    const dbs = this.getSortedDatabases(LibraryStore.getState().dbs);
     const options = dbs ? dbs.map((db) => db.name + ` (${db.type})`).toList() : [];
 
     return (
@@ -513,7 +518,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderCreateAlgorithmModal()
   {
-    const canCreateAlgorithm: boolean = this.state.newAlgorithmDbList && this.state.newAlgorithmDbList.size > 0;
+    const dbs = this.getSortedDatabases(LibraryStore.getState().dbs);
+    const canCreateAlgorithm: boolean = dbs && dbs.size > 0;
     return canCreateAlgorithm ?
       (<Modal
         open={this.state.creatingNewAlgorithm}
