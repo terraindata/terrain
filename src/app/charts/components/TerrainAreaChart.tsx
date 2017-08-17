@@ -313,23 +313,44 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
   public handleLegendMouseOver(e, props)
   {
+    /* Return an array of affected victory components.
+     * @childName: is optional, can be used to reference any victory component
+     *   within the same VictoryChart by its name property. Then, the props
+     *   received by the mutation function will be the ones of the referenced
+     *   component, and the props returned by the mutation will be applied to
+     *   it.
+     * @target: {'data' | 'labels'} indicates what's the component to which
+     *   the new props returned by the mutation will be applied. For instance,
+     *   if this event comes from a VictoryLegend, 'data' refers to the legend
+     *   item marker (the dot in this case) and 'labels' means the legend item
+     *   text.
+     * @mutation: is a function, recieves the props of the matched element, and
+     *   returns a new props objects to be applied to it.
+     */
     return [
       {
+        // Matches the VictoryLegend texts.
         target: 'labels',
         mutation: (labelProps) =>
         {
+          // Changes the VictoryLegend hover item text font size.
           const newStyle = Object.assign({}, labelProps.style, { fontSize: 16 });
           return { style: newStyle };
         },
       },
       {
+        // Matches the VictoryArea that corresponds with the hovered legend item.
         childName: `area-${props.datum.id}`,
-        target: 'data',
-        eventKey: 'all',
+        target: 'data', // in this case 'data' means the area (the 'labels' are
+        // the tooltips)
+        eventKey: 'all', // this holds the index of single data points,
+        // we want to paint the whole area
         mutation: (areaProps) =>
         {
+          // Store a reference to the active dataset, to bring it to the front
           this.setState({ highlightDataset: props.datum.id });
           return {
+            // Change the corresponding area style.
             style: Object.assign(
               {},
               areaProps.style,
@@ -354,6 +375,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
         eventKey: 'all',
         mutation: () =>
         {
+          // Returning null resets all mutations, reverts the component back to
+          // its original state.
           return null;
         },
       },
@@ -410,7 +433,10 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
                 width={width}
                 height={height}
                 events={[{
+                  // indicate, by name, the component that listens to the event
                   childName: ['legend'],
+                  // { 'data', 'labels' }, indicates if the texts or the dots
+                  // of the legend items are the one that listens to the event.
                   target: 'labels',
                   eventHandlers: {
                     onClick: this.handleLegendClick,
