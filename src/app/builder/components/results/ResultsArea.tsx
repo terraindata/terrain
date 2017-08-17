@@ -68,7 +68,6 @@ import Actions from '../../data/BuilderActions';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import Result from '../results/Result';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
-import ResultsExportComponent from '../results/ResultsExportComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import Radium = require('radium');
@@ -519,17 +518,6 @@ column if you have customized the results view.');
   {
     if (this.state.showingExport)
     {
-      // return (
-      //   <ResultsExportComponent
-      //     query={this.props.query}
-      //     fields={this.props.resultsState.fields}
-      //     results={this.props.resultsState.results}
-      //     handleESresultExport={this.handleESresultExport}
-      //     onClose={this.hideExport}
-      //     exportState={this.props.exportState}
-      //   />
-      // );
-
       const mainBg = backgroundColor(Colors().bg1);
       const mainFontColor = fontColor(Colors().text2);
       const { previewRows, primaryKey, columnNames, columnsToInclude, columnTypes, templates, transforms,

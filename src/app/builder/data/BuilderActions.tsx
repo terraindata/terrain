@@ -147,39 +147,6 @@ const BuilderActions =
       $(ActionTypes.results, {
         resultsState,
       }),
-
-    // export
-    loadTemplate:
-    (templateId: number) =>
-      $(ActionTypes.loadTemplate, { templateId }),
-
-    saveTemplate:
-    (templateName: string) =>
-      $(ActionTypes.saveTemplate, { templateName }),
-
-    exportResults:
-    (handleESresultExport: () => void) =>
-      $(ActionTypes.exportResults, { handleESresultExport }),
-
-    setColumnName:
-    (columnId: number, newName: string) =>
-      $(ActionTypes.setColumnName, { columnId, newName }),
-
-    setColumnToInclude:
-    (columnId: number) =>
-      $(ActionTypes.setColumnToInclude, { columnId }),
-
-    setColumnType:
-    (columnId: number, recursionDepth: number, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
-
-    changePrimaryKey:
-    (columnId: number) =>
-      $(ActionTypes.changePrimaryKey, { columnId }),
-
-    addTransform:
-    (transform: FileImportTypes.Transform) =>
-      $(ActionTypes.addTransform, { transform }),
   };
 
 _.map(ActionTypes,

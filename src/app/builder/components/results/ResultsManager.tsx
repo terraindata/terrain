@@ -529,8 +529,6 @@ export class ResultsManager extends TerrainComponent<Props>
         )),
       )),
     };
-    console.log('exportChanges: ', exportChanges);
-    console.log(Number(this.props.db.id), getIndex(), getType());
     Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
 
     this.changeResults(changes, exportChanges);

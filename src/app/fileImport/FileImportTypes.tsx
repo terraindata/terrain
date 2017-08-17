@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
+
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import { BaseClass, New } from '../Classes';
@@ -52,10 +55,10 @@ const { List } = Immutable;
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
 {
-  public connectionId: number = -1;
-  public serverText: string = '';
-  public dbText: string = '';
-  public tableText: string = '';
+  public serverId: number = -1;
+  public serverName: string = '';
+  public dbName: string = '';
+  public tableName: string = '';
   public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
@@ -65,7 +68,7 @@ class FileImportStateC extends BaseClass
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<IMMap<string, any>> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
+  public columnTypes: List<ColumnTypesTree> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
@@ -85,39 +88,89 @@ export type FileImportState = FileImportStateC & IRecord<FileImportStateC>;
 export const _FileImportState = (config?: { [key: string]: any }) =>
   New<FileImportState>(new FileImportStateC(config), config);
 
-export interface Transform
+class TransformArgsC
 {
-  name: string;                         // transform name
-  colName: string;                      // name of column to be transformed
-  args: {
-    mergeName?: string;                 // name of column to be merged
-    newName?: string | string[];        // rename name, duplicate name, split names
-    text?: string;                      // text to append/prepend, text to split/merge on
-  };
+  public mergeName?: string = null;             // name of column to be merged
+  public newName?: string | string[] = null;   // includes rename name, duplicate name, split names
+  public text?: string = null;                  // text to append/prepend, text to split/merge on
 }
 
-export interface Template
+const TransformArgs_Record = Immutable.Record(new TransformArgsC());
+export interface TransformArgs extends TransformArgsC, IRecord<TransformArgs> { }
+export const _TransformArgs = (config?: any) =>
 {
-  id: number;
-  name: string;
-  originalNames: List<string>;
-  columnTypes: Immutable.Map<string, object>;
-  transformations: List<object>;
-  csvHeaderMissing: boolean;
-  primaryKey: number;
-  export: boolean;
+  return new TransformArgs_Record(config) as any as TransformArgs;
+};
+
+class TransformC
+{
+  public name: string = '';      // transform name
+  public colName: string = '';   // name of column to be transformed
+  public args: TransformArgs = _TransformArgs();
 }
+
+const Transform_Record = Immutable.Record(new TransformC());
+export interface Transform extends TransformC, IRecord<Transform> { }
+export const _Transform =
+  (config: {
+    name: string,
+    colName: string,
+    args: TransformArgs,
+  }) =>
+  {
+    return new Transform_Record(config) as any as Transform;
+  };
+
+class TemplateC
+{
+  public templateId = -1;
+  public templateName = '';
+  public originalNames: List<string> = List([]);
+  public columnTypes: List<ColumnTypesTree> = List([]);
+  public transformations: List<Transform> = List([]);
+  public csvHeaderMissing = false;
+  public primaryKey = -1;
+  public export = false;
+}
+
+const Template_Record = Immutable.Record(new TemplateC());
+export interface Template extends TemplateC, IRecord<Template> { }
+export const _Template =
+  (config: {
+    templateId: number;
+    templateName: string;
+    originalNames: List<string>;
+    columnTypes: Immutable.Map<string, object>;
+    transformations: List<object>;
+    csvHeaderMissing: boolean;
+    primaryKey: number;
+    export: boolean;
+  }) =>
+  {
+    return new Template_Record(config) as any as Template;
+  };
 
 // supports nested types, i.e. an array of array of dates
-export interface ColumnTypesTree
+class ColumnTypesTreeC
 {
-  type: string | number;
-  innerType?: ColumnTypesTree;
+  public type = 'text';
+  public innerType?: ColumnTypesTree = null;
 }
+
+const ColumnTypesTree_Record = Immutable.Record(new ColumnTypesTreeC());
+export interface ColumnTypesTree extends ColumnTypesTreeC, IRecord<ColumnTypesTree> { }
+export const _ColumnTypesTree = (config?: any) =>
+{
+  config = config || {};
+  config.type = config.type || 'text';
+  config.innerType = config.innerType || null;
+
+  return new ColumnTypesTree_Record(config) as any as ColumnTypesTree;
+};
 
 export const NUMBER_PREVIEW_ROWS = 5;
 
-export const CHUNK_SIZE = 10000000; // 10mb
+export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) - amount to read in order to extract preview rows
 
 export const FILE_TYPES =
   [

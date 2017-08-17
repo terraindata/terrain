@@ -215,7 +215,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public handleNewAlgorithmTextboxChange(value)
   {
     this.setState({
-      newAlgorithmTextboxValue: value
+      newAlgorithmTextboxValue: value,
     });
   }
 
@@ -240,7 +240,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       this.props.groupId,
       this.state.newAlgorithmTextboxValue,
       dbs.get(index),
-      this.handleNewAlgorithmCreated
+      this.handleNewAlgorithmCreated,
     );
   }
 

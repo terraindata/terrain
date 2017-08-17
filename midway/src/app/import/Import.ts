@@ -55,7 +55,7 @@ import * as _ from 'underscore';
 import * as winston from 'winston';
 
 import { json } from 'd3-request';
-import * as SharedUtil from '../../../../shared/fileImport/Util';
+import * as SharedUtil from '../../../../shared/database/elastic/ElasticUtil';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -344,6 +344,7 @@ export class Import
         reject(e);
       }
 
+      // TODO: switch back to the first line once file system callbacks have been rewritten as promises
       // this._cleanStreamingTempFolder(true);
       fs.mkdirSync(this.STREAMING_TEMP_FOLDER);
 

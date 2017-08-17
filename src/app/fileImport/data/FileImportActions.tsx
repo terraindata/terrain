@@ -48,25 +48,28 @@ import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
 
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
+
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
 const FileImportActions =
   {
     changeServer:
-    (connectionId: number, name: string) =>
-      $(ActionTypes.changeServer, { connectionId, name }),
+    (serverId: number, name: string) =>
+      $(ActionTypes.changeServer, { serverId, name }),
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+    changeDbName:
+    (dbName: string) =>
+      $(ActionTypes.changeDbName, { dbName }),
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+    changeTableName:
+    (tableName: string) =>
+      $(ActionTypes.changeTableName, { tableName }),
 
     changeServerDbTable:
-    (connectionId: number, dbText: string, tableText: string) =>
-      $(ActionTypes.changeServerDbTable, { connectionId, dbText, tableText }),
+    (serverId: number, dbName: string, tableName: string) =>
+      $(ActionTypes.changeServerDbTable, { serverId, dbName, tableName }),
 
     changeCsvHeaderMissing:
     (csvHeaderMissing: boolean) =>
@@ -89,7 +92,7 @@ const FileImportActions =
       $(ActionTypes.exportFile, {}),
 
     addTransform:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
@@ -101,23 +104,23 @@ const FileImportActions =
       $(ActionTypes.setColumnName, { columnId, newName }),
 
     setColumnType:
-    (columnId: number, recursionDepth: number, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
+    (columnId: number, recursionDepth: number, type: string) =>
+      $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
     updatePreviewRows:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateText: string, exporting: boolean) =>
-      $(ActionTypes.saveTemplate, { templateText, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateName: string, exporting: boolean) =>
+      $(ActionTypes.saveTemplate, { templateName, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
     fetchTemplates:
     (exporting: boolean) =>
       $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
-    (templates: List<FileImportTypes.Template>) =>
+    (templates: List<Template>) =>
       $(ActionTypes.setTemplates, { templates }),
 
     loadTemplate:
