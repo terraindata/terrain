@@ -267,6 +267,9 @@ class Login extends TerrainComponent<Props>
             <div className='login-row'
               style={[
                 fontColor(Colors().text2),
+                backgroundColor(Colors().bg2),
+                borderColor(Colors().text3,
+                  Colors().text2),
               ]}
               key={'login-email'}
             >
@@ -300,6 +303,9 @@ class Login extends TerrainComponent<Props>
             <div className='login-row'
               style={[
                 fontColor(Colors().text2),
+                backgroundColor(Colors().bg2),
+                borderColor(Colors().text3,
+                  Colors().text2),
               ]}
               key={'login-password'}
             >
