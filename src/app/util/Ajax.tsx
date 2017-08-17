@@ -750,7 +750,7 @@ export const Ajax =
 
     saveTemplate(dbname: string,
       tablename: string,
-      connectionId: number,
+      dbid: number,
       originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
       primaryKey: string,
@@ -761,7 +761,7 @@ export const Ajax =
     )
     {
       const payload: object = {
-        dbid: connectionId,
+        dbid,
         dbname,
         tablename,
         originalNames,
@@ -770,6 +770,7 @@ export const Ajax =
         transformations,
         name,
       };
+      console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);

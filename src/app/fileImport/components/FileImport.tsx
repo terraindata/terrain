@@ -70,7 +70,7 @@ import has = Reflect.has;
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
-const CHUNK_SIZE = FileImportTypes.CHUNK_SIZE;
+const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
 
 export interface Props
 {
@@ -289,7 +289,7 @@ class FileImport extends TerrainComponent<any>
 
   public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
   {
-    const fileToRead: Blob = file.slice(0, CHUNK_SIZE);
+    const fileToRead: Blob = file.slice(0, PREVIEW_CHUNK_SIZE);
     const fr = new FileReader();
     fr.readAsText(fileToRead);
     fr.onloadend = () =>
@@ -308,12 +308,15 @@ class FileImport extends TerrainComponent<any>
       }
       if (items === undefined)
       {
+        this.setState({
+          filename: '',
+        });
         return;
       }
 
       const previewRows = items.map((item) =>
         _.map(item, (value, key) =>
-          typeof value === 'string' ? value : JSON.stringify(value), // JSON files infer types
+          typeof value === 'string' ? value : JSON.stringify(value), // JSON infers types
         ),
       );
       const columnNames = _.map(items[0], (value, index) =>
@@ -402,63 +405,14 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbName, tableName } = fileImportState;
-    const { file, previewRows, columnNames, columnsToInclude, columnsCount, columnTypes, primaryKey } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKey } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
 
-    let content;
+    let content = {};
     switch (this.state.stepId)
     {
       case 0:
-        content =
-          <div>
-            <div
-              className='flex-container fi-step-row'
-            >
-              <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
-              <div
-                className='button'
-                onClick={this.handleSelectFileButtonClick}
-                style={buttonColors()}
-                ref='fi-select-button'
-              >
-                Choose File
-              </div>
-              <span
-                className='flex-grow fi-input-label clickable'
-                onClick={this.handleSelectFileButtonClick}
-              >
-                {
-                  this.state.filename ? this.state.filename + ' selected' : 'No file selected'
-                }
-              </span>
-            </div>
-            {
-              this.state.showCsvHeaderOption &&
-              <div
-                className='fi-csv'
-              >
-                <span>
-                  Does your csv have a header row?
-                </span>
-                <div
-                  className='fi-csv-option button'
-                  onClick={() => this.handleCsvHeaderChoice(true)}
-                  style={buttonColors()}
-                  ref='fi-yes-button'
-                >
-                  Yes
-                </div>
-                <div
-                  className='fi-csv-option button'
-                  onClick={() => this.handleCsvHeaderChoice(false)}
-                  style={buttonColors()}
-                  ref='fi-no-button'
-                >
-                  No
-                </div>
-              </div>
-            }
-          </div>;
+        content = this.renderSelect();
         break;
       case 1:
         content =
@@ -493,7 +447,6 @@ class FileImport extends TerrainComponent<any>
         content =
           <FileImportPreview
             previewRows={previewRows}
-            columnsCount={columnsCount}
             primaryKey={primaryKey}
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
@@ -501,7 +454,6 @@ class FileImport extends TerrainComponent<any>
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
-            file={file}
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
           />;
@@ -516,6 +468,61 @@ class FileImport extends TerrainComponent<any>
       >
         {
           content
+        }
+      </div>
+    );
+  }
+
+  public renderSelect()
+  {
+    return (
+      <div>
+        <div
+          className='flex-container fi-step-row'
+        >
+          <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
+          <div
+            className='button'
+            onClick={this.handleSelectFileButtonClick}
+            style={buttonColors()}
+            ref='fi-select-button'
+          >
+            Choose File
+          </div>
+          <span
+            className='flex-grow fi-input-label clickable'
+            onClick={this.handleSelectFileButtonClick}
+          >
+            {
+              this.state.filename ? this.state.filename + ' selected' : 'No file selected'
+            }
+          </span>
+        </div>
+        {
+          this.state.showCsvHeaderOption &&
+          <div
+            className='fi-csv'
+          >
+            <span>
+              Does your csv have a header row?
+                </span>
+            <div
+              className='fi-csv-option button'
+              onClick={() => this.handleCsvHeaderChoice(true)}
+              style={buttonColors()}
+              ref='fi-yes-button'
+            >
+              Yes
+            </div>
+            <div
+              className='fi-csv-option button'
+              onClick={() => this.handleCsvHeaderChoice(false)}
+              style={buttonColors()}
+              ref='fi-no-button'
+            >
+              No
+            </div>
+          </div>
         }
       </div>
     );

@@ -66,20 +66,22 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 const { List } = Immutable;
 
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
+
 export interface Props
 {
-  file: File;
   previewRows: List<List<string>>;
-  columnsCount: number;
   primaryKey: number;
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<IMMap<string, any>>;
+  columnTypes: List<ColumnTypesTree>;
 
   columnOptions: List<string>;
-  templates: List<FileImportTypes.Template>;
-  transforms: List<FileImportTypes.Transform>;
+  templates: List<Template>;
+  transforms: List<Transform>;
 
   uploadInProgress: boolean;
   elasticUpdate: boolean;
@@ -104,7 +106,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     Actions.fetchTemplates();
     this.setState({
-      templateOptions: this.props.templates.map((template, i) => template.name),
+      templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
   }
 
@@ -113,7 +115,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
-        templateOptions: nextProps.templates.map((template, i) => String(template.id) + ': ' + template.name),
+        templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
   }
@@ -131,15 +133,14 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.columnNames.get(columnId) !== localColumnName)
     {
       Actions.setColumnName(columnId, this.props.columnNames.get(columnId), localColumnName);
-      Actions.addTransform(
+      Actions.addTransform(FileImportTypes._Transform(
         {
           name: 'rename',
           colName: this.props.columnNames.get(columnId),
-          args: {
+          args: FileImportTypes._TransformArgs({
             newName: localColumnName,
-          },
-        },
-      );
+          }),
+        }));
       return true;
     }
   }
@@ -336,26 +337,28 @@ class FileImportPreview extends TerrainComponent<Props>
               Join against any existing entries
             </span>
           </div>
-          <div
-            className='fi-preview-import-button'
-            onClick={this.handleUploadFile}
-            style={buttonColors()}
-          >
-            Import
-          </div>
+          {
+            this.props.uploadInProgress ?
+              this.props.uploadInProgress &&
+              <div className='fi-preview-loading-container'>
+                <Loading
+                  width={100}
+                  height={100}
+                  loading={this.props.uploadInProgress}
+                  loaded={false}
+                  onLoadedEnd={null}
+                />
+              </div>
+              :
+              <div
+                className='fi-preview-import-button'
+                onClick={this.handleUploadFile}
+                style={buttonColors()}
+              >
+                Import
+            </div>
+          }
         </div>
-        {
-          this.props.uploadInProgress &&
-          <div className='fi-preview-loading-container'>
-            <Loading
-              width={100}
-              height={100}
-              loading={this.props.uploadInProgress}
-              loaded={false}
-              onLoadedEnd={null}
-            />
-          </div>
-        }
       </div>
     );
   }

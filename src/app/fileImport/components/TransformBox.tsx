@@ -62,6 +62,10 @@ import * as FileImportTypes from './../FileImportTypes';
 import './TransformBox.less';
 const { List } = Immutable;
 
+type Transform = FileImportTypes.Transform;
+const ELASTIC_TYPES = FileImportTypes.ELASTIC_TYPES;
+const TRANSFORM_TYPES = FileImportTypes.TRANSFORM_TYPES;
+
 export interface Props
 {
   datatype: string;
@@ -195,36 +199,31 @@ class TransformBox extends TerrainComponent<Props>
     return '';
   }
 
-  public setTransform(transformName: string)
+  public getTransform(transformName: string): Transform
   {
-    const transform: FileImportTypes.Transform = {
-      name: transformName,
-      colName: this.props.colName,
-      args: {},
-    };
-
+    let transformArgsConfig = {};
     switch (transformName)
     {
       case 'duplicate':
-        transform.args = {
+        transformArgsConfig = {
           newName: this.state.duplicateNewName,
         };
         break;
 
       case 'append':
-        transform.args = {
+        transformArgsConfig = {
           text: this.state.transformText,
         };
         break;
 
       case 'prepend':
-        transform.args = {
+        transformArgsConfig = {
           text: this.state.transformText,
         };
         break;
 
       case 'split':
-        transform.args = {
+        transformArgsConfig = {
           newName: this.state.splitNames.toArray(),
           text: this.state.transformText,
         };
@@ -232,7 +231,7 @@ class TransformBox extends TerrainComponent<Props>
         break;
 
       case 'merge':
-        transform.args = {
+        transformArgsConfig = {
           mergeName: this.state.mergeName,
           newName: this.state.mergeNewName,
           text: this.state.transformText,
@@ -241,13 +240,18 @@ class TransformBox extends TerrainComponent<Props>
         break;
       default:
     }
-    return transform;
+    const transformConfig = {
+      name: transformName,
+      colName: this.props.colName,
+      args: FileImportTypes._TransformArgs(transformArgsConfig),
+    };
+    return FileImportTypes._Transform(transformConfig);
   }
 
   public handleTransformClick()
   {
-    const datatypeId: number = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
-    const transformName: string = FileImportTypes.TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex];
+    const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
+    const transformName: string = TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex];
     const msg: string = this.transformErrorCheck(transformName);
     if (msg)
     {
@@ -255,7 +259,7 @@ class TransformBox extends TerrainComponent<Props>
       return;
     }
 
-    const transform: FileImportTypes.Transform = this.setTransform(transformName);
+    const transform: Transform = this.getTransform(transformName);
     Actions.updatePreviewRows(transform);
     Actions.addTransform(transform);
 
@@ -389,26 +393,26 @@ class TransformBox extends TerrainComponent<Props>
 
   public renderTransform()
   {
-    const datatypeId: number = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
     switch (this.props.datatype)
     {
       case 'text': // currently only strings have transform operations besides duplicate
-        return this.renderText(FileImportTypes.TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
+        return this.renderText(TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
       default:
-        return this.renderDefault(FileImportTypes.TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
+        return this.renderDefault(TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
     }
   }
 
   public render()
   {
-    const datatypeId: number = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
     return (
       <div
         className='fi-transform-box'
       >
         <Dropdown
           selectedIndex={this.state.transformTypeIndex}
-          options={List(FileImportTypes.TRANSFORM_TYPES[datatypeId])}
+          options={List(TRANSFORM_TYPES[datatypeId])}
           onChange={this.handleTransformTypeChange}
           canEdit={true}
         />

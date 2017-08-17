@@ -54,29 +54,13 @@ import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 const { List, Map } = Immutable;
 
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
+
 const FileImportReducers = {};
 
-const deeplyColumnTypeToString = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
-{
-  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES[columnTypesTree.type];
-  if (columnTypesTree.innerType)
-  {
-    deeplyColumnTypeToString(columnTypesTree.innerType);
-  }
-  return columnTypesTree;
-};
-
-const deeplyColumnTypeToNumber = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
-{
-  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES.indexOf(String(columnTypesTree.type));
-  if (columnTypesTree.innerType)
-  {
-    deeplyColumnTypeToNumber(columnTypesTree.innerType);
-  }
-  return columnTypesTree;
-};
-
-const applyTransform = (state, transform) =>
+const applyTransform = (state: FileImportTypes.FileImportState, transform: Transform) =>
 {
   const transformCol: number = state.columnNames.indexOf(transform.colName);
 
@@ -105,18 +89,12 @@ const applyTransform = (state, transform) =>
     return state
       .set('primaryKey', primaryKey)
       .set('columnNames', state.columnNames
-        .insert(transformCol + 1, transform.args.newName))
+        .insert(transformCol + 1, transform.args.newName as string))
       .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
       .set('columnTypes', state.columnTypes.insert(transformCol + 1, state.columnTypes.get(transformCol)))
-      .set('previewRows', List(state.previewRows.map((row, i) =>
+      .set('previewRows', List(state.previewRows.map((row: any, i) =>
         [].concat(...row.map((col, j) =>           // convoluted way of mapping an array and returning a larger array
-        {                                          // since one column needs to be added (same for split below)
-          if (j === transformCol)
-          {
-            return [col, col];
-          }
-          return col;
-        },
+          j === transformCol ? [col, col] : col,    // since one column needs to be added (same for split below)
         )),
       )));
   }
@@ -129,8 +107,8 @@ const applyTransform = (state, transform) =>
         .set(transformCol, transform.args.newName[0])
         .insert(transformCol + 1, transform.args.newName[1]))
       .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
-      .set('columnTypes', state.columnTypes.insert(transformCol + 1, Immutable.fromJS({ type: 0 })))
-      .set('previewRows', List(state.previewRows.map((row, i) =>
+      .set('columnTypes', state.columnTypes.insert(transformCol + 1, FileImportTypes._ColumnTypesTree()))
+      .set('previewRows', List(state.previewRows.map((row: any, i) =>
         [].concat(...row.map((col, j) =>
         {
           if (j === transformCol)
@@ -164,7 +142,7 @@ const applyTransform = (state, transform) =>
     return state
       .set('primaryKey', primaryKey)
       .set('columnNames', state.columnNames
-        .set(transformCol, transform.args.newName)
+        .set(transformCol, transform.args.newName as string)
         .delete(mergeCol))
       .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
       .set('columnTypes', state.columnTypes.delete(mergeCol))
@@ -247,14 +225,14 @@ FileImportReducers[ActionTypes.setColumnType] =
     }
     keyPath.push('type');
 
-    if (FileImportTypes.ELASTIC_TYPES[action.payload.typeIndex] === 'array')
+    if (action.payload.type === 'array')
     {
       const keyPathAdd = keyPath.slice();
       keyPathAdd[keyPathAdd.length - 1] = 'innerType'; // add new 'innerType' at the same level as highest 'type'
-      return state.setIn(keyPath, action.payload.typeIndex)
-        .setIn(keyPathAdd, Immutable.fromJS({ type: 0 }));
+      return state.setIn(keyPath, action.payload.type)
+        .setIn(keyPathAdd, FileImportTypes._ColumnTypesTree());
     }
-    return state.setIn(keyPath, action.payload.typeIndex);
+    return state.setIn(keyPath, action.payload.type);
   };
 
 FileImportReducers[ActionTypes.addTransform] =
@@ -277,7 +255,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
       .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
-      .set('columnTypes', List(action.payload.originalNames.map(() => (Immutable.fromJS({ type: 0 })))))
+      .set('columnTypes', List(action.payload.originalNames.map(() => FileImportTypes._ColumnTypesTree())))
       .set('transforms', List([]))
   ;
 
@@ -293,7 +271,7 @@ FileImportReducers[ActionTypes.uploadFile] =
       state.originalNames,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&                          // backend requires type as string
-        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+        [colName, state.columnTypes.get(colId).toJS()],
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
@@ -321,9 +299,9 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.tableName,
       state.serverId,
       state.originalNames,
-      Map<string, FileImportTypes.ColumnTypesTree>(state.columnNames.map((colName, colId) =>
+      Map<string, ColumnTypesTree>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&
-        [colName, deeplyColumnTypeToString(state.columnTypes.get(colId).toJS())],
+        [colName, state.columnTypes.get(colId).toJS()],
       )),
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
@@ -351,7 +329,18 @@ FileImportReducers[ActionTypes.fetchTemplates] =
 
       (templatesArr) =>
       {
-        const templates: Immutable.List<FileImportTypes.Template> = Immutable.List<FileImportTypes.Template>(templatesArr);
+        const templates: List<Template> = List<Template>(templatesArr.map((template) =>
+          FileImportTypes._Template({
+            templateId: template['id'],
+            templateName: template['name'],
+            originalNames: template['originalNames'],
+            columnTypes: template['columnTypes'],
+            transformations: template['transformations'],
+            csvHeaderMissing: template['csvHeaderMissing'],
+            primaryKey: template['primaryKey'],
+          }),
+        ));
+        console.log('fetched templates: ', templates);
         action.payload.setTemplates(templates);
       },
     );
@@ -366,23 +355,22 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
-    const template: FileImportTypes.Template = state.templates.get(action.payload.templateId);
+    const template: Template = state.templates.get(action.payload.templateId);
     template.transformations.map((transform) =>
     {
       state = applyTransform(state, transform);
     });
     const { columnNames, previewRows } = state;
-
     return state
-      .set('originalNames', List(template.originalNames))
       .set('primaryKey', columnNames.indexOf(template.primaryKey))
-      .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('columnNames', columnNames)
+      .set('originalNames', List(template.originalNames))
+      .set('transforms', List<Transform>(template.transformations))
       .set('columnTypes', List(columnNames.map((colName) =>
         template.columnTypes[colName] ?
-          Immutable.fromJS(deeplyColumnTypeToNumber(template.columnTypes[colName]))
+          FileImportTypes._ColumnTypesTree(template.columnTypes[colName])
           :
-          Immutable.fromJS({ type: 0 }),
+          FileImportTypes._ColumnTypesTree(),
       )))
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewRows', previewRows);
