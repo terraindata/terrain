@@ -60,7 +60,7 @@ import Actions from '../../data/BuilderActions';
 import PanelMixin from '../layout/PanelMixin';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle, getCardColors } from '../../../common/Colors';
+import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getCardColors, getStyle } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');

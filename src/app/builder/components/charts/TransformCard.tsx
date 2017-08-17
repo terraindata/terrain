@@ -61,10 +61,10 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
 
+import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
-import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 
 const NUM_BARS = 1000;
 
@@ -278,7 +278,7 @@ class TransformCard extends TerrainComponent<Props>
       theHist = elasticHistogram.transformCard.buckets;
     } else
     {
-      return this.handleElasticAggregationError("No Result");
+      return this.handleElasticAggregationError('No Result');
     }
     const bars: Bar[] = [];
     for (let j = 0; j < NUM_BARS; j++)
@@ -356,7 +356,7 @@ class TransformCard extends TerrainComponent<Props>
           bool: {
             must: {
               range: {
-                [input as string]: { gte: min, lt: max }
+                [input as string]: { gte: min, lt: max },
               },
             },
           },
@@ -372,7 +372,7 @@ class TransformCard extends TerrainComponent<Props>
             },
           },
         },
-      }
+      },
     };
     aggQuery['index'] = index;
     aggQuery['type'] = type;
