@@ -377,6 +377,7 @@ class VariantsColumn extends TerrainComponent<Props>
             <StatusDropdown
               variant={variant}
               noBorder={true}
+              variantActions={this.props.variantActions}
             />
             <div
               className='library-item-line'

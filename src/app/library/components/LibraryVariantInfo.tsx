@@ -55,7 +55,6 @@ import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
-import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 import VariantVersions from './VariantVersions';
@@ -68,6 +67,7 @@ export interface Props
   dbs: List<BackendInstance>;
   isSuperUser: boolean;
   isBuilder: boolean;
+  variantActions: any;
 }
 
 // TODO MOD centralize
@@ -100,6 +100,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
               <div className='biv-cell-second'>
                 <StatusDropdown
                   variant={this.props.variant}
+                  variantActions={this.props.variantActions}
                 />
               </div>
             </div>

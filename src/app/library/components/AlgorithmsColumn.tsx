@@ -501,6 +501,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public renderDatabaseDropdown()
   {
     const { dbs } = this.props;
+
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
@@ -520,6 +521,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public renderCreateAlgorithmModal()
   {
     const { dbs } = this.props;
+
     const canCreateAlgorithm: boolean = dbs.size > 0;
     return canCreateAlgorithm ?
       (<Modal
