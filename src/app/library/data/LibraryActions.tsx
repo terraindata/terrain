@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
 
 import * as Immutable from 'immutable';
+import { ThunkAction } from 'redux-thunk';
 import * as _ from 'underscore';
 
 import BackendInstance from '../../../database/types/BackendInstance';
@@ -63,7 +64,12 @@ type Variant = LibraryTypes.Variant;
 
 import Ajax from './../../util/Ajax';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+const $ = (type: string, payload: any) =>
+{
+  // jmansor: Dispatch to the old LibraryStore too, store unification is finished.
+  Store.dispatch({ type, payload });
+  return { type, payload };
+};
 
 const Actions =
   {
@@ -114,7 +120,7 @@ const Actions =
         const group = LibraryStore.getState().groups.get(groupId);
         algorithm = algorithm
           .set('parent', groupId)
-          .set('groupId', groupId)
+          .set('groupId', groupId);
 
         Ajax.saveItem(
           algorithm,
@@ -226,7 +232,7 @@ const Actions =
       {
         const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
         variant = variant.set('db', algorithm.db).set('language', algorithm.language);
-        $(ActionTypes.variants.move, { variant, index, groupId, algorithmId })
+        return $(ActionTypes.variants.move, { variant, index, groupId, algorithmId });
       },
 
       duplicate:
@@ -329,16 +335,19 @@ const Actions =
     fetch:
     () =>
     {
-      Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
+      return (dispatch) =>
       {
-        Actions.loadState(_LibraryState({
-          groups,
-          algorithms,
-          variants,
-          groupsOrder,
-          loading: false,
-        }));
-      });
+        Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
+        {
+          dispatch(Actions.loadState(_LibraryState({
+            groups,
+            algorithms,
+            variants,
+            groupsOrder,
+            loading: false,
+          })));
+        });
+      };
     },
   };
 
