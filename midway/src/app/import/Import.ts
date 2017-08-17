@@ -203,7 +203,7 @@ export class Import
           newDoc['rank'] = rankCounter;
           for (const field of Object.keys(newDoc))
           {
-            if (newDoc.hasOwnProperty(field) && newDoc[field] instanceof Array)
+            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]))
             {
               newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
             }
