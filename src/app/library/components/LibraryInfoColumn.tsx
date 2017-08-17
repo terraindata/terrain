@@ -62,9 +62,6 @@ import * as UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import ColorManager from './../../util/ColorManager';
 import Util from './../../util/Util';
-import LibraryActions from './../data/LibraryActions';
-import Actions from './../data/LibraryActions';
-import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
@@ -86,9 +83,14 @@ type UserMap = UserTypes.UserMap;
 
 export interface Props
 {
+  dbs: List<BackendInstance>;
   group: Group;
   algorithm: Algorithm;
   variant: Variant;
+  groupActions: any;
+  algorithmActions: any;
+  variantActions: any;
+  libraryActions: any;
 }
 
 class LibraryInfoColumn extends TerrainComponent<Props>
@@ -97,12 +99,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     users: UserMap,
     roles: RoleMap,
     me: User,
-    dbs: List<BackendInstance>,
   } = {
     users: null,
     roles: null,
     me: null,
-    dbs: List([]),
   };
 
   constructor(props: Props)
@@ -121,14 +121,9 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       stateKey: 'roles',
     });
 
-    this._subscribe(LibraryStore, {
-      stateKey: 'dbs',
-      storeKeyPath: ['dbs'],
-    });
-
     Ajax.getDbs((dbs: BackendInstance[], loadFinished: boolean) =>
     {
-      LibraryActions.setDbs(
+      this.props.libraryActions.setDbs(
         List(dbs),
         loadFinished,
       );
@@ -147,14 +142,15 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         variant={this.props.variant}
         isSuperUser={isSuperUser}
         isBuilder={isBuilder}
+        variantActions={this.props.variantActions}
       />
     );
   }
 
   public handleAlgorithmDbChange(dbIndex: number)
   {
-    const dbs = this.getSortedDatabases(this.state.dbs);
-    Actions.algorithms.change(this.props.algorithm.set('db', dbs.get(dbIndex)) as Algorithm);
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    this.props.algorithmActions.change(this.props.algorithm.set('db', dbs.get(dbIndex)) as Algorithm);
   }
 
   public renderAlgorithm(isSuperUser, isBuilder)
@@ -245,8 +241,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public handleGroupDbChange(dbIndex: number)
   {
-    const dbs = this.getSortedDatabases(this.state.dbs);
-    Actions.groups.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    this.props.groupActions.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
   }
 
   public renderGroup(isSuperUser, isBuilder)
@@ -262,7 +258,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
 
     const isSysAdmin = this.state.me && this.state.me.isSuperUser;
-    const dbs = this.getSortedDatabases(this.state.dbs);
+    const dbs = this.getSortedDatabases(this.props.dbs);
     return (
       <div>
         <div className='library-info-line'>

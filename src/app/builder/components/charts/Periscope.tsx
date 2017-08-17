@@ -102,7 +102,7 @@ const Periscope = {
       fill: ${Colors().text2} !important;
     }
     `;
-    let style = $(el).append(`<style>${styleCSS}</style>`);
+    const style = $(el).append(`<style>${styleCSS}</style>`);
   },
 
   update(el, state)

@@ -569,7 +569,7 @@ class _CardComponent extends TerrainComponent<Props>
                   className='card-handle-icon'
                 >
                   <HandleIcon />
-                </div>
+                </div>,
               )
             }
             {
