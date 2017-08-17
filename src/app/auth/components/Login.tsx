@@ -261,12 +261,12 @@ class Login extends TerrainComponent<Props>
         >
           <div className='login-info'
             style={[
-              backgroundColor(Colors().bg3)
+              backgroundColor(Colors().bg3),
             ]}
           >
             <div className='login-row'
               style={[
-                fontColor(Colors().text2)
+                fontColor(Colors().text2),
               ]}
               key={'login-email'}
             >
@@ -275,7 +275,7 @@ class Login extends TerrainComponent<Props>
                   fontColor(Colors().altText1),
                   backgroundColor(Colors().altBg1),
                   borderColor(Colors().border3,
-                    Colors().active)
+                    Colors().active),
                 ]}
                 key={'login-input-email'}
                 id='login-email'
@@ -290,7 +290,7 @@ class Login extends TerrainComponent<Props>
                 htmlFor='login-email'
                 className='login-label'
                 style={[
-                  fontColor(Colors().border3)
+                  fontColor(Colors().border3),
                 ]}
                 key={'login-label-email'}
               >
@@ -299,7 +299,7 @@ class Login extends TerrainComponent<Props>
             </div>
             <div className='login-row'
               style={[
-                fontColor(Colors().text2)
+                fontColor(Colors().text2),
               ]}
               key={'login-password'}
             >
@@ -308,7 +308,7 @@ class Login extends TerrainComponent<Props>
                   fontColor(Colors().altText1),
                   backgroundColor(Colors().altBg1),
                   borderColor(Colors().border3,
-                    Colors().active)
+                    Colors().active),
                 ]}
                 key={'login-input-password'}
                 id='login-password'
@@ -324,7 +324,7 @@ class Login extends TerrainComponent<Props>
                 className='login-label'
                 htmlFor='login-password'
                 style={[
-                  fontColor(Colors().border3)
+                  fontColor(Colors().border3),
                 ]}
                 key={'login-label-password'}
               >
@@ -337,7 +337,7 @@ class Login extends TerrainComponent<Props>
               style={[
                 fontColor(Colors().text2),
                 backgroundColor(Colors().active,
-                  Colors().activeHover)
+                  Colors().activeHover),
               ]}
               key={'login-submit-button'}
               onClick={this.handleLogin}
