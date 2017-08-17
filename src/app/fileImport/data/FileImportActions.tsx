@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
+import { Query } from '../../../items/types/Query';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
@@ -88,8 +89,8 @@ const FileImportActions =
       $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     exportFile:
-    () =>
-      $(ActionTypes.exportFile, {}),
+    (query: Query, templateId: number, rank: boolean) =>
+      $(ActionTypes.exportFile, { query, templateId, rank }),
 
     addTransform:
     (transform: Transform) =>

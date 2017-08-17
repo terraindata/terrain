@@ -52,6 +52,7 @@ import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
+import { Query } from '../../../items/types/Query';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
@@ -86,6 +87,7 @@ export interface Props
   uploadInProgress: boolean;
   elasticUpdate: boolean;
   exporting: boolean;
+  query?: Query;
 }
 
 @Radium
@@ -219,7 +221,8 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      Actions.exportFile();
+      const id = this.props.templates.get(this.state.templateId).templateId;
+      Actions.exportFile(this.props.query, id, true);
     }
     else
     {

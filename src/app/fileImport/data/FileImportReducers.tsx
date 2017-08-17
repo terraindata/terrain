@@ -302,31 +302,22 @@ FileImportReducers[ActionTypes.exportFile] =
   {
     Ajax.exportFile(
       state.filetype,
-      state.dbText,
-      state.tableText,
-      state.connectionId,
-      state.originalNames,
-      Map<string, object>(state.columnNames.map((colName, colId) =>
-        state.columnsToInclude.get(colId) &&
-        [colName, state.columnTypes.get(colId).toJS()],
-      )),
-      state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
-      state.transforms,
-      state.elasticUpdate,
+      state.dbName,
+      state.tableName,
+      state.serverId,
       true, // exporting
-      state.templateName,
-      () =>
+      JSON.stringify(action.payload.query),
+      action.payload.templateId,
+      action.payload.rank,
+      (response: object[]) =>
       {
+        console.log(response);
         alert('success');
       },
       (err: string) =>
       {
         alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
       },
-      // query?: Query,
-      // variantId?: number,
-      // templateID?: number,
-      // rank?: boolean,
     );
     return state;
   };
@@ -345,7 +336,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.transforms,
       action.payload.templateName,
-      action.payload.exporting, // isExport
+      action.payload.exporting,
       () =>
       {
         alert('successfully saved template');
@@ -382,7 +373,9 @@ FileImportReducers[ActionTypes.fetchTemplates] =
           }),
         ));
         console.log('fetched templates: ', templates);
-        action.payload.setTemplates(List(templates.filter((template) => template.export === action.payload.exporting)));
+        action.payload.setTemplates(List(templates.filter((template) =>
+          !!template.export === action.payload.exporting,
+        )));
       },
     );
     return state;

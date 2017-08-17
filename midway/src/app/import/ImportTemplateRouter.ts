@@ -99,7 +99,6 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
   {
     throw Error('Invalid parameter template ID');
   }
-
   ctx.body = await templates.upsert(ctx.state.user, template);
 });
 

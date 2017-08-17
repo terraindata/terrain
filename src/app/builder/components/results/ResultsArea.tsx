@@ -570,6 +570,7 @@ column if you have customized the results view.');
               uploadInProgress={false}
               elasticUpdate={elasticUpdate}
               exporting={true}
+              query={this.props.query}
             />
 
           </div>

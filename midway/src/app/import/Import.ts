@@ -192,7 +192,6 @@ export class Import
       qryObj['scroll'] = this.SCROLL_TIMEOUT;
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
-
         const newDocs: object[] = resp.hits.hits as object[];
         if (newDocs.length === 0)
         {
