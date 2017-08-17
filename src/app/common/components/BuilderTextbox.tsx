@@ -338,7 +338,7 @@ class BuilderTextbox extends TerrainComponent<Props>
       const textStyle = this.props.textStyle || {};
       if (valueIsInput)
       {
-        textStyle.color = Colors().builder.cards.inputParameter[0];
+        textStyle.color = Colors().builder.cards.inputParameter;
       }
 
       return (

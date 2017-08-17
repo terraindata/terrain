@@ -243,7 +243,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const placeholderStyle = [
       fontColor(Colors().text1),
       borderColor(Colors().border1),
-      backgroundColor(Colors().bg1)
+      backgroundColor(Colors().bg1),
     ];
 
     return (
@@ -272,7 +272,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               style={[
                 fontColor(Colors().text1),
                 borderColor(Colors().border1, Colors().border3),
-                backgroundColor(Colors().bg3)
+                backgroundColor(Colors().bg3),
               ]}
               onClick={this.handleClose}
             >
@@ -389,9 +389,12 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             }
           </CRTarget>
           <div className='results-config-disabled-veil'
-            style={backgroundColor(Color(Colors().bg1).alpha(0.5))} // bg1 but with alpha 0.5
+            style={backgroundColor(Colors().fadedOutBg)}
           >
-            <div className='results-config-disabled-veil-inner'>
+            <div
+              className='results-config-disabled-veil-inner'
+              style={backgroundColor(Colors().bg1)}
+            >
               <b>Custom results view is off.</b>
               Results will display the information returned from the query.
             </div>
@@ -507,19 +510,19 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
       getStyle('borderRightColor', Colors().border1, Colors().border2),
       getStyle('borderTopColor', Colors().border1, Colors().border2),
       getStyle('borderBottomColor', Colors().border1, Colors().border2),
-      getStyle('borderLeftColor', selected ? Colors().active : Colors().border1, selected ? Colors().active : Colors().border2)
+      getStyle('borderLeftColor', selected ? Colors().active : Colors().border1, selected ? Colors().active : Colors().border2),
     ];
 
     const activeBtnStyle = [
       backgroundColor(Colors().active),
       fontColor(Colors().text1),
-      borderColor(Colors().border2)
+      borderColor(Colors().border2),
     ];
 
     const inactiveBtnStyle = [
       backgroundColor(Colors().bg1),
       fontColor(Colors().text3, Colors().text2),
-      borderColor(Colors().border1, Colors().border2)
+      borderColor(Colors().border1, Colors().border2),
     ];
 
     return this.props.connectDropTarget(this.props.connectDragSource(

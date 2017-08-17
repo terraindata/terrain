@@ -382,7 +382,7 @@ class VariantsColumn extends TerrainComponent<Props>
               className='library-item-line'
             >
               {
-                Util.formatDate(variant.lastEdited)
+                'Changed ' + Util.formatDate(variant.lastEdited)
               }
             </div>
           </div>
