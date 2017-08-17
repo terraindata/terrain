@@ -191,7 +191,7 @@ class Modal extends TerrainComponent<Props>
                 this.props.children
               }
               {
-                this.props.confirm &&
+                this.props.confirm ?
                 <div
                   className='modal-buttons'
                   style={MODAL_HEADER_FOOTER_STYLE}
@@ -227,6 +227,8 @@ class Modal extends TerrainComponent<Props>
                     Cancel
                     </div>
                 </div>
+                :
+                <div className='modal-buttons-empty'/>
               }
             </div>
           </ReactModal>
