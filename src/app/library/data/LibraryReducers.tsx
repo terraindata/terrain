@@ -48,7 +48,7 @@ import { ItemStatus } from '../../../items/types/Item';
 import Util from './../../util/Util';
 import * as LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
-import { LibraryState } from './LibraryStore';
+import { _LibraryState, LibraryState } from './LibraryStore';
 
 import * as Immutable from 'immutable';
 

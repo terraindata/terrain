@@ -95,6 +95,7 @@ import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
+import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
 
@@ -258,7 +259,8 @@ class App extends TerrainComponent<Props>
   public fetchData()
   {
     UserActions.fetch();
-    LibraryActions.fetch();
+    TerrainStore.dispatch(LibraryActions.fetch());
+    LibraryStore.dispatch(LibraryActions.fetch());
     SchemaActions.fetch();
     // RolesActions.fetch();
   }
