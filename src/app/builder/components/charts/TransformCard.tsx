@@ -64,6 +64,7 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
+import {ElasticQueryResult} from '../../../../../shared/database/elastic/ElasticQueryResponse';
 
 const NUM_BARS = 1000;
 
@@ -113,7 +114,7 @@ class TransformCard extends TerrainComponent<Props>
   {
     super(props);
     this.state = {
-      // props.data.doma is List<string>
+      // props.data.domain is List<string>
       maxDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
       chartDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
       range: List([0, 1]),
@@ -237,7 +238,7 @@ class TransformCard extends TerrainComponent<Props>
   {
     const low = maxDomain.get(0);
     const high = maxDomain.get(1);
-    if (Number.isNaN(low) || Number.isNaN(high) || low >= high || low < 0 || high < 0)
+    if (Number.isNaN(low) || Number.isNaN(high) || low >= high)
     {
       // TODO: show an error message about the wrong domain values.
       return curStateDomain;
@@ -264,34 +265,31 @@ class TransformCard extends TerrainComponent<Props>
 
     const min = this.state.maxDomain.get(0);
     const max = this.state.maxDomain.get(1);
-    const elasticHistogram = resp.getAggregationResult();
-    let theHist;
-    try
+    const elasticHistogram = (resp.result as ElasticQueryResult).aggregations;
+    const hits = (resp.result as ElasticQueryResult).hits;
+    let totalDoc = 0;
+    if (hits && hits.total)
     {
-      if (elasticHistogram.transformCard.buckets.length >= NUM_BARS)
-      {
-        theHist = elasticHistogram.transformCard.buckets;
-      } else
-      {
-        throw Error('elasticHistogram.transformCard.buckets.length < NUM_BARS');
-      }
-    } catch (e)
-    {
-      return this.handleElasticAggregationError(e.message);
+      totalDoc = hits.total;
     }
-
-    // because the query's min,max,interl are same as the input parameters,
-    // we can directly set the count and the percentage sequentially.
+    let theHist;
+    if (totalDoc > 0 && elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+    {
+      theHist = elasticHistogram.transformCard.buckets;
+    } else
+    {
+      return this.handleElasticAggregationError("No Result");
+    }
     const bars: Bar[] = [];
     for (let j = 0; j < NUM_BARS; j++)
     {
       bars.push({
         id: '' + j,
         count: theHist[j].doc_count,
-        percentage: theHist[j].doc_count,
+        percentage: theHist[j].doc_count / totalDoc,
         range: {
-          min: min + (max - min) * j / NUM_BARS,
-          max: min + (max - min) * (j + 1) / NUM_BARS,
+          min: theHist[j].key,
+          max: theHist[j + 1].key,
         },
       });
     }
@@ -310,14 +308,14 @@ class TransformCard extends TerrainComponent<Props>
         this.computeTQLBars(input);
         break;
       case 'elastic':
-        this.computeEQLBars(input, maxDomain);
+        this.computeElasticBars(input, maxDomain);
         break;
       default:
         break;
     }
   }
 
-  private computeEQLBars(input: CardString, maxDomain: List<number>)
+  private computeElasticBars(input: CardString, maxDomain: List<number>)
   {
     const { builderState } = this.props;
     const { db } = builderState;
@@ -328,6 +326,7 @@ class TransformCard extends TerrainComponent<Props>
     }
 
     // get the index and type from the cards
+    // TODO: use common function from ElasticBlockHelpers
     let index: string = '';
     let type: string = '';
     const cards = builderState.query.cards;
@@ -357,6 +356,7 @@ class TransformCard extends TerrainComponent<Props>
           bool: {
             must: {
               range: {
+                [input as string]: { gte: min, lt: max }
               },
             },
           },
@@ -367,7 +367,7 @@ class TransformCard extends TerrainComponent<Props>
               field: input,
               interval,
               extended_bounds: {
-                min, max, // make sure the buckets start from min
+                min, max, // force the ES server to return NUM_BARS + 1 bins.
               },
             },
           },
@@ -376,7 +376,6 @@ class TransformCard extends TerrainComponent<Props>
     };
     aggQuery['index'] = index;
     aggQuery['type'] = type;
-    aggQuery.body.query.bool.must.range[input as string] = { gte: min, lte: max };
 
     this.setState(
       Ajax.query(

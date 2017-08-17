@@ -79,7 +79,7 @@ export const elasticTransform = _card(
     input: '',
     scorePoints: List([]),
 
-    // make this list<string> since the values passed form the TextBuilder are string.
+    // make this list<string> since the values passed from BuilderTextBox are string.
     domain: List(['0', '100']),
     hasCustomDomain: false, // has the user set a custom domain
 

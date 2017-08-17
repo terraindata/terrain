@@ -91,20 +91,6 @@ export default class MidwayQueryResponse extends QueryResponse
     super(result, errors, request);
   }
 
-  public getAggregationResult(): any
-  {
-    let aggs;
-    switch (this.request.databasetype)
-    {
-      case 'elastic':
-        aggs = (this.result as ElasticQueryResult).aggregations;
-        break;
-      default:
-        aggs = {};
-    }
-    return aggs;
-  }
-
   public getResultsData(): any[]
   {
     let result;
