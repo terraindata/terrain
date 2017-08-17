@@ -59,7 +59,7 @@ import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import { spotlightAction } from '../../data/SpotlightStore';
+import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Result } from './ResultTypes';
 
@@ -87,13 +87,13 @@ export interface Props
 
 @Radium
 class ResultComponent extends TerrainComponent<Props> {
-  // state: {
-  //   isSpotlit: boolean;
-  //   spotlightColor: string;
-  // } = {
-  //   isSpotlit: false,
-  //   spotlightColor: "",
-  // };
+  public state: {
+    isSpotlit: boolean;
+    spotlightColor: string;
+  } = {
+    isSpotlit: false,
+    spotlightColor: '',
+  };
 
   public menuOptions =
   [
@@ -118,16 +118,20 @@ class ResultComponent extends TerrainComponent<Props> {
     {
       if (key !== 'result' && this.props[key] !== nextProps[key])
       {
+        this.unspotlight();
         return true;
       }
     }
 
-    if (!_.isEqual(this.props.result.toJS(), nextProps.result.toJS()))
+    for (const key in nextState)
     {
-      return true;
+      if (this.state[key] !== nextState[key])
+      {
+        return true;
+      }
     }
 
-    return false;
+    return !_.isEqual(this.props.result.toJS(), nextProps.result.toJS());
   }
 
   public renderExpandedField(value, field)
@@ -187,13 +191,14 @@ class ResultComponent extends TerrainComponent<Props> {
     this.setState({
       isSpotlit: true,
       spotlightColor,
-    });
-
-    const spotlightData = this.props.result.toJS();
-    spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig);
-    spotlightData['color'] = spotlightColor;
-    spotlightData['id'] = id;
-    spotlightAction(id, spotlightData);
+    }, function()
+      {
+        const spotlightData = this.props.result.toJS();
+        spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig);
+        spotlightData['color'] = spotlightColor;
+        spotlightData['id'] = id;
+        spotlightAction(id, spotlightData);
+      });
   }
 
   public unspotlight()
@@ -206,7 +211,7 @@ class ResultComponent extends TerrainComponent<Props> {
 
   public renderSpotlight()
   {
-    if (!this.props.result.spotlight)
+    if (!this.state.isSpotlit)
     {
       return null;
     }
@@ -314,7 +319,7 @@ class ResultComponent extends TerrainComponent<Props> {
 
           <Menu
             options={
-              this.menuOptions[result.spotlight ? 1 : 0]
+              this.menuOptions[this.state.isSpotlit ? 1 : 0]
             }
           />
 

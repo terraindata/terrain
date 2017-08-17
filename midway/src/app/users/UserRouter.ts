@@ -86,10 +86,9 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   }
 
   // if superuser or id to be updated is current user
-  const isSuperUser: boolean = ctx.state.user.isSuperUser;
-  if (isSuperUser || ctx.request.body.id === ctx.params.id)
+  if (ctx.state.user.isSuperUser || ctx.request.body.id === user.id)
   {
-    ctx.body = await users.update(isSuperUser, user);
+    ctx.body = await users.update(user);
   }
 });
 

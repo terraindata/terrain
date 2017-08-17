@@ -201,42 +201,42 @@ export class ResultsManager extends TerrainComponent<Props>
       }
     }
 
-    // if(nextProps.resultsState.results !== this.props.resultsState.results)
-    // {
-    //   // update spotlights
-    //   let nextState = nextProps.resultsState;
-    //   let {resultsConfig} = nextProps.query;
+    if (nextProps.resultsState.results !== this.props.resultsState.results)
+    {
+      // update spotlights
+      let nextState = nextProps.resultsState;
+      let { resultsConfig } = nextProps.query;
 
-    //   SpotlightStore.getState().spotlights.map(
-    //     (spotlight, id) =>
-    //     {
-    //       let resultIndex = nextState.results && nextState.results.findIndex(
-    //         r => getPrimaryKeyFor(r, resultsConfig) === id
-    //       );
-    //       if(resultIndex !== -1)
-    //       {
-    //         spotlightAction(id, _.extend({
-    //             color: spotlight.color,
-    //             name: spotlight.name,
-    //           },
-    //           nextState.results.get(resultIndex).toJS()
-    //         ));
-    //         // TODO something more like this
-    //         // spotlightAction(id,
-    //         //   {
-    //         //     color: spotlight.color,
-    //         //     name: spotlight.name,
-    //         //     result: nextState.results.get(resultIndex),
-    //         //   }
-    //         // );
-    //       }
-    //       else
-    //       {
-    //         spotlightAction(id, null);
-    //       }
-    //     }
-    //   );
-    // }
+      SpotlightStore.getState().spotlights.map(
+        (spotlight, id) =>
+        {
+          let resultIndex = nextState.results && nextState.results.findIndex(
+            (r) => getPrimaryKeyFor(r, resultsConfig) === id,
+          );
+          if (resultIndex !== -1)
+          {
+            spotlightAction(id, _.extend({
+              color: spotlight.color,
+              name: spotlight.name,
+            },
+              nextState.results.get(resultIndex).toJS(),
+            ));
+            // TODO something more like this
+            // spotlightAction(id,
+            //   {
+            //     color: spotlight.color,
+            //     name: spotlight.name,
+            //     result: nextState.results.get(resultIndex),
+            //   }
+            // );
+          }
+          else
+          {
+            spotlightAction(id, null);
+          }
+        },
+      );
+    }
   }
 
   public handleCountResponse(response: M1QueryResponse)
@@ -695,12 +695,12 @@ export class ResultsManager extends TerrainComponent<Props>
   }
 }
 
-function getPrimaryKeyFor(result: Result, config: ResultsConfig, index: number): string
+function getPrimaryKeyFor(result: Result, config: ResultsConfig, index?: number): string
 {
   if (config && config.primaryKeys.size)
   {
     return config.primaryKeys.map(
-      (field) => result.fields[field],
+      (field) => result.fields.get(field),
     ).join('-and-');
   }
 

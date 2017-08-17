@@ -58,6 +58,9 @@ import Util from '../../util/Util';
 import LayoutManager from './../../builder/components/layout/LayoutManager';
 import Dropdown from './Dropdown';
 
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../common/Colors';
+import StyleTag from '../../common/components/StyleTag';
+
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
@@ -152,8 +155,62 @@ class DatePicker extends TerrainComponent<Props>
           initialMonth={date}
         />
         {this.renderTimePicker()}
+        <StyleTag style={DATE_PICKER_STYLE} />
       </div>
     );
   }
 }
+
+const DATE_PICKER_STYLE = {
+
+  '.date-picker': {
+    'background': Colors().bg1,
+    'color': Colors().text2,
+
+    '.dropdown-wrapper:not(:hover)': {
+      'box-shadow': getStyle('boxShadow', '0px 0px 0px 1px ' + Colors().boxShadow),
+    }
+  },
+
+  '.DayPicker-Weekday': {
+    color: Colors().text2,
+  },
+
+  '.DayPicker-Day': {
+    'border-color': Colors().altHighlight,
+    'background': Colors().altBg1,
+    'color': Colors().altText3,
+  },
+
+  '.DayPicker-Day:hover:not(.DayPicker-Day--selected):not(.DayPicker-Day--outside)': {
+    background: Colors().inactiveHover,
+  },
+
+  '.DayPicker-Day--today': {
+    'color': Colors().altText1,
+    'background-color': Colors().altBg1,
+  },
+
+  '.DayPicker-Day--disabled': {
+    'color': Colors().text2,
+    'background-color': Colors().altBg2,
+  },
+
+  '.DayPicker-Day--outside': {
+    color: Colors().text2,
+    background: Colors().altBg2,
+  },
+
+  '.DayPicker-Day--sunday': {
+    'color': Colors().text2,
+    'background-color': Colors().altBg1,
+  },
+
+  '.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)': {
+    'color': Colors().text1,
+    'background-color': Colors().active,
+  },
+
+};
+
 export default DatePicker;

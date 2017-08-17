@@ -209,21 +209,21 @@ const Util = {
   {
     const then = moment(date);
     const now = moment();
-    const hour = ' at ' + then.format('h:mma');
 
     if (then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
-      return 'Today at' + hour;
+      const hour = then.format('h:mma');
+      return 'Today, ' + hour;
     }
 
     if (then.format('YYYY') === now.format('YYYY'))
     {
       // same year
-      return then.format('MM/DD/YY') + hour;
+      return then.format('MM/DD/YY');
     }
 
-    return then.format('MM/DD/YY') + hour;
+    return then.format('MM/DD/YY');
   },
 
   roundNumber(num, decimalPoints)
