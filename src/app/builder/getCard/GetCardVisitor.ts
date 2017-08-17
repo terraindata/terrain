@@ -304,10 +304,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           accepts: List(['eql' + clause.elementID]),
         },
 
-        init: (blocksConfig) =>
+        init: (blocksConfig, extraConfig?, skipTemplate?) =>
           ({
             cards: List([
-              BlockUtils.make(blocksConfig, 'eql' + clause.elementID),
+              BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
             ]),
           }),
 
@@ -563,7 +563,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
-    const init = (blocksConfig) =>
+    const init = (blocksConfig, extraConfig?, skipTemplate?) =>
     {
       const config = {
         childOptionClickHandler: (card, option: { text: string, key: string, type: string }): Card =>
@@ -582,7 +582,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         },
       };
 
-      if (clause.template)
+      if (clause.template && skipTemplate !== true)
       {
         // create the card list from the template
         const cards = _.compact(
@@ -780,7 +780,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           return ''; // tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
 
-        init: (blocksConfig, extraConfig) =>
+        init: (blocksConfig, extraConfig?, skipTemplate?) =>
         {
           if (extraConfig !== undefined)
           {
@@ -820,6 +820,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
                 {
                   key: card['key'],
                 },
+                skipTemplate,
               );
             },
           });

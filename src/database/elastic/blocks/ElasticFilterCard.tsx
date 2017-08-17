@@ -57,7 +57,6 @@ import * as CommonBlocks from '../../../blocks/CommonBlocks';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 const esFilterOperatorsMap = {
@@ -73,7 +72,7 @@ export const elasticFilterBlock = _block(
   {
     field: '',
     value: undefined,
-    boolQuery: '',
+    boolQuery: 'must',
     filterOp: '=',
 
     static: {
@@ -238,7 +237,6 @@ export const elasticFilter = _card({
             {
               displayType: DisplayType.TEXT,
               key: 'value',
-              autoDisabled: true,
             },
           ],
         },
