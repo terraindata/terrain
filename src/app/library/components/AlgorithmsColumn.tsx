@@ -47,9 +47,11 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
 import * as Immutable from 'immutable';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
+import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
@@ -63,8 +65,6 @@ import InfoArea from './../../common/components/InfoArea';
 import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import Actions from './../data/LibraryActions';
-import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
@@ -74,18 +74,22 @@ import './AlgorithmsColumn.less';
 
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
+type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   basePath: string;
+  dbs: List<BackendInstance>;
+  groups: Immutable.Map<ID, Group>;
   algorithms: Immutable.Map<ID, Algorithm>;
   variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
   groupId: ID;
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
+  algorithmActions: any;
 }
 
 class AlgorithmsColumn extends TerrainComponent<Props>
@@ -112,6 +116,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     newAlgorithmDbIndex: -1,
   };
 
+  constructor(props)
+  {
+    super(props);
+    this.getSortedDatabases = memoizeOne(this.getSortedDatabases);
+  }
+
   public componentWillMount()
   {
     this._subscribe(UserStore, {
@@ -125,7 +135,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public componetDidMount()
+  public componentDidMount()
   {
     this.setState({
       rendered: true,
@@ -152,10 +162,17 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
   }
 
+  public getSortedDatabases(dbs)
+  {
+    return Util.sortDatabases(dbs);
+  }
+
   public getNewAlgorithmIndex(): number
   {
-    const group = LibraryStore.getState().groups.get(this.props.groupId);
-    const dbs = LibraryStore.getState().dbs;
+    const { groups } = this.props;
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const group = groups.get(this.props.groupId);
+
     if (this.state.newAlgorithmDbIndex !== -1)
     {
       return this.state.newAlgorithmDbIndex;
@@ -168,7 +185,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleDuplicate(id: ID)
   {
-    Actions.algorithms.duplicate(
+    this.props.algorithmActions.duplicate(
       this.props.algorithms.get(id),
       this.props.algorithmsOrder.findIndex((iid) => iid === id),
     );
@@ -176,15 +193,20 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleArchive(id: ID)
   {
-    Actions.algorithms.change(
+    this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('status', ItemStatus.Archive) as Algorithm,
     );
   }
 
+  public handleCreate()
+  {
+    this.props.algorithmActions.create(this.props.groupId);
+  }
+
   public handleNameChange(id: ID, name: string)
   {
-    Actions.algorithms.change(
+    this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm,
     );
@@ -215,7 +237,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public handleNewAlgorithmTextboxChange(value)
   {
     this.setState({
-      newAlgorithmTextboxValue: value
+      newAlgorithmTextboxValue: value,
     });
   }
 
@@ -228,19 +250,21 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNewAlgorithmCreated(algorithmId)
   {
-    const groupId = LibraryStore.getState().algorithms.get(algorithmId).groupId;
+    const { algorithms } = this.props;
+    const groupId = algorithms.get(algorithmId).groupId;
     browserHistory.push(`/library/${groupId}/${algorithmId}`);
   }
 
   public handleNewAlgorithmCreate()
   {
-    const dbs = LibraryStore.getState().dbs;
+    const dbs = this.getSortedDatabases(this.props.dbs);
     const index = this.getNewAlgorithmIndex();
-    Actions.algorithms.createAs(
+
+    this.props.algorithmActions.createAs(
       this.props.groupId,
       this.state.newAlgorithmTextboxValue,
       dbs.get(index),
-      this.handleNewAlgorithmCreated
+      this.handleNewAlgorithmCreated,
     );
   }
 
@@ -265,7 +289,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       case 'group':
         if (shiftKey)
         {
-          Actions.algorithms.duplicate(
+          this.props.algorithmActions.duplicate(
             this.props.algorithms.get(id),
             0,
             targetItem.id,
@@ -273,7 +297,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         }
         else
         {
-          Actions.algorithms.move(
+          this.props.algorithmActions.move(
             this.props.algorithms.get(id),
             0,
             targetItem.id,
@@ -281,7 +305,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         }
         break;
       case 'algorithm':
-        Actions.algorithms.move(
+        this.props.algorithmActions.move(
           this.props.algorithms.get(id),
           this.props.algorithmsOrder.indexOf(targetItem.id),
           this.props.groupId,
@@ -291,7 +315,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         // no good
         break;
     }
+  }
 
+  public handleDragFinish()
+  {
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
@@ -343,7 +370,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
     variants.map(
       (v: Variant) =>
-        scores[v.status] && scores[v.status].score++,
+      {
+        if (v.status !== undefined)
+        {
+          scores[v.status].score++;
+        }
+      },
     );
 
     // scores.splice(0, 1); // remove Archived count
@@ -409,6 +441,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={algorithm}
         canEdit={canEdit}
         canDrag={canDrag}
@@ -444,10 +477,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public handleCategoryHover(statusString: string, id: ID)
   {
     const a = this.props.algorithms.get(id);
-    const status = ItemStatus[statusString];
-    if (a.status !== status)
+    if (a.status !== statusString && statusString !== undefined)
     {
-      Actions.algorithms.change(a.set('status', status) as Algorithm);
+      this.props.algorithmActions.change(a.set('status', statusString) as Algorithm);
     }
   }
 
@@ -485,13 +517,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderDatabaseDropdown()
   {
-    const dbs = LibraryStore.getState().dbs;
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const options = dbs ? dbs.map((db) => db.name + ` (${db.type})`).toList() : [];
+
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
             selectedIndex={this.state.newAlgorithmDbIndex}
-            options={dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
+            options={options}
             onChange={this.handleNewAlgorithmDbChange}
             canEdit={true}
             directionBias={90}
@@ -504,7 +538,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderCreateAlgorithmModal()
   {
-    const canCreateAlgorithm: boolean = LibraryStore.getState().dbs.size > 0;
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const canCreateAlgorithm: boolean = dbs && dbs.size > 0;
+
     return canCreateAlgorithm ?
       (<Modal
         open={this.state.creatingNewAlgorithm}
@@ -532,6 +568,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public render()
   {
+    const { algorithms, algorithmsOrder, groupId } = this.props;
+
     return (
       <LibraryColumn
         index={2}
@@ -541,9 +579,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
           this.renderCreateAlgorithmModal()
         }
         {
-          this.props.algorithmsOrder ?
+          algorithmsOrder ?
             (
-              this.props.algorithmsOrder.size ?
+              algorithmsOrder.size ?
                 (
                   <div>
                     {
@@ -558,7 +596,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                 <InfoArea
                   large='No algorithms created, yet.'
                   button={
-                    Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(groupId, 'admin', UserStore, RolesStore)
                       ? 'Create a algorithm' : null
                   }
                   onClick={this.handleNewAlgorithmModalOpen}
