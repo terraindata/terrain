@@ -66,8 +66,8 @@ Router.post('/', async (ctx, next) =>
     return;
   }
 
-  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'tablename', 'filetype']);
-  Util.verifyParameters(authStream['fields'], ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
+  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKey', 'transformations']);
   // optional parameters: update, hasCsvHeader
 
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
@@ -75,14 +75,8 @@ Router.post('/', async (ctx, next) =>
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const authStream: object = await Util.authenticateStream(ctx.req);
-  if (authStream['user'] === null)
-  {
-    ctx.status = 400;
-    return;
-  }
   const exprtConf: ExportConfig = ctx.request.body.body;
-  Util.verifyParameters(exprtConf, ['variantId', 'templateID']);
+  Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
   ctx.body = await imprt.export(exprtConf);
 });
 
@@ -96,7 +90,7 @@ Router.post('/headless', async (ctx, next) =>
     return;
   }
 
-  Util.verifyParameters(authStream['fields'], ['templateID', 'filetype']);
+  Util.verifyParameters(authStream['fields'], ['filetype', 'templateID']);
   // optional parameters: update, hasCsvHeader
 
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);

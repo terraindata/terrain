@@ -93,8 +93,8 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 {
   winston.info('add new template');
   const template: ImportTemplateConfig = ctx.request.body.body;
-  Util.verifyParameters(template, ['name', 'dbid', 'dbname', 'tablename']);
-  Util.verifyParameters(template, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  Util.verifyParameters(template, ['dbid', 'dbname', 'name', 'tablename']);
+  Util.verifyParameters(template, ['columnTypes', 'originalNames', 'primaryKey', 'transformations']);
   if (template.id !== undefined)
   {
     throw Error('Invalid parameter template ID');
