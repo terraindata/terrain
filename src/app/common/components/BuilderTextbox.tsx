@@ -134,6 +134,8 @@ interface State
 
   focused: boolean;
   boxValue: any;
+
+  boxValueBuffer: any;
 }
 
 class BuilderTextbox extends TerrainComponent<Props>
@@ -157,6 +159,7 @@ class BuilderTextbox extends TerrainComponent<Props>
 
       focused: false,
       boxValue: props.value,
+      boxValueBuffer: null,
     };
   }
 
@@ -203,7 +206,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     if (!this.state.focused)
     {
       this.setState({
-        boxValue: value,
+        boxValueBuffer: value,
       });
     }
   }
@@ -229,6 +232,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   {
     this.setState({
       boxValue: value,
+      boxValueBuffer: null,
     });
     this.debouncedChange(value);
   }
@@ -282,6 +286,13 @@ class BuilderTextbox extends TerrainComponent<Props>
     this.setState({
       focused: false,
     });
+    if (this.state.boxValueBuffer !== null)
+    {
+      this.setState({
+        boxValue: this.state.boxValueBuffer,
+        boxValueBuffer: null,
+      });
+    }
   }
 
   public handleCardToolClose()
