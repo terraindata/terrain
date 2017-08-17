@@ -100,6 +100,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     creatingNewAlgorithm: boolean;
     newAlgorithmTextboxValue: string;
     newAlgorithmDbIndex: number;
+    newAlgorithmDbList?;
   } = {
     rendered: false,
     me: null,
@@ -125,7 +126,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public componetDidMount()
+  public componentDidMount()
   {
     this.setState({
       rendered: true,
@@ -144,6 +145,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
+    if (! this.state.newAlgorithmDbList)
+    {
+      this.setState({
+        newAlgorithmDbList: Util.sortDatabases(LibraryStore.getState().dbs),
+      });
+    }
     if (nextProps.groupId !== this.props.groupId)
     {
       this.setState({
@@ -155,7 +162,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public getNewAlgorithmIndex(): number
   {
     const group = LibraryStore.getState().groups.get(this.props.groupId);
-    const dbs = LibraryStore.getState().dbs;
+    const dbs = this.state.newAlgorithmDbList;
     if (this.state.newAlgorithmDbIndex !== -1)
     {
       return this.state.newAlgorithmDbIndex;
@@ -234,7 +241,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNewAlgorithmCreate()
   {
-    const dbs = LibraryStore.getState().dbs;
+    const dbs = this.state.newAlgorithmDbList;
     const index = this.getNewAlgorithmIndex();
     Actions.algorithms.createAs(
       this.props.groupId,
@@ -485,13 +492,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderDatabaseDropdown()
   {
-    const dbs = LibraryStore.getState().dbs;
+    const dbs = this.state.newAlgorithmDbList;
+    const options = dbs ? dbs.map((db) => db.name + ` (${db.type})`).toList() : [];
+
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
             selectedIndex={this.state.newAlgorithmDbIndex}
-            options={dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
+            options={options}
             onChange={this.handleNewAlgorithmDbChange}
             canEdit={true}
             directionBias={90}
@@ -504,7 +513,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderCreateAlgorithmModal()
   {
-    const canCreateAlgorithm: boolean = LibraryStore.getState().dbs.size > 0;
+    const canCreateAlgorithm: boolean = this.state.newAlgorithmDbList && this.state.newAlgorithmDbList.size > 0;
     return canCreateAlgorithm ?
       (<Modal
         open={this.state.creatingNewAlgorithm}
