@@ -56,7 +56,7 @@
     
     &:hover {
       border-color: rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.1);
+      //background: rgba(255,255,255,0.1);
     }
   }
   
@@ -64,11 +64,8 @@
     z-index: 9999;
     .card-field-tools-left,
     .card-field-tools-right {
-      border-color: rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.1);
-      .card-field-handle {
-        color: #333;
-      }
+      //border-color: rgba(255,255,255,0.5);
+     // background: rgba(255,255,255,0.1);
     }
   }
   
@@ -104,7 +101,6 @@
   .card-field-remove {
     font-weight: 200;
     font-size: calc(@medium-font-size * 1.25);
-    color: @light-gray;
     .transition(all 0.25s);   
     cursor: pointer;
   }
@@ -131,8 +127,7 @@
     margin-top: 4px;
     
     svg {
-      width: 8px;
-      fill: #777; // #FF6259;
+      width: 10px;
       .dead-center;
     }
     
@@ -158,17 +153,18 @@
     width: 18px;
     height: 18px;
     border-radius: 18px;
-    background: #fff;
+    //background: #fff;
     margin-top: 3px;
+    left: -3px; l, 
     
     svg {
       width: 12px;
-      fill: #8ac541;
+      //fill: #8ac541;
       .dead-center;
     }
     
     &:hover {
-      background: #8ac541;
+     // background: #8ac541;
       svg {
         fill: #fff;
       }
@@ -185,26 +181,26 @@
     top: 5px;
   }
 
-  &:hover {
-    .card {
-      .card-field-tools-left-inner,
-      .card-field-tools-right-inner {
-        opacity: 0;
-      }
+  // &:hover {
+  //   // .card {
+  //   //   .card-field-tools-left-inner,
+  //   //   .card-field-tools-right-inner {
+  //   //     opacity: 0;
+  //   //   }
       
-      .card-field:hover {
-        .card-field-tools-left-inner,
-        .card-field-tools-right-inner {
-          opacity: 1;
-        }
-      }
-    }
+  //   //   .card-field:hover {
+  //   //     .card-field-tools-left-inner,
+  //   //     .card-field-tools-right-inner {
+  //   //       opacity: 1;
+  //   //     }
+  //   //   }
+  //   // }
     
-    .card-field-tools-left-inner,
-    .card-field-tools-right-inner {
-      opacity: 1;
-    }
-  }
+  //   .card-field-tools-left-inner,
+  //   .card-field-tools-right-inner {
+  //     opacity: 1;
+  //   }
+  // }
   
   &.card-field-moving {
     .card-field-tools-left-inner {
@@ -218,6 +214,21 @@
   &.card-field-single {
     .card-field-tools-left {
       display: none;
+    }
+  }
+}
+
+.card:hover {
+  .card .card:hover {
+    .card-field-tools-left-inner, 
+    .card-field-tools-right-inner {
+        opacity: 1;
+      }
+    }
+  .card-field {
+    .card-field-tools-left-inner, 
+    .card-field-tools-right-inner {
+      opacity: 0;
     }
   }
 }
