@@ -220,41 +220,41 @@ class DeployModal extends TerrainComponent<Props>
 
     return (
       <div>
-      <Modal
-        open={this.state.changingStatus}
-        message={null}
-        onClose={this.handleClose}
-        title={title}
-        confirm={false}
-        fill={true}
-      >
-        {
-          changingStatusOf &&
-          <div
-            className={classNames({
-              'deploy-modal': true,
-            })}
-          >
-            {
-              this.renderTQLColumn(defaultVariant)
-            }
-            <DeployModalColumn
-              variant={changingStatusOf}
-              status={changingStatusTo}
-              onDeploy={this.handleDeploy}
-              defaultChecked={this.state.defaultChecked}
-              defaultVariant={defaultVariant}
-              onDefaultCheckedChange={this.handleDefaultCheckedChange}
-            />
-          </div>
-        }
         <Modal
-          message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal}
-          open={this.state.showErrorModal}
-          error={true}
-        />
-      </Modal>
+          open={this.state.changingStatus}
+          message={null}
+          onClose={this.handleClose}
+          title={title}
+          confirm={false}
+          fill={true}
+        >
+          {
+            changingStatusOf &&
+            <div
+              className={classNames({
+                'deploy-modal': true,
+              })}
+            >
+              {
+                this.renderTQLColumn(defaultVariant)
+              }
+              <DeployModalColumn
+                variant={changingStatusOf}
+                status={changingStatusTo}
+                onDeploy={this.handleDeploy}
+                defaultChecked={this.state.defaultChecked}
+                defaultVariant={defaultVariant}
+                onDefaultCheckedChange={this.handleDefaultCheckedChange}
+              />
+            </div>
+          }
+          <Modal
+            message={this.state.errorModalMessage}
+            onClose={this.toggleErrorModal}
+            open={this.state.showErrorModal}
+            error={true}
+          />
+        </Modal>
       </div>
     );
   }
