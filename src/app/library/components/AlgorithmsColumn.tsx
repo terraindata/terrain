@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
+import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
@@ -67,7 +68,6 @@ import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
-import BackendInstance from '../../../database/types/BackendInstance';
 
 import './AlgorithmsColumn.less';
 
@@ -224,7 +224,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public handleNewAlgorithmTextboxChange(value)
   {
     this.setState({
-      newAlgorithmTextboxValue: value
+      newAlgorithmTextboxValue: value,
     });
   }
 
@@ -250,7 +250,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       this.props.groupId,
       this.state.newAlgorithmTextboxValue,
       dbs.get(index),
-      this.handleNewAlgorithmCreated
+      this.handleNewAlgorithmCreated,
     );
   }
 

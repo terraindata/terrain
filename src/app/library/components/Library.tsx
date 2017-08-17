@@ -177,7 +177,7 @@ class Library extends TerrainComponent<any>
       algorithms,
       variants,
       selectedVariants,
-      groupsOrder
+      groupsOrder,
     } = libraryState;
 
     const { router, basePath, variantsMultiselect } = this.props;
