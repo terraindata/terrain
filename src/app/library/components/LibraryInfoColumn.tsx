@@ -83,6 +83,7 @@ type UserMap = UserTypes.UserMap;
 
 export interface Props
 {
+  dbs: List<BackendInstance>;
   group: Group;
   algorithm: Algorithm;
   variant: Variant;
@@ -98,12 +99,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     users: UserMap,
     roles: RoleMap,
     me: User,
-    dbs: List<BackendInstance>,
   } = {
     users: null,
     roles: null,
     me: null,
-    dbs: List([]),
   };
 
   constructor(props: Props)
@@ -131,6 +130,11 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     });
   }
 
+  public getSortedDatabases(dbs)
+  {
+    return Util.sortDatabases(dbs);
+  }
+
   public renderVariant(isSuperUser, isBuilder)
   {
     return (
@@ -138,7 +142,6 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         variant={this.props.variant}
         isSuperUser={isSuperUser}
         isBuilder={isBuilder}
-        dbs={this.state.dbs}
         variantActions={this.props.variantActions}
       />
     );
@@ -146,7 +149,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public handleAlgorithmDbChange(dbIndex: number)
   {
-    this.props.algorithmActions.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    this.props.algorithmActions.change(this.props.algorithm.set('db', dbs.get(dbIndex)) as Algorithm);
   }
 
   public renderAlgorithm(isSuperUser, isBuilder)
@@ -237,7 +241,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public handleGroupDbChange(dbIndex: number)
   {
-    this.props.groupActions.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    this.props.groupActions.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
   }
 
   public renderGroup(isSuperUser, isBuilder)
@@ -253,7 +258,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
 
     const isSysAdmin = this.state.me && this.state.me.isSuperUser;
-
+    const dbs = this.getSortedDatabases(this.props.dbs);
     return (
       <div>
         <div className='library-info-line'>
@@ -261,10 +266,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             Default Database
           </div>
           <Dropdown
-            selectedIndex={this.state.dbs && this.state.dbs.findIndex(
+            selectedIndex={dbs && dbs.findIndex(
               (db) => db.id === this.props.group.db.id,
             )}
-            options={this.state.dbs.map((db) => db.name).toList()}
+            options={dbs.map((db) => db.name + ` (${db.type})`).toList()}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isSuperUser}
             className='bic-db-dropdown'

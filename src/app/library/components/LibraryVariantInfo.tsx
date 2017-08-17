@@ -64,7 +64,6 @@ type Variant = LibraryTypes.Variant;
 export interface Props
 {
   variant: Variant;
-  dbs: List<BackendInstance>;
   isSuperUser: boolean;
   isBuilder: boolean;
   variantActions: any;

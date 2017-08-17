@@ -283,6 +283,7 @@ class Library extends TerrainComponent<any>
           {!variantsMultiselect ?
             <LibraryInfoColumn
               {...{
+                dbs,
                 group,
                 algorithm,
                 variant,

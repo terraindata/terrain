@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
 import * as Immutable from 'immutable';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
@@ -115,6 +116,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     newAlgorithmDbIndex: -1,
   };
 
+  constructor(props)
+  {
+    super(props);
+    this.getSortedDatabases = memoizeOne(this.getSortedDatabases);
+  }
+
   public componentWillMount()
   {
     this._subscribe(UserStore, {
@@ -128,7 +135,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public componetDidMount()
+  public componentDidMount()
   {
     this.setState({
       rendered: true,
@@ -155,9 +162,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
   }
 
+  public getSortedDatabases(dbs)
+  {
+    return Util.sortDatabases(dbs);
+  }
+
   public getNewAlgorithmIndex(): number
   {
-    const { groups, dbs } = this.props;
+    const { groups } = this.props;
+    const dbs = this.getSortedDatabases(this.props.dbs);
     const group = groups.get(this.props.groupId);
 
     if (this.state.newAlgorithmDbIndex !== -1)
@@ -244,8 +257,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleNewAlgorithmCreate()
   {
-    const { dbs } = this.props;
+    const dbs = this.getSortedDatabases(this.props.dbs);
     const index = this.getNewAlgorithmIndex();
+
     this.props.algorithmActions.createAs(
       this.props.groupId,
       this.state.newAlgorithmTextboxValue,
@@ -500,14 +514,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderDatabaseDropdown()
   {
-    const { dbs } = this.props;
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const options = dbs ? dbs.map((db) => db.name + ` (${db.type})`).toList() : [];
 
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
             selectedIndex={this.state.newAlgorithmDbIndex}
-            options={dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
+            options={options}
             onChange={this.handleNewAlgorithmDbChange}
             canEdit={true}
             directionBias={90}
@@ -520,9 +535,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderCreateAlgorithmModal()
   {
-    const { dbs } = this.props;
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const canCreateAlgorithm: boolean = dbs && dbs.size > 0;
 
-    const canCreateAlgorithm: boolean = dbs.size > 0;
     return canCreateAlgorithm ?
       (<Modal
         open={this.state.creatingNewAlgorithm}
