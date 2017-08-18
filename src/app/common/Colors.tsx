@@ -96,6 +96,7 @@ interface Theme
 
   scrollbarBG: string;
   scrollbarPiece: string;
+  altScrollbarPiece: string;
 
   error: string;
 
@@ -350,6 +351,8 @@ const DARK: Theme =
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+    altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',
 
     error: '#d14f42',
 
