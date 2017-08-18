@@ -66,6 +66,7 @@ const Periscope = {
 
   create(el, state)
   {
+    console.log(state.colors);
     d3.select(el).attr('class', 'periscope-wrapper');
 
     const svg = d3

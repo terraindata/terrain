@@ -70,6 +70,7 @@ export interface Props
   canEdit: boolean;
   width: number;
   language: string;
+  colors: [string];
 }
 
 const MAX_BARS = 100;
@@ -210,6 +211,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
       onDomainChangeStart: this.handleDomainChangeStart,
       width: (overrideState && overrideState['width']) || this.props.width,
       height: 40,
+      colors: this.props.colors,
     });
 
     return chartState;
