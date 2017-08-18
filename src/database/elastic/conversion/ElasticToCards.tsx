@@ -49,7 +49,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import * as _ from 'underscore';
 
- // TODO change / remove
+// TODO change / remove
 import Query from '../../../items/types/Query';
 
 import * as BlockUtils from '../../../blocks/BlockUtils';

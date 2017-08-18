@@ -81,7 +81,7 @@ import Util from './util/Util';
 import EasterEggs from './x/components/EasterEggs';
 
 import BuilderActions from './builder/data/BuilderActions'; // for card hovering
- // for error reporting
+// for error reporting
 
 // data that needs to be loaded
 import AuthActions from './auth/data/AuthActions';
