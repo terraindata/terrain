@@ -140,7 +140,12 @@ class SchemaTreeItem extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
+    
+    if(this.props.type === 'table')
+    {/*
+      console.log('making a SchemaTreeItem')
+      console.log(this.props);
+    */}
     this._subscribe(SchemaStore, {
       stateKey: 'item',
       storeKeyPath:
@@ -148,6 +153,11 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
       updater: (state: SchemaTypes.SchemaState) =>
       {
+        if(this.props.type === 'table')
+        {/*
+          console.log('updating a SchemaTreeItem')
+          console.log(this.props);
+        */}
         if (this.state.childCount === -1) // assumes that schema data does not change
         {
           const item = state.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
@@ -282,23 +292,28 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
   public handleArrowClick(event)
   {
-    this.setState({
-      open: !this.state.open,
-    });
-    event.stopPropagation();
-    this.lastArrowClickTime = (new Date()).getTime();
-    // used to stop triggering of double click handler
-  }
-
-  public handleHeaderDoubleClick(event)
-  {
-    if ((new Date()).getTime() - this.lastArrowClickTime > 100)
+    if(!this.props.search)
     {
-      // ^ need to double check this wasn't trigged for the arrow
       this.setState({
         open: !this.state.open,
       });
       event.stopPropagation();
+      this.lastArrowClickTime = (new Date()).getTime();
+      // used to stop triggering of double click handler
+    }
+  }
+  public handleHeaderDoubleClick(event)
+  {
+    if(!this.props.search)
+    {
+      if ((new Date()).getTime() - this.lastArrowClickTime > 100)
+      {
+        // ^ need to double check this wasn't trigged for the arrow
+        this.setState({
+          open: !this.state.open,
+        });
+        event.stopPropagation();
+      }
     }
   }
 
@@ -319,7 +334,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
         nameText = (
           <div>
             {
-              ['column', 'table', 'database', 'server'].map(
+              ['server', 'database', 'table', 'column'].map(
                 (type) =>
                 {
                   const id = item[type + 'Id'];
@@ -372,6 +387,11 @@ class SchemaTreeItem extends TerrainComponent<Props>
     const { item, isSelected, isHighlighted } = this.state;
 
     const showing = SchemaTypes.searchIncludes(item, this.props.search);
+
+    // console.log('this.state=');
+    // console.log(this.state);
+    // console.log('this.props.search=');
+    // console.log(this.props.search);
 
     return (
       <div

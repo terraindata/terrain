@@ -161,7 +161,27 @@ class SchemaSearchResults extends TerrainComponent<Props>
     }
 
     const showSection = !!renderItems.length;
-
+    if(showSection)
+    {/*
+      console.log(label);
+      console.log(renderItems.length);
+      if(label==='Types')
+      {
+        console.log(this.props.search);
+      }
+      if(label==='Types' || label==='Fields')
+      {
+        renderItems.map(
+          (item,index) =>
+            {
+              console.log('index=');
+              console.log(index);
+              console.log('item=');
+              console.log(item);
+            }
+        )
+      }
+    */}
     return (
       <FadeInOut
         open={showSection}
@@ -247,20 +267,20 @@ class SchemaSearchResults extends TerrainComponent<Props>
           }
 
           {
-            this.renderSection('databases', 'database', 'Databases')
+            this.renderSection('databases', 'database', 'Indices')
           }
 
           {
-            this.renderSection('tables', 'table', 'Tables')
+            this.renderSection('tables', 'table', 'Types')
           }
 
           {
-            this.renderSection('columns', 'column', 'Columns')
+            this.renderSection('columns', 'column', 'Fields')
           }
 
-          {
+          {/*
             this.renderSection('indexes', 'index', 'Indexes')
-          }
+          */}
         </div>
       </div>
     );

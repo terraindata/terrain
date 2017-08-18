@@ -184,7 +184,7 @@ const SchemaTreeStyles =
 
     searchTextEmphasis: {
       fontWeight: 1000,
-      color: Styles.colors.active,
+      color: Colors().active,
     },
 
     margin: Styles.margin,
