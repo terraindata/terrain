@@ -46,16 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'underscore';
 
-import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
-import AjaxM1 from '../../../app/util/AjaxM1'; // TODO change / remove
+// TODO change / remove
 import Query from '../../../items/types/Query';
 
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
-import { Card, Cards, CardString } from '../../../blocks/types/Card';
+import { Card } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';

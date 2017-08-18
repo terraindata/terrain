@@ -55,25 +55,22 @@ import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { AllBackendsMap } from '../../../../database/AllBackends';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
 import Ajax from '../../../util/Ajax';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import Result from '../results/Result';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 
+import Radium = require('radium');
+import { link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultTypes';
-import Radium = require('radium');
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 const RESULTS_PAGE_SIZE = 20;
 

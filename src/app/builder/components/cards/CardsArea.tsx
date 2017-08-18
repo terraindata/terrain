@@ -48,14 +48,10 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 import { Card, Cards } from '../../../../blocks/types/Card';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
@@ -64,7 +60,6 @@ import CreateCardTool from './CreateCardTool';
 const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 export interface Props
 {

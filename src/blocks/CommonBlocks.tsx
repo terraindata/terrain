@@ -51,7 +51,7 @@ import * as _ from 'underscore';
 
 import * as BlockUtils from './BlockUtils';
 import { Display, getCardStringDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from './displays/Display';
-import { Block, TQLFn } from './types/Block';
+import { TQLFn } from './types/Block';
 import { _card, Card, Cards } from './types/Card';
 const { List, Map } = Immutable;
 const L = () => List([]);

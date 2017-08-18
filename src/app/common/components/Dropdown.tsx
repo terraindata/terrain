@@ -53,12 +53,10 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import Actions from '../../builder/data/BuilderActions';
-import { altStyle, backgroundColor, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
+import { altStyle, Colors } from '../../common/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
-import StyleTag from './StyleTag';
 
 export interface Props
 {

@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import { BaseClass, New } from '../Classes';
-import Util from '../util/Util';
 
 type stringList = string[] | List<string>;
 

@@ -49,7 +49,6 @@ THE SOFTWARE.
 const _ = require('underscore');
 import * as Immutable from 'immutable';
 import List = Immutable.List;
-import Map = Immutable.Map;
 
 import CommonSQL from '../../../../shared/database/mysql/syntax/CommonSQL';
 import AjaxM1 from '../../../app/util/AjaxM1'; // TODO change / remove

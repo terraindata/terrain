@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';

@@ -49,12 +49,9 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { CardConfig } from '../../../../blocks/types/Card';
-import { backgroundColor, borderColor, cardStyle, Colors, fontColor } from '../../../common/Colors';
+import { borderColor, cardStyle, Colors } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
 import './CreateCardOption.less';
 
 export interface Props

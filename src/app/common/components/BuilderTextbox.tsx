@@ -52,26 +52,19 @@ import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
-import * as ReactDOM from 'react-dom';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
 import { Display } from '../../../blocks/displays/Display';
-import { Block } from '../../../blocks/types/Block';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
-import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
-import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
 import { borderColor, cardStyle, Colors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
-import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
 
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');

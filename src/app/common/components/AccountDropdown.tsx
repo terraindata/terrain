@@ -48,9 +48,7 @@ THE SOFTWARE.
 
 import * as $ from 'jquery';
 import * as React from 'react';
-import { Link } from 'react-router';
 import { browserHistory } from 'react-router';
-import Actions from '../../builder/data/BuilderActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';

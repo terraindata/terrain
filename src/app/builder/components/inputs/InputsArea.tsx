@@ -48,17 +48,13 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
 import { Input } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import InputComponent from '../inputs/InputComponent';
-import LayoutManager from '../layout/LayoutManager';
-import PanelMixin from '../layout/PanelMixin';
 
 export interface Props
 {
