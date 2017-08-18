@@ -67,7 +67,7 @@ export const elasticScore = _card(
     key: 'sort',
     sortOrder: 'desc',
     sortType: 'number',
-    sortMode: '',
+    sortMode: undefined,
 
     static: {
       language: 'elastic',
@@ -95,7 +95,7 @@ export const elasticScore = _card(
           ],
         });
 
-        return {
+        const _scriptObj = {
           _script:
           {
             type: block['sortType'],
@@ -108,6 +108,13 @@ export const elasticScore = _card(
             },
           },
         };
+
+        if (block['sortMode'] !== undefined)
+        {
+          _scriptObj._script['mode'] = block['sortMode'];
+        }
+
+        return _scriptObj;
       },
 
       init: (blocksConfig) =>
@@ -118,7 +125,7 @@ export const elasticScore = _card(
           ]),
           sortOrder: 'desc',
           sortType: 'number',
-          sortMode: '',
+          sortMode: undefined,
         };
       },
       display:
