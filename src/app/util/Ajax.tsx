@@ -691,12 +691,13 @@ export const Ajax =
       dbname: string,
       tablename: string,
       connectionId: number,
-      originalNames: List<string>,
+      originalNames: Immutable.List<string>,
       columnTypes: Immutable.Map<string, object>,
-      primaryKey: string,
+      primaryKeys: List<string>,
       transformations: Immutable.List<object>,
       update: boolean,
-      csvHeaderMissing: boolean,
+      hasCsvHeader: boolean,
+      primaryKeyDelimiter: string,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
     )
@@ -714,10 +715,11 @@ export const Ajax =
       formData.append('dbid', String(connectionId));
       formData.append('originalNames', JSON.stringify(originalNames));
       formData.append('columnTypes', JSON.stringify(columnTypes));
-      formData.append('primaryKey', primaryKey);
+      formData.append('primaryKeys', JSON.stringify(primaryKeys));
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
-      formData.append('hasCsvHeader', String(!csvHeaderMissing));
+      formData.append('hasCsvHeader', String(hasCsvHeader));
+      formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
 
       const xhr = new XMLHttpRequest();
       xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
@@ -756,7 +758,7 @@ export const Ajax =
       query: string,
       templateID: number,
       rank: boolean,
-      onLoad: (resp: object[]) => void,
+      onLoad: (resp: any) => void,
       onError?: (ev: string) => void,
     )
     {
@@ -771,18 +773,25 @@ export const Ajax =
         rank,
       };
       console.log('export payload: ', payload);
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
+      // const onLoadHandler = (resp) =>
+      // {
+      //   const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+      //   onLoad(queryResult);
+      // };
       Ajax.req(
         'post',
         'import/export/',
         payload,
-        onLoadHandler,
+        onLoad,
+        // onLoadHandler,
         {
           onError,
-        },
+          download: true,
+          downloadFilename: 'test.csv',
+        }
+        // {
+        //   onError,
+        // },
       );
       return;
     },
@@ -792,10 +801,11 @@ export const Ajax =
       dbid: number,
       originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
-      primaryKey: string,
+      primaryKeys: List<string>,
       transformations: List<object>,
       name: string,
       isExport: boolean,
+      primaryKeyDelimiter: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -806,10 +816,11 @@ export const Ajax =
         tablename,
         originalNames,
         columnTypes,
-        primaryKey,
+        primaryKeys,
         transformations,
         name,
         export: isExport,
+        primaryKeyDelimiter,
       };
       console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
@@ -832,7 +843,6 @@ export const Ajax =
       connectionId: number,
       dbname: string,
       tablename: string,
-
       onLoad: (templates: object[]) => void,
     )
     {

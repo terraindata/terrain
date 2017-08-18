@@ -50,11 +50,14 @@ import Util from './../../util/Util';
 const FileImportActionTypes =
   {
     changeServer: '',
-    changeServerDbTable: '',
     changeDbName: '',
     changeTableName: '',
-    changeCsvHeaderMissing: '',
+    changeServerDbTable: '',
+    changeDbText: '',
+    changeTableText: '',
+    changeHasCsvHeader: '',
     changePrimaryKey: '',
+    changePrimaryKeyDelimiter: '',
     chooseFile: '',
     importFile: '',
     exportFile: '',

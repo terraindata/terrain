@@ -72,13 +72,17 @@ const FileImportActions =
     (serverId: number, dbName: string, tableName: string) =>
       $(ActionTypes.changeServerDbTable, { serverId, dbName, tableName }),
 
-    changeCsvHeaderMissing:
-    (csvHeaderMissing: boolean) =>
-      $(ActionTypes.changeCsvHeaderMissing, { csvHeaderMissing }),
+    changeHasCsvHeader:
+    (hasCsvHeader: boolean) =>
+      $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
 
     changePrimaryKey:
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
+
+    changePrimaryKeyDelimiter:
+    (delim: string) =>
+      $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
 
     chooseFile:
     (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
@@ -89,7 +93,7 @@ const FileImportActions =
       $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     exportFile:
-    (query: Query, templateId: number, rank: boolean) =>
+    (query: string, templateId: number, rank: boolean) =>
       $(ActionTypes.exportFile, { query, templateId, rank }),
 
     addTransform:

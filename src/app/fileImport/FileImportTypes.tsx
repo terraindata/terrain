@@ -62,13 +62,14 @@ class FileImportStateC extends BaseClass
   public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
-  public primaryKey: number = -1;
-  public csvHeaderMissing: boolean = false;
+  public primaryKeys: List<number> = List([]);
+  public primaryKeyDelimiter: string = '-';
+  public hasCsvHeader: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<ColumnTypesTree> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
+  public columnTypes: List<ColumnTypesTree> = List([]);
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
@@ -128,8 +129,9 @@ class TemplateC
   public originalNames: List<string> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
   public transformations: List<Transform> = List([]);
-  public csvHeaderMissing = false;
-  public primaryKey = -1;
+  public hasCsvHeader: boolean = true;
+  public primaryKeys: List<number> = List([]);
+  public primaryKeyDelimiter: string = '-';
   public export = false;
 }
 
@@ -142,8 +144,9 @@ export const _Template =
     originalNames: List<string>;
     columnTypes: Immutable.Map<string, object>;
     transformations: List<object>;
-    csvHeaderMissing: boolean;
-    primaryKey: number;
+    hasCsvHeader: boolean;
+    primaryKeys: List<number>;
+    primaryKeyDelimiter: string;
     export: boolean;
   }) =>
   {

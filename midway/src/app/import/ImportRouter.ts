@@ -50,13 +50,11 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { HA } from '../App';
-import { users } from '../users/UserRouter';
 import * as Util from '../Util';
-import { ExportConfig, Import, ImportConfig } from './Import';
-import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+import { ExportConfig, Import } from './Import';
 
 const Router = new KoaRouter();
-export const imprt: Import = new Import();
+const imprt: Import = new Import();
 
 Router.post('/', async (ctx, next) =>
 {
@@ -69,7 +67,7 @@ Router.post('/', async (ctx, next) =>
   }
 
   Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
-  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKey', 'transformations']);
+  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   // optional parameters: update, hasCsvHeader
 
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
@@ -77,8 +75,17 @@ Router.post('/', async (ctx, next) =>
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  const exprtConf: ExportConfig = JSON.parse(ctx.request.body.data).body as ExportConfig;
+  const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
+  ctx.type = 'text/plain';
+  ctx.attachment('test.csv');
+  ctx.body = exportReturn;
+});
+
+Router.post('/export/headless', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
   const exprtConf: ExportConfig = ctx.request.body.body;
-  // Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
+  Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
   const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
   ctx.body = exportReturn;
 });

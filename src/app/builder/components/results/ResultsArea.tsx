@@ -520,7 +520,7 @@ column if you have customized the results view.');
     {
       const mainBg = backgroundColor(Colors().bg1);
       const mainFontColor = fontColor(Colors().text2);
-      const { previewRows, primaryKey, columnNames, columnsToInclude, columnTypes, templates, transforms,
+      const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
         elasticUpdate } = this.props.exportState;
       return (
         <div className='results-config-wrapper'>
@@ -560,7 +560,8 @@ column if you have customized the results view.');
 
             <FileImportPreview
               previewRows={previewRows}
-              primaryKey={primaryKey}
+              primaryKeys={primaryKeys}
+              primaryKeyDelimiter={primaryKeyDelimiter}
               columnNames={columnNames}
               columnsToInclude={columnsToInclude}
               columnTypes={columnTypes}

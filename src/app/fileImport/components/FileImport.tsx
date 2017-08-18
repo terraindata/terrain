@@ -393,7 +393,7 @@ class FileImport extends TerrainComponent<any>
 
   public handleCsvHeaderChoice(hasCsvHeader: boolean)
   {
-    Actions.changeCsvHeaderMissing(!hasCsvHeader);
+    Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
     this.setState({
       showCsvHeaderOption: false,
@@ -405,7 +405,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbName, tableName } = fileImportState;
-    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKey } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
 
     let content = {};
@@ -447,7 +447,8 @@ class FileImport extends TerrainComponent<any>
         content =
           <FileImportPreview
             previewRows={previewRows}
-            primaryKey={primaryKey}
+            primaryKeys={primaryKeys}
+            primaryKeyDelimiter={primaryKeyDelimiter}
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
