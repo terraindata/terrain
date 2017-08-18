@@ -297,7 +297,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
         preview: '[cards.size] ' + clause.type + '(s)',
-
+        accepts,
         display:
         {
           displayType: DisplayType.CARDS,
