@@ -89,7 +89,8 @@ const appSchemaSQL: string[] = [
      tablename text NOT NULL,
      originalNames text NOT NULL,
      columnTypes text NOT NULL,
-     primaryKey text NOT NULL,
+     primaryKeyDelimiter text,
+     primaryKeys text NOT NULL,
      transformations text NOT NULL);`,
 ];
 

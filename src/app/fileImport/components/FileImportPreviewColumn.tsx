@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-empty strict-boolean-expressions no-console
+
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -74,6 +77,7 @@ export interface Props
   isPrimaryKey: boolean;
   columnOptions: List<string>;
   editing: boolean;
+  exporting: boolean;
   handleEditColumnChange(editColumnId: number);
   onColumnNameChange(columnId: number, localColumnName: string);
 }
@@ -137,7 +141,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       <div
         className='fi-preview-column'
         style={{
-          background: Colors().bg1,
+          background: Colors().bg2,
           text: Colors().text1,
         }}
       >
@@ -200,27 +204,28 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             />
           </div>
         </div>
-
-        <div
-          className='flex-container fi-preview-column-field'
-        >
-          <span
-            className='fi-preview-column-field-name'
-          >
-            Type
-          </span>
+        {
+          !this.props.exporting &&
           <div
-            className='fi-preview-column-field-content'
+            className='flex-container fi-preview-column-field'
           >
-            <TypeDropdown
-              columnId={this.props.columnId}
-              recursionDepth={0}
-              columnType={this.props.columnType}
-              editing={this.props.editing}
-            />
+            <span
+              className='fi-preview-column-field-name'
+            >
+              Type
+            </span>
+            <div
+              className='fi-preview-column-field-content'
+            >
+              <TypeDropdown
+                columnId={this.props.columnId}
+                recursionDepth={0}
+                columnType={this.props.columnType}
+                editing={this.props.editing}
+              />
+            </div>
           </div>
-        </div>
-
+        }
         <div
           className='flex-container fi-preview-column-field'
         >
@@ -233,7 +238,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             className='fi-preview-column-field-content'
           >
             <TransformBox
-              datatype={this.props.columnType.get('type')}
+              datatype={this.props.columnType.type}
               colName={this.props.columnName}
               columnNames={this.props.columnNames}
               setLocalColumnName={this.handleLocalColumnNameChange}
@@ -250,16 +255,19 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       <div
         className='fi-preview-column-title'
         style={{
-          background: Colors().bg1,
+          background: Colors().bg2,
           text: Colors().text1,
         }}
       >
         <div className='fi-preview-column-title-name'>
           {this.props.columnName}
         </div>
-        <div className='fi-preview-column-title-type'>
-          {this.props.columnType.get('type')}
-        </div>
+        {
+          !this.props.exporting &&
+          <div className='fi-preview-column-title-type'>
+            {this.props.columnType.type}
+          </div>
+        }
         <div
           className='fi-preview-column-edit-button'
           onClick={this.handleEditClick}

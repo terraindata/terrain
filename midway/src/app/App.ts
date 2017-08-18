@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as http from 'http';
 import * as Koa from 'koa';
-import * as socketio from 'socket.io';
 import * as winston from 'winston';
 
 import babelRegister = require('babel-register');
@@ -63,7 +62,6 @@ import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import { imprt } from './import/ImportRouter';
 import './Logging';
 import Middleware from './Middleware';
 import MidwayRouter from './Router';

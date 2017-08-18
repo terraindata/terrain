@@ -60,7 +60,8 @@ export interface ImportTemplateBase
   dbname: string;         // for elastic, index name
   export?: boolean;       // export type template
   originalNames: string[];    // array of strings (oldName)
-  primaryKey: string;  // newName of primary key
+  primaryKeyDelimiter?: string;
+  primaryKeys: string[];  // newName of primary key(s)
   tablename: string;      // for elastic, type name
   transformations: object[];  // list of in-order data transformations
 }
@@ -80,7 +81,8 @@ interface ImportTemplateConfigStringified
   id?: number;
   name: string;
   originalNames: string;
-  primaryKey: string;
+  primaryKeyDelimiter: string;
+  primaryKeys: string;
   tablename: string;
   transformations: string;
 }
@@ -110,22 +112,54 @@ export class ImportTemplates
         'export',
         'name',
         'originalNames',
-        'primaryKey',
+        'primaryKeyDelimiter',
+        'primaryKeys',
         'tablename',
         'transformations',
       ],
     );
   }
 
+  public async delete(user: UserConfig, id: number): Promise<ImportTemplateConfig[]>
+  {
+    return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
+    {
+      const results: ImportTemplateConfig[] = await this.get(id);
+      // template id specified but template not found
+      if (results.length === 0)
+      {
+        return reject('Invalid template id passed');
+      }
+
+      const deleted: ImportTemplateConfigStringified[] =
+        await App.DB.delete(this.templateTable, { id }) as ImportTemplateConfigStringified[];
+      resolve(this._parseConfig(deleted) as ImportTemplateConfig[]);
+    });
+  }
+
+  public async get(id?: number): Promise<ImportTemplateConfig[]>
+  {
+    const filter: object = (id !== undefined) ? { id } : {};
+    return this.select([], filter);
+  }
+
   public async getExport(id?: number): Promise<ImportTemplateConfig[]>
   {
-    const filter: object = (id !== undefined) ? { export: true, id } : {};
+    const filter: object = { export: true };
+    if (id !== undefined)
+    {
+      filter['id'] = id;
+    }
     return this.select([], filter);
   }
 
   public async getImport(id?: number): Promise<ImportTemplateConfig[]>
   {
-    const filter: object = (id !== undefined) ? { export: false, id } : {};
+    const filter: object = { export: false };
+    if (id !== undefined)
+    {
+      filter['id'] = id;
+    }
     return this.select([], filter);
   }
 
@@ -145,7 +179,7 @@ export class ImportTemplates
     {
       if (template.id !== undefined)
       {
-        const results: ImportTemplateConfig[] = await this.getImport(template.id);
+        const results: ImportTemplateConfig[] = await this.get(template.id);
         // template id specified but template not found
         if (results.length === 0)
         {
@@ -180,7 +214,8 @@ export class ImportTemplates
         id: stringified['id'],
         name: stringified['name'],
         originalNames: JSON.parse(stringified['originalNames']),
-        primaryKey: stringified['primaryKey'],
+        primaryKeyDelimiter: stringified['primaryKeyDelimiter'],
+        primaryKeys: JSON.parse(stringified['primaryKeys']),
         tablename: stringified['tablename'],
         transformations: JSON.parse(stringified['transformations']),
       };
@@ -198,7 +233,9 @@ export class ImportTemplates
         id: template['id'],
         name: template['name'],
         originalNames: JSON.stringify(template['originalNames']),
-        primaryKey: template['primaryKey'],
+        // hack around silly linter complaint below
+        primaryKeyDelimiter: (template['primaryKeyDelimiter'] === undefined ? '-' : template['primaryKeyDelimiter']) as string,
+        primaryKeys: JSON.stringify(template['primaryKeys']),
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };

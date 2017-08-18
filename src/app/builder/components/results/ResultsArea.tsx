@@ -60,6 +60,8 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
+import FileImportPreview from '../../../fileImport/components/FileImportPreview';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -69,7 +71,7 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import Radium = require('radium');
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -80,6 +82,7 @@ const RESULTS_PAGE_SIZE = 20;
 export interface Props
 {
   resultsState: ResultsState;
+  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -98,6 +101,8 @@ interface State
 
   resultsPages: number;
   onResultsLoaded?: (unchanged?: boolean) => void;
+
+  showingExport?: boolean;
 }
 
 @Radium
@@ -107,6 +112,7 @@ class ResultsArea extends TerrainComponent<Props>
     expanded: false,
     expandedResultIndex: null,
     showingConfig: false,
+    showingExport: false,
     resultsPages: 1,
     resultFormat: 'icon',
   };
@@ -457,7 +463,7 @@ column if you have customized the results view.');
 
         <div
           className='results-top-config'
-          onClick={this.handleESresultExport}
+          onClick={this.showExport}
           key='results-area-export'
           style={link()}
         >
@@ -484,6 +490,20 @@ column if you have customized the results view.');
     );
   }
 
+  public showExport()
+  {
+    this.setState({
+      showingExport: true,
+    });
+  }
+
+  public hideExport()
+  {
+    this.setState({
+      showingExport: false,
+    });
+  }
+
   public showConfig()
   {
     this.setState({
@@ -496,6 +516,72 @@ column if you have customized the results view.');
     this.setState({
       showingConfig: false,
     });
+  }
+
+  public renderExport()
+  {
+    if (this.state.showingExport)
+    {
+      const mainBg = backgroundColor(Colors().bg1);
+      const mainFontColor = fontColor(Colors().text2);
+      const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
+        elasticUpdate } = this.props.exportState;
+      return (
+        <div className='results-config-wrapper'>
+          <div
+            className={classNames({
+              'results-config': true,
+              'results-config-disabled': false,
+            })}
+            style={[mainBg, borderColor(Colors().border2)]}
+          >
+            <div className='results-config-bar' style={[mainBg, borderColor(Colors().border1)]}>
+              <div className='results-config-title' style={mainFontColor}>
+                Export Results
+              </div>
+              <div key={'results-export-button'}
+                className='results-config-switch'
+                style={[
+                  fontColor(Colors().text1),
+                  borderColor(Colors().border1, Colors().border3),
+                  backgroundColor(Colors().bg3),
+                ]}
+              >
+                Export
+              </div>
+              <div key={'results-config-button'}
+                className='results-config-button'
+                style={[
+                  fontColor(Colors().text1),
+                  borderColor(Colors().border1, Colors().border3),
+                  backgroundColor(Colors().bg3),
+                ]}
+                onClick={this.hideExport}
+              >
+                Done
+              </div>
+            </div>
+
+            <FileImportPreview
+              previewRows={previewRows}
+              primaryKeys={primaryKeys}
+              primaryKeyDelimiter={primaryKeyDelimiter}
+              columnNames={columnNames}
+              columnsToInclude={columnsToInclude}
+              columnTypes={columnTypes}
+              templates={templates}
+              transforms={transforms}
+              columnOptions={List([])}
+              uploadInProgress={false}
+              elasticUpdate={elasticUpdate}
+              exporting={true}
+              query={this.props.query}
+            />
+
+          </div>
+        </div>
+      );
+    }
   }
 
   public renderConfig()
@@ -529,7 +615,7 @@ column if you have customized the results view.');
         {this.renderTopbar()}
         {this.renderResults()}
         {this.renderConfig()}
-        {this.renderExpandedResult()}
+        {this.renderExport()}
       </div>
     );
   }

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'underscore';
+import { Query } from '../../../items/types/Query';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
@@ -67,21 +68,33 @@ const FileImportActions =
     (tableName: string) =>
       $(ActionTypes.changeTableName, { tableName }),
 
-    changeCsvHeaderMissing:
-    (csvHeaderMissing: boolean) =>
-      $(ActionTypes.changeCsvHeaderMissing, { csvHeaderMissing }),
+    changeServerDbTable:
+    (serverId: number, dbName: string, tableName: string) =>
+      $(ActionTypes.changeServerDbTable, { serverId, dbName, tableName }),
+
+    changeHasCsvHeader:
+    (hasCsvHeader: boolean) =>
+      $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
 
     changePrimaryKey:
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
 
+    changePrimaryKeyDelimiter:
+    (delim: string) =>
+      $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
+
     chooseFile:
     (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
       $(ActionTypes.chooseFile, { filetype, preview, originalNames }),
 
-    uploadFile:
+    importFile:
     () =>
-      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+      $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+
+    exportFile:
+    (query: string, templateId: number, rank: boolean) =>
+      $(ActionTypes.exportFile, { query, templateId, rank }),
 
     addTransform:
     (transform: Transform) =>
@@ -92,8 +105,8 @@ const FileImportActions =
       $(ActionTypes.setColumnToInclude, { columnId }),
 
     setColumnName:
-    (columnId: number, colName: string, newName: string) =>
-      $(ActionTypes.setColumnName, { columnId, colName, newName }),
+    (columnId: number, newName: string) =>
+      $(ActionTypes.setColumnName, { columnId, newName }),
 
     setColumnType:
     (columnId: number, recursionDepth: number, type: string) =>
@@ -104,12 +117,12 @@ const FileImportActions =
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateName: string) =>
-      $(ActionTypes.saveTemplate, { templateName, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateName: string, exporting: boolean) =>
+      $(ActionTypes.saveTemplate, { templateName, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
     fetchTemplates:
-    () =>
-      $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
+    (exporting: boolean) =>
+      $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
     (templates: List<Template>) =>

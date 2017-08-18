@@ -302,7 +302,8 @@ export class Import
           file,
           filetype: fields['filetype'],
           originalNames: template['originalNames'],
-          primaryKey: template['primaryKey'],
+          primaryKeyDelimiter: template['primaryKeyDelimiter'],
+          primaryKeys: template['primaryKeys'],
           tablename: template['tablename'],
           transformations: template['transformations'],
           update,
@@ -314,6 +315,7 @@ export class Import
         {
           const columnTypes: object = JSON.parse(fields['columnTypes']);
           const originalNames: string[] = JSON.parse(fields['originalNames']);
+          const primaryKeys: string[] = JSON.parse(fields['primaryKeys']);
           const transformations: object[] = JSON.parse(fields['transformations']);
 
           imprtConf = {
@@ -323,7 +325,8 @@ export class Import
             file,
             filetype: fields['filetype'],
             originalNames,
-            primaryKey: fields['primaryKey'],
+            primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
+            primaryKeys,
             tablename: fields['tablename'],
             transformations,
             update,
@@ -346,7 +349,7 @@ export class Import
       }
 
       const time: number = Date.now();
-      winston.info('checking config and schema...');
+      winston.info('File Import: beginning config/schema check.');
       const configError: string = this._verifyConfig(imprtConf);
       if (configError !== '')
       {
@@ -359,15 +362,16 @@ export class Import
       {
         return reject(mappingForSchema);
       }
-      winston.info('checked config and schema (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished config/schema check. Time (s): ' + String((Date.now() - time) / 1000));
 
       const columns: string[] = Object.keys(imprtConf.columnTypes);
       const insertTable: Tasty.Table = new Tasty.Table(
         imprtConf.tablename,
-        [imprtConf.primaryKey],
+        imprtConf.primaryKeys,
         columns,
         imprtConf.dbname,
         mappingForSchema,
+        imprtConf.primaryKeyDelimiter,
       );
 
       await this._deleteStreamingTempFolder();
@@ -473,8 +477,11 @@ export class Import
           {
             throw new Error('Rename transformation must supply colName and newName arguments.');
           }
-          obj[newName] = obj[oldName];
-          delete obj[oldName];
+          if (oldName !== newName)
+          {
+            obj[newName] = obj[oldName];
+            delete obj[oldName];
+          }
           break;
         case 'split':
           const oldCol: string | undefined = transform['colName'];
@@ -492,18 +499,18 @@ export class Import
           {
             throw new Error('Can only split columns containing text.');
           }
-          const ind: number = obj[oldCol].indexOf(splitText);
+          const oldText: string = obj[oldCol];
+          delete obj[oldCol];
+          const ind: number = oldText.indexOf(splitText);
           if (ind === -1)
           {
-            obj[newCols[0]] = obj[oldCol];
+            obj[newCols[0]] = oldText;
             obj[newCols[1]] = '';
-            delete obj[oldCol];
           }
           else
           {
-            obj[newCols[0]] = obj[oldCol].substring(0, ind);
-            obj[newCols[1]] = obj[oldCol].substring(ind + splitText.length);
-            delete obj[oldCol];
+            obj[newCols[0]] = oldText.substring(0, ind);
+            obj[newCols[1]] = oldText.substring(ind + splitText.length);
           }
           break;
         case 'merge':
@@ -520,8 +527,14 @@ export class Import
             throw new Error('Can only merge columns containing text.');
           }
           obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
-          delete obj[startCol];
-          delete obj[mergeCol];
+          if (startCol !== newCol)
+          {
+            delete obj[startCol];
+          }
+          if (mergeCol !== newCol)
+          {
+            delete obj[mergeCol];
+          }
           break;
         case 'duplicate':
           colName = transform['colName'];
@@ -691,7 +704,7 @@ export class Import
           {
             if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
-              return 'Encountered an object whose field "' + key + ' does not match the specified type (' +
+              return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
                 JSON.stringify(imprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
             }
           }
@@ -706,7 +719,7 @@ export class Import
         {
           if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
           {
-            return 'Encountered an object whose field "' + name + ' does not match the specified type (' +
+            return 'Encountered an object whose field "' + name + '"does not match the specified type (' +
               JSON.stringify(imprt.columnTypes[name]) + '): ' + JSON.stringify(obj);
           }
         }
@@ -725,9 +738,12 @@ export class Import
       }
     }
 
-    if (obj[imprt.primaryKey] === '' || obj[imprt.primaryKey] === null)
+    for (const key of imprt.primaryKeys)
     {
-      return 'Encountered an object with an empty primary key: ' + JSON.stringify(obj);
+      if (obj[key] === '' || obj[key] === null)
+      {
+        return 'Encountered an object with an empty primary key ("' + key + '"): ' + JSON.stringify(obj);
+      }
     }
 
     return '';
@@ -885,7 +901,7 @@ export class Import
     return new Promise<object[]>(async (resolve, reject) =>
     {
       let time: number = Date.now();
-      winston.info('parsing data...');
+      winston.info('File Import: beginning data parsing.');
       let items: object[];
       try
       {
@@ -894,12 +910,12 @@ export class Import
       {
         return reject('Error parsing data: ' + String(e));
       }
-      winston.info('got parsed data! (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished parsing data. Time (s): ' + String((Date.now() - time) / 1000));
       time = Date.now();
-      winston.info('transforming and type-checking data...');
+      winston.info('File Import: beginning transform/type-checking of data.');
       if (items.length === 0)
       {
-        return reject('No data provided in file to upload.');
+        return resolve(items);
       }
       try
       {
@@ -908,7 +924,7 @@ export class Import
       {
         return reject(e);
       }
-      winston.info('transformed (and type-checked) data! (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished transforming/type-checking data. Time (s): ' + String((Date.now() - time) / 1000));
       resolve(items);
     });
   }
@@ -1174,7 +1190,7 @@ export class Import
   {
     return new Promise<void>(async (resolve, reject) =>
     {
-      winston.info('BEGINNING read file upload number ' + String(num));
+      winston.info('File Import: beginning read/upload file number ' + String(num) + '.');
       let items: object[];
       try
       {
@@ -1182,8 +1198,12 @@ export class Import
           { encoding: 'utf8' }) as string;
 
         const time = Date.now();
-        winston.info('about to upsert to tasty...');
+        winston.info('File Import: about to update/upsert to ES.');
         items = JSON.parse(data);
+        if (items.length === 0)
+        {
+          return resolve();
+        }
         if (imprt.update)
         {
           await database.getTasty().update(insertTable, items);
@@ -1192,8 +1212,8 @@ export class Import
         {
           await database.getTasty().upsert(insertTable, items);
         }
-        winston.info('upserted to tasty (s): ' + String((Date.now() - time) / 1000));
-        winston.info('FINISHED read file upload number ' + String(num));
+        winston.info('File Import: finished update/upsert to ES. Time (s): ' + String((Date.now() - time) / 1000));
+        winston.info('File Import: finished read/upload file number ' + String(num) + '.');
         resolve();
       }
       catch (err)
@@ -1209,11 +1229,10 @@ export class Import
     return new Promise<void>(async (resolve, reject) =>
     {
       const time: number = Date.now();
-      winston.info('putting mapping...');
+      winston.info('File Import: beginning to insert ES mapping.');
       await database.getTasty().getDB().putMapping(insertTable);
-      winston.info('put mapping (s): ' + String((Date.now() - time) / 1000));
+      winston.info('File Import: finished inserted ES mapping. Time (s): ' + String((Date.now() - time) / 1000));
 
-      winston.info('opening files for upsert...');
       const queue = new promiseQueue(this.MAX_ACTIVE_READS, this.chunkCount);
       let counter: number = 0;
       for (let num = 0; num < this.chunkCount; num++)
@@ -1226,7 +1245,7 @@ export class Import
             if (counter === this.chunkCount)
             {
               await this._deleteStreamingTempFolder();
-              winston.info('deleted streaming temp folder');
+              winston.info('File Import: deleted streaming temp folder.');
               resolve();
             }
             thisResolve();
@@ -1311,9 +1330,16 @@ export class Import
     {
       return 'Provided column names must be distinct.';
     }
-    if (!columns.has(imprt.primaryKey))
+    if (imprt.primaryKeys.length === 0)
     {
-      return 'A column to be included in the uploaded must be specified as the primary key.';
+      return 'At least one column must be specified as a primary key.';
+    }
+    for (const key of imprt.primaryKeys)
+    {
+      if (!columns.has(key))
+      {
+        return 'The column "' + key + '" was specified to be part of the primary key, so it must be included.';
+      }
     }
     let fieldError: string;
     for (const colName of columnList)
@@ -1419,14 +1445,13 @@ export class Import
       {
         return reject('Failed to get items: ' + String(e));
       }
-      winston.info('streaming server got items from data');
 
       try
       {
-        winston.info('opening file for writing...');
+        winston.info('File Import: opening temp file for writing.');
         await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
           JSON.stringify(items), { flag: 'wx' });
-        winston.info('wrote items to file.');
+        winston.info('File Import: finished writing items to temp file.');
       }
       catch (err)
       {

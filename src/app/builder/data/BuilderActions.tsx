@@ -49,6 +49,7 @@ import BackendInstance from '../../../database/types/BackendInstance';
 import List = Immutable.List;
 import Map = Immutable.Map;
 import Query from '../../../items/types/Query';
+import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';
 import ActionTypes from './BuilderActionTypes';
 import Store from './BuilderStore';
