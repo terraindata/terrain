@@ -62,9 +62,10 @@ const arrowSvgStyles = {
   // fill: 'rgba(0,0,0,0)',
   // stroke: Styles.colors.transBlack,
   // strokeWidth: 20,
-  'marginLeft': 6,
-  'position': 'relative',
-  'top': 5,
+  'marginLeft': 5.5,
+  // 'position': 'relative',
+  // 'top': 5,
+  'marginTop': 5,
   ':hover': {
     fill: Colors().text2,
   },
@@ -99,19 +100,6 @@ const SchemaTreeStyles =
       Styles.rotate90,
       Styles.transition,
     ),
-
-    /*arrow: [{
-      'fill': Colors().text3,
-      ':hover': {
-        fill: Colors().text2,
-      },
-      'width': '12px',
-      'cursor': 'pointer',
-      'marginLeft': 6,
-    },
-    Styles.rotate90,
-    Styles.transition,
-    ],*/
 
     arrowOpen: _.extend(
       {},

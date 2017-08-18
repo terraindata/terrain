@@ -73,7 +73,7 @@ class State
 }
 
 const NORMAL_STYLE = {
-  borderLeft: ('0.5px solid ' + Colors().active),
+  borderLeft: ('1px solid ' + Colors().active),
   paddingLeft: Styles.margin,
 };
 
