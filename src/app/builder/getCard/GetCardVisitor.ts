@@ -289,6 +289,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESArrayClause(clause: ESArrayClause): any
   {
+    const accepts = List(this.getCardTypes([clause.elementID], clause));
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
 
@@ -301,7 +302,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         {
           displayType: DisplayType.CARDS,
           key: 'cards',
-          accepts: List(['eql' + clause.elementID]),
+          accepts,
         },
 
         init: (blocksConfig, extraConfig?, skipTemplate?) =>
