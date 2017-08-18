@@ -1,6 +1,6 @@
 @import "../../common/Common.less";
 
-@border-radius: 5px;
+@border-radius: 3px;
 
 .modal-overlay {
   position: fixed;
@@ -23,7 +23,7 @@
 
   &.modal-dialog-no-footer
   {
-    padding-bottom: 10px;
+    padding-bottom: @half-spacing;
   }
 
   .modal-title {
@@ -75,13 +75,13 @@
 .modal-message{
   text-align: left;
   font-size: @small-font-size;
-  padding: 14px 24px;
+  padding: @spacing @double-spacing;
 }
 
 .modal-buttons {
   max-width: 100%;
-  height: 28px;
-  padding: 12px;
+  height: @double-spacing;
+  padding: @spacing;
   .bold-normal-text;
 }
 
@@ -102,12 +102,12 @@
 }
 
 .modal-confirm-button {
-  margin-left: 12px;
+  margin-left: @spacing;
 }
 
 .modal-info-icon {
-  width: 20px;
-  margin-right: 6px;
+  width: @double-spacing;
+  margin-right: @half-spacing;
   svg {
     fill: #FFF;
   }
