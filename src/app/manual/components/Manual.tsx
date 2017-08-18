@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link } from 'react-router';
 import { browserHistory } from 'react-router';
 import * as _ from 'underscore';
 import Autocomplete from './../../common/components/Autocomplete';

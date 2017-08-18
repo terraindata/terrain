@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
 
 import * as React from 'react';
-import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 

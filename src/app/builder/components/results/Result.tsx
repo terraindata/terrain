@@ -53,15 +53,13 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import './Result.less';
 const { List } = Immutable;
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
-import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
-import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
+import { spotlightAction } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { MAX_RESULTS, Result } from './ResultTypes';
+import { Result } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');

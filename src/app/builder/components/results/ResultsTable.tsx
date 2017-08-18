@@ -51,16 +51,14 @@ import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
 import { Toolbar } from 'react-data-grid-addons';
 
-import * as _ from 'underscore';
-
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
-import { getResultFields, getResultName, getResultValue } from './Result';
-import { MAX_RESULTS, Results } from './ResultTypes';
+import { getResultName } from './Result';
+import { Results } from './ResultTypes';
 
 export interface Props
 {

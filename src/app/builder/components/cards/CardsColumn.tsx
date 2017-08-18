@@ -50,9 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
@@ -63,9 +61,9 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { altStyle, Colors, fontColor } from '../../../common/Colors';
 
-import { Card, Cards } from '../../../../blocks/types/Card';
+import { Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 

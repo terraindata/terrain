@@ -48,11 +48,9 @@ THE SOFTWARE.
 
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import * as _ from 'underscore';
 import './panel.less';
 const shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from 'react-dom';
-import Util from '../../../util/Util';
 const $ = require('jquery');
 
 const Panel = {

@@ -46,19 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:max-line-length
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'underscore';
 
 import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
 import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
-
-import { elasticTransform } from './ElasticTransformCard';
+import { _card } from '../../../blocks/types/Card';
 
 export const elasticScore = _card(
   {

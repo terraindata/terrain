@@ -55,7 +55,6 @@ import * as _ from 'underscore';
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemType } from '../../items/types/Item';
 import Query from '../../items/types/Query';
-import LibraryStore from '../library/data/LibraryStore';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import * as LibraryTypes from './../library/LibraryTypes';
@@ -63,7 +62,6 @@ import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 
-import { routerShape } from 'react-router';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { QueryRequest } from '../../database/types/QueryRequest';
 import { recordForSave, responseToRecordConfig } from '../Classes';
