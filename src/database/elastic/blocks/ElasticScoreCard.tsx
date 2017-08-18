@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import * as _ from 'underscore';
 
+import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
 import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -59,8 +60,10 @@ import { _card } from '../../../blocks/types/Card';
 export const elasticScore = _card(
   {
     weights: List(),
-
     key: 'sort',
+    sortOrder: 'desc',
+    sortType: 'number',
+    sortMode: undefined,
 
     static: {
       language: 'elastic',
@@ -88,11 +91,11 @@ export const elasticScore = _card(
           ],
         });
 
-        return {
+        const _scriptObj = {
           _script:
           {
-            type: 'number',
-            order: 'desc',
+            type: block['sortType'],
+            order: block['sortOrder'],
             script: {
               stored: 'Terrain.Score.PWL',
               params: {
@@ -101,6 +104,13 @@ export const elasticScore = _card(
             },
           },
         };
+
+        if (block['sortMode'] !== undefined)
+        {
+          _scriptObj._script['mode'] = block['sortMode'];
+        }
+
+        return _scriptObj;
       },
 
       init: (blocksConfig) =>
@@ -109,10 +119,81 @@ export const elasticScore = _card(
           weights: List([
             BlockUtils.make(blocksConfig, 'elasticWeight'),
           ]),
+          sortOrder: 'desc',
+          sortType: 'number',
+          sortMode: undefined,
         };
       },
       display:
       [
+        {
+          displayType: DisplayType.FLEX,
+          key: null,
+          style: {
+            paddingBottom: 20,
+          },
+
+          flex:
+          [
+            {
+              displayType: DisplayType.LABEL,
+              key: null,
+              label: 'Order',
+              style: {
+                paddingLeft: 20,
+              }
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              key: 'sortOrder',
+              options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values']),
+              autoDisabled: true,
+              dropdownUsesRawValues: true,
+              centerDropdown: true,
+              style: {
+                maxWidth: 80,
+              }
+            },
+            {
+              displayType: DisplayType.LABEL,
+              key: null,
+              label: 'Mode',
+              style: {
+                paddingLeft: 20,
+              }
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              key: 'sortMode',
+              options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values']),
+              dropdownUsesRawValues: true,
+              autoDisabled: true,
+              centerDropdown: true,
+              style: {
+                maxWidth: 80,
+              }
+            },
+            {
+              displayType: DisplayType.LABEL,
+              key: null,
+              label: 'Type',
+              style: {
+                paddingLeft: 20,
+              }
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              key: 'sortType',
+              options: List(ESInterpreterDefaultConfig.getClause('field_type')['values']),
+              dropdownUsesRawValues: true,
+              autoDisabled: true,
+              centerDropdown: true,
+              style: {
+                maxWidth: 120,
+              }
+            },
+          ],
+        },
         {
           displayType: DisplayType.ROWS,
           key: 'weights',
@@ -150,6 +231,7 @@ export const elasticScore = _card(
                 // help: ManualConfig.help['score'],
               },
             ],
+
             below:
             {
               displayType: DisplayType.CARDSFORTEXT,
@@ -165,6 +247,7 @@ export const elasticWeight = _block(
   {
     key: '',
     weight: 1,
+
     static: {
       language: 'elastic',
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
