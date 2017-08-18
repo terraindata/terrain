@@ -161,7 +161,7 @@ class ElasticClient
   }
 
   /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-scroll
    */
   public scroll<T>(params: Elastic.ScrollParams,
     callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
