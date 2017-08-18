@@ -46,12 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
 import * as AuthTypes from '../AuthTypes';
-import ActionTypes from './AuthActionTypes';
 
 import AuthReducers from './AuthReducers';
 

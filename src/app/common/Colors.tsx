@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'underscore';
-import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
 
 const Color = require('color');
 

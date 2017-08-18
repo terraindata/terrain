@@ -46,17 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
-import * as _ from 'underscore';
 
 import './Table.less';
 
-import * as classNames from 'classnames';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import { Menu, MenuOption } from '../../common/components/Menu';
-import Util from '../../util/Util';
+import { MenuOption } from '../../common/components/Menu';
 import TerrainComponent from './TerrainComponent';
 const Dimensions = require('react-dimensions');
 

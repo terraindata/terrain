@@ -47,14 +47,12 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
-import AjaxM1 from './../../util/AjaxM1';
 import Actions from './BuilderActions';
 import ActionTypes from './BuilderActionTypes';
 import { BuilderState } from './BuilderStore';

@@ -50,7 +50,6 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import ColorManager from './../../util/ColorManager';
 import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
 import './UserThumbnail.less';

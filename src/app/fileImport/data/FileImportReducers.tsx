@@ -47,9 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-console strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import Ajax from './../../util/Ajax';
-import Util from './../../util/Util';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 const { List, Map } = Immutable;

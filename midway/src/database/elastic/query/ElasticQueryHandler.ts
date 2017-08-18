@@ -58,8 +58,7 @@ import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
 import QueryHandler from '../../../app/query/QueryHandler';
-import { ElasticQueryError, QueryError } from '../../../error/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
+import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 

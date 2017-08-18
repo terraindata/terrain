@@ -49,7 +49,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Library from '../components/Library';
 import LibraryActions from '../data/LibraryActions';
-import { LibraryState } from '../data/LibraryStore';
 
 const mapStateToProps = (state) =>
 {

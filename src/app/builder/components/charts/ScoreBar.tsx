@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands
 
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';

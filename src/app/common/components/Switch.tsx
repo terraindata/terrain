@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Switch.less';
 

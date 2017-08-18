@@ -51,16 +51,14 @@ import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
 import { Toolbar } from 'react-data-grid-addons';
 
-import * as _ from 'underscore';
-
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
-import { getResultFields, getResultName, getResultValue } from './Result';
-import { MAX_RESULTS, Results } from './ResultTypes';
+import { getResultName } from './Result';
+import { Results } from './ResultTypes';
 
 export interface Props
 {
@@ -253,7 +251,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     if (this.state.selectedIndexes.size > 0)
     {
       const primaryKeys = this.state.selectedIndexes.map(
-        (v) => this.state.rows && this.state.rows.get(v).primaryKey
+        (v) => this.state.rows && this.state.rows.get(v).primaryKey,
       );
 
       const selectedIndexes = [];
@@ -267,7 +265,7 @@ export default class ResultsTable extends TerrainComponent<Props>
 
       this.setState({
         rows,
-        selectedIndexes: List(selectedIndexes)
+        selectedIndexes: List(selectedIndexes),
       });
     }
     else
@@ -287,7 +285,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     else
     {
       this.setState({
-        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm.toLowerCase())))
+        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm.toLowerCase()))),
       });
     }
   }
@@ -322,7 +320,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     {
       const result = this.state.rows && this.state.rows.get(props.idx);
       const id = result.primaryKey;
-      const spotlight = this.state.spotlightState.getIn(['spotlights', id])
+      const spotlight = this.state.spotlightState.getIn(['spotlights', id]);
       if (spotlight === undefined)
       {
         return (<ReactDataGrid.Row {...props} />);
@@ -331,7 +329,7 @@ export default class ResultsTable extends TerrainComponent<Props>
       return (
         <div
           style={{
-            backgroundColor: spotlight.color
+            backgroundColor: spotlight.color,
           }}>
           <ReactDataGrid.Row {...props} />
         </div>
@@ -365,7 +363,7 @@ export default class ResultsTable extends TerrainComponent<Props>
           onRowsDeselected: this.onRowsDeselected,
           selectBy: {
             indexes: this.state.selectedIndexes.toJS(),
-          }
+          },
         }}
         toolbar={<Toolbar enableFilter={true} filterRowsButtonText={'Search Within Results'} />}
         onAddFilter={this.handleFilterChange}

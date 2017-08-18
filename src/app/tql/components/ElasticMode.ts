@@ -50,7 +50,7 @@ import * as CodeMirror from 'codemirror';
 
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import { toInputMap } from '../../../blocks/types/Input';
-import { BuilderState, BuilderStore } from '../../builder/data/BuilderStore';
+import { BuilderStore } from '../../builder/data/BuilderStore';
 
 CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {

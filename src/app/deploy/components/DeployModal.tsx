@@ -47,13 +47,10 @@ THE SOFTWARE.
 // tslint:disable:no-empty-interface strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DeployModal.less';
 
-import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
