@@ -56,17 +56,11 @@
     
     &:hover {
       border-color: rgba(255,255,255,0.5);
-      //background: rgba(255,255,255,0.1);
     }
   }
   
   &.card-field-moving {
     z-index: 9999;
-    .card-field-tools-left,
-    .card-field-tools-right {
-      //border-color: rgba(255,255,255,0.5);
-     // background: rgba(255,255,255,0.1);
-    }
   }
   
   .card-field-tools-left-inner,
@@ -155,7 +149,7 @@
     border-radius: 18px;
     //background: #fff;
     margin-top: 3px;
-    left: -3px; l, 
+    left: -3px; 
     
     svg {
       width: 12px;
@@ -218,17 +212,19 @@
   }
 }
 
-.card:hover {
-  .card .card:hover {
+.card-hovering {
+  .card {
+    .card-field {
     .card-field-tools-left-inner, 
     .card-field-tools-right-inner {
-        opacity: 1;
+        opacity: 0;
       }
     }
+  }
   .card-field {
     .card-field-tools-left-inner, 
     .card-field-tools-right-inner {
-      opacity: 0;
+      opacity: 1;
     }
   }
 }
