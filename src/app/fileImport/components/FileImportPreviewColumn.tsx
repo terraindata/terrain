@@ -62,13 +62,15 @@ import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreviewColumn.less';
 
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
+
 export interface Props
 {
   columnId: number;
   columnName: string;
   columnNames: List<string>; // TODO: move to parent component while preserving merge transformation options
   isIncluded: boolean;
-  columnType: IMMap<string, any>;
+  columnType: ColumnTypesTree;
   isPrimaryKey: boolean;
   columnOptions: List<string>;
   editing: boolean;
@@ -109,7 +111,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public handleBlur()
   {
-    const success = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
+    const success: boolean = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
     if (!success)
     {
       this.setState({
@@ -130,6 +132,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public renderColumn()
   {
+    // TODO: make less redundant
     return (
       <div
         className='fi-preview-column'
@@ -230,7 +233,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             className='fi-preview-column-field-content'
           >
             <TransformBox
-              datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
+              datatype={this.props.columnType.get('type')}
               colName={this.props.columnName}
               columnNames={this.props.columnNames}
               setLocalColumnName={this.handleLocalColumnNameChange}
@@ -255,7 +258,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           {this.props.columnName}
         </div>
         <div className='fi-preview-column-title-type'>
-          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
+          {this.props.columnType.get('type')}
         </div>
         <div
           className='fi-preview-column-edit-button'

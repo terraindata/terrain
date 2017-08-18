@@ -44,92 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-/* returns an error message if there are any; else returns empty string */
-export function isValidIndexName(name: string): string
-{
-  if (name === '')
-  {
-    return 'Index name cannot be an empty string.';
-  }
-  if (name !== name.toLowerCase())
-  {
-    return 'Index name may not contain uppercase letters.';
-  }
-  if (!/^[a-z\d].*$/.test(name))
-  {
-    return 'Index name must start with a lowercase letter or digit.';
-  }
-  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(name))
-  {
-    return 'Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.';
-  }
-  return '';
-}
-/* returns an error message if there are any; else returns empty string */
-export function isValidTypeName(name: string): string
-{
-  if (name === '')
-  {
-    return 'Document type cannot be an empty string.';
-  }
-  if (/^_.*/.test(name))
-  {
-    return 'Document type may not start with an underscore.';
-  }
-  return '';
-}
-/* returns an error message if there are any; else returns empty string */
-export function isValidFieldName(name: string): string
-{
-  if (name === '')
-  {
-    return 'Field name cannot be an empty string.';
-  }
-  if (/^_.*/.test(name))
-  {
-    return 'Field name may not start with an underscore.';
-  }
-  if (name.indexOf('.') !== -1)
-  {
-    return 'Field name may not contain periods.';
-  }
-  return '';
-}
+import * as Immutable from 'immutable';
+import { applyMiddleware, compose, createStore } from 'redux';
+import { combineReducers } from 'redux-immutable';
+import thunk from 'redux-thunk';
+import { LibraryStoreReducerWrapper } from '../library/data/LibraryStore';
 
-export function parseJSONSubset(file: string, numLines: number): object[]
-{
-  let lineCount = 0;
-  let openBracketCount = 0;
-  let closeBracketCount = 0;
-  let charIndex = 0;
+const reducers = {
+  library: LibraryStoreReducerWrapper,
+};
 
-  while (lineCount < numLines)
-  {
-    if (charIndex >= file.length - 1)
-    {
-      if (file.charAt(charIndex) === '\n')
-      {
-        charIndex--;
-      }
-      break;
-    }
+const rootReducer = combineReducers(reducers);
+const initialState = Immutable.Map();
 
-    if (file.charAt(charIndex) === '{')
-    {
-      openBracketCount++;
-    }
-    else if (file.charAt(charIndex) === '}')
-    {
-      closeBracketCount++;
-    }
-    charIndex++;
+const terrainStore = createStore(rootReducer, initialState, compose(
+  applyMiddleware(thunk),
+  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
+));
 
-    if (openBracketCount === closeBracketCount && openBracketCount !== 0)
-    {
-      lineCount++;
-      openBracketCount = 0;
-      closeBracketCount = 0;
-    }
-  }
-  return JSON.parse(file.substring(0, charIndex) + ']');
-}
+export default terrainStore;

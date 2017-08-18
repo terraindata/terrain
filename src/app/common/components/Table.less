@@ -1,9 +1,26 @@
 @import "../../common/Common.less";
 
 .react-grid-Grid {
-  border: 0px;
-  
+  border: none;
   color: #242424;
+}
+
+.react-grid-Toolbar {
+  border: none;
+  padding: 0;
+  height: 32px;
+  .btn {
+    padding-right: 16px;
+    padding-top: 16px;
+    color: rgba(30, 180, 250, 0.75);
+    border: none;
+    background: none;
+    font-size: 12px;
+  }
+  .btn:hover {
+    border: none;
+    color: rgba(30, 180, 250, 1);
+  }
 }
 
 .react-grid-HeaderRow {
@@ -12,4 +29,12 @@
 
 .react-grid-Cell {
   box-sizing: border-box;
+}
+
+.react-grid-Row.row-selected {
+  background-color: inherit
+}
+
+.react-grid-Row.row-selected .react-grid-Cell {
+  background-color: inherit
 }

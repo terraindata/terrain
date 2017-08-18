@@ -65,7 +65,7 @@ export interface Input extends IRecord<Input>
 
 export function isInput(name: string, inputs: Immutable.List<Input>)
 {
-  return inputs && name.charAt(0) === InputPrefix &&
+  return inputs && name && name.charAt(0) === InputPrefix &&
     (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);
 }
 

@@ -44,43 +44,54 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface ElasticQueryHitSource
+/* returns an error message if there are any; else returns empty string */
+export function isValidIndexName(name: string): string
 {
-  [key: string]: any;
+  if (name === '')
+  {
+    return 'Index name cannot be an empty string.';
+  }
+  if (name !== name.toLowerCase())
+  {
+    return 'Index name may not contain uppercase letters.';
+  }
+  if (!/^[a-z\d].*$/.test(name))
+  {
+    return 'Index name must start with a lowercase letter or digit.';
+  }
+  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(name))
+  {
+    return 'Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.';
+  }
+  return '';
 }
-
-export interface ElasticQueryHit
+/* returns an error message if there are any; else returns empty string */
+export function isValidTypeName(name: string): string
 {
-  _index: string;
-  _type: string;
-  _id: string;
-  _score: number;
-  _source: ElasticQueryHitSource;
-  sort?: number[];
+  if (name === '')
+  {
+    return 'Document type cannot be an empty string.';
+  }
+  if (/^_.*/.test(name))
+  {
+    return 'Document type may not start with an underscore.';
+  }
+  return '';
 }
-
-export interface ElasticQueryShards
+/* returns an error message if there are any; else returns empty string */
+export function isValidFieldName(name: string): string
 {
-  total: number;
-  successful: number;
-  failed: number;
+  if (name === '')
+  {
+    return 'Field name cannot be an empty string.';
+  }
+  if (/^_.*/.test(name))
+  {
+    return 'Field name may not start with an underscore.';
+  }
+  if (name.indexOf('.') !== -1)
+  {
+    return 'Field name may not contain periods.';
+  }
+  return '';
 }
-
-export interface ElasticQueryHits
-{
-  total: number;
-  max_score: number;
-  hits: ElasticQueryHit[];
-}
-
-export interface ElasticQueryResult
-{
-  took: number;
-  timed_out: boolean;
-  hits: ElasticQueryHits;
-  aggregations?: any;
-  _shards: ElasticQueryShards;
-
-}
-
-export default ElasticQueryResult;

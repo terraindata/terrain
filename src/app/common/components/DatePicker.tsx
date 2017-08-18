@@ -169,7 +169,7 @@ const DATE_PICKER_STYLE = {
 
     '.dropdown-wrapper:not(:hover)': {
       'box-shadow': getStyle('boxShadow', '0px 0px 0px 1px ' + Colors().boxShadow),
-    }
+    },
   },
 
   '.DayPicker-Weekday': {

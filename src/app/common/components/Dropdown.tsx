@@ -73,7 +73,7 @@ export interface Props
   optionsDisplayName?: Map<any, string>; // maps value to display name
   textColor?: string | ((index: number) => string);
   width?: string;
-  directionBias?: number // bias for determining whether or not dropdown opens up or down
+  directionBias?: number; // bias for determining whether or not dropdown opens up or down
 }
 
 @Radium

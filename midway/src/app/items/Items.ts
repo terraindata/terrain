@@ -82,9 +82,10 @@ export class Items
     );
   }
 
-  public async delete(id: number): Promise<object>
+  public async delete(id: number): Promise<ItemConfig[]>
   {
-    return App.DB.delete(this.itemTable, { id } as ItemConfig);
+    const idObj: object = { id };
+    return App.DB.delete(this.itemTable, { id } as object) as Promise<ItemConfig[]>;
   }
 
   public async select(columns: string[], filter: object): Promise<ItemConfig[]>

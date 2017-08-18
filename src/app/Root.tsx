@@ -45,9 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
 import LibraryStore from './library/data/LibraryStore';
+import TerrainStore from './store/TerrainStore';
 import UserStore from './users/data/UserStore';
 
 if (!DEV)
@@ -85,7 +87,11 @@ if (!DEV)
   };
 }
 
-ReactDOM.render(<AppRouter />, document.getElementById('app'), () =>
-{
-  // tests can go here
-});
+ReactDOM.render(
+  <Provider store={TerrainStore}>
+    <AppRouter />
+  </Provider>,
+  document.getElementById('app'), () =>
+  {
+    // tests can go here
+  });

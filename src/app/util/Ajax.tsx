@@ -686,31 +686,6 @@ export const Ajax =
       );
     },
 
-    // streamFile(file: File)
-    // {
-    //   const authState = AuthStore.getState();
-    //
-    //   const formData = new FormData();
-    //   formData.append('file', file);
-    //   formData.append('id', String(authState.id));
-    //   formData.append('accessToken', authState.accessToken);
-    //   formData.append('templateID', String(31));
-    //   formData.append('filetype', 'csv');
-    //
-    //   const request = new XMLHttpRequest();
-    //   request.open('post', 'http://localhost:3000/midway/v1/import/headless');
-    //   request.send(formData);
-    //   request.onreadystatechange = () =>
-    //   {
-    //     if (request.readyState === XMLHttpRequest.DONE && request.status === 200)
-    //     {
-    //       const respArr = JSON.parse(request.response);
-    //       console.log(respArr);
-    //     }
-    //   };
-    //   return;
-    // },
-
     importFile(file: File,
       filetype: string,
       dbname: string,
@@ -773,55 +748,9 @@ export const Ajax =
       return;
     },
 
-    // importFile(fileContents: string,
-    //   filetype: string,
-    //   dbname: string,
-    //   tablename: string,
-    //   connectionId: number,
-    //   originalNames: List<string>,
-    //   columnTypes: Immutable.Map<string, object>,
-    //   primaryKey: string,
-    //   transformations: Immutable.List<object>,
-    //   update: boolean,
-    //   streaming: boolean,
-    //   onLoad: (resp: object[]) => void,
-    //   onError?: (ev: string) => void,
-    // )
-    // {
-    //   const payload: object = {
-    //     dbid: connectionId,
-    //     dbname,
-    //     tablename,
-    //     contents: fileContents,
-    //     filetype,
-    //     originalNames,
-    //     columnTypes,
-    //     primaryKey,
-    //     transformations,
-    //     update,
-    //     streaming,
-    //   };
-    //   console.log('import payload: ', payload);
-    //   const onLoadHandler = (resp) =>
-    //   {
-    //     onLoad(resp);
-    //   };
-    //   Ajax.req(
-    //     'post',
-    //     'import/',
-    //     payload,
-    //     onLoadHandler,
-    //     {
-    //       onError,
-    //     },
-    //   );
-    //
-    //   return;
-    // },
-
     saveTemplate(dbname: string,
       tablename: string,
-      connectionId: number,
+      dbid: number,
       originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
       primaryKey: string,
@@ -832,7 +761,7 @@ export const Ajax =
     )
     {
       const payload: object = {
-        dbid: connectionId,
+        dbid,
         dbname,
         tablename,
         originalNames,
@@ -841,6 +770,7 @@ export const Ajax =
         transformations,
         name,
       };
+      console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
