@@ -326,22 +326,8 @@ class CardField extends TerrainComponent<Props>
       };
     }
 
-    const removeToolStyle = _.extend({},
-      getStyle('fill', Colors().text1),
-    );
-
-    const addToolStyle = _.extend({},
-      getStyle('fill', Colors().text1),
-      backgroundColor('transparent', Colors().inactiveHover),
-      borderColor(Colors().text1),
-    );
-
     const handleToolStyle = _.extend({},
       this.state.moving ? getStyle('color', Colors().active) : getStyle('color', Colors().text1, Colors().inactiveHover),
-    );
-
-    const cardFieldMovingStyle = _.extend({},
-      borderColor(Colors().active),
     );
 
     const { row } = this.props;
@@ -403,7 +389,7 @@ class CardField extends TerrainComponent<Props>
             renderTools && this.props.canEdit &&
             <div
               className='card-field-tools-left'
-              style={this.state.moving ? cardFieldMovingStyle : {}}
+              style={this.state.moving ? CARD_FIELD_MOVING_STYLE : {}}
             >
               <div className='card-field-tools-left-inner'>
                 <div
@@ -448,7 +434,7 @@ class CardField extends TerrainComponent<Props>
                     className='card-field-add'
                     onClick={this.addField}
                     data-tip={'Add another'}
-                    style={addToolStyle}
+                    style={ADD_TOOL_STYLE}
                     key={'add-tool'}
                   >
                     <AddIcon />
@@ -468,7 +454,7 @@ class CardField extends TerrainComponent<Props>
                       className='card-field-remove'
                       onClick={this.removeField}
                       data-tip={'Remove'}
-                      style={removeToolStyle}
+                      style={REMOVE_TOOL_STYLE}
                       key={'remove-tool'}
                     >
                       <RemoveIcon />
@@ -504,5 +490,20 @@ class CardField extends TerrainComponent<Props>
     );
   }
 }
+
+const REMOVE_TOOL_STYLE = _.extend({},
+  getStyle('fill', Colors().text1),
+  borderColor(Colors().text1),
+);
+
+const ADD_TOOL_STYLE = _.extend({},
+  getStyle('fill', Colors().text1),
+  backgroundColor('transparent', Colors().inactiveHover),
+  borderColor(Colors().text1),
+);
+
+const CARD_FIELD_MOVING_STYLE = _.extend({},
+  borderColor(Colors().active),
+);
 
 export default CardField;
