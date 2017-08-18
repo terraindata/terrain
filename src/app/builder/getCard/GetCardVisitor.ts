@@ -887,10 +887,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   // We need to replace occurences of variant card types with their final types
   // We also need to splice in some custom types
-  private getCardTypes(initialCardTypes: string[], forClause?: ESClause): List<string>
+  private getCardTypes(initialClauseTypes: string[], forClause?: ESClause): List<string>
   {
     let cardTypes: string[] = [];
-    initialCardTypes.map((childType) =>
+    initialClauseTypes.map((childType) =>
     {
       if (this.variantClauseMapping[childType] !== undefined)
       {
