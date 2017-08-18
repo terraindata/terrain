@@ -193,7 +193,7 @@ export function parseMySQLDb(rawServer: object,
     let tables: IMMap<string, Table> = Map<string, Table>();
     let columns: IMMap<string, Column> = Map<string, Column>();
     const indexes: IMMap<string, Index> = Map<string, Index>();
-    const fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
+    const fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>({});
 
     let tableNames = List<string>();
     let columnIds = List<string>();
@@ -323,7 +323,7 @@ export function parseElasticDb(elasticServer: object,
 
         _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
         {
-          // fieldPropertiesMap = fieldPropertiesMap.clear();
+          //fieldPropertiesMap = fieldPropertiesMap.clear();
           fieldPropertyIds = fieldPropertyIds.clear();
 
           _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName, fieldPropertyList) => {
@@ -353,9 +353,6 @@ export function parseElasticDb(elasticServer: object,
           column = column.set(
             'fieldPropertyIds', fieldPropertyIds,
           );
-
-          console.log('column');
-          console.log(column);
 
           columns = columns.set(column.id, column);
 

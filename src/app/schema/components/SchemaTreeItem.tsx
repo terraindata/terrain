@@ -151,6 +151,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
         if (this.state.childCount === -1) // assumes that schema data does not change
         {
           const item = state.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+
           if (item)
           {
             let childCount = 0;
@@ -182,17 +183,13 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
   public renderItemInfo()
   {
-    console.log('here45');
-    console.log(this.state);
     const { item } = this.state;
 
     if (!item)
     {
-      console.log('here456');
       return null;
     }
 
-    console.log('item.type = ' + item.type);
     if (typeToRendering[item.type])
     {
       const Comp = typeToRendering[item.type].component;
@@ -210,23 +207,19 @@ class SchemaTreeItem extends TerrainComponent<Props>
   {
     const { item } = this.state;
 
-    if (!this.state.open || item.type === 'fieldProperty')
+    if (!this.state.open)
     {
       return null;
     }
 
     if (!item)
     {
-      console.log('LOADING 2');
       return (
         <div
           className='loading-text'
         />
       );
     }
-
-    console.log('foobar');
-    console.log(item['fieldPropertyIds']);
 
     return (
       <div
@@ -315,8 +308,6 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
     let nameText: string | El = <span className='loading-text' />;
 
-    console.log('h383833');
-    console.log(this.state);
     if (item)
     {
       if (this.props.search)
@@ -363,9 +354,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
         // show plain name
         nameText = item.name;
       }
-    } else {
-      console.log('LOADING 3');
-    }
+    } 
 
     return (
       <div

@@ -261,7 +261,7 @@ class FieldPropertyC extends SchemaBaseClass
   public tableId: string = '';
   public columnId: string = '';
 
-  public columnIds: List<string> = List([]);
+  public fieldPropertyInfoIds: List<string> = List();
 }
 export type FieldProperty = FieldPropertyC & IRecord<FieldPropertyC>;
 export const _FieldProperty = (config: {

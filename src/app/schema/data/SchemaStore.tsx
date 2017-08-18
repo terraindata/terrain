@@ -155,9 +155,6 @@ export const SchemaStore: Store<SchemaState> =
           state = state.set('loading', false).set('loaded', true);
         }
 
-        //console.log('state fp 1 = ');
-        //console.log(state.fieldProperties);
-
         return state
           .setIn(['servers', server.id], server)
           .set('databases', state.databases.merge(databases))
@@ -183,9 +180,6 @@ export const SchemaStore: Store<SchemaState> =
           newServer = state.servers.get(server.id).set('databaseIds',
             state.servers.get(server.id).databaseIds.concat(server.databaseIds));
         }
-
-        //console.log('state fp 2 = ');
-        //console.log(state.fieldProperties);
 
         return state
           .setIn(['servers', server.id], newServer)

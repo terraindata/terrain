@@ -54,7 +54,7 @@ import Radium = require('radium');
 
 export interface Props
 {
-  item: SchemaTypes.Index;
+  item: SchemaTypes.FieldProperty;
 }
 
 class State
@@ -68,8 +68,13 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
 
   public render()
   {
-    const index = this.props.item;
-    console.log('I MADE IT HERE');
+    const fieldProperty = this.props.item;
+    if (fieldProperty.name !== 'type')
+    {
+        console.log('fieldProperty');
+        console.log(fieldProperty.name);
+        console.log(fieldProperty.value);
+    }
 
     return (
       <div
@@ -81,7 +86,7 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            HELO!
+            {fieldProperty.name === 'type'? fieldProperty.value : 'Placeholder'}
           </span>
         </div>
       </div>
@@ -92,8 +97,8 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
 export const fieldPropertyChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Properties',
-      type: 'fieldProperty',
+      label: 'Additional Info',
+      type: 'fieldPropertyInfo',
     },
   ];
 

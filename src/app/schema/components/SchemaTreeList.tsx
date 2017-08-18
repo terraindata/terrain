@@ -129,11 +129,8 @@ class SchemaTreeList extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('props');
-    console.log(this.props);
     if (!this.props.itemIds)
     {
-      console.log('LOADING 1');
       return (
         <div
           className='loading-text'
@@ -142,9 +139,6 @@ class SchemaTreeList extends TerrainComponent<Props>
     }
 
     const { itemIds, itemType, search, label, topLevel } = this.props;
-
-    console.log('itemIds = ');
-    console.log(itemIds);
 
     return (
       <div
