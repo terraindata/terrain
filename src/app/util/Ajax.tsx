@@ -788,7 +788,7 @@ export const Ajax =
           onError,
           download: true,
           downloadFilename: 'test.csv',
-        }
+        },
         // {
         //   onError,
         // },
