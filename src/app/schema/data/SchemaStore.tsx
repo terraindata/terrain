@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import * as _ from 'lodash';
 import Redux = require('redux');
 import { Store } from 'redux';
 import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
 import * as SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
 import BackendInstance from '../../../database/types/BackendInstance';

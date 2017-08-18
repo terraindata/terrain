@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions max-line-length
 
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
 export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);

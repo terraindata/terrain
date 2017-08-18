@@ -50,8 +50,8 @@ import * as Immutable from 'immutable';
 import './ResultsArea.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 

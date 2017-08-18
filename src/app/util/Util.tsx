@@ -50,9 +50,9 @@ import * as $ from 'jquery';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 const suffixes = ['', ' k', ' M', ' B'];

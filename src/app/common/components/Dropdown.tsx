@@ -48,10 +48,10 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import Actions from '../../builder/data/BuilderActions';
 import { altStyle, Colors } from '../../common/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';

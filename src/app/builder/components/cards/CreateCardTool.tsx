@@ -47,9 +47,9 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-unused-expression member-access max-line-length
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';

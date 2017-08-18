@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';

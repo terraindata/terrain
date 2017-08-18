@@ -47,8 +47,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 import './StatusDropdown.less';
 const { List } = Immutable;
 import { ItemStatus as Status } from '../../../items/types/Item';

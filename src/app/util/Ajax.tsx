@@ -50,7 +50,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemType } from '../../items/types/Item';

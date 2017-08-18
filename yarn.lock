@@ -457,10 +457,6 @@
   dependencies:
     "@types/source-map" "*"
 
-"@types/underscore@^1.8.1":
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.8.1.tgz#bf5d680f24277284d4e42fed86bd86e5a59a44a4"
-
 "@types/webpack@^2.2.14":
   version "2.2.16"
   resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-2.2.16.tgz#9ca93f468ab3a8eb4b6f45f589acf58c8133aa9b"
@@ -562,11 +558,11 @@ amdefine@1.0.0, amdefine@>=0.0.4, amdefine@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.0.tgz#fd17474700cb5cc9c2b709f0be9d23ce3c198c33"
 
-ansi-escape-sequences@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/ansi-escape-sequences/-/ansi-escape-sequences-3.0.0.tgz#1c18394b6af9b76ff9a63509fa497669fd2ce53e"
+ansi-escape-sequences@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/ansi-escape-sequences/-/ansi-escape-sequences-4.0.0.tgz#e0ecb042958b71e42942d35c1fcf1d9b00a0f67e"
   dependencies:
-    array-back "^1.0.3"
+    array-back "^2.0.0"
 
 ansi-escapes@^1.4.0:
   version "1.4.0"
@@ -643,6 +639,12 @@ array-back@^1.0.3, array-back@^1.0.4:
   resolved "https://registry.yarnpkg.com/array-back/-/array-back-1.0.4.tgz#644ba7f095f7ffcf7c43b5f0dc39d3c1f03c063b"
   dependencies:
     typical "^2.6.0"
+
+array-back@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/array-back/-/array-back-2.0.0.tgz#6877471d51ecc9c9bfa6136fb6c7d5fe69748022"
+  dependencies:
+    typical "^2.6.1"
 
 array-differ@^1.0.0:
   version "1.0.0"
@@ -1874,10 +1876,6 @@ chalk@^2.0.0, chalk@^2.0.1:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/charenc/-/charenc-0.0.2.tgz#c0a1d2f3a7092e03774bfa83f14c0fc5790a8667"
 
-chart.js@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-1.1.1.tgz#a9b17054220bd45cbdb176fd6bcb8783ef871a7d"
-
 cheerio@^0.22.0:
   version "0.22.0"
   resolved "https://registry.yarnpkg.com/cheerio/-/cheerio-0.22.0.tgz#a9baa860a3f9b595a6b81b1a86873121ed3a269e"
@@ -2031,9 +2029,9 @@ color@^0.11.0:
     color-convert "^1.3.0"
     color-string "^0.3.0"
 
-color@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/color/-/color-1.0.3.tgz#e48e832d85f14ef694fb468811c2d5cfe729b55d"
+color@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/color/-/color-2.0.0.tgz#e0c9972d1e969857004b101eaa55ceab5961d67d"
   dependencies:
     color-convert "^1.8.2"
     color-string "^1.4.0"
@@ -2066,22 +2064,22 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   dependencies:
     delayed-stream "~1.0.0"
 
-command-line-args@^4.0.3:
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/command-line-args/-/command-line-args-4.0.6.tgz#0ff87a1dd159890dcaeb2a005abdae71e55059fc"
+command-line-args@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/command-line-args/-/command-line-args-4.0.7.tgz#f8d1916ecb90e9e121eda6428e41300bfb64cc46"
   dependencies:
-    array-back "^1.0.4"
+    array-back "^2.0.0"
     find-replace "^1.0.3"
     typical "^2.6.1"
 
-command-line-usage@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/command-line-usage/-/command-line-usage-4.0.0.tgz#816b32788b58f9feba44d1e6dac60fcaeb29b5ea"
+command-line-usage@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/command-line-usage/-/command-line-usage-4.0.1.tgz#d89cf16c8ae71e8e8a6e6aabae1652af76ff644e"
   dependencies:
-    ansi-escape-sequences "^3.0.0"
-    array-back "^1.0.4"
-    table-layout "^0.4.0"
-    typical "^2.6.0"
+    ansi-escape-sequences "^4.0.0"
+    array-back "^2.0.0"
+    table-layout "^0.4.1"
+    typical "^2.6.1"
 
 commander@2.0.x:
   version "2.0.0"
@@ -2599,9 +2597,13 @@ deep-equal@^1.0.1, deep-equal@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
 
-deep-extend@~0.4.0, deep-extend@~0.4.1:
+deep-extend@~0.4.0:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.4.2.tgz#48b699c27e334bf89f10892be432f6e4c7d34a7f"
+
+deep-extend@~0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.5.0.tgz#6ef4a09b05f98b0e358d6d93d4ca3caec6672803"
 
 deep-is@~0.1.3:
   version "0.1.3"
@@ -3320,12 +3322,6 @@ fd-slicer@~1.0.1:
   resolved "https://registry.yarnpkg.com/fd-slicer/-/fd-slicer-1.0.1.tgz#8b5bcbd9ec327c5041bf9ab023fd6750f1177e65"
   dependencies:
     pend "~1.2.0"
-
-feature-detect-es6@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/feature-detect-es6/-/feature-detect-es6-1.3.1.tgz#f888736af9cb0c91f55663bfa4762eb96ee7047f"
-  dependencies:
-    array-back "^1.0.3"
 
 file-loader@0.11.1:
   version "0.11.1"
@@ -6729,15 +6725,15 @@ react-container-dimensions@^1.3.2:
     invariant "^2.2.2"
     prop-types "^15.5.8"
 
-react-data-grid-addons@^2.0.55:
-  version "2.0.55"
-  resolved "https://registry.yarnpkg.com/react-data-grid-addons/-/react-data-grid-addons-2.0.55.tgz#3153fb6dbcd2c54a258c36406dc90ee1d2751453"
+react-data-grid-addons@^2.0.57:
+  version "2.0.57"
+  resolved "https://registry.yarnpkg.com/react-data-grid-addons/-/react-data-grid-addons-2.0.57.tgz#35aba7a19e6952d125ad4e052531039a01b9d54f"
   dependencies:
-    react-data-grid "^2.0.55"
+    react-data-grid "^2.0.57"
 
-react-data-grid@^2.0.55:
-  version "2.0.55"
-  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.55.tgz#385e91f5ed374e6c4bd34d924b49366a189b7953"
+react-data-grid@^2.0.57:
+  version "2.0.57"
+  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.57.tgz#684e5b89a631669290077bf14ffd39dca343ccdc"
 
 react-day-picker@^6.1.0:
   version "6.1.0"
@@ -7864,15 +7860,15 @@ symbol-tree@^3.2.1:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
 
-table-layout@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/table-layout/-/table-layout-0.4.0.tgz#c70ff0455d9add63b91f7c15a77926295c0e0e7d"
+table-layout@^0.4.1:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/table-layout/-/table-layout-0.4.2.tgz#10e9043c142a1e2d155da7257e478f0ef4981786"
   dependencies:
-    array-back "^1.0.4"
-    deep-extend "~0.4.1"
+    array-back "^2.0.0"
+    deep-extend "~0.5.0"
     lodash.padend "^4.6.1"
-    typical "^2.6.0"
-    wordwrapjs "^2.0.0"
+    typical "^2.6.1"
+    wordwrapjs "^3.0.0"
 
 tapable@^0.2.7:
   version "0.2.7"
@@ -8219,10 +8215,6 @@ undefsafe@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-0.0.3.tgz#ecca3a03e56b9af17385baac812ac83b994a962f"
 
-underscore@^1.8.3:
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.8.3.tgz#4f3fb53b106e6097fcf9cb4109f2a5e9bdfa5022"
-
 uniq@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/uniq/-/uniq-1.0.1.tgz#b31c5ae8254844a3a8281541ce2b04b865a734ff"
@@ -8356,7 +8348,7 @@ velocity-animate@^1.4.0, velocity-animate@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/velocity-animate/-/velocity-animate-1.5.0.tgz#fc8771d8dfe1136ff02a707e10fbb0957c4b030f"
 
-velocity-react@^1.2.2:
+velocity-react@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/velocity-react/-/velocity-react-1.3.3.tgz#d6d47276cfc8be2a75623879b20140ac58c1b82b"
   dependencies:
@@ -8618,14 +8610,12 @@ wordwrap@~0.0.2:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-0.0.3.tgz#a3d5da6cd5c0bc0008d37234bbaf1bed63059107"
 
-wordwrapjs@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/wordwrapjs/-/wordwrapjs-2.0.0.tgz#ab55f695e6118da93858fdd70c053d1c5e01ac20"
+wordwrapjs@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/wordwrapjs/-/wordwrapjs-3.0.0.tgz#c94c372894cadc6feb1a66bff64e1d9af92c5d1e"
   dependencies:
-    array-back "^1.0.3"
-    feature-detect-es6 "^1.3.1"
     reduce-flatten "^1.0.1"
-    typical "^2.6.0"
+    typical "^2.6.1"
 
 worker-farm@^1.3.1:
   version "1.4.1"
