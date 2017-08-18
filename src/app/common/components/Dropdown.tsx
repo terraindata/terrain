@@ -272,7 +272,7 @@ class Dropdown extends TerrainComponent<Props>
           className='dropdown-options-wrapper'
           style={altStyle()}
         >
-          <StyleTag style={scrollbarStyle}/>
+          <StyleTag style={scrollbarStyle} />
           {
             this.props.options ?
               this.props.options.map(this.renderOption)
