@@ -407,6 +407,9 @@ const COMMON_THEME_COLOR_STYLE = {
   '::-webkit-scrollbar-thumb': {
     background: Colors().scrollbarPiece,
   },
+  '.altBg ::-webkit-scrollbar-thumb': {
+    background: Colors().altScrollbarPiece,
+  },
   'input': {
     background: Colors().inputBg,
     color: Colors().text1,

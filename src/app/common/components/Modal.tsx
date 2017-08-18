@@ -100,7 +100,7 @@ class Modal extends TerrainComponent<Props>
 
   public render()
   {
-    const defaultTitle = this.props.error ? 'Alert' : 'Please Confirm';
+    const defaultTitle = this.props.error ? 'Error' : 'Please Confirm';
 
     const msgTag = this.props.pre ? <pre /> : <div />;
 
