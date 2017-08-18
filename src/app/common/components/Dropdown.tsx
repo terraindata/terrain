@@ -256,10 +256,10 @@ class Dropdown extends TerrainComponent<Props>
   {
     // Element with options, rendered at the top or bottom of the dropdown
     const scrollbarStyle = {
-      '::-webkit-scrollbar-track': {
+      '.dropdown-wrapper ::-webkit-scrollbar-track': {
         background: Colors().scrollbarBG,
       },
-      '::-webkit-scrollbar-thumb': {
+      '.dropdown-wrapper ::-webkit-scrollbar-thumb': {
         background: Colors().altScrollbarPiece,
       },
     };
@@ -272,7 +272,6 @@ class Dropdown extends TerrainComponent<Props>
           className='dropdown-options-wrapper'
           style={altStyle()}
         >
-          <StyleTag style={scrollbarStyle} />
           {
             this.props.options ?
               this.props.options.map(this.renderOption)
@@ -298,7 +297,7 @@ class Dropdown extends TerrainComponent<Props>
         })}
         key='dropdown-body'
       >
-
+        <StyleTag style={scrollbarStyle} />
         {
           this.state.up && this.state.open
           && optionsEl

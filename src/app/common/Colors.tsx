@@ -352,7 +352,7 @@ const DARK: Theme =
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
 
-    altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',
+    altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
 
     error: '#d14f42',
 
