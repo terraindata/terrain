@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions
+// tslint:disable:no-var-requires strict-boolean-expressions restrict-plus-operands
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
