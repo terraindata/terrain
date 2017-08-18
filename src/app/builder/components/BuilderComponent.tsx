@@ -148,7 +148,7 @@ class BuilderComponent extends TerrainComponent<Props>
       // special type that is unrelated to the data
       return <div
         className='builder-label'
-        key={keySeed + '-label'}
+        key={keySeed + '-label-' + d.label}
         style={d.style}
       >
         {d.label}
@@ -212,7 +212,6 @@ class BuilderComponent extends TerrainComponent<Props>
         break;
       case DisplayType.DROPDOWN:
         let selectedIndex = d.options.indexOf(typeof value === 'string' ? value : JSON.stringify(value));
-
         content = (
           <div key={key} className='builder-component-wrapper  builder-component-wrapper-wide'>
             <Dropdown

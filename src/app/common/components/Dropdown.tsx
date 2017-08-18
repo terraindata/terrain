@@ -100,7 +100,7 @@ class Dropdown extends TerrainComponent<Props>
         const pr = this.props;
         if (pr.keyPath)
         {
-          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : index);
+          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
         }
         if (pr.onChange)
         {
