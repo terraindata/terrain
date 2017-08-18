@@ -134,7 +134,6 @@ export const elasticScore = _card(
           displayType: DisplayType.FLEX,
           key: null,
           style: {
-            paddingTop: 20,
             paddingBottom: 20,
           },
 
