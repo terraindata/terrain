@@ -166,7 +166,11 @@ class ResultsArea extends TerrainComponent<Props>
     }
 
     return (
-      <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
+      <div className={classNames({
+        'result-expanded-wrapper': true,
+        'result-collapsed-wrapper': !this.state.expanded,
+        'result-expanded-config-open': this.state.showingConfig,
+      })}>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result
           result={result}
@@ -601,7 +605,6 @@ column if you have customized the results view.');
       >
         {this.renderTopbar()}
         {this.renderResults()}
-        {this.renderExpandedResult()}
         {this.renderConfig()}
         {this.renderExport()}
       </div>

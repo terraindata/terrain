@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as Redux from 'redux';
+import thunk from 'redux-thunk';
 import * as _ from 'underscore';
-// const Redux = require('redux');
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from './../../auth/data/AuthStore';
@@ -138,29 +138,33 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
   }
 }
 
-export const LibraryStore = Redux.createStore(
-  (state: LibraryState = DefaultState, action) =>
+export const LibraryStoreReducerWrapper = (state: LibraryState = DefaultState, action) =>
+{
+  if (LibraryReducers[action.type])
   {
-    if (LibraryReducers[action.type])
-    {
-      state = LibraryReducers[action.type](state, action);
-    }
-
-    if (CleanLibraryActionTypes.indexOf(action.type) === -1)
-    {
-      // save the new state
-      saveStateOf(state.groups, state.prevGroups);
-      saveStateOf(state.algorithms, state.prevAlgorithms);
-      saveStateOf(state.variants, state.prevVariants);
-    }
-
-    state = state
-      .set('prevGroups', state.groups)
-      .set('prevAlgorithms', state.algorithms)
-      .set('prevVariants', state.variants);
-
-    return state;
+    state = LibraryReducers[action.type](state, action);
   }
-  , DefaultState);
+
+  if (CleanLibraryActionTypes.indexOf(action.type) === -1)
+  {
+    // save the new state
+    saveStateOf(state.groups, state.prevGroups);
+    saveStateOf(state.algorithms, state.prevAlgorithms);
+    saveStateOf(state.variants, state.prevVariants);
+  }
+
+  state = state
+    .set('prevGroups', state.groups)
+    .set('prevAlgorithms', state.algorithms)
+    .set('prevVariants', state.variants);
+
+  return state;
+};
+
+export const LibraryStore = Redux.createStore(
+  LibraryStoreReducerWrapper,
+  DefaultState,
+  Redux.applyMiddleware(thunk),
+);
 
 export default LibraryStore;

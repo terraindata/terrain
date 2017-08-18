@@ -44,43 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface ElasticQueryHitSource
+import * as _ from 'lodash';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import Library from '../components/Library';
+import LibraryActions from '../data/LibraryActions';
+import { LibraryState } from '../data/LibraryStore';
+
+const mapStateToProps = (state) =>
 {
-  [key: string]: any;
+  return {
+    library: state.get('library'),
+  };
+};
+
+function mapDispatchToProps(dispatch)
+{
+  return {
+    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
+    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
+    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
+    libraryActions: bindActionCreators(
+      _.pick(
+        LibraryActions,
+        ['loadState', 'setDbs', 'fetch'],
+      ),
+      dispatch,
+    ),
+  };
 }
 
-export interface ElasticQueryHit
-{
-  _index: string;
-  _type: string;
-  _id: string;
-  _score: number;
-  _source: ElasticQueryHitSource;
-  sort?: number[];
-}
+const LibraryContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Library);
 
-export interface ElasticQueryShards
-{
-  total: number;
-  successful: number;
-  failed: number;
-}
-
-export interface ElasticQueryHits
-{
-  total: number;
-  max_score: number;
-  hits: ElasticQueryHit[];
-}
-
-export interface ElasticQueryResult
-{
-  took: number;
-  timed_out: boolean;
-  hits: ElasticQueryHits;
-  aggregations?: any;
-  _shards: ElasticQueryShards;
-
-}
-
-export default ElasticQueryResult;
+export default LibraryContainer;

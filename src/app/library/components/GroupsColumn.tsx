@@ -56,7 +56,6 @@ import * as UserTypes from '../../users/UserTypes';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
@@ -73,6 +72,7 @@ export interface Props
   groupsOrder: Immutable.List<ID>;
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
+  groupActions: any;
 }
 
 class GroupsColumn extends TerrainComponent<Props>
@@ -113,13 +113,13 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleArchive(id: ID)
   {
-    Actions.groups.change(this.props.groups.find((g) => g.id === id)
+    this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
       .set('status', ItemStatus.Archive) as Group);
   }
 
   public handleNameChange(id: ID, name: string)
   {
-    Actions.groups.change(
+    this.props.groupActions.change(
       this.props.groups.get(id)
         .set('name', name) as Group,
     );
@@ -127,7 +127,7 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleCreate()
   {
-    Actions.groups.create();
+    this.props.groupActions.create();
   }
 
   public handleHover(index: number, type: string, id: ID)
@@ -140,11 +140,16 @@ class GroupsColumn extends TerrainComponent<Props>
         lastMoved: index + ' ' + itemIndex,
       });
       const target = this.props.groups.get(this.props.groupsOrder.get(index));
-      Actions.groups.move(this.props.groups.get(id).set('status', target.status) as Group, index);
+      this.props.groupActions.move(this.props.groups.get(id).set('status', target.status) as Group, index);
     }
   }
 
   public handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
+  {
+
+  }
+
+  public handleDragFinish()
   {
 
   }
@@ -176,6 +181,7 @@ class GroupsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={group}
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
@@ -225,7 +231,7 @@ class GroupsColumn extends TerrainComponent<Props>
     const status = ItemStatus[statusString];
     if (g.status !== status)
     {
-      Actions.groups.change(g.set('status', status) as Group);
+      this.props.groupActions.change(g.set('status', status) as Group);
     }
   }
 
