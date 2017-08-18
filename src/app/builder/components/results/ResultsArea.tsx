@@ -353,7 +353,7 @@ class ResultsArea extends TerrainComponent<Props>
     );
   }
 
-  public handleESresultExport()
+  /* public handleESresultExport()
   {
     this.props.onNavigationException();
 
@@ -378,7 +378,7 @@ class ResultsArea extends TerrainComponent<Props>
     alert('Your data is being prepared for export, and will be automatically downloaded when ready.\n\
 Note: this exports the results of your query, which may be different from the results in the Results \
 column if you have customized the results view.');
-  }
+  }*/
 
   /*  handleExport()
     {
@@ -522,6 +522,7 @@ column if you have customized the results view.');
       const mainFontColor = fontColor(Colors().text2);
       const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
         elasticUpdate } = this.props.exportState;
+      // TODO: re-style, current styling taken from ResultsConfigComponent
       return (
         <div className='results-config-wrapper'>
           <div
@@ -534,16 +535,6 @@ column if you have customized the results view.');
             <div className='results-config-bar' style={[mainBg, borderColor(Colors().border1)]}>
               <div className='results-config-title' style={mainFontColor}>
                 Export Results
-              </div>
-              <div key={'results-export-button'}
-                className='results-config-switch'
-                style={[
-                  fontColor(Colors().text1),
-                  borderColor(Colors().border1, Colors().border3),
-                  backgroundColor(Colors().bg3),
-                ]}
-              >
-                Export
               </div>
               <div key={'results-config-button'}
                 className='results-config-button'
@@ -571,7 +562,7 @@ column if you have customized the results view.');
               uploadInProgress={false}
               elasticUpdate={elasticUpdate}
               exporting={true}
-              query={this.props.query}
+              query={this.props.query.tql}
             />
 
           </div>

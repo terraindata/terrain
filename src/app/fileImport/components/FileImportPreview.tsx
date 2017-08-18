@@ -52,7 +52,6 @@ import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as _ from 'underscore';
-import { Query } from '../../../items/types/Query';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Util from '../../util/Util';
 import Autocomplete from './../../common/components/Autocomplete';
@@ -88,7 +87,7 @@ export interface Props
   uploadInProgress: boolean;
   elasticUpdate: boolean;
   exporting: boolean;
-  query?: Query;
+  query?: string;
 }
 
 @Radium
@@ -249,7 +248,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.exporting)
     {
       const id = this.props.templates.get(this.state.templateId).templateId;
-      Actions.exportFile(this.props.query.tql, id, true);
+      Actions.exportFile(this.props.query, id, true);
     }
     else
     {
@@ -425,13 +424,46 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderUpload()
+  {
+    const upload =
+      <div
+        className='fi-preview-import-button'
+        onClick={this.handleUploadFile}
+        style={buttonColors()}
+      >
+        {this.props.exporting ? 'Export' : 'Import'}
+      </div>;
+
+    return (
+      this.props.exporting ?
+        this.props.uploadInProgress ?
+          <div className='fi-preview-loading-container'>
+            <Loading
+              width={100}
+              height={100}
+              loading={this.props.uploadInProgress}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          </div>
+          :
+          upload
+        :
+        upload
+    );
+  }
+
   public renderTopBar()
   {
     return (
       <div
         className='flex-container fi-preview-topbar'
       >
-        {this.renderPrimaryKeys()}
+        {
+          !this.props.exporting &&
+          this.renderPrimaryKeys()
+        }
         {this.renderTemplate()}
       </div>
     );
@@ -450,12 +482,15 @@ class FileImportPreview extends TerrainComponent<Props>
             checked={this.props.elasticUpdate}
             onChange={this.handleElasticUpdateChange}
           />
-          <span
-            className='clickable'
-            onClick={this.handleElasticUpdateChange}
-          >
-            Join against any existing entries
+          {
+            !this.props.exporting &&
+            <span
+              className='clickable'
+              onClick={this.handleElasticUpdateChange}
+            >
+              Join against any existing entries
             </span>
+          }
         </div>
         {
           this.props.uploadInProgress ?
@@ -469,13 +504,7 @@ class FileImportPreview extends TerrainComponent<Props>
               />
             </div>
             :
-            <div
-              className='fi-preview-import-button'
-              onClick={this.handleUploadFile}
-              style={buttonColors()}
-            >
-              Import
-            </div>
+            this.renderUpload()
         }
       </div>
     );
@@ -490,18 +519,6 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTopBar()}
         {this.renderTable()}
         {this.renderBottomBar()}
-        {
-          this.props.uploadInProgress &&
-          <div className='fi-preview-loading-container'>
-            <Loading
-              width={100}
-              height={100}
-              loading={this.props.uploadInProgress}
-              loaded={false}
-              onLoadedEnd={null}
-            />
-          </div>
-        }
       </div>
     );
   }

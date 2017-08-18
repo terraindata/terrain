@@ -134,9 +134,133 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     }
   }
 
+  public renderIncluded()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
+        <div
+          className='fi-preview-column-field-name'
+        >
+          <CheckBox
+            checked={this.props.isIncluded}
+            onChange={this.handleIncludedChange}
+          />
+        </div>
+        <span
+          className='fi-preview-column-field-content clickable'
+          onClick={this.handleIncludedChange}
+        >
+          Include Column
+          </span>
+      </div>
+    );
+  }
+
+  public renderPrimaryKey()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
+        <div
+          className='fi-preview-column-field-name'
+        >
+          <CheckBox
+            checked={this.props.isPrimaryKey}
+            onChange={this.handlePrimaryKeyChange}
+          />
+        </div>
+        <span
+          className='fi-preview-column-field-content clickable'
+          onClick={this.handlePrimaryKeyChange}
+        >
+          Primary Key
+        </span>
+      </div>
+    );
+  }
+
+  public renderName()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
+        <span
+          className='fi-preview-column-field-name'
+        >
+          Name
+          </span>
+        <div
+          className='fi-preview-column-field-content'
+        >
+          <Autocomplete
+            value={this.state.localColumnName}
+            options={this.props.columnOptions}
+            onChange={this.handleLocalColumnNameChange}
+            placeholder={''}
+            disabled={false}
+            onBlur={this.handleBlur}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderType()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
+        <span
+          className='fi-preview-column-field-name'
+        >
+          Type
+            </span>
+        <div
+          className='fi-preview-column-field-content'
+        >
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionDepth={0}
+            columnType={this.props.columnType}
+            editing={this.props.editing}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderTransform()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
+        <span
+          className='fi-preview-column-field-name'
+        >
+          Transform
+          </span>
+        <div
+          className='fi-preview-column-field-content'
+        >
+          <TransformBox
+            datatype={this.props.columnType.type}
+            colName={this.props.columnName}
+            columnNames={this.props.columnNames}
+            setLocalColumnName={this.handleLocalColumnNameChange}
+          />
+        </div>
+      </div>
+    );
+  }
+
   public renderColumn()
   {
-    // TODO: make less redundant
     return (
       <div
         className='fi-preview-column'
@@ -145,106 +269,11 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           text: Colors().text1,
         }}
       >
-        <div
-          className='flex-container fi-preview-column-field'
-        >
-          <div
-            className='fi-preview-column-field-name'
-          >
-            <CheckBox
-              checked={this.props.isIncluded}
-              onChange={this.handleIncludedChange}
-            />
-          </div>
-          <span
-            className='fi-preview-column-field-content clickable'
-            onClick={this.handleIncludedChange}
-          >
-            Include Column
-          </span>
-        </div>
-
-        <div
-          className='flex-container fi-preview-column-field'
-        >
-          <div
-            className='fi-preview-column-field-name'
-          >
-            <CheckBox
-              checked={this.props.isPrimaryKey}
-              onChange={this.handlePrimaryKeyChange}
-            />
-          </div>
-          <span
-            className='fi-preview-column-field-content clickable'
-            onClick={this.handlePrimaryKeyChange}
-          >
-            Primary Key
-          </span>
-        </div>
-
-        <div
-          className='flex-container fi-preview-column-field'
-        >
-          <span
-            className='fi-preview-column-field-name'
-          >
-            Name
-          </span>
-          <div
-            className='fi-preview-column-field-content'
-          >
-            <Autocomplete
-              value={this.state.localColumnName}
-              options={this.props.columnOptions}
-              onChange={this.handleLocalColumnNameChange}
-              placeholder={''}
-              disabled={false}
-              onBlur={this.handleBlur}
-            />
-          </div>
-        </div>
-        {
-          !this.props.exporting &&
-          <div
-            className='flex-container fi-preview-column-field'
-          >
-            <span
-              className='fi-preview-column-field-name'
-            >
-              Type
-            </span>
-            <div
-              className='fi-preview-column-field-content'
-            >
-              <TypeDropdown
-                columnId={this.props.columnId}
-                recursionDepth={0}
-                columnType={this.props.columnType}
-                editing={this.props.editing}
-              />
-            </div>
-          </div>
-        }
-        <div
-          className='flex-container fi-preview-column-field'
-        >
-          <span
-            className='fi-preview-column-field-name'
-          >
-            Transform
-          </span>
-          <div
-            className='fi-preview-column-field-content'
-          >
-            <TransformBox
-              datatype={this.props.columnType.type}
-              colName={this.props.columnName}
-              columnNames={this.props.columnNames}
-              setLocalColumnName={this.handleLocalColumnNameChange}
-            />
-          </div>
-        </div>
+        {this.renderIncluded()}
+        {!this.props.exporting && this.renderPrimaryKey()}
+        {this.renderName()}
+        {!this.props.exporting && this.renderType()}
+        {this.renderTransform()}
       </div>
     );
   }
