@@ -87,7 +87,8 @@ export interface Props
 class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
-    pointsCache: ScorePoints;
+    pointsCache: ScorePoints; //  this component points
+    pointsBuffer: ScorePoints; // parent component points
     selectedPointIds: IMMap<string, boolean>;
     lastSelectedPointId?: string;
     initialScore?: number;
@@ -97,11 +98,14 @@ class TransformCardChart extends TerrainComponent<Props>
     // these move seeds are use to identify fluid point movements, which should all be undone in the same action
     moveSeed: number;
     movedSeed: number;
+    dragging: boolean;
   } = {
     pointsCache: this.props.points,
+    pointsBuffer: null,
     selectedPointIds: Map<string, boolean>({}),
     moveSeed: 0,
     movedSeed: -1,
+    dragging: false,
   };
 
   constructor(props: Props)
@@ -174,6 +178,7 @@ class TransformCardChart extends TerrainComponent<Props>
     ).toList();
     this.setState({
       pointsCache: points,
+      pointsBuffer: null,
     });
     this.debouncedUpdatePoints(points, isConcrete);
     if (isConcrete)
@@ -189,6 +194,7 @@ class TransformCardChart extends TerrainComponent<Props>
       initialValue,
       initialPoints: this.state.pointsCache,
       moveSeed: this.state.moveSeed + 1,
+      dragging: true,
     });
   }
 
@@ -244,12 +250,21 @@ class TransformCardChart extends TerrainComponent<Props>
   public onPointRelease()
   {
     this.debouncedUpdatePoints.flush();
+    this.setState({
+      dragging: false,
+    });
+    if (this.state.pointsBuffer !== null)
+    {
+      this.setState({
+        pointsCache: this.state.pointsBuffer,
+        pointsBuffer: null,
+      });
+    }
   }
 
   public onLineClick(x, y)
   {
     this.setState({
-      lineMoving: true,
       initialLineY: y,
       initialPoints: this.state.pointsCache,
     });
@@ -336,6 +351,9 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
+    this.setState({
+      dragging: false,
+    });
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
@@ -344,10 +362,16 @@ class TransformCardChart extends TerrainComponent<Props>
   // happens on undos/redos
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.points !== this.state.pointsCache)
+    if (!this.state.dragging)
     {
       this.setState({
         pointsCache: nextProps.points,
+      });
+    }
+    else
+    {
+      this.setState({
+        pointsBuffer: nextProps.points,
       });
     }
   }
