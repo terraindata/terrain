@@ -83,6 +83,8 @@ export interface Props
   // ^ called on target
   onDropped: (id: ID, targetType: string, targetItem: any, shiftKey: boolean) => void;
   // ^ called on dragged element
+  onDragFinish: () => void;
+  // ^ called on target even if no drop occurs
 
   draggingItemIndex: number;
   draggingOverIndex: number;
@@ -418,6 +420,7 @@ const source =
 
     endDrag(props, monitor, component)
     {
+      props.onDragFinish();
       if (!monitor.didDrop())
       {
         return;

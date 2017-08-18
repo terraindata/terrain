@@ -258,7 +258,10 @@ class VariantsColumn extends TerrainComponent<Props>
         );
         break;
     }
+  }
 
+  public handleDragFinish()
+  {
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
@@ -357,6 +360,7 @@ class VariantsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={variant}
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}
@@ -377,6 +381,7 @@ class VariantsColumn extends TerrainComponent<Props>
             <StatusDropdown
               variant={variant}
               noBorder={true}
+              variantActions={this.props.variantActions}
             />
             <div
               className='library-item-line'
@@ -394,8 +399,7 @@ class VariantsColumn extends TerrainComponent<Props>
   public handlItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
-    const status = ItemStatus[statusString];
-    if (v.status !== status)
+    if (v.status !== statusString)
     {
       this.props.variantActions.change(v.set('status', status) as Variant);
     }

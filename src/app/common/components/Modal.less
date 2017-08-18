@@ -13,24 +13,25 @@
 }
 
 .modal-dialog{
-	Modal {
-		.ReactModal__Content ReactModal__Content--after-open{
-			width: 100px;
-		}
-	}
+  padding-bottom: 10px;
+  Modal {
+    .ReactModal__Content ReactModal__Content--after-open{
+      width: 100px;
+    }
+  }
 
   .modal-title {
-  	padding: @spacing;
-  	font-size: @font-size;
-  	color: #636363;
+    padding: @spacing;
+    font-size: @font-size;
+    color: #636363;
 
     position: relative;
     display: flex;
     align-items: center;
     
     &.modal-title-error{
-    	background-color: #ffd8d5;
-    	display: flex;
+      background-color: #ffd8d5;
+      display: flex;
     }
     
     .modal-title-inner {
@@ -73,37 +74,37 @@
 }
 
 .modal-message{
-	text-align: left;
-	font-size: @small-font-size;
-	color: rgba(0, 0, 0, 0.6);
-	padding: 14px 24px;
+  text-align: left;
+  font-size: @small-font-size;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 14px 24px;
 }
 
 .modal-message-error {
-	background-color: #d9817b;
-	color: #ffffff;
-	border-radius: 4px;
-	margin: 12px;
-	margin-bottom: 4px;
-	margin-top: 8px;
-	padding: 8px 12px;
-	border: none;
+  background-color: #d9817b;
+  color: #ffffff;
+  border-radius: 4px;
+  margin: 12px;
+  margin-bottom: 4px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: none;
 }
 
 .modal-buttons {
-	max-width: 100%;
-	height: 28px;
-	padding: 12px;
-	.bold-normal-text;
+  max-width: 100%;
+  height: 28px;
+  padding: 12px;
+  .bold-normal-text;
 }
 
 .modal-close-button,
 .modal-third-button,
 .modal-confirm-button {
-	color: #636363;
-	background-color: #fff;
-	float: right;
-	border: 1px solid #ccc;
+  color: #636363;
+  background-color: #fff;
+  float: right;
+  border: 1px solid #ccc;
   .transition;
   &:hover {
     // border-color: #aaa;
@@ -121,7 +122,7 @@
 }
 
 .modal-confirm-button {
-	background-color: #70b9e7;
+  background-color: #70b9e7;
   border-color: #70b9e7;
   &:hover {
     background-color: darken(saturate(#70b9e7, 10%), 10%);
@@ -131,14 +132,14 @@
     background-color: darken(saturate(#70b9e7, 20%), 20%);
     color: #fff;
   }
-	color: #fff;
-	margin-left: 12px;
+  color: #fff;
+  margin-left: 12px;
 }
 
 .modal-info-icon {
-	width: 20px;
-	margin-right: 6px;
-	svg {
-		fill: #636363;
-	}
+  width: 20px;
+  margin-right: 6px;
+  svg {
+    fill: #636363;
+  }
 }

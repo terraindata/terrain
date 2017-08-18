@@ -5466,6 +5466,10 @@ mem@^1.1.0:
   dependencies:
     mimic-fn "^1.0.0"
 
+memoize-one@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-3.0.1.tgz#7b599850bb41be8beed305f4eefd963c8cea9a0a"
+
 memory-fs@^0.4.0, memory-fs@~0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.4.1.tgz#3a9a20b8462523e447cfbc7e8bb80ed667bfc552"
@@ -6782,7 +6786,13 @@ react-container-dimensions@^1.3.2:
     invariant "^2.2.2"
     prop-types "^15.5.8"
 
-react-data-grid@^2.0.54:
+react-data-grid-addons@^2.0.55:
+  version "2.0.55"
+  resolved "https://registry.yarnpkg.com/react-data-grid-addons/-/react-data-grid-addons-2.0.55.tgz#3153fb6dbcd2c54a258c36406dc90ee1d2751453"
+  dependencies:
+    react-data-grid "^2.0.55"
+
+react-data-grid@^2.0.55:
   version "2.0.56"
   resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.56.tgz#69996beaa0233483d6af278c9f2a3c580c76a282"
 
