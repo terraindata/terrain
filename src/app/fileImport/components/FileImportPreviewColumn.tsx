@@ -71,7 +71,7 @@ export interface Props
 {
   columnId: number;
   columnName: string;
-  columnNames: List<string>; // TODO: move to parent component while preserving merge transformation options
+  columnNames: List<string>; // TODO: move to parent component while preserving split/merge functionality
   isIncluded: boolean;
   columnType: ColumnTypesTree;
   isPrimaryKey: boolean;
@@ -250,7 +250,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         >
           <TransformBox
             datatype={this.props.columnType.type}
-            colName={this.props.columnName}
+            columnId={this.props.columnId}
+            columnName={this.props.columnName}
             columnNames={this.props.columnNames}
             setLocalColumnName={this.handleLocalColumnNameChange}
           />
