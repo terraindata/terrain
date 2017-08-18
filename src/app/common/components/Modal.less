@@ -7,32 +7,30 @@
   right: 0;
   bottom: 0;
   z-index: 999999999;
-  background-color: @fadedOutBg;
-  
+  // background-color: @fadedOutBg;
   .fade-in;
 }
 
 .modal-dialog{
-  padding-bottom: 10px;
+  padding-bottom: 0px;
   Modal {
     .ReactModal__Content ReactModal__Content--after-open{
       width: 100px;
     }
   }
 
+  &.modal-dialog-no-footer
+  {
+    padding-bottom: 10px;
+  }
+
   .modal-title {
     padding: @spacing;
     font-size: @font-size;
-    color: #636363;
 
     position: relative;
     display: flex;
     align-items: center;
-    
-    &.modal-title-error{
-      background-color: #ffd8d5;
-      display: flex;
-    }
     
     .modal-title-inner {
       flex-grow: 1;
@@ -56,7 +54,6 @@
   left: 50%;
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
-  box-shadow: rgba(0, 0, 0, 0.20) 0px 0px 5px 2px;
   
   &.modal-content-fill {
     height: calc(~"100% - 48px");
@@ -76,19 +73,7 @@
 .modal-message{
   text-align: left;
   font-size: @small-font-size;
-  color: rgba(0, 0, 0, 0.6);
   padding: 14px 24px;
-}
-
-.modal-message-error {
-  background-color: #d9817b;
-  color: #ffffff;
-  border-radius: 4px;
-  margin: 12px;
-  margin-bottom: 4px;
-  margin-top: 8px;
-  padding: 8px 12px;
-  border: none;
 }
 
 .modal-buttons {
@@ -99,26 +84,15 @@
 }
 
 .modal-buttons-empty {
-  height: 6px;
+  height: 1px;
 }
 
 .modal-close-button,
 .modal-third-button,
 .modal-confirm-button {
-  color: #636363;
-  background-color: #fff;
   float: right;
-  border: 1px solid #ccc;
+  border: 1px solid;
   .transition;
-  &:hover {
-    // border-color: #aaa;
-    color: darken(saturate(#70b9e7, 10%), 10%);
-    background-color: #fff;
-  }
-  &:active {
-    // border-color: #999;
-    color: darken(saturate(#70b9e7, 20%), 20%);
-  }
 }
 
 .modal-third-button {
@@ -126,17 +100,6 @@
 }
 
 .modal-confirm-button {
-  background-color: #70b9e7;
-  border-color: #70b9e7;
-  &:hover {
-    background-color: darken(saturate(#70b9e7, 10%), 10%);
-    color: #fff;
-  }
-  &:active {
-    background-color: darken(saturate(#70b9e7, 20%), 20%);
-    color: #fff;
-  }
-  color: #fff;
   margin-left: 12px;
 }
 
@@ -144,6 +107,6 @@
   width: 20px;
   margin-right: 6px;
   svg {
-    fill: #636363;
+    fill: #FFF;
   }
 }
