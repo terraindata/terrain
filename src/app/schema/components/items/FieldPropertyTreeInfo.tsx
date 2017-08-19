@@ -70,11 +70,11 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
   {
     const fieldProperty = this.props.item;
     if (fieldProperty.name !== 'type')
-    {
+    {/*
         console.log('fieldProperty');
         console.log(fieldProperty.name);
         console.log(fieldProperty.value);
-    }
+    */}
 
     return (
       <div

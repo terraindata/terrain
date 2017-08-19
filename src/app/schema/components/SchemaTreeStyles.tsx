@@ -187,6 +187,19 @@ const SchemaTreeStyles =
       color: Colors().active,
     },
 
+    link: {
+      'color': Colors().active,
+      'cursor': 'pointer',
+
+      ':hover':
+      {
+        color: Colors().activeText,
+      },
+
+      'float': 'left',
+      'width': '100px',
+    },
+
     margin: Styles.margin,
   };
 
