@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:member-ordering restrict-plus-operands member-access strict-boolean-expressions prefer-const
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import CommonSQL from '../../../../shared/database/mysql/syntax/CommonSQL';
 
 import * as BlockUtils from '../../../blocks/BlockUtils';

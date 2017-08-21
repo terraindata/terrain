@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import TastyNode from '../tasty/TastyNode';
-import TastyNodeTypes from '../tasty/TastyNodeTypes';
 import TastyQuery from '../tasty/TastyQuery';
 
 export const enum FixEnum

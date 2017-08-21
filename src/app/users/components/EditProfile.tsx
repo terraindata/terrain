@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as React from 'react';
-import { Link } from 'react-router';
 import AuthStore from './../../auth/data/AuthStore';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';

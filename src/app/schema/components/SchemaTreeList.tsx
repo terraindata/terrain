@@ -47,8 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 
 import * as React from 'react';
-import SchemaStore from '../data/SchemaStore';
-import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeItem from './SchemaTreeItem';
 const Radium = require('radium');

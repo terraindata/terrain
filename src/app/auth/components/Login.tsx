@@ -50,10 +50,8 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Ajax from '../../util/Ajax';
-import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
@@ -267,6 +265,9 @@ class Login extends TerrainComponent<Props>
             <div className='login-row'
               style={[
                 fontColor(Colors().text2),
+                backgroundColor(Colors().bg2),
+                borderColor(Colors().text3,
+                  Colors().text2),
               ]}
               key={'login-email'}
             >
@@ -300,6 +301,9 @@ class Login extends TerrainComponent<Props>
             <div className='login-row'
               style={[
                 fontColor(Colors().text2),
+                backgroundColor(Colors().bg2),
+                borderColor(Colors().text3,
+                  Colors().text2),
               ]}
               key={'login-password'}
             >

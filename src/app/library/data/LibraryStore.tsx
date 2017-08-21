@@ -49,18 +49,12 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as Redux from 'redux';
 import thunk from 'redux-thunk';
-import * as _ from 'underscore';
 
 import BackendInstance from '../../../database/types/BackendInstance';
-import AuthStore from './../../auth/data/AuthStore';
-import RoleStore from './../../roles/data/RolesStore';
-import UserStore from './../../users/data/UserStore';
 import * as LibraryTypes from './../LibraryTypes';
-import Actions from './LibraryActions';
-import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
+import { CleanLibraryActionTypes } from './LibraryActionTypes';
 
 import { ItemStatus } from '../../../items/types/Item';
-import BuilderActions from '../../builder/data/BuilderActions';
 import Util from './../../util/Util';
 
 import Ajax from './../../util/Ajax';

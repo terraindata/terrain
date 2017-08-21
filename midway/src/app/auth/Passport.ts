@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
 import passportLocal = require('passport-local');
 
 import Middleware from '../Middleware';

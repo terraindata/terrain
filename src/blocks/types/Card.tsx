@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as _ from 'underscore';
-import * as BlockUtils from '../BlockUtils';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
 

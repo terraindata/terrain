@@ -46,16 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands max-line-length
 
-import { List, Map } from 'immutable';
-import * as _ from 'underscore';
+import { List } from 'immutable';
 
 import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import { _card } from '../../../blocks/types/Card';
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';

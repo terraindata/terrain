@@ -55,10 +55,9 @@ import ReactDayPicker = require('react-day-picker');
 import { DateUtils } from 'react-day-picker';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
-import LayoutManager from './../../builder/components/layout/LayoutManager';
 import Dropdown from './Dropdown';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../common/Colors';
+import { Colors, getStyle } from '../../common/Colors';
 import StyleTag from '../../common/components/StyleTag';
 
 const MINUTE_INTERVAL = 30;

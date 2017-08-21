@@ -46,16 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'underscore';
 
-import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
-import AjaxM1 from '../../../app/util/AjaxM1'; // TODO change / remove
+// TODO change / remove
 import Query from '../../../items/types/Query';
 
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
-import { Card, Cards, CardString } from '../../../blocks/types/Card';
+import { Card } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
@@ -120,8 +119,11 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   }
   else if (isScoreCard(valueInfo))
   {
+    const _scriptValueInfo = valueInfo.objectChildren._script.propertyValue;
+    const scriptValueInfo = _scriptValueInfo && _scriptValueInfo.objectChildren.script.propertyValue;
+
     const weights = [];
-    for (const factor of valueInfo.value.params.factors)
+    for (const factor of scriptValueInfo.value.params.factors)
     {
       const weight = parseElasticWeightBlock(factor);
       if (weight)
@@ -129,10 +131,32 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         weights.push(weight);
       }
     }
+
+    let sortOrder;
+    if (_scriptValueInfo && _scriptValueInfo.objectChildren.order)
+    {
+      sortOrder = _scriptValueInfo.objectChildren.order.propertyValue.value;
+    }
+
+    let sortMode;
+    if (_scriptValueInfo && _scriptValueInfo.objectChildren.mode)
+    {
+      sortMode = _scriptValueInfo.objectChildren.mode.propertyValue.value;
+    }
+
+    let sortType;
+    if (_scriptValueInfo && _scriptValueInfo.objectChildren.type)
+    {
+      sortType = _scriptValueInfo.objectChildren.type.propertyValue.value;
+    }
+
     return make(
       Blocks, 'elasticScore',
       {
         weights: List(weights),
+        sortOrder,
+        sortMode,
+        sortType,
       }, true);
   }
 
@@ -257,8 +281,21 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
 
 function isScoreCard(valueInfo: ESValueInfo): boolean
 {
-  return (valueInfo.clause.clauseType === ESClauseType.ESScriptClause) &&
-    (valueInfo.objectChildren.stored.propertyValue.value === 'Terrain.Score.PWL');
+  const isScriptSort = (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
+    (valueInfo.clause.name === 'script sort');
+
+  if (isScriptSort)
+  {
+    const _scriptValueInfo = valueInfo.objectChildren._script.propertyValue;
+    const scriptValueInfo = _scriptValueInfo && _scriptValueInfo.objectChildren.script.propertyValue;
+
+    return scriptValueInfo && (scriptValueInfo.clause.clauseType === ESClauseType.ESScriptClause) &&
+      (scriptValueInfo.objectChildren.stored.propertyValue.value === 'Terrain.Score.PWL');
+  }
+  else
+  {
+    return false;
+  }
 }
 
 function parseElasticWeightBlock(obj: object): Block

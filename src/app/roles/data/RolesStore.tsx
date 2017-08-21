@@ -50,7 +50,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
-import ActionTypes from './RolesActionTypes';
 
 import RolesReducers from './RolesReducers';
 

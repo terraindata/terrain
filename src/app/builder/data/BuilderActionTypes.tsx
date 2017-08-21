@@ -46,9 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:forin restrict-plus-operands
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-
 // Defining our object like this gives us compile-time TypeScript support for ActionTypes
 //  and prevents us from defining duplicate action types.
 // The keys are the action types.

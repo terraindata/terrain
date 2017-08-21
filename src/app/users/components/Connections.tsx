@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
-import { Link } from 'react-router';
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from '../../auth/data/AuthStore';
@@ -58,9 +57,7 @@ import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import SchemaActionTypes from '../../schema/data/SchemaActionTypes';
-import { SchemaActions, SchemaStore } from '../../schema/data/SchemaStore';
-import * as SchemaTypes from '../../schema/SchemaTypes';
+import { SchemaStore } from '../../schema/data/SchemaStore';
 import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';

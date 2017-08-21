@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as aesjs from 'aes-js';
-import * as sha1 from 'sha1';
 
 /*
 * Decrypt a message with the private key using AES128

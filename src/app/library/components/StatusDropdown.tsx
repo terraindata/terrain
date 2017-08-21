@@ -51,12 +51,10 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import './StatusDropdown.less';
 const { List } = Immutable;
-import * as classNames from 'classnames';
 import { ItemStatus as Status } from '../../../items/types/Item';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
-import LibraryActions from '../data/LibraryActions';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -67,6 +65,7 @@ export interface Props
 {
   variant: LibraryTypes.Variant;
   noBorder?: boolean;
+  variantActions: any;
 }
 
 class StatusDropdown extends TerrainComponent<Props>
@@ -98,7 +97,7 @@ class StatusDropdown extends TerrainComponent<Props>
   public handleChange(index: number)
   {
     const status = this.getOrder()[index];
-    LibraryActions.variants.status(this.props.variant, status as Status, false);
+    this.props.variantActions.status(this.props.variant, status as Status, false);
   }
 
   public canEdit(): boolean

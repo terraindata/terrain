@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file
 
+import Radium = require('radium');
 import * as React from 'react';
 import * as SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import Radium = require('radium');
 
 export interface Props
 {

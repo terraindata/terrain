@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
 import App from './App';
@@ -58,7 +57,6 @@ import Library from './library/components/LibraryDnd';
 import LibraryActions from './library/data/LibraryActions';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
-import TerrainStore from './store/TerrainStore';
 import Account from './users/components/Account';
 import Connections from './users/components/Connections';
 import EditProfile from './users/components/EditProfile';
