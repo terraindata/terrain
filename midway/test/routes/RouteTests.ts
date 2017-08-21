@@ -761,6 +761,7 @@ describe('File import route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         try
         {
+          await elasticDB.refresh('test_elastic_db');
           const result: object = await elasticDB.query([
             {
               index: 'test_elastic_db',
@@ -819,6 +820,7 @@ describe('File import route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         try
         {
+          await elasticDB.refresh('test_elastic_db');
           const result: object = await elasticDB.query([
             {
               index: 'test_elastic_db',

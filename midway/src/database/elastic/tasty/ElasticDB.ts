@@ -285,6 +285,23 @@ export class ElasticDB implements TastyDB
     return Promise.all(promises);
   }
 
+  /*
+   * Refreshes the given index
+   */
+  public async refresh(indexName: string)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const params = {
+        index: indexName,
+      };
+
+      this.client.indices.refresh(
+        params,
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
   private async upsertObjects(table: TastyTable, elements: object[])
   {
     if (elements.length > 2)
