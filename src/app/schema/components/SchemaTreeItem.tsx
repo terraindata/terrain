@@ -319,7 +319,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
       {
         // show search details
         const { name } = item;
-        const searchStartIndex = item.name.indexOf(this.props.search);
+        const searchStartIndex = item.name.toLowerCase().indexOf(this.props.search.toLowerCase());
         const searchEndIndex = searchStartIndex + this.props.search.length;
         nameText = (
           <div>
@@ -376,6 +376,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
   {
     const { item, isSelected, isHighlighted } = this.state;
 
+    const hasChildren = this.state.childCount > 0;
+
     const showing = SchemaTypes.searchIncludes(item, this.props.search);
 
     return (
@@ -402,16 +404,22 @@ class SchemaTreeItem extends TerrainComponent<Props>
                 onClick={this.handleHeaderClick}
                 onDoubleClick={this.handleHeaderDoubleClick}
               >
-                <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='foo'>
-                  <ArrowIcon
-                    onClick={this.handleArrowClick}
-                  />
-                </div>
-
+                {
+                  hasChildren &&
+                  <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='arrow'>
+                    <ArrowIcon
+                      onClick={this.handleArrowClick}
+                    />
+                  </div>
+                }
+                {
+                  !hasChildren &&
+                  <div style={Styles.arrow} key='no-arrow'>
+                  </div>
+                }
                 {
                   this.renderName()
                 }
-
                 <div
                   style={Styles.itemInfoRow as any}
                 >
@@ -424,14 +432,17 @@ class SchemaTreeItem extends TerrainComponent<Props>
           }
         </FadeInOut>
 
-        <FadeInOut
-          open={this.state.open}
-          key='two'
-        >
-          {
-            this.renderItemChildren()
-          }
-        </FadeInOut>
+        {
+          hasChildren &&
+          <FadeInOut
+            open={this.state.open}
+            key='two'
+          >
+            {
+              this.renderItemChildren()
+            }
+          </FadeInOut>
+        }
       </div>
     );
   }

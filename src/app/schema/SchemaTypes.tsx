@@ -245,9 +245,16 @@ export const _Index = (config: {
 };
 export type IndexMap = IMMap<string, Index>;
 
-export function fieldPropertyId(serverId: string, databaseName: string, tableName: string, columnName: string, fieldPropertyName: string)
+export function fieldPropertyId(columnId: string, fieldPropertyParentId: string, fieldPropertyName: string)
 {
-  return serverId + '/' + databaseName + '.' + tableName + '.' + columnName + '.' + fieldPropertyName;
+  if (fieldPropertyParentId)
+  {
+    return fieldPropertyParentId + '.' + fieldPropertyName;
+  }
+  else
+  {
+    return columnId + '.' + fieldPropertyName;
+  }
 }
 
 class FieldPropertyC extends SchemaBaseClass
@@ -255,26 +262,22 @@ class FieldPropertyC extends SchemaBaseClass
   public type = 'fieldProperty';
   public name = '';
   public value = '';
-  public serverId: string = '';
-  public databaseId: string = '';
-  public tableId: string = '';
   public columnId: string = '';
+  public fieldPropertyParentId: string = ''; // if we have nested field Properties
 
-  public fieldPropertyInfoIds: List<string> = List();
+  public fieldPropertyIds: List<string> = List(); // If we have nested field Properties
 }
 export type FieldProperty = FieldPropertyC & IRecord<FieldPropertyC>;
 export const _FieldProperty = (config: {
   name: string,
   value: any,
-  serverId: string,
-  databaseId: string,
-  tableId: string,
   columnId: string,
+  fieldPropertyParentId: string,
 
   id?: string,
 }) =>
 {
-  config.id = fieldPropertyId(config.serverId, config.databaseId, config.tableId, config.columnId, config.name);
+  config.id = fieldPropertyId(config.columnId, config.fieldPropertyParentId, config.name);
   return New<FieldProperty>(new FieldPropertyC(config), config, 'string');
 };
 export type FieldPropertyMap = IMMap<string, FieldProperty>;

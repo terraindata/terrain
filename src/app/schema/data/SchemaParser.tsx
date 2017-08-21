@@ -59,6 +59,51 @@ type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
 type FieldProperty = SchemaTypes.FieldProperty;
 
+function recursiveParseFieldProperties(fieldProperty: FieldProperty, fieldPropertiesMap: IMMap<string, FieldProperty>)
+{
+  if (typeof fieldProperty.value === 'string')
+  {
+    return { fieldProperty, fieldPropertiesMap };
+  }
+  if (typeof fieldProperty.value === 'number')
+  {
+    fieldProperty = fieldProperty.set(
+      'value', 'long', // what should we do for numerical values in schema?
+    );
+  }
+  else if (typeof fieldProperty.value === 'boolean')
+  {
+    fieldProperty = fieldProperty.set(
+      'value', 'boolean', // see ^
+    );
+  }
+  else if (typeof fieldProperty.value === 'object')
+  {
+    let fieldPropertyChildIds = List<string>();
+    _.each((fieldProperty.value as any), (fieldPropertyChildValue, fieldPropertyChildName, fieldPropertyChildList) =>
+    {
+      let fieldPropertyChild = SchemaTypes._FieldProperty({
+        name: (fieldPropertyChildName as any) as string,
+        value: fieldPropertyChildValue,
+        columnId: '',
+        fieldPropertyParentId: fieldProperty.id,
+      });
+      const recursiveReturn = recursiveParseFieldProperties(fieldPropertyChild, fieldPropertiesMap);
+      fieldPropertyChild = recursiveReturn.fieldProperty;
+      fieldPropertiesMap = recursiveReturn.fieldPropertiesMap;
+      fieldPropertyChildIds = fieldPropertyChildIds.push(fieldPropertyChild.id);
+      fieldPropertiesMap = fieldPropertiesMap.set(fieldPropertyChild.id, fieldPropertyChild);
+    });
+    fieldProperty = fieldProperty.set(
+      'fieldPropertyIds', fieldPropertyChildIds,
+    );
+    fieldProperty = fieldProperty.set(
+      'value', 'object',
+    );
+  }
+  return { fieldProperty, fieldPropertiesMap };
+}
+
 export function parseMySQLDbs_m1(db: BackendInstance,
   colsData: object,
   addDbToServerAction: (payload: SchemaTypes.AddDbToServerActionPayload) => void)
@@ -328,17 +373,18 @@ export function parseElasticDb(elasticServer: object,
 
           _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName, fieldPropertyList) =>
           {
-            const fieldProperty = SchemaTypes._FieldProperty({
+            let fieldProperty = SchemaTypes._FieldProperty({
               name: (fieldPropertyName as any) as string,
               value: fieldPropertyValue,
-              serverId,
-              databaseId,
-              tableId,
-              columnId: (fieldName as any) as string,
+              columnId: tableId + '.' + ((fieldName as any) as string),
+              fieldPropertyParentId: '',
             });
 
-            fieldPropertiesMap = fieldPropertiesMap.set(fieldProperty.id, fieldProperty);
+            const recursiveReturn = recursiveParseFieldProperties(fieldProperty, fieldPropertiesMap);
+            fieldProperty = recursiveReturn.fieldProperty;
+            fieldPropertiesMap = recursiveReturn.fieldPropertiesMap;
 
+            fieldPropertiesMap = fieldPropertiesMap.set(fieldProperty.id, fieldProperty);
             fieldPropertyIds = fieldPropertyIds.push(fieldProperty.id);
           });
 

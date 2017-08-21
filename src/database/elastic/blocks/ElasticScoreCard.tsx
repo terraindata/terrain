@@ -141,7 +141,7 @@ export const elasticScore = _card(
               label: 'Order',
               style: {
                 paddingLeft: 20,
-              }
+              },
             },
             {
               displayType: DisplayType.DROPDOWN,
@@ -152,7 +152,7 @@ export const elasticScore = _card(
               centerDropdown: true,
               style: {
                 maxWidth: 80,
-              }
+              },
             },
             {
               displayType: DisplayType.LABEL,
@@ -160,7 +160,7 @@ export const elasticScore = _card(
               label: 'Mode',
               style: {
                 paddingLeft: 20,
-              }
+              },
             },
             {
               displayType: DisplayType.DROPDOWN,
@@ -171,7 +171,7 @@ export const elasticScore = _card(
               centerDropdown: true,
               style: {
                 maxWidth: 80,
-              }
+              },
             },
             {
               displayType: DisplayType.LABEL,
@@ -179,7 +179,7 @@ export const elasticScore = _card(
               label: 'Type',
               style: {
                 paddingLeft: 20,
-              }
+              },
             },
             {
               displayType: DisplayType.DROPDOWN,
@@ -190,7 +190,7 @@ export const elasticScore = _card(
               centerDropdown: true,
               style: {
                 maxWidth: 120,
-              }
+              },
             },
           ],
         },

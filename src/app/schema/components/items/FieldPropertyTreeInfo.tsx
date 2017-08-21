@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file
 
+import Radium = require('radium');
 import * as React from 'react';
 import * as SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import Radium = require('radium');
 
 export interface Props
 {
@@ -69,12 +69,6 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
   public render()
   {
     const fieldProperty = this.props.item;
-    if (fieldProperty.name !== 'type')
-    {/*
-        console.log('fieldProperty');
-        console.log(fieldProperty.name);
-        console.log(fieldProperty.value);
-    */}
 
     return (
       <div
@@ -86,7 +80,7 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            {fieldProperty.name === 'type' ? fieldProperty.value : 'Placeholder'}
+            {fieldProperty.value}
           </span>
         </div>
       </div>
@@ -97,8 +91,8 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
 export const fieldPropertyChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Additional Info',
-      type: 'fieldPropertyInfo',
+      label: 'Additional Properties',
+      type: 'fieldProperty',
     },
   ];
 
