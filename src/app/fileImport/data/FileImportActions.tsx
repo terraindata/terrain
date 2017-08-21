@@ -118,6 +118,10 @@ const FileImportActions =
     (templateName: string, exporting: boolean) =>
       $(ActionTypes.saveTemplate, { templateName, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
+    updateTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.updateTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+
     fetchTemplates:
     (exporting: boolean) =>
       $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),
@@ -129,6 +133,10 @@ const FileImportActions =
     loadTemplate:
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
+
+    deleteTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.deleteTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
     saveFile:
     (file: File, filetype: string) =>

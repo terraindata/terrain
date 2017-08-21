@@ -90,13 +90,17 @@ export interface Props
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    templateId: number,
+    deleteTemplateId: number,
+    loadTemplateId: number,
+    loadedTemplateId: number,
     templateName: string,
     templateOptions: List<string>,
     editColumnId: number,
     showingDelimTextBox: boolean,
   } = {
-    templateId: -1,
+    deleteTemplateId: -1,
+    loadTemplateId: -1,
+    loadedTemplateId: -1,
     templateName: '',
     templateOptions: List([]),
     editColumnId: -1,
@@ -182,10 +186,17 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleTemplateChange(templateId: number)
+  public handleLoadTemplateChange(loadTemplateId: number)
   {
     this.setState({
-      templateId,
+      loadTemplateId,
+    });
+  }
+
+  public handleDeleteTemplateChange(deleteTemplateId: number)
+  {
+    this.setState({
+      deleteTemplateId,
     });
   }
 
@@ -196,14 +207,32 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleDeleteTemplate()
+  {
+    if (this.props.templates.size === 0)
+    {
+      alert('There are no templates to delete');
+      return;
+    }
+    else if (this.state.deleteTemplateId === -1)
+    {
+      alert('Please select a template to delete');
+      return;
+    }
+    Actions.deleteTemplate(this.props.templates.get(this.state.deleteTemplateId).templateId, this.props.exporting);
+    this.setState({
+      deleteTemplateId: -1,
+    });
+  }
+
   public handleLoadTemplate()
   {
-    if (this.state.templateId === -1)
+    if (this.state.loadTemplateId === -1)
     {
       alert('Please select a template to load');
       return;
     }
-    const templateNames: Immutable.List<string> = this.props.templates.get(this.state.templateId).originalNames;
+    const templateNames: Immutable.List<string> = this.props.templates.get(this.state.loadTemplateId).originalNames;
     let isCompatible: boolean = true;
     const unmatchedTemplateNames: string[] = [];
     const unmatchedTableNames: string[] = this.props.columnNames.toArray();
@@ -226,7 +255,10 @@ class FileImportPreview extends TerrainComponent<Props>
         + JSON.stringify(unmatchedTableNames));
       return;
     }
-    Actions.loadTemplate(this.state.templateId);
+    Actions.loadTemplate(this.state.loadTemplateId);
+    this.setState({
+      loadedTemplateId: this.props.templates.get(this.state.loadTemplateId).templateId,
+    });
   }
 
   public handleSaveTemplate()
@@ -239,11 +271,21 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.templateName, this.props.exporting);
   }
 
+  public handleUpdateTemplate()
+  {
+    if (this.state.loadedTemplateId === -1)
+    {
+      alert('No template loaded');
+      return;
+    }
+    Actions.updateTemplate(this.state.loadedTemplateId, this.props.exporting);
+  }
+
   public handleUploadFile()
   {
     if (this.props.exporting)
     {
-      const id = this.props.templates.get(this.state.templateId).templateId;
+      const id = this.props.templates.get(this.state.loadTemplateId).templateId;
       Actions.exportFile(this.props.query, id, true);
     }
     else
@@ -258,26 +300,41 @@ class FileImportPreview extends TerrainComponent<Props>
       <div
         className='flex-container fi-preview-template'
       >
-        <div
-          className='flex-container fi-preview-template-wrapper'
-        >
-          <div
-            className='flex-grow fi-preview-template-button'
-            onClick={this.handleLoadTemplate}
-            style={buttonColors()}
-            ref='fi-preview-template-button-load'
-          >
-            Load Template
-          </div>
-          <Dropdown
-            selectedIndex={this.state.templateId}
-            options={this.state.templateOptions}
-            onChange={this.handleTemplateChange}
-            className={'flex-grow fi-preview-template-load-dropdown'}
-            canEdit={true}
-          />
-        </div>
-
+        {
+          this.state.loadedTemplateId === -1 ?
+            <div
+              className='flex-container fi-preview-template-wrapper'
+            >
+              <div
+                className='flex-grow fi-preview-template-button'
+                onClick={this.handleLoadTemplate}
+                style={buttonColors()}
+                ref='fi-preview-template-button-load'
+              >
+                Load Template
+              </div>
+              <Dropdown
+                selectedIndex={this.state.loadTemplateId}
+                options={this.state.templateOptions}
+                onChange={this.handleLoadTemplateChange}
+                className={'flex-grow fi-preview-template-load-dropdown'}
+                canEdit={true}
+              />
+            </div>
+            :
+            <div
+              className='flex-container fi-preview-template-wrapper'
+            >
+              <div
+                className='flex-grow fi-preview-template-button'
+                onClick={this.handleUpdateTemplate}
+                style={buttonColors()}
+                ref='fi-preview-template-button-update'
+              >
+                Update
+                </div>
+            </div>
+        }
         <div
           className='flex-container fi-preview-template-wrapper'
         >
@@ -296,6 +353,26 @@ class FileImportPreview extends TerrainComponent<Props>
             placeholder={'template name'}
             className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
+          />
+        </div>
+
+        <div
+          className='flex-container fi-preview-template-wrapper'
+        >
+          <div
+            className='flex-grow fi-preview-template-button'
+            onClick={this.handleDeleteTemplate}
+            style={buttonColors()}
+            ref='fi-preview-template-button-delete'
+          >
+            Delete Template
+          </div>
+          <Dropdown
+            selectedIndex={this.state.deleteTemplateId}
+            options={this.state.templateOptions}
+            onChange={this.handleDeleteTemplateChange}
+            className={'flex-grow fi-preview-template-delete-dropdown'}
+            canEdit={true}
           />
         </div>
       </div>

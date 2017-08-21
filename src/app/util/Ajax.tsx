@@ -802,7 +802,7 @@ export const Ajax =
       primaryKeys: List<string>,
       transformations: List<object>,
       name: string,
-      isExport: boolean,
+      exporting: boolean,
       primaryKeyDelimiter: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
@@ -817,7 +817,7 @@ export const Ajax =
         primaryKeys,
         transformations,
         name,
-        export: isExport,
+        export: exporting,
         primaryKeyDelimiter,
       };
       console.log('save template payload: ', payload);
@@ -837,10 +837,70 @@ export const Ajax =
       return;
     },
 
+    updateTemplate(originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKeys: List<string>,
+      transformations: List<object>,
+      exporting: boolean,
+      primaryKeyDelimiter: string,
+      templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload: object = {
+        originalNames,
+        columnTypes,
+        primaryKeys,
+        transformations,
+        export: exporting,
+        primaryKeyDelimiter,
+      };
+      console.log('updating template: ', templateId);
+      console.log('update template payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/' + String(templateId),
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
+    deleteTemplate(templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      console.log('deleting template: ', templateId);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/delete/' + String(templateId),
+        {},
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
     fetchTemplates(
       connectionId: number,
       dbname: string,
       tablename: string,
+      exporting: boolean,
       onLoad: (templates: object[]) => void,
     )
     {
@@ -849,6 +909,15 @@ export const Ajax =
         dbname,
         tablename,
       };
+
+      if (exporting)
+      {
+        payload['exportOnly'] = true;
+      }
+      else
+      {
+        payload['importOnly'] = true;
+      }
       console.log('fetch templates payload: ', payload);
 
       Ajax.req(
