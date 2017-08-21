@@ -305,60 +305,40 @@ class FileImportPreview extends TerrainComponent<Props>
         className='flex-container fi-preview-template'
       >
         {
-          this.state.loadedTemplateId !== -1 &&
-          <div
-            className='flex-container fi-preview-template-wrapper'
-          >
+          this.state.loadedTemplateId === -1 ?
             <div
-              className='flex-grow fi-preview-template-button'
-              onClick={this.handleUpdateTemplate}
-              style={buttonColors()}
-              ref='fi-preview-template-button-update'
+              className='flex-container fi-preview-template-wrapper'
             >
-              Update
+              <div
+                className='flex-grow fi-preview-template-button'
+                onClick={this.handleLoadTemplate}
+                style={buttonColors()}
+                ref='fi-preview-template-button-load'
+              >
+                Load Template
               </div>
-          </div>
+              <Dropdown
+                selectedIndex={this.state.loadTemplateId}
+                options={this.state.templateOptions}
+                onChange={this.handleLoadTemplateChange}
+                className={'flex-grow fi-preview-template-load-dropdown'}
+                canEdit={true}
+              />
+            </div>
+            :
+            <div
+              className='flex-container fi-preview-template-wrapper'
+            >
+              <div
+                className='flex-grow fi-preview-template-button'
+                onClick={this.handleUpdateTemplate}
+                style={buttonColors()}
+                ref='fi-preview-template-button-update'
+              >
+                Update
+                </div>
+            </div>
         }
-        <div
-          className='flex-container fi-preview-template-wrapper'
-        >
-          <div
-            className='flex-grow fi-preview-template-button'
-            onClick={this.handleDeleteTemplate}
-            style={buttonColors()}
-            ref='fi-preview-template-button-delete'
-          >
-            Delete Template
-          </div>
-          <Dropdown
-            selectedIndex={this.state.deleteTemplateId}
-            options={this.state.templateOptions}
-            onChange={this.handleDeleteTemplateChange}
-            className={'flex-grow fi-preview-template-delete-dropdown'}
-            canEdit={true}
-          />
-        </div>
-
-        <div
-          className='flex-container fi-preview-template-wrapper'
-        >
-          <div
-            className='flex-grow fi-preview-template-button'
-            onClick={this.handleLoadTemplate}
-            style={buttonColors()}
-            ref='fi-preview-template-button-load'
-          >
-            Load Template
-          </div>
-          <Dropdown
-            selectedIndex={this.state.loadTemplateId}
-            options={this.state.templateOptions}
-            onChange={this.handleLoadTemplateChange}
-            className={'flex-grow fi-preview-template-load-dropdown'}
-            canEdit={true}
-          />
-        </div>
-
         <div
           className='flex-container fi-preview-template-wrapper'
         >
@@ -377,6 +357,26 @@ class FileImportPreview extends TerrainComponent<Props>
             placeholder={'template name'}
             className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
+          />
+        </div>
+
+        <div
+          className='flex-container fi-preview-template-wrapper'
+        >
+          <div
+            className='flex-grow fi-preview-template-button'
+            onClick={this.handleDeleteTemplate}
+            style={buttonColors()}
+            ref='fi-preview-template-button-delete'
+          >
+            Delete Template
+          </div>
+          <Dropdown
+            selectedIndex={this.state.deleteTemplateId}
+            options={this.state.templateOptions}
+            onChange={this.handleDeleteTemplateChange}
+            className={'flex-grow fi-preview-template-delete-dropdown'}
+            canEdit={true}
           />
         </div>
       </div>
