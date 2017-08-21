@@ -199,30 +199,26 @@ class SchemaSearchResults extends TerrainComponent<Props>
             )
           }
 
-          <FadeInOut
-            open={couldShowMore || couldShowLess}
-          >
-            {
-              couldShowMore &&
-              <div
-                style={SchemaTreeStyles.link}
-                onClick={this._fn(this.handleShowMore, stateKey)}
-                key={'show-more-' + stateKey}
-              >
-                Show More
-              </div>
-            }
-            {
-              couldShowLess &&
-              <div
-                style={SchemaTreeStyles.link}
-                onClick={this._fn(this.handleShowLess, stateKey)}
-                key={'show-less-' + stateKey}
-              >
-                Show Less
-              </div>
-            }
-          </FadeInOut>
+          {
+            couldShowMore &&
+            <div
+              style={SchemaTreeStyles.link}
+              onClick={this._fn(this.handleShowMore, stateKey)}
+              key={'show-more-' + stateKey}
+            >
+              Show More
+            </div>
+          }
+          {
+            couldShowLess &&
+            <div
+              style={SchemaTreeStyles.link}
+              onClick={this._fn(this.handleShowLess, stateKey)}
+              key={'show-less-' + stateKey}
+            >
+              Show Less
+            </div>
+          }
         </div>
       </FadeInOut>
     );
