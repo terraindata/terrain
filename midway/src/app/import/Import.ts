@@ -48,9 +48,9 @@ import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
+import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
-import * as _ from 'underscore';
 import * as winston from 'winston';
 
 import { json } from 'd3-request';
