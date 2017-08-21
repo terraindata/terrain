@@ -11,7 +11,7 @@ body {
 
     background: @builder-bg;
     font-size: @medium-font-size;
-    
+
     &.resizing {
       cursor: col-resize;
     }
@@ -54,15 +54,15 @@ body {
   background: #3e3c3c;
   position: relative;
   z-index: 999999999;
-  
+
   .slide-down;
-  
+
   .app-top-bar-icon {
     float: left;
     height: @icon-height;
     fill: #CDDE20;
     padding-top: @icon-padding;
-    padding-left: @icon-padding; 
+    padding-left: @icon-padding;
   }
 }
 
@@ -106,21 +106,21 @@ textarea, input {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
-input[type=text], input[type=email], input[type=tel], 
+input[type=text], input[type=email], input[type=tel],
 input[type=num], input[type=password]
 {
   .transition;
   // border: 1px solid rgba(0,0,0,0);
   border-radius: 3px;
-  
+
   &:hover:not(:disabled) {
     border-color: #fff;
   }
-  
+
   &:focus:not(:disabled) {
    border-color: #fff;
   }
-  
+
   &.standard-input { // TODO make this the default
     background: #fff;
     padding: @spacing;
@@ -129,7 +129,7 @@ input[type=num], input[type=password]
     font-size: @font-size;
     border: 1px solid #dddff3;
     border-radius: 3px;
-    
+
     &:hover,
     &:focus {
       border: 1px solid #ccd1d7;
@@ -140,7 +140,7 @@ input[type=num], input[type=password]
 .button {
   display: inline-block;
   padding: 4px 18px;
-  border-radius: 5px;  
+  border-radius: 5px;
   background: rgba(0,0,0,0.2);
   background-blend-mode: multiply;
   color: #fff;
@@ -148,11 +148,12 @@ input[type=num], input[type=password]
   .transition;
   margin-top: 2px;
   cursor: pointer;
-  
+  white-space: nowrap;
+
   &:hover {
     background: rgba(0,0,0,0.35); //rgba(255,255,255,0.45);
   }
-  
+
   &:active {
     background: rgba(255,255,255,0.25);
   }

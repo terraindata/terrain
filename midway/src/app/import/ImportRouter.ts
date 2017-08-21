@@ -56,14 +56,22 @@ import { Import, ImportConfig } from './Import';
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', async (ctx, next) =>
 {
   winston.info('importing to database');
-  const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype', 'update']);
-  Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  const { files, fields } = await asyncBusboy(ctx.req);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.status = 400;
+    return;
+  }
 
-  ctx.body = await imprt.upsert(imprtConf);
+  Util.verifyParameters(fields, ['dbid', 'dbname', 'tablename', 'filetype']);
+  Util.verifyParameters(fields, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  // optional parameters: update, hasCsvHeader
+
+  ctx.body = await imprt.upsert(files, fields, false);
 });
 
 Router.post('/headless', async (ctx, next) =>
@@ -78,8 +86,9 @@ Router.post('/headless', async (ctx, next) =>
   }
 
   Util.verifyParameters(fields, ['templateID', 'filetype']);
+  // optional parameters: update, hasCsvHeader
 
-  ctx.body = await imprt.upsertHeadless(files, fields);
+  ctx.body = await imprt.upsert(files, fields, true);
 });
 
 export default Router;

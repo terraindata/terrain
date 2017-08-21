@@ -268,7 +268,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             selectedIndex={dbs && dbs.findIndex(
               (db) => db.id === this.props.group.db.id,
             )}
-            options={dbs.map((db) => db.name + ` (${db.type})`).toList()}
+            options={dbs.map((db) => String(db.name) + ` (${db.type})`).toList()}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isSuperUser}
             className='bic-db-dropdown'

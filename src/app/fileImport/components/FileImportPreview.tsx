@@ -62,19 +62,23 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 const { List } = Immutable;
 
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
+
 export interface Props
 {
   previewRows: List<List<string>>;
-  columnsCount: number;
   primaryKey: number;
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<IMMap<string, any>>;
+  columnTypes: List<ColumnTypesTree>;
 
   columnOptions: List<string>;
-  templates: List<FileImportTypes.Template>;
-  transforms: List<FileImportTypes.Transform>;
+  templates: List<Template>;
+  transforms: List<Transform>;
+
   uploadInProgress: boolean;
   elasticUpdate: boolean;
 }
@@ -84,12 +88,12 @@ class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
     templateId: number,
-    templateText: string,
+    templateName: string,
     templateOptions: List<string>,
     editColumnId: number,
   } = {
     templateId: -1,
-    templateText: '',
+    templateName: '',
     templateOptions: List([]),
     editColumnId: -1,
   };
@@ -98,7 +102,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     Actions.fetchTemplates();
     this.setState({
-      templateOptions: this.props.templates.map((template, i) => template.name),
+      templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
   }
 
@@ -107,7 +111,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
-        templateOptions: nextProps.templates.map((template, i) => String(template.id) + ': ' + template.name),
+        templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
   }
@@ -125,15 +129,14 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.columnNames.get(columnId) !== localColumnName)
     {
       Actions.setColumnName(columnId, this.props.columnNames.get(columnId), localColumnName);
-      Actions.addTransform(
+      Actions.addTransform(FileImportTypes._Transform(
         {
           name: 'rename',
           colName: this.props.columnNames.get(columnId),
-          args: {
+          args: FileImportTypes._TransformArgs({
             newName: localColumnName,
-          },
-        },
-      );
+          }),
+        }));
       return true;
     }
   }
@@ -145,6 +148,11 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
+  }
+
   public handleTemplateChange(templateId: number)
   {
     this.setState({
@@ -152,10 +160,10 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleAutocompleteTemplateChange(templateText: string)
+  public handleAutocompleteTemplateChange(templateName: string)
   {
     this.setState({
-      templateText,
+      templateName,
     });
   }
 
@@ -166,10 +174,10 @@ class FileImportPreview extends TerrainComponent<Props>
       alert('Please select a template to load');
       return;
     }
-    const templateNames = List(this.props.templates.get(this.state.templateId).originalNames);
-    let isCompatible = true;
-    const unmatchedTemplateNames = [];
-    const unmatchedTableNames = this.props.columnNames.toArray();
+    const templateNames: Immutable.List<string> = this.props.templates.get(this.state.templateId).originalNames;
+    let isCompatible: boolean = true;
+    const unmatchedTemplateNames: string[] = [];
+    const unmatchedTableNames: string[] = this.props.columnNames.toArray();
     templateNames.map((templateName) =>
     {
       if (!this.props.columnNames.contains(templateName))
@@ -194,17 +202,12 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleSaveTemplate()
   {
-    if (!this.state.templateText)
+    if (!this.state.templateName)
     {
       alert('Please enter a template name');
       return;
     }
-    Actions.saveTemplate(this.state.templateText);
-  }
-
-  public handleElasticUpdateChange()
-  {
-    Actions.changeElasticUpdate();
+    Actions.saveTemplate(this.state.templateName);
   }
 
   public handleUploadFile()
@@ -216,16 +219,16 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='fi-preview-template'
+        className='flex-container fi-preview-template'
       >
         <div
-          className='fi-preview-load'
+          className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='fi-load-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleLoadTemplate}
             style={buttonColors()}
-            ref='fi-load-button'
+            ref='fi-preview-template-button-load'
           >
             Load Template
           </div>
@@ -233,28 +236,28 @@ class FileImportPreview extends TerrainComponent<Props>
             selectedIndex={this.state.templateId}
             options={this.state.templateOptions}
             onChange={this.handleTemplateChange}
-            className={'fi-load-dropdown'}
+            className={'flex-grow fi-preview-template-load-dropdown'}
             canEdit={true}
           />
         </div>
 
         <div
-          className='fi-preview-save'
+          className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='fi-save-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleSaveTemplate}
             style={buttonColors()}
-            ref='fi-save-button'
+            ref='fi-preview-template-button-save'
           >
             Save Template
           </div>
           <Autocomplete
-            value={this.state.templateText}
+            value={this.state.templateName}
             options={null}
             onChange={this.handleAutocompleteTemplateChange}
             placeholder={'template name'}
-            className={'fi-save-autocomplete'}
+            className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
           />
         </div>
@@ -314,33 +317,44 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTemplate()}
         {this.renderTable()}
         <div
-          className='fi-preview-update'
+          className='fi-import-button-wrapper'
         >
-          update
-          <CheckBox
-            checked={this.props.elasticUpdate}
-            onChange={this.handleElasticUpdateChange}
-          />
-        </div>
-        <div
-          className='fi-preview-import-button'
-          onClick={this.handleUploadFile}
-          style={buttonColors()}
-        >
-          Import
-        </div>
-        {
-          this.props.uploadInProgress &&
-          <div className='fi-preview-loading-container'>
-            <Loading
-              width={100}
-              height={100}
-              loading={this.props.uploadInProgress}
-              loaded={false}
-              onLoadedEnd={null}
+          <div
+            className='fi-preview-update'
+          >
+            <CheckBox
+              checked={this.props.elasticUpdate}
+              onChange={this.handleElasticUpdateChange}
             />
+            <span
+              className='clickable'
+              onClick={this.handleElasticUpdateChange}
+            >
+              Join against any existing entries
+            </span>
           </div>
-        }
+          {
+            this.props.uploadInProgress ?
+              this.props.uploadInProgress &&
+              <div className='fi-preview-loading-container'>
+                <Loading
+                  width={100}
+                  height={100}
+                  loading={this.props.uploadInProgress}
+                  loaded={false}
+                  onLoadedEnd={null}
+                />
+              </div>
+              :
+              <div
+                className='fi-preview-import-button'
+                onClick={this.handleUploadFile}
+                style={buttonColors()}
+              >
+                Import
+            </div>
+          }
+        </div>
       </div>
     );
   }
