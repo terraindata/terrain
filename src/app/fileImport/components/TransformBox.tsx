@@ -133,9 +133,12 @@ class TransformBox extends TerrainComponent<Props>
     {
       alert('split names cannot be identical');
     }
-    this.setState({
-      splitNames: this.state.splitNames.set(0, splitNameA),
-    });
+    else
+    {
+      this.setState({
+        splitNames: this.state.splitNames.set(0, splitNameA),
+      });
+    }
   }
 
   public handleSplitNameBChange(splitNameB: string)
@@ -148,9 +151,12 @@ class TransformBox extends TerrainComponent<Props>
     {
       alert('split names cannot be identical');
     }
-    this.setState({
-      splitNames: this.state.splitNames.set(1, splitNameB),
-    });
+    else
+    {
+      this.setState({
+        splitNames: this.state.splitNames.set(1, splitNameB),
+      });
+    }
   }
 
   public handleMergeIndexChange(mergeIndex: number)
@@ -164,11 +170,12 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleMergeNewNameChange(mergeNewName: string)
   {
-    if (this.props.columnNames.filter((colName, index) =>
-      index !== this.props.columnId || index !== this.state.mergeIndex,
+    if (this.props.columnNames.delete(this.props.columnId).filter((colName, index) =>
+      index !== this.state.mergeIndex,
     ).contains(mergeNewName))
     {
       alert('column name: ' + mergeNewName + ' already exists, duplicate column names are not allowed');
+      return;
     }
     this.setState({
       mergeNewName,
