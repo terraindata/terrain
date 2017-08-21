@@ -49,11 +49,9 @@ THE SOFTWARE.
 // Libraries
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
@@ -62,11 +60,9 @@ import { withRouter } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
 import Query from '../../../items/types/Query';
 import LibraryActions from '../../library/data/LibraryActions';
-import { LibraryState, LibraryStore } from '../../library/data/LibraryStore';
+import { LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
-import RolesActions from '../../roles/data/RolesActions';
 import RolesStore from '../../roles/data/RolesStore';
-import UserActions from '../../users/data/UserActions';
 import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
@@ -75,12 +71,11 @@ type Variant = LibraryTypes.Variant;
 
 // Components
 
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import { notificationManager } from './../../common/components/InAppNotification';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Ajax from './../../util/Ajax';
 import BuilderColumn from './BuilderColumn';
 import LayoutManager from './layout/LayoutManager';
 import { TabAction, Tabs } from './layout/Tabs';

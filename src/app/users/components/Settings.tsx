@@ -47,14 +47,10 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as React from 'react';
-import { Link } from 'react-router';
 import * as UserTypes from '../UserTypes';
-import AuthActions from './../../auth/data/AuthActions';
 import AuthStore from './../../auth/data/AuthStore';
 import CheckBox from './../../common/components/CheckBox';
-import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import UserStore from './../../users/data/UserStore';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';

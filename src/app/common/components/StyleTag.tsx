@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 import TerrainComponent from '../../common/components/TerrainComponent';
 
 export interface Props
@@ -61,10 +61,10 @@ export class StyleTag extends TerrainComponent<Props>
   {
     let str = '';
 
-    _.mapObject(this.props.style, (styles: object, selector: string) =>
+    _.mapValues(this.props.style, (styles: object, selector: string) =>
     {
       let innerStr = '';
-      _.mapObject(styles, (value: string, styleName: string) =>
+      _.mapValues(styles, (value: string, styleName: string) =>
       {
         innerStr += styleName + ':' + value + '; ';
       });

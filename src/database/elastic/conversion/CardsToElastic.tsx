@@ -46,11 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
-import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import Query from '../../../items/types/Query';

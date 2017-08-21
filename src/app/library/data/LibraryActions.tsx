@@ -47,8 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
 
 import * as Immutable from 'immutable';
-import { ThunkAction } from 'redux-thunk';
-import * as _ from 'underscore';
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';

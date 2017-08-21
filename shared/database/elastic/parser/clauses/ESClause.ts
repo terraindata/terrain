@@ -46,8 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as _ from 'underscore';
-
 import EQLConfig from '../EQLConfig';
 import ESClauseType from '../ESClauseType';
 import ESClauseVisitor from '../ESClauseVisitor';

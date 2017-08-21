@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import { BaseClass, New } from '../Classes';
-import * as RoleTypes from './../roles/RoleTypes';
 
 class UserC extends BaseClass
 {

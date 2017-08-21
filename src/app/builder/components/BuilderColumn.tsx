@@ -49,22 +49,18 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import './BuilderColumn.less';
 const { List } = Immutable;
-import InfoArea from '../../common/components/InfoArea';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
-import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
-import Ajax from './../../util/Ajax';
 
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';

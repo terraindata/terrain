@@ -47,9 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import { BaseClass, New } from '../Classes';
-import Util from './../util/Util';
 const { List } = Immutable;
 
 // This type represents the state of the FileImportStore

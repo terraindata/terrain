@@ -43,10 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
+
 import * as React from 'react';
-import CommonSQL from '../../../shared/database/mysql/syntax/CommonSQL';
-const { Combinators, Operators } = CommonSQL;
 
 // import * as SchemaTypes from '../schema/SchemaTypes';
 // const ManualConfig = require('./../manual/ManualConfig.json');

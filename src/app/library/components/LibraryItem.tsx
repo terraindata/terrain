@@ -54,7 +54,7 @@ const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 

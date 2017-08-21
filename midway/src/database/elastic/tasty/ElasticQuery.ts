@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyTable from '../../../tasty/TastyTable';
-
 export interface ElasticQuery
 {
   index: string;
