@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:switch-default strict-boolean-expressions restrict-plus-operands no-console
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import Radium = require('radium');
 import * as React from 'react';

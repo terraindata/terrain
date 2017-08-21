@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
 
 import { List } from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 // TODO change / remove
 import Query from '../../../items/types/Query';

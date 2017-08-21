@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 /// <reference path="../../typings/tsd.d.ts" />
 
+import * as _ from 'lodash';
 import * as test from 'tape';
-import * as _ from 'underscore';
 // import * as TestUtils from 'react-addons-test-utils';
 const TestUtils = require('react-addons-test-utils');
 import * as React from 'react';

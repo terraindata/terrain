@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import AuthStore from './../../auth/data/AuthStore';
 import Ajax from './../../util/Ajax';
 import * as UserTypes from './../UserTypes';

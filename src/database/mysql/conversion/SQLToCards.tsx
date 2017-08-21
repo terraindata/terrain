@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands no-unused-expression strict-boolean-expressions no-console
 
-const _ = require('underscore');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import List = Immutable.List;
 
 import CommonSQL from '../../../../shared/database/mysql/syntax/CommonSQL';

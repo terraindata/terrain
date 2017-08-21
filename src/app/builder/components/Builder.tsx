@@ -49,9 +49,9 @@ THE SOFTWARE.
 // Libraries
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
-import * as _ from 'underscore';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';

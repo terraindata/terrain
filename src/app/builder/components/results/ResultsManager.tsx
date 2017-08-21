@@ -47,8 +47,8 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
 import { List, Map } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';

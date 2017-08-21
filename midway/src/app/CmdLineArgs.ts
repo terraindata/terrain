@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Config } from './Config';
 import cmdLineArgs = require('command-line-args');
 import cmdLineUsage = require('command-line-usage');
+import { Config } from './Config';
 
 // process command-line arguments
 const optionList = [

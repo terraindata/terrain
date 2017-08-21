@@ -55,8 +55,8 @@ THE SOFTWARE.
  * - helper method for subscribing to a Redux state
 */
 
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 import Util from '../../util/Util';
 const shallowCompare = require('react-addons-shallow-compare');
 

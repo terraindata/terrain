@@ -47,11 +47,11 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Papa from 'papaparse';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
-import * as _ from 'underscore';
 import { buttonColors } from '../../common/Colors';
 import { isValidIndexName, isValidTypeName, parseJSONSubset } from './../../../../shared/fileImport/Util';
 import Autocomplete from './../../common/components/Autocomplete';

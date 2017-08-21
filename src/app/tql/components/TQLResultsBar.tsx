@@ -47,8 +47,8 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TQLResultsBar.less';

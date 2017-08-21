@@ -48,9 +48,9 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import './Result.less';
 const { List } = Immutable;
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
