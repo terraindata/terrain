@@ -400,7 +400,7 @@ class VariantsColumn extends TerrainComponent<Props>
     const v = this.props.variants.get(id);
     if (v.status !== statusString)
     {
-      this.props.variantActions.change(v.set('status', status) as Variant);
+      this.props.variantActions.change(v.set('status', statusString) as Variant);
     }
   }
 
