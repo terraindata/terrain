@@ -288,7 +288,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      Actions.exportFile(this.props.query, true, this.props.variantName + ' on ' + String(moment().format('MM/DD/YY')) + '.csv');
+      Actions.exportFile(this.props.query, true, this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
     }
     else
     {
