@@ -86,7 +86,7 @@ export class FieldPropertyTreeInfo extends TerrainComponent<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            {fieldProperty.name === 'type'? fieldProperty.value : 'Placeholder'}
+            {fieldProperty.name === 'type' ? fieldProperty.value : 'Placeholder'}
           </span>
         </div>
       </div>

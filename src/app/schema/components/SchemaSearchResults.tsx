@@ -161,33 +161,13 @@ class SchemaSearchResults extends TerrainComponent<Props>
       index++;
     }
 
-    if(max > INIT_SHOWING_COUNT.get(stateKey))
+    if (max > INIT_SHOWING_COUNT.get(stateKey))
     {
       couldShowLess = true;
     }
 
     const showSection = !!renderItems.length;
-    if(showSection)
-    {/*
-      console.log(label);
-      console.log(renderItems.length);
-      if(label==='Types')
-      {
-        console.log(this.props.search);
-      }
-      if(label==='Types' || label==='Fields')
-      {
-        renderItems.map(
-          (item,index) =>
-            {
-              console.log('index=');
-              console.log(index);
-              console.log('item=');
-              console.log(item);
-            }
-        )
-      }
-    */}
+
     return (
       <FadeInOut
         open={showSection}
@@ -220,7 +200,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
           }
 
           <FadeInOut
-            open = {couldShowMore && !couldShowLess}
+            open={couldShowMore && !couldShowLess}
           >
             <div
               style={SchemaTreeStyles.link}
@@ -230,9 +210,9 @@ class SchemaSearchResults extends TerrainComponent<Props>
               Show More
             </div>
           </FadeInOut>
-          
+
           <FadeInOut
-            open = {!couldShowMore && couldShowLess}
+            open={!couldShowMore && couldShowLess}
           >
             <div
               style={SchemaTreeStyles.link}
@@ -244,7 +224,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
           </FadeInOut>
 
           <FadeInOut
-            open = {couldShowMore && couldShowLess}
+            open={couldShowMore && couldShowLess}
           >
             <div>
               <div
@@ -281,7 +261,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
   public handleShowLess(stateKey: string)
   {
     let { showingCount } = this.state;
-    if( showingCount.get(stateKey) - SHOW_MORE_INCREMENT >= INIT_SHOWING_COUNT.get(stateKey))
+    if (showingCount.get(stateKey) - SHOW_MORE_INCREMENT >= INIT_SHOWING_COUNT.get(stateKey))
     {
       showingCount = showingCount.set(stateKey, showingCount.get(stateKey) - SHOW_MORE_INCREMENT);
       this.setState({

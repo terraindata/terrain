@@ -111,7 +111,7 @@ export function parseMySQLDbs_m1(db: BackendInstance,
       GENERATION_EXPRESSION: string,
     }) =>
     {
-      const tableId = SchemaTypes.tableId(serverId, db['name'], col.TABLE_NAME);
+      const tableId = SchemaTypes.tableId(databaseId, col.TABLE_NAME);
       let table = tables.get(tableId);
 
       if (!table)
@@ -202,7 +202,7 @@ export function parseMySQLDb(rawServer: object,
     _.each((databaseValue as any),
       (tableFields, tableName, tableList) =>
       {
-        const tableId = SchemaTypes.tableId(server['name'], database['name'], (tableName as any) as string);
+        const tableId = SchemaTypes.tableId(databaseId, (tableName as any) as string);
         let table = tables.get(tableId);
 
         if (!table)
@@ -301,7 +301,7 @@ export function parseElasticDb(elasticServer: object,
     _.each((databaseValue as any),
       (tableFields, tableName, tableList) =>
       {
-        const tableId = SchemaTypes.tableId(server['name'], database['name'], (tableName as any) as string);
+        const tableId = SchemaTypes.tableId(databaseId, (tableName as any) as string);
         let table = tables.get(tableId);
 
         if (!table)
@@ -323,10 +323,11 @@ export function parseElasticDb(elasticServer: object,
 
         _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
         {
-          //fieldPropertiesMap = fieldPropertiesMap.clear();
+          // fieldPropertiesMap = fieldPropertiesMap.clear();
           fieldPropertyIds = fieldPropertyIds.clear();
 
-          _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName, fieldPropertyList) => {
+          _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName, fieldPropertyList) =>
+          {
             const fieldProperty = SchemaTypes._FieldProperty({
               name: (fieldPropertyName as any) as string,
               value: fieldPropertyValue,

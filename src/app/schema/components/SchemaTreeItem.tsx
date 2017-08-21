@@ -59,7 +59,7 @@ const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 import FadeInOut from '../../common/components/FadeInOut';
-import {fieldPropertyChildrenConfig, FieldPropertyTreeInfo} from './items/FieldPropertyTreeInfo';
+import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
 import SchemaTreeList from './SchemaTreeList';
 
 export interface Props
@@ -140,12 +140,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    
-    if(this.props.type === 'table')
-    {/*
-      console.log('making a SchemaTreeItem')
-      console.log(this.props);
-    */}
+
     this._subscribe(SchemaStore, {
       stateKey: 'item',
       storeKeyPath:
@@ -153,11 +148,6 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
       updater: (state: SchemaTypes.SchemaState) =>
       {
-        if(this.props.type === 'table')
-        {/*
-          console.log('updating a SchemaTreeItem')
-          console.log(this.props);
-        */}
         if (this.state.childCount === -1) // assumes that schema data does not change
         {
           const item = state.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
@@ -292,7 +282,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
   public handleArrowClick(event)
   {
-    if(!this.props.search)
+    if (!this.props.search)
     {
       this.setState({
         open: !this.state.open,
@@ -304,7 +294,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
   }
   public handleHeaderDoubleClick(event)
   {
-    if(!this.props.search)
+    if (!this.props.search)
     {
       if ((new Date()).getTime() - this.lastArrowClickTime > 100)
       {
@@ -369,7 +359,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
         // show plain name
         nameText = item.name;
       }
-    } 
+    }
 
     return (
       <div
@@ -387,11 +377,6 @@ class SchemaTreeItem extends TerrainComponent<Props>
     const { item, isSelected, isHighlighted } = this.state;
 
     const showing = SchemaTypes.searchIncludes(item, this.props.search);
-
-    // console.log('this.state=');
-    // console.log(this.state);
-    // console.log('this.props.search=');
-    // console.log(this.props.search);
 
     return (
       <div
@@ -418,9 +403,9 @@ class SchemaTreeItem extends TerrainComponent<Props>
                 onDoubleClick={this.handleHeaderDoubleClick}
               >
                 <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='foo'>
-                <ArrowIcon
-                  onClick={this.handleArrowClick}
-                />
+                  <ArrowIcon
+                    onClick={this.handleArrowClick}
+                  />
                 </div>
 
                 {

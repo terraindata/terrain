@@ -145,9 +145,9 @@ export const _Database =
   };
 export type DatabaseMap = IMMap<string, Database>;
 
-export function tableId(serverName: string, databaseName: string, tableName: string): string
+export function tableId(databaseId: string, tableName: string): string
 {
-  return serverName + '/' + databaseName + '.' + tableName;
+  return databaseId + '.' + tableName;
 }
 
 class TableC extends SchemaBaseClass
@@ -168,7 +168,7 @@ export const _Table = (config: {
   id?: string,
 }) =>
 {
-  config.id = tableId(config.serverId, config.databaseId, config.name);
+  config.id = tableId(config.databaseId, config.name);
   return New<Table>(new TableC(config), config, 'string');
 };
 export type TableMap = IMMap<string, Table>;
