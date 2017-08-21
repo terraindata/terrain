@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Util from '../app/Util';
 import DatabaseController from '../database/DatabaseController';
 import TastyColumn from './TastyColumn';
 import TastyDB from './TastyDB';

@@ -49,7 +49,7 @@ THE SOFTWARE.
 import { List, Map, Record } from 'immutable';
 
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
-import { _ResultsConfig, ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';

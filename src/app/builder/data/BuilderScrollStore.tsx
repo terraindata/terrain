@@ -47,9 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions variable-name
 
 import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
 const Redux = require('redux');
 
 export class BuilderScrollStateClass

@@ -46,9 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 
 import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
@@ -60,7 +58,6 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
 import ElasticHighlighter from '../highlighters/ElasticHighlighter';
-import SyntaxHighlighter from '../highlighters/SyntaxHighlighter';
 
 // Formatting and Parsing
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';

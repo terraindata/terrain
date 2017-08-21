@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions return-undefined no-console no-empty max-line-length no-unused-expression no-shadowed-variable
 
 import * as $ from 'jquery';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import BackendInstance from '../../database/types/BackendInstance';
 
 /**

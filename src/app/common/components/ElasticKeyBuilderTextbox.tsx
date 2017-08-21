@@ -48,15 +48,12 @@ THE SOFTWARE.
 
 import './BuilderTextbox.less';
 
-import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
 import { Display } from '../../../blocks/displays/Display';
-import { Card, CardString } from '../../../blocks/types/Card';
+import { CardString } from '../../../blocks/types/Card';
 import BuilderStore from '../../builder/data/BuilderStore';
 // import { AllBackendsMap } from '../../../../shared/database/AllBackends';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import Util from '../../util/Util';
 import BuilderTextbox from './BuilderTextbox';
 
 export interface Props

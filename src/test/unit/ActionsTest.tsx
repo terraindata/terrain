@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 /// <reference path="../../typings/tsd.d.ts" />
 
+import * as _ from 'lodash';
 import * as test from 'tape';
-import * as _ from 'underscore';
 import Actions from '../../app/builder/data/BuilderActions';
 import ActionTypes from '../../app/builder/data/BuilderActionTypes';
 

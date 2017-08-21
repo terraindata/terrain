@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as KoaRouter from 'koa-router';
 
 import EventRouter from './events/EventRouter';
-import * as Util from './Util';
 
 export const AnalyticsRouter = new KoaRouter();
 AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());

@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as winston from 'winston';
 
 import TastyDB from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';

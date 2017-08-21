@@ -45,10 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
-import * as Util from '../Util';
-import { EventConfig, Events, EventTemplateConfig } from './Events';
+import { EventConfig, Events } from './Events';
 
 export const events: Events = new Events();
 

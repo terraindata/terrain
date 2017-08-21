@@ -47,9 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions interface-name no-var-requires
 
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
-import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
+import { Display, RowDisplay } from '../../../../blocks/displays/Display';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';

@@ -53,8 +53,6 @@ import MySQLController from '../database/mysql/MySQLController';
 import SQLiteConfig from '../database/sqlite/SQLiteConfig';
 import SQLiteController from '../database/sqlite/SQLiteController';
 
-import DatabaseController from './DatabaseController';
-
 export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
 {
   if (type === 'sqlite')

@@ -52,9 +52,7 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import { altStyle, backgroundColor, Colors, couldHover, fontColor } from '../../common/Colors';
-import Util from '../../util/Util';
+import { altStyle, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props

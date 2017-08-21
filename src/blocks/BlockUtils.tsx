@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:forin no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression no-console
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 const { Map, List } = Immutable;
 
 import { Block, BlockConfig } from './types/Block';

@@ -50,12 +50,9 @@ import { Card, CardString } from '../../../blocks/types/Card';
 
 import * as classNames from 'classnames';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+import { Display } from '../../../blocks/displays/Display';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import CardComponent from '../../builder/components/cards/CardComponent';
-import Util from '../../util/Util';
 
 export interface Props
 {
