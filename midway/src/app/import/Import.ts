@@ -136,6 +136,10 @@ export class Import
           return reject('Template not found.');
         }
         const template = templates[0] as object;
+        if (exprt.dbid !== template['dbid'])
+        {
+          return reject('Template database ID does not match supplied database ID.');
+        }
         for (const templateKey of Object.keys(template))
         {
           exprt[templateKey] = template[templateKey];
@@ -176,11 +180,15 @@ export class Import
       {
         return reject('Empty query provided.');
       }
+      const qryObj: object = JSON.parse(qry);
+      if (qryObj['index'] !== exprt['dbname'])
+      {
+        return reject('Query index name does not match supplied index name.');
+      }
       let rankCounter: number = 1;
       const writer = csvWriter();
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      const qryObj: object = JSON.parse(qry);
       if (qryObj.hasOwnProperty('terrainRank') && exprt.rank === true)
       {
         return reject('Conflicting field: terrainRank.');
