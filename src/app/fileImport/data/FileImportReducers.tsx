@@ -323,6 +323,7 @@ FileImportReducers[ActionTypes.exportFile] =
       )),
       action.payload.query,
       action.payload.rank,
+      state.transforms,
       _.noop,
       _.noop,
       // (resp: any) =>

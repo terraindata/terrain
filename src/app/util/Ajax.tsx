@@ -754,6 +754,7 @@ export const Ajax =
       columnTypes: Immutable.Map<string, object>,
       query: string,
       rank: boolean,
+      transformations: Immutable.List<object>,
       onLoad: (resp: any) => void,
       onError?: (ev: string) => void,
     )
@@ -765,6 +766,7 @@ export const Ajax =
         columnTypes,
         query,
         rank,
+        transformations,
       };
       console.log('export payload: ', payload);
       // const onLoadHandler = (resp) =>
