@@ -110,7 +110,7 @@ export class Import
   private chunkQueue: object[];
   private nextChunk: string;
 
-  public async export(exprt: ExportConfig): Promise<stream.Readable | string>
+  public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
   {
     return new Promise<stream.Readable | string>(async (resolve, reject) =>
     {
@@ -127,20 +127,23 @@ export class Import
 
       const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
-      // get a template given the template ID
-      const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
-      if (templates.length === 0)
+      if (headless)
       {
-        return reject('Template not found.');
-      }
-      const template = templates[0] as object;
-      for (const templateKey of Object.keys(template))
-      {
-        exprt[templateKey] = template[templateKey];
-      }
-      if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
-      {
-        return reject('Cannot use an import template for export.');
+        // get a template given the template ID
+        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
+        if (templates.length === 0)
+        {
+          return reject('Template not found.');
+        }
+        const template = templates[0] as object;
+        for (const templateKey of Object.keys(template))
+        {
+          exprt[templateKey] = template[templateKey];
+        }
+        if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
+        {
+          return reject('Cannot use an import template for export.');
+        }
       }
 
       let qry: string = '';
