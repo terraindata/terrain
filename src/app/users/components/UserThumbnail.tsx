@@ -119,7 +119,7 @@ class UserThumbnail extends TerrainComponent<Props>
   public render()
   {
     const { user } = this.state;
-    const name: string = user ? (user.name ? user.name : user.email) : "Loading...";
+    const name: string = user ? (user.name !== undefined && user.name.length > 0 ? user.name : user.email) : "Loading...";
     const src: string = UserTypes.profileUrlFor(user);
     const tip = this.props.showName ? null :
       '<div class="user-thumbnail-tip-name">' + name + '</div>' +
