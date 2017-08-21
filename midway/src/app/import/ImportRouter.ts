@@ -50,11 +50,14 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { HA } from '../App';
+import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { ExportConfig, Import } from './Import';
 
 const Router = new KoaRouter();
 const imprt: Import = new Import();
+const perm: Permissions = new Permissions();
 
 Router.post('/', async (ctx, next) =>
 {
@@ -65,17 +68,31 @@ Router.post('/', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-
+  const user: UserConfig = authStream['user'];
   Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
   Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   // optional parameters: update, hasCsvHeader
 
+  const verify: void | string = await perm.ImportPermissions.verifyDefaultRoute(user, authStream['fields']);
+  if (verify !== undefined)
+  {
+    ctx.body = verify;
+    return;
+  }
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
 });
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const exprtConf: ExportConfig = JSON.parse(ctx.request.body.data).body as ExportConfig;
+
+  const verify: void | string = await perm.ImportPermissions.verifyExportRoute(ctx.state.user, JSON.parse(ctx.request.body.data));
+  if (verify !== undefined)
+  {
+    ctx.body = verify;
+    return;
+  }
+
   const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
   ctx.type = 'text/plain';
   ctx.attachment('test.csv');
@@ -86,6 +103,9 @@ Router.post('/export/headless', passport.authenticate('access-token-local'), asy
 {
   const exprtConf: ExportConfig = ctx.request.body.body;
   Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
+
+  await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body);
+
   const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
   ctx.body = exportReturn;
 });

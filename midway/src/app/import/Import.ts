@@ -60,6 +60,7 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import { ItemConfig, Items } from '../items/Items';
+import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 const importTemplates = new ImportTemplates();
