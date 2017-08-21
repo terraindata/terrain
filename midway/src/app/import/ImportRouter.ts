@@ -75,12 +75,12 @@ Router.post('/', async (ctx, next) =>
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const requestObj: object = JSON.parse(ctx.request.body.data);
+  const requestObj: object = JSON.parse(ctx.request.body.data).body;
   Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
   const exprtConf: ExportConfig = requestObj as ExportConfig;
   const exportReturn: stream.Readable | string = await imprt.export(exprtConf, false);
   ctx.type = 'text/plain';
-  ctx.attachment('test.csv');
+  ctx.attachment(ctx.request.body.filename);
   ctx.body = exportReturn;
 });
 
