@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'underscore';
-import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
 
 const Color = require('color');
 
@@ -96,6 +95,7 @@ interface Theme
 
   scrollbarBG: string;
   scrollbarPiece: string;
+  altScrollbarPiece: string;
 
   error: string;
 
@@ -182,6 +182,7 @@ interface Theme
         compound: string,
         join: string,
         geo: string,
+        parameter: string,
       };
 
       //by clause type
@@ -350,6 +351,8 @@ const DARK: Theme =
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
 
+    altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
+
     error: '#d14f42',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
@@ -438,6 +441,7 @@ const DARK: Theme =
           compound: '#fad14b',
           join: '#fad14b',
           geo: '#0ee06b',
+          parameter: code.inputParameter,
         },
 
         //by clause type
@@ -648,6 +652,18 @@ export function buttonColors()
   }
 
   return CACHE['buttonColors' + curTheme];
+}
+
+export function disabledButtonColors()
+{
+  if (!CACHE['disabledButtonColors' + curTheme])
+  {
+    CACHE['disabledButtonColors' + curTheme] = extend({},
+      backgroundColor(Colors().altBg2),
+      fontColor(Colors().altText3),
+    );
+  }
+  return CACHE['disabledButtonColors' + curTheme];
 }
 
 export function getStyle(style: string, color: string, hoverColor?: string): object
