@@ -91,9 +91,9 @@ export const _FileImportState = (config?: { [key: string]: any }) =>
 
 class TransformArgsC
 {
-  public mergeName?: string = null;             // name of column to be merged
-  public newName?: string | string[] = null;   // includes rename name, duplicate name, split names
-  public text?: string = null;                  // text to append/prepend, text to split/merge on
+  public mergeName?: string = '';            // name of column to be merged
+  public newName?: string | string[] = '';   // includes rename name, duplicate name, split names
+  public text?: string = '';                 // text to append/prepend, text to split/merge on
 }
 
 const TransformArgs_Record = Immutable.Record(new TransformArgsC());
