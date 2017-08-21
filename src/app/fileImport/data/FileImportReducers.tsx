@@ -359,8 +359,6 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.templateName,
       action.payload.exporting,
       state.primaryKeyDelimiter,
-      action.payload.updating,
-      action.payload.templateId,
       () =>
       {
         alert('successfully saved template');
@@ -369,6 +367,32 @@ FileImportReducers[ActionTypes.saveTemplate] =
       (err: string) =>
       {
         alert('Error saving template: ' + err);
+      },
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.updateTemplate] =
+  (state, action) =>
+  {
+    Ajax.updateTemplate(state.originalNames,
+      Map<string, ColumnTypesTree>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&
+        [colName, state.columnTypes.get(colId).toJS()],
+      )),
+      state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
+      state.transforms,
+      action.payload.exporting,
+      state.primaryKeyDelimiter,
+      action.payload.templateId,
+      () =>
+      {
+        alert('successfully updated template');
+        action.payload.fetchTemplates(action.payload.exporting);
+      },
+      (err: string) =>
+      {
+        alert('Error updating template: ' + err);
       },
     );
     return state;

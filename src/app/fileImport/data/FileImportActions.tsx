@@ -120,6 +120,10 @@ const FileImportActions =
     (templateName: string, exporting: boolean) =>
       $(ActionTypes.saveTemplate, { templateName, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
+    updateTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.updateTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+
     fetchTemplates:
     (exporting: boolean) =>
       $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),

@@ -260,6 +260,9 @@ class FileImportPreview extends TerrainComponent<Props>
       return;
     }
     Actions.loadTemplate(this.state.loadTemplateId);
+    this.setState({
+      loadedTemplateId: this.props.templates.get(this.state.loadTemplateId).templateId,
+    });
   }
 
   public handleSaveTemplate()
@@ -279,7 +282,7 @@ class FileImportPreview extends TerrainComponent<Props>
       alert('No template loaded');
       return;
     }
-    // Actions.updateTemplate(this.state.loadedTemplateId, this.props.exporting)
+    Actions.updateTemplate(this.state.loadedTemplateId, this.props.exporting);
   }
 
   public handleUploadFile()

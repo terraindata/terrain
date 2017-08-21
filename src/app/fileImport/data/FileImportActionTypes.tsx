@@ -71,6 +71,7 @@ const FileImportActionTypes =
     setTemplates: '',
     loadTemplate: '',
     deleteTemplate: '',
+    updateTemplate: '',
     saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',

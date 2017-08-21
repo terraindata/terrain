@@ -806,8 +806,6 @@ export const Ajax =
       name: string,
       exporting: boolean,
       primaryKeyDelimiter: string,
-      updating: boolean,
-      templateId: number,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -829,31 +827,52 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      Ajax.req(
+        'post',
+        'templates/create',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
 
-      if (updating)
+    updateTemplate(originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKeys: List<string>,
+      transformations: List<object>,
+      exporting: boolean,
+      primaryKeyDelimiter: string,
+      templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload: object = {
+        originalNames,
+        columnTypes,
+        primaryKeys,
+        transformations,
+        export: exporting,
+        primaryKeyDelimiter,
+      };
+      console.log('updating template: ', templateId);
+      console.log('update template payload: ', payload);
+      const onLoadHandler = (resp) =>
       {
-        Ajax.req(
-          'post',
-          'templates/' + String(templateId),
-          payload,
-          onLoadHandler,
-          {
-            onError,
-          },
-        );
-      }
-      else
-      {
-        Ajax.req(
-          'post',
-          'templates/create',
-          payload,
-          onLoadHandler,
-          {
-            onError,
-          },
-        );
-      }
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/' + String(templateId),
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
       return;
     },
 
