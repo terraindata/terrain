@@ -49,9 +49,9 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import * as _ from 'underscore';
 import './BuilderColumn.less';
 const { List } = Immutable;
 import Menu from '../../common/components/Menu';

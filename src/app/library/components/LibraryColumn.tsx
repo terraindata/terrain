@@ -49,8 +49,8 @@ THE SOFTWARE.
 import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 import { backgroundColor, borderColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 

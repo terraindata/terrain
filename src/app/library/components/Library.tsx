@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import * as _ from 'underscore';
 import TerrainAreaChart from '../../charts/components/TerrainAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';

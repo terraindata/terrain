@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-console
 
 import { List } from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -227,7 +227,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // first, populate the variant clause map, since it will be used by getCard
     this.computeVariantClauses(this.clauses);
 
-    _.mapObject(
+    _.mapValues(
       this.clauses,
       (clause, key) =>
       {
@@ -850,7 +850,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private computeVariantClauses(clauses: { [name: string]: ESClause })
   {
     const variantClauses: { [clauseType: string]: ESClause } = {};
-    _.mapObject(clauses, (clause, key) =>
+    _.mapValues(clauses, (clause, key) =>
     {
       if (clause.clauseType === ESClauseType.ESVariantClause)
       {
@@ -862,7 +862,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     const getClauseTypesForVariant = (clause: ESVariantClause): string[] =>
     {
       let types: string[] = [];
-      _.mapObject(clause.subtypes, (subtype) =>
+      _.mapValues(clause.subtypes, (subtype) =>
       {
         if (variantClauses[subtype] !== undefined)
         {
@@ -882,7 +882,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       return types;
     };
 
-    this.variantClauseMapping = _.mapObject(variantClauses, getClauseTypesForVariant);
+    this.variantClauseMapping = _.mapValues(variantClauses, getClauseTypesForVariant);
   }
 
   // We need to replace occurences of variant card types with their final types

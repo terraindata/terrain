@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:max-line-length
 
 import { List } from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
@@ -127,7 +127,7 @@ export const elasticScore = _card(
               label: 'Order',
               style: {
                 paddingLeft: 20,
-              }
+              },
             },
             {
               displayType: DisplayType.DROPDOWN,
@@ -138,7 +138,7 @@ export const elasticScore = _card(
               centerDropdown: true,
               style: {
                 maxWidth: 80,
-              }
+              },
             },
             {
               displayType: DisplayType.LABEL,
@@ -146,7 +146,7 @@ export const elasticScore = _card(
               label: 'Mode',
               style: {
                 paddingLeft: 20,
-              }
+              },
             },
             {
               displayType: DisplayType.DROPDOWN,
@@ -157,7 +157,7 @@ export const elasticScore = _card(
               centerDropdown: true,
               style: {
                 maxWidth: 80,
-              }
+              },
             },
             {
               displayType: DisplayType.LABEL,
@@ -165,7 +165,7 @@ export const elasticScore = _card(
               label: 'Type',
               style: {
                 paddingLeft: 20,
-              }
+              },
             },
             {
               displayType: DisplayType.DROPDOWN,
@@ -176,7 +176,7 @@ export const elasticScore = _card(
               centerDropdown: true,
               style: {
                 maxWidth: 120,
-              }
+              },
             },
           ],
         },

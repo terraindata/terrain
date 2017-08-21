@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './EasterEggs.less';

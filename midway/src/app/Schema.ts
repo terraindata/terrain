@@ -86,7 +86,6 @@ const appSchemaSQL: string[] = [
      dbid integer NOT NULL,
      dbname text NOT NULL,
      tablename text NOT NULL,
-     csvHeaderMissing bool,
      originalNames text NOT NULL,
      columnTypes text NOT NULL,
      primaryKey text NOT NULL,

@@ -50,7 +50,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemType } from '../../items/types/Item';
@@ -684,7 +684,7 @@ export const Ajax =
       );
     },
 
-    importFile(file: string,
+    importFile(file: File,
       filetype: string,
       dbname: string,
       tablename: string,
@@ -694,45 +694,61 @@ export const Ajax =
       primaryKey: string,
       transformations: Immutable.List<object>,
       update: boolean,
-      onLoad: (resp: object[]) => void,
-      onError?: (ev: string) => void,
-      csvHeaderMissing?: boolean,
+      csvHeaderMissing: boolean,
+      onLoad: (resp: any) => void,
+      onError: (resp: any) => void,
     )
     {
-      const payload: object = {
-        dbid: connectionId,
-        dbname,
-        tablename,
-        contents: file,
-        filetype,
-        originalNames,
-        columnTypes,
-        primaryKey,
-        csvHeaderMissing,
-        transformations,
-        update,
-      };
-      console.log('import payload: ', payload);
-      const onLoadHandler = (resp) =>
-      {
-        onLoad(resp);
-      };
-      Ajax.req(
-        'post',
-        'import/',
-        payload,
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
+      // TODO: call Ajax.req() instead with formData in body
+      const authState = AuthStore.getState();
 
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('id', String(authState.id));
+      formData.append('accessToken', authState.accessToken);
+      formData.append('filetype', filetype);
+      formData.append('dbname', dbname);
+      formData.append('tablename', tablename);
+      formData.append('dbid', String(connectionId));
+      formData.append('originalNames', JSON.stringify(originalNames));
+      formData.append('columnTypes', JSON.stringify(columnTypes));
+      formData.append('primaryKey', primaryKey);
+      formData.append('transformations', JSON.stringify(transformations));
+      formData.append('update', String(update));
+      formData.append('hasCsvHeader', String(!csvHeaderMissing));
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
+      xhr.send(formData);
+
+      xhr.onerror = (err: any) =>
+      {
+        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+        onError(routeError);
+      };
+
+      xhr.onload = (ev: Event) =>
+      {
+        if (xhr.status === 401)
+        {
+          // TODO re-enable
+          Actions.logout();
+        }
+
+        if (xhr.status !== 200)
+        {
+          onError(xhr.responseText);
+          return;
+        }
+
+        onLoad(xhr.responseText);
+      };
       return;
     },
 
     saveTemplate(dbname: string,
       tablename: string,
-      connectionId: number,
+      dbid: number,
       originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
       primaryKey: string,
@@ -740,20 +756,19 @@ export const Ajax =
       name: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
-      csvHeaderMissing?: boolean,
     )
     {
       const payload: object = {
-        dbid: connectionId,
+        dbid,
         dbname,
         tablename,
         originalNames,
         columnTypes,
         primaryKey,
-        csvHeaderMissing,
         transformations,
         name,
       };
+      console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);

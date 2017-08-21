@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires no-console
 
+import * as _ from 'lodash';
 import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
 const Redux = require('redux');
 
 import AuthStore from './../../auth/data/AuthStore';

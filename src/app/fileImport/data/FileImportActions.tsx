@@ -47,40 +47,43 @@ import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
 
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
+
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
 const FileImportActions =
   {
     changeServer:
-    (connectionId: number, name: string) =>
-      $(ActionTypes.changeServer, { connectionId, name }),
+    (serverId: number, name: string) =>
+      $(ActionTypes.changeServer, { serverId, name }),
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+    changeDbName:
+    (dbName: string) =>
+      $(ActionTypes.changeDbName, { dbName }),
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+    changeTableName:
+    (tableName: string) =>
+      $(ActionTypes.changeTableName, { tableName }),
 
-    changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
+    changeCsvHeaderMissing:
+    (csvHeaderMissing: boolean) =>
+      $(ActionTypes.changeCsvHeaderMissing, { csvHeaderMissing }),
 
     changePrimaryKey:
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
 
     chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
+    (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { filetype, preview, originalNames }),
 
     uploadFile:
     () =>
       $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     addTransform:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
@@ -92,28 +95,32 @@ const FileImportActions =
       $(ActionTypes.setColumnName, { columnId, colName, newName }),
 
     setColumnType:
-    (columnId: number, recursionDepth: number, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
+    (columnId: number, recursionDepth: number, type: string) =>
+      $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
     updatePreviewRows:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateText: string) =>
-      $(ActionTypes.saveTemplate, { templateText, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateName: string) =>
+      $(ActionTypes.saveTemplate, { templateName, fetchTemplates: FileImportActions.fetchTemplates }),
 
     fetchTemplates:
     () =>
       $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
-    (templates: List<FileImportTypes.Template>) =>
+    (templates: List<Template>) =>
       $(ActionTypes.setTemplates, { templates }),
 
     loadTemplate:
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
+
+    saveFile:
+    (file: File, filetype: string) =>
+      $(ActionTypes.saveFile, { file, filetype }),
 
     changeUploadInProgress:
     (uploading: boolean) =>
