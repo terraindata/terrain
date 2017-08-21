@@ -60,6 +60,7 @@ import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
 import Actions from '../../../fileImport/data/FileImportActions';
+import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import * as SchemaTypes from '../../../schema/SchemaTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
@@ -520,7 +521,7 @@ export class ResultsManager extends TerrainComponent<Props>
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: fields,
-      preview: Immutable.List(results.map((result) =>
+      preview: Immutable.List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
         Immutable.List(result.fields.valueSeq().toList().map((field) =>
           field,
         )),

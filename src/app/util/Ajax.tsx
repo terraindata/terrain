@@ -750,11 +750,9 @@ export const Ajax =
 
     exportFile(filetype: string,
       dbname: string,
-      tablename: string,
       serverId: number,
-      exporting: boolean,
+      columnTypes: Immutable.Map<string, object>,
       query: string,
-      templateID: number,
       rank: boolean,
       onLoad: (resp: any) => void,
       onError?: (ev: string) => void,
@@ -763,11 +761,9 @@ export const Ajax =
       const payload: object = {
         dbid: serverId,
         dbname,
-        tablename,
         filetype,
-        export: exporting,
+        columnTypes,
         query,
-        templateID,
         rank,
       };
       console.log('export payload: ', payload);
