@@ -395,7 +395,7 @@ class VariantsColumn extends TerrainComponent<Props>
     );
   }
 
-  public handlItemStatusHover(statusString: string, id: ID)
+  public handleItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
     if (v.status !== statusString)
@@ -426,7 +426,7 @@ class VariantsColumn extends TerrainComponent<Props>
         status={archived ? ItemStatus.Archive : ItemStatus.Build}
         key={archived ? '1' : '0'}
         type='variant'
-        onHover={this.handlItemStatusHover}
+        onHover={this.handleItemStatusHover}
         titleHidden={!archived}
       >
         {
