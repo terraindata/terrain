@@ -111,7 +111,15 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
     if (item['new'])
     {
       // is a new card
+      // - first look at the parent card's structure
+    // - if new card matches any card types in parents, use key from that
+    //   IF this card does not already exist in parent
+    // - write code in CardDropArea in drop handlers
+    //   - need to instrument it with ability to define special handlers per-language
+
       Actions.create(targetProps.keyPath, targetIndex, type);
+      console.log(targetProps);
+      console.log(type);
     }
     else
     {
