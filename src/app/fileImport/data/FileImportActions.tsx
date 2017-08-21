@@ -91,8 +91,8 @@ const FileImportActions =
       $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     exportFile:
-    (query: string, templateId: number, rank: boolean) =>
-      $(ActionTypes.exportFile, { query, templateId, rank }),
+    (query: string, rank: boolean, downloadFilename: string) =>
+      $(ActionTypes.exportFile, { query, rank, downloadFilename }),
 
     addTransform:
     (transform: Transform) =>

@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty strict-boolean-expressions no-console
 
 import * as Immutable from 'immutable';
+import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { buttonColors, Colors } from '../../common/Colors';
@@ -83,7 +84,9 @@ export interface Props
   uploadInProgress: boolean;
   elasticUpdate: boolean;
   exporting: boolean;
+
   query?: string;
+  variantName?: string;
 }
 
 @Radium
@@ -285,8 +288,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      const id = this.props.templates.get(this.state.loadTemplateId).templateId;
-      Actions.exportFile(this.props.query, id, true);
+      Actions.exportFile(this.props.query, true, this.props.variantName + ' on ' + String(moment().format('MM/DD/YY')) + '.csv');
     }
     else
     {

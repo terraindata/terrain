@@ -565,6 +565,7 @@ column if you have customized the results view.');
               elasticUpdate={elasticUpdate}
               exporting={true}
               query={this.props.query.tql}
+              variantName={this.props.variantName}
             />
 
           </div>

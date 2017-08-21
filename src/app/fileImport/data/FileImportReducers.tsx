@@ -321,9 +321,10 @@ FileImportReducers[ActionTypes.exportFile] =
         state.columnsToInclude.get(colId) &&
         [colName, state.columnTypes.get(colId).toJS()],
       )),
+      state.transforms,
       action.payload.query,
       action.payload.rank,
-      state.transforms,
+      action.payload.downloadFilename,
       _.noop,
       _.noop,
       // (resp: any) =>

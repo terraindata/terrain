@@ -752,9 +752,10 @@ export const Ajax =
       dbname: string,
       serverId: number,
       columnTypes: Immutable.Map<string, object>,
+      transformations: Immutable.List<object>,
       query: string,
       rank: boolean,
-      transformations: Immutable.List<object>,
+      downloadFilename: string,
       onLoad: (resp: any) => void,
       onError?: (ev: string) => void,
     )
@@ -783,7 +784,7 @@ export const Ajax =
         {
           onError,
           download: true,
-          downloadFilename: 'test.csv',
+          downloadFilename,
         },
         // {
         //   onError,
