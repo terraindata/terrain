@@ -46,11 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import * as FileImportTypes from './../FileImportTypes';
 const Redux = require('redux');
-import Util from './../../util/Util';
 
 const DefaultState = FileImportTypes._FileImportState();
 

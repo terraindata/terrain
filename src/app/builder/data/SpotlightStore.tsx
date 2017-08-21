@@ -46,10 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
+import { Map } from 'immutable';
+import * as _ from 'lodash';
 import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
 const Redux = require('redux');
 import { BaseClass, New } from '../../Classes';
 

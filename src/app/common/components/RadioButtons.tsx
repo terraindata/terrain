@@ -44,10 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as React from 'react';
-import * as _ from 'underscore';
-import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RadioButtons.less';
 

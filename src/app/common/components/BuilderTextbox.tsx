@@ -52,28 +52,22 @@ import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
-import * as ReactDOM from 'react-dom';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
 import { Display } from '../../../blocks/displays/Display';
-import { Block } from '../../../blocks/types/Block';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
-import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
-import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
 import { borderColor, cardStyle, Colors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
-import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
 
+const shallowCompare = require('react-addons-shallow-compare');
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
 const CloseIcon = require('./../../../images/icon_close.svg');
@@ -130,6 +124,11 @@ interface State
   isSwitching: boolean;
   backupString: number | string | Card;
   options: List<string>;
+
+  focused: boolean;
+  boxValue: any;
+
+  boxValueBuffer: any;
 }
 
 class BuilderTextbox extends TerrainComponent<Props>
@@ -139,7 +138,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    this.executeChange = _.debounce(this.executeChange, 300);
+    this.debouncedChange = _.debounce(this.debouncedChange, 300);
 
     this.state = {
       // store these in state to avoid unnecessary calls to Store.getState()
@@ -150,6 +149,10 @@ class BuilderTextbox extends TerrainComponent<Props>
       isSwitching: false,
       backupString: props.value,
       options: List([]),
+
+      focused: false,
+      boxValue: props.value,
+      boxValueBuffer: null,
     };
   }
 
@@ -192,15 +195,28 @@ class BuilderTextbox extends TerrainComponent<Props>
         this.refs['input']['value'] = newProps.value;
       }
     }
+
+    if (!this.state.focused)
+    {
+      this.setState({
+        boxValue: value,
+      });
+    }
+    else
+    {
+      this.setState({
+        boxValueBuffer: value,
+      });
+    }
   }
 
   public componentWillUnmount()
   {
-    this.executeChange.flush();
+    this.debouncedChange.flush();
   }
 
   // throttled event handler - becomes a lodash debounce object
-  public executeChange: any = (value) =>
+  public debouncedChange: any = (value) =>
   {
     // if(this.props.isNumber)
     // {
@@ -209,6 +225,15 @@ class BuilderTextbox extends TerrainComponent<Props>
 
     Actions.change(this.props.keyPath, value);
     this.props.onChange && this.props.onChange(value);
+  }
+
+  public executeChange(value)
+  {
+    this.setState({
+      boxValue: value,
+      boxValueBuffer: null,
+    });
+    this.debouncedChange(value);
   }
 
   public handleCardDrop(item)
@@ -248,20 +273,34 @@ class BuilderTextbox extends TerrainComponent<Props>
   {
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
+    this.setState({
+      focused: true,
+    });
   }
 
   public handleBlur(event: React.FocusEvent<any>, value: string)
   {
-    this.executeChange.flush();
+    this.debouncedChange.flush();
     this.props.onBlur && this.props.onBlur(this, value, event);
+    this.setState({
+      focused: false,
+    });
+    if (this.state.boxValueBuffer !== null)
+    {
+      this.setState({
+        boxValue: this.state.boxValueBuffer,
+        boxValueBuffer: null,
+      });
+    }
   }
 
   public handleCardToolClose()
   {
     this.executeChange('');
-    this.executeChange.flush();
+    this.debouncedChange.flush();
     this.setState({
       value: '',
+      focused: false,
     });
   }
 
@@ -340,7 +379,6 @@ class BuilderTextbox extends TerrainComponent<Props>
       {
         textStyle.color = Colors().builder.cards.inputParameter;
       }
-
       return (
         <div
           className={classNames({
@@ -356,7 +394,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               <textarea
                 ref='input'
                 disabled={!this.props.canEdit}
-                defaultValue={this.props.value as string}
+                defaultValue={this.state.boxValue as string || ''}
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
@@ -365,7 +403,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               <Autocomplete
                 ref='input'
                 disabled={!this.props.canEdit}
-                value={this.props.value as string}
+                value={this.state.boxValue as string || ''}
                 options={options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}

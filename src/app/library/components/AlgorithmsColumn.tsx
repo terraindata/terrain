@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import * as _ from 'underscore';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';

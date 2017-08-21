@@ -48,9 +48,8 @@ THE SOFTWARE.
 
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../common/Colors';
+import { borderColor, Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import Util from '../../util/Util';
 import './CreateLine.less';
 
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');

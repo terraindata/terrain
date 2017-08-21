@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import './BuilderTQLColumn.less';
 const { List } = Immutable;
 import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
@@ -57,10 +56,8 @@ import Query from '../../../items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
 import { MenuOption } from '../../common/components/Menu';
 import * as LibraryTypes from '../../library/LibraryTypes';
-import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
-import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';

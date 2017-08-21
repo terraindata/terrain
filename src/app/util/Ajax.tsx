@@ -50,12 +50,11 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemType } from '../../items/types/Item';
 import Query from '../../items/types/Query';
-import LibraryStore from '../library/data/LibraryStore';
 import Actions from './../auth/data/AuthActions';
 import AuthStore from './../auth/data/AuthStore';
 import * as LibraryTypes from './../library/LibraryTypes';
@@ -63,7 +62,6 @@ import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 
-import { routerShape } from 'react-router';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { QueryRequest } from '../../database/types/QueryRequest';
 import { recordForSave, responseToRecordConfig } from '../Classes';
@@ -752,12 +750,12 @@ export const Ajax =
 
     exportFile(filetype: string,
       dbname: string,
-      tablename: string,
       serverId: number,
-      exporting: boolean,
+      columnTypes: Immutable.Map<string, object>,
+      transformations: Immutable.List<object>,
       query: string,
-      templateID: number,
       rank: boolean,
+      downloadFilename: string,
       onLoad: (resp: any) => void,
       onError?: (ev: string) => void,
     )
@@ -765,12 +763,11 @@ export const Ajax =
       const payload: object = {
         dbid: serverId,
         dbname,
-        tablename,
         filetype,
-        export: exporting,
+        columnTypes,
         query,
-        templateID,
         rank,
+        transformations,
       };
       console.log('export payload: ', payload);
       // const onLoadHandler = (resp) =>
@@ -787,7 +784,7 @@ export const Ajax =
         {
           onError,
           download: true,
-          downloadFilename: 'test.csv',
+          downloadFilename,
         },
         // {
         //   onError,
@@ -804,7 +801,7 @@ export const Ajax =
       primaryKeys: List<string>,
       transformations: List<object>,
       name: string,
-      isExport: boolean,
+      exporting: boolean,
       primaryKeyDelimiter: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
@@ -819,7 +816,7 @@ export const Ajax =
         primaryKeys,
         transformations,
         name,
-        export: isExport,
+        export: exporting,
         primaryKeyDelimiter,
       };
       console.log('save template payload: ', payload);
@@ -839,10 +836,70 @@ export const Ajax =
       return;
     },
 
+    updateTemplate(originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKeys: List<string>,
+      transformations: List<object>,
+      exporting: boolean,
+      primaryKeyDelimiter: string,
+      templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload: object = {
+        originalNames,
+        columnTypes,
+        primaryKeys,
+        transformations,
+        export: exporting,
+        primaryKeyDelimiter,
+      };
+      console.log('updating template: ', templateId);
+      console.log('update template payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/' + String(templateId),
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
+    deleteTemplate(templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      console.log('deleting template: ', templateId);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/delete/' + String(templateId),
+        {},
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
     fetchTemplates(
       connectionId: number,
       dbname: string,
       tablename: string,
+      exporting: boolean,
       onLoad: (templates: object[]) => void,
     )
     {
@@ -851,6 +908,15 @@ export const Ajax =
         dbname,
         tablename,
       };
+
+      if (exporting)
+      {
+        payload['exportOnly'] = true;
+      }
+      else
+      {
+        payload['importOnly'] = true;
+      }
       console.log('fetch templates payload: ', payload);
 
       Ajax.req(

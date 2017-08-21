@@ -47,17 +47,11 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands max-line-length
 
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as React from 'react';
-import * as _ from 'underscore';
-import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './ManualEntry.less';
 const ManualConfig = require('./../ManualConfig.json');
 const ArrowIcon = require('./../../../images/icon_smallArrow.svg');
-import * as Immutable from 'immutable';
-import * as BlockUtils from '../../../blocks/BlockUtils';
-import Card from './../../builder/components/cards/CardComponent';
 
 const CodeMirror = require('./../../tql/components/Codemirror.js');
 require('./../../tql/components/TQLMode.js');

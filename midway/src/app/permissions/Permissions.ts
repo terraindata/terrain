@@ -48,7 +48,6 @@ import * as ImportP from './ImportPermissions';
 
 export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
 
-
 export class Permissions
 {
   public ImportPermissions: ImportP.ImportPermissions;

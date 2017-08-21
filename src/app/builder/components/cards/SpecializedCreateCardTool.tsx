@@ -46,15 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { Card } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 
 import CreateCardTool from './CreateCardTool';

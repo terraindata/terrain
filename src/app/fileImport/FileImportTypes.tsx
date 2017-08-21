@@ -47,9 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import { BaseClass, New } from '../Classes';
-import Util from './../util/Util';
 const { List } = Immutable;
 
 // This type represents the state of the FileImportStore
@@ -91,9 +89,9 @@ export const _FileImportState = (config?: { [key: string]: any }) =>
 
 class TransformArgsC
 {
-  public mergeName?: string = null;             // name of column to be merged
-  public newName?: string | string[] = null;   // includes rename name, duplicate name, split names
-  public text?: string = null;                  // text to append/prepend, text to split/merge on
+  public mergeName?: string = '';            // name of column to be merged
+  public newName?: string | string[] = '';   // includes rename name, duplicate name, split names
+  public text?: string = '';                 // text to append/prepend, text to split/merge on
 }
 
 const TransformArgs_Record = Immutable.Record(new TransformArgsC());

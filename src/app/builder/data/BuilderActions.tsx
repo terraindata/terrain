@@ -43,11 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import BackendInstance from '../../../database/types/BackendInstance';
-import List = Immutable.List;
-import Map = Immutable.Map;
 import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';

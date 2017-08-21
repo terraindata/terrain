@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands
 
 import * as React from 'react';
-import * as _ from 'underscore';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 const SCROLL_SENSITIVITY = 500;

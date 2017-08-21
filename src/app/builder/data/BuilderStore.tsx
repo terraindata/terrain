@@ -48,16 +48,13 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
-import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
 import { CardItem } from '../components/cards/CardComponent';
 const Redux = require('redux');
 import { _FileImportState, FileImportState } from '../../fileImport/FileImportTypes';
-import Util from '../../util/Util';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
-import { Card, Cards } from '../../../blocks/types/Card';
+import { Cards } from '../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';

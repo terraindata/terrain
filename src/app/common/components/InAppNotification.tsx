@@ -68,7 +68,6 @@ render()
 */
 
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import TerrainComponent from './../../common/components/TerrainComponent';
 const NotificationSystem = require('./notification-system/NotificationSystem');
 const styles = require('./notification-system/styles.js');

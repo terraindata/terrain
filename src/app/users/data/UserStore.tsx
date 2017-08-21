@@ -46,15 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires no-console
 
-import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
 const Redux = require('redux');
 
-import Ajax from './../../util/Ajax';
-
 import AuthStore from './../../auth/data/AuthStore';
-import Util from './../../util/Util';
 
 import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';

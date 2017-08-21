@@ -54,7 +54,6 @@ import Util from '../../util/Util';
 import { SchemaActions, SchemaStore } from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import SchemaResults from './SchemaResults';
 import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';

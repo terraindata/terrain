@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import { Block } from '../../blocks/types/Block';
 import { Card } from '../../blocks/types/Card';
 import { Input, InputPrefix } from '../../blocks/types/Input';
 

@@ -49,9 +49,8 @@ THE SOFTWARE.
 import './LibraryItemCategory.less';
 
 import * as React from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
+import { DropTarget } from 'react-dnd';
 import { ItemStatus } from '../../../items/types/Item';
-import * as LibraryTypes from '../LibraryTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props

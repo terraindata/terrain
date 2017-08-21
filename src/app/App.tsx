@@ -54,10 +54,8 @@ require('babel-polyfill');
 import './App.less';
 
 // Libraries
-import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 const Perf = require('react-addons-perf');
 
@@ -83,13 +81,11 @@ import Util from './util/Util';
 import EasterEggs from './x/components/EasterEggs';
 
 import BuilderActions from './builder/data/BuilderActions'; // for card hovering
-import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+// for error reporting
 
 // data that needs to be loaded
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
-import FileImportActions from './fileImport/data/FileImportActions';
-import FileImportStore from './fileImport/data/FileImportStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
@@ -406,6 +402,9 @@ const COMMON_THEME_COLOR_STYLE = {
   },
   '::-webkit-scrollbar-thumb': {
     background: Colors().scrollbarPiece,
+  },
+  '.altBg ::-webkit-scrollbar-thumb': {
+    background: Colors().altScrollbarPiece,
   },
   'input': {
     background: Colors().inputBg,

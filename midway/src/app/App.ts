@@ -48,7 +48,6 @@ import * as http from 'http';
 import * as Koa from 'koa';
 import * as winston from 'winston';
 
-import babelRegister = require('babel-register');
 import cors = require('kcors');
 import session = require('koa-session');
 import serve = require('koa-static-server');

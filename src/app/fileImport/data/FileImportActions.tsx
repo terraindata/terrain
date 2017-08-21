@@ -43,8 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'underscore';
-import { Query } from '../../../items/types/Query';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
@@ -93,8 +91,8 @@ const FileImportActions =
       $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
 
     exportFile:
-    (query: string, templateId: number, rank: boolean) =>
-      $(ActionTypes.exportFile, { query, templateId, rank }),
+    (query: string, rank: boolean, downloadFilename: string) =>
+      $(ActionTypes.exportFile, { query, rank, downloadFilename }),
 
     addTransform:
     (transform: Transform) =>
@@ -120,6 +118,10 @@ const FileImportActions =
     (templateName: string, exporting: boolean) =>
       $(ActionTypes.saveTemplate, { templateName, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
+    updateTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.updateTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+
     fetchTemplates:
     (exporting: boolean) =>
       $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),
@@ -131,6 +133,10 @@ const FileImportActions =
     loadTemplate:
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
+
+    deleteTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.deleteTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
     saveFile:
     (file: File, filetype: string) =>

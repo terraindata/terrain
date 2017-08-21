@@ -47,9 +47,8 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-console strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import Ajax from './../../util/Ajax';
-import Util from './../../util/Util';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 const { List, Map } = Immutable;
@@ -317,12 +316,15 @@ FileImportReducers[ActionTypes.exportFile] =
     Ajax.exportFile(
       state.filetype,
       state.dbName,
-      state.tableName,
       state.serverId,
-      true, // exporting
+      Map<string, object>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&
+        [colName, state.columnTypes.get(colId).toJS()],
+      )),
+      state.transforms,
       action.payload.query,
-      action.payload.templateId,
       action.payload.rank,
+      action.payload.downloadFilename,
       _.noop,
       _.noop,
       // (resp: any) =>
@@ -337,6 +339,11 @@ FileImportReducers[ActionTypes.exportFile] =
     );
     return state;
   };
+
+FileImportReducers[ActionTypes.setTemplates] =
+  (state, action) =>
+    state.set('templates', action.payload.templates)
+  ;
 
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
@@ -367,6 +374,49 @@ FileImportReducers[ActionTypes.saveTemplate] =
     return state;
   };
 
+FileImportReducers[ActionTypes.updateTemplate] =
+  (state, action) =>
+  {
+    Ajax.updateTemplate(state.originalNames,
+      Map<string, ColumnTypesTree>(state.columnNames.map((colName, colId) =>
+        state.columnsToInclude.get(colId) &&
+        [colName, state.columnTypes.get(colId).toJS()],
+      )),
+      state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
+      state.transforms,
+      action.payload.exporting,
+      state.primaryKeyDelimiter,
+      action.payload.templateId,
+      () =>
+      {
+        alert('successfully updated template');
+        action.payload.fetchTemplates(action.payload.exporting);
+      },
+      (err: string) =>
+      {
+        alert('Error updating template: ' + err);
+      },
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.deleteTemplate] =
+  (state, action) =>
+  {
+    Ajax.deleteTemplate(action.payload.templateId,
+      () =>
+      {
+        alert('successfully deleted template');
+        action.payload.fetchTemplates(action.payload.exporting);
+      },
+      (err: string) =>
+      {
+        alert('Error deleting template: ' + err);
+      },
+    );
+    return state;
+  };
+
 FileImportReducers[ActionTypes.fetchTemplates] =
   (state, action) =>
   {
@@ -374,7 +424,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       state.serverId,
       state.dbName,
       state.tableName,
-
+      action.payload.exporting,
       (templatesArr) =>
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
@@ -391,18 +441,11 @@ FileImportReducers[ActionTypes.fetchTemplates] =
           }),
         ));
         console.log('fetched templates: ', templates);
-        action.payload.setTemplates(List(templates.filter((template) =>
-          !!template.export === action.payload.exporting,
-        )));
+        action.payload.setTemplates(templates);
       },
     );
     return state;
   };
-
-FileImportReducers[ActionTypes.setTemplates] =
-  (state, action) =>
-    state.set('templates', action.payload.templates)
-  ;
 
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>

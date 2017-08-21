@@ -68,34 +68,27 @@ Router.post('/', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  const user: UserConfig = authStream['user'];
   Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
   Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   // optional parameters: update, hasCsvHeader
 
-  const verify: void | string = await perm.ImportPermissions.verifyDefaultRoute(user, authStream['fields']);
-  if (verify !== undefined)
-  {
-    ctx.body = verify;
-    return;
-  }
+  await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
+
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
 });
 
 Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const exprtConf: ExportConfig = JSON.parse(ctx.request.body.data).body as ExportConfig;
+  const requestObj: object = JSON.parse(ctx.request.body.data).body;
+  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
+  const exprtConf: ExportConfig = requestObj as ExportConfig;
 
-  const verify: void | string = await perm.ImportPermissions.verifyExportRoute(ctx.state.user, JSON.parse(ctx.request.body.data));
-  if (verify !== undefined)
-  {
-    ctx.body = verify;
-    return;
-  }
+  await perm.ImportPermissions.verifyExportRoute(ctx.state.user, requestObj);
 
-  const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
+  const exportReturn: stream.Readable | string = await imprt.export(exprtConf, false);
+
   ctx.type = 'text/plain';
-  ctx.attachment('test.csv');
+  ctx.attachment(ctx.request.body.filename);
   ctx.body = exportReturn;
 });
 
@@ -104,9 +97,9 @@ Router.post('/export/headless', passport.authenticate('access-token-local'), asy
   const exprtConf: ExportConfig = ctx.request.body.body;
   Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
 
-  await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body);
+  await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body.body);
 
-  const exportReturn: stream.Readable | string = await imprt.export(exprtConf);
+  const exportReturn: stream.Readable | string = await imprt.export(exprtConf, true);
   ctx.body = exportReturn;
 });
 
@@ -122,6 +115,8 @@ Router.post('/headless', async (ctx, next) =>
 
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateID']);
   // optional parameters: update, hasCsvHeader
+
+  await perm.ImportPermissions.verifyHeadlessRoute(authStream['user'] as UserConfig, authStream['fields']);
 
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });

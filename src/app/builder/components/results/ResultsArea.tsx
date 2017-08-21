@@ -50,27 +50,25 @@ import * as Immutable from 'immutable';
 import './ResultsArea.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { AllBackendsMap } from '../../../../database/AllBackends';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import Result from '../results/Result';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import ResultsTable from '../results/ResultsTable';
 
 import Radium = require('radium');
+
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
@@ -567,6 +565,7 @@ column if you have customized the results view.');
               elasticUpdate={elasticUpdate}
               exporting={true}
               query={this.props.query.tql}
+              variantName={this.props.variantName}
             />
 
           </div>

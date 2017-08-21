@@ -48,9 +48,9 @@ import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
+import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
-import * as _ from 'underscore';
 import * as winston from 'winston';
 
 import { json } from 'd3-request';
@@ -111,7 +111,7 @@ export class Import
   private chunkQueue: object[];
   private nextChunk: string;
 
-  public async export(exprt: ExportConfig): Promise<stream.Readable | string>
+  public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
   {
     return new Promise<stream.Readable | string>(async (resolve, reject) =>
     {
@@ -128,20 +128,27 @@ export class Import
 
       const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
-      // get a template given the template ID
-      const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
-      if (templates.length === 0)
+      if (headless)
       {
-        return reject('Template not found.');
-      }
-      const template = templates[0] as object;
-      for (const templateKey of Object.keys(template))
-      {
-        exprt[templateKey] = template[templateKey];
-      }
-      if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
-      {
-        return reject('Cannot use an import template for export.');
+        // get a template given the template ID
+        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
+        if (templates.length === 0)
+        {
+          return reject('Template not found.');
+        }
+        const template = templates[0] as object;
+        if (exprt.dbid !== template['dbid'])
+        {
+          return reject('Template database ID does not match supplied database ID.');
+        }
+        for (const templateKey of Object.keys(template))
+        {
+          exprt[templateKey] = template[templateKey];
+        }
+        if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
+        {
+          return reject('Cannot use an import template for export.');
+        }
       }
 
       let qry: string = '';
@@ -174,11 +181,15 @@ export class Import
       {
         return reject('Empty query provided.');
       }
+      const qryObj: object = JSON.parse(qry);
+      if (qryObj['index'] !== exprt['dbname'])
+      {
+        return reject('Query index name does not match supplied index name.');
+      }
       let rankCounter: number = 1;
       const writer = csvWriter();
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      const qryObj: object = JSON.parse(qry);
       if (qryObj.hasOwnProperty('terrainRank') && exprt.rank === true)
       {
         return reject('Conflicting field: terrainRank.');

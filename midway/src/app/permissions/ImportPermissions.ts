@@ -52,7 +52,7 @@ export class ImportPermissions
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (!user.isSuperUser)
+      if (user.isSuperUser === 0)
       {
         return reject('User must be a super user.');
       }
@@ -64,7 +64,19 @@ export class ImportPermissions
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (!user.isSuperUser)
+      if (user.isSuperUser === 0)
+      {
+        return reject('User must be a super user.');
+      }
+      return resolve();
+    });
+  }
+
+  public async verifyHeadlessRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (user.isSuperUser === 0)
       {
         return reject('User must be a super user.');
       }

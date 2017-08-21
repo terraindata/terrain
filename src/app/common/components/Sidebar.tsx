@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
