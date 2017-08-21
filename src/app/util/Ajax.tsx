@@ -839,10 +839,33 @@ export const Ajax =
       return;
     },
 
+    deleteTemplate(templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      console.log('deleting template: ', templateId);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/delete/' + String(templateId),
+        {},
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
     fetchTemplates(
       connectionId: number,
       dbname: string,
       tablename: string,
+      exporting: boolean,
       onLoad: (templates: object[]) => void,
     )
     {
@@ -851,6 +874,15 @@ export const Ajax =
         dbname,
         tablename,
       };
+
+      if (exporting)
+      {
+        payload['exportOnly'] = true;
+      }
+      else
+      {
+        payload['importOnly'] = true;
+      }
       console.log('fetch templates payload: ', payload);
 
       Ajax.req(

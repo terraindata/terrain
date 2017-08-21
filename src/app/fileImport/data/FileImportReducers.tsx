@@ -338,6 +338,11 @@ FileImportReducers[ActionTypes.exportFile] =
     return state;
   };
 
+FileImportReducers[ActionTypes.setTemplates] =
+  (state, action) =>
+    state.set('templates', action.payload.templates)
+  ;
+
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
   {
@@ -367,6 +372,23 @@ FileImportReducers[ActionTypes.saveTemplate] =
     return state;
   };
 
+FileImportReducers[ActionTypes.deleteTemplate] =
+  (state, action) =>
+  {
+    Ajax.deleteTemplate(action.payload.templateId,
+      () =>
+      {
+        alert('successfully deleted template');
+        action.payload.fetchTemplates(action.payload.exporting);
+      },
+      (err: string) =>
+      {
+        alert('Error deleting template: ' + err);
+      },
+    );
+    return state;
+  };
+
 FileImportReducers[ActionTypes.fetchTemplates] =
   (state, action) =>
   {
@@ -374,7 +396,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       state.serverId,
       state.dbName,
       state.tableName,
-
+      action.payload.exporting,
       (templatesArr) =>
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
@@ -391,18 +413,14 @@ FileImportReducers[ActionTypes.fetchTemplates] =
           }),
         ));
         console.log('fetched templates: ', templates);
-        action.payload.setTemplates(List(templates.filter((template) =>
-          !!template.export === action.payload.exporting,
-        )));
+        // action.payload.setTemplates(List(templates.filter((template) =>
+        //   !!template.export === action.payload.exporting,
+        // )));
+        action.payload.setTemplates(templates);
       },
     );
     return state;
   };
-
-FileImportReducers[ActionTypes.setTemplates] =
-  (state, action) =>
-    state.set('templates', action.payload.templates)
-  ;
 
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>

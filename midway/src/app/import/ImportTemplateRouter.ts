@@ -85,6 +85,18 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     {
       filter['tablename'] = request['tablename'];
     }
+    if (request['exportOnly'] === true)
+    {
+      filter['export'] = true;
+    }
+    if (request['importOnly'] === true)
+    {
+      filter['export'] = false;
+    }
+    if (request['importOnly'] === true && request['exportOnly'] === true)
+    {
+      throw new Error('At most one of "importOnly" and "exportOnly" may be set to true.');
+    }
   }
   ctx.body = await templates.select([], filter);
 });

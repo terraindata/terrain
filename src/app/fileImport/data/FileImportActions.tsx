@@ -132,6 +132,10 @@ const FileImportActions =
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
 
+    deleteTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.deleteTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+
     saveFile:
     (file: File, filetype: string) =>
       $(ActionTypes.saveFile, { file, filetype }),
