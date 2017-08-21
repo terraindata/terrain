@@ -96,6 +96,7 @@ class FileImportPreview extends TerrainComponent<Props>
   public state: {
     deleteTemplateId: number,
     loadTemplateId: number,
+    loadedTemplateId: number,
     templateName: string,
     templateOptions: List<string>,
     editColumnId: number,
@@ -103,6 +104,7 @@ class FileImportPreview extends TerrainComponent<Props>
   } = {
     deleteTemplateId: -1,
     loadTemplateId: -1,
+    loadedTemplateId: -1,
     templateName: '',
     templateOptions: List([]),
     editColumnId: -1,
@@ -270,6 +272,16 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.templateName, this.props.exporting);
   }
 
+  public handleUpdateTemplate()
+  {
+    if (this.state.loadedTemplateId === -1)
+    {
+      alert('No template loaded');
+      return;
+    }
+    // Actions.updateTemplate(this.state.loadedTemplateId, this.props.exporting)
+  }
+
   public handleUploadFile()
   {
     if (this.props.exporting)
@@ -289,6 +301,21 @@ class FileImportPreview extends TerrainComponent<Props>
       <div
         className='flex-container fi-preview-template'
       >
+        {
+          this.state.loadedTemplateId !== -1 &&
+          <div
+            className='flex-container fi-preview-template-wrapper'
+          >
+            <div
+              className='flex-grow fi-preview-template-button'
+              onClick={this.handleUpdateTemplate}
+              style={buttonColors()}
+              ref='fi-preview-template-button-update'
+            >
+              Update
+              </div>
+          </div>
+        }
         <div
           className='flex-container fi-preview-template-wrapper'
         >

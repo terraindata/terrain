@@ -359,6 +359,8 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.templateName,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      action.payload.updating,
+      action.payload.templateId,
       () =>
       {
         alert('successfully saved template');
@@ -413,9 +415,6 @@ FileImportReducers[ActionTypes.fetchTemplates] =
           }),
         ));
         console.log('fetched templates: ', templates);
-        // action.payload.setTemplates(List(templates.filter((template) =>
-        //   !!template.export === action.payload.exporting,
-        // )));
         action.payload.setTemplates(templates);
       },
     );

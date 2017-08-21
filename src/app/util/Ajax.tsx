@@ -804,8 +804,10 @@ export const Ajax =
       primaryKeys: List<string>,
       transformations: List<object>,
       name: string,
-      isExport: boolean,
+      exporting: boolean,
       primaryKeyDelimiter: string,
+      updating: boolean,
+      templateId: number,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -819,7 +821,7 @@ export const Ajax =
         primaryKeys,
         transformations,
         name,
-        export: isExport,
+        export: exporting,
         primaryKeyDelimiter,
       };
       console.log('save template payload: ', payload);
@@ -827,15 +829,31 @@ export const Ajax =
       {
         onLoad(resp);
       };
-      Ajax.req(
-        'post',
-        'templates/create',
-        payload,
-        onLoadHandler,
-        {
-          onError,
-        },
-      );
+
+      if (updating)
+      {
+        Ajax.req(
+          'post',
+          'templates/' + String(templateId),
+          payload,
+          onLoadHandler,
+          {
+            onError,
+          },
+        );
+      }
+      else
+      {
+        Ajax.req(
+          'post',
+          'templates/create',
+          payload,
+          onLoadHandler,
+          {
+            onError,
+          },
+        );
+      }
       return;
     },
 
