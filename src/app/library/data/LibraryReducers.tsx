@@ -284,9 +284,9 @@ LibraryReducers[ActionTypes.variants.unselectAll] =
 
 function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 {
-  if (current !== previous)
+  if (current !== previous && current !== null && previous !== null)
   {
-    current && previous && current.map((curItem: any, curId: ID) =>
+    current.map((curItem: any, curId: ID) =>
     {
       const prevItem = previous.get(curId);
       if (curItem !== prevItem)

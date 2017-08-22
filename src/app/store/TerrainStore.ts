@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 
+import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
-import LibraryReducer from 'library/data/LibraryReducers';
 import RolesReducer from 'roles/data/RolesReducers';
 import UserReducer from 'users/data/UserReducers';
 
