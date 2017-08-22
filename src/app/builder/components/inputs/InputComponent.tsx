@@ -58,8 +58,9 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
 import GoogleMap from 'google-map-react';
+import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -105,6 +106,32 @@ const colorForInputType = (inputType: InputType): string =>
 @Radium
 class InputComponent extends TerrainComponent<Props>
 {
+
+  constructor(props: Props)
+  {
+    super(props);
+
+    this.state =
+      {
+        address: '',
+        latitude: 0.0,
+        longitude: 0.0,
+        focused: false,
+      };
+  }
+
+  public onAddressChange(address: string) {
+    this.setState({ address });
+  }
+
+  public handleFormSubmit(e) {
+    e.preventDefault();
+    geocodeByAddress(this.state.address)
+      .then(results => getLatLng(results[0]))
+      .then(latLng => this.setState({latitude: latLng.lat, longitude: latLng.lon}))
+      .catch(error => console.log('Error', error));
+  }
+
   public getKeyPath(type?: string)
   {
     const keyPath = List(['query', 'inputs']);
@@ -168,19 +195,30 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
+      const inputProps = {
+        value: this.state.address,
+        onChange: this.onAddressChange,
+      }
       return (
-        <div className = 'input-map-wrapper'>
-        <GoogleMap
-          defaultCenter={{lat: 59.95, lng: 30.33}}
-          defaultZoom={11}
-          style={{paddingBottom: '100%', height: '0'}}
-           bootstrapURLKeys={{
-            key: 'AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU',
-            language: 'en',
-          }}
-        >
-        </GoogleMap>
-         </div>
+        <div>
+          <form onSubmit={this.handleFormSubmit}>
+            <PlacesAutocomplete inputProps= {inputProps} />
+            <button type="submit"> Submit </button>
+          </form>
+          <div className='input-map-wrapper'>
+            <GoogleMap
+              defaultCenter={{ lat: 59.95, lng: 30.33 }}
+              defaultZoom={11}
+              center={{ lat: this.state.latitude, lng: this.state.longitude}}
+              style={{ paddingBottom: '100%', height: '0' }}
+              bootstrapURLKeys={{
+                key: 'AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU',
+                language: 'en',
+              }}
+            >
+            </GoogleMap>
+          </div>
+        </div>
       );
     }
 
