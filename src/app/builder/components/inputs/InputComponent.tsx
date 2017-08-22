@@ -63,6 +63,7 @@ import GoogleMap from 'google-map-react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+import GoogleMap from 'google-map-react';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -99,11 +100,7 @@ const colorForInputType = (inputType: InputType): string =>
     case InputType.DATE:
       return Colors().builder.cards.enumClause;
     case InputType.LOCATION:
-<<<<<<< HEAD
       return Colors().builder.cards.enumClause;
-=======
-      return Colors().builder.cards.numberClause;
->>>>>>> Added location input type
     default:
       return '#f00';
   }
