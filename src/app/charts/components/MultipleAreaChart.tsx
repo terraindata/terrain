@@ -128,7 +128,7 @@ interface State
 
 const colors = ['blue', 'red', 'green', 'yellow'];
 
-export default class TerrainAreaChart extends TerrainComponent<Props> {
+export default class MultipleAreaChart extends TerrainComponent<Props> {
   public static defaultProps = {
     datasets: [],
   };

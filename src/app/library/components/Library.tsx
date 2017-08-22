@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import TerrainAreaChart from '../../charts/components/TerrainAreaChart';
+import MultipleAreaChart from '../../charts/components/MultipleAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import UserActions from './../../users/data/UserActions';
@@ -293,7 +293,7 @@ class Library extends TerrainComponent<any>
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <TerrainAreaChart variants={variants} datasets={datasets} />
+            <MultipleAreaChart variants={variants} datasets={datasets} />
           </div> : null
         }
       </div>
