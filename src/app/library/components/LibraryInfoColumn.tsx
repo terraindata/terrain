@@ -44,14 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions
+// tslint:disable:no-var-requires strict-boolean-expressions restrict-plus-operands
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
 const { List } = Immutable;
 import BackendInstance from '../../../database/types/BackendInstance';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -62,9 +61,6 @@ import * as UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import ColorManager from './../../util/ColorManager';
 import Util from './../../util/Util';
-import LibraryActions from './../data/LibraryActions';
-import Actions from './../data/LibraryActions';
-import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
@@ -86,9 +82,14 @@ type UserMap = UserTypes.UserMap;
 
 export interface Props
 {
+  dbs: List<BackendInstance>;
   group: Group;
   algorithm: Algorithm;
   variant: Variant;
+  groupActions: any;
+  algorithmActions: any;
+  variantActions: any;
+  libraryActions: any;
 }
 
 class LibraryInfoColumn extends TerrainComponent<Props>
@@ -97,12 +98,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     users: UserMap,
     roles: RoleMap,
     me: User,
-    dbs: List<BackendInstance>,
   } = {
     users: null,
     roles: null,
     me: null,
-    dbs: List([]),
   };
 
   constructor(props: Props)
@@ -121,18 +120,18 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       stateKey: 'roles',
     });
 
-    this._subscribe(LibraryStore, {
-      stateKey: 'dbs',
-      storeKeyPath: ['dbs'],
-    });
-
     Ajax.getDbs((dbs: BackendInstance[], loadFinished: boolean) =>
     {
-      LibraryActions.setDbs(
+      this.props.libraryActions.setDbs(
         List(dbs),
         loadFinished,
       );
     });
+  }
+
+  public getSortedDatabases(dbs)
+  {
+    return Util.sortDatabases(dbs);
   }
 
   public renderVariant(isSuperUser, isBuilder)
@@ -142,14 +141,15 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         variant={this.props.variant}
         isSuperUser={isSuperUser}
         isBuilder={isBuilder}
-        dbs={this.state.dbs}
+        variantActions={this.props.variantActions}
       />
     );
   }
 
   public handleAlgorithmDbChange(dbIndex: number)
   {
-    Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    this.props.algorithmActions.change(this.props.algorithm.set('db', dbs.get(dbIndex)) as Algorithm);
   }
 
   public renderAlgorithm(isSuperUser, isBuilder)
@@ -158,22 +158,26 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     {
       return null;
     }
-
+    const db = this.props.algorithm.db;
     return (
-      <div>
-        <div className='library-info-line'>
-          <div>
-            Default Database
+      <div className='library-info-line'>
+        <div className='library-info-table'>
+          <div className='library-info-row'>
+            <div className='library-info-row-data'>
+              Database
+            </div>
+            <div className='library-info-row-data'>
+              {db.name}
+            </div>
           </div>
-          <Dropdown
-            selectedIndex={this.state.dbs && this.state.dbs.findIndex(
-              (db) => db.id === this.props.algorithm.db.id,
-            )}
-            options={this.state.dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
-            onChange={this.handleAlgorithmDbChange}
-            canEdit={isBuilder || isSuperUser}
-            className='bic-db-dropdown'
-          />
+          <div className='library-info-row'>
+            <div className='library-info-row-data'>
+              Language
+            </div>
+            <div className='library-info-row-data'>
+              {db.type}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -236,7 +240,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public handleGroupDbChange(dbIndex: number)
   {
-    Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    this.props.groupActions.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
   }
 
   public renderGroup(isSuperUser, isBuilder)
@@ -252,7 +257,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
 
     const isSysAdmin = this.state.me && this.state.me.isSuperUser;
-
+    const dbs = this.getSortedDatabases(this.props.dbs);
     return (
       <div>
         <div className='library-info-line'>
@@ -260,10 +265,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             Default Database
           </div>
           <Dropdown
-            selectedIndex={this.state.dbs && this.state.dbs.findIndex(
+            selectedIndex={dbs && dbs.findIndex(
               (db) => db.id === this.props.group.db.id,
             )}
-            options={this.state.dbs.map((db) => db.name).toList()}
+            options={dbs.map((db) => String(db.name) + ` (${db.type})`).toList()}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isSuperUser}
             className='bic-db-dropdown'

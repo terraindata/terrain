@@ -129,7 +129,10 @@ class DeployModalColumn extends TerrainComponent<Props>
 
   public handleDeploy()
   {
-    this.props.onDeploy();
+    if (this.state.confirmChecked)
+    {
+      this.props.onDeploy();
+    }
   }
 
   public render()

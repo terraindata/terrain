@@ -48,17 +48,15 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import Actions from '../../builder/data/BuilderActions';
-import { altStyle, backgroundColor, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
+import { altStyle, Colors } from '../../common/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
-import StyleTag from './StyleTag';
 
 export interface Props
 {
@@ -73,6 +71,7 @@ export interface Props
   optionsDisplayName?: Map<any, string>; // maps value to display name
   textColor?: string | ((index: number) => string);
   width?: string;
+  directionBias?: number; // bias for determining whether or not dropdown opens up or down
 }
 
 @Radium
@@ -101,7 +100,7 @@ class Dropdown extends TerrainComponent<Props>
         const pr = this.props;
         if (pr.keyPath)
         {
-          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : index);
+          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
         }
         if (pr.onChange)
         {
@@ -211,7 +210,7 @@ class Dropdown extends TerrainComponent<Props>
 
     this.setState({
       open: !this.state.open,
-      up: cr.bottom > windowBottom / 2,
+      up: cr.bottom > windowBottom / 2 + (this.props.directionBias || 0),
     });
   }
 
@@ -254,7 +253,6 @@ class Dropdown extends TerrainComponent<Props>
   public render()
   {
     // Element with options, rendered at the top or bottom of the dropdown
-
     let optionsEl: El = null;
     if (this.state.open)
     {
@@ -280,6 +278,7 @@ class Dropdown extends TerrainComponent<Props>
         onClick={this.toggleOpen}
         className={classNames({
           'dropdown-wrapper': true,
+          'altBg': true,
           'dropdown-up': this.state.up,
           'dropdown-open': this.state.open,
           'dropdown-disabled': !this.props.canEdit,
@@ -288,7 +287,6 @@ class Dropdown extends TerrainComponent<Props>
         })}
         key='dropdown-body'
       >
-
         {
           this.state.up && this.state.open
           && optionsEl

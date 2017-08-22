@@ -46,11 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires variable-name no-shadowed-variable
 
-import * as classNames from 'classnames';
-import * as $ from 'jquery';
 import * as React from 'react';
-import * as _ from 'underscore';
-import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import PasswordMeter from './PasswordMeter';
 import './Settings.less';

@@ -57,7 +57,7 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 const shallowCompare = require('react-addons-shallow-compare');
 const $ = require('jquery');
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 // Coordinate these classNames with layout_manager.css/less
 const lmClass = 'layout-manager';

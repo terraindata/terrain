@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
-import * as classNames from 'classnames';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TQLPopup.less';

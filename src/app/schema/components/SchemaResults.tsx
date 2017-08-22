@@ -47,16 +47,14 @@ THE SOFTWARE.
 // tslint:disable:switch-default strict-boolean-expressions restrict-plus-operands no-console
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import Radium = require('radium');
 import * as React from 'react';
 import BackendInstance from '../../../database/types/BackendInstance';
-import Styles from '../../Styles';
 import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { _Query, Query } from '../../../items/types/Query';

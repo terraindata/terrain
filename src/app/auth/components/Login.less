@@ -1,6 +1,7 @@
 @import "../../common/Common.less";
 
 @m: 12px;
+@font-size: 18px;
 
 .login-wrapper {
   .dead-center;
@@ -13,7 +14,7 @@
   .login-logo-container {
     width: 100%;
     padding-bottom: @m;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 2px solid #ccc;
     margin-bottom: @m;
     .transition(~"all 0.5s");
     
@@ -26,8 +27,8 @@
   .login-container {
     .transition(~"all 0.3s");
     overflow-y: hidden;
-    padding-left: 80px;
-    margin-left: -80px;
+    padding-left: 100px;
+    margin-left: -100px;
     // ^ to expand the width to the left
     //   so that the labels don't get clipped off
     //   by overflow:hidden during animation
@@ -41,34 +42,40 @@
     }
   }
 
-  &.login-wrapper-open {
-    .login-container {
-      height: 110px;
-    }
+  .login-info {
+    border-radius: 4px;
+    padding: 12px;
+    padding-top: 1px;
+    padding-bottom: 1px;
   }
+
+  //&.login-wrapper-open {
+  //  .login-container {
+  //    height: 110px;
+  //  }
+  //}
+  // ^ so that the box has no fixed height
 
   .login-row {
     position: relative;
-    margin-bottom: @m / 2;
-    
+    margin-top: 12px;
+    margin-bottom: 12px;
+
     .login-label {
       position: absolute;
-      top: 6px;
-      left: 6px;
-      color: @grey;
+      top: 7px;
+      left: 7px;
+      font-size: @font-size;
+      //color: @grey;
       .transition;
     }
 
     .login-input-field {
-      font-size: 14px;
+      font-size: @font-size;
       width: 100%;
-      border: 1px solid #ccc;
+      padding: 6px;
+      border: 2px solid;
       border-radius: 4px;
-      padding-left: @m;
-      color: #617214;
-      // :hover{
-      //   border: none !important;
-      // }
     }
   }
   
@@ -77,26 +84,21 @@
       .login-label {
         -webkit-transform: translateX(-100%);
         transform: translateX(-100%);
-        padding-right: 18px;
+        padding-right: 24px;
       }
-    }
+    } 
   }
 
   .login-submit-button-wrapper {
     .login-submit-button {
-      color: #fff;
-      background: #50594A;
-      font-size: 14px;
+      font-size: @font-size;
       display: inline-block;
-      padding: 6px 24px;
+      margin-top: 12px;
+      padding: 12px 30px;
       letter-spacing: 0.3;
       cursor: pointer;
       
       .transition;
-      
-      &:hover {
-        background: lighten(saturate(#50594A, 20%), 10%);
-      }
     }
   }
 

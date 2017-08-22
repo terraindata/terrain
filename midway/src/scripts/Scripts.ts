@@ -49,7 +49,6 @@ import * as winston from 'winston';
 
 import DatabaseController from '../database/DatabaseController';
 import ElasticClient from '../database/elastic/client/ElasticClient';
-import * as Tasty from '../tasty/Tasty';
 import { makePromiseCallback } from '../tasty/Utils';
 import * as Util from './Utils';
 

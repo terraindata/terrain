@@ -54,10 +54,8 @@ require('babel-polyfill');
 import './App.less';
 
 // Libraries
-import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 const Perf = require('react-addons-perf');
 
@@ -83,18 +81,17 @@ import Util from './util/Util';
 import EasterEggs from './x/components/EasterEggs';
 
 import BuilderActions from './builder/data/BuilderActions'; // for card hovering
-import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+// for error reporting
 
 // data that needs to be loaded
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
-import FileImportActions from './fileImport/data/FileImportActions';
-import FileImportStore from './fileImport/data/FileImportStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
+import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
 
@@ -104,6 +101,7 @@ const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
+const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
 const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
@@ -131,7 +129,7 @@ const links =
       route: '/builder',
     },
     {
-      icon: <ReportingIcon />,
+      icon: <SchemaIcon />,
       text: 'Schema',
       route: '/schema',
     },
@@ -257,7 +255,8 @@ class App extends TerrainComponent<Props>
   public fetchData()
   {
     UserActions.fetch();
-    LibraryActions.fetch();
+    TerrainStore.dispatch(LibraryActions.fetch());
+    LibraryStore.dispatch(LibraryActions.fetch());
     SchemaActions.fetch();
     // RolesActions.fetch();
   }
@@ -403,6 +402,9 @@ const COMMON_THEME_COLOR_STYLE = {
   },
   '::-webkit-scrollbar-thumb': {
     background: Colors().scrollbarPiece,
+  },
+  '.altBg ::-webkit-scrollbar-thumb': {
+    background: Colors().altScrollbarPiece,
   },
   'input': {
     background: Colors().inputBg,

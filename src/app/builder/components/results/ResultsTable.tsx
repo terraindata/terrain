@@ -46,18 +46,19 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-console
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import * as ReactDataGrid from 'react-data-grid';
+import { Toolbar } from 'react-data-grid-addons';
+
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
-import { MenuOption } from '../../../common/components/Menu';
-import { IColumn, Table } from '../../../common/components/Table';
+import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
-import { getResultFields, getResultName, getResultValue } from './Result';
-import { MAX_RESULTS, Results } from './ResultTypes';
+import { getResultName } from './Result';
+import { Results } from './ResultTypes';
 
 export interface Props
 {
@@ -72,19 +73,16 @@ export default class ResultsTable extends TerrainComponent<Props>
   public state: {
     random: number;
     spotlightState: SpotlightState;
-    columns: List<IColumn>;
+    columns: List<TableColumn>;
+    rows: List<any>;
+    selectedIndexes: List<any>;
   } = {
     random: 0,
     spotlightState: null,
     columns: this.getColumns(this.props),
+    rows: List([]),
+    selectedIndexes: List([]),
   };
-
-  public menuOptions: List<MenuOption> = Immutable.List([
-    {
-      text: 'Spotlight',
-      onClick: this.spotlight,
-    },
-  ]);
 
   public componentWillReceiveProps(nextProps: Props)
   {
@@ -94,14 +92,15 @@ export default class ResultsTable extends TerrainComponent<Props>
       this.setState({
         random: Math.random(),
         columns: this.getColumns(nextProps),
+        rows: nextProps.results,
       });
     }
   }
 
-  public getColumns(props: Props): List<IColumn>
+  public getColumns(props: Props): List<TableColumn>
   {
     const { resultsConfig } = props;
-    let cols: IColumn[] = [];
+    let cols: TableColumn[] = [];
 
     if (resultsConfig.enabled)
     {
@@ -110,7 +109,9 @@ export default class ResultsTable extends TerrainComponent<Props>
         cols.push({
           key: resultsConfig.name,
           name: resultsConfig.name,
+          filterable: true,
           resizable: true,
+          sortable: true,
         });
       }
 
@@ -119,7 +120,9 @@ export default class ResultsTable extends TerrainComponent<Props>
         cols.push({
           key: resultsConfig.score,
           name: resultsConfig.score,
+          filterable: true,
           resizable: true,
+          sortable: true,
         });
       }
     }
@@ -131,19 +134,23 @@ export default class ResultsTable extends TerrainComponent<Props>
           cols.push({
             key: field,
             name: field,
+            filterable: true,
             resizable: true,
+            sortable: true,
           }),
       );
     }
     else
     {
-      const resultFields = props.results.size ? props.results.get(0).fields : Immutable.Map({});
+      const resultFields = props.results.size ? props.results.get(0).fields : Map({});
       resultFields.map(
         (value, field) =>
           cols.push({
             key: field,
             name: field,
+            filterable: true,
             resizable: true,
+            sortable: true,
             width: 120,
           }),
       );
@@ -172,7 +179,7 @@ export default class ResultsTable extends TerrainComponent<Props>
       }
     }
 
-    return Immutable.List(cols);
+    return List(cols);
   }
 
   public componentDidMount()
@@ -181,117 +188,186 @@ export default class ResultsTable extends TerrainComponent<Props>
       isMounted: true,
       stateKey: 'spotlightState',
     });
+
+    this.setState({ rows: this.props.results });
   }
-
-  // getKey(col: number): string
-  // {
-  //   let config = this.state.resultsConfig;
-  //   let hasName = this.hasName();
-  //   let hasScore = this.hasScore();
-
-  //   if(col === 0 && hasName)
-  //   {
-  //     return config.name;
-  //   }
-  //   if(col === 0 && hasScore)
-  //   {
-  //     return config.score;
-  //   }
-  //   if(col === 1 && hasName && hasScore)
-  //   {
-  //     return config.score;
-  //   }
-
-  //   let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
-  //   let fieldIndex = col - offset;
-  //   return config.fields.get(fieldIndex);
-  // }
 
   public getRow(i: number): object
   {
-    // TODO
-    return this.props.results.get(i).fields.toJS();
-    // let field = this.getKey(col);
-    // let {results} = this.props;
-    // let {resultsConfig} = this.state;
-    // let primaryKey = getPrimaryKeyFor(results && results.get(i), resultsConfig);
-    // let spotlight = col === 0
-    //   && this.state.spotlightState
-    //   && this.state.spotlightState.getIn(['spotlights', primaryKey]);
-
-    // return (
-    //   <div>
-    //     {
-    //       spotlight &&
-    //         <div
-    //           className='result-spotlight'
-    //           style={{
-    //             background: spotlight.color,
-    //           }}
-    //         />
-    //     }
-    //     {
-    //       getResultValue(results && results.get(i), field, resultsConfig)
-    //     }
-    //   </div>
-    // );
+    return this.state.rows.get(i).fields.toJS();
   }
 
-  // hasScore(): boolean
-  // {
-  //   return this.state.resultsConfig.score !== "";
-  // }
-
-  // hasName(): boolean
-  // {
-  //   return this.state.resultsConfig.name !== "";
-  // }
-
-  public handleCellClick(r: number, c: number)
+  public onRowsSelected(rows)
   {
-    this.props.onExpand(r);
+    const rowIndexes = rows.map((r) =>
+    {
+      this.spotlight(r.rowIdx);
+      return r.rowIdx;
+    });
+    this.setState({ selectedIndexes: this.state.selectedIndexes.concat(rowIndexes) });
   }
 
-  public spotlight(menuIndex: number, rc: string)
+  public onRowsDeselected(rows)
   {
-    // TODO
-    const row = rc.split('-')[0];
-    const col = rc.split('-')[1];
-    const result = this.props.results && this.props.results.get(+row);
+    const rowIndexes = rows.map((r) =>
+    {
+      this.unspotlight(r.rowIdx);
+      return r.rowIdx;
+    });
+    this.setState({ selectedIndexes: this.state.selectedIndexes.filter((i) => rowIndexes.indexOf(i) === -1) });
+  }
+
+  public handleGridSort(sortColumn, sortDirection)
+  {
+    const comparer = (aa, bb) =>
+    {
+      const a = aa.fields.get(sortColumn);
+      const b = bb.fields.get(sortColumn);
+
+      if (sortDirection === 'ASC')
+      {
+        return (a > b) ? 1 : -1;
+      }
+      else if (sortDirection === 'DESC')
+      {
+        return (a < b) ? 1 : -1;
+      }
+      else
+      {
+        return 0;
+      }
+    };
+
+    let rows;
+    if (sortDirection === 'NONE')
+    {
+      rows = this.props.results;
+    }
+    else
+    {
+      rows = this.state.rows.sort(comparer);
+    }
+
+    if (this.state.selectedIndexes.size > 0)
+    {
+      const primaryKeys = this.state.selectedIndexes.map(
+        (v) => this.state.rows && this.state.rows.get(v).primaryKey,
+      );
+
+      const selectedIndexes = [];
+      rows.map((r, idx) =>
+      {
+        if (primaryKeys.includes(r.fields.get('_id')))
+        {
+          selectedIndexes.push(idx);
+        }
+      });
+
+      this.setState({
+        rows,
+        selectedIndexes: List(selectedIndexes),
+      });
+    }
+    else
+    {
+      this.setState({
+        rows,
+      });
+    }
+  }
+
+  public handleFilterChange(filter)
+  {
+    if (filter.filterTerm === '')
+    {
+      this.clearFilters();
+    }
+    else
+    {
+      this.setState({
+        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm.toLowerCase()))),
+      });
+    }
+  }
+
+  public clearFilters()
+  {
+    this.setState({ rows: this.props.results });
+  }
+
+  public spotlight(row: number)
+  {
+    const result = this.state.rows && this.state.rows.get(row);
     const id = result.primaryKey;
-    const spotlightColor = ColorManager.colorForKey(id);
+    const spotlightColor = ColorManager.altColorForKey(id);
 
-    const spotlightData = _.extend({}, result);
+    const spotlightData = result.toJS();
     spotlightData['name'] = getResultName(result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
   }
 
+  public unspotlight(row: number)
+  {
+    const result = this.state.rows && this.state.rows.get(row);
+    spotlightAction(result.primaryKey, null);
+  }
+
+  public rowRenderer(props)
+  {
+    if (this.state.selectedIndexes.includes(props.idx))
+    {
+      const result = this.state.rows && this.state.rows.get(props.idx);
+      const id = result.primaryKey;
+      const spotlight = this.state.spotlightState.getIn(['spotlights', id]);
+      if (spotlight === undefined)
+      {
+        return (<ReactDataGrid.Row {...props} />);
+      }
+
+      return (
+        <div
+          style={{
+            backgroundColor: spotlight.color,
+          }}>
+          <ReactDataGrid.Row {...props} />
+        </div>
+      );
+    }
+
+    return (<ReactDataGrid.Row {...props} />);
+  }
+
   public render()
   {
-    if (!this.props.results)
+    if (!this.state.rows)
     {
       return <InfoArea large='Loading...' />;
     }
 
-    // let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
-    // let fieldCount = this.state.resultsConfig.fields.size + pinnedCols;
-
-    // if(!fieldCount && this.props.results.size)
-    // {
-    //   fieldCount = this.props.results.get(0).fields.size;
-    // }
-    // console.log(this.state.columns);
     return (
       <Table
+        onGridSort={this.handleGridSort}
         columns={this.state.columns}
+        rows={this.state.rows}
         rowGetter={this.getRow}
-        rowsCount={this.props.results.size}
+        rowsCount={this.state.rows.size}
         random={this.state.random}
-        onCellClick={this.handleCellClick}
-        menuOptions={this.menuOptions}
-        rowKey={'id' /*TODO*/}
+        rowRenderer={this.rowRenderer}
+        rowKey={'_id' /*TODO*/}
+        rowSelection={{
+          showCheckbox: true,
+          enableShiftSelect: true,
+          onRowsSelected: this.onRowsSelected,
+          onRowsDeselected: this.onRowsDeselected,
+          selectBy: {
+            indexes: this.state.selectedIndexes.toJS(),
+          },
+        }}
+        toolbar={<Toolbar enableFilter={true} filterRowsButtonText={'Search Within Results'} />}
+        onAddFilter={this.handleFilterChange}
+        onClearFilters={this.clearFilters}
       />
     );
   }

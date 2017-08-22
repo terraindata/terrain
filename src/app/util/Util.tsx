@@ -50,9 +50,9 @@ import * as $ from 'jquery';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 const suffixes = ['', ' k', ' M', ' B'];
@@ -209,21 +209,21 @@ const Util = {
   {
     const then = moment(date);
     const now = moment();
-    const hour = ' at ' + then.format('h:mma');
 
     if (then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
-      return 'Today at' + hour;
+      const hour = then.format('h:mma');
+      return 'Today, ' + hour;
     }
 
     if (then.format('YYYY') === now.format('YYYY'))
     {
       // same year
-      return then.format('MM/DD/YY') + hour;
+      return then.format('MM/DD/YY');
     }
 
-    return then.format('MM/DD/YY') + hour;
+    return then.format('MM/DD/YY');
   },
 
   roundNumber(num, decimalPoints)
@@ -613,6 +613,19 @@ const Util = {
       return 0; // It is not IE
     }
   },
+
+  sortDatabases(dbs)
+  {
+    return dbs.sort((a, b) =>
+    {
+      if (a.type === b.type)
+      {
+        return a.name.localeCompare(b.name);
+      }
+      return a.type.localeCompare(b.type);
+    });
+  },
+
 };
 
 export default Util;

@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as nodeScheduler from 'node-schedule';
 import * as winston from 'winston';
-import * as Util from '../Util';
 
 export interface SchedulerConfig
 {

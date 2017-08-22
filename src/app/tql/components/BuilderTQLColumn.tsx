@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import './BuilderTQLColumn.less';
 const { List } = Immutable;
 import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
@@ -57,10 +56,8 @@ import Query from '../../../items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
 import { MenuOption } from '../../common/components/Menu';
 import * as LibraryTypes from '../../library/LibraryTypes';
-import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import BuilderActions from './../../builder/data/BuilderActions';
 import Menu from './../../common/components/Menu';
-import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
@@ -186,30 +183,12 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     });
   }
 
-  public changeThemeNeo()
-  {
-    localStorage.setItem('theme', 'neo');
-    this.setState({
-      theme: 'neo',
-      theme_index: 1,
-    });
-  }
-
-  public changeThemeCobalt()
-  {
-    localStorage.setItem('theme', 'cobalt');
-    this.setState({
-      theme: 'cobalt',
-      theme_index: 2,
-    });
-  }
-
   public changeThemeMonokai()
   {
     localStorage.setItem('theme', 'monokai');
     this.setState({
       theme: 'monokai',
-      theme_index: 3,
+      theme_index: 0,
     });
   }
 
@@ -217,12 +196,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   {
     switch (this.state.theme)
     {
-      case 'monokai':
-        return 3;
-      case 'cobalt':
-        return 2;
-      case 'neo':
-        return 1;
       default:
         return 0;
     }
@@ -246,26 +219,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   {
     const options: List<MenuOption> =
       List([
-        {
-          text: 'Plain',
-          onClick: this.changeThemeDefault,
-          disabled: this.getThemeIndex() === 0,
-        },
-        {
-          text: 'Neo',
-          onClick: this.changeThemeNeo,
-          disabled: this.getThemeIndex() === 1,
-        },
-        {
-          text: 'Cobalt',
-          onClick: this.changeThemeCobalt,
-          disabled: this.getThemeIndex() === 2,
-        },
-        {
-          text: 'Monokai',
-          onClick: this.changeThemeMonokai,
-          disabled: this.getThemeIndex() === 3,
-        },
         {
           text: 'Auto',
           onClick: this.changeRunModeToAuto,

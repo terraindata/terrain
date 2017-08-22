@@ -47,10 +47,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands no-unused-expression
 
 import * as React from 'react';
-import { Link } from 'react-router';
 import * as UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
-import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import RadioButtons from './../../common/components/RadioButtons';
 import TerrainComponent from './../../common/components/TerrainComponent';

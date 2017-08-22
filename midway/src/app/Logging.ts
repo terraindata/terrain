@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
 import dateFormat = require('date-format');
+import * as winston from 'winston';
 
 winston.configure(
   {

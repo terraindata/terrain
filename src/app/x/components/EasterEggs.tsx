@@ -46,12 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty-interface prefer-const max-line-length strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './EasterEggs.less';

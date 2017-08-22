@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 import './Periscope.less';
 
+import { Colors } from '../../../common/Colors';
+
 // consider upgrading d3 to v4, which has available types
 // import * as d3 from 'd3';
 const d3 = require('d3');
@@ -94,6 +96,13 @@ const Periscope = {
       .attr('class', 'handles');
 
     this.update(el, state);
+
+    const styleCSS = `
+    .periscope .tick text {
+      fill: ${Colors().text2} !important;
+    }
+    `;
+    const style = $(el).append(`<style>${styleCSS}</style>`);
   },
 
   update(el, state)

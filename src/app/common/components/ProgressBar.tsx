@@ -81,10 +81,10 @@ class ProgressBar extends TerrainComponent<Props>
         })}
       >
         <div
-          className="progressbar-text"
+          className='progressbar-text'
         >
           <span
-            className="progressbar-text-percentage"
+            className='progressbar-text-percentage'
           >
             {
               String(Math.round(100 * Number(this.props.progress))) + '%'

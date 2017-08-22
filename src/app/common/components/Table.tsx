@@ -44,17 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions interface-name
+// tslint:disable:no-var-requires strict-boolean-expressions
 
+import { List } from 'immutable';
 import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
-import * as _ from 'underscore';
 
 import './Table.less';
 
-import * as classNames from 'classnames';
-import { Menu, MenuOption } from '../../common/components/Menu';
-import Util from '../../util/Util';
+import { MenuOption } from '../../common/components/Menu';
 import TerrainComponent from './TerrainComponent';
 const Dimensions = require('react-dimensions');
 
@@ -63,17 +61,22 @@ const LEFT_COLOR_TO = hexToRgb('#828c76');
 const TOP_COLOR_FROM = hexToRgb('#565d4e');
 const TOP_COLOR_TO = hexToRgb('#3e3c3c');
 
-export interface IColumn
+export interface TableColumn
 {
   key: string;
   name: string;
   resizable?: boolean;
+  sortable?: boolean;
+  filterable?: boolean;
   width?: number;
 }
 
 export interface Props
 {
-  columns: List<IColumn>;
+  columns: List<TableColumn>;
+  onGridSort: (sortColumn, sortDirection) => void;
+  rows: List<any>;
+  rowSelection?: object;
   rowGetter: (index: number) => object;
   rowsCount: number;
   // rows: List<Map<any, any>>;
@@ -82,19 +85,20 @@ export interface Props
   menuOptions?: List<MenuOption>;
   rowKey: string;
   rowHeight?: number;
+  toolbar?: object;
+  onAddFilter?: (filter: object) => void;
+  onClearFilters?: () => void;
 
   containerWidth?: number;
   containerHeight?: number;
 }
 
-const HEADER_ROW_HEIGHT = 35;
-const MAX_INIT_HEIGHT = 40;
-const MAX_INIT_WIDTH = 300;
-
-class TableComponent extends TerrainComponent<Props>
+export class TableComponent extends TerrainComponent<Props>
 {
   public state: {
+    rows: List<any>;
   } = {
+    rows: List([]),
   };
 
   constructor(props: Props)

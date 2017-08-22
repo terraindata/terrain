@@ -46,12 +46,12 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name strict-boolean-expressions member-access comment-format
 
-import * as Immutable from 'immutable';
+import { List, Map, Record } from 'immutable';
+
+import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
+import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
-const { List } = Immutable;
-import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
-import { _ResultsConfig, ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../database/AllBackends';
 
 // A query can be viewed and edited in the Builder
@@ -85,16 +85,15 @@ class QueryC
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
 
   cardsAndCodeInSync: boolean = false;
-  parseError: string = null;
 
-  meta: IMMap<string, any> = Immutable.Map<string, any>({});
+  meta: IMMap<string, any> = Map<string, any>({});
 
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields = ['dbFields', 'excludeFields'];
 
   modelVersion = 2; // 2 is for the first version of Node midway
 }
-const Query_Record = Immutable.Record(new QueryC());
+const Query_Record = Record(new QueryC());
 export interface Query extends QueryC, IRecord<Query> { }
 
 export const _Query = (config?: object) =>
@@ -104,7 +103,7 @@ export const _Query = (config?: object) =>
   config['cards'] = BlockUtils.recordFromJS(config['cards'] || [], Blocks);
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
-  config['meta'] = Immutable.Map<string, any>(config['meta']);
+  config['meta'] = Map<string, any>(config['meta']);
 
   const query = new Query_Record(config) as any as Query;
 

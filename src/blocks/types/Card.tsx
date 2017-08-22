@@ -46,12 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as _ from 'underscore';
-import * as BlockUtils from '../BlockUtils';
+import * as _ from 'lodash';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
 
-export type InitFn = (blockSpec: { [type: string]: BlockConfig }) => {
+export type InitFn = (blockSpec: { [type: string]: BlockConfig }, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) => {
   [k: string]: any;
 };
 

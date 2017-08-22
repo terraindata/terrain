@@ -44,18 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import * as _ from 'underscore';
-import TerrainAreaChart from '../../charts/TerrainAreaChart';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
-import InfoArea from './../../common/components/InfoArea';
+import TerrainAreaChart from '../../charts/components/TerrainAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import UserActions from './../../users/data/UserActions';
-import Actions from './../data/LibraryActions';
 import { LibraryState } from './../data/LibraryStore';
-import Store from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import GroupsColumn from './GroupsColumn';
@@ -98,13 +94,6 @@ class Library extends TerrainComponent<any>
     zoomDomain: {},
   };
 
-  constructor(props)
-  {
-    super(props);
-
-    this.state.libraryState = props.store ? props.store.getState() : Store.getState();
-  }
-
   public componentWillMount()
   {
     const { basePath } = this.props;
@@ -122,11 +111,6 @@ class Library extends TerrainComponent<any>
 
   public componentDidMount()
   {
-    this._subscribe(Store, {
-      stateKey: 'libraryState',
-      isMounted: true,
-    });
-
     RolesActions.fetch();
     UserActions.fetch();
   }
@@ -135,14 +119,18 @@ class Library extends TerrainComponent<any>
   {
     return [...Array(20).keys()].map((i) =>
     {
-      return { x: i, y: _.random(1, 100) };
+      const time = new Date(2017, 8, i, 0, 0, 0);
+      return { time, value: _.random(1, 100) };
     });
   }
 
   public getDatasets()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState } = this.props;
     const { variants, selectedVariants } = libraryState;
+
+    let metricId = 0;
+    const metricName = 'Click Through Rate';
 
     const datasets = variants
       .filter((variant) =>
@@ -151,10 +139,11 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        return { id: +variant.id, name: variant.name, data: this.getData() };
+        metricId += 1;
+        return { metric: { id: metricId, name: metricName }, data: this.getData() };
       });
 
-    return datasets.toList();
+    return datasets.toMap();
   }
 
   public getLastPath()
@@ -176,9 +165,17 @@ class Library extends TerrainComponent<any>
 
   public render()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState } = this.props;
 
-    const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
+    const {
+      dbs,
+      groups,
+      algorithms,
+      variants,
+      selectedVariants,
+      groupsOrder,
+    } = libraryState;
+
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
 
@@ -248,17 +245,21 @@ class Library extends TerrainComponent<any>
               groupsOrder,
               params,
               basePath,
+              groupActions: this.props.libraryGroupActions,
             }}
             isFocused={algorithm === undefined}
           />
           <AlgorithmsColumn
             {...{
+              dbs,
+              groups,
               algorithms,
               variants,
               algorithmsOrder,
               groupId,
               params,
               basePath,
+              algorithmActions: this.props.libraryAlgorithmActions,
             }}
             isFocused={variantIds !== null && variantIds.length === 0}
           />
@@ -273,20 +274,26 @@ class Library extends TerrainComponent<any>
               multiselect: variantsMultiselect,
               basePath,
               router,
+              variantActions: this.props.libraryVariantActions,
             }}
           />
           {!variantsMultiselect ?
             <LibraryInfoColumn
               {...{
+                dbs,
                 group,
                 algorithm,
                 variant,
+                groupActions: this.props.libraryGroupActions,
+                algorithmActions: this.props.libraryAlgorithmActions,
+                variantActions: this.props.libraryVariantActions,
+                libraryActions: this.props.libraryActions,
               }}
             /> : null}
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <TerrainAreaChart datasets={datasets} />
+            <TerrainAreaChart variants={variants} datasets={datasets} />
           </div> : null
         }
       </div>

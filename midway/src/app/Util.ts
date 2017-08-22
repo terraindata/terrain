@@ -44,21 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as asyncBusboy from 'async-busboy';
+import * as fs from 'fs';
+import * as http from 'http';
 import * as request from 'request';
+import * as rimraf from 'rimraf';
 import * as sha1 from 'sha1';
-import * as stream from 'stream';
 
-export function isJSON(str: string): boolean
+import { users } from './users/UserRouter';
+
+export async function authenticateStream(req: http.IncomingMessage): Promise<object>
 {
-  try
+  return new Promise<object>(async (resolve, reject) =>
   {
-    JSON.parse(str);
-  }
-  catch (e)
-  {
-    return false;
-  }
-  return true;
+    const { files, fields } = await asyncBusboy(req);
+    const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+    resolve({ files, fields, user });
+  });
 }
 
 export function buildDesiredHash(nameToType: object): string
@@ -130,6 +132,19 @@ export function getRequest(url)
   });
 }
 
+export function isJSON(str: string): boolean
+{
+  try
+  {
+    JSON.parse(str);
+  }
+  catch (e)
+  {
+    return false;
+  }
+  return true;
+}
+
 export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
   return (error: Error, response: T) =>
@@ -143,6 +158,46 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
       resolve(response);
     }
   };
+}
+
+export function makePromiseCallbackVoid(resolve: () => void, reject: (Error) => void)
+{
+  return (error: Error) =>
+  {
+    if (error !== null && error !== undefined)
+    {
+      reject(error);
+    }
+    else
+    {
+      resolve();
+    }
+  };
+}
+
+export async function mkdir(dirName: string)
+{
+  return new Promise((resolve, reject) =>
+  {
+    fs.mkdir(dirName, makePromiseCallbackVoid(resolve, reject));
+  });
+}
+
+export async function readFile(fileName: string, options: object)
+{
+  return new Promise((resolve, reject) =>
+  {
+    fs.readFile(fileName, options, makePromiseCallback(resolve, reject));
+  });
+}
+
+/* differs from File System's rmdir in that no error is thrown if the directory does not exist */
+export async function rmdir(dirName: string)
+{
+  return new Promise((resolve, reject) =>
+  {
+    rimraf(dirName, makePromiseCallbackVoid(resolve, reject));
+  });
 }
 
 export function updateObject<T>(obj: T, newObj: T): T
@@ -171,4 +226,12 @@ export function verifyParameters(parameters: any, required: string[]): void
       throw new Error('Parameter "' + key + '" not found in request object.');
     }
   }
+}
+
+export async function writeFile(fileName: string, data: string, options: object)
+{
+  return new Promise((resolve, reject) =>
+  {
+    fs.writeFile(fileName, data, options, makePromiseCallbackVoid(resolve, reject));
+  });
 }

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import { DragDropContext } from 'react-dnd';
-import Library from './Library';
+import Library from '../containers/LibraryContainer';
 
 import HTML5Backend = require('react-dnd-html5-backend');
 

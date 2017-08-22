@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import EQLConfig from '../EQLConfig';
 import ESClauseSettings from '../ESClauseSettings';

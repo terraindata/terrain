@@ -54,12 +54,12 @@ import { ItemType } from '../../../items/types/Item';
 
 describe('Library', () =>
 {
-  let initialState: LibraryState = _LibraryState({
+  let library: LibraryState = _LibraryState({
     groups: Immutable.Map<number, LibraryTypes.Group>({}),
     variants: Immutable.Map<number, LibraryTypes.Variant>({}),
   });
 
-  initialState = initialState.set('groups', initialState.groups.set(1, LibraryTypes._Group({
+  library = library.set('groups', library.groups.set(1, LibraryTypes._Group({
     type: ItemType.Group,
     id: 1,
     name: 'Group 1',
@@ -71,21 +71,20 @@ describe('Library', () =>
     parent: 0,
   })));
 
-  initialState = initialState.set('variants', initialState.variants.set(3, LibraryTypes._Variant({
+  library = library.set('variants', library.variants.set(3, LibraryTypes._Variant({
     id: 3,
     name: 'Variant 1',
   })));
 
   const mockStore = configureStore();
-  let store = null;
+  const store = null;
   let libraryComponent = null;
 
   beforeEach(() =>
   {
-    store = mockStore(initialState);
     libraryComponent = shallow(
       <Library
-        store={store}
+        library={library}
         router={{ params: { groupId: '1' } }}
       />,
     );

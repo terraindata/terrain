@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
@@ -53,16 +52,16 @@ import * as Util from '../Util';
 
 export interface ImportTemplateBase
 {
-  dbid: number;           // instance id
-  dbname: string;         // for elastic, index name
-  tablename: string;      // for elastic, type name
-
-  // array of strings (oldName)
-  originalNames: string[];
   // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
   // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
   columnTypes: object;
-  primaryKey: string;  // newName of primary key
+  dbid: number;           // instance id
+  dbname: string;         // for elastic, index name
+  export?: boolean;       // export type template
+  originalNames: string[];    // array of strings (oldName)
+  primaryKeyDelimiter?: string;
+  primaryKeys: string[];  // newName of primary key(s)
+  tablename: string;      // for elastic, type name
   transformations: object[];  // list of in-order data transformations
 }
 
@@ -71,18 +70,29 @@ export interface ImportTemplateConfig extends ImportTemplateBase
   id?: number;
   name: string;
 }
+
 interface ImportTemplateConfigStringified
+{
+  columnTypes: string;
+  dbid: number;
+  dbname: string;
+  export: boolean;
+  id?: number;
+  name: string;
+  originalNames: string;
+  primaryKeyDelimiter: string;
+  primaryKeys: string;
+  tablename: string;
+  transformations: string;
+}
+
+export interface ExportTemplateConfig extends ImportTemplateBase
 {
   id?: number;
   name: string;
-
-  dbid: number;
-  dbname: string;
-  tablename: string;
-  originalNames: string;
-  columnTypes: string;
-  primaryKey: string;
-  transformations: string;
+  query?: string;
+  templateID?: number;
+  variantId?: number;
 }
 
 export class ImportTemplates
@@ -95,16 +105,61 @@ export class ImportTemplates
       'importTemplates',
       ['id'],
       [
-        'name',
+        'columnTypes',
         'dbid',
         'dbname',
-        'tablename',
+        'export',
+        'name',
         'originalNames',
-        'columnTypes',
-        'primaryKey',
+        'primaryKeyDelimiter',
+        'primaryKeys',
+        'tablename',
         'transformations',
       ],
     );
+  }
+
+  public async delete(user: UserConfig, id: number): Promise<ImportTemplateConfig[]>
+  {
+    return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
+    {
+      const results: ImportTemplateConfig[] = await this.get(id);
+      // template id specified but template not found
+      if (results.length === 0)
+      {
+        return reject('Invalid template id passed');
+      }
+
+      const deleted: ImportTemplateConfigStringified[] =
+        await App.DB.delete(this.templateTable, { id }) as ImportTemplateConfigStringified[];
+      resolve(this._parseConfig(deleted) as ImportTemplateConfig[]);
+    });
+  }
+
+  public async get(id?: number): Promise<ImportTemplateConfig[]>
+  {
+    const filter: object = (id !== undefined) ? { id } : {};
+    return this.select([], filter);
+  }
+
+  public async getExport(id?: number): Promise<ImportTemplateConfig[]>
+  {
+    const filter: object = { export: true };
+    if (id !== undefined)
+    {
+      filter['id'] = id;
+    }
+    return this.select([], filter);
+  }
+
+  public async getImport(id?: number): Promise<ImportTemplateConfig[]>
+  {
+    const filter: object = { export: false };
+    if (id !== undefined)
+    {
+      filter['id'] = id;
+    }
+    return this.select([], filter);
   }
 
   public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>
@@ -115,12 +170,6 @@ export class ImportTemplates
         await App.DB.select(this.templateTable, columns, filter) as ImportTemplateConfigStringified[];
       resolve(this._parseConfig(templates) as ImportTemplateConfig[]);
     });
-  }
-
-  public async get(id?: number): Promise<ImportTemplateConfig[]>
-  {
-    const filter: object = (id !== undefined) ? { id } : {};
-    return this.select([], filter);
   }
 
   public async upsert(user: UserConfig, template: ImportTemplateConfig): Promise<ImportTemplateConfig>
@@ -144,23 +193,6 @@ export class ImportTemplates
     });
   }
 
-  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateConfigStringified
-  {
-    const stringified: ImportTemplateConfigStringified =
-      {
-        id: template['id'],
-        name: template['name'],
-        dbid: template['dbid'],
-        dbname: template['dbname'],
-        tablename: template['tablename'],
-        originalNames: JSON.stringify(template['originalNames']),
-        columnTypes: JSON.stringify(template['columnTypes']),
-        primaryKey: template['primaryKey'],
-        transformations: JSON.stringify(template['transformations']),
-      };
-    return stringified;
-  }
-
   private _parseConfig(stringified: ImportTemplateConfigStringified | ImportTemplateConfigStringified[]):
     ImportTemplateConfig | ImportTemplateConfig[]
   {
@@ -174,17 +206,39 @@ export class ImportTemplates
   {
     const template: ImportTemplateConfig =
       {
-        id: stringified['id'],
-        name: stringified['name'],
+        columnTypes: JSON.parse(stringified['columnTypes']),
         dbid: stringified['dbid'],
         dbname: stringified['dbname'],
-        tablename: stringified['tablename'],
+        export: stringified['export'],
+        id: stringified['id'],
+        name: stringified['name'],
         originalNames: JSON.parse(stringified['originalNames']),
-        columnTypes: JSON.parse(stringified['columnTypes']),
-        primaryKey: stringified['primaryKey'],
+        primaryKeyDelimiter: stringified['primaryKeyDelimiter'],
+        primaryKeys: JSON.parse(stringified['primaryKeys']),
+        tablename: stringified['tablename'],
         transformations: JSON.parse(stringified['transformations']),
       };
     return template;
+  }
+
+  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateConfigStringified
+  {
+    const stringified: ImportTemplateConfigStringified =
+      {
+        columnTypes: JSON.stringify(template['columnTypes']),
+        dbid: template['dbid'],
+        dbname: template['dbname'],
+        export: template['export'] === true ? true : false,
+        id: template['id'],
+        name: template['name'],
+        originalNames: JSON.stringify(template['originalNames']),
+        // hack around silly linter complaint below
+        primaryKeyDelimiter: (template['primaryKeyDelimiter'] === undefined ? '-' : template['primaryKeyDelimiter']) as string,
+        primaryKeys: JSON.stringify(template['primaryKeys']),
+        tablename: template['tablename'],
+        transformations: JSON.stringify(template['transformations']),
+      };
+    return stringified;
   }
 }
 

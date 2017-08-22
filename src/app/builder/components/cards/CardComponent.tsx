@@ -53,8 +53,6 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 const { createDragPreview } = require('react-dnd-text-dragpreview');
 import { Display } from '../../../../blocks/displays/Display';
@@ -62,9 +60,7 @@ import { Card } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import LayoutManager from '../layout/LayoutManager';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import ManualPopup from './../../../manual/components/ManualPopup';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
@@ -72,7 +68,7 @@ import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, cardStyle, Colors, fontColor, link } from '../../../common/Colors';
+import { cardStyle, Colors } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -548,65 +544,66 @@ class _CardComponent extends TerrainComponent<Props>
           )}
           ref='cardInner'
         >
-          {
-            !card['cannotBeMoved'] &&
-            connectDragSource(
+          <div
+            className={classNames({
+              'card-title': true,
+              'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
+              'card-title-card-hovering': this.state.hovering,
+            })}
+            style={{
+              // shrink the width if the card does not have a title
+              // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+              width: NO_TITLE_WIDTH,
+            }}
+            onClick={this.handleTitleClick}
+          >
+            {
+              this.props.canEdit &&
+              !card['cannotBeMoved'] &&
+              connectDragSource(
+                <div
+                  className='card-handle-icon'
+                >
+                  <HandleIcon />
+                </div>,
+              )
+            }
+            {
+              this.state.hovering &&
+              <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
+            }
+            {
+              this.props.canEdit &&
+              !card['cannotBeMoved'] &&
+              <Menu
+                options={this.state.menuOptions}
+                openRight={true}
+              />
+            }
+            {
+              !(this.props.card && this.props.card['noTitle']) &&
               <div
-                className={classNames({
-                  'card-title': true,
-                  'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
-                  'card-title-card-hovering': this.state.hovering,
-                })}
+                className='card-title-inner'
                 style={{
-                  // shrink the width if the card does not have a title
-                  // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
-                  width: NO_TITLE_WIDTH,
+                  color: card.static.colors[0],
                 }}
-                onClick={this.handleTitleClick}
               >
                 {
-                  this.props.canEdit &&
-                  <HandleIcon
-                    className='card-handle-icon'
-                  />
+                  title
                 }
-                {
-                  this.state.hovering &&
-                  <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
-                }
-                {
-                  this.props.canEdit &&
-                  <Menu
-                    options={this.state.menuOptions}
-                    openRight={true}
-                  />
-                }
-                {
-                  !(this.props.card && this.props.card['noTitle']) &&
-                  <div
-                    className='card-title-inner'
-                    style={{
-                      color: card.static.colors[0],
-                    }}
-                  >
-                    {
-                      title
-                    }
-                  </div>
-                }
+              </div>
+            }
 
-                {
-                  !this.props.card.closed ? null :
-                    <div className={classNames({
-                      'card-preview': true,
-                      'card-preview-hidden': this.state.opening,
-                    })}>
-                      {BlockUtils.getPreview(card)}
-                    </div>
-                }
-              </div>,
-            )
-          }
+            {
+              !this.props.card.closed ? null :
+                <div className={classNames({
+                  'card-preview': true,
+                  'card-preview-hidden': this.state.opening,
+                })}>
+                  {BlockUtils.getPreview(card)}
+                </div>
+            }
+          </div>
 
           {
             (!this.props.card.closed || this.state.opening) &&

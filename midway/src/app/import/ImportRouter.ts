@@ -44,43 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { users } from '../users/UserRouter';
+import { HA } from '../App';
 import * as Util from '../Util';
-import { Import, ImportConfig } from './Import';
+import { ExportConfig, Import } from './Import';
 
 const Router = new KoaRouter();
-export const imprt: Import = new Import();
+const imprt: Import = new Import();
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', async (ctx, next) =>
 {
   winston.info('importing to database');
-  const imprtConf: ImportConfig = ctx.request.body.body;
-  Util.verifyParameters(imprtConf, ['contents', 'dbid', 'dbname', 'tablename', 'filetype', 'update', 'streaming']);
-  Util.verifyParameters(imprtConf, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
-
-  ctx.body = await imprt.upsert(imprtConf);
-});
-
-Router.post('/headless', async (ctx, next) =>
-{
-  winston.info('importing to database, from file and template id');
-  const { files, fields } = await asyncBusboy(ctx.req);
-  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-  if (user === null)
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
   {
     ctx.status = 400;
     return;
   }
 
-  Util.verifyParameters(fields, ['templateID', 'filetype']);
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
+  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   // optional parameters: update, hasCsvHeader
 
-  ctx.body = await imprt.upsertHeadless(files, fields);
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
+});
+
+Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const requestObj: object = JSON.parse(ctx.request.body.data).body;
+  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
+  const exprtConf: ExportConfig = requestObj as ExportConfig;
+  const exportReturn: stream.Readable | string = await imprt.export(exprtConf, false);
+  ctx.type = 'text/plain';
+  ctx.attachment(ctx.request.body.filename);
+  ctx.body = exportReturn;
+});
+
+Router.post('/export/headless', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const exprtConf: ExportConfig = ctx.request.body.body;
+  Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
+  const exportReturn: stream.Readable | string = await imprt.export(exprtConf, true);
+  ctx.body = exportReturn;
+});
+
+Router.post('/headless', async (ctx, next) =>
+{
+  winston.info('importing to database, from file and template id');
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+
+  Util.verifyParameters(authStream['fields'], ['filetype', 'templateID']);
+  // optional parameters: update, hasCsvHeader
+
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
+});
+
+Router.post('/progress', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const progress: number | string = await imprt.getProgress();
+  ctx.body = progress;
 });
 
 export default Router;

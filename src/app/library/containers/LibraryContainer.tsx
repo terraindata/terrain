@@ -44,92 +44,38 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-/* returns an error message if there are any; else returns empty string */
-export function isValidIndexName(name: string): string
+import * as _ from 'lodash';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import Library from '../components/Library';
+import LibraryActions from '../data/LibraryActions';
+
+const mapStateToProps = (state) =>
 {
-  if (name === '')
-  {
-    return 'Index name cannot be an empty string.';
-  }
-  if (name !== name.toLowerCase())
-  {
-    return 'Index name may not contain uppercase letters.';
-  }
-  if (!/^[a-z\d].*$/.test(name))
-  {
-    return 'Index name must start with a lowercase letter or digit.';
-  }
-  if (!/^[a-z\d][a-z\d\._\+-]*$/.test(name))
-  {
-    return 'Index name may only contain lowercase letters, digits, periods, underscores, dashes, and pluses.';
-  }
-  return '';
-}
-/* returns an error message if there are any; else returns empty string */
-export function isValidTypeName(name: string): string
+  return {
+    library: state.get('library'),
+  };
+};
+
+function mapDispatchToProps(dispatch)
 {
-  if (name === '')
-  {
-    return 'Document type cannot be an empty string.';
-  }
-  if (/^_.*/.test(name))
-  {
-    return 'Document type may not start with an underscore.';
-  }
-  return '';
-}
-/* returns an error message if there are any; else returns empty string */
-export function isValidFieldName(name: string): string
-{
-  if (name === '')
-  {
-    return 'Field name cannot be an empty string.';
-  }
-  if (/^_.*/.test(name))
-  {
-    return 'Field name may not start with an underscore.';
-  }
-  if (name.indexOf('.') !== -1)
-  {
-    return 'Field name may not contain periods.';
-  }
-  return '';
+  return {
+    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
+    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
+    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
+    libraryActions: bindActionCreators(
+      _.pick(
+        LibraryActions,
+        ['loadState', 'setDbs', 'fetch'],
+      ),
+      dispatch,
+    ),
+  };
 }
 
-export function parseJSONSubset(file: string, numLines: number): object[]
-{
-  let lineCount = 0;
-  let openBracketCount = 0;
-  let closeBracketCount = 0;
-  let charIndex = 0;
+const LibraryContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Library);
 
-  while (lineCount < numLines)
-  {
-    if (charIndex >= file.length - 1)
-    {
-      if (file.charAt(charIndex) === '\n')
-      {
-        charIndex--;
-      }
-      break;
-    }
-
-    if (file.charAt(charIndex) === '{')
-    {
-      openBracketCount++;
-    }
-    else if (file.charAt(charIndex) === '}')
-    {
-      closeBracketCount++;
-    }
-    charIndex++;
-
-    if (openBracketCount === closeBracketCount && openBracketCount !== 0)
-    {
-      lineCount++;
-      openBracketCount = 0;
-      closeBracketCount = 0;
-    }
-  }
-  return JSON.parse(file.substring(0, charIndex) + ']');
-}
+export default LibraryContainer;

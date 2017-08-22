@@ -46,12 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires member-access
 
-import { List, Map } from 'immutable';
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import { List } from 'immutable';
 import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import ElasticBlocks from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';

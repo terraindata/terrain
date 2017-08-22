@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-console
 
 import { List } from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -56,10 +56,10 @@ import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Backend } from '../../../database/types/Backend';
-import { Colors } from '../../common/Colors';
+import { Colors, getCardColors } from '../../common/Colors';
+
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
-import { BuilderStore } from '../data/BuilderStore';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 
@@ -147,7 +147,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: clause.name,
-      colors: [Colors().border2, Colors().bg2],
+      colors: getCardColors(clause.path[0], Colors().border2),
       language: 'elastic',
       description: clause.desc,
     }, obj['static']);
@@ -227,7 +227,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // first, populate the variant clause map, since it will be used by getCard
     this.computeVariantClauses(this.clauses);
 
-    _.mapObject(
+    _.mapValues(
       this.clauses,
       (clause, key) =>
       {
@@ -269,7 +269,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.anyClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.anyClause),
         title: clause.type + ' (Variant)',
         tql: (block, tqlFn, tqlConfig) =>
         {
@@ -294,7 +294,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.arrayClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
         preview: '[cards.size] ' + clause.type + '(s)',
 
         display:
@@ -304,10 +304,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           accepts: List(['eql' + clause.elementID]),
         },
 
-        init: (blocksConfig) =>
+        init: (blocksConfig, extraConfig?, skipTemplate?) =>
           ({
             cards: List([
-              BlockUtils.make(blocksConfig, 'eql' + clause.elementID),
+              BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
             ]),
           }),
 
@@ -323,9 +323,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
-      colors: Colors().builder.cards.baseClause,
+      colors: getCardColors(clause.path[0], Colors().builder.cards.baseClause),
       static: {
-        colors: Colors().builder.cards.baseClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.baseClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -342,7 +342,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       value: true,
 
       static: {
-        colors: Colors().builder.cards.booleanClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.booleanClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.DROPDOWN,
@@ -361,9 +361,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? clause.values[0] : clause.template,
-      colors: Colors().builder.cards.enumClause,
+      colors: getCardColors(clause.path[0], Colors().builder.cards.enumClause),
       static: {
-        colors: Colors().builder.cards.enumClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.enumClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.DROPDOWN,
@@ -381,7 +381,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
-        colors: Colors().builder.cards.fieldClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.fieldClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -401,7 +401,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
-        colors: Colors().builder.cards.indexClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.indexClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -428,7 +428,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.mapClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.mapClause),
         preview: '[cards.size] properties',
 
         display:
@@ -459,7 +459,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       noTitle: false,
       static: {
-        colors: Colors().builder.cards.nullClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.nullClause),
         preview: '',
         display: [],
         tql: () => null,
@@ -474,7 +474,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         ? 0 : clause.template,
       static: {
         preview: '[value]',
-        colors: Colors().builder.cards.numberClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.numberClause),
         display: {
           displayType: DisplayType.NUM,
           key: 'value',
@@ -493,7 +493,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       static:
       {
-        colors: Colors().builder.cards.objectClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.objectClause),
         preview: '[cards.size] properties',
 
         display:
@@ -544,7 +544,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
       static: {
-        colors: Colors().builder.cards.stringClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.stringClause),
         preview: '[value]',
 
         display: {
@@ -563,7 +563,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
-    const init = (blocksConfig) =>
+    const init = (blocksConfig, extraConfig?, skipTemplate?) =>
     {
       const config = {
         childOptionClickHandler: (card, option: { text: string, key: string, type: string }): Card =>
@@ -582,7 +582,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         },
       };
 
-      if (clause.template)
+      if (clause.template && skipTemplate !== true)
       {
         // create the card list from the template
         const cards = _.compact(
@@ -695,7 +695,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             return json;
           },
 
-          colors: Colors().builder.cards.structureClause,
+          colors: getCardColors(clause.path[0], Colors().builder.cards.structureClause),
           preview: '[cards.size] Properties',
 
           accepts,
@@ -725,7 +725,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause, {
       value: typeof clause.template === 'string' ? clause.template : '',
       static: {
-        colors: Colors().builder.cards.typeClause,
+        colors: getCardColors(clause.path[0], Colors().builder.cards.typeClause),
         preview: '[value]',
         display: {
           displayType: DisplayType.TEXT,
@@ -780,8 +780,37 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           return ''; // tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
         },
 
-        init: (blocksConfig) =>
-          ({
+        init: (blocksConfig, extraConfig?, skipTemplate?) =>
+        {
+          if (extraConfig !== undefined)
+          {
+            // This can happen if Elastic To Cards tries to generate a Variant card
+            //  we need to try to catch its value, and if it has a value,
+            //  create the type of card appropriate for the value.
+
+            let valueType: string;
+            const { value } = extraConfig;
+            if (value !== undefined)
+            {
+              valueType = typeof value;
+            }
+            else if (extraConfig['cards'] !== undefined)
+            {
+              valueType = 'object';
+            }
+
+            const clauseType = clause.subtypes[valueType];
+            if (clauseType !== undefined)
+            {
+              // we have a matching card type -- override with that type
+              const cardType = GetCardVisitor.getCardType(this.clauses[clauseType]);
+              return ({
+                type: cardType, // override our card type
+              });
+            }
+          }
+
+          return ({
             childOptionClickHandler:
             (card: Card, option: { text: string, type: string }): Card =>
             {
@@ -791,9 +820,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
                 {
                   key: card['key'],
                 },
+                skipTemplate,
               );
             },
-          }),
+          });
+        },
 
         // accepts,
 
@@ -819,7 +850,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private computeVariantClauses(clauses: { [name: string]: ESClause })
   {
     const variantClauses: { [clauseType: string]: ESClause } = {};
-    _.mapObject(clauses, (clause, key) =>
+    _.mapValues(clauses, (clause, key) =>
     {
       if (clause.clauseType === ESClauseType.ESVariantClause)
       {
@@ -831,7 +862,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     const getClauseTypesForVariant = (clause: ESVariantClause): string[] =>
     {
       let types: string[] = [];
-      _.mapObject(clause.subtypes, (subtype) =>
+      _.mapValues(clause.subtypes, (subtype) =>
       {
         if (variantClauses[subtype] !== undefined)
         {
@@ -851,15 +882,15 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       return types;
     };
 
-    this.variantClauseMapping = _.mapObject(variantClauses, getClauseTypesForVariant);
+    this.variantClauseMapping = _.mapValues(variantClauses, getClauseTypesForVariant);
   }
 
   // We need to replace occurences of variant card types with their final types
   // We also need to splice in some custom types
-  private getCardTypes(initialCardTypes: string[], forClause?: ESClause): List<string>
+  private getCardTypes(initialClauseTypes: string[], forClause?: ESClause): List<string>
   {
     let cardTypes: string[] = [];
-    initialCardTypes.map((childType) =>
+    initialClauseTypes.map((childType) =>
     {
       if (this.variantClauseMapping[childType] !== undefined)
       {
