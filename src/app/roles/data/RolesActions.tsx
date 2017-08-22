@@ -47,7 +47,10 @@ import * as RoleTypes from './../RoleTypes';
 import ActionTypes from './RolesActionTypes';
 import Store from './RolesStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+const $ = (type: string, payload: any) => {
+  Store.dispatch({ type, payload });
+  return { type, payload };
+};
 
 const RolesActions =
   {

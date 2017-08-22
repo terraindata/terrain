@@ -43,11 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+import Ajax from 'util/Ajax';
 import { ItemStatus } from '../../../items/types/Item';
 import * as LibraryTypes from './../LibraryTypes';
 import { _LibraryState, LibraryState } from './LibraryStore';
 import ActionTypes, { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
-import Ajax from 'util/Ajax';
 import * as Immutable from 'immutable';
 
 const LibraryReducers = {};

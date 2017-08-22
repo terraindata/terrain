@@ -47,7 +47,10 @@ import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
 import Store from './UserStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+const $ = (type: string, payload: any) => {
+  Store.dispatch({ type, payload });
+  return { type, payload };
+};
 
 const Actions =
   {

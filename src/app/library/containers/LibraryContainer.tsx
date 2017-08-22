@@ -47,13 +47,18 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Library from '../components/Library';
-import LibraryActions from '../data/LibraryActions';
+import RolesActions from 'roles/data/RolesActions';
+import Library from 'library/components/Library';
+import LibraryActions from 'library/data/LibraryActions';
+import UserActions from 'users/data/UserActions';
+import { LibraryState } from 'library/data/LibraryStore';
 
 const mapStateToProps = (state) =>
 {
   return {
     library: state.get('library'),
+    roles: state.get('roles'),
+    users: state.get('users'),
   };
 };
 
@@ -70,6 +75,8 @@ function mapDispatchToProps(dispatch)
       ),
       dispatch,
     ),
+    roleActions: bindActionCreators(RolesActions, dispatch),
+    userActions: bindActionCreators(UserActions, dispatch),
   };
 }
 

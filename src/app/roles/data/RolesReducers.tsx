@@ -100,6 +100,6 @@ const RolesReducerWrapper = (state: Immutable.Map<ID, any> = Immutable.Map({}), 
   }
 
   return nextState;
-}
+};
 
 export default RolesReducerWrapper;
