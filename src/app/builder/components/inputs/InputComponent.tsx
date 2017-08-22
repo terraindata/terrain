@@ -99,7 +99,11 @@ const colorForInputType = (inputType: InputType): string =>
     case InputType.DATE:
       return Colors().builder.cards.enumClause;
     case InputType.LOCATION:
+<<<<<<< HEAD
       return Colors().builder.cards.enumClause;
+=======
+      return Colors().builder.cards.numberClause;
+>>>>>>> Added location input type
     default:
       return '#f00';
   }
@@ -198,7 +202,7 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
-      const inputProps = {
+          const inputProps = {
         value: this.state.address,
         onChange: this.onAddressChange,
       };
