@@ -58,8 +58,14 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
+<<<<<<< HEAD
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
 import MapComponent from '../../../common/components/MapComponent';
+=======
+import GoogleMap from 'google-map-react';
+import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
+>>>>>>> working on search bar
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -119,6 +125,21 @@ class InputComponent extends TerrainComponent<Props>
       };
   }
 
+<<<<<<< HEAD
+=======
+  public onAddressChange(address: string) {
+    this.setState({ address });
+  }
+
+  public handleFormSubmit(e) {
+    e.preventDefault();
+    geocodeByAddress(this.state.address)
+      .then(results => getLatLng(results[0]))
+      .then(latLng => this.setState({latitude: latLng.lat, longitude: latLng.lon}))
+      .catch(error => console.log('Error', error));
+  }
+
+>>>>>>> working on search bar
   public getKeyPath(type?: string)
   {
     const keyPath = List(['query', 'inputs']);
@@ -182,6 +203,7 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
+<<<<<<< HEAD
       let value = this.props.input.value.toJS !== undefined ? this.props.input.value.toJS() : this.props.input.value;
       let markLocation: boolean = false;
       if (value && value.location && value.address)
@@ -204,6 +226,33 @@ class InputComponent extends TerrainComponent<Props>
           zoomControl={true}
           geocoder='google'
         />);
+=======
+      const inputProps = {
+        value: this.state.address,
+        onChange: this.onAddressChange,
+      }
+      return (
+        <div>
+          <form onSubmit={this.handleFormSubmit}>
+            <PlacesAutocomplete inputProps= {inputProps} />
+            <button type="submit"> Submit </button>
+          </form>
+          <div className='input-map-wrapper'>
+            <GoogleMap
+              defaultCenter={{ lat: 59.95, lng: 30.33 }}
+              defaultZoom={11}
+              center={{ lat: this.state.latitude, lng: this.state.longitude}}
+              style={{ paddingBottom: '100%', height: '0' }}
+              bootstrapURLKeys={{
+                key: 'AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU',
+                language: 'en',
+              }}
+            >
+            </GoogleMap>
+          </div>
+        </div>
+      );
+>>>>>>> working on search bar
     }
 
     return (

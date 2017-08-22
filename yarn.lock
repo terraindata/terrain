@@ -6845,12 +6845,22 @@ react-modal@^1.4.0:
     prop-types "^15.5.7"
     react-dom-factories "^1.0.0"
 
+<<<<<<< HEAD
 react-places-autocomplete@^5.4.3:
   version "5.4.3"
   resolved "https://registry.yarnpkg.com/react-places-autocomplete/-/react-places-autocomplete-5.4.3.tgz#321166247a9279b93ff21ee59112836058dda0ba"
   dependencies:
     lodash.debounce "^4.0.8"
     prop-types "^15.5.8"
+=======
+react-places-autocomplete@^5.4.2:
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/react-places-autocomplete/-/react-places-autocomplete-5.4.2.tgz#c9ea44e2752a7f8eca2d511b40001c3f8433aa4a"
+  dependencies:
+    lodash.debounce "^4.0.8"
+    prop-types "^15.5.8"
+    react "^15.3.0"
+>>>>>>> working on search bar
 
 react-redux@^5.0.5:
   version "5.0.5"
@@ -6938,7 +6948,7 @@ react-transition-group@^1.1.2:
     prop-types "^15.5.6"
     warning "^3.0.0"
 
-react@^15.6.1:
+react@^15.3.0, react@^15.6.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/react/-/react-15.6.1.tgz#baa8434ec6780bde997cdc380b79cd33b96393df"
   dependencies:
