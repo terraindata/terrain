@@ -59,6 +59,7 @@ import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+import GoogleMap from 'google-map-react';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -169,7 +170,15 @@ class InputComponent extends TerrainComponent<Props>
     {
       return (
         <div>
-        This is where the map will go...
+        <GoogleMap
+          defaultCenter={{lat: 59.95, lng: 30.33}}
+          defaultZoom={11}
+           bootstrapURLKeys={{
+            key: 'AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU',
+            language: 'en',
+          }}
+        >
+        </GoogleMap>
          </div>
       );
     }
