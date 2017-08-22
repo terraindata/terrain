@@ -51,6 +51,7 @@ export enum InputType
   NUMBER,
   TEXT,
   DATE,
+  LOCATION,
 }
 
 export const InputPrefix: string = '@';

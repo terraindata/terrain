@@ -81,6 +81,7 @@ const TYPE_OPTIONS =
     InputType[0],
     InputType[1],
     InputType[2],
+    InputType[3],
   ]);
 
 const colorForInputType = (inputType: InputType): string =>
@@ -93,6 +94,8 @@ const colorForInputType = (inputType: InputType): string =>
       return Colors().builder.cards.stringClause;
     case InputType.DATE:
       return Colors().builder.cards.enumClause;
+    case InputType.LOCATION:
+      return Colors().builder.cards.numberClause;
     default:
       return '#f00';
   }
@@ -159,6 +162,15 @@ class InputComponent extends TerrainComponent<Props>
             language={this.props.language}
           />
         </div>
+      );
+    }
+
+    if (this.props.input.inputType === InputType.LOCATION)
+    {
+      return (
+        <div>
+        This is where the map will go...
+         </div>
       );
     }
 
