@@ -311,7 +311,7 @@ export class Import
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
-      const update: boolean | string = this._parseBooleanField(fields, 'update', false);
+      const update: boolean | string = this._parseBooleanField(fields, 'update', true);
       if (typeof update === 'string')
       {
         return reject(update);
@@ -1154,7 +1154,11 @@ export class Import
     {
       parsed = false;
     }
-    else if (obj[field] !== undefined && obj[field] !== 'true')
+    else if (obj[field] === 'true')
+    {
+      parsed = true;
+    }
+    else if (obj[field] !== undefined)
     {
       return 'Invalid value for parameter "' + field + '": ' + String(obj[field]);
     }

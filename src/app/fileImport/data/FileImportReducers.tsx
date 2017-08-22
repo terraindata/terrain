@@ -290,7 +290,6 @@ FileImportReducers[ActionTypes.importFile] =
         state.columnsToInclude.get(colId) &&
         [colName, state.columnTypes.get(colId).toJS()],
       )),
-      // state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
       state.transforms,
       state.elasticUpdate,
@@ -300,10 +299,11 @@ FileImportReducers[ActionTypes.importFile] =
       {
         alert('success');
         action.payload.changeUploadInProgress(false);
+        action.payload.fetchSchema();
       },
       (err: string) =>
       {
-        alert('Error uploading file: ' + err);
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         action.payload.changeUploadInProgress(false);
       },
     );
@@ -325,17 +325,14 @@ FileImportReducers[ActionTypes.exportFile] =
       action.payload.query,
       action.payload.rank,
       action.payload.downloadFilename,
-      _.noop,
-      _.noop,
-      // (resp: any) =>
-      // {
-      //   resp.pipe(new File([''], 'test.csv'));
-      //   alert('success');
-      // },
-      // (err: string) =>
-      // {
-      //   alert('Error exporting file: ' + err);
-      // },
+      (resp: any) =>
+      {
+        alert('success');
+      },
+      (err: string) =>
+      {
+        alert('Error exporting file: ' + err);
+      },
     );
     return state;
   };

@@ -434,18 +434,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       state.set('resultsState', action.payload.resultsState),
   };
 
-/*---------------------------- Export -------------------------------*/
-
-const deeplyColumnTypeToString = (columnTypesTree: FileImportTypes.ColumnTypesTree) =>
-{
-  columnTypesTree.type = FileImportTypes.ELASTIC_TYPES[columnTypesTree.type];
-  if (columnTypesTree.innerType)
-  {
-    deeplyColumnTypeToString(columnTypesTree.innerType);
-  }
-  return columnTypesTree;
-};
-
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
 {
   const parentKeyPath = keyPath.splice(keyPath.size - 1, 1).toList();

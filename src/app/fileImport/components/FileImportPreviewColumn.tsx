@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
-
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Colors } from '../../common/Colors';
@@ -153,26 +151,29 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public renderPrimaryKey()
   {
-    return (
-      <div
-        className='flex-container fi-preview-column-field'
-      >
+    if (!this.props.exporting)
+    {
+      return (
         <div
-          className='fi-preview-column-field-name'
+          className='flex-container fi-preview-column-field'
         >
-          <CheckBox
-            checked={this.props.isPrimaryKey}
-            onChange={this.handlePrimaryKeyChange}
-          />
+          <div
+            className='fi-preview-column-field-name'
+          >
+            <CheckBox
+              checked={this.props.isPrimaryKey}
+              onChange={this.handlePrimaryKeyChange}
+            />
+          </div>
+          <span
+            className='fi-preview-column-field-content clickable'
+            onClick={this.handlePrimaryKeyChange}
+          >
+            Primary Key
+          </span>
         </div>
-        <span
-          className='fi-preview-column-field-content clickable'
-          onClick={this.handlePrimaryKeyChange}
-        >
-          Primary Key
-        </span>
-      </div>
-    );
+      );
+    }
   }
 
   public renderName()
@@ -204,31 +205,35 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public renderType()
   {
-    return (
-      <div
-        className='flex-container fi-preview-column-field'
-      >
-        <span
-          className='fi-preview-column-field-name'
-        >
-          Type
-            </span>
+    if (!this.props.exporting)
+    {
+      return (
         <div
-          className='fi-preview-column-field-content'
+          className='flex-container fi-preview-column-field'
         >
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={0}
-            columnType={this.props.columnType}
-            editing={this.props.editing}
-          />
+          <span
+            className='fi-preview-column-field-name'
+          >
+            Type
+            </span>
+          <div
+            className='fi-preview-column-field-content'
+          >
+            <TypeDropdown
+              columnId={this.props.columnId}
+              recursionDepth={0}
+              columnType={this.props.columnType}
+              editing={this.props.editing}
+            />
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   public renderTransform()
   {
+    const { props } = this;
     return (
       <div
         className='flex-container fi-preview-column-field'
@@ -242,10 +247,10 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           className='fi-preview-column-field-content'
         >
           <TransformBox
-            datatype={this.props.columnType.type}
-            columnId={this.props.columnId}
-            columnName={this.props.columnName}
-            columnNames={this.props.columnNames}
+            datatype={props.columnType.type}
+            columnId={props.columnId}
+            columnName={props.columnName}
+            columnNames={props.columnNames}
             setLocalColumnName={this.handleLocalColumnNameChange}
           />
         </div>
@@ -264,9 +269,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         }}
       >
         {this.renderIncluded()}
-        {!this.props.exporting && this.renderPrimaryKey()}
+        {this.renderPrimaryKey()}
         {this.renderName()}
-        {!this.props.exporting && this.renderType()}
+        {this.renderType()}
         {this.renderTransform()}
       </div>
     );
@@ -286,10 +291,12 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           {this.props.columnName}
         </div>
         {
-          !this.props.exporting &&
-          <div className='fi-preview-column-title-type'>
-            {this.props.columnType.type}
-          </div>
+          this.props.exporting ?
+            null
+            :
+            <div className='fi-preview-column-title-type'>
+              {this.props.columnType.type}
+            </div>
         }
         <div
           className='fi-preview-column-edit-button'
