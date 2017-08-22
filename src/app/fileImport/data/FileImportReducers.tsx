@@ -303,7 +303,7 @@ FileImportReducers[ActionTypes.importFile] =
       },
       (err: string) =>
       {
-        alert('Error uploading file: ' + err);
+        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         action.payload.changeUploadInProgress(false);
       },
     );
