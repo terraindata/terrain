@@ -59,11 +59,16 @@ import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
 import './MapComponentStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
+<<<<<<< HEAD
 import GoogleMap from 'google-map-react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+=======
+>>>>>>> working on search bar
 import GoogleMap from 'google-map-react';
+import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -123,6 +128,7 @@ class InputComponent extends TerrainComponent<Props>
       };
   }
 
+<<<<<<< HEAD
   public onAddressChange(address: string)
   {
     this.setState({ address });
@@ -134,6 +140,18 @@ class InputComponent extends TerrainComponent<Props>
       .then((results) => getLatLng(results[0]))
       .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
       .catch((error) => console.log('Error', error));
+=======
+  public onAddressChange(address: string) {
+    this.setState({ address });
+  }
+
+  public handleFormSubmit(e) {
+    e.preventDefault();
+    geocodeByAddress(this.state.address)
+      .then(results => getLatLng(results[0]))
+      .then(latLng => this.setState({latitude: latLng.lat, longitude: latLng.lon}))
+      .catch(error => console.log('Error', error));
+>>>>>>> working on search bar
   }
 
   public getKeyPath(type?: string)
@@ -218,8 +236,6 @@ class InputComponent extends TerrainComponent<Props>
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               />
             </Map>
-          </div>
-        </div>
       );
     }
 
