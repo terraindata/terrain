@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
 import * as winston from 'winston';
+import * as writeStream from 'write-stream';
 
 import { json } from 'd3-request';
 import * as SharedUtil from '../../../../shared/database/elastic/ElasticUtil';
@@ -128,13 +129,17 @@ export class Import
 
       const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
+      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json')
+      {
+        return reject('Filetype must be either CSV or JSON.');
+      }
       if (headless)
       {
         // get a template given the template ID
         const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
         if (templates.length === 0)
         {
-          return reject('Template not found.');
+          return reject('Template not found. Did you supply an export template ID?');
         }
         const template = templates[0] as object;
         if (exprt.dbid !== template['dbid'])
@@ -144,10 +149,6 @@ export class Import
         for (const templateKey of Object.keys(template))
         {
           exprt[templateKey] = template[templateKey];
-        }
-        if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
-        {
-          return reject('Cannot use an import template for export.');
         }
       }
 
@@ -181,21 +182,42 @@ export class Import
       {
         return reject('Empty query provided.');
       }
-      const qryObj: object = JSON.parse(qry);
+
+      let qryObj: object;
+      try
+      {
+        qryObj = JSON.parse(qry);
+      }
+      catch (e)
+      {
+        return reject(e);
+      }
+
       if (qryObj['index'] !== exprt['dbname'])
       {
         return reject('Query index name does not match supplied index name.');
       }
       let rankCounter: number = 1;
-      const writer = csvWriter();
+      let writer: any;
+      if (exprt.filetype === 'csv')
+      {
+        writer = csvWriter();
+      }
+      else if (exprt.filetype === 'json')
+      {
+        writer = new stream.PassThrough();
+      }
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      if (qryObj.hasOwnProperty('terrainRank') && exprt.rank === true)
+
+      if (exprt.filetype === 'json')
       {
-        return reject('Conflicting field: terrainRank.');
+        writer.write('[');
       }
+
       qryObj['scroll'] = this.SCROLL_TIMEOUT;
       let errMsg: string = '';
+      let isFirstJSONObj: boolean = true;
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
         if (resp.hits === undefined || resp.hits.total === 0)
@@ -211,6 +233,11 @@ export class Import
           return resolve(pass);
         }
         let returnDocs: object[] = [];
+        if (newDocs[0].hasOwnProperty('terrainRank') && exprt.rank === true)
+        {
+          writer.end();
+          return reject('Conflicting field: terrainRank.');
+        }
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
@@ -221,6 +248,7 @@ export class Import
             errMsg = newDoc;
             return reject(errMsg);
           }
+
           newDoc['terrainRank'] = rankCounter;
           for (const field of Object.keys(newDoc))
           {
@@ -244,10 +272,19 @@ export class Import
           return reject(errMsg);
         }
 
+        console.log(returnDocs);
         // export to csv
         for (const returnDoc of returnDocs)
         {
-          writer.write(returnDoc);
+          if (exprt.filetype === 'csv')
+          {
+            writer.write(returnDoc);
+          }
+          else if (exprt.filetype === 'json')
+          {
+            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+            writer.write(JSON.stringify(returnDoc));
+          }
         }
         if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
         {
@@ -258,6 +295,10 @@ export class Import
         }
         else
         {
+          if (exprt.filetype === 'json')
+          {
+            writer.write(']');
+          }
           writer.end();
           resolve(pass);
         }
