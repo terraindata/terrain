@@ -406,75 +406,68 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
-            {({ width, height }) =>
-              <VictoryChart
-                scale={config.topChart.scale}
-                theme={VictoryTheme.material}
-                padding={styles.topChart.padding}
-                containerComponent={
-                  <VictoryZoomVoronoiContainer
-                    responsive={false}
-                    dimension='x'
-                    zoomDomain={this.state.zoomDomain}
-                    onDomainChange={this.handleZoom}
-                    labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
-                    labelComponent={
-                      <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
-                    }
-                  />
-                }
-                width={width}
-                height={height}
-                events={[{
-                  // indicate, by name, the component that listens to the event
-                  childName: ['legend'],
-                  // { 'data', 'labels' }, indicates if the texts or the dots
-                  // of the legend items are the one that listens to the event.
-                  target: 'labels',
-                  eventHandlers: {
-                    onClick: this.handleLegendClick,
-                    onMouseOver: this.handleLegendMouseOver,
-                    onMouseOut: this.handleLegendMouseOut,
-                  },
-                }]}
+            <VictoryChart
+              scale={config.topChart.scale}
+              theme={VictoryTheme.material}
+              padding={styles.topChart.padding}
+              containerComponent={
+                <VictoryZoomVoronoiContainer
+                  responsive={false}
+                  dimension='x'
+                  zoomDomain={this.state.zoomDomain}
+                  onDomainChange={this.handleZoom}
+                  labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
+                  labelComponent={
+                    <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                  }
+                />
+              }
+              events={[{
+                // indicate, by name, the component that listens to the event
+                childName: ['legend'],
+                // { 'data', 'labels' }, indicates if the texts or the dots
+                // of the legend items are the one that listens to the event.
+                target: 'labels',
+                eventHandlers: {
+                  onClick: this.handleLegendClick,
+                  onMouseOver: this.handleLegendMouseOver,
+                  onMouseOut: this.handleLegendMouseOut,
+                },
+              }]}
+            >
+              <VictoryGroup
+                style={styles.topChart.areas}
               >
-                <VictoryGroup
-                  style={styles.topChart.areas}
-                >
-                  {data.areas}
-                  {data.scatters}
-                </VictoryGroup>
-                {legend}
-              </VictoryChart>
-            }
+                {data.areas}
+                {data.scatters}
+              </VictoryGroup>
+              {legend}
+            </VictoryChart>
           </ContainerDimensions>
         </div>
         <div style={styles.bottomChartWrapper}>
           <ContainerDimensions>
-            {({ width, height }) =>
-              <VictoryChart
-                scale={config.bottomChart.scale}
-                padding={styles.bottomChart.padding}
-                theme={VictoryTheme.material}
-                width={width} height={height}
-                containerComponent={
-                  <VictoryBrushContainer responsive={false}
-                    dimension='x'
-                    selectedDomain={this.state.selectedDomain}
-                    onDomainChange={this.handleBrush}
-                  />
-                }
-              >
-                <VictoryAxis />
-                <VictoryArea
-                  style={styles.bottomChart.areas}
-                  data={datasets.first() !== null ? datasets.first().data : []}
-                  interpolation={config.bottomChart.interpolation}
-                  x='time'
-                  y='value'
+            <VictoryChart
+              scale={config.bottomChart.scale}
+              padding={styles.bottomChart.padding}
+              theme={VictoryTheme.material}
+              containerComponent={
+                <VictoryBrushContainer responsive={false}
+                  dimension='x'
+                  selectedDomain={this.state.selectedDomain}
+                  onDomainChange={this.handleBrush}
                 />
-              </VictoryChart>
-            }
+              }
+            >
+              <VictoryAxis />
+              <VictoryArea
+                style={styles.bottomChart.areas}
+                data={datasets.first() !== null ? datasets.first().data : []}
+                interpolation={config.bottomChart.interpolation}
+                x='time'
+                y='value'
+              />
+            </VictoryChart>
           </ContainerDimensions>
         </div>
       </div>
