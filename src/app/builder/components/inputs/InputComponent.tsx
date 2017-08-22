@@ -122,17 +122,16 @@ class InputComponent extends TerrainComponent<Props>
       };
   }
 
-  public onAddressChange(address: string)
-  {
+  public onAddressChange(address: string) {
     this.setState({ address });
   }
 
-  public handleFormSubmit()
-  {
+  public handleFormSubmit(e) {
+    e.preventDefault();
     geocodeByAddress(this.state.address)
-      .then((results) => getLatLng(results[0]))
-      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
-      .catch((error) => console.log('Error', error));
+      .then(results => getLatLng(results[0]))
+      .then(latLng => this.setState({latitude: latLng.lat, longitude: latLng.lon}))
+      .catch(error => console.log('Error', error));
   }
 
   public getKeyPath(type?: string)
