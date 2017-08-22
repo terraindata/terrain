@@ -299,6 +299,7 @@ FileImportReducers[ActionTypes.importFile] =
       {
         alert('success');
         action.payload.changeUploadInProgress(false);
+        action.payload.fetchSchema();
       },
       (err: string) =>
       {

@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { SchemaActions } from '../../schema/data/SchemaStore';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
@@ -88,7 +89,7 @@ const FileImportActions =
 
     importFile:
     () =>
-      $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+      $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress, fetchSchema: SchemaActions.fetch }),
 
     exportFile:
     (query: string, rank: boolean, downloadFilename: string) =>
