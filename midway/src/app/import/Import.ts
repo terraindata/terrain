@@ -233,11 +233,7 @@ export class Import
           return resolve(pass);
         }
         let returnDocs: object[] = [];
-        if (newDocs[0].hasOwnProperty('terrainRank') && exprt.rank === true)
-        {
-          writer.end();
-          return reject('Conflicting field: terrainRank.');
-        }
+
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
@@ -1352,6 +1348,10 @@ export class Import
             }
             if (rank === true)
             {
+              if (item['terrainRank'] !== undefined)
+              {
+                return thisReject('Conflicting field: terrainRank.');
+              }
               trimmedItem['terrainRank'] = item['terrainRank'];
             }
             transformedItems.push(trimmedItem);
