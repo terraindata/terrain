@@ -770,25 +770,21 @@ export const Ajax =
         transformations,
       };
       console.log('export payload: ', payload);
-      // const onLoadHandler = (resp) =>
-      // {
-      //   const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-      //   onLoad(queryResult);
-      // };
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
       Ajax.req(
         'post',
         'import/export/',
         payload,
-        onLoad,
-        // onLoadHandler,
+        onLoadHandler,
         {
           onError,
           download: true,
           downloadFilename,
         },
-        // {
-        //   onError,
-        // },
       );
       return;
     },
@@ -855,7 +851,6 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
       };
-      console.log('updating template: ', templateId);
       console.log('update template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
@@ -878,7 +873,6 @@ export const Ajax =
       onError?: (ev: string) => void,
     )
     {
-      console.log('deleting template: ', templateId);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);

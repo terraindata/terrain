@@ -290,7 +290,6 @@ FileImportReducers[ActionTypes.importFile] =
         state.columnsToInclude.get(colId) &&
         [colName, state.columnTypes.get(colId).toJS()],
       )),
-      // state.primaryKey === -1 ? '' : state.columnNames.get(state.primaryKey),
       state.primaryKeys.map((pkey) => state.columnNames.get(pkey)),
       state.transforms,
       state.elasticUpdate,

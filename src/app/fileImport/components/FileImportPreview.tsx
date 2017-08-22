@@ -406,7 +406,7 @@ class FileImportPreview extends TerrainComponent<Props>
                   }
                   <span
                     className='fi-preview-pkeys-pkey-delete clickable'
-                    onClick={() => this.deletePrimaryKey(this.props.columnNames.get(pkey))}
+                    onClick={this._fn(this.deletePrimaryKey, this.props.columnNames.get(pkey))}
                   >
                     x
                   </span>
