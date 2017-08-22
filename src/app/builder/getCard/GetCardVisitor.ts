@@ -289,6 +289,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESArrayClause(clause: ESArrayClause): any
   {
+    const accepts = List(this.getCardTypes([clause.elementID], clause));
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
 
@@ -296,18 +297,18 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
         preview: '[cards.size] ' + clause.type + '(s)',
-
+        accepts,
         display:
         {
           displayType: DisplayType.CARDS,
           key: 'cards',
-          accepts: List(['eql' + clause.elementID]),
+          accepts,
         },
 
         init: (blocksConfig, extraConfig?, skipTemplate?) =>
           ({
             cards: List([
-              BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
+              // BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
             ]),
           }),
 
