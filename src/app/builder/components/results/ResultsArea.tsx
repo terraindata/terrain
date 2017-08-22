@@ -534,8 +534,14 @@ column if you have customized the results view.');
             })}
             style={[mainBg, borderColor(Colors().border2)]}
           >
-            <div className='results-config-bar' style={[mainBg, borderColor(Colors().border1)]}>
-              <div className='results-config-title' style={mainFontColor}>
+            <div
+              className='results-config-bar'
+              style={[mainBg, borderColor(Colors().border1)]}
+            >
+              <div
+                className='results-config-title'
+                style={mainFontColor}
+              >
                 Export Results
               </div>
               <div key={'results-config-button'}

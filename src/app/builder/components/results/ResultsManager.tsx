@@ -520,11 +520,9 @@ export class ResultsManager extends TerrainComponent<Props>
 
     const exportChanges: any = {
       filetype: 'csv',
-      originalNames: fields,
-      preview: Immutable.List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
-        Immutable.List(result.fields.valueSeq().toList().map((field) =>
-          field,
-        )),
+      originalNames: List(_.difference(fields.toArray(), ['_score', '_index', '_type', '_id'])),
+      preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+        List(_.map(_.omit(result.fields.toJS(), ['_score', '_index', '_type', '_id']), (field) => field)),
       )),
     };
     Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
