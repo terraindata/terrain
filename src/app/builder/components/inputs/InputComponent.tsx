@@ -167,10 +167,11 @@ class InputComponent extends TerrainComponent<Props>
     if (this.props.input.inputType === InputType.LOCATION)
     {
       return (
-        <div>
+        <div className = 'input-map-wrapper'>
         <GoogleMap
           defaultCenter={{lat: 59.95, lng: 30.33}}
           defaultZoom={11}
+          style={{paddingBottom: '100%', height: '0'}}
            bootstrapURLKeys={{
             key: 'AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU',
             language: 'en',

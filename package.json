@@ -78,6 +78,7 @@
     "elasticsearch-scroll-stream": "^1.1.1",
     "fast-csv": "^2.4.0",
     "global": "^4.3.2",
+    "google-map-react": "^0.24.0",
     "hash-object": "^0.1.7",
     "immutable": "^3.7.3",
     "jest": "^20.0.4",
