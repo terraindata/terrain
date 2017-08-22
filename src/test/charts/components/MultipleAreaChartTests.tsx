@@ -54,31 +54,24 @@ import * as LibraryTypes from 'library/LibraryTypes';
 describe('MultipleAreaChart', () =>
 {
   let chartComponent = null;
+  const variantId = 1;
+  const variantName = 'Bargain Shopper';
   const datasets = Immutable.Map<ID, any>({
-    1: {
-      metric: {
-        id: 1,
-        name: 'Click Through Rate',
-      },
+    [variantId]: {
+      id: variantId,
+      label: variantName,
       data: [
         { time: new Date(2017, 8, 1, 0, 0, 0), value: 1 },
-        { time: new Date(2017, 8, 2, 0, 0, 0), value: 2 }
+        { time: new Date(2017, 8, 2, 0, 0, 0), value: 2 },
       ],
     }
   });
-
-  const variants = Immutable.Map<ID, LibraryTypes.Variant>({
-    1: LibraryTypes._Variant({ id: 1, name: 'Variant 1' }),
-    2: LibraryTypes._Variant({ id: 2, name: 'Variant 2' }),
-  });
-
 
   beforeEach(() =>
   {
     chartComponent = shallow(
       <MultipleAreaChart
         datasets={datasets}
-        variants={variants}
         xDataKey={'xaxis'}
         yDataKey={'yaxis'}
       />,
@@ -87,21 +80,27 @@ describe('MultipleAreaChart', () =>
 
   it('should render a multiple area chart', () =>
   {
-    // Render a checkbox with label in the document
-    expect(chartComponent.find('VictoryChart').length).toEqual(2);
+    expect(chartComponent.find('VictoryChart')).toHaveLength(2);
 
     const topChartComponent = chartComponent.find('VictoryChart').at(0);
-    expect(topChartComponent.find('VictoryGroup').length).toEqual(1);
-    expect(topChartComponent.find('VictoryArea').length).toEqual(datasets.count());
-    expect(topChartComponent.find('VictoryScatter').length).toEqual(datasets.count());
-    expect(topChartComponent.find('VictoryLegend').length).toEqual(1);
+    expect(topChartComponent.find('VictoryGroup')).toHaveLength(1);
+    expect(topChartComponent.find('VictoryArea')).toHaveLength(datasets.count());
+    expect(topChartComponent.find('VictoryScatter')).toHaveLength(datasets.count());
+    expect(topChartComponent.find('VictoryLegend')).toHaveLength(1);
+
+    const topChartLegendComponent = topChartComponent.find('VictoryLegend');
+    const topChartLegendData = topChartLegendComponent.props().data;
+    expect(topChartLegendData).toHaveLength(1);
+    expect(topChartLegendData[0]).toMatchObject(
+      { id: variantId, name: variantName, labels: {} }
+    );
 
     const topChartAreaComponent = topChartComponent.find('VictoryArea').first();
     expect(topChartAreaComponent.props().x).toEqual('xaxis');
     expect(topChartAreaComponent.props().y).toEqual('yaxis');
 
     const bottomChartComponent = chartComponent.find('VictoryChart').at(1);
-    expect(bottomChartComponent.find('VictoryAxis').length).toEqual(1);
-    expect(bottomChartComponent.find('VictoryArea').length).toEqual(1);
+    expect(bottomChartComponent.find('VictoryAxis')).toHaveLength(1);
+    expect(bottomChartComponent.find('VictoryArea')).toHaveLength(1);
   });
 });

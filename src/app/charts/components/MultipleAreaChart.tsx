@@ -104,17 +104,14 @@ const config = {
 
 interface Dataset
 {
-  metric: {
-    id: number;
-    name: string;
-  };
+  id: ID,
+  label: string[];
   data: any[];
 }
 
 interface Props
 {
   datasets: Immutable.Map<ID, Dataset>;
-  variants: Immutable.Map<ID, LibraryTypes.Variant>;
   xDataKey: string; // The key to get the value of x from the data
   yDataKey: string; // The key to get the value of y from the data
 }
@@ -268,13 +265,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public renderLegend()
   {
-    const { variants, datasets } = this.props;
+    const { datasets } = this.props;
     const { visibleDatasets } = this.state;
 
     const data = datasets
       .map((ds, key) =>
       {
-        const variant = variants.get(key);
         let labelsStyle = {};
 
         if (visibleDatasets.includes(key))
@@ -283,8 +279,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         }
 
         return {
-          id: variant.get('id'),
-          name: variant.get('name'),
+          id: ds.id,
+          name: ds.label,
           labels: labelsStyle,
         };
       });
