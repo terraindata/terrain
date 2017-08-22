@@ -3,7 +3,7 @@
         "newLine": "LF",
         "jsx": "react",
         "module": "commonjs",
-        "sourceMap": false,
+        "sourceMap": true,
         "inlineSources": true,
         "inlineSourceMap": true,
         "target": "es6",
