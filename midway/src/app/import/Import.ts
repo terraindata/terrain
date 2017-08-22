@@ -52,7 +52,6 @@ import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
 import * as winston from 'winston';
-import * as writeStream from 'write-stream';
 
 import { json } from 'd3-request';
 import * as SharedUtil from '../../../../shared/database/elastic/ElasticUtil';
