@@ -251,7 +251,7 @@ export class Import
           newDoc['terrainRank'] = rankCounter;
           for (const field of Object.keys(newDoc))
           {
-            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]))
+            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
             {
               newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
             }
