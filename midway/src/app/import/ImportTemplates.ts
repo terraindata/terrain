@@ -91,7 +91,7 @@ export interface ExportTemplateConfig extends ImportTemplateBase
   id?: number;
   name: string;
   query?: string;
-  templateID?: number;
+  templateId?: number;
   variantId?: number;
 }
 

@@ -131,7 +131,7 @@ export class Import
       if (headless)
       {
         // get a template given the template ID
-        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
+        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateId);
         if (templates.length === 0)
         {
           return reject('Template not found.');
@@ -300,10 +300,10 @@ export class Import
       let imprtConf: ImportConfig;
       if (headless)
       {
-        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateID']));
+        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateId']));
         if (templates.length === 0)
         {
-          return reject('Invalid template ID provided: ' + String(fields['templateID']));
+          return reject('Invalid template ID provided: ' + String(fields['templateId']));
         }
         const template: ImportTemplateConfig = templates[0];
 
