@@ -296,10 +296,15 @@ class FileImportPreview extends TerrainComponent<Props>
     else
     {
       Actions.importFile();
-      while (this.props.uploadInProgress)
-      {
-        Actions.getStreamingProgress();
-      }
+      this.manageProgress();
+    }
+  }
+
+  public manageProgress()
+  {
+    for (let i = 0; i < 10; i++)
+    {
+      setInterval(Actions.getStreamingProgress(), 2000);
     }
   }
 
