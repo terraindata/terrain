@@ -110,16 +110,11 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
 
     if (item['new'])
     {
-      // is a new card
-      // - first look at the parent card's structure
-    // - if new card matches any card types in parents, use key from that
-    //   IF this card does not already exist in parent
-    // - write code in CardDropArea in drop handlers
-    //   - need to instrument it with ability to define special handlers per-language
+      // pass in extra data {key: 'key'}, get from the function in getcardvisitor
 
+      // Using handleCardDrop prop, should be able to get the key for the card using the type
+      // Issue: TargetProps.handleCardDrop is never defined, not sure how else to access the props?
       Actions.create(targetProps.keyPath, targetIndex, type);
-      console.log(targetProps);
-      console.log(type);
     }
     else
     {
@@ -168,6 +163,8 @@ export interface Props
   wrapType?: string;
 
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
+
+  handleCardDrop?: (type: string) => string;
 }
 
 class CardDropArea extends TerrainComponent<Props>

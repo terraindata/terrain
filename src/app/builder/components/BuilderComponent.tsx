@@ -190,6 +190,7 @@ class BuilderComponent extends TerrainComponent<Props>
           singleChild={d.singleChild}
           language={this.props.language}
           hideCreateCardTool={d.hideCreateCardTool}
+          handleCardDrop={d.handleCardDrop}
         />;
         break;
       case DisplayType.CARDTEXT:

@@ -206,6 +206,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private clauses: { [name: string]: ESClause };
   private config: EQLConfig;
   private colorIndex: number;
+  private cardTypesToKeys: { [type: string]: string };
 
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
@@ -223,6 +224,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     this.config = config;
 
     this.clauses = this.config.getClauses();
+    this.cardTypesToKeys = {};
 
     // first, populate the variant clause map, since it will be used by getCard
     this.computeVariantClauses(this.clauses);
@@ -561,7 +563,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESStructureClause(clause: ESStructureClause): any
   {
     const accepts = this.getCardTypes(_.keys(clause.structure), clause);
-
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
     const init = (blocksConfig, extraConfig?, skipTemplate?) =>
@@ -639,6 +640,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               if (card['cards'].find((p) => p.key === key) === undefined)
               {
                 const cardTypes = this.getCardTypes([clauseType]);
+                cardTypes.map((cardType) =>
+                  this.cardTypesToKeys[cardType] = key,
+                );
 
                 cardTypes.map((cardType) =>
                   result.push({
@@ -658,6 +662,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               {
                 const cardConfig = backend.blocks[cardType];
                 const key: string = cardConfig['key'];
+
+                this.cardTypesToKeys[cardType] = key;
 
                 result.push({
                   text: key + ': ' + (cardConfig.static['title'] as string),
@@ -707,6 +713,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               displayType: DisplayType.CARDS,
               key: 'cards',
               hideCreateCardTool: true,
+              handleCardDrop: this.onCardDrop,
+              // pass in onDrop: reference to on drop function that accepts type of card
+              // Change display.tsx, buildercomponent.tsx, cardarea.tsx, cardsdroparea.tsx
             },
             {
               provideParentData: true, // need this to grey out the type dropdown
@@ -739,6 +748,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         tql: (stringBlock) => stringBlock['value'],
       },
     });
+  }
+
+  public onCardDrop(type: string): string
+  {
+    return this.cardTypesToKeys[type];
   }
 
   public visitESVariantClause(clause: ESVariantClause): any

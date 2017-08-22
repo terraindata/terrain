@@ -77,6 +77,7 @@ export interface Props
   noCardTool?: boolean;
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
+  handleCardDrop?: (type: string) => string;
 }
 
 interface KeyState
@@ -211,6 +212,7 @@ class CardsArea extends TerrainComponent<Props>
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
                   helpOn={this.state.learningMode || this.props.helpOn}
+                  handleCardDrop={this.props.handleCardDrop}
                 />
               </div>,
             )
