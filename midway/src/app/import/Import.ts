@@ -244,7 +244,11 @@ export class Import
             errMsg = newDoc;
             return reject(errMsg);
           }
-
+          if (newDoc['terrainRank'] !== undefined)
+          {
+            errMsg = 'Conflicting field: terrainRank.';
+            return reject(errMsg);
+          }
           newDoc['terrainRank'] = rankCounter;
           for (const field of Object.keys(newDoc))
           {
@@ -268,7 +272,6 @@ export class Import
           return reject(errMsg);
         }
 
-        console.log(returnDocs);
         // export to csv
         for (const returnDoc of returnDocs)
         {
@@ -1348,10 +1351,6 @@ export class Import
             }
             if (rank === true)
             {
-              if (item['terrainRank'] !== undefined)
-              {
-                return thisReject('Conflicting field: terrainRank.');
-              }
               trimmedItem['terrainRank'] = item['terrainRank'];
             }
             transformedItems.push(trimmedItem);
