@@ -120,26 +120,6 @@ class InputComponent extends TerrainComponent<Props>
       };
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  public onAddressChange(address: string) {
-=======
-  public onAddressChange(address: string)
-  {
->>>>>>> experimenting with leaflet maps
-    this.setState({ address });
-  }
-
-  public handleFormSubmit()
-  {
-    geocodeByAddress(this.state.address)
-      .then((results) => getLatLng(results[0]))
-      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
-      .catch((error) => console.log('Error', error));
-  }
-
->>>>>>> working on search bar
   public getKeyPath(type?: string)
   {
     const keyPath = List(['query', 'inputs']);
