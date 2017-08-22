@@ -243,12 +243,6 @@ export class Import
             errMsg = newDoc;
             return reject(errMsg);
           }
-          if (newDoc['terrainRank'] !== undefined)
-          {
-            errMsg = 'Conflicting field: terrainRank.';
-            return reject(errMsg);
-          }
-          newDoc['terrainRank'] = rankCounter;
           for (const field of Object.keys(newDoc))
           {
             if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
@@ -257,13 +251,25 @@ export class Import
             }
           }
           returnDocs.push(newDoc as object);
-          rankCounter++;
         }
 
         // transform documents with template
         try
         {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true, exprt.rank));
+          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
+          for (const doc of returnDocs)
+          {
+            if (exprt.rank === true)
+            {
+              if (doc['terrainRank'] !== undefined)
+              {
+                errMsg = 'Conflicting field: terrainRank.';
+                return reject(errMsg);
+              }
+              doc['terrainRank'] = rankCounter;
+            }
+            rankCounter++;
+          }
         } catch (e)
         {
           writer.end();
@@ -1311,7 +1317,7 @@ export class Import
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
   private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig,
-    dontCheck?: boolean, rank?: boolean): Promise<object[][]>
+    dontCheck?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
     let items: object[];
@@ -1347,10 +1353,6 @@ export class Import
               {
                 return thisReject(typeError);
               }
-            }
-            if (rank === true)
-            {
-              trimmedItem['terrainRank'] = item['terrainRank'];
             }
             transformedItems.push(trimmedItem);
           }
