@@ -115,6 +115,8 @@ interface Props
 {
   datasets: Immutable.Map<ID, Dataset>;
   variants: Immutable.Map<ID, LibraryTypes.Variant>;
+  xDataKey: string; // The key to get the value of x from the data
+  yDataKey: string; // The key to get the value of y from the data
 }
 
 interface State
@@ -131,6 +133,8 @@ const colors = ['blue', 'red', 'green', 'yellow'];
 export default class MultipleAreaChart extends TerrainComponent<Props> {
   public static defaultProps = {
     datasets: [],
+    xDataKey: 'x',
+    yDataKey: 'y',
   };
 
   public state: State = {
@@ -187,7 +191,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public renderData()
   {
-    const { datasets } = this.props;
+    const { datasets, xDataKey, yDataKey } = this.props;
     const { visibleDatasets, highlightDataset } = this.state;
     const areas = [];
     const scatters = [];
@@ -208,8 +212,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               style={{ data: { fill: this.getDatasetColor(key) } }}
               data={ds.data}
               interpolation={config.topChart.interpolation}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />,
           );
           scatters.push(
@@ -217,8 +221,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               key={key}
               data={ds.data}
               size={0}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />,
           );
         }
@@ -231,8 +235,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               style={{ data: { fill: this.getDatasetColor(key) } }}
               data={ds.data}
               interpolation={config.topChart.interpolation}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />
           );
 
@@ -241,8 +245,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               key={key}
               size={(datum, active) => active ? 5 : 0}
               data={ds.data}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />
           );
         }
@@ -396,7 +400,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public render()
   {
-    const { datasets } = this.props;
+    const { datasets, xDataKey, yDataKey } = this.props;
     const data = this.renderData();
     const legend = this.renderLegend();
 
@@ -464,8 +468,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                 style={styles.bottomChart.areas}
                 data={datasets.first() !== null ? datasets.first().data : []}
                 interpolation={config.bottomChart.interpolation}
-                x='time'
-                y='value'
+                x={xDataKey}
+                y={yDataKey}
               />
             </VictoryChart>
           </ContainerDimensions>

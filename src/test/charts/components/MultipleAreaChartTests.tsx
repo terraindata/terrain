@@ -79,6 +79,8 @@ describe('MultipleAreaChart', () =>
       <MultipleAreaChart
         datasets={datasets}
         variants={variants}
+        xDataKey={'xaxis'}
+        yDataKey={'yaxis'}
       />,
     );
   });
@@ -93,6 +95,10 @@ describe('MultipleAreaChart', () =>
     expect(topChartComponent.find('VictoryArea').length).toEqual(datasets.count());
     expect(topChartComponent.find('VictoryScatter').length).toEqual(datasets.count());
     expect(topChartComponent.find('VictoryLegend').length).toEqual(1);
+
+    const topChartAreaComponent = topChartComponent.find('VictoryArea').first();
+    expect(topChartAreaComponent.props().x).toEqual('xaxis');
+    expect(topChartAreaComponent.props().y).toEqual('yaxis');
 
     const bottomChartComponent = chartComponent.find('VictoryChart').at(1);
     expect(bottomChartComponent.find('VictoryAxis').length).toEqual(1);
