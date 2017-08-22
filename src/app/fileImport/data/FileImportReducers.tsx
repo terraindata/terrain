@@ -325,17 +325,14 @@ FileImportReducers[ActionTypes.exportFile] =
       action.payload.query,
       action.payload.rank,
       action.payload.downloadFilename,
-      _.noop,
-      _.noop,
-      // (resp: any) =>
-      // {
-      //   resp.pipe(new File([''], 'test.csv'));
-      //   alert('success');
-      // },
-      // (err: string) =>
-      // {
-      //   alert('Error exporting file: ' + err);
-      // },
+      (resp: any) =>
+      {
+        alert('success');
+      },
+      (err: string) =>
+      {
+        alert('Error exporting file: ' + err);
+      },
     );
     return state;
   };

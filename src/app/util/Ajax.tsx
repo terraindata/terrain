@@ -155,6 +155,7 @@ export const Ajax =
         const form = document.createElement('form');
         form.setAttribute('action', fullUrl);
         form.setAttribute('method', 'post');
+        form.setAttribute('target', '_blank');
 
         // TODO move
         const accessToken = AuthStore.getState().accessToken;
