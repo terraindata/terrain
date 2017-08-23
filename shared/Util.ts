@@ -95,7 +95,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   const quoteChar = config.quoteChar || '\"';
   const escapeChar = config.escapeChar || '\"';
   const comments = config.comments || '#';
-  const hasHeaderRow = config.hasHeaderRow || true;
+  const hasHeaderRow = config.hasHeaderRow === undefined ? true : config.hasHeaderRow;
   let preview = config.preview;
 
   // autodetect newLine
