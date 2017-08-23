@@ -64,6 +64,7 @@ interface LibraryInfoUserProps
   user: User;
   groupRoles: GroupRoleMap;
   groupId: ID;
+  roleActions: any;
 }
 
 class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
@@ -77,7 +78,7 @@ class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
       role = new RoleTypes.Role({ groupId: this.props.groupId, userId: user.id });
     }
 
-    RolesActions.change(
+    this.props.roleActions.change(
       role.set('builder', newRole === 'Builder').set('admin', newRole === 'Admin') as RoleTypes.Role,
     );
   }
