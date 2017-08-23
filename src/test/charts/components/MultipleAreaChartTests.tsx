@@ -64,6 +64,14 @@ describe('MultipleAreaChart', () =>
         { time: new Date(2017, 8, 1, 0, 0, 0), value: 1 },
         { time: new Date(2017, 8, 2, 0, 0, 0), value: 2 },
       ],
+    },
+    2: {
+      id: 2,
+      label: 'Customer Rating Boost',
+      data: [
+        { time: new Date(2017, 8, 1, 0, 0, 0), value: 5 },
+        { time: new Date(2017, 8, 2, 0, 0, 0), value: 4 },
+      ],
     }
   });
 
@@ -83,14 +91,15 @@ describe('MultipleAreaChart', () =>
     expect(chartComponent.find('VictoryChart')).toHaveLength(2);
 
     const topChartComponent = chartComponent.find('VictoryChart').at(0);
+    const visibleDatasetsCount = chartComponent.state().visibleDatasets.count();
     expect(topChartComponent.find('VictoryGroup')).toHaveLength(1);
-    expect(topChartComponent.find('VictoryArea')).toHaveLength(datasets.count());
-    expect(topChartComponent.find('VictoryScatter')).toHaveLength(datasets.count());
+    expect(topChartComponent.find('VictoryArea')).toHaveLength(visibleDatasetsCount);
+    expect(topChartComponent.find('VictoryScatter')).toHaveLength(visibleDatasetsCount);
     expect(topChartComponent.find('VictoryLegend')).toHaveLength(1);
 
     const topChartLegendComponent = topChartComponent.find('VictoryLegend');
     const topChartLegendData = topChartLegendComponent.props().data;
-    expect(topChartLegendData).toHaveLength(1);
+    expect(topChartLegendData).toHaveLength(2);
     expect(topChartLegendData[0]).toMatchObject(
       { id: variantId, name: variantName, labels: {} }
     );
@@ -102,5 +111,100 @@ describe('MultipleAreaChart', () =>
     const bottomChartComponent = chartComponent.find('VictoryChart').at(1);
     expect(bottomChartComponent.find('VictoryAxis')).toHaveLength(1);
     expect(bottomChartComponent.find('VictoryArea')).toHaveLength(1);
+  });
+
+  it('should set all datasets as visible by default', () =>
+  {
+    // jmansor: I don't like these assertions, there must be something better
+    // to assert on Immutable objects.
+    expect(chartComponent.state().visibleDatasets.toJS()).toEqual(datasets.keySeq().toJS());
+  });
+
+  it('should only show datasets marked as visible', () => {
+    chartComponent.setState({ visibleDatasets: Immutable.List(['1']) });
+    const topChartComponent = chartComponent.find('VictoryChart').at(0);
+
+    expect(topChartComponent.find('VictoryArea')).toHaveLength(1);
+    expect(topChartComponent.find('VictoryArea').props().name).toEqual('area-1');
+  });
+
+  describe('#componentWillReceiveProps', () => {
+    it('should update the visible datasets list when new datasets are received', () => {
+      const nextDatasets = Immutable.Map<ID, any>({
+        3: {
+          id: 3,
+          label: 'Variant 3',
+          data: [
+            { time: new Date(2017, 8, 1, 0, 0, 0), value: 10 },
+            { time: new Date(2017, 8, 2, 0, 0, 0), value: 12 },
+          ],
+        },
+        4: {
+          id: 4,
+          label: 'Variant 4',
+          data: [
+            { time: new Date(2017, 8, 1, 0, 0, 0), value: 15 },
+            { time: new Date(2017, 8, 2, 0, 0, 0), value: 14 },
+          ],
+        }
+      });
+
+      chartComponent.setProps({ datasets: nextDatasets });
+
+      expect(chartComponent.state().visibleDatasets.toJS())
+        .toEqual(chartComponent.instance().props.datasets.keySeq().toJS());
+    });
+  });
+
+  describe('#handleZoom', () => {
+    it('should update state.selectedDomain (that handles the brush)', () => {
+      expect(chartComponent.state().selectedDomain).toEqual({});
+      const nextZoomDomain = { x: [0, 5], y: [10, 15] };
+      chartComponent.instance().handleZoom(nextZoomDomain);
+
+      expect(chartComponent.state().selectedDomain).toEqual(nextZoomDomain);
+    });
+  });
+
+  describe('#handleBrush', () => {
+    it('should update state.zoomDomain', () => {
+      expect(chartComponent.state().zoomDomain).toEqual({});
+      const nextBrushDomain = { x: [0, 5], y: [10, 15] };
+      chartComponent.instance().handleBrush(nextBrushDomain);
+
+      expect(chartComponent.state().zoomDomain).toEqual(nextBrushDomain);
+    });
+  });
+
+  describe('#handleLegendClick', () => {
+    it('should call toggleDatasetVisibility', () => {
+      chartComponent.instance().toggleDatasetVisibility = jest.fn();
+
+      chartComponent.instance().handleLegendClick({}, { datum: { id: 1 } });
+
+      expect(chartComponent.instance().toggleDatasetVisibility)
+        .toHaveBeenCalledTimes(1);
+      expect(chartComponent.instance().toggleDatasetVisibility)
+        .toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe('#toggleDatasetVisibility', () => {
+    describe('when the dataset is currently visible', () => {
+      it('should remove the dataset from the visible list', () => {
+        chartComponent.instance().toggleDatasetVisibility('1');
+
+        expect(chartComponent.state().visibleDatasets.toJS()).not.toContain('1');
+      });
+    });
+
+    describe('when the dataset is NOT currently visible', () => {
+      it('should add the dataset from the visible list', () => {
+        chartComponent.instance().toggleDatasetVisibility('1');
+        chartComponent.instance().toggleDatasetVisibility('1');
+
+        expect(chartComponent.state().visibleDatasets.toJS()).toContain('1');
+      });
+    });
   });
 });

@@ -290,7 +290,6 @@ class Library extends TerrainComponent<any>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
             <MultipleAreaChart
-              variants={variants}
               datasets={datasets}
               xDataKey={'time'}
               yDataKey={'value'}
