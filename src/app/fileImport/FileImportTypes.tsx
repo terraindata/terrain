@@ -223,13 +223,21 @@ export const STEP_NAMES =
     'Step 3',
     'Step 4',
     'Step 5',
+    'Step 6',
   ];
 
 export const STEP_TITLES =
   [
     'Select a File',
+    'Specify CSV Header',
     'Select a Server',
     'Select a Database',
     'Select a Table',
     'Select and Rename Columns you\'d like to Import',
   ];
+
+export const STEP_SUBTEXT =
+  {
+    DATABASE_SUBTEXT: 'Use the field above to either choose an existing database or name a new one that will be created',
+    TABLE_SUBTEXT: 'Use the field above to either choose an existing table or name a new one that will be created',
+  };

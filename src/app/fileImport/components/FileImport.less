@@ -1,4 +1,5 @@
 @import "../../common/Common.less";
+@import "../../App.less";
 
 .file-import {
 	height: 100%;
@@ -12,7 +13,7 @@
     max-width: 100%;
 
     max-height: 100%;
-    overflow: auto;
+    overflow: hidden;
 
     .fi-step {
       .fi-step-name {
@@ -35,30 +36,50 @@
       max-width: 100%;
       margin: 12px;
 
-      .fi-choose {
-        align-items: center;
-        justify-content: center;
+      .fi-content-csv {
+
+        .fi-content-csv-wrapper {
+          text-align: center;
+          margin-bottom: 12px;
+
+          .fi-content-csv-option {
+            margin-left: 12px;
+          }
+        }
       }
 
-      .fi-csv {
+      .fi-content-subtext {
         margin-top: 12px;
-        .fi-csv-option {
-          margin-left: 12px;
+        word-wrap: break-word;
+        max-width: 300px;
+
+        .fi-content-subtext-text {
+          .big-text;
+        }
+      }
+
+      .fi-content-choose {
+        align-items: center;
+        justify-content: center;
+
+        .fi-content-choose-button {
+          .large-button;
         }
       }
     }
 
     .fi-nav {
-      float: right;
-      margin-top: 12px;
+      margin: 12px;
+      align-items: center;
+      justify-content: space-between;
 
       .fi-back-button {
-        .fi-button;
+        .button;
         display: inline-block;
       }
 
       .fi-next-button {
-        .fi-button;
+        .button;
         display: inline-block;
       }
     }
