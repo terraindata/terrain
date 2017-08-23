@@ -717,8 +717,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               {
                 return this.cardTypesToKeys[type];
               },
-              // pass in onDrop: reference to on drop function that accepts type of card
-              // Change display.tsx, buildercomponent.tsx, cardarea.tsx, cardsdroparea.tsx
             },
             {
               provideParentData: true, // need this to grey out the type dropdown
