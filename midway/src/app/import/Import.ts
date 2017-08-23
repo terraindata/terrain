@@ -128,13 +128,17 @@ export class Import
 
       const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
+      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json')
+      {
+        return reject('Filetype must be either CSV or JSON.');
+      }
       if (headless)
       {
         // get a template given the template ID
-        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
+        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateId);
         if (templates.length === 0)
         {
-          return reject('Template not found.');
+          return reject('Template not found. Did you supply an export template ID?');
         }
         const template = templates[0] as object;
         if (exprt.dbid !== template['dbid'])
@@ -144,10 +148,6 @@ export class Import
         for (const templateKey of Object.keys(template))
         {
           exprt[templateKey] = template[templateKey];
-        }
-        if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
-        {
-          return reject('Cannot use an import template for export.');
         }
       }
 
@@ -181,21 +181,42 @@ export class Import
       {
         return reject('Empty query provided.');
       }
-      const qryObj: object = JSON.parse(qry);
+
+      let qryObj: object;
+      try
+      {
+        qryObj = JSON.parse(qry);
+      }
+      catch (e)
+      {
+        return reject(e);
+      }
+
       if (qryObj['index'] !== exprt['dbname'])
       {
         return reject('Query index name does not match supplied index name.');
       }
       let rankCounter: number = 1;
-      const writer = csvWriter();
+      let writer: any;
+      if (exprt.filetype === 'csv')
+      {
+        writer = csvWriter();
+      }
+      else if (exprt.filetype === 'json')
+      {
+        writer = new stream.PassThrough();
+      }
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      if (qryObj.hasOwnProperty('terrainRank') && exprt.rank === true)
+
+      if (exprt.filetype === 'json')
       {
-        return reject('Conflicting field: terrainRank.');
+        writer.write('[');
       }
+
       qryObj['scroll'] = this.SCROLL_TIMEOUT;
       let errMsg: string = '';
+      let isFirstJSONObj: boolean = true;
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
         if (resp.hits === undefined || resp.hits.total === 0)
@@ -211,6 +232,7 @@ export class Import
           return resolve(pass);
         }
         let returnDocs: object[] = [];
+
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
@@ -221,22 +243,33 @@ export class Import
             errMsg = newDoc;
             return reject(errMsg);
           }
-          newDoc['terrainRank'] = rankCounter;
           for (const field of Object.keys(newDoc))
           {
-            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]))
+            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
             {
               newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
             }
           }
           returnDocs.push(newDoc as object);
-          rankCounter++;
         }
 
         // transform documents with template
         try
         {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true, exprt.rank));
+          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
+          for (const doc of returnDocs)
+          {
+            if (exprt.rank === true)
+            {
+              if (doc['terrainRank'] !== undefined)
+              {
+                errMsg = 'Conflicting field: terrainRank.';
+                return reject(errMsg);
+              }
+              doc['terrainRank'] = rankCounter;
+            }
+            rankCounter++;
+          }
         } catch (e)
         {
           writer.end();
@@ -247,7 +280,15 @@ export class Import
         // export to csv
         for (const returnDoc of returnDocs)
         {
-          writer.write(returnDoc);
+          if (exprt.filetype === 'csv')
+          {
+            writer.write(returnDoc);
+          }
+          else if (exprt.filetype === 'json')
+          {
+            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+            writer.write(JSON.stringify(returnDoc));
+          }
         }
         if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
         {
@@ -258,6 +299,10 @@ export class Import
         }
         else
         {
+          if (exprt.filetype === 'json')
+          {
+            writer.write(']');
+          }
           writer.end();
           resolve(pass);
         }
@@ -300,10 +345,10 @@ export class Import
       let imprtConf: ImportConfig;
       if (headless)
       {
-        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateID']));
+        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateId']));
         if (templates.length === 0)
         {
-          return reject('Invalid template ID provided: ' + String(fields['templateID']));
+          return reject('Invalid template ID provided: ' + String(fields['templateId']));
         }
         const template: ImportTemplateConfig = templates[0];
 
@@ -1272,7 +1317,7 @@ export class Import
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
   private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig,
-    dontCheck?: boolean, rank?: boolean): Promise<object[][]>
+    dontCheck?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
     let items: object[];
@@ -1308,10 +1353,6 @@ export class Import
               {
                 return thisReject(typeError);
               }
-            }
-            if (rank === true)
-            {
-              trimmedItem['terrainRank'] = item['terrainRank'];
             }
             transformedItems.push(trimmedItem);
           }

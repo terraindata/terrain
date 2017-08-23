@@ -95,7 +95,7 @@ Router.post('/export', passport.authenticate('access-token-local'), async (ctx, 
 Router.post('/export/headless', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const exprtConf: ExportConfig = ctx.request.body.body;
-  Util.verifyParameters(exprtConf, ['templateID', 'variantId']);
+  Util.verifyParameters(exprtConf, ['templateId', 'variantId']);
 
   await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body.body);
 
@@ -113,7 +113,7 @@ Router.post('/headless', async (ctx, next) =>
     return;
   }
 
-  Util.verifyParameters(authStream['fields'], ['filetype', 'templateID']);
+  Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
   // optional parameters: update, hasCsvHeader
 
   await perm.ImportPermissions.verifyHeadlessRoute(authStream['user'] as UserConfig, authStream['fields']);
