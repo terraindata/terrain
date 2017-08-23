@@ -45,25 +45,20 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
 import
 {
+  createContainer,
   VictoryArea,
   VictoryAxis,
   VictoryBrushContainer,
   VictoryChart,
-  VictoryContainer,
   VictoryGroup,
-  VictoryLabel,
   VictoryLegend,
-  VictoryLine,
   VictoryScatter,
   VictoryTheme,
   VictoryTooltip,
-  VictoryVoronoiContainer,
-  VictoryZoomContainer,
 } from 'victory';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import * as LibraryTypes from './../../library/LibraryTypes';
@@ -127,6 +122,8 @@ interface State
   selectedDomain: any;
   zoomDomain: any;
   visibleDatasets: List<ID>;
+  highlightDataset: ID;
+  datasetColors: any;
 }
 
 const colors = ['blue', 'red', 'green', 'yellow'];
@@ -140,14 +137,30 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     selectedDomain: {},
     zoomDomain: {},
     visibleDatasets: null,
+    highlightDataset: null,
+    datasetColors: {},
   };
 
   constructor(props)
   {
     super(props);
 
-    const visibleDatasets = props.datasets.map((ds) => ds.id);
-    this.state.visibleDatasets = Immutable.List<ID>(visibleDatasets);
+    const { datasets } = props;
+
+    this.state.visibleDatasets = datasets.keySeq().toList();
+    this.state.datasetColors = this.mapDatasetColors(datasets);
+  }
+
+  public mapDatasetColors(datasets)
+  {
+    const datasetColors = {};
+
+    datasets.keySeq().forEach((datasetId, index) =>
+    {
+      datasetColors[datasetId] = colors[index % colors.length];
+    });
+
+    return datasetColors;
   }
 
   public componentWillReceiveProps(nextProps)
@@ -155,7 +168,10 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     if (this.props.datasets !== nextProps.datasets)
     {
       const visibleDatasets = nextProps.datasets.keySeq();
-      this.setState({ visibleDatasets: visibleDatasets.toList() });
+      this.setState({
+        visibleDatasets: visibleDatasets.toList(),
+        datasetColors: this.mapDatasetColors(nextProps.datasets),
+      });
     }
   }
 
@@ -172,36 +188,76 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
   public renderData()
   {
     const { datasets } = this.props;
-    const { visibleDatasets } = this.state;
+    const { visibleDatasets, highlightDataset } = this.state;
     const areas = [];
     const scatters = [];
+
+    let areaToHightlight = null;
+    let scatterToHightlight = null;
 
     datasets.forEach((ds, key) =>
     {
       if (visibleDatasets.includes(key))
       {
-        const dsIndex = visibleDatasets.indexOf(key);
-        areas.push(
-          <VictoryArea
-            key={key}
-            style={{ data: { fill: colors[dsIndex % colors.length] } }}
-            data={ds.data}
-            interpolation={config.topChart.interpolation}
-            x='time'
-            y='value'
-          />,
-        );
-        scatters.push(
-          <VictoryScatter
-            key={key}
-            data={ds.data}
-            size={0}
-            x='time'
-            y='value'
-          />,
-        );
+        if (key !== highlightDataset || highlightDataset === null)
+        {
+          areas.push(
+            <VictoryArea
+              key={key}
+              name={`area-${key}`}
+              style={{ data: { fill: this.getDatasetColor(key) } }}
+              data={ds.data}
+              interpolation={config.topChart.interpolation}
+              x='time'
+              y='value'
+            />,
+          );
+          scatters.push(
+            <VictoryScatter
+              key={key}
+              data={ds.data}
+              size={0}
+              x='time'
+              y='value'
+            />,
+          );
+        }
+        else
+        {
+          areaToHightlight = (
+            <VictoryArea
+              name={`area-${key}`}
+              key={key}
+              style={{ data: { fill: this.getDatasetColor(key) } }}
+              data={ds.data}
+              interpolation={config.topChart.interpolation}
+              x='time'
+              y='value'
+            />
+          );
+
+          scatterToHightlight = (
+            <VictoryScatter
+              key={key}
+              size={(datum, active) => active ? 5 : 0}
+              data={ds.data}
+              x='time'
+              y='value'
+            />
+          );
+        }
       }
     });
+
+    if (areaToHightlight !== null)
+    {
+      areas.push(areaToHightlight);
+    }
+
+    if (scatterToHightlight !== null)
+    {
+      scatters.push(scatterToHightlight);
+    }
 
     return { areas, scatters };
   }
@@ -215,29 +271,109 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
       .map((ds, key) =>
       {
         const variant = variants.get(key);
+        let labelsStyle = {};
+
+        if (visibleDatasets.includes(key))
+        {
+          labelsStyle = { textDecoration: 'underline' };
+        }
+
         return {
           id: variant.get('id'),
           name: variant.get('name'),
+          labels: labelsStyle,
         };
       });
 
     return (
       <VictoryLegend
+        name='legend'
         data={data.toArray()}
         orientation={config.legend.orientation}
-        events={[{
-          target: 'labels',
-          eventHandlers: {
-            onClick: this.handleLegendClick,
-          },
-        }]}
       />
     );
+  }
+
+  public getDatasetColor(datasetId)
+  {
+    return this.state.datasetColors[datasetId];
   }
 
   public handleLegendClick(e, props)
   {
     this.toggleDatasetVisibility(props.datum.id);
+  }
+
+  public handleLegendMouseOver(e, props)
+  {
+    /* Return an array of affected victory components.
+     * @childName: is optional, can be used to reference any victory component
+     *   within the same VictoryChart by its name property. Then, the props
+     *   received by the mutation function will be the ones of the referenced
+     *   component, and the props returned by the mutation will be applied to
+     *   it.
+     * @target: {'data' | 'labels'} indicates what's the component to which
+     *   the new props returned by the mutation will be applied. For instance,
+     *   if this event comes from a VictoryLegend, 'data' refers to the legend
+     *   item marker (the dot in this case) and 'labels' means the legend item
+     *   text.
+     * @mutation: is a function, recieves the props of the matched element, and
+     *   returns a new props objects to be applied to it.
+     */
+    return [
+      {
+        // Matches the VictoryLegend texts.
+        target: 'labels',
+        mutation: (labelProps) =>
+        {
+          // Changes the VictoryLegend hover item text font size.
+          const newStyle = Object.assign({}, labelProps.style, { fontSize: 16 });
+          return { style: newStyle };
+        },
+      },
+      {
+        // Matches the VictoryArea that corresponds with the hovered legend item.
+        childName: `area-${props.datum.id}`,
+        target: 'data', // in this case 'data' means the area (the 'labels' are
+        // the tooltips)
+        eventKey: 'all', // this holds the index of single data points,
+        // we want to paint the whole area
+        mutation: (areaProps) =>
+        {
+          // Store a reference to the active dataset, to bring it to the front
+          this.setState({ highlightDataset: props.datum.id });
+          return {
+            // Change the corresponding area style.
+            style: Object.assign(
+              {},
+              areaProps.style,
+              { fill: this.getDatasetColor(props.datum.id), strokeWidth: 3, fillOpacity: 0.7 },
+            ),
+          };
+        },
+      },
+    ];
+  }
+
+  public handleLegendMouseOut(e, props)
+  {
+    return [
+      {
+        target: 'labels',
+        mutation: () => null,
+      },
+      {
+        childName: [`area-${props.datum.id}`],
+        target: 'data',
+        eventKey: 'all',
+        mutation: () =>
+        {
+          // Returning null resets all mutations, reverts the component back to
+          // its original state.
+          return null;
+        },
+      },
+    ];
   }
 
   public toggleDatasetVisibility(datasetId)
@@ -264,6 +400,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
     const data = this.renderData();
     const legend = this.renderLegend();
 
+    const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
+
     return (
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
@@ -274,32 +412,36 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
                 theme={VictoryTheme.material}
                 padding={styles.topChart.padding}
                 containerComponent={
-                  <VictoryZoomContainer
+                  <VictoryZoomVoronoiContainer
                     responsive={false}
                     dimension='x'
                     zoomDomain={this.state.zoomDomain}
                     onDomainChange={this.handleZoom}
+                    labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
+                    labelComponent={
+                      <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                    }
                   />
                 }
                 width={width}
                 height={height}
+                events={[{
+                  // indicate, by name, the component that listens to the event
+                  childName: ['legend'],
+                  // { 'data', 'labels' }, indicates if the texts or the dots
+                  // of the legend items are the one that listens to the event.
+                  target: 'labels',
+                  eventHandlers: {
+                    onClick: this.handleLegendClick,
+                    onMouseOver: this.handleLegendMouseOver,
+                    onMouseOut: this.handleLegendMouseOut,
+                  },
+                }]}
               >
                 <VictoryGroup
                   style={styles.topChart.areas}
-                  containerComponent={
-                    <VictoryVoronoiContainer
-                      labels={(d) => `${d.x.toDateString()} => ${d.y}`}
-                      dimension='x'
-                      labelComponent={
-                        <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
-                      }
-                    />
-                  }
-                  labelComponent={<VictoryTooltip activateData={true} cornerRadius={0} flyoutStyle={{ fill: 'white' }} />}
                 >
                   {data.areas}
-                </VictoryGroup>
-                <VictoryGroup>
                   {data.scatters}
                 </VictoryGroup>
                 {legend}

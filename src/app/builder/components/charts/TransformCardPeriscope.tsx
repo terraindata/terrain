@@ -49,9 +49,9 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import './TransformCardPeriscope.less';
 const { Map, List } = Immutable;
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';

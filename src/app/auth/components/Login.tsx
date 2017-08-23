@@ -50,10 +50,8 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Ajax from '../../util/Ajax';
-import Util from '../../util/Util';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
@@ -259,17 +257,28 @@ class Login extends TerrainComponent<Props>
           className='login-container'
           ref='container'
         >
-          <div className='login-info'>
+          <div className='login-info'
+            style={[
+              backgroundColor(Colors().bg3),
+            ]}
+          >
             <div className='login-row'
               style={[
                 fontColor(Colors().text2),
                 backgroundColor(Colors().bg2),
                 borderColor(Colors().text3,
-                  Colors().text2)
+                  Colors().text2),
               ]}
               key={'login-email'}
             >
               <input
+                style={[
+                  fontColor(Colors().altText1),
+                  backgroundColor(Colors().altBg1),
+                  borderColor(Colors().border3,
+                    Colors().active),
+                ]}
+                key={'login-input-email'}
                 id='login-email'
                 type='text'
                 onChange={this.handleEmailChange}
@@ -281,6 +290,10 @@ class Login extends TerrainComponent<Props>
               <label
                 htmlFor='login-email'
                 className='login-label'
+                style={[
+                  fontColor(Colors().border3),
+                ]}
+                key={'login-label-email'}
               >
                 Email
               </label>
@@ -290,23 +303,34 @@ class Login extends TerrainComponent<Props>
                 fontColor(Colors().text2),
                 backgroundColor(Colors().bg2),
                 borderColor(Colors().text3,
-                  Colors().text2)
+                  Colors().text2),
               ]}
               key={'login-password'}
             >
               <input
-                className='login-input-field'
-                type='password'
+                style={[
+                  fontColor(Colors().altText1),
+                  backgroundColor(Colors().altBg1),
+                  borderColor(Colors().border3,
+                    Colors().active),
+                ]}
+                key={'login-input-password'}
                 id='login-password'
-                placeholder=''
+                type='password'
                 onKeyDown={this.handleKeyDown}
                 onChange={this.handlePasswordChange}
+                className='login-input-field'
+                placeholder=''
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
               <label
                 className='login-label'
                 htmlFor='login-password'
+                style={[
+                  fontColor(Colors().border3),
+                ]}
+                key={'login-label-password'}
               >
                 Password
               </label>
@@ -317,7 +341,7 @@ class Login extends TerrainComponent<Props>
               style={[
                 fontColor(Colors().text2),
                 backgroundColor(Colors().active,
-                  Colors().activeHover)
+                  Colors().activeHover),
               ]}
               key={'login-submit-button'}
               onClick={this.handleLogin}

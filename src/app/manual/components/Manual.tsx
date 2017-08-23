@@ -47,10 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
-import { Link } from 'react-router';
 import { browserHistory } from 'react-router';
-import * as _ from 'underscore';
 import Autocomplete from './../../common/components/Autocomplete';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Manual.less';

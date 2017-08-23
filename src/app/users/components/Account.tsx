@@ -50,10 +50,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Actions from './../data/UserActions';
-import Store from './../data/UserStore';
 import './Account.less';
 
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');

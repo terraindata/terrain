@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';

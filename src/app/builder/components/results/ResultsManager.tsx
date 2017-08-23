@@ -46,25 +46,28 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
-import { line } from 'd3-shape';
 import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
+import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
+import Actions from '../../../fileImport/data/FileImportActions';
+import * as FileImportTypes from '../../../fileImport/FileImportTypes';
+import * as SchemaTypes from '../../../schema/SchemaTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-
-import { _Result, _ResultsState, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
+import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
 
 export interface Props
 {
@@ -278,13 +281,19 @@ export class ResultsManager extends TerrainComponent<Props>
     // );
   }
 
-  public changeResults(changes: { [key: string]: any })
+  public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
   {
     let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
         resultsState = resultsState.set(key, value),
     );
+
+    if (exportChanges)
+    {
+      const { filetype, preview, originalNames } = exportChanges;
+      Actions.chooseFile(filetype, preview, originalNames);
+    }
 
     this.props.onResultsStateChange(resultsState);
   }
@@ -509,7 +518,22 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = results.size;
     }
 
-    this.changeResults(changes);
+    const filteredFields = List(_.difference(fields.toArray(), ['_score', '_index', '_type', '_id']));
+    const exportChanges: any = {
+      filetype: 'csv',
+      originalNames: filteredFields,
+      // preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+      //   List(_.map(_.omit(result.fields.toJS(), ['_score', '_index', '_type', '_id']), (field) => field)),
+      // )),
+      preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+        filteredFields.map((field, index) =>
+          result.fields.get(String(field)),
+        ),
+      )),
+    };
+    Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
+
+    this.changeResults(changes, exportChanges);
   }
 
   private handleM1QueryResponse(response: M1QueryResponse, isAllFields: boolean)

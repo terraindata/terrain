@@ -54,7 +54,7 @@ const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -83,6 +83,8 @@ export interface Props
   // ^ called on target
   onDropped: (id: ID, targetType: string, targetItem: any, shiftKey: boolean) => void;
   // ^ called on dragged element
+  onDragFinish: () => void;
+  // ^ called on target even if no drop occurs
 
   draggingItemIndex: number;
   draggingOverIndex: number;
@@ -418,6 +420,7 @@ const source =
 
     endDrag(props, monitor, component)
     {
+      props.onDragFinish();
       if (!monitor.didDrop())
       {
         return;

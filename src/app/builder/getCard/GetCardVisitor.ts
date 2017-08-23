@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-console
 
 import { List } from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -227,7 +227,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // first, populate the variant clause map, since it will be used by getCard
     this.computeVariantClauses(this.clauses);
 
-    _.mapObject(
+    _.mapValues(
       this.clauses,
       (clause, key) =>
       {
@@ -289,6 +289,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESArrayClause(clause: ESArrayClause): any
   {
+    const accepts = List(this.getCardTypes([clause.elementID], clause));
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
 
@@ -296,18 +297,18 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
         preview: '[cards.size] ' + clause.type + '(s)',
-
+        accepts,
         display:
         {
           displayType: DisplayType.CARDS,
           key: 'cards',
-          accepts: List(['eql' + clause.elementID]),
+          accepts,
         },
 
         init: (blocksConfig, extraConfig?, skipTemplate?) =>
           ({
             cards: List([
-              BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
+              // BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
             ]),
           }),
 
@@ -850,7 +851,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private computeVariantClauses(clauses: { [name: string]: ESClause })
   {
     const variantClauses: { [clauseType: string]: ESClause } = {};
-    _.mapObject(clauses, (clause, key) =>
+    _.mapValues(clauses, (clause, key) =>
     {
       if (clause.clauseType === ESClauseType.ESVariantClause)
       {
@@ -862,7 +863,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     const getClauseTypesForVariant = (clause: ESVariantClause): string[] =>
     {
       let types: string[] = [];
-      _.mapObject(clause.subtypes, (subtype) =>
+      _.mapValues(clause.subtypes, (subtype) =>
       {
         if (variantClauses[subtype] !== undefined)
         {
@@ -882,15 +883,15 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       return types;
     };
 
-    this.variantClauseMapping = _.mapObject(variantClauses, getClauseTypesForVariant);
+    this.variantClauseMapping = _.mapValues(variantClauses, getClauseTypesForVariant);
   }
 
   // We need to replace occurences of variant card types with their final types
   // We also need to splice in some custom types
-  private getCardTypes(initialCardTypes: string[], forClause?: ESClause): List<string>
+  private getCardTypes(initialClauseTypes: string[], forClause?: ESClause): List<string>
   {
     let cardTypes: string[] = [];
-    initialCardTypes.map((childType) =>
+    initialClauseTypes.map((childType) =>
     {
       if (this.variantClauseMapping[childType] !== undefined)
       {

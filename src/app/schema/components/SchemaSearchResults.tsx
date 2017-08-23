@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires no-shadowed-variable strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 const Radium = require('radium');
 import * as React from 'react';
 import FadeInOut from '../../common/components/FadeInOut';

@@ -48,22 +48,13 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as Redux from 'redux';
-import * as _ from 'underscore';
-// const Redux = require('redux');
+import thunk from 'redux-thunk';
 
 import BackendInstance from '../../../database/types/BackendInstance';
-import AuthStore from './../../auth/data/AuthStore';
-import RoleStore from './../../roles/data/RolesStore';
-import UserStore from './../../users/data/UserStore';
 import * as LibraryTypes from './../LibraryTypes';
-import Actions from './LibraryActions';
-import { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
 
 import { ItemStatus } from '../../../items/types/Item';
-import BuilderActions from '../../builder/data/BuilderActions';
 import Util from './../../util/Util';
-
-import Ajax from './../../util/Ajax';
 
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
@@ -122,45 +113,10 @@ const DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers';
 
-function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
-{
-  if (current !== previous)
-  {
-    current && previous && current.map((curItem: any, curId: ID) =>
-    {
-      const prevItem = previous.get(curId);
-      if (curItem !== prevItem)
-      {
-        // should save
-        Ajax.saveItem(curItem);
-      }
-    });
-  }
-}
-
 export const LibraryStore = Redux.createStore(
-  (state: LibraryState = DefaultState, action) =>
-  {
-    if (LibraryReducers[action.type])
-    {
-      state = LibraryReducers[action.type](state, action);
-    }
-
-    if (CleanLibraryActionTypes.indexOf(action.type) === -1)
-    {
-      // save the new state
-      saveStateOf(state.groups, state.prevGroups);
-      saveStateOf(state.algorithms, state.prevAlgorithms);
-      saveStateOf(state.variants, state.prevVariants);
-    }
-
-    state = state
-      .set('prevGroups', state.groups)
-      .set('prevAlgorithms', state.algorithms)
-      .set('prevVariants', state.variants);
-
-    return state;
-  }
-  , DefaultState);
+  LibraryReducers,
+  DefaultState,
+  Redux.applyMiddleware(thunk),
+);
 
 export default LibraryStore;

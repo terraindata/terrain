@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
 
 import * as React from 'react';
-import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
@@ -63,7 +62,6 @@ import { notificationManager } from './../../common/components/InAppNotification
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
@@ -84,6 +82,7 @@ export interface Props
   algorithmId: ID;
   multiselect?: boolean;
   params?: any;
+  variantActions?: any;
 }
 
 class VariantsColumn extends TerrainComponent<Props>
@@ -111,7 +110,7 @@ class VariantsColumn extends TerrainComponent<Props>
     if (multiselect && params && params.variantId)
     {
       const variantIds = params.variantId.split(',');
-      variantIds.forEach((id) => Actions.variants.select(id));
+      variantIds.forEach((id) => this.props.variantActions.select(id));
     }
 
     this._subscribe(UserStore, {
@@ -160,7 +159,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleDuplicate(id: ID)
   {
-    Actions.variants.duplicate(
+    this.props.variantActions.duplicate(
       this.props.variants.get(id),
       this.props.variantsOrder.findIndex((iid) => iid === id),
     );
@@ -168,7 +167,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleArchive(id: ID)
   {
-    Actions.variants.change(
+    this.props.variantActions.change(
       this.props.variants.get(id)
         .set('status', ItemStatus.Archive) as Variant,
     );
@@ -176,7 +175,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleCreate()
   {
-    Actions.variants.create(this.props.groupId, this.props.algorithmId);
+    this.props.variantActions.create(this.props.groupId, this.props.algorithmId);
   }
 
   public handleNameChange(id: ID, name: string)
@@ -198,7 +197,7 @@ class VariantsColumn extends TerrainComponent<Props>
       );
     }
 
-    Actions.variants.change(
+    this.props.variantActions.change(
       this.props.variants.get(id)
         .set('name', name) as Variant,
     );
@@ -217,7 +216,7 @@ class VariantsColumn extends TerrainComponent<Props>
       });
 
       // var target = this.props.variants.get(this.props.variantsOrder.get(index));
-      // Actions.variants.move(this.props.variants.get(id).set('status', target.status) as Variant,
+      // this.props.variantActions.move(this.props.variants.get(id).set('status', target.status) as Variant,
       //   index, this.props.groupId, this.props.algorithmId);
     }
   }
@@ -242,15 +241,15 @@ class VariantsColumn extends TerrainComponent<Props>
         );
         if (shiftKey)
         {
-          Actions.variants.duplicate(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
+          this.props.variantActions.duplicate(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
         }
         else
         {
-          Actions.variants.move(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
+          this.props.variantActions.move(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
         }
         break;
       case 'variant':
-        Actions.variants.move(
+        this.props.variantActions.move(
           this.props.variants.get(id),
           this.props.variantsOrder.indexOf(targetItem.id),
           this.props.groupId,
@@ -258,7 +257,10 @@ class VariantsColumn extends TerrainComponent<Props>
         );
         break;
     }
+  }
 
+  public handleDragFinish()
+  {
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
@@ -279,17 +281,17 @@ class VariantsColumn extends TerrainComponent<Props>
     {
       if (selectedVariants.includes(id.toString()))
       {
-        Actions.variants.unselect(id.toString());
+        this.props.variantActions.unselect(id.toString());
       } else
       {
-        Actions.variants.select(id.toString());
+        this.props.variantActions.select(id.toString());
       }
     } else
     {
       browserHistory.push(`/${basePath}/${groupId}/${algorithmId}/${id}`);
       const { variantId } = this.props.params;
-      Actions.variants.unselectAll();
-      Actions.variants.select(variantId);
+      this.props.variantActions.unselectAll();
+      this.props.variantActions.select(variantId);
     }
   }
 
@@ -357,6 +359,7 @@ class VariantsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={variant}
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}
@@ -377,6 +380,7 @@ class VariantsColumn extends TerrainComponent<Props>
             <StatusDropdown
               variant={variant}
               noBorder={true}
+              variantActions={this.props.variantActions}
             />
             <div
               className='library-item-line'
@@ -391,13 +395,12 @@ class VariantsColumn extends TerrainComponent<Props>
     );
   }
 
-  public handlItemStatusHover(statusString: string, id: ID)
+  public handleItemStatusHover(statusString: string, id: ID)
   {
     const v = this.props.variants.get(id);
-    const status = ItemStatus[statusString];
-    if (v.status !== status)
+    if (v.status !== statusString)
     {
-      Actions.variants.change(v.set('status', status) as Variant);
+      this.props.variantActions.change(v.set('status', statusString) as Variant);
     }
   }
 
@@ -423,7 +426,7 @@ class VariantsColumn extends TerrainComponent<Props>
         status={archived ? ItemStatus.Archive : ItemStatus.Build}
         key={archived ? '1' : '0'}
         type='variant'
-        onHover={this.handlItemStatusHover}
+        onHover={this.handleItemStatusHover}
         titleHidden={!archived}
       >
         {

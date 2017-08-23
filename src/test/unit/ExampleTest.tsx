@@ -53,7 +53,6 @@ import * as test from 'tape';
 const TestUtils = require('react-addons-test-utils');
 import createReactClass = require('create-react-class');
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
 
 const CardField = createReactClass({
   render()

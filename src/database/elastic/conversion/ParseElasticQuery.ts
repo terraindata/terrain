@@ -54,7 +54,7 @@ import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLPar
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import { Input, InputType, isInput, toInputMap } from '../../../blocks/types/Input';
+import { Input, isInput, toInputMap } from '../../../blocks/types/Input';
 
 export function stringifyWithParameters(
   obj: object | number | boolean | string | null,

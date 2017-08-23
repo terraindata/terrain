@@ -46,16 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
-import * as BlockUtils from '../../../blocks/BlockUtils';
+import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
 
-import { InputPrefix } from '../../../blocks/types/Input';
+import { isInput } from '../../../blocks/types/Input';
 import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 
 class CardsToElastic
@@ -92,12 +91,15 @@ class CardsToElastic
 
     if (block && block.static.tql)
     {
-      if (typeof block['value'] === 'string' && block['value'].charAt(0) === InputPrefix)
-      {
-        return block['value'];
-      }
       const tql = block.static.tql as TQLRecursiveObjectFn;
-      return tql(block, CardsToElastic.blockToElastic, options);
+      let value = tql(block, CardsToElastic.blockToElastic, options);
+
+      if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
+        && isInput(block['value'], BuilderStore.getState().query.inputs))
+      {
+        value = block['value'];
+      }
+      return value;
     }
     return { notYet: 'not yet done' };
   }

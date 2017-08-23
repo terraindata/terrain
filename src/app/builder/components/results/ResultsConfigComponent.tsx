@@ -53,16 +53,10 @@ const { List, Map } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
-import * as _ from 'underscore';
-import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
-import InfoArea from '../../../common/components/InfoArea';
-import Ajax from '../../../util/Ajax';
-import Util from '../../../util/Util';
-import Result from '../results/Result';
+import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { MAX_RESULTS, Results } from './ResultTypes';
 
 const Color = require('color');
 
@@ -389,9 +383,12 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             }
           </CRTarget>
           <div className='results-config-disabled-veil'
-            style={backgroundColor(Color(Colors().bg1).alpha(0.5))} // bg1 but with alpha 0.5
+            style={backgroundColor(Colors().fadedOutBg)}
           >
-            <div className='results-config-disabled-veil-inner'>
+            <div
+              className='results-config-disabled-veil-inner'
+              style={backgroundColor(Colors().bg1)}
+            >
               <b>Custom results view is off.</b>
               Results will display the information returned from the query.
             </div>

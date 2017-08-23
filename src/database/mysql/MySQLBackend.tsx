@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import MySQLBlocks from './blocks/MySQLBlocks';
 import MySQLCardsDeck from './blocks/MySQLCardsDeck';
 import CardsToSQL from './conversion/CardsToSQL';

@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 
 import Blocks from './ElasticBlocks';
 import { ElasticElasticCardDeckTypes } from './ElasticElasticCards';
