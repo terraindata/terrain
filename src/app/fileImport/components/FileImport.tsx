@@ -234,17 +234,8 @@ class FileImport extends TerrainComponent<any>
     if (hasCsvHeader)
     {
       const testDuplicateConfig: ParseCSVConfig = {
-        delimiter: ',',
-        newLine: '\n',
-        quoteChar: '\"',
-        escapeChar: '\"',
-        comments: '#',
         preview: 1,
         hasHeaderRow: false,
-        error: (err) =>
-        {
-          alert(String(err));
-        },
       };
 
       const columnHeaders = parseCSV(file, testDuplicateConfig);
@@ -272,17 +263,8 @@ class FileImport extends TerrainComponent<any>
       }
     }
     const config: ParseCSVConfig = {
-      delimiter: ',',
-      newLine: '\n',
-      quoteChar: '\"',
-      escapeChar: '\"',
-      comments: '#',
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       hasHeaderRow: hasCsvHeader,
-      error: (err) =>
-      {
-        alert(String(err));
-      },
     };
     return parseCSV(file, config);
   }
