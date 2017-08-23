@@ -51,7 +51,6 @@ import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
 import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
 import * as EventEncryption from './Encryption';

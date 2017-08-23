@@ -46,17 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands
 
-import { List, Map } from 'immutable';
-import * as _ from 'underscore';
+import { List } from 'immutable';
+import * as _ from 'lodash';
 
-import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
-import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
 import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType } from '../../../blocks/displays/Display';
+import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
+import { _card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 const esFilterOperatorsMap = {
@@ -72,7 +69,7 @@ export const elasticFilterBlock = _block(
   {
     field: '',
     value: undefined,
-    boolQuery: '',
+    boolQuery: 'must',
     filterOp: '=',
 
     static: {

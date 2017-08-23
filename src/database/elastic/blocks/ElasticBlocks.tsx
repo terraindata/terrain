@@ -44,18 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { _block, Block, TQLFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import { _block } from '../../../blocks/types/Block';
+import { _card } from '../../../blocks/types/Card';
+import { InputType } from '../../../blocks/types/Input';
 
-import Util from '../../../app/util/Util';
-
-import { ElasticElasticCardDeckTypes, ElasticElasticCards } from './ElasticElasticCards';
+import { ElasticElasticCards } from './ElasticElasticCards';
 import { elasticFilter, elasticFilterBlock } from './ElasticFilterCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';
 import { elasticTransform, scorePoint } from './ElasticTransformCard';

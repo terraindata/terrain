@@ -43,14 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
+import { backgroundColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './FileImportPreviewRow.less';
 
@@ -73,7 +68,10 @@ class FileImportPreviewRow extends TerrainComponent<Props>
             <div
               key={key}
               className='fi-preview-row-cell'
-              style={backgroundColor(Colors().fileimport.preview.cell)}
+              style={{
+                background: Colors().bg2,
+                text: Colors().text1,
+              }}
             >
               <div
                 className='fi-preview-row-cell-text'

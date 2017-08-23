@@ -50,12 +50,9 @@ THE SOFTWARE.
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
 import ESParserToken from '../../../../shared/database/elastic/parser/ESParserToken';
-import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 // interpreter and clause imports
-import ESClause from '../../../../shared/database/elastic/parser/clauses/ESClause';
-import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 // other imports

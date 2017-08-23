@@ -46,10 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
@@ -57,17 +56,16 @@ import Dropdown from '../../../common/components/Dropdown';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import PanelMixin from '../layout/PanelMixin';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle, getCardColors } from '../../../common/Colors';
+import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-import { Input, InputType } from '../../../../blocks/types/Input';
+import { InputType } from '../../../../blocks/types/Input';
 
 interface Props
 {

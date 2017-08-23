@@ -46,8 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
-import { extend } from 'underscore';
-import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
+import { extend } from 'lodash';
 
 const Color = require('color');
 
@@ -96,6 +95,7 @@ interface Theme
 
   scrollbarBG: string;
   scrollbarPiece: string;
+  altScrollbarPiece: string;
 
   error: string;
 
@@ -350,6 +350,8 @@ const DARK: Theme =
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
+
+    altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
 
     error: '#d14f42',
 

@@ -85,11 +85,12 @@ const appSchemaSQL: string[] = [
      name text NOT NULL,
      dbid integer NOT NULL,
      dbname text NOT NULL,
+     export bool,
      tablename text NOT NULL,
-     csvHeaderMissing bool,
      originalNames text NOT NULL,
      columnTypes text NOT NULL,
-     primaryKey text NOT NULL,
+     primaryKeyDelimiter text,
+     primaryKeys text NOT NULL,
      transformations text NOT NULL);`,
 ];
 

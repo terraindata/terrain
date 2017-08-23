@@ -44,10 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
-import Ajax from './../../util/Ajax';
 import * as RoleTypes from './../RoleTypes';
-import Actions from './RolesActions';
 import ActionTypes from './RolesActionTypes';
 
 const RolesReducer = {};
@@ -94,4 +91,15 @@ RolesReducer[ActionTypes.change] =
     return state.setIn([role.groupId, role.userId], role);
   };
 
-export default RolesReducer;
+const RolesReducerWrapper = (state: Immutable.Map<ID, any> = Immutable.Map({}), action) =>
+{
+  let nextState = state;
+  if (RolesReducer[action.type])
+  {
+    nextState = RolesReducer[action.type](state, action);
+  }
+
+  return nextState;
+};
+
+export default RolesReducerWrapper;

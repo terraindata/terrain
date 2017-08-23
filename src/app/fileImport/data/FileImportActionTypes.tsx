@@ -43,19 +43,22 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import Util from './../../util/Util';
 
 const FileImportActionTypes =
   {
     changeServer: '',
+    changeDbName: '',
+    changeTableName: '',
+    changeServerDbTable: '',
     changeDbText: '',
     changeTableText: '',
     changeHasCsvHeader: '',
     changePrimaryKey: '',
+    changePrimaryKeyDelimiter: '',
     chooseFile: '',
-    uploadFile: '',
+    importFile: '',
+    exportFile: '',
     addTransform: '',
     setColumnToInclude: '',
     setColumnName: '',
@@ -65,6 +68,9 @@ const FileImportActionTypes =
     fetchTemplates: '',
     setTemplates: '',
     loadTemplate: '',
+    deleteTemplate: '',
+    updateTemplate: '',
+    saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
   };

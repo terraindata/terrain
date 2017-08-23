@@ -54,7 +54,7 @@ import { Colors } from '../../../common/Colors';
 const d3 = require('d3');
 // import * as d3 from 'd3';
 import * as $ from 'jquery';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import Util from '../../../util/Util';
 
 const xMargin = 45;
@@ -130,7 +130,7 @@ const TransformChart = {
       fill: ${Colors().text2} !important;
     }
     `;
-    let style = $(el).append(`<style>${styleCSS}</style>`);
+    const style = $(el).append(`<style>${styleCSS}</style>`);
   },
 
   update(el, state)

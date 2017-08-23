@@ -44,9 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { IndexRoute, Route, Router } from 'react-router';
 import { browserHistory } from 'react-router';
+import { IndexRoute, Route, Router } from 'react-router';
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -91,7 +90,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/builder/:config' component={Builder} />
           <Route path='/builder/:config/:splitConfig' component={Builder} />
 
-          <Route path='/library' onEnter={this.libraryOnEnter.bind(this)}>
+          <Route path='/library' onEnter={this.libraryOnEnter}>
             <IndexRoute component={libraryLibrary} />
             <Route path=':groupId' component={libraryLibrary}>
               <IndexRoute component={libraryLibrary} />
@@ -134,7 +133,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/schema' component={SchemaPage} />
 
           <Route path='/import' component={FileImport} />
-          <Route path='/analytics' onEnter={this.libraryOnEnter.bind(this)}>
+          <Route path='/analytics' onEnter={this.libraryOnEnter}>
             <IndexRoute component={analyticsLibrary} />
             <Route path=':groupId' component={analyticsLibrary}>
               <IndexRoute component={analyticsLibrary} />

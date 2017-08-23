@@ -43,14 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'underscore';
-import { ItemStatus } from '../../../items/types/Item';
-import Util from './../../util/Util';
-import * as LibraryTypes from './../LibraryTypes';
-import ActionTypes from './LibraryActionTypes';
-import { LibraryState } from './LibraryStore';
 
 import * as Immutable from 'immutable';
+import Ajax from 'util/Ajax';
+import { ItemStatus } from '../../../items/types/Item';
+import * as LibraryTypes from './../LibraryTypes';
+import ActionTypes, { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
+import { _LibraryState, LibraryState } from './LibraryStore';
 
 const LibraryReducers = {};
 
@@ -283,4 +282,44 @@ LibraryReducers[ActionTypes.variants.unselectAll] =
     action: Action<{}>,
   ) => state.set('selectedVariants', state.selectedVariants.clear());
 
-export default LibraryReducers;
+function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
+{
+  if (current !== previous && current !== null && previous !== null)
+  {
+    current.map((curItem: any, curId: ID) =>
+    {
+      const prevItem = previous.get(curId);
+      if (curItem !== prevItem)
+      {
+        // should save
+        Ajax.saveItem(curItem);
+      }
+    });
+  }
+}
+
+const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =>
+{
+  let nextState = state;
+  if (LibraryReducers[action.type])
+  {
+    nextState = LibraryReducers[action.type](state, action);
+  }
+
+  if (CleanLibraryActionTypes.indexOf(action.type) === -1)
+  {
+    // save the new state
+    saveStateOf(nextState.groups, nextState.prevGroups);
+    saveStateOf(nextState.algorithms, nextState.prevAlgorithms);
+    saveStateOf(nextState.variants, nextState.prevVariants);
+  }
+
+  nextState = nextState
+    .set('prevGroups', nextState.groups)
+    .set('prevAlgorithms', nextState.algorithms)
+    .set('prevVariants', nextState.variants);
+
+  return nextState;
+};
+
+export default LibraryReducersWrapper;
