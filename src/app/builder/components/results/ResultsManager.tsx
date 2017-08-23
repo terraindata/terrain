@@ -68,6 +68,7 @@ import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTyp
 export interface Props
 {
   query: Query;
+  queryString?: string;
   resultsState: ResultsState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
@@ -128,7 +129,7 @@ export class ResultsManager extends TerrainComponent<Props>
     );
   }
 
-  public queryResults(query: Query, db: BackendInstance)
+  public queryResults(query: Query, db: BackendInstance, queryString?: string)
   {
     if (!query || !db)
     {
@@ -140,7 +141,7 @@ export class ResultsManager extends TerrainComponent<Props>
       this.queryM1Results(query, db);
     } else if (db.source === 'm2')
     {
-      this.queryM2Results(query, db);
+      this.queryM2Results(query, db, queryString);
     } else
     {
       console.log('Unknown Database ' + query);
@@ -371,21 +372,23 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
-  private queryM2Results(query: Query, db: BackendInstance)
+  private queryM2Results(query: Query, db: BackendInstance, queryString?: string)
   {
-    if (query.parseTree === null || query.parseTree.hasError())
+    if (!queryString && (query.parseTree === null || query.parseTree.hasError()))
     {
       return;
     }
 
-    if (query !== this.state.lastQuery)
+    if (queryString || query !== this.state.lastQuery)
     {
-      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+      const eql = queryString? queryString : AllBackendsMap[query.language].parseTreeToQueryString(
         query,
         {
           replaceInputs: true,
         },
       );
+      console.log('eql');
+      console.log(eql);
 
       this.setState({
         lastQuery: query,
@@ -407,7 +410,7 @@ export class ResultsManager extends TerrainComponent<Props>
       let allFieldsQueryCode;
       try
       {
-        allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
+        allFieldsQueryCode = queryString? queryString : AllBackendsMap[query.language].parseTreeToQueryString(
           query,
           {
             allFields: true,
@@ -419,6 +422,9 @@ export class ResultsManager extends TerrainComponent<Props>
       {
         console.log('Could not generate all field Elastic request, reason:' + err);
       }
+      console.log()
+      console.log('allFieldsQueryCode');
+      console.log(allFieldsQueryCode);
       if (allFieldsQueryCode)
       {
         this.setState({

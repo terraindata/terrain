@@ -62,6 +62,10 @@ import { ResultsManager } from '../../builder/components/results/ResultsManager'
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
+import Colors from '../../common/Colors';
+import ResultsArea from '../../builder/components/results/ResultsArea';
+import * as PropTypes from 'prop-types';
+import { _ResultsConfig, ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
 
 import { AllBackendsMap } from '../../../database/AllBackends';
 
@@ -69,7 +73,7 @@ const NUM_ROWS = 200;
 
 export interface Props
 {
-  databases: SchemaTypes.DatabaseMap;
+  servers: SchemaTypes.ServerMap;
 }
 
 @Radium
@@ -80,11 +84,14 @@ class SchemaResults extends TerrainComponent<Props>
     selectedItem?: SchemaBaseClass,
 
     resultsState?: ResultsState;
+    resultsConfig?: ResultsConfig;
     resultsQuery?: Query;
-    resultsDb?: BackendInstance;
+    resultsQueryString?: string;
+    resultsServer?: BackendInstance;
     resultsErrorMessage?: string;
   } = {
     resultsState: _ResultsState(),
+    resultsConfig: _ResultsConfig(),
   };
 
   constructor(props: Props)
@@ -97,10 +104,10 @@ class SchemaResults extends TerrainComponent<Props>
         const { selectedId } = storeState;
         // TODO change if store changes
         const selectedItem =
+          storeState.getIn(['servers', selectedId]) ||
           storeState.getIn(['databases', selectedId]) ||
           storeState.getIn(['tables', selectedId]) ||
-          storeState.getIn(['columns', selectedId]) ||
-          storeState.getIn(['indexes', selectedId]);
+          storeState.getIn(['columns', selectedId]);
 
         if (selectedItem !== this.state.selectedItem)
         {
@@ -111,49 +118,44 @@ class SchemaResults extends TerrainComponent<Props>
 
           if (this.showsResults(selectedItem))
           {
-            const resultsDb =
-              selectedItem.type === 'database' ? selectedItem.name :
-                this.props.databases
-                && this.props.databases.get(selectedItem['databaseId']);
-            console.log('schema resultsDb', resultsDb);
-            let field: string;
-            let table: string;
-            let where: string;
+            const resultsServer =
+              selectedItem.type === 'server' ? selectedItem.name :
+                this.props.servers
+                && this.props.servers.get(selectedItem['serverId']);
 
+            console.log('resultsServer=');
+            console.log(this.state.resultsServer);
+
+            let queryString: string = '';
             switch (selectedItem.type)
             {
+              case 'server':
+                queryString = '{ "index": "", "type": "", "from": 0, "size": 1000, "body": { "query": { } } }';
+                break;
               case 'database':
-                field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
-                table = 'INFORMATION_SCHEMA.TABLES';
-                where = `TABLE_SCHEMA = '${selectedItem.name}'`;
+                queryString = '{ "index": "'+selectedItem['name']+'", "type": "", "from": 0, "size": 1000, "body": { "query": { } } }';
                 break;
               case 'table':
-                field = '*';
-                table = selectedItem.name;
+                queryString = '{ "index": "'+selectedItem['databaseId'].replace(selectedItem['serverId']+'/','')+'", "type": "'+selectedItem['name']+'", "from": 0, "size": 1000, "body": { "query": { } } }';
                 break;
               case 'column':
-                field = selectedItem.name;
-                table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
-                break;
-              case 'index':
-                // TODO
+                queryString = '{ "index": "'+selectedItem['databaseId'].replace(selectedItem['serverId']+'/','')+'", "type": "'+selectedItem['tableId'].replace(selectedItem['databaseId']+'.','')+'", "from": 0, "size": 1000, "body": { "query": { } } }';
                 break;
             }
 
-            const resultsQuery = this.getQuery(resultsDb, field, table, where);
+            const resultsQuery: Query = _Query({});
             let resultsErrorMessage = null;
 
-            if (!resultsQuery)
-            {
-              resultsErrorMessage = 'Unsupported DB type: ' + resultsDb.type;
-            }
-
             this.setState({
+              resultsQueryString: queryString,
               resultsQuery,
-              resultsDb,
+              resultsServer,
               resultsState: _ResultsState(),
+              resultsConfig: _ResultsConfig(),
               resultsErrorMessage,
             });
+            console.log('resultsServer=');
+            console.log(this.state.resultsServer);
           }
           else
           {
@@ -161,93 +163,6 @@ class SchemaResults extends TerrainComponent<Props>
           }
         }
       },
-    });
-  }
-
-  public getQuery(resultsDb: BackendInstance, field: string, table: string, where: string = '1'): Query
-  {
-    if (resultsDb.type !== 'mysql')
-    {
-      // TODO MOD
-      return null;
-    }
-
-    const inputs = [
-      {
-        key: 'table',
-        value: table,
-      },
-      {
-        key: 'field',
-        value: field,
-      },
-      {
-        key: 'numRows',
-        value: NUM_ROWS,
-      },
-    ].map(
-      (inputConfig) =>
-        BlockUtils.make(
-          AllBackendsMap.mysql.blocks, 'input',
-          inputConfig,
-        ),
-    );
-
-    return _Query({
-      inputs: List(inputs),
-
-      cards: List([
-        BlockUtils.make(
-          AllBackendsMap.mysql.blocks, 'sfw',
-          {
-            fields: List([
-              BlockUtils.make(
-                AllBackendsMap.mysql.blocks, 'field',
-                {
-                  field: 'input.field',
-                },
-              ),
-            ]),
-
-            cards: List([
-              BlockUtils.make(
-                AllBackendsMap.mysql.blocks, 'from',
-                {
-                  tables: List([
-                    BlockUtils.make(
-                      AllBackendsMap.mysql.blocks, 'table',
-                      {
-                        table: 'input.table',
-                      },
-                    ),
-                  ]),
-                },
-              ),
-
-              BlockUtils.make(
-                AllBackendsMap.mysql.blocks, 'where',
-                {
-                  cards: List([
-                    BlockUtils.make(
-                      AllBackendsMap.mysql.blocks, 'tql',
-                      {
-                        clause: where,
-                      },
-                    ),
-                  ]),
-                },
-              ),
-
-              BlockUtils.make(
-                AllBackendsMap.mysql.blocks, 'take',
-                {
-                  value: 'input.numRows',
-                },
-              ),
-            ]),
-          },
-        ),
-      ]),
     });
   }
 
@@ -270,10 +185,10 @@ class SchemaResults extends TerrainComponent<Props>
         style={{
           width: '100%',
           height: '100%',
-          background: '#fff',
+          background: Colors().bg2,
         }}
       >
-        {
+        {/*
           this.showsResults(this.state.selectedItem) ?
             (
               this.state.resultsErrorMessage ?
@@ -284,6 +199,7 @@ class SchemaResults extends TerrainComponent<Props>
                 :
                 <ResultsTable
                   results={this.state.resultsState.results}
+                  resultsConfig={this.state.resultsConfig}
                   onExpand={_.noop}
                   resultsLoading={this.state.resultsState.loading}
                 />
@@ -292,13 +208,28 @@ class SchemaResults extends TerrainComponent<Props>
             <InfoArea
               large='Select an item to see its contents here.'
             />
+        */}
+        {
+          this.showsResults(this.state.selectedItem) ?
+            <ResultsArea
+              query={this.state.resultsQuery}
+              canEdit={false}
+              db={this.state.resultsServer}
+              variantName={''}
+              onNavigationException={PropTypes.func}
+              resultsState={this.state.resultsState}
+             />
+            :
+            <InfoArea
+              large='Select an item to see its contents here.'
+            />
         }
-
         <ResultsManager
-          db={this.state.resultsDb}
+          db={this.state.resultsServer}
           onResultsStateChange={this.handleResultsStateChange}
           resultsState={this.state.resultsState}
           query={this.state.resultsQuery}
+          queryString={this.state.resultsQueryString}
           noExtraFields={true}
         />
       </div>
