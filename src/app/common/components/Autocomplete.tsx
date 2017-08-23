@@ -70,6 +70,8 @@ export interface Props
 
   onFocus?: (event: React.FocusEvent<any>) => void;
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
+  onEnter?: () => void;
+  onSelectOption?: () => void;
 }
 
 @Radium
@@ -145,6 +147,7 @@ class Autocomplete extends TerrainComponent<Props>
   public handleSelect(value)
   {
     this.props.onChange(value);
+    this.props.onSelectOption();
     this.setState({
       value,
       open: false,
@@ -211,6 +214,7 @@ class Autocomplete extends TerrainComponent<Props>
         });
         this.blurValue = value;
         this.props.onChange(value);
+        this.props.onEnter();
         this.refs['input']['blur']();
         break;
       case 27:

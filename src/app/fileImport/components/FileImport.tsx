@@ -135,6 +135,16 @@ class FileImport extends TerrainComponent<any>
   public incrementStep()
   {
     const { filetype, stepId } = this.state;
+    const { dbName, tableName } = this.state.fileImportState;
+    if (stepId === 3 && !!isValidIndexName(dbName)) // TODO: convert stepIds to enums
+    {
+      return;
+    }
+    else if (stepId === 4 && !!isValidTypeName(tableName))
+    {
+      return;
+    }
+
     this.setState({
       stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
     });
@@ -180,9 +190,7 @@ class FileImport extends TerrainComponent<any>
     if (msg)
     {
       alert(msg);
-      return;
     }
-    this.incrementStep();
   }
 
   public handleAutocompleteTableChange(tableName: string)
@@ -203,9 +211,7 @@ class FileImport extends TerrainComponent<any>
     if (msg)
     {
       alert(msg);
-      return;
     }
-    this.incrementStep();
   }
 
   public parseJson(file: string): object[]
@@ -408,6 +414,8 @@ class FileImport extends TerrainComponent<any>
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={false}
+            onEnter={this._fn(this.incrementStep)}
+            onSelectOption={this._fn(this.incrementStep)}
             key={'fi-content-autocomplete-db'}
           />,
           <div
@@ -434,6 +442,8 @@ class FileImport extends TerrainComponent<any>
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={false}
+            onEnter={this._fn(this.incrementStep)}
+            onSelectOption={this._fn(this.incrementStep)}
             key={'fi-content-autocomplete-table'}
           />,
           <div
