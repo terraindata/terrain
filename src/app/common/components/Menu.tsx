@@ -142,8 +142,10 @@ export class Menu extends TerrainComponent<Props>
     $(document).off('click', this.close);
   }
 
-  public toggleOpen()
+  public toggleOpen(e)
   {
+    e.preventDefault();
+    e.stopPropagation();
     this.setState({
       open: !this.state.open,
     });
