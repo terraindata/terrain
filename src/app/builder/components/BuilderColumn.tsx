@@ -68,6 +68,8 @@ import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import CardsColumn from './cards/CardsColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsArea from './results/ResultsArea';
+import DragHandle from '../../common/components/DragHandle';
+
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -332,6 +334,7 @@ const BuilderColumn = createReactClass<any, any>(
               className='builder-title-bar-title'
               style={fontColor(Colors().text2)}
             >
+              <DragHandle />
               <span ref='handle'>
                 {
                   COLUMNS[this.state.column]
