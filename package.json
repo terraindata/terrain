@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "The one search front-end to rule them all.",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "start": "yarn run $NODE_DEBUG_OPTION build-midway:live",
     "start-front": "yarn run commit-log && MIDWAY_HOST=localhost:3000 OLD_MIDWAY_HOST=pa-terraformer02.terrain.int webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback --compress",
