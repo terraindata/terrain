@@ -1397,7 +1397,14 @@ export class Import
             {
               if (imprt.columnTypes.hasOwnProperty(name))
               {
-                trimmedItem[name] = item[name];
+                if (typeof item[name] === 'string')
+                {
+                  trimmedItem[name] = item[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+                }
+                else
+                {
+                  trimmedItem[name] = item[name];
+                }
               }
             }
             if (dontCheck !== true)
