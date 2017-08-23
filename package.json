@@ -74,7 +74,7 @@
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
     "diff-match-patch": "^1.0.0",
-    "elasticsearch": "^13.2.0",
+    "elasticsearch": "^13.3.1",
     "elasticsearch-scroll-stream": "^1.1.1",
     "fast-csv": "^2.4.0",
     "global": "^4.3.2",
