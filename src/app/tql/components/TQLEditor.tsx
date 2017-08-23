@@ -346,7 +346,6 @@ class TQLEditor extends TerrainComponent<Props>
     {
       return;
     }
-    console.log("name " + target.className);
     const box = target.getBoundingClientRect();
     const x = (box.left + box.right) / 2;
     const y = (box.top + box.bottom) / 2;
