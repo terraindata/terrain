@@ -76,6 +76,8 @@ export interface Props
   columnIndex?: number;
 
   textStyle?: React.CSSProperties;
+
+  handleCardDrop?: (type: string) => string;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
@@ -190,7 +192,7 @@ class BuilderComponent extends TerrainComponent<Props>
           singleChild={d.singleChild}
           language={this.props.language}
           hideCreateCardTool={d.hideCreateCardTool}
-          handleCardDrop={d.handleCardDrop}
+          handleCardDrop={d.handleCardDrop ? d.handleCardDrop : this.props.handleCardDrop}
         />;
         break;
       case DisplayType.CARDTEXT:

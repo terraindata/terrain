@@ -111,6 +111,7 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
 
     if (item['new'])
     {
+      console.log(targetProps.handleCardDrop);
       if (targetProps.handleCardDrop)
       {
         const card = BlockUtils.make(

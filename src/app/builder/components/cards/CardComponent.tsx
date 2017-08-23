@@ -500,6 +500,7 @@ class _CardComponent extends TerrainComponent<Props>
         color: this.props.card.static.colors[0],
         backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
       }}
+      handleCardDrop={this.props.handleCardDrop}
     />;
 
     const { card } = this.props;

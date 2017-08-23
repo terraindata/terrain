@@ -80,6 +80,7 @@ export interface Props
 
   containerWidth?: number;
   containerHeight?: number;
+  handleCardDrop?: (type: string) => string;
 }
 
 class CardsColumn extends TerrainComponent<Props>
@@ -225,6 +226,7 @@ class CardsColumn extends TerrainComponent<Props>
               heightOffset={12}
               accepts={this.getPossibleCards()}
               language={this.props.language}
+              handleCardDrop={this.props.handleCardDrop}
             />
             <CardsArea
               cards={cards}
@@ -235,6 +237,7 @@ class CardsColumn extends TerrainComponent<Props>
               columnIndex={this.props.columnIndex}
               noCardTool={true}
               accepts={this.getPossibleCards()}
+              handleCardDrop={this.props.handleCardDrop}
             />
             {
               !cards.size ? /* "Create your first card." */
