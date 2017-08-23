@@ -98,7 +98,6 @@ class FileImportPreview extends TerrainComponent<Props>
     loadedTemplateId: number,
     templateName: string,
     templateOptions: List<string>,
-    editColumnId: number,
     showingDelimTextBox: boolean,
   } = {
     deleteTemplateId: -1,
@@ -106,7 +105,6 @@ class FileImportPreview extends TerrainComponent<Props>
     loadedTemplateId: -1,
     templateName: '',
     templateOptions: List([]),
-    editColumnId: -1,
     showingDelimTextBox: false,
   };
 
@@ -151,13 +149,6 @@ class FileImportPreview extends TerrainComponent<Props>
         }));
       return true;
     }
-  }
-
-  public handleEditColumnChange(editColumnId: number)
-  {
-    this.setState({
-      editColumnId,
-    });
   }
 
   public handleElasticUpdateChange()
@@ -475,9 +466,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 columnType={this.props.columnTypes.get(key)}
                 isPrimaryKey={this.props.primaryKeys.includes(key)}
                 columnOptions={this.props.columnOptions}
-                editing={key === this.state.editColumnId}
                 exporting={this.props.exporting}
-                handleEditColumnChange={this.handleEditColumnChange}
                 onColumnNameChange={this.onColumnNameChange}
               />,
             ).toArray()
