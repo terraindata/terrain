@@ -53,6 +53,7 @@ import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
+import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
@@ -98,6 +99,8 @@ class FileImport extends TerrainComponent<any>
     fileSelected: boolean;
     filetype: string;
     filename: string,
+    dbValid: boolean,
+    tableValid: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
@@ -109,6 +112,8 @@ class FileImport extends TerrainComponent<any>
     fileSelected: false,
     filetype: '',
     filename: '',
+    dbValid: false,
+    tableValid: false,
   };
 
   constructor(props)
@@ -132,19 +137,15 @@ class FileImport extends TerrainComponent<any>
     });
   }
 
+  public setError(err: string)
+  {
+    Actions.setErrorMsg(err);
+  }
+
   public incrementStep()
   {
     const { filetype, stepId } = this.state;
-    const { dbName, tableName } = this.state.fileImportState;
-    if (stepId === 3 && !!isValidIndexName(dbName)) // TODO: convert stepIds to enums
-    {
-      return;
-    }
-    else if (stepId === 4 && !!isValidTypeName(tableName))
-    {
-      return;
-    }
-
+    // TODO: convert stepIds to enums
     this.setState({
       stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
     });
@@ -185,12 +186,11 @@ class FileImport extends TerrainComponent<any>
         :
         List([]),
     });
+
     Actions.changeDbName(dbName);
-    const msg: string = isValidIndexName(dbName); // TODO: remove annoying empty index name error
-    if (msg)
-    {
-      alert(msg);
-    }
+    this.setState({
+      dbValid: !isValidIndexName(dbName),
+    });
   }
 
   public handleAutocompleteTableChange(tableName: string)
@@ -207,11 +207,9 @@ class FileImport extends TerrainComponent<any>
     });
 
     Actions.changeTableName(tableName);
-    const msg: string = isValidTypeName(tableName);
-    if (msg)
-    {
-      alert(msg);
-    }
+    this.setState({
+      tableValid: !isValidTypeName(tableName),
+    });
   }
 
   public parseJson(file: string): object[]
@@ -219,7 +217,7 @@ class FileImport extends TerrainComponent<any>
     const items: object[] = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
     if (!Array.isArray(items))
     {
-      alert('Input JSON file must parse to an array of objects.');
+      Actions.setErrorMsg('Input JSON file must parse to an array of objects.');
       return undefined;
     }
     return items;
@@ -346,6 +344,41 @@ class FileImport extends TerrainComponent<any>
     this.parseFile(file.target.files[0], filetype, false);
   }
 
+  public handleSelectFileButtonClick()
+  {
+    this.refs['file']['value'] = null; // prevent file-caching
+    this.refs['file']['click']();
+  }
+
+  public handleCsvHeaderChoice(hasCsvHeader: boolean)
+  {
+    Actions.changeHasCsvHeader(hasCsvHeader);
+    const { file, filetype } = this.state.fileImportState;
+    this.parseFile(file, filetype, hasCsvHeader); // TODO: what happens on error?
+  }
+
+  public handleSelectDb(dbName: string)
+  {
+    const msg = isValidIndexName(dbName);
+    if (msg)
+    {
+      Actions.setErrorMsg(msg);
+      return;
+    }
+    this.incrementStep();
+  }
+
+  public handleSelectTable(tableName: string)
+  {
+    const msg = isValidTypeName(tableName);
+    if (msg)
+    {
+      Actions.setErrorMsg(msg);
+      return;
+    }
+    this.incrementStep();
+  }
+
   public renderSteps()
   {
     return (
@@ -365,19 +398,6 @@ class FileImport extends TerrainComponent<any>
         }
       </div>
     );
-  }
-
-  public handleSelectFileButtonClick()
-  {
-    this.refs['file']['value'] = null; // prevent file-caching
-    this.refs['file']['click']();
-  }
-
-  public handleCsvHeaderChoice(hasCsvHeader: boolean)
-  {
-    Actions.changeHasCsvHeader(hasCsvHeader);
-    const { file, filetype } = this.state.fileImportState;
-    this.parseFile(file, filetype, hasCsvHeader); // TODO: what happens on error?
   }
 
   public renderContent()
@@ -414,8 +434,8 @@ class FileImport extends TerrainComponent<any>
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={false}
-            onEnter={this._fn(this.incrementStep)}
-            onSelectOption={this._fn(this.incrementStep)}
+            onEnter={this._fn(this.handleSelectDb)}
+            onSelectOption={this._fn(this.handleSelectDb)}
             key={'fi-content-autocomplete-db'}
           />,
           <div
@@ -442,8 +462,8 @@ class FileImport extends TerrainComponent<any>
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={false}
-            onEnter={this._fn(this.incrementStep)}
-            onSelectOption={this._fn(this.incrementStep)}
+            onEnter={this._fn(this.handleSelectTable)}
+            onSelectOption={this._fn(this.handleSelectTable)}
             key={'fi-content-autocomplete-table'}
           />,
           <div
@@ -559,8 +579,8 @@ class FileImport extends TerrainComponent<any>
 
   public renderNav()
   {
-    const { stepId, fileSelected } = this.state;
-    const { serverName, dbName, tableName } = this.state.fileImportState;
+    const { stepId, fileSelected, dbValid, tableValid } = this.state;
+    const { serverName, errorMsg } = this.state.fileImportState;
     let nextEnabled = false;
     switch (stepId)
     {
@@ -574,10 +594,10 @@ class FileImport extends TerrainComponent<any>
         nextEnabled = !!serverName;
         break;
       case 3:
-        nextEnabled = !!dbName && !isValidIndexName(dbName);
+        nextEnabled = dbValid;
         break;
       case 4:
-        nextEnabled = !!tableName && !isValidTypeName(tableName);
+        nextEnabled = tableValid;
         break;
       default:
     }
@@ -601,7 +621,7 @@ class FileImport extends TerrainComponent<any>
           stepId > 1 && stepId < 5 &&
           <div
             className='fi-next-button'
-            onClick={nextEnabled ? this.incrementStep : null}
+            onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
             style={nextEnabled ?
               buttonColors()
               :
@@ -619,6 +639,19 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
+  public renderError()
+  {
+    const { errorMsg } = this.state.fileImportState;
+    return (
+      <Modal
+        open={!!errorMsg}
+        message={errorMsg}
+        error={true}
+        onClose={this._fn(this.setError, '')}
+      />
+    );
+  }
+
   public render()
   {
     return (
@@ -628,6 +661,7 @@ class FileImport extends TerrainComponent<any>
         <div
           className='file-import-inner'
         >
+          {this.renderError()}
           {this.renderSteps()}
           {this.renderContent()}
           {this.renderNav()}
