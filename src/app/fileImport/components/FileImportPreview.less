@@ -2,6 +2,7 @@
 @import "../../App.less";
 
 @padding: 6px;
+@primary-key-padding: 12px 6px;
 
 .fi-preview {
   white-space: nowrap;
@@ -52,9 +53,10 @@
       .fi-preview-pkeys-wrapper {
 
         .fi-preview-pkeys-pkey {
-          padding: @padding;
           .big-text;
+          padding: @primary-key-padding;
           margin-bottom: 3px;
+          border-radius: 3px;
 
           .delete-primary-key {
             margin-left: 6px;
@@ -62,8 +64,8 @@
         }
 
         .fi-preview-pkeys-delim {
-          padding: @padding;
           .big-text;
+          padding: @primary-key-padding;
 
           .autocomplete {
             max-width: 30px;
@@ -72,8 +74,8 @@
       }
 
       .fi-preview-pkeys-nokey {
-        padding: @padding;
         .big-text;
+        padding: @padding;
         vertical-align: middle;
       }
     }
