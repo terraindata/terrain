@@ -64,9 +64,10 @@ const TRANSFORM_TYPES = FileImportTypes.TRANSFORM_TYPES;
 
 export interface Props
 {
-  datatype: string;
-  colName: string;
+  columnId: number;
+  columnName: string;
   columnNames: List<string>;
+  datatype: string;
   setLocalColumnName(columnName: string);
 }
 
@@ -120,21 +121,43 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleSplitNameAChange(splitNameA: string)
   {
-    this.setState({
-      splitNames: this.state.splitNames.set(0, splitNameA),
-    });
+    if (this.props.columnNames.delete(this.props.columnId).contains(splitNameA))
+    {
+      alert('column name: ' + splitNameA + ' already exists, duplicate column names are not allowed');
+    }
+    else if (this.state.splitNames.get(1) === splitNameA)
+    {
+      alert('split names cannot be identical');
+    }
+    else
+    {
+      this.setState({
+        splitNames: this.state.splitNames.set(0, splitNameA),
+      });
+    }
   }
 
   public handleSplitNameBChange(splitNameB: string)
   {
-    this.setState({
-      splitNames: this.state.splitNames.set(1, splitNameB),
-    });
+    if (this.props.columnNames.delete(this.props.columnId).contains(splitNameB))
+    {
+      alert('column name: ' + splitNameB + ' already exists, duplicate column names are not allowed');
+    }
+    else if (this.state.splitNames.get(0) === splitNameB)
+    {
+      alert('split names cannot be identical');
+    }
+    else
+    {
+      this.setState({
+        splitNames: this.state.splitNames.set(1, splitNameB),
+      });
+    }
   }
 
   public handleMergeIndexChange(mergeIndex: number)
   {
-    const mergeName = this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName)).get(mergeIndex);
+    const mergeName = this.props.columnNames.delete(this.props.columnId).get(mergeIndex);
     this.setState({
       mergeIndex,
       mergeName,
@@ -143,6 +166,13 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleMergeNewNameChange(mergeNewName: string)
   {
+    if (this.props.columnNames.delete(this.props.columnId).filter((colName, index) =>
+      index !== this.state.mergeIndex,
+    ).contains(mergeNewName))
+    {
+      alert('column name: ' + mergeNewName + ' already exists, duplicate column names are not allowed');
+      return;
+    }
     this.setState({
       mergeNewName,
     });
@@ -238,7 +268,7 @@ class TransformBox extends TerrainComponent<Props>
     }
     const transformConfig = {
       name: transformName,
-      colName: this.props.colName,
+      colName: this.props.columnName,
       args: FileImportTypes._TransformArgs(transformArgsConfig),
     };
     return FileImportTypes._Transform(transformConfig);
@@ -345,7 +375,7 @@ class TransformBox extends TerrainComponent<Props>
             }
             <Dropdown
               selectedIndex={this.state.mergeIndex}
-              options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
+              options={this.props.columnNames.delete(this.props.columnId)}
               onChange={this.handleMergeIndexChange}
               canEdit={true}
             />

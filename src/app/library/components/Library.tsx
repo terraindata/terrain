@@ -50,7 +50,6 @@ import { browserHistory } from 'react-router';
 import TerrainAreaChart from '../../charts/components/TerrainAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
-import UserActions from './../../users/data/UserActions';
 import { LibraryState } from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
@@ -111,8 +110,8 @@ class Library extends TerrainComponent<any>
 
   public componentDidMount()
   {
-    RolesActions.fetch();
-    UserActions.fetch();
+    this.props.roleActions.fetch();
+    this.props.userActions.fetch();
   }
 
   public getData()
@@ -288,6 +287,7 @@ class Library extends TerrainComponent<any>
                 algorithmActions: this.props.libraryAlgorithmActions,
                 variantActions: this.props.libraryVariantActions,
                 libraryActions: this.props.libraryActions,
+                roleActions: this.props.roleActions,
               }}
             /> : null}
         </div>

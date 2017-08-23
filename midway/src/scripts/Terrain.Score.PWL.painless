@@ -18,34 +18,33 @@ if (input <= ranges[0])
   return a + (b - a) * pos;
 }
 
-double accumulateFactors(def doc, List factors, double offset)
+double accumulateFactors(def doc, List factors, double offset, def _score)
 {
   double acc = offset;
+  def range = 0;
   for (List element : factors)
-    acc += element[1] * doc[element[0]].value;
+  {
+    def value;
+    if (element[0].equalsIgnoreCase("_score"))
+      value = _score;
+    else
+      value = doc[element[0]].value;
+    acc += element[1] * value;
+  }
   return acc;
 }
 
 List factors = params.factors;
 double total = 0.0;
-
 for (int i = 0; i < factors.length; ++i)
 {
   Map factor = factors[i];
   double weight = factor['weight'];
   if (weight == 0)
     continue;
-  double input = 0;
-  if (i == 0)
-  {
-    input = _score;
-  }
-  else
-  {
-    double numerator = accumulateFactors(doc, factor['numerators'], factor['a']);
-    double denominator = accumulateFactors(doc, factor['denominators'], factor['b']);
-    input = numerator / denominator;
-  }
+  double numerator = accumulateFactors(doc, factor['numerators'], factor['a'], _score);
+  double denominator = accumulateFactors(doc, factor['denominators'], factor['b'], _score);
+  double input = numerator / denominator;
   double output = pwlTransform(factor.ranges, factor.outputs, input);
   total += weight * output;
 }

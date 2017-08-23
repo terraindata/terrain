@@ -155,6 +155,7 @@ export const Ajax =
         const form = document.createElement('form');
         form.setAttribute('action', fullUrl);
         form.setAttribute('method', 'post');
+        form.setAttribute('target', '_blank');
 
         // TODO move
         const accessToken = AuthStore.getState().accessToken;
@@ -689,12 +690,13 @@ export const Ajax =
       dbname: string,
       tablename: string,
       connectionId: number,
-      originalNames: List<string>,
+      originalNames: Immutable.List<string>,
       columnTypes: Immutable.Map<string, object>,
-      primaryKey: string,
+      primaryKeys: List<string>,
       transformations: Immutable.List<object>,
       update: boolean,
-      csvHeaderMissing: boolean,
+      hasCsvHeader: boolean,
+      primaryKeyDelimiter: string,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
     )
@@ -712,10 +714,11 @@ export const Ajax =
       formData.append('dbid', String(connectionId));
       formData.append('originalNames', JSON.stringify(originalNames));
       formData.append('columnTypes', JSON.stringify(columnTypes));
-      formData.append('primaryKey', primaryKey);
+      formData.append('primaryKeys', JSON.stringify(primaryKeys));
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
-      formData.append('hasCsvHeader', String(!csvHeaderMissing));
+      formData.append('hasCsvHeader', String(hasCsvHeader));
+      formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
 
       const xhr = new XMLHttpRequest();
       xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
@@ -746,14 +749,57 @@ export const Ajax =
       return;
     },
 
+    exportFile(filetype: string,
+      dbname: string,
+      serverId: number,
+      columnTypes: Immutable.Map<string, object>,
+      transformations: Immutable.List<object>,
+      query: string,
+      rank: boolean,
+      downloadFilename: string,
+      onLoad: (resp: any) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload: object = {
+        dbid: serverId,
+        dbname,
+        filetype,
+        columnTypes,
+        query,
+        rank,
+        transformations,
+      };
+      console.log('export payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
+      Ajax.req(
+        'post',
+        'import/export/',
+        payload,
+        onLoadHandler,
+        {
+          onError,
+          download: true,
+          downloadFilename,
+        },
+      );
+      return;
+    },
+
     saveTemplate(dbname: string,
       tablename: string,
       dbid: number,
       originalNames: List<string>,
       columnTypes: Immutable.Map<string, object>,
-      primaryKey: string,
+      primaryKeys: List<string>,
       transformations: List<object>,
       name: string,
+      exporting: boolean,
+      primaryKeyDelimiter: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -764,9 +810,11 @@ export const Ajax =
         tablename,
         originalNames,
         columnTypes,
-        primaryKey,
+        primaryKeys,
         transformations,
         name,
+        export: exporting,
+        primaryKeyDelimiter,
       };
       console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
@@ -785,11 +833,68 @@ export const Ajax =
       return;
     },
 
+    updateTemplate(originalNames: List<string>,
+      columnTypes: Immutable.Map<string, object>,
+      primaryKeys: List<string>,
+      transformations: List<object>,
+      exporting: boolean,
+      primaryKeyDelimiter: string,
+      templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload: object = {
+        originalNames,
+        columnTypes,
+        primaryKeys,
+        transformations,
+        export: exporting,
+        primaryKeyDelimiter,
+      };
+      console.log('update template payload: ', payload);
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/' + String(templateId),
+        payload,
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
+    deleteTemplate(templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/delete/' + String(templateId),
+        {},
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
     fetchTemplates(
       connectionId: number,
       dbname: string,
       tablename: string,
-
+      exporting: boolean,
       onLoad: (templates: object[]) => void,
     )
     {
@@ -798,6 +903,16 @@ export const Ajax =
         dbname,
         tablename,
       };
+
+      if (exporting)
+      {
+        payload['exportOnly'] = true;
+      }
+      else
+      {
+        payload['importOnly'] = true;
+      }
+      console.log('fetch templates payload: ', payload);
 
       Ajax.req(
         'post',
