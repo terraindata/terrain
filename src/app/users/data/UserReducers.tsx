@@ -113,4 +113,15 @@ UserReducers[ActionTypes.completeTutorial] =
     return state;
   };
 
-export default UserReducers;
+const UserReducersWrapper = (state: Immutable.Map<ID, any> = Immutable.Map({}), action) =>
+{
+  let nextState = state;
+  if (UserReducers[action.type] !== undefined)
+  {
+    nextState = UserReducers[action.type](state, action);
+  }
+
+  return nextState;
+};
+
+export default UserReducersWrapper;
