@@ -1122,6 +1122,10 @@ export class Import
 
   private _isTypeConsistentHelper(arr: object[]): string
   {
+    if (arr.length === 0)
+    {
+      return 'null';
+    }
     const types: Set<string> = new Set();
     arr.forEach((obj) =>
     {
@@ -1174,6 +1178,10 @@ export class Import
     }
     if (thisType === 'array')
     {
+      if (item[0] === undefined)
+      {
+        return true;
+      }
       return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
     }
     return true;
