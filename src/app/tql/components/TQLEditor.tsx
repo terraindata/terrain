@@ -303,7 +303,8 @@ class TQLEditor extends TerrainComponent<Props>
     }
   }
 
-  private popupTooltips(ann: MarkerAnnotation, e: MouseEvent) {
+  private popupTooltips(ann: MarkerAnnotation, e: MouseEvent)
+  {
     const target = e.target || e.srcElement;
     const tooltipDoc = document.createDocumentFragment();
     const tip = document.createElement('div');
@@ -312,11 +313,11 @@ class TQLEditor extends TerrainComponent<Props>
     tooltipDoc.appendChild(tip);
     const tooltip = this.showTooltip(e, tooltipDoc);
     // clicking either the tooltip or the token closes the tooltip
-    CodeMirrorLib.on(tooltip, 'mousedown', ( hideEvent: MouseEvent ) =>
+    CodeMirrorLib.on(tooltip, 'mousedown', (hideEvent: MouseEvent) =>
     {
       this.hidePopupClickHandler(hideEvent, tooltip, ann)
     });
-    CodeMirrorLib.on(target, 'mousedown', ( hideEvent: MouseEvent ) =>
+    CodeMirrorLib.on(target, 'mousedown', (hideEvent: MouseEvent) =>
     {
       this.hidePopupClickHandler(hideEvent, tooltip, ann);
     });
@@ -349,7 +350,7 @@ class TQLEditor extends TerrainComponent<Props>
     const box = target.getBoundingClientRect();
     const x = (box.left + box.right) / 2;
     const y = (box.top + box.bottom) / 2;
-    const spans = cm.findMarksAt(cm.coordsChar({left: x, top: y}, "client"));
+    const spans = cm.findMarksAt(cm.coordsChar({ left: x, top: y }, "client"));
     let ann: MarkerAnnotation;
     for (let i = 0; i < spans.length; ++i)
     {

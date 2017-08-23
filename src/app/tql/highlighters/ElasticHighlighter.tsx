@@ -56,11 +56,11 @@ import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo'
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 // other imports
-import {MarkerAnnotation} from 'tql/components/TQLEditor';
+import { MarkerAnnotation } from 'tql/components/TQLEditor';
 import { ESParserTokenizer, FlaggedToken } from '../../../../shared/database/elastic/formatter/ESParserTokenizer';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
-import {BuilderStore} from 'builder/data/BuilderStore';
+import { BuilderStore } from 'builder/data/BuilderStore';
 import { toInputMap } from '../../../blocks/types/Input';
 
 /*
@@ -113,11 +113,11 @@ class ElasticHighlighter extends SyntaxHighlighter
     for (const e of parser.getErrors())
     {
       const token = e.token;
-      const errorAnnotation: MarkerAnnotation = {showing: false, msg: e.message};
+      const errorAnnotation: MarkerAnnotation = { showing: false, msg: e.message };
       const marker = instance.markText(
-        {line: token.row, ch: token.col},
-        {line: token.toRow, ch: token.toCol},
-        {className: 'CodeMirror-lint-mark-error', __annotation: errorAnnotation});
+        { line: token.row, ch: token.col },
+        { line: token.toRow, ch: token.toCol },
+        { className: 'CodeMirror-lint-mark-error', __annotation: errorAnnotation });
     }
   }
 
