@@ -216,7 +216,16 @@ class FileImport extends TerrainComponent<any>
 
   public parseJson(file: string): object[]
   {
-    const items: object[] = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+    let items: object[] = [];
+    try
+    {
+      items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+    }
+    catch (e)
+    {
+      alert(e);
+      return undefined;
+    }
     if (!Array.isArray(items))
     {
       alert('Input JSON file must parse to an array of objects.');
@@ -265,7 +274,7 @@ class FileImport extends TerrainComponent<any>
     return parseCSV(file, config);
   }
 
-  public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
+  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean)
   {
     const fileToRead: Blob = file.slice(0, PREVIEW_CHUNK_SIZE);
     const fr = new FileReader();
@@ -343,7 +352,7 @@ class FileImport extends TerrainComponent<any>
     //   this.parseFile(file.target.files[0], filetype, null);
     // }
 
-    this.parseFile(file.target.files[0], filetype, false);
+    // this.parseFile(file.target.files[0], filetype, false);
   }
 
   public renderSteps()
@@ -377,7 +386,14 @@ class FileImport extends TerrainComponent<any>
   {
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
-    this.parseFile(file, filetype, hasCsvHeader); // TODO: what happens on error?
+    this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
+  }
+
+  public handleJSONFormatChoice(isNewlineSeparatedJSON : boolean)
+  {
+    Actions.changeHasCsvHeader(isNewlineSeparatedJSON);
+    const { file, filetype } = this.state.fileImportState;
+    this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
   }
 
   public renderContent()
