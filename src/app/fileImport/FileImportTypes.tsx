@@ -229,7 +229,7 @@ export const STEP_NAMES =
 export const STEP_TITLES =
   [
     'Select a File',
-    'Specify CSV Header',
+    'Does your CSV have a header row?',
     'Select a Server',
     'Select a Database',
     'Select a Table',

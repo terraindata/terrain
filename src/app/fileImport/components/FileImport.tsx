@@ -96,6 +96,7 @@ class FileImport extends TerrainComponent<any>
     tables?: SchemaTypes.TableMap;
     tableNames: List<string>;
     fileSelected: boolean;
+    filetype: string;
     filename: string,
   } = {
     fileImportState: FileImportStore.getState(),
@@ -106,6 +107,7 @@ class FileImport extends TerrainComponent<any>
     dbNames: List([]),
     tableNames: List([]),
     fileSelected: false,
+    filetype: '',
     filename: '',
   };
 
@@ -132,47 +134,17 @@ class FileImport extends TerrainComponent<any>
 
   public incrementStep()
   {
+    const { filetype, stepId } = this.state;
     this.setState({
-      stepId: this.state.stepId + 1,
+      stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
     });
   }
 
-  public handleNextStepChange()
+  public decrementStep()
   {
-    const { stepId } = this.state;
-    const { dbName, tableName } = this.state.fileImportState;
-    switch (stepId)
-    {
-      case 0:
-        break;
-      case 1:
-        break;
-      case 2:
-        let msg: string = isValidIndexName(dbName);
-        if (msg)
-        {
-          alert(msg);
-          return;
-        }
-        break;
-      case 3:
-        msg = isValidTypeName(tableName);
-        if (msg)
-        {
-          alert(msg);
-          return;
-        }
-        break;
-      default:
-    }
-    this.incrementStep();
-  }
-
-  public handlePrevStepChange()
-  {
-    const { stepId } = this.state;
+    const { filetype, stepId } = this.state;
     this.setState({
-      stepId: stepId - 1,
+      stepId: filetype === 'json' && stepId === 2 ? stepId - 2 : stepId - 1,
     });
   }
 
@@ -203,8 +175,13 @@ class FileImport extends TerrainComponent<any>
         :
         List([]),
     });
-
     Actions.changeDbName(dbName);
+    const msg: string = isValidIndexName(dbName); // TODO: remove annoying empty index name error
+    if (msg)
+    {
+      alert(msg);
+      return;
+    }
     this.incrementStep();
   }
 
@@ -222,6 +199,12 @@ class FileImport extends TerrainComponent<any>
     });
 
     Actions.changeTableName(tableName);
+    const msg: string = isValidTypeName(tableName);
+    if (msg)
+    {
+      alert(msg);
+      return;
+    }
     this.incrementStep();
   }
 
@@ -315,8 +298,8 @@ class FileImport extends TerrainComponent<any>
       Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
       this.setState({
         fileSelected: true,
-        stepId: filetype === 'csv' ? this.state.stepId + 1 : this.state.stepId + 2,
       });
+      this.incrementStep();
     };
   }
 
@@ -339,6 +322,7 @@ class FileImport extends TerrainComponent<any>
     }
     this.setState({
       filename: file.target.files[0].name,
+      filetype,
     });
     Actions.saveFile(file.target.files[0], filetype);
 
@@ -393,7 +377,7 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { dbName, tableName } = fileImportState;
+    const { serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
 
@@ -409,7 +393,7 @@ class FileImport extends TerrainComponent<any>
       case 2:
         content =
           <Dropdown
-            selectedIndex={this.state.serverIndex}
+            selectedIndex={serverId !== -1 ? this.state.serverIndex : -1}
             options={this.state.serverNames}
             onChange={this.handleServerChange}
             canEdit={true}
@@ -530,9 +514,6 @@ class FileImport extends TerrainComponent<any>
         <div
           className='fi-content-csv-wrapper'
         >
-          <span>
-            Does your csv have a header row?
-          </span>
           <div
             className='fi-content-csv-option button'
             onClick={() => this.handleCsvHeaderChoice(true)}
@@ -577,13 +558,16 @@ class FileImport extends TerrainComponent<any>
         nextEnabled = fileSelected;
         break;
       case 1:
-        nextEnabled = !!serverName;
+        nextEnabled = false;
         break;
       case 2:
-        nextEnabled = !!dbName;
+        nextEnabled = !!serverName;
         break;
       case 3:
-        nextEnabled = !!tableName;
+        nextEnabled = !!dbName && !isValidIndexName(dbName);
+        break;
+      case 4:
+        nextEnabled = !!tableName && !isValidTypeName(tableName);
         break;
       default:
     }
@@ -596,7 +580,7 @@ class FileImport extends TerrainComponent<any>
           stepId > 0 &&
           <div
             className='fi-back-button'
-            onClick={this.handlePrevStepChange}
+            onClick={this.decrementStep}
             style={buttonColors()}
             ref='fi-back-button'
           >
@@ -604,10 +588,10 @@ class FileImport extends TerrainComponent<any>
           </div>
         }
         {
-          stepId > 0 && stepId < 4 &&
+          stepId > 1 && stepId < 5 &&
           <div
             className='fi-next-button'
-            onClick={nextEnabled ? this.handleNextStepChange : null}
+            onClick={nextEnabled ? this.incrementStep : null}
             style={nextEnabled ?
               buttonColors()
               :
