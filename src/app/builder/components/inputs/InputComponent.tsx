@@ -67,8 +67,9 @@ import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Col
 =======
 >>>>>>> working on search bar
 import GoogleMap from 'google-map-react';
+import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -129,6 +130,7 @@ class InputComponent extends TerrainComponent<Props>
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   public onAddressChange(address: string)
   {
     this.setState({ address });
@@ -142,16 +144,26 @@ class InputComponent extends TerrainComponent<Props>
       .catch((error) => console.log('Error', error));
 =======
   public onAddressChange(address: string) {
+=======
+  public onAddressChange(address: string)
+  {
+>>>>>>> experimenting with leaflet maps
     this.setState({ address });
   }
 
-  public handleFormSubmit(e) {
-    e.preventDefault();
+  public handleFormSubmit()
+  {
     geocodeByAddress(this.state.address)
+<<<<<<< HEAD
       .then(results => getLatLng(results[0]))
       .then(latLng => this.setState({latitude: latLng.lat, longitude: latLng.lon}))
       .catch(error => console.log('Error', error));
 >>>>>>> working on search bar
+=======
+      .then((results) => getLatLng(results[0]))
+      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
+      .catch((error) => console.log('Error', error));
+>>>>>>> experimenting with leaflet maps
   }
 
   public getKeyPath(type?: string)
@@ -236,6 +248,8 @@ class InputComponent extends TerrainComponent<Props>
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               />
             </Map>
+            </div>
+            </div>
       );
     }
 
