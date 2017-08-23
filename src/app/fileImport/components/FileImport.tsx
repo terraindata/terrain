@@ -308,6 +308,7 @@ class FileImport extends TerrainComponent<any>
       Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
       this.setState({
         fileSelected: true,
+        stepId: this.state.stepId + 1,
       });
     };
   }
@@ -355,11 +356,14 @@ class FileImport extends TerrainComponent<any>
             FileImportTypes.STEP_NAMES[this.state.stepId]
           }
         </div>
-        <div className='fi-step-title'>
-          {
-            FileImportTypes.STEP_TITLES[this.state.stepId]
-          }
-        </div>
+        {
+          this.state.stepId > 0 &&
+          <div className='fi-step-title'>
+            {
+              FileImportTypes.STEP_TITLES[this.state.stepId]
+            }
+          </div>
+        }
       </div>
     );
   }
@@ -462,7 +466,7 @@ class FileImport extends TerrainComponent<any>
     return (
       <div>
         <div
-          className='flex-container fi-step-row'
+          className='flex-container fi-choose'
         >
           <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
           <div
@@ -473,14 +477,6 @@ class FileImport extends TerrainComponent<any>
           >
             Choose File
           </div>
-          <span
-            className='flex-grow fi-input-label clickable'
-            onClick={this.handleSelectFileButtonClick}
-          >
-            {
-              this.state.filename ? this.state.filename + ' selected' : 'No file selected'
-            }
-          </span>
         </div>
         {
           this.state.showCsvHeaderOption &&
@@ -550,7 +546,7 @@ class FileImport extends TerrainComponent<any>
           </div>
         }
         {
-          stepId < 4 &&
+          stepId > 0 && stepId < 4 &&
           <div
             className='fi-next-button'
             onClick={nextEnabled ? this.handleNextStepChange : null}
