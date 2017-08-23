@@ -527,7 +527,7 @@ export class ResultsManager extends TerrainComponent<Props>
       // )),
       preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
         filteredFields.map((field, index) =>
-          result.fields.get(String(field))
+          result.fields.get(String(field)),
         ),
       )),
     };
