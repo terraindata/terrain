@@ -57,10 +57,12 @@ import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
+import './MapComponentStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 import GoogleMap from 'google-map-react';
+import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -96,7 +98,7 @@ const colorForInputType = (inputType: InputType): string =>
     case InputType.DATE:
       return Colors().builder.cards.enumClause;
     case InputType.LOCATION:
-      return Colors().builder.cards.numberClause;
+      return Colors().builder.cards.enumClause;
     default:
       return '#f00';
   }
@@ -119,16 +121,17 @@ class InputComponent extends TerrainComponent<Props>
       };
   }
 
-  public onAddressChange(address: string) {
+  public onAddressChange(address: string)
+  {
     this.setState({ address });
   }
 
-  public handleFormSubmit(e) {
-    e.preventDefault();
+  public handleFormSubmit()
+  {
     geocodeByAddress(this.state.address)
-      .then(results => getLatLng(results[0]))
-      .then(latLng => this.setState({latitude: latLng.lat, longitude: latLng.lon}))
-      .catch(error => console.log('Error', error));
+      .then((results) => getLatLng(results[0]))
+      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
+      .catch((error) => console.log('Error', error));
   }
 
   public getKeyPath(type?: string)
@@ -196,25 +199,22 @@ class InputComponent extends TerrainComponent<Props>
       const inputProps = {
         value: this.state.address,
         onChange: this.onAddressChange,
-      }
+      };
       return (
         <div>
           <form onSubmit={this.handleFormSubmit}>
-            <PlacesAutocomplete inputProps= {inputProps} />
-            <button type="submit"> Submit </button>
+            <PlacesAutocomplete
+              inputProps={inputProps}
+              onEnterKeyDown={this.handleFormSubmit}
+            />
           </form>
           <div className='input-map-wrapper'>
-            <GoogleMap
-              defaultCenter={{ lat: 59.95, lng: 30.33 }}
-              defaultZoom={11}
-              center={{ lat: this.state.latitude, lng: this.state.longitude}}
-              style={{ paddingBottom: '100%', height: '0' }}
-              bootstrapURLKeys={{
-                key: 'AIzaSyCJWmfGt5jsesHrATBYByvXzpf8JbE5eFU',
-                language: 'en',
-              }}
-            >
-            </GoogleMap>
+            <Map center={[this.state.latitude, this.state.longitude]} zoom={18}>
+              <TileLayer
+                url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              />
+            </Map>
           </div>
         </div>
       );
