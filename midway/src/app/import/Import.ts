@@ -766,7 +766,7 @@ export class Import
         }
         for (const key of Object.keys(obj))
         {
-          if (obj.hasOwnProperty(key) && obj[key] !== null)
+          if (obj.hasOwnProperty(key))
           {
             if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
@@ -1118,6 +1118,10 @@ export class Import
     {
       types.add(this._getType(obj));
     });
+    if (types.size > 1)
+    {
+      types.delete('null');
+    }
     if (types.size !== 1)
     {
       return 'inconsistent';
@@ -1130,6 +1134,10 @@ export class Import
       {
         innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
       });
+      if (innerTypes.size > 1)
+      {
+        innerTypes.delete('null');
+      }
       if (innerTypes.size !== 1)
       {
         return 'inconsistent';
@@ -1143,6 +1151,10 @@ export class Import
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
     const thisType: string = this._getType(item);
+    if (thisType === 'null')
+    {
+      return true;
+    }
     if (thisType === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
     {
       return true;
@@ -1185,21 +1197,28 @@ export class Import
       if (imprt.filetype === 'json')
       {
         let items: object[];
-        try
+        if (imprt.isNewlineSeparatedJSON === true)
         {
-          if (imprt.isNewlineSeparatedJSON === true)
+          const stringItems: string[] = contents.split(/\r|\n/);
+          items = [];
+          for (const str of stringItems)
           {
-            const stringItems: string[] = contents.split(/\r|\n/);
-            items = [];
-            for (const str of stringItems)
+            try
             {
               if (str !== '')
               {
                 items.push(JSON.parse(str));
               }
             }
+            catch (e)
+            {
+              return reject('JSON format incorrect: Could not parse object: ' + str);
+            }
           }
-          else
+        }
+        else
+        {
+          try
           {
             items = JSON.parse(contents);
             if (!Array.isArray(items))
@@ -1207,10 +1226,10 @@ export class Import
               return reject('Input JSON file must parse to an array of objects.');
             }
           }
-        }
-        catch (e)
-        {
-          return reject('JSON format incorrect: ' + String(e));
+          catch (e)
+          {
+            return reject('JSON format incorrect: ' + String(e));
+          }
         }
 
         for (const obj of items)
@@ -1220,7 +1239,7 @@ export class Import
           {
             if (obj.hasOwnProperty(field))
             {
-              return reject('JSON file contains an object with an unexpected field (' + String(field) + '): ' +
+              return reject('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
                 JSON.stringify(obj));
             }
             delete obj[field];
