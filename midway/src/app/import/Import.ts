@@ -71,6 +71,8 @@ export interface ImportConfig extends ImportTemplateBase
 {
   file: stream.Readable;
   filetype: string;     // either 'json' or 'csv'
+  isNewlineSeparatedJSON?: boolean;      // defaults to false
+  requireJSONHaveAllFields?: boolean;    // defaults to true
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
@@ -321,6 +323,18 @@ export class Import
         return reject(update);
       }
 
+      const isNewlineSeparatedJSON: boolean | string = this._parseBooleanField(fields, 'isNewlineSeparatedJSON', false);
+      if (typeof isNewlineSeparatedJSON === 'string')
+      {
+        return reject(isNewlineSeparatedJSON);
+      }
+
+      const requireJSONHaveAllFields: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
+      if (typeof requireJSONHaveAllFields === 'string')
+      {
+        return reject(requireJSONHaveAllFields);
+      }
+
       let file: stream.Readable | null = null;
       for (const f of files)
       {
@@ -340,7 +354,7 @@ export class Import
         return reject(hasCsvHeader);
       }
       let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
-      let jsonBracketRemoved: boolean = fields['filetype'] !== 'json';
+      let jsonBracketRemoved: boolean = !(fields['filetype'] === 'json' && !isNewlineSeparatedJSON);
 
       let imprtConf: ImportConfig;
       if (headless)
@@ -358,9 +372,11 @@ export class Import
           dbname: template['dbname'],
           file,
           filetype: fields['filetype'],
+          isNewlineSeparatedJSON,
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
+          requireJSONHaveAllFields,
           tablename: template['tablename'],
           transformations: template['transformations'],
           update,
@@ -381,9 +397,11 @@ export class Import
             dbname: fields['dbname'],
             file,
             filetype: fields['filetype'],
+            isNewlineSeparatedJSON,
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
+            requireJSONHaveAllFields,
             tablename: fields['tablename'],
             transformations,
             update,
@@ -757,7 +775,7 @@ export class Import
         }
         for (const key of Object.keys(obj))
         {
-          if (obj.hasOwnProperty(key) && obj[key] !== null)
+          if (obj.hasOwnProperty(key))
           {
             if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
@@ -1104,11 +1122,19 @@ export class Import
 
   private _isTypeConsistentHelper(arr: object[]): string
   {
+    if (arr.length === 0)
+    {
+      return 'null';
+    }
     const types: Set<string> = new Set();
     arr.forEach((obj) =>
     {
       types.add(this._getType(obj));
     });
+    if (types.size > 1)
+    {
+      types.delete('null');
+    }
     if (types.size !== 1)
     {
       return 'inconsistent';
@@ -1121,6 +1147,10 @@ export class Import
       {
         innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
       });
+      if (innerTypes.size > 1)
+      {
+        innerTypes.delete('null');
+      }
       if (innerTypes.size !== 1)
       {
         return 'inconsistent';
@@ -1134,6 +1164,10 @@ export class Import
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
     const thisType: string = this._getType(item);
+    if (thisType === 'null')
+    {
+      return true;
+    }
     if (thisType === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
     {
       return true;
@@ -1144,6 +1178,10 @@ export class Import
     }
     if (thisType === 'array')
     {
+      if (item[0] === undefined)
+      {
+        return true;
+      }
       return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
     }
     return true;
@@ -1175,14 +1213,44 @@ export class Import
     {
       if (imprt.filetype === 'json')
       {
-        try
+        let items: object[];
+        if (imprt.isNewlineSeparatedJSON === true)
         {
-          const items: object[] = JSON.parse(contents);
-          if (!Array.isArray(items))
+          const stringItems: string[] = contents.split(/\r|\n/);
+          items = [];
+          for (const str of stringItems)
           {
-            return reject('Input JSON file must parse to an array of objects.');
+            try
+            {
+              if (str !== '')
+              {
+                items.push(JSON.parse(str));
+              }
+            }
+            catch (e)
+            {
+              return reject('JSON format incorrect: Could not parse object: ' + str);
+            }
           }
+        }
+        else
+        {
+          try
+          {
+            items = JSON.parse(contents);
+            if (!Array.isArray(items))
+            {
+              return reject('Input JSON file must parse to an array of objects.');
+            }
+          }
+          catch (e)
+          {
+            return reject('JSON format incorrect: ' + String(e));
+          }
+        }
 
+        if (imprt.requireJSONHaveAllFields !== false)
+        {
           const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
           for (const obj of items)
           {
@@ -1192,11 +1260,29 @@ export class Import
                 JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
             }
           }
-          resolve(items);
-        } catch (e)
-        {
-          return reject('JSON format incorrect: ' + String(e));
         }
+        else
+        {
+          for (const obj of items)
+          {
+            const fieldsInDocumentNotExpected = _.difference(Object.keys(obj), imprt.originalNames);
+            for (const field of fieldsInDocumentNotExpected)
+            {
+              if (obj.hasOwnProperty(field))
+              {
+                return reject('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
+                  JSON.stringify(obj));
+              }
+              delete obj[field];
+            }
+            const expectedFieldsNotInDocument = _.difference(imprt.originalNames, Object.keys(obj));
+            for (const field of expectedFieldsNotInDocument)
+            {
+              obj[field] = null;
+            }
+          }
+        }
+        resolve(items);
       } else if (imprt.filetype === 'csv')
       {
         const items: object[] = [];
@@ -1343,7 +1429,14 @@ export class Import
             {
               if (imprt.columnTypes.hasOwnProperty(name))
               {
-                trimmedItem[name] = item[name];
+                if (typeof item[name] === 'string')
+                {
+                  trimmedItem[name] = item[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+                }
+                else
+                {
+                  trimmedItem[name] = item[name];
+                }
               }
             }
             if (dontCheck !== true)
@@ -1438,13 +1531,13 @@ export class Import
     {
       // get valid piece of data
       let thisChunk: string = '';
-      if (imprt.filetype === 'csv')
+      if (imprt.filetype === 'csv' || (imprt.filetype === 'json' && imprt.isNewlineSeparatedJSON === true))
       {
         const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
         thisChunk = this.nextChunk + String(chunk.substring(0, end));
         this.nextChunk = chunk.substring(end + 1, chunk.length);
       }
-      else if (imprt.filetype === 'json')
+      else
       {
         // open square-bracket has already been removed by frontend/headless preprocessing
         if (isLast)
