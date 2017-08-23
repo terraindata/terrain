@@ -70,7 +70,7 @@ Router.post('/', async (ctx, next) =>
   }
   Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
   Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
-  // optional parameters: update, hasCsvHeader
+  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, update
 
   await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
 
@@ -114,7 +114,7 @@ Router.post('/headless', async (ctx, next) =>
   }
 
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
-  // optional parameters: update, hasCsvHeader
+  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, update
 
   await perm.ImportPermissions.verifyHeadlessRoute(authStream['user'] as UserConfig, authStream['fields']);
 

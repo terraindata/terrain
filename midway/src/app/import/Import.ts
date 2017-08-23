@@ -71,6 +71,7 @@ export interface ImportConfig extends ImportTemplateBase
 {
   file: stream.Readable;
   filetype: string;     // either 'json' or 'csv'
+  isNewlineSeparatedJSON?: boolean;    // defaults to false
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
@@ -321,6 +322,12 @@ export class Import
         return reject(update);
       }
 
+      const isNewlineSeparatedJSON: boolean | string = this._parseBooleanField(fields, 'isNewlineSeparatedJSON', false);
+      if (typeof isNewlineSeparatedJSON === 'string')
+      {
+        return reject(isNewlineSeparatedJSON);
+      }
+
       let file: stream.Readable | null = null;
       for (const f of files)
       {
@@ -340,7 +347,7 @@ export class Import
         return reject(hasCsvHeader);
       }
       let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
-      let jsonBracketRemoved: boolean = fields['filetype'] !== 'json';
+      let jsonBracketRemoved: boolean = !(fields['filetype'] === 'json' && !isNewlineSeparatedJSON);
 
       let imprtConf: ImportConfig;
       if (headless)
@@ -358,6 +365,7 @@ export class Import
           dbname: template['dbname'],
           file,
           filetype: fields['filetype'],
+          isNewlineSeparatedJSON,
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
@@ -381,6 +389,7 @@ export class Import
             dbname: fields['dbname'],
             file,
             filetype: fields['filetype'],
+            isNewlineSeparatedJSON,
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
@@ -1175,28 +1184,45 @@ export class Import
     {
       if (imprt.filetype === 'json')
       {
+        let items: object[];
         try
         {
-          const items: object[] = JSON.parse(contents);
-          if (!Array.isArray(items))
+          if (imprt.isNewlineSeparatedJSON === true)
           {
-            return reject('Input JSON file must parse to an array of objects.');
-          }
-
-          const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
-          for (const obj of items)
-          {
-            if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
+            const stringItems: string[] = contents.split(/\r|\n/);
+            items = [];
+            for (const str of stringItems)
             {
-              return reject('JSON file contains an object that does not contain the expected fields. Got fields: ' +
-                JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
+              if (str !== '')
+              {
+                items.push(JSON.parse(str));
+              }
             }
           }
-          resolve(items);
-        } catch (e)
+          else
+          {
+            items = JSON.parse(contents);
+            if (!Array.isArray(items))
+            {
+              return reject('Input JSON file must parse to an array of objects.');
+            }
+          }
+        }
+        catch (e)
         {
           return reject('JSON format incorrect: ' + String(e));
         }
+
+        const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
+        for (const obj of items)
+        {
+          if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
+          {
+            return reject('JSON file contains an object that does not contain the expected fields. Got fields: ' +
+              JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
+          }
+        }
+        resolve(items);
       } else if (imprt.filetype === 'csv')
       {
         const items: object[] = [];
@@ -1438,13 +1464,13 @@ export class Import
     {
       // get valid piece of data
       let thisChunk: string = '';
-      if (imprt.filetype === 'csv')
+      if (imprt.filetype === 'csv' || (imprt.filetype === 'json' && imprt.isNewlineSeparatedJSON === true))
       {
         const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
         thisChunk = this.nextChunk + String(chunk.substring(0, end));
         this.nextChunk = chunk.substring(end + 1, chunk.length);
       }
-      else if (imprt.filetype === 'json')
+      else
       {
         // open square-bracket has already been removed by frontend/headless preprocessing
         if (isLast)
