@@ -44,45 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyColumn from './TastyColumn';
-import TastyTable from './TastyTable';
+import * as ImportP from './ImportPermissions';
 
-export default class TastyTableState
+export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
+
+export class Permissions
 {
-  public table: TastyTable;
-  public databaseName: string;
-  public tableName: string;
-  public columns: Map<string, TastyColumn>;
-  public primaryKeys: string[];
-  public columnNames: string[]; // sorted list of columns
-  public columnMapping: object; // ES mapping format
-  public primaryKeyDelimiter: string;
+  public ImportPermissions: ImportP.ImportPermissions;
 
-  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[],
-    database: string = '', columnMapping: object = {}, primaryKeyDelimiter: string = '-')
+  constructor()
   {
-    // primary key is a list, so that composite keys can be supported
-    this.table = table;
-    this.databaseName = database;
-    this.tableName = name;
-    this.columns = new Map();
-    this.primaryKeys = primaryKeys;
-    this.columnNames = columns.concat(primaryKeys).sort();
-    this.columnMapping = columnMapping;
-    this.primaryKeyDelimiter = primaryKeyDelimiter;
-  }
-
-  public init(): void
-  {
-    this.addColumns(this.columnNames);
-  }
-
-  private addColumns(columns: string[]): void
-  {
-    columns.forEach(
-      (columnName) =>
-      {
-        this.columns.set(columnName, new TastyColumn(this.table, columnName));
-      });
+    this.ImportPermissions = ImportPermissions;
   }
 }
+
+export default Permissions;

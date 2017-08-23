@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import Ajax from './../../util/Ajax';
 import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
 import Store from './UserStore';
-import Ajax from './../../util/Ajax';
 
 const $ = (type: string, payload: any) =>
 {
