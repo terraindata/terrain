@@ -44,45 +44,45 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyColumn from './TastyColumn';
-import TastyTable from './TastyTable';
+import { UserConfig } from '../users/Users';
 
-export default class TastyTableState
+export class ImportPermissions
 {
-  public table: TastyTable;
-  public databaseName: string;
-  public tableName: string;
-  public columns: Map<string, TastyColumn>;
-  public primaryKeys: string[];
-  public columnNames: string[]; // sorted list of columns
-  public columnMapping: object; // ES mapping format
-  public primaryKeyDelimiter: string;
-
-  constructor(table: TastyTable, name: string, primaryKeys: string[], columns: string[],
-    database: string = '', columnMapping: object = {}, primaryKeyDelimiter: string = '-')
+  public async verifyDefaultRoute(user: UserConfig, params: object): Promise<string>
   {
-    // primary key is a list, so that composite keys can be supported
-    this.table = table;
-    this.databaseName = database;
-    this.tableName = name;
-    this.columns = new Map();
-    this.primaryKeys = primaryKeys;
-    this.columnNames = columns.concat(primaryKeys).sort();
-    this.columnMapping = columnMapping;
-    this.primaryKeyDelimiter = primaryKeyDelimiter;
-  }
-
-  public init(): void
-  {
-    this.addColumns(this.columnNames);
-  }
-
-  private addColumns(columns: string[]): void
-  {
-    columns.forEach(
-      (columnName) =>
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (user.isSuperUser === 0)
       {
-        this.columns.set(columnName, new TastyColumn(this.table, columnName));
-      });
+        return reject('User must be a super user.');
+      }
+      return resolve();
+    });
+  }
+
+  public async verifyExportRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (user.isSuperUser === 0)
+      {
+        return reject('User must be a super user.');
+      }
+      return resolve();
+    });
+  }
+
+  public async verifyHeadlessRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (user.isSuperUser === 0)
+      {
+        return reject('User must be a super user.');
+      }
+      return resolve();
+    });
   }
 }
+
+export default ImportPermissions;

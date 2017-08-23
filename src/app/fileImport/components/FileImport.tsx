@@ -234,17 +234,8 @@ class FileImport extends TerrainComponent<any>
     if (hasCsvHeader)
     {
       const testDuplicateConfig: ParseCSVConfig = {
-        delimiter: ',',
-        newLine: '\n',
-        quoteChar: '\"',
-        escapeChar: '\"',
-        comments: '#',
         preview: 1,
         hasHeaderRow: false,
-        error: (err) =>
-        {
-          alert(String(err));
-        },
       };
 
       const columnHeaders = parseCSV(file, testDuplicateConfig);
@@ -272,17 +263,8 @@ class FileImport extends TerrainComponent<any>
       }
     }
     const config: ParseCSVConfig = {
-      delimiter: ',',
-      newLine: '\n',
-      quoteChar: '\"',
-      escapeChar: '\"',
-      comments: '#',
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       hasHeaderRow: hasCsvHeader,
-      error: (err) =>
-      {
-        alert(String(err));
-      },
     };
     return parseCSV(file, config);
   }
@@ -393,7 +375,7 @@ class FileImport extends TerrainComponent<any>
 
   public handleCsvHeaderChoice(hasCsvHeader: boolean)
   {
-    Actions.changeCsvHeaderMissing(!hasCsvHeader);
+    Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
     this.setState({
       showCsvHeaderOption: false,
@@ -405,7 +387,7 @@ class FileImport extends TerrainComponent<any>
   {
     const { fileImportState } = this.state;
     const { dbName, tableName } = fileImportState;
-    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKey } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
 
     let content = {};
@@ -447,7 +429,8 @@ class FileImport extends TerrainComponent<any>
         content =
           <FileImportPreview
             previewRows={previewRows}
-            primaryKey={primaryKey}
+            primaryKeys={primaryKeys}
+            primaryKeyDelimiter={primaryKeyDelimiter}
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
@@ -456,6 +439,7 @@ class FileImport extends TerrainComponent<any>
             columnOptions={this.state.columnOptionNames}
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
+            exporting={false}
           />;
         break;
       default:
