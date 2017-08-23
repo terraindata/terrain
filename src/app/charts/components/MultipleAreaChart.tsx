@@ -104,7 +104,7 @@ const config = {
 
 interface Dataset
 {
-  id: ID,
+  id: ID;
   label: string[];
   data: any[];
 }
