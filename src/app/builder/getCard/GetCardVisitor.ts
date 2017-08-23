@@ -564,6 +564,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     const accepts = this.getCardTypes(_.keys(clause.structure), clause);
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
+
     const init = (blocksConfig, extraConfig?, skipTemplate?) =>
     {
       const config = {
@@ -712,7 +713,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               displayType: DisplayType.CARDS,
               key: 'cards',
               hideCreateCardTool: true,
-              handleCardDrop: this.onCardDrop,
+              handleCardDrop: (type: string): string =>
+              {
+                return this.cardTypesToKeys[type];
+              },
               // pass in onDrop: reference to on drop function that accepts type of card
               // Change display.tsx, buildercomponent.tsx, cardarea.tsx, cardsdroparea.tsx
             },
@@ -747,16 +751,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         tql: (stringBlock) => stringBlock['value'],
       },
     });
-  }
-
-  public onCardDrop(type: string): string
-  {
-    console.log(this.cardTypesToKeys);
-    if (this.cardTypesToKeys)
-    {
-      return this.cardTypesToKeys[type];
-    }
-    return 'from';
   }
 
   public visitESVariantClause(clause: ESVariantClause): any
