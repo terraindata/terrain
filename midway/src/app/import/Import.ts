@@ -1213,13 +1213,22 @@ export class Import
           return reject('JSON format incorrect: ' + String(e));
         }
 
-        const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
         for (const obj of items)
         {
-          if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
+          const fieldsInDocumentNotExpected = _.difference(Object.keys(obj), imprt.originalNames);
+          for (const field of fieldsInDocumentNotExpected)
           {
-            return reject('JSON file contains an object that does not contain the expected fields. Got fields: ' +
-              JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
+            if (obj.hasOwnProperty(field))
+            {
+              return reject('JSON file contains an object with an unexpected field (' + String(field) + '): ' +
+                JSON.stringify(obj));
+            }
+            delete obj[field];
+          }
+          const expectedFieldsNotInDocument = _.difference(imprt.originalNames, Object.keys(obj));
+          for (const field of expectedFieldsNotInDocument)
+          {
+            obj[field] = null;
           }
         }
         resolve(items);
