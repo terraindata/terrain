@@ -52,6 +52,7 @@ import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDropArea.less';
 const classNames = require('classnames');
+import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
@@ -110,11 +111,18 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
 
     if (item['new'])
     {
-      // pass in extra data {key: 'key'}, get from the function in getcardvisitor
-
-      // Using handleCardDrop prop, should be able to get the key for the card using the type
-      // Issue: TargetProps.handleCardDrop is never defined, not sure how else to access the props?
-      Actions.create(targetProps.keyPath, targetIndex, type);
+      if (targetProps.handleCardDrop)
+      {
+        const card = BlockUtils.make(
+          AllBackendsMap[targetProps.language].blocks, type,
+        );
+        const edited = card.set('key', targetProps.handleCardDrop(type));
+        Actions.create(targetProps.keyPath, targetIndex, type, edited);
+      }
+      else
+      {
+        Actions.create(targetProps.keyPath, targetIndex, type);
+      }
     }
     else
     {
@@ -214,6 +222,7 @@ class CardDropArea extends TerrainComponent<Props>
         keyPath={this.props.keyPath}
         index={this.props.index}
         language={this.props.language}
+        handleCardDrop={this.props.handleCardDrop}
       />
     );
   }

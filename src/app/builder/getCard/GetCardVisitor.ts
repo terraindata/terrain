@@ -206,7 +206,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private clauses: { [name: string]: ESClause };
   private config: EQLConfig;
   private colorIndex: number;
-  private cardTypesToKeys: { [type: string]: string };
+  private cardTypesToKeys: { [type: string]: string } = {};
 
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
@@ -224,7 +224,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     this.config = config;
 
     this.clauses = this.config.getClauses();
-    this.cardTypesToKeys = {};
 
     // first, populate the variant clause map, since it will be used by getCard
     this.computeVariantClauses(this.clauses);
@@ -752,7 +751,12 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public onCardDrop(type: string): string
   {
-    return this.cardTypesToKeys[type];
+    console.log(this.cardTypesToKeys);
+    if (this.cardTypesToKeys)
+    {
+      return this.cardTypesToKeys[type];
+    }
+    return 'from';
   }
 
   public visitESVariantClause(clause: ESVariantClause): any

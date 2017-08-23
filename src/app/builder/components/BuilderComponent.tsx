@@ -316,6 +316,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   columnIndex={this.props.columnIndex}
                   isFirstRow={i === 0}
                   isOnlyRow={value.size === 1}
+                  handleCardDrop={d.handleCardDrop}
                 />
               ))
             }

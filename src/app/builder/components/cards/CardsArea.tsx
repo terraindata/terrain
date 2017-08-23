@@ -198,6 +198,7 @@ class CardsArea extends TerrainComponent<Props>
                   singleChild={this.props.singleChild}
                   wrapType={card.type}
                   language={this.props.language}
+                  handleCardDrop={this.props.handleCardDrop}
                 />
                 <CardComponent
                   card={card}
@@ -229,6 +230,7 @@ class CardsArea extends TerrainComponent<Props>
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
             language={this.props.language}
+            handleCardDrop={this.props.handleCardDrop}
           />
 
           {
@@ -245,6 +247,7 @@ class CardsArea extends TerrainComponent<Props>
               onToggle={this._toggle('cardToolOpen')}
               hidePlaceholder={this.props.singleChild || cards.size === 0}
               cannotClose={cards.size === 0}
+              handleCardDrop={this.props.handleCardDrop}
             />
           }
 
