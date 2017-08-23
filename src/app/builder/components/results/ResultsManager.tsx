@@ -46,13 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
+import { line } from 'd3-shape';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
@@ -60,15 +61,14 @@ import Query from '../../../../items/types/Query';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
-import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
+import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
-import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
+import { _Result, _ResultsState, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
 
 export interface Props
 {
   query: Query;
-  queryString?: string;
   resultsState: ResultsState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
@@ -129,7 +129,7 @@ export class ResultsManager extends TerrainComponent<Props>
     );
   }
 
-  public queryResults(query: Query, db: BackendInstance, queryString?: string)
+  public queryResults(query: Query, db: BackendInstance)
   {
     if (!query || !db)
     {
@@ -141,7 +141,7 @@ export class ResultsManager extends TerrainComponent<Props>
       this.queryM1Results(query, db);
     } else if (db.source === 'm2')
     {
-      this.queryM2Results(query, db, queryString);
+      this.queryM2Results(query, db);
     } else
     {
       console.log('Unknown Database ' + query);
@@ -174,14 +174,16 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (
-      nextProps.query
-      && nextProps.query.tql
-      && (!this.props.query ||
-        (
-          this.props.query.tql !== nextProps.query.tql ||
-          this.props.query.cards !== nextProps.query.cards ||
-          this.props.query.inputs !== nextProps.query.inputs
+    if (this.props.db !== nextProps.db ||
+      (
+        nextProps.query
+        && nextProps.query.tql
+        && (!this.props.query ||
+          (
+            this.props.query.tql !== nextProps.query.tql ||
+            this.props.query.cards !== nextProps.query.cards ||
+            this.props.query.inputs !== nextProps.query.inputs
+          )
         )
       )
     )
@@ -372,23 +374,21 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
-  private queryM2Results(query: Query, db: BackendInstance, queryString?: string)
+  private queryM2Results(query: Query, db: BackendInstance)
   {
-    if (!queryString && (query.parseTree === null || query.parseTree.hasError()))
+    if (query.parseTree === null || query.parseTree.hasError())
     {
       return;
     }
 
-    if (queryString || query !== this.state.lastQuery)
+    if (query !== this.state.lastQuery)
     {
-      const eql = queryString? queryString : AllBackendsMap[query.language].parseTreeToQueryString(
+      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
         {
           replaceInputs: true,
         },
       );
-      console.log('eql');
-      console.log(eql);
 
       this.setState({
         lastQuery: query,
@@ -410,7 +410,7 @@ export class ResultsManager extends TerrainComponent<Props>
       let allFieldsQueryCode;
       try
       {
-        allFieldsQueryCode = queryString? queryString : AllBackendsMap[query.language].parseTreeToQueryString(
+        allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
           query,
           {
             allFields: true,
@@ -422,9 +422,6 @@ export class ResultsManager extends TerrainComponent<Props>
       {
         console.log('Could not generate all field Elastic request, reason:' + err);
       }
-      console.log()
-      console.log('allFieldsQueryCode');
-      console.log(allFieldsQueryCode);
       if (allFieldsQueryCode)
       {
         this.setState({

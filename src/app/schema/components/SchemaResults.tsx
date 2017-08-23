@@ -56,16 +56,16 @@ import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
+import * as PropTypes from 'prop-types';
+import { _ResultsConfig, ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { _Query, Query } from '../../../items/types/Query';
+import ResultsArea from '../../builder/components/results/ResultsArea';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
-import InfoArea from '../../common/components/InfoArea';
 import Colors from '../../common/Colors';
-import ResultsArea from '../../builder/components/results/ResultsArea';
-import * as PropTypes from 'prop-types';
-import { _ResultsConfig, ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
+import InfoArea from '../../common/components/InfoArea';
 
 import { AllBackendsMap } from '../../../database/AllBackends';
 
@@ -84,14 +84,12 @@ class SchemaResults extends TerrainComponent<Props>
     selectedItem?: SchemaBaseClass,
 
     resultsState?: ResultsState;
-    resultsConfig?: ResultsConfig;
     resultsQuery?: Query;
     resultsQueryString?: string;
     resultsServer?: BackendInstance;
     resultsErrorMessage?: string;
   } = {
     resultsState: _ResultsState(),
-    resultsConfig: _ResultsConfig(),
   };
 
   constructor(props: Props)
@@ -118,44 +116,64 @@ class SchemaResults extends TerrainComponent<Props>
 
           if (this.showsResults(selectedItem))
           {
-            const resultsServer =
-              selectedItem.type === 'server' ? selectedItem.name :
+            const resultsServer: SchemaTypes.Server =
+              selectedItem['type'] === 'server' ? selectedItem :
                 this.props.servers
                 && this.props.servers.get(selectedItem['serverId']);
-
-            console.log('resultsServer=');
-            console.log(this.state.resultsServer);
 
             let queryString: string = '';
             switch (selectedItem.type)
             {
               case 'server':
-                queryString = '{ "index": "", "type": "", "from": 0, "size": 1000, "body": { "query": { } } }';
+                queryString = '{ "index": "", "type": "", "from": 0, "size": 1000 }';
                 break;
               case 'database':
-                queryString = '{ "index": "'+selectedItem['name']+'", "type": "", "from": 0, "size": 1000, "body": { "query": { } } }';
+                queryString = '{ "index": "' + selectedItem['name'] + '", "type": "", "from": 0, "size": 1000 }';
                 break;
               case 'table':
-                queryString = '{ "index": "'+selectedItem['databaseId'].replace(selectedItem['serverId']+'/','')+'", "type": "'+selectedItem['name']+'", "from": 0, "size": 1000, "body": { "query": { } } }';
+                queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
+                  + '", "type": "' + selectedItem['name'] + '", "from": 0, "size": 1000 }';
                 break;
               case 'column':
-                queryString = '{ "index": "'+selectedItem['databaseId'].replace(selectedItem['serverId']+'/','')+'", "type": "'+selectedItem['tableId'].replace(selectedItem['databaseId']+'.','')+'", "from": 0, "size": 1000, "body": { "query": { } } }';
+                queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
+                  + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '", "from": 0, "size": 1000 }';
                 break;
             }
 
-            const resultsQuery: Query = _Query({});
-            let resultsErrorMessage = null;
+            if (resultsServer === this.state.resultsServer && queryString === this.state.resultsQueryString)
+            {
+              return;
+            }
+
+            let resultsQuery: Query;
+            if (!this.state.resultsQuery)
+            {
+              resultsQuery = _Query({});
+              resultsQuery = resultsQuery.set('resultsConfig', _ResultsConfig());
+            }
+            else
+            {
+              resultsQuery = this.state.resultsQuery;
+              resultsQuery = resultsQuery.set('lastMutation', resultsQuery.lastMutation + 1);
+            }
+            resultsQuery = resultsQuery.set('db', {
+              id: resultsServer.connectionId,
+              name: resultsServer.name,
+              source: 'm2',
+              type: 'elastic',
+            });
+            resultsQuery = resultsQuery.set('tql', queryString);
+            resultsQuery = resultsQuery.set('parseTree', AllBackendsMap['elastic'].parseQuery(resultsQuery));
+
+            const resultsErrorMessage = null;
 
             this.setState({
-              resultsQueryString: queryString,
               resultsQuery,
-              resultsServer,
+              resultsQueryString: queryString,
+              resultsServer: resultsQuery.db as BackendInstance,
               resultsState: _ResultsState(),
-              resultsConfig: _ResultsConfig(),
               resultsErrorMessage,
             });
-            console.log('resultsServer=');
-            console.log(this.state.resultsServer);
           }
           else
           {
@@ -218,7 +236,7 @@ class SchemaResults extends TerrainComponent<Props>
               variantName={''}
               onNavigationException={PropTypes.func}
               resultsState={this.state.resultsState}
-             />
+            />
             :
             <InfoArea
               large='Select an item to see its contents here.'
@@ -229,7 +247,6 @@ class SchemaResults extends TerrainComponent<Props>
           onResultsStateChange={this.handleResultsStateChange}
           resultsState={this.state.resultsState}
           query={this.state.resultsQuery}
-          queryString={this.state.resultsQueryString}
           noExtraFields={true}
         />
       </div>
