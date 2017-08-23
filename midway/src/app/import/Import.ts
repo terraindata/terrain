@@ -71,7 +71,8 @@ export interface ImportConfig extends ImportTemplateBase
 {
   file: stream.Readable;
   filetype: string;     // either 'json' or 'csv'
-  isNewlineSeparatedJSON?: boolean;    // defaults to false
+  isNewlineSeparatedJSON?: boolean;      // defaults to false
+  requireJSONHaveAllFields?: boolean;    // defaults to true
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
@@ -328,6 +329,12 @@ export class Import
         return reject(isNewlineSeparatedJSON);
       }
 
+      const requireJSONHaveAllFields: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
+      if (typeof requireJSONHaveAllFields === 'string')
+      {
+        return reject(requireJSONHaveAllFields);
+      }
+
       let file: stream.Readable | null = null;
       for (const f of files)
       {
@@ -369,6 +376,7 @@ export class Import
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
+          requireJSONHaveAllFields,
           tablename: template['tablename'],
           transformations: template['transformations'],
           update,
@@ -393,6 +401,7 @@ export class Import
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
+            requireJSONHaveAllFields,
             tablename: fields['tablename'],
             transformations,
             update,
@@ -1232,22 +1241,37 @@ export class Import
           }
         }
 
-        for (const obj of items)
+        if (imprt.requireJSONHaveAllFields !== false)
         {
-          const fieldsInDocumentNotExpected = _.difference(Object.keys(obj), imprt.originalNames);
-          for (const field of fieldsInDocumentNotExpected)
+          const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
+          for (const obj of items)
           {
-            if (obj.hasOwnProperty(field))
+            if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
             {
-              return reject('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
-                JSON.stringify(obj));
+              return reject('JSON file contains an object that does not contain the expected fields. Got fields: ' +
+                JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
             }
-            delete obj[field];
           }
-          const expectedFieldsNotInDocument = _.difference(imprt.originalNames, Object.keys(obj));
-          for (const field of expectedFieldsNotInDocument)
+        }
+        else
+        {
+          for (const obj of items)
           {
-            obj[field] = null;
+            const fieldsInDocumentNotExpected = _.difference(Object.keys(obj), imprt.originalNames);
+            for (const field of fieldsInDocumentNotExpected)
+            {
+              if (obj.hasOwnProperty(field))
+              {
+                return reject('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
+                  JSON.stringify(obj));
+              }
+              delete obj[field];
+            }
+            const expectedFieldsNotInDocument = _.difference(imprt.originalNames, Object.keys(obj));
+            for (const field of expectedFieldsNotInDocument)
+            {
+              obj[field] = null;
+            }
           }
         }
         resolve(items);
