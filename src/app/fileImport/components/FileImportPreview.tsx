@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-empty strict-boolean-expressions no-console
+// tslint:disable:no-empty strict-boolean-expressions no-console no-var-requires
 
 import * as Immutable from 'immutable';
 import * as moment from 'moment';
@@ -62,6 +62,8 @@ import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 const { List } = Immutable;
+
+const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
 type Transform = FileImportTypes.Transform;
 type Template = FileImportTypes.Template;
@@ -395,12 +397,11 @@ class FileImportPreview extends TerrainComponent<Props>
                   {
                     this.props.columnNames.get(pkey)
                   }
-                  <span
-                    className='fi-preview-pkeys-pkey-delete clickable'
+                  <CloseIcon
                     onClick={this._fn(this.deletePrimaryKey, this.props.columnNames.get(pkey))}
-                  >
-                    x
-                  </span>
+                    className='close delete-primary-key'
+                    data-tip='Delete Primary Key'
+                  />
                 </div>
                 {
                   index !== this.props.primaryKeys.size - 1 &&
@@ -417,6 +418,7 @@ class FileImportPreview extends TerrainComponent<Props>
                           placeholder={'delimiter'}
                           className={'fi-preview-pkeys-autocomplete'}
                           disabled={false}
+                          onEnter={this.onDelimChange}
                           onBlur={this.onDelimChange}
                         />
                         :

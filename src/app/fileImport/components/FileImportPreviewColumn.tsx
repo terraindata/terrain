@@ -97,7 +97,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleBlur()
+  public handleRename()
   {
     const success: boolean = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
     if (!success)
@@ -184,7 +184,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             onChange={this.handleLocalColumnNameChange}
             placeholder={''}
             disabled={false}
-            onBlur={this.handleBlur}
+            onEnter={this.handleRename}
+            onSelectOption={this.handleRename}
+            onBlur={this.handleRename}
           />
         </div>
       </div>

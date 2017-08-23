@@ -46,25 +46,27 @@
     .fi-preview-pkeys {
       margin-left: 6px;
       margin-bottom: 6px;
+      max-width: 300px;
+      flex-wrap: wrap;
 
       .fi-preview-pkeys-wrapper {
 
         .fi-preview-pkeys-pkey {
           padding: @padding;
-          .title-text;
+          .big-text;
+          margin-bottom: 3px;
 
-          .fi-preview-pkeys-pkey-delete {
-            padding: @padding;
-            .big-text;
+          .delete-primary-key {
+            margin-left: 6px;
           }
         }
 
         .fi-preview-pkeys-delim {
           padding: @padding;
-          .title-text;
+          .big-text;
 
           .autocomplete {
-            max-width: 50px;
+            max-width: 30px;
           }
         }
       }
