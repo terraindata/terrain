@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions interface-name no-var-requires
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
