@@ -65,7 +65,7 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 // Components
-import {generateThemeStyles} from 'common/components/tooltip/Tooltip';
+import {generateThemeStyles} from 'common/components/tooltip/Tooltips';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
 import AccountDropdown from './common/components/AccountDropdown';
