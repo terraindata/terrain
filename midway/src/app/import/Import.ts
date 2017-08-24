@@ -240,6 +240,7 @@ export class Import
         }
         let returnDocs: object[] = [];
 
+        const fieldArrayDepths: object = {};
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
@@ -252,12 +253,25 @@ export class Import
           }
           for (const field of Object.keys(newDoc))
           {
+            if (fieldArrayDepths[field] === undefined)
+            {
+              fieldArrayDepths[field] = new Set<number>();
+            }
+            fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
             if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
             {
               newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
             }
           }
           returnDocs.push(newDoc as object);
+        }
+        for (const field of Object.keys(fieldArrayDepths))
+        {
+          if (fieldArrayDepths[field].size > 1)
+          {
+            errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
+            return reject(errMsg);
+          }
         }
 
         // transform documents with template
@@ -969,6 +983,16 @@ export class Import
     }
     this.chunkQueue.push({ chunk: contents, isLast });
     return '';
+  }
+
+  /* assumes arrays are of uniform depth */
+  private _getArrayDepth(obj: any): number
+  {
+    if (Array.isArray(obj))
+    {
+      return this._getArrayDepth(obj[0]) + 1;
+    }
+    return 0;
   }
 
   /* return ES type from type specification format of ImportConfig
