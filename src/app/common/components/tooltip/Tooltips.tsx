@@ -52,10 +52,10 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import * as React from 'react';
-import {Tooltip} from 'react-tippy';
+import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css';
 
-import {backgroundColor, borderColor, Colors, fontColor} from 'common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from 'common/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
 
 import './Tooltips.less';
@@ -66,14 +66,18 @@ function assertUnreachable(param: never): never
 }
 
 // https://stackoverflow.com/questions/12303989/cartesian-product-of-multiple-arrays-in-javascript
-function cartesianProductOf(... vars: any[]) {
-    return _.reduce(arguments, (a, b) => {
-        return _.flatten(_.map(a, (x) => {
-            return _.map(b, (y) => {
-                return x.concat([y]);
-            });
-        }), true);
-    }, [ [] ]);
+function cartesianProductOf(...vars: any[])
+{
+  return _.reduce(arguments, (a, b) =>
+  {
+    return _.flatten(_.map(a, (x) =>
+    {
+      return _.map(b, (y) =>
+      {
+        return x.concat([y]);
+      });
+    }), true);
+  }, [[]]);
 };
 const classCombinations = cartesianProductOf(['regular', 'small', 'big', 'circle'], ['top', 'bottom', 'left', 'right']);
 
@@ -90,7 +94,7 @@ class TooltipStyleGenerator
       const modifier: ArrowModifier = combination[0];
       const direction: ShowDirection = combination[1];
       const className = TooltipStyleGenerator.getClassName(theme, modifier, direction);
-      const objToAdd = {[className]: TooltipStyleGenerator.styleForArrow(modifier, direction, bgColor)};
+      const objToAdd = { [className]: TooltipStyleGenerator.styleForArrow(modifier, direction, bgColor) };
       classes = _.extend(classes, objToAdd);
     }
     const bodyClass = {
@@ -200,12 +204,14 @@ class TooltipStyleGenerator
 
 // exports
 
-export interface ThemeInfo {
+export interface ThemeInfo
+{
   backgroundColor: () => string;
   fontColor: () => string;
 }
 
-export interface Themes {
+export interface Themes
+{
   main: ThemeInfo;
   alt: ThemeInfo;
   error: ThemeInfo;
@@ -242,7 +248,7 @@ export interface TooltipProps
   interactiveBorder?: number;
   delay?: number;
   hideDelay?: number
-  animation?: 'shift'| 'perspective' | 'fade' | 'scale' | 'none';
+  animation?: 'shift' | 'perspective' | 'fade' | 'scale' | 'none';
   arrow?: boolean
   arrowSize?: 'small' | 'regular' | 'big';
   animateFill?: boolean;
@@ -296,11 +302,11 @@ export function simpleTooltip(tip: string, innerComponent: any, theme: Theme = '
   const props: TooltipProps = defaultProps;
   props.title = tip;
   props.theme = theme;
-  return <Tooltip children={innerComponent} {...props}/>
+  return <Tooltip children={innerComponent} {...props} />
 }
 
 export function makeTooltip(givenProps: TooltipProps, innerComponent): Tooltip
 {
   const props = _.defaults(givenProps, defaultProps);
-  return <Tooltip children={innerComponent} {...props}/>;
+  return <Tooltip children={innerComponent} {...props} />;
 }
