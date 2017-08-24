@@ -70,7 +70,7 @@ export interface Props
   canEdit: boolean;
   width: number;
   language: string;
-  colors: [string];
+  colors: [string, string];
 }
 
 const MAX_BARS = 100;

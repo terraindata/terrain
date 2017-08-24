@@ -78,7 +78,7 @@ export interface Props
   updatePoints: (points: ScorePoints, released?: boolean) => void;
   width: number;
   language: string;
-  colors: [string];
+  colors: [string, string];
   spotlights: any; // TODO spawtlights
 }
 

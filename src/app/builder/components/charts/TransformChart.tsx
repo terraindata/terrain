@@ -82,7 +82,7 @@ const TransformChart = {
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('style', 'fill: ' + Colors().altBg1);
+      .attr('fill', Colors().altBg1);
 
     svg.append('g')
       .attr('class', 'yLeftAxis');
@@ -109,7 +109,7 @@ const TransformChart = {
     innerSvg.append('g')
       .append('path')
       .attr('class', 'lines-bg')
-      .attr('style', 'fill: ' + state.colors[1]);
+      .attr('fill', state.colors[1]);
     innerSvg.append('g')
       .append('path')
       .attr('class', 'lines')
@@ -384,7 +384,8 @@ const TransformChart = {
     bar.enter()
       .append('rect')
       .attr('class', 'bar')
-      .attr('style', 'fill: ' + colors[0]);
+      .attr('fill', colors[0])
+      .attr('opacity', '50%');
 
     bar
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
@@ -837,20 +838,20 @@ const TransformChart = {
       .attr('ry', 5)
       .attr('width', w)
       .attr('height', h)
-      .attr('style', 'fill: ' + colors[0]);
+      .attr('fill', colors[0]);
 
     crosshairs.append('text')
       .attr('x', menuX + 6)
       .attr('y', menuY + 14)
       .attr('text-anchor', 'start')
-      .attr('style', 'fill: ' + Colors().altBg1)
+      .attr('fill', Colors().altBg1)
       .text(text_x);
 
     crosshairs.append('text')
       .attr('x', menuX + 6)
       .attr('y', menuY + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('style', 'fill: ' + Colors().altBg1)
+      .attr('fill', Colors().altBg1)
       .text(text_y);
 
     const crosshairLines = d3.select(el).select('.inner-svg').insert('g', '.points').attr('class', 'crosshairs');
@@ -907,20 +908,20 @@ const TransformChart = {
       .attr('ry', 5)
       .attr('width', w)
       .attr('height', h)
-      .attr('style', 'fill: ' + colors[0]);
+      .attr('fill', colors[0]);
 
     tooltip.append('text')
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
-      .attr('style', 'fill: ' + Colors().altBg1)
+      .attr('fill', Colors().altBg1)
       .text(text_x);
 
     tooltip.append('text')
       .attr('x', x + 6)
       .attr('y', y + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('style', 'fill: ' + Colors().altBg1)
+      .attr('fill', Colors().altBg1)
       .text(text_y);
 
   },
@@ -1136,7 +1137,7 @@ const TransformChart = {
       .duration(50)
       .attr('width', w)
       .attr('height', h)
-      .attr('style', 'fill: ' + colors[0]);
+      .attr('fill', colors[0]);
 
     menu.append('text')
       .attr('x', x + w / 2)
@@ -1148,12 +1149,12 @@ const TransformChart = {
       .delay(100)
       .duration(50)
       .attr('opacity', 1)
-      .attr('style', 'fill: ' + Colors().altBg1);
+      .attr('fill', Colors().altBg1);
     menu.append('circle')
       .attr('cx', mouse[0])
       .attr('cy', mouse[1])
       .attr('r', 3)
-      .attr('style', 'fill: ' + Colors().altHighlight)
+      .attr('fill', Colors().altHighlight)
       .transition()
       .duration(50);
 

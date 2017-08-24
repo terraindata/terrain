@@ -79,7 +79,7 @@ const Periscope = {
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('style', 'fill: ' + Colors().altBg1);
+      .attr('fill', Colors().altBg1);
     svg.append('g')
       .attr('class', 'bottomAxis');
 
@@ -93,7 +93,7 @@ const Periscope = {
 
     svg.append('rect')
       .attr('class', 'line')
-      .attr('style', 'fill: ' + state.colors[0]);
+      .attr('fill', state.colors[0]);
     svg.append('g')
       .attr('class', 'handles');
 
@@ -177,7 +177,7 @@ const Periscope = {
     bar.enter()
       .append('rect')
       .attr('class', 'bar')
-      .attr('style', 'fill: ' + colors[0]);
+      .attr('fill', colors[0]);
 
     bar
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
@@ -243,13 +243,14 @@ const Periscope = {
     handle.enter()
       .append('circle')
       .attr('class', 'handle')
-      .attr('style', 'stroke: ' + Colors().altHighlight + '; fill: ' + Colors().altBg1 + ';');
+      .attr('style', 'stroke: ' + Colors().altHighlight)
+      .attr('fill', Colors().altBg1 + ';');
 
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
       .attr('fill', '#fff')
-      .attr('stroke', '#f00')
+      .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('stroke-width', '3px')
       .attr('r', 10);
 
