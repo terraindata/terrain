@@ -136,7 +136,6 @@ const BuilderColumn = createReactClass<any, any>(
       canEdit: PropTypes.bool.isRequired,
       cantEditReason: PropTypes.string,
       onNavigationException: PropTypes.func,
-      handleCardDrop: PropTypes.func,
     },
 
     getInitialState()
@@ -194,9 +193,6 @@ const BuilderColumn = createReactClass<any, any>(
 
     renderContent()
     {
-      console.log(this.props.query);
-      console.log(this.props.variant);
-      
       if (!this.props.query)
       {
         return (
@@ -221,7 +217,6 @@ const BuilderColumn = createReactClass<any, any>(
             columnIndex={this.props.index}
             cardsAndCodeInSync={query.cardsAndCodeInSync}
             language={query.language}
-            handleCardDrop={this.props.handleCardDrop}
           />;
 
         case COLUMNS.Inputs:
