@@ -80,6 +80,7 @@ export interface Props
 class SchemaResults extends TerrainComponent<Props>
 {
   public state: {
+    initialized?: boolean,
     selectedId?: ID,
     selectedItem?: SchemaBaseClass,
 
@@ -89,6 +90,7 @@ class SchemaResults extends TerrainComponent<Props>
     resultsServer?: BackendInstance;
     resultsErrorMessage?: string;
   } = {
+    initialized: false,
     resultsState: _ResultsState(),
   };
 
@@ -99,6 +101,13 @@ class SchemaResults extends TerrainComponent<Props>
     this._subscribe(SchemaStore, {
       updater: (storeState: SchemaTypes.SchemaState) =>
       {
+        if (!this.state.initialized)
+        {
+          this.setState({
+            'initialized':true,
+          });
+          return;
+        }
         const { selectedId } = storeState;
         // TODO change if store changes
         const selectedItem =
