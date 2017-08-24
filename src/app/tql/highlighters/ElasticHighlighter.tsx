@@ -56,8 +56,12 @@ import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo'
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 // other imports
+import { MarkerAnnotation } from 'tql/components/TQLEditor';
 import { ESParserTokenizer, FlaggedToken } from '../../../../shared/database/elastic/formatter/ESParserTokenizer';
 import SyntaxHighlighter from './SyntaxHighlighter';
+
+import { BuilderStore } from 'builder/data/BuilderStore';
+import { toInputMap } from '../../../blocks/types/Input';
 
 /*
  *  Errors involving this function probably mean a missing a case on a switch.
@@ -90,18 +94,30 @@ class ElasticHighlighter extends SyntaxHighlighter
   {
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
-    const interpreter = new ESInterpreter(parser);
+    const state = BuilderStore.getState();
+    const inputs = state.query && state.query.inputs;
+    const params: { [name: string]: any; } = toInputMap(inputs);
+    const interpreter = new ESInterpreter(parser, params);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();
     const tokens = ESParserTokenizer.getTokens(parser);
     for (const fToken of tokens)
     {
       const token: ESParserToken = fToken.parserToken;
       const style: string = this.getStyle(fToken);
-      instance.markText(
+      const marker = instance.markText(
         { line: token.row, ch: token.col },
         { line: token.toRow, ch: token.toCol },
-        { className: style },
+        { className: style, },
       );
+    }
+    for (const e of parser.getErrors())
+    {
+      const token = e.token;
+      const errorAnnotation: MarkerAnnotation = { showing: false, msg: e.message };
+      const marker = instance.markText(
+        { line: token.row, ch: token.col },
+        { line: token.toRow, ch: token.toCol },
+        { className: 'CodeMirror-lint-mark-error', __annotation: errorAnnotation });
     }
   }
 
