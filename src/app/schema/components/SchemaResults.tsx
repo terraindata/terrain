@@ -229,14 +229,24 @@ class SchemaResults extends TerrainComponent<Props>
         */}
         {
           this.showsResults(this.state.selectedItem) ?
-            <ResultsArea
-              query={this.state.resultsQuery}
-              canEdit={false}
-              db={this.state.resultsServer}
-              variantName={''}
-              onNavigationException={PropTypes.func}
-              resultsState={this.state.resultsState}
-            />
+            <div
+              style={{
+                marginLeft: 12,
+                marginRight: 12,
+                boxSizing: 'border-box',
+              }}
+            >
+              <ResultsArea
+                query={this.state.resultsQuery}
+                canEdit={false}
+                db={this.state.resultsServer}
+                variantName={''}
+                onNavigationException={PropTypes.func}
+                resultsState={this.state.resultsState}
+                showExport={false}
+                showCustomizeView={false}
+              />
+            </div>
             :
             <InfoArea
               large='Select an item to see its contents here.'

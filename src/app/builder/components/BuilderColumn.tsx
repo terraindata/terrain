@@ -234,6 +234,8 @@ const BuilderColumn = createReactClass<any, any>(
             variantName={this.props.variant.name}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
+            showExport={true}
+            showCustomizeView={true}
           />;
 
         case COLUMNS.Editor:
@@ -251,6 +253,7 @@ const BuilderColumn = createReactClass<any, any>(
           return <SchemaView
             fullPage={false}
             showSearch={true}
+            showResults={false}
           />;
         // case COLUMNS.Manual:
         //   return <Manual

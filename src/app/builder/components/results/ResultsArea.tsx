@@ -81,7 +81,8 @@ export interface Props
   query: Query;
   canEdit: boolean;
   variantName: string;
-
+  showExport: boolean;
+  showCustomizeView: boolean;
   onNavigationException: () => void;
 }
 
@@ -452,23 +453,27 @@ column if you have customized the results view.');
           }
         </div>
 
-        <div
-          className='results-top-config'
-          onClick={this.handleESresultExport}
-          key='results-area-export'
-          style={link()}
-        >
-          Export
-        </div>
+        {this.props.showExport &&
+          <div
+            className='results-top-config'
+            onClick={this.handleESresultExport}
+            key='results-area-export'
+            style={link()}
+          >
+            Export
+          </div>
+        }
 
-        <div
-          className='results-top-config'
-          onClick={this.showConfig}
-          key='results-area-customize'
-          style={link()}
-        >
-          Customize view
+        {this.props.showCustomizeView &&
+          <div
+            className='results-top-config'
+            onClick={this.showConfig}
+            key='results-area-customize'
+            style={link()}
+          >
+            Customize view
         </div>
+        }
 
         <Switch
           first='Icons'

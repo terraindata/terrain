@@ -115,7 +115,7 @@ const SchemaTreeStyles =
     treeItemHeader: [{
       'display': 'flex',
       'cursor': 'pointer',
-      'height': itemHeaderHeight,
+      // 'height': itemHeaderHeight,
 
       'borderRadius': 4,
 
