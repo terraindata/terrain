@@ -65,6 +65,7 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 // Components
+import {generateThemeStyles} from 'common/components/tooltip/Tooltip';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
 import AccountDropdown from './common/components/AccountDropdown';
@@ -410,6 +411,7 @@ const COMMON_THEME_COLOR_STYLE = {
     background: Colors().inputBg,
     color: Colors().text1,
   },
+  ...generateThemeStyles(),
 };
 
 export default App;
