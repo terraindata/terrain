@@ -233,7 +233,7 @@ class FileImport extends TerrainComponent<any>
       const testDuplicateConfig: ParseCSVConfig = {
         preview: 1,
         hasHeaderRow: false,
-        error: this._fn(this.setError)
+        error: this._fn(this.setError),
       };
 
       const columnHeaders = parseCSV(file, testDuplicateConfig);
@@ -263,7 +263,7 @@ class FileImport extends TerrainComponent<any>
     const config: ParseCSVConfig = {
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       hasHeaderRow: hasCsvHeader,
-      error: this._fn(this.setError)
+      error: this._fn(this.setError),
     };
     return parseCSV(file, config);
   }
@@ -551,7 +551,7 @@ class FileImport extends TerrainComponent<any>
         >
           <div
             className='fi-content-csv-option button'
-            onClick={() => this.handleCsvHeaderChoice(true)}
+            onClick={this._fn(this.handleCsvHeaderChoice, true)}
             style={buttonColors()}
             ref='fi-yes-button'
           >
@@ -559,7 +559,7 @@ class FileImport extends TerrainComponent<any>
           </div>
           <div
             className='fi-content-csv-option button'
-            onClick={() => this.handleCsvHeaderChoice(false)}
+            onClick={this._fn(this.handleCsvHeaderChoice, false)}
             style={buttonColors()}
             ref='fi-no-button'
           >

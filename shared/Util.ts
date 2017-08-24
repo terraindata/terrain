@@ -294,3 +294,13 @@ export function parseJSONSubset(file: string, numLines: number): object[]
   }
   return JSON.parse(file.substring(0, c) + ']');
 }
+
+export function getTemplateName(templateName: string): string
+{
+  return templateName.substring(templateName.indexOf(':') + 1);
+}
+
+export function getTemplateId(templateName: string): number
+{
+  return Number(templateName.substring(0, templateName.indexOf(':')));
+}

@@ -50,9 +50,10 @@ import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { buttonColors, Colors } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import TemplateList from '../../common/components/TemplateList';
+import { getTemplateId, getTemplateName } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -97,17 +98,21 @@ export interface Props
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    loadedTemplateId: number,
-    templateName: string,
+    appliedTemplateName: string,
+    saveTemplateName: string,
     templateOptions: List<string>,
     showingDelimTextBox: boolean,
+    showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
+    showingSaveTemplate: boolean,
   } = {
-    loadedTemplateId: -1,
-    templateName: '',
+    appliedTemplateName: '',
+    saveTemplateName: '',
     templateOptions: List([]),
     showingDelimTextBox: false,
+    showingUpdateTemplate: false,
     showingApplyTemplate: false,
+    showingSaveTemplate: false,
   };
 
   public componentDidMount()
@@ -126,6 +131,140 @@ class FileImportPreview extends TerrainComponent<Props>
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
+  }
+
+  public showDelimTextBox()
+  {
+    this.setState({
+      showingDelimTextBox: true,
+    });
+  }
+
+  public onDelimChange()
+  {
+    this.setState({
+      showingDelimTextBox: false,
+    });
+  }
+
+  public showApplyTemplate()
+  {
+    this.setState({
+      showingApplyTemplate: true,
+    });
+  }
+
+  public hideApplyTemplate()
+  {
+    this.setState({
+      showingApplyTemplate: false,
+    });
+  }
+
+  public showSaveTemplate()
+  {
+    this.setState({
+      showingSaveTemplate: true,
+    });
+  }
+
+  public hideSaveTemplate()
+  {
+    this.setState({
+      showingSaveTemplate: false,
+    });
+  }
+
+  public showUpdateTemplate()
+  {
+    this.setState({
+      showingUpdateTemplate: true,
+    });
+  }
+
+  public hideUpdateTemplate()
+  {
+    this.setState({
+      showingUpdateTemplate: false,
+    });
+  }
+
+  public onSaveTemplateNameChange(saveTemplateName: string)
+  {
+    this.setState({
+      saveTemplateName,
+    });
+  }
+
+  public handleSaveTemplate()
+  {
+    const { saveTemplateName } = this.state;
+    if (!saveTemplateName)
+    {
+      Actions.setErrorMsg('Please enter a template name');
+      return;
+    }
+    if (this.props.templates.find((temp) => temp.templateName === saveTemplateName))
+    {
+      this.showUpdateTemplate();
+      return;
+    }
+    Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting);
+    this.setState({
+      appliedTemplateName: saveTemplateName,
+    });
+  }
+
+  public handleUpdateTemplate()
+  {
+    const { appliedTemplateName, saveTemplateName } = this.state;
+    Actions.updateTemplate(getTemplateId(appliedTemplateName), this.props.exporting);
+    this.setState({
+      showingSaveTemplate: false,
+      appliedTemplateName: saveTemplateName,
+    });
+  }
+
+  public handleDeleteTemplate(itemIndex: number)
+  {
+    const templateName = this.state.templateOptions.get(itemIndex);
+    Actions.deleteTemplate(getTemplateId(templateName), this.props.exporting);
+  }
+
+  public handleApplyTemplate(itemIndex: number)
+  {
+    const templateName = this.state.templateOptions.get(itemIndex);
+
+    // check if template is compatible with current mapping -> whether column names match
+    const colNames: Immutable.List<string> = this.props.templates.get(itemIndex).originalNames;
+    let isCompatible: boolean = true;
+    const unmatchedColNames: string[] = [];
+    const unmatchedTableNames: string[] = this.props.columnNames.toArray();
+    colNames.map((colName) =>
+    {
+      if (!this.props.columnNames.contains(colName))
+      {
+        isCompatible = false;
+        unmatchedColNames.push(colName);
+      }
+      else
+      {
+        unmatchedTableNames.splice(unmatchedTableNames.indexOf(colName), 1);
+      }
+    });
+    if (!isCompatible)
+    {
+      Actions.setErrorMsg('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedColNames) + '\n and \n'
+        + JSON.stringify(unmatchedTableNames));
+      return;
+    }
+
+    Actions.loadTemplate(getTemplateId(templateName));
+    this.setState({
+      showingApplyTemplate: false,
+      appliedTemplateName: templateName,
+      saveTemplateName: getTemplateName(templateName),
+    });
   }
 
   public onColumnNameChange(columnId: number, localColumnName: string): boolean
@@ -168,102 +307,6 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.changePrimaryKeyDelimiter(delim);
   }
 
-  public showDelimTextBox()
-  {
-    this.setState({
-      showingDelimTextBox: true,
-    });
-  }
-
-  public onDelimChange()
-  {
-    this.setState({
-      showingDelimTextBox: false,
-    });
-  }
-
-  public showApplyTemplate()
-  {
-    this.setState({
-      showingApplyTemplate: true,
-    });
-  }
-
-  public hideApplyTemplate()
-  {
-    this.setState({
-      showingApplyTemplate: false,
-    });
-  }
-
-  public handleAutocompleteTemplateChange(templateName: string)
-  {
-    this.setState({
-      templateName,
-    });
-  }
-
-  public handleDeleteTemplate(itemIndex: number)
-  {
-    const templateName = this.state.templateOptions.get(itemIndex);
-    const templateId = Number(templateName.split(':').shift());
-    Actions.deleteTemplate(templateId, this.props.exporting);
-  }
-
-  public handleLoadTemplate(itemIndex: number)
-  {
-    const templateName = this.state.templateOptions.get(itemIndex);
-    const templateId = Number(templateName.split(':').shift());
-
-    const colNames: Immutable.List<string> = this.props.templates.get(itemIndex).originalNames;
-    let isCompatible: boolean = true;
-    const unmatchedColNames: string[] = [];
-    const unmatchedTableNames: string[] = this.props.columnNames.toArray();
-    colNames.map((colName) =>
-    {
-      if (!this.props.columnNames.contains(colName))
-      {
-        isCompatible = false;
-        unmatchedColNames.push(colName);
-      }
-      else
-      {
-        unmatchedTableNames.splice(unmatchedTableNames.indexOf(colName), 1);
-      }
-    });
-
-    if (!isCompatible)
-    {
-      Actions.setErrorMsg('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedColNames) + '\n and \n'
-        + JSON.stringify(unmatchedTableNames));
-      return;
-    }
-    Actions.loadTemplate(templateId);
-    this.setState({
-      showingApplyTemplate: false,
-    });
-  }
-
-  public handleSaveTemplate()
-  {
-    if (!this.state.templateName)
-    {
-      Actions.setErrorMsg('Please enter a template name');
-      return;
-    }
-    Actions.saveTemplate(this.state.templateName, this.props.exporting);
-  }
-
-  public handleUpdateTemplate()
-  {
-    if (this.state.loadedTemplateId === -1)
-    {
-      Actions.setErrorMsg('No template loaded');
-      return;
-    }
-    Actions.updateTemplate(this.state.loadedTemplateId, this.props.exporting);
-  }
-
   public handleUploadFile()
   {
     if (this.props.exporting)
@@ -287,14 +330,48 @@ class FileImportPreview extends TerrainComponent<Props>
           <TemplateList
             items={this.state.templateOptions}
             title={'Select a Template to Apply'}
-            onDelete={this._fn(this.handleDeleteTemplate)}
-            onApply={this._fn(this.handleLoadTemplate)}
+            onDelete={this.handleDeleteTemplate}
+            onApply={this.handleApplyTemplate}
           />
         }
         fill={true}
       />
     );
   }
+
+  public renderSaveTemplate()
+  {
+    return (
+      <Modal
+        open={this.state.showingSaveTemplate}
+        onClose={this.hideSaveTemplate}
+        title={'Save As Template'}
+        confirm={true}
+        confirmButtonText={'Save'}
+        onConfirm={this.handleSaveTemplate}
+        showTextbox={true}
+        initialTextboxValue={getTemplateName(this.state.appliedTemplateName)}
+        onTextboxValueChange={this.onSaveTemplateNameChange}
+        closeOnConfirm={false}
+      />
+    );
+  }
+
+  public renderUpdateTemplate()
+  {
+    return (
+      <Modal
+        open={this.state.showingUpdateTemplate}
+        message={'By saving this, you are overwriting template ABC. Continue?'}
+        onClose={this.hideUpdateTemplate}
+        title={'Overwriting Template'}
+        confirm={true}
+        confirmButtonText={'Yes'}
+        onConfirm={this.handleUpdateTemplate}
+      />
+    );
+  }
+
   public renderTemplate()
   {
     return (
@@ -313,40 +390,17 @@ class FileImportPreview extends TerrainComponent<Props>
             Load Template
           </div>
         </div>
-        {
-          this.state.loadedTemplateId === -1 &&
-          <div
-            className='flex-container fi-preview-template-wrapper'
-          >
-            <div
-              className='flex-grow fi-preview-template-button'
-              onClick={this.handleUpdateTemplate}
-              style={buttonColors()}
-              ref='fi-preview-template-button-update'
-            >
-              Update
-                </div>
-          </div>
-        }
         <div
           className='flex-container fi-preview-template-wrapper'
         >
           <div
             className='flex-grow fi-preview-template-button'
-            onClick={this.handleSaveTemplate}
+            onClick={this.showSaveTemplate}
             style={buttonColors()}
             ref='fi-preview-template-button-save'
           >
-            Save Template
+            Save As Template
           </div>
-          <Autocomplete
-            value={this.state.templateName}
-            options={null}
-            onChange={this.handleAutocompleteTemplateChange}
-            placeholder={'template name'}
-            className={'flex-grow fi-preview-template-save-autocomplete'}
-            disabled={false}
-          />
         </div>
       </div>
     );
@@ -481,6 +535,8 @@ class FileImportPreview extends TerrainComponent<Props>
 
     return (
       this.props.exporting ?
+        upload
+        :
         this.props.uploadInProgress ?
           <div className='fi-preview-loading-container'>
             <Loading
@@ -493,8 +549,6 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
           :
           upload
-        :
-        upload
     );
   }
 
@@ -536,20 +590,7 @@ class FileImportPreview extends TerrainComponent<Props>
               </span>
           </div>
         }
-        {
-          this.props.uploadInProgress ?
-            <div className='fi-preview-loading-container'>
-              <Loading
-                width={100}
-                height={100}
-                loading={this.props.uploadInProgress}
-                loaded={false}
-                onLoadedEnd={null}
-              />
-            </div>
-            :
-            this.renderUpload()
-        }
+        {this.renderUpload()}
       </div>
     );
   }
@@ -564,6 +605,8 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTable()}
         {this.renderBottomBar()}
         {this.renderApplyTemplate()}
+        {this.renderSaveTemplate()}
+        {this.renderUpdateTemplate()}
       </div>
     );
   }
