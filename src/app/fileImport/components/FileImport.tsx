@@ -233,6 +233,7 @@ class FileImport extends TerrainComponent<any>
       const testDuplicateConfig: ParseCSVConfig = {
         preview: 1,
         hasHeaderRow: false,
+        error: this._fn(this.setError)
       };
 
       const columnHeaders = parseCSV(file, testDuplicateConfig);
@@ -262,6 +263,7 @@ class FileImport extends TerrainComponent<any>
     const config: ParseCSVConfig = {
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       hasHeaderRow: hasCsvHeader,
+      error: this._fn(this.setError)
     };
     return parseCSV(file, config);
   }

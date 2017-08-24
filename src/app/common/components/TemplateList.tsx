@@ -58,6 +58,7 @@ const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon')
 export interface Props
 {
   items: List<string>;
+  title?: string;
   onDelete?: (index: number) => void;
   onSelectOption?: () => void;
   onApply?: (index: number) => void;
@@ -85,8 +86,27 @@ class TemplateList extends TerrainComponent<Props>
   public handleSelectOption(index: number)
   {
     this.setState({
-      selectedIndex: index,
+      selectedIndex: this.state.selectedIndex === index ? -1 : index,
     });
+  }
+
+  public renderTitle()
+  {
+    if (this.props.title !== undefined && this.props.title !== '')
+    {
+      return (
+        <div
+          className='list-title'
+          style={{
+            color: Colors().text1,
+          }}
+        >
+          {
+            this.props.title
+          }
+        </div>
+      );
+    }
   }
 
   public renderApply()
@@ -105,6 +125,61 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
+  public renderList()
+  {
+    if (this.props.items.size === 0)
+    {
+      return (
+        <div
+          className='list-empty'
+          style={{
+            color: Colors().text1,
+          }}
+        >
+          There are no templates to load
+        </div>
+      );
+    }
+    else
+    {
+      return (
+        <div
+          className='flex-container list-items'
+        >
+          {
+            this.props.items.map((item, index) =>
+              <div
+                className={classNames({
+                  'clickable list-items-item': true,
+                  'list-items-item-selected': index === this.state.selectedIndex,
+                })}
+                onClick={this._fn(this.handleSelectOption, index)}
+                style={{
+                  background: Colors().bg3,
+                  color: Colors().text1,
+                }}
+                key={index}
+              >
+                <div
+                  className='flex-container list-items-item-wrapper'
+                >
+                  {
+                    item
+                  }
+                  <CloseIcon
+                    onClick={this._fn(this.handleDelete, index)}
+                    className='close delete-list-item'
+                    data-tip='Delete List Item'
+                  />
+                </div>
+              </div>,
+            )
+          }
+        </div>
+      );
+    }
+  }
+
   public render()
   {
     return (
@@ -112,49 +187,8 @@ class TemplateList extends TerrainComponent<Props>
         className='flex-container list-container'
         style={backgroundColor(Colors().bg1)}
       >
-        {
-          this.props.items.size === 0 ?
-            <div
-              className='list-empty'
-              style={{
-                color: Colors().text1,
-              }}
-            >
-              There are no templates to load
-            </div>
-            :
-            <div
-              className='flex-container list-items'
-            >
-              {
-                this.props.items.map((item, index) =>
-                  <div
-                    className='clickable list-items-item'
-                    onClick={this._fn(this.handleSelectOption, index)}
-                    style={{
-                      background: Colors().bg3,
-                      color: Colors().text1,
-                      border: index === this.state.selectedIndex ? 'solid 1px white' : '0px',
-                    }}
-                    key={index}
-                  >
-                    <div
-                      className='flex-container list-items-item-wrapper'
-                    >
-                      {
-                        item
-                      }
-                      <CloseIcon
-                        onClick={this._fn(this.handleDelete, index)}
-                        className='close delete-list-item'
-                        data-tip='Delete List Item'
-                      />
-                    </div>
-                  </div>,
-                )
-              }
-            </div>
-        }
+        {this.renderTitle()}
+        {this.renderList()}
         {this.renderApply()}
       </div>
     );

@@ -286,6 +286,7 @@ class FileImportPreview extends TerrainComponent<Props>
         children={
           <TemplateList
             items={this.state.templateOptions}
+            title={'Select a Template to Apply'}
             onDelete={this._fn(this.handleDeleteTemplate)}
             onApply={this._fn(this.handleLoadTemplate)}
           />

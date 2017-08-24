@@ -7,6 +7,11 @@
   flex-direction: column;
   min-height: 500px;
 
+  .list-title {
+    .big-text;
+    padding: 12px;
+  }
+
   .list-empty {
     .big-text;
     padding: 12px;
@@ -35,8 +40,17 @@
           font-size: 18px;
         }
       }
+
+      &.list-items-item-selected {
+        border: solid 1px white;
+      }
+
+      &:hover {
+        border: solid 1px white;
+      }
     }
   }
+
 
   .list-apply {
     .button;
