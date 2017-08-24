@@ -71,7 +71,7 @@ class CheckBox extends TerrainComponent<Props>
         className={classNames({
           'checkbox': true,
           'checkbox-checked': this.props.checked,
-          [this.props.className]: !!this.props.className,
+          [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
         })}
         style={this.props.checked ? CHECKED_STYLE : UNCHECKED_STYLE}
         onClick={this.props.onChange}
