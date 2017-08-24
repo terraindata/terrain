@@ -314,14 +314,35 @@ class FileImport extends TerrainComponent<any>
         return;
       }
 
-      const previewRows = items.map((item) =>
-        _.map(item, (value, key) =>
-          typeof value === 'string' ? value : JSON.stringify(value), // JSON infers types
-        ),
-      );
-      const columnNames = _.map(items[0], (value, index) =>
-        filetype === 'csv' && !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
-      );
+      let columnNames = [];
+      let previewRows;
+      switch (filetype)
+      {
+        case 'json':
+          const columnNamesSet = new Set();
+          for (const obj of items)
+          {
+            Object.keys(obj).forEach((val) => { columnNamesSet.add(val); });
+          }
+          columnNames = Array.from(columnNamesSet);
+          previewRows = items.map((item) =>
+            columnNames.map((value) =>
+              item[value] === undefined ? '' : typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
+            ),
+          );
+          break;
+        case 'csv':
+          columnNames = _.map(items[0], (value, index) =>
+            filetype === 'csv' && !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
+          );
+          previewRows = items.map((item) =>
+            columnNames.map((value, key) =>
+              item[key] === undefined ? '' : typeof item[key] === 'string' ? item[key] : JSON.stringify(item[key]),
+            ),
+          );
+          break;
+        default:
+      }
 
       Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
       this.setState({
@@ -365,8 +386,14 @@ class FileImport extends TerrainComponent<any>
     //   this.parseFile(file.target.files[0], filetype, null);
     // }
 
-    this.incrementStep();
-    // this.parseFile(file.target.files[0], filetype, false);
+    if (filetype === 'csv')
+    {
+      this.parseFile(file.target.files[0], filetype, false, false);
+    }
+    else
+    {
+      this.incrementStep();
+    }
   }
 
   public handleSelectFileButtonClick()
@@ -645,18 +672,6 @@ class FileImport extends TerrainComponent<any>
           >
             Object list
           </div>
-        </div>
-        <div
-          className='fi-preview-rows-container'
-        >
-          {
-            previewRows.map((items, key) =>
-              <FileImportPreviewRow
-                key={key}
-                items={items}
-              />,
-            )
-          }
         </div>
       </div>
     );
