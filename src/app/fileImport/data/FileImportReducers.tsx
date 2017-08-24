@@ -159,6 +159,12 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   return state;
 };
 
+FileImportReducers[ActionTypes.setErrorMsg] =
+  (state, action) =>
+    state
+      .set('errorMsg', action.payload.err)
+  ;
+
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
@@ -308,7 +314,7 @@ FileImportReducers[ActionTypes.importFile] =
       },
       (err: string) =>
       {
-        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        action.payload.setErrorMsg('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         action.payload.changeUploadInProgress(false);
       },
     );
@@ -370,7 +376,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       },
       (err: string) =>
       {
-        alert('Error saving template: ' + err);
+        action.payload.setErrorMsg('Error saving template: ' + err);
       },
     );
     return state;

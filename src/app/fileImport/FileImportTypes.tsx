@@ -75,6 +75,8 @@ class FileImportStateC extends BaseClass
 
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
+
+  public errorMsg: string = '';
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -229,11 +231,17 @@ export const STEP_NAMES =
 export const STEP_TITLES =
   [
     'Select a File',
-    'Does your CSV have a header row?',
+    '',
     'Select a Server',
     'Select a Database',
     'Select a Table',
     'Select and Rename Columns you\'d like to Import',
+  ];
+
+export const STEP_TWO_TITLES = 
+  [
+    'Does your CSV have a header row?',
+    'What format is your JSON file?',
   ];
 
 export const STEP_SUBTEXT =

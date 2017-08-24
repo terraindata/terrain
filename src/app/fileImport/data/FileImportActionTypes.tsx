@@ -73,6 +73,7 @@ const FileImportActionTypes =
     saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
+    setErrorMsg: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

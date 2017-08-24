@@ -53,6 +53,7 @@ import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
+import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
@@ -98,6 +99,8 @@ class FileImport extends TerrainComponent<any>
     fileSelected: boolean;
     filetype: string;
     filename: string,
+    dbValid: boolean,
+    tableValid: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
@@ -109,6 +112,8 @@ class FileImport extends TerrainComponent<any>
     fileSelected: false,
     filetype: '',
     filename: '',
+    dbValid: false,
+    tableValid: false,
   };
 
   constructor(props)
@@ -132,21 +137,18 @@ class FileImport extends TerrainComponent<any>
     });
   }
 
+  public setError(err: string)
+  {
+    Actions.setErrorMsg(err);
+  }
+
   public incrementStep()
   {
     const { filetype, stepId } = this.state;
-    const { dbName, tableName } = this.state.fileImportState;
-    if (stepId === 3 && !!isValidIndexName(dbName)) // TODO: convert stepIds to enums
-    {
-      return;
-    }
-    else if (stepId === 4 && !!isValidTypeName(tableName))
-    {
-      return;
-    }
-
+    // TODO: convert stepIds to enums
     this.setState({
-      stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
+      // stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
+      stepId: stepId + 1,
     });
   }
 
@@ -154,7 +156,8 @@ class FileImport extends TerrainComponent<any>
   {
     const { filetype, stepId } = this.state;
     this.setState({
-      stepId: filetype === 'json' && stepId === 2 ? stepId - 2 : stepId - 1,
+      // stepId: filetype === 'json' && stepId === 2 ? stepId - 2 : stepId - 1,
+      stepId: stepId - 1,
     });
   }
 
@@ -185,12 +188,11 @@ class FileImport extends TerrainComponent<any>
         :
         List([]),
     });
+
     Actions.changeDbName(dbName);
-    const msg: string = isValidIndexName(dbName); // TODO: remove annoying empty index name error
-    if (msg)
-    {
-      alert(msg);
-    }
+    this.setState({
+      dbValid: !isValidIndexName(dbName),
+    });
   }
 
   public handleAutocompleteTableChange(tableName: string)
@@ -207,14 +209,12 @@ class FileImport extends TerrainComponent<any>
     });
 
     Actions.changeTableName(tableName);
-    const msg: string = isValidTypeName(tableName);
-    if (msg)
-    {
-      alert(msg);
-    }
+    this.setState({
+      tableValid: !isValidTypeName(tableName),
+    });
   }
 
-  public parseJson(file: string): object[]
+  public parseJson(file: string, isNewlineSeparatedJSON: boolean): object[]
   {
     let items: object[] = [];
     try
@@ -228,7 +228,7 @@ class FileImport extends TerrainComponent<any>
     }
     if (!Array.isArray(items))
     {
-      alert('Input JSON file must parse to an array of objects.');
+      Actions.setErrorMsg('Input JSON file must parse to an array of objects.');
       return undefined;
     }
     return items;
@@ -286,7 +286,7 @@ class FileImport extends TerrainComponent<any>
       switch (filetype)
       {
         case 'json':
-          items = this.parseJson(fr.result);
+          items = this.parseJson(fr.result, isNewlineSeparatedJSON);
           break;
         case 'csv':
           items = this.parseCsv(fr.result, hasCsvHeader);
@@ -352,28 +352,8 @@ class FileImport extends TerrainComponent<any>
     //   this.parseFile(file.target.files[0], filetype, null);
     // }
 
+    this.incrementStep();
     // this.parseFile(file.target.files[0], filetype, false);
-  }
-
-  public renderSteps()
-  {
-    return (
-      <div className='fi-step'>
-        <div className='fi-step-name'>
-          {
-            FileImportTypes.STEP_NAMES[this.state.stepId]
-          }
-        </div>
-        {
-          this.state.stepId > 0 &&
-          <div className='fi-step-title'>
-            {
-              FileImportTypes.STEP_TITLES[this.state.stepId]
-            }
-          </div>
-        }
-      </div>
-    );
   }
 
   public handleSelectFileButtonClick()
@@ -396,6 +376,59 @@ class FileImport extends TerrainComponent<any>
     this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
   }
 
+  public handleSelectDb(dbName: string)
+  {
+    const msg = isValidIndexName(dbName);
+    if (msg)
+    {
+      Actions.setErrorMsg(msg);
+      return;
+    }
+    this.incrementStep();
+  }
+
+  public handleSelectTable(tableName: string)
+  {
+    const msg = isValidTypeName(tableName);
+    if (msg)
+    {
+      Actions.setErrorMsg(msg);
+      return;
+    }
+    this.incrementStep();
+  }
+
+  public renderSteps()
+  {
+    let fileImportTypeStepTitle: string = '';
+    if (this.state.stepId === 1)
+    {
+      fileImportTypeStepTitle = FileImportTypes.STEP_TWO_TITLES[this.state.filetype === 'csv' ? 0 : this.state.filetype === 'json' ? 1 : undefined];
+    }
+    else
+    {
+      fileImportTypeStepTitle = FileImportTypes.STEP_TITLES[this.state.stepId];
+    }
+
+    return (
+      <div className='fi-step'>
+        <div className='fi-step-name'>
+          {
+            FileImportTypes.STEP_NAMES[this.state.stepId]
+          }
+        </div>
+        {
+          this.state.stepId > 0 &&
+          <div className='fi-step-title'>
+            {
+              fileImportTypeStepTitle
+            }
+          </div>
+        }
+      </div>
+    );
+  }
+
   public renderContent()
   {
     const { fileImportState } = this.state;
@@ -410,7 +443,7 @@ class FileImport extends TerrainComponent<any>
         content = this.renderSelect();
         break;
       case 1:
-        content = this.renderCsv();
+        content = this.state.filetype === 'csv' ? this.renderCsv() : this.state.filetype === 'json' ? this.renderJSON() : undefined;
         break;
       case 2:
         content =
@@ -430,8 +463,8 @@ class FileImport extends TerrainComponent<any>
             onChange={this.handleAutocompleteDbChange}
             placeholder={'database'}
             disabled={false}
-            onEnter={this._fn(this.incrementStep)}
-            onSelectOption={this._fn(this.incrementStep)}
+            onEnter={this._fn(this.handleSelectDb)}
+            onSelectOption={this._fn(this.handleSelectDb)}
             key={'fi-content-autocomplete-db'}
           />,
           <div
@@ -458,8 +491,8 @@ class FileImport extends TerrainComponent<any>
             onChange={this.handleAutocompleteTableChange}
             placeholder={'table'}
             disabled={false}
-            onEnter={this._fn(this.incrementStep)}
-            onSelectOption={this._fn(this.incrementStep)}
+            onEnter={this._fn(this.handleSelectTable)}
+            onSelectOption={this._fn(this.handleSelectTable)}
             key={'fi-content-autocomplete-table'}
           />,
           <div
@@ -573,10 +606,53 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
+  public renderJSON()
+  {
+    const { previewRows } = this.state.fileImportState;
+    return (
+      <div
+        className='fi-content-json'
+      >
+        <div
+          className='fi-content-json-wrapper'
+        >
+          <div
+            className='fi-content-json-option button'
+            onClick={() => this.handleJSONFormatChoice(true)}
+            style={buttonColors()}
+            ref='fi-yes-button'
+          >
+            Newline
+          </div>
+          <div
+            className='fi-content-json-option button'
+            onClick={() => this.handleJSONFormatChoice(false)}
+            style={buttonColors()}
+            ref='fi-no-button'
+          >
+            Object list
+          </div>
+        </div>
+        <div
+          className='fi-preview-rows-container'
+        >
+          {
+            previewRows.map((items, key) =>
+              <FileImportPreviewRow
+                key={key}
+                items={items}
+              />,
+            )
+          }
+        </div>
+      </div>
+    );
+  }
+
   public renderNav()
   {
-    const { stepId, fileSelected } = this.state;
-    const { serverName, dbName, tableName } = this.state.fileImportState;
+    const { stepId, fileSelected, dbValid, tableValid } = this.state;
+    const { serverName, errorMsg } = this.state.fileImportState;
     let nextEnabled = false;
     switch (stepId)
     {
@@ -590,10 +666,10 @@ class FileImport extends TerrainComponent<any>
         nextEnabled = !!serverName;
         break;
       case 3:
-        nextEnabled = !!dbName && !isValidIndexName(dbName);
+        nextEnabled = dbValid;
         break;
       case 4:
-        nextEnabled = !!tableName && !isValidTypeName(tableName);
+        nextEnabled = tableValid;
         break;
       default:
     }
@@ -617,7 +693,7 @@ class FileImport extends TerrainComponent<any>
           stepId > 1 && stepId < 5 &&
           <div
             className='fi-next-button'
-            onClick={nextEnabled ? this.incrementStep : null}
+            onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
             style={nextEnabled ?
               buttonColors()
               :
@@ -635,6 +711,19 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
+  public renderError()
+  {
+    const { errorMsg } = this.state.fileImportState;
+    return (
+      <Modal
+        open={!!errorMsg}
+        message={errorMsg}
+        error={true}
+        onClose={this._fn(this.setError, '')}
+      />
+    );
+  }
+
   public render()
   {
     return (
@@ -644,6 +733,7 @@ class FileImport extends TerrainComponent<any>
         <div
           className='file-import-inner'
         >
+          {this.renderError()}
           {this.renderSteps()}
           {this.renderContent()}
           {this.renderNav()}

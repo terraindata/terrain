@@ -64,7 +64,6 @@ export interface Props
   columnId: number;
   recursionDepth: number;
   columnType: ColumnTypesTree;
-  editing: boolean;
 }
 
 @Radium
@@ -98,7 +97,6 @@ class TypeDropdown extends TerrainComponent<Props>
             columnId={this.props.columnId}
             recursionDepth={this.props.recursionDepth + 1}
             columnType={this.props.columnType.innerType}
-            editing={this.props.editing}
           />
         }
       </div>

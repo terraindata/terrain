@@ -98,7 +98,6 @@ class FileImportPreview extends TerrainComponent<Props>
     loadedTemplateId: number,
     templateName: string,
     templateOptions: List<string>,
-    editColumnId: number,
     showingDelimTextBox: boolean,
   } = {
     deleteTemplateId: -1,
@@ -106,7 +105,6 @@ class FileImportPreview extends TerrainComponent<Props>
     loadedTemplateId: -1,
     templateName: '',
     templateOptions: List([]),
-    editColumnId: -1,
     showingDelimTextBox: false,
   };
 
@@ -134,7 +132,7 @@ class FileImportPreview extends TerrainComponent<Props>
     // otherwise, if the name has actually changed - set the new name and add the rename transform and return true
     if (this.props.columnNames.delete(columnId).contains(localColumnName))
     {
-      alert('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
+      Actions.setErrorMsg('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
       return false;
     }
 
@@ -151,13 +149,6 @@ class FileImportPreview extends TerrainComponent<Props>
         }));
       return true;
     }
-  }
-
-  public handleEditColumnChange(editColumnId: number)
-  {
-    this.setState({
-      editColumnId,
-    });
   }
 
   public handleElasticUpdateChange()
@@ -214,12 +205,12 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.templates.size === 0)
     {
-      alert('There are no templates to delete');
+      Actions.setErrorMsg('There are no templates to delete');
       return;
     }
     else if (this.state.deleteTemplateId === -1)
     {
-      alert('Please select a template to delete');
+      Actions.setErrorMsg('Please select a template to delete');
       return;
     }
     Actions.deleteTemplate(this.props.templates.get(this.state.deleteTemplateId).templateId, this.props.exporting);
@@ -232,7 +223,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.state.loadTemplateId === -1)
     {
-      alert('Please select a template to load');
+      Actions.setErrorMsg('Please select a template to load');
       return;
     }
     const templateNames: Immutable.List<string> = this.props.templates.get(this.state.loadTemplateId).originalNames;
@@ -254,7 +245,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
     if (!isCompatible)
     {
-      alert('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedTemplateNames) + '\n and \n'
+      Actions.setErrorMsg('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedTemplateNames) + '\n and \n'
         + JSON.stringify(unmatchedTableNames));
       return;
     }
@@ -268,7 +259,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (!this.state.templateName)
     {
-      alert('Please enter a template name');
+      Actions.setErrorMsg('Please enter a template name');
       return;
     }
     Actions.saveTemplate(this.state.templateName, this.props.exporting);
@@ -278,7 +269,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.state.loadedTemplateId === -1)
     {
-      alert('No template loaded');
+      Actions.setErrorMsg('No template loaded');
       return;
     }
     Actions.updateTemplate(this.state.loadedTemplateId, this.props.exporting);
@@ -475,9 +466,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 columnType={this.props.columnTypes.get(key)}
                 isPrimaryKey={this.props.primaryKeys.includes(key)}
                 columnOptions={this.props.columnOptions}
-                editing={key === this.state.editColumnId}
                 exporting={this.props.exporting}
-                handleEditColumnChange={this.handleEditColumnChange}
                 onColumnNameChange={this.onColumnNameChange}
               />,
             ).toArray()
