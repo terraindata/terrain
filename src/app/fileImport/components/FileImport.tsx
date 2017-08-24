@@ -58,6 +58,7 @@ import { isValidIndexName, isValidTypeName } from './../../../../shared/database
 import { parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
+import TemplateList from './../../common/components/TemplateList';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
@@ -564,7 +565,7 @@ class FileImport extends TerrainComponent<any>
           </div>
         </div>
         <div
-          className='fi-preview-rows-container'
+          className='fi-content-rows-container'
         >
           {
             previewRows.map((items, key) =>

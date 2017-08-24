@@ -1,0 +1,45 @@
+@import "../../common/Common.less";
+@import "../../App.less";
+
+.list-container {
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 500px;
+
+  .list-empty {
+    .big-text;
+    padding: 12px;
+  }
+
+  .list-items {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    // width: calc(~"100% - 48px");
+    width: 50%;
+    padding: 12px;
+
+    .list-items-item {
+      .big-text;
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+      margin-bottom: 6px;
+
+      .list-items-item-wrapper {
+        justify-content: space-between;
+
+        .list-items-delete {
+          // align-self: flex-end;
+          font-size: 18px;
+        }
+      }
+    }
+  }
+
+  .list-apply {
+    .button;
+    margin-bottom: 24px;
+  }
+}

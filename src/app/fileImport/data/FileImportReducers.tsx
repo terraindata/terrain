@@ -458,7 +458,8 @@ FileImportReducers[ActionTypes.fetchTemplates] =
 FileImportReducers[ActionTypes.loadTemplate] =
   (state, action) =>
   {
-    const template: Template = state.templates.get(action.payload.templateId);
+    const index = state.templates.findKey((temp) => temp.templateId === action.payload.templateId);
+    const template: Template = state.templates.get(index);
     template.transformations.map((transform) =>
     {
       state = applyTransform(state, transform);

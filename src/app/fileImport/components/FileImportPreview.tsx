@@ -51,6 +51,8 @@ import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { buttonColors, Colors } from '../../common/Colors';
+import Modal from '../../common/components/Modal';
+import TemplateList from '../../common/components/TemplateList';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -95,19 +97,17 @@ export interface Props
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    deleteTemplateId: number,
-    loadTemplateId: number,
     loadedTemplateId: number,
     templateName: string,
     templateOptions: List<string>,
     showingDelimTextBox: boolean,
+    showingApplyTemplate: boolean,
   } = {
-    deleteTemplateId: -1,
-    loadTemplateId: -1,
     loadedTemplateId: -1,
     templateName: '',
     templateOptions: List([]),
     showingDelimTextBox: false,
+    showingApplyTemplate: false,
   };
 
   public componentDidMount()
@@ -182,17 +182,17 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleLoadTemplateChange(loadTemplateId: number)
+  public showApplyTemplate()
   {
     this.setState({
-      loadTemplateId,
+      showingApplyTemplate: true,
     });
   }
 
-  public handleDeleteTemplateChange(deleteTemplateId: number)
+  public hideApplyTemplate()
   {
     this.setState({
-      deleteTemplateId,
+      showingApplyTemplate: false,
     });
   }
 
@@ -203,57 +203,44 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleDeleteTemplate()
+  public handleDeleteTemplate(itemIndex: number)
   {
-    if (this.props.templates.size === 0)
-    {
-      Actions.setErrorMsg('There are no templates to delete');
-      return;
-    }
-    else if (this.state.deleteTemplateId === -1)
-    {
-      Actions.setErrorMsg('Please select a template to delete');
-      return;
-    }
-    Actions.deleteTemplate(this.props.templates.get(this.state.deleteTemplateId).templateId, this.props.exporting);
-    this.setState({
-      deleteTemplateId: -1,
-    });
+    const templateName = this.state.templateOptions.get(itemIndex);
+    const templateId = Number(templateName.split(':').shift());
+    Actions.deleteTemplate(templateId, this.props.exporting);
   }
 
-  public handleLoadTemplate()
+  public handleLoadTemplate(itemIndex: number)
   {
-    if (this.state.loadTemplateId === -1)
-    {
-      Actions.setErrorMsg('Please select a template to load');
-      return;
-    }
-    const templateNames: Immutable.List<string> = this.props.templates.get(this.state.loadTemplateId).originalNames;
+    const templateName = this.state.templateOptions.get(itemIndex);
+    const templateId = Number(templateName.split(':').shift());
+
+    const colNames: Immutable.List<string> = this.props.templates.get(itemIndex).originalNames;
     let isCompatible: boolean = true;
-    const unmatchedTemplateNames: string[] = [];
+    const unmatchedColNames: string[] = [];
     const unmatchedTableNames: string[] = this.props.columnNames.toArray();
-    templateNames.map((templateName) =>
+    colNames.map((colName) =>
     {
-      if (!this.props.columnNames.contains(templateName))
+      if (!this.props.columnNames.contains(colName))
       {
         isCompatible = false;
-        unmatchedTemplateNames.push(templateName);
+        unmatchedColNames.push(colName);
       }
       else
       {
-        unmatchedTableNames.splice(unmatchedTableNames.indexOf(templateName), 1);
+        unmatchedTableNames.splice(unmatchedTableNames.indexOf(colName), 1);
       }
     });
 
     if (!isCompatible)
     {
-      Actions.setErrorMsg('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedTemplateNames) + '\n and \n'
+      Actions.setErrorMsg('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedColNames) + '\n and \n'
         + JSON.stringify(unmatchedTableNames));
       return;
     }
-    Actions.loadTemplate(this.state.loadTemplateId);
+    Actions.loadTemplate(templateId);
     this.setState({
-      loadedTemplateId: this.props.templates.get(this.state.loadTemplateId).templateId,
+      showingApplyTemplate: false,
     });
   }
 
@@ -289,46 +276,56 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
+  public renderApplyTemplate()
+  {
+    return (
+      <Modal
+        open={this.state.showingApplyTemplate}
+        onClose={this.hideApplyTemplate}
+        title={'Apply Template'}
+        children={
+          <TemplateList
+            items={this.state.templateOptions}
+            onDelete={this._fn(this.handleDeleteTemplate)}
+            onApply={this._fn(this.handleLoadTemplate)}
+          />
+        }
+        fill={true}
+      />
+    );
+  }
   public renderTemplate()
   {
     return (
       <div
         className='flex-container fi-preview-template'
       >
+        <div
+          className='flex-container fi-preview-template-wrapper'
+        >
+          <div
+            className='flex-grow fi-preview-template-button'
+            onClick={this.showApplyTemplate}
+            style={buttonColors()}
+            ref='fi-preview-template-button-load'
+          >
+            Load Template
+          </div>
+        </div>
         {
-          this.state.loadedTemplateId === -1 ?
+          this.state.loadedTemplateId === -1 &&
+          <div
+            className='flex-container fi-preview-template-wrapper'
+          >
             <div
-              className='flex-container fi-preview-template-wrapper'
+              className='flex-grow fi-preview-template-button'
+              onClick={this.handleUpdateTemplate}
+              style={buttonColors()}
+              ref='fi-preview-template-button-update'
             >
-              <div
-                className='flex-grow fi-preview-template-button'
-                onClick={this.handleLoadTemplate}
-                style={buttonColors()}
-                ref='fi-preview-template-button-load'
-              >
-                Load Template
-              </div>
-              <Dropdown
-                selectedIndex={this.state.loadTemplateId}
-                options={this.state.templateOptions}
-                onChange={this.handleLoadTemplateChange}
-                className={'flex-grow fi-preview-template-load-dropdown'}
-                canEdit={true}
-              />
-            </div>
-            :
-            <div
-              className='flex-container fi-preview-template-wrapper'
-            >
-              <div
-                className='flex-grow fi-preview-template-button'
-                onClick={this.handleUpdateTemplate}
-                style={buttonColors()}
-                ref='fi-preview-template-button-update'
-              >
-                Update
+              Update
                 </div>
-            </div>
+          </div>
         }
         <div
           className='flex-container fi-preview-template-wrapper'
@@ -348,26 +345,6 @@ class FileImportPreview extends TerrainComponent<Props>
             placeholder={'template name'}
             className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
-          />
-        </div>
-
-        <div
-          className='flex-container fi-preview-template-wrapper'
-        >
-          <div
-            className='flex-grow fi-preview-template-button'
-            onClick={this.handleDeleteTemplate}
-            style={buttonColors()}
-            ref='fi-preview-template-button-delete'
-          >
-            Delete Template
-          </div>
-          <Dropdown
-            selectedIndex={this.state.deleteTemplateId}
-            options={this.state.templateOptions}
-            onChange={this.handleDeleteTemplateChange}
-            className={'flex-grow fi-preview-template-delete-dropdown'}
-            canEdit={true}
           />
         </div>
       </div>
@@ -585,6 +562,7 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTopBar()}
         {this.renderTable()}
         {this.renderBottomBar()}
+        {this.renderApplyTemplate()}
       </div>
     );
   }
