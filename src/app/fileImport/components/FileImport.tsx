@@ -72,6 +72,8 @@ import has = Reflect.has;
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
+// const ArrowIcon = require('./../../../images/icon_carrot.svg');
+
 const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
 
 export interface Props
@@ -614,7 +616,7 @@ class FileImport extends TerrainComponent<any>
             style={buttonColors()}
             ref='fi-back-button'
           >
-            &lt; Back
+            Back
           </div>
         }
         {
@@ -632,7 +634,7 @@ class FileImport extends TerrainComponent<any>
             }
             ref='fi-next-button'
           >
-            Next &gt;
+            Next
           </div>
         }
       </div>
