@@ -78,7 +78,7 @@ function cartesianProductOf(...vars: any[])
       });
     }), true);
   }, [[]]);
-};
+}
 const classCombinations = cartesianProductOf(['regular', 'small', 'big', 'circle'], ['top', 'bottom', 'left', 'right']);
 
 type ArrowModifier = 'regular' | 'small' | 'big' | 'circle';
@@ -99,12 +99,12 @@ class TooltipStyleGenerator
     }
     const bodyClass = {
       [TooltipStyleGenerator.getSimpleClassName(theme)]: TooltipStyleGenerator.styleForBody(bgColor, textColor),
-    }
+    };
     const bodyAnimateFillClass = {
       [TooltipStyleGenerator.getSimpleClassName(theme) + '[data-animatefill]']: {
         'background-color': 'transparent',
-      }
-    }
+      },
+    };
     classes = _.extend(classes, bodyClass, bodyAnimateFillClass);
     return classes;
   }
@@ -115,7 +115,7 @@ class TooltipStyleGenerator
       'color': textColor,
       'box-shadow': `0 4px 20px 4px ${Colors().boxShadow}, 0 4px 80px -8px ${Colors().boxShadow}`,
       'background-color': bgColor,
-    }
+    };
   }
 
   private static styleForArrow(modifier: ArrowModifier, direction: ShowDirection, color: string): object
@@ -139,7 +139,7 @@ class TooltipStyleGenerator
       case 'circle':
         return {
           'background-color': color,
-        }
+        };
       default:
         assertUnreachable(modifier);
     }
@@ -150,25 +150,25 @@ class TooltipStyleGenerator
           'border-top': `${size} solid ${color}`,
           'border-right': `${size} solid transparent`,
           'border-left': `${size} solid transparent`,
-        }
+        };
       case 'bottom':
         return {
           'border-bottom': `${size} solid ${color}`,
           'border-right': `${size} solid transparent`,
           'border-left': `${size} solid transparent`,
-        }
+        };
       case 'left':
         return {
           'border-left': `${size} solid ${color}`,
           'border-top': `${size} solid transparent`,
           'border-bottom': `${size} solid transparent`,
-        }
+        };
       case 'right':
         return {
           'border-right': `${size} solid ${color}`,
           'border-top': `${size} solid transparent`,
           'border-bottom': `${size} solid transparent`,
-        }
+        };
       default:
         assertUnreachable(direction);
     }
@@ -232,7 +232,7 @@ export const TOOLTIP_THEMES: Themes = {
     backgroundColor: () => Colors().error,
     fontColor: () => Colors().text1,
   },
-}
+};
 
 export interface TooltipProps
 {
@@ -247,9 +247,9 @@ export interface TooltipProps
   interactive?: boolean;
   interactiveBorder?: number;
   delay?: number;
-  hideDelay?: number
+  hideDelay?: number;
   animation?: 'shift' | 'perspective' | 'fade' | 'scale' | 'none';
-  arrow?: boolean
+  arrow?: boolean;
   arrowSize?: 'small' | 'regular' | 'big';
   animateFill?: boolean;
   duration?: number;
@@ -266,7 +266,7 @@ export interface TooltipProps
   unmountHTMLWhenHide?: boolean;
   size?: 'small' | 'regular' | 'big';
   sticky?: boolean;
-  stickyDuration?: number
+  stickyDuration?: number;
   beforeShown?: () => void;
   shown?: () => void;
   beforeHidden?: () => void;
@@ -281,7 +281,7 @@ export const defaultProps: TooltipProps = {
   size: 'regular',
   theme: 'alt',
   animation: 'fade',
-}
+};
 
 export function generateThemeStyles()
 {
@@ -302,7 +302,7 @@ export function simpleTooltip(tip: string, innerComponent: any, theme: Theme = '
   const props: TooltipProps = defaultProps;
   props.title = tip;
   props.theme = theme;
-  return <Tooltip children={innerComponent} {...props} />
+  return <Tooltip children={innerComponent} {...props} />;
 }
 
 export function makeTooltip(givenProps: TooltipProps, innerComponent): Tooltip
