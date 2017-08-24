@@ -90,6 +90,7 @@ export interface Props
   algorithmActions: any;
   variantActions: any;
   libraryActions: any;
+  roleActions: any;
 }
 
 class LibraryInfoColumn extends TerrainComponent<Props>
@@ -197,6 +198,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       me={this.state.me}
       groupId={this.props.group.id}
       key={user.id}
+      roleActions={this.props.roleActions}
     />;
   }
 

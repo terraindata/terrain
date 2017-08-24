@@ -44,84 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-empty
+import * as ImportP from './ImportPermissions';
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import AuthStore from './../../auth/data/AuthStore';
-import Ajax from './../../util/Ajax';
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
+export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
 
-const UserReducers = {};
-
-UserReducers[ActionTypes.change] =
-  (state, action) =>
-    state.setIn(['users', action.payload.user.id], action.payload.user);
-
-UserReducers[ActionTypes.fetch] =
-  (state, action) =>
-  {
-    Ajax.getUsers((usersObj) =>
-    {
-      let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
-      _.map(usersObj, (userObj, userId) =>
-      {
-        users = users.set(
-          +userId,
-          UserTypes._User(userObj),
-        );
-      });
-      action.payload.setUsers(users);
-    });
-    return state.set('loading', true);
-  };
-
-UserReducers[ActionTypes.setUsers] =
-  (state, action) =>
-  {
-    return state.set('users', action.payload.users)
-      .set('currentUser', action.payload.users.get(AuthStore.getState().id))
-      .set('loading', false)
-      .set('loaded', true);
-  };
-
-// This currentUser reference is hacky, and we should change it.
-UserReducers[ActionTypes.updateCurrentUser] =
-  (state, action) =>
-    state.set('currentUser',
-      state.getIn(['users', AuthStore.getState().id]));
-
-UserReducers[ActionTypes.completeTutorial] =
-  (
-    state: UserTypes.UserState,
-    action: Action<{
-      stepId: string,
-      complete: boolean,
-    }>,
-  ) =>
-  {
-    state = state.setIn(
-      ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId],
-      action.payload.complete,
-    );
-
-    const user = state.users.get(state.currentUser.id);
-    Ajax.saveUser(user, () => { }, () => { });
-
-    state = state.set('currentUser', user); // update the version of the current user reference
-    return state;
-  };
-
-const UserReducersWrapper = (state: Immutable.Map<ID, any> = Immutable.Map({}), action) =>
+export class Permissions
 {
-  let nextState = state;
-  if (UserReducers[action.type] !== undefined)
+  public ImportPermissions: ImportP.ImportPermissions;
+
+  constructor()
   {
-    nextState = UserReducers[action.type](state, action);
+    this.ImportPermissions = ImportPermissions;
   }
+}
 
-  return nextState;
-};
-
-export default UserReducersWrapper;
+export default Permissions;

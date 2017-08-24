@@ -85,6 +85,18 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     {
       filter['tablename'] = request['tablename'];
     }
+    if (request['exportOnly'] === true)
+    {
+      filter['export'] = true;
+    }
+    if (request['importOnly'] === true)
+    {
+      filter['export'] = false;
+    }
+    if (request['importOnly'] === true && request['exportOnly'] === true)
+    {
+      throw new Error('At most one of "importOnly" and "exportOnly" may be set to true.');
+    }
   }
   ctx.body = await templates.select([], filter);
 });
@@ -93,14 +105,38 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 {
   winston.info('add new template');
   const template: ImportTemplateConfig = ctx.request.body.body;
-  Util.verifyParameters(template, ['name', 'dbid', 'dbname', 'tablename']);
-  Util.verifyParameters(template, ['originalNames', 'columnTypes', 'primaryKey', 'transformations']);
+  Util.verifyParameters(template, ['dbid', 'dbname', 'name', 'tablename']);
+  Util.verifyParameters(template, ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   if (template.id !== undefined)
   {
-    throw Error('Invalid parameter template ID');
+    throw new Error('Invalid parameter template ID');
+  }
+  ctx.body = await templates.upsert(ctx.state.user, template);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('editing existing template');
+  const template: ImportTemplateConfig = ctx.request.body.body;
+  if (template['id'] === undefined)
+  {
+    template['id'] = Number(ctx.params.id);
+  }
+  else
+  {
+    if (template['id'] !== Number(ctx.params.id))
+    {
+      throw new Error('Template ID does not match the supplied id in the URL.');
+    }
   }
 
   ctx.body = await templates.upsert(ctx.state.user, template);
+});
+
+Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('deleting template');
+  ctx.body = await templates.delete(ctx.state.user, ctx.params.id);
 });
 
 export default Router;
