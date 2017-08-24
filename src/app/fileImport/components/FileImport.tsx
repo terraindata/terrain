@@ -333,11 +333,11 @@ class FileImport extends TerrainComponent<any>
           break;
         case 'csv':
           columnNames = _.map(items[0], (value, index) =>
-            filetype === 'csv' && !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
+            !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
           );
           previewRows = items.map((item) =>
-            columnNames.map((value, key) =>
-              item[key] === undefined ? '' : typeof item[key] === 'string' ? item[key] : JSON.stringify(item[key]),
+            (hasCsvHeader ? columnNames : _.range(columnNames.length)).map((value) =>
+              item[value] === undefined ? '' : typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
             ),
           );
           break;
