@@ -294,3 +294,38 @@ export function parseJSONSubset(file: string, numLines: number): object[]
   }
   return JSON.parse(file.substring(0, c) + ']');
 }
+
+export function parseNewlineJSON(file: string, numLines: number): object[]
+{
+  const items: object[] = [];
+  let ind: number = 0;
+  while(ind < file.length)
+  {
+    let end: number;
+    const rInd = file.indexOf('\r', ind);
+    const nInd = file.indexOf('\n', ind);
+    if (rInd === -1 && nInd === -1)
+    {
+      end = file.length;
+    }
+    else
+    {
+      end = Math.min(Math.max(rInd, 0), Math.max(nInd, 0));
+    }
+
+    const line: string = file.substring(ind, end);
+    if (line !== '')
+    {
+      try
+      {
+        items.push(JSON.parse(file.substring(ind, end)));
+      }
+      catch (e)
+      ind = end;
+    }
+    else
+    {
+      ind++;
+    }
+  }
+}
