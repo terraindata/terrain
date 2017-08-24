@@ -55,7 +55,7 @@ import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/Util';
+import { parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -217,19 +217,32 @@ class FileImport extends TerrainComponent<any>
   public parseJson(file: string, isNewlineSeparatedJSON: boolean): object[]
   {
     let items: object[] = [];
-    try
+    if (isNewlineSeparatedJSON)
     {
-      items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      const newlineJSON: object[] | string = parseNewlineJSON(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      if (typeof newlineJSON === 'string')
+      {
+        Actions.setErrorMsg(newlineJSON);
+        return undefined;
+      }
+      items = newlineJSON;
     }
-    catch (e)
+    else
     {
-      alert(e);
-      return undefined;
-    }
-    if (!Array.isArray(items))
-    {
-      Actions.setErrorMsg('Input JSON file must parse to an array of objects.');
-      return undefined;
+      try
+      {
+        items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      }
+      catch (e)
+      {
+        Actions.setErrorMsg(String(e));
+        return undefined;
+      }
+      if (!Array.isArray(items))
+      {
+        Actions.setErrorMsg('Input JSON file must parse to an array of objects.');
+        return undefined;
+      }
     }
     return items;
   }
@@ -369,9 +382,9 @@ class FileImport extends TerrainComponent<any>
     this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
   }
 
-  public handleJSONFormatChoice(isNewlineSeparatedJSON : boolean)
+  public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
   {
-    Actions.changeHasCsvHeader(isNewlineSeparatedJSON);
+    Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
   }

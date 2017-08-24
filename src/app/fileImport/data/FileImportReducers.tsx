@@ -199,6 +199,12 @@ FileImportReducers[ActionTypes.changeHasCsvHeader] =
       .set('hasCsvHeader', action.payload.hasCsvHeader)
   ;
 
+FileImportReducers[ActionTypes.changeIsNewlineSeparatedJSON] =
+  (state, action) =>
+    state
+      .set('isNewlineSeparatedJSON', action.payload.isNewlineSeparatedJSON)
+  ;
+
 FileImportReducers[ActionTypes.changeUploadInProgress] =
   (state, action) =>
     state
@@ -305,6 +311,7 @@ FileImportReducers[ActionTypes.importFile] =
       state.transforms,
       state.elasticUpdate,
       state.hasCsvHeader,
+      state.isNewlineSeparatedJSON,
       state.primaryKeyDelimiter,
       () =>
       {

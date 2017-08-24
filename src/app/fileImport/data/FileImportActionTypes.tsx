@@ -54,6 +54,7 @@ const FileImportActionTypes =
     changeDbText: '',
     changeTableText: '',
     changeHasCsvHeader: '',
+    changeIsNewlineSeparatedJSON: '',
     changePrimaryKey: '',
     changePrimaryKeyDelimiter: '',
     chooseFile: '',

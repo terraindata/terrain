@@ -63,6 +63,7 @@ class FileImportStateC extends BaseClass
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
   public hasCsvHeader: boolean = false;
+  public isNewlineSeparatedJSON: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
@@ -238,7 +239,7 @@ export const STEP_TITLES =
     'Select and Rename Columns you\'d like to Import',
   ];
 
-export const STEP_TWO_TITLES = 
+export const STEP_TWO_TITLES =
   [
     'Does your CSV have a header row?',
     'What format is your JSON file?',

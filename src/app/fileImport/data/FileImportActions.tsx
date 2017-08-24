@@ -75,6 +75,10 @@ const FileImportActions =
     (hasCsvHeader: boolean) =>
       $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
 
+    changeIsNewlineSeparatedJSON:
+    (isNewlineSeparatedJSON: boolean) =>
+      $(ActionTypes.changeIsNewlineSeparatedJSON, { isNewlineSeparatedJSON }),
+
     changePrimaryKey:
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
