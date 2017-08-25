@@ -65,35 +65,52 @@ export interface Props
 
 class DragHandle extends TerrainComponent<Props>
 {
-  public render()
+  public renderHandle(dragHandleStyle)
   {
-    const dragHandleStyle = {
-      '.drag-icon': {
-        fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
-        opacity: this.props.hiddenByDefault ? 0 : 1,
-      },
-      '.drag-icon:hover': {
-        fill: Colors().inactiveHover,
-        opacity: 1,
-      },
-      '.drag-icon:active': {
-        fill: Colors().active,
-      },
-      '.builder-title-bar:hover .drag-icon': {
-        opacity: '1 !important' as any,
-      },
-    };
     return (
       <div>
         <Handle
           className={classNames({
             'drag-icon': true,
-            'hidden': this.props.hiddenByDefault,
+
           })}
         />
         <StyleTag style={dragHandleStyle} />
       </div>
     );
+  }
+
+  public render()
+  {
+    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
+    const dragHandleStyle = {
+      '.drag-icon': {
+        opacity: this.props.hiddenByDefault ? 0 : '1 !important' as any,
+      },
+      '.drag-icon .cls-1': {
+        fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
+      },
+      '.drag-icon:hover .cls-1': {
+        fill: Colors().inactiveHover,
+        opacity: 0.85,
+      },
+      '.drag-icon:active .cls-1': {
+        fill: Colors().active,
+        opacity: 0.85,
+      },
+      ['.' + hoveringClassName]: {
+        opacity: '1 !important' as any,
+      },
+    };
+
+    return (
+      (
+        this.props.connectDragSource !== undefined ?
+          this.props.connectDragSource(this.renderHandle(dragHandleStyle)) :
+          this.renderHandle(dragHandleStyle)
+      )
+    );
+
   }
 
 }

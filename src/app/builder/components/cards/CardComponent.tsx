@@ -60,6 +60,7 @@ import { Card } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
+import DragHandle from './../../../common/components/DragHandle';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
@@ -560,13 +561,9 @@ class _CardComponent extends TerrainComponent<Props>
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
-              connectDragSource(
-                <div
-                  className='card-handle-icon'
-                >
-                  <HandleIcon />
-                </div>,
-              )
+              <div className='drag-handle'>
+                <DragHandle connectDragSource={connectDragSource} hiddenByDefault={true} showWhenHoveringClassName={'card-inner'} />
+              </div>
             }
             {
               this.state.hovering &&
