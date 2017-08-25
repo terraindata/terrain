@@ -78,6 +78,7 @@ var CodeMirror = createReactClass({
     diff: PropTypes.string,
 
     containerHeight: PropTypes.number,
+    placeholder: PropTypes.string,
   },
   foldClass: {
     open: "CodeMirror-foldgutter-open",
@@ -440,7 +441,7 @@ var CodeMirror = createReactClass({
       {
         className: editorClassName,
       },
-      React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write your query here", defaultValue: this.props.value, autoComplete: 'off' })
+      React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: this.props.placeholder, defaultValue: this.props.value, autoComplete: 'off' })
     );
   }
 });
