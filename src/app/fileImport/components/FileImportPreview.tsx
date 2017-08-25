@@ -351,6 +351,7 @@ class FileImportPreview extends TerrainComponent<Props>
             title={'Select a Template to Apply'}
             onDelete={this.handleDeleteTemplate}
             onApply={this.handleApplyTemplate}
+            confirmDelete={true}
           />
         }
         fill={true}
@@ -381,7 +382,7 @@ class FileImportPreview extends TerrainComponent<Props>
     return (
       <Modal
         open={this.state.showingUpdateTemplate}
-        message={'By saving this, you are overwriting template ABC. Continue?'}
+        message={'By saving this, you are overwriting template ' + this.state.appliedTemplateName + ', Continue?'}
         onClose={this.hideUpdateTemplate}
         title={'Overwriting Template'}
         confirm={true}
@@ -406,7 +407,7 @@ class FileImportPreview extends TerrainComponent<Props>
             style={buttonColors()}
             ref='fi-preview-template-button-apply'
           >
-            Load Template
+            Apply Template
           </div>
         </div>
         <div
@@ -632,8 +633,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('applied: ', this.state.appliedTemplateName);
-    console.log('saved: ', this.state.saveTemplateName);
     return (
       <div
         className='fi-preview'

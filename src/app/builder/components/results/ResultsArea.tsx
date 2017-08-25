@@ -526,7 +526,7 @@ column if you have customized the results view.');
     const content =
       <div
         style={{
-          background: 'black',
+          background: 'black',  // TODO: black from Colors?
         }}
       >
         <FileImportPreview
@@ -556,66 +556,6 @@ column if you have customized the results view.');
         fill={true}
       />
     );
-    // if (this.state.showingExport)
-    // {
-    //   const mainBg = backgroundColor(Colors().bg1);
-    //   const mainFontColor = fontColor(Colors().text2);
-    //   const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-    //     elasticUpdate } = this.props.exportState;
-    //   // TODO: re-style, current styling taken from ResultsConfigComponent
-    //   return (
-    //     <div className='results-config-wrapper'>
-    //       <div
-    //         className={classNames({
-    //           'results-config': true,
-    //           'results-config-disabled': false,
-    //         })}
-    //         style={[mainBg, borderColor(Colors().border2)]}
-    //       >
-    //         <div
-    //           className='results-config-bar'
-    //           style={[mainBg, borderColor(Colors().border1)]}
-    //         >
-    //           <div
-    //             className='results-config-title'
-    //             style={mainFontColor}
-    //           >
-    //             Export Results
-    //           </div>
-    //           <div key={'results-config-button'}
-    //             className='results-config-button'
-    //             style={[
-    //               fontColor(Colors().text1),
-    //               borderColor(Colors().border1, Colors().border3),
-    //               backgroundColor(Colors().bg3),
-    //             ]}
-    //             onClick={this.hideExport}
-    //           >
-    //             Done
-    //           </div>
-    //         </div>
-    //
-    //         <FileImportPreview
-    //           previewRows={previewRows}
-    //           primaryKeys={primaryKeys}
-    //           primaryKeyDelimiter={primaryKeyDelimiter}
-    //           columnNames={columnNames}
-    //           columnsToInclude={columnsToInclude}
-    //           columnTypes={columnTypes}
-    //           templates={templates}
-    //           transforms={transforms}
-    //           columnOptions={List([])}
-    //           uploadInProgress={false}
-    //           elasticUpdate={elasticUpdate}
-    //           exporting={true}
-    //           query={this.props.query.tql}
-    //           variantName={this.props.variantName}
-    //         />
-    //
-    //       </div>
-    //     </div>
-    //   );
-    // }
   }
 
   public renderConfig()

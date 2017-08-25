@@ -51,6 +51,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import Modal from './../../common/components/Modal';
 import './TemplateList.less';
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -62,6 +63,7 @@ export interface Props
   onDelete?: (index: number) => void;
   onSelectOption?: () => void;
   onApply?: (index: number) => void;
+  confirmDelete?: boolean;
 }
 
 @Radium
@@ -69,12 +71,31 @@ class TemplateList extends TerrainComponent<Props>
 {
   public state: {
     selectedIndex: number,
+    modalOpen: boolean,
+    deleteIndex: number,
   } = {
     selectedIndex: -1,
+    modalOpen: false,
+    deleteIndex: -1,
   };
+
+  public hideModal()
+  {
+    this.setState({
+      modalOpen: false,
+    });
+  }
 
   public handleDelete(index: number)
   {
+    if (this.props.confirmDelete !== undefined && this.props.confirmDelete)
+    {
+      this.setState({
+        modalOpen: true,
+        deleteIndex: index,
+      });
+      return;
+    }
     this.props.onDelete(index);
   }
 
@@ -134,7 +155,7 @@ class TemplateList extends TerrainComponent<Props>
             color: Colors().text1,
           }}
         >
-          There are no templates to load
+          There are no templates to apply
         </div>
       );
     }
@@ -178,6 +199,19 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
+  public renderError()
+  {
+    return (
+      <Modal
+        open={this.state.modalOpen}
+        message={'Are you sure you want to delete template ' + this.props.items.get(this.state.deleteIndex) + '?'}
+        onClose={this.hideModal}
+        confirm={true}
+        onConfirm={this._fn(this.props.onDelete, this.state.deleteIndex)}
+      />
+    );
+  }
+
   public render()
   {
     return (
@@ -188,6 +222,7 @@ class TemplateList extends TerrainComponent<Props>
         {this.renderTitle()}
         {this.renderList()}
         {this.renderApply()}
+        {this.renderError()}
       </div>
     );
   }
