@@ -131,7 +131,7 @@ export const ElasticBlockHelpers = {
       }
     }
 
-    return List([]);
+    return List();
   },
 };
 

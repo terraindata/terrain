@@ -65,7 +65,7 @@ const arrowSvgStyles = {
   'marginLeft': 5.5,
   // 'position': 'relative',
   // 'top': 5,
-  'marginTop': 3,
+  'marginTop': 4,
   ':hover': {
     fill: Colors().text2,
   },

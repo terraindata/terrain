@@ -46,9 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:switch-default strict-boolean-expressions restrict-plus-operands no-console
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
 import Radium = require('radium');
 import * as React from 'react';
 import BackendInstance from '../../../database/types/BackendInstance';
@@ -57,19 +54,14 @@ import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import * as PropTypes from 'prop-types';
-import { _ResultsConfig, ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
-import * as BlockUtils from '../../../blocks/BlockUtils';
+import { _ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
 import { _Query, Query } from '../../../items/types/Query';
 import ResultsArea from '../../builder/components/results/ResultsArea';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
-import ResultsTable from '../../builder/components/results/ResultsTable';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
-import Colors from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 
 import { AllBackendsMap } from '../../../database/AllBackends';
-
-const NUM_ROWS = 200;
 
 export interface Props
 {
@@ -213,30 +205,8 @@ class SchemaResults extends TerrainComponent<Props>
           width: '100%',
           height: '100%',
           overflow: 'hidden',
-          // background: '#ccc', // Colors().bg2,
         }}
       >
-        {/*
-          this.showsResults(this.state.selectedItem) ?
-            (
-              this.state.resultsErrorMessage ?
-                <InfoArea
-                  large='Error retrieving results'
-                  small={this.state.resultsErrorMessage}
-                />
-                :
-                <ResultsTable
-                  results={this.state.resultsState.results}
-                  resultsConfig={this.state.resultsConfig}
-                  onExpand={_.noop}
-                  resultsLoading={this.state.resultsState.loading}
-                />
-            )
-            :
-            <InfoArea
-              large='Select an item to see its contents here.'
-            />
-        */}
         {
           this.showsResults(this.state.selectedItem) ?
             <div

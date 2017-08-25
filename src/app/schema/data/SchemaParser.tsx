@@ -188,7 +188,7 @@ export function parseMySQLDbs_m1(db: BackendInstance,
 
       if (!columnNamesByTable.get(table.id))
       {
-        columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+        columnNamesByTable = columnNamesByTable.set(table.id, List());
       }
       columnNamesByTable = columnNamesByTable.update(table.id,
         (list) => list.push(column.name),
@@ -238,7 +238,7 @@ export function parseMySQLDb(rawServer: object,
     let tables: IMMap<string, Table> = Map<string, Table>();
     let columns: IMMap<string, Column> = Map<string, Column>();
     const indexes: IMMap<string, Index> = Map<string, Index>();
-    const fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>({});
+    const fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
 
     let tableNames = List<string>();
     let columnIds = List<string>();
@@ -281,7 +281,7 @@ export function parseMySQLDb(rawServer: object,
 
           if (!columnNamesByTable.get(table.id))
           {
-            columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+            columnNamesByTable = columnNamesByTable.set(table.id, List());
           }
           columnNamesByTable = columnNamesByTable.update(table.id,
             (list) => list.push(column.name),
@@ -405,7 +405,7 @@ export function parseElasticDb(elasticServer: object,
 
           if (!columnNamesByTable.get(table.id))
           {
-            columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+            columnNamesByTable = columnNamesByTable.set(table.id, List());
           }
           columnNamesByTable = columnNamesByTable.update(table.id,
             (list) => list.push(column.name),

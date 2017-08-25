@@ -98,7 +98,7 @@ class ServerC extends SchemaBaseClass
   public name = '';
   public connectionId: number = -1;
 
-  public databaseIds: List<string> = List([]);
+  public databaseIds: List<string> = List();
 }
 export type Server = ServerC & IRecord<ServerC>;
 export const _Server =
@@ -127,7 +127,7 @@ class DatabaseC extends SchemaBaseClass
   public databaseType = 'mysql';
   public serverId: string = '';
 
-  public tableIds: List<string> = List([]);
+  public tableIds: List<string> = List();
 }
 export type Database = DatabaseC & IRecord<DatabaseC>;
 export const _Database =
@@ -156,8 +156,8 @@ class TableC extends SchemaBaseClass
   public serverId: string = '';
   public databaseId: string = '';
 
-  public columnIds: List<string> = List([]);
-  public indexIds: List<string> = List([]);
+  public columnIds: List<string> = List();
+  public indexIds: List<string> = List();
 }
 export type Table = TableC & IRecord<TableC>;
 export const _Table = (config: {
@@ -227,7 +227,7 @@ class IndexC extends SchemaBaseClass
   public tableId: string = '';
 
   public indexType = '';
-  public columnIds: List<string> = List([]);
+  public columnIds: List<string> = List();
 }
 export type Index = IndexC & IRecord<IndexC>;
 export const _Index = (config: {
