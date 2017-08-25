@@ -58,6 +58,7 @@ import { isValidIndexName, isValidTypeName } from './../../../../shared/database
 import { parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
+import TemplateList from './../../common/components/TemplateList';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
@@ -71,6 +72,8 @@ import FileImportPreviewRow from './FileImportPreviewRow';
 import has = Reflect.has;
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
+
+// const ArrowIcon = require('./../../../images/icon_carrot.svg');
 
 const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
 
@@ -254,6 +257,7 @@ class FileImport extends TerrainComponent<any>
       const testDuplicateConfig: ParseCSVConfig = {
         preview: 1,
         hasHeaderRow: false,
+        error: this._fn(this.setError),
       };
 
       const columnHeaders = parseCSV(file, testDuplicateConfig);
@@ -283,6 +287,7 @@ class FileImport extends TerrainComponent<any>
     const config: ParseCSVConfig = {
       preview: FileImportTypes.NUMBER_PREVIEW_ROWS,
       hasHeaderRow: hasCsvHeader,
+      error: this._fn(this.setError),
     };
     return parseCSV(file, config);
   }
@@ -593,7 +598,7 @@ class FileImport extends TerrainComponent<any>
         >
           <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
           <div
-            className='fi-content-choose-button'
+            className='fi-content-choose-button large-button'
             onClick={this.handleSelectFileButtonClick}
             style={buttonColors()}
             ref='fi-content-choose-button'
@@ -617,7 +622,7 @@ class FileImport extends TerrainComponent<any>
         >
           <div
             className='fi-content-csv-option button'
-            onClick={() => this.handleCsvHeaderChoice(true)}
+            onClick={this._fn(this.handleCsvHeaderChoice, true)}
             style={buttonColors()}
             ref='fi-yes-button'
           >
@@ -625,7 +630,7 @@ class FileImport extends TerrainComponent<any>
           </div>
           <div
             className='fi-content-csv-option button'
-            onClick={() => this.handleCsvHeaderChoice(false)}
+            onClick={this._fn(this.handleCsvHeaderChoice, false)}
             style={buttonColors()}
             ref='fi-no-button'
           >
@@ -633,7 +638,7 @@ class FileImport extends TerrainComponent<any>
           </div>
         </div>
         <div
-          className='fi-preview-rows-container'
+          className='fi-content-rows-container'
         >
           {
             previewRows.map((items, key) =>
@@ -711,18 +716,18 @@ class FileImport extends TerrainComponent<any>
         {
           stepId > 0 &&
           <div
-            className='fi-back-button'
+            className='fi-back-button button'
             onClick={this.decrementStep}
             style={buttonColors()}
             ref='fi-back-button'
           >
-            &lt; Back
+            Back
           </div>
         }
         {
           stepId > 1 && stepId < 5 &&
           <div
-            className='fi-next-button'
+            className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
             style={nextEnabled ?
               buttonColors()
@@ -734,7 +739,7 @@ class FileImport extends TerrainComponent<any>
             }
             ref='fi-next-button'
           >
-            Next &gt;
+            Next
           </div>
         }
       </div>

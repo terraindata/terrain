@@ -446,7 +446,7 @@ class TransformBox extends TerrainComponent<Props>
         {
           this.state.transformTypeIndex !== -1 &&
           <span
-            className='fi-transform-button clickable'
+            className='fi-transform-button clickable button'
             onClick={this.handleTransformClick}
             style={buttonColors()}
           >

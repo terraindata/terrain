@@ -331,3 +331,18 @@ export function parseNewlineJSON(file: string, numLines: number): object[] | str
   }
   return items;
 }
+
+export function getTemplateName(templateName: string): string
+{
+  return templateName.substring(templateName.indexOf(':') + 2);
+}
+
+export function getTemplateId(templateName: string): number
+{
+  return Number(templateName.substring(0, templateName.indexOf(':')));
+}
+
+export function updateTemplateName(templateName: string, newName: string): string
+{
+  return String(getTemplateId(templateName)) + ': ' + newName;
+}
