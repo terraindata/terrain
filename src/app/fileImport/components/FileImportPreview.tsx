@@ -109,6 +109,8 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
     showingSaveTemplate: boolean,
+    showingAddColumn: boolean,
+    addColumnName: string,
     previewErrorMsg: string,
   } = {
     appliedTemplateName: '',
@@ -118,6 +120,8 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: false,
     showingApplyTemplate: false,
     showingSaveTemplate: false,
+    showingAddColumn: false,
+    addColumnName: '',
     previewErrorMsg: '',
   };
 
@@ -199,6 +203,20 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     this.setState({
       showingUpdateTemplate: false,
+    });
+  }
+
+  public showAddColumn()
+  {
+    this.setState({
+      showingAddColumn: true,
+    });
+  }
+
+  public hideAddColumn()
+  {
+    this.setState({
+      showingAddColumn: false,
     });
   }
 
@@ -340,9 +358,30 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
+  public onAddColumnNameChange(addColumnName: string)
+  {
+    this.setState({
+      addColumnName,
+    });
+  }
+
   public handleAddPreviewColumn()
   {
-    Actions.addPreviewColumn();
+    const { addColumnName } = this.state;
+    if (!addColumnName)
+    {
+      Actions.setErrorMsg('Please enter a new column name');
+      return;
+    }
+    if (this.props.columnNames.includes(addColumnName))
+    {
+      Actions.setErrorMsg('Column name already in use');
+      return;
+    }
+    Actions.addPreviewColumn(addColumnName);
+    this.setState({
+      showingAddColumn: false,
+    });
   }
 
   public renderApplyTemplate()
@@ -395,6 +434,24 @@ class FileImportPreview extends TerrainComponent<Props>
         confirm={true}
         confirmButtonText={'Yes'}
         onConfirm={this.handleUpdateTemplate}
+      />
+    );
+  }
+
+  public renderAddColumn()
+  {
+    return (
+      <Modal
+        open={this.state.showingAddColumn}
+        onClose={this.hideAddColumn}
+        title={'Add New Column'}
+        confirm={true}
+        confirmButtonText={'Add'}
+        onConfirm={this.handleAddPreviewColumn}
+        showTextbox={true}
+        initialTextboxValue={''}
+        onTextboxValueChange={this.onAddColumnNameChange}
+        closeOnConfirm={false}
       />
     );
   }
@@ -529,7 +586,7 @@ class FileImportPreview extends TerrainComponent<Props>
         (<div
           key={previewColumns.length}
           className='fi-preview-add-column-button'
-          onClick={this.handleAddPreviewColumn}
+          onClick={this.showAddColumn}
           style={buttonColors()}
         >
           {'+'}
@@ -664,6 +721,7 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderApplyTemplate()}
         {this.renderSaveTemplate()}
         {this.renderUpdateTemplate()}
+        {this.renderAddColumn()}
         {this.renderError()}
       </div>
     );

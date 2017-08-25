@@ -491,17 +491,9 @@ FileImportReducers[ActionTypes.addPreviewColumn] =
   (state, action) =>
   {
     const { originalNames, columnNames, columnTypes, columnsToInclude, previewRows } = state;
-    const newColumnNameBase = 'column' + columnNames.size;
-    let newColumnName = newColumnNameBase;
-    let copyNum = 0;
-    while (columnNames.includes(newColumnName))
-    {
-      copyNum++;
-      newColumnName = newColumnNameBase + ' (' + String(copyNum) + ')';
-    }
     return state
-      .set('originalNames', originalNames.push(newColumnName))
-      .set('columnNames', columnNames.push(newColumnName))
+      .set('originalNames', originalNames.push(action.payload.columnName))
+      .set('columnNames', columnNames.push(action.payload.columnName))
       .set('columnTypes', columnTypes.push(FileImportTypes._ColumnTypesTree()))
       .set('columnsToInclude', columnsToInclude.push(true))
       .set('previewRows', previewRows.map((row) => row.concat('')));
