@@ -1918,7 +1918,7 @@ clarinet@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/clarinet/-/clarinet-0.11.0.tgz#6cc912b93138dc867fc273cd34ea90e83e054719"
 
-classnames@^2.2.0, classnames@^2.2.4, classnames@^2.2.5:
+classnames@^2.2.4, classnames@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
@@ -6909,12 +6909,6 @@ react-tippy@^1.2.1:
   resolved "https://registry.yarnpkg.com/react-tippy/-/react-tippy-1.2.1.tgz#50aa4caa3cac5e873238b0a99c5b15818d2f2ca8"
   dependencies:
     popper.js "^1.11.1"
-
-react-tooltip@^2.0.0:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-2.0.3.tgz#cfdb3a56e83eaaf5dac732a42c6f69b71e838934"
-  dependencies:
-    classnames "^2.2.0"
 
 react-transition-group@^1.1.2:
   version "1.2.0"

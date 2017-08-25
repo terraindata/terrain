@@ -188,7 +188,6 @@ class StatusDropdown extends TerrainComponent<Props>
     //       'status-dropdown-no-border': this.props.noBorder,
     //       'status-dropdown-can-edit': this.canEdit(),
     //     })}
-    //     data-html={true}
     //   >
     //   </div>
     // </div>

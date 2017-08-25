@@ -72,7 +72,7 @@ import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
-const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
+
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import StyleTag from './common/components/StyleTag';
@@ -377,13 +377,6 @@ class App extends TerrainComponent<Props>
         </div>
 
         <DeployModal />
-
-        <ReactTooltip
-          place='bottom'
-          effect='solid'
-          class='tooltip'
-          hideOnClick={true}
-        />
 
         <StyleTag
           style={COMMON_THEME_COLOR_STYLE}

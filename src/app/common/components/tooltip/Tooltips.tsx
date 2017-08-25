@@ -316,6 +316,10 @@ export function tooltip(innerComponent: any, tip: string, theme: Theme = 'alt')
 
 export function makeTooltip(innerComponent: any, givenProps: TooltipProps)
 {
+  if ((givenProps.title === '' || givenProps.title === undefined) && (givenProps.html === null || givenProps.html === undefined))
+  {
+    return innerComponent;
+  }
   const props = _.defaults({}, givenProps, defaultProps);
   return <Tooltip children={innerComponent} {...props} />;
 }
