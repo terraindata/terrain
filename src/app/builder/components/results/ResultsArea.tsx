@@ -83,6 +83,7 @@ export interface Props
   variantName: string;
   showExport: boolean;
   showCustomizeView: boolean;
+  allowSpotlights: boolean;
   onNavigationException: () => void;
 }
 
@@ -169,6 +170,7 @@ class ResultsArea extends TerrainComponent<Props>
           resultsConfig={resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
+          allowSpotlights={this.props.allowSpotlights}
           index={-1}
           primaryKey={result.primaryKey}
         />
@@ -291,6 +293,7 @@ class ResultsArea extends TerrainComponent<Props>
             resultsConfig={resultsConfig}
             onExpand={this.handleExpand}
             resultsLoading={resultsState.loading}
+            allowSpotlights={this.props.allowSpotlights}
           />
         </div>
       );
@@ -321,6 +324,7 @@ class ResultsArea extends TerrainComponent<Props>
                   index={index}
                   key={index}
                   primaryKey={result.primaryKey}
+                  allowSpotlights={this.props.allowSpotlights}
                 />
               );
             })

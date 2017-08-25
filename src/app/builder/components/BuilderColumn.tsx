@@ -236,6 +236,7 @@ const BuilderColumn = createReactClass<any, any>(
             resultsState={this.props.resultsState}
             showExport={true}
             showCustomizeView={true}
+            allowSpotlights={true}
           />;
 
         case COLUMNS.Editor:

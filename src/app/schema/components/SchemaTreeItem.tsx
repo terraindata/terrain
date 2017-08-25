@@ -408,7 +408,12 @@ class SchemaTreeItem extends TerrainComponent<Props>
                   hasChildren &&
                   <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='arrow'>
                     <ArrowIcon
+                      className={'schema-arrow-icon'}
                       onClick={this.handleArrowClick}
+                      style={{
+                        width: 12,
+                        height: 12,
+                      }}
                     />
                   </div>
                 }

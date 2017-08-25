@@ -65,7 +65,7 @@ const arrowSvgStyles = {
   'marginLeft': 5.5,
   // 'position': 'relative',
   // 'top': 5,
-  'marginTop': 5,
+  'marginTop': 3,
   ':hover': {
     fill: Colors().text2,
   },
@@ -96,6 +96,10 @@ const SchemaTreeStyles =
     ],
 
     arrow: _.extend(
+      {
+        width: '12px',
+        height: '12px',
+      },
       arrowSvgStyles,
       Styles.rotate90,
       Styles.transition,
@@ -105,6 +109,8 @@ const SchemaTreeStyles =
       {},
       arrowSvgStyles,
       {
+        width: '12px',
+        height: '12px',
         fill: Colors().active,
         // stroke: Styles.colors.active,
       },

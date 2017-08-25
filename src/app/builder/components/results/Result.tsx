@@ -75,6 +75,7 @@ export interface Props
   primaryKey: string;
   onExpand: (index: number) => void;
   expanded?: boolean;
+  allowSpotlights: boolean;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -315,11 +316,13 @@ class ResultComponent extends TerrainComponent<Props> {
             </div>
           </div>
 
-          <Menu
-            options={
-              this.menuOptions[this.state.isSpotlit ? 1 : 0]
-            }
-          />
+          {this.props.allowSpotlights &&
+            <Menu
+              options={
+                this.menuOptions[this.state.isSpotlit ? 1 : 0]
+              }
+            />
+          }
 
           {
             scoreArea

@@ -104,7 +104,7 @@ class SchemaResults extends TerrainComponent<Props>
         if (!this.state.initialized)
         {
           this.setState({
-            'initialized':true,
+            initialized: true,
           });
           return;
         }
@@ -212,7 +212,8 @@ class SchemaResults extends TerrainComponent<Props>
         style={{
           width: '100%',
           height: '100%',
-          background: Colors().bg2,
+          overflow: 'hidden',
+          // background: '#ccc', // Colors().bg2,
         }}
       >
         {/*
@@ -241,9 +242,10 @@ class SchemaResults extends TerrainComponent<Props>
             <div
               style={{
                 marginLeft: 12,
-                marginRight: 12,
+                paddingRight: 6,
                 boxSizing: 'border-box',
               }}
+              className={'schema-results-wrapper'}
             >
               <ResultsArea
                 query={this.state.resultsQuery}
@@ -254,6 +256,7 @@ class SchemaResults extends TerrainComponent<Props>
                 resultsState={this.state.resultsState}
                 showExport={false}
                 showCustomizeView={false}
+                allowSpotlights={false}
               />
             </div>
             :
