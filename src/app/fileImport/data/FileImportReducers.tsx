@@ -312,6 +312,7 @@ FileImportReducers[ActionTypes.importFile] =
       state.elasticUpdate,
       state.hasCsvHeader,
       state.isNewlineSeparatedJSON,
+      state.requireJSONHaveAllFields,
       state.primaryKeyDelimiter,
       () =>
       {
@@ -474,9 +475,7 @@ FileImportReducers[ActionTypes.loadTemplate] =
     return state
       .set('originalNames', List(template.originalNames))
       .set('primaryKeys', List(template.primaryKeys.map((pkey) => columnNames.indexOf(pkey))))
-      .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('columnNames', columnNames)
-      .set('originalNames', List(template.originalNames))
       .set('transforms', List<Transform>(template.transformations))
       .set('columnTypes', List(columnNames.map((colName) =>
         template.columnTypes[colName] ?
@@ -494,5 +493,25 @@ FileImportReducers[ActionTypes.saveFile] =
     state.set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
   ;
+
+FileImportReducers[ActionTypes.addPreviewColumn] =
+  (state, action) =>
+  {
+    const { originalNames, columnNames, columnTypes, columnsToInclude, previewRows } = state;
+    const newColumnNameBase = 'column' + columnNames.size;
+    let newColumnName = newColumnNameBase;
+    let copyNum = 0;
+    while (columnNames.includes(newColumnName))
+    {
+      copyNum++;
+      newColumnName = newColumnNameBase + ' (' + String(copyNum) + ')';
+    }
+    return state
+      .set('originalNames', originalNames.push(newColumnName))
+      .set('columnNames', columnNames.push(newColumnName))
+      .set('columnTypes', columnTypes.push(FileImportTypes._ColumnTypesTree()))
+      .set('columnsToInclude', columnsToInclude.push(true))
+      .set('previewRows', previewRows.map((row) => row.concat('')));
+  };
 
 export default FileImportReducers;

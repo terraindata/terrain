@@ -522,8 +522,8 @@ column if you have customized the results view.');
     {
       const mainBg = backgroundColor(Colors().bg1);
       const mainFontColor = fontColor(Colors().text2);
-      const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-        elasticUpdate } = this.props.exportState;
+      const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, filetype,
+        requireJSONHaveAllFields, templates, transforms, elasticUpdate } = this.props.exportState;
       // TODO: re-style, current styling taken from ResultsConfigComponent
       return (
         <div className='results-config-wrapper'>
@@ -564,6 +564,8 @@ column if you have customized the results view.');
               columnNames={columnNames}
               columnsToInclude={columnsToInclude}
               columnTypes={columnTypes}
+              filetype={filetype}
+              requireJSONHaveAllFields={requireJSONHaveAllFields}
               templates={templates}
               transforms={transforms}
               columnOptions={List([])}

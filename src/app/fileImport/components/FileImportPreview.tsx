@@ -76,6 +76,8 @@ export interface Props
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<ColumnTypesTree>;
+  filetype: string;
+  requireJSONHaveAllFields: boolean;
 
   columnOptions: List<string>;
   templates: List<Template>;
@@ -287,6 +289,11 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
+  public handleAddPreviewColumn()
+  {
+    Actions.addPreviewColumn();
+  }
+
   public renderTemplate()
   {
     return (
@@ -448,6 +455,33 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTable()
   {
+    const previewColumns = this.props.columnNames.map((value, key) =>
+      <FileImportPreviewColumn
+        key={key}
+        columnId={key}
+        columnName={this.props.columnNames.get(key)}
+        columnNames={this.props.columnNames}
+        isIncluded={this.props.columnsToInclude.get(key)}
+        columnType={this.props.columnTypes.get(key)}
+        isPrimaryKey={this.props.primaryKeys.includes(key)}
+        columnOptions={this.props.columnOptions}
+        exporting={this.props.exporting}
+        onColumnNameChange={this.onColumnNameChange}
+      />,
+    ).toArray();
+    if (this.props.filetype === 'json' && !this.props.requireJSONHaveAllFields)
+    {
+      previewColumns.push(
+        (<div
+          key={previewColumns.length}
+          className='fi-preview-add-column-button'
+          onClick={this.handleAddPreviewColumn}
+          style={buttonColors()}
+        >
+          {'+'}
+        </div>));
+    }
+
     return (
       <div
         className='fi-preview-table-container'
@@ -456,20 +490,7 @@ class FileImportPreview extends TerrainComponent<Props>
           className='fi-preview-columns-container'
         >
           {
-            this.props.columnNames.map((value, key) =>
-              <FileImportPreviewColumn
-                key={key}
-                columnId={key}
-                columnName={this.props.columnNames.get(key)}
-                columnNames={this.props.columnNames}
-                isIncluded={this.props.columnsToInclude.get(key)}
-                columnType={this.props.columnTypes.get(key)}
-                isPrimaryKey={this.props.primaryKeys.includes(key)}
-                columnOptions={this.props.columnOptions}
-                exporting={this.props.exporting}
-                onColumnNameChange={this.onColumnNameChange}
-              />,
-            ).toArray()
+            previewColumns
           }
         </div>
         <div

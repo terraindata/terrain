@@ -183,6 +183,10 @@ const FileImportActions =
     () =>
       $(ActionTypes.changeElasticUpdate, {}),
 
+    addPreviewColumn:
+    () =>
+      $(ActionTypes.addPreviewColumn, {}),
+
     setErrorMsg:
     (err: string) =>
       $(ActionTypes.setErrorMsg, { err }),
