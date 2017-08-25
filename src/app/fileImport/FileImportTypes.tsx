@@ -145,7 +145,6 @@ export const _Template =
     originalNames: List<string>;
     columnTypes: Immutable.Map<string, object>;
     transformations: List<object>;
-    hasCsvHeader: boolean;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
     export: boolean;

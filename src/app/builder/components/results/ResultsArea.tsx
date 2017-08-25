@@ -571,6 +571,8 @@ column if you have customized the results view.');
               elasticUpdate={elasticUpdate}
               exporting={true}
               query={this.props.query.tql}
+              dbName={JSON.parse(this.props.query.tql).index}
+              serverId={this.props.db.id as number}
               variantName={this.props.variantName}
             />
 

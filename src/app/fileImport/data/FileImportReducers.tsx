@@ -186,13 +186,6 @@ FileImportReducers[ActionTypes.changeTableName] =
     state
       .set('tableName', action.payload.tableName);
 
-FileImportReducers[ActionTypes.changeServerDbTable] =
-  (state, action) =>
-    state
-      .set('serverId', action.payload.serverId)
-      .set('dbName', action.payload.dbName)
-      .set('tableName', action.payload.tableName);
-
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
@@ -333,8 +326,8 @@ FileImportReducers[ActionTypes.exportFile] =
   {
     Ajax.exportFile(
       state.filetype,
-      state.dbName,
-      state.serverId,
+      action.payload.dbName,
+      action.payload.serverId,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&
         [colName, state.columnTypes.get(colId).toJS()],
@@ -449,7 +442,6 @@ FileImportReducers[ActionTypes.fetchTemplates] =
             originalNames: template['originalNames'],
             columnTypes: template['columnTypes'],
             transformations: template['transformations'],
-            hasCsvHeader: template['csvHeaderMissing'],
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
             export: template['export'],
