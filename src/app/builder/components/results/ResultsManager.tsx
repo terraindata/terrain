@@ -521,16 +521,12 @@ export class ResultsManager extends TerrainComponent<Props>
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: filteredFields,
-      // preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
-      //   List(_.map(_.omit(result.fields.toJS(), ['_score', '_index', '_type', '_id']), (field) => field)),
-      // )),
       preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
         filteredFields.map((field, index) =>
           result.fields.get(String(field)),
         ),
       )),
     };
-
     this.changeResults(changes, exportChanges);
   }
 

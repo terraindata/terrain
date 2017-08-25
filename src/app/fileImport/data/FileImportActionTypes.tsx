@@ -67,7 +67,7 @@ const FileImportActionTypes =
     saveTemplate: '',
     fetchTemplates: '',
     setTemplates: '',
-    loadTemplate: '',
+    applyTemplate: '',
     deleteTemplate: '',
     updateTemplate: '',
     saveFile: '',
