@@ -241,8 +241,8 @@ export interface TooltipProps
   open?: boolean;
   useContext?: boolean;
   onRequestClose?: () => void;
-  position?: 'top' | 'bottom' | 'left' | 'right';
-  trigger?: 'mouseenter' | 'focus' | 'clickmanual';
+  position?: string;
+  trigger?: string;
   tabIndex?: number;
   interactive?: boolean;
   interactiveBorder?: number;
@@ -274,13 +274,18 @@ export interface TooltipProps
   theme?: Theme;
   className?: string;
   style?: any;
+  [others: string]: any;
 }
 
 export const defaultProps: TooltipProps = {
   arrow: true,
   size: 'regular',
   theme: 'alt',
-  animation: 'fade',
+  animation: 'shift',
+  position: 'top-start',
+  delay: 100,
+  duration: 200,
+  hideDuration: 200,
 };
 
 export function generateThemeStyles()
@@ -297,16 +302,20 @@ export function generateThemeStyles()
   return allClasses;
 }
 
-export function simpleTooltip(tip: string, innerComponent: any, theme: Theme = 'alt'): Tooltip
+export function tooltip(innerComponent: any, tip: string, theme: Theme = 'alt')
 {
+  if (tip === '' || tip === undefined)
+  {
+    return innerComponent;
+  }
   const props: TooltipProps = defaultProps;
   props.title = tip;
   props.theme = theme;
   return <Tooltip children={innerComponent} {...props} />;
 }
 
-export function makeTooltip(givenProps: TooltipProps, innerComponent): Tooltip
+export function makeTooltip(innerComponent: any, givenProps: TooltipProps)
 {
-  const props = _.defaults(givenProps, defaultProps);
+  const props = _.defaults({}, givenProps, defaultProps);
   return <Tooltip children={innerComponent} {...props} />;
 }

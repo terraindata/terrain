@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from '../../auth/data/AuthStore';
 import CreateItem from '../../common/components/CreateItem';
@@ -235,12 +236,17 @@ class Connections extends TerrainComponent<Props>
               </div>
             </div>
           </div>
-          <div
-            className='connections-remove'
-            onClick={this._fn(this.removeConnection, id)}
-            data-tip='Remove'>
-            <CloseIcon />
-          </div>
+          {
+            tooltip(
+              <div
+                className='connections-remove'
+                onClick={this._fn(this.removeConnection, id)}
+              >
+                <CloseIcon />
+              </div>,
+              'Remove'
+            )
+          }
         </div>
         {
           connInfo

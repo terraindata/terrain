@@ -52,6 +52,8 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+
+import { makeTooltip } from 'common/components/tooltip/Tooltips';
 import { altStyle, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -64,6 +66,8 @@ export interface Props
 
   placeholder?: string;
   help?: string;
+  helpIsError?: boolean;
+
   ref?: string;
   className?: string;
   disabled?: boolean;
@@ -283,23 +287,38 @@ class Autocomplete extends TerrainComponent<Props>
 
     const open = this.state.open && !!options && options.size > 0;
 
+    const inputElem =
+      <input
+        style={this.props.style}
+        ref='input'
+        type='text'
+        className={inputClassName}
+        value={this.state.value}
+        onChange={this.handleChange}
+        onFocus={this.handleFocus}
+        onBlur={this.handleBlur}
+        onKeyDown={this.handleKeydown}
+        disabled={this.props.disabled}
+        placeholder={this.props.placeholder}
+        data-html={true}
+      />;
+
     return (
       <div className='autocomplete'>
-        <input
-          style={this.props.style}
-          ref='input'
-          type='text'
-          className={inputClassName}
-          value={this.state.value}
-          onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          onKeyDown={this.handleKeydown}
-          disabled={this.props.disabled}
-          placeholder={this.props.placeholder}
-          data-tip={this.props.help}
-          data-html={true}
-        />
+        {
+          this.props.help === undefined ?
+            inputElem
+            :
+            makeTooltip(
+              inputElem,
+              {
+                title: this.props.help,
+                position: 'top-start',
+                key: this.props.helpIsError ? 'error' : 'nonerror',
+                theme: this.props.helpIsError ? 'error' : undefined,
+              },
+            )
+        }
         {!open ? null :
           <div
             className={classNames({
