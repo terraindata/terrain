@@ -631,19 +631,40 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
+  public renderEmptyExport()
+  {
+    return (
+      <div
+        className='fi-preview-empty-export'
+        style={{
+          color: Colors().text1,
+        }}
+      >
+        You must create a query in order to export
+      </div>
+    );
+  }
+
   public render()
   {
     return (
       <div
         className='fi-preview'
       >
-        {this.renderTopBar()}
-        {this.renderTable()}
-        {this.renderBottomBar()}
-        {this.renderApplyTemplate()}
-        {this.renderSaveTemplate()}
-        {this.renderUpdateTemplate()}
-        {this.renderError()}
+        {
+          this.props.exporting && !this.props.query ?
+            this.renderEmptyExport()
+            :
+            <div>
+              {this.renderTopBar()}
+              {this.renderTable()}
+              {this.renderBottomBar()}
+              {this.renderApplyTemplate()}
+              {this.renderSaveTemplate()}
+              {this.renderUpdateTemplate()}
+              {this.renderError()}
+            </div>
+        }
       </div>
     );
   }

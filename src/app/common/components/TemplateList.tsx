@@ -50,8 +50,8 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import Modal from './../../common/components/Modal';
+import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');

@@ -52,13 +52,12 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
-import TemplateList from './../../common/components/TemplateList';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
@@ -100,8 +99,6 @@ class FileImport extends TerrainComponent<any>
     tables?: SchemaTypes.TableMap;
     tableNames: List<string>;
     fileSelected: boolean;
-    filetype: string;
-    filename: string,
     dbValid: boolean,
     tableValid: boolean,
   } = {
@@ -113,8 +110,6 @@ class FileImport extends TerrainComponent<any>
     dbNames: List([]),
     tableNames: List([]),
     fileSelected: false,
-    filetype: '',
-    filename: '',
     dbValid: false,
     tableValid: false,
   };
@@ -147,20 +142,16 @@ class FileImport extends TerrainComponent<any>
 
   public incrementStep()
   {
-    const { filetype, stepId } = this.state;
     // TODO: convert stepIds to enums
     this.setState({
-      // stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
-      stepId: stepId + 1,
+      stepId: this.state.stepId + 1,
     });
   }
 
   public decrementStep()
   {
-    const { filetype, stepId } = this.state;
     this.setState({
-      // stepId: filetype === 'json' && stepId === 2 ? stepId - 2 : stepId - 1,
-      stepId: stepId - 1,
+      stepId: this.state.stepId - 1,
     });
   }
 
@@ -260,13 +251,13 @@ class FileImport extends TerrainComponent<any>
         error: this._fn(this.setError),
       };
 
-      const columnHeaders = parseCSV(file, testDuplicateConfig);
+      const columnHeaders: object[] = parseCSV(file, testDuplicateConfig);
       if (columnHeaders === undefined)
       {
         return undefined;
       }
-      const colHeaderSet = new Set();
-      const duplicateHeaderSet = new Set();
+      const colHeaderSet: Set<string> = new Set();
+      const duplicateHeaderSet: Set<string> = new Set();
       _.map(columnHeaders[0], (colHeader) =>
       {
         if (colHeaderSet.has(colHeader))
@@ -300,7 +291,7 @@ class FileImport extends TerrainComponent<any>
     fr.onloadend = () =>
     {
       // assume preview fits in one chunk
-      let items;
+      let items: object[];
       switch (filetype)
       {
         case 'json':
@@ -313,41 +304,46 @@ class FileImport extends TerrainComponent<any>
       }
       if (items === undefined)
       {
-        this.setState({
-          filename: '',
-        });
         return;
       }
 
-      let columnNames = [];
-      let previewRows;
+      let columnNames: string[] = [];
+      let previewRows: string[][];
       switch (filetype)
       {
         case 'json':
-          const columnNamesSet = new Set();
+          const columnNamesSet: Set<string> = new Set();
           for (const obj of items)
           {
-            Object.keys(obj).forEach((val) => { columnNamesSet.add(val); });
+            _.map(obj, (val) =>
+            {
+              columnNamesSet.add(val);
+            });
           }
           columnNames = Array.from(columnNamesSet);
-          previewRows = items.map((item) =>
-            columnNames.map((value) =>
-              item[value] === undefined ? '' : typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
-            ),
-          );
           break;
         case 'csv':
           columnNames = _.map(items[0], (value, index) =>
             !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
           );
-          previewRows = items.map((item) =>
-            (hasCsvHeader ? columnNames : _.range(columnNames.length)).map((value) =>
-              item[value] === undefined ? '' : typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
-            ),
-          );
           break;
         default:
       }
+
+      const columnNamesToMap: string[] =
+        filetype === 'json' || (filetype === 'csv' && hasCsvHeader) ?
+          columnNames
+          :
+          _.range(columnNames.length);
+
+      previewRows = items.map((item) =>
+        columnNamesToMap.map((value) =>
+          item[value] === undefined ?
+            ''
+            :
+            typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
+        ),
+      );
 
       Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
       this.setState({
@@ -374,24 +370,9 @@ class FileImport extends TerrainComponent<any>
       alert('Invalid filetype: ' + String(filetype));
       return;
     }
-    this.setState({
-      filename: file.target.files[0].name,
-      filetype,
-    });
     Actions.saveFile(file.target.files[0], filetype);
 
-    // if (filetype === 'csv')
-    // {
-    //   this.setState({
-    //     showCsvHeaderOption: true,
-    //   });
-    // }
-    // else
-    // {
-    //   this.parseFile(file.target.files[0], filetype, null);
-    // }
-
-    if (filetype === 'csv')
+    if (filetype === 'csv') // csv shows preview rows on choose csv header step
     {
       this.parseFile(file.target.files[0], filetype, false, false);
     }
@@ -445,15 +426,12 @@ class FileImport extends TerrainComponent<any>
 
   public renderSteps()
   {
-    let fileImportTypeStepTitle: string = '';
-    if (this.state.stepId === 1)
-    {
-      fileImportTypeStepTitle = FileImportTypes.STEP_TWO_TITLES[this.state.filetype === 'csv' ? 0 : this.state.filetype === 'json' ? 1 : undefined];
-    }
-    else
-    {
-      fileImportTypeStepTitle = FileImportTypes.STEP_TITLES[this.state.stepId];
-    }
+    const { filetype } = this.state.fileImportState;
+    const stepTitle: string =
+      this.state.stepId === 1 ?
+        FileImportTypes.STEP_TWO_TITLES[filetype === 'csv' ? 0 : filetype === 'json' ? 1 : undefined]
+        :
+        FileImportTypes.STEP_TITLES[this.state.stepId];
 
     return (
       <div className='fi-step'>
@@ -466,7 +444,7 @@ class FileImport extends TerrainComponent<any>
           this.state.stepId > 0 &&
           <div className='fi-step-title'>
             {
-              fileImportTypeStepTitle
+              stepTitle
             }
           </div>
         }
@@ -477,7 +455,7 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { serverId, dbName, tableName } = fileImportState;
+    const { filetype, serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
 
@@ -488,7 +466,7 @@ class FileImport extends TerrainComponent<any>
         content = this.renderSelect();
         break;
       case 1:
-        content = this.state.filetype === 'csv' ? this.renderCsv() : this.state.filetype === 'json' ? this.renderJSON() : undefined;
+        content = filetype === 'csv' ? this.renderCsv() : filetype === 'json' ? this.renderJSON() : undefined;
         break;
       case 2:
         content =
@@ -518,7 +496,6 @@ class FileImport extends TerrainComponent<any>
           >
             <span
               className='fi-content-subtext-text'
-              style={{ text: Colors().text2 }}
             >
               {
                 FileImportTypes.STEP_SUBTEXT.DATABASE_SUBTEXT
@@ -546,7 +523,6 @@ class FileImport extends TerrainComponent<any>
           >
             <span
               className='fi-content-subtext-text'
-              style={{ text: Colors().text2 }}
             >
               {
                 FileImportTypes.STEP_SUBTEXT.TABLE_SUBTEXT
@@ -653,7 +629,6 @@ class FileImport extends TerrainComponent<any>
 
   public renderJSON()
   {
-    const { previewRows } = this.state.fileImportState;
     return (
       <div
         className='fi-content-json'
@@ -707,6 +682,7 @@ class FileImport extends TerrainComponent<any>
       default:
     }
 
+    // TODO: add carrot icon arrows
     return (
       <div
         className='flex-container fi-nav'
@@ -732,7 +708,6 @@ class FileImport extends TerrainComponent<any>
               :
               {
                 background: Colors().bg3,
-                text: Colors().text3,
               }
             }
             ref='fi-next-button'
