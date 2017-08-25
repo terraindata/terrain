@@ -944,28 +944,23 @@ export const Ajax =
 
     getDbs(onLoad: (dbs: BackendInstance[], loadFinished: boolean) => void, onError?: (ev: Event) => void)
     {
-      let m1Dbs: BackendInstance[] = null;
       let m2Dbs: BackendInstance[] = null;
       const checkForLoaded = () =>
       {
-        if (!m1Dbs || !m2Dbs)
+        if (!m2Dbs)
         {
           return;
         }
 
         let dbs: BackendInstance[] = [];
-        if (m1Dbs)
-        {
-          dbs = m1Dbs;
-        }
         if (m2Dbs)
         {
           dbs = dbs.concat(m2Dbs);
         }
-        onLoad(dbs, !!(m1Dbs && m2Dbs));
+        onLoad(dbs, !!(m2Dbs));
       };
 
-      AjaxM1.getDbs_m1(
+      {/* AjaxM1.getDbs_m1(
         (dbNames: string[]) =>
         {
           m1Dbs = dbNames.map(
@@ -984,7 +979,7 @@ export const Ajax =
           m1Dbs = [];
           checkForLoaded();
         },
-      );
+      ); */}
 
       Ajax.req(
         'get',

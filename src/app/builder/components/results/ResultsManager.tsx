@@ -169,7 +169,10 @@ export class ResultsManager extends TerrainComponent<Props>
     this.mapQueries(
       (query) =>
       {
-        AjaxM1.killQuery(query.queryId);
+        if (this.props.db.source === 'm1')
+        {
+          AjaxM1.killQuery(query.queryId);
+        }
         query.xhr.abort();
       },
     );
