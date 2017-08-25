@@ -64,7 +64,7 @@ import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
 
-const CloseIcon = require('../../../images/icon_close_8x8_gray.svg');
+const CloseIcon = require('../../../images/icon_close_8x8.svg');
 
 import './Connections.less';
 

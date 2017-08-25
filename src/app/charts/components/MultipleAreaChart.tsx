@@ -104,17 +104,16 @@ const config = {
 
 interface Dataset
 {
-  metric: {
-    id: number;
-    name: string;
-  };
+  id: ID;
+  label: string[];
   data: any[];
 }
 
 interface Props
 {
   datasets: Immutable.Map<ID, Dataset>;
-  variants: Immutable.Map<ID, LibraryTypes.Variant>;
+  xDataKey: string; // The key to get the value of x from the data
+  yDataKey: string; // The key to get the value of y from the data
 }
 
 interface State
@@ -128,9 +127,11 @@ interface State
 
 const colors = ['blue', 'red', 'green', 'yellow'];
 
-export default class TerrainAreaChart extends TerrainComponent<Props> {
+export default class MultipleAreaChart extends TerrainComponent<Props> {
   public static defaultProps = {
     datasets: [],
+    xDataKey: 'x',
+    yDataKey: 'y',
   };
 
   public state: State = {
@@ -187,7 +188,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
   public renderData()
   {
-    const { datasets } = this.props;
+    const { datasets, xDataKey, yDataKey } = this.props;
     const { visibleDatasets, highlightDataset } = this.state;
     const areas = [];
     const scatters = [];
@@ -208,8 +209,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               style={{ data: { fill: this.getDatasetColor(key) } }}
               data={ds.data}
               interpolation={config.topChart.interpolation}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />,
           );
           scatters.push(
@@ -217,8 +218,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               key={key}
               data={ds.data}
               size={0}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />,
           );
         }
@@ -231,8 +232,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               style={{ data: { fill: this.getDatasetColor(key) } }}
               data={ds.data}
               interpolation={config.topChart.interpolation}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />
           );
 
@@ -241,8 +242,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
               key={key}
               size={(datum, active) => active ? 5 : 0}
               data={ds.data}
-              x='time'
-              y='value'
+              x={xDataKey}
+              y={yDataKey}
             />
           );
         }
@@ -264,13 +265,12 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
   public renderLegend()
   {
-    const { variants, datasets } = this.props;
+    const { datasets } = this.props;
     const { visibleDatasets } = this.state;
 
     const data = datasets
       .map((ds, key) =>
       {
-        const variant = variants.get(key);
         let labelsStyle = {};
 
         if (visibleDatasets.includes(key))
@@ -279,8 +279,8 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
         }
 
         return {
-          id: variant.get('id'),
-          name: variant.get('name'),
+          id: ds.id,
+          name: ds.label,
           labels: labelsStyle,
         };
       });
@@ -396,7 +396,7 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
 
   public render()
   {
-    const { datasets } = this.props;
+    const { datasets, xDataKey, yDataKey } = this.props;
     const data = this.renderData();
     const legend = this.renderLegend();
 
@@ -406,75 +406,68 @@ export default class TerrainAreaChart extends TerrainComponent<Props> {
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
-            {({ width, height }) =>
-              <VictoryChart
-                scale={config.topChart.scale}
-                theme={VictoryTheme.material}
-                padding={styles.topChart.padding}
-                containerComponent={
-                  <VictoryZoomVoronoiContainer
-                    responsive={false}
-                    dimension='x'
-                    zoomDomain={this.state.zoomDomain}
-                    onDomainChange={this.handleZoom}
-                    labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
-                    labelComponent={
-                      <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
-                    }
-                  />
-                }
-                width={width}
-                height={height}
-                events={[{
-                  // indicate, by name, the component that listens to the event
-                  childName: ['legend'],
-                  // { 'data', 'labels' }, indicates if the texts or the dots
-                  // of the legend items are the one that listens to the event.
-                  target: 'labels',
-                  eventHandlers: {
-                    onClick: this.handleLegendClick,
-                    onMouseOver: this.handleLegendMouseOver,
-                    onMouseOut: this.handleLegendMouseOut,
-                  },
-                }]}
+            <VictoryChart
+              scale={config.topChart.scale}
+              theme={VictoryTheme.material}
+              padding={styles.topChart.padding}
+              containerComponent={
+                <VictoryZoomVoronoiContainer
+                  responsive={false}
+                  dimension='x'
+                  zoomDomain={this.state.zoomDomain}
+                  onDomainChange={this.handleZoom}
+                  labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
+                  labelComponent={
+                    <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                  }
+                />
+              }
+              events={[{
+                // indicate, by name, the component that listens to the event
+                childName: ['legend'],
+                // { 'data', 'labels' }, indicates if the texts or the dots
+                // of the legend items are the one that listens to the event.
+                target: 'labels',
+                eventHandlers: {
+                  onClick: this.handleLegendClick,
+                  onMouseOver: this.handleLegendMouseOver,
+                  onMouseOut: this.handleLegendMouseOut,
+                },
+              }]}
+            >
+              <VictoryGroup
+                style={styles.topChart.areas}
               >
-                <VictoryGroup
-                  style={styles.topChart.areas}
-                >
-                  {data.areas}
-                  {data.scatters}
-                </VictoryGroup>
-                {legend}
-              </VictoryChart>
-            }
+                {data.areas}
+                {data.scatters}
+              </VictoryGroup>
+              {legend}
+            </VictoryChart>
           </ContainerDimensions>
         </div>
         <div style={styles.bottomChartWrapper}>
           <ContainerDimensions>
-            {({ width, height }) =>
-              <VictoryChart
-                scale={config.bottomChart.scale}
-                padding={styles.bottomChart.padding}
-                theme={VictoryTheme.material}
-                width={width} height={height}
-                containerComponent={
-                  <VictoryBrushContainer responsive={false}
-                    dimension='x'
-                    selectedDomain={this.state.selectedDomain}
-                    onDomainChange={this.handleBrush}
-                  />
-                }
-              >
-                <VictoryAxis />
-                <VictoryArea
-                  style={styles.bottomChart.areas}
-                  data={datasets.first() !== null ? datasets.first().data : []}
-                  interpolation={config.bottomChart.interpolation}
-                  x='time'
-                  y='value'
+            <VictoryChart
+              scale={config.bottomChart.scale}
+              padding={styles.bottomChart.padding}
+              theme={VictoryTheme.material}
+              containerComponent={
+                <VictoryBrushContainer responsive={false}
+                  dimension='x'
+                  selectedDomain={this.state.selectedDomain}
+                  onDomainChange={this.handleBrush}
                 />
-              </VictoryChart>
-            }
+              }
+            >
+              <VictoryAxis />
+              <VictoryArea
+                style={styles.bottomChart.areas}
+                data={datasets.first() !== null ? datasets.first().data : []}
+                interpolation={config.bottomChart.interpolation}
+                x={xDataKey}
+                y={yDataKey}
+              />
+            </VictoryChart>
           </ContainerDimensions>
         </div>
       </div>
