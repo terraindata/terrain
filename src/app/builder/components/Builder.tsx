@@ -65,6 +65,7 @@ import LibraryActions from '../../library/data/LibraryActions';
 import { LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
+import TerrainStore from '../../store/TerrainStore';
 import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
@@ -551,7 +552,7 @@ class Builder extends TerrainComponent<Props>
     });
 
     // TODO remove if queries/variants model changes
-    LibraryActions.variants.change(variant);
+    TerrainStore.dispatch(LibraryActions.variants.change(variant));
     this.onSaveSuccess(variant);
     Actions.save(); // register that we are saving
 

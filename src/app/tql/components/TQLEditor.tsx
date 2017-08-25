@@ -66,7 +66,6 @@ import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParse
 import { Doc, Editor } from 'codemirror';
 import * as CodeMirrorLib from 'codemirror';
 
-
 import './ElasticMode';
 import './TQLMode.js';
 
@@ -105,6 +104,8 @@ export interface Props
 
   isDiff?: boolean;
   diffTql?: string;
+
+  placeholder?: string;
 
   onChange?(tql: string, noAction?: boolean, manualRequest?: boolean);
 
@@ -206,6 +207,7 @@ class TQLEditor extends TerrainComponent<Props>
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
         onCodeMirrorMount={this.registerCodeMirror}
+        placeholder={(this.props.placeholder !== '' && this.props.placeholder !== undefined) ? this.props.placeholder : 'Write your query here'}
       />
     );
 
@@ -296,7 +298,7 @@ class TQLEditor extends TerrainComponent<Props>
       CodeMirrorLib.off(tooltip, 'mousedown', this.hidePopupClickHandler);
       if (tooltip.parentNode)
       {
-        tooltip.parentNode.removeChild(tooltip)
+        tooltip.parentNode.removeChild(tooltip);
       }
       tooltip = null;
       ann.showing = false;
@@ -315,7 +317,7 @@ class TQLEditor extends TerrainComponent<Props>
     // clicking either the tooltip or the token closes the tooltip
     CodeMirrorLib.on(tooltip, 'mousedown', (hideEvent: MouseEvent) =>
     {
-      this.hidePopupClickHandler(hideEvent, tooltip, ann)
+      this.hidePopupClickHandler(hideEvent, tooltip, ann);
     });
     CodeMirrorLib.on(target, 'mousedown', (hideEvent: MouseEvent) =>
     {
@@ -349,7 +351,7 @@ class TQLEditor extends TerrainComponent<Props>
     const box = target.getBoundingClientRect();
     const x = (box.left + box.right) / 2;
     const y = (box.top + box.bottom) / 2;
-    const spans = cm.findMarksAt(cm.coordsChar({ left: x, top: y }, "client"));
+    const spans = cm.findMarksAt(cm.coordsChar({ left: x, top: y }, 'client'));
     let ann: MarkerAnnotation;
     for (let i = 0; i < spans.length; ++i)
     {
