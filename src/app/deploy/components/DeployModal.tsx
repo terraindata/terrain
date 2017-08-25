@@ -51,6 +51,7 @@ import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DeployModal.less';
 
+import TerrainStore from 'store/TerrainStore';
 import { ItemStatus } from '../../../items/types/Item';
 import Modal from '../../common/components/Modal';
 import LibraryActions from '../../library/data/LibraryActions';
@@ -111,7 +112,7 @@ class DeployModal extends TerrainComponent<Props>
 
   public handleClose()
   {
-    LibraryActions.variants.status(null, null);
+    TerrainStore.dispatch(LibraryActions.variants.status(null, null));
   }
 
   public handleDeploy()
@@ -143,7 +144,7 @@ class DeployModal extends TerrainComponent<Props>
           template,
         },
       };
-      LibraryActions.variants.deploy(variant, 'putTemplate', body, this.state.changingStatusTo);
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, this.state.changingStatusTo));
     }
     else if (this.state.changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
     {
@@ -151,7 +152,7 @@ class DeployModal extends TerrainComponent<Props>
       const body: object = {
         id,
       };
-      LibraryActions.variants.deploy(variant, 'deleteTemplate', body, this.state.changingStatusTo);
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, this.state.changingStatusTo));
     }
   }
 
