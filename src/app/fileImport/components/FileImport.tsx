@@ -65,6 +65,7 @@ import * as SchemaTypes from './../../schema/SchemaTypes';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
+import { Steps } from './../FileImportTypes';
 import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
 import FileImportPreviewRow from './FileImportPreviewRow';
@@ -99,8 +100,6 @@ class FileImport extends TerrainComponent<any>
     tables?: SchemaTypes.TableMap;
     tableNames: List<string>;
     fileSelected: boolean;
-    dbValid: boolean,
-    tableValid: boolean,
   } = {
     fileImportState: FileImportStore.getState(),
     columnOptionNames: List([]),
@@ -110,8 +109,6 @@ class FileImport extends TerrainComponent<any>
     dbNames: List([]),
     tableNames: List([]),
     fileSelected: false,
-    dbValid: false,
-    tableValid: false,
   };
 
   constructor(props)
@@ -142,7 +139,6 @@ class FileImport extends TerrainComponent<any>
 
   public incrementStep()
   {
-    // TODO: convert stepIds to enums
     this.setState({
       stepId: this.state.stepId + 1,
     });
@@ -184,9 +180,6 @@ class FileImport extends TerrainComponent<any>
     });
 
     Actions.changeDbName(dbName);
-    this.setState({
-      dbValid: !isValidIndexName(dbName),
-    });
   }
 
   public handleAutocompleteTableChange(tableName: string)
@@ -203,9 +196,6 @@ class FileImport extends TerrainComponent<any>
     });
 
     Actions.changeTableName(tableName);
-    this.setState({
-      tableValid: !isValidTypeName(tableName),
-    });
   }
 
   public parseJson(file: string, isNewlineSeparatedJSON: boolean): object[]
@@ -424,145 +414,6 @@ class FileImport extends TerrainComponent<any>
     this.incrementStep();
   }
 
-  public renderSteps()
-  {
-    const { filetype } = this.state.fileImportState;
-    const stepTitle: string =
-      this.state.stepId === 1 ?
-        FileImportTypes.STEP_TWO_TITLES[filetype === 'csv' ? 0 : filetype === 'json' ? 1 : undefined]
-        :
-        FileImportTypes.STEP_TITLES[this.state.stepId];
-
-    return (
-      <div className='fi-step'>
-        <div className='fi-step-name'>
-          {
-            FileImportTypes.STEP_NAMES[this.state.stepId]
-          }
-        </div>
-        {
-          this.state.stepId > 0 &&
-          <div className='fi-step-title'>
-            {
-              stepTitle
-            }
-          </div>
-        }
-      </div>
-    );
-  }
-
-  public renderContent()
-  {
-    const { fileImportState } = this.state;
-    const { filetype, serverId, dbName, tableName } = fileImportState;
-    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
-    const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
-
-    let content;
-    switch (this.state.stepId)
-    {
-      case 0:
-        content = this.renderSelect();
-        break;
-      case 1:
-        content = filetype === 'csv' ? this.renderCsv() : filetype === 'json' ? this.renderJSON() : undefined;
-        break;
-      case 2:
-        content =
-          <Dropdown
-            selectedIndex={serverId !== -1 ? this.state.serverIndex : -1}
-            options={this.state.serverNames}
-            onChange={this.handleServerChange}
-            canEdit={true}
-          />;
-        break;
-      case 3:
-        content = [];
-        content.push(
-          <Autocomplete
-            value={dbName}
-            options={this.state.dbNames}
-            onChange={this.handleAutocompleteDbChange}
-            placeholder={'database'}
-            disabled={false}
-            onEnter={this._fn(this.handleSelectDb)}
-            onSelectOption={this._fn(this.handleSelectDb)}
-            key={'fi-content-autocomplete-db'}
-          />,
-          <div
-            className='fi-content-subtext'
-            key={'fi-content-subtext-db'}
-          >
-            <span
-              className='fi-content-subtext-text'
-            >
-              {
-                FileImportTypes.STEP_SUBTEXT.DATABASE_SUBTEXT
-              }
-            </span>
-          </div>,
-        );
-        break;
-      case 4:
-        content = [];
-        content.push(
-          <Autocomplete
-            value={tableName}
-            options={this.state.tableNames}
-            onChange={this.handleAutocompleteTableChange}
-            placeholder={'table'}
-            disabled={false}
-            onEnter={this._fn(this.handleSelectTable)}
-            onSelectOption={this._fn(this.handleSelectTable)}
-            key={'fi-content-autocomplete-table'}
-          />,
-          <div
-            className='fi-content-subtext'
-            key={'fi-content-subtext-table'}
-          >
-            <span
-              className='fi-content-subtext-text'
-            >
-              {
-                FileImportTypes.STEP_SUBTEXT.TABLE_SUBTEXT
-              }
-            </span>
-          </div>,
-        );
-        break;
-      case 5:
-        content =
-          <FileImportPreview
-            previewRows={previewRows}
-            primaryKeys={primaryKeys}
-            primaryKeyDelimiter={primaryKeyDelimiter}
-            columnNames={columnNames}
-            columnsToInclude={columnsToInclude}
-            columnTypes={columnTypes}
-            templates={templates}
-            transforms={transforms}
-            columnOptions={this.state.columnOptionNames}
-            uploadInProgress={uploadInProgress}
-            elasticUpdate={elasticUpdate}
-            exporting={false}
-          />;
-        break;
-      default:
-    }
-
-    return (
-      <div
-        className='fi-content'
-        style={this.state.stepId === 0 ? backgroundColor(Colors().bg1) : backgroundColor(Colors().bg3)}
-      >
-        {
-          content
-        }
-      </div>
-    );
-  }
-
   public renderSelect()
   {
     return (
@@ -657,27 +508,172 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
+  public renderSteps()
+  {
+    const { filetype } = this.state.fileImportState;
+    const stepTitle: string =
+      this.state.stepId === Steps.CsvJsonOptions ?
+        FileImportTypes.STEP_TWO_TITLES[filetype === 'csv' ? 0 : filetype === 'json' ? 1 : undefined]
+        :
+        FileImportTypes.STEP_TITLES[this.state.stepId];
+
+    return (
+      <div className='fi-step'>
+        <div className='fi-step-name'>
+          {
+            FileImportTypes.STEP_NAMES[this.state.stepId]
+          }
+        </div>
+        {
+          this.state.stepId > 0 &&
+          <div className='fi-step-title'>
+            {
+              stepTitle
+            }
+          </div>
+        }
+      </div>
+    );
+  }
+
+  public renderContent()
+  {
+    const { fileImportState } = this.state;
+    const { filetype, serverId, dbName, tableName } = fileImportState;
+    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
+    const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
+
+    let content;
+    switch (this.state.stepId)
+    {
+      case Steps.ChooseFile:
+        content = this.renderSelect();
+        break;
+      case Steps.CsvJsonOptions:
+        content = filetype === 'csv' ? this.renderCsv() : filetype === 'json' ? this.renderJSON() : undefined;
+        break;
+      case Steps.SelectServer:
+        content =
+          <Dropdown
+            selectedIndex={serverId !== -1 ? this.state.serverIndex : -1}
+            options={this.state.serverNames}
+            onChange={this.handleServerChange}
+            canEdit={true}
+          />;
+        break;
+      case Steps.SelectDb:
+        content = [];
+        content.push(
+          <Autocomplete
+            value={dbName}
+            options={this.state.dbNames}
+            onChange={this.handleAutocompleteDbChange}
+            placeholder={'database'}
+            disabled={false}
+            onEnter={this._fn(this.handleSelectDb)}
+            onSelectOption={this._fn(this.handleSelectDb)}
+            key={'fi-content-autocomplete-db'}
+          />,
+          <div
+            className='fi-content-subtext'
+            key={'fi-content-subtext-db'}
+          >
+            <span
+              className='fi-content-subtext-text'
+            >
+              {
+                FileImportTypes.STEP_SUBTEXT.DATABASE_SUBTEXT
+              }
+            </span>
+          </div>,
+        );
+        break;
+      case Steps.SelectTable:
+        content = [];
+        content.push(
+          <Autocomplete
+            value={tableName}
+            options={this.state.tableNames}
+            onChange={this.handleAutocompleteTableChange}
+            placeholder={'table'}
+            disabled={false}
+            onEnter={this._fn(this.handleSelectTable)}
+            onSelectOption={this._fn(this.handleSelectTable)}
+            key={'fi-content-autocomplete-table'}
+          />,
+          <div
+            className='fi-content-subtext'
+            key={'fi-content-subtext-table'}
+          >
+            <span
+              className='fi-content-subtext-text'
+            >
+              {
+                FileImportTypes.STEP_SUBTEXT.TABLE_SUBTEXT
+              }
+            </span>
+          </div>,
+        );
+        break;
+      case Steps.Preview:
+        content =
+          <FileImportPreview
+            previewRows={previewRows}
+            primaryKeys={primaryKeys}
+            primaryKeyDelimiter={primaryKeyDelimiter}
+            columnNames={columnNames}
+            columnsToInclude={columnsToInclude}
+            columnTypes={columnTypes}
+            templates={templates}
+            transforms={transforms}
+            columnOptions={this.state.columnOptionNames}
+            uploadInProgress={uploadInProgress}
+            elasticUpdate={elasticUpdate}
+            exporting={false}
+          />;
+        break;
+      default:
+    }
+
+    return (
+      <div
+        className='fi-content'
+        style={this.state.stepId === Steps.ChooseFile ? backgroundColor(Colors().bg1) : backgroundColor(Colors().bg3)}
+      >
+        {
+          content
+        }
+      </div>
+    );
+  }
+
   public renderNav()
   {
-    const { stepId, fileSelected, dbValid, tableValid } = this.state;
-    const { serverName, errorMsg } = this.state.fileImportState;
-    let nextEnabled = false;
+    const { stepId, fileSelected } = this.state;
+    const { serverName, dbName, tableName } = this.state.fileImportState;
+    let nextEnabled: boolean = false;
+    let errorMsg: string = '';
     switch (stepId)
     {
-      case 0:
+      case Steps.ChooseFile:
         nextEnabled = fileSelected;
         break;
-      case 1:
+      case Steps.CsvJsonOptions:
         nextEnabled = false;
         break;
-      case 2:
+      case Steps.SelectServer:
+        errorMsg = 'No server selected';
         nextEnabled = !!serverName;
         break;
-      case 3:
-        nextEnabled = dbValid;
+      case Steps.SelectDb:
+        errorMsg = isValidIndexName(dbName);
+        nextEnabled = !errorMsg;
         break;
-      case 4:
-        nextEnabled = tableValid;
+      case Steps.SelectTable:
+        errorMsg = isValidTypeName(tableName);
+        nextEnabled = !errorMsg;
+        break;
+      case Steps.Preview:
         break;
       default:
     }
@@ -688,7 +684,7 @@ class FileImport extends TerrainComponent<any>
         className='flex-container fi-nav'
       >
         {
-          stepId > 0 &&
+          stepId > Steps.ChooseFile &&
           <div
             className='fi-back-button button'
             onClick={this.decrementStep}
@@ -699,7 +695,7 @@ class FileImport extends TerrainComponent<any>
           </div>
         }
         {
-          stepId > 1 && stepId < 5 &&
+          stepId > Steps.CsvJsonOptions && stepId < Steps.Preview &&
           <div
             className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
@@ -713,7 +709,7 @@ class FileImport extends TerrainComponent<any>
             ref='fi-next-button'
           >
             Next
-          </div>
+            </div>
         }
       </div>
     );

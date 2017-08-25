@@ -249,3 +249,13 @@ export const STEP_SUBTEXT =
     DATABASE_SUBTEXT: 'Use the field above to either choose an existing database or name a new one that will be created',
     TABLE_SUBTEXT: 'Use the field above to either choose an existing table or name a new one that will be created',
   };
+
+export const enum Steps
+{
+  ChooseFile,
+  CsvJsonOptions,
+  SelectServer,
+  SelectDb,
+  SelectTable,
+  Preview,
+}
