@@ -293,6 +293,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       const { filetype, preview, originalNames } = exportChanges;
       Actions.chooseFile(filetype, preview, originalNames);
+      Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
     }
 
     this.props.onResultsStateChange(resultsState);
@@ -531,7 +532,6 @@ export class ResultsManager extends TerrainComponent<Props>
         ),
       )),
     };
-    Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
 
     this.changeResults(changes, exportChanges);
   }
