@@ -242,6 +242,7 @@ class DeployModal extends TerrainComponent<Props>
                 defaultChecked={this.state.defaultChecked}
                 defaultVariant={defaultVariant}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
+                onCancelDeploy={this.handleClose}
               />
             </div>
           }
