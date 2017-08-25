@@ -47,15 +47,19 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
+import { Colors, getStyle } from '../Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CheckBox.less';
+
 const CheckMark = require('./../../../images/icon_checkMark.svg');
 
 export interface Props
 {
   checked: boolean;
   onChange: () => void;
+  className?: string;
 }
 
 class CheckBox extends TerrainComponent<Props>
@@ -67,13 +71,24 @@ class CheckBox extends TerrainComponent<Props>
         className={classNames({
           'checkbox': true,
           'checkbox-checked': this.props.checked,
+          [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
         })}
+        style={this.props.checked ? CHECKED_STYLE : UNCHECKED_STYLE}
         onClick={this.props.onChange}
       >
-        {this.props.checked ? <CheckMark className='check-mark-icon' /> : 'O'}
+        {this.props.checked ? <CheckMark className='check-mark-icon' /> : ' '}
       </div>
     );
   }
 }
+
+const CHECKED_STYLE = _.extend({},
+  getStyle('background', Colors().active),
+);
+
+const UNCHECKED_STYLE = _.extend({},
+  getStyle('background', Colors().altBg2),
+  getStyle('color', Colors().altBg2),
+);
 
 export default CheckBox;

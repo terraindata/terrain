@@ -63,6 +63,7 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
+import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
 
@@ -325,26 +326,8 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    // get the index and type from the cards
-    // TODO: use common function from ElasticBlockHelpers
-    let index: string = '';
-    let type: string = '';
-    const cards = builderState.query.cards;
-    cards.map((card) =>
-    {
-      if (card._isCard)
-      {
-        const title = card.static.title;
-        if (title === 'index')
-        {
-          index = card.value;
-        } else if (title === 'type')
-        {
-          type = card.value;
-        }
-      }
-    });
-
+    const index: string = getIndex();
+    const type: string = getType();
     const min = maxDomain.get(0);
     const max = maxDomain.get(1);
     const interval = (max - min) / NUM_BARS;

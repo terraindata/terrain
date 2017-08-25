@@ -531,7 +531,6 @@ export class ResultsManager extends TerrainComponent<Props>
         ),
       )),
     };
-
     this.changeResults(changes, exportChanges);
   }
 
