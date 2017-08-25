@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires no-console
 
+import * as _ from 'lodash';
 import * as ReduxActions from 'redux-actions';
-import * as _ from 'underscore';
 const Redux = require('redux');
 
 import AuthStore from './../../auth/data/AuthStore';
@@ -56,9 +56,7 @@ import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
 import UserReducers from './UserReducers';
 
-const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  UserReducers,
-  {}), UserTypes._UserState({})), UserTypes._UserState({}));
+const UserStore = Redux.createStore(UserReducers);
 
 UserStore.subscribe(() =>
 {

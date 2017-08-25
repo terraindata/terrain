@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { buttonColors } from '../../common/Colors';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -58,11 +58,16 @@ import * as FileImportTypes from './../FileImportTypes';
 import './TransformBox.less';
 const { List } = Immutable;
 
+type Transform = FileImportTypes.Transform;
+const ELASTIC_TYPES = FileImportTypes.ELASTIC_TYPES;
+const TRANSFORM_TYPES = FileImportTypes.TRANSFORM_TYPES;
+
 export interface Props
 {
-  datatype: string;
-  colName: string;
+  columnId: number;
+  columnName: string;
   columnNames: List<string>;
+  datatype: string;
   setLocalColumnName(columnName: string);
 }
 
@@ -116,21 +121,43 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleSplitNameAChange(splitNameA: string)
   {
-    this.setState({
-      splitNames: this.state.splitNames.set(0, splitNameA),
-    });
+    if (this.props.columnNames.delete(this.props.columnId).contains(splitNameA))
+    {
+      alert('column name: ' + splitNameA + ' already exists, duplicate column names are not allowed');
+    }
+    else if (this.state.splitNames.get(1) === splitNameA)
+    {
+      alert('split names cannot be identical');
+    }
+    else
+    {
+      this.setState({
+        splitNames: this.state.splitNames.set(0, splitNameA),
+      });
+    }
   }
 
   public handleSplitNameBChange(splitNameB: string)
   {
-    this.setState({
-      splitNames: this.state.splitNames.set(1, splitNameB),
-    });
+    if (this.props.columnNames.delete(this.props.columnId).contains(splitNameB))
+    {
+      alert('column name: ' + splitNameB + ' already exists, duplicate column names are not allowed');
+    }
+    else if (this.state.splitNames.get(0) === splitNameB)
+    {
+      alert('split names cannot be identical');
+    }
+    else
+    {
+      this.setState({
+        splitNames: this.state.splitNames.set(1, splitNameB),
+      });
+    }
   }
 
   public handleMergeIndexChange(mergeIndex: number)
   {
-    const mergeName = this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName)).get(mergeIndex);
+    const mergeName = this.props.columnNames.delete(this.props.columnId).get(mergeIndex);
     this.setState({
       mergeIndex,
       mergeName,
@@ -139,6 +166,13 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleMergeNewNameChange(mergeNewName: string)
   {
+    if (this.props.columnNames.delete(this.props.columnId).filter((colName, index) =>
+      index !== this.state.mergeIndex,
+    ).contains(mergeNewName))
+    {
+      alert('column name: ' + mergeNewName + ' already exists, duplicate column names are not allowed');
+      return;
+    }
     this.setState({
       mergeNewName,
     });
@@ -191,36 +225,31 @@ class TransformBox extends TerrainComponent<Props>
     return '';
   }
 
-  public setTransform(transformName: string)
+  public getTransform(transformName: string): Transform
   {
-    const transform: FileImportTypes.Transform = {
-      name: transformName,
-      colName: this.props.colName,
-      args: {},
-    };
-
+    let transformArgsConfig = {};
     switch (transformName)
     {
       case 'duplicate':
-        transform.args = {
+        transformArgsConfig = {
           newName: this.state.duplicateNewName,
         };
         break;
 
       case 'append':
-        transform.args = {
+        transformArgsConfig = {
           text: this.state.transformText,
         };
         break;
 
       case 'prepend':
-        transform.args = {
+        transformArgsConfig = {
           text: this.state.transformText,
         };
         break;
 
       case 'split':
-        transform.args = {
+        transformArgsConfig = {
           newName: this.state.splitNames.toArray(),
           text: this.state.transformText,
         };
@@ -228,7 +257,7 @@ class TransformBox extends TerrainComponent<Props>
         break;
 
       case 'merge':
-        transform.args = {
+        transformArgsConfig = {
           mergeName: this.state.mergeName,
           newName: this.state.mergeNewName,
           text: this.state.transformText,
@@ -237,21 +266,26 @@ class TransformBox extends TerrainComponent<Props>
         break;
       default:
     }
-    return transform;
+    const transformConfig = {
+      name: transformName,
+      colName: this.props.columnName,
+      args: FileImportTypes._TransformArgs(transformArgsConfig),
+    };
+    return FileImportTypes._Transform(transformConfig);
   }
 
   public handleTransformClick()
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
-    const transformName = FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex];
-    const msg = this.transformErrorCheck(transformName);
+    const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
+    const transformName: string = TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex];
+    const msg: string = this.transformErrorCheck(transformName);
     if (msg)
     {
       alert(msg);
       return;
     }
 
-    const transform = this.setTransform(transformName);
+    const transform: Transform = this.getTransform(transformName);
     Actions.updatePreviewRows(transform);
     Actions.addTransform(transform);
 
@@ -341,7 +375,7 @@ class TransformBox extends TerrainComponent<Props>
             }
             <Dropdown
               selectedIndex={this.state.mergeIndex}
-              options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
+              options={this.props.columnNames.delete(this.props.columnId)}
               onChange={this.handleMergeIndexChange}
               canEdit={true}
             />
@@ -385,37 +419,40 @@ class TransformBox extends TerrainComponent<Props>
 
   public renderTransform()
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
     switch (this.props.datatype)
     {
-      case 'text':            // currently only strings have transform operations besides duplicate
-        return this.renderText(FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex]);
+      case 'text': // currently only strings have transform operations besides duplicate
+        return this.renderText(TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
       default:
-        return this.renderDefault(FileImportTypes.TRANSFORM_TYPES[datatype][this.state.transformTypeIndex]);
+        return this.renderDefault(TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex]);
     }
   }
 
   public render()
   {
-    const datatype = FileImportTypes.ELASTIC_TYPES.indexOf(this.props.datatype);
+    const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
     return (
       <div
         className='fi-transform-box'
-        style={backgroundColor(Colors().fileimport.preview.column.transform)}
       >
         <Dropdown
           selectedIndex={this.state.transformTypeIndex}
-          options={List(FileImportTypes.TRANSFORM_TYPES[datatype])}
+          options={List(TRANSFORM_TYPES[datatypeId])}
           onChange={this.handleTransformTypeChange}
           canEdit={true}
         />
         {this.renderTransform()}
-        <div
-          className='fi-transform-button'
-          onClick={this.handleTransformClick}
-        >
-          Transform
-        </div>
+        {
+          this.state.transformTypeIndex !== -1 &&
+          <span
+            className='fi-transform-button clickable'
+            onClick={this.handleTransformClick}
+            style={buttonColors()}
+          >
+            Apply
+          </span>
+        }
       </div>
     );
   }

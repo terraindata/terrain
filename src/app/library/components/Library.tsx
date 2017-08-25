@@ -44,13 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import * as _ from 'underscore';
-import TerrainAreaChart from '../../charts/components/TerrainAreaChart';
+import MultipleAreaChart from '../../charts/components/MultipleAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
-import UserActions from './../../users/data/UserActions';
 import { LibraryState } from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
@@ -111,8 +110,8 @@ class Library extends TerrainComponent<any>
 
   public componentDidMount()
   {
-    RolesActions.fetch();
-    UserActions.fetch();
+    this.props.roleActions.fetch();
+    this.props.userActions.fetch();
   }
 
   public getData()
@@ -129,9 +128,6 @@ class Library extends TerrainComponent<any>
     const { library: libraryState } = this.props;
     const { variants, selectedVariants } = libraryState;
 
-    let metricId = 0;
-    const metricName = 'Click Through Rate';
-
     const datasets = variants
       .filter((variant) =>
       {
@@ -139,8 +135,7 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        metricId += 1;
-        return { metric: { id: metricId, name: metricName }, data: this.getData() };
+        return { id: variant.id, label: variant.name, data: this.getData() };
       });
 
     return datasets.toMap();
@@ -288,12 +283,17 @@ class Library extends TerrainComponent<any>
                 algorithmActions: this.props.libraryAlgorithmActions,
                 variantActions: this.props.libraryVariantActions,
                 libraryActions: this.props.libraryActions,
+                roleActions: this.props.roleActions,
               }}
             /> : null}
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <TerrainAreaChart variants={variants} datasets={datasets} />
+            <MultipleAreaChart
+              datasets={datasets}
+              xDataKey={'time'}
+              yDataKey={'value'}
+            />
           </div> : null
         }
       </div>

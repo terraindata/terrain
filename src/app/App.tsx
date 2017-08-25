@@ -54,8 +54,8 @@ require('babel-polyfill');
 import './App.less';
 
 // Libraries
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 
 const Perf = require('react-addons-perf');
 
@@ -138,11 +138,11 @@ const links =
       text: 'Import',
       route: '/import',
     },
-    {
-      icon: <ReportingIcon />,
-      text: 'Analytics',
-      route: '/analytics',
-    },
+    // {
+    //   icon: <ReportingIcon />,
+    //   text: 'Analytics',
+    //   route: '/analytics',
+    // },
     // {
     //   icon: <ManualIcon />,
     //   text: 'Manual',

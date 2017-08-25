@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaTypes from '../SchemaTypes';
 const { Map, List } = Immutable;

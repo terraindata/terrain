@@ -48,9 +48,14 @@ import * as fs from 'fs';
 import * as sqlite3 from 'sqlite3';
 import * as request from 'supertest';
 import * as winston from 'winston';
+
 import App from '../../src/app/App';
+import ElasticConfig from '../../src/database/elastic/ElasticConfig';
+import ElasticController from '../../src/database/elastic/ElasticController';
+import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import { readFile } from '../Utils';
 
+let elasticDB: ElasticDB;
 let server;
 
 /* tslint:disable:max-line-length */
@@ -82,6 +87,20 @@ beforeAll(async (done) =>
 
   const app = new App(options);
   server = await app.start();
+
+  try
+  {
+    const config: ElasticConfig = {
+      hosts: ['http://localhost:9200'],
+    };
+
+    const elasticController: ElasticController = new ElasticController(config, 0, 'FileImportRouteTests');
+    elasticDB = elasticController.getTasty().getDB() as ElasticDB;
+  }
+  catch (e)
+  {
+    fail(e);
+  }
 
   const sql = await readFile('./midway/test/scripts/test.sql');
   const results = await new Promise((resolve, reject) =>
@@ -713,48 +732,59 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .send({
-        id: 1,
-        accessToken: 'AccessToken',
-        body: {
-          dbid: 1,
-          dbname: 'test_elastic_db',
-          tablename: 'fileImportTestTable',
-          contents: '[{"pkey":1,"column1":"hello","col2":"goodbye","col3":false,"col4":null}]',
-          filetype: 'json',
-          update: true,
-
-          originalNames: ['pkey', 'column1', 'col2', 'col3', 'col4'],
-          columnTypes:
-          {
-            pkey: { type: 'long' },
-            col1: { type: 'text' },
-            col3: { type: 'boolean' },
-            col4: { type: 'date' },
-          },
-          primaryKey: 'pkey',
-          transformations: [
-            {
-              name: 'rename',
-              colName: 'column1',
-              args: { newName: 'col1' },
-            },
-          ],
+      .field('accessToken', 'AccessToken')
+      .field('columnTypes', JSON.stringify({
+        pkey: { type: 'long' },
+        col1: { type: 'text' },
+        col3: { type: 'boolean' },
+        col4: { type: 'date' },
+      }))
+      .field('dbid', '1')
+      .field('dbname', 'test_elastic_db')
+      .attach('file', './midway/test/routes/fileImport/test_file.json')
+      .field('filetype', 'json')
+      .field('id', '1')
+      .field('originalNames', JSON.stringify(['pkey', 'column1', 'col2', 'col3', 'col4']))
+      .field('primaryKeys', JSON.stringify(['pkey']))
+      .field('tablename', 'fileImportTestTable')
+      .field('transformations', JSON.stringify([
+        {
+          name: 'rename',
+          colName: 'column1',
+          args: { newName: 'col1' },
         },
-      })
+      ]))
+      .field('update', 'false')
       .expect(200)
-      .then((response) =>
+      .then(async (response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response.text);
-        expect(respData.length).toBeGreaterThan(0);
-        expect(respData[0])
-          .toMatchObject({
-            pkey: 1,
-            col1: 'hello',
-            col3: false,
-            col4: null,
-          });
+        try
+        {
+          await elasticDB.refresh('test_elastic_db');
+          const result: object = await elasticDB.query([
+            {
+              index: 'test_elastic_db',
+              type: 'fileImportTestTable',
+              body: {
+                query: {},
+                sort: [{ pkey: 'asc' }],
+              },
+            },
+          ]);
+          expect(result['hits']['hits'].length).toBeGreaterThan(0);
+          expect(result['hits']['hits'][0]['_source'])
+            .toMatchObject({
+              pkey: 1,
+              col1: 'hello',
+              col3: false,
+              col4: null,
+            });
+        }
+        catch (e)
+        {
+          fail(e);
+        }
       })
       .catch((error) =>
       {
@@ -766,50 +796,61 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .send({
-        id: 1,
-        accessToken: 'AccessToken',
-        body: {
-          dbid: 1,
-          dbname: 'test_elastic_db',
-          tablename: 'fileImportTestTable',
-          contents: 'pkey,column1,column2,sillyname,column4\n1,hi,hello,false,1970-01-01\n2,bye,goodbye,,',
-          filetype: 'csv',
-          update: true,
-
-          csvHeaderMissing: false,
-          originalNames: ['pkey', 'column1', 'column2', 'column3', 'column4'],
-          columnTypes:
-          {
-            pkey: { type: 'long' },
-            column1: { type: 'text' },
-            column3: { type: 'boolean' },
-            column4: { type: 'date' },
-          },
-          primaryKey: 'pkey',
-          transformations: [],
-        },
-      })
+      .field('accessToken', 'AccessToken')
+      .field('columnTypes', JSON.stringify({
+        pkey: { type: 'long' },
+        column1: { type: 'text' },
+        column3: { type: 'boolean' },
+        column4: { type: 'date' },
+      }))
+      .field('dbid', '1')
+      .field('dbname', 'test_elastic_db')
+      .attach('file', './midway/test/routes/fileImport/test_file.csv')
+      .field('filetype', 'csv')
+      .field('hasCsvHeader', 'true')
+      .field('id', '1')
+      .field('originalNames', JSON.stringify(['pkey', 'column1', 'column2', 'column3', 'column4']))
+      .field('primaryKeys', JSON.stringify(['pkey']))
+      .field('tablename', 'fileImportTestTable')
+      .field('transformations', JSON.stringify([]))
+      .field('update', 'false')
       .expect(200)
-      .then((response) =>
+      .then(async (response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response.text);
-        expect(respData.length).toBeGreaterThan(0);
-        expect(respData[0])
-          .toMatchObject({
-            pkey: 1,
-            column1: 'hi',
-            column3: false,
-            column4: new Date(Date.parse('1970-01-01')).toISOString(),
-          });
-        expect(respData[1])
-          .toMatchObject({
-            pkey: 2,
-            column1: 'bye',
-            column3: null,
-            column4: null,
-          });
+        try
+        {
+          await elasticDB.refresh('test_elastic_db');
+          const result: object = await elasticDB.query([
+            {
+              index: 'test_elastic_db',
+              type: 'fileImportTestTable',
+              body: {
+                query: {},
+                sort: [{ pkey: 'desc' }],
+              },
+            },
+          ]);
+          expect(result['hits']['hits'].length).toBeGreaterThanOrEqual(2);
+          expect(result['hits']['hits'][0]['_source'])
+            .toMatchObject({
+              pkey: 3,
+              column1: 'hi',
+              column3: false,
+              column4: new Date(Date.parse('1970-01-01')).toISOString(),
+            });
+          expect(result['hits']['hits'][1]['_source'])
+            .toMatchObject({
+              pkey: 2,
+              column1: 'bye',
+              column3: null,
+              column4: null,
+            });
+        }
+        catch (e)
+        {
+          fail(e);
+        }
       })
       .catch((error) =>
       {
@@ -821,28 +862,29 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .send({
-        id: 1,
-        accessToken: 'AccessToken',
-        body: {
-          dbid: 1,
-          dbname: 'test_elastic_db',
-          tablename: 'fileImportTestTable',
-          contents: '{"pkey":1,"column1":"hello","column2":"goodbye"}',
-          filetype: 'json',
-          update: true,
-
-          originalNames: ['pkey', 'column1', 'column2'],
-          columnTypes:
-          {
-            pkey: { type: 'long' },
-            column1: { type: 'text' },
-            column2: { type: 'text' },
-          },
-          primaryKey: 'pkey',
-          transformations: [],
+      .field('accessToken', 'AccessToken')
+      .field('columnTypes', JSON.stringify({
+        pkey: { type: 'long' },
+        col1: { type: 'text' },
+        col3: { type: 'boolean' },
+        col4: { type: 'date' },
+      }))
+      .field('dbid', '1')
+      .field('dbname', 'test_elastic_db')
+      .attach('file', './midway/test/routes/fileImport/test_file_bad.json')
+      .field('filetype', 'json')
+      .field('id', '1')
+      .field('originalNames', JSON.stringify(['pkey', 'column1', 'col2', 'col3', 'col4']))
+      .field('primaryKeys', JSON.stringify(['pkey']))
+      .field('tablename', 'fileImportTestTable')
+      .field('transformations', JSON.stringify([
+        {
+          name: 'rename',
+          colName: 'column1',
+          args: { newName: 'col1' },
         },
-      })
+      ]))
+      .field('update', 'false')
       .expect(400)
       .then((response) =>
       {
@@ -878,7 +920,7 @@ describe('File import templates route tests', () =>
             column1: { type: 'text' },
             column2: { type: 'text' },
           },
-          primaryKey: 'pkey',
+          primaryKeys: ['pkey'],
           transformations: [],
         },
       })
@@ -904,7 +946,7 @@ describe('File import templates route tests', () =>
               column1: { type: 'text' },
               column2: { type: 'text' },
             },
-            primaryKey: 'pkey',
+            primaryKeys: ['pkey'],
             transformations: [],
           });
       })
@@ -943,7 +985,7 @@ describe('File import templates route tests', () =>
             column1: { type: 'text' },
             column2: { type: 'text' },
           },
-          primaryKey: 'pkey',
+          primaryKeys: ['pkey'],
           transformations: [],
         });
       })

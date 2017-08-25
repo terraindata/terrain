@@ -90,6 +90,7 @@ export interface Props
   algorithmActions: any;
   variantActions: any;
   libraryActions: any;
+  roleActions: any;
 }
 
 class LibraryInfoColumn extends TerrainComponent<Props>
@@ -197,6 +198,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       me={this.state.me}
       groupId={this.props.group.id}
       key={user.id}
+      roleActions={this.props.roleActions}
     />;
   }
 
@@ -268,7 +270,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             selectedIndex={dbs && dbs.findIndex(
               (db) => db.id === this.props.group.db.id,
             )}
-            options={dbs.map((db) => db.name + ` (${db.type})`).toList()}
+            options={dbs.map((db) => String(db.name) + ` (${db.type})`).toList()}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isSuperUser}
             className='bic-db-dropdown'

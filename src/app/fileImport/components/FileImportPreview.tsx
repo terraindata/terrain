@@ -47,9 +47,10 @@ THE SOFTWARE.
 // tslint:disable:no-empty strict-boolean-expressions no-console
 
 import * as Immutable from 'immutable';
+import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { buttonColors } from '../../common/Colors';
+import { buttonColors, Colors } from '../../common/Colors';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -62,43 +63,58 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
 const { List } = Immutable;
 
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
+
 export interface Props
 {
   previewRows: List<List<string>>;
-  columnsCount: number;
-  primaryKey: number;
+  primaryKeys: List<number>;
+  primaryKeyDelimiter: string;
 
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
-  columnTypes: List<IMMap<string, any>>;
+  columnTypes: List<ColumnTypesTree>;
 
   columnOptions: List<string>;
-  templates: List<FileImportTypes.Template>;
-  transforms: List<FileImportTypes.Transform>;
+  templates: List<Template>;
+  transforms: List<Transform>;
+
   uploadInProgress: boolean;
   elasticUpdate: boolean;
+  exporting: boolean;
+
+  query?: string;
+  variantName?: string;
 }
 
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    templateId: number,
-    templateText: string,
+    deleteTemplateId: number,
+    loadTemplateId: number,
+    loadedTemplateId: number,
+    templateName: string,
     templateOptions: List<string>,
     editColumnId: number,
+    showingDelimTextBox: boolean,
   } = {
-    templateId: -1,
-    templateText: '',
+    deleteTemplateId: -1,
+    loadTemplateId: -1,
+    loadedTemplateId: -1,
+    templateName: '',
     templateOptions: List([]),
     editColumnId: -1,
+    showingDelimTextBox: false,
   };
 
   public componentDidMount()
   {
-    Actions.fetchTemplates();
+    Actions.fetchTemplates(this.props.exporting);
     this.setState({
-      templateOptions: this.props.templates.map((template, i) => template.name),
+      templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
   }
 
@@ -107,7 +123,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (!this.props.templates.equals(nextProps.templates))
     {
       this.setState({
-        templateOptions: nextProps.templates.map((template, i) => String(template.id) + ': ' + template.name),
+        templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
   }
@@ -124,16 +140,15 @@ class FileImportPreview extends TerrainComponent<Props>
 
     if (this.props.columnNames.get(columnId) !== localColumnName)
     {
-      Actions.setColumnName(columnId, this.props.columnNames.get(columnId), localColumnName);
-      Actions.addTransform(
+      Actions.setColumnName(columnId, localColumnName);
+      Actions.addTransform(FileImportTypes._Transform(
         {
           name: 'rename',
           colName: this.props.columnNames.get(columnId),
-          args: {
+          args: FileImportTypes._TransformArgs({
             newName: localColumnName,
-          },
-        },
-      );
+          }),
+        }));
       return true;
     }
   }
@@ -145,31 +160,85 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleTemplateChange(templateId: number)
+  public handleElasticUpdateChange()
+  {
+    Actions.changeElasticUpdate();
+  }
+
+  public deletePrimaryKey(columnName: string)
+  {
+    Actions.changePrimaryKey(this.props.columnNames.indexOf(columnName));
+  }
+
+  public changePrimaryKeyDelimiter(delim: string)
+  {
+    Actions.changePrimaryKeyDelimiter(delim);
+  }
+
+  public showDelimTextBox()
   {
     this.setState({
-      templateId,
+      showingDelimTextBox: true,
     });
   }
 
-  public handleAutocompleteTemplateChange(templateText: string)
+  public onDelimChange()
   {
     this.setState({
-      templateText,
+      showingDelimTextBox: false,
+    });
+  }
+
+  public handleLoadTemplateChange(loadTemplateId: number)
+  {
+    this.setState({
+      loadTemplateId,
+    });
+  }
+
+  public handleDeleteTemplateChange(deleteTemplateId: number)
+  {
+    this.setState({
+      deleteTemplateId,
+    });
+  }
+
+  public handleAutocompleteTemplateChange(templateName: string)
+  {
+    this.setState({
+      templateName,
+    });
+  }
+
+  public handleDeleteTemplate()
+  {
+    if (this.props.templates.size === 0)
+    {
+      alert('There are no templates to delete');
+      return;
+    }
+    else if (this.state.deleteTemplateId === -1)
+    {
+      alert('Please select a template to delete');
+      return;
+    }
+    Actions.deleteTemplate(this.props.templates.get(this.state.deleteTemplateId).templateId, this.props.exporting);
+    this.setState({
+      deleteTemplateId: -1,
     });
   }
 
   public handleLoadTemplate()
   {
-    if (this.state.templateId === -1)
+    if (this.state.loadTemplateId === -1)
     {
       alert('Please select a template to load');
       return;
     }
-    const templateNames = List(this.props.templates.get(this.state.templateId).originalNames);
-    let isCompatible = true;
-    const unmatchedTemplateNames = [];
-    const unmatchedTableNames = this.props.columnNames.toArray();
+    const templateNames: Immutable.List<string> = this.props.templates.get(this.state.loadTemplateId).originalNames;
+    let isCompatible: boolean = true;
+    const unmatchedTemplateNames: string[] = [];
+    const unmatchedTableNames: string[] = this.props.columnNames.toArray();
     templateNames.map((templateName) =>
     {
       if (!this.props.columnNames.contains(templateName))
@@ -189,75 +258,199 @@ class FileImportPreview extends TerrainComponent<Props>
         + JSON.stringify(unmatchedTableNames));
       return;
     }
-    Actions.loadTemplate(this.state.templateId);
+    Actions.loadTemplate(this.state.loadTemplateId);
+    this.setState({
+      loadedTemplateId: this.props.templates.get(this.state.loadTemplateId).templateId,
+    });
   }
 
   public handleSaveTemplate()
   {
-    if (!this.state.templateText)
+    if (!this.state.templateName)
     {
       alert('Please enter a template name');
       return;
     }
-    Actions.saveTemplate(this.state.templateText);
+    Actions.saveTemplate(this.state.templateName, this.props.exporting);
   }
 
-  public handleElasticUpdateChange()
+  public handleUpdateTemplate()
   {
-    Actions.changeElasticUpdate();
+    if (this.state.loadedTemplateId === -1)
+    {
+      alert('No template loaded');
+      return;
+    }
+    Actions.updateTemplate(this.state.loadedTemplateId, this.props.exporting);
   }
 
   public handleUploadFile()
   {
-    Actions.uploadFile();
+    if (this.props.exporting)
+    {
+      Actions.exportFile(this.props.query, true, this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
+    }
+    else
+    {
+      Actions.importFile();
+    }
   }
 
   public renderTemplate()
   {
     return (
       <div
-        className='fi-preview-template'
+        className='flex-container fi-preview-template'
       >
+        {
+          this.state.loadedTemplateId === -1 ?
+            <div
+              className='flex-container fi-preview-template-wrapper'
+            >
+              <div
+                className='flex-grow fi-preview-template-button'
+                onClick={this.handleLoadTemplate}
+                style={buttonColors()}
+                ref='fi-preview-template-button-load'
+              >
+                Load Template
+              </div>
+              <Dropdown
+                selectedIndex={this.state.loadTemplateId}
+                options={this.state.templateOptions}
+                onChange={this.handleLoadTemplateChange}
+                className={'flex-grow fi-preview-template-load-dropdown'}
+                canEdit={true}
+              />
+            </div>
+            :
+            <div
+              className='flex-container fi-preview-template-wrapper'
+            >
+              <div
+                className='flex-grow fi-preview-template-button'
+                onClick={this.handleUpdateTemplate}
+                style={buttonColors()}
+                ref='fi-preview-template-button-update'
+              >
+                Update
+                </div>
+            </div>
+        }
         <div
-          className='fi-preview-load'
+          className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='fi-load-button'
-            onClick={this.handleLoadTemplate}
-            style={buttonColors()}
-            ref='fi-load-button'
-          >
-            Load Template
-          </div>
-          <Dropdown
-            selectedIndex={this.state.templateId}
-            options={this.state.templateOptions}
-            onChange={this.handleTemplateChange}
-            className={'fi-load-dropdown'}
-            canEdit={true}
-          />
-        </div>
-
-        <div
-          className='fi-preview-save'
-        >
-          <div
-            className='fi-save-button'
+            className='flex-grow fi-preview-template-button'
             onClick={this.handleSaveTemplate}
             style={buttonColors()}
-            ref='fi-save-button'
+            ref='fi-preview-template-button-save'
           >
             Save Template
           </div>
           <Autocomplete
-            value={this.state.templateText}
+            value={this.state.templateName}
             options={null}
             onChange={this.handleAutocompleteTemplateChange}
             placeholder={'template name'}
-            className={'fi-save-autocomplete'}
+            className={'flex-grow fi-preview-template-save-autocomplete'}
             disabled={false}
           />
         </div>
+
+        <div
+          className='flex-container fi-preview-template-wrapper'
+        >
+          <div
+            className='flex-grow fi-preview-template-button'
+            onClick={this.handleDeleteTemplate}
+            style={buttonColors()}
+            ref='fi-preview-template-button-delete'
+          >
+            Delete Template
+          </div>
+          <Dropdown
+            selectedIndex={this.state.deleteTemplateId}
+            options={this.state.templateOptions}
+            onChange={this.handleDeleteTemplateChange}
+            className={'flex-grow fi-preview-template-delete-dropdown'}
+            canEdit={true}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderPrimaryKeys()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-pkeys'
+      >
+        {
+          this.props.primaryKeys.size > 0 ?
+            this.props.primaryKeys.map((pkey, index) =>
+              <div
+                key={pkey}
+                className='flex-shrink flex-container fi-preview-pkeys-wrapper'
+              >
+                <div
+                  className='flex-shrink fi-preview-pkeys-pkey'
+                  style={{
+                    background: Colors().bg1,
+                    text: Colors().text1,
+                  }}
+                >
+                  {
+                    this.props.columnNames.get(pkey)
+                  }
+                  <span
+                    className='fi-preview-pkeys-pkey-delete clickable'
+                    onClick={this._fn(this.deletePrimaryKey, this.props.columnNames.get(pkey))}
+                  >
+                    x
+                  </span>
+                </div>
+                {
+                  index !== this.props.primaryKeys.size - 1 &&
+                  <div
+                    className='flex-shrink fi-preview-pkeys-delim'
+                    onClick={this.showDelimTextBox}
+                  >
+                    {
+                      this.state.showingDelimTextBox ?
+                        <Autocomplete
+                          value={this.props.primaryKeyDelimiter}
+                          options={null}
+                          onChange={this.changePrimaryKeyDelimiter}
+                          placeholder={'delimiter'}
+                          className={'fi-preview-pkeys-autocomplete'}
+                          disabled={false}
+                          onBlur={this.onDelimChange}
+                        />
+                        :
+                        <span
+                          className='clickable'
+                        >
+                          {
+                            this.props.primaryKeyDelimiter
+                          }
+                        </span>
+                    }
+                  </div>
+                }
+              </div>,
+            )
+            :
+            <div
+              className='flex-shrink fi-preview-pkeys-nokey'
+              style={{
+                text: Colors().text1,
+              }}
+            >
+              No Primary Keys Selected
+            </div>
+        }
       </div>
     );
   }
@@ -280,9 +473,10 @@ class FileImportPreview extends TerrainComponent<Props>
                 columnNames={this.props.columnNames}
                 isIncluded={this.props.columnsToInclude.get(key)}
                 columnType={this.props.columnTypes.get(key)}
-                isPrimaryKey={this.props.primaryKey === key}
+                isPrimaryKey={this.props.primaryKeys.includes(key)}
                 columnOptions={this.props.columnOptions}
                 editing={key === this.state.editColumnId}
+                exporting={this.props.exporting}
                 handleEditColumnChange={this.handleEditColumnChange}
                 onColumnNameChange={this.onColumnNameChange}
               />,
@@ -305,32 +499,20 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
-  public render()
+  public renderUpload()
   {
-    return (
+    const upload =
       <div
-        className='fi-preview'
+        className='fi-preview-import-button'
+        onClick={this.handleUploadFile}
+        style={buttonColors()}
       >
-        {this.renderTemplate()}
-        {this.renderTable()}
-        <div
-          className='fi-preview-update'
-        >
-          update
-          <CheckBox
-            checked={this.props.elasticUpdate}
-            onChange={this.handleElasticUpdateChange}
-          />
-        </div>
-        <div
-          className='fi-preview-import-button'
-          onClick={this.handleUploadFile}
-          style={buttonColors()}
-        >
-          Import
-        </div>
-        {
-          this.props.uploadInProgress &&
+        {this.props.exporting ? 'Export' : 'Import'}
+      </div>;
+
+    return (
+      this.props.exporting ?
+        this.props.uploadInProgress ?
           <div className='fi-preview-loading-container'>
             <Loading
               width={100}
@@ -340,7 +522,78 @@ class FileImportPreview extends TerrainComponent<Props>
               onLoadedEnd={null}
             />
           </div>
+          :
+          upload
+        :
+        upload
+    );
+  }
+
+  public renderTopBar()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-topbar'
+      >
+        {
+          !this.props.exporting &&
+          this.renderPrimaryKeys()
         }
+        {this.renderTemplate()}
+      </div>
+    );
+  }
+
+  public renderBottomBar()
+  {
+    return (
+      <div
+        className='fi-import-button-wrapper'
+      >
+        {
+          !this.props.exporting &&
+          <div
+            className='fi-preview-update'
+          >
+            <CheckBox
+              checked={this.props.elasticUpdate}
+              onChange={this.handleElasticUpdateChange}
+            />
+            <span
+              className='clickable'
+              onClick={this.handleElasticUpdateChange}
+            >
+              Join against any existing entries
+              </span>
+          </div>
+        }
+        {
+          this.props.uploadInProgress ?
+            <div className='fi-preview-loading-container'>
+              <Loading
+                width={100}
+                height={100}
+                loading={this.props.uploadInProgress}
+                loaded={false}
+                onLoadedEnd={null}
+              />
+            </div>
+            :
+            this.renderUpload()
+        }
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div
+        className='fi-preview'
+      >
+        {this.renderTopBar()}
+        {this.renderTable()}
+        {this.renderBottomBar()}
       </div>
     );
   }

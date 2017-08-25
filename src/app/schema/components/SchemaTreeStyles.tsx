@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import Colors from '../../common/Colors';
 import Styles from '../../Styles';
 const color = require('color');

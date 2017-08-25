@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands
 
 import { List } from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';

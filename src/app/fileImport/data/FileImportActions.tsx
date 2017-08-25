@@ -43,44 +43,60 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { SchemaActions } from '../../schema/data/SchemaStore';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
+
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
 const FileImportActions =
   {
     changeServer:
-    (connectionId: number, name: string) =>
-      $(ActionTypes.changeServer, { connectionId, name }),
+    (serverId: number, name: string) =>
+      $(ActionTypes.changeServer, { serverId, name }),
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+    changeDbName:
+    (dbName: string) =>
+      $(ActionTypes.changeDbName, { dbName }),
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+    changeTableName:
+    (tableName: string) =>
+      $(ActionTypes.changeTableName, { tableName }),
+
+    changeServerDbTable:
+    (serverId: number, dbName: string, tableName: string) =>
+      $(ActionTypes.changeServerDbTable, { serverId, dbName, tableName }),
 
     changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
+    (hasCsvHeader: boolean) =>
+      $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
 
     changePrimaryKey:
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
 
-    chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
+    changePrimaryKeyDelimiter:
+    (delim: string) =>
+      $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
 
-    uploadFile:
+    chooseFile:
+    (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+      $(ActionTypes.chooseFile, { filetype, preview, originalNames }),
+
+    importFile:
     () =>
-      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+      $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress, fetchSchema: SchemaActions.fetch }),
+
+    exportFile:
+    (query: string, rank: boolean, downloadFilename: string) =>
+      $(ActionTypes.exportFile, { query, rank, downloadFilename }),
 
     addTransform:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
@@ -88,32 +104,44 @@ const FileImportActions =
       $(ActionTypes.setColumnToInclude, { columnId }),
 
     setColumnName:
-    (columnId: number, colName: string, newName: string) =>
-      $(ActionTypes.setColumnName, { columnId, colName, newName }),
+    (columnId: number, newName: string) =>
+      $(ActionTypes.setColumnName, { columnId, newName }),
 
     setColumnType:
-    (columnId: number, recursionDepth: number, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
+    (columnId: number, recursionDepth: number, type: string) =>
+      $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
     updatePreviewRows:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateText: string) =>
-      $(ActionTypes.saveTemplate, { templateText, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateName: string, exporting: boolean) =>
+      $(ActionTypes.saveTemplate, { templateName, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+
+    updateTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.updateTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
 
     fetchTemplates:
-    () =>
-      $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
+    (exporting: boolean) =>
+      $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),
 
     setTemplates:
-    (templates: List<FileImportTypes.Template>) =>
+    (templates: List<Template>) =>
       $(ActionTypes.setTemplates, { templates }),
 
     loadTemplate:
     (templateId: number) =>
       $(ActionTypes.loadTemplate, { templateId }),
+
+    deleteTemplate:
+    (templateId: number, exporting: boolean) =>
+      $(ActionTypes.deleteTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+
+    saveFile:
+    (file: File, filetype: string) =>
+      $(ActionTypes.saveFile, { file, filetype }),
 
     changeUploadInProgress:
     (uploading: boolean) =>

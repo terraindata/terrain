@@ -47,9 +47,9 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-unused-expression member-access max-line-length
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
@@ -306,7 +306,6 @@ class CreateCardTool extends TerrainComponent<Props>
     }
 
     const cardTypeList = this.getCardTypeList();
-
     return (
       <div
         className={classes}
@@ -324,7 +323,7 @@ class CreateCardTool extends TerrainComponent<Props>
         <CardDropArea
           index={this.props.index}
           keyPath={this.props.keyPath}
-          accepts={this.props.accepts}
+          accepts={this.getCardTypeList()}
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
         />

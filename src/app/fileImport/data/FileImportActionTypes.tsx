@@ -48,12 +48,17 @@ import Util from './../../util/Util';
 const FileImportActionTypes =
   {
     changeServer: '',
+    changeDbName: '',
+    changeTableName: '',
+    changeServerDbTable: '',
     changeDbText: '',
     changeTableText: '',
     changeHasCsvHeader: '',
     changePrimaryKey: '',
+    changePrimaryKeyDelimiter: '',
     chooseFile: '',
-    uploadFile: '',
+    importFile: '',
+    exportFile: '',
     addTransform: '',
     setColumnToInclude: '',
     setColumnName: '',
@@ -63,6 +68,9 @@ const FileImportActionTypes =
     fetchTemplates: '',
     setTemplates: '',
     loadTemplate: '',
+    deleteTemplate: '',
+    updateTemplate: '',
+    saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
   };

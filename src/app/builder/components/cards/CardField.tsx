@@ -45,11 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions interface-name no-var-requires
-
 import * as $ from 'jquery';
+import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
-import { Display, RowDisplay } from '../../../../blocks/displays/Display';
+import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
@@ -114,6 +115,7 @@ const DefaultMoveState: IMoveState =
 
 const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
+@Radium
 class CardField extends TerrainComponent<Props>
 {
   public state: IMoveState = DefaultMoveState;
@@ -324,6 +326,10 @@ class CardField extends TerrainComponent<Props>
       };
     }
 
+    const handleToolStyle = _.extend({},
+      this.state.moving ? getStyle('color', Colors().active) : getStyle('color', Colors().text1, Colors().inactiveHover),
+    );
+
     const { row } = this.props;
 
     const isData = typeof this.props.data[this.props.row.inner['key']] !== 'string';
@@ -381,11 +387,16 @@ class CardField extends TerrainComponent<Props>
           }
           {
             renderTools && this.props.canEdit &&
-            <div className='card-field-tools-left'>
+            <div
+              className='card-field-tools-left'
+              style={this.state.moving ? CARD_FIELD_MOVING_STYLE : {}}
+            >
               <div className='card-field-tools-left-inner'>
                 <div
                   className='card-field-handle'
                   onMouseDown={this.handleHandleMousedown}
+                  style={handleToolStyle}
+                  key={'handle-tool'}
                 >
                   ⋮⋮
                   </div>
@@ -423,6 +434,8 @@ class CardField extends TerrainComponent<Props>
                     className='card-field-add'
                     onClick={this.addField}
                     data-tip={'Add another'}
+                    style={ADD_TOOL_STYLE}
+                    key={'add-tool'}
                   >
                     <AddIcon />
                   </div>
@@ -441,6 +454,8 @@ class CardField extends TerrainComponent<Props>
                       className='card-field-remove'
                       onClick={this.removeField}
                       data-tip={'Remove'}
+                      style={REMOVE_TOOL_STYLE}
+                      key={'remove-tool'}
                     >
                       <RemoveIcon />
                     </div>
@@ -475,5 +490,20 @@ class CardField extends TerrainComponent<Props>
     );
   }
 }
+
+const REMOVE_TOOL_STYLE = _.extend({},
+  getStyle('fill', Colors().text1),
+  borderColor(Colors().text1),
+);
+
+const ADD_TOOL_STYLE = _.extend({},
+  getStyle('fill', Colors().text1),
+  backgroundColor('transparent', Colors().inactiveHover),
+  borderColor(Colors().text1),
+);
+
+const CARD_FIELD_MOVING_STYLE = _.extend({},
+  borderColor(Colors().active),
+);
 
 export default CardField;

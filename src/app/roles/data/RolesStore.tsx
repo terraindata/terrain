@@ -47,14 +47,12 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
 
 import RolesReducers from './RolesReducers';
 
-const RolesStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  RolesReducers,
-  {}), Immutable.Map({})), Immutable.Map({}));
+const RolesStore = Redux.createStore(RolesReducers);
 
 export default RolesStore;

@@ -55,7 +55,7 @@ THE SOFTWARE.
 // import * as $ from 'jquery';
 // import * as React from 'react';
 // import * as ReactDOM from 'react-dom';
-// import * as _ from 'underscore';
+// import * as _ from 'lodash';
 // import Util from '../../../util/Util';
 // import Actions from '../../data/BuilderActions';
 // import Card from '../cards/Card';
