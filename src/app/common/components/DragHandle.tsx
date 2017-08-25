@@ -44,10 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { Colors, getStyle } from '../../common/Colors';
+import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DragHandleStyle.less';
+
 const Handle = require('./../../../images/icon_drag.svg');
 
 export interface Props
@@ -55,26 +60,42 @@ export interface Props
   hiddenByDefault?: boolean;
   showWhenHoveringClassName?: string;
   useAltColor?: boolean;
-  connectDragSource?: (el: El) => El
+  connectDragSource?: (el: El) => El;
 }
-
 
 class DragHandle extends TerrainComponent<Props>
 {
   public render()
   {
+    const dragHandleStyle = {
+      '.drag-icon': {
+        fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
+        opacity: this.props.hiddenByDefault ? 0 : 1,
+      },
+      '.drag-icon:hover': {
+        fill: Colors().inactiveHover,
+        opacity: 1,
+      },
+      '.drag-icon:active': {
+        fill: Colors().active,
+      },
+      '.builder-title-bar:hover .drag-icon': {
+        opacity: '1 !important' as any,
+      },
+    };
     return (
       <div>
-        <Handle 
-        	className= {classNames({
-        		'drag-icon': true,
-        		'hidden': this.props.hiddenByDefault, 
-        	})}
-      	/> 
+        <Handle
+          className={classNames({
+            'drag-icon': true,
+            'hidden': this.props.hiddenByDefault,
+          })}
+        />
+        <StyleTag style={dragHandleStyle} />
       </div>
     );
   }
+
 }
 
 export default DragHandle;
-

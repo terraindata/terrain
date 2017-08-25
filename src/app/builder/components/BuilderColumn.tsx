@@ -63,13 +63,12 @@ const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
 
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import CardsColumn from './cards/CardsColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsArea from './results/ResultsArea';
-import DragHandle from '../../common/components/DragHandle';
-
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -330,12 +329,14 @@ const BuilderColumn = createReactClass<any, any>(
                 </div>
               )
             }
+            <div ref='handle' className='builder-title-bar-drag'>
+              <DragHandle hiddenByDefault={true} showWhenHoveringClassName='builder-title-bar' />
+            </div>
             <div
               className='builder-title-bar-title'
               style={fontColor(Colors().text2)}
             >
-              <DragHandle />
-              <span ref='handle'>
+              <span>
                 {
                   COLUMNS[this.state.column]
                 }
