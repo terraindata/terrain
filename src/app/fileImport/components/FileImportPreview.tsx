@@ -259,7 +259,7 @@ class FileImportPreview extends TerrainComponent<Props>
       return;
     }
 
-    Actions.loadTemplate(getTemplateId(templateName));
+    Actions.applyTemplate(getTemplateId(templateName));
     this.setState({
       showingApplyTemplate: false,
       appliedTemplateName: templateName,
@@ -382,10 +382,10 @@ class FileImportPreview extends TerrainComponent<Props>
           className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='flex-grow fi-preview-template-button'
+            className='flex-grow fi-preview-template-button button'
             onClick={this.showApplyTemplate}
             style={buttonColors()}
-            ref='fi-preview-template-button-load'
+            ref='fi-preview-template-button-apply'
           >
             Load Template
           </div>
@@ -394,7 +394,7 @@ class FileImportPreview extends TerrainComponent<Props>
           className='flex-container fi-preview-template-wrapper'
         >
           <div
-            className='flex-grow fi-preview-template-button'
+            className='flex-grow fi-preview-template-button button'
             onClick={this.showSaveTemplate}
             style={buttonColors()}
             ref='fi-preview-template-button-save'
@@ -526,7 +526,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const upload =
       <div
-        className='fi-preview-import-button'
+        className='fi-preview-import-button button'
         onClick={this.handleUploadFile}
         style={buttonColors()}
       >

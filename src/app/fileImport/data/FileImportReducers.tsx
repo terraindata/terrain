@@ -455,7 +455,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
     return state;
   };
 
-FileImportReducers[ActionTypes.loadTemplate] =
+FileImportReducers[ActionTypes.applyTemplate] =
   (state, action) =>
   {
     const index = state.templates.findKey((temp) => temp.templateId === action.payload.templateId);

@@ -155,9 +155,9 @@ const FileImportActions =
     (templates: List<Template>) =>
       $(ActionTypes.setTemplates, { templates }),
 
-    loadTemplate:
+    applyTemplate:
     (templateId: number) =>
-      $(ActionTypes.loadTemplate, { templateId }),
+      $(ActionTypes.applyTemplate, { templateId }),
 
     deleteTemplate:
     (templateId: number, exporting: boolean) =>

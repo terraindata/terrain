@@ -527,7 +527,7 @@ class FileImport extends TerrainComponent<any>
         >
           <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
           <div
-            className='fi-content-choose-button'
+            className='fi-content-choose-button large-button'
             onClick={this.handleSelectFileButtonClick}
             style={buttonColors()}
             ref='fi-content-choose-button'
@@ -614,7 +614,7 @@ class FileImport extends TerrainComponent<any>
         {
           stepId > 0 &&
           <div
-            className='fi-back-button'
+            className='fi-back-button button'
             onClick={this.decrementStep}
             style={buttonColors()}
             ref='fi-back-button'
@@ -625,7 +625,7 @@ class FileImport extends TerrainComponent<any>
         {
           stepId > 1 && stepId < 5 &&
           <div
-            className='fi-next-button'
+            className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
             style={nextEnabled ?
               buttonColors()
