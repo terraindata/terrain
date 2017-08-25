@@ -67,10 +67,6 @@ const FileImportActions =
     (tableName: string) =>
       $(ActionTypes.changeTableName, { tableName }),
 
-    changeServerDbTable:
-    (serverId: number, dbName: string, tableName: string) =>
-      $(ActionTypes.changeServerDbTable, { serverId, dbName, tableName }),
-
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>
       $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
@@ -104,9 +100,11 @@ const FileImportActions =
       }),
 
     exportFile:
-    (query: string, rank: boolean, downloadFilename: string) =>
+    (query: string, serverId: number, dbName: string, rank: boolean, downloadFilename: string) =>
       $(ActionTypes.exportFile, {
         query,
+        serverId,
+        dbName,
         rank,
         downloadFilename,
       }),

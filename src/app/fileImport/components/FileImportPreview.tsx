@@ -55,6 +55,7 @@ import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
+import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -86,6 +87,8 @@ export interface Props
   exporting: boolean;
 
   query?: string;
+  dbName?: string;
+  serverId?: number;
   variantName?: string;
 }
 
@@ -99,6 +102,7 @@ class FileImportPreview extends TerrainComponent<Props>
     templateName: string,
     templateOptions: List<string>,
     showingDelimTextBox: boolean,
+    previewErrorMsg: string,
   } = {
     deleteTemplateId: -1,
     loadTemplateId: -1,
@@ -106,6 +110,7 @@ class FileImportPreview extends TerrainComponent<Props>
     templateName: '',
     templateOptions: List([]),
     showingDelimTextBox: false,
+    previewErrorMsg: '',
   };
 
   public componentDidMount()
@@ -124,6 +129,13 @@ class FileImportPreview extends TerrainComponent<Props>
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
+  }
+
+  public setError(msg: string)
+  {
+    this.setState({
+      previewErrorMsg: msg,
+    });
   }
 
   public onColumnNameChange(columnId: number, localColumnName: string): boolean
@@ -279,7 +291,13 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      Actions.exportFile(this.props.query, true, this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
+      if (this.props.dbName === undefined || this.props.dbName === '')
+      {
+        this.setError('Index must be selected in order to export results');
+        return;
+      }
+      Actions.exportFile(this.props.query, this.props.serverId, this.props.dbName, true,
+        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
     }
     else
     {
@@ -574,6 +592,22 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderError()
+  {
+    const { previewErrorMsg } = this.state;
+    if (this.props.exporting)
+    {
+      return (
+        <Modal
+          open={!!previewErrorMsg}
+          message={previewErrorMsg}
+          error={true}
+          onClose={this._fn(this.setError, '')}
+        />
+      );
+    }
+  }
+
   public render()
   {
     return (
@@ -583,6 +617,7 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderTopBar()}
         {this.renderTable()}
         {this.renderBottomBar()}
+        {this.renderError()}
       </div>
     );
   }

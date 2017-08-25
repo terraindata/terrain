@@ -55,7 +55,6 @@ import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
@@ -293,7 +292,6 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       const { filetype, preview, originalNames } = exportChanges;
       Actions.chooseFile(filetype, preview, originalNames);
-      Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
     }
 
     this.props.onResultsStateChange(resultsState);
