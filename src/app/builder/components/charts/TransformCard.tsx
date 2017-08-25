@@ -63,7 +63,7 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
-import {getIndex, getType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
 
