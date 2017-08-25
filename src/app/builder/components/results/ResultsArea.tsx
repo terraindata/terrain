@@ -648,6 +648,7 @@ column if you have customized the results view.');
       >
         {this.renderTopbar()}
         {this.renderResults()}
+        {this.renderExpandedResult()}
         {this.renderConfig()}
         {this.renderExport()}
       </div>

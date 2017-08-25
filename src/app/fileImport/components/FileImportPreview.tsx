@@ -51,13 +51,13 @@ import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
-import Modal from '../../common/components/Modal';
 import TemplateList from '../../common/components/TemplateList';
-import { getTemplateId, getTemplateName } from './../../../../shared/Util';
+import { getTemplateId, getTemplateName, updateTemplateName } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
+import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -91,6 +91,8 @@ export interface Props
   exporting: boolean;
 
   query?: string;
+  dbName?: string;
+  serverId?: number;
   variantName?: string;
 }
 
@@ -105,6 +107,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
     showingSaveTemplate: boolean,
+    previewErrorMsg: string,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -113,6 +116,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: false,
     showingApplyTemplate: false,
     showingSaveTemplate: false,
+    previewErrorMsg: '',
   };
 
   public componentDidMount()
@@ -131,6 +135,13 @@ class FileImportPreview extends TerrainComponent<Props>
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
+  }
+
+  public setError(msg: string)
+  {
+    this.setState({
+      previewErrorMsg: msg,
+    });
   }
 
   public showDelimTextBox()
@@ -198,12 +209,13 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleSaveTemplate()
   {
-    const { saveTemplateName } = this.state;
+    const { appliedTemplateName, saveTemplateName } = this.state;
     if (!saveTemplateName)
     {
       Actions.setErrorMsg('Please enter a template name');
       return;
     }
+    console.log(this.props.templates, saveTemplateName);
     if (this.props.templates.find((temp) => temp.templateName === saveTemplateName))
     {
       this.showUpdateTemplate();
@@ -211,7 +223,8 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting);
     this.setState({
-      appliedTemplateName: saveTemplateName,
+      showingSaveTemplate: false,
+      appliedTemplateName: updateTemplateName(appliedTemplateName, saveTemplateName),
     });
   }
 
@@ -221,7 +234,7 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.updateTemplate(getTemplateId(appliedTemplateName), this.props.exporting);
     this.setState({
       showingSaveTemplate: false,
-      appliedTemplateName: saveTemplateName,
+      appliedTemplateName: updateTemplateName(appliedTemplateName, saveTemplateName),
     });
   }
 
@@ -311,7 +324,13 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      Actions.exportFile(this.props.query, true, this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
+      if (this.props.dbName === undefined || this.props.dbName === '')
+      {
+        this.setError('Index must be selected in order to export results');
+        return;
+      }
+      Actions.exportFile(this.props.query, this.props.serverId, this.props.dbName, true,
+        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
     }
     else
     {
@@ -595,8 +614,26 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderError()
+  {
+    const { previewErrorMsg } = this.state;
+    if (this.props.exporting)
+    {
+      return (
+        <Modal
+          open={!!previewErrorMsg}
+          message={previewErrorMsg}
+          error={true}
+          onClose={this._fn(this.setError, '')}
+        />
+      );
+    }
+  }
+
   public render()
   {
+    console.log('applied: ', this.state.appliedTemplateName);
+    console.log('saved: ', this.state.saveTemplateName);
     return (
       <div
         className='fi-preview'
@@ -607,6 +644,7 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderApplyTemplate()}
         {this.renderSaveTemplate()}
         {this.renderUpdateTemplate()}
+        {this.renderError()}
       </div>
     );
   }

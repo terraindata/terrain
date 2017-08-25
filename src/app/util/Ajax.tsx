@@ -696,6 +696,7 @@ export const Ajax =
       transformations: Immutable.List<object>,
       update: boolean,
       hasCsvHeader: boolean,
+      isNewlineSeparatedJSON: boolean,
       primaryKeyDelimiter: string,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
@@ -718,6 +719,7 @@ export const Ajax =
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
       formData.append('hasCsvHeader', String(hasCsvHeader));
+      formData.append('isNewlineSeparatedJSON', String(isNewlineSeparatedJSON));
       formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
 
       const xhr = new XMLHttpRequest();

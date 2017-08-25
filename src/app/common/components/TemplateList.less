@@ -1,5 +1,4 @@
 @import "../../common/Common.less";
-@import "../../App.less";
 
 .list-container {
   align-items: center;
@@ -19,11 +18,13 @@
 
   .list-items {
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     // width: calc(~"100% - 48px");
     width: 50%;
     padding: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     .list-items-item {
       .big-text;
@@ -31,12 +32,12 @@
       text-align: center;
       padding: 12px;
       margin-bottom: 6px;
+      border: solid 1px transparent;
 
       .list-items-item-wrapper {
         justify-content: space-between;
 
         .list-items-delete {
-          // align-self: flex-end;
           font-size: 18px;
         }
       }
@@ -53,7 +54,6 @@
 
 
   .list-apply {
-    .button;
-    margin-bottom: 24px;
+    margin: 12px;
   }
 }

@@ -55,7 +55,7 @@ import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { parseCSV, ParseCSVConfig, parseJSONSubset } from './../../../../shared/Util';
+import { parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TemplateList from './../../common/components/TemplateList';
@@ -150,7 +150,8 @@ class FileImport extends TerrainComponent<any>
     const { filetype, stepId } = this.state;
     // TODO: convert stepIds to enums
     this.setState({
-      stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
+      // stepId: filetype === 'json' && stepId === 0 ? stepId + 2 : stepId + 1, // skip choose csv header step
+      stepId: stepId + 1,
     });
   }
 
@@ -158,7 +159,8 @@ class FileImport extends TerrainComponent<any>
   {
     const { filetype, stepId } = this.state;
     this.setState({
-      stepId: filetype === 'json' && stepId === 2 ? stepId - 2 : stepId - 1,
+      // stepId: filetype === 'json' && stepId === 2 ? stepId - 2 : stepId - 1,
+      stepId: stepId - 1,
     });
   }
 
@@ -215,13 +217,35 @@ class FileImport extends TerrainComponent<any>
     });
   }
 
-  public parseJson(file: string): object[]
+  public parseJson(file: string, isNewlineSeparatedJSON: boolean): object[]
   {
-    const items: object[] = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
-    if (!Array.isArray(items))
+    let items: object[] = [];
+    if (isNewlineSeparatedJSON)
     {
-      Actions.setErrorMsg('Input JSON file must parse to an array of objects.');
-      return undefined;
+      const newlineJSON: object[] | string = parseNewlineJSON(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      if (typeof newlineJSON === 'string')
+      {
+        Actions.setErrorMsg(newlineJSON);
+        return undefined;
+      }
+      items = newlineJSON;
+    }
+    else
+    {
+      try
+      {
+        items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      }
+      catch (e)
+      {
+        Actions.setErrorMsg(String(e));
+        return undefined;
+      }
+      if (!Array.isArray(items))
+      {
+        Actions.setErrorMsg('Input JSON file must parse to an array of objects.');
+        return undefined;
+      }
     }
     return items;
   }
@@ -268,7 +292,7 @@ class FileImport extends TerrainComponent<any>
     return parseCSV(file, config);
   }
 
-  public parseFile(file: File, filetype: string, hasCsvHeader: boolean)
+  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean)
   {
     const fileToRead: Blob = file.slice(0, PREVIEW_CHUNK_SIZE);
     const fr = new FileReader();
@@ -280,7 +304,7 @@ class FileImport extends TerrainComponent<any>
       switch (filetype)
       {
         case 'json':
-          items = this.parseJson(fr.result);
+          items = this.parseJson(fr.result, isNewlineSeparatedJSON);
           break;
         case 'csv':
           items = this.parseCsv(fr.result, hasCsvHeader);
@@ -295,14 +319,35 @@ class FileImport extends TerrainComponent<any>
         return;
       }
 
-      const previewRows = items.map((item) =>
-        _.map(item, (value, key) =>
-          typeof value === 'string' ? value : JSON.stringify(value), // JSON infers types
-        ),
-      );
-      const columnNames = _.map(items[0], (value, index) =>
-        filetype === 'csv' && !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
-      );
+      let columnNames = [];
+      let previewRows;
+      switch (filetype)
+      {
+        case 'json':
+          const columnNamesSet = new Set();
+          for (const obj of items)
+          {
+            Object.keys(obj).forEach((val) => { columnNamesSet.add(val); });
+          }
+          columnNames = Array.from(columnNamesSet);
+          previewRows = items.map((item) =>
+            columnNames.map((value) =>
+              item[value] === undefined ? '' : typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
+            ),
+          );
+          break;
+        case 'csv':
+          columnNames = _.map(items[0], (value, index) =>
+            !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
+          );
+          previewRows = items.map((item) =>
+            (hasCsvHeader ? columnNames : _.range(columnNames.length)).map((value) =>
+              item[value] === undefined ? '' : typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
+            ),
+          );
+          break;
+        default:
+      }
 
       Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
       this.setState({
@@ -346,7 +391,14 @@ class FileImport extends TerrainComponent<any>
     //   this.parseFile(file.target.files[0], filetype, null);
     // }
 
-    this.parseFile(file.target.files[0], filetype, false);
+    if (filetype === 'csv')
+    {
+      this.parseFile(file.target.files[0], filetype, false, false);
+    }
+    else
+    {
+      this.incrementStep();
+    }
   }
 
   public handleSelectFileButtonClick()
@@ -359,7 +411,14 @@ class FileImport extends TerrainComponent<any>
   {
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
-    this.parseFile(file, filetype, hasCsvHeader); // TODO: what happens on error?
+    this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
+  }
+
+  public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
+  {
+    Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
+    const { file, filetype } = this.state.fileImportState;
+    this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
   }
 
   public handleSelectDb(dbName: string)
@@ -386,6 +445,16 @@ class FileImport extends TerrainComponent<any>
 
   public renderSteps()
   {
+    let fileImportTypeStepTitle: string = '';
+    if (this.state.stepId === 1)
+    {
+      fileImportTypeStepTitle = FileImportTypes.STEP_TWO_TITLES[this.state.filetype === 'csv' ? 0 : this.state.filetype === 'json' ? 1 : undefined];
+    }
+    else
+    {
+      fileImportTypeStepTitle = FileImportTypes.STEP_TITLES[this.state.stepId];
+    }
+
     return (
       <div className='fi-step'>
         <div className='fi-step-name'>
@@ -397,7 +466,7 @@ class FileImport extends TerrainComponent<any>
           this.state.stepId > 0 &&
           <div className='fi-step-title'>
             {
-              FileImportTypes.STEP_TITLES[this.state.stepId]
+              fileImportTypeStepTitle
             }
           </div>
         }
@@ -419,7 +488,7 @@ class FileImport extends TerrainComponent<any>
         content = this.renderSelect();
         break;
       case 1:
-        content = this.renderCsv();
+        content = this.state.filetype === 'csv' ? this.renderCsv() : this.state.filetype === 'json' ? this.renderJSON() : undefined;
         break;
       case 2:
         content =
@@ -577,6 +646,37 @@ class FileImport extends TerrainComponent<any>
               />,
             )
           }
+        </div>
+      </div>
+    );
+  }
+
+  public renderJSON()
+  {
+    const { previewRows } = this.state.fileImportState;
+    return (
+      <div
+        className='fi-content-json'
+      >
+        <div
+          className='fi-content-json-wrapper'
+        >
+          <div
+            className='fi-content-json-option button'
+            onClick={() => this.handleJSONFormatChoice(true)}
+            style={buttonColors()}
+            ref='fi-yes-button'
+          >
+            Newline
+          </div>
+          <div
+            className='fi-content-json-option button'
+            onClick={() => this.handleJSONFormatChoice(false)}
+            style={buttonColors()}
+            ref='fi-no-button'
+          >
+            Object list
+          </div>
         </div>
       </div>
     );

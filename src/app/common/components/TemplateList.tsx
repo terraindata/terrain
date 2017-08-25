@@ -111,18 +111,16 @@ class TemplateList extends TerrainComponent<Props>
 
   public renderApply()
   {
-    if (this.state.selectedIndex !== -1)
-    {
-      return (
-        <div
-          className='list-apply'
-          onClick={this._fn(this.handleApply)}
-          style={buttonColors()}
-        >
-          Apply
-        </div>
-      );
-    }
+    // TODO: button changes colors on delete
+    return (
+      <div
+        className='list-apply button'
+        onClick={this._fn(this.handleApply)}
+        style={this.state.selectedIndex === -1 ? Colors().bg3 : buttonColors()}
+      >
+        Apply
+      </div>
+    );
   }
 
   public renderList()
