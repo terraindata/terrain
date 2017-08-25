@@ -70,7 +70,7 @@ class FileImportPreviewRow extends TerrainComponent<Props>
               className='fi-preview-row-cell'
               style={{
                 background: Colors().bg2,
-                text: Colors().text1,
+                color: Colors().text1,
               }}
             >
               <div

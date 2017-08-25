@@ -526,7 +526,7 @@ column if you have customized the results view.');
     const content =
       <div
         style={{
-          background: Colors().bg1,
+          background: 'black',
         }}
       >
         <FileImportPreview
