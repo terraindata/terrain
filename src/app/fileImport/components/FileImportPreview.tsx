@@ -585,11 +585,14 @@ class FileImportPreview extends TerrainComponent<Props>
       previewColumns.push(
         (<div
           key={previewColumns.length}
-          className='fi-preview-add-column-button'
+          className='fi-preview-column fi-preview-add-column-button'
           onClick={this.showAddColumn}
           style={buttonColors()}
         >
-          {'+'}
+          <div className='fi-preview-add-column-content'>
+            {'+'}
+          </div>
+
         </div>));
     }
 
