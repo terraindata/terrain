@@ -332,17 +332,23 @@ export function parseNewlineJSON(file: string, numLines: number): object[] | str
   return items;
 }
 
-export function getTemplateName(templateName: string): string
+// full template name is of the form - 'id: name'
+export function getTemplateName(template: string): string
 {
-  return templateName.substring(templateName.indexOf(':') + 2);
+  return template.substring(template.indexOf(':') + 2);
 }
 
-export function getTemplateId(templateName: string): number
+export function getTemplateId(template: string): number
 {
-  return Number(templateName.substring(0, templateName.indexOf(':')));
+  return Number(template.substring(0, template.indexOf(':')));
 }
 
-export function updateTemplateName(templateName: string, newName: string): string
+export function updateTemplateName(template: string, newName: string): string
 {
-  return String(getTemplateId(templateName)) + ': ' + newName;
+  return String(getTemplateId(template)) + ': ' + newName;
+}
+
+export function updateTemplateId(template: string, newId: number): string
+{
+  return String(newId) + ': ' + getTemplateName(template);
 }
