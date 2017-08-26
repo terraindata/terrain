@@ -614,7 +614,7 @@ column if you have customized the results view.');
         className={classNames({
           'results-area': true,
           'results-area-config-open': this.state.showingConfig,
-          'results-area-table': this.state.resultFormat === 'table',
+          'results-area-table altBg': this.state.resultFormat === 'table',
         })}
       >
         {this.renderTopbar()}
