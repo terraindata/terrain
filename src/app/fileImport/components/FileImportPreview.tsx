@@ -109,6 +109,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
     showingSaveTemplate: boolean,
+    showingAdvanced: boolean,
     showingAddColumn: boolean,
     addColumnName: string,
     previewErrorMsg: string,
@@ -120,6 +121,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: false,
     showingApplyTemplate: false,
     showingSaveTemplate: false,
+    showingAdvanced: false,
     showingAddColumn: false,
     addColumnName: '',
     previewErrorMsg: '',
@@ -192,6 +194,20 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public showAdvanced()
+  {
+    this.setState({
+      showingAdvanced: true,
+    });
+  }
+
+  public hideAdvanced()
+  {
+    this.setState({
+      showingAdvanced: false,
+    });
+  }
+
   public showUpdateTemplate()
   {
     this.setState({
@@ -246,6 +262,13 @@ class FileImportPreview extends TerrainComponent<Props>
       showingSaveTemplate: false,
       appliedTemplateName: updateTemplateName(appliedTemplateName, saveTemplateName),
     });
+  }
+
+  public handleAdvanced()
+  {
+    // this.setState({
+    // do something
+    // });
   }
 
   public handleUpdateTemplate()
@@ -328,6 +351,11 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleElasticUpdateChange()
   {
     Actions.changeElasticUpdate();
+  }
+
+  public handleRequireJSONHaveAllFieldsChange()
+  {
+    Actions.togglePreviewColumn();
   }
 
   public deletePrimaryKey(columnName: string)
@@ -423,6 +451,49 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderAdvancedModal()
+  {
+    const restrictiveMode =
+    (
+      <div
+        className='fi-advanced-button-wrapper'
+        style={{
+          background: Colors().bg1,
+
+        }}
+      >
+        <div
+          className='fi-preview-jsonfields'
+        >
+          <CheckBox
+            checked={this.props.requireJSONHaveAllFields}
+            onChange={this.handleRequireJSONHaveAllFieldsChange}
+
+          />
+          <span
+            className='clickable'
+            onClick={this.handleRequireJSONHaveAllFieldsChange}
+          >
+            Require all JSON fields to exist?
+            </span>
+        </div>
+      </div>
+    );
+
+    return (
+      <Modal
+        open={this.state.showingAdvanced}
+        onClose={this.hideAdvanced}
+        title={'Advanced'}
+        children={restrictiveMode}
+        confirm={true}
+        confirmButtonText={'Save'}
+        onConfirm={this.handleAdvanced}
+        closeOnConfirm={true}
+      />
+    );
+  }
+
   public renderUpdateTemplate()
   {
     return (
@@ -458,6 +529,22 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTemplate()
   {
+    const renderAdvancedButton =
+    (
+      <div
+        className='flex-container fi-preview-template-wrapper'
+      >
+        <div
+          className='flex-grow fi-preview-template-button button'
+          onClick={this.showAdvanced}
+          style={buttonColors()}
+          ref='fi-preview-template-button-advanced'
+        >
+          Advanced...
+        </div>
+      </div>
+    );
+
     return (
       <div
         className='flex-container fi-preview-template'
@@ -486,6 +573,7 @@ class FileImportPreview extends TerrainComponent<Props>
             Save As Template
           </div>
         </div>
+        {renderAdvancedButton}
       </div>
     );
   }
@@ -721,6 +809,7 @@ class FileImportPreview extends TerrainComponent<Props>
         {this.renderApplyTemplate()}
         {this.renderSaveTemplate()}
         {this.renderUpdateTemplate()}
+        {this.renderAdvancedModal()}
         {this.renderAddColumn()}
         {this.renderError()}
       </div>
