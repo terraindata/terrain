@@ -113,6 +113,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingAddColumn: boolean,
     addColumnName: string,
     previewErrorMsg: string,
+    advancedCheck: boolean,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -125,6 +126,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingAddColumn: false,
     addColumnName: '',
     previewErrorMsg: '',
+    advancedCheck: this.props.requireJSONHaveAllFields,
   };
 
   public componentDidMount()
@@ -266,9 +268,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleAdvanced()
   {
-    // this.setState({
-    // do something
-    // });
+    Actions.togglePreviewColumn(this.state.advancedCheck);
   }
 
   public handleUpdateTemplate()
@@ -355,7 +355,9 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleRequireJSONHaveAllFieldsChange()
   {
-    Actions.togglePreviewColumn();
+    this.setState({
+      advancedCheck: !this.state.advancedCheck,
+    });
   }
 
   public deletePrimaryKey(columnName: string)
@@ -454,31 +456,32 @@ class FileImportPreview extends TerrainComponent<Props>
   public renderAdvancedModal()
   {
     const restrictiveMode =
-    (
-      <div
-        className='fi-advanced-button-wrapper'
-        style={{
-          background: Colors().bg1,
-
-        }}
-      >
+      (
         <div
-          className='fi-preview-jsonfields'
+          className='fi-advanced'
+          style={{
+            background: Colors().bg1,
+          }}
         >
-          <CheckBox
-            checked={this.props.requireJSONHaveAllFields}
-            onChange={this.handleRequireJSONHaveAllFieldsChange}
-
-          />
-          <span
-            className='clickable'
-            onClick={this.handleRequireJSONHaveAllFieldsChange}
+          <div
+            className='fi-advanced-fields'
           >
-            Require all JSON fields to exist?
+            <CheckBox
+              checked={this.state.advancedCheck}
+              onChange={this.handleRequireJSONHaveAllFieldsChange}
+            />
+            <span
+              className='clickable'
+              onClick={this.handleRequireJSONHaveAllFieldsChange}
+              style={{
+                color: Colors().text1,
+              }}
+            >
+              Require all JSON fields to exist?
             </span>
+          </div>
         </div>
-      </div>
-    );
+      );
 
     return (
       <Modal
@@ -530,20 +533,20 @@ class FileImportPreview extends TerrainComponent<Props>
   public renderTemplate()
   {
     const renderAdvancedButton =
-    (
-      <div
-        className='flex-container fi-preview-template-wrapper'
-      >
+      (
         <div
-          className='flex-grow fi-preview-template-button button'
-          onClick={this.showAdvanced}
-          style={buttonColors()}
-          ref='fi-preview-template-button-advanced'
+          className='flex-container fi-preview-template-wrapper'
         >
-          Advanced...
+          <div
+            className='flex-grow fi-preview-template-button button'
+            onClick={this.showAdvanced}
+            style={buttonColors()}
+            ref='fi-preview-template-button-advanced'
+          >
+            Advanced...
         </div>
-      </div>
-    );
+        </div>
+      );
 
     return (
       <div

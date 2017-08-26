@@ -186,8 +186,8 @@ const FileImportActions =
       $(ActionTypes.addPreviewColumn, { columnName }),
 
     togglePreviewColumn:
-    () =>
-      $(ActionTypes.togglePreviewColumn, {}),
+    (requireJSONHaveAllFields: boolean) =>
+      $(ActionTypes.togglePreviewColumn, { requireJSONHaveAllFields }),
 
     setErrorMsg:
     (err: string) =>
