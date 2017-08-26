@@ -185,6 +185,10 @@ const FileImportActions =
     (columnName: string) =>
       $(ActionTypes.addPreviewColumn, { columnName }),
 
+    togglePreviewColumn:
+    () =>
+      $(ActionTypes.togglePreviewColumn, {}),
+
     setErrorMsg:
     (err: string) =>
       $(ActionTypes.setErrorMsg, { err }),

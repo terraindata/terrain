@@ -210,6 +210,12 @@ FileImportReducers[ActionTypes.changeElasticUpdate] =
       .set('elasticUpdate', !state.elasticUpdate)
   ;
 
+FileImportReducers[ActionTypes.togglePreviewColumn] =
+  (state, action) =>
+    state
+      .set('requireJSONHaveAllFields', !state.requireJSONHaveAllFields)
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
   {
