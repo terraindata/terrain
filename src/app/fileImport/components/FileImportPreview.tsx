@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty strict-boolean-expressions no-console no-var-requires
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
@@ -58,6 +59,7 @@ import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
+import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -546,9 +548,11 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const upload =
       <div
-        className='fi-preview-import-button button'
+        className='fi-preview-import-button large-button'
         onClick={this.handleUploadFile}
-        style={buttonColors()}
+        style={{
+          background: 'green', // TODO: add green to Colors?
+        }}
       >
         {this.props.exporting ? 'Export' : 'Import'}
       </div>;
@@ -591,23 +595,34 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='fi-import-button-wrapper'
+        className='flex-container fi-import-button-wrapper'
       >
         {
           !this.props.exporting &&
           <div
-            className='fi-preview-update'
+            className='flex-container fi-preview-update'
           >
-            <CheckBox
-              checked={this.props.elasticUpdate}
+            <div
+              className='flex-container fi-preview-update-text'
+            >
+              <span
+                className='fi-preview-update-text-text'
+              >
+                Update: If a document with the specified primary key(s) already exists, update the existing document.
+                </span>
+              <span
+                className='fi-preview-update-text-text'
+              >
+                Replace: If a document with the specified primary key(s) already exists, replace the existing document.
+                </span>
+            </div>
+
+            <Switch
+              first={'update'}
+              second={'replace'}
+              selected={this.props.elasticUpdate ? 1 : 2}
               onChange={this.handleElasticUpdateChange}
             />
-            <span
-              className='clickable'
-              onClick={this.handleElasticUpdateChange}
-            >
-              Join against any existing entries
-              </span>
           </div>
         }
         {this.renderUpload()}
@@ -649,7 +664,10 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='fi-preview'
+        className={classNames({
+          'fi-preview': true,
+          'fi-preview-export': this.props.exporting,
+        })}
       >
         {
           this.props.exporting && !this.props.query ?

@@ -421,7 +421,7 @@ class FileImport extends TerrainComponent<any>
         <div
           className='flex-container fi-content-choose'
         >
-          <input ref='file' type='file' name='abc' onChange={this.handleSelectFile} />
+          `<input ref='file' type='file' accept='.csv,.json' name='abc' onChange={this.handleSelectFile} />`
           <div
             className='fi-content-choose-button large-button'
             onClick={this.handleSelectFileButtonClick}
