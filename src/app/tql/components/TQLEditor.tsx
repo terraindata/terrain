@@ -207,7 +207,7 @@ class TQLEditor extends TerrainComponent<Props>
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
         onCodeMirrorMount={this.registerCodeMirror}
-        placeholder={(this.props.placeholder !== '' && this.props.placeholder !== undefined) ? 
+        placeholder={(this.props.placeholder !== '' && this.props.placeholder !== undefined) ?
           this.props.placeholder : 'Write your query here'}
       />
     );
