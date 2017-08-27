@@ -69,12 +69,7 @@ class DragHandle extends TerrainComponent<Props>
   {
     return (
       <div>
-        <Handle
-          className={classNames({
-            'drag-icon': true,
-
-          })}
-        />
+        <Handle className='drag-icon' />
         <StyleTag style={dragHandleStyle} />
       </div>
     );
@@ -82,16 +77,21 @@ class DragHandle extends TerrainComponent<Props>
 
   public render()
   {
-    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon .cls-1';
+    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
     const dragHandleStyle = {
       '.drag-icon': {
+        opacity: this.props.hiddenByDefault ? 0 : 0.85,
       },
       '.drag-icon .cls-1': {
         fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
-        opacity: this.props.hiddenByDefault ? 0 : 1,
       },
-      '.drag-icon:hover .cls-1': {
+      '.drag-icon:hover': {
+        opacity: 0.85,
+      },
+      '.drag-icon:hover. cls-1': {
         fill: Colors().inactiveHover,
+      },
+      '.drag-icon:active': {
         opacity: 0.85,
       },
       '.drag-icon:active .cls-1': {
@@ -102,8 +102,7 @@ class DragHandle extends TerrainComponent<Props>
         opacity: '0.85 !important' as any,
       },
     };
-    console.log(this.props.hiddenByDefault);
-    console.log(dragHandleStyle);
+
     return (
       (
         this.props.connectDragSource !== undefined ?

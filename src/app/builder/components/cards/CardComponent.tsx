@@ -562,7 +562,7 @@ class _CardComponent extends TerrainComponent<Props>
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
               <div className='drag-handle'>
-                <DragHandle connectDragSource={connectDragSource} showWhenHoveringClassName={'card-inner'} />
+                <DragHandle hiddenByDefault={true} connectDragSource={connectDragSource} showWhenHoveringClassName={'card-inner'} />
               </div>
             }
             {

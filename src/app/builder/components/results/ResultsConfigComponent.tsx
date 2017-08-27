@@ -535,7 +535,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
       >
         <div className='results-config-field-body'>
           <span className='results-config-handle'>
-            <DragHandle />
+            <DragHandle hiddenByDefault={true} showWhenHoveringClassName='results-config-field' />
           </span>
           <span className='results-config-text'>
             {
