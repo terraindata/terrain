@@ -529,8 +529,8 @@ column if you have customized the results view.');
 
   public renderExport()
   {
-    const { previewRows, columnNames, columnsToInclude, columnTypes, filetype, exportRank, templates,
-      transforms } = this.props.exportState;
+    const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
+      elasticUpdate } = this.props.exportState;
 
     const content =
       <div
@@ -540,14 +540,16 @@ column if you have customized the results view.');
       >
         <FileImportPreview
           previewRows={previewRows}
+          primaryKeys={primaryKeys}
+          primaryKeyDelimiter={primaryKeyDelimiter}
           columnNames={columnNames}
           columnsToInclude={columnsToInclude}
           columnTypes={columnTypes}
-          filetype={filetype}
-          exportRank={exportRank}
           templates={templates}
           transforms={transforms}
           columnOptions={List([])}
+          uploadInProgress={false}
+          elasticUpdate={elasticUpdate}
           exporting={true}
           query={this.props.query.tql}
           serverId={Number(this.props.db.id)}

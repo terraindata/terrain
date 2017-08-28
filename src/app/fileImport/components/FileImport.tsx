@@ -541,7 +541,7 @@ class FileImport extends TerrainComponent<any>
     const { fileImportState } = this.state;
     const { filetype, serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
-    const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields } = fileImportState;
+    const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
 
     let content;
     switch (this.state.stepId)
@@ -625,8 +625,6 @@ class FileImport extends TerrainComponent<any>
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
-            filetype={filetype}
-            requireJSONHaveAllFields={requireJSONHaveAllFields}
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}

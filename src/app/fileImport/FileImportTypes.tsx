@@ -64,8 +64,6 @@ class FileImportStateC extends BaseClass
   public primaryKeyDelimiter: string = '-';
   public hasCsvHeader: boolean = false;
   public isNewlineSeparatedJSON: boolean = false;
-  public requireJSONHaveAllFields: boolean = true;
-  public exportRank: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);

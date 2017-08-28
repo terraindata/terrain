@@ -104,7 +104,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   const nIndex = file.indexOf('\n');
   if (rnIndex === -1 && nIndex === -1)
   {
-    config.error('Error: no line-breaks found in uploaded file.');
+    config.error('Error: no newLine sequence found. Valid newLine sequences are ' + String(VALID_NEWLINE_SEQUENCES));
     return undefined;
   }
   if (rnIndex === -1)
