@@ -532,7 +532,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTemplate()
   {
-    const renderAdvancedButton =
+    const renderAdvancedButton = this.props.filetype === 'json' &&
       (
         <div
           className='flex-container fi-preview-template-wrapper'
