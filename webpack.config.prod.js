@@ -58,6 +58,7 @@ conf.plugins = [
     },
 
     DEV: "false",
+    MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || 'localhost:3000') + "'",
   }),
 
   // Minify code.

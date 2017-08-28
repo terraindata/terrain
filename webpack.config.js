@@ -125,7 +125,7 @@ module.exports =
     plugins:
     [
         new webpack.DefinePlugin({
-            MIDWAY_HOST: "'http://" + process.env.MIDWAY_HOST + "'",
+            MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || 'localhost:3000') + "'",
             DEV: true,
         }),
         new webpack.optimize.AggressiveMergingPlugin(),
