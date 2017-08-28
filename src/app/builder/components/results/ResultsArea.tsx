@@ -543,6 +543,7 @@ column if you have customized the results view.');
           elasticUpdate={elasticUpdate}
           exporting={true}
           query={this.props.query.tql}
+          serverId={Number(this.props.db.id)}
           variantName={this.props.variantName}
         />
       </div>;

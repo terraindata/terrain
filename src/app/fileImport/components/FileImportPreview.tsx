@@ -93,7 +93,6 @@ export interface Props
   exporting: boolean;
 
   query?: string;
-  dbName?: string;
   serverId?: number;
   variantName?: string;
 }
@@ -326,12 +325,13 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      if (this.props.dbName === undefined || this.props.dbName === '')
+      const dbName = JSON.parse(this.props.query)['index'];
+      if (dbName === undefined || dbName === '')
       {
         this.setError('Index must be selected in order to export results');
         return;
       }
-      Actions.exportFile(this.props.query, this.props.serverId, this.props.dbName, true,
+      Actions.exportFile(this.props.query, this.props.serverId, dbName, true,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
     }
     else
