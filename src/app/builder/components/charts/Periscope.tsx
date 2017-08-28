@@ -78,8 +78,7 @@ const Periscope = {
       ;
 
     svg.append('rect')
-      .attr('class', 'bg')
-      .attr('fill', Colors().altBg1);
+      .attr('class', 'bg');
     svg.append('g')
       .attr('class', 'bottomAxis');
 
@@ -138,7 +137,7 @@ const Periscope = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', '#f0f8e8');
+      .attr('fill', Colors().altBg1);
   },
 
   _drawAxes(el, scales)
@@ -244,12 +243,12 @@ const Periscope = {
       .append('circle')
       .attr('class', 'handle')
       .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('fill', Colors().altBg1 + ';');
+      .attr('fill', Colors().altBg1);
 
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
-      .attr('fill', '#fff')
+      .attr('fill', Colors().altBg1)
       .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('stroke-width', '3px')
       .attr('r', 10);
