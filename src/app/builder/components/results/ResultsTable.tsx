@@ -339,6 +339,28 @@ export default class ResultsTable extends TerrainComponent<Props>
     return (<ReactDataGrid.Row {...props} />);
   }
 
+  // public getCellValue(key) {
+  //     var val = void 0;
+  //     if (key === 'select-row') {
+  //       return this.props.isSelected;
+  //     } else if (typeof this.props.row.get === 'function') {
+  //       val = this.props.row.get(key);
+  //     } else {
+  //       val = this.props.row[key];
+  //       if (Array.isArray(val))
+  //       {
+  //         val = JSON.stringify(val);
+  //       }
+  //     }
+  //     return val;
+  // }
+
+  public cellRenderer(props)
+  {
+    console.log('Testing');
+    return (<ReactDataGrid.Cell {...props} />);
+  }
+
   public render()
   {
     if (!this.state.rows)
