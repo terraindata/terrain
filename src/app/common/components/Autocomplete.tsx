@@ -151,7 +151,10 @@ class Autocomplete extends TerrainComponent<Props>
   public handleSelect(value)
   {
     this.props.onChange(value);
-    this.props.onSelectOption(value);
+    if (this.props.onSelectOption !== undefined)
+    {
+      this.props.onSelectOption(value);
+    }
     this.setState({
       value,
       open: false,
