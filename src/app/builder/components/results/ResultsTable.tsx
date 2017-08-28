@@ -278,6 +278,7 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public handleFilterChange(filter)
   {
+    console.log(filter);
     if (filter.filterTerm === '')
     {
       this.clearFilters();
@@ -285,7 +286,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     else
     {
       this.setState({
-        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm.toLowerCase()))),
+        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().toLowerCase().includes(filter.filterTerm.toLowerCase()))),
       });
     }
   }
