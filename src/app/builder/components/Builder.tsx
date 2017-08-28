@@ -73,7 +73,7 @@ import { BuilderState, BuilderStore } from './../data/BuilderStore';
 type Variant = LibraryTypes.Variant;
 
 // Components
-
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { backgroundColor, Colors } from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
@@ -776,13 +776,15 @@ class Builder extends TerrainComponent<Props>
           <div className='builder-white-space' />
           {
             this.canEdit() &&
-            <div
-              className='button builder-revert-button'
-              onClick={this.revertVersion}
-              data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
-            >
-              Revert to this version
-              </div>
+            tooltip(
+              <div
+                className='button builder-revert-button'
+                onClick={this.revertVersion}
+              >
+                Revert to this version
+              </div>,
+              "Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history.",
+            )
           }
         </div>
       );

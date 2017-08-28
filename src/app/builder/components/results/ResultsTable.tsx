@@ -66,6 +66,7 @@ export interface Props
   resultsConfig?: ResultsConfig;
   onExpand: (index: number) => void;
   resultsLoading: boolean;
+  allowSpotlights: boolean;
 }
 
 export default class ResultsTable extends TerrainComponent<Props>
@@ -285,7 +286,8 @@ export default class ResultsTable extends TerrainComponent<Props>
     else
     {
       this.setState({
-        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().includes(filter.filterTerm.toLowerCase()))),
+        rows: this.props.results.filter((r) =>
+          (r.fields.get(filter.column.key).toString().toLowerCase().includes(filter.filterTerm.toLowerCase()))),
       });
     }
   }
@@ -357,7 +359,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         rowRenderer={this.rowRenderer}
         rowKey={'_id' /*TODO*/}
         rowSelection={{
-          showCheckbox: true,
+          showCheckbox: this.props.allowSpotlights,
           enableShiftSelect: true,
           onRowsSelected: this.onRowsSelected,
           onRowsDeselected: this.onRowsDeselected,

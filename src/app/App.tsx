@@ -65,13 +65,14 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 // Components
+import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
 import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
-const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
+
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import StyleTag from './common/components/StyleTag';
@@ -377,13 +378,6 @@ class App extends TerrainComponent<Props>
 
         <DeployModal />
 
-        <ReactTooltip
-          place='bottom'
-          effect='solid'
-          class='tooltip'
-          hideOnClick={true}
-        />
-
         <StyleTag
           style={COMMON_THEME_COLOR_STYLE}
         />
@@ -410,6 +404,7 @@ const COMMON_THEME_COLOR_STYLE = {
     background: Colors().inputBg,
     color: Colors().text1,
   },
+  ...generateThemeStyles(),
 };
 
 export default App;

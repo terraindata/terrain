@@ -62,6 +62,7 @@ import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -235,6 +236,9 @@ const BuilderColumn = createReactClass<any, any>(
             variantName={this.props.variant.name}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
+            showExport={true}
+            showCustomizeView={true}
+            allowSpotlights={true}
             exportState={this.props.exportState}
           />;
 
@@ -253,6 +257,7 @@ const BuilderColumn = createReactClass<any, any>(
           return <SchemaView
             fullPage={false}
             showSearch={true}
+            showResults={false}
           />;
         // case COLUMNS.Manual:
         //   return <Manual
@@ -340,28 +345,30 @@ const BuilderColumn = createReactClass<any, any>(
                 }
                 {
                   !canEdit &&
-                  <LockedIcon
-                    data-tip={cantEditReason}
-                  />
+                  tooltip(<LockedIcon />, cantEditReason)
                 }
               </span>
             </div>
             <div className='builder-title-bar-options'>
               {
                 this.props.canCloseColumn &&
-                <CloseIcon
-                  onClick={this.handleCloseColumn}
-                  className='close close-builder-title-bar'
-                  data-tip='Close Column'
-                />
+                tooltip(
+                  <CloseIcon
+                    onClick={this.handleCloseColumn}
+                    className='close close-builder-title-bar'
+                  />,
+                  'Close Column',
+                )
               }
               {
                 this.props.canAddColumn &&
-                <SplitScreenIcon
-                  onClick={this.handleAddColumn}
-                  className='bc-options-svg builder-split-screen'
-                  data-tip='Add Column'
-                />
+                tooltip(
+                  <SplitScreenIcon
+                    onClick={this.handleAddColumn}
+                    className='bc-options-svg builder-split-screen'
+                  />,
+                  'Add Column',
+                )
               }
               <Menu
                 options={this.getMenuOptions()}
