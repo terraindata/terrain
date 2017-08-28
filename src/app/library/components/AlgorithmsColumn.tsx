@@ -72,6 +72,8 @@ import LibraryItemCategory from './LibraryItemCategory';
 
 import './AlgorithmsColumn.less';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
+
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
 type Group = LibraryTypes.Group;
@@ -506,10 +508,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         }
         {
           status === ItemStatus.Build && canCreate &&
-          <CreateLine
-            onClick={this.handleNewAlgorithmModalOpen}
-            open={false}
-          />
+          tooltip(
+            <CreateLine onClick={this.handleNewAlgorithmModalOpen} open={false} />,
+            {
+              title: 'Create a New Algorithm',
+              position: 'top',
+            },
+          )
         }
       </LibraryItemCategory>
     );

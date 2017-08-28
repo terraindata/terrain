@@ -1789,7 +1789,7 @@ clarinet@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/clarinet/-/clarinet-0.11.0.tgz#6cc912b93138dc867fc273cd34ea90e83e054719"
 
-classnames@^2.2.0, classnames@^2.2.4, classnames@^2.2.5:
+classnames@^2.2.4, classnames@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
@@ -6177,6 +6177,10 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
+popper.js@^1.11.1:
+  version "1.12.3"
+  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.12.3.tgz#e46a99c52e74e310411df505d820b61bdbe7eaee"
+
 portfinder@^1.0.9:
   version "1.0.13"
   resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.13.tgz#bb32ecd87c27104ae6ee44b5a3ccbf0ebb1aede9"
@@ -6808,11 +6812,11 @@ react-test-renderer@^15.6.1:
     fbjs "^0.8.9"
     object-assign "^4.1.0"
 
-react-tooltip@^2.0.0:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-2.0.3.tgz#cfdb3a56e83eaaf5dac732a42c6f69b71e838934"
+react-tippy@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/react-tippy/-/react-tippy-1.2.1.tgz#50aa4caa3cac5e873238b0a99c5b15818d2f2ca8"
   dependencies:
-    classnames "^2.2.0"
+    popper.js "^1.11.1"
 
 react-transition-group@^1.1.2:
   version "1.2.0"
