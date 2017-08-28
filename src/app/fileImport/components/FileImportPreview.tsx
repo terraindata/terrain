@@ -273,17 +273,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleAdvanced()
   {
-    if (this.state.exportFiletype === '')
-    {
-      this.setState({
-        exportFiletype: 'csv',
-      });
-      Actions.setExportFiletype('csv');
-    }
-    else
-    {
-      Actions.setExportFiletype(this.state.exportFiletype);
-    }
+    Actions.setExportFiletype(this.state.exportFiletype);
     Actions.togglePreviewColumn(this.state.advancedCheck);
   }
 
@@ -488,62 +478,57 @@ class FileImportPreview extends TerrainComponent<Props>
   public renderAdvancedModal()
   {
     const advancedModalContent = this.props.exporting ?
-      (
-        <div
-          className='fi-advanced-fields'
-        >
-          <CheckBox
-            checked={this.state.advancedExportRank}
-            onChange={this.handleAdvancedRankChange}
-          />
-          <span
-            className='clickable'
-            onClick={this.handleAdvancedRankChange}
-            style={{
-              color: Colors().text1,
-            }}
-          >
-            Rank
-        </span>
-          <Dropdown
-            selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.state.exportFiletype)}
-            options={List(FileImportTypes.FILE_TYPES)}
-            onChange={this.handleExportFiletypeChange}
-            canEdit={true}
-          />
-        </div>
-      ) :
-      (
-        <div
-          className='fi-advanced-fields'
-        >
-          <CheckBox
-            checked={this.state.advancedCheck}
-            onChange={this.handleRequireJSONHaveAllFieldsChange}
-          />
-          <span
-            className='clickable'
-            onClick={this.handleRequireJSONHaveAllFieldsChange}
-            style={{
-              color: Colors().text1,
-            }}
-          >
-            Require all JSON fields to exist?
-        </span>
-        </div>
-      );
-
-    const restrictiveMode =
-      (
-        <div
-          className='fi-advanced'
+      <div
+        className='fi-advanced-fields'
+      >
+        <CheckBox
+          checked={this.state.advancedExportRank}
+          onChange={this.handleAdvancedRankChange}
+        />
+        <span
+          className='clickable'
+          onClick={this.handleAdvancedRankChange}
           style={{
-            background: Colors().bg1,
+            color: Colors().text1,
           }}
         >
-          {advancedModalContent}
-        </div>
-      );
+          Rank
+          </span>
+        <Dropdown
+          selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.state.exportFiletype)}
+          options={List(FileImportTypes.FILE_TYPES)}
+          onChange={this.handleExportFiletypeChange}
+          canEdit={true}
+        />
+      </div>
+      :
+      <div
+        className='fi-advanced-fields'
+      >
+        <CheckBox
+          checked={this.state.advancedCheck}
+          onChange={this.handleRequireJSONHaveAllFieldsChange}
+        />
+        <span
+          className='clickable'
+          onClick={this.handleRequireJSONHaveAllFieldsChange}
+          style={{
+            color: Colors().text1,
+          }}
+        >
+          Require all JSON fields to exist?
+          </span>
+      </div>;
+
+    const restrictiveMode =
+      <div
+        className='fi-advanced'
+        style={{
+          background: Colors().bg1,
+        }}
+      >
+        {advancedModalContent}
+      </div>;
 
     return (
       <Modal
@@ -896,6 +881,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
+    console.log('exportFiletype: ', this.state.exportFiletype);
     return (
       <div
         className={classNames({

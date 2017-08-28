@@ -197,8 +197,8 @@ const FileImportActions =
       $(ActionTypes.setErrorMsg, { err }),
 
     setExportFiletype:
-    (type: string) =>
-      $(ActionTypes.setExportFiletype, { type }),
+    (exportFiletype: string) =>
+      $(ActionTypes.setExportFiletype, { exportFiletype }),
   };
 
 export default FileImportActions;

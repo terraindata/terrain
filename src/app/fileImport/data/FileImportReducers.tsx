@@ -230,8 +230,9 @@ FileImportReducers[ActionTypes.togglePreviewColumn] =
 FileImportReducers[ActionTypes.setExportFiletype] =
   (state, action) =>
   {
-    state
-      .set('filetype', action.payload.type)
+    console.log('setting type: ', action.payload.exportFiletype);
+    return state
+      .set('filetype', action.payload.exportFiletype);
   }
   ;
 
