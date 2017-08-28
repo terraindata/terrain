@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
 import './BuilderTQLColumn.less';
-const { List } = Immutable;
+
 import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
 import Query from '../../../items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
