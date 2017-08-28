@@ -342,13 +342,3 @@ export function getTemplateId(template: string): number
 {
   return Number(template.substring(0, template.indexOf(':')));
 }
-
-export function updateTemplateName(template: string, newName: string): string
-{
-  return String(getTemplateId(template)) + ': ' + newName;
-}
-
-export function updateTemplateId(template: string, newId: number): string
-{
-  return String(newId) + ': ' + getTemplateName(template);
-}

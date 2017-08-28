@@ -332,8 +332,8 @@ class TQLEditor extends TerrainComponent<Props>
     tt.className = 'CodeMirror-lint-tooltip';
     tt.appendChild(content.cloneNode(true));
     document.body.appendChild(tt);
-    tt.style.top = Math.max(0, e.clientY - tt.offsetHeight - 5) + 'px';
-    tt.style.left = (e.clientX + 5) + 'px';
+    tt.style.top = String(Math.max(0, e.clientY - tt.offsetHeight - 5)) + 'px';
+    tt.style.left = String((e.clientX + 5)) + 'px';
     if (tt.style.opacity != null)
     {
       tt.style.opacity = '1';
@@ -350,8 +350,8 @@ class TQLEditor extends TerrainComponent<Props>
       return;
     }
     const box = target.getBoundingClientRect();
-    const x = (box.left + box.right) / 2;
-    const y = (box.top + box.bottom) / 2;
+    const x = (Number(box.left) + Number(box.right)) / 2;
+    const y = (Number(box.top) + Number(box.bottom)) / 2;
     const spans = cm.findMarksAt(cm.coordsChar({ left: x, top: y }, 'client'));
     let ann: MarkerAnnotation;
     for (let i = 0; i < spans.length; ++i)

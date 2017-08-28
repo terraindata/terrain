@@ -53,7 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
-import { getTemplateId, getTemplateName, updateTemplateId, updateTemplateName } from './../../../../shared/Util';
+import { getTemplateId, getTemplateName } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -102,7 +102,7 @@ export interface Props
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
-    appliedTemplate: string,
+    appliedTemplateName: string,
     saveTemplateName: string,
     templateOptions: List<string>,
     showingDelimTextBox: boolean,
@@ -111,7 +111,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingSaveTemplate: boolean,
     previewErrorMsg: string,
   } = {
-    appliedTemplate: '',
+    appliedTemplateName: '',
     saveTemplateName: '',
     templateOptions: List([]),
     showingDelimTextBox: false,
@@ -136,16 +136,6 @@ class FileImportPreview extends TerrainComponent<Props>
       this.setState({
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
-
-      if (this.state.appliedTemplate)
-      {
-        this.setState({
-          appliedTemplate: updateTemplateId(this.state.appliedTemplate, nextProps.templates.find((temp) =>
-            temp.templateName === getTemplateName(this.state.appliedTemplate),
-          ).templateId,
-          ),
-        });
-      }
     }
   }
 
@@ -221,16 +211,13 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleSaveTemplate()
   {
-    const { appliedTemplate, saveTemplateName } = this.state;
+    const { appliedTemplateName, saveTemplateName } = this.state;
     if (!saveTemplateName)
     {
       Actions.setErrorMsg('Please enter a template name');
       return;
     }
-    console.log(this.props.templates, saveTemplateName);
-    // TODO: Question - should users be allowed to update non-applied templates (wouldn't have any effect) ?
-    // if (getTemplateName(appliedTemplate) === saveTemplateName)
-    if (this.props.templates.find((temp) => temp.templateName === saveTemplateName))
+    if (this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName))
     {
       this.showUpdateTemplate();
       return;
@@ -238,21 +225,18 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting);
     this.setState({
       showingSaveTemplate: false,
-      appliedTemplate: updateTemplateName(appliedTemplate, saveTemplateName),
-      // appliedTemplate: updateTemplateId(appliedTemplate, this.props.templates.find((temp) =>
-      //   temp.templateName === saveTemplateName
-      //   ).templateId
-      // ),
+      appliedTemplateName: saveTemplateName,
     });
   }
 
   public handleUpdateTemplate()
   {
-    const { appliedTemplate, saveTemplateName } = this.state;
-    Actions.updateTemplate(getTemplateId(appliedTemplate), this.props.exporting);
+    const { appliedTemplateName, saveTemplateName } = this.state;
+    const id = getTemplateId(this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName));
+    Actions.updateTemplate(id, this.props.exporting);
     this.setState({
       showingSaveTemplate: false,
-      appliedTemplate: updateTemplateName(appliedTemplate, saveTemplateName),
+      appliedTemplateName: saveTemplateName,
     });
   }
 
@@ -293,7 +277,7 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.applyTemplate(getTemplateId(templateName));
     this.setState({
       showingApplyTemplate: false,
-      appliedTemplate: templateName,
+      appliedTemplateName: getTemplateName(templateName),
       saveTemplateName: getTemplateName(templateName),
     });
   }
@@ -388,7 +372,7 @@ class FileImportPreview extends TerrainComponent<Props>
         confirmButtonText={'Save'}
         onConfirm={this.handleSaveTemplate}
         showTextbox={true}
-        initialTextboxValue={getTemplateName(this.state.appliedTemplate)}
+        initialTextboxValue={this.state.appliedTemplateName}
         onTextboxValueChange={this.onSaveTemplateNameChange}
         closeOnConfirm={false}
       />
@@ -397,10 +381,11 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderUpdateTemplate()
   {
+    const overwriteName: string = this.state.templateOptions.find((option) => getTemplateName(option) === this.state.saveTemplateName);
     return (
       <Modal
         open={this.state.showingUpdateTemplate}
-        message={'By saving this, you are overwriting template ' + this.state.appliedTemplate + ', Continue?'}
+        message={'By saving this, you are overwriting template ' + overwriteName + ', Continue?'}
         onClose={this.hideUpdateTemplate}
         title={'Overwriting Template'}
         confirm={true}
@@ -678,7 +663,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('appliedTemplate: ', this.state.appliedTemplate);
+    console.log('appliedTemplateName: ', this.state.appliedTemplateName);
     console.log('saveTemplateName: ', this.state.saveTemplateName);
     return (
       <div
