@@ -106,6 +106,7 @@ class InputsArea extends TerrainComponent<Props>
               canEdit={this.props.canEdit}
               key={input.id}
               onCreateInput={this.handleCreateInput}
+              language={this.props.language}
             />,
           )
         }
