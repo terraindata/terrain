@@ -199,6 +199,10 @@ const FileImportActions =
     setExportFiletype:
     (exportFiletype: string) =>
       $(ActionTypes.setExportFiletype, { exportFiletype }),
+
+    toggleExportRank:
+    (exportRank: boolean) =>
+      $(ActionTypes.toggleExportRank, { exportRank }),
   };
 
 export default FileImportActions;

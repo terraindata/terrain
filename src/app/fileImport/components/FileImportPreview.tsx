@@ -275,6 +275,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     Actions.setExportFiletype(this.state.exportFiletype);
     Actions.togglePreviewColumn(this.state.advancedCheck);
+    Actions.toggleExportRank(this.state.advancedExportRank);
   }
 
   public handleUpdateTemplate()
@@ -394,7 +395,7 @@ class FileImportPreview extends TerrainComponent<Props>
         return;
       }
       Actions.exportFile(this.props.query, this.props.serverId, dbName, this.props.exportRank,
-        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
+        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype);
     }
     else
     {
@@ -881,7 +882,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('exportFiletype: ', this.state.exportFiletype);
     return (
       <div
         className={classNames({

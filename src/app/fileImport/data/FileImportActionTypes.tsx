@@ -76,6 +76,7 @@ const FileImportActionTypes =
     addPreviewColumn: '',
     togglePreviewColumn: '',
     setExportFiletype: '',
+    toggleExportRank: '',
     setErrorMsg: '',
   };
 

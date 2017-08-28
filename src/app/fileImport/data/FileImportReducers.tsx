@@ -229,11 +229,14 @@ FileImportReducers[ActionTypes.togglePreviewColumn] =
 
 FileImportReducers[ActionTypes.setExportFiletype] =
   (state, action) =>
-  {
-    console.log('setting type: ', action.payload.exportFiletype);
-    return state
-      .set('filetype', action.payload.exportFiletype);
-  }
+    state
+      .set('filetype', action.payload.exportFiletype)
+  ;
+
+FileImportReducers[ActionTypes.toggleExportRank] =
+  (state, action) =>
+    state
+      .set('exportRank', action.payload.exportRank)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
