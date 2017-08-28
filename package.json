@@ -14,7 +14,7 @@
     "test-back-teardown": "./midway/test/scripts/teardown_env.sh",
     "test-back-all": "yarn run test-back-setup && yarn run test-back ; yarn run test-back-teardown",
     "commit-log": "git log --pretty=format:\"%h%x09%an%x09%ad%x09%s\" | head -n 10 > src/commitlog.txt",
-    "build-prod": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack -p --optimize-minimize --config webpack.config.prod.js --output-filename ./midway/src/assets/bundle.min.js",
+    "build-prod": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack -p --optimize-minimize --config webpack.config.prod.js --output-filename ./midway/src/assets/bundle.js",
     "build": "yarn run commit-log && MIDWAY_HOST=localhost:3000 webpack --config webpack.config.js --output-filename ./midway/src/assets/bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts",
     "lint": "yarn run lint-front && yarn run lint-back",
