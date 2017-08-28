@@ -76,25 +76,28 @@ type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
 {
+  exporting: boolean;
+  filetype: string;
   previewRows: List<List<string>>;
-  primaryKeys: List<number>;
-  primaryKeyDelimiter: string;
-
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<ColumnTypesTree>;
-
   columnOptions: List<string>;
   templates: List<Template>;
   transforms: List<Transform>;
 
-  uploadInProgress: boolean;
-  elasticUpdate: boolean;
-  exporting: boolean;
+  // import
+  primaryKeys?: List<number>;
+  primaryKeyDelimiter?: string;
+  requireJSONHaveAllFields?: boolean;
+  uploadInProgress?: boolean;
+  elasticUpdate?: boolean;
 
+  // export
   query?: string;
   serverId?: number;
   variantName?: string;
+  exportRank?: boolean;
 }
 
 @Radium
@@ -108,7 +111,13 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
     showingSaveTemplate: boolean,
+    showingAdvanced: boolean,
+    showingAddColumn: boolean,
+    addColumnName: string,
     previewErrorMsg: string,
+    advancedCheck: boolean,
+    advancedExportRank: boolean,
+    exportFiletype: string,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -117,7 +126,13 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: false,
     showingApplyTemplate: false,
     showingSaveTemplate: false,
+    showingAdvanced: false,
+    showingAddColumn: false,
+    addColumnName: '',
     previewErrorMsg: '',
+    advancedCheck: this.props.requireJSONHaveAllFields,
+    advancedExportRank: this.props.exportRank,
+    exportFiletype: 'csv',
   };
 
   public componentDidMount()
@@ -187,6 +202,20 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public showAdvanced()
+  {
+    this.setState({
+      showingAdvanced: true,
+    });
+  }
+
+  public hideAdvanced()
+  {
+    this.setState({
+      showingAdvanced: false,
+    });
+  }
+
   public showUpdateTemplate()
   {
     this.setState({
@@ -198,6 +227,20 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     this.setState({
       showingUpdateTemplate: false,
+    });
+  }
+
+  public showAddColumn()
+  {
+    this.setState({
+      showingAddColumn: true,
+    });
+  }
+
+  public hideAddColumn()
+  {
+    this.setState({
+      showingAddColumn: false,
     });
   }
 
@@ -228,6 +271,13 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleAdvanced()
+  {
+    Actions.setExportFiletype(this.state.exportFiletype);
+    Actions.setPreviewColumn(this.state.advancedCheck);
+    Actions.setExportRank(this.state.advancedExportRank);
+  }
+
   public handleUpdateTemplate()
   {
     const { appliedTemplateName, saveTemplateName } = this.state;
@@ -249,31 +299,30 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const templateName = this.state.templateOptions.get(itemIndex);
 
-    // check if template is compatible with current mapping -> whether column names match
-    const colNames: Immutable.List<string> = this.props.templates.get(itemIndex).originalNames;
+    // check if template is compatible with current mapping; all current columns must exist in template
+    const templateCols: string[] = this.props.templates.get(itemIndex).originalNames.toArray();
     let isCompatible: boolean = true;
-    const unmatchedColNames: string[] = [];
-    const unmatchedTableNames: string[] = this.props.columnNames.toArray();
-    colNames.map((colName) =>
+    const unmatchedTemplateCols: Set<string> = new Set(templateCols);
+    const missingTableCols: string[] = [];
+    this.props.columnNames.map((tableCol) =>
     {
-      if (!this.props.columnNames.contains(colName))
+      if (templateCols.indexOf(tableCol) === -1)
       {
         isCompatible = false;
-        unmatchedColNames.push(colName);
+        missingTableCols.push(tableCol);
       }
       else
       {
-        unmatchedTableNames.splice(unmatchedTableNames.indexOf(colName), 1);
+        unmatchedTemplateCols.delete(tableCol);
       }
     });
     if (!isCompatible)
     {
-      Actions.setErrorMsg('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedColNames) + '\n and \n'
-        + JSON.stringify(unmatchedTableNames));
+      Actions.setErrorMsg('Incompatible template. Template does not contain columns: ' + JSON.stringify(missingTableCols));
       return;
     }
 
-    Actions.applyTemplate(getTemplateId(templateName));
+    Actions.applyTemplate(getTemplateId(templateName), List(Array.from(unmatchedTemplateCols)));
     this.setState({
       showingApplyTemplate: false,
       appliedTemplateName: getTemplateName(templateName),
@@ -311,6 +360,20 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.changeElasticUpdate();
   }
 
+  public handleRequireJSONHaveAllFieldsChange()
+  {
+    this.setState({
+      advancedCheck: !this.state.advancedCheck,
+    });
+  }
+
+  public handleAdvancedRankChange()
+  {
+    this.setState({
+      advancedExportRank: !this.state.advancedExportRank,
+    });
+  }
+
   public deletePrimaryKey(columnName: string)
   {
     Actions.changePrimaryKey(this.props.columnNames.indexOf(columnName));
@@ -331,13 +394,47 @@ class FileImportPreview extends TerrainComponent<Props>
         this.setError('Index must be selected in order to export results');
         return;
       }
-      Actions.exportFile(this.props.query, this.props.serverId, dbName, true,
-        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
+      Actions.exportFile(this.props.query, this.props.serverId, dbName, this.props.exportRank,
+        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype);
     }
     else
     {
       Actions.importFile();
     }
+  }
+
+  public onAddColumnNameChange(addColumnName: string)
+  {
+    this.setState({
+      addColumnName,
+    });
+  }
+
+  public handleAddPreviewColumn()
+  {
+    const { addColumnName } = this.state;
+    if (!addColumnName)
+    {
+      Actions.setErrorMsg('Please enter a new column name');
+      return;
+    }
+    if (this.props.columnNames.includes(addColumnName))
+    {
+      Actions.setErrorMsg('Column name already in use');
+      return;
+    }
+    Actions.addPreviewColumn(addColumnName);
+    this.setState({
+      showingAddColumn: false,
+    });
+  }
+
+  public handleExportFiletypeChange(typeIndex: number)
+  {
+    const type = FileImportTypes.FILE_TYPES[typeIndex];
+    this.setState({
+      exportFiletype: type,
+    });
   }
 
   public renderApplyTemplate()
@@ -379,6 +476,75 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderAdvancedModal()
+  {
+    const advancedModalContent = this.props.exporting ?
+      <div
+        className='fi-advanced-fields'
+      >
+        <CheckBox
+          checked={this.state.advancedExportRank}
+          onChange={this.handleAdvancedRankChange}
+        />
+        <span
+          className='clickable'
+          onClick={this.handleAdvancedRankChange}
+          style={{
+            color: Colors().text1,
+          }}
+        >
+          Rank
+          </span>
+        <Dropdown
+          selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.state.exportFiletype)}
+          options={List(FileImportTypes.FILE_TYPES)}
+          onChange={this.handleExportFiletypeChange}
+          canEdit={true}
+        />
+      </div>
+      :
+      <div
+        className='fi-advanced-fields'
+      >
+        <CheckBox
+          checked={this.state.advancedCheck}
+          onChange={this.handleRequireJSONHaveAllFieldsChange}
+        />
+        <span
+          className='clickable'
+          onClick={this.handleRequireJSONHaveAllFieldsChange}
+          style={{
+            color: Colors().text1,
+          }}
+        >
+          Require all JSON fields to exist?
+          </span>
+      </div>;
+
+    const restrictiveMode =
+      <div
+        className='fi-advanced'
+        style={{
+          background: Colors().bg1,
+        }}
+      >
+        {advancedModalContent}
+      </div>;
+
+    return (
+      <Modal
+        open={this.state.showingAdvanced}
+        onClose={this.hideAdvanced}
+        title={'Advanced'}
+        children={restrictiveMode}
+        confirm={true}
+        confirmButtonText={'Save'}
+        onConfirm={this.handleAdvanced}
+        closeOnConfirm={true}
+      />
+    );
+  }
+
   public renderUpdateTemplate()
   {
     const overwriteName: string = this.state.templateOptions.find((option) => getTemplateName(option) === this.state.saveTemplateName);
@@ -395,8 +561,43 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderAddColumn()
+  {
+    return (
+      <Modal
+        open={this.state.showingAddColumn}
+        onClose={this.hideAddColumn}
+        title={'Add New Column'}
+        confirm={true}
+        confirmButtonText={'Add'}
+        onConfirm={this.handleAddPreviewColumn}
+        showTextbox={true}
+        initialTextboxValue={''}
+        onTextboxValueChange={this.onAddColumnNameChange}
+        closeOnConfirm={false}
+      />
+    );
+  }
+
   public renderTemplate()
   {
+    const renderAdvancedButton =
+      (this.props.filetype === 'json' || this.props.exporting) &&
+      (
+        <div
+          className='flex-container fi-preview-template-wrapper'
+        >
+          <div
+            className='flex-grow fi-preview-template-button button'
+            onClick={this.showAdvanced}
+            style={buttonColors()}
+            ref='fi-preview-template-button-advanced'
+          >
+            Advanced...
+          </div>
+        </div>
+      );
+
     return (
       <div
         className='flex-container fi-preview-template'
@@ -425,6 +626,7 @@ class FileImportPreview extends TerrainComponent<Props>
             Save As Template
           </div>
         </div>
+        {renderAdvancedButton}
       </div>
     );
   }
@@ -505,6 +707,36 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTable()
   {
+    const previewColumns = this.props.columnNames.map((value, key) =>
+      <FileImportPreviewColumn
+        key={key}
+        columnId={key}
+        columnName={this.props.columnNames.get(key)}
+        columnNames={this.props.columnNames}
+        isIncluded={this.props.columnsToInclude.get(key)}
+        columnType={this.props.columnTypes.get(key)}
+        isPrimaryKey={this.props.primaryKeys.includes(key)}
+        columnOptions={this.props.columnOptions}
+        exporting={this.props.exporting}
+        onColumnNameChange={this.onColumnNameChange}
+      />,
+    ).toArray();
+    if (this.props.filetype === 'json' && !this.props.requireJSONHaveAllFields)
+    {
+      previewColumns.push(
+        (<div
+          key={previewColumns.length}
+          className='fi-preview-column fi-preview-add-column-button'
+          onClick={this.showAddColumn}
+          style={buttonColors()}
+        >
+          <div className='fi-preview-add-column-content'>
+            {'+'}
+          </div>
+
+        </div>));
+    }
+
     return (
       <div
         className='fi-preview-table-container'
@@ -513,20 +745,7 @@ class FileImportPreview extends TerrainComponent<Props>
           className='fi-preview-columns-container'
         >
           {
-            this.props.columnNames.map((value, key) =>
-              <FileImportPreviewColumn
-                key={key}
-                columnId={key}
-                columnName={this.props.columnNames.get(key)}
-                columnNames={this.props.columnNames}
-                isIncluded={this.props.columnsToInclude.get(key)}
-                columnType={this.props.columnTypes.get(key)}
-                isPrimaryKey={this.props.primaryKeys.includes(key)}
-                columnOptions={this.props.columnOptions}
-                exporting={this.props.exporting}
-                onColumnNameChange={this.onColumnNameChange}
-              />,
-            ).toArray()
+            previewColumns
           }
         </div>
         <div
@@ -681,6 +900,8 @@ class FileImportPreview extends TerrainComponent<Props>
               {this.renderApplyTemplate()}
               {this.renderSaveTemplate()}
               {this.renderUpdateTemplate()}
+              {this.renderAdvancedModal()}
+              {this.renderAddColumn()}
               {this.renderError()}
             </div>
         }

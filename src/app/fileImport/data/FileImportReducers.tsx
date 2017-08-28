@@ -159,6 +159,17 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   return state;
 };
 
+const addPreviewColumn = (state: FileImportTypes.FileImportState, columnName: string) =>
+{
+  const { originalNames, columnNames, columnTypes, columnsToInclude, previewRows } = state;
+  return state
+    .set('originalNames', originalNames.push(columnName))
+    .set('columnNames', columnNames.push(columnName))
+    .set('columnTypes', columnTypes.push(FileImportTypes._ColumnTypesTree()))
+    .set('columnsToInclude', columnsToInclude.push(true))
+    .set('previewRows', previewRows.map((row) => row.concat('')));
+};
+
 FileImportReducers[ActionTypes.setErrorMsg] =
   (state, action) =>
     state
@@ -208,6 +219,24 @@ FileImportReducers[ActionTypes.changeElasticUpdate] =
   (state, action) =>
     state
       .set('elasticUpdate', !state.elasticUpdate)
+  ;
+
+FileImportReducers[ActionTypes.setPreviewColumn] =
+  (state, action) =>
+    state
+      .set('requireJSONHaveAllFields', action.payload.requireJSONHaveAllFields)
+  ;
+
+FileImportReducers[ActionTypes.setExportFiletype] =
+  (state, action) =>
+    state
+      .set('filetype', action.payload.exportFiletype)
+  ;
+
+FileImportReducers[ActionTypes.setExportRank] =
+  (state, action) =>
+    state
+      .set('exportRank', action.payload.exportRank)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -305,6 +334,7 @@ FileImportReducers[ActionTypes.importFile] =
       state.elasticUpdate,
       state.hasCsvHeader,
       state.isNewlineSeparatedJSON,
+      state.requireJSONHaveAllFields,
       state.primaryKeyDelimiter,
       () =>
       {
@@ -439,7 +469,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
           FileImportTypes._Template({
             templateId: template['id'],
             templateName: template['name'],
-            originalNames: template['originalNames'],
+            originalNames: List(template['originalNames']),
             columnTypes: template['columnTypes'],
             transformations: template['transformations'],
             primaryKeys: template['primaryKeys'],
@@ -464,12 +494,9 @@ FileImportReducers[ActionTypes.applyTemplate] =
       state = applyTransform(state, transform);
     });
     const { columnNames, previewRows } = state;
-    return state
-      .set('originalNames', List(template.originalNames))
+    state.set('originalNames', List(template.originalNames))
       .set('primaryKeys', List(template.primaryKeys.map((pkey) => columnNames.indexOf(pkey))))
-      .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('columnNames', columnNames)
-      .set('originalNames', List(template.originalNames))
       .set('transforms', List<Transform>(template.transformations))
       .set('columnTypes', List(columnNames.map((colName) =>
         template.columnTypes[colName] ?
@@ -480,12 +507,22 @@ FileImportReducers[ActionTypes.applyTemplate] =
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewRows', previewRows)
       .set('primaryKeyDelimiter', template.primaryKeyDelimiter);
+    action.payload.newColumns.forEach((colName) =>
+    {
+      state = addPreviewColumn(state, colName);
+    });
+    return state;
   };
 
 FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
     state.set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
+  ;
+
+FileImportReducers[ActionTypes.addPreviewColumn] =
+  (state, action) =>
+    addPreviewColumn(state, action.payload.columnName)
   ;
 
 export default FileImportReducers;
