@@ -511,9 +511,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
           makeTooltip(
             <CreateLine onClick={this.handleNewAlgorithmModalOpen} open={false} />,
             {
-              title: 'Create New Algorithm',
+              title: 'Create a New Algorithm',
               position: 'top',
-            }
+            },
           )
         }
       </LibraryItemCategory>
