@@ -47,30 +47,25 @@ THE SOFTWARE.
 var webpack = require("webpack");
 var conf = require("./webpack.config");
 
-// Disable source map.
-delete conf.devtool;
-
-conf.plugins = [
+conf.plugins[0] =
   new webpack.DefinePlugin({
-    // Signal to React not to include detailed checks.
     "process.env": {
-      "NODE_ENV": "'production'",
+//    "NODE_ENV": JSON.stringify('production'),
+      "BABEL_ENV": JSON.stringify('production'),
     },
-
     DEV: "false",
-    MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || 'localhost:3000') + "'",
-  }),
+    MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
+  });
 
+conf.plugins.concat([
   // Minify code.
-  new webpack.optimize.UglifyJsPlugin()
-];
-
-// enable babel plugins on tsx loader
-if(!conf.module.rules[0].loader.startsWith('babel-loader'))
-{
-  throw new Error('Expected first loader to be babel-loader but found ' + conf.module.rules[0].loader);
-}
-conf.module.rules[0].loader =
-  'babel-loader?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements&minified=true!ts-loader?{"compilerOptions":{}}';
+  new webpack.optimize.UglifyJsPlugin({
+    parallel: true,
+    uglifyOptions: {
+      ecma: 6,
+    }
+  }),
+  new webpack.optimize.AggressiveMergingPlugin(),
+]);
 
 module.exports = conf;
