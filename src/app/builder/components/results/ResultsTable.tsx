@@ -278,7 +278,6 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public handleFilterChange(filter)
   {
-    console.log(filter);
     if (filter.filterTerm === '')
     {
       this.clearFilters();
