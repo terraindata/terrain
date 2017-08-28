@@ -272,7 +272,9 @@ const Util = {
   // for SQL
   formatInputDate(date: Date): string
   {
-    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+    const day = moment(date).format('YYYY-MM-DD');
+    const time = moment(date).format('HH:mm:ssZ');
+    return day + 'T' + time;
   },
 
   formatNumber(n: number): string
