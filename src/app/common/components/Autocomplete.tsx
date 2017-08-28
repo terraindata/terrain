@@ -221,7 +221,7 @@ class Autocomplete extends TerrainComponent<Props>
         });
         this.blurValue = value;
         this.props.onChange(value);
-        this.props.onEnter(value);
+        this.props.onEnter && this.props.onEnter(value);
         this.refs['input']['blur']();
         break;
       case 27:
