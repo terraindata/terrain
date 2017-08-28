@@ -357,6 +357,7 @@ class FileImportPreview extends TerrainComponent<Props>
           />
         }
         fill={true}
+        noFooterPadding={true}
       />
     );
   }

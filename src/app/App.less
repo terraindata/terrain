@@ -151,6 +151,20 @@ input[type=num], input[type=password]
   cursor: pointer;
   white-space: nowrap;
 
+  svg {
+    width: 12px;
+    fill: rgba(255, 255, 255, 1);
+
+    &.back {
+      .rotate180;
+      margin-right: 6px;
+    }
+
+    &.next {
+      margin-left: 6px;
+    }
+  }
+
   &:hover {
     background: rgba(0,0,0,0.35); //rgba(255,255,255,0.45);
   }

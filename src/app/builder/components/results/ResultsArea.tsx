@@ -555,6 +555,7 @@ column if you have customized the results view.');
         title={'Export'}
         children={content}
         fill={true}
+        noFooterPadding={true}
       />
     );
   }
