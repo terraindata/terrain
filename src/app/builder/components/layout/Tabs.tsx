@@ -59,7 +59,7 @@ import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
-const ReactTooltip = require('react-tooltip');
+
 import { backgroundColor, Colors } from '../../../common/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');

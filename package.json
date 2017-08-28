@@ -75,7 +75,6 @@
     ],
     "testURL": "http://localhost"
   },
-  "private": true,
   "dependencies": {
     "aes-js": "^3.1.0",
     "async-busboy": "^0.6.1",
@@ -142,7 +141,7 @@
     "react-router-dom": "^4.1.1",
     "react-select": "^1.0.0-beta13",
     "react-string-replace": "^0.4.0",
-    "react-tooltip": "^2.0.0",
+    "react-tippy": "^1.2.1",
     "redux": "^3.0.5",
     "redux-actions": "^0.9.0",
     "redux-immutable": "^4.0.0",

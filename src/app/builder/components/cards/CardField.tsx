@@ -49,6 +49,8 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -369,21 +371,23 @@ class CardField extends TerrainComponent<Props>
         >
           {
             !renderTools && this.props.canEdit && this.props.isFirstRow &&
-            <div
-              className='card-field-top-add card-field-add'
-              onClick={this.addFieldTop}
-              data-tip={'Add another'}
-            >
-              <AddIcon />
-              <CardDropArea
-                index={null}
-                keyPath={this._ikeyPath(this.props.keyPath, (row.inner as Display).key)}
-                beforeDrop={this.beforeTopAddDrop}
-                renderPreview={true}
-                accepts={(this.props.row.inner as Display).accepts}
-                language={this.props.language}
-              />
-            </div>
+            tooltip(
+              <div
+                className='card-field-top-add card-field-add'
+                onClick={this.addFieldTop}
+              >
+                <AddIcon />
+                <CardDropArea
+                  index={null}
+                  keyPath={this._ikeyPath(this.props.keyPath, (row.inner as Display).key)}
+                  beforeDrop={this.beforeTopAddDrop}
+                  renderPreview={true}
+                  accepts={(this.props.row.inner as Display).accepts}
+                  language={this.props.language}
+                />
+              </div>,
+              'Add another',
+            )
           }
           {
             renderTools && this.props.canEdit &&
@@ -430,15 +434,19 @@ class CardField extends TerrainComponent<Props>
             <div className='card-field-tools-right'>
               <div className='card-field-tools-right-inner'>
                 <div>
-                  <div
-                    className='card-field-add'
-                    onClick={this.addField}
-                    data-tip={'Add another'}
-                    style={ADD_TOOL_STYLE}
-                    key={'add-tool'}
-                  >
-                    <AddIcon />
-                  </div>
+                  {
+                    tooltip(
+                      <div
+                        className='card-field-add'
+                        onClick={this.addField}
+                        style={ADD_TOOL_STYLE}
+                        key={'add-tool'}
+                      >
+                        <AddIcon />
+                      </div>,
+                      'Add another',
+                    )
+                  }
                   {
                     this.props.helpOn ?
                       <ManualInfo
@@ -450,15 +458,17 @@ class CardField extends TerrainComponent<Props>
                   }
                   {
                     !this.props.isOnlyRow &&
-                    <div
-                      className='card-field-remove'
-                      onClick={this.removeField}
-                      data-tip={'Remove'}
-                      style={REMOVE_TOOL_STYLE}
-                      key={'remove-tool'}
-                    >
-                      <RemoveIcon />
-                    </div>
+                    tooltip(
+                      <div
+                        className='card-field-remove'
+                        onClick={this.removeField}
+                        style={REMOVE_TOOL_STYLE}
+                        key={'remove-tool'}
+                      >
+                        <RemoveIcon />
+                      </div>,
+                      'Remove',
+                    )
                   }
                 </div>
               </div>
