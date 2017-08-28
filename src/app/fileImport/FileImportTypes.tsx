@@ -57,7 +57,7 @@ class FileImportStateC extends BaseClass
   public serverName: string = '';
   public dbName: string = '';
   public tableName: string = '';
-  public filetype: string = 'csv';
+  public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
