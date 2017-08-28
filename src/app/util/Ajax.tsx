@@ -960,27 +960,6 @@ export const Ajax =
         onLoad(dbs, !!(m2Dbs));
       };
 
-      {/* AjaxM1.getDbs_m1(
-        (dbNames: string[]) =>
-        {
-          m1Dbs = dbNames.map(
-            (dbName: string) =>
-              ({
-                id: dbName,
-                name: dbName,
-                type: 'mysql',
-                source: 'm1' as ('m1' | 'm2'),
-              }),
-          );
-          checkForLoaded();
-        },
-        () =>
-        {
-          m1Dbs = [];
-          checkForLoaded();
-        },
-      ); */}
-
       Ajax.req(
         'get',
         'database',
