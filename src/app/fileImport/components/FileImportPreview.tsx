@@ -663,8 +663,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('appliedTemplateName: ', this.state.appliedTemplateName);
-    console.log('saveTemplateName: ', this.state.saveTemplateName);
     return (
       <div
         className={classNames({
