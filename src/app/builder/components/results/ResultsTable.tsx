@@ -59,6 +59,7 @@ import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultName } from './Result';
 import { Results } from './ResultTypes';
+import * as _ from 'lodash';
 
 export interface Props
 {
@@ -194,7 +195,8 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public getRow(i: number): object
   {
-    return this.state.rows.get(i).fields.toJS();
+    var obj = this.state.rows.get(i).fields.toJS();
+    return _.mapValues(obj, (value) => JSON.stringify(value));;
   }
 
   public onRowsSelected(rows)
@@ -339,28 +341,6 @@ export default class ResultsTable extends TerrainComponent<Props>
     return (<ReactDataGrid.Row {...props} />);
   }
 
-  // public getCellValue(key) {
-  //     var val = void 0;
-  //     if (key === 'select-row') {
-  //       return this.props.isSelected;
-  //     } else if (typeof this.props.row.get === 'function') {
-  //       val = this.props.row.get(key);
-  //     } else {
-  //       val = this.props.row[key];
-  //       if (Array.isArray(val))
-  //       {
-  //         val = JSON.stringify(val);
-  //       }
-  //     }
-  //     return val;
-  // }
-
-  public cellRenderer(props)
-  {
-    console.log('Testing');
-    return (<ReactDataGrid.Cell {...props} />);
-  }
-
   public render()
   {
     if (!this.state.rows)
@@ -394,3 +374,5 @@ export default class ResultsTable extends TerrainComponent<Props>
     );
   }
 }
+
+
