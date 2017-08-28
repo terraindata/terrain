@@ -559,6 +559,7 @@ class FileImport extends TerrainComponent<any>
             options={this.state.serverNames}
             onChange={this.handleServerChange}
             canEdit={true}
+            unmountOnChange={true}
           />;
         break;
       case Steps.SelectDb:
