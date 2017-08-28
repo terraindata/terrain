@@ -56,20 +56,11 @@
     
     &:hover {
       border-color: rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.1);
     }
   }
   
   &.card-field-moving {
     z-index: 9999;
-    .card-field-tools-left,
-    .card-field-tools-right {
-      border-color: rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.1);
-      .card-field-handle {
-        color: #333;
-      }
-    }
   }
   
   .card-field-tools-left-inner,
@@ -104,7 +95,6 @@
   .card-field-remove {
     font-weight: 200;
     font-size: calc(@medium-font-size * 1.25);
-    color: @light-gray;
     .transition(all 0.25s);   
     cursor: pointer;
   }
@@ -127,12 +117,13 @@
     width: 12px;
     height: 12px;
     border-radius: 12px;
+    border-width: 1px;
+    border-style: solid;
     // background: #fff;
     margin-top: 4px;
     
     svg {
-      width: 8px;
-      fill: #777; // #FF6259;
+      width: 10px;
       .dead-center;
     }
     
@@ -153,22 +144,24 @@
     display: inline-block;
     position: relative;
     vertical-align: middle;
+    cursor: pointer;
     .transition;
     margin-right: 2px;
     width: 18px;
     height: 18px;
     border-radius: 18px;
-    background: #fff;
+    //background: #fff;
     margin-top: 3px;
+    left: -3px; 
     
     svg {
       width: 12px;
-      fill: #8ac541;
+      //fill: #8ac541;
       .dead-center;
     }
     
     &:hover {
-      background: #8ac541;
+     // background: #8ac541;
       svg {
         fill: #fff;
       }
@@ -185,26 +178,26 @@
     top: 5px;
   }
 
-  &:hover {
-    .card {
-      .card-field-tools-left-inner,
-      .card-field-tools-right-inner {
-        opacity: 0;
-      }
+  // &:hover {
+  //   // .card {
+  //   //   .card-field-tools-left-inner,
+  //   //   .card-field-tools-right-inner {
+  //   //     opacity: 0;
+  //   //   }
       
-      .card-field:hover {
-        .card-field-tools-left-inner,
-        .card-field-tools-right-inner {
-          opacity: 1;
-        }
-      }
-    }
+  //   //   .card-field:hover {
+  //   //     .card-field-tools-left-inner,
+  //   //     .card-field-tools-right-inner {
+  //   //       opacity: 1;
+  //   //     }
+  //   //   }
+  //   // }
     
-    .card-field-tools-left-inner,
-    .card-field-tools-right-inner {
-      opacity: 1;
-    }
-  }
+  //   .card-field-tools-left-inner,
+  //   .card-field-tools-right-inner {
+  //     opacity: 1;
+  //   }
+  // }
   
   &.card-field-moving {
     .card-field-tools-left-inner {
@@ -218,6 +211,23 @@
   &.card-field-single {
     .card-field-tools-left {
       display: none;
+    }
+  }
+}
+
+.card-hovering {
+  .card {
+    .card-field {
+    .card-field-tools-left-inner, 
+    .card-field-tools-right-inner {
+        opacity: 0;
+      }
+    }
+  }
+  .card-field {
+    .card-field-tools-left-inner, 
+    .card-field-tools-right-inner {
+      opacity: 1;
     }
   }
 }

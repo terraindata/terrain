@@ -161,7 +161,6 @@ class DeployModal extends TerrainComponent<Props>
     const defaultTql =
       (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
     const tql = variant ? variant.query.tql : '';
-
     return (
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
@@ -170,6 +169,7 @@ class DeployModal extends TerrainComponent<Props>
             tql={tql}
             isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
+            placeholder={'Your algorithm is blank'}
           />
         </div>
       </div>
@@ -242,6 +242,7 @@ class DeployModal extends TerrainComponent<Props>
                 defaultChecked={this.state.defaultChecked}
                 defaultVariant={defaultVariant}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
+                onCancelDeploy={this.handleClose}
               />
             </div>
           }
