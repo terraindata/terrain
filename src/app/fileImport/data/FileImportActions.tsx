@@ -158,8 +158,11 @@ const FileImportActions =
       $(ActionTypes.setTemplates, { templates }),
 
     applyTemplate:
-    (templateId: number) =>
-      $(ActionTypes.applyTemplate, { templateId }),
+    (templateId: number, newColumns: List<string>) =>
+      $(ActionTypes.applyTemplate, {
+        templateId,
+        newColumns,
+      }),
 
     deleteTemplate:
     (templateId: number, exporting: boolean) =>
