@@ -308,31 +308,30 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const templateName = this.state.templateOptions.get(itemIndex);
 
-    // check if template is compatible with current mapping -> whether column names match
-    const colNames: Immutable.List<string> = this.props.templates.get(itemIndex).originalNames;
+    // check if template is compatible with current mapping; all current columns must exist in template
+    const templateCols: string[] = this.props.templates.get(itemIndex).originalNames.toArray();
     let isCompatible: boolean = true;
-    const unmatchedColNames: string[] = [];
-    const unmatchedTableNames: string[] = this.props.columnNames.toArray();
-    colNames.map((colName) =>
+    const unmatchedTemplateCols: Set<string> = new Set(templateCols);
+    const missingTableCols: string[] = [];
+    this.props.columnNames.map((tableCol) =>
     {
-      if (!this.props.columnNames.contains(colName))
+      if (templateCols.indexOf(tableCol) === -1)
       {
         isCompatible = false;
-        unmatchedColNames.push(colName);
+        missingTableCols.push(tableCol);
       }
       else
       {
-        unmatchedTableNames.splice(unmatchedTableNames.indexOf(colName), 1);
+        unmatchedTemplateCols.delete(tableCol);
       }
     });
     if (!isCompatible)
     {
-      Actions.setErrorMsg('Incompatible template, unmatched column names:\n' + JSON.stringify(unmatchedColNames) + '\n and \n'
-        + JSON.stringify(unmatchedTableNames));
+      Actions.setErrorMsg('Incompatible template. Template does not contain columns: ' + JSON.stringify(missingTableCols));
       return;
     }
 
-    Actions.applyTemplate(getTemplateId(templateName));
+    Actions.applyTemplate(getTemplateId(templateName), List(Array.from(unmatchedTemplateCols)));
     this.setState({
       showingApplyTemplate: false,
       appliedTemplateName: getTemplateName(templateName),
