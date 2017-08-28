@@ -51,6 +51,7 @@ import './CardStyle.less';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
 
@@ -105,6 +106,7 @@ export interface Props
   display?: Display;
 }
 
+@Radium
 class _CardComponent extends TerrainComponent<Props>
 {
   public state: {
@@ -562,7 +564,7 @@ class _CardComponent extends TerrainComponent<Props>
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
               <div className='drag-handle'>
-                <DragHandle hiddenByDefault={true} connectDragSource={connectDragSource} showWhenHoveringClassName={'card-inner'} />
+                <DragHandle key={Math.random().toString()} hiddenByDefault={!this.state.hovering} connectDragSource={connectDragSource} />
               </div>
             }
             {

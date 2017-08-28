@@ -329,8 +329,8 @@ const BuilderColumn = createReactClass<any, any>(
                 </div>
               )
             }
-            <div ref='handle'>
-              <DragHandle hiddenByDefault={true} showWhenHoveringClassName='builder-title-bar' />
+            <div ref='handle' className='builder-title-bar-drag-handle'>
+              <DragHandle key={Math.random().toString()} showWhenHoveringClassName='builder-title-bar' />
             </div>
             <div
               className='builder-title-bar-title'

@@ -233,7 +233,7 @@ const Panel = {
         return parentNode === this.refs[this.props.handleRef];
       };
 
-      if (event.target !== this.refs[this.props.handleRef] && Util.findParentNode(event.target, checkParent, 4))
+      if (event.target !== this.refs[this.props.handleRef] && Util.findParentNode(event.target, checkParent, 4) === null)
       {
         // a handleRef is set, so only respond to mouse events on our handle
         return;

@@ -47,28 +47,39 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { Colors, getStyle } from '../../common/Colors';
 import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DragHandleStyle.less';
 
-const Handle = require('./../../../images/icon_drag.svg');
+const Handle = require('./../../../images/icon_drag_1.svg');
 
 export interface Props
 {
+  id?: number;
   hiddenByDefault?: boolean;
   showWhenHoveringClassName?: string;
   useAltColor?: boolean;
   connectDragSource?: (el: El) => El;
 }
 
+@Radium
 class DragHandle extends TerrainComponent<Props>
 {
   public renderHandle(dragHandleStyle)
   {
     return (
-      <div>
+      <div
+        key={this.props.id}
+        style={{
+          'opacity': this.props.hiddenByDefault ? 0 : 0.85,
+          ':hover': {
+            opacity: 0.85,
+          },
+        }}
+      >
         <Handle className='drag-icon' />
         <StyleTag style={dragHandleStyle} />
       </div>
@@ -78,23 +89,16 @@ class DragHandle extends TerrainComponent<Props>
   public render()
   {
     const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
+
+    // TODO: Find a way to only generate these styles once for the whole app
     const dragHandleStyle = {
       '.drag-icon': {
-        opacity: this.props.hiddenByDefault ? 0 : 0.85,
-      },
-      '.drag-icon .cls-1': {
         fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
       },
       '.drag-icon:hover': {
-        opacity: 0.85,
-      },
-      '.drag-icon:hover. cls-1': {
         fill: Colors().inactiveHover,
       },
       '.drag-icon:active': {
-        opacity: 0.85,
-      },
-      '.drag-icon:active .cls-1': {
         fill: Colors().active,
       },
       ['.' + hoveringClassName]: {
