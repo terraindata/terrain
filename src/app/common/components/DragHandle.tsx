@@ -96,7 +96,6 @@ class DragHandle extends TerrainComponent<Props>
       },
       '.drag-icon:active .cls-1': {
         fill: Colors().active,
-        opacity: 0.85,
       },
       ['.' + hoveringClassName]: {
         opacity: '0.85 !important' as any,
