@@ -44,45 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions
+// tslint:disable:max-classes-per-file
 
-import * as CodeMirror from 'codemirror';
+import Radium = require('radium');
+import * as React from 'react';
+import * as SchemaTypes from '../../SchemaTypes';
+import Styles from '../SchemaTreeStyles';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 
-CodeMirror.defineMode('elastic', (config, parserConfig) =>
+export interface Props
 {
-  const indentUnit = config.indentUnit;
-  return {
-    startState: () =>
-    {
-      return {
-        indent: 0,
-      };
-    },
-    token: (stream, state) =>
-    {
-      let ch;
-      do
-      {
-        if (stream.eol())
-        {
-          return null;
-        }
-        ch = stream.next();
-      } while (ch !== '[' && ch !== ']' && ch !== '{' && ch !== '}');
+  item: SchemaTypes.FieldProperty;
+}
 
-      state.indent = stream.indentation();
-      if (ch === '{' || ch === '[')
-      {
-        state.indent += indentUnit;
-      }
-      else if (ch === '}' || ch === ']')
-      {
-        state.indent -= indentUnit;
-      }
-      stream.skipToEnd();
-      return null;
+class State
+{
+}
+
+@Radium
+export class FieldPropertyTreeInfo extends TerrainComponent<Props>
+{
+  public state: State = new State();
+
+  public render()
+  {
+    const fieldProperty = this.props.item;
+
+    return (
+      <div
+        style={Styles.infoPieces}
+      >
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {fieldProperty.value}
+          </span>
+        </div>
+      </div>
+    );
+  }
+}
+
+export const fieldPropertyChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
+  [
+    {
+      label: 'Additional Properties',
+      type: 'fieldProperty',
     },
-    indent: (state, textAfter) => state.indent,
-    helperType: 'elastic',
-  };
-});
+  ];
+
+export default FieldPropertyTreeInfo;

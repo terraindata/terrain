@@ -66,6 +66,7 @@ export interface Props
   resultsConfig?: ResultsConfig;
   onExpand: (index: number) => void;
   resultsLoading: boolean;
+  allowSpotlights: boolean;
 }
 
 export default class ResultsTable extends TerrainComponent<Props>
@@ -357,7 +358,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         rowRenderer={this.rowRenderer}
         rowKey={'_id' /*TODO*/}
         rowSelection={{
-          showCheckbox: true,
+          showCheckbox: this.props.allowSpotlights,
           enableShiftSelect: true,
           onRowsSelected: this.onRowsSelected,
           onRowsDeselected: this.onRowsDeselected,

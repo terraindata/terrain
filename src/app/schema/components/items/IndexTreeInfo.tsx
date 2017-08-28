@@ -102,7 +102,7 @@ export class IndexTreeInfo extends TerrainComponent<Props>
 export const indexChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Columns',
+      label: 'Fields',
       type: 'column',
     },
   ];
