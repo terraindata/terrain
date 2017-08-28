@@ -219,6 +219,7 @@ class TransformCard extends TerrainComponent<Props>
           updatePoints={this.handleUpdatePoints}
           width={width}
           language={this.props.language}
+          colors={this.props.data.static.colors}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleChartDomainChange}
@@ -230,6 +231,7 @@ class TransformCard extends TerrainComponent<Props>
           canEdit={this.props.canEdit}
           width={width}
           language={this.props.language}
+          colors={this.props.data.static.colors}
         />
       </div>
     );

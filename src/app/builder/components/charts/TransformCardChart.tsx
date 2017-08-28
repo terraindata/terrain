@@ -78,7 +78,7 @@ export interface Props
   updatePoints: (points: ScorePoints, released?: boolean) => void;
   width: number;
   language: string;
-
+  colors: [string, string];
   spotlights: any; // TODO spawtlights
 }
 
@@ -344,6 +344,7 @@ class TransformCardChart extends TerrainComponent<Props>
       height: 300,
       canEdit: this.props.canEdit,
       inputKey: overrideState.inputKey || this.props.inputKey,
+      colors: this.props.colors,
     };
 
     return chartState;
