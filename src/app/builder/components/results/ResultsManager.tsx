@@ -54,7 +54,6 @@ import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
@@ -525,9 +524,6 @@ export class ResultsManager extends TerrainComponent<Props>
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: filteredFields,
-      // preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
-      //   List(_.map(_.omit(result.fields.toJS(), ['_score', '_index', '_type', '_id']), (field) => field)),
-      // )),
       preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
         filteredFields.map((field, index) =>
           result.fields.get(String(field)),

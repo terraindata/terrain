@@ -1,9 +1,20 @@
 @import "../../common/Common.less";
 
 @padding: 6px;
+@primary-key-padding: 12px 6px;
 
 .fi-preview {
   white-space: nowrap;
+  text-align: center;
+
+  &.fi-preview-export {
+    padding: 12px;
+  }
+
+  .fi-preview-empty-export {
+    .big-text;
+    padding: 24px;
+  }
 
   .fi-preview-loading-container {
     text-align: center;
@@ -25,19 +36,6 @@
         margin-left: 12px;
 
         .fi-preview-template-button {
-          .fi-button;
-        }
-
-        .fi-preview-template-delete-dropdown {
-          min-width: 150px;
-        }
-
-        .fi-preview-template-load-dropdown {
-          min-width: 150px;
-        }
-
-        .autocomplete {
-          min-width: 150px;
         }
       }
     }
@@ -45,32 +43,35 @@
     .fi-preview-pkeys {
       margin-left: 6px;
       margin-bottom: 6px;
+      max-width: 300px;
+      flex-wrap: wrap;
 
       .fi-preview-pkeys-wrapper {
 
         .fi-preview-pkeys-pkey {
-          padding: @padding;
-          .title-text;
+          .big-text;
+          padding: @primary-key-padding;
+          margin-bottom: 3px;
+          border-radius: 3px;
 
-          .fi-preview-pkeys-pkey-delete {
-            padding: @padding;
-            .big-text;
+          .delete-primary-key {
+            margin-left: 6px;
           }
         }
 
         .fi-preview-pkeys-delim {
-          padding: @padding;
-          .title-text;
+          .big-text;
+          padding: @primary-key-padding;
 
           .autocomplete {
-            max-width: 50px;
+            max-width: 20px;
           }
         }
       }
 
       .fi-preview-pkeys-nokey {
-        padding: @padding;
         .big-text;
+        padding: @padding;
         vertical-align: middle;
       }
     }
@@ -87,15 +88,31 @@
   }
 
   .fi-import-button-wrapper {
-    text-align: center;
+    flex-direction: row;
+    justify-content: flex-end;
     margin-top: 12px;
 
     .fi-preview-update {
-      color: #FFFFFF;
+      flex-direction: row;
+      white-space: normal;
+      align-items: center;
+      // max-width: 500px;
+
+      .fi-preview-update-text {
+        // word-wrap: break-word;
+        flex-direction: column;
+        margin-right: 12px;
+        align-items: flex-start;
+
+        .fi-preview-update-text-text {
+          .big-text;
+          padding: 3px;
+        }
+      }
     }
 
     .fi-preview-import-button {
-      .fi-button;
+      margin-left: 12px;
     }
   }
 }

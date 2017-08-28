@@ -244,7 +244,7 @@ class Connections extends TerrainComponent<Props>
               >
                 <CloseIcon />
               </div>,
-              'Remove'
+              'Remove',
             )
           }
         </div>

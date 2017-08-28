@@ -63,6 +63,7 @@ class FileImportStateC extends BaseClass
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
   public hasCsvHeader: boolean = false;
+  public isNewlineSeparatedJSON: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
@@ -75,6 +76,8 @@ class FileImportStateC extends BaseClass
 
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
+
+  public errorMsg: string = '';
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -142,7 +145,6 @@ export const _Template =
     originalNames: List<string>;
     columnTypes: Immutable.Map<string, object>;
     transformations: List<object>;
-    hasCsvHeader: boolean;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
     export: boolean;
@@ -223,13 +225,37 @@ export const STEP_NAMES =
     'Step 3',
     'Step 4',
     'Step 5',
+    'Step 6',
   ];
 
 export const STEP_TITLES =
   [
     'Select a File',
+    '',
     'Select a Server',
     'Select a Database',
     'Select a Table',
     'Select and Rename Columns you\'d like to Import',
   ];
+
+export const STEP_TWO_TITLES =
+  [
+    'Does your CSV have a header row?',
+    'What format is your JSON file?',
+  ];
+
+export const STEP_SUBTEXT =
+  {
+    DATABASE_SUBTEXT: 'Use the field above to either choose an existing database or name a new one that will be created',
+    TABLE_SUBTEXT: 'Use the field above to either choose an existing table or name a new one that will be created',
+  };
+
+export const enum Steps
+{
+  ChooseFile,
+  CsvJsonOptions,
+  SelectServer,
+  SelectDb,
+  SelectTable,
+  Preview,
+}

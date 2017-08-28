@@ -121,38 +121,16 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleSplitNameAChange(splitNameA: string)
   {
-    if (this.props.columnNames.delete(this.props.columnId).contains(splitNameA))
-    {
-      alert('column name: ' + splitNameA + ' already exists, duplicate column names are not allowed');
-    }
-    else if (this.state.splitNames.get(1) === splitNameA)
-    {
-      alert('split names cannot be identical');
-    }
-    else
-    {
-      this.setState({
-        splitNames: this.state.splitNames.set(0, splitNameA),
-      });
-    }
+    this.setState({
+      splitNames: this.state.splitNames.set(0, splitNameA),
+    });
   }
 
   public handleSplitNameBChange(splitNameB: string)
   {
-    if (this.props.columnNames.delete(this.props.columnId).contains(splitNameB))
-    {
-      alert('column name: ' + splitNameB + ' already exists, duplicate column names are not allowed');
-    }
-    else if (this.state.splitNames.get(0) === splitNameB)
-    {
-      alert('split names cannot be identical');
-    }
-    else
-    {
-      this.setState({
-        splitNames: this.state.splitNames.set(1, splitNameB),
-      });
-    }
+    this.setState({
+      splitNames: this.state.splitNames.set(1, splitNameB),
+    });
   }
 
   public handleMergeIndexChange(mergeIndex: number)
@@ -166,13 +144,6 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleMergeNewNameChange(mergeNewName: string)
   {
-    if (this.props.columnNames.delete(this.props.columnId).filter((colName, index) =>
-      index !== this.state.mergeIndex,
-    ).contains(mergeNewName))
-    {
-      alert('column name: ' + mergeNewName + ' already exists, duplicate column names are not allowed');
-      return;
-    }
     this.setState({
       mergeNewName,
     });
@@ -184,43 +155,68 @@ class TransformBox extends TerrainComponent<Props>
     {
       return 'Select a transformation';
     }
-    if (transformName === 'duplicate' && !this.state.duplicateNewName)
+
+    switch (transformName)
     {
-      return 'Enter duplicate column name';
-    }
-    if (transformName === 'append' && !this.state.transformText)
-    {
-      return 'Enter text to append';
-    }
-    if (transformName === 'prepend' && !this.state.transformText)
-    {
-      return 'Enter text to prepend';
-    }
-    if (transformName === 'split')
-    {
-      if (!this.state.transformText)
-      {
-        return 'Enter split text';
-      }
-      if (!this.state.splitNames.get(0))
-      {
-        return 'Enter new column 1 name';
-      }
-      if (!this.state.splitNames.get(1))
-      {
-        return 'Enter new column 2 name';
-      }
-    }
-    if (transformName === 'merge')
-    {
-      if (!this.state.mergeName)
-      {
-        return 'Select column to merge';
-      }
-      if (!this.state.mergeNewName)
-      {
-        return 'Enter new column name';
-      }
+      case 'duplicate':
+        if (!this.state.duplicateNewName)
+        {
+          return 'Enter duplicate column name';
+        }
+        if (this.props.columnNames.contains(this.state.duplicateNewName))
+        {
+          return 'Column name: ' + this.state.duplicateNewName + ' already exists, duplicate column names are not allowed';
+        }
+        break;
+
+      case 'append':
+        if (!this.state.transformText)
+        {
+          return 'Enter text to append';
+        }
+        break;
+
+      case 'prepend':
+        if (!this.state.transformText)
+        {
+          return 'Enter text to prepend';
+        }
+        break;
+
+      case 'split':
+        if (!this.state.transformText)
+        {
+          return 'Enter split text';
+        }
+        if (!this.state.splitNames.get(0))
+        {
+          return 'Enter new column 1 name';
+        }
+        if (!this.state.splitNames.get(1))
+        {
+          return 'Enter new column 2 name';
+        }
+        if (this.state.splitNames.get(0) === this.state.splitNames.get(1))
+        {
+          return 'Split names cannot be identical';
+        }
+        if (this.props.columnNames.delete(this.props.columnId).contains(this.state.splitNames.get(0)))
+        {
+          return 'Column name: ' + this.state.splitNames.get(0) + ' already exists, duplicate column names are not allowed';
+        }
+        if (this.props.columnNames.delete(this.props.columnId).contains(this.state.splitNames.get(1)))
+        {
+          return 'Column name: ' + this.state.splitNames.get(1) + ' already exists, duplicate column names are not allowed';
+        }
+        break;
+
+      case 'merge':
+        if (this.props.columnNames.delete(this.props.columnId).delete(this.state.mergeIndex).contains(this.state.mergeNewName))
+        {
+          return 'Column name: ' + this.state.mergeNewName + ' already exists, duplicate column names are not allowed';
+        }
+        break;
+      default:
     }
     return '';
   }
@@ -281,7 +277,7 @@ class TransformBox extends TerrainComponent<Props>
     const msg: string = this.transformErrorCheck(transformName);
     if (msg)
     {
-      alert(msg);
+      Actions.setErrorMsg(msg);
       return;
     }
 
@@ -446,7 +442,7 @@ class TransformBox extends TerrainComponent<Props>
         {
           this.state.transformTypeIndex !== -1 &&
           <span
-            className='fi-transform-button clickable'
+            className='fi-transform-button clickable button'
             onClick={this.handleTransformClick}
             style={buttonColors()}
           >

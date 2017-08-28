@@ -72,7 +72,7 @@ class CreateItem extends TerrainComponent<Props>
           title: 'Create ' + this.props.name,
           position: 'top',
           distance: 40,
-        }
+        },
       )
     );
   }

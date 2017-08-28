@@ -72,6 +72,7 @@ export interface Props
   textColor?: string | ((index: number) => string);
   width?: string;
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
+  unmountOnChange?: boolean;
 }
 
 @Radium
@@ -200,7 +201,7 @@ class Dropdown extends TerrainComponent<Props>
       return;
     }
 
-    if (!this.state.open)
+    if (!this.state.open && this.props.unmountOnChange === false)
     {
       $(document).on('click', this.close);
     }
