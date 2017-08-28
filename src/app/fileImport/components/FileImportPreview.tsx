@@ -135,11 +135,17 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       this.setState({
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
-        appliedTemplate: updateTemplateId(this.state.appliedTemplate, nextProps.templates.find((temp) =>
-          temp.templateName === getTemplateName(this.state.appliedTemplate),
-        ).templateId,
-        ),
       });
+
+      if (this.state.appliedTemplate)
+      {
+        this.setState({
+          appliedTemplate: updateTemplateId(this.state.appliedTemplate, nextProps.templates.find((temp) =>
+            temp.templateName === getTemplateName(this.state.appliedTemplate),
+          ).templateId,
+          ),
+        });
+      }
     }
   }
 
