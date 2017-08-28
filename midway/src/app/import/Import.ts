@@ -253,11 +253,14 @@ export class Import
           }
           for (const field of Object.keys(newDoc))
           {
-            if (fieldArrayDepths[field] === undefined)
+            if (newDoc[field] !== null && newDoc[field] !== undefined)
             {
-              fieldArrayDepths[field] = new Set<number>();
+              if (fieldArrayDepths[field] === undefined)
+              {
+                fieldArrayDepths[field] = new Set<number>();
+              }
+              fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
             }
-            fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
             if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
             {
               newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);

@@ -63,6 +63,9 @@ import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
+import { Doc, Editor } from 'codemirror';
+import * as CodeMirrorLib from 'codemirror';
+
 import './ElasticMode';
 import './TQLMode.js';
 
@@ -102,6 +105,8 @@ export interface Props
   isDiff?: boolean;
   diffTql?: string;
 
+  placeholder?: string;
+
   onChange?(tql: string, noAction?: boolean, manualRequest?: boolean);
 
   toggleSyntaxPopup?(event, line);
@@ -110,10 +115,16 @@ export interface Props
   hideTermDefinition?();
 }
 
+export interface MarkerAnnotation
+{
+  showing: boolean;
+  msg: string;
+}
+
 class TQLEditor extends TerrainComponent<Props>
 {
   public state: {
-    codeMirrorInstance, // CodeMirror instance does not have a defined type.
+    codeMirrorInstance: Doc,
   } = {
     codeMirrorInstance: undefined,
   };
@@ -146,7 +157,7 @@ class TQLEditor extends TerrainComponent<Props>
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,
-        lint: true,
+        lint: false,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
         revertButtons: false,
         connect: 'align',
@@ -196,6 +207,8 @@ class TQLEditor extends TerrainComponent<Props>
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
         onCodeMirrorMount={this.registerCodeMirror}
+        placeholder={(this.props.placeholder !== '' &&
+          this.props.placeholder !== undefined) ? this.props.placeholder : 'Write your query here'}
       />
     );
 
@@ -277,6 +290,90 @@ class TQLEditor extends TerrainComponent<Props>
     }
   }
 
+  private hidePopupClickHandler(e: MouseEvent, tooltip: HTMLElement, ann: MarkerAnnotation)
+  {
+    const target = e.target || e.srcElement;
+    CodeMirrorLib.off(target, 'mousedown', this.hidePopupClickHandler);
+    if (tooltip)
+    {
+      CodeMirrorLib.off(tooltip, 'mousedown', this.hidePopupClickHandler);
+      if (tooltip.parentNode)
+      {
+        tooltip.parentNode.removeChild(tooltip);
+      }
+      tooltip = null;
+      ann.showing = false;
+    }
+  }
+
+  private popupTooltips(ann: MarkerAnnotation, e: MouseEvent)
+  {
+    const target = e.target || e.srcElement;
+    const tooltipDoc = document.createDocumentFragment();
+    const tip = document.createElement('div');
+    tip.className = 'CodeMirror-lint-message-error';
+    tip.appendChild(document.createTextNode(ann.msg));
+    tooltipDoc.appendChild(tip);
+    const tooltip = this.showTooltip(e, tooltipDoc);
+    // clicking either the tooltip or the token closes the tooltip
+    CodeMirrorLib.on(tooltip, 'mousedown', (hideEvent: MouseEvent) =>
+    {
+      this.hidePopupClickHandler(hideEvent, tooltip, ann);
+    });
+    CodeMirrorLib.on(target, 'mousedown', (hideEvent: MouseEvent) =>
+    {
+      this.hidePopupClickHandler(hideEvent, tooltip, ann);
+    });
+  }
+
+  private showTooltip(e: MouseEvent, content: DocumentFragment): HTMLElement
+  {
+    const tt = document.createElement('div');
+    tt.className = 'CodeMirror-lint-tooltip';
+    tt.appendChild(content.cloneNode(true));
+    document.body.appendChild(tt);
+    tt.style.top = String(Math.max(0, e.clientY - tt.offsetHeight - 5)) + 'px';
+    tt.style.left = String((e.clientX + 5)) + 'px';
+    if (tt.style.opacity != null)
+    {
+      tt.style.opacity = '1';
+    }
+    return tt;
+  }
+
+  private handleMouseOver(cm: any, e: MouseEvent)
+  {
+    const target: any = e.target || e.srcElement;
+    // TODO: show helping messages for other tokens too.
+    if (!/\bCodeMirror-lint-mark-error/.test(target.className))
+    {
+      return;
+    }
+    const box = target.getBoundingClientRect();
+    const x = (Number(box.left) + Number(box.right)) / 2;
+    const y = (Number(box.top) + Number(box.bottom)) / 2;
+    const spans = cm.findMarksAt(cm.coordsChar({ left: x, top: y }, 'client'));
+    let ann: MarkerAnnotation;
+    for (let i = 0; i < spans.length; ++i)
+    {
+      const a = spans[i].__annotation;
+      if (a)
+      {
+        ann = a;
+        break;
+      }
+    }
+    if (!ann)
+    {
+      return;
+    }
+    if (ann.showing === false)
+    {
+      ann.showing = true;
+      this.popupTooltips(ann, e);
+    }
+  }
+
   private registerCodeMirror(cmInstance)
   {
     this.setState({
@@ -293,6 +390,11 @@ class TQLEditor extends TerrainComponent<Props>
      * CodeMirror updates the DOM.
      */
     cmInstance.on('changes', this.handleTQLChange);
+
+    CodeMirrorLib.on(cmInstance.getWrapperElement(), 'mouseover', (e: MouseEvent) =>
+    {
+      this.handleMouseOver(cmInstance, e);
+    });
 
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {

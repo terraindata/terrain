@@ -46,18 +46,20 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty strict-boolean-expressions no-console no-var-requires
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
-import { getTemplateId, getTemplateName, updateTemplateName } from './../../../../shared/Util';
+import { getTemplateId, getTemplateName } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
+import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
@@ -93,7 +95,6 @@ export interface Props
   exporting: boolean;
 
   query?: string;
-  dbName?: string;
   serverId?: number;
   variantName?: string;
 }
@@ -255,8 +256,7 @@ class FileImportPreview extends TerrainComponent<Props>
       Actions.setErrorMsg('Please enter a template name');
       return;
     }
-    console.log(this.props.templates, saveTemplateName);
-    if (this.props.templates.find((temp) => temp.templateName === saveTemplateName))
+    if (this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName))
     {
       this.showUpdateTemplate();
       return;
@@ -264,7 +264,7 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting);
     this.setState({
       showingSaveTemplate: false,
-      appliedTemplateName: updateTemplateName(appliedTemplateName, saveTemplateName),
+      appliedTemplateName: saveTemplateName,
     });
   }
 
@@ -276,10 +276,11 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleUpdateTemplate()
   {
     const { appliedTemplateName, saveTemplateName } = this.state;
-    Actions.updateTemplate(getTemplateId(appliedTemplateName), this.props.exporting);
+    const id = getTemplateId(this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName));
+    Actions.updateTemplate(id, this.props.exporting);
     this.setState({
       showingSaveTemplate: false,
-      appliedTemplateName: updateTemplateName(appliedTemplateName, saveTemplateName),
+      appliedTemplateName: saveTemplateName,
     });
   }
 
@@ -320,7 +321,7 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.applyTemplate(getTemplateId(templateName));
     this.setState({
       showingApplyTemplate: false,
-      appliedTemplateName: templateName,
+      appliedTemplateName: getTemplateName(templateName),
       saveTemplateName: getTemplateName(templateName),
     });
   }
@@ -376,12 +377,13 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      if (this.props.dbName === undefined || this.props.dbName === '')
+      const dbName = JSON.parse(this.props.query)['index'];
+      if (dbName === undefined || dbName === '')
       {
         this.setError('Index must be selected in order to export results');
         return;
       }
-      Actions.exportFile(this.props.query, this.props.serverId, this.props.dbName, true,
+      Actions.exportFile(this.props.query, this.props.serverId, dbName, true,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
     }
     else
@@ -456,7 +458,7 @@ class FileImportPreview extends TerrainComponent<Props>
         confirmButtonText={'Save'}
         onConfirm={this.handleSaveTemplate}
         showTextbox={true}
-        initialTextboxValue={getTemplateName(this.state.appliedTemplateName)}
+        initialTextboxValue={this.state.appliedTemplateName}
         onTextboxValueChange={this.onSaveTemplateNameChange}
         closeOnConfirm={false}
       />
@@ -466,50 +468,50 @@ class FileImportPreview extends TerrainComponent<Props>
   public renderAdvancedModal()
   {
     const advancedModalContent = this.props.exporting ?
-    (
-      <div
-        className='fi-advanced-fields'
-      >
-        <CheckBox
-          checked={this.state.advancedCheck}
-          onChange={this.handleRequireJSONHaveAllFieldsChange}
-        />
-        <span
-          className='clickable'
-          onClick={this.handleRequireJSONHaveAllFieldsChange}
-          style={{
-            color: Colors().text1,
-          }}
+      (
+        <div
+          className='fi-advanced-fields'
         >
-          Rank
+          <CheckBox
+            checked={this.state.advancedCheck}
+            onChange={this.handleRequireJSONHaveAllFieldsChange}
+          />
+          <span
+            className='clickable'
+            onClick={this.handleRequireJSONHaveAllFieldsChange}
+            style={{
+              color: Colors().text1,
+            }}
+          >
+            Rank
         </span>
-        <Dropdown
-          selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.props.filetype)}
-          options={List(FileImportTypes.FILE_TYPES)}
-          onChange={this.handleExportFiletypeChange}
-          canEdit={true}
-        />
-      </div>
-    ) :
-    (
-      <div
-        className='fi-advanced-fields'
-      >
-        <CheckBox
-          checked={this.state.advancedCheck}
-          onChange={this.handleRequireJSONHaveAllFieldsChange}
-        />
-        <span
-          className='clickable'
-          onClick={this.handleRequireJSONHaveAllFieldsChange}
-          style={{
-            color: Colors().text1,
-          }}
+          <Dropdown
+            selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.props.filetype)}
+            options={List(FileImportTypes.FILE_TYPES)}
+            onChange={this.handleExportFiletypeChange}
+            canEdit={true}
+          />
+        </div>
+      ) :
+      (
+        <div
+          className='fi-advanced-fields'
         >
-          Require all JSON fields to exist?
+          <CheckBox
+            checked={this.state.advancedCheck}
+            onChange={this.handleRequireJSONHaveAllFieldsChange}
+          />
+          <span
+            className='clickable'
+            onClick={this.handleRequireJSONHaveAllFieldsChange}
+            style={{
+              color: Colors().text1,
+            }}
+          >
+            Require all JSON fields to exist?
         </span>
-      </div>
-    );
+        </div>
+      );
 
     const restrictiveMode =
       (
@@ -539,10 +541,11 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderUpdateTemplate()
   {
+    const overwriteName: string = this.state.templateOptions.find((option) => getTemplateName(option) === this.state.saveTemplateName);
     return (
       <Modal
         open={this.state.showingUpdateTemplate}
-        message={'By saving this, you are overwriting template ' + this.state.appliedTemplateName + ', Continue?'}
+        message={'By saving this, you are overwriting template ' + overwriteName + ', Continue?'}
         onClose={this.hideUpdateTemplate}
         title={'Overwriting Template'}
         confirm={true}
@@ -573,7 +576,7 @@ class FileImportPreview extends TerrainComponent<Props>
   public renderTemplate()
   {
     const renderAdvancedButton =
-    (this.props.filetype === 'json' || this.props.exporting) &&
+      (this.props.filetype === 'json' || this.props.exporting) &&
       (
         <div
           className='flex-container fi-preview-template-wrapper'
@@ -759,9 +762,11 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const upload =
       <div
-        className='fi-preview-import-button button'
+        className='fi-preview-import-button large-button'
         onClick={this.handleUploadFile}
-        style={buttonColors()}
+        style={{
+          background: 'green', // TODO: add green to Colors?
+        }}
       >
         {this.props.exporting ? 'Export' : 'Import'}
       </div>;
@@ -804,23 +809,34 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='fi-import-button-wrapper'
+        className='flex-container fi-import-button-wrapper'
       >
         {
           !this.props.exporting &&
           <div
-            className='fi-preview-update'
+            className='flex-container fi-preview-update'
           >
-            <CheckBox
-              checked={this.props.elasticUpdate}
+            <div
+              className='flex-container fi-preview-update-text'
+            >
+              <span
+                className='fi-preview-update-text-text'
+              >
+                Update: If a document with the specified primary key(s) already exists, update the existing document.
+                </span>
+              <span
+                className='fi-preview-update-text-text'
+              >
+                Replace: If a document with the specified primary key(s) already exists, replace the existing document.
+                </span>
+            </div>
+
+            <Switch
+              first={'update'}
+              second={'replace'}
+              selected={this.props.elasticUpdate ? 1 : 2}
               onChange={this.handleElasticUpdateChange}
             />
-            <span
-              className='clickable'
-              onClick={this.handleElasticUpdateChange}
-            >
-              Join against any existing entries
-              </span>
           </div>
         }
         {this.renderUpload()}
@@ -844,21 +860,45 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
+  public renderEmptyExport()
+  {
+    return (
+      <div
+        className='fi-preview-empty-export'
+        style={{
+          color: Colors().text1,
+        }}
+      >
+        You must create a query in order to export
+      </div>
+    );
+  }
+
   public render()
   {
     return (
       <div
-        className='fi-preview'
+        className={classNames({
+          'fi-preview': true,
+          'fi-preview-export': this.props.exporting,
+        })}
       >
-        {this.renderTopBar()}
-        {this.renderTable()}
-        {this.renderBottomBar()}
-        {this.renderApplyTemplate()}
-        {this.renderSaveTemplate()}
-        {this.renderUpdateTemplate()}
-        {this.renderAdvancedModal()}
-        {this.renderAddColumn()}
-        {this.renderError()}
+        {
+          this.props.exporting && !this.props.query ?
+            this.renderEmptyExport()
+            :
+            <div>
+              {this.renderTopBar()}
+              {this.renderTable()}
+              {this.renderBottomBar()}
+              {this.renderApplyTemplate()}
+              {this.renderSaveTemplate()}
+              {this.renderUpdateTemplate()}
+              {this.renderAdvancedModal()}
+              {this.renderAddColumn()}
+              {this.renderError()}
+            </div>
+        }
       </div>
     );
   }

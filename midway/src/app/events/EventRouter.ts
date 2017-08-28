@@ -44,8 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
+import * as Util from '../Util';
 import { EventConfig, Events } from './Events';
 
 export const events: Events = new Events();
@@ -102,6 +105,18 @@ Router.post('/update/', async (ctx, next) =>
     ctx.body = '';
   }
 
+});
+
+Router.post('/variants/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const requestObj = JSON.parse(JSON.stringify(ctx.request.query));
+  Util.verifyParameters(requestObj, ['start', 'end', 'metric']);
+  if (!ctx.params.id)
+  {
+    throw new Error('missing variant ID');
+  }
+  winston.info('getting events for variant ID ' + String(ctx.params.id));
+  ctx.body = await events.getEventData(Number(ctx.params.id), ctx.request.query);
 });
 
 export default Router;

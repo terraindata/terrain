@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import TerrainAreaChart from '../../charts/components/TerrainAreaChart';
+import MultipleAreaChart from '../../charts/components/MultipleAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import { LibraryState } from './../data/LibraryStore';
@@ -128,9 +128,6 @@ class Library extends TerrainComponent<any>
     const { library: libraryState } = this.props;
     const { variants, selectedVariants } = libraryState;
 
-    let metricId = 0;
-    const metricName = 'Click Through Rate';
-
     const datasets = variants
       .filter((variant) =>
       {
@@ -138,8 +135,7 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        metricId += 1;
-        return { metric: { id: metricId, name: metricName }, data: this.getData() };
+        return { id: variant.id, label: variant.name, data: this.getData() };
       });
 
     return datasets.toMap();
@@ -293,7 +289,11 @@ class Library extends TerrainComponent<any>
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <TerrainAreaChart variants={variants} datasets={datasets} />
+            <MultipleAreaChart
+              datasets={datasets}
+              xDataKey={'time'}
+              yDataKey={'value'}
+            />
           </div> : null
         }
       </div>

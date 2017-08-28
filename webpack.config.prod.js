@@ -68,11 +68,10 @@ conf.plugins = [
   new webpack.optimize.UglifyJsPlugin()
 ];
 
-// ,enable babel plugins on tsx loader
-if(conf.module.rules[0].loader !== 'babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}}')
+// enable babel plugins on tsx loader
+if(!conf.module.rules[0].loader.startsWith('babel-loader'))
 {
-  throw new Error('Expected first loader to be babel-loader?presets[]=react&presets[]=latest!ts-loader?{"compilerOptions":{}} but found '
-    + conf.module.rules[0].loader);
+  throw new Error('Expected first loader to be babel-loader but found ' + conf.module.rules[0].loader);
 }
 conf.module.rules[0].loader =
   'babel-loader?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements&minified=true!ts-loader?{"compilerOptions":{}}';

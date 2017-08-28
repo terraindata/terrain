@@ -1,6 +1,7 @@
 .directory
 *DS_Store
 *~
+.cache-loader
 coverage/
 node_modules
 bundle.js
