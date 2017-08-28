@@ -47,16 +47,16 @@ THE SOFTWARE.
 // tslint:disable:no-empty-interface strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import './DeployModal.less';
 
+import Modal from 'common/components/Modal';
+import LibraryActions from 'library/data/LibraryActions';
+import LibraryStore from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 import TerrainStore from 'store/TerrainStore';
 import { ItemStatus } from '../../../items/types/Item';
-import Modal from '../../common/components/Modal';
-import LibraryActions from '../../library/data/LibraryActions';
-import LibraryStore from '../../library/data/LibraryStore';
-import * as LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
 
