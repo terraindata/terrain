@@ -219,6 +219,7 @@ class TransformCard extends TerrainComponent<Props>
           updatePoints={this.handleUpdatePoints}
           width={width}
           language={this.props.language}
+          colors={this.props.data.static.colors}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleChartDomainChange}
@@ -230,6 +231,7 @@ class TransformCard extends TerrainComponent<Props>
           canEdit={this.props.canEdit}
           width={width}
           language={this.props.language}
+          colors={this.props.data.static.colors}
         />
       </div>
     );
@@ -514,14 +516,17 @@ class TransformCard extends TerrainComponent<Props>
 
         if (table)
         {
-          this.setState(
-            AjaxM1.queryM1(
-              `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
-              db,
-              this.handleM1TQLQueryResponse,
-              this.handleQueryError,
-            ),
-          );
+          if (this.props.language === 'mysql')
+          {
+            this.setState(
+              AjaxM1.queryM1(
+                `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
+                db,
+                this.handleM1TQLQueryResponse,
+                this.handleQueryError,
+              ),
+            );
+          }
           return;
         }
       }
@@ -574,14 +579,17 @@ class TransformCard extends TerrainComponent<Props>
         if (finalTable)
         {
           // convert the score to TQL, do the query
-          // this.setState(
-          //   AjaxM1.queryM1(
-          //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
-          //     db,
-          //     this.handleQueryResponse,
-          //     this.handleQueryError,
-          //   ),
-          // );
+          if (this.props.language === 'mysql')
+          {
+            // this.setState(
+            //   AjaxM1.queryM1(
+            //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+            //     db,
+            //     this.handleQueryResponse,
+            //     this.handleQueryError,
+            //   ),
+            // );
+          }
           return;
         }
       }

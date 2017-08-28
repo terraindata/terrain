@@ -137,7 +137,13 @@ class TemplateList extends TerrainComponent<Props>
       <div
         className='list-apply button'
         onClick={this._fn(this.handleApply)}
-        style={this.state.selectedIndex === -1 ? Colors().bg3 : buttonColors()}
+        style={this.state.selectedIndex !== -1 ?
+          buttonColors()
+          :
+          {
+            background: Colors().bg3,
+          }
+        }
       >
         Apply
       </div>

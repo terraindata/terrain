@@ -43,52 +43,57 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
+// tslint:disable:max-classes-per-file
 
-export let LibraryActionTypes =
+import Radium = require('radium');
+import * as React from 'react';
+import * as SchemaTypes from '../../SchemaTypes';
+import Styles from '../SchemaTreeStyles';
+import TerrainComponent from './../../../common/components/TerrainComponent';
+
+export interface Props
+{
+  item: SchemaTypes.FieldProperty;
+}
+
+class State
+{
+}
+
+@Radium
+export class FieldPropertyTreeInfo extends TerrainComponent<Props>
+{
+  public state: State = new State();
+
+  public render()
   {
-    groups:
-    {
-      create, change, move,
-      // duplicate,
-    },
+    const fieldProperty = this.props.item;
 
-    algorithms:
-    {
-      create, change, move,
-    },
+    return (
+      <div
+        style={Styles.infoPieces}
+      >
+        <div
+          style={Styles.infoPiece}
+        >
+          <span
+            style={Styles.infoPieceNumber as any}
+          >
+            {fieldProperty.value}
+          </span>
+        </div>
+      </div>
+    );
+  }
+}
 
-    variants:
-    {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-      unselectAll: '',
-    },
-
-    loadState: '',
-    setDbs: '',
-  };
-
-Util.setValuesToKeys(LibraryActionTypes, '');
-
-export const CleanLibraryActionTypes = // not dirty
+export const fieldPropertyChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-    LibraryActionTypes.variants.fetchVersion,
-    LibraryActionTypes.variants.loadVersion,
-    LibraryActionTypes.variants.select,
-    LibraryActionTypes.variants.unselect,
-    LibraryActionTypes.variants.unselectAll,
+    {
+      label: 'Additional Properties',
+      type: 'fieldProperty',
+    },
   ];
 
-export default LibraryActionTypes;
+export default FieldPropertyTreeInfo;

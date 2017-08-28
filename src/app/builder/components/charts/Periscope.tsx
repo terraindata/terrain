@@ -91,13 +91,17 @@ const Periscope = {
       .attr('class', 'bars');
 
     svg.append('rect')
-      .attr('class', 'line');
+      .attr('class', 'line')
+      .attr('fill', state.colors[0]);
     svg.append('g')
       .attr('class', 'handles');
 
     this.update(el, state);
 
     const styleCSS = `
+    .periscope .tick {
+      stroke: ${Colors().altHighlight}
+    }
     .periscope .tick text {
       fill: ${Colors().text2} !important;
     }
@@ -116,7 +120,7 @@ const Periscope = {
 
     state.numBars = 10;
     const scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
-    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart);
+    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart, state.colors);
   },
 
   destroy(el)
@@ -133,7 +137,7 @@ const Periscope = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', '#f0f8e8');
+      .attr('fill', Colors().altBg1);
   },
 
   _drawAxes(el, scales)
@@ -146,10 +150,11 @@ const Periscope = {
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
+      .attr('style', 'stroke: ' + Colors().altHighlight)
       .call(bottomAxis);
   },
 
-  _drawBars(el, scales, barsData)
+  _drawBars(el, scales, barsData, colors)
   {
     const g = d3.select(el).selectAll('.bars');
 
@@ -170,7 +175,8 @@ const Periscope = {
 
     bar.enter()
       .append('rect')
-      .attr('class', 'bar');
+      .attr('class', 'bar')
+      .attr('fill', colors[0]);
 
     bar
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
@@ -235,13 +241,15 @@ const Periscope = {
 
     handle.enter()
       .append('circle')
-      .attr('class', 'handle');
+      .attr('class', 'handle')
+      .attr('style', 'stroke: ' + Colors().altHighlight)
+      .attr('fill', Colors().altBg1);
 
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
-      .attr('fill', '#fff')
-      .attr('stroke', '#f00')
+      .attr('fill', Colors().altBg1)
+      .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('stroke-width', '3px')
       .attr('r', 10);
 
@@ -254,7 +262,7 @@ const Periscope = {
     handle.exit().remove();
   },
 
-  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart)
+  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -262,7 +270,7 @@ const Periscope = {
 
     this._drawBg(el, scales);
     this._drawAxes(el, scales);
-    this._drawBars(el, scales, barsData);
+    this._drawBars(el, scales, barsData, colors);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
   },
