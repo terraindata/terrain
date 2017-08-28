@@ -63,6 +63,7 @@ import TransformCardPeriscope from './TransformCardPeriscope';
 
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
+import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
 
@@ -218,6 +219,7 @@ class TransformCard extends TerrainComponent<Props>
           updatePoints={this.handleUpdatePoints}
           width={width}
           language={this.props.language}
+          colors={this.props.data.static.colors}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleChartDomainChange}
@@ -229,6 +231,7 @@ class TransformCard extends TerrainComponent<Props>
           canEdit={this.props.canEdit}
           width={width}
           language={this.props.language}
+          colors={this.props.data.static.colors}
         />
       </div>
     );
@@ -325,26 +328,8 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    // get the index and type from the cards
-    // TODO: use common function from ElasticBlockHelpers
-    let index: string = '';
-    let type: string = '';
-    const cards = builderState.query.cards;
-    cards.map((card) =>
-    {
-      if (card._isCard)
-      {
-        const title = card.static.title;
-        if (title === 'index')
-        {
-          index = card.value;
-        } else if (title === 'type')
-        {
-          type = card.value;
-        }
-      }
-    });
-
+    const index: string = getIndex();
+    const type: string = getType();
     const min = maxDomain.get(0);
     const max = maxDomain.get(1);
     const interval = (max - min) / NUM_BARS;
@@ -531,14 +516,17 @@ class TransformCard extends TerrainComponent<Props>
 
         if (table)
         {
-          this.setState(
-            AjaxM1.queryM1(
-              `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
-              db,
-              this.handleM1TQLQueryResponse,
-              this.handleQueryError,
-            ),
-          );
+          if (this.props.language === 'mysql')
+          {
+            this.setState(
+              AjaxM1.queryM1(
+                `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
+                db,
+                this.handleM1TQLQueryResponse,
+                this.handleQueryError,
+              ),
+            );
+          }
           return;
         }
       }
@@ -591,14 +579,17 @@ class TransformCard extends TerrainComponent<Props>
         if (finalTable)
         {
           // convert the score to TQL, do the query
-          // this.setState(
-          //   AjaxM1.queryM1(
-          //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
-          //     db,
-          //     this.handleQueryResponse,
-          //     this.handleQueryError,
-          //   ),
-          // );
+          if (this.props.language === 'mysql')
+          {
+            // this.setState(
+            //   AjaxM1.queryM1(
+            //     `SELECT ${CardsToSQL._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+            //     db,
+            //     this.handleQueryResponse,
+            //     this.handleQueryError,
+            //   ),
+            // );
+          }
           return;
         }
       }

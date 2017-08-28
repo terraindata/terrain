@@ -54,6 +54,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display } from '../../../blocks/displays/Display';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
@@ -312,18 +313,20 @@ class BuilderTextbox extends TerrainComponent<Props>
     }
 
     return (
-      <a
-        className={classNames({
-          'builder-tb-switch': this.isText(),
-          'close-icon-builder-textbox': !this.isText(),
-        })}
-        onClick={this.handleSwitch}
-        data-tip={this.isText() ? 'Convert to cards' : ''}
-      >
-        {
-          this.isText() ? <AddCardIcon /> : <CloseIcon />
-        }
-      </a>
+      tooltip(
+        <a
+          className={classNames({
+            'builder-tb-switch': this.isText(),
+            'close-icon-builder-textbox': !this.isText(),
+          })}
+          onClick={this.handleSwitch}
+        >
+          {
+            this.isText() ? <AddCardIcon /> : <CloseIcon />
+          }
+        </a>,
+        this.isText() ? 'Convert to cards' : '',
+      )
     );
   }
 
@@ -408,6 +411,7 @@ class BuilderTextbox extends TerrainComponent<Props>
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}
                 help={valueIsWrongType ? this.props.typeErrorMessage : this.props.help}
+                helpIsError={valueIsWrongType}
                 className={valueIsWrongType ? 'ac-wrong-type' : null}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}

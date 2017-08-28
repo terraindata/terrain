@@ -19,7 +19,6 @@ input[type=number]::-webkit-outer-spin-button {
   .point-edit-menu {
     position: absolute;
     width: 70px;
-    background: #14849f;
     border-radius: 6px;
     padding: 4px 8px 6px 8px;
     
@@ -29,12 +28,9 @@ input[type=number]::-webkit-outer-spin-button {
       font-size: 12px;
       height: 14px;
       width: 58px;
-      background-color: #c6ebf0;
-      color: #14849f;
     }
     
     label {
-      color: white;
       font-size: 14px;
       margin-right: 1px;
     }
@@ -44,46 +40,30 @@ input[type=number]::-webkit-outer-spin-button {
 
 
 .transform-chart {
-  .bg {
-    fill: @bg;
-  }
   
   .tick line {
-    stroke: @axis;
     stroke-width: 1px;
   }
   
   .domain {
     fill: none;
-    stroke: @text;
     stroke-width: 0px;
   }
   
   .point {
     cursor: pointer;
     transition: stroke-width 0.15s, stroke 0.15s;
-    fill: #fff;
-    stroke: @line;
     stroke-width: 3px;
     &:not(.point-disabled) {
       &:hover,
       &[active="1"] {
         stroke-width: 5px;
       }
-      
-      &.point-selected,
-      &[active="1"] {
-        stroke: #fc5218;
-      }
     }
   }
   
-  .lines-bg {
-    fill: fade(@lineFill, 30%);
-  }
   
   .lines {
-    stroke: @line;
     stroke-width: 5px;
     fill: none;
     .transition(~"stroke 0.15s");
@@ -98,7 +78,7 @@ input[type=number]::-webkit-outer-spin-button {
   }
   
   .bar {
-    fill: @bar;
+    opacity: .5;
   }
   
   .spotlight,
@@ -126,36 +106,18 @@ input[type=number]::-webkit-outer-spin-button {
   }
   
   .right-menu {
-    rect {
-       fill: #14849f;  
-    }
 
-    &:hover {
-      rect {
-        fill: #1db7ca;
-      }
-    }
-    circle {
-      fill: #999;
-    }
     
     text {
-      fill: #fff;
       font-size: 12px;
-      // font-weight: 200;
       letter-spacing: 0.3px;
     }
   }
 
   .crosshairs, .transform-tooltip {
-    rect {
-      fill: #14849f;
-    } 
     
     text {
-      fill: #fff;
       font-size: 12px;
-      // font-weight: 200;
       letter-spacing: 0.3px;
       text-anchor: start;
     }
@@ -164,7 +126,6 @@ input[type=number]::-webkit-outer-spin-button {
   .crosshairs-line {
       fill: none;
       stroke-width: 1px;
-      stroke: #14849f;
       pointer-events: none;
     }
 }
