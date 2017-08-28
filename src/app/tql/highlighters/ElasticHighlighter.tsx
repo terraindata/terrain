@@ -107,7 +107,7 @@ class ElasticHighlighter extends SyntaxHighlighter
       const marker = instance.markText(
         { line: token.row, ch: token.col },
         { line: token.toRow, ch: token.toCol },
-        { className: style, },
+        { className: style },
       );
     }
     for (const e of parser.getErrors())

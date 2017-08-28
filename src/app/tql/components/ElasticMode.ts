@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as CodeMirror from 'codemirror';
 
-
 CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {
   const indentUnit = config.indentUnit;
@@ -87,4 +86,3 @@ CodeMirror.defineMode('elastic', (config, parserConfig) =>
     helperType: 'elastic',
   };
 });
-

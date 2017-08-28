@@ -305,10 +305,10 @@ class FileImport extends TerrainComponent<any>
           const columnNamesSet: Set<string> = new Set();
           for (const obj of items)
           {
-            _.map(obj, (val) =>
+            for (const key of Object.keys(obj))
             {
-              columnNamesSet.add(val);
-            });
+              columnNamesSet.add(key);
+            }
           }
           columnNames = Array.from(columnNamesSet);
           break;
