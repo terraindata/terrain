@@ -518,7 +518,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public renderDatabaseDropdown()
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    const options = dbs ? dbs.map((db) => db.name + ` (${db.type})`).toList() : [];
+    const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
 
     return (
       <div className='new-algorithm-modal-child'>

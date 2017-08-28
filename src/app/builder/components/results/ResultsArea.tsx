@@ -85,7 +85,9 @@ export interface Props
   query: Query;
   canEdit: boolean;
   variantName: string;
-
+  showExport: boolean;
+  showCustomizeView: boolean;
+  allowSpotlights: boolean;
   onNavigationException: () => void;
 }
 
@@ -175,6 +177,7 @@ class ResultsArea extends TerrainComponent<Props>
           resultsConfig={resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
+          allowSpotlights={this.props.allowSpotlights}
           index={-1}
           primaryKey={result.primaryKey}
         />
@@ -297,6 +300,7 @@ class ResultsArea extends TerrainComponent<Props>
             resultsConfig={resultsConfig}
             onExpand={this.handleExpand}
             resultsLoading={resultsState.loading}
+            allowSpotlights={this.props.allowSpotlights}
           />
         </div>
       );
@@ -327,6 +331,7 @@ class ResultsArea extends TerrainComponent<Props>
                   index={index}
                   key={index}
                   primaryKey={result.primaryKey}
+                  allowSpotlights={this.props.allowSpotlights}
                 />
               );
             })
@@ -459,23 +464,27 @@ column if you have customized the results view.');
           }
         </div>
 
-        <div
-          className='results-top-config'
-          onClick={this.showExport}
-          key='results-area-export'
-          style={link()}
-        >
-          Export
-        </div>
+        {this.props.showExport &&
+          <div
+            className='results-top-config'
+            onClick={this.showExport}
+            key='results-area-export'
+            style={link()}
+          >
+            Export
+          </div>
+        }
 
-        <div
-          className='results-top-config'
-          onClick={this.showConfig}
-          key='results-area-customize'
-          style={link()}
-        >
-          Customize view
+        {this.props.showCustomizeView &&
+          <div
+            className='results-top-config'
+            onClick={this.showConfig}
+            key='results-area-customize'
+            style={link()}
+          >
+            Customize view
         </div>
+        }
 
         <Switch
           first='Icons'
@@ -605,7 +614,7 @@ column if you have customized the results view.');
         className={classNames({
           'results-area': true,
           'results-area-config-open': this.state.showingConfig,
-          'results-area-table': this.state.resultFormat === 'table',
+          'results-area-table altBg': this.state.resultFormat === 'table',
         })}
       >
         {this.renderTopbar()}
