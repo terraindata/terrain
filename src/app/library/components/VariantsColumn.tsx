@@ -50,7 +50,7 @@ import * as React from 'react';
 // import * as moment from 'moment';
 const moment = require('moment');
 
-import { makeTooltip } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
@@ -444,7 +444,7 @@ class VariantsColumn extends TerrainComponent<Props>
         }
         {
           canCreate && !archived &&
-          makeTooltip(
+          tooltip(
             <CreateLine onClick={this.handleCreate} open={false} />,
             {
               title: 'Create a New Variant',

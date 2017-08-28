@@ -61,7 +61,7 @@ import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 
-import { makeTooltip } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
 type Group = LibraryTypes.Group;
@@ -257,7 +257,7 @@ class GroupsColumn extends TerrainComponent<Props>
         }
         {
           status === ItemStatus.Build && !!canCreate &&
-          makeTooltip(
+          tooltip(
             <CreateLine onClick={this.handleCreate} open={false} />,
             {
               title: 'Create a New Group',

@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 
-import { makeTooltip } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CreateItem.less';
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -64,7 +64,7 @@ class CreateItem extends TerrainComponent<Props>
   public render()
   {
     return (
-      makeTooltip(
+      tooltip(
         <div className='create-item' onClick={this.props.onCreate}>
           <AddIcon />
         </div>,

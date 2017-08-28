@@ -302,24 +302,25 @@ export function generateThemeStyles()
   return allClasses;
 }
 
-export function tooltip(innerComponent: any, tip: string, theme: Theme = 'alt')
+export function tooltip(innerComponent: any, options: TooltipProps | string)
 {
-  if (tip === '' || tip === undefined)
+  if (options === undefined || options === '')
   {
     return innerComponent;
   }
-  const props: TooltipProps = defaultProps;
-  props.title = tip;
-  props.theme = theme;
-  return <Tooltip children={innerComponent} {...props} />;
-}
-
-export function makeTooltip(innerComponent: any, givenProps: TooltipProps)
-{
-  if ((givenProps.title === '' || givenProps.title === undefined) && (givenProps.html === null || givenProps.html === undefined))
+  else if (typeof options === 'string')
+  {
+    const props: TooltipProps = { ...defaultProps };
+    props.title = options;
+    return <Tooltip children={innerComponent} {...props} />;
+  }
+  else if ((options.title === '' || options.title === undefined) && (options.html === null || options.html === undefined))
   {
     return innerComponent;
   }
-  const props = _.defaults({}, givenProps, defaultProps);
-  return <Tooltip children={innerComponent} {...props} />;
+  else
+  {
+    const props = _.defaults({}, options, defaultProps);
+    return <Tooltip children={innerComponent} {...props} />;
+  }
 }

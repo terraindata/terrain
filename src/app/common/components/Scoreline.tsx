@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 
-import { makeTooltip } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Scoreline.less';
 
@@ -68,7 +68,7 @@ class Scoreline extends TerrainComponent<Props>
     {
       return null;
     }
-    return makeTooltip(
+    return tooltip(
       <div className='scoreline-score'>
         <div
           className='scoreline-score-icon'

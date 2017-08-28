@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import { makeTooltip } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
@@ -134,7 +134,7 @@ class UserThumbnail extends TerrainComponent<Props>
       );
 
     const text: string = this.props.showName ? name : null;
-    const thumbnail = makeTooltip(
+    const thumbnail = tooltip(
       <div
         className={classNames({
           'user-thumbnail': true,

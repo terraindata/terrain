@@ -53,7 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { makeTooltip } from 'common/components/tooltip/Tooltips';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { altStyle, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -308,7 +308,7 @@ class Autocomplete extends TerrainComponent<Props>
           this.props.help === undefined ?
             inputElem
             :
-            makeTooltip(
+            tooltip(
               inputElem,
               {
                 title: this.props.help,
