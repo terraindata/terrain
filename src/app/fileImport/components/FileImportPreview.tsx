@@ -93,6 +93,7 @@ export interface Props
   uploadInProgress: boolean;
   elasticUpdate: boolean;
   exporting: boolean;
+  exportRank: boolean;
 
   query?: string;
   serverId?: number;
@@ -115,7 +116,8 @@ class FileImportPreview extends TerrainComponent<Props>
     addColumnName: string,
     previewErrorMsg: string,
     advancedCheck: boolean,
-    EXPORT_TYPES: string[],
+    advancedExportRank: boolean,
+    exportFiletype: string,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -129,7 +131,8 @@ class FileImportPreview extends TerrainComponent<Props>
     addColumnName: '',
     previewErrorMsg: '',
     advancedCheck: this.props.requireJSONHaveAllFields,
-    EXPORT_TYPES: ['csv', 'json'],
+    advancedExportRank: this.props.exportRank,
+    exportFiletype: 'csv',
   };
 
   public componentDidMount()
@@ -270,6 +273,17 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleAdvanced()
   {
+    if (this.state.exportFiletype === '')
+    {
+      this.setState({
+        exportFiletype: 'csv',
+      });
+      Actions.setExportFiletype('csv');
+    }
+    else
+    {
+      Actions.setExportFiletype(this.state.exportFiletype);
+    }
     Actions.togglePreviewColumn(this.state.advancedCheck);
   }
 
@@ -363,6 +377,13 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleAdvancedRankChange()
+  {
+    this.setState({
+      advancedExportRank: !this.state.advancedExportRank,
+    });
+  }
+
   public deletePrimaryKey(columnName: string)
   {
     Actions.changePrimaryKey(this.props.columnNames.indexOf(columnName));
@@ -383,7 +404,7 @@ class FileImportPreview extends TerrainComponent<Props>
         this.setError('Index must be selected in order to export results');
         return;
       }
-      Actions.exportFile(this.props.query, this.props.serverId, dbName, true,
+      Actions.exportFile(this.props.query, this.props.serverId, dbName, this.props.exportRank,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.csv');
     }
     else
@@ -422,7 +443,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const type = FileImportTypes.FILE_TYPES[typeIndex];
     this.setState({
-      filetype: type,
+      exportFiletype: type,
     });
   }
 
@@ -473,12 +494,12 @@ class FileImportPreview extends TerrainComponent<Props>
           className='fi-advanced-fields'
         >
           <CheckBox
-            checked={this.state.advancedCheck}
-            onChange={this.handleRequireJSONHaveAllFieldsChange}
+            checked={this.state.advancedExportRank}
+            onChange={this.handleAdvancedRankChange}
           />
           <span
             className='clickable'
-            onClick={this.handleRequireJSONHaveAllFieldsChange}
+            onClick={this.handleAdvancedRankChange}
             style={{
               color: Colors().text1,
             }}
@@ -486,7 +507,7 @@ class FileImportPreview extends TerrainComponent<Props>
             Rank
         </span>
           <Dropdown
-            selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.props.filetype)}
+            selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.state.exportFiletype)}
             options={List(FileImportTypes.FILE_TYPES)}
             onChange={this.handleExportFiletypeChange}
             canEdit={true}

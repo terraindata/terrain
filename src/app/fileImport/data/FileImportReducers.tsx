@@ -216,6 +216,14 @@ FileImportReducers[ActionTypes.togglePreviewColumn] =
       .set('requireJSONHaveAllFields', action.payload.requireJSONHaveAllFields)
   ;
 
+FileImportReducers[ActionTypes.setExportFiletype] =
+  (state, action) =>
+  {
+    state
+      .set('filetype', action.payload.type)
+  }
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
   {

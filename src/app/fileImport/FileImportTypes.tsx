@@ -57,7 +57,7 @@ class FileImportStateC extends BaseClass
   public serverName: string = '';
   public dbName: string = '';
   public tableName: string = '';
-  public filetype: string = '';
+  public filetype: string = 'csv';
 
   public previewRows: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
@@ -65,6 +65,7 @@ class FileImportStateC extends BaseClass
   public hasCsvHeader: boolean = false;
   public isNewlineSeparatedJSON: boolean = false;
   public requireJSONHaveAllFields: boolean = true;
+  public exportRank: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
