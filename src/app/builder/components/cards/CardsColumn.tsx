@@ -189,17 +189,17 @@ class CardsColumn extends TerrainComponent<Props>
     switch (type)
     {
       case 'eqlfrom':
-        return 'from';
+        return { key: 'from' };
       case 'eqltype':
-        return 'type';
+        return { key: 'type' };
       case 'eqlindex':
-        return 'index';
+        return { key: 'index' };
       case 'eqlsize':
-        return 'size';
+        return { key: 'size' };
       case 'eqlbody':
-        return 'body';
+        return { key: 'body' };
       default:
-        return '';
+        return { key: '' };
     }
   }
 

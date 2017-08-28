@@ -111,13 +111,12 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
 
     if (item['new'])
     {
-      if (targetProps.handleCardDrop)
+      if (targetProps.handleCardDrop !== undefined)
       {
         const card = BlockUtils.make(
-          AllBackendsMap[targetProps.language].blocks, type,
+          AllBackendsMap[targetProps.language].blocks, type, targetProps.handleCardDrop(type),
         );
-        const edited = card.set('key', targetProps.handleCardDrop(type));
-        Actions.create(targetProps.keyPath, targetIndex, type, edited);
+        Actions.create(targetProps.keyPath, targetIndex, type, card);
       }
       else
       {
@@ -172,7 +171,7 @@ export interface Props
 
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
 
-  handleCardDrop?: (type: string) => string;
+  handleCardDrop?: (type: string) => any;
 }
 
 class CardDropArea extends TerrainComponent<Props>

@@ -206,7 +206,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private clauses: { [name: string]: ESClause };
   private config: EQLConfig;
   private colorIndex: number;
-  private cardTypesToKeys: { [type: string]: string } = {};
 
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
@@ -564,6 +563,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     const accepts = this.getCardTypes(_.keys(clause.structure), clause);
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
+    const cardTypesToKeys: { [type: string]: string } = {};
 
     const init = (blocksConfig, extraConfig?, skipTemplate?) =>
     {
@@ -641,7 +641,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               {
                 const cardTypes = this.getCardTypes([clauseType]);
                 cardTypes.map((cardType) =>
-                  this.cardTypesToKeys[cardType] = key,
+                {
+                  cardTypesToKeys[cardType] = key;
+                },
                 );
 
                 cardTypes.map((cardType) =>
@@ -662,8 +664,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               {
                 const cardConfig = backend.blocks[cardType];
                 const key: string = cardConfig['key'];
-
-                this.cardTypesToKeys[cardType] = key;
+                cardTypesToKeys[cardType] = key;
 
                 result.push({
                   text: key + ': ' + (cardConfig.static['title'] as string),
@@ -713,9 +714,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               displayType: DisplayType.CARDS,
               key: 'cards',
               hideCreateCardTool: true,
-              handleCardDrop: (type: string): string =>
+              handleCardDrop: (type: string): any =>
               {
-                return this.cardTypesToKeys[type];
+                return { key: cardTypesToKeys[type] };
               },
             },
             {

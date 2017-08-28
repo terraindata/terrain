@@ -135,7 +135,7 @@ export interface Display
   //  computed at a higher level
   requiresBuilderState?: boolean;
 
-  handleCardDrop?: (type: string) => string;
+  handleCardDrop?: (type: string) => any;
 }
 
 // Section: Re-useable displays

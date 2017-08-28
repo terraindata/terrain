@@ -77,7 +77,7 @@ export interface Props
   noCardTool?: boolean;
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
-  handleCardDrop?: (type: string) => string;
+  handleCardDrop?: (type: string) => any;
 }
 
 interface KeyState

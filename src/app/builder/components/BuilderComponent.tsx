@@ -77,7 +77,7 @@ export interface Props
 
   textStyle?: React.CSSProperties;
 
-  handleCardDrop?: (type: string) => string;
+  handleCardDrop?: (type: string) => any;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }

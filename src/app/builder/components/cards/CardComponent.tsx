@@ -103,7 +103,7 @@ export interface Props
 
   display?: Display;
 
-  handleCardDrop?: (type: string) => string;
+  handleCardDrop?: (type: string) => any;
 }
 
 class _CardComponent extends TerrainComponent<Props>

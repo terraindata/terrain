@@ -90,7 +90,7 @@ export interface Props
   }>; // can override the options displayed
   overrideClick?: (index: number) => void; // override the click handler
 
-  handleCardDrop?: (tyoe: string) => string;
+  handleCardDrop?: (tyoe: string) => any;
 }
 
 @Radium

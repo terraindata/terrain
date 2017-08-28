@@ -89,7 +89,7 @@ export interface Props
   helpOn?: boolean;
   addColumn?: (number, string?) => void;
   columnIndex?: number;
-  handleCardDrop?: (type: string) => string;
+  handleCardDrop?: (type: string) => any;
 }
 
 interface IMoveState
