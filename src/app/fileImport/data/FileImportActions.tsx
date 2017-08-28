@@ -188,9 +188,9 @@ const FileImportActions =
     (columnName: string) =>
       $(ActionTypes.addPreviewColumn, { columnName }),
 
-    togglePreviewColumn:
+    setPreviewColumn:
     (requireJSONHaveAllFields: boolean) =>
-      $(ActionTypes.togglePreviewColumn, { requireJSONHaveAllFields }),
+      $(ActionTypes.setPreviewColumn, { requireJSONHaveAllFields }),
 
     setErrorMsg:
     (err: string) =>
@@ -200,9 +200,9 @@ const FileImportActions =
     (exportFiletype: string) =>
       $(ActionTypes.setExportFiletype, { exportFiletype }),
 
-    toggleExportRank:
+    setExportRank:
     (exportRank: boolean) =>
-      $(ActionTypes.toggleExportRank, { exportRank }),
+      $(ActionTypes.setExportRank, { exportRank }),
   };
 
 export default FileImportActions;

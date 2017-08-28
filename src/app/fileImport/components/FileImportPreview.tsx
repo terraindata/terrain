@@ -76,28 +76,28 @@ type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
 {
+  exporting: boolean;
+  filetype: string;
   previewRows: List<List<string>>;
-  primaryKeys: List<number>;
-  primaryKeyDelimiter: string;
-
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<ColumnTypesTree>;
-  filetype: string;
-  requireJSONHaveAllFields: boolean;
-
   columnOptions: List<string>;
   templates: List<Template>;
   transforms: List<Transform>;
 
-  uploadInProgress: boolean;
-  elasticUpdate: boolean;
-  exporting: boolean;
-  exportRank: boolean;
+  // import
+  primaryKeys?: List<number>;
+  primaryKeyDelimiter?: string;
+  requireJSONHaveAllFields?: boolean;
+  uploadInProgress?: boolean;
+  elasticUpdate?: boolean;
 
+  // export
   query?: string;
   serverId?: number;
   variantName?: string;
+  exportRank?: boolean;
 }
 
 @Radium
@@ -274,8 +274,8 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleAdvanced()
   {
     Actions.setExportFiletype(this.state.exportFiletype);
-    Actions.togglePreviewColumn(this.state.advancedCheck);
-    Actions.toggleExportRank(this.state.advancedExportRank);
+    Actions.setPreviewColumn(this.state.advancedCheck);
+    Actions.setExportRank(this.state.advancedExportRank);
   }
 
   public handleUpdateTemplate()
