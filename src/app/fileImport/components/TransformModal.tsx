@@ -478,7 +478,7 @@ class TransformModal extends TerrainComponent<Props>
         open={this.props.open}
         onClose={this.props.onClose}
         title={'Apply a Transformation to ' + columnName}
-        message={'Choose a transformation that will be applied to every row in' + columnName + ' before data are imported'}
+        message={'Choose a transformation that will be applied to every row in ' + columnName + ' before data are imported'}
         children={transformChildren}
         noFooterPadding={true}
         confirm={true}
