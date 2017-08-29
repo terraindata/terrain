@@ -352,38 +352,46 @@ export class CSVTypeParser
   }
   public getBestTypeFromArrayAsArray(values: string[]): string[]
   {
-    const stringifiedTypes: Set<string> = new Set();
+    const types: Set<string> = new Set();
     for (const value of values)
     {
-      stringifiedTypes.add(JSON.stringify(this._getCSVTypeAsArray(value)));
+      types.add(JSON.stringify(this._getCSVTypeAsArray(value)));
     }
-    const types: Set<any> = new Set();
-    for (const type of stringifiedTypes)
+    const bestType: string[] = this._getBestTypeFromArrayHelper(types);
+    return bestType[0] === 'BAD' ? ['text'] : bestType;
+  }
+  private _getBestTypeFromArrayHelper(types: Set<string>): string[]
+  {
+    types.delete(JSON.stringify(['null']));
+    if (types.size === 0)
     {
-      types.add(JSON.parse(type));
+      return ['text'];    // no data provided, so return the default
     }
     let numberOfArrayTypes: number = 0;
-    let arrType: string[] = [];
     for (const type of types)
     {
-      if (type[0] === 'array')
+      if (JSON.parse(type)[0] === 'array')
       {
         numberOfArrayTypes++;
-        arrType = type;
       }
     }
-    if (numberOfArrayTypes > 1 || (numberOfArrayTypes === 1 && (types.size > 2
-      || (types.size === 2 && !stringifiedTypes.has(JSON.stringify(['null']))))))
+    if (numberOfArrayTypes > 0)
     {
-      return ['text']; // special case for when there's multiple array types encountered or array + non-null types
-    }
-    else if (numberOfArrayTypes === 1 || (numberOfArrayTypes === 2 && stringifiedTypes.has(JSON.stringify(['null']))))
-    {
-      return arrType;
+      if (numberOfArrayTypes !== types.size)
+      {
+        return ['BAD']; // mix of array and (non-null) non-array types is not allowed
+      }
+      const innerTypes: Set<string> = new Set<string>();
+      for (const type of types)
+      {
+        innerTypes.add(JSON.stringify(JSON.parse(type).slice(1)));
+      }
+      const bestType: string[] = this._getBestTypeFromArrayHelper(innerTypes);
+      return bestType[0] === 'BAD' ? ['text'] : ['array'].concat(bestType);
     }
     if (types.size === 1)
     {
-      return Array.from(types)[0] as string[];
+      return JSON.parse(Array.from(types)[0]) as string[];
     }
     if (this._matchInSet(types, ['long', 'double']))
     {
@@ -419,7 +427,7 @@ export class CSVTypeParser
 
   private _isNullHelper(value: string): boolean
   {
-    return value === null || value === undefined || value === '' || value === 'null';
+    return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
   }
   private _isIntHelper(value: string): boolean
   {
@@ -480,7 +488,7 @@ export class CSVTypeParser
       {
         return ['array', 'null'];
       }
-      return ['array'].concat(this._getCSVType(innerValue[0]));
+      return ['array'].concat(this._getCSVType(JSON.stringify(innerValue[0])));
     }
     if (this._isIntHelper(value))
     {
@@ -524,17 +532,17 @@ export class CSVTypeParser
     }
     return ['text'];
   }
-  private _matchInSet(typeSet: Set<any>, types: string[]): boolean
+  // typeSet should already have JSON.stringify(['null']) removed
+  private _matchInSet(typeSet: Set<string>, types: string[]): boolean
   {
     let counter: number = 0;
     for (const type of types)
     {
-      // typeSet.has([type]) ? counter++ : this._noop();
-      if (typeSet.has([type]))
+      if (typeSet.has(JSON.stringify([type])))
       {
         counter++;
       }
     }
-    return counter === typeSet.size || (typeSet.has('null') && counter + 1 === typeSet.size);
+    return counter === typeSet.size;
   }
 }

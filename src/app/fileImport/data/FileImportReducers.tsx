@@ -271,8 +271,6 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
   {
-    console.log('from the reducer');
-    console.log(action.payload.columnTypes);
     const columnTypes = action.payload.columnTypes !== undefined ? action.payload.columnTypes :
       List(action.payload.originalNames.map(() => FileImportTypes._ColumnTypesTree()));
     return state
