@@ -653,17 +653,21 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
           if (this.customCardTypesMap[clause.type] !== undefined)
           {
+            // TODO consolidate this code with above code block, DRY
             this.customCardTypesMap[clause.type].forEach(
               (cardType) =>
               {
                 const cardConfig = backend.blocks[cardType];
                 const key: string = cardConfig['key'];
 
-                result.push({
-                  text: key + ': ' + (cardConfig.static['title'] as string),
-                  key,
-                  type: cardType,
-                });
+                if (card['cards'].find((p) => p.key === key) === undefined)
+                {
+                  result.push({
+                    text: key + ': ' + (cardConfig.static['title'] as string),
+                    key,
+                    type: cardType,
+                  });
+                }
               },
             );
           }
