@@ -61,6 +61,8 @@ const LEFT_COLOR_TO = hexToRgb('#828c76');
 const TOP_COLOR_FROM = hexToRgb('#565d4e');
 const TOP_COLOR_TO = hexToRgb('#3e3c3c');
 
+const TOOLBAR_HEIGHT = 32; // The react-data-grid toolbar is 32px high, by default
+
 export interface TableColumn
 {
   key: string;
@@ -112,7 +114,7 @@ export class TableComponent extends TerrainComponent<Props>
       <ReactDataGrid
         {...this.props}
         columns={this.props.columns.toJS()}
-        minHeight={this.props.containerHeight}
+        minHeight={this.props.containerHeight - TOOLBAR_HEIGHT}
         minWidth={this.props.containerWidth}
       />
     );
