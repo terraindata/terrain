@@ -55,7 +55,7 @@ import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
+import { CSVTypeParser, parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -335,7 +335,28 @@ class FileImport extends TerrainComponent<any>
         ),
       );
 
-      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      let previewColumns;
+      switch (filetype)
+      {
+        case 'csv':
+          previewColumns = columnNamesToMap.map((name) =>
+            items.map((item) => item[name]));
+          break;
+        case 'json':
+          previewColumns = columnNamesToMap.map((name) =>
+            items.map((item) => JSON.stringify(item[name])));
+          break;
+        default:
+      }
+      if (previewColumns === undefined)
+      {
+        return;
+      }
+      const typeParser = new CSVTypeParser();
+      const types: object[] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsObject(column));
+      const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map((typeObj) => FileImportTypes._ColumnTypesTree(typeObj));
+
+      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
