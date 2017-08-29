@@ -487,6 +487,10 @@ FileImportReducers[ActionTypes.fetchTemplates] =
 FileImportReducers[ActionTypes.applyTemplate] =
   (state, action) =>
   {
+    action.payload.newColumns.forEach((colName) =>
+    {
+      state = addPreviewColumn(state, colName);
+    });
     const index = state.templates.findKey((temp) => temp.templateId === action.payload.templateId);
     const template: Template = state.templates.get(index);
     template.transformations.map((transform) =>
@@ -494,7 +498,7 @@ FileImportReducers[ActionTypes.applyTemplate] =
       state = applyTransform(state, transform);
     });
     const { columnNames, previewRows } = state;
-    state.set('originalNames', List(template.originalNames))
+    return state.set('originalNames', List(template.originalNames))
       .set('primaryKeys', List(template.primaryKeys.map((pkey) => columnNames.indexOf(pkey))))
       .set('columnNames', columnNames)
       .set('transforms', List<Transform>(template.transformations))
@@ -507,11 +511,6 @@ FileImportReducers[ActionTypes.applyTemplate] =
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewRows', previewRows)
       .set('primaryKeyDelimiter', template.primaryKeyDelimiter);
-    action.payload.newColumns.forEach((colName) =>
-    {
-      state = addPreviewColumn(state, colName);
-    });
-    return state;
   };
 
 FileImportReducers[ActionTypes.saveFile] =
