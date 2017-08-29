@@ -115,6 +115,7 @@ class Dropdown extends TerrainComponent<Props>
           });
         }
       };
+      $('body').click(this.close);
     }
 
     return this._clickHandlers[index];
@@ -135,6 +136,12 @@ class Dropdown extends TerrainComponent<Props>
     }
 
     return undefined;
+  }
+
+  public onMouseDown(event)
+  {
+    event.stopPropagation();
+    $('body').unbind('click', this.close);
   }
 
   public renderOption(option, index)
@@ -179,7 +186,8 @@ class Dropdown extends TerrainComponent<Props>
           'dropdown-option-focused': focused,
         })}
         key={index}
-        onMouseDown={this.clickHandler(index)}
+        onMouseDown={this.onMouseDown}
+        onClick={this.clickHandler(index)}
         style={style}
       >
         <div className='dropdown-option-inner'>
