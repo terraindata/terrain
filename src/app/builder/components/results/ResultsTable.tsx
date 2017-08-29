@@ -51,6 +51,7 @@ import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
 import { Toolbar } from 'react-data-grid-addons';
 
+import * as _ from 'lodash';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
@@ -59,7 +60,6 @@ import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultName } from './Result';
 import { Results } from './ResultTypes';
-import * as _ from 'lodash';
 
 export interface Props
 {
@@ -196,8 +196,14 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public getRow(i: number): object
   {
-    var obj = this.state.rows.get(i).fields.toJS();
-    return _.mapValues(obj, (value) => JSON.stringify(value));;
+    const obj = this.state.rows.get(i).fields.toJS();
+    return _.mapValues(obj, (value) => {
+      if (Array.isArray(value) || typeof(value) === 'boolean')
+      {
+        return JSON.stringify(value);
+      }
+      return value;
+    });
   }
 
   public onRowsSelected(rows)
@@ -376,5 +382,3 @@ export default class ResultsTable extends TerrainComponent<Props>
     );
   }
 }
-
-
