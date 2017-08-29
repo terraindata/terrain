@@ -335,42 +335,33 @@ class FileImport extends TerrainComponent<any>
         ),
       );
 
-      const previewColumns = columnNamesToMap.map((name) =>
-        items.map((item) => item[name]));
-      const types = this.detectTypes(filetype, previewColumns);
-      if (types === undefined)
+      let previewColumns;
+      switch (filetype)
+      {
+        case 'csv':
+          previewColumns = columnNamesToMap.map((name) =>
+            items.map((item) => item[name]));
+          break;
+        case 'json':
+          previewColumns = columnNamesToMap.map((name) =>
+            items.map((item) => JSON.stringify(item[name])));
+          break;
+        default:
+      }
+      if (previewColumns === undefined)
       {
         return;
       }
+      const typeParser = new CSVTypeParser();
+      const types: object[] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsObject(column));
+      const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map((typeObj) => FileImportTypes._ColumnTypesTree(typeObj));
 
-      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(types));
+      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
       this.incrementStep();
     };
-  }
-
-  public detectTypes(filetype: string, previewColumns: any[][]): FileImportTypes.ColumnTypesTree[] | undefined
-  {
-    let types: object[];
-    switch (filetype)
-    {
-      case 'csv':
-        const csvParse = new CSVTypeParser();
-        types = previewColumns.map((column) => csvParse.getBestTypeFromArrayAsObject(column));
-        break;
-      case 'json':
-        // TODO
-        break;
-      default:
-    }
-    if (types === undefined)
-    {
-      return undefined;
-    }
-
-    return types.map((typeObj) => FileImportTypes._ColumnTypesTree(typeObj));
   }
 
   public handleSelectFile(file)
