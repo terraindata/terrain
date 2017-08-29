@@ -488,7 +488,7 @@ export class CSVTypeParser
       {
         return ['array', 'null'];
       }
-      return ['array'].concat(this._getCSVType(JSON.stringify(innerValue[0])));
+      return isTypeConsistent(innerValue) ? ['array'].concat(this._getCSVType(JSON.stringify(innerValue[0]))) : ['text'];
     }
     if (this._isIntHelper(value))
     {
@@ -545,4 +545,75 @@ export class CSVTypeParser
     }
     return counter === typeSet.size;
   }
+}
+
+/* checks if all elements in the provided array are of the same type ; handles nested arrays */
+export function isTypeConsistent(arr: object[]): boolean
+{
+  return _isTypeConsistentHelper(arr) !== 'inconsistent';
+}
+
+function _isTypeConsistentHelper(arr: object[]): string
+{
+  if (arr.length === 0)
+  {
+    return 'null';
+  }
+  const types: Set<string> = new Set();
+  arr.forEach((obj) =>
+  {
+    types.add(getType(obj));
+  });
+  if (types.size > 1)
+  {
+    types.delete('null');
+  }
+  if (types.size !== 1)
+  {
+    return 'inconsistent';
+  }
+  const type: string = types.entries().next().value[0];
+  if (type === 'array')
+  {
+    const innerTypes: Set<string> = new Set();
+    arr.forEach((obj) =>
+    {
+      innerTypes.add(_isTypeConsistentHelper(obj as object[]));
+    });
+    if (innerTypes.size > 1)
+    {
+      innerTypes.delete('null');
+    }
+    if (innerTypes.size !== 1)
+    {
+      return 'inconsistent';
+    }
+    return innerTypes.entries().next().value[0];
+  }
+  return type;
+}
+
+export function getType(obj: object): string
+{
+  if (typeof obj === 'object')
+  {
+    if (obj === null)
+    {
+      return 'null';
+    }
+    if (obj instanceof Date)
+    {
+      return 'date';
+    }
+    if (Array.isArray(obj))
+    {
+      return 'array';
+    }
+  }
+  if (typeof obj === 'string')
+  {
+    return 'text';
+  }
+  // handles "number", "boolean", "object", and "undefined" cases
+  return typeof obj;
 }

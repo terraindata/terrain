@@ -54,7 +54,8 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { json } from 'd3-request';
-import * as SharedUtil from '../../../../shared/database/elastic/ElasticUtil';
+import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
+import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -838,7 +839,7 @@ export class Import
     {
       if (imprt.columnTypes[field]['type'] === 'array')
       {
-        if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
+        if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
         {
           return 'Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj);
         }
@@ -1092,7 +1093,7 @@ export class Import
 
   private _getObjectStructureStr(payload: object): string
   {
-    let structStr: string = this._getType(payload);
+    let structStr: string = SharedUtil.getType(payload);
     if (structStr === 'object')
     {
       structStr = Object.keys(payload).sort().reduce((res, item) =>
@@ -1116,31 +1117,6 @@ export class Import
     return structStr;
   }
 
-  private _getType(obj: object): string
-  {
-    if (typeof obj === 'object')
-    {
-      if (obj === null)
-      {
-        return 'null';
-      }
-      if (obj instanceof Date)
-      {
-        return 'date';
-      }
-      if (Array.isArray(obj))
-      {
-        return 'array';
-      }
-    }
-    if (typeof obj === 'string')
-    {
-      return 'text';
-    }
-    // handles "number", "boolean", "object", and "undefined" cases
-    return typeof obj;
-  }
-
   /* returns a hash based on the object's field names and data types
    * handles object fields recursively ; only checks the type of the first element of arrays */
   private _hashObjectStructure(payload: object): string
@@ -1156,56 +1132,10 @@ export class Import
     return this.COMPATIBLE_TYPES[proposedType] !== undefined && this.COMPATIBLE_TYPES[proposedType].has(existing['type']);
   }
 
-  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
-  private _isTypeConsistent(arr: object[]): boolean
-  {
-    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
-  }
-
-  private _isTypeConsistentHelper(arr: object[]): string
-  {
-    if (arr.length === 0)
-    {
-      return 'null';
-    }
-    const types: Set<string> = new Set();
-    arr.forEach((obj) =>
-    {
-      types.add(this._getType(obj));
-    });
-    if (types.size > 1)
-    {
-      types.delete('null');
-    }
-    if (types.size !== 1)
-    {
-      return 'inconsistent';
-    }
-    const type: string = types.entries().next().value[0];
-    if (type === 'array')
-    {
-      const innerTypes: Set<string> = new Set();
-      arr.forEach((obj) =>
-      {
-        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
-      });
-      if (innerTypes.size > 1)
-      {
-        innerTypes.delete('null');
-      }
-      if (innerTypes.size !== 1)
-      {
-        return 'inconsistent';
-      }
-      return innerTypes.entries().next().value[0];
-    }
-    return type;
-  }
-
   /* manually checks types (rather than checking hashes) ; handles arrays recursively */
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
-    const thisType: string = this._getType(item);
+    const thisType: string = SharedUtil.getType(item);
     if (thisType === 'null')
     {
       return true;
@@ -1500,12 +1430,12 @@ export class Import
   /* returns an error message if there are any; else returns empty string */
   private _verifyConfig(imprt: ImportConfig): string
   {
-    const indexError: string = SharedUtil.isValidIndexName(imprt.dbname);
+    const indexError: string = SharedElasticUtil.isValidIndexName(imprt.dbname);
     if (indexError !== '')
     {
       return indexError;
     }
-    const typeError: string = SharedUtil.isValidTypeName(imprt.tablename);
+    const typeError: string = SharedElasticUtil.isValidTypeName(imprt.tablename);
     if (typeError !== '')
     {
       return typeError;
@@ -1536,7 +1466,7 @@ export class Import
     let fieldError: string;
     for (const colName of columnList)
     {
-      fieldError = SharedUtil.isValidFieldName(colName);
+      fieldError = SharedElasticUtil.isValidFieldName(colName);
       if (fieldError !== '')
       {
         return fieldError;
